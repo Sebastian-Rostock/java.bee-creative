@@ -245,7 +245,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _capacity_() {
+	protected int customCapacity() {
 		return this._array_.length;
 	}
 

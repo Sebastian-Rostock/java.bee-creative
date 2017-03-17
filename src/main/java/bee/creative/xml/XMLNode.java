@@ -25,7 +25,7 @@ public final class XMLNode extends BaseNodeData<XMLNode> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected final XMLNode _this_() {
+	protected final XMLNode customThis() {
 		return this;
 	}
 

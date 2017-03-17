@@ -30,7 +30,7 @@ public final class XMLParser {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SourceData _this_() {
+		protected final SourceData customThis() {
 			return this;
 		}
 
@@ -52,7 +52,7 @@ public final class XMLParser {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final BuilderData _this_() {
+		protected final BuilderData customThis() {
 			return this;
 		}
 
@@ -61,10 +61,10 @@ public final class XMLParser {
 	{}
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final SourceData _sourceData_ = new SourceData();
+	final SourceData sourceData = new SourceData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openBuilderData()}. */
-	final BuilderData _builderData_ = new BuilderData();
+	final BuilderData builderData = new BuilderData();
 
 	{}
 
@@ -74,8 +74,8 @@ public final class XMLParser {
 	 * @return {@code this}. */
 	public final XMLParser use(final XMLParser data) {
 		if (data == null) return this;
-		this._sourceData_.use(data._sourceData_);
-		this._builderData_.use(data._builderData_);
+		this.sourceData.use(data.sourceData);
+		this.builderData.use(data.builderData);
 		return this;
 	}
 
@@ -86,8 +86,8 @@ public final class XMLParser {
 	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst. */
 	public final Document parse() throws IOException, SAXException, ParserConfigurationException {
-		final InputSource source = this._sourceData_.getInputSource();
-		final DocumentBuilder builder = this._builderData_.getBuilder();
+		final InputSource source = this.sourceData.getInputSource();
+		final DocumentBuilder builder = this.builderData.getBuilder();
 		final Document result = builder.parse(source);
 		return result;
 	}
@@ -98,7 +98,7 @@ public final class XMLParser {
 	 * @throws SAXException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilder#newDocument()} eine entsprechende Ausnahme auslöst. */
 	public final Document create() throws SAXException, ParserConfigurationException {
-		final DocumentBuilder builder = this._builderData_.getBuilder();
+		final DocumentBuilder builder = this.builderData.getBuilder();
 		final Document result = builder.newDocument();
 		return result;
 	}
@@ -108,14 +108,14 @@ public final class XMLParser {
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @return Konfigurator. */
 	public final SourceData openSourceData() {
-		return this._sourceData_;
+		return this.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link DocumentBuilder} zurück.
 	 *
 	 * @return Konfigurator. */
 	public final BuilderData openBuilderData() {
-		return this._builderData_;
+		return this.builderData;
 	}
 
 	{}
@@ -123,7 +123,7 @@ public final class XMLParser {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._sourceData_, this._builderData_);
+		return Objects.toInvokeString(this, this.sourceData, this.builderData);
 	}
 
 }

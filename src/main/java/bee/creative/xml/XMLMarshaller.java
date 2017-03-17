@@ -37,7 +37,7 @@ public final class XMLMarshaller {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SourceData _this_() {
+		protected final SourceData customThis() {
 			return this;
 		}
 
@@ -60,7 +60,7 @@ public final class XMLMarshaller {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final ResultData _this_() {
+		protected final ResultData customThis() {
 			return this;
 		}
 
@@ -82,7 +82,7 @@ public final class XMLMarshaller {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final MarshallerData _this_() {
+		protected final MarshallerData customThis() {
 			return this;
 		}
 
@@ -104,13 +104,13 @@ public final class XMLMarshaller {
 	{}
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final SourceData _sourceData_ = new SourceData();
+	final SourceData sourceData = new SourceData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openResultData()}. */
-	final ResultData _resultData_ = new ResultData();
+	final ResultData resultData = new ResultData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openMarshallerData()}. */
-	final MarshallerData _marshallerData_ = new MarshallerData();
+	final MarshallerData marshallerData = new MarshallerData();
 
 	{}
 
@@ -120,9 +120,9 @@ public final class XMLMarshaller {
 	 * @return {@code this}. */
 	public final XMLMarshaller use(final XMLMarshaller data) {
 		if (data == null) return this;
-		this._sourceData_.use(data._sourceData_);
-		this._resultData_.use(data._resultData_);
-		this._marshallerData_.use(data._marshallerData_);
+		this.sourceData.use(data.sourceData);
+		this.resultData.use(data.resultData);
+		this.marshallerData.use(data.marshallerData);
 		return this;
 	}
 
@@ -135,10 +135,10 @@ public final class XMLMarshaller {
 	 * @throws SAXException Wenn {@link MarshallerData#getMarshaller()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link Marshaller#marshal(Object, Result)} eine entsprechende Ausnahme auslöst. */
 	public final XMLMarshaller marshal() throws SAXException, JAXBException {
-		final Marshaller marshaller = this._marshallerData_.getMarshaller();
+		final Marshaller marshaller = this.marshallerData.getMarshaller();
 		synchronized (marshaller) {
-			final Object source = this._sourceData_.get();
-			final Result result = this._resultData_.getResult();
+			final Object source = this.sourceData.get();
+			final Result result = this.resultData.getResult();
 			marshaller.marshal(source, result);
 		}
 		return this;
@@ -178,7 +178,7 @@ public final class XMLMarshaller {
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return Konfigurator. */
 	public final SourceData openSourceData() {
-		return this._sourceData_;
+		return this.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabedaten und gibt ihn zurück.
@@ -186,14 +186,14 @@ public final class XMLMarshaller {
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return Konfigurator. */
 	public final ResultData openResultData() {
-		return this._resultData_;
+		return this.resultData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Marshaller} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
 	public final MarshallerData openMarshallerData() {
-		return this._marshallerData_;
+		return this.marshallerData;
 	}
 
 	{}
@@ -201,7 +201,7 @@ public final class XMLMarshaller {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._sourceData_, this._resultData_, this._marshallerData_);
+		return Objects.toInvokeString(this, this.sourceData, this.resultData, this.marshallerData);
 	}
 
 }

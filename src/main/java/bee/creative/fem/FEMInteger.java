@@ -66,13 +66,13 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	{}
 
 	/** Dieses Feld speichert die interne Darstellung der Dezimalzahl. */
-	final long _value_;
+	final long value;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung der Dezimalzahl.
 	 *
 	 * @param value interne Darstellung der Dezimalzahl. */
 	public FEMInteger(final long value) {
-		this._value_ = value;
+		this.value = value;
 	}
 
 	{}
@@ -81,14 +81,14 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	 *
 	 * @return interne Darstellung der Dezimalzahl. */
 	public final long value() {
-		return this._value_;
+		return this.value;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		final long value = this._value_;
+		final long value = this.value;
 		return (int)(value >>> 0) ^ (int)(value >>> 32);
 	}
 
@@ -98,7 +98,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMInteger that) throws NullPointerException {
-		return this._value_ == that._value_;
+		return this.value == that.value;
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Dezimalzahl kleiner, gleich oder größer als die gegebene Dezimalzahl ist.
@@ -107,14 +107,14 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMInteger that) throws NullPointerException {
-		return Comparators.compare(this._value_, that._value_);
+		return Comparators.compare(this.value, that.value);
 	}
 
 	/** Diese Methode gibt diese Dezimalzahl als {@link Number} zurück.
 	 *
 	 * @return {@link Number}. */
 	public final Number toNumber() {
-		return new Long(this._value_);
+		return new Long(this.value);
 	}
 
 	{}
@@ -173,7 +173,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		return Long.toString(this._value_);
+		return Long.toString(this.value);
 	}
 
 }

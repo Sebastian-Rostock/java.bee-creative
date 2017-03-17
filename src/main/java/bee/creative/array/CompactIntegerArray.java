@@ -245,7 +245,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _capacity_() {
+	protected int customCapacity() {
 		return this._array_.length;
 	}
 

@@ -106,7 +106,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public static final FEMDatetime MAXIMUM = FEMDatetime.fromDate(9999, 12, 31).withTime(24, 0, 0, 0).withZone(-14, 0);
 
 	@SuppressWarnings ("javadoc")
-	static final FEMDatetime _utcbase_ = FEMDatetime.EMPTY.withDate(1970, 1, 1).withTime(0).withZone(0).withZone(TimeZone.getDefault().getRawOffset() / 60000);
+	static final FEMDatetime utcbase = FEMDatetime.EMPTY.withDate(1970, 1, 1).withTime(0).withZone(0).withZone(TimeZone.getDefault().getRawOffset() / 60000);
 
 	{}
 
@@ -125,7 +125,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
 	public static FEMDatetime from(final long millis) throws IllegalArgumentException {
-		return FEMDatetime._utcbase_._moveTime_(millis);
+		return FEMDatetime.utcbase.moveTimeImpl(millis);
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit den in der gegebenen Zeitangabe kodierten Komponenten zurück.<br>
@@ -146,90 +146,93 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 			case 0: //
 				return FEMDatetime.EMPTY;
 			case 1: // Z
-				return FEMDatetime._fromZ1_(FEMDatetime.EMPTY, buffer, 0);
+				return FEMDatetime.fromZ1(FEMDatetime.EMPTY, buffer, 0);
 			case 6: // +00:01
-				return FEMDatetime._fromZ6_(FEMDatetime.EMPTY, buffer, 0);
+				return FEMDatetime.fromZ6(FEMDatetime.EMPTY, buffer, 0);
 			case 8: // 00:00:01
-				return FEMDatetime._fromT8_(FEMDatetime.EMPTY, buffer, 0);
+				return FEMDatetime.fromT8(FEMDatetime.EMPTY, buffer, 0);
 			case 9: // 00:00:01Z
-				return FEMDatetime._fromZ1_(FEMDatetime._fromT8_(FEMDatetime.EMPTY, buffer, 0), buffer, 8);
+				return FEMDatetime.fromZ1(FEMDatetime.fromT8(FEMDatetime.EMPTY, buffer, 0), buffer, 8);
 			case 10: // 1582-10-16
-				return FEMDatetime._fromD10_(FEMDatetime.EMPTY, buffer, 0);
+				return FEMDatetime.fromD10(FEMDatetime.EMPTY, buffer, 0);
 			case 11: // 1582-10-16Z
-				return FEMDatetime._fromZ1_(FEMDatetime._fromD10_(FEMDatetime.EMPTY, buffer, 0), buffer, 10);
+				return FEMDatetime.fromZ1(FEMDatetime.fromD10(FEMDatetime.EMPTY, buffer, 0), buffer, 10);
 			case 12: // 00:00:00.001
-				return FEMDatetime._fromT12_(FEMDatetime.EMPTY, buffer, 0);
+				return FEMDatetime.fromT12(FEMDatetime.EMPTY, buffer, 0);
 			case 13: // 00:00:00.001Z
-				return FEMDatetime._fromZ1_(FEMDatetime._fromT12_(FEMDatetime.EMPTY, buffer, 0), buffer, 12);
+				return FEMDatetime.fromZ1(FEMDatetime.fromT12(FEMDatetime.EMPTY, buffer, 0), buffer, 12);
 			case 14: // 00:00:01+00:01
-				return FEMDatetime._fromZ6_(FEMDatetime._fromT8_(FEMDatetime.EMPTY, buffer, 0), buffer, 8);
+				return FEMDatetime.fromZ6(FEMDatetime.fromT8(FEMDatetime.EMPTY, buffer, 0), buffer, 8);
 			case 16: // 1582-10-16+00:01
-				return FEMDatetime._fromZ6_(FEMDatetime._fromD10_(FEMDatetime.EMPTY, buffer, 0), buffer, 10);
+				return FEMDatetime.fromZ6(FEMDatetime.fromD10(FEMDatetime.EMPTY, buffer, 0), buffer, 10);
 			case 18: // 00:00:00.001+00:01
-				return FEMDatetime._fromZ6_(FEMDatetime._fromT12_(FEMDatetime.EMPTY, buffer, 0), buffer, 12);
+				return FEMDatetime.fromZ6(FEMDatetime.fromT12(FEMDatetime.EMPTY, buffer, 0), buffer, 12);
 			case 19: // 1582-10-16T00:00:01
-				return FEMDatetime._fromT8_(FEMDatetime._fromD11_(FEMDatetime.EMPTY, buffer, 0), buffer, 11);
+				return FEMDatetime.fromT8(FEMDatetime.fromD11(FEMDatetime.EMPTY, buffer, 0), buffer, 11);
+			case 20: // 1582-10-16T00:00:00Z
+				return FEMDatetime.fromZ1(FEMDatetime.fromT8(FEMDatetime.fromD11(FEMDatetime.EMPTY, buffer, 0), buffer, 11), buffer, 19);
 			case 23: // 1582-10-16T00:00:00.001
-				return FEMDatetime._fromT12_(FEMDatetime._fromD11_(FEMDatetime.EMPTY, buffer, 0), buffer, 11);
+				return FEMDatetime.fromT12(FEMDatetime.fromD11(FEMDatetime.EMPTY, buffer, 0), buffer, 11);
 			case 24: // 1582-10-16T00:00:00.001Z
-				return FEMDatetime._fromZ1_(FEMDatetime._fromT12_(FEMDatetime._fromD11_(FEMDatetime.EMPTY, buffer, 0), buffer, 11), buffer, 23);
+				return FEMDatetime.fromZ1(FEMDatetime.fromT12(FEMDatetime.fromD11(FEMDatetime.EMPTY, buffer, 0), buffer, 11), buffer, 23);
+			case 25: // 1582-10-16T00:00:00+00:01
+				return FEMDatetime.fromZ6(FEMDatetime.fromT8(FEMDatetime.fromD11(FEMDatetime.EMPTY, buffer, 0), buffer, 11), buffer, 19);
 			case 29: // 1582-10-16T00:00:00.001+00:01
-				return FEMDatetime._fromZ6_(FEMDatetime._fromT12_(FEMDatetime._fromD11_(FEMDatetime.EMPTY, buffer, 0), buffer, 11), buffer, 23);
+				return FEMDatetime.fromZ6(FEMDatetime.fromT12(FEMDatetime.fromD11(FEMDatetime.EMPTY, buffer, 0), buffer, 11), buffer, 23);
 			default:
 				throw new IllegalArgumentException();
 		}
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int _fromI2_(final char[] buffer, final int offset) {
+	static int fromI2(final char[] buffer, final int offset) {
 		if (Integers.integerSize(buffer, offset, 2) != 2) throw new IllegalArgumentException();
 		return Integers.parseInt(buffer, offset, 2);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static FEMDatetime _fromZ1_(final FEMDatetime result, final char[] buffer, final int offset) {
+	static FEMDatetime fromZ1(final FEMDatetime result, final char[] buffer, final int offset) {
 		if (buffer[offset] != 'Z') throw new IllegalArgumentException();
 		return result.withZone(0);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static FEMDatetime _fromZ6_(final FEMDatetime result, final char[] buffer, final int offset) {
+	static FEMDatetime fromZ6(final FEMDatetime result, final char[] buffer, final int offset) {
 		if (buffer[offset + 3] != ':') throw new IllegalArgumentException();
-		final int sign = buffer[offset], hour = FEMDatetime._fromI2_(buffer, offset + 1), minute = FEMDatetime._fromI2_(buffer, offset + 4);
+		final int sign = buffer[offset], hour = FEMDatetime.fromI2(buffer, offset + 1), minute = FEMDatetime.fromI2(buffer, offset + 4);
 		if (sign == '-') return result.withZone(-hour, minute);
 		if (sign == '+') return result.withZone(+hour, minute);
 		throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static FEMDatetime _fromT8_(final FEMDatetime result, final char[] buffer, final int offset) {
+	static FEMDatetime fromT8(final FEMDatetime result, final char[] buffer, final int offset) {
 		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':')) throw new IllegalArgumentException();
-		final int hour = FEMDatetime._fromI2_(buffer, offset + 0), minute = FEMDatetime._fromI2_(buffer, offset + 3),
-			second = FEMDatetime._fromI2_(buffer, offset + 6);
+		final int hour = FEMDatetime.fromI2(buffer, offset + 0), minute = FEMDatetime.fromI2(buffer, offset + 3), second = FEMDatetime.fromI2(buffer, offset + 6);
 		return result.withTime(hour, minute, second, 0);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static FEMDatetime _fromT12_(final FEMDatetime result, final char[] buffer, final int offset) {
+	static FEMDatetime fromT12(final FEMDatetime result, final char[] buffer, final int offset) {
 		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.')) throw new IllegalArgumentException();
 		if (Integers.integerSize(buffer, offset + 9, 3) != 3) throw new IllegalArgumentException();
-		final int hour = FEMDatetime._fromI2_(buffer, offset + 0), minute = FEMDatetime._fromI2_(buffer, offset + 3),
-			second = FEMDatetime._fromI2_(buffer, offset + 6), millisecond = Integers.parseInt(buffer, offset + 9, 3);
+		final int hour = FEMDatetime.fromI2(buffer, offset + 0), minute = FEMDatetime.fromI2(buffer, offset + 3), second = FEMDatetime.fromI2(buffer, offset + 6),
+			millisecond = Integers.parseInt(buffer, offset + 9, 3);
 		return result.withTime(hour, minute, second, millisecond);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static FEMDatetime _fromD10_(final FEMDatetime result, final char[] buffer, final int offset) {
+	static FEMDatetime fromD10(final FEMDatetime result, final char[] buffer, final int offset) {
 		if ((buffer[offset + 4] != '-') || (buffer[offset + 7] != '-')) throw new IllegalArgumentException();
 		if (Integers.integerSize(buffer, offset, 4) != 4) throw new IllegalArgumentException();
-		final int year = Integers.parseInt(buffer, offset, 4), month = FEMDatetime._fromI2_(buffer, offset + 5), date = FEMDatetime._fromI2_(buffer, offset + 8);
+		final int year = Integers.parseInt(buffer, offset, 4), month = FEMDatetime.fromI2(buffer, offset + 5), date = FEMDatetime.fromI2(buffer, offset + 8);
 		return result.withDate(year, month, date);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static FEMDatetime _fromD11_(final FEMDatetime result, final char[] buffer, final int offset) {
+	static FEMDatetime fromD11(final FEMDatetime result, final char[] buffer, final int offset) {
 		if (buffer[offset + 10] != 'T') throw new IllegalArgumentException();
-		return FEMDatetime._fromD10_(result, buffer, offset);
+		return FEMDatetime.fromD10(result, buffer, offset);
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit dem Datum, der Uhrzeit und der Zeitzone des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
@@ -307,25 +310,25 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void _checkDate_(final int calendarday) throws IllegalArgumentException {
+	static void checkDate(final int calendarday) throws IllegalArgumentException {
 		if ((calendarday < 0) || (calendarday > 3074323)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void _checkDate_(final int year, final int month, final int date) throws IllegalArgumentException {
+	static void checkDate(final int year, final int month, final int date) throws IllegalArgumentException {
 		if (year != 1582) {
-			FEMDatetime._checkYear_(year);
+			FEMDatetime.checkYear(year);
 			if ((month < 1) || (month > 12)) throw new IllegalArgumentException();
 			if (date < 1) throw new IllegalArgumentException();
 		} else if (month != 10) {
 			if ((month < 10) || (month > 12)) throw new IllegalArgumentException();
 			if (date < 1) throw new IllegalArgumentException();
 		} else if (date < 15) throw new IllegalArgumentException();
-		if (date > FEMDatetime._lengthOf_(month, year)) throw new IllegalArgumentException();
+		if (date > FEMDatetime.lengthOfImpl(month, year)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void _checkTime_(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
+	static void checkTime(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
 		if (hour == 24) {
 			if (minute != 0) throw new IllegalArgumentException();
 			if (second != 0) throw new IllegalArgumentException();
@@ -339,17 +342,17 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void _checkYear_(final int year) throws IllegalArgumentException {
+	static void checkYear(final int year) throws IllegalArgumentException {
 		if ((year < 1582) || (year > 9999)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void _checkZero_(final int data, final int ignore) {
+	static void checkZero(final int data, final int ignore) {
 		if ((data & ~ignore) != 0) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void _checkZone_(final int zone) throws IllegalArgumentException {
+	static void checkZone(final int zone) throws IllegalArgumentException {
 		if ((zone < -840) || (zone > 840)) throw new IllegalArgumentException();
 	}
 
@@ -381,12 +384,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return {@code true} bei einem Schaltjahr.
 	 * @throws IllegalArgumentException Wenn {@code year} ungültig ist. */
 	public static boolean leapOf(final int year) throws IllegalArgumentException {
-		FEMDatetime._checkYear_(year);
-		return FEMDatetime._leapOf_(year);
+		FEMDatetime.checkYear(year);
+		return FEMDatetime.leapOfImpl(year);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static boolean _leapOf_(final int year) {
+	static boolean leapOfImpl(final int year) {
 		final int div = year / 100, mod = year % 100;
 		return ((mod != 0 ? mod : div) & 3) == 0;
 	}
@@ -402,10 +405,10 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 *
 	 * @param calendarday Kalendertag.
 	 * @return Jahr, Monat und Tag. */
-	static int _dateOf_(final int calendarday) {
+	static int dateOf(final int calendarday) {
 		final int months = (int)(((calendarday + 139824) * 400 * 12L) / 146097);
 		final int div = months / 12, mod = months % 12;
-		int year = div + 1200, month = mod + 1, date = (calendarday - FEMDatetime._calendardayOf_(year, month, 1)) + 1;
+		int year = div + 1200, month = mod + 1, date = (calendarday - FEMDatetime.calendardayOfImpl(year, month, 1)) + 1;
 		if (date <= 0) {
 			if (month == 1) {
 				year--;
@@ -413,7 +416,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 			} else {
 				month--;
 			}
-			date += FEMDatetime._lengthOf_(month, year);
+			date += FEMDatetime.lengthOfImpl(month, year);
 		}
 		return (year << 10) | (month << 5) | (date << 0);
 	}
@@ -429,12 +432,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public static int lengthOf(final int month, final int year) throws IllegalArgumentException {
 		if (year != 1582) return FEMDatetime.lengthOf(month, FEMDatetime.leapOf(year));
 		if ((month < 10) || (month > 12)) throw new IllegalArgumentException();
-		return FEMDatetime._lengthOf_(month, FEMDatetime.leapOf(year));
+		return FEMDatetime.lengthOfImpl(month, FEMDatetime.leapOf(year));
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int _lengthOf_(final int month, final int year) {
-		return FEMDatetime._lengthOf_(month, FEMDatetime._leapOf_(year));
+	static int lengthOfImpl(final int month, final int year) {
+		return FEMDatetime.lengthOfImpl(month, FEMDatetime.leapOfImpl(year));
 	}
 
 	/** Diese Methode gibt die Länge des gegebenen Monats zurück, d.h. die Anzahl der Tage im Monat.
@@ -446,11 +449,11 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalArgumentException Wenn {@code month} ungültig ist. */
 	public static int lengthOf(final int month, final boolean leap) throws IllegalArgumentException {
 		if ((month < 1) || (month > 12)) throw new IllegalArgumentException();
-		return FEMDatetime._lengthOf_(month, leap);
+		return FEMDatetime.lengthOfImpl(month, leap);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int _lengthOf_(final int month, final boolean isLeap) {
+	static int lengthOfImpl(final int month, final boolean isLeap) {
 		return 28 + (((isLeap ? 62648028 : 62648012) >> (month << 1)) & 3);
 	}
 
@@ -461,16 +464,16 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Jahrestag ({@code 1..366}).
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist. */
 	public static int yeardayOf(final int calendarday) throws IllegalArgumentException {
-		FEMDatetime._checkDate_(calendarday);
-		return FEMDatetime._yeardayOf_(calendarday);
+		FEMDatetime.checkDate(calendarday);
+		return FEMDatetime.yeardayOfImpl(calendarday);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int _yeardayOf_(final int calendarday) {
+	static int yeardayOfImpl(final int calendarday) {
 		final int year = (((calendarday + 139810) * 400) / 146097) + 1200;
-		final int result = (calendarday - FEMDatetime._calendardayOf_(year, 1, 1)) + 1;
-		if (result == 0) return FEMDatetime._leapOf_(year - 1) ? 366 : 365;
-		if (result == 366) return FEMDatetime._leapOf_(year) ? 366 : 1;
+		final int result = (calendarday - FEMDatetime.calendardayOfImpl(year, 1, 1)) + 1;
+		if (result == 0) return FEMDatetime.leapOfImpl(year - 1) ? 366 : 365;
+		if (result == 366) return FEMDatetime.leapOfImpl(year) ? 366 : 1;
 		return result;
 	}
 
@@ -481,12 +484,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Wochentag ({@code 1..7}).
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist. */
 	public static int weekdayOf(final int calendarday) throws IllegalArgumentException {
-		FEMDatetime._checkDate_(calendarday);
-		return FEMDatetime._weekdayOf_(calendarday);
+		FEMDatetime.checkDate(calendarday);
+		return FEMDatetime.weekdayOfImpl(calendarday);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int _weekdayOf_(final int calendarday) {
+	static int weekdayOfImpl(final int calendarday) {
 		return ((calendarday + 5) % 7) + 1;
 	}
 
@@ -499,12 +502,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Anzahl der Millisekunden zwischen {@code 00:00:00.000} und der gegebenen Uhrzeit ({@code 0..86400000}).
 	 * @throws IllegalArgumentException Wenn die gegebene Uhrzeit ungültig ist. */
 	public static int daymillisOf(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
-		FEMDatetime._checkTime_(hour, minute, second, millisecond);
-		return FEMDatetime._daymillisOf_(hour, minute, second, millisecond);
+		FEMDatetime.checkTime(hour, minute, second, millisecond);
+		return FEMDatetime.daymillisOfImpl(hour, minute, second, millisecond);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int _daymillisOf_(final int hour, final int minute, final int second, final int millisecond) {
+	static int daymillisOfImpl(final int hour, final int minute, final int second, final int millisecond) {
 		return (hour * 3600000) + (minute * 60000) + (second * 1000) + millisecond;
 	}
 
@@ -516,12 +519,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Anzahl der Tage zwischen dem {@code 15.10.1582} und dem gegebenen Datum ({@code 0..3074323}).
 	 * @throws IllegalArgumentException Wenn das gegebene Datum ungültig ist. */
 	public static int calendardayOf(final int year, final int month, final int date) throws IllegalArgumentException {
-		FEMDatetime._checkDate_(year, month, date);
-		return FEMDatetime._calendardayOf_(year, month, date);
+		FEMDatetime.checkDate(year, month, date);
+		return FEMDatetime.calendardayOfImpl(year, month, date);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int _calendardayOf_(final int year, final int month, final int date) {
+	static int calendardayOfImpl(final int year, final int month, final int date) {
 		final int year2 = (year - ((7 >> month) & 1)) >> 2, year3 = year2 / 25, month2 = month << 1;
 		final int month3 = (month * 29) + ((59630432 >> month2) & 3) + ((266948608 >> month2) & 12);
 		return ((((year * 365) + year2) - year3) + (year3 >> 2) + month3 + date) - 578130;
@@ -540,7 +543,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>millisecondValue - 10 Bit</li>
 	 * </ul>
 	*/
-	final int _valueL_;
+	final int valueL;
 
 	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitangabe.
 	 * <p>
@@ -554,7 +557,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>hasTime - 1 Bit</li>
 	 * </ul>
 	*/
-	final int _valueH_;
+	final int valueH;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung.
 	 *
@@ -564,28 +567,28 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public FEMDatetime(final long value) throws IllegalArgumentException {
 		this((int)(value >> 32), (int)(value >> 0));
 		if (this.hasDate()) {
-			FEMDatetime._checkDate_(this._yearValue_(), this._monthValue_(), this._dateValue_());
+			FEMDatetime.checkDate(this.yearValueImpl(), this.monthValueImpl(), this.dateValueImpl());
 		} else {
-			FEMDatetime._checkZero_(this._valueH_, 0x3FFD);
-			FEMDatetime._checkZero_(this._valueL_, 0xFFF07FFF);
+			FEMDatetime.checkZero(this.valueH, 0x3FFD);
+			FEMDatetime.checkZero(this.valueL, 0xFFF07FFF);
 		}
 		if (this.hasTime()) {
-			FEMDatetime._checkTime_(this._hourValue_(), this._minuteValue_(), this._secondValue_(), this._millisecondValue_());
+			FEMDatetime.checkTime(this.hourValueImpl(), this.minuteValueImpl(), this.secondValueImpl(), this.millisecondValueImpl());
 		} else {
-			FEMDatetime._checkZero_(this._valueH_, 0xFFFFC002);
-			FEMDatetime._checkZero_(this._valueL_, 0xFFFF8000);
+			FEMDatetime.checkZero(this.valueH, 0xFFFFC002);
+			FEMDatetime.checkZero(this.valueL, 0xFFFF8000);
 		}
 		if (this.hasZone()) {
-			FEMDatetime._checkZone_(this._zoneValue_());
+			FEMDatetime.checkZone(this.zoneValueImpl());
 		} else {
-			FEMDatetime._checkZero_(this._zoneValue_(), 0);
+			FEMDatetime.checkZero(this.zoneValueImpl(), 0);
 		}
 	}
 
 	@SuppressWarnings ("javadoc")
 	FEMDatetime(final int valueH, final int valueL) {
-		this._valueH_ = valueH;
-		this._valueL_ = valueL;
+		this.valueH = valueH;
+		this.valueL = valueL;
 	}
 
 	{}
@@ -609,7 +612,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 *
 	 * @return interne Darstellung der Zeitangabe. */
 	public final long value() {
-		return (((long)this._valueH_) << 32) | (((long)this._valueL_) << 0);
+		return (((long)this.valueH) << 32) | (((long)this.valueL) << 0);
 	}
 
 	/** Diese Methode gibt das Jahr zurück.
@@ -618,12 +621,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int yearValue() throws IllegalStateException {
 		if (!this.hasDate()) throw new IllegalStateException();
-		return this._yearValue_();
+		return this.yearValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _yearValue_() {
-		return (this._valueH_ >> 18) & 0x3FFF;
+	final int yearValueImpl() {
+		return (this.valueH >> 18) & 0x3FFF;
 	}
 
 	/** Diese Methode gibt den Tag zurück.
@@ -632,12 +635,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int dateValue() throws IllegalStateException {
 		if (!this.hasDate()) throw new IllegalStateException();
-		return this._dateValue_();
+		return this.dateValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _dateValue_() {
-		return (this._valueL_ >> 15) & 0x1F;
+	final int dateValueImpl() {
+		return (this.valueL >> 15) & 0x1F;
 	}
 
 	/** Diese Methode gibt den Monat zurück.
@@ -646,12 +649,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int monthValue() throws IllegalStateException {
 		if (!this.hasDate()) throw new IllegalStateException();
-		return this._monthValue_();
+		return this.monthValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _monthValue_() {
-		return (this._valueH_ >> 14) & 0x0F;
+	final int monthValueImpl() {
+		return (this.valueH >> 14) & 0x0F;
 	}
 
 	/** Diese Methode gibt die Stunde zurück.
@@ -660,12 +663,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasTime() keine Uhrzeit} besitzt. */
 	public final int hourValue() throws IllegalStateException {
 		if (!this.hasTime()) throw new IllegalStateException();
-		return this._hourValue_();
+		return this.hourValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _hourValue_() {
-		return (this._valueL_ >> 10) & 0x1F;
+	final int hourValueImpl() {
+		return (this.valueL >> 10) & 0x1F;
 	}
 
 	/** Diese Methode gibt die Minute zurück.
@@ -674,12 +677,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasTime() keine Uhrzeit} besitzt. */
 	public final int minuteValue() throws IllegalStateException {
 		if (!this.hasTime()) throw new IllegalStateException();
-		return this._minuteValue_();
+		return this.minuteValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _minuteValue_() {
-		return (this._valueH_ >> 8) & 0x3F;
+	final int minuteValueImpl() {
+		return (this.valueH >> 8) & 0x3F;
 	}
 
 	/** Diese Methode gibt die Sekunde zurück.
@@ -688,12 +691,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasTime() keine Uhrzeit} besitzt. */
 	public final int secondValue() throws IllegalStateException {
 		if (!this.hasTime()) throw new IllegalStateException();
-		return this._secondValue_();
+		return this.secondValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _secondValue_() {
-		return (this._valueH_ >> 2) & 0x3F;
+	final int secondValueImpl() {
+		return (this.valueH >> 2) & 0x3F;
 	}
 
 	/** Diese Methode gibt die Millisekunde zurück.
@@ -702,12 +705,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasTime() keine Uhrzeit} besitzt. */
 	public final int millisecondValue() throws IllegalStateException {
 		if (!this.hasTime()) throw new IllegalStateException();
-		return this._millisecondValue_();
+		return this.millisecondValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _millisecondValue_() {
-		return (this._valueL_ >> 0) & 0x03FF;
+	final int millisecondValueImpl() {
+		return (this.valueL >> 0) & 0x03FF;
 	}
 
 	/** Diese Methode gibt die Zeitzonenverschiebung zur UTC in Minuten zurück.
@@ -716,33 +719,33 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() keine Zeitzone} besitzt. */
 	public final int zoneValue() throws IllegalStateException {
 		if (!this.hasZone()) throw new IllegalStateException();
-		return this._zoneValue_();
+		return this.zoneValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _zoneValue_() {
-		return ((this._valueL_ >> 20) & 0x07FF) - 1024;
+	final int zoneValueImpl() {
+		return ((this.valueL >> 20) & 0x07FF) - 1024;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe ein Datum besitzt.
 	 *
 	 * @return {@code true}, wenn diese Zeitangabe ein Datum besitzt. */
 	public final boolean hasDate() {
-		return (this._valueH_ & 0x02) != 0;
+		return (this.valueH & 0x02) != 0;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe eine Uhrzeit besitzt.
 	 *
 	 * @return {@code true}, wenn diese Zeitangabe eine Uhrzeit besitzt. */
 	public final boolean hasTime() {
-		return (this._valueH_ & 0x01) != 0;
+		return (this.valueH & 0x01) != 0;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe eine Zeitzone besitzt.
 	 *
 	 * @return {@code true}, wenn diese Zeitangabe eine Zeitzone besitzt. */
 	public final boolean hasZone() {
-		return (this._valueL_ & 0x80000000) != 0;
+		return (this.valueL & 0x80000000) != 0;
 	}
 
 	/** Diese Methode gibt den Jahrestag zurück.
@@ -751,7 +754,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Jahrestag ({@code 1..366}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int yeardayValue() throws IllegalStateException {
-		return FEMDatetime._yeardayOf_(this.calendardayValue());
+		return FEMDatetime.yeardayOfImpl(this.calendardayValue());
 	}
 
 	/** Diese Methode gibt den Wochentag zurück.
@@ -760,7 +763,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Wochentag ({@code 1..7}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int weekdayValue() throws IllegalStateException {
-		return FEMDatetime._weekdayOf_(this.calendardayValue());
+		return FEMDatetime.weekdayOfImpl(this.calendardayValue());
 	}
 
 	/** Diese Methode gibt die Tagesmillis zurück.
@@ -770,12 +773,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int daymillisValue() throws IllegalStateException {
 		if (!this.hasDate()) throw new IllegalStateException();
-		return this._daymillisValue_();
+		return this.daymillisValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _daymillisValue_() {
-		return FEMDatetime._daymillisOf_(this._hourValue_(), this._minuteValue_(), this._secondValue_(), this._millisecondValue_());
+	final int daymillisValueImpl() {
+		return FEMDatetime.daymillisOfImpl(this.hourValueImpl(), this.minuteValueImpl(), this.secondValueImpl(), this.millisecondValueImpl());
 	}
 
 	/** Diese Methode gibt den Kalendertag zurück.
@@ -785,12 +788,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int calendardayValue() throws IllegalStateException {
 		if (!this.hasDate()) throw new IllegalStateException();
-		return this._calendardayValue_();
+		return this.calendardayValueImpl();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final int _calendardayValue_() {
-		return FEMDatetime._calendardayOf_(this._yearValue_(), this._monthValue_(), this._dateValue_());
+	final int calendardayValueImpl() {
+		return FEMDatetime.calendardayOfImpl(this.yearValueImpl(), this.monthValueImpl(), this.dateValueImpl());
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit dem Datum zum gegebenen Kalendertag zurück.
@@ -801,9 +804,9 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return diese Zeitangabe mit Datum.
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist. */
 	public final FEMDatetime withDate(final int calendarday) throws IllegalArgumentException {
-		FEMDatetime._checkDate_(calendarday);
-		final int date = FEMDatetime._dateOf_(calendarday);
-		return this._withDate_((date >> 10) & 0x3FFF, (date >> 5) & 0x1F, (date >> 0) & 0x1F);
+		FEMDatetime.checkDate(calendarday);
+		final int date = FEMDatetime.dateOf(calendarday);
+		return this.withDateImpl((date >> 10) & 0x3FFF, (date >> 5) & 0x1F, (date >> 0) & 0x1F);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit dem gegebenen Datum zurück.
@@ -815,8 +818,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return diese Zeitangabe mit Datum.
 	 * @throws IllegalArgumentException Wenn das gegebene Datum ungültig ist. */
 	public final FEMDatetime withDate(final int year, final int month, final int date) throws IllegalArgumentException {
-		FEMDatetime._checkDate_(year, month, date);
-		return this._withDate_(year, month, date);
+		FEMDatetime.checkDate(year, month, date);
+		return this.withDateImpl(year, month, date);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit dem Datum des gegebenen {@link Calendar} zurück.<br>
@@ -842,14 +845,14 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
 	public final FEMDatetime withDate(final FEMDatetime datetime) throws NullPointerException {
 		if (!datetime.hasDate()) return this.withoutDate();
-		return this._withDate_(datetime._yearValue_(), datetime._monthValue_(), datetime._dateValue_());
+		return this.withDateImpl(datetime.yearValueImpl(), datetime.monthValueImpl(), datetime.dateValueImpl());
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime _withDate_(final int year, final int month, final int date) {
+	final FEMDatetime withDateImpl(final int year, final int month, final int date) {
 		return new FEMDatetime( //
-			(this._valueH_ & 0x3FFD) | (year << 18) | (month << 14) | (1 << 1), //
-			(this._valueL_ & 0xFFF07FFF) | (date << 15));
+			(this.valueH & 0x3FFD) | (year << 18) | (month << 14) | (1 << 1), //
+			(this.valueL & 0xFFF07FFF) | (date << 15));
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der Uhrzeit zu den gegebenen Tagesmillis zurück.
@@ -861,7 +864,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalArgumentException Wenn {@code daymillis} ungültig ist. */
 	public final FEMDatetime withTime(final int daymillis) throws IllegalArgumentException {
 		if ((daymillis < 0) || (daymillis > 86400000)) throw new IllegalArgumentException();
-		return this._withTime_(daymillis);
+		return this.withTimeImpl(daymillis);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der gegebenen Uhrzeit zurück.
@@ -874,8 +877,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitangabe mit Uhrzeit.
 	 * @throws IllegalArgumentException Wenn die gegebenen Uhrzei ungültig ist. */
 	public final FEMDatetime withTime(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
-		FEMDatetime._checkTime_(hour, minute, second, millisecond);
-		return this._withTime_(hour, minute, second, millisecond);
+		FEMDatetime.checkTime(hour, minute, second, millisecond);
+		return this.withTimeImpl(hour, minute, second, millisecond);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der Uhrzeit des gegebenen {@link Calendar} zurück.<br>
@@ -901,22 +904,22 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
 	public final FEMDatetime withTime(final FEMDatetime datetime) throws NullPointerException {
 		if (!datetime.hasTime()) return this.withoutTime();
-		return this._withTime_(datetime._hourValue_(), datetime._minuteValue_(), datetime._secondValue_(), datetime._millisecondValue_());
+		return this.withTimeImpl(datetime.hourValueImpl(), datetime.minuteValueImpl(), datetime.secondValueImpl(), datetime.millisecondValueImpl());
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime _withTime_(final int daymillis) {
+	final FEMDatetime withTimeImpl(final int daymillis) {
 		final int hour = daymillis / 3600000, hourmillis = daymillis % 3600000;
 		final int minute = hourmillis / 60000, minutemillis = hourmillis % 60000;
 		final int second = minutemillis / 1000, millisecond = minutemillis % 1000;
-		return this._withTime_(hour, minute, second, millisecond);
+		return this.withTimeImpl(hour, minute, second, millisecond);
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime _withTime_(final int hour, final int minute, final int second, final int millisecond) {
+	final FEMDatetime withTimeImpl(final int hour, final int minute, final int second, final int millisecond) {
 		return new FEMDatetime( //
-			(this._valueH_ & 0xFFFFC002) | (minute << 8) | (second << 2) | (1 << 0), //
-			(this._valueL_ & 0xFFFF8000) | (hour << 10) | (millisecond << 0));
+			(this.valueH & 0xFFFFC002) | (minute << 8) | (second << 2) | (1 << 0), //
+			(this.valueL & 0xFFFF8000) | (hour << 10) | (millisecond << 0));
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück.<br>
@@ -928,9 +931,9 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitangabe mit Zeitzone.
 	 * @throws IllegalArgumentException Wenn die gegebenen Zeitzone ungültig ist. */
 	public final FEMDatetime withZone(final int zone) throws IllegalArgumentException {
-		FEMDatetime._checkZone_(zone);
-		if (!this.hasZone()) return this._withZone_(zone);
-		return this.moveZone(0, zone - this._zoneValue_());
+		FEMDatetime.checkZone(zone);
+		if (!this.hasZone()) return this.withZoneImpl(zone);
+		return this.moveZone(0, zone - this.zoneValueImpl());
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück.<br>
@@ -949,8 +952,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 			if ((zoneMinute < 0) || (zoneMinute > 59)) throw new IllegalArgumentException();
 		}
 		final int zone = (zoneHour * 60) + (zoneHour < 0 ? -zoneMinute : zoneMinute);
-		if (!this.hasZone()) return this._withZone_(zone);
-		return this._moveZone_(zone - this._zoneValue_());
+		if (!this.hasZone()) return this.withZoneImpl(zone);
+		return this.moveZoneImpl(zone - this.zoneValueImpl());
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der Zeitzone des gegebenen {@link Calendar} zurück.<br>
@@ -978,14 +981,14 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
 	public final FEMDatetime withZone(final FEMDatetime datetime) throws NullPointerException {
 		if (!datetime.hasZone()) return this.withoutZone();
-		final int zone = datetime._zoneValue_();
-		if (!this.hasZone()) return this._withZone_(zone);
-		return this._moveZone_(zone - this._zoneValue_());
+		final int zone = datetime.zoneValueImpl();
+		if (!this.hasZone()) return this.withZoneImpl(zone);
+		return this.moveZoneImpl(zone - this.zoneValueImpl());
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime _withZone_(final int zone) {
-		return new FEMDatetime(this._valueH_, (this._valueL_ & 0xFFFFF) | (1 << 31) | ((zone + 1024) << 20));
+	final FEMDatetime withZoneImpl(final int zone) {
+		return new FEMDatetime(this.valueH, (this.valueL & 0xFFFFF) | (1 << 31) | ((zone + 1024) << 20));
 	}
 
 	/** Diese Methode gibt diese Zeitangabe ohne Datum zurück.
@@ -997,7 +1000,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitangabe ohne Datum. */
 	public final FEMDatetime withoutDate() {
 		if (!this.hasDate()) return this;
-		return new FEMDatetime(this._valueH_ & 0x3FFD, this._valueL_ & 0xFFF07FFF);
+		return new FEMDatetime(this.valueH & 0x3FFD, this.valueL & 0xFFF07FFF);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe ohne Uhrzeit zurück.
@@ -1009,7 +1012,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitangabe ohne Uhrzeit. */
 	public final FEMDatetime withoutTime() {
 		if (!this.hasTime()) return this;
-		return new FEMDatetime(this._valueH_ & 0xFFFFC002, this._valueL_ & 0xFFFF8000);
+		return new FEMDatetime(this.valueH & 0xFFFFC002, this.valueL & 0xFFFF8000);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe ohne Zeitzone zurück.
@@ -1021,7 +1024,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitangabe ohne Zeitzone. */
 	public final FEMDatetime withoutZone() {
 		if (!this.hasZone()) return this;
-		return new FEMDatetime(this._valueH_, (this._valueL_ & 0xFFFFF) | (1024 << 20));
+		return new FEMDatetime(this.valueH, (this.valueL & 0xFFFFF) | (1024 << 20));
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobenem Zeitpunkt zurück.<br>
@@ -1062,7 +1065,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		if ((years < -8417) || (years > 8417)) throw new IllegalArgumentException();
 		if ((months < -101015) || (months > 101015)) throw new IllegalArgumentException();
 		if ((days < -3074323) || (days > 3074323)) throw new IllegalArgumentException();
-		return this._moveDate_((years * 12) + months, days);
+		return this.moveDateImpl((years * 12) + months, days);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.
@@ -1080,13 +1083,13 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime _moveDate_(final int monthsAdd, final int daysAdd) throws IllegalArgumentException {
-		int value = ((12 * this._yearValue_()) + this._monthValue_() + monthsAdd) - 1;
+	final FEMDatetime moveDateImpl(final int monthsAdd, final int daysAdd) throws IllegalArgumentException {
+		int value = ((12 * this.yearValueImpl()) + this.monthValueImpl() + monthsAdd) - 1;
 		final int year = value / 12, month = (value % 12) + 1;
-		FEMDatetime._checkYear_(year);
-		value = this._dateValue_();
+		FEMDatetime.checkYear(year);
+		value = this.dateValueImpl();
 		final int length = FEMDatetime.lengthOf(month, year), date = value > length ? length : value;
-		value = FEMDatetime._calendardayOf_(year, month, date) + daysAdd;
+		value = FEMDatetime.calendardayOfImpl(year, month, date) + daysAdd;
 		return this.withDate(value);
 	}
 
@@ -1110,7 +1113,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		if (!this.hasTime()) throw new IllegalStateException();
 		if ((hours == 0) && (minutes == 0) && (seconds == 0) && (milliseconds == 0)) return this;
 		if ((hours < -73783776) || (hours > 73783775)) throw new IllegalArgumentException();
-		return this._moveTime_((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
+		return this.moveTimeImpl((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.<br>
@@ -1136,7 +1139,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		if ((minutes < -4427026560L) || (minutes > 4427026559L)) throw new IllegalArgumentException();
 		if ((seconds < -265621593600L) || (seconds > 265621593599L)) throw new IllegalArgumentException();
 		if ((milliseconds < -265621593600000L) || (milliseconds > 265621593599999L)) throw new IllegalArgumentException();
-		return this._moveTime_((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
+		return this.moveTimeImpl((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.
@@ -1154,14 +1157,14 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime _moveTime_(final long millisecondsAdd) {
-		final long value = this._daymillisValue_() + millisecondsAdd;
+	final FEMDatetime moveTimeImpl(final long millisecondsAdd) {
+		final long value = this.daymillisValueImpl() + millisecondsAdd;
 		int daysAdd = (int)(value / 86400000), daymillis = (int)(value % 86400000);
 		if (daymillis < 0) {
 			daysAdd--;
 			daymillis += 86400000;
 		}
-		return ((daysAdd != 0) && this.hasDate() ? this._moveDate_(0, daysAdd) : this)._withTime_(daymillis);
+		return ((daysAdd != 0) && this.hasDate() ? this.moveDateImpl(0, daysAdd) : this).withTimeImpl(daymillis);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobener Zeitzone zurück.<br>
@@ -1178,19 +1181,19 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		if ((hours == 0) && (minutes == 0)) return this;
 		if ((hours < -28) || (hours > 28)) throw new IllegalArgumentException();
 		if ((minutes < -1680) || (minutes > 1680)) throw new IllegalArgumentException();
-		return this._moveZone_((hours * 60) + minutes);
+		return this.moveZoneImpl((hours * 60) + minutes);
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime _moveZone_(final int zoneAdd) {
+	final FEMDatetime moveZoneImpl(final int zoneAdd) {
 		if (zoneAdd == 0) return this;
-		final int zoneNew = zoneAdd + this._zoneValue_();
-		FEMDatetime._checkZone_(zoneNew);
-		if (this.hasTime()) return this._moveTime_(zoneAdd * 60000)._withZone_(zoneNew);
-		if (!this.hasDate()) return this._withZone_(zoneNew);
+		final int zoneNew = zoneAdd + this.zoneValueImpl();
+		FEMDatetime.checkZone(zoneNew);
+		if (this.hasTime()) return this.moveTimeImpl(zoneAdd * 60000).withZoneImpl(zoneNew);
+		if (!this.hasDate()) return this.withZoneImpl(zoneNew);
 		final int daysAdd = (zoneAdd - 1439) / 1440;
-		if (daysAdd != 0) return this._moveDate_(0, daysAdd)._withZone_(zoneNew);
-		return this._withZone_(zoneNew);
+		if (daysAdd != 0) return this.moveDateImpl(0, daysAdd).withZoneImpl(zoneNew);
+		return this.withZoneImpl(zoneNew);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe normalisiert zurück.<br>
@@ -1199,15 +1202,15 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return normalisierte Zeitangabe. */
 	public final FEMDatetime normalize() {
 		if (!this.hasDate() || !this.hasTime()) return this;
-		if ((this._hourValue_() == 24) && (this._yearValue_() == 9999) && (this._monthValue_() == 12) && (this._dateValue_() == 31)) return this;
-		return this._moveDate_(0, 1)._withTime_(0, 0, 0, 0);
+		if ((this.hourValueImpl() == 24) && (this.yearValueImpl() == 9999) && (this.monthValueImpl() == 12) && (this.dateValueImpl() == 31)) return this;
+		return this.moveDateImpl(0, 1).withTimeImpl(0, 0, 0, 0);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		return this._valueH_ ^ this._valueL_;
+		return this.valueH ^ this.valueL;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe effektiv gleich der gegebenen ist.
@@ -1217,7 +1220,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMDatetime that) throws NullPointerException {
-		return ((this._valueL_ == that._valueL_) && (this._valueH_ == that._valueH_)) || (this.compare(that, 1) == 0);
+		return ((this.valueL == that.valueL) && (this.valueH == that.valueH)) || (this.compare(that, 1) == 0);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Zeitangabe früher, gleich bzw. später als die gegebene Zeitangabe ist. Wenn
@@ -1253,41 +1256,41 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		int result;
 		if (this.hasDate()) {
 			if (!that.hasDate()) return undefined;
-			result = this._calendardayValue_() - that._calendardayValue_();
+			result = this.calendardayValueImpl() - that.calendardayValueImpl();
 			if ((result < -2) || (result > 2)) return Comparators.compare(result, 0);
 			if (this.hasTime()) {
 				if (that.hasTime()) {
 					result *= 86400000;
-					result += (this._daymillisValue_() - that._daymillisValue_());
-					result += (this._zoneValue_() - that._zoneValue_()) * -60000;
+					result += (this.daymillisValueImpl() - that.daymillisValueImpl());
+					result += (this.zoneValueImpl() - that.zoneValueImpl()) * -60000;
 					return Comparators.compare(result, 0);
 				} else {
-					if (that._zoneValue_() > 0) {
+					if (that.zoneValueImpl() > 0) {
 						result++;
 					}
 					result *= 86400000;
-					result += this._daymillisValue_();
-					result += this._zoneValue_() * -60000;
+					result += this.daymillisValueImpl();
+					result += this.zoneValueImpl() * -60000;
 					if (result < 0) return -1;
 					if (result >= 86400000) return +1;
 					return undefined;
 				}
 			} else {
 				if (that.hasTime()) {
-					if (this._zoneValue_() > 0) {
+					if (this.zoneValueImpl() > 0) {
 						result--;
 					}
 					result *= 86400000;
-					result -= that._daymillisValue_();
-					result -= that._zoneValue_() * -60000;
+					result -= that.daymillisValueImpl();
+					result -= that.zoneValueImpl() * -60000;
 					if (result > 0) return +1;
 					if (result <= -86400000) return -1;
 					return undefined;
 				} else {
-					if (this._zoneValue_() > 0) {
+					if (this.zoneValueImpl() > 0) {
 						result--;
 					}
-					if (that._zoneValue_() > 0) {
+					if (that.zoneValueImpl() > 0) {
 						result++;
 					}
 					return Comparators.compare(result, 0);
@@ -1297,14 +1300,14 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 			if (that.hasDate()) return undefined;
 			if (this.hasTime()) {
 				if (!that.hasTime()) return undefined;
-				result = this._daymillisValue_() - that._daymillisValue_();
-				result += (this._zoneValue_() - that._zoneValue_()) * -60000;
+				result = this.daymillisValueImpl() - that.daymillisValueImpl();
+				result += (this.zoneValueImpl() - that.zoneValueImpl()) * -60000;
 				return Comparators.compare(result, 0);
 			} else {
 				if (that.hasTime()) return undefined;
 				if (this.hasZone()) {
 					if (!that.hasZone()) return undefined;
-					result = that._zoneValue_() - this._zoneValue_();
+					result = that.zoneValueImpl() - this.zoneValueImpl();
 					return Comparators.compare(result, 0);
 				} else {
 					if (that.hasZone()) return undefined;
@@ -1321,18 +1324,18 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		final GregorianCalendar result = new GregorianCalendar();
 		result.clear();
 		if (this.hasDate()) {
-			result.set(Calendar.YEAR, this._yearValue_());
-			result.set(Calendar.MONTH, (this._monthValue_() - 1));
-			result.set(Calendar.DATE, this._dateValue_());
+			result.set(Calendar.YEAR, this.yearValueImpl());
+			result.set(Calendar.MONTH, (this.monthValueImpl() - 1));
+			result.set(Calendar.DATE, this.dateValueImpl());
 		}
 		if (this.hasTime()) {
-			result.set(Calendar.HOUR_OF_DAY, this._hourValue_());
-			result.set(Calendar.MINUTE, this._minuteValue_());
-			result.set(Calendar.SECOND, this._secondValue_());
-			result.set(Calendar.MILLISECOND, this._millisecondValue_());
+			result.set(Calendar.HOUR_OF_DAY, this.hourValueImpl());
+			result.set(Calendar.MINUTE, this.minuteValueImpl());
+			result.set(Calendar.SECOND, this.secondValueImpl());
+			result.set(Calendar.MILLISECOND, this.millisecondValueImpl());
 		}
 		if (this.hasZone()) {
-			result.set(Calendar.ZONE_OFFSET, this._zoneValue_() * 60000);
+			result.set(Calendar.ZONE_OFFSET, this.zoneValueImpl() * 60000);
 		}
 		return result;
 	}
@@ -1404,15 +1407,15 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		final boolean hasDate = this.hasDate();
 		int offset = 0;
 		if (hasDate) {
-			Integers.formatInt(this._yearValue_(), buffer, offset, 4);
+			Integers.formatInt(this.yearValueImpl(), buffer, offset, 4);
 			offset += 4;
 			buffer[offset] = '-';
 			offset += 1;
-			Integers.formatInt(this._monthValue_(), buffer, offset, 2);
+			Integers.formatInt(this.monthValueImpl(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = '-';
 			offset += 1;
-			Integers.formatInt(this._dateValue_(), buffer, offset, 2);
+			Integers.formatInt(this.dateValueImpl(), buffer, offset, 2);
 			offset += 2;
 		}
 		if (this.hasTime()) {
@@ -1421,17 +1424,17 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 				offset += 1;
 			}
 			buffer[7] = '-';
-			Integers.formatInt(this._hourValue_(), buffer, offset, 2);
+			Integers.formatInt(this.hourValueImpl(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = ':';
 			offset += 1;
-			Integers.formatInt(this._minuteValue_(), buffer, offset, 2);
+			Integers.formatInt(this.minuteValueImpl(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = ':';
 			offset += 1;
-			Integers.formatInt(this._secondValue_(), buffer, offset, 2);
+			Integers.formatInt(this.secondValueImpl(), buffer, offset, 2);
 			offset += 2;
-			final int millisecond = this._millisecondValue_();
+			final int millisecond = this.millisecondValueImpl();
 			if (millisecond != 0) {
 				buffer[offset] = '.';
 				offset += 1;
@@ -1440,7 +1443,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 			}
 		}
 		if (this.hasZone()) {
-			final int zone = this._zoneValue_();
+			final int zone = this.zoneValueImpl();
 			if (zone == 0) {
 				buffer[offset] = 'Z';
 				offset += 1;

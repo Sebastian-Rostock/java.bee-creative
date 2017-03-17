@@ -17,18 +17,18 @@ public class IAMLoader {
 	public static final class IAMHeader {
 
 		/** Dieses Feld speichert die Bitmaske. */
-		final int _mask_;
+		final int mask;
 
 		/** Dieses Feld speichert den Vergleichswert. */
-		final int _value_;
+		final int value;
 
 		/** Dieser Konstruktor initialisiert Bitmaske und Vergleichswert.
 		 *
 		 * @param mask Bitmaske.
 		 * @param value Vergleichswert. */
 		public IAMHeader(final int mask, final int value) {
-			this._mask_ = mask;
-			this._value_ = value;
+			this.mask = mask;
+			this.value = value;
 		}
 
 		{}
@@ -38,7 +38,7 @@ public class IAMLoader {
 		 * @param header Kopfdaten.
 		 * @return {@code true}, wenn die Kopfdaten eine gültige Kennunge enthalten. */
 		public final boolean isValid(final int header) {
-			return (header & this._mask_) == this._value_;
+			return (header & this.mask) == this.value;
 		}
 
 		/** Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
@@ -74,7 +74,7 @@ public class IAMLoader {
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
-			return Integer.toHexString(this._value_);
+			return Integer.toHexString(this.value);
 		}
 
 	}
@@ -93,15 +93,15 @@ public class IAMLoader {
 		{}
 
 		/** Dieses Feld speichert die Abbildungen. */
-		final IAMMappingLoader[] _mappings_;
+		final IAMMappingLoader[] mappings;
 
 		/** Dieses Feld speichert die Listen. */
-		final IAMListingLoader[] _listings_;
+		final IAMListingLoader[] listings;
 
 		/** Dieser Konstruktor initialisiert das leere Inhaltsverzeichnis. */
 		IAMIndexLoader() {
-			this._mappings_ = new IAMMappingLoader[0];
-			this._listings_ = new IAMListingLoader[0];
+			this.mappings = new IAMMappingLoader[0];
+			this.listings = new IAMListingLoader[0];
 		}
 
 		/** Dieser Kontrukteur initialisiert diesen {@link IAMIndex} als Sicht auf den gegebenen Speicherbereich.
@@ -148,18 +148,18 @@ public class IAMLoader {
 			offset += listingDataLength;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this._mappings_ = new IAMMappingLoader[mappingCount];
+			this.mappings = new IAMMappingLoader[mappingCount];
 			for (int i = 0; i < mappingCount; i++) {
 				final int offset2 = mappingOffset.get(i);
 				final int length2 = mappingOffset.get(i + 1) - offset2;
-				this._mappings_[i] = new IAMMappingLoader(mappingData.section(offset2, length2).toINT32());
+				this.mappings[i] = new IAMMappingLoader(mappingData.section(offset2, length2).toINT32());
 			}
 
-			this._listings_ = new IAMListingLoader[listingCount];
+			this.listings = new IAMListingLoader[listingCount];
 			for (int i = 0; i < listingCount; i++) {
 				final int offset2 = listingOffset.get(i);
 				final int length2 = listingOffset.get(i + 1) - offset2;
-				this._listings_[i] = new IAMListingLoader(listingData.section(offset2, length2).toINT32());
+				this.listings[i] = new IAMListingLoader(listingData.section(offset2, length2).toINT32());
 			}
 
 		}
@@ -169,27 +169,27 @@ public class IAMLoader {
 		/** {@inheritDoc} */
 		@Override
 		public final IAMMappingLoader mapping(final int index) {
-			if ((index < 0) || (index >= this._mappings_.length)) return IAMMappingLoader.EMPTY;
-			return this._mappings_[index];
+			if ((index < 0) || (index >= this.mappings.length)) return IAMMappingLoader.EMPTY;
+			return this.mappings[index];
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final int mappingCount() {
-			return this._mappings_.length;
+			return this.mappings.length;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final IAMListingLoader listing(final int index) {
-			if ((index < 0) || (index >= this._listings_.length)) return IAMListingLoader.EMPTY;
-			return this._listings_[index];
+			if ((index < 0) || (index >= this.listings.length)) return IAMListingLoader.EMPTY;
+			return this.listings[index];
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final int listingCount() {
-			return this._listings_.length;
+			return this.listings.length;
 		}
 
 	}
@@ -208,23 +208,23 @@ public class IAMLoader {
 		{}
 
 		/** Dieses Feld speichert die Zahlen der Elemente. */
-		final MMFArray _itemData_;
+		final MMFArray itemData;
 
 		/** Dieses Feld speichert die Startpositionen der Elemente. */
-		final MMFArray _itemOffset_;
+		final MMFArray itemOffset;
 
 		/** Dieses Feld speichert die Länge der Elemente. */
-		final int _itemLength_;
+		final int itemLength;
 
 		/** Dieses Feld speichert die Anzahl der Elemente. */
-		final int _itemCount_;
+		final int itemCount;
 
 		/** Dieser Konstruktor initialisiert die leere Liste. */
 		IAMListingLoader() {
-			this._itemData_ = null;
-			this._itemOffset_ = null;
-			this._itemLength_ = 0;
-			this._itemCount_ = 0;
+			this.itemData = null;
+			this.itemOffset = null;
+			this.itemLength = 0;
+			this.itemCount = 0;
 		}
 
 		/** Dieser Kontrukteur initialisiert diese {@link IAMListing} als Sicht auf den gegebenen Speicherbereich.
@@ -254,13 +254,13 @@ public class IAMLoader {
 			final MMFArray itemOffset;
 			if (itemSizeType != 0) {
 
-				itemValue = IAMLoader._byteAlign_((itemCount + 1) * IAMLoader._byteCount_(itemSizeType));
+				itemValue = IAMLoader.byteAlign((itemCount + 1) * IAMLoader.byteCount(itemSizeType));
 				itemLength = 0;
 				itemOffset = IAMLoader.sizeArray(array.section(offset, itemValue), itemSizeType).section(0, itemCount + 1);
 				offset += itemValue;
 				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMLoader._checkArray_(itemOffset);
+				IAMLoader.checkArray(itemOffset);
 				itemValue = itemOffset.get(itemCount);
 
 			} else {
@@ -275,15 +275,15 @@ public class IAMLoader {
 
 			}
 
-			itemValue = IAMLoader._byteAlign_(itemValue * IAMLoader._byteCount_(itemDataType));
-			final MMFArray itemData = IAMLoader._dataArray_(array.section(offset, itemValue), itemDataType);
+			itemValue = IAMLoader.byteAlign(itemValue * IAMLoader.byteCount(itemDataType));
+			final MMFArray itemData = IAMLoader.dataArray(array.section(offset, itemValue), itemDataType);
 			offset += itemValue;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this._itemData_ = itemData;
-			this._itemOffset_ = itemOffset;
-			this._itemLength_ = itemLength;
-			this._itemCount_ = itemCount;
+			this.itemData = itemData;
+			this.itemOffset = itemOffset;
+			this.itemLength = itemLength;
+			this.itemCount = itemCount;
 
 		}
 
@@ -292,23 +292,23 @@ public class IAMLoader {
 		/** {@inheritDoc} */
 		@Override
 		public final MMFArray item(final int itemIndex) {
-			if ((itemIndex < 0) || (itemIndex >= this._itemCount_)) return MMFArray.EMPTY;
-			final IAMArray itemOffset = this._itemOffset_;
+			if ((itemIndex < 0) || (itemIndex >= this.itemCount)) return MMFArray.EMPTY;
+			final IAMArray itemOffset = this.itemOffset;
 			if (itemOffset != null) {
-				final int offset = itemOffset._get_(itemIndex);
-				final int length = itemOffset._get_(itemIndex + 1) - offset;
-				return this._itemData_.section(offset, length);
+				final int offset = itemOffset.customGet(itemIndex);
+				final int length = itemOffset.customGet(itemIndex + 1) - offset;
+				return this.itemData.section(offset, length);
 			} else {
-				final int length = this._itemLength_;
+				final int length = this.itemLength;
 				final int offset = length * itemIndex;
-				return this._itemData_.section(offset, length);
+				return this.itemData.section(offset, length);
 			}
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final int itemCount() {
-			return this._itemCount_;
+			return this.itemCount;
 		}
 
 	}
@@ -327,43 +327,43 @@ public class IAMLoader {
 		{}
 
 		/** Dieses Feld speichert die Zahlen der Schlüssel. */
-		final MMFArray _keyData_;
+		final MMFArray keyData;
 
 		/** Dieses Feld speichert die Startpositionen der Schlüssel. */
-		final MMFArray _keyOffset_;
+		final MMFArray keyOffset;
 
 		/** Dieses Feld speichert die Länge der Schlüssel. */
-		final int _keyLength_;
+		final int keyLength;
 
 		/** Dieses Feld speichert die Zahlen der Werte. */
-		final MMFArray _valueData_;
+		final MMFArray valueData;
 
 		/** Dieses Feld speichert die Startpositionen der Werte. */
-		final MMFArray _valueOffset_;
+		final MMFArray valueOffset;
 
 		/** Dieses Feld speichert die Länge der Werte. */
-		final int _valueLength_;
+		final int valueLength;
 
 		/** Dieses Feld speichert die Bitmaske der Schlüsselbereiche. */
-		final int _rangeMask_;
+		final int rangeMask;
 
 		/** Dieses Feld speichert die Startpositionen der Schlüsselbereiche. */
-		final MMFArray _rangeOffset_;
+		final MMFArray rangeOffset;
 
 		/** Dieses Feld speichert die Anzahl der Einträge. */
-		final int _entryCount_;
+		final int entryCount;
 
 		/** Dieser Konstruktor initialisiert die leere Abbildung. */
 		IAMMappingLoader() {
-			this._keyData_ = null;
-			this._keyOffset_ = null;
-			this._keyLength_ = 0;
-			this._valueData_ = null;
-			this._valueOffset_ = null;
-			this._valueLength_ = 0;
-			this._rangeMask_ = 0;
-			this._rangeOffset_ = null;
-			this._entryCount_ = 0;
+			this.keyData = null;
+			this.keyOffset = null;
+			this.keyLength = 0;
+			this.valueData = null;
+			this.valueOffset = null;
+			this.valueLength = 0;
+			this.rangeMask = 0;
+			this.rangeOffset = null;
+			this.entryCount = 0;
 		}
 
 		/** Dieser Kontrukteur initialisiert diese {@link IAMMapping} als Sicht auf den gegebenen Speicherbereich.
@@ -402,12 +402,12 @@ public class IAMLoader {
 				offset++;
 				if ((rangeMask < 1) || (rangeMask > 0x1FFFFFFF) || (((rangeMask + 1) & rangeMask) != 0)) throw new IAMException(IAMException.INVALID_VALUE);
 
-				rangeValue = IAMLoader._byteAlign_((rangeMask + 2) * IAMLoader._byteCount_(rangeSizeType));
+				rangeValue = IAMLoader.byteAlign((rangeMask + 2) * IAMLoader.byteCount(rangeSizeType));
 				rangeOffset = IAMLoader.sizeArray(array.section(offset, rangeValue), rangeSizeType).section(0, rangeMask + 2);
 				offset += rangeValue;
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMLoader._checkArray_(rangeOffset);
+				IAMLoader.checkArray(rangeOffset);
 				rangeValue = rangeOffset.get(rangeMask + 1);
 				if (rangeValue != entryCount) throw new IAMException(IAMException.INVALID_OFFSET);
 
@@ -425,13 +425,13 @@ public class IAMLoader {
 			final MMFArray keyOffset;
 			if (keySizeType != 0) {
 
-				keyValue = IAMLoader._byteAlign_((entryCount + 1) * IAMLoader._byteCount_(keySizeType));
+				keyValue = IAMLoader.byteAlign((entryCount + 1) * IAMLoader.byteCount(keySizeType));
 				keyLength = 0;
 				keyOffset = IAMLoader.sizeArray(array.section(offset, keyValue), keySizeType).section(0, entryCount + 1);
 				offset += keyValue;
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMLoader._checkArray_(keyOffset);
+				IAMLoader.checkArray(keyOffset);
 				keyValue = keyOffset.get(entryCount);
 
 			} else {
@@ -447,8 +447,8 @@ public class IAMLoader {
 			}
 			if ((keyValue < 0) || (keyValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
-			keyValue = IAMLoader._byteAlign_(keyValue * IAMLoader._byteCount_(keyDataType));
-			final MMFArray keyData = IAMLoader._dataArray_(array.section(offset, keyValue), keyDataType);
+			keyValue = IAMLoader.byteAlign(keyValue * IAMLoader.byteCount(keyDataType));
+			final MMFArray keyData = IAMLoader.dataArray(array.section(offset, keyValue), keyDataType);
 			offset += keyValue;
 			if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
@@ -457,13 +457,13 @@ public class IAMLoader {
 			final MMFArray valueOffset;
 			if (valueSizeType != 0) {
 
-				valueValue = IAMLoader._byteAlign_((entryCount + 1) * IAMLoader._byteCount_(valueSizeType));
+				valueValue = IAMLoader.byteAlign((entryCount + 1) * IAMLoader.byteCount(valueSizeType));
 				valueLength = 0;
 				valueOffset = IAMLoader.sizeArray(array.section(offset, valueValue), valueSizeType).section(0, entryCount + 1);
 				offset += valueValue;
 				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMLoader._checkArray_(valueOffset);
+				IAMLoader.checkArray(valueOffset);
 				valueValue = valueOffset.get(entryCount);
 
 			} else {
@@ -479,20 +479,20 @@ public class IAMLoader {
 			}
 			if ((valueValue < 0) || (valueValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
-			valueValue = IAMLoader._byteAlign_(valueValue * IAMLoader._byteCount_(valueDataType));
-			final MMFArray valueData = IAMLoader._dataArray_(array.section(offset, valueValue), valueDataType);
+			valueValue = IAMLoader.byteAlign(valueValue * IAMLoader.byteCount(valueDataType));
+			final MMFArray valueData = IAMLoader.dataArray(array.section(offset, valueValue), valueDataType);
 			offset += valueValue;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this._keyData_ = keyData;
-			this._keyOffset_ = keyOffset;
-			this._keyLength_ = keyLength;
-			this._valueData_ = valueData;
-			this._valueOffset_ = valueOffset;
-			this._valueLength_ = valueLength;
-			this._rangeMask_ = rangeMask;
-			this._rangeOffset_ = rangeOffset;
-			this._entryCount_ = entryCount;
+			this.keyData = keyData;
+			this.keyOffset = keyOffset;
+			this.keyLength = keyLength;
+			this.valueData = valueData;
+			this.valueOffset = valueOffset;
+			this.valueLength = valueLength;
+			this.rangeMask = rangeMask;
+			this.rangeOffset = rangeOffset;
+			this.entryCount = entryCount;
 
 		}
 
@@ -501,7 +501,7 @@ public class IAMLoader {
 		/** {@inheritDoc} */
 		@Override
 		public final boolean mode() {
-			return this._rangeMask_ != 0;
+			return this.rangeMask != 0;
 		}
 
 		{}
@@ -509,54 +509,54 @@ public class IAMLoader {
 		/** {@inheritDoc} */
 		@Override
 		public final MMFArray key(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this._entryCount_)) return MMFArray.EMPTY;
-			final IAMArray keyOffset = this._keyOffset_;
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return MMFArray.EMPTY;
+			final IAMArray keyOffset = this.keyOffset;
 			if (keyOffset != null) {
-				final int offset = keyOffset._get_(entryIndex);
-				final int length = keyOffset._get_(entryIndex + 1) - offset;
-				return this._keyData_.section(offset, length);
+				final int offset = keyOffset.customGet(entryIndex);
+				final int length = keyOffset.customGet(entryIndex + 1) - offset;
+				return this.keyData.section(offset, length);
 			} else {
-				final int length = this._keyLength_;
+				final int length = this.keyLength;
 				final int offset = length * entryIndex;
-				return this._keyData_.section(offset, length);
+				return this.keyData.section(offset, length);
 			}
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final MMFArray value(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this._entryCount_)) return MMFArray.EMPTY;
-			final IAMArray keyOffset = this._valueOffset_;
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return MMFArray.EMPTY;
+			final IAMArray keyOffset = this.valueOffset;
 			if (keyOffset != null) {
-				final int offset = keyOffset._get_(entryIndex);
-				final int length = keyOffset._get_(entryIndex + 1) - offset;
-				return this._valueData_.section(offset, length);
+				final int offset = keyOffset.customGet(entryIndex);
+				final int length = keyOffset.customGet(entryIndex + 1) - offset;
+				return this.valueData.section(offset, length);
 			} else {
-				final int length = this._valueLength_;
+				final int length = this.valueLength;
 				final int offset = length * entryIndex;
-				return this._valueData_.section(offset, length);
+				return this.valueData.section(offset, length);
 			}
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final int entryCount() {
-			return this._entryCount_;
+			return this.entryCount;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
 			if (key == null) throw new NullPointerException("key = null");
-			int i = this._rangeMask_;
+			int i = this.rangeMask;
 			if (i != 0) {
-				final IAMArray range = this._rangeOffset_;
+				final IAMArray range = this.rangeOffset;
 				i = key.hash() & i;
-				for (int l = range._get_(i), r = range._get_(i + 1); l < r; l++) {
+				for (int l = range.customGet(i), r = range.customGet(i + 1); l < r; l++) {
 					if (this.key(l).equals(key)) return l;
 				}
 			} else {
-				int l = 0, r = this._entryCount_;
+				int l = 0, r = this.entryCount;
 				while (l < r) {
 					final int c = (l + r) >> 1;
 					i = key.compare(this.key(c));
@@ -604,7 +604,7 @@ public class IAMLoader {
 	 * @param dataType Datentyp ({@code 1..3}).
 	 * @return Folge von {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen.
 	 * @throws IllegalArgumentException Wenn der gegebene Datentyp ungültig ist. */
-	static MMFArray _dataArray_(final MMFArray array, final int dataType) throws IllegalArgumentException {
+	public static MMFArray dataArray(final MMFArray array, final int dataType) throws IllegalArgumentException {
 		switch (dataType) {
 			case 1:
 				return array.toINT8();
@@ -620,7 +620,7 @@ public class IAMLoader {
 	 *
 	 * @param array Zahlenfolge.
 	 * @throws IAMException Wenn die erste Zahl nicht {@code 0} ist oder die Zahlen nicht monoton steigen. */
-	static void _checkArray_(final IAMArray array) throws IAMException {
+	static void checkArray(final IAMArray array) throws IAMException {
 		int value = array.get(0);
 		if (value != 0) throw new IAMException(IAMException.INVALID_OFFSET);
 		for (int i = 0, length = array.length(); i < length; i++) {
@@ -634,7 +634,7 @@ public class IAMLoader {
 	 *
 	 * @param byteCount Länge eines {@code INT8} Arrays.
 	 * @return Länge des {@code INT32} Arrays. */
-	static int _byteAlign_(final int byteCount) {
+	public static int byteAlign(final int byteCount) {
 		return (byteCount + 3) >> 2;
 	}
 
@@ -642,7 +642,7 @@ public class IAMLoader {
 	 *
 	 * @param dataType Datengrößentyps ({@code 1}, {@code 2} oder {@code 3}).
 	 * @return Byteanzahl ({@code 1}, {@code 2} oder {@code 4}). */
-	static int _byteCount_(final int dataType) {
+	public static int byteCount(final int dataType) {
 		return (1 << dataType) >> 1;
 	}
 

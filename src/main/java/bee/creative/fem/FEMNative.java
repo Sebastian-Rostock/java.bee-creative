@@ -40,20 +40,20 @@ public final class FEMNative extends FEMValue {
 	{}
 
 	/** Dieses Feld speichert das native Objekt. */
-	final Object _data_;
+	final Object data;
 
 	/** Dieser Konstruktor initialisiert das native Objekt.
 	 *
 	 * @param data Objekt. */
 	public FEMNative(final Object data) {
-		this._data_ = data;
+		this.data = data;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		return Objects.hash(this._data_);
+		return Objects.hash(this.data);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wert gleich dem gegebenen ist.<br>
@@ -64,7 +64,7 @@ public final class FEMNative extends FEMValue {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMNative that) throws NullPointerException {
 		if (this == that) return true;
-		return Objects.equals(this._data_, that._data_);
+		return Objects.equals(this.data, that.data);
 	}
 
 	{}
@@ -72,7 +72,7 @@ public final class FEMNative extends FEMValue {
 	/** Diese Methode gibt das native Objekt zurück. */
 	@Override
 	public final Object data() {
-		return this._data_;
+		return this.data;
 	}
 
 	/** Diese Methode gibt {@link #TYPE} zurück. */
@@ -84,7 +84,7 @@ public final class FEMNative extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final FEMNative result(final boolean recursive) {
-		if (this._data_ instanceof FEMValue) return new FEMNative(((FEMValue)this._data_).result(recursive));
+		if (this.data instanceof FEMValue) return new FEMNative(((FEMValue)this.data).result(recursive));
 		return this;
 	}
 
@@ -109,7 +109,7 @@ public final class FEMNative extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.putData(this._data_);
+		target.putData(this.data);
 	}
 
 }

@@ -45,22 +45,22 @@ public abstract class ArrayData<GArray> {
 	 *
 	 * @param startIndex Index des ersten Elements im Bereich.
 	 * @param finalIndex Index des ersten Elements nach dem Bereich. */
-	protected void _clearArray_(final int startIndex, final int finalIndex) {
+	protected void customClearArray(final int startIndex, final int finalIndex) {
 	}
 
 	/** Diese Methode gibt die Länge des Arrays zurück.
 	 *
 	 * @return Länge des Arrays. */
-	protected abstract int _capacity_();
+	protected abstract int customCapacity();
 
 	/** Diese Methode gibt die Position zurück, an der die Elemente des internen Arrays ausgerichtet werden sollen. Bei der Ausrichtung {@code 0} werden die
 	 * Elemente am Anfang des internen Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des internen Arrays beschleunigt wird. Für die
 	 * relative Ausrichtung {@code space} gilt das gegenteil, da hier die Elemente am Ende des internen Arrays ausgerichtet werden, wodurch das häufige Einfügen
 	 * von Elementen am Anfang des internen Arrays beschleunigt wird. Diese ergibt sich aus {@code space / 2}.
 	 *
-	 * @see ArrayData#_insert_(int, int)
-	 * @see ArrayData#_remove_(int, int)
-	 * @see ArrayData#_resize_(int)
+	 * @see ArrayData#customInsert(int, int)
+	 * @see ArrayData#customRemove(int, int)
+	 * @see ArrayData#customResize(int)
 	 * @param space Anzahl der nicht belegten Elemente.
 	 * @return Position zur Ausrichtung ({@code 0..space}). */
 	protected int _calcAlign_(final int space) {
@@ -72,7 +72,7 @@ public abstract class ArrayData<GArray> {
 	 * @param count Anzahl.
 	 * @return Länge. */
 	protected int _calcLength_(final int count) {
-		final int oldLength = this._capacity_();
+		final int oldLength = this.customCapacity();
 		if (oldLength >= count) return oldLength;
 		final int newLength = oldLength + (oldLength >> 1);
 		if (newLength >= count) return newLength;
@@ -85,11 +85,11 @@ public abstract class ArrayData<GArray> {
 	 * @see ArrayData#_calcAlign_(int)
 	 * @param length neue Größe.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
-	protected void _resize_(final int length) throws IllegalArgumentException {
+	protected void customResize(final int length) throws IllegalArgumentException {
 		final int size = this._size_;
 		if (size > length) throw new IllegalArgumentException("size > length");
 		final int from2 = this._calcAlign_(length - size);
-		if (length != this._capacity_()) {
+		if (length != this.customCapacity()) {
 			final GArray array = this._array_();
 			final GArray array2 = this._allocArray_(length);
 			System.arraycopy(array, this._from_, array2, from2, size);
@@ -109,7 +109,7 @@ public abstract class ArrayData<GArray> {
 	 * @param index Index des ersten neuen Elements.
 	 * @param count Anzahl der neuen Elemente.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
-	protected void _insert_(final int index, final int count) throws IllegalArgumentException {
+	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
 		final int from = this._from_;
 		final int index2 = index - from;
 		if (index2 < 0) throw new IllegalArgumentException("index < from");
@@ -119,7 +119,7 @@ public abstract class ArrayData<GArray> {
 		if (count < 0) throw new IllegalArgumentException("count < 0");
 		final int size2 = size + count;
 		final GArray array = this._array_();
-		final int arrayLength = this._capacity_();
+		final int arrayLength = this.customCapacity();
 		final int array2Length = this._calcLength_(size2);
 		this._size_ = size2;
 		if (arrayLength != array2Length) {
@@ -151,13 +151,13 @@ public abstract class ArrayData<GArray> {
 			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
 			final int last = from + size, last2 = from2 + size2;
 			if (last2 < last) {
-				this._clearArray_(last2, last);
+				this.customClearArray(last2, last);
 			}
 		} else {
 			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
 			System.arraycopy(array, from, array, from2, index2);
 			if (from2 > from) {
-				this._clearArray_(from, from2);
+				this.customClearArray(from, from2);
 			}
 		}
 	}
@@ -169,7 +169,7 @@ public abstract class ArrayData<GArray> {
 	 * @param index Index des ersten entfallenden Elements.
 	 * @param count Anzahl der entfallende Elemente.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
-	protected void _remove_(final int index, final int count) throws IllegalArgumentException {
+	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
 		final int from = this._from_;
 		final int index2 = index - from;
 		if (index2 < 0) throw new IllegalArgumentException("index < from");
@@ -182,16 +182,16 @@ public abstract class ArrayData<GArray> {
 		final GArray array = this._array_();
 		this._size_ = size2;
 		if (size2 == 0) {
-			this._from_ = this._calcAlign_(this._capacity_());
-			this._clearArray_(from, from + size);
+			this._from_ = this._calcAlign_(this.customCapacity());
+			this.customClearArray(from, from + size);
 		} else if (index2 > (size2 / 2)) {
 			System.arraycopy(array, index + count, array, index, size2 - index2);
-			this._clearArray_(from + size2, from + size);
+			this.customClearArray(from + size2, from + size);
 		} else {
 			final int from2 = from + count;
 			this._from_ = from2;
 			System.arraycopy(array, from, array, from2, index2);
-			this._clearArray_(from, from2);
+			this.customClearArray(from, from2);
 		}
 	}
 
@@ -199,7 +199,7 @@ public abstract class ArrayData<GArray> {
 	 *
 	 * @return Kapazität. */
 	public final int capacity() {
-		return this._capacity_();
+		return this.customCapacity();
 	}
 
 	/** Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
@@ -208,12 +208,12 @@ public abstract class ArrayData<GArray> {
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
 	public final void allocate(final int capacity) throws IllegalArgumentException {
 		if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
-		this._resize_(this._calcLength_(capacity));
+		this.customResize(this._calcLength_(capacity));
 	}
 
 	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
 	public final void compact() {
-		this._resize_(this._size_);
+		this.customResize(this._size_);
 	}
 
 }

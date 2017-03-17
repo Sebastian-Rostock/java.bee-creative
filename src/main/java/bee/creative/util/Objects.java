@@ -30,7 +30,7 @@ public class Objects {
 	 *
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug. */
-	static String _indent_(final String value) {
+	static String indent(final String value) {
 		if (value == null) return "null";
 		final StringBuilder result = new StringBuilder();
 		int last = -1, next = 0;
@@ -51,7 +51,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param indent Aktivierung der Erhöhung des Einzugs.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	static String _format_(final boolean format, final boolean indent, final Object object) {
+	static String format(final boolean format, final boolean indent, final Object object) {
 		if (object == null) return "null";
 		final String result;
 		if (object.getClass().isArray()) {
@@ -77,7 +77,7 @@ public class Objects {
 		} else {
 			result = String.valueOf(object);
 		}
-		return (indent ? Objects._indent_(result) : result);
+		return (indent ? Objects.indent(result) : result);
 	}
 
 	/** Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
@@ -93,7 +93,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (final Entry<?, ?> entry: object.entrySet()) {
-			result.append(space).append(Objects._format_(format, format, entry.getKey())).append(": ").append(Objects._format_(format, format, entry.getValue()));
+			result.append(space).append(Objects.format(format, format, entry.getKey())).append(": ").append(Objects.format(format, format, entry.getValue()));
 			space = comma;
 		}
 		return result.append((format ? "\n}" : "}")).toString();
@@ -140,7 +140,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (int i = 0; i < size; i++) {
-			result.append(space).append(Objects._format_(format, format, Array.get(object, i)));
+			result.append(space).append(Objects.format(format, format, Array.get(object, i)));
 			space = comma;
 		}
 		return result.append((format ? "\n]" : "]")).toString();
@@ -192,7 +192,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		do {
-			result.append(space).append(Objects._format_(format, format, iter.next()));
+			result.append(space).append(Objects.format(format, format, iter.next()));
 			space = comma;
 		} while (iter.hasNext());
 		return result.append((format ? "\n]" : "]")).toString();
@@ -466,12 +466,12 @@ public class Objects {
 	 * <p>
 	 * Sollte das gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner {@link Object#toString() toString()}-Methode geliefert.
 	 *
-	 * @see Objects#_format_(boolean, boolean, Object)
+	 * @see Objects#format(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
 	public static String toString(final boolean format, final Object object) {
-		return Objects._format_(format, false, object);
+		return Objects.format(format, false, object);
 	}
 
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der gegebene Zeichenkette entspricht.
@@ -552,12 +552,12 @@ public class Objects {
 			final String comma = (format ? ",\n  " : ", ");
 			if (label) {
 				for (int i = 0, size = args.length - 1; i < size; i += 2) {
-					result.append(join).append(Objects._format_(format, format, args[i])).append(": ").append(Objects._format_(format, format, args[i + 1]));
+					result.append(join).append(Objects.format(format, format, args[i])).append(": ").append(Objects.format(format, format, args[i + 1]));
 					join = comma;
 				}
 			} else {
 				for (int i = 0, size = args.length; i < size; i++) {
-					result.append(join).append(Objects._format_(format, format, args[i]));
+					result.append(join).append(Objects.format(format, format, args[i]));
 					join = comma;
 				}
 			}

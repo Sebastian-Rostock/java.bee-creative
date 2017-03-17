@@ -8,7 +8,7 @@ package bee.creative.fem;
 public final class FEMParam extends FEMFunction {
 
 	/** Dieses Feld speichert die projezierenden Funktionen für die Indizes {@code 0..9}. */
-	static final FEMParam[] _cache_ = {new FEMParam(0), new FEMParam(1), new FEMParam(2), new FEMParam(3), new FEMParam(4), new FEMParam(5), new FEMParam(6),
+	static final FEMParam[] CACHE = {new FEMParam(0), new FEMParam(1), new FEMParam(2), new FEMParam(3), new FEMParam(4), new FEMParam(5), new FEMParam(6),
 		new FEMParam(7), new FEMParam(8), new FEMParam(9)};
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (index: Integer): Value}, deren Ergebniswert dem {@code index}-ten Parameterwert des
@@ -77,18 +77,18 @@ public final class FEMParam extends FEMFunction {
 	 * @throws IndexOutOfBoundsException Wenn {@code index < 0} ist. */
 	public static FEMParam from(final int index) throws IndexOutOfBoundsException {
 		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
-		if (index < FEMParam._cache_.length) return FEMParam._cache_[index];
+		if (index < FEMParam.CACHE.length) return FEMParam.CACHE[index];
 		return new FEMParam(index);
 	}
 
 	{}
 
 	/** Dieses Feld speichert den Index des Parameterwerts. */
-	final int _index_;
+	final int index;
 
 	@SuppressWarnings ("javadoc")
 	FEMParam(final int index) {
-		this._index_ = index;
+		this.index = index;
 	}
 
 	{}
@@ -98,7 +98,7 @@ public final class FEMParam extends FEMFunction {
 	 * @return Index des Parameterwerts.
 	 * @see #invoke(FEMFrame) */
 	public final int index() {
-		return this._index_;
+		return this.index;
 	}
 
 	{}
@@ -110,13 +110,13 @@ public final class FEMParam extends FEMFunction {
 	 * @see #index() */
 	@Override
 	public final FEMValue invoke(final FEMFrame frame) {
-		return frame.get(this._index_);
+		return frame.get(this.index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put("$").put(Integer.valueOf(this._index_ + 1));
+		target.put("$").put(Integer.valueOf(this.index + 1));
 	}
 
 }

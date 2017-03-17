@@ -12,7 +12,7 @@ import java.io.RandomAccessFile;
 public class FileDataTarget extends BaseDataTarget {
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final RandomAccessFile _data_;
+	final RandomAccessFile data;
 
 	/** Dieser Konstruktor initialisiert das {@link RandomAccessFile} mit dem gegebenen {@link File} im Modus {@code "rw"}.
 	 *
@@ -38,7 +38,7 @@ public class FileDataTarget extends BaseDataTarget {
 	 * @throws NullPointerException Wenn das {@link RandomAccessFile} {@code null} ist. */
 	public FileDataTarget(final RandomAccessFile file) throws NullPointerException {
 		if (file == null) throw new NullPointerException("file = null");
-		this._data_ = file;
+		this.data = file;
 	}
 
 	{}
@@ -46,43 +46,43 @@ public class FileDataTarget extends BaseDataTarget {
 	/** {@inheritDoc} */
 	@Override
 	public final RandomAccessFile data() {
-		return this._data_;
+		return this.data;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
-		this._data_.write(array, offset, length);
+		this.data.write(array, offset, length);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
-		this._data_.seek(index);
+		this.data.seek(index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
-		return this._data_.getFilePointer();
+		return this.data.getFilePointer();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
-		return this._data_.length();
+		return this.data.length();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void allocate(final long value) throws IOException {
-		this._data_.setLength(value);
+		this.data.setLength(value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
-		this._data_.close();
+		this.data.close();
 	}
 
 }

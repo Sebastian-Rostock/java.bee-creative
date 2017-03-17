@@ -32,7 +32,7 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 
 		/** {@inheritDoc} */
 		@Override
-		protected ClassData<GOwner> _this_() {
+		protected ClassData<GOwner> customThis() {
 			return this;
 		}
 
@@ -54,7 +54,7 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 
 		/** {@inheritDoc} */
 		@Override
-		protected PropertyData<GOwner> _this_() {
+		protected PropertyData<GOwner> customThis() {
 			return this;
 		}
 
@@ -63,24 +63,24 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	{}
 
 	/** Dieses Feld speichert den {@link JAXBContext}. */
-	JAXBContext _context_;
+	JAXBContext context;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openClassData()}. */
-	final ClassData<GThis> _classData_ = new ClassData<GThis>() {
+	final ClassData<GThis> classData = new ClassData<GThis>() {
 
 		@Override
 		public GThis closeClassesData() {
-			return BaseContextData.this._this_();
+			return BaseContextData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openPropertyData()}. */
-	final PropertyData<GThis> _propertyData_ = new PropertyData<GThis>() {
+	final PropertyData<GThis> propertyData = new PropertyData<GThis>() {
 
 		@Override
 		public GThis closePropertyData() {
-			return BaseContextData.this._this_();
+			return BaseContextData.this.customThis();
 		}
 
 	};
@@ -92,11 +92,11 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseContextData<?> data) {
-		if (data == null) return this._this_();
-		this._context_ = data._context_;
-		this._classData_.use(data._classData_);
-		this._propertyData_.use(data._propertyData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.context = data.context;
+		this.classData.use(data.classData);
+		this.propertyData.use(data.propertyData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt den {@link JAXBContext} zurück.<br>
@@ -108,10 +108,10 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	 * @return {@link JAXBContext}.
 	 * @throws JAXBException Wenn {@link JAXBContext#newInstance(Class[], Map)} eine entsprechende Ausnahme auslöst. */
 	public final JAXBContext getContext() throws JAXBException {
-		JAXBContext result = this._context_;
+		JAXBContext result = this.context;
 		if (result != null) return result;
-		final Set<Class<?>> classes = this._classData_.getItems();
-		result = JAXBContext.newInstance(classes.toArray(new Class<?>[classes.size()]), this._propertyData_.getEntries());
+		final Set<Class<?>> classes = this.classData.getItems();
+		result = JAXBContext.newInstance(classes.toArray(new Class<?>[classes.size()]), this.propertyData.getEntries());
 		this.useContext(result);
 		return result;
 	}
@@ -121,8 +121,8 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	 * @param context {@link JAXBContext} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useContext(final JAXBContext context) {
-		this._context_ = context;
-		return this._this_();
+		this.context = context;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt den {@link JAXBContext} auf {@code null} und gibt {@code this} zurück.
@@ -138,7 +138,7 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	 * @see JAXBContext#newInstance(Class[], Map)
 	 * @return Konfigurator. */
 	public final ClassData<GThis> openClassData() {
-		return this._classData_;
+		return this.classData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Eigenschaften zur Erzeugung des {@link JAXBContext} und gibt ihn zurück.
@@ -146,14 +146,14 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	 * @see JAXBContext#newInstance(Class[], Map)
 	 * @return Konfigurator. */
 	public final PropertyData<GThis> openPropertyData() {
-		return this._propertyData_;
+		return this.propertyData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc}
 	 *
@@ -170,7 +170,7 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._classData_, this._propertyData_);
+		return Objects.toInvokeString(this, this.classData, this.propertyData);
 	}
 
 }

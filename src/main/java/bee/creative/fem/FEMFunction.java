@@ -17,24 +17,24 @@ public abstract class FEMFunction {
 	@SuppressWarnings ("javadoc")
 	static final class TraceFunction extends FEMFunction {
 
-		final FEMTracer _tracer_;
+		final FEMTracer tracer;
 
-		final FEMFunction _function_;
+		final FEMFunction function;
 
 		TraceFunction(final FEMTracer tracer, final FEMFunction function) throws NullPointerException {
 			if (tracer == null) throw new NullPointerException("tracer = null");
-			this._tracer_ = tracer;
-			this._function_ = function;
+			this.tracer = tracer;
+			this.function = function;
 		}
 
 		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			final FEMTracer tracer = this._tracer_;
+			final FEMTracer tracer = this.tracer;
 			try {
 				final FEMTracer.Listener helper = tracer.getListener();
-				helper.onExecute(tracer.useFrame(frame).useFunction(this._function_));
+				helper.onExecute(tracer.useFrame(frame).useFunction(this.function));
 				try {
 					helper.onReturn(tracer.useResult(tracer.getFunction().invoke(tracer.getFrame())));
 					return tracer.getResult();
@@ -49,17 +49,17 @@ public abstract class FEMFunction {
 
 		@Override
 		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-			return this._function_.withTracer(tracer);
+			return this.function.withTracer(tracer);
 		}
 
 		@Override
 		public final FEMFunction withoutTracer() {
-			return this._function_.withoutTracer();
+			return this.function.withoutTracer();
 		}
 
 		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this._function_);
+			target.putFunction(this.function);
 		}
 
 	}
@@ -67,41 +67,41 @@ public abstract class FEMFunction {
 	@SuppressWarnings ("javadoc")
 	static final class FrameFunction extends FEMFunction {
 
-		final FEMFrame _frame_;
+		final FEMFrame frame;
 
-		final FEMFunction _function_;
+		final FEMFunction function;
 
 		FrameFunction(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
 			if (frame == null) throw new NullPointerException("frame = null");
-			this._frame_ = frame;
-			this._function_ = function;
+			this.frame = frame;
+			this.function = function;
 		}
 
 		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			return this._function_.invoke(this._frame_.withParams(frame.params()));
+			return this.function.invoke(this.frame.withParams(frame.params()));
 		}
 
 		@Override
 		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-			return this._function_.withTracer(tracer).toClosure(this._frame_);
+			return this.function.withTracer(tracer).toClosure(this.frame);
 		}
 
 		@Override
 		public final FEMFunction withoutTracer() {
-			return this._function_.withoutTracer().toClosure(this._frame_);
+			return this.function.withoutTracer().toClosure(this.frame);
 		}
 
 		@Override
 		public final FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
-			return this._function_.toClosure(frame);
+			return this.function.toClosure(frame);
 		}
 
 		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this._function_);
+			target.putFunction(this.function);
 		}
 
 	}
@@ -109,10 +109,10 @@ public abstract class FEMFunction {
 	@SuppressWarnings ("javadoc")
 	static final class FutureFunction extends FEMFunction {
 
-		final FEMFunction _function_;
+		final FEMFunction function;
 
 		FutureFunction(final FEMFunction function) {
-			this._function_ = function;
+			this.function = function;
 		}
 
 		{}
@@ -124,22 +124,22 @@ public abstract class FEMFunction {
 
 		@Override
 		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-			return this._function_.withTracer(tracer).toFuture();
+			return this.function.withTracer(tracer).toFuture();
 		}
 
 		@Override
 		public final FEMFunction toClosure(final FEMFrame params) {
-			return this._function_.toClosure(params).toFuture();
+			return this.function.toClosure(params).toFuture();
 		}
 
 		@Override
 		public final FEMFunction withoutTracer() {
-			return this._function_.withoutTracer().toFuture();
+			return this.function.withoutTracer().toFuture();
 		}
 
 		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this._function_);
+			target.putFunction(this.function);
 		}
 
 		@Override
@@ -149,7 +149,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
-			return this._function_.toFuture(frame);
+			return this.function.toFuture(frame);
 		}
 
 	}
@@ -157,43 +157,43 @@ public abstract class FEMFunction {
 	@SuppressWarnings ("javadoc")
 	static final class ConcatFunction extends FEMFunction {
 
-		final FEMFunction[] _params_;
+		final FEMFunction[] params;
 
-		final FEMFunction _function_;
+		final FEMFunction function;
 
 		ConcatFunction(final FEMFunction function, final FEMFunction... params) {
-			this._params_ = params;
-			this._function_ = function;
+			this.params = params;
+			this.function = function;
 		}
 
 		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			return FEMHandler.from(this._function_.invoke(frame), frame._context_).value().invoke(frame.newFrame(this._params_));
+			return FEMHandler.from(this.function.invoke(frame), frame.context).value().invoke(frame.newFrame(this.params));
 		}
 
 		@Override
 		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-			final FEMFunction[] params = this._params_.clone();
+			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withTracer(tracer);
 			}
-			return new ConcatFunction(this._function_.withTracer(tracer), params);
+			return new ConcatFunction(this.function.withTracer(tracer), params);
 		}
 
 		@Override
 		public final FEMFunction withoutTracer() {
-			final FEMFunction[] params = this._params_.clone();
+			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withoutTracer();
 			}
-			return new ConcatFunction(this._function_.withoutTracer(), params);
+			return new ConcatFunction(this.function.withoutTracer(), params);
 		}
 
 		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this._function_).putParams(Arrays.asList(this._params_));
+			target.putFunction(this.function).putParams(Arrays.asList(this.params));
 		}
 
 	}
@@ -203,34 +203,34 @@ public abstract class FEMFunction {
 
 		{}
 
-		final FEMFunction _function_;
+		final FEMFunction function;
 
 		ClosureFunction(final FEMFunction function) throws NullPointerException {
-			this._function_ = function;
+			this.function = function;
 		}
 
 		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			return this._function_.toClosure(frame).toValue();
+			return this.function.toClosure(frame).toValue();
 		}
 
 		@Override
 		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-			return this._function_.withTracer(tracer).toClosure();
+			return this.function.withTracer(tracer).toClosure();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public FEMFunction withoutTracer() {
-			return this._function_.withoutTracer().toClosure();
+			return this.function.withoutTracer().toClosure();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putHandler(this._function_);
+			target.putHandler(this.function);
 		}
 
 	}
@@ -238,43 +238,43 @@ public abstract class FEMFunction {
 	@SuppressWarnings ("javadoc")
 	static final class CompositeFunction extends FEMFunction {
 
-		final FEMFunction[] _params_;
+		final FEMFunction[] params;
 
-		final FEMFunction _function_;
+		final FEMFunction function;
 
 		CompositeFunction(final FEMFunction function, final FEMFunction... params) {
-			this._params_ = params;
-			this._function_ = function;
+			this.params = params;
+			this.function = function;
 		}
 
 		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			return this._function_.invoke(frame.newFrame(this._params_));
+			return this.function.invoke(frame.newFrame(this.params));
 		}
 
 		@Override
 		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-			final FEMFunction[] params = this._params_.clone();
+			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withTracer(tracer);
 			}
-			return new CompositeFunction(this._function_.withTracer(tracer), params);
+			return new CompositeFunction(this.function.withTracer(tracer), params);
 		}
 
 		@Override
 		public final FEMFunction withoutTracer() {
-			final FEMFunction[] params = this._params_.clone();
+			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withoutTracer();
 			}
-			return new CompositeFunction(this._function_.withoutTracer(), params);
+			return new CompositeFunction(this.function.withoutTracer(), params);
 		}
 
 		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this._function_).putParams(Arrays.asList(this._params_));
+			target.putFunction(this.function).putParams(Arrays.asList(this.params));
 		}
 
 	}

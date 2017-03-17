@@ -20,10 +20,10 @@ public final class FEMProxy extends FEMFunction {
 	{}
 
 	/** Dieses Feld speichert den Namen. */
-	final String _name_;
+	final String name;
 
 	/** Dieses Feld speichert die Funktion. */
-	FEMFunction _function_;
+	FEMFunction function;
 
 	/** Dieser Konstruktor initialisiert den Namen.
 	 *
@@ -31,7 +31,7 @@ public final class FEMProxy extends FEMFunction {
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
 	public FEMProxy(final String name) throws NullPointerException {
 		if (name == null) throw new NullPointerException("name = null");
-		this._name_ = name;
+		this.name = name;
 	}
 
 	{}
@@ -41,21 +41,21 @@ public final class FEMProxy extends FEMFunction {
 	 *
 	 * @return Funktion oder {@code null}. */
 	public final FEMFunction get() {
-		return this._function_;
+		return this.function;
 	}
 
 	/** Diese Methode setzt die in {@link #invoke(FEMFrame)} aufzurufende Funktion.
 	 *
 	 * @param function Funktion oder {@code null}. */
 	public final void set(final FEMFunction function) {
-		this._function_ = function;
+		this.function = function;
 	}
 
 	/** Diese Methode gibt den Namen des Platzhalters zurück.
 	 *
 	 * @return Name. */
 	public final String name() {
-		return this._name_;
+		return this.name;
 	}
 
 	{}
@@ -63,21 +63,21 @@ public final class FEMProxy extends FEMFunction {
 	/** {@inheritDoc} */
 	@Override
 	public final FEMValue invoke(final FEMFrame frame) {
-		return this._function_.invoke(frame);
+		return this.function.invoke(frame);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEMParser.formatValue(this._name_));
+		target.put(FEMParser.formatValue(this.name));
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		final FEMFunction function = this._function_;
-		if (function != null) return new FEMFormatter().put(FEMParser.formatValue(this._name_)).putHandler(this._function_).format();
-		return FEMParser.formatValue(this._name_);
+		final FEMFunction function = this.function;
+		if (function != null) return new FEMFormatter().put(FEMParser.formatValue(this.name)).putHandler(this.function).format();
+		return FEMParser.formatValue(this.name);
 	}
 
 }

@@ -29,7 +29,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SourceData<GOwner> _this_() {
+		protected final SourceData<GOwner> customThis() {
 			return this;
 		}
 
@@ -51,7 +51,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final FactoryData<GOwner> _this_() {
+		protected final FactoryData<GOwner> customThis() {
 			return this;
 		}
 
@@ -60,24 +60,24 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	{}
 
 	/** Dieses Feld speichert das {@link Schema}. */
-	Schema _schema_;
+	Schema schema;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}. */
-	final FactoryData<GThis> _factoryData_ = new FactoryData<GThis>() {
+	final FactoryData<GThis> factoryData = new FactoryData<GThis>() {
 
 		@Override
 		public final GThis closeFactoryData() {
-			return BaseSchemaData.this._this_();
+			return BaseSchemaData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final SourceData<GThis> _sourceData_ = new SourceData<GThis>() {
+	final SourceData<GThis> sourceData = new SourceData<GThis>() {
 
 		@Override
 		public final GThis closeSourceData() {
-			return BaseSchemaData.this._this_();
+			return BaseSchemaData.this.customThis();
 		}
 
 	};
@@ -89,11 +89,11 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseSchemaData<?> data) {
-		if (data == null) return this._this_();
-		this._schema_ = data._schema_;
-		this._sourceData_.use(data._sourceData_);
-		this._factoryData_.use(data._factoryData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.schema = data.schema;
+		this.sourceData.use(data.sourceData);
+		this.factoryData.use(data.factoryData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt das {@link Schema} zurück.<br>
@@ -105,11 +105,11 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 * @return {@link Schema} oder {@code null}.
 	 * @throws SAXException Wenn {@link SchemaFactory#newSchema(Source)} eine entsprechende Ausnahme auslöst. */
 	public final Schema getSchema() throws SAXException {
-		Schema result = this._schema_;
+		Schema result = this.schema;
 		if (result != null) return result;
-		final Source source = this._sourceData_.getSource();
+		final Source source = this.sourceData.getSource();
 		if (source == null) return null;
-		result = this._factoryData_.getFactory().newSchema(source);
+		result = this.factoryData.getFactory().newSchema(source);
 		this.useSchema(result);
 		return result;
 	}
@@ -119,8 +119,8 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 * @param schema {@link Schema} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useSchema(final Schema schema) {
-		this._schema_ = schema;
-		return this._this_();
+		this.schema = schema;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt das {@link Schema} auf {@code null} und gibt {@code this} zurück. Wenn {@link #getSchema()} {@code null} liefern soll, müssen die
@@ -137,7 +137,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 * @see SchemaFactory#newSchema(Source)
 	 * @return Konfigurator. */
 	public final SourceData<GThis> openSourceData() {
-		return this._sourceData_;
+		return this.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die {@link SchemaFactory} und gibt ihn zurück.
@@ -145,14 +145,14 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 * @see SchemaFactory#newSchema(Source)
 	 * @return Konfigurator. */
 	public final FactoryData<GThis> openFactoryData() {
-		return this._factoryData_;
+		return this.factoryData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc}
 	 *
@@ -169,7 +169,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._sourceData_, this._factoryData_);
+		return Objects.toInvokeString(this, this.sourceData, this.factoryData);
 	}
 
 }

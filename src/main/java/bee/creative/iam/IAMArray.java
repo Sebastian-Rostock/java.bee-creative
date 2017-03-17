@@ -14,18 +14,21 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class IntArray extends IAMArray {
 
-		final int[] _array_;
+		final int[] array;
 
-		IntArray(final int[] array) {
-			super(array.length);
-			this._array_ = array;
+		final int offset;
+
+		IntArray(final int[] array, final int offset, final int length) {
+			super(length);
+			this.array = array;
+			this.offset = offset;
 		}
 
 		{}
 
 		@Override
-		protected final int _get_(final int index) {
-			return this._array_[index];
+		protected final int customGet(final int index) {
+			return this.array[this.offset + index];
 		}
 
 		@Override
@@ -38,18 +41,21 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class ByteArray extends IAMArray {
 
-		final byte[] _array_;
+		final byte[] array;
 
-		ByteArray(final byte[] array) {
-			super(array.length);
-			this._array_ = array;
+		final int offset;
+
+		ByteArray(final byte[] array, final int offset, final int length) {
+			super(length);
+			this.array = array;
+			this.offset = offset;
 		}
 
 		{}
 
 		@Override
-		protected final int _get_(final int index) {
-			return this._array_[index];
+		protected final int customGet(final int index) {
+			return this.array[this.offset + index];
 		}
 
 		@Override
@@ -62,18 +68,21 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class CharArray extends IAMArray {
 
-		final char[] _array_;
+		final char[] array;
 
-		CharArray(final char[] array) {
-			super(array.length);
-			this._array_ = array;
+		final int offset;
+
+		CharArray(final char[] array, final int offset, final int length) {
+			super(length);
+			this.array = array;
+			this.offset = offset;
 		}
 
 		{}
 
 		@Override
-		protected final int _get_(final int index) {
-			return this._array_[index];
+		protected final int customGet(final int index) {
+			return this.array[this.offset + index];
 		}
 
 		@Override
@@ -86,18 +95,21 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class ShortArray extends IAMArray {
 
-		final short[] _array_;
+		final short[] array;
 
-		ShortArray(final short[] array) {
+		final int offset;
+
+		ShortArray(final short[] array, final int offset, final int length) {
 			super(array.length);
-			this._array_ = array;
+			this.array = array;
+			this.offset = offset;
 		}
 
 		{}
 
 		@Override
-		protected final int _get_(final int index) {
-			return this._array_[index];
+		protected final int customGet(final int index) {
+			return this.array[this.offset + index];
 		}
 
 		@Override
@@ -119,31 +131,31 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class SectionArray extends IAMArray {
 
-		final IAMArray _array_;
+		final IAMArray array;
 
-		final int _offset_;
+		final int offset;
 
 		SectionArray(final IAMArray array, final int offset, final int length) {
 			super(length);
-			this._array_ = array;
-			this._offset_ = offset;
+			this.array = array;
+			this.offset = offset;
 		}
 
 		{}
 
 		@Override
-		protected final int _get_(final int index) {
-			return this._array_._get_(this._offset_ + index);
+		protected final int customGet(final int index) {
+			return this.array.customGet(this.offset + index);
 		}
 
 		@Override
-		protected final IAMArray _section_(final int offset, final int length) {
-			return this._array_._section_(this._offset_ + offset, length);
+		protected final IAMArray customSection(final int offset, final int length) {
+			return this.array.customSection(this.offset + offset, length);
 		}
 
 		@Override
 		public final int mode() {
-			return this._array_.mode();
+			return this.array.mode();
 		}
 
 	}
@@ -155,48 +167,104 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	{}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
-	 * {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
+	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
 	 *
-	 * @param array Zahlen.
+	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 	public static IAMArray from(final int... array) throws NullPointerException {
-		if (array.length == 0) return IAMArray.EMPTY;
-		return new IntArray(array);
+		return IAMArray.from(array, 0, array.length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
-	 * {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
+	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	 * 
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static IAMArray from(final int[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return IAMArray.EMPTY;
+		return new IntArray(array, offset, length);
+	}
+
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
+	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
 	 *
-	 * @param array Zahlen.
+	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 	public static IAMArray from(final byte[] array) throws NullPointerException {
-		if (array.length == 0) return IAMArray.EMPTY;
-		return new ByteArray(array);
+		return IAMArray.from(array, 0, array.length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
-	 * {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
+	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	 * 
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static IAMArray from(final byte[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return IAMArray.EMPTY;
+		return new ByteArray(array, offset, length);
+	}
+
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
+	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
 	 *
-	 * @param array Zahlen.
+	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 	public static IAMArray from(final char[] array) throws NullPointerException {
-		if (array.length == 0) return IAMArray.EMPTY;
-		return new CharArray(array);
+		return IAMArray.from(array, 0, array.length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
-	 * {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
+	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	 * 
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static IAMArray from(final char[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return IAMArray.EMPTY;
+		return new CharArray(array, offset, length);
+	}
+
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
+	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
 	 *
-	 * @param array Zahlen.
+	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 	public static IAMArray from(final short[] array) throws NullPointerException {
-		if (array.length == 0) return IAMArray.EMPTY;
-		return new ShortArray(array);
+		return IAMArray.from(array, 0, array.length);
+	}
+
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
+	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	 * 
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static IAMArray from(final short[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return IAMArray.EMPTY;
+		return new ShortArray(array, offset, length);
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code byte[]} zurück.
@@ -207,12 +275,24 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Kopie der Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 	public static byte[] toBytes(final IAMArray array) throws NullPointerException {
-		final int length = array._length_;
-		final byte[] result = new byte[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = (byte)array._get_(i);
-		}
+		final byte[] result = new byte[array.length];
+		IAMArray.toBytes(array, result, 0);
 		return result;
+	}
+
+	/** Diese Methode kopiert die gegebene Zahlenfolge an die gegebene Position in das gegebenen {@code byte[]}.
+	 *
+	 * @param array Zahlenfolge.
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code array} bzw. {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public static void toBytes(final IAMArray array, final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = array.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		for (int i = 0; i < length; i++) {
+			result[i + offset] = (byte)array.customGet(i);
+		}
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code char[]} zurück.
@@ -223,15 +303,27 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Kopie der Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 	public static char[] toChars(final IAMArray array) throws NullPointerException {
-		final int length = array._length_;
-		final char[] result = new char[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = (char)array._get_(i);
-		}
+		final char[] result = new char[array.length];
+		IAMArray.toChars(array, result, 0);
 		return result;
 	}
 
-	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code short[]} zurück.
+	/** Diese Methode kopiert die gegebene Zahlenfolge an die gegebene Position in das gegebenen {@code char[]}.
+	 *
+	 * @param array Zahlenfolge.
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code array} bzw. {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public static void toChars(final IAMArray array, final char[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = array.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		for (int i = 0; i < length; i++) {
+			result[i + offset] = (char)array.customGet(i);
+		}
+	}
+
+	/** Diese Methode gibt eine Kopie der gegebenen Zahlenfolge als {@code short[]} zurück.
 	 *
 	 * @see #get(int)
 	 * @see #length()
@@ -239,24 +331,36 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Kopie der Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 	public static short[] toShorts(final IAMArray array) throws NullPointerException {
-		final int length = array._length_;
-		final short[] result = new short[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = (short)array._get_(i);
-		}
+		final short[] result = new short[array.length];
+		IAMArray.toShorts(array, result, 0);
 		return result;
+	}
+
+	/** Diese Methode kopiert die gegebene Zahlenfolge an die gegebene Position in das gegebenen {@code chort[]}.
+	 *
+	 * @param array Zahlenfolge.
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code array} bzw. {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public static void toShorts(final IAMArray array, final short[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = array.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		for (int i = 0; i < length; i++) {
+			result[i + offset] = (short)array.customGet(i);
+		}
 	}
 
 	{}
 
 	/** Dieses Feld speichert die Länge. */
-	protected final int _length_;
+	protected final int length;
 
 	/** Dieser Konstruktor initialisiert die Länge.
 	 *
 	 * @param length Länge. */
 	protected IAMArray(final int length) {
-		this._length_ = length;
+		this.length = length;
 	}
 
 	{}
@@ -265,7 +369,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 *
 	 * @param index Index.
 	 * @return {@code index}-te Zahl. */
-	protected int _get_(final int index) {
+	protected int customGet(final int index) {
 		return 0;
 	}
 
@@ -274,7 +378,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
 	 * @return Abschnitt. */
-	protected IAMArray _section_(final int offset, final int length) {
+	protected IAMArray customSection(final int offset, final int length) {
 		if (length == 0) return IAMArray.EMPTY;
 		return new SectionArray(this, offset, length);
 	}
@@ -285,8 +389,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param index Index.
 	 * @return {@code index}-te Zahl. */
 	public final int get(final int index) {
-		if ((index < 0) || (index >= this._length_)) return 0;
-		return this._get_(index);
+		if ((index < 0) || (index >= this.length)) return 0;
+		return this.customGet(index);
 	}
 
 	/** Diese Methode gibt die Länge der Zahlenfolge zurück ({@code 0..1073741823}).
@@ -294,7 +398,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @see #get(int)
 	 * @return Länge. */
 	public final int length() {
-		return this._length_;
+		return this.length;
 	}
 
 	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück.<br>
@@ -316,8 +420,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Streuwert. */
 	public final int hash() {
 		int hash = 0x811C9DC5;
-		for (int i = 0, size = this._length_; i < size; i++) {
-			hash = (hash * 0x01000193) ^ this._get_(i);
+		for (int i = 0, size = this.length; i < size; i++) {
+			hash = (hash * 0x01000193) ^ this.customGet(i);
 		}
 		return hash;
 	}
@@ -333,10 +437,10 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final IAMArray that) throws NullPointerException {
-		final int length = this._length_;
-		if (length != that._length_) return false;
+		final int length = this.length;
+		if (length != that.length) return false;
 		for (int i = 0; i < length; i++)
-			if (this._get_(i) != that._get_(i)) return false;
+			if (this.customGet(i) != that.customGet(i)) return false;
 		return true;
 	}
 
@@ -351,9 +455,9 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Vergleichswert der Ordnungen.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final IAMArray that) throws NullPointerException {
-		final int length1 = this._length_, length2 = that._length_;
+		final int length1 = this.length, length2 = that.length;
 		for (int i = 0, length = length1 < length2 ? length1 : length2, result; i < length; i++)
-			if ((result = Comparators.compare(this._get_(i), that._get_(i))) != 0) return result;
+			if ((result = Comparators.compare(this.customGet(i), that.customGet(i))) != 0) return result;
 		return length1 - length2;
 	}
 
@@ -364,8 +468,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param length Länge des Abschnitts.
 	 * @return Abschnitt. */
 	public IAMArray section(final int offset, final int length) {
-		if ((offset < 0) || (length <= 0) || ((offset + length) > this._length_)) return this._section_(0, 0);
-		return this._section_(offset, length);
+		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length)) return this.customSection(0, 0);
+		return this.customSection(offset, length);
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code int[]} zurück.
@@ -374,12 +478,23 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @see #length()
 	 * @return Kopie der Zahlenfolge. */
 	public final int[] toArray() {
-		final int length = this._length_;
-		final int[] result = new int[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = this._get_(i);
-		}
+		final int[] result = new int[this.length];
+		this.toArray(result, 0);
 		return result;
+	}
+
+	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code int[]}.
+	 *
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der dessen dieser Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public final void toArray(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = this.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		for (int i = 0; i < length; i++) {
+			result[i + offset] = this.customGet(i);
+		}
 	}
 
 	{}
@@ -389,16 +504,16 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	public final Iterator<Integer> iterator() {
 		return new Iterator<Integer>() {
 
-			int _index_ = 0;
+			int index = 0;
 
 			@Override
 			public boolean hasNext() {
-				return this._index_ < IAMArray.this._length_;
+				return this.index < IAMArray.this.length;
 			}
 
 			@Override
 			public Integer next() {
-				return new Integer(IAMArray.this._get_(this._index_++));
+				return new Integer(IAMArray.this.customGet(this.index++));
 			}
 
 			@Override

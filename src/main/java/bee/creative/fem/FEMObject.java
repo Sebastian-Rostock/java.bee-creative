@@ -25,7 +25,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	public static final FEMObject EMPTY = new FEMObject(0, (short)0, (short)0);
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern _pattern_ = Pattern.compile("^#(\\d+)\\.(\\d+):(\\d+)$");
+	static final Pattern pattern = Pattern.compile("^#(\\d+)\\.(\\d+):(\\d+)$");
 
 	{}
 
@@ -39,7 +39,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMObject from(final String string) throws NullPointerException, IllegalArgumentException {
 		try {
-			final Matcher matcher = FEMObject._pattern_.matcher(string);
+			final Matcher matcher = FEMObject.pattern.matcher(string);
 			if (!matcher.find()) throw new IllegalArgumentException();
 			final int ref = Integer.parseInt(matcher.group(1));
 			final int type = Integer.parseInt(matcher.group(3));
@@ -77,13 +77,13 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	final int _refValue_;
+	final int refValue;
 
 	@SuppressWarnings ("javadoc")
-	final short _typeValue_;
+	final short typeValue;
 
 	@SuppressWarnings ("javadoc")
-	final short _ownerValue_;
+	final short ownerValue;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung der Referenz.
 	 *
@@ -96,9 +96,9 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 
 	@SuppressWarnings ("javadoc")
 	FEMObject(final int refValue, final short typeValue, final short ownerValue) {
-		this._refValue_ = refValue;
-		this._typeValue_ = typeValue;
-		this._ownerValue_ = ownerValue;
+		this.refValue = refValue;
+		this.typeValue = typeValue;
+		this.ownerValue = ownerValue;
 	}
 
 	{}
@@ -114,14 +114,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 *
 	 * @return interne Darstellung der Referenz. */
 	public final long value() {
-		return (((long)this._refValue_) << 32) | (this._ownerValue_ << 16) | (this._typeValue_ << 0);
+		return (((long)this.refValue) << 32) | (this.ownerValue << 16) | (this.typeValue << 0);
 	}
 
 	/** Diese Methode gibt den Objektschlüssel zurück.
 	 *
 	 * @return Objektschlüssel ({@code 0..2147483647}). */
 	public final int refValue() {
-		return this._refValue_;
+		return this.refValue;
 	}
 
 	/** Diese Methode gibt die Typkennung zurück.
@@ -129,7 +129,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @see #withType(int)
 	 * @return Typkennung ({@code 0..65535}). */
 	public final int typeValue() {
-		return this._typeValue_ & 0xFFFF;
+		return this.typeValue & 0xFFFF;
 	}
 
 	/** Diese Methode gibt die Besitzerkennung zurück.
@@ -137,7 +137,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @see #withOwner(int)
 	 * @return Besitzerkennung ({@code 0..65535}). */
 	public final int ownerValue() {
-		return this._ownerValue_ & 0xFFFF;
+		return this.ownerValue & 0xFFFF;
 	}
 
 	/** Diese Methode gibt diese Referenz mit dem gegebenen Objektschlüssel zurück.
@@ -147,7 +147,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Objektschlüssel.
 	 * @throws IllegalArgumentException Wenn {@code ref} ungültig ist. */
 	public final FEMObject withRef(final int ref) throws IllegalArgumentException {
-		return new FEMObject(ref, this._typeValue_, this._ownerValue_);
+		return new FEMObject(ref, this.typeValue, this.ownerValue);
 	}
 
 	/** Diese Methode gibt diese Referenz mit der gegebenen Typkennung zurück.
@@ -157,7 +157,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Typkennung.
 	 * @throws IllegalArgumentException Wenn {@code type} ungültig ist. */
 	public final FEMObject withType(final int type) throws IllegalArgumentException {
-		return new FEMObject(this._refValue_, (short)type, this._ownerValue_);
+		return new FEMObject(this.refValue, (short)type, this.ownerValue);
 	}
 
 	/** Diese Methode gibt diese Referenz mit der gegebenen Besitzerkennung zurück.
@@ -167,14 +167,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Besitzerkennung.
 	 * @throws IllegalArgumentException Wenn {@code owner} ungültig ist. */
 	public final FEMObject withOwner(final int owner) throws IllegalArgumentException {
-		return new FEMObject(this._refValue_, this._typeValue_, (short)owner);
+		return new FEMObject(this.refValue, this.typeValue, (short)owner);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		return this._refValue_ ^ this._typeValue_ ^ this._ownerValue_;
+		return this.refValue ^ this.typeValue ^ this.ownerValue;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Referenz gleich der gegebenen ist.
@@ -183,7 +183,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMObject that) throws NullPointerException {
-		return (this._refValue_ == that._refValue_) && (this._typeValue_ == that._typeValue_) && (this._ownerValue_ == that._ownerValue_);
+		return (this.refValue == that.refValue) && (this.typeValue == that.typeValue) && (this.ownerValue == that.ownerValue);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die Ordnung dieser Referenz kleiner, gleich bzw. größer als die der gegebenen

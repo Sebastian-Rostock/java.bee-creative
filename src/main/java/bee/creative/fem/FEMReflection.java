@@ -90,7 +90,7 @@ public abstract class FEMReflection extends FEMFunction {
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
 			try {
-				final Object[] params = FEMReflection._params_(frame, false);
+				final Object[] params = FEMReflection.params(frame, false);
 				final Object result = this.method.invoke(null, params);
 				return new FEMNative(result);
 			} catch (final Exception cause) {
@@ -124,7 +124,7 @@ public abstract class FEMReflection extends FEMFunction {
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
 			try {
-				final Object[] params = FEMReflection._params_(frame, false);
+				final Object[] params = FEMReflection.params(frame, false);
 				final Object result = this.constructor.newInstance(params);
 				return new FEMNative(result);
 			} catch (final Exception cause) {
@@ -201,7 +201,7 @@ public abstract class FEMReflection extends FEMFunction {
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
 			try {
-				final Object[] params = FEMReflection._params_(frame, true);
+				final Object[] params = FEMReflection.params(frame, true);
 				final Object input = frame.get(0).data();
 				final Object result = this.method.invoke(input, params);
 				return new FEMNative(result);
@@ -274,7 +274,7 @@ public abstract class FEMReflection extends FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static Object[] _params_(final FEMFrame frame, final boolean skipFirst) {
+	static Object[] params(final FEMFrame frame, final boolean skipFirst) {
 		final int offset = skipFirst ? 1 : 0, length = frame.size() - offset;
 		final Object[] result = new Object[length];
 		for (int i = 0; i < length; i++) {

@@ -6,13 +6,13 @@ package bee.creative.util;
 public class Integers {
 
 	/** Dieses Feld speichert die Zehnerstelle der ersten 100 positiven Dezimanzahlen. */
-	final static char[] _digitTenArray_ = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2',
+	final static char[] digitTenArray = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2',
 		'2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '5', '5', '5', '5', '5',
 		'5', '5', '5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7', '7', '7', '8', '8', '8', '8', '8', '8',
 		'8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'};
 
 	/** Dieses Feld speichert die Einerstelle der ersten 100 positiven Dezimanzahlen. */
-	final static char[] _digitOneArray_ = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
+	final static char[] digitOneArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
 		'4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4',
 		'5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5',
 		'6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -65,13 +65,13 @@ public class Integers {
 			div = value / 100;
 			mod = value % 100;
 			if (div != 0) {
-				buffer[--offset] = Integers._digitOneArray_[mod];
-				buffer[--offset] = Integers._digitTenArray_[mod];
+				buffer[--offset] = Integers.digitOneArray[mod];
+				buffer[--offset] = Integers.digitTenArray[mod];
 				value = div;
 			} else {
-				buffer[--offset] = Integers._digitOneArray_[mod];
+				buffer[--offset] = Integers.digitOneArray[mod];
 				if (mod < 10) return;
-				buffer[--offset] = Integers._digitTenArray_[mod];
+				buffer[--offset] = Integers.digitTenArray[mod];
 				return;
 			}
 		}

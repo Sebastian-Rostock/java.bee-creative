@@ -35,10 +35,10 @@ import bee.creative.util.Objects;
 public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 
 	/** Dieses Feld speichert die Quelldaten. */
-	Source _source_;
+	Source source;
 
 	/** Dieses Feld speichert den System-Identifikator. */
-	String _systemID_;
+	String systemId;
 
 	{}
 
@@ -47,10 +47,10 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseSourceData<?> data) {
-		if (data == null) return this._this_();
-		this._source_ = data._source_;
-		this._systemID_ = data._systemID_;
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.source = data.source;
+		this.systemId = data.systemId;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URI} und gibt {@code this} zurück.
@@ -164,10 +164,10 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	 * @param systemID System-Identifikator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useSystemID(final String systemID) {
-		this._systemID_ = systemID;
-		if (this._source_ == null) return this._this_();
-		this._source_.setSystemId(systemID);
-		return this._this_();
+		this.systemId = systemID;
+		if (this.source == null) return this.customThis();
+		this.source.setSystemId(systemID);
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die Quelldaten und gibt {@code this} zurück. Der aktuelle System-Identifikator wird beibehalten, sofern er nicht {@code null} ist.
@@ -177,9 +177,9 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	 * @param source Quelldaten oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useSource(final Source source) {
-		this._source_ = source;
-		if (source == null) return this._this_();
-		return this.useSystemID(this._systemID_ != null ? this._systemID_ : source.getSystemId());
+		this.source = source;
+		if (source == null) return this.customThis();
+		return this.useSystemID(this.systemId != null ? this.systemId : source.getSystemId());
 	}
 
 	/** Diese Methode gibt die aktuell konfigurierten Quelldaten zurück.
@@ -194,7 +194,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	 * @see StreamSource
 	 * @return Quelldaten oder {@code null}. */
 	public final Source getSource() {
-		return this._source_;
+		return this.source;
 	}
 
 	/** Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück.<br>
@@ -235,7 +235,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._source_, this._systemID_);
+		return Objects.toInvokeString(this, this.source, this.systemId);
 	}
 
 }

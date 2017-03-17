@@ -15,10 +15,10 @@ import java.util.Map;
 public class Natives {
 
 	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
-	static final Map<String, Class<?>> _parseClass_ = new HashMap<>(9);
+	static final Map<String, Class<?>> parseClass = new HashMap<>(9);
 
 	/** Dieses Feld speichert den {@link Converter} zu {@link #formatClass(Class)}. */
-	static final Converter<Class<?>, Object> _formatClass_ = new Converter<Class<?>, Object>() {
+	static final Converter<Class<?>, Object> formatClass = new Converter<Class<?>, Object>() {
 
 		@Override
 		public Object convert(final Class<?> input) {
@@ -30,7 +30,7 @@ public class Natives {
 	static {
 		final Class<?>[] classes = {byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class};
 		for (final Class<?> clazz: classes) {
-			Natives._parseClass_.put(clazz.getName(), clazz);
+			Natives.parseClass.put(clazz.getName(), clazz);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class Natives {
 	public static Class<?> parseClass(final String classText) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (classText.endsWith("[]")) return Array.newInstance(Natives.parseClass(classText.substring(0, classText.length() - 2)), 0).getClass();
-			Class<?> result = Natives._parseClass_.get(classText);
+			Class<?> result = Natives.parseClass.get(classText);
 			if (result != null) return result;
 			result = Class.forName(classText);
 			return result;
@@ -261,7 +261,7 @@ public class Natives {
 	 * @return Parametertypentext.
 	 * @throws NullPointerException Wenn {@code types} {@code null} ist oder enthält. */
 	public static String formatParams(final Class<?>... types) throws NullPointerException {
-		return "(" + Strings.join(",", Iterables.convertedIterable(Natives._formatClass_, Arrays.asList(types))) + ")";
+		return "(" + Strings.join(",", Iterables.convertedIterable(Natives.formatClass, Arrays.asList(types))) + ")";
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Method Methode} zurück.<br>
@@ -275,7 +275,7 @@ public class Natives {
 	 * @return Methodentext.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
 	public static String formatMethod(final Method method) throws NullPointerException {
-		return Natives._formatMethod_(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
+		return Natives.formatMethod(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
 	}
 
 	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Constructor Konstruktors} zurück.<br>
@@ -286,11 +286,11 @@ public class Natives {
 	 * @return Konstruktortext.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
 	public static String formatConstructor(final Constructor<?> constructor) throws NullPointerException {
-		return Natives._formatMethod_(constructor.getDeclaringClass(), "new", constructor.getParameterTypes());
+		return Natives.formatMethod(constructor.getDeclaringClass(), "new", constructor.getParameterTypes());
 	}
 
 	@SuppressWarnings ("javadoc")
-	static String _formatMethod_(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
+	static String formatMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
 		return Natives.formatClass(methodOwner) + "." + methodName + Natives.formatParams(methodParams);
 	}
 

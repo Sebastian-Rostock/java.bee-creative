@@ -9,7 +9,7 @@ public final class XMLTransformer extends BaseTransformerData<XMLTransformer> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected final XMLTransformer _this_() {
+	protected final XMLTransformer customThis() {
 		return this;
 	}
 

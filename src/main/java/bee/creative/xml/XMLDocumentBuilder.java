@@ -10,7 +10,7 @@ public final class XMLDocumentBuilder extends BaseDocumentBuilderData<XMLDocumen
 
 	/** {@inheritDoc} */
 	@Override
-	protected final XMLDocumentBuilder _this_() {
+	protected final XMLDocumentBuilder customThis() {
 		return this;
 	}
 

@@ -33,18 +33,18 @@ public class Tester {
 	public static final class Sampler extends Thread {
 
 		/** Dieses Feld speichert das Interval in Millisekunden, in dem die Messung erfolgt. Es ist {@code 0}, wenn die Messung beendet werden soll. */
-		int _millis_;
+		int millis;
 
 		/** Dieses Feld speichert die Rechenzeit in Nanosekunden, die zur Messung benötigt wurde.
 		 *
 		 * @see System#nanoTime() */
-		long _usedTime_;
+		long usedTime;
 
 		/** Dieses Feld speichert die maximale Speicherbelegung in Byte, die während der Messung ermittelt wurde.
 		 *
 		 * @see Runtime#freeMemory()
 		 * @see Runtime#totalMemory() */
-		long _usedMemory_;
+		long usedMemory;
 
 		/** Dieser Konstruktor initialisiert das Interval in Millisekunden.
 		 *
@@ -53,7 +53,7 @@ public class Tester {
 		public Sampler(final int millis) throws IllegalArgumentException {
 			super(Sampler.class.getSimpleName());
 			if (millis <= 0) throw new IllegalArgumentException("millis <= 0");
-			this._millis_ = millis;
+			this.millis = millis;
 			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
 		}
 
@@ -70,7 +70,7 @@ public class Tester {
 		 *
 		 * @see #join() */
 		public final void deactivate() {
-			this._millis_ = 0;
+			this.millis = 0;
 			try {
 				this.join();
 			} catch (final InterruptedException e) {}
@@ -86,18 +86,18 @@ public class Tester {
 			long leaveTime = 0;
 			do {
 				final long enterTime2 = System.nanoTime();
-				this._usedTime_ += leaveTime - enterTime;
+				this.usedTime += leaveTime - enterTime;
 				runtime.gc();
-				this._usedMemory_ = Math.max(runtime.totalMemory() - runtime.freeMemory(), this._usedMemory_);
+				this.usedMemory = Math.max(runtime.totalMemory() - runtime.freeMemory(), this.usedMemory);
 				enterTime = enterTime2;
 				leaveTime = System.nanoTime();
 				try {
-					Thread.sleep(this._millis_);
+					Thread.sleep(this.millis);
 				} catch (final InterruptedException e) {
 					break;
 				}
-			} while (this._millis_ != 0);
-			this._usedTime_ += leaveTime - enterTime;
+			} while (this.millis != 0);
+			this.usedTime += leaveTime - enterTime;
 		}
 
 	}
@@ -178,8 +178,8 @@ public class Tester {
 			}
 			runtime.gc();
 			leaveMemory = runtime.totalMemory() - runtime.freeMemory();
-			this.usedTime = leaveTime - enterTime - sampler._usedTime_;
-			this.usedMemory = Math.max(sampler._usedMemory_, leaveMemory) - enterMemory;
+			this.usedTime = leaveTime - enterTime - sampler.usedTime;
+			this.usedMemory = Math.max(sampler.usedMemory, leaveMemory) - enterMemory;
 		} else {
 			runtime.gc();
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();

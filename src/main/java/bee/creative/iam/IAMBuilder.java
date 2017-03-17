@@ -147,10 +147,10 @@ public class IAMBuilder {
 	public static final class IAMIndexBuilder extends IAMIndex {
 
 		/** Dieses Feld speichert die {@link IAMMapping}. */
-		final List<IAMMapping> _mappings_ = new ArrayList<>();
+		final List<IAMMapping> mappings = new ArrayList<>();
 
 		/** Dieses Feld speichert die {@link IAMListing}. */
-		final List<IAMListing> _listings_ = new ArrayList<>();
+		final List<IAMListing> listings = new ArrayList<>();
 
 		/** Dieser Konstruktor initialisiert einen leeren {@link IAMIndexBuilder}. */
 		public IAMIndexBuilder() {
@@ -165,8 +165,8 @@ public class IAMBuilder {
 		 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
 		public final int putMapping(final IAMMapping mapping) throws NullPointerException {
 			mapping.entryCount();
-			final int result = this._mappings_.size();
-			this._mappings_.add(result, mapping);
+			final int result = this.mappings.size();
+			this.mappings.add(result, mapping);
 			return result;
 		}
 
@@ -177,15 +177,15 @@ public class IAMBuilder {
 		 * @throws NullPointerException Wenn {@code listing} {@code null} ist. */
 		public final int putListing(final IAMListing listing) throws NullPointerException {
 			listing.itemCount();
-			final int result = this._listings_.size();
-			this._listings_.add(result, listing);
+			final int result = this.listings.size();
+			this.listings.add(result, listing);
 			return result;
 		}
 
 		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
 		public final void clear() {
-			this._mappings_.clear();
-			this._listings_.clear();
+			this.mappings.clear();
+			this.listings.clear();
 		}
 
 		{}
@@ -193,27 +193,27 @@ public class IAMBuilder {
 		/** {@inheritDoc} */
 		@Override
 		public final IAMMapping mapping(final int index) {
-			if ((index < 0) || (index >= this._mappings_.size())) return IAMMapping.EMPTY;
-			return this._mappings_.get(index);
+			if ((index < 0) || (index >= this.mappings.size())) return IAMMapping.EMPTY;
+			return this.mappings.get(index);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final int mappingCount() {
-			return this._mappings_.size();
+			return this.mappings.size();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final IAMListing listing(final int index) {
-			if ((index < 0) || (index >= this._listings_.size())) return IAMListing.EMPTY;
-			return this._listings_.get(index);
+			if ((index < 0) || (index >= this.listings.size())) return IAMListing.EMPTY;
+			return this.listings.get(index);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final int listingCount() {
-			return this._listings_.size();
+			return this.listings.size();
 		}
 
 	}
@@ -224,7 +224,7 @@ public class IAMBuilder {
 	public static final class IAMListingBuilder extends IAMListing {
 
 		/** Dieses Feld speichert die bisher gesammelten Elemente. */
-		final UniqueItemPool _items_ = new UniqueItemPool();
+		final UniqueItemPool items = new UniqueItemPool();
 
 		/** Dieser Konstruktor initialisiert einen leeren {@link IAMListingBuilder}. */
 		public IAMListingBuilder() {
@@ -241,7 +241,7 @@ public class IAMBuilder {
 		 * @return {@code int}-Array des {@code itemIndex}-ten Elements.
 		 * @throws IndexOutOfBoundsException Wenn eine der Eingaben ungültig ist. */
 		public final int[] get(final int itemIndex) throws IndexOutOfBoundsException {
-			return this._items_.datas.get(itemIndex).item;
+			return this.items.datas.get(itemIndex).item;
 		}
 
 		/** Diese Methode fügt das gegebene Element hinzu und gibt den Index zurück, unter dem das Element verwaltet wird. Wenn bereits ein Element mit dem gleichen
@@ -254,7 +254,7 @@ public class IAMBuilder {
 		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 		public final int put(final int[] value) throws NullPointerException {
-			return this._items_.put(value).index;
+			return this.items.put(value).index;
 		}
 
 		/** Diese Methode fügt das gegebene Element hinzu und gibt den Index zurück, unter dem das Element verwaltet wird. Wenn die Wiederverwendung aktiviert ist
@@ -267,13 +267,13 @@ public class IAMBuilder {
 		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 		public final int put(final int[] value, final boolean reuse) throws NullPointerException {
-			if (reuse) return this._items_.get(value).index;
-			return this._items_.put(value).index;
+			if (reuse) return this.items.get(value).index;
+			return this.items.put(value).index;
 		}
 
 		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
 		public final void clear() {
-			this._items_.clear();
+			this.items.clear();
 		}
 
 		{}
@@ -281,7 +281,7 @@ public class IAMBuilder {
 		/** {@inheritDoc} */
 		@Override
 		public final IAMArray item(final int itemIndex) {
-			final List<ItemData> datas = this._items_.datas;
+			final List<ItemData> datas = this.items.datas;
 			if ((itemIndex < 0) || (itemIndex >= datas.size())) return IAMArray.EMPTY;
 			return IAMArray.from(datas.get(itemIndex).item);
 		}
@@ -289,7 +289,7 @@ public class IAMBuilder {
 		/** {@inheritDoc} */
 		@Override
 		public final int itemCount() {
-			return this._items_.datas.size();
+			return this.items.datas.size();
 		}
 
 	}
@@ -300,10 +300,10 @@ public class IAMBuilder {
 	public static final class IAMMappingBuilder extends IAMMapping {
 
 		/** Dieses Feld speichert den Modus. */
-		boolean _mode_ = IAMMapping.MODE_HASHED;
+		boolean mode = IAMMapping.MODE_HASHED;
 
 		/** Dieses Feld speichert die Einträge. */
-		final UniqueEntryPool _entries_ = new UniqueEntryPool();
+		final UniqueEntryPool entries = new UniqueEntryPool();
 
 		/** Dieser Konstruktor initialisiert einen leeren {@link IAMMappingBuilder}. */
 		public IAMMappingBuilder() {
@@ -318,7 +318,7 @@ public class IAMBuilder {
 		 * @return {@code int}-Array des Werts des {@code entryIndex}-ten Eintrags.
 		 * @throws IndexOutOfBoundsException Wenn {@code entryIndex} ungültig ist. */
 		public final int[] get(final int entryIndex) throws IndexOutOfBoundsException {
-			return this._entries_.datas.get(entryIndex).value;
+			return this.entries.datas.get(entryIndex).value;
 		}
 
 		/** Diese Methode fügt einen Eintrag mit dem gegebenen Schlüssel sowie dem gegebenen Wert hinzu. Wenn bereits ein Eintrag mit diesem Schlüssel existiert,
@@ -330,13 +330,13 @@ public class IAMBuilder {
 		public final void put(final int[] key, final int[] value) throws NullPointerException {
 			if (key == null) throw new NullPointerException("key = null");
 			if (value == null) throw new NullPointerException("value = null");
-			this._entries_.get(key).value = value;
+			this.entries.get(key).value = value;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final boolean mode() {
-			return this._mode_;
+			return this.mode;
 		}
 
 		/** Diese Methode setzt den Modus.
@@ -345,12 +345,12 @@ public class IAMBuilder {
 		 * @see #MODE_SORTED
 		 * @param mode Modus. */
 		public final void mode(final boolean mode) {
-			this._mode_ = mode;
+			this.mode = mode;
 		}
 
 		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
 		public final void clear() {
-			this._entries_.clear();
+			this.entries.clear();
 		}
 
 		{}
@@ -358,7 +358,7 @@ public class IAMBuilder {
 		/** {@inheritDoc} */
 		@Override
 		public final IAMArray key(final int entryIndex) {
-			final List<EntryData> datas = this._entries_.datas;
+			final List<EntryData> datas = this.entries.datas;
 			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAMArray.EMPTY;
 			return IAMArray.from(datas.get(entryIndex).key);
 		}
@@ -366,7 +366,7 @@ public class IAMBuilder {
 		/** {@inheritDoc} */
 		@Override
 		public final IAMArray value(final int entryIndex) {
-			final List<EntryData> datas = this._entries_.datas;
+			final List<EntryData> datas = this.entries.datas;
 			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAMArray.EMPTY;
 			return IAMArray.from(datas.get(entryIndex).value);
 		}
@@ -374,13 +374,13 @@ public class IAMBuilder {
 		/** {@inheritDoc} */
 		@Override
 		public final int entryCount() {
-			return this._entries_.datas.size();
+			return this.entries.datas.size();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
-			final EntryData result = this._entries_.entryMap().get(key.toArray());
+			final EntryData result = this.entries.entryMap().get(key.toArray());
 			return result == null ? -1 : result.index;
 		}
 

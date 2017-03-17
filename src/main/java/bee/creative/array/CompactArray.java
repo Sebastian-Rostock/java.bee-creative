@@ -572,13 +572,13 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	/** {@inheritDoc} */
 	@Override
 	public void insert(final int index, final int count) throws IndexOutOfBoundsException, IllegalArgumentException {
-		this._insert_(this._exclusiveIndex_(index), count);
+		this.customInsert(this._exclusiveIndex_(index), count);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void remove(final int index, final int count) throws IndexOutOfBoundsException, IllegalArgumentException {
-		this._remove_(this._exclusiveIndex_(index), count);
+		this.customRemove(this._exclusiveIndex_(index), count);
 	}
 
 	/** {@inheritDoc} */

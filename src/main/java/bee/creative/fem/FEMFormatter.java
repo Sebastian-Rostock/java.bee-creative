@@ -19,13 +19,13 @@ public final class FEMFormatter {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class Mark {
 
-		/** Dieses Feld speichert das Objekt, dass in {@link #_items_} vor jeder Markierung eingefügt wird. */
+		/** Dieses Feld speichert das Objekt, dass in {@link #items} vor jeder Markierung eingefügt wird. */
 		static final FEMFormatter.Mark EMPTY = new FEMFormatter.Mark(0, false, false, false);
 
 		{}
 
 		/** Dieses Feld speichert die Eigenschaften dieser Markierung. */
-		int _data_;
+		int data;
 
 		/** Dieser Konstruktor initialisiert die Markierung.
 		 *
@@ -34,7 +34,7 @@ public final class FEMFormatter {
 		 * @param space Leerzeichen ({@link #isSpace()}).
 		 * @param enabled Aktivierung ({@link #isEnabled()}). */
 		public Mark(final int level, final boolean last, final boolean space, final boolean enabled) {
-			this._data_ = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
+			this.data = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
 		}
 
 		{}
@@ -43,33 +43,33 @@ public final class FEMFormatter {
 		 *
 		 * @return Tiefe der Einrückung. */
 		public final int level() {
-			return this._data_ >> 3;
+			return this.data >> 3;
 		}
 
 		/** Diese Methode aktiviert die Einrückung. */
 		public final void enable() {
-			this._data_ |= 2;
+			this.data |= 2;
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Objekt das Ende einer Einrückungsebene markiert.
 		 *
 		 * @return {@code true} bei einer Endmarkierung. */
 		public final boolean isLast() {
-			return (this._data_ & 1) != 0;
+			return (this.data & 1) != 0;
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Objekt ein bedingtes Leerzeichen markiert.
 		 *
 		 * @return {@code true} bei einem bedingten Leerzeichen. */
 		public final boolean isSpace() {
-			return (this._data_ & 4) != 0;
+			return (this.data & 4) != 0;
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die Einrückung aktiviert ist.
 		 *
 		 * @return Aktivierung. */
 		public final boolean isEnabled() {
-			return (this._data_ & 2) != 0;
+			return (this.data & 2) != 0;
 		}
 
 		{}
@@ -85,19 +85,19 @@ public final class FEMFormatter {
 	{}
 
 	/** Dieses Feld speichert die bisher gesammelten Zeichenketten und Markierungen. */
-	final List<Object> _items_ = new ArrayList<Object>();
+	final List<Object> items = new ArrayList<Object>();
 
 	/** Dieses Feld speichert den Puffer für {@link #format()}. */
-	final StringBuilder _string_ = new StringBuilder();
+	final StringBuilder string = new StringBuilder();
 
 	/** Dieses Feld speichert den Stack der Hierarchieebenen. */
-	final LinkedList<Boolean> _indents_ = new LinkedList<Boolean>();
+	final LinkedList<Boolean> indents = new LinkedList<Boolean>();
 
 	/** Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "  "}. */
-	String _indent_;
+	String indent;
 
 	/** Dieses Feld speichert die Formatierungsmethoden. */
-	FEMDomain _domain_ = FEMDomain.NORMAL;
+	FEMDomain domain = FEMDomain.NORMAL;
 
 	{}
 
@@ -111,10 +111,10 @@ public final class FEMFormatter {
 	 *
 	 * @return {@code this}. */
 	public synchronized final FEMFormatter reset() {
-		this._items_.clear();
-		this._string_.setLength(0);
-		this._indents_.clear();
-		this._indents_.addLast(Boolean.FALSE);
+		this.items.clear();
+		this.string.setLength(0);
+		this.indents.clear();
+		this.indents.addLast(Boolean.FALSE);
 		return this;
 	}
 
@@ -122,8 +122,8 @@ public final class FEMFormatter {
 	 *
 	 * @param object Markierung.
 	 * @return {@code this}. */
-	final FEMFormatter _putMark_(final FEMFormatter.Mark object) {
-		this._items_.add(object);
+	final FEMFormatter putMark(final FEMFormatter.Mark object) {
+		this.items.add(object);
 		return this;
 	}
 
@@ -136,9 +136,9 @@ public final class FEMFormatter {
 	 * @see #putIndent()
 	 * @return {@code this}. */
 	public final FEMFormatter putBreakInc() {
-		final LinkedList<Boolean> indents = this._indents_;
+		final LinkedList<Boolean> indents = this.indents;
 		indents.addLast(Boolean.FALSE);
-		return this._putMark_(Mark.EMPTY)._putMark_(new Mark(indents.size(), false, false, false));
+		return this.putMark(Mark.EMPTY).putMark(new Mark(indents.size(), false, false, false));
 	}
 
 	/** Diese Methode markiert das Ende der aktuellen Hierarchieebene, reduziert die Tiefe der Einrückung um eins und gibt {@code this} zurück. Wenn über
@@ -151,10 +151,10 @@ public final class FEMFormatter {
 	 * @return {@code this}.
 	 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde. */
 	public final FEMFormatter putBreakDec() throws IllegalStateException {
-		final LinkedList<Boolean> indents = this._indents_;
+		final LinkedList<Boolean> indents = this.indents;
 		final int value = indents.size();
 		if (value <= 1) throw new IllegalStateException();
-		return this._putMark_(Mark.EMPTY)._putMark_(new Mark(value, true, false, indents.removeLast().booleanValue()));
+		return this.putMark(Mark.EMPTY).putMark(new Mark(value, true, false, indents.removeLast().booleanValue()));
 	}
 
 	/** Diese Methode fügt ein bedingtes Leerzeichen an und gibt {@code this} zurück. Wenn über {@link #putIndent()} die Einrückung für die aktuelle
@@ -165,8 +165,8 @@ public final class FEMFormatter {
 	 * @see #putIndent()
 	 * @return {@code this}. */
 	public final FEMFormatter putBreakSpace() {
-		final LinkedList<Boolean> indents = this._indents_;
-		return this._putMark_(Mark.EMPTY)._putMark_(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
+		final LinkedList<Boolean> indents = this.indents;
+		return this.putMark(Mark.EMPTY).putMark(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
 	}
 
 	/** Diese Methode markiert die aktuelle sowie alle übergeordneten Hierarchieebenen als einzurücken und gibt {@code this} zurück. Beginn und Ende einer
@@ -177,13 +177,13 @@ public final class FEMFormatter {
 	 * @see #putBreakDec()
 	 * @return {@code this}. */
 	public final FEMFormatter putIndent() {
-		final LinkedList<Boolean> indents = this._indents_;
-		if (this._indents_.getLast().booleanValue()) return this;
+		final LinkedList<Boolean> indents = this.indents;
+		if (this.indents.getLast().booleanValue()) return this;
 		final int value = indents.size();
 		for (int i = 0; i < value; i++) {
 			indents.set(i, Boolean.TRUE);
 		}
-		final List<Object> items = this._items_;
+		final List<Object> items = this.items;
 		for (int i = items.size() - 2; i >= 0; i--) {
 			final Object item = items.get(i);
 			if (item == Mark.EMPTY) {
@@ -205,7 +205,7 @@ public final class FEMFormatter {
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn {@code part} nicht formatiert werden kann. */
 	public final FEMFormatter put(final Object part) throws IllegalArgumentException {
-		this._items_.add(part.toString());
+		this.items.add(part.toString());
 		return this;
 	}
 
@@ -218,7 +218,7 @@ public final class FEMFormatter {
 	 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
 	public final FEMFormatter putData(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data == null) throw new NullPointerException("data = null");
-		this._domain_.formatData(this, data);
+		this.domain.formatData(this, data);
 		return this;
 	}
 
@@ -353,7 +353,7 @@ public final class FEMFormatter {
 	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
 	public final FEMFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalArgumentException {
 		if (function == null) throw new NullPointerException("function = null");
-		this._domain_.formatFunction(this, function);
+		this.domain.formatFunction(this, function);
 		return this;
 	}
 
@@ -361,14 +361,14 @@ public final class FEMFormatter {
 	 *
 	 * @return Zeichenkette zur Einrückung oder {@code null}. */
 	public final String getIndent() {
-		return this._indent_;
+		return this.indent;
 	}
 
 	/** Diese Methode gibt die genutzten Formatierungsmethoden zurück.
 	 *
 	 * @return Formatierungsmethoden. */
 	public final FEMDomain getDomain() {
-		return this._domain_;
+		return this.domain;
 	}
 
 	/** Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.<br>
@@ -377,7 +377,7 @@ public final class FEMFormatter {
 	 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
 	 * @return {@code this}. */
 	public synchronized final FEMFormatter useIndent(final String indent) {
-		this._indent_ = indent;
+		this.indent = indent;
 		return this;
 	}
 
@@ -388,7 +388,7 @@ public final class FEMFormatter {
 	 * @throws NullPointerException Wenn {@code domain} {@code null} ist. */
 	public synchronized final FEMFormatter useDomain(final FEMDomain domain) throws NullPointerException {
 		if (domain == null) throw new NullPointerException("domain = null");
-		this._domain_ = domain;
+		this.domain = domain;
 		return this;
 	}
 
@@ -397,9 +397,9 @@ public final class FEMFormatter {
 	 * @see #put(Object)
 	 * @return Quelltext. */
 	public final String format() {
-		final String indent = this._indent_;
-		final List<Object> items = this._items_;
-		final StringBuilder string = this._string_;
+		final String indent = this.indent;
+		final List<Object> items = this.items;
+		final StringBuilder string = this.string;
 		final int size = items.size();
 		for (int i = 0; i < size;) {
 			final Object item = items.get(i++);
@@ -432,7 +432,7 @@ public final class FEMFormatter {
 	 * @return formatierter Quelltext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann. */
-	final <GItem> String _format_(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter)
+	final <GItem> String formatIterable(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter)
 		throws NullPointerException, IllegalArgumentException {
 		final Iterator<? extends GItem> iter = items.iterator();
 		if (!iter.hasNext()) return "";
@@ -472,7 +472,7 @@ public final class FEMFormatter {
 	 * @throws NullPointerException Wenn {@code objects} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn ein Objekt nicht formatiert werden kann. */
 	public final String formatDatas(final Iterable<?> objects) throws NullPointerException, IllegalArgumentException {
-		return this._format_(objects, new Converter<Object, Object>() {
+		return this.formatIterable(objects, new Converter<Object, Object>() {
 
 			@Override
 			public Object convert(final Object input) {
@@ -503,7 +503,7 @@ public final class FEMFormatter {
 	 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann. */
 	public final String formatFunctions(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalArgumentException {
-		return this._format_(functions, new Converter<FEMFunction, Object>() {
+		return this.formatIterable(functions, new Converter<FEMFunction, Object>() {
 
 			@Override
 			public Object convert(final FEMFunction input) {
@@ -518,7 +518,7 @@ public final class FEMFormatter {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._domain_, this._indent_, this._items_);
+		return Objects.toInvokeString(this, this.domain, this.indent, this.items);
 	}
 
 }

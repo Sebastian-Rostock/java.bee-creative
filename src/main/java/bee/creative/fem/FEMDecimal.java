@@ -64,13 +64,13 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	{}
 
 	/** Dieses Feld speichert die interne Darstellung des Dezimalbruchs. */
-	final double _value_;
+	final double value;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung des Dezimalbruchs.
 	 *
 	 * @param value interne Darstellung des Dezimalbruchs. */
 	public FEMDecimal(final double value) {
-		this._value_ = value;
+		this.value = value;
 	}
 
 	{}
@@ -79,14 +79,14 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	 *
 	 * @return interne Darstellung des Dezimalbruchs. */
 	public final double value() {
-		return this._value_;
+		return this.value;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		final long value = Double.doubleToLongBits(this._value_);
+		final long value = Double.doubleToLongBits(this.value);
 		return (int)(value >>> 0) ^ (int)(value >>> 32);
 	}
 
@@ -97,7 +97,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMDecimal that) throws NullPointerException {
 		if (that == null) throw new NullPointerException("that = null");
-		return (this._value_ == that._value_) || (Double.isNaN(this._value_) && Double.isNaN(that._value_));
+		return (this.value == that.value) || (Double.isNaN(this.value) && Double.isNaN(that.value));
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn dieser Dezimalbruch kleiner, gleich oder größer als der gegebene Dezimalbruch ist.
@@ -108,8 +108,8 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	 * @return Vergleichswert oder {@code undefined}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final int compare(final FEMDecimal that, final int undefined) throws NullPointerException {
-		if (this._value_ < that._value_) return -1;
-		if (this._value_ > that._value_) return +1;
+		if (this.value < that.value) return -1;
+		if (this.value > that.value) return +1;
 		if (this.equals(that)) return 0;
 		return undefined;
 	}
@@ -118,7 +118,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	 *
 	 * @return {@link Number}. */
 	public final Number toNumber() {
-		return new Double(this._value_);
+		return new Double(this.value);
 	}
 
 	{}
@@ -177,7 +177,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		return Double.toString(this._value_);
+		return Double.toString(this.value);
 	}
 
 }

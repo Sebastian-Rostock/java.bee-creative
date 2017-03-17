@@ -64,22 +64,22 @@ public final class FEMTracer {
 	}
 
 	/** Dieses Feld speichert den {@link Listener}. */
-	Listener _listener_ = Listener.EMPTY;
+	Listener listener = Listener.EMPTY;
 
 	/** Dieses Feld speichert den Stapelrahmen der Funktion. Dieser kann in der Methode {@link Listener#onExecute(FEMTracer)} für den Aufruf angepasst werden. */
-	FEMFrame _frame_;
+	FEMFrame frame;
 
 	/** Dieses Feld speichert die Function, die nach {@link Listener#onExecute(FEMTracer)} aufgerufen wird bzw. vor {@link Listener#onThrow(FEMTracer)} oder
 	 * {@link Listener#onReturn(FEMTracer)} aufgerufen wurde. Diese kann in der Methode {@link Listener#onExecute(FEMTracer)} für den Aufruf angepasst werden. */
-	FEMFunction _function_;
+	FEMFunction function;
 
 	/** Dieses Feld speichert den Ergebniswert, der von der Funktion zurück gegeben wurde. Dieser kann in der Methode {@link Listener#onReturn(FEMTracer)}
 	 * angepasst werden. */
-	FEMValue _result_;
+	FEMValue result;
 
 	/** Dieses Feld speichert die {@link RuntimeException}, die von der Funktion ausgelöst wurde. Diese kann in der Methode {@link Listener#onThrow(FEMTracer)}
 	 * angepasst werden. */
-	RuntimeException _exception_;
+	RuntimeException exception;
 
 	{}
 
@@ -87,35 +87,35 @@ public final class FEMTracer {
 	 *
 	 * @return Überwachungsmethoden. */
 	public final Listener getListener() {
-		return this._listener_;
+		return this.listener;
 	}
 
 	/** Diese Methode gibt den aktuellen Ergebniswert der {@link #getFunction() aktuellen Funktion} zurück.
 	 *
 	 * @return Ergebniswert oder {@code null}. */
 	public final FEMValue getResult() {
-		return this._result_;
+		return this.result;
 	}
 
 	/** Diese Methode gibt den aktuellen Stapelrahmen zurück, der zur Auswertung der {@link #getFunction() aktuellen Funktion} verwendet wird.
 	 *
 	 * @return Stapelrahmen oder {@code null}. */
 	public final FEMFrame getFrame() {
-		return this._frame_;
+		return this.frame;
 	}
 
 	/** Diese Methode gibt die aktuelle Funktion zurück, die mit dem {@link #getFrame() aktuellen Stapelrahmen} ausgewertet wird.
 	 *
 	 * @return Funktion oder {@code null}. */
 	public final FEMFunction getFunction() {
-		return this._function_;
+		return this.function;
 	}
 
 	/** Diese Methode gibt die aktuelle Ausnahme der {@link #getFunction() aktuellen Funktion} zurück.
 	 *
 	 * @return Ausnahme oder {@code null}. */
 	public final RuntimeException getException() {
-		return this._exception_;
+		return this.exception;
 	}
 
 	/** Diese Methode setzt die Überwachungsmethoden und gibt {@code this} zurück.
@@ -125,7 +125,7 @@ public final class FEMTracer {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useListener(final Listener value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
-		this._listener_ = value;
+		this.listener = value;
 		return this;
 	}
 
@@ -137,8 +137,8 @@ public final class FEMTracer {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useResult(final FEMValue value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
-		this._result_ = value;
-		this._exception_ = null;
+		this.result = value;
+		this.exception = null;
 		return this;
 	}
 
@@ -150,7 +150,7 @@ public final class FEMTracer {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useFrame(final FEMFrame value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
-		this._frame_ = value;
+		this.frame = value;
 		return this;
 	}
 
@@ -161,7 +161,7 @@ public final class FEMTracer {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useFunction(final FEMFunction value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
-		this._function_ = value;
+		this.function = value;
 		return this;
 	}
 
@@ -173,8 +173,8 @@ public final class FEMTracer {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useException(final RuntimeException value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
-		this._result_ = null;
-		this._exception_ = value;
+		this.result = null;
+		this.exception = value;
 		return this;
 	}
 
@@ -186,10 +186,10 @@ public final class FEMTracer {
 	 * @see #getException()
 	 * @return {@code this}. */
 	public final FEMTracer clear() {
-		this._frame_ = null;
-		this._function_ = null;
-		this._result_ = null;
-		this._exception_ = null;
+		this.frame = null;
+		this.function = null;
+		this.result = null;
+		this.exception = null;
 		return this;
 	}
 
@@ -198,8 +198,8 @@ public final class FEMTracer {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toFormatString(true, true, this, "listener", this._listener_, "frame", this._frame_, "function", this._function_, "result", this._result_,
-			"exception", this._exception_);
+		return Objects.toFormatString(true, true, this, "listener", this.listener, "frame", this.frame, "function", this.function, "result", this.result,
+			"exception", this.exception);
 	}
 
 }

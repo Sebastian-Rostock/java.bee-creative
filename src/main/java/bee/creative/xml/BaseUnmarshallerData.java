@@ -39,7 +39,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 
 		/** {@inheritDoc} */
 		@Override
-		protected ContextData<GOwner> _this_() {
+		protected ContextData<GOwner> customThis() {
 			return this;
 		}
 
@@ -61,7 +61,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 
 		/** {@inheritDoc} */
 		@Override
-		protected ShemaData<GOwner> _this_() {
+		protected ShemaData<GOwner> customThis() {
 			return this;
 		}
 
@@ -83,7 +83,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 
 		/** {@inheritDoc} */
 		@Override
-		protected AdapterData<GOwner> _this_() {
+		protected AdapterData<GOwner> customThis() {
 			return this;
 		}
 
@@ -105,7 +105,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 
 		/** {@inheritDoc} */
 		@Override
-		protected ListenerData<GOwner> _this_() {
+		protected ListenerData<GOwner> customThis() {
 			return this;
 		}
 
@@ -127,7 +127,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 
 		/** {@inheritDoc} */
 		@Override
-		protected PropertyData<GOwner> _this_() {
+		protected PropertyData<GOwner> customThis() {
 			return this;
 		}
 
@@ -149,7 +149,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 
 		/** {@inheritDoc} */
 		@Override
-		protected ValidationData<GOwner> _this_() {
+		protected ValidationData<GOwner> customThis() {
 			return this;
 		}
 
@@ -158,64 +158,64 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	{}
 
 	/** Dieses Feld speichert den {@link Unmarshaller}. */
-	Unmarshaller _marshaller_;
+	Unmarshaller marshaller;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openContextData()}. */
-	final ContextData<GThis> _contextData_ = new ContextData<GThis>() {
+	final ContextData<GThis> contextData = new ContextData<GThis>() {
 
 		@Override
 		public GThis closeContextData() {
-			return BaseUnmarshallerData.this._this_();
+			return BaseUnmarshallerData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openShemaData()}. */
-	final ShemaData<GThis> _shemaData_ = new ShemaData<GThis>() {
+	final ShemaData<GThis> shemaData = new ShemaData<GThis>() {
 
 		@Override
 		public GThis closeShemaData() {
-			return BaseUnmarshallerData.this._this_();
+			return BaseUnmarshallerData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openAdapterData()}. */
-	final AdapterData<GThis> _adapterData_ = new AdapterData<GThis>() {
+	final AdapterData<GThis> adapterData = new AdapterData<GThis>() {
 
 		@Override
 		public GThis closeAdapterData() {
-			return BaseUnmarshallerData.this._this_();
+			return BaseUnmarshallerData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openListenerData()}. */
-	final ListenerData<GThis> _listenerData_ = new ListenerData<GThis>() {
+	final ListenerData<GThis> listenerData = new ListenerData<GThis>() {
 
 		@Override
 		public GThis closeListenerData() {
-			return BaseUnmarshallerData.this._this_();
+			return BaseUnmarshallerData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openPropertyData()}. */
-	final PropertyData<GThis> _propertyData_ = new PropertyData<GThis>() {
+	final PropertyData<GThis> propertyData = new PropertyData<GThis>() {
 
 		@Override
 		public GThis closePropertyData() {
-			return BaseUnmarshallerData.this._this_();
+			return BaseUnmarshallerData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openValidationData()}. */
-	final ValidationData<GThis> _validationData_ = new ValidationData<GThis>() {
+	final ValidationData<GThis> validationData = new ValidationData<GThis>() {
 
 		@Override
 		public GThis closeValidationData() {
-			return BaseUnmarshallerData.this._this_();
+			return BaseUnmarshallerData.this.customThis();
 		}
 
 	};
@@ -227,14 +227,14 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseUnmarshallerData<?> data) {
-		if (data == null) return this._this_();
-		this._marshaller_ = data._marshaller_;
-		this._shemaData_.use(data._shemaData_);
-		this._adapterData_.use(data._adapterData_);
-		this._listenerData_.use(data._listenerData_);
-		this._propertyData_.use(data._propertyData_);
-		this._validationData_.use(data._validationData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.marshaller = data.marshaller;
+		this.shemaData.use(data.shemaData);
+		this.adapterData.use(data.adapterData);
+		this.listenerData.use(data.listenerData);
+		this.propertyData.use(data.propertyData);
+		this.validationData.use(data.validationData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt den {@link Unmarshaller} zurück.<br>
@@ -248,9 +248,9 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @throws SAXException Wenn {@link #updateUnmarshaller()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link JAXBContext#createUnmarshaller()} eine entsprechende Ausnahme auslöst. */
 	public final Unmarshaller getUnmarshaller() throws SAXException, JAXBException {
-		Unmarshaller result = this._marshaller_;
+		Unmarshaller result = this.marshaller;
 		if (result != null) return result;
-		final JAXBContext context = this._contextData_.getContext();
+		final JAXBContext context = this.contextData.getContext();
 		result = context.createUnmarshaller();
 		this.useUnmarshaller(result);
 		this.updateUnmarshaller();
@@ -262,8 +262,8 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @param marshaller {@link Unmarshaller} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useUnmarshaller(final Unmarshaller marshaller) {
-		this._marshaller_ = marshaller;
-		return this._this_();
+		this.marshaller = marshaller;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt den {@link Unmarshaller} auf {@code null} und gibt {@code this} zurück.
@@ -285,16 +285,16 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 *         {@link Unmarshaller#setEventHandler(ValidationEventHandler)} eine entsprechende Ausnahme auslöst. */
 	public final GThis updateUnmarshaller() throws SAXException, JAXBException {
 		final Unmarshaller result = this.getUnmarshaller();
-		result.setSchema(this._shemaData_.getSchema());
-		result.setListener(this._listenerData_.get());
-		result.setEventHandler(this._validationData_.get());
-		for (final XmlAdapter<?, ?> entry: this._adapterData_) {
+		result.setSchema(this.shemaData.getSchema());
+		result.setListener(this.listenerData.get());
+		result.setEventHandler(this.validationData.get());
+		for (final XmlAdapter<?, ?> entry: this.adapterData) {
 			result.setAdapter(entry);
 		}
-		for (final Entry<String, Object> entry: this._propertyData_) {
+		for (final Entry<String, Object> entry: this.propertyData) {
 			result.setProperty(entry.getKey(), entry.getValue());
 		}
-		return this._this_();
+		return this.customThis();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das Schema und gibt ihn zurück.
@@ -302,7 +302,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @see Unmarshaller#setSchema(Schema)
 	 * @return Konfigurator. */
 	public final ShemaData<GThis> openShemaData() {
-		return this._shemaData_;
+		return this.shemaData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Adapter und gibt ihn zurück.
@@ -310,7 +310,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @see Unmarshaller#setAdapter(XmlAdapter)
 	 * @return Konfigurator. */
 	public final AdapterData<GThis> openAdapterData() {
-		return this._adapterData_;
+		return this.adapterData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ereignisüberwachung und gibt ihn zurück.
@@ -318,7 +318,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @see Unmarshaller#setListener(Listener)
 	 * @return Konfigurator. */
 	public final ListenerData<GThis> openListenerData() {
-		return this._listenerData_;
+		return this.listenerData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Eigenschaften und gibt ihn zurück.
@@ -326,7 +326,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @see Unmarshaller#setProperty(String, Object)
 	 * @return Konfigurator. */
 	public final PropertyData<GThis> openPropertyData() {
-		return this._propertyData_;
+		return this.propertyData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Validationsüberwachung und gibt ihn zurück.
@@ -334,7 +334,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @see Unmarshaller#setEventHandler(ValidationEventHandler)
 	 * @return Konfigurator. */
 	public final ValidationData<GThis> openValidationData() {
-		return this._validationData_;
+		return this.validationData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den Kontext und gibt ihn zurück.
@@ -342,14 +342,14 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @see JAXBContext#createUnmarshaller()
 	 * @return Konfigurator. */
 	public final ContextData<GThis> openContextData() {
-		return this._contextData_;
+		return this.contextData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc}
 	 *
@@ -368,7 +368,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._shemaData_, this._adapterData_, this._listenerData_, this._propertyData_, this._validationData_);
+		return Objects.toInvokeString(this, this.shemaData, this.adapterData, this.listenerData, this.propertyData, this.validationData);
 	}
 
 }

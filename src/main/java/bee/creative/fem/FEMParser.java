@@ -94,85 +94,85 @@ public final class FEMParser extends Parser {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	boolean _active_;
+	boolean active;
 
 	/** Dieses Feld speichert die Startposition des aktuell geparsten Wertbereichs oder {@code -1}. */
-	int _value_;
+	int value;
 
 	/** Dieses Feld speichert die bisher ermittelten Bereiche. */
-	final List<Range> _ranges_ = new ArrayList<>();
+	final List<Range> ranges = new ArrayList<>();
 
 	{}
 
-	/** Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #_stop_()} verwendet werden.
+	/** Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #stop()} verwendet werden.
 	 *
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	synchronized final void _start_() throws IllegalStateException {
-		this._check_();
-		this._active_ = true;
-		this._value_ = -1;
+	synchronized final void start() throws IllegalStateException {
+		this.check();
+		this.active = true;
+		this.value = -1;
 		this.reset();
 	}
 
 	@SuppressWarnings ("javadoc")
-	synchronized final void _stop_() {
-		this._active_ = false;
+	synchronized final void stop() {
+		this.active = false;
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void _check_() throws IllegalStateException {
-		if (this._active_) throw new IllegalStateException();
+	final void check() throws IllegalStateException {
+		if (this.active) throw new IllegalStateException();
 	}
 
 	/** Diese Methode fügt eine neue Bereich mit den gegebenen Parametern hinzu, der bei {@link #index()} endet.
 	 *
 	 * @param type Typ des Bereichs.
 	 * @param start Start des Bereichs. */
-	final void _put_(final int type, final int start) {
-		this._ranges_.add(new Range((char)type, start, this.index() - start));
+	final void putRange(final int type, final int start) {
+		this.ranges.add(new Range((char)type, start, this.index() - start));
 	}
 
-	/** Diese Methode beginnt das parsen eines Wertbereichs mit dem Bereichstyp {@code '.'}, welches mit {@link #_closeValue_()} beendet werden muss. */
-	final void _openValue_() {
-		if (this._value_ >= 0) return;
-		this._value_ = this.index();
+	/** Diese Methode beginnt das parsen eines Wertbereichs mit dem Bereichstyp {@code '.'}, welches mit {@link #closeValue()} beendet werden muss. */
+	final void openValue() {
+		if (this.value >= 0) return;
+		this.value = this.index();
 	}
 
 	/** Diese Methode beendet das einlesen des Wertbereichs mit dem Bereichstyp {@code '.'}. */
-	final void _closeValue_() {
-		final int start = this._value_;
+	final void closeValue() {
+		final int start = this.value;
 		if (start < 0) return;
-		this._value_ = -1;
+		this.value = -1;
 		if (this.index() <= start) return;
-		this._put_('.', start);
+		this.putRange('.', start);
 	}
 
 	/** Diese Methode parst einen Bereich, der mit dem gegebenen Zeichen beginnt, endet, in dem das Zeichen durch Verdopplung maskiert werden kann und welcher das
 	 * Zeichen als Typ verwendet.
 	 *
 	 * @param type Zeichen als Bereichstyp. */
-	final void _parseMask_(final int type) {
+	final void parseMask(final int type) {
 		final int start = this.index();
 		for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 			if (symbol == type) {
 				if (this.skip() != type) {
-					this._put_(type, start);
+					this.putRange(type, start);
 					return;
 				}
 			}
 		}
-		this._put_('?', start);
+		this.putRange('?', start);
 	}
 
 	/** Diese Methode parst einen Bereich, der mit dem Zeichen <code>'&lt;'</code> beginnt, mit dem Zeichen <code>'&gt;'</code> ende und in dem diese Zeichen nur
 	 * paarweise vorkommen dürfen. ein solcher Bereich geparst werden konnte, ist dessen Bereichstyp {@code '!'}. Wenn eine dieser Regeln verletzt wird, ist der
 	 * Bereichstyp {@code '?'}. */
-	final void _parseName_() {
+	final void parseName() {
 		final int start = this.index();
 		for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 			if (symbol == '>') {
 				if (this.skip() != '>') {
-					this._put_('!', start);
+					this.putRange('!', start);
 					return;
 				}
 			} else if (symbol == '<') {
@@ -181,45 +181,45 @@ public final class FEMParser extends Parser {
 				}
 			}
 		}
-		this._put_('?', start);
+		this.putRange('?', start);
 	}
 
 	/** Diese Methode überspringt alle Zeichen, die kleiner oder gleich dem eerzeichen sind. */
-	final void _parseSpace_() {
+	final void parseSpace() {
 		final int start = this.index();
 		for (int symbol = this.skip(); (symbol >= 0) && (symbol <= ' '); symbol = this.skip()) {}
-		this._put_('_', start);
+		this.putRange('_', start);
 	}
 
 	/** Diese Methode erzeugt zum gegebenen Zeichen einen Bereich der Länge 1 und navigiert zum nächsten Zeichen.
 	 *
 	 * @see #skip()
-	 * @see #_put_(int, int)
+	 * @see #putRange(int, int)
 	 * @param type Zeichen als Bereichstyp. */
-	final void _parseSymbol_(final int type) {
+	final void parseSymbol(final int type) {
 		final int start = this.index();
 		this.skip();
-		this._put_(type, start);
+		this.putRange(type, start);
 	}
 
 	/** Diese Methode parst die {@link #source() Eingabe}. */
-	final void _parseSource_() {
+	final void parseSource() {
 		for (int symbol; true;) {
 			switch (symbol = this.symbol()) {
 				case -1: {
-					this._closeValue_();
+					this.closeValue();
 					return;
 				}
 				case '\'':
 				case '\"':
 				case '/': {
-					this._closeValue_();
-					this._parseMask_(symbol);
+					this.closeValue();
+					this.parseMask(symbol);
 					break;
 				}
 				case '<': {
-					this._closeValue_();
-					this._parseName_();
+					this.closeValue();
+					this.parseName();
 					break;
 				}
 				case '$':
@@ -231,16 +231,16 @@ public final class FEMParser extends Parser {
 				case ']':
 				case '{':
 				case '}': {
-					this._closeValue_();
-					this._parseSymbol_(symbol);
+					this.closeValue();
+					this.parseSymbol(symbol);
 					break;
 				}
 				default: {
 					if (symbol <= ' ') {
-						this._closeValue_();
-						this._parseSpace_();
+						this.closeValue();
+						this.parseSpace();
 					} else {
-						this._openValue_();
+						this.openValue();
 						this.skip();
 					}
 				}
@@ -250,10 +250,10 @@ public final class FEMParser extends Parser {
 
 	/** Diese Methode gibt die in Anführungszeichen eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
 	 *
-	 * @see #_parseMask_(int)
+	 * @see #parseMask(int)
 	 * @param type Anführungszeichen.
 	 * @return Eingabe mit Maskierung. */
-	final String _encodeMask_(final int type) {
+	final String encodeMask(final int type) {
 		this.take(type);
 		for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
 			if (symbol == type) {
@@ -267,9 +267,9 @@ public final class FEMParser extends Parser {
 
 	/** Diese Methode gibt die in spitze Klammern eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
 	 *
-	 * @see #_parseName_()
+	 * @see #parseName()
 	 * @return Eingabe mit Maskierung. */
-	final String _encodeValue_() {
+	final String encodeValue() {
 		this.take('<');
 		for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
 			if ((symbol == '<') || (symbol == '>')) {
@@ -286,7 +286,7 @@ public final class FEMParser extends Parser {
 	 * @param type Anführungszeichen.
 	 * @return Eingabe ohne Maskierung.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
-	final String _decodeMask_(final int type) throws IllegalArgumentException {
+	final String decodeMask(final int type) throws IllegalArgumentException {
 		if (this.symbol() != type) throw new IllegalArgumentException();
 		for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 			if (symbol == type) {
@@ -302,10 +302,10 @@ public final class FEMParser extends Parser {
 
 	/** Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden spitzen Klammern und deren Maskierungen zurück.
 	 *
-	 * @see #_parseName_()
+	 * @see #parseName()
 	 * @return Eingabe ohne Maskierung.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
-	final String _decodeValue_() throws IllegalArgumentException {
+	final String decodeValue() throws IllegalArgumentException {
 		if (this.symbol() != '<') throw new IllegalArgumentException();
 		for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 			if (symbol == '<') {
@@ -328,7 +328,7 @@ public final class FEMParser extends Parser {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public synchronized final FEMParser useSource(final String value) throws NullPointerException, IllegalStateException {
-		this._check_();
+		this.check();
 		super.source(value);
 		return this;
 	}
@@ -349,14 +349,14 @@ public final class FEMParser extends Parser {
 	 * @return Bereiche.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final Range[] parseRanges() throws IllegalStateException {
-		this._start_();
+		this.start();
 		try {
-			this._ranges_.clear();
-			this._parseSource_();
-			final Range[] result = this._ranges_.toArray(new Range[this._ranges_.size()]);
+			this.ranges.clear();
+			this.parseSource();
+			final Range[] result = this.ranges.toArray(new Range[this.ranges.size()]);
 			return result;
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -368,13 +368,13 @@ public final class FEMParser extends Parser {
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
 	public final String parseString() throws IllegalStateException, IllegalArgumentException {
-		this._start_();
+		this.start();
 		try {
-			if (this.symbol() == '\'') return this._decodeMask_('\'');
-			if (this.symbol() == '\"') return this._decodeMask_('\"');
+			if (this.symbol() == '\'') return this.decodeMask('\'');
+			if (this.symbol() == '\"') return this.decodeMask('\"');
 			throw new IllegalArgumentException();
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -386,12 +386,12 @@ public final class FEMParser extends Parser {
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
 	public final String parseComment() throws IllegalStateException, IllegalArgumentException {
-		this._start_();
+		this.start();
 		try {
-			if (this.symbol() == '/') return this._decodeMask_('/');
+			if (this.symbol() == '/') return this.decodeMask('/');
 			throw new IllegalArgumentException();
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -402,11 +402,11 @@ public final class FEMParser extends Parser {
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
 	public final String parseValue() throws IllegalStateException, IllegalArgumentException {
-		this._start_();
+		this.start();
 		try {
-			return this._decodeValue_();
+			return this.decodeValue();
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -416,11 +416,11 @@ public final class FEMParser extends Parser {
 	 * @return Eingabe mit Maskierung.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final String formatValue() throws IllegalStateException {
-		this._start_();
+		this.start();
 		try {
-			return this._encodeValue_();
+			return this.encodeValue();
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -430,11 +430,11 @@ public final class FEMParser extends Parser {
 	 * @return Eingabe mit Maskierung.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final String formatString() throws IllegalStateException {
-		this._start_();
+		this.start();
 		try {
-			return this._encodeMask_('\'');
+			return this.encodeMask('\'');
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -444,11 +444,11 @@ public final class FEMParser extends Parser {
 	 * @return Eingabe mit Maskierung.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final String formatComment() throws IllegalStateException {
-		this._start_();
+		this.start();
 		try {
-			return this._encodeMask_('/');
+			return this.encodeMask('/');
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 

@@ -32,7 +32,7 @@ public final class XMLUnmarshaller {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SourceData _this_() {
+		protected final SourceData customThis() {
 			return this;
 		}
 
@@ -54,7 +54,7 @@ public final class XMLUnmarshaller {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final UnmarshallerData _this_() {
+		protected final UnmarshallerData customThis() {
 			return this;
 		}
 
@@ -76,10 +76,10 @@ public final class XMLUnmarshaller {
 	{}
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final SourceData _sourceData_ = new SourceData();
+	final SourceData sourceData = new SourceData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openUnmarshallerData()}. */
-	final UnmarshallerData _unmarshallerData_ = new UnmarshallerData();
+	final UnmarshallerData unmarshallerData = new UnmarshallerData();
 
 	{}
 
@@ -89,8 +89,8 @@ public final class XMLUnmarshaller {
 	 * @return {@code this}. */
 	public final XMLUnmarshaller use(final XMLUnmarshaller data) {
 		if (data == null) return this;
-		this._sourceData_.use(data._sourceData_);
-		this._unmarshallerData_.use(data._unmarshallerData_);
+		this.sourceData.use(data.sourceData);
+		this.unmarshallerData.use(data.unmarshallerData);
 		return this;
 	}
 
@@ -102,9 +102,9 @@ public final class XMLUnmarshaller {
 	 * @throws SAXException Wenn {@link UnmarshallerData#getUnmarshaller()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link Unmarshaller#unmarshal(Source)} eine entsprechende Ausnahme auslöst. */
 	public final Object unmarshal() throws SAXException, JAXBException {
-		final Unmarshaller unmarshaller = this._unmarshallerData_.getUnmarshaller();
+		final Unmarshaller unmarshaller = this.unmarshallerData.getUnmarshaller();
 		synchronized (unmarshaller) {
-			final Source source = this._sourceData_.getSource();
+			final Source source = this.sourceData.getSource();
 			return unmarshaller.unmarshal(source);
 		}
 	}
@@ -114,14 +114,14 @@ public final class XMLUnmarshaller {
 	 * @see Unmarshaller#unmarshal(Source)
 	 * @return Konfigurator. */
 	public final SourceData openSourceData() {
-		return this._sourceData_;
+		return this.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Unmarshaller} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
 	public final UnmarshallerData openUnmarshallerData() {
-		return this._unmarshallerData_;
+		return this.unmarshallerData;
 	}
 
 	{}
@@ -129,7 +129,7 @@ public final class XMLUnmarshaller {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._sourceData_, this._unmarshallerData_);
+		return Objects.toInvokeString(this, this.sourceData, this.unmarshallerData);
 	}
 
 }

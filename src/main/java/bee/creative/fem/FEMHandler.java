@@ -39,11 +39,11 @@ public final class FEMHandler extends FEMValue {
 	{}
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final FEMFunction _value_;
+	final FEMFunction value;
 
 	@SuppressWarnings ("javadoc")
 	FEMHandler(final FEMFunction value) throws NullPointerException {
-		this._value_ = value;
+		this.value = value;
 	}
 
 	{}
@@ -52,14 +52,14 @@ public final class FEMHandler extends FEMValue {
 	 *
 	 * @return Funktion. */
 	public final FEMFunction value() {
-		return this._value_;
+		return this.value;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		return this._value_.hashCode();
+		return this.value.hashCode();
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Funktionszeiger gleich der gegebenen ist.
@@ -68,7 +68,7 @@ public final class FEMHandler extends FEMValue {
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMHandler that) throws NullPointerException {
-		return this._value_.equals(that._value_);
+		return this.value.equals(that.value);
 	}
 
 	{}
@@ -119,19 +119,19 @@ public final class FEMHandler extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-		return FEMHandler.from(this._value_.withTracer(tracer));
+		return FEMHandler.from(this.value.withTracer(tracer));
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.putHandler(this._value_);
+		target.putHandler(this.value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final FEMFunction toFunction() {
-		return this._value_;
+		return this.value;
 	}
 
 }

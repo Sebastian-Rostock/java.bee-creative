@@ -245,7 +245,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _capacity_() {
+	protected int customCapacity() {
 		return this._array_.length;
 	}
 

@@ -171,7 +171,7 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMFindMode> _values_ = new HashMapBuilder<Object, IAMFindMode>() //
+		static final Map<?, IAMFindMode> values = new HashMapBuilder<Object, IAMFindMode>() //
 			.useEntry(null, AUTO).useEntry("", AUTO).useEntry("A", AUTO).useEntry("AUTO", AUTO) //
 			.useEntry(IAMMapping.MODE_HASHED, SORTED).useEntry("H", HASHED).useEntry("HASHED", HASHED) //
 			.useEntry(IAMMapping.MODE_SORTED, SORTED).useEntry("S", SORTED).useEntry("SORTED", SORTED) //
@@ -195,7 +195,7 @@ public final class IAMCodec {
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
 		public static IAMFindMode from(final Object object) throws IllegalArgumentException {
 			if (object instanceof IAMFindMode) return (IAMFindMode)object;
-			final IAMFindMode result = IAMFindMode._values_.get(object);
+			final IAMFindMode result = IAMFindMode.values.get(object);
 			if (result == null) throw new IllegalArgumentException("illegal find-mode: " + object);
 			return result;
 		}
@@ -251,7 +251,7 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMByteOrder> _values_ = new HashMapBuilder<Object, IAMByteOrder>() //
+		static final Map<?, IAMByteOrder> values = new HashMapBuilder<Object, IAMByteOrder>() //
 			.useEntry(null, AUTO).useEntry("", AUTO).useEntry("A", AUTO).useEntry("AUTO", AUTO) //
 			.useEntry("B", BIGENDIAN).useEntry("BIGENDIAN", BIGENDIAN).useEntry(BIGENDIAN.toOrder(), BIGENDIAN) //
 			.useEntry("L", LITTLEENDIAN).useEntry("LITTLEENDIAN", LITTLEENDIAN).useEntry(LITTLEENDIAN.toOrder(), LITTLEENDIAN) //
@@ -275,7 +275,7 @@ public final class IAMCodec {
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
 		public static IAMByteOrder from(final Object object) throws IllegalArgumentException {
 			if (object instanceof IAMByteOrder) return (IAMByteOrder)object;
-			final IAMByteOrder result = IAMByteOrder._values_.get(object);
+			final IAMByteOrder result = IAMByteOrder.values.get(object);
 			if (result == null) throw new IllegalArgumentException("illegal byte-order: " + object);
 			return result;
 		}
@@ -368,12 +368,12 @@ public final class IAMCodec {
 
 			@Override
 			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec._parseBytes_(string.getBytes(this.charset));
+				return IAMCodec.parseBytes(string.getBytes(this.charset));
 			}
 
 			@Override
 			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec._formatBytes_(array), this.charset);
+				return new String(IAMCodec.formatBytes(array), this.charset);
 			}
 
 		},
@@ -384,12 +384,12 @@ public final class IAMCodec {
 
 			@Override
 			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec._parseChars_(string.toCharArray());
+				return IAMCodec.parseChars(string.toCharArray());
 			}
 
 			@Override
 			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec._formatChars_(array));
+				return new String(IAMCodec.formatChars(array));
 			}
 
 		},
@@ -424,12 +424,12 @@ public final class IAMCodec {
 
 			@Override
 			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec._parseBytes_(string.getBytes(this.charset));
+				return IAMCodec.parseBytes(string.getBytes(this.charset));
 			}
 
 			@Override
 			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec._formatBytes_(array), this.charset);
+				return new String(IAMCodec.formatBytes(array), this.charset);
 			}
 
 		},
@@ -442,12 +442,12 @@ public final class IAMCodec {
 
 			@Override
 			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec._parseBytes_(string.getBytes(this.charset));
+				return IAMCodec.parseBytes(string.getBytes(this.charset));
 			}
 
 			@Override
 			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec._formatBytes_(array), this.charset);
+				return new String(IAMCodec.formatBytes(array), this.charset);
 			}
 
 		},
@@ -460,12 +460,12 @@ public final class IAMCodec {
 
 			@Override
 			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec._parseBytes_(string.getBytes(this.charset));
+				return IAMCodec.parseBytes(string.getBytes(this.charset));
 			}
 
 			@Override
 			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec._formatBytes_(array), this.charset);
+				return new String(IAMCodec.formatBytes(array), this.charset);
 			}
 
 		},
@@ -519,7 +519,7 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMArrayFormat> _values_ = new HashMapBuilder<Object, IAMArrayFormat>() //
+		static final Map<?, IAMArrayFormat> values = new HashMapBuilder<Object, IAMArrayFormat>() //
 			.useEntry(null, ARRAY).useEntry("", ARRAY).useEntry("A", ARRAY).useEntry("ARRAY", ARRAY) //
 			.useEntry("B", BINARY).useEntry("BINARY", BINARY) //
 			.useEntry("UTF-8", STRING_UTF_8).useEntry("UTF-16", STRING_UTF_16).useEntry("UTF-32", STRING_UTF_32) //
@@ -529,7 +529,7 @@ public final class IAMCodec {
 			.build();
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, String> _strings_ = new HashMapBuilder<Object, String>() //
+		static final Map<?, String> strings = new HashMapBuilder<Object, String>() //
 			.useEntry(ARRAY, "ARRAY") //
 			.useEntry(BINARY, "BINARY") //
 			.useEntry(STRING_UTF_8, "UTF-8").useEntry(STRING_UTF_16, "UTF-16").useEntry(STRING_UTF_32, "UTF-32") //
@@ -572,7 +572,7 @@ public final class IAMCodec {
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
 		public static IAMArrayFormat from(final Object object) throws IllegalArgumentException {
 			if (object instanceof IAMArrayFormat) return (IAMArrayFormat)object;
-			final IAMArrayFormat result = IAMArrayFormat._values_.get(object);
+			final IAMArrayFormat result = IAMArrayFormat.values.get(object);
 			if (result == null) throw new IllegalArgumentException("illegal array-format: " + object);
 			return result;
 		}
@@ -600,7 +600,7 @@ public final class IAMCodec {
 		/** {@inheritDoc} */
 		@Override
 		public String toString() {
-			return IAMArrayFormat._strings_.get(this);
+			return IAMArrayFormat.strings.get(this);
 		}
 
 	}
@@ -608,13 +608,13 @@ public final class IAMCodec {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static int _checkRange_(final int value, final int length) throws IllegalArgumentException {
+	static int checkRange(final int value, final int length) throws IllegalArgumentException {
 		if ((value >= 0) && (value < length)) return value;
 		throw new IllegalArgumentException("illegal integer: " + value);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int[] _parseBytes_(final byte[] source) {
+	static int[] parseBytes(final byte[] source) {
 		final int length = source.length;
 		final int[] result = new int[length];
 		for (int i = 0; i < length; i++) {
@@ -624,7 +624,7 @@ public final class IAMCodec {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static byte[] _formatBytes_(final int[] source) {
+	static byte[] formatBytes(final int[] source) {
 		final int length = source.length;
 		final byte[] result = new byte[length];
 		for (int i = 0; i < length; i++) {
@@ -634,7 +634,7 @@ public final class IAMCodec {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static int[] _parseChars_(final char[] source) {
+	static int[] parseChars(final char[] source) {
 		final int length = source.length;
 		final int[] result = new int[length];
 		for (int i = 0; i < length; i++) {
@@ -644,7 +644,7 @@ public final class IAMCodec {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static char[] _formatChars_(final int[] source) {
+	static char[] formatChars(final int[] source) {
 		final int length = source.length;
 		final char[] result = new char[length];
 		for (int i = 0; i < length; i++) {
@@ -656,19 +656,19 @@ public final class IAMCodec {
 	{}
 
 	/** Dieses Feld speichert die Bytereihenfolge. */
-	IAMByteOrder _byteOrder_ = IAMByteOrder.AUTO;
+	IAMByteOrder byteOrder = IAMByteOrder.AUTO;
 
 	/** Dieses Feld speichert die Eingabedaten. */
-	Object _sourceData_;
+	Object sourceData;
 
 	/** Dieses Feld speichert das Eingabeformat. */
-	IAMDataType _sourceFormat_;
+	IAMDataType sourceFormat;
 
 	/** Dieses Feld speichert die Ausgabedaten. */
-	Object _targetData_;
+	Object targetData;
 
 	/** Dieses Feld speichert das Ausgabeformat. */
-	IAMDataType _targetFormat_;
+	IAMDataType targetFormat;
 
 	/** Dieser Konstruktor initialisiert einen neuen {@link IAMCodec} mit Bytereihenfolge {@link IAMByteOrder#AUTO}) */
 	public IAMCodec() {
@@ -681,7 +681,7 @@ public final class IAMCodec {
 	 * @see #useByteOrder(IAMByteOrder)
 	 * @return Bytereihenfolge. */
 	public final synchronized IAMByteOrder getByteOrder() {
-		return this._byteOrder_;
+		return this.byteOrder;
 	}
 
 	/** Diese Methode gibt die Eingabedaten zurück.
@@ -690,7 +690,7 @@ public final class IAMCodec {
 	 * @see #getSourceFormat()
 	 * @return Eingabedaten. */
 	public final synchronized Object getSourceData() {
-		return this._sourceData_;
+		return this.sourceData;
 	}
 
 	/** Diese Methode gibt das Format der Eingabedaten zurück.
@@ -705,7 +705,7 @@ public final class IAMCodec {
 	 *
 	 * @return Eingabeformat. */
 	public final synchronized IAMDataType getSourceFormat() {
-		return this._sourceFormat_;
+		return this.sourceFormat;
 	}
 
 	/** Diese Methode gibt die Ausgabedaten zurück.
@@ -714,7 +714,7 @@ public final class IAMCodec {
 	 * @see #getTargetFormat()
 	 * @return Ausgabedaten. */
 	public final synchronized Object getTargetData() {
-		return this._targetData_;
+		return this.targetData;
 	}
 
 	/** Diese Methode gibt das Format der Ausgabedaten zurück.
@@ -729,7 +729,7 @@ public final class IAMCodec {
 	 *
 	 * @return Ausgabeformat. */
 	public final synchronized IAMDataType getTargetFormat() {
-		return this._targetFormat_;
+		return this.targetFormat;
 	}
 
 	/** Diese Methode setzt die Bytereihenfolge und gibt {@code this} zurück.
@@ -737,7 +737,7 @@ public final class IAMCodec {
 	 * @param order Bytereihenfolge.
 	 * @return {@code this}. */
 	public final synchronized IAMCodec useByteOrder(final IAMByteOrder order) {
-		this._byteOrder_ = order;
+		this.byteOrder = order;
 		return this;
 	}
 
@@ -748,7 +748,7 @@ public final class IAMCodec {
 	 * @param data Eingabedaten.
 	 * @return {@code this}. */
 	public final synchronized IAMCodec useSourceData(final Object data) {
-		this._sourceData_ = data;
+		this.sourceData = data;
 		return this;
 	}
 
@@ -759,7 +759,7 @@ public final class IAMCodec {
 	 * @param format Eingabeformat.
 	 * @return {@code this}. */
 	public final synchronized IAMCodec useSourceFormat(final IAMDataType format) {
-		this._sourceFormat_ = format;
+		this.sourceFormat = format;
 		return this;
 	}
 
@@ -770,7 +770,7 @@ public final class IAMCodec {
 	 * @param data Ausgabedaten.
 	 * @return {@code this}. */
 	public final synchronized IAMCodec useTargetData(final Object data) {
-		this._targetData_ = data;
+		this.targetData = data;
 		return this;
 	}
 
@@ -781,7 +781,7 @@ public final class IAMCodec {
 	 * @param format Ausgabeformat.
 	 * @return {@code this}. */
 	public final synchronized IAMCodec useTargetFormat(final IAMDataType format) {
-		this._targetFormat_ = format;
+		this.targetFormat = format;
 		return this;
 	}
 
@@ -805,7 +805,7 @@ public final class IAMCodec {
 	 * @throws IllegalStateException Wenn kein Eingabeformat eingestellt ist.
 	 * @throws IllegalArgumentException Wenn die Eingabedaten ungültig sind. */
 	public final synchronized IAMIndex decodeSource() throws IOException, IllegalStateException, IllegalArgumentException {
-		final IAMDataType format = this._sourceFormat_;
+		final IAMDataType format = this.sourceFormat;
 		if (format == null) throw new IllegalStateException();
 		return format.decode(this);
 	}
@@ -818,9 +818,9 @@ public final class IAMCodec {
 	 * @throws IllegalStateException Wenn kein Ausgabeformat oder keine Bytereihenfolge eingestellt ist.
 	 * @throws IllegalArgumentException Wenn die Ausgabedaten ungültig sind. */
 	public final synchronized void encodeTarget(final IAMIndex index) throws IOException, IllegalStateException, IllegalArgumentException {
-		final IAMDataType format = this._targetFormat_;
+		final IAMDataType format = this.targetFormat;
 		if (format == null) throw new IllegalStateException();
-		if (this._byteOrder_ == null) throw new IllegalStateException();
+		if (this.byteOrder == null) throw new IllegalStateException();
 		format.encode(this, index);
 	}
 

@@ -245,7 +245,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _capacity_() {
+	protected int customCapacity() {
 		return this._array_.length;
 	}
 

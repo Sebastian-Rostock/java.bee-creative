@@ -47,7 +47,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 
 		/** {@inheritDoc} */
 		@Override
-		protected final ModelData<GOwner> _this_() {
+		protected final ModelData<GOwner> customThis() {
 			return this;
 		}
 
@@ -69,7 +69,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 
 		/** {@inheritDoc} */
 		@Override
-		protected final FeatureData<GOwner> _this_() {
+		protected final FeatureData<GOwner> customThis() {
 			return this;
 		}
 
@@ -91,7 +91,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 
 		/** {@inheritDoc} */
 		@Override
-		protected final VariableData<GOwner> _this_() {
+		protected final VariableData<GOwner> customThis() {
 			return this;
 		}
 
@@ -113,7 +113,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 
 		/** {@inheritDoc} */
 		@Override
-		protected final FunctionData<GOwner> _this_() {
+		protected final FunctionData<GOwner> customThis() {
 			return this;
 		}
 
@@ -122,44 +122,44 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	{}
 
 	/** Dieses Feld speichert die {@link XPathFactory}. */
-	XPathFactory _factory_;
+	XPathFactory factory;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openModelData()}. */
-	final ModelData<GThis> _modelData_ = new ModelData<GThis>() {
+	final ModelData<GThis> modelData = new ModelData<GThis>() {
 
 		@Override
 		public final GThis closeModelData() {
-			return BaseXPathFactoryData.this._this_();
+			return BaseXPathFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}. */
-	final FeatureData<GThis> _featureData_ = new FeatureData<GThis>() {
+	final FeatureData<GThis> featureData = new FeatureData<GThis>() {
 
 		@Override
 		public final GThis closeFeatureData() {
-			return BaseXPathFactoryData.this._this_();
+			return BaseXPathFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openVariableData()}. */
-	final VariableData<GThis> _variableData_ = new VariableData<GThis>() {
+	final VariableData<GThis> variableData = new VariableData<GThis>() {
 
 		@Override
 		public final GThis closeVariableData() {
-			return BaseXPathFactoryData.this._this_();
+			return BaseXPathFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFunctionData()}. */
-	final FunctionData<GThis> _functionData_ = new FunctionData<GThis>() {
+	final FunctionData<GThis> functionData = new FunctionData<GThis>() {
 
 		@Override
 		public final GThis closeFunctionData() {
-			return BaseXPathFactoryData.this._this_();
+			return BaseXPathFactoryData.this.customThis();
 		}
 
 	};
@@ -171,13 +171,13 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseXPathFactoryData<?> data) {
-		if (data == null) return this._this_();
-		this._factory_ = data._factory_;
-		this._modelData_.use(data._modelData_);
-		this._featureData_.use(data._featureData_);
-		this._variableData_.use(data._variableData_);
-		this._functionData_.use(data._functionData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.factory = data.factory;
+		this.modelData.use(data.modelData);
+		this.featureData.use(data.featureData);
+		this.variableData.use(data.variableData);
+		this.functionData.use(data.functionData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt das {@link XPathFactory} zurück.<br>
@@ -190,9 +190,9 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactory#newInstance(String)} bzw. {@link #updateFactory()} eine entsprechende Ausnahme
 	 *         auslöst. */
 	public final XPathFactory getFactory() throws XPathFactoryConfigurationException {
-		XPathFactory result = this._factory_;
+		XPathFactory result = this.factory;
 		if (result != null) return result;
-		result = XPathFactory.newInstance(this._modelData_.build());
+		result = XPathFactory.newInstance(this.modelData.build());
 		this.useFactory(result);
 		this.updateFactory();
 		return result;
@@ -203,8 +203,8 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @param factory {@link XPathFactory} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useFactory(final XPathFactory factory) {
-		this._factory_ = factory;
-		return this._this_();
+		this.factory = factory;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die {@link XPathFactory} auf {@code null} und gibt {@code this} zurück.
@@ -224,16 +224,16 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 *         auslöst. */
 	public final GThis updateFactory() throws XPathFactoryConfigurationException {
 		final XPathFactory factory = this.getFactory();
-		for (final XPathVariableResolver value: this._variableData_) {
+		for (final XPathVariableResolver value: this.variableData) {
 			factory.setXPathVariableResolver(value);
 		}
-		for (final XPathFunctionResolver value: this._functionData_) {
+		for (final XPathFunctionResolver value: this.functionData) {
 			factory.setXPathFunctionResolver(value);
 		}
-		for (final Entry<String, Boolean> entry: this._featureData_) {
+		for (final Entry<String, Boolean> entry: this.featureData) {
 			factory.setFeature(entry.getKey(), entry.getValue());
 		}
-		return this._this_();
+		return this.customThis();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das Objektmodel und gibt ihn zurück.
@@ -241,7 +241,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#newInstance(String)
 	 * @return Konfigurator. */
 	public final ModelData<GThis> openModelData() {
-		return this._modelData_;
+		return this.modelData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
@@ -249,7 +249,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#setFeature(String, boolean)
 	 * @return Konfigurator. */
 	public final FeatureData<GThis> openFeatureData() {
-		return this._featureData_;
+		return this.featureData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link XPathVariableResolver} und gibt ihn zurück.
@@ -257,7 +257,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
 	 * @return Konfigurator. */
 	public final VariableData<GThis> openVariableData() {
-		return this._variableData_;
+		return this.variableData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link XPathFunctionResolver} und gibt ihn zurück.
@@ -265,14 +265,14 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @return Konfigurator. */
 	public final FunctionData<GThis> openFunctionData() {
-		return this._functionData_;
+		return this.functionData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc}
 	 *
@@ -289,7 +289,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._modelData_, this._featureData_, this._variableData_, this._functionData_);
+		return Objects.toInvokeString(this, this.modelData, this.featureData, this.variableData, this.functionData);
 	}
 
 }

@@ -9,13 +9,13 @@ import bee.creative.array.CompactByteArray;
 public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements CodecTarget<GContext> {
 
 	/** Dieses Feld speichert das Kontextobjekt. */
-	final GContext _context_;
+	final GContext context;
 
 	/** Dieser Konstruktor initialisiert das Kontextobjekt sowie die Nutzdaten mit 128 Byte Größe.
 	 *
 	 * @param context Kontextobjekt. */
 	public ArrayCodecTarget(final GContext context) {
-		this._context_ = context;
+		this.context = context;
 	}
 
 	/** Dieser Konstruktor initialisiert Kontextobjekt und Nutzdaten.
@@ -25,7 +25,7 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
 	public ArrayCodecTarget(final GContext context, final CompactByteArray data) throws NullPointerException {
 		super(data);
-		this._context_ = context;
+		this.context = context;
 	}
 
 	/** Dieser Konstruktor initialisiert das Kontextobjekt sowie die Nutzdaten mit der gegebenen Größe.
@@ -35,7 +35,7 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 	 * @param size Größe. */
 	public ArrayCodecTarget(final GContext context, final int size) {
 		super(size);
-		this._context_ = context;
+		this.context = context;
 	}
 
 	{}
@@ -43,7 +43,7 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 	/** {@inheritDoc} */
 	@Override
 	public final GContext context() {
-		return this._context_;
+		return this.context;
 	}
 
 }

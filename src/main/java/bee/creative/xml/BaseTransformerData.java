@@ -98,7 +98,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 
 		/** {@inheritDoc} */
 		@Override
-		protected final PropertyData<GOwner> _this_() {
+		protected final PropertyData<GOwner> customThis() {
 			return this;
 		}
 
@@ -120,7 +120,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 
 		/** {@inheritDoc} */
 		@Override
-		protected final ParameterData<GOwner> _this_() {
+		protected final ParameterData<GOwner> customThis() {
 			return this;
 		}
 
@@ -142,7 +142,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 
 		/** {@inheritDoc} */
 		@Override
-		protected final TemplatesData<GOwner> _this_() {
+		protected final TemplatesData<GOwner> customThis() {
 			return this;
 		}
 
@@ -151,34 +151,34 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	{}
 
 	/** Dieses Feld speichert den {@link Transformer}. */
-	Transformer _transformer_;
+	Transformer transformer;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openPropertyData()}. */
-	final PropertyData<GThis> _propertyData_ = new PropertyData<GThis>() {
+	final PropertyData<GThis> propertyData = new PropertyData<GThis>() {
 
 		@Override
 		public final GThis closePropertyData() {
-			return BaseTransformerData.this._this_();
+			return BaseTransformerData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openParameterData()}. */
-	final ParameterData<GThis> _parameterData_ = new ParameterData<GThis>() {
+	final ParameterData<GThis> parameterData = new ParameterData<GThis>() {
 
 		@Override
 		public final GThis closeParameterData() {
-			return BaseTransformerData.this._this_();
+			return BaseTransformerData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openTemplatesData()}. */
-	final TemplatesData<GThis> _templatesData_ = new TemplatesData<GThis>() {
+	final TemplatesData<GThis> templatesData = new TemplatesData<GThis>() {
 
 		@Override
 		public final GThis closeTemplatesData() {
-			return BaseTransformerData.this._this_();
+			return BaseTransformerData.this.customThis();
 		}
 
 	};
@@ -190,12 +190,12 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseTransformerData<?> data) {
-		if (data == null) return this._this_();
-		this._transformer_ = data._transformer_;
-		this._propertyData_.use(data._propertyData_);
-		this._parameterData_.use(data._parameterData_);
-		this._templatesData_.use(data._templatesData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.transformer = data.transformer;
+		this.propertyData.use(data.propertyData);
+		this.parameterData.use(data.parameterData);
+		this.templatesData.use(data.templatesData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt den {@link Transformer} zurück.<br>
@@ -210,10 +210,10 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @throws TransformerConfigurationException Wenn {@link FactoryData#getFactory()}, {@link TemplatesData#getTemplates()}, {@link Templates#newTransformer()}
 	 *         bzw. {@link TransformerFactory#newTransformer()} eine entsprechende Ausnahme auslöst. */
 	public final Transformer getTransformer() throws TransformerConfigurationException {
-		Transformer result = this._transformer_;
+		Transformer result = this.transformer;
 		if (result != null) return result;
-		final Templates templates = this._templatesData_.getTemplates();
-		final TransformerFactory factory = this._templatesData_.openFactoryData().getFactory();
+		final Templates templates = this.templatesData.getTemplates();
+		final TransformerFactory factory = this.templatesData.openFactoryData().getFactory();
 		result = templates != null ? templates.newTransformer() : factory.newTransformer();
 		this.useTransformer(result);
 		this.updateTransformer();
@@ -225,8 +225,8 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @param transformer {@link Transformer} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useTransformer(final Transformer transformer) {
-		this._transformer_ = transformer;
-		return this._this_();
+		this.transformer = transformer;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt den {@link Transformer} auf {@code null} und gibt {@code this} zurück.
@@ -244,13 +244,13 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @throws TransformerConfigurationException Wenn {@link #getTransformer()} eine entsprechende Ausnahme auslöst. */
 	public final GThis updateTransformer() throws TransformerConfigurationException {
 		final Transformer result = this.getTransformer();
-		for (final Entry<String, String> entry: this._propertyData_) {
+		for (final Entry<String, String> entry: this.propertyData) {
 			result.setOutputProperty(entry.getKey(), entry.getValue());
 		}
-		for (final Entry<String, Object> entry: this._parameterData_) {
+		for (final Entry<String, Object> entry: this.parameterData) {
 			result.setParameter(entry.getKey(), entry.getValue());
 		}
-		return this._this_();
+		return this.customThis();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabeeigenschaften und gibt ihn zurück.
@@ -258,7 +258,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @see Transformer#setOutputProperty(String, String)
 	 * @return Konfigurator. */
 	public final PropertyData<GThis> openPropertyData() {
-		return this._propertyData_;
+		return this.propertyData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Parameter und gibt ihn zurück.
@@ -266,7 +266,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @see Transformer#setParameter(String, Object)
 	 * @return Konfigurator. */
 	public final ParameterData<GThis> openParameterData() {
-		return this._parameterData_;
+		return this.parameterData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die {@link Templates} und gibt ihn zurück.
@@ -275,14 +275,14 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @see TransformerFactory#newTransformer()
 	 * @return Konfigurator. */
 	public final TemplatesData<GThis> openTemplatesData() {
-		return this._templatesData_;
+		return this.templatesData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc}
 	 *
@@ -299,7 +299,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._propertyData_, this._parameterData_, this._templatesData_);
+		return Objects.toInvokeString(this, this.propertyData, this.parameterData, this.templatesData);
 	}
 
 }

@@ -105,8 +105,8 @@ final class IAMCodec_XML {
 
 		final IAMIndexBuilder indexBuilder = new IAMIndexBuilder();
 		codec.useByteOrder(IAMByteOrder.from(xmlIndex.byteOrder));
-		final int mappingCount = IAMCodec._checkRange_(Integer.parseInt(xmlIndex.mappingCount), 1073741824);
-		final int listingCount = IAMCodec._checkRange_(Integer.parseInt(xmlIndex.listingCount), 1073741824);
+		final int mappingCount = IAMCodec.checkRange(Integer.parseInt(xmlIndex.mappingCount), 1073741824);
+		final int listingCount = IAMCodec.checkRange(Integer.parseInt(xmlIndex.listingCount), 1073741824);
 
 		final IAMMappingBuilder[] mappingBuilders = new IAMMappingBuilder[mappingCount];
 		for (int i = 0; i < mappingCount; i++) {
@@ -122,7 +122,7 @@ final class IAMCodec_XML {
 			if (object instanceof IAMMAPPINGTYPE) {
 				final IAMMAPPINGTYPE xmlMapping = (IAMMAPPINGTYPE)object;
 
-				final IAMMappingBuilder mappingBuilder = mappingBuilders[IAMCodec._checkRange_(Integer.parseInt(xmlMapping.index), mappingCount)];
+				final IAMMappingBuilder mappingBuilder = mappingBuilders[IAMCodec.checkRange(Integer.parseInt(xmlMapping.index), mappingCount)];
 				final IAMFindMode mappingFindMode = IAMFindMode.from(xmlMapping.findMode);
 				final IAMArrayFormat mappingKeyFormat = IAMArrayFormat.from(xmlMapping.keyFormat);
 				final IAMArrayFormat mappingValueFormat = IAMArrayFormat.from(xmlMapping.valueFormat);
@@ -141,7 +141,7 @@ final class IAMCodec_XML {
 			} else {
 				final IAMLISTINGTYPE xmlListing = (IAMLISTINGTYPE)object;
 
-				final IAMListingBuilder listingBuilder = listingBuilders[IAMCodec._checkRange_(Integer.parseInt(xmlListing.index), listingCount)];
+				final IAMListingBuilder listingBuilder = listingBuilders[IAMCodec.checkRange(Integer.parseInt(xmlListing.index), listingCount)];
 				final IAMArrayFormat listingItemFormat = IAMArrayFormat.from(xmlListing.itemFormat);
 
 				final int oldCount = listingBuilder.itemCount();

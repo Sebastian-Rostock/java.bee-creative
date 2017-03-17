@@ -9,7 +9,7 @@ public final class XMLResult extends BaseResultData<XMLResult> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected final XMLResult _this_() {
+	protected final XMLResult customThis() {
 		return this;
 	}
 

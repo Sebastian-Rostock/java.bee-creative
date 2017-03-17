@@ -30,6 +30,7 @@ public class Comparators {
 		@Override
 		public int compare(final String item1, final String item2) {
 			final int s1 = item1.length(), s2 = item2.length();
+			// TODO vorzeichen
 			int a1 = 0, a2 = 0;
 			{ // '0' überspringen
 				while ((a1 < s1) && (item1.charAt(a1) == '0')) {

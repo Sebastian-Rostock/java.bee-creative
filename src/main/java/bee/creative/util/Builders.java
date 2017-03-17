@@ -60,7 +60,7 @@ public class Builders {
 		/** Diese Methode gibt {@code this} zurück.
 		 *
 		 * @return {@code this}. */
-		protected abstract GThis _this_();
+		protected abstract GThis customThis();
 
 	}
 
@@ -72,7 +72,7 @@ public class Builders {
 	public static abstract class BaseValueBuilder<GValue, GThis> extends BaseBuilder<GValue, GThis> implements Iterable<GValue> {
 
 		/** Dieses Feld speichert den Wert. */
-		protected GValue _value_;
+		protected GValue value;
 
 		/** Dieser Konstruktor initialisiert den Wert mit {@code null}. */
 		public BaseValueBuilder() {
@@ -85,7 +85,7 @@ public class Builders {
 		 * @see #use(Object)
 		 * @return Wert. */
 		public final GValue get() {
-			return this._value_;
+			return this.value;
 		}
 
 		/** Diese Methode setzt den Wert und gibt {@code this} zurück.
@@ -94,8 +94,8 @@ public class Builders {
 		 * @param value Wert.
 		 * @return {@code this}. */
 		public final GThis use(final GValue value) {
-			this._value_ = value;
-			return this._this_();
+			this.value = value;
+			return this.customThis();
 		}
 
 		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
@@ -104,16 +104,16 @@ public class Builders {
 		 * @param data Konfigurator oder {@code null}.
 		 * @return {@code this}. */
 		public final GThis use(final BaseValueBuilder<? extends GValue, ?> data) {
-			if (data == null) return this._this_();
-			return this.use(data._value_);
+			if (data == null) return this.customThis();
+			return this.use(data.value);
 		}
 
 		/** Diese Methode setzt den Wert auf {@code null} und gibt {@code this} zurück.
 		 *
 		 * @return {@code this}. */
 		public final GThis clear() {
-			this._value_ = null;
-			return this._this_();
+			this.value = null;
+			return this.customThis();
 		}
 
 		{}
@@ -121,13 +121,13 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		public final GValue build() throws IllegalStateException {
-			return this._value_;
+			return this.value;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<GValue> iterator() {
-			final GValue value = this._value_;
+			final GValue value = this.value;
 			if (value == null) return Iterators.emptyIterator();
 			return Iterators.itemIterator(value);
 		}
@@ -135,7 +135,7 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
-			return Objects.toString(true, this._value_);
+			return Objects.toString(true, this.value);
 		}
 
 	}
@@ -149,7 +149,7 @@ public class Builders {
 	public static abstract class BaseItemsBuilder<GItem, GItems extends Collection<GItem>, GThis> extends BaseBuilder<GItems, GThis> implements Iterable<GItem> {
 
 		/** Dieses Feld speichert die Sammlung. */
-		protected GItems _items_;
+		protected GItems items;
 
 		/** Dieser Konstruktor initialisiert die interne Sammlung.
 		 *
@@ -157,7 +157,7 @@ public class Builders {
 		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 		protected BaseItemsBuilder(final GItems items) throws NullPointerException {
 			if (items == null) throw new NullPointerException("items = null");
-			this._items_ = items;
+			this.items = items;
 		}
 
 		{}
@@ -169,7 +169,7 @@ public class Builders {
 		 * @param data Konfigurator oder {@code null}.
 		 * @return {@code this}. */
 		public final GThis use(final BaseItemsBuilder<? extends GItem, ?, ?> data) {
-			if (data == null) return this._this_();
+			if (data == null) return this.customThis();
 			this.clearItems();
 			return this.useItems(data);
 		}
@@ -179,8 +179,8 @@ public class Builders {
 		 * @param item Element.
 		 * @return {@code this}. */
 		public final GThis useItem(final GItem item) {
-			this._items_.add(item);
-			return this._this_();
+			this.items.add(item);
+			return this.customThis();
 		}
 
 		/** Diese Methode fügt die gegebenen Elemente zur {@link #getItems() internen Sammlung} hinzu und gibt {@code this} zurück.
@@ -188,24 +188,24 @@ public class Builders {
 		 * @param items Elemente oder {@code null}.
 		 * @return {@code this}. */
 		public final GThis useItems(final Iterable<? extends GItem> items) {
-			if (items == null) return this._this_();
-			Iterables.appendAll(this._items_, items);
-			return this._this_();
+			if (items == null) return this.customThis();
+			Iterables.appendAll(this.items, items);
+			return this.customThis();
 		}
 
 		/** Diese Methode gibt die interne Sammlung zurück.
 		 *
 		 * @return interne Sammlung. */
 		public final GItems getItems() {
-			return this._items_;
+			return this.items;
 		}
 
 		/** Diese Methode leert die {@link #getItems() interne Sammlung} und gibt {@code this} zurück.
 		 *
 		 * @return {@code this}. */
 		public final GThis clearItems() {
-			this._items_.clear();
-			return this._this_();
+			this.items.clear();
+			return this.customThis();
 		}
 
 		/** Diese Methode macht die {@link #getItems() interne Sammlung} datentypsicher und gibt {@code this} zurück.
@@ -241,19 +241,19 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		public final GItems build() throws IllegalStateException {
-			return this._items_;
+			return this.items;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<GItem> iterator() {
-			return this._items_.iterator();
+			return this.items.iterator();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
-			return Objects.toString(true, this._items_);
+			return Objects.toString(true, this.items);
 		}
 
 	}
@@ -269,10 +269,10 @@ public class Builders {
 		implements Iterable<Entry<GKey, GValue>> {
 
 		/** Dieses Feld speichert den über {@link #forKey(Object)} gewählten Schlüssel. */
-		protected GKey _key_;
+		protected GKey key;
 
 		/** Dieses Feld speichert die interne {@link Map}. */
-		protected GEntries _entries_;
+		protected GEntries entries;
 
 		/** Dieser Konstruktor initialisiert die interne {@link Map}.
 		 *
@@ -280,7 +280,7 @@ public class Builders {
 		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
 		protected BaseEntriesBuilder(final GEntries entries) throws NullPointerException {
 			if (entries == null) throw new NullPointerException("entries = null");
-			this._entries_ = entries;
+			this.entries = entries;
 		}
 
 		{}
@@ -292,7 +292,7 @@ public class Builders {
 		 * @param data Konfigurator oder {@code null}.
 		 * @return {@code this}. */
 		public final GThis use(final BaseEntriesBuilder<? extends GKey, ? extends GValue, ?, ?> data) {
-			if (data == null) return this._this_();
+			if (data == null) return this.customThis();
 			this.clearEntries();
 			return this.useEntries(data.getEntries());
 		}
@@ -303,7 +303,7 @@ public class Builders {
 		 * @param entry Eintrag.
 		 * @return {@code this}. */
 		public final GThis useEntry(final Entry<? extends GKey, ? extends GValue> entry) {
-			if (entry == null) return this._this_();
+			if (entry == null) return this.customThis();
 			return this.useEntry(entry.getKey(), entry.getValue());
 		}
 
@@ -314,8 +314,8 @@ public class Builders {
 		 * @param value Wert.
 		 * @return {@code this}. */
 		public final GThis useEntry(final GKey key, final GValue value) {
-			this._entries_.put(key, value);
-			return this._this_();
+			this.entries.put(key, value);
+			return this.customThis();
 		}
 
 		/** Diese Methode fügt die gegebenen Einträge zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
@@ -324,7 +324,7 @@ public class Builders {
 		 * @param entries Einträge oder {@code null}.
 		 * @return {@code this}. */
 		public final GThis useEntries(final Map<? extends GKey, ? extends GValue> entries) {
-			if (entries == null) return this._this_();
+			if (entries == null) return this.customThis();
 			return this.useEntries(entries.entrySet());
 		}
 
@@ -334,11 +334,11 @@ public class Builders {
 		 * @param entries Einträge oder {@code null}.
 		 * @return {@code this}. */
 		public final GThis useEntries(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-			if (entries == null) return this._this_();
+			if (entries == null) return this.customThis();
 			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
 				this.useEntry(entry);
 			}
-			return this._this_();
+			return this.customThis();
 		}
 
 		/** Diese Methode gibt die interne {@link Map} zurück.
@@ -346,7 +346,7 @@ public class Builders {
 		 * @see BaseEntriesBuilder#BaseEntriesBuilder(Map)
 		 * @return interne Abbildung. */
 		public final GEntries getEntries() {
-			return this._entries_;
+			return this.entries;
 		}
 
 		/** Diese Methode wählt den gegebenen Schlüssel und gibt {@code this} zurück. Dieser Schlüssel wird in den nachfolgenden Aufrufen von {@link #getValue()}
@@ -357,8 +357,8 @@ public class Builders {
 		 * @param key Schlüssel.
 		 * @return {@code this}. */
 		public final GThis forKey(final GKey key) {
-			this._key_ = key;
-			return this._this_();
+			this.key = key;
+			return this.customThis();
 		}
 
 		/** Diese Methode gibt den Wert zum {@link #forKey(Object) gewählten Schlüssel} zurück.
@@ -367,7 +367,7 @@ public class Builders {
 		 * @see #useValue(Object)
 		 * @return Wert zum gewählten Schlüssel. */
 		public final GValue getValue() {
-			return this._entries_.get(this._key_);
+			return this.entries.get(this.key);
 		}
 
 		/** Diese Methode setzt den Wert zum {@link #forKey(Object) gewählten Schlüssel} und gibt {@code this} zurück.
@@ -377,16 +377,16 @@ public class Builders {
 		 * @param value Wert.
 		 * @return {@code this}. */
 		public final GThis useValue(final GValue value) {
-			this.useEntry(this._key_, value);
-			return this._this_();
+			this.useEntry(this.key, value);
+			return this.customThis();
 		}
 
 		/** Diese Methode leert die {@link #getEntries() interne Abbildung} und gibt {@code this} zurück.
 		 *
 		 * @return {@code this}. */
 		public final GThis clearEntries() {
-			this._entries_.clear();
-			return this._this_();
+			this.entries.clear();
+			return this.customThis();
 		}
 
 		/** Diese Methode macht die {@link #getEntries() interne Abbildung} datentypsicher und gibt {@code this} zurück.
@@ -425,13 +425,13 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<Entry<GKey, GValue>> iterator() {
-			return this._entries_.entrySet().iterator();
+			return this.entries.entrySet().iterator();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
-			return Objects.toString(true, this._entries_);
+			return Objects.toString(true, this.entries);
 		}
 
 	}
@@ -461,22 +461,22 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeChecked(final Class<GItem> clazz) {
-			this._items_ = Collections.checkedSet(this._items_, clazz);
-			return this._this_();
+			this.items = Collections.checkedSet(this.items, clazz);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeSynchronized() {
-			this._items_ = Collections.synchronizedSet(this._items_);
-			return this._this_();
+			this.items = Collections.synchronizedSet(this.items);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeUnmodifiable() {
-			this._items_ = Collections.unmodifiableSet(this._items_);
-			return this._this_();
+			this.items = Collections.unmodifiableSet(this.items);
+			return this.customThis();
 		}
 
 	}
@@ -539,22 +539,22 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeChecked(final Class<GItem> clazz) {
-			this._items_ = Collections.checkedList(this._items_, clazz);
-			return this._this_();
+			this.items = Collections.checkedList(this.items, clazz);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeSynchronized() {
-			this._items_ = Collections.synchronizedList(this._items_);
-			return this._this_();
+			this.items = Collections.synchronizedList(this.items);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeUnmodifiable() {
-			this._items_ = Collections.unmodifiableList(this._items_);
-			return this._this_();
+			this.items = Collections.unmodifiableList(this.items);
+			return this.customThis();
 		}
 
 	}
@@ -586,15 +586,15 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		public final GThis makeSynchronized() {
-			this._items_ = Collections.synchronizedList(this._items_);
-			return this._this_();
+			this.items = Collections.synchronizedList(this.items);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final GThis makeUnmodifiable() {
-			this._items_ = Collections.unmodifiableList(this._items_);
-			return this._this_();
+			this.items = Collections.unmodifiableList(this.items);
+			return this.customThis();
 		}
 
 	}
@@ -625,22 +625,22 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
-			this._entries_ = Collections.checkedMap(this._entries_, keyClazz, valueClazz);
-			return this._this_();
+			this.entries = Collections.checkedMap(this.entries, keyClazz, valueClazz);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeSynchronized() {
-			this._entries_ = Collections.synchronizedMap(this._entries_);
-			return this._this_();
+			this.entries = Collections.synchronizedMap(this.entries);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeUnmodifiable() {
-			this._entries_ = Collections.unmodifiableMap(this._entries_);
-			return this._this_();
+			this.entries = Collections.unmodifiableMap(this.entries);
+			return this.customThis();
 		}
 
 	}
@@ -704,22 +704,22 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeChecked(final Class<GItem> clazz) {
-			this._items_ = Collections.checkedCollection(this._items_, clazz);
-			return this._this_();
+			this.items = Collections.checkedCollection(this.items, clazz);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeSynchronized() {
-			this._items_ = Collections.synchronizedCollection(this._items_);
-			return this._this_();
+			this.items = Collections.synchronizedCollection(this.items);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeUnmodifiable() {
-			this._items_ = Collections.unmodifiableCollection(this._items_);
-			return this._this_();
+			this.items = Collections.unmodifiableCollection(this.items);
+			return this.customThis();
 		}
 
 	}
@@ -787,22 +787,22 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeChecked(final Class<GItem> clazz) {
-			this._items_ = Collections.checkedSortedSet(this._items_, clazz);
-			return this._this_();
+			this.items = Collections.checkedSortedSet(this.items, clazz);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeSynchronized() {
-			this._items_ = Collections.synchronizedSortedSet(this._items_);
-			return this._this_();
+			this.items = Collections.synchronizedSortedSet(this.items);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeUnmodifiable() {
-			this._items_ = Collections.unmodifiableSortedSet(this._items_);
-			return this._this_();
+			this.items = Collections.unmodifiableSortedSet(this.items);
+			return this.customThis();
 		}
 
 	}
@@ -866,22 +866,22 @@ public class Builders {
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
-			this._entries_ = Collections.checkedSortedMap(this._entries_, keyClazz, valueClazz);
-			return this._this_();
+			this.entries = Collections.checkedSortedMap(this.entries, keyClazz, valueClazz);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeSynchronized() {
-			this._entries_ = Collections.synchronizedSortedMap(this._entries_);
-			return this._this_();
+			this.entries = Collections.synchronizedSortedMap(this.entries);
+			return this.customThis();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		protected GThis makeUnmodifiable() {
-			this._entries_ = Collections.unmodifiableSortedMap(this._entries_);
-			return this._this_();
+			this.entries = Collections.unmodifiableSortedMap(this.entries);
+			return this.customThis();
 		}
 
 	}
@@ -940,7 +940,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final TreeSetBuilder<GItem> _this_() {
+		protected final TreeSetBuilder<GItem> customThis() {
 			return this;
 		}
 
@@ -962,7 +962,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final TreeMapBuilder<GKey, GValue> _this_() {
+		protected final TreeMapBuilder<GKey, GValue> customThis() {
 			return this;
 		}
 
@@ -983,7 +983,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final HashSetBuilder<GItem> _this_() {
+		protected final HashSetBuilder<GItem> customThis() {
 			return this;
 		}
 
@@ -1005,7 +1005,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final HashMapBuilder<GKey, GValue> _this_() {
+		protected final HashMapBuilder<GKey, GValue> customThis() {
 			return this;
 		}
 
@@ -1026,7 +1026,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final LinkedListBuilder<GItem> _this_() {
+		protected final LinkedListBuilder<GItem> customThis() {
 			return this;
 		}
 
@@ -1047,7 +1047,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final ArrayListBuilder<GItem> _this_() {
+		protected final ArrayListBuilder<GItem> customThis() {
 			return this;
 		}
 
@@ -1083,7 +1083,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SimpleSetBuilder<GItem> _this_() {
+		protected final SimpleSetBuilder<GItem> customThis() {
 			return this;
 		}
 
@@ -1119,7 +1119,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SimpleListBuilder<GItem> _this_() {
+		protected final SimpleListBuilder<GItem> customThis() {
 			return this;
 		}
 
@@ -1157,7 +1157,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SimpleMapBuilder<GKey, GValue> _this_() {
+		protected final SimpleMapBuilder<GKey, GValue> customThis() {
 			return this;
 		}
 
@@ -1193,7 +1193,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SimpleCollectionBuilder<GItem> _this_() {
+		protected final SimpleCollectionBuilder<GItem> customThis() {
 			return this;
 		}
 
@@ -1229,7 +1229,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SimpleSortedSetBuilder<GItem> _this_() {
+		protected final SimpleSortedSetBuilder<GItem> customThis() {
 			return this;
 		}
 
@@ -1267,7 +1267,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SimpleSortedMapBuilder<GKey, GValue> _this_() {
+		protected final SimpleSortedMapBuilder<GKey, GValue> customThis() {
 			return this;
 		}
 
@@ -1410,7 +1410,7 @@ public class Builders {
 				if (pointer != null) {
 					final GValue data = pointer.data();
 					if (data != null) return data;
-					if (pointer == Pointers._null_) return null;
+					if (pointer == Pointers.NULL) return null;
 				}
 				final GValue data = builder.build();
 				this.pointer = Pointers.pointer(mode, data);

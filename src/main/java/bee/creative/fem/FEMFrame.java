@@ -20,37 +20,37 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	@SuppressWarnings ("javadoc")
 	static final class ArrayFrame extends FEMFrame {
 
-		final FEMArray _params_;
+		final FEMArray params;
 
 		ArrayFrame(final FEMFrame parent, final FEMArray params, final FEMContext context) {
 			super(parent, context);
-			this._params_ = params;
+			this.params = params;
 		}
 
 		{}
 
 		@Override
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
-			final int index2 = index - this._params_._length_;
-			if (index2 >= 0) return this._parent_.get(index2);
-			final FEMValue result = this._params_._get_(index);
+			final int index2 = index - this.params.length;
+			if (index2 >= 0) return this.parent.get(index2);
+			final FEMValue result = this.params.customGet(index);
 			return result;
 		}
 
 		@Override
 		public int size() {
-			return this._params_._length_;
+			return this.params.length;
 		}
 
 		@Override
 		public FEMArray params() {
-			return this._params_;
+			return this.params;
 		}
 
 		@Override
 		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
 			if (context == null) throw new NullPointerException("context = null");
-			return new ArrayFrame(this._parent_, this._params_, context);
+			return new ArrayFrame(this.parent, this.params, context);
 		}
 
 	}
@@ -86,45 +86,45 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		static final class Params extends FEMArray {
 
-			final FEMFrame _frame_;
+			final FEMFrame frame;
 
-			final FEMValue[] _values_;
+			final FEMValue[] values;
 
-			final FEMFunction[] _params_;
+			final FEMFunction[] functions;
 
 			Params(final FEMFrame frame, final FEMFunction[] params) {
 				super(params.length);
-				this._frame_ = frame;
-				this._params_ = params;
-				this._values_ = new FEMValue[params.length];
+				this.frame = frame;
+				this.functions = params;
+				this.values = new FEMValue[params.length];
 			}
 
 			{}
 
-			@Override
-			protected FEMValue _get_(final int index) {
-				synchronized (this._values_) {
-					FEMValue result = this._values_[index];
+			FEMValue frameGet(final int index) {
+				final int index2 = index - this.length;
+				if (index2 >= 0) return this.frame.get(index2);
+				synchronized (this.values) {
+					FEMValue result = this.values[index];
 					if (result != null) return result;
-					final FEMFunction param = this._params_[index];
-					if (param == null) throw new NullPointerException("params[index] = null");
-					result = new FEMFuture(this._frame_, param);
-					this._values_[index] = result;
+					final FEMFunction param = this.functions[index];
+					if (param == null) throw new NullPointerException("params().get(index) = null");
+					result = param.invoke(this.frame);
+					if (result == null) throw new NullPointerException("params().get(index).invoke(frame) = null");
+					this.values[index] = result;
 					return result;
 				}
 			}
 
-			FEMValue _get2_(final int index) {
-				final int index2 = index - this._length_;
-				if (index2 >= 0) return this._frame_.get(index2);
-				synchronized (this._values_) {
-					FEMValue result = this._values_[index];
+			@Override
+			protected FEMValue customGet(final int index) {
+				synchronized (this.values) {
+					FEMValue result = this.values[index];
 					if (result != null) return result;
-					final FEMFunction param = this._params_[index];
-					if (param == null) throw new NullPointerException("params().get(index) = null");
-					result = param.invoke(this._frame_);
-					if (result == null) throw new NullPointerException("params().get(index).invoke(frame) = null");
-					this._values_[index] = result;
+					final FEMFunction param = this.functions[index];
+					if (param == null) throw new NullPointerException("params[index] = null");
+					result = new FEMFuture(this.frame, param);
+					this.values[index] = result;
 					return result;
 				}
 			}
@@ -133,41 +133,41 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		{}
 
-		final Params _params_;
+		final Params params;
 
 		InvokeFrame(final FEMFrame parent, final Params params, final FEMContext context) {
 			super(parent, context);
-			this._params_ = params;
+			this.params = params;
 		}
 
 		InvokeFrame(final FEMFrame parent, final FEMFunction[] params, final FEMContext context) {
 			super(parent, context);
-			this._params_ = new Params(parent, params);
+			this.params = new Params(parent, params);
 		}
 
 		{}
 
 		@Override
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
-			final int index2 = index - this._params_._length_;
-			if (index2 >= 0) return this._parent_.get(index2);
-			return this._params_._get2_(index);
+			final int index2 = index - this.params.length;
+			if (index2 >= 0) return this.parent.get(index2);
+			return this.params.frameGet(index);
 		}
 
 		@Override
 		public int size() {
-			return this._params_._length_;
+			return this.params.length;
 		}
 
 		@Override
 		public FEMArray params() {
-			return this._params_;
+			return this.params;
 		}
 
 		@Override
 		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
 			if (context == null) throw new NullPointerException("context = null");
-			return new InvokeFrame(this._parent_, this._params_, context);
+			return new InvokeFrame(this.parent, this.params, context);
 		}
 
 	}
@@ -193,21 +193,21 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	{}
 
 	/** Dieses Feld speichert die übergeordneten Parameterdaten. */
-	protected final FEMFrame _parent_;
+	protected final FEMFrame parent;
 
 	/** Dieses Feld speichert das Kontextobjekt. */
-	protected final FEMContext _context_;
+	protected final FEMContext context;
 
 	@SuppressWarnings ("javadoc")
 	FEMFrame() {
-		this._parent_ = this;
-		this._context_ = FEMContext.EMPTY;
+		this.parent = this;
+		this.context = FEMContext.EMPTY;
 	}
 
 	@SuppressWarnings ("javadoc")
 	protected FEMFrame(final FEMFrame parent, final FEMContext context) {
-		this._parent_ = parent;
-		this._context_ = context;
+		this.parent = parent;
+		this.context = context;
 	}
 
 	{}
@@ -222,7 +222,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 *
 	 * @return übergeordnete Parameterdaten oder {@code this}. */
 	public final FEMFrame parent() {
-		return this._parent_;
+		return this.parent;
 	}
 
 	/** Diese Methode gibt eine Wertliste als Sicht auf die zugesicherten Parameterwerte zurück.<br>
@@ -239,7 +239,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 *
 	 * @return Kontextobjekt. */
 	public final FEMContext context() {
-		return this._context_;
+		return this.context;
 	}
 
 	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher keine {@link #params() zugesicherten Parameterwerte} besitzt, das {@link #context()
@@ -247,7 +247,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 *
 	 * @return neuer Stapelrahmen. */
 	public final FEMFrame newFrame() {
-		return new ArrayFrame(this, FEMArray.EMPTY, this._context_);
+		return new ArrayFrame(this, FEMArray.EMPTY, this.context);
 	}
 
 	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher die gegebenen {@link #params() zugesicherten Parameterwerte} besitzt, das {@link #context()
@@ -257,7 +257,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame newFrame(final FEMArray params) throws NullPointerException {
-		return new ArrayFrame(this, params._length_ == 0 ? FEMArray.EMPTY : params, this._context_);
+		return new ArrayFrame(this, params.length == 0 ? FEMArray.EMPTY : params, this.context);
 	}
 
 	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher die gegebenen {@link #params() zugesicherten Parameterwerte} besitzt, das {@link #context()
@@ -268,7 +268,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame newFrame(final FEMValue... params) throws NullPointerException {
-		return new ArrayFrame(this, FEMArray.from(params), this._context_);
+		return new ArrayFrame(this, FEMArray.from(params), this.context);
 	}
 
 	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher die gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten
@@ -285,7 +285,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame newFrame(final FEMFunction[] params) throws NullPointerException {
-		return new InvokeFrame(this, params, this._context_);
+		return new InvokeFrame(this, params, this.context);
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen {@link #params() zugesicherten Parameterwerten} zurück.<br>
@@ -297,7 +297,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame withParams(final FEMArray params) throws NullPointerException {
-		return new ArrayFrame(this._parent_, params._length_ == 0 ? FEMArray.EMPTY : params, this._context_);
+		return new ArrayFrame(this.parent, params.length == 0 ? FEMArray.EMPTY : params, this.context);
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen {@link #params() zugesicherten Parameterwerten} zurück.<br>
@@ -309,7 +309,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame withParams(final FEMValue... params) throws NullPointerException {
-		return new ArrayFrame(this._parent_, FEMArray.from(params), this._context_);
+		return new ArrayFrame(this.parent, FEMArray.from(params), this.context);
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten Parameterwerte} zurück.<br>
@@ -321,7 +321,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMFrame withParams(final FEMFunction[] params) throws NullPointerException {
-		return new InvokeFrame(this._parent_, params, this._context_);
+		return new InvokeFrame(this.parent, params, this.context);
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen ohne {@link #params() zugesicherte Parameterwerte} zurück.<br>
@@ -331,7 +331,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @see #withContext(FEMContext)
 	 * @return neuer Stapelrahmen. */
 	public final FEMFrame withoutParams() {
-		return new ArrayFrame(this._parent_, FEMArray.EMPTY, this._context_);
+		return new ArrayFrame(this.parent, FEMArray.EMPTY, this.context);
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen mit dem gegebenen {@link #context() Kontextobjekt} zurück.

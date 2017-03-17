@@ -17,14 +17,14 @@ class MMFINT8Array extends MMFArray {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _get_(final int index) {
-		return this._byteBuffer_.get(this._byteOffset_ + index);
+	protected int customGet(final int index) {
+		return this.byteBuffer.get(this.byteOffset + index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected MMFArray _section_(final int offset, final int length) {
-		return new MMFINT8Array(this._byteBuffer_, this._byteOffset_ + offset, length);
+	protected MMFArray customSection(final int offset, final int length) {
+		return new MMFINT8Array(this.byteBuffer, this.byteOffset + offset, length);
 	}
 
 	/** {@inheritDoc} */
@@ -36,7 +36,7 @@ class MMFINT8Array extends MMFArray {
 	/** {@inheritDoc} */
 	@Override
 	public MMFArray withOrder(final ByteOrder order) {
-		return new MMFINT8Array(this._byteBuffer_.duplicate().order(order), this._byteOffset_, this._byteLength_);
+		return new MMFINT8Array(this.byteBuffer.duplicate().order(order), this.byteOffset, this.byteLength);
 	}
 
 }

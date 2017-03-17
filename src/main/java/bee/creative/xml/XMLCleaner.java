@@ -40,7 +40,7 @@ public final class XMLCleaner {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final FileData _this_() {
+		protected final FileData customThis() {
 			return this;
 		}
 
@@ -62,7 +62,7 @@ public final class XMLCleaner {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final CharsetData _this_() {
+		protected final CharsetData customThis() {
 			return this;
 		}
 
@@ -71,33 +71,33 @@ public final class XMLCleaner {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern _listFieldPattern_ = Pattern.compile("^(\\s+)protected (List<\\S+)( [^;]+);");
+	static final Pattern listFieldPattern = Pattern.compile("^(\\s+)protected (List<\\S+)( [^;]+);");
 
 	@SuppressWarnings ("javadoc")
-	static final String _listFieldReplace_ = "$1 public Array$2$3 = new Array$2();";
+	static final String listFieldReplace = "$1 public Array$2$3 = new Array$2();";
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern _listMethodPattern_ = Pattern.compile("^\\s+public List<");
+	static final Pattern listMethodPattern = Pattern.compile("^\\s+public List<");
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern _itemFieldPattern_ = Pattern.compile("^(\\s+)(?:protected|private) (.*)");
+	static final Pattern itemFieldPattern = Pattern.compile("^(\\s+)(?:protected|private) (.*)");
 
 	@SuppressWarnings ("javadoc")
-	static final String _itemFieldReplace_ = "$1public $2";
+	static final String itemFieldReplace = "$1public $2";
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern _itemMethodPattern_ = Pattern.compile("^\\s+public \\S+ (value\\(\\)|[gs]et\\S+)");
+	static final Pattern itemMethodPattern = Pattern.compile("^\\s+public \\S+ (value\\(\\)|([gs]et|is)\\S+)");
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern _commentPattern_ = Pattern.compile("^\\s*[*/]");
+	static final Pattern commentPattern = Pattern.compile("^\\s*[*/]");
 
 	{}
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFileData()}. */
-	final FileData _fileData_ = new FileData();
+	final FileData fileData = new FileData();
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openCharsetData()}. */
-	final CharsetData _charsetData_ = new CharsetData();
+	final CharsetData charsetData = new CharsetData();
 
 	{}
 
@@ -106,23 +106,23 @@ public final class XMLCleaner {
 	 * @return {@code this}.
 	 * @throws IllegalStateException Wenn {@link File} oder {@link Charset} unzulässig konfiguriert sind. */
 	public final XMLCleaner cleanup() throws IllegalStateException {
-		final File path = this._fileData_.get();
-		final Charset charset = this._charsetData_.get();
+		final File path = this.fileData.get();
+		final Charset charset = this.charsetData.get();
 		if ((path == null) || (charset == null)) throw new IllegalStateException();
 		if (path.isDirectory()) {
 			final File[] list = path.listFiles();
 			if (list == null) return this;
 			for (final File file: list) {
-				this._cleanup_(file, charset);
+				this.cleanup(file, charset);
 			}
 		} else {
-			this._cleanup_(path, charset);
+			this.cleanup(path, charset);
 		}
 		return this;
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void _cleanup_(final File file, final Charset charset) throws IllegalStateException {
+	final void cleanup(final File file, final Charset charset) throws IllegalStateException {
 		try {
 			if (!file.isFile() || !file.getName().endsWith(".java")) return;
 			final List<String> sourceList = Files.readAllLines(file.toPath(), charset);
@@ -135,21 +135,21 @@ public final class XMLCleaner {
 				final String source = sourceList.get(index);
 				if (source.isEmpty()) {
 					index += 1;
-				} else if ((matcher = XMLCleaner._commentPattern_.matcher(source)).find()) {
+				} else if ((matcher = XMLCleaner.commentPattern.matcher(source)).find()) {
 					index += 1;
-				} else if ((matcher = XMLCleaner._listMethodPattern_.matcher(source)).find()) {
+				} else if ((matcher = XMLCleaner.listMethodPattern.matcher(source)).find()) {
 					index += 6;
-				} else if ((matcher = XMLCleaner._itemMethodPattern_.matcher(source)).find()) {
+				} else if ((matcher = XMLCleaner.itemMethodPattern.matcher(source)).find()) {
 					index += 3;
-				} else if ((matcher = XMLCleaner._listFieldPattern_.matcher(source)).find()) {
+				} else if ((matcher = XMLCleaner.listFieldPattern.matcher(source)).find()) {
 					index += 1;
 					target.setLength(0);
-					matcher.appendReplacement(target, XMLCleaner._listFieldReplace_);
+					matcher.appendReplacement(target, XMLCleaner.listFieldReplace);
 					targetList.add(target.toString());
-				} else if ((matcher = XMLCleaner._itemFieldPattern_.matcher(source)).find()) {
+				} else if ((matcher = XMLCleaner.itemFieldPattern.matcher(source)).find()) {
 					index += 1;
 					target.setLength(0);
-					matcher.appendReplacement(target, XMLCleaner._itemFieldReplace_);
+					matcher.appendReplacement(target, XMLCleaner.itemFieldReplace);
 					targetList.add(target.toString());
 				} else {
 					index += 1;
@@ -169,7 +169,7 @@ public final class XMLCleaner {
 	 * @see Files#write(Path, Iterable, Charset, OpenOption...)
 	 * @return Konfigurator. */
 	public final FileData openFileData() {
-		return this._fileData_;
+		return this.fileData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link Charset} zum Laden und Speichern der Quelltextdateien und gibt ihn zurück.
@@ -178,7 +178,7 @@ public final class XMLCleaner {
 	 * @see Files#write(Path, Iterable, Charset, OpenOption...)
 	 * @return Konfigurator. */
 	public final CharsetData openCharsetData() {
-		return this._charsetData_;
+		return this.charsetData;
 	}
 
 }

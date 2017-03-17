@@ -28,25 +28,25 @@ public abstract class IAMEntry {
 	@SuppressWarnings ("javadoc")
 	static final class SimpleEntry extends IAMEntry {
 
-		final IAMArray _key_;
+		final IAMArray key;
 
-		final IAMArray _value_;
+		final IAMArray value;
 
 		SimpleEntry(final IAMArray key, final IAMArray value) {
-			this._key_ = key;
-			this._value_ = value;
+			this.key = key;
+			this.value = value;
 		}
 
 		{}
 
 		@Override
 		public final IAMArray key() {
-			return this._key_;
+			return this.key;
 		}
 
 		@Override
 		public final IAMArray value() {
-			return this._value_;
+			return this.value;
 		}
 
 	}

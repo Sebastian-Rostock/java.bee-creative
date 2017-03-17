@@ -14,13 +14,9 @@ import bee.creative.util.Pointers.SoftPointer;
  * {@code Helper} verwendet, wobei maximal eine Instanz pro {@link Thread} erzeugt wird: <pre>
  * public final class Helper {
  *
- *   static final {@literal Converter<Thread, Helper> CACHE = Converters.synchronizedConverter(Converters.bufferedConverter(new Converter<Thread, Helper>()} {
- *
- *     public Helper convert(Thread value) {
- *       return new Helper(value);
- *     }
- *
- *   }));
+ *   static final Converter&lt;Thread, Helper&gt; CACHE = Converters.synchronizedConverter(Converters.bufferedConverter(
+ *   	(Thread value) -&gt; new Helper(value)
+ *   ));
  *
  *   public static Helper get() {
  *     return Helper.CACHE.convert(Thread.currentThread());
@@ -93,17 +89,17 @@ public class Converters {
 	public static <GInput, GValue> Converter<GInput, GValue> getterAdapter(final Getter<? super GInput, ? extends GValue> getter) throws NullPointerException {
 		if (getter == null) throw new NullPointerException("getter = null");
 		return new Converter<GInput, GValue>() {
-	
+
 			@Override
 			public GValue convert(final GInput input) {
 				return getter.get(input);
 			}
-	
+
 			@Override
 			public String toString() {
 				return Objects.toInvokeString("getterAdapter", getter);
 			}
-	
+
 		};
 	}
 

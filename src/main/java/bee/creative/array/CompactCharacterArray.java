@@ -245,7 +245,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _capacity_() {
+	protected int customCapacity() {
 		return this._array_.length;
 	}
 

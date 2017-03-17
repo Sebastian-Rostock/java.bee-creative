@@ -38,21 +38,21 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	{}
 
 	/** Dieses Feld speichert den Wert. */
-	FEMValue _value_;
+	FEMValue value;
 
 	/** Dieses Feld speichert die Ursache. */
-	Throwable _cause_;
+	Throwable cause;
 
 	/** Dieses Feld speichert den Kontextobjekt. */
-	FEMContext _context_;
+	FEMContext context;
 
 	/** Dieses Feld speichert die Nachrichten. */
-	final List<String> _messages_;
+	final List<String> messages;
 
 	/** Dieser Konstruktor initialisiert eine neue Ausnahme ohne {@link #getValue() Wert}, {@link #getContext() Kontextobjekt}, {@link #getCause() Ursache} und
 	 * {@link #getMessages() Nachrichten}. */
 	public FEMException() {
-		this._messages_ = Collections.synchronizedList(new ArrayList<String>());
+		this.messages = Collections.synchronizedList(new ArrayList<String>());
 	}
 
 	{}
@@ -63,7 +63,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @param value Wert oder {@code null}.
 	 * @return {@code this}. */
 	public final FEMException useValue(final FEMValue value) {
-		this._value_ = value;
+		this.value = value;
 		return this;
 	}
 
@@ -73,7 +73,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @param cause Ursache des Ausnahmefalls.
 	 * @return {@code this}. */
 	public final FEMException useCause(final Throwable cause) {
-		this._cause_ = cause;
+		this.cause = cause;
 		return this;
 	}
 
@@ -83,7 +83,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @param context Kontextobjekt oder {@code null}.
 	 * @return {@code this}. */
 	public final FEMException useContext(final FEMContext context) {
-		this._context_ = context;
+		this.context = context;
 		return this;
 	}
 
@@ -91,7 +91,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 *
 	 * @return Wert oder {@code null}. */
 	public final FEMValue getValue() {
-		return this._value_;
+		return this.value;
 	}
 
 	/** Diese Methode gibt das Kontextobjekt zurück, das die {@link #getCause() Ursache} des Ausnahmefalls genauer beschreibt bzw. zur Umwandlung des
@@ -99,7 +99,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 *
 	 * @return Kontextobjekt oder {@code null}. */
 	public final FEMContext getContext() {
-		return this._context_;
+		return this.context;
 	}
 
 	/** Diese Methode gibt eine unveränderliche Sicht auf die Nachrichten dieser Ausnahme zurück.
@@ -108,7 +108,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @see #clearMessages()
 	 * @return Nachrichten. */
 	public final List<String> getMessages() {
-		return Collections.unmodifiableList(this._messages_);
+		return Collections.unmodifiableList(this.messages);
 	}
 
 	/** Diese Methode entfernt alle {@link #getMessages() Nachrichten} dieser Ausnahme und gibt {@code this} zurück.
@@ -116,7 +116,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @see #getMessages()
 	 * @return {@code this}. */
 	public final FEMException clearMessages() {
-		this._messages_.clear();
+		this.messages.clear();
 		return this;
 	}
 
@@ -128,7 +128,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @return {@code this}. */
 	public final FEMException push(final String message) {
 		if (message == null) return this;
-		this._messages_.add(message);
+		this.messages.add(message);
 		return this;
 	}
 
@@ -170,7 +170,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @return {@code this}. */
 	public final FEMException pushAll(final Iterable<String> messages) {
 		if (messages == null) return this;
-		Iterables.appendAll(this._messages_, Iterables.filteredIterable(Filters.nullFilter(), messages));
+		Iterables.appendAll(this.messages, Iterables.filteredIterable(Filters.nullFilter(), messages));
 		return this;
 	}
 
@@ -179,19 +179,19 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	/** {@inheritDoc} */
 	@Override
 	public final Iterator<String> iterator() {
-		return this._messages_.iterator();
+		return this.messages.iterator();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final synchronized Throwable getCause() {
-		return this._cause_;
+		return this.cause;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final String getMessage() {
-		return Strings.join("\n", this._messages_);
+		return Strings.join("\n", this.messages);
 	}
 
 }

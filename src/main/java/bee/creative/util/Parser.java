@@ -6,22 +6,22 @@ package bee.creative.util;
 public class Parser {
 
 	/** Dieses Feld speichert die aktuelle Position. */
-	private int _index_;
+	private int index;
 
 	/** Dieses Feld speichert die Zeichen der Eingabe. */
-	private char[] _chars_;
+	private char[] chars;
 
 	/** Dieses Feld speichert die Ausgabe. */
-	private final StringBuffer _target_ = new StringBuffer();
+	private final StringBuffer target = new StringBuffer();
 
 	/** Dieses Feld speichert das aktuelle Zeichen oder {@code -1}. */
-	private int _symbol_;
+	private int symbol;
 
 	/** Dieses Feld speichert die Eingabe. */
-	private String _source_;
+	private String source;
 
 	/** Dieses Feld speichert die Anzahl der Zeichen in der Eingabe. */
-	private int _length_;
+	private int length;
 
 	/** Dieser Konstruktor initialisiert die leere Eingabe. */
 	public Parser() {
@@ -57,9 +57,9 @@ public class Parser {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist. */
 	public final int seek(final int index) throws IndexOutOfBoundsException {
 		if (index < 0) throw new IndexOutOfBoundsException();
-		if (index < this._length_) return this._symbol_ = this._chars_[this._index_ = index];
-		this._index_ = this._length_;
-		return this._symbol_ = -1;
+		if (index < this.length) return this.symbol = this.chars[this.index = index];
+		this.index = this.length;
+		return this.symbol = -1;
 	}
 
 	/** Diese Methode überspring das {@link #symbol() aktuelle Zeichen}, navigiert zum nächsten Zeichen und gibt dieses zurück.
@@ -70,9 +70,9 @@ public class Parser {
 	 * @see #target()
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}. */
 	public final int skip() {
-		final int index = this._index_ + 1, symbol = index < this._length_ ? this._chars_[index] : -1;
-		this._index_ = index;
-		this._symbol_ = symbol;
+		final int index = this.index + 1, symbol = index < this.length ? this.chars[index] : -1;
+		this.index = index;
+		this.symbol = symbol;
 		return symbol;
 	}
 
@@ -90,7 +90,7 @@ public class Parser {
 	 * @see #symbol()
 	 * @return aktuelle Position. */
 	public final int index() {
-		return this._index_;
+		return this.index;
 	}
 
 	/** Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der
@@ -101,7 +101,7 @@ public class Parser {
 	 * @see #index()
 	 * @return aktuelles Zeichen oder {@code -1}. */
 	public final int symbol() {
-		return this._symbol_;
+		return this.symbol;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #source()
@@ -112,7 +112,7 @@ public class Parser {
 	 * @see #index()
 	 * @return {@code true}, wenn die aktuelle Position minimal ist. */
 	public final boolean isReset() {
-		return this._index_ == 0;
+		return this.index == 0;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das {@link #symbol() aktuelle Zeichen} kleiner {@code 0} und damit die {@link #index() aktuelle
@@ -124,7 +124,7 @@ public class Parser {
 	 * @see #symbol()
 	 * @return {@code true}, wenn die aktuelle Position maximal ist. */
 	public final boolean isParsed() {
-		return this._symbol_ < 0;
+		return this.symbol < 0;
 	}
 
 	{}
@@ -139,7 +139,7 @@ public class Parser {
 	 * @see #target()
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}. */
 	public final int take() {
-		this.take(this._symbol_);
+		this.take(this.symbol);
 		return this.skip();
 	}
 
@@ -150,7 +150,7 @@ public class Parser {
 	 * @param symbol Zeichen. */
 	public final void take(final int symbol) {
 		if (symbol < 0) return;
-		this._target_.append((char)symbol);
+		this.target.append((char)symbol);
 	}
 
 	/** Diese Methode übernimmt die gegebene Zeichenkette in die {@link #target() Ausgabe}.
@@ -161,7 +161,7 @@ public class Parser {
 	 * @throws NullPointerException Wenn die Zeichenkette {@code null} ist. */
 	public final void take(final String symbols) throws NullPointerException {
 		if (symbols == null) throw new NullPointerException("symbols = null");
-		this._target_.append(symbols.toString());
+		this.target.append(symbols.toString());
 	}
 
 	/** Diese Methode leert die {@link #target() Ausgabe}.
@@ -171,7 +171,7 @@ public class Parser {
 	 * @see #take(String)
 	 * @see #target() */
 	public final void clear() {
-		this._target_.setLength(0);
+		this.target.setLength(0);
 	}
 
 	/** Diese Methode gibt die via {@link #take()}, {@link #take(int)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
@@ -184,7 +184,7 @@ public class Parser {
 	 * @see #symbol()
 	 * @return Ausgabe. */
 	public final String target() {
-		return this._target_.toString();
+		return this.target.toString();
 	}
 
 	/** Diese Methode setzt die Ausgabe.
@@ -193,8 +193,8 @@ public class Parser {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void target(final String value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
-		this._target_.setLength(0);
-		this._target_.append(value);
+		this.target.setLength(0);
+		this.target.append(value);
 	}
 
 	{}
@@ -206,14 +206,14 @@ public class Parser {
 	 * @see #source()
 	 * @return Länge der Eingabe. */
 	public final int length() {
-		return this._length_;
+		return this.length;
 	}
 
 	/** Diese Methode gibt die Eingabe zurück.
 	 *
 	 * @return Eingabe. */
 	public final String source() {
-		return this._source_;
+		return this.source;
 	}
 
 	/** Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
@@ -221,9 +221,9 @@ public class Parser {
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void source(final String source) throws NullPointerException {
-		this._chars_ = source.toCharArray();
-		this._length_ = source.length();
-		this._source_ = source;
+		this.chars = source.toCharArray();
+		this.length = source.length();
+		this.source = source;
 		this.reset();
 	}
 
@@ -240,7 +240,7 @@ public class Parser {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this._source_);
+		return Objects.toInvokeString(this, this.source);
 	}
 
 }

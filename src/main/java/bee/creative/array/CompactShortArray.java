@@ -245,7 +245,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _capacity_() {
+	protected int customCapacity() {
 		return this._array_.length;
 	}
 

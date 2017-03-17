@@ -23,7 +23,7 @@ public final class IAMException extends RuntimeException {
 	{}
 
 	/** Dieses Feld speichert die Kennungen der Fehlerursache. */
-	final int _code_;
+	final int code;
 
 	/** Dieser Konstrukteur initialisiert die Kennungen der Fehlerursachen.
 	 *
@@ -33,7 +33,7 @@ public final class IAMException extends RuntimeException {
 	 * @see #INVALID_HEADER
 	 * @param code Kennungen der Fehlerursachen ({@code |}-verknüpft). */
 	public IAMException(final int code) {
-		this._code_ = code;
+		this.code = code;
 	}
 
 	{}
@@ -42,7 +42,7 @@ public final class IAMException extends RuntimeException {
 	 *
 	 * @return Kennungen der Fehlerursachen. */
 	public final int code() {
-		return this._code_;
+		return this.code;
 	}
 
 }

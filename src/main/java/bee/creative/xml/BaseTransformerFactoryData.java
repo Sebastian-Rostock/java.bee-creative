@@ -38,7 +38,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 
 		/** {@inheritDoc} */
 		@Override
-		protected final FeatureData<GOwner> _this_() {
+		protected final FeatureData<GOwner> customThis() {
 			return this;
 		}
 
@@ -60,7 +60,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 
 		/** {@inheritDoc} */
 		@Override
-		protected final AttributeData<GOwner> _this_() {
+		protected final AttributeData<GOwner> customThis() {
 			return this;
 		}
 
@@ -82,7 +82,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 
 		/** {@inheritDoc} */
 		@Override
-		protected final ListenerData<GOwner> _this_() {
+		protected final ListenerData<GOwner> customThis() {
 			return this;
 		}
 
@@ -104,7 +104,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 
 		/** {@inheritDoc} */
 		@Override
-		protected final ResolverData<GOwner> _this_() {
+		protected final ResolverData<GOwner> customThis() {
 			return this;
 		}
 
@@ -113,44 +113,44 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	{}
 
 	/** Dieses Feld speichert die {@link TransformerFactory}. */
-	TransformerFactory _factory_;
+	TransformerFactory factory;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}. */
-	final FeatureData<GThis> _featureData_ = new FeatureData<GThis>() {
+	final FeatureData<GThis> featureData = new FeatureData<GThis>() {
 
 		@Override
 		public final GThis closeFeatureData() {
-			return BaseTransformerFactoryData.this._this_();
+			return BaseTransformerFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openAttributeData()}. */
-	final AttributeData<GThis> _attributeData_ = new AttributeData<GThis>() {
+	final AttributeData<GThis> attributeData = new AttributeData<GThis>() {
 
 		@Override
 		public final GThis closeAttributeData() {
-			return BaseTransformerFactoryData.this._this_();
+			return BaseTransformerFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openListenerData()}. */
-	final ListenerData<GThis> _listenerData_ = new ListenerData<GThis>() {
+	final ListenerData<GThis> listenerData = new ListenerData<GThis>() {
 
 		@Override
 		public final GThis closeListenerData() {
-			return BaseTransformerFactoryData.this._this_();
+			return BaseTransformerFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openResolverData()}. */
-	final ResolverData<GThis> _resolverData_ = new ResolverData<GThis>() {
+	final ResolverData<GThis> resolverData = new ResolverData<GThis>() {
 
 		@Override
 		public final GThis closeResolverData() {
-			return BaseTransformerFactoryData.this._this_();
+			return BaseTransformerFactoryData.this.customThis();
 		}
 
 	};
@@ -162,13 +162,13 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseTransformerFactoryData<?> data) {
-		if (data == null) return this._this_();
-		this._factory_ = data._factory_;
-		this._featureData_.use(data._featureData_);
-		this._attributeData_.use(data._attributeData_);
-		this._listenerData_.use(data._listenerData_);
-		this._resolverData_.use(data._resolverData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.factory = data.factory;
+		this.featureData.use(data.featureData);
+		this.attributeData.use(data.attributeData);
+		this.listenerData.use(data.listenerData);
+		this.resolverData.use(data.resolverData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt die {@link TransformerFactory} zurück.<br>
@@ -180,7 +180,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @return {@link TransformerFactory}.
 	 * @throws TransformerConfigurationException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst. */
 	public final TransformerFactory getFactory() throws TransformerConfigurationException {
-		TransformerFactory result = this._factory_;
+		TransformerFactory result = this.factory;
 		if (result != null) return result;
 		result = TransformerFactory.newInstance();
 		this.useFactory(result);
@@ -193,8 +193,8 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @param factory {@link TransformerFactory} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useFactory(final TransformerFactory factory) {
-		this._factory_ = factory;
-		return this._this_();
+		this.factory = factory;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die {@link TransformerFactory} auf {@code null} und gibt {@code this} zurück.
@@ -213,19 +213,19 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @throws TransformerConfigurationException Wenn {@link TransformerFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst. */
 	public final GThis updateFactory() throws TransformerConfigurationException {
 		final TransformerFactory factory = this.getFactory();
-		for (final URIResolver value: this._resolverData_) {
+		for (final URIResolver value: this.resolverData) {
 			factory.setURIResolver(value);
 		}
-		for (final ErrorListener value: this._listenerData_) {
+		for (final ErrorListener value: this.listenerData) {
 			factory.setErrorListener(value);
 		}
-		for (final Entry<String, Boolean> entry: this._featureData_) {
+		for (final Entry<String, Boolean> entry: this.featureData) {
 			factory.setFeature(entry.getKey(), entry.getValue().booleanValue());
 		}
-		for (final Entry<String, String> entry: this._attributeData_) {
+		for (final Entry<String, String> entry: this.attributeData) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
-		return this._this_();
+		return this.customThis();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
@@ -233,7 +233,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setFeature(String, boolean)
 	 * @return Konfigurator. */
 	public final FeatureData<GThis> openFeatureData() {
-		return this._featureData_;
+		return this.featureData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Attribute der und gibt ihn zurück.
@@ -241,7 +241,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setAttribute(String, Object)
 	 * @return Konfigurator. */
 	public final AttributeData<GThis> openAttributeData() {
-		return this._attributeData_;
+		return this.attributeData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link ErrorListener} und gibt ihn zurück.
@@ -249,7 +249,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @return Konfigurator. */
 	public final ListenerData<GThis> openListenerData() {
-		return this._listenerData_;
+		return this.listenerData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link URIResolver} und gibt ihn zurück.
@@ -257,14 +257,14 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @return Konfigurator. */
 	public final ResolverData<GThis> openResolverData() {
-		return this._resolverData_;
+		return this.resolverData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc}
 	 *
@@ -281,7 +281,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._featureData_, this._attributeData_, this._listenerData_, this._resolverData_);
+		return Objects.toInvokeString(this, this.featureData, this.attributeData, this.listenerData, this.resolverData);
 	}
 
 }

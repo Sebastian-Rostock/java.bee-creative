@@ -114,7 +114,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		public final FEMArray array2;
 
 		ConcatArray(final FEMArray array1, final FEMArray array2) throws IllegalArgumentException {
-			super(array1._length_ + array2._length_);
+			super(array1.length + array2.length);
 			this.array1 = array1;
 			this.array2 = array2;
 		}
@@ -122,28 +122,28 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		{}
 
 		@Override
-		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
-			final int index2 = index - this.array1._length_;
-			return index2 < 0 ? this.array1._get_(index) : this.array2._get_(index2);
+		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
+			final int index2 = index - this.array1.length;
+			return index2 < 0 ? this.array1.customGet(index) : this.array2.customGet(index2);
 		}
 
 		@Override
-		protected final boolean _extract_(final Collector target, final int offset, final int length, final boolean foreward) {
-			final int offset2 = offset - this.array1._length_, length2 = offset2 + length;
-			if (offset2 >= 0) return this.array2._extract_(target, offset2, length, foreward);
-			if (length2 <= 0) return this.array1._extract_(target, offset, length, foreward);
+		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
+			if (offset2 >= 0) return this.array2.customExtract(target, offset2, length, foreward);
+			if (length2 <= 0) return this.array1.customExtract(target, offset, length, foreward);
 			if (foreward) {
-				if (!this.array1._extract_(target, offset, -offset2, foreward)) return false;
-				return this.array2._extract_(target, 0, length2, foreward);
+				if (!this.array1.customExtract(target, offset, -offset2, foreward)) return false;
+				return this.array2.customExtract(target, 0, length2, foreward);
 			} else {
-				if (!this.array2._extract_(target, 0, length2, foreward)) return false;
-				return this.array1._extract_(target, offset, -offset2, foreward);
+				if (!this.array2.customExtract(target, 0, length2, foreward)) return false;
+				return this.array1.customExtract(target, offset, -offset2, foreward);
 			}
 		}
 
 		@Override
 		public final FEMArray section(final int offset, final int length) throws IllegalArgumentException {
-			final int offset2 = offset - this.array1._length_, length2 = offset2 + length;
+			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.array2.section(offset2, length);
 			if (length2 <= 0) return this.array1.section(offset, length);
 			return this.array1.section(offset, -offset2).concat(this.array2.section(0, length2));
@@ -167,13 +167,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		{}
 
 		@Override
-		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
-			return this.array._get_(index + this.offset);
+		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
+			return this.array.customGet(index + this.offset);
 		}
 
 		@Override
-		protected final boolean _extract_(final Collector target, final int offset2, final int length2, final boolean foreward) {
-			return this.array._extract_(target, this.offset + offset2, length2, foreward);
+		protected final boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
+			return this.array.customExtract(target, this.offset + offset2, length2, foreward);
 		}
 
 		@Override
@@ -189,20 +189,20 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		public final FEMArray array;
 
 		ReverseArray(final FEMArray array) throws IllegalArgumentException {
-			super(array._length_);
+			super(array.length);
 			this.array = array;
 		}
 
 		{}
 
 		@Override
-		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
-			return this.array._get_(this._length_ - index - 1);
+		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
+			return this.array.customGet(this.length - index - 1);
 		}
 
 		@Override
-		protected final boolean _extract_(final Collector target, final int offset, final int length, final boolean foreward) {
-			return this.array._extract_(target, this._length_ - offset - length, length, !foreward);
+		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+			return this.array.customExtract(target, this.length - offset - length, length, !foreward);
 		}
 
 		@Override
@@ -212,7 +212,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		@Override
 		public final FEMArray section(final int offset, final int length) throws IllegalArgumentException {
-			return this.array.section(this._length_ - offset - length, length).reverse();
+			return this.array.section(this.length - offset - length, length).reverse();
 		}
 
 		@Override
@@ -235,12 +235,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		{}
 
 		@Override
-		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
+		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			return this.item;
 		}
 
 		@Override
-		protected final boolean _extract_(final Collector target, final int offset, int length, final boolean foreward) {
+		protected final boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
 				if (!target.push(this.item)) return false;
 				length--;
@@ -261,7 +261,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		@Override
 		public FEMArray result(final boolean recursive) {
 			if (!recursive) return this;
-			return new UniformResultArray(this._length_, this.item.result(true));
+			return new UniformResultArray(this.length, this.item.result(true));
 		}
 
 	}
@@ -295,7 +295,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		{}
 
 		@Override
-		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
+		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
 		}
 
@@ -400,10 +400,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	{}
 
 	/** Dieses Feld speichert den Streuwert. */
-	int _hash_;
+	int hash;
 
 	/** Dieses Feld speichert die Länge. */
-	protected final int _length_;
+	protected final int length;
 
 	/** Dieser Konstruktor initialisiert die Länge.
 	 *
@@ -411,7 +411,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMArray(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
-		this._length_ = length;
+		this.length = length;
 	}
 
 	{}
@@ -420,7 +420,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Wert. */
-	protected FEMValue _get_(final int index) {
+	protected FEMValue customGet(final int index) {
 		return null;
 	}
 
@@ -432,14 +432,14 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
-	protected boolean _extract_(final Collector target, int offset, int length, final boolean foreward) {
+	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
 			for (length += offset; offset < length; offset++) {
-				if (!target.push(this._get_(offset))) return false;
+				if (!target.push(this.customGet(offset))) return false;
 			}
 		} else {
 			for (length += offset - 1; offset <= length; length--) {
-				if (!target.push(this._get_(length))) return false;
+				if (!target.push(this.customGet(length))) return false;
 			}
 		}
 		return true;
@@ -449,7 +449,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 *
 	 * @return Array mit den Werten dieser Wertliste. */
 	public FEMValue[] value() {
-		final ValueCollector target = new ValueCollector(this._length_);
+		final ValueCollector target = new ValueCollector(this.length);
 		this.extract(target);
 		return target.array;
 	}
@@ -458,7 +458,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 *
 	 * @return Länge der Wertliste. */
 	public final int length() {
-		return this._length_;
+		return this.length;
 	}
 
 	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste zurück.
@@ -467,8 +467,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return {@link FEMArray}-Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public FEMArray concat(final FEMArray that) throws NullPointerException {
-		if (that._length_ == 0) return this;
-		if (this._length_ == 0) return that;
+		if (that.length == 0) return this;
+		if (this.length == 0) return that;
 		return new ConcatArray(this, that);
 	}
 
@@ -479,8 +479,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return {@link FEMArray}-Sicht auf einen Abschnitt dieser Wertliste.
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte. */
 	public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
-		if ((offset == 0) && (length == this._length_)) return this;
-		if ((offset < 0) || ((offset + length) > this._length_)) throw new IllegalArgumentException();
+		if ((offset == 0) && (length == this.length)) return this;
+		if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMArray.EMPTY;
 		return new SectionArray(this, offset, length);
 	}
@@ -498,8 +498,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @see #value()
 	 * @return performanteren Wertliste oder {@code this}. */
 	public FEMArray compact() {
-		final FEMArray result = this._length_ == 1 ? new UniformArray(1, this._get_(0)) : new CompactArray(this.value());
-		result._hash_ = this._hash_;
+		final FEMArray result = this.length == 1 ? new UniformArray(1, this.customGet(0)) : new CompactArray(this.value());
+		result.hash = this.hash;
 		return result;
 	}
 
@@ -511,10 +511,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return Position des ersten Vorkommens des gegebenen Werts ({@code offset..this.length()-1}) oder {@code -1}.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMValue that, final int offset) throws IllegalArgumentException {
-		final int length = this._length_ - offset;
+		final int length = this.length - offset;
 		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		final FindCollector collector = new FindCollector(that);
-		if (this._extract_(collector, offset, length, true)) return -1;
+		if (this.customExtract(collector, offset, length, true)) return -1;
 		return collector.index + offset;
 	}
 
@@ -527,15 +527,15 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMArray that, final int offset) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (offset > this._length_)) throw new IllegalArgumentException();
-		final int count = that._length_;
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
+		final int count = that.length;
 		if (count == 0) return offset;
-		final FEMValue value = that._get_(0);
-		final int length = this._length_ - count;
+		final FEMValue value = that.customGet(0);
+		final int length = this.length - count;
 		FIND: for (int i = offset; i < length; i++) {
-			if (value.equals(this._get_(i))) {
+			if (value.equals(this.customGet(i))) {
 				for (int i2 = 1; i2 < count; i2++) {
-					if (!this._get_(i + i2).equals(that._get_(i2))) {
+					if (!this.customGet(i + i2).equals(that.customGet(i2))) {
 						continue FIND;
 					}
 				}
@@ -553,20 +553,20 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean extract(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
-		if (this._length_ == 0) return true;
-		return this._extract_(target, 0, this._length_, true);
+		if (this.length == 0) return true;
+		return this.customExtract(target, 0, this.length, true);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		int result = this._hash_;
+		int result = this.hash;
 		if (result != 0) return result;
-		final int length = this._length_;
+		final int length = this.length;
 		final HashCollector collector = new HashCollector();
-		this._extract_(collector, 0, length, true);
-		this._hash_ = (result = (collector.hash | 1));
+		this.customExtract(collector, 0, length, true);
+		this.hash = (result = (collector.hash | 1));
 		return result;
 	}
 
@@ -576,11 +576,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMArray that) throws NullPointerException {
-		final int length = this._length_;
-		if (length != that._length_) return false;
+		final int length = this.length;
+		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;
 		for (int i = 0; i < length; i++) {
-			if (this._get_(i).equals(that._get_(i))) return false;
+			if (this.customGet(i).equals(that.customGet(i))) return false;
 		}
 		return true;
 	}
@@ -593,13 +593,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} bzw. {@code order} {@code null} ist. */
 	public final int compare(final FEMArray that, final Comparator<FEMValue> order) throws NullPointerException {
-		final int length = Math.min(this._length_, that._length_);
+		final int length = Math.min(this.length, that.length);
 		for (int i = 0; i < length; i++) {
-			final int result = order.compare(this._get_(i), that._get_(i));
+			final int result = order.compare(this.customGet(i), that.customGet(i));
 			if (result < 0) return -1;
 			if (result > 0) return +1;
 		}
-		return Comparators.compare(this._length_, that._length_);
+		return Comparators.compare(this.length, that.length);
 	}
 
 	/** Diese Methode gibt diese Wertliste als {@link List} zurück.
@@ -615,8 +615,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	/** Diese Methode gibt den {@code index}-ten Wert zurück. */
 	@Override
 	public final FEMValue get(final int index) throws IndexOutOfBoundsException {
-		if ((index < 0) || (index >= this._length_)) throw new IndexOutOfBoundsException();
-		return this._get_(index);
+		if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
+		return this.customGet(index);
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -670,7 +670,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	/** {@inheritDoc} */
 	@Override
 	public final Iterator<FEMValue> iterator() {
-		return Iterators.itemsIterator(this, 0, this._length_);
+		return Iterators.itemsIterator(this, 0, this.length);
 	}
 
 	/** {@inheritDoc} */

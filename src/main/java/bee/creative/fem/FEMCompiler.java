@@ -42,31 +42,31 @@ import bee.creative.util.Parser;
 public final class FEMCompiler extends Parser {
 
 	@SuppressWarnings ("javadoc")
-	boolean _active_;
+	boolean active;
 
 	/** Dieses Feld speichert die Kompilationsmethoden. */
-	FEMDomain _domain_ = FEMDomain.NORMAL;
+	FEMDomain domain = FEMDomain.NORMAL;
 
 	/** Dieses Feld speichert den Quelltext. */
-	FEMScript _script_ = FEMScript.EMPTY;
+	FEMScript script = FEMScript.EMPTY;
 
 	/** Dieses Feld speichert die über {@link #proxy(String)} erzeugten Platzhalter. */
-	final Map<String, FEMProxy> _proxies_ = Collections.synchronizedMap(new LinkedHashMap<String, FEMProxy>());
+	final Map<String, FEMProxy> proxies = Collections.synchronizedMap(new LinkedHashMap<String, FEMProxy>());
 
 	/** Dieses Feld speichert die Parameternamen. */
-	final List<String> _params_ = Collections.synchronizedList(new LinkedList<String>());
+	final List<String> params = Collections.synchronizedList(new LinkedList<String>());
 
 	/** Dieses Feld speichert die Zulässigkeit von Wertlisten. */
-	boolean _arrayEnabled_ = true;
+	boolean arrayEnabled = true;
 
 	/** Dieses Feld speichert die Zulässigkeit der Verkettung von Funktionen. */
-	boolean _concatEnabled_ = true;
+	boolean concatEnabled = true;
 
 	/** Dieses Feld speichert die Zulässigkeit der Bindung des Stapelrahmens. */
-	boolean _closureEnabled_ = true;
+	boolean closureEnabled = true;
 
 	/** Dieses Feld speichert den Formatierer. */
-	FEMFormatter _formatter_;
+	FEMFormatter formatter;
 
 	/** Dieser Konstruktor initialisiert einen neuen Kompiler, welcher {@link FEMDomain#NORMAL} nutzt und {@link FEMCompiler#useArrayEnabled(boolean) Wertlisten},
 	 * {@link FEMCompiler#useClosureEnabled(boolean) Stapelrahmenbindung} sowie {@link FEMCompiler#useChainingEnabled(boolean) Funktionsverkettung} zulässt. */
@@ -75,28 +75,28 @@ public final class FEMCompiler extends Parser {
 
 	{}
 
-	/** Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #_stop_()} verwendet werden.
+	/** Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #stop()} verwendet werden.
 	 *
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	final synchronized void _start_() throws IllegalStateException {
-		this._check_();
-		this._active_ = true;
-		this._proxies_.clear();
+	final synchronized void start() throws IllegalStateException {
+		this.check();
+		this.active = true;
+		this.proxies.clear();
 		this.reset();
 	}
 
 	@SuppressWarnings ("javadoc")
-	synchronized final void _stop_() {
-		this._active_ = false;
+	synchronized final void stop() {
+		this.active = false;
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void _check_() throws IllegalStateException {
-		if (this._active_) throw new IllegalStateException();
+	final void check() throws IllegalStateException {
+		if (this.active) throw new IllegalStateException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	final IllegalArgumentException _illegal_(final Throwable cause, final String format, final Object... args) {
+	final IllegalArgumentException illegal(final Throwable cause, final String format, final Object... args) {
 		final String hint = String.format(format, args);
 		if (this.isParsed()) return new IllegalArgumentException("Unerwartetes Ende der Zeichenkette." + hint, cause);
 		final String source = this.script().source();
@@ -116,10 +116,10 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode formatiert den aktuellen Quelltext als Sequenz von Werten und Stoppzeichen. */
-	final void _format_() {
-		final FEMFormatter formatter = this._formatter_;
+	final void format() {
+		final FEMFormatter formatter = this.formatter;
 		while (true) {
-			this._formatSequence_(false);
+			this.formatSequence(false);
 			if (this.symbol() < 0) return;
 			formatter.put(this.section()).putBreakSpace();
 			this.skip();
@@ -127,11 +127,11 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode formatiert die aktuelle Wertliste. */
-	final void _formatArray_() {
-		final FEMFormatter formatter = this._formatter_;
+	final void formatArray() {
+		final FEMFormatter formatter = this.formatter;
 		formatter.put("[").putBreakInc();
 		this.skip();
-		this._formatSequence_(false);
+		this.formatSequence(false);
 		if (this.symbol() == ']') {
 			formatter.putBreakDec().put("]");
 			this.skip();
@@ -139,11 +139,11 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode formatiert die aktuelle Parameterliste. */
-	final void _formatParam_() {
-		final FEMFormatter formatter = this._formatter_;
+	final void formatParam() {
+		final FEMFormatter formatter = this.formatter;
 		formatter.put("(").putBreakInc();
 		this.skip();
-		this._formatSequence_(false);
+		this.formatSequence(false);
 		if (this.symbol() == ')') {
 			formatter.putBreakDec().put(")");
 			this.skip();
@@ -151,15 +151,15 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode formatiert die aktuelle parametrisierte Funktion. */
-	final void _formatFrame_() {
-		final FEMFormatter formatter = this._formatter_;
+	final void formatFrame() {
+		final FEMFormatter formatter = this.formatter;
 		formatter.put("{");
 		this.skip();
-		this._formatSequence_(true);
+		this.formatSequence(true);
 		if (this.symbol() == ':') {
 			formatter.put(": ");
 			this.skip();
-			this._formatSequence_(false);
+			this.formatSequence(false);
 		}
 		if (this.symbol() == '}') {
 			formatter.put("}");
@@ -170,8 +170,8 @@ public final class FEMCompiler extends Parser {
 	/** Diese Methode formatiert die aktuelle Wertsequenz, die bei einer schließenden Klammer oder Doppelpunkt endet.
 	 *
 	 * @param space {@code true}, wenn hinter Kommentaren und Semikola ein Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll. */
-	final void _formatSequence_(final boolean space) {
-		final FEMFormatter formatter = this._formatter_;
+	final void formatSequence(final boolean space) {
+		final FEMFormatter formatter = this.formatter;
 		int count = 0;
 		while (true) {
 			switch (this.symbol()) {
@@ -202,15 +202,15 @@ public final class FEMCompiler extends Parser {
 					break;
 				}
 				case '(': {
-					this._formatParam_();
+					this.formatParam();
 					break;
 				}
 				case '[': {
-					this._formatArray_();
+					this.formatArray();
 					break;
 				}
 				case '{': {
-					this._formatFrame_();
+					this.formatFrame();
 					break;
 				}
 				default: {
@@ -236,7 +236,7 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @see #skip()
 	 * @return aktueller Bereichstyp. */
-	final int _compileType_() {
+	final int compileType() {
 		int symbol = this.symbol();
 		while ((symbol == '_') || (symbol == '/')) {
 			symbol = this.skip();
@@ -248,7 +248,7 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @param string Zeichenkette.
 	 * @return Zahl. */
-	final int _compileIndex_(final String string) {
+	final int compileIndex(final String string) {
 		if ((string == null) || string.isEmpty()) return -1;
 		final char symbol = string.charAt(0);
 		if ((symbol < '0') || (symbol > '9')) return -1;
@@ -263,21 +263,21 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @return Wertliste als {@link FEMValue}.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
-	final FEMValue _compileArrayAsValue_() throws IllegalArgumentException {
-		if (!this._arrayEnabled_) throw this._illegal_(null, " Wertlisten sind nicht zulässig.");
+	final FEMValue compileArrayAsValue() throws IllegalArgumentException {
+		if (!this.arrayEnabled) throw this.illegal(null, " Wertlisten sind nicht zulässig.");
 		final List<FEMValue> result = new ArrayList<>();
 		this.skip();
-		if (this._compileType_() == ']') {
+		if (this.compileType() == ']') {
 			this.skip();
 			return FEMArray.EMPTY;
 		}
 		while (true) {
-			final FEMValue value = this._compileParamAsValue_();
+			final FEMValue value = this.compileParamAsValue();
 			result.add(value);
-			switch (this._compileType_()) {
+			switch (this.compileType()) {
 				case ';': {
 					this.skip();
-					this._compileType_();
+					this.compileType();
 					break;
 				}
 				case ']': {
@@ -285,7 +285,7 @@ public final class FEMCompiler extends Parser {
 					return FEMArray.from(result);
 				}
 				default: {
-					throw this._illegal_(null, " Zeichen «;» oder «]» erwartet.");
+					throw this.illegal(null, " Zeichen «;» oder «]» erwartet.");
 				}
 			}
 		}
@@ -298,23 +298,23 @@ public final class FEMCompiler extends Parser {
 	 * @see FEMParam#VIEW
 	 * @return Wertliste als {@link FEMFunction}.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
-	final FEMFunction _compileArrayAsFunction_() throws IllegalArgumentException {
-		if (!this._arrayEnabled_) throw this._illegal_(null, " Wertlisten sind nicht zulässig.");
+	final FEMFunction compileArrayAsFunction() throws IllegalArgumentException {
+		if (!this.arrayEnabled) throw this.illegal(null, " Wertlisten sind nicht zulässig.");
 		this.skip();
-		if (this._compileType_() == ']') {
+		if (this.compileType() == ']') {
 			this.skip();
 			return FEMArray.EMPTY;
 		}
 		final List<FEMFunction> list = new ArrayList<>();
 		boolean value = true;
 		while (true) {
-			final FEMFunction item = this._compileParamAsFunction_();
+			final FEMFunction item = this.compileParamAsFunction();
 			list.add(item);
-			value = value && (this._functionToValue(item) != null);
-			switch (this._compileType_()) {
+			value = value && (this.functionToValue(item) != null);
+			switch (this.compileType()) {
 				case ';': {
 					this.skip();
-					this._compileType_();
+					this.compileType();
 					break;
 				}
 				case ']': {
@@ -331,7 +331,7 @@ public final class FEMCompiler extends Parser {
 					return FEMArray.from(values);
 				}
 				default: {
-					throw this._illegal_(null, " Zeichen «;» oder «]» erwartet.");
+					throw this.illegal(null, " Zeichen «;» oder «]» erwartet.");
 				}
 			}
 		}
@@ -343,16 +343,16 @@ public final class FEMCompiler extends Parser {
 	 * @see FEMDomain#compileFunction(FEMCompiler)
 	 * @return Parameterfunktion.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
-	final FEMFunction _compileParam_() throws IllegalArgumentException {
+	final FEMFunction compileParam() throws IllegalArgumentException {
 		try {
-			final FEMFunction result = this._domain_.compileFunction(this);
-			if (result == null) throw this._illegal_(null, " Parameter erwartet.");
+			final FEMFunction result = this.domain.compileFunction(this);
+			if (result == null) throw this.illegal(null, " Parameter erwartet.");
 			this.skip();
 			return result;
 		} catch (final IllegalArgumentException cause) {
 			throw cause;
 		} catch (final RuntimeException cause) {
-			throw this._illegal_(cause, "");
+			throw this.illegal(cause, "");
 		}
 	}
 
@@ -360,8 +360,8 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @return Wert.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
-	final FEMValue _compileParamAsValue_() throws IllegalArgumentException {
-		switch (this._compileType_()) {
+	final FEMValue compileParamAsValue() throws IllegalArgumentException {
+		switch (this.compileType()) {
 			case -1:
 			case '$':
 			case ';':
@@ -370,20 +370,20 @@ public final class FEMCompiler extends Parser {
 			case ')':
 			case ']':
 			case '}': {
-				throw this._illegal_(null, " Wert erwartet.");
+				throw this.illegal(null, " Wert erwartet.");
 			}
 			case '[': {
-				return this._compileArrayAsValue_();
+				return this.compileArrayAsValue();
 			}
 			case '{': {
-				if (this._closureEnabled_) throw this._illegal_(null, " Ungebundene Funktion unzulässig.");
-				final FEMFunction retult = this._compileFrame_();
+				if (this.closureEnabled) throw this.illegal(null, " Ungebundene Funktion unzulässig.");
+				final FEMFunction retult = this.compileFrame();
 				return FEMHandler.from(retult);
 			}
 			default: {
-				final FEMFunction param = this._compileParam_();
-				final FEMValue result = this._functionToValue(param);
-				if (result == null) throw this._illegal_(null, " Wert erwartet.");
+				final FEMFunction param = this.compileParam();
+				final FEMValue result = this.functionToValue(param);
+				if (result == null) throw this.illegal(null, " Wert erwartet.");
 				return result;
 			}
 		}
@@ -393,10 +393,10 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
-	final FEMFunction _compileParamAsFunction_() throws IllegalArgumentException {
+	final FEMFunction compileParamAsFunction() throws IllegalArgumentException {
 		FEMFunction result;
 		boolean concat = false;
-		switch (this._compileType_()) {
+		switch (this.compileType()) {
 			case -1:
 			case ';':
 			case ':':
@@ -404,61 +404,61 @@ public final class FEMCompiler extends Parser {
 			case ')':
 			case ']':
 			case '}': {
-				throw this._illegal_(null, " Wert oder Funktion erwartet.");
+				throw this.illegal(null, " Wert oder Funktion erwartet.");
 			}
 			case '$': {
 				this.skip();
-				final String name = this._compileName_();
+				final String name = this.compileName();
 				if (name == null) return FEMParam.VIEW;
-				int index = this._compileIndex_(name);
+				int index = this.compileIndex(name);
 				if (index < 0) {
-					index = this._params_.indexOf(name);
-					if (index < 0) throw this._illegal_(null, " Parametername «%s» ist unbekannt.", name);
+					index = this.params.indexOf(name);
+					if (index < 0) throw this.illegal(null, " Parametername «%s» ist unbekannt.", name);
 				} else if (index > 0) {
 					index--;
-				} else throw this._illegal_(null, " Parameterindex «%s» ist unzulässig.", index);
+				} else throw this.illegal(null, " Parameterindex «%s» ist unzulässig.", index);
 				return FEMParam.from(index);
 			}
 			case '{': {
-				result = this._compileFrame_();
-				if (this._compileType_() != '(') {
-					if (this._closureEnabled_) return result.toClosure();
+				result = this.compileFrame();
+				if (this.compileType() != '(') {
+					if (this.closureEnabled) return result.toClosure();
 					return result.toValue();
 				}
-				if (!this._concatEnabled_) throw this._illegal_(null, " Funktionsverkettungen ist nicht zulässsig.");
+				if (!this.concatEnabled) throw this.illegal(null, " Funktionsverkettungen ist nicht zulässsig.");
 				break;
 			}
 			case '[': {
-				return this._compileArrayAsFunction_();
+				return this.compileArrayAsFunction();
 			}
 			default: {
-				result = this._compileParam_();
-				if (this._compileType_() != '(') return result;
+				result = this.compileParam();
+				if (this.compileType() != '(') return result;
 			}
 		}
 		do {
-			if (concat && !this._concatEnabled_) throw this._illegal_(null, " Funktionsverkettungen ist nicht zulässsig.");
+			if (concat && !this.concatEnabled) throw this.illegal(null, " Funktionsverkettungen ist nicht zulässsig.");
 			this.skip(); // '('
 			final List<FEMFunction> list = new ArrayList<>();
 			while (true) {
-				if (this._compileType_() == ')') {
+				if (this.compileType() == ')') {
 					this.skip();
 					final FEMFunction[] params = list.toArray(new FEMFunction[list.size()]);
 					result = concat ? result.concat(params) : result.compose(params);
 					break;
 				}
-				final FEMFunction item = this._compileParamAsFunction_();
+				final FEMFunction item = this.compileParamAsFunction();
 				list.add(item);
-				switch (this._compileType_()) {
+				switch (this.compileType()) {
 					default:
-						throw this._illegal_(null, " Zeichen «;» oder «)» erwartet.");
+						throw this.illegal(null, " Zeichen «;» oder «)» erwartet.");
 					case ';':
 						this.skip();
 					case ')':
 				}
 			}
 			concat = true;
-		} while (this._compileType_() == '(');
+		} while (this.compileType() == '(');
 		return result;
 	}
 
@@ -466,12 +466,12 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @return Parameterfunktion.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
-	final FEMProxy _compileProxy_() throws IllegalArgumentException {
-		final String name = this._compileName_();
-		if ((name == null) || (this._compileIndex_(name) >= 0)) throw this._illegal_(null, " Funktionsname erwartet.");
+	final FEMProxy compileProxy() throws IllegalArgumentException {
+		final String name = this.compileName();
+		if ((name == null) || (this.compileIndex(name) >= 0)) throw this.illegal(null, " Funktionsname erwartet.");
 		final FEMProxy result = this.proxy(name);
-		if (this._compileType_() != '{') throw this._illegal_(null, " Parametrisierter Funktionsaufruf erwartet.");
-		result.set(this._compileFrame_());
+		if (this.compileType() != '{') throw this.illegal(null, " Parametrisierter Funktionsaufruf erwartet.");
+		result.set(this.compileFrame());
 		return result;
 	}
 
@@ -480,9 +480,9 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @return Funktions- oder Parametername oder {@code null}.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
-	final String _compileName_() throws IllegalArgumentException {
+	final String compileName() throws IllegalArgumentException {
 		try {
-			switch (this._compileType_()) {
+			switch (this.compileType()) {
 				case '$':
 				case '(':
 				case '[':
@@ -498,14 +498,14 @@ public final class FEMCompiler extends Parser {
 					return null;
 				}
 			}
-			final String result = this._domain_.compileName(this);
+			final String result = this.domain.compileName(this);
 			if (result.isEmpty()) throw new IllegalArgumentException();
 			this.skip();
 			return result;
 		} catch (final IllegalArgumentException cause) {
 			throw cause;
 		} catch (final RuntimeException cause) {
-			throw this._illegal_(cause, " Funktionsname, Parametername oder Parameterindex erwartet.");
+			throw this.illegal(cause, " Funktionsname, Parametername oder Parameterindex erwartet.");
 		}
 	}
 
@@ -513,32 +513,32 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
-	final FEMFunction _compileFrame_() throws IllegalArgumentException {
+	final FEMFunction compileFrame() throws IllegalArgumentException {
 		this.skip();
 		int count = 0;
 		while (true) {
-			if (this._compileType_() < 0) throw this._illegal_(null, "");
-			final String name = this._compileName_();
+			if (this.compileType() < 0) throw this.illegal(null, "");
+			final String name = this.compileName();
 			if (name != null) {
-				if (this._compileIndex_(name) >= 0) throw this._illegal_(null, " Parametername erwartet.");
-				this._params_.add(count++, name);
+				if (this.compileIndex(name) >= 0) throw this.illegal(null, " Parametername erwartet.");
+				this.params.add(count++, name);
 			}
-			switch (this._compileType_()) {
+			switch (this.compileType()) {
 				case ';': {
-					if (name == null) throw this._illegal_(null, " Parametername oder Zeichen «:» erwartet.");
+					if (name == null) throw this.illegal(null, " Parametername oder Zeichen «:» erwartet.");
 					this.skip();
 					break;
 				}
 				case ':': {
 					this.skip();
-					final FEMFunction result = this._compileParamAsFunction_();
-					if (this._compileType_() != '}') throw this._illegal_(null, " Zeichen «}» erwartet.");
+					final FEMFunction result = this.compileParamAsFunction();
+					if (this.compileType() != '}') throw this.illegal(null, " Zeichen «}» erwartet.");
 					this.skip();
-					this._params_.subList(0, count).clear();
+					this.params.subList(0, count).clear();
 					return result;
 				}
 				default: {
-					throw this._illegal_(null, "");
+					throw this.illegal(null, "");
 				}
 			}
 		}
@@ -548,7 +548,7 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @param function Funktion.
 	 * @return Ergebniswert oder {@code null}. */
-	final FEMValue _functionToValue(final FEMFunction function) {
+	final FEMValue functionToValue(final FEMFunction function) {
 		if (function instanceof FEMValue) return (FEMValue)function;
 		return null;
 	}
@@ -559,10 +559,10 @@ public final class FEMCompiler extends Parser {
 	 * @return Platzhalterfunktion.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
 	public final FEMProxy proxy(final String name) throws NullPointerException {
-		synchronized (this._proxies_) {
-			FEMProxy result = this._proxies_.get(name);
+		synchronized (this.proxies) {
+			FEMProxy result = this.proxies.get(name);
 			if (result != null) return result;
-			this._proxies_.put(name, result = new FEMProxy(name));
+			this.proxies.put(name, result = new FEMProxy(name));
 			return result;
 		}
 	}
@@ -571,21 +571,21 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @return aktueller Bereich. */
 	public final Range range() {
-		return this.isParsed() ? Range.EMPTY : this._script_.get(this.index());
+		return this.isParsed() ? Range.EMPTY : this.script.get(this.index());
 	}
 
 	/** Diese Methode gibt den zu kompilierenden Quelltext zurück.
 	 *
 	 * @return Quelltext. */
 	public final FEMScript script() {
-		return this._script_;
+		return this.script;
 	}
 
 	/** Diese Methode gibt die genutzten Kompilationsmethoden zurück.
 	 *
 	 * @return Kompilationsmethoden. */
 	public final FEMDomain domain() {
-		return this._domain_;
+		return this.domain;
 	}
 
 	/** Diese Methode gibt die über {@link #proxy(String)} erzeugten Platzhalter zurück.<br>
@@ -593,14 +593,14 @@ public final class FEMCompiler extends Parser {
 	 *
 	 * @return Abbildung von Namen auf Platzhalter. */
 	public final Map<String, FEMProxy> proxies() {
-		return this._proxies_;
+		return this.proxies;
 	}
 
 	/** Diese Methode gibt die Liste der aktellen Parameternamen zurück.
 	 *
 	 * @return Parameternamen. */
 	public final List<String> params() {
-		return Collections.unmodifiableList(this._params_);
+		return Collections.unmodifiableList(this.params);
 	}
 
 	/** Diese Methode gibt die Zeichenkette im {@link #range() aktuellen Abschnitt} des {@link #script() Quelltexts} zurück.
@@ -608,7 +608,7 @@ public final class FEMCompiler extends Parser {
 	 * @see Range#extract(String)
 	 * @return Aktuelle Zeichenkette. */
 	public final String section() {
-		return this.range().extract(this._script_.source());
+		return this.range().extract(this.script.source());
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn Wertlisten zulässig sind (z.B. {@code [1;2]}).
@@ -616,7 +616,7 @@ public final class FEMCompiler extends Parser {
 	 * @see #compileFunction()
 	 * @return Zulässigkeit von Wertlisten. */
 	public final boolean isArrayEnabled() {
-		return this._arrayEnabled_;
+		return this.arrayEnabled;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die Verkettung von Funktionen zulässig ist, d.h. ob die Funktion, die von einem Funktionsaufruf
@@ -626,7 +626,7 @@ public final class FEMCompiler extends Parser {
 	 * @see FEMFunction#concat(FEMFunction...)
 	 * @return Zulässigkeit der Verkettung von Funktionen. */
 	public final boolean isConcatEnabled() {
-		return this._concatEnabled_;
+		return this.concatEnabled;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn Funktionen als Parameter nicht über {@link FEMFunction#toValue()} sondern über
@@ -635,7 +635,7 @@ public final class FEMCompiler extends Parser {
 	 * @see #compileFunction()
 	 * @return Zulässigkeit der Bindung des Stapelrahmens. */
 	public final boolean isClosureEnabled() {
-		return this._closureEnabled_;
+		return this.closureEnabled;
 	}
 
 	/** Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
@@ -645,9 +645,9 @@ public final class FEMCompiler extends Parser {
 	 * @throws NullPointerException Wenn {@code vslue} {@code null} ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public synchronized final FEMCompiler useScript(final FEMScript value) throws NullPointerException, IllegalStateException {
-		this._check_();
+		this.check();
 		this.source(value.types());
-		this._script_ = value;
+		this.script = value;
 		return this;
 	}
 
@@ -659,8 +659,8 @@ public final class FEMCompiler extends Parser {
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public synchronized final FEMCompiler useDomain(final FEMDomain value) throws NullPointerException, IllegalStateException {
 		if (value == null) throw new NullPointerException("value = null");
-		this._check_();
-		this._domain_ = value;
+		this.check();
+		this.domain = value;
 		return this;
 	}
 
@@ -682,9 +682,9 @@ public final class FEMCompiler extends Parser {
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public synchronized final FEMCompiler useParams(final List<String> value) throws NullPointerException, IllegalStateException {
 		if (value.contains(null)) throw new NullPointerException("value.contains(null)");
-		this._check_();
-		this._params_.clear();
-		this._params_.addAll(value);
+		this.check();
+		this.params.clear();
+		this.params.addAll(value);
 		return this;
 	}
 
@@ -695,8 +695,8 @@ public final class FEMCompiler extends Parser {
 	 * @return {@code this}.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public synchronized final FEMCompiler useArrayEnabled(final boolean value) throws IllegalStateException {
-		this._check_();
-		this._arrayEnabled_ = value;
+		this.check();
+		this.arrayEnabled = value;
 		return this;
 	}
 
@@ -707,8 +707,8 @@ public final class FEMCompiler extends Parser {
 	 * @return {@code this}.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public synchronized final FEMCompiler useChainingEnabled(final boolean value) throws IllegalStateException {
-		this._check_();
-		this._concatEnabled_ = value;
+		this.check();
+		this.concatEnabled = value;
 		return this;
 	}
 
@@ -719,8 +719,8 @@ public final class FEMCompiler extends Parser {
 	 * @return {@code this}.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public synchronized final FEMCompiler useClosureEnabled(final boolean value) throws IllegalStateException {
-		this._check_();
-		this._closureEnabled_ = value;
+		this.check();
+		this.closureEnabled = value;
 		return this;
 	}
 
@@ -730,14 +730,14 @@ public final class FEMCompiler extends Parser {
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final void formatScript(final FEMFormatter target) throws NullPointerException, IllegalStateException {
-		this._start_();
+		this.start();
 		if (target == null) throw new NullPointerException("target = null");
-		this._formatter_ = target;
+		this.formatter = target;
 		try {
-			this._format_();
+			this.format();
 		} finally {
-			this._formatter_ = null;
-			this._stop_();
+			this.formatter = null;
+			this.stop();
 		}
 	}
 
@@ -748,14 +748,14 @@ public final class FEMCompiler extends Parser {
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final FEMValue compileValue() throws IllegalArgumentException, IllegalStateException {
-		this._start_();
+		this.start();
 		try {
-			if (this._compileType_() < 0) return null;
-			final FEMValue result = this._compileParamAsValue_();
-			if (this._compileType_() < 0) return result;
-			throw this._illegal_(null, " Keine weiteren Definitionen erwartet.");
+			if (this.compileType() < 0) return null;
+			final FEMValue result = this.compileParamAsValue();
+			if (this.compileType() < 0) return result;
+			throw this.illegal(null, " Keine weiteren Definitionen erwartet.");
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -767,13 +767,13 @@ public final class FEMCompiler extends Parser {
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final FEMValue[] compileValues() throws IllegalArgumentException, IllegalStateException {
-		this._start_();
+		this.start();
 		try {
-			if (this._compileType_() < 0) return new FEMValue[0];
+			if (this.compileType() < 0) return new FEMValue[0];
 			final List<FEMValue> result = new ArrayList<FEMValue>();
 			while (true) {
-				result.add(this._compileParamAsValue_());
-				switch (this._compileType_()) {
+				result.add(this.compileParamAsValue());
+				switch (this.compileType()) {
 					case -1: {
 						return result.toArray(new FEMValue[result.size()]);
 					}
@@ -783,7 +783,7 @@ public final class FEMCompiler extends Parser {
 				}
 			}
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -797,13 +797,13 @@ public final class FEMCompiler extends Parser {
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final FEMProxy[] compileProxies() throws IllegalArgumentException, IllegalStateException {
-		this._start_();
+		this.start();
 		try {
 			final List<FEMProxy> result = new ArrayList<FEMProxy>();
-			if (this._compileType_() < 0) return new FEMProxy[0];
+			if (this.compileType() < 0) return new FEMProxy[0];
 			while (true) {
-				result.add(this._compileProxy_());
-				switch (this._compileType_()) {
+				result.add(this.compileProxy());
+				switch (this.compileType()) {
 					case -1: {
 						return result.toArray(new FEMProxy[result.size()]);
 					}
@@ -813,7 +813,7 @@ public final class FEMCompiler extends Parser {
 				}
 			}
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -824,14 +824,14 @@ public final class FEMCompiler extends Parser {
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final FEMFunction compileFunction() throws IllegalArgumentException, IllegalStateException {
-		this._start_();
+		this.start();
 		try {
-			if (this._compileType_() < 0) return null;
-			final FEMFunction result = this._compileParamAsFunction_();
-			if (this._compileType_() < 0) return result;
-			throw this._illegal_(null, " Keine weiteren Definitionen erwartet.");
+			if (this.compileType() < 0) return null;
+			final FEMFunction result = this.compileParamAsFunction();
+			if (this.compileType() < 0) return result;
+			throw this.illegal(null, " Keine weiteren Definitionen erwartet.");
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -843,13 +843,13 @@ public final class FEMCompiler extends Parser {
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final FEMFunction[] compileFunctions() throws IllegalArgumentException, IllegalStateException {
-		this._start_();
+		this.start();
 		try {
-			if (this._compileType_() < 0) return new FEMFunction[0];
+			if (this.compileType() < 0) return new FEMFunction[0];
 			final List<FEMFunction> result = new ArrayList<FEMFunction>();
 			while (true) {
-				result.add(this._compileParamAsFunction_());
-				switch (this._compileType_()) {
+				result.add(this.compileParamAsFunction());
+				switch (this.compileType()) {
 					case -1: {
 						return result.toArray(new FEMFunction[result.size()]);
 					}
@@ -859,7 +859,7 @@ public final class FEMCompiler extends Parser {
 				}
 			}
 		} finally {
-			this._stop_();
+			this.stop();
 		}
 	}
 
@@ -868,7 +868,7 @@ public final class FEMCompiler extends Parser {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this._domain_, this._params_, this._script_, this._proxies_);
+		return Objects.toInvokeString(this, this.domain, this.params, this.script, this.proxies);
 	}
 
 }

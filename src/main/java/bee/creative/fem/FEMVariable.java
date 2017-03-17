@@ -35,7 +35,7 @@ public final class FEMVariable extends FEMValue {
 	{}
 
 	/** Dieses Feld speichert den Wert. */
-	FEMValue _value_;
+	FEMValue value;
 
 	/** Dieser Konstruktor initialisiert den Wert dieser Variablen.
 	 *
@@ -52,7 +52,7 @@ public final class FEMVariable extends FEMValue {
 	 * @see #update(FEMValue)
 	 * @return aktueller Wert. */
 	public final synchronized FEMValue value() {
-		return this._value_;
+		return this.value;
 	}
 
 	/** Diese Methode setzt den aktuellen Wert der Variable, der über {@link #value()} gelesen werden kann.
@@ -61,7 +61,7 @@ public final class FEMVariable extends FEMValue {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final synchronized void update(final FEMValue value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
-		this._value_ = value;
+		this.value = value;
 	}
 
 	{}
@@ -81,10 +81,10 @@ public final class FEMVariable extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final synchronized FEMValue result(final boolean recursive) {
-		final FEMValue oldValue = this._value_;
+		final FEMValue oldValue = this.value;
 		final FEMValue newValue = oldValue.result(recursive);
 		if (oldValue == newValue) return newValue;
-		this._value_ = newValue;
+		this.value = newValue;
 		return newValue;
 	}
 

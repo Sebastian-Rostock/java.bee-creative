@@ -31,20 +31,20 @@ public final class CSVWriter implements Closeable {
 	{}
 
 	/** Dieses Feld speichert die Zieldaten. */
-	final Writer _writer_;
+	final Writer writer;
 
 	/** Dieses Feld speichert den Maskierungszwang. */
-	boolean _force_ = true;
+	boolean force = true;
 
 	/** Dieses Feld speichert das Maskierungszeichen. */
-	char _quote_ = '"';
+	char quote = '"';
 
 	/** Dieses Feld speichert das Trennzeichen. */
-	char _comma_ = ';';
+	char comma = ';';
 
 	/** Dieses Feld speichert nur dann {@code true}, wenn das {@link #getComma() Trennzeichen} vor dem {@link #writeValue(String) nächsten geschriebenen Wert}
 	 * ignoriert werden soll (Zeilenanfang). */
-	boolean _ignore_ = true;
+	boolean ignore = true;
 
 	/** Dieser Konstruktor initialisiert die Ausgabe.<br>
 	 * Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird {@code '"'} genutzt. Der {@link #getForce()
@@ -57,7 +57,7 @@ public final class CSVWriter implements Closeable {
 	 * @throws NullPointerException Wenn {@code writer} {@code null} ist. */
 	public CSVWriter(final Writer writer) throws IOException, NullPointerException {
 		writer.flush();
-		this._writer_ = writer;
+		this.writer = writer;
 	}
 
 	{}
@@ -68,8 +68,8 @@ public final class CSVWriter implements Closeable {
 	 *
 	 * @return Maskierungszwang. */
 	public final boolean getForce() {
-		synchronized (this._writer_) {
-			return this._force_;
+		synchronized (this.writer) {
+			return this.force;
 		}
 	}
 
@@ -81,8 +81,8 @@ public final class CSVWriter implements Closeable {
 	 * @see #getForce()
 	 * @return Maskierungszeichen. */
 	public final char getQuote() {
-		synchronized (this._writer_) {
-			return this._quote_;
+		synchronized (this.writer) {
+			return this.quote;
 		}
 	}
 
@@ -91,8 +91,8 @@ public final class CSVWriter implements Closeable {
 	 *
 	 * @return Trennzeichen. */
 	public final char getComma() {
-		synchronized (this._writer_) {
-			return this._comma_;
+		synchronized (this.writer) {
+			return this.comma;
 		}
 	}
 
@@ -101,8 +101,8 @@ public final class CSVWriter implements Closeable {
 	 * @param force Maskierungszwang.
 	 * @return {@code this}. */
 	public final CSVWriter useForce(final boolean force) {
-		synchronized (this._writer_) {
-			this._force_ = force;
+		synchronized (this.writer) {
+			this.force = force;
 		}
 		return this;
 	}
@@ -113,9 +113,9 @@ public final class CSVWriter implements Closeable {
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Maskierungszeichen einem Zeilenumbruch gleicht. */
 	public final CSVWriter useQuote(final char quote) throws IllegalArgumentException {
-		CSVReader._check_(quote);
-		synchronized (this._writer_) {
-			this._quote_ = quote;
+		CSVReader.check(quote);
+		synchronized (this.writer) {
+			this.quote = quote;
 		}
 		return this;
 	}
@@ -126,9 +126,9 @@ public final class CSVWriter implements Closeable {
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Trennzeichen einem Zeilenumbruch gleicht. */
 	public final CSVWriter useComma(final char comma) throws IllegalArgumentException {
-		CSVReader._check_(comma);
-		synchronized (this._writer_) {
-			this._comma_ = comma;
+		CSVReader.check(comma);
+		synchronized (this.writer) {
+			this.comma = comma;
 		}
 		return this;
 	}
@@ -142,16 +142,16 @@ public final class CSVWriter implements Closeable {
 	 * @throws IOException Wenn {@link #writeEntry(String...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code entries} {@code null} ist oder enthält. */
 	public final CSVWriter writeTable(final String[][] entries) throws IOException {
-		synchronized (this._writer_) {
-			this._writeTable_(entries);
+		synchronized (this.writer) {
+			this.writeTableImpl(entries);
 		}
 		return this;
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void _writeTable_(final String[][] values) throws IOException {
+	final void writeTableImpl(final String[][] values) throws IOException {
 		for (final String[] value: values) {
-			this._writeEntry_(value);
+			this.writeEntryImpl(value);
 		}
 	}
 
@@ -165,19 +165,19 @@ public final class CSVWriter implements Closeable {
 	 * @throws IOException Wenn {@link #writeValue(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält. */
 	public final CSVWriter writeEntry(final String... values) throws IOException, NullPointerException {
-		synchronized (this._writer_) {
-			this._writeEntry_(values);
+		synchronized (this.writer) {
+			this.writeEntryImpl(values);
 		}
 		return this;
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void _writeEntry_(final String... values) throws IOException {
+	final void writeEntryImpl(final String[] values) throws IOException {
 		for (final String value: values) {
-			this._writeValue_(value);
+			this.writeValueImpl(value);
 		}
-		this._writer_.write("\r\n");
-		this._ignore_ = true;
+		this.writer.write("\r\n");
+		this.ignore = true;
 	}
 
 	/** Diese Methode schreibt den gegebenen Wert und gibt {@code this} zurück.<br>
@@ -193,19 +193,19 @@ public final class CSVWriter implements Closeable {
 	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final CSVWriter writeValue(final String value) throws IOException, NullPointerException {
-		synchronized (this._writer_) {
-			this._writeValue_(value);
+		synchronized (this.writer) {
+			this.writeValueImpl(value);
 		}
 		return this;
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void _writeValue_(final String value) throws IOException {
-		final Writer target = this._writer_;
-		final char quote = this._quote_;
-		final char comma = this._comma_;
-		if (this._ignore_) {
-			this._ignore_ = false;
+	final void writeValueImpl(final String value) throws IOException {
+		final Writer target = this.writer;
+		final char quote = this.quote;
+		final char comma = this.comma;
+		if (this.ignore) {
+			this.ignore = false;
 		} else {
 			target.write(comma);
 		}
@@ -213,7 +213,7 @@ public final class CSVWriter implements Closeable {
 		boolean mask = false;
 		if (quote == 0) {
 			mask = false;
-		} else if (!this._force_) {
+		} else if (!this.force) {
 			for (int i = 0; i < length; i++) {
 				final char symbol = value.charAt(i);
 				if ((symbol == quote) || (symbol == comma) || (symbol == '\r') || (symbol == '\n')) {
@@ -244,16 +244,16 @@ public final class CSVWriter implements Closeable {
 	/** {@inheritDoc} */
 	@Override
 	public final void close() throws IOException {
-		synchronized (this._writer_) {
-			this._writer_.close();
+		synchronized (this.writer) {
+			this.writer.close();
 		}
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		synchronized (this._writer_) {
-			return Objects.toInvokeString(this, this._force_, this._quote_, this._comma_, this._writer_);
+		synchronized (this.writer) {
+			return Objects.toInvokeString(this, this.force, this.quote, this.comma, this.writer);
 		}
 	}
 

@@ -121,7 +121,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		{}
 
 		@Override
-		protected final byte _get_(final int index) throws IndexOutOfBoundsException {
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
 			return (byte)this.array.get(index);
 		}
 
@@ -161,7 +161,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		public final FEMBinary binary2;
 
 		ConcatBinary(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
-			super(binary1._length_ + binary2._length_);
+			super(binary1.length + binary2.length);
 			this.binary1 = binary1;
 			this.binary2 = binary2;
 		}
@@ -169,28 +169,28 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		{}
 
 		@Override
-		protected final byte _get_(final int index) throws IndexOutOfBoundsException {
-			final int index2 = index - this.binary1._length_;
-			return index2 < 0 ? this.binary1._get_(index) : this.binary2._get_(index2);
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+			final int index2 = index - this.binary1.length;
+			return index2 < 0 ? this.binary1.customGet(index) : this.binary2.customGet(index2);
 		}
 
 		@Override
-		protected final boolean _extract_(final Collector target, final int offset, final int length, final boolean foreward) {
-			final int offset2 = offset - this.binary1._length_, length2 = offset2 + length;
-			if (offset2 >= 0) return this.binary2._extract_(target, offset2, length, foreward);
-			if (length2 <= 0) return this.binary1._extract_(target, offset, length, foreward);
+		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+			final int offset2 = offset - this.binary1.length, length2 = offset2 + length;
+			if (offset2 >= 0) return this.binary2.customExtract(target, offset2, length, foreward);
+			if (length2 <= 0) return this.binary1.customExtract(target, offset, length, foreward);
 			if (foreward) {
-				if (!this.binary1._extract_(target, offset, -offset2, foreward)) return false;
-				return this.binary2._extract_(target, 0, length2, foreward);
+				if (!this.binary1.customExtract(target, offset, -offset2, foreward)) return false;
+				return this.binary2.customExtract(target, 0, length2, foreward);
 			} else {
-				if (!this.binary2._extract_(target, 0, length2, foreward)) return false;
-				return this.binary1._extract_(target, offset, -offset2, foreward);
+				if (!this.binary2.customExtract(target, 0, length2, foreward)) return false;
+				return this.binary1.customExtract(target, offset, -offset2, foreward);
 			}
 		}
 
 		@Override
 		public final FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
-			final int offset2 = offset - this.binary1._length_, length2 = offset2 + length;
+			final int offset2 = offset - this.binary1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.binary2.section(offset2, length);
 			if (length2 <= 0) return this.binary1.section(offset, length);
 			return this.binary1.section(offset, -offset2).concat(this.binary2.section(0, length2));
@@ -214,13 +214,13 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		{}
 
 		@Override
-		protected final byte _get_(final int index) throws IndexOutOfBoundsException {
-			return this.binary._get_(index + this.offset);
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+			return this.binary.customGet(index + this.offset);
 		}
 
 		@Override
-		protected final boolean _extract_(final Collector target, final int offset2, final int length2, final boolean foreward) {
-			return this.binary._extract_(target, this.offset + offset2, length2, foreward);
+		protected final boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
+			return this.binary.customExtract(target, this.offset + offset2, length2, foreward);
 		}
 
 		@Override
@@ -236,20 +236,20 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		public final FEMBinary binary;
 
 		ReverseBinary(final FEMBinary binary) throws IllegalArgumentException {
-			super(binary._length_);
+			super(binary.length);
 			this.binary = binary;
 		}
 
 		{}
 
 		@Override
-		protected final byte _get_(final int index) throws IndexOutOfBoundsException {
-			return this.binary._get_(this._length_ - index - 1);
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+			return this.binary.customGet(this.length - index - 1);
 		}
 
 		@Override
-		protected final boolean _extract_(final Collector target, final int offset, final int length, final boolean foreward) {
-			return this.binary._extract_(target, this._length_ - offset - length, length, !foreward);
+		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+			return this.binary.customExtract(target, this.length - offset - length, length, !foreward);
 		}
 
 		@Override
@@ -259,7 +259,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 		@Override
 		public final FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
-			return this.binary.section(this._length_ - offset - length, length).reverse();
+			return this.binary.section(this.length - offset - length, length).reverse();
 		}
 
 		@Override
@@ -282,12 +282,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		{}
 
 		@Override
-		protected final byte _get_(final int index) throws IndexOutOfBoundsException {
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.item;
 		}
 
 		@Override
-		protected final boolean _extract_(final Collector target, final int offset, int length, final boolean foreward) {
+		protected final boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
 				if (!target.push(this.item)) return false;
 				length--;
@@ -320,7 +320,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		{}
 
 		@Override
-		protected final byte _get_(final int index) throws IndexOutOfBoundsException {
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
 		}
 
@@ -465,10 +465,10 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	{}
 
 	/** Dieses Feld speichert den Streuwert. */
-	int _hash_;
+	int hash;
 
 	/** Dieses Feld speichert die Länge. */
-	protected final int _length_;
+	protected final int length;
 
 	/** Dieser Konstruktor initialisiert die Länge.
 	 *
@@ -476,7 +476,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMBinary(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
-		this._length_ = length;
+		this.length = length;
 	}
 
 	{}
@@ -485,7 +485,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Byte. */
-	protected byte _get_(final int index) {
+	protected byte customGet(final int index) {
 		return 0;
 	}
 
@@ -497,14 +497,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
-	protected boolean _extract_(final Collector target, int offset, int length, final boolean foreward) {
+	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
 			for (length += offset; offset < length; offset++) {
-				if (!target.push(this._get_(offset))) return false;
+				if (!target.push(this.customGet(offset))) return false;
 			}
 		} else {
 			for (length += offset - 1; offset <= length; length--) {
-				if (!target.push(this._get_(length))) return false;
+				if (!target.push(this.customGet(length))) return false;
 			}
 		}
 		return true;
@@ -514,7 +514,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 *
 	 * @return Array mit den Bytes dieser Bytefolge. */
 	public byte[] value() {
-		final ValueCollector target = new ValueCollector(this._length_);
+		final ValueCollector target = new ValueCollector(this.length);
 		this.extract(target);
 		return target.array;
 	}
@@ -525,15 +525,15 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return {@code index}-tes Byte.
 	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist. */
 	public final byte get(final int index) throws IndexOutOfBoundsException {
-		if ((index < 0) || (index >= this._length_)) throw new IndexOutOfBoundsException();
-		return this._get_(index);
+		if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
+		return this.customGet(index);
 	}
 
 	/** Diese Methode gibt die Länge, d.h. die Anzahl der Bytes in der Bytefolge zurück.
 	 *
 	 * @return Länge der Bytefolge. */
 	public final int length() {
-		return this._length_;
+		return this.length;
 	}
 
 	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Bytefolge mit der gegebenen Bytefolge zurück.
@@ -542,8 +542,8 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return {@link FEMBinary}-Sicht auf die Verkettung dieser mit der gegebenen Bytefolge.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public FEMBinary concat(final FEMBinary that) throws NullPointerException {
-		if (that._length_ == 0) return this;
-		if (this._length_ == 0) return that;
+		if (that.length == 0) return this;
+		if (this.length == 0) return that;
 		return new ConcatBinary(this, that);
 	}
 
@@ -554,8 +554,8 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return {@link FEMBinary}-Sicht auf einen Abschnitt dieser Bytefolge.
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Bytefolge liegt oder eine negative Länge hätte. */
 	public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
-		if ((offset == 0) && (length == this._length_)) return this;
-		if ((offset < 0) || ((offset + length) > this._length_)) throw new IllegalArgumentException();
+		if ((offset == 0) && (length == this.length)) return this;
+		if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMBinary.EMPTY;
 		return new SectionBinary(this, offset, length);
 	}
@@ -573,8 +573,8 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @see #value()
 	 * @return performanteren Bytefolge oder {@code this}. */
 	public FEMBinary compact() {
-		final FEMBinary result = this._length_ == 1 ? new UniformBinary(1, this._get_(0)) : new CompactBinary(this.value());
-		result._hash_ = this._hash_;
+		final FEMBinary result = this.length == 1 ? new UniformBinary(1, this.customGet(0)) : new CompactBinary(this.value());
+		result.hash = this.hash;
 		return result;
 	}
 
@@ -586,10 +586,10 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return Position des ersten Vorkommens des gegebenen Bytewerts ({@code offset..this.length()-1}) oder {@code -1}.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final byte that, final int offset) throws IllegalArgumentException {
-		final int length = this._length_ - offset;
+		final int length = this.length - offset;
 		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		final FindCollector collector = new FindCollector(that);
-		if (this._extract_(collector, offset, length, true)) return -1;
+		if (this.customExtract(collector, offset, length, true)) return -1;
 		return collector.index + offset;
 	}
 
@@ -602,14 +602,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMBinary that, final int offset) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (offset > this._length_)) throw new IllegalArgumentException();
-		final int count = that._length_;
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
+		final int count = that.length;
 		if (count == 0) return offset;
-		final int value = that._get_(0), length = this._length_ - count;
+		final int value = that.customGet(0), length = this.length - count;
 		FIND: for (int i = offset; i < length; i++) {
-			if (value == this._get_(i)) {
+			if (value == this.customGet(i)) {
 				for (int i2 = 1; i2 < count; i2++) {
-					if (this._get_(i + i2) != that._get_(i2)) {
+					if (this.customGet(i + i2) != that.customGet(i2)) {
 						continue FIND;
 					}
 				}
@@ -627,20 +627,20 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean extract(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
-		if (this._length_ == 0) return true;
-		return this._extract_(target, 0, this._length_, true);
+		if (this.length == 0) return true;
+		return this.customExtract(target, 0, this.length, true);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		int result = this._hash_;
+		int result = this.hash;
 		if (result != 0) return result;
-		final int length = this._length_;
+		final int length = this.length;
 		final HashCollector collector = new HashCollector();
-		this._extract_(collector, 0, length, true);
-		this._hash_ = (result = (collector.hash | 1));
+		this.customExtract(collector, 0, length, true);
+		this.hash = (result = (collector.hash | 1));
 		return result;
 	}
 
@@ -650,11 +650,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMBinary that) throws NullPointerException {
-		final int length = this._length_;
-		if (length != that._length_) return false;
+		final int length = this.length;
+		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;
 		for (int i = 0; i < length; i++) {
-			if (this._get_(i) != that._get_(i)) return false;
+			if (this.customGet(i) != that.customGet(i)) return false;
 		}
 		return true;
 	}
@@ -666,12 +666,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMBinary that) throws NullPointerException {
-		final int length = Math.min(this._length_, that._length_);
+		final int length = Math.min(this.length, that.length);
 		for (int i = 0; i < length; i++) {
-			final int result = Comparators.compare(this._get_(i) & 255, that._get_(i) & 255);
+			final int result = Comparators.compare(this.customGet(i) & 255, that.customGet(i) & 255);
 			if (result != 0) return result;
 		}
-		return Comparators.compare(this._length_, that._length_);
+		return Comparators.compare(this.length, that.length);
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
@@ -681,7 +681,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @param header {@code true}, wenn die Zeichenkette mit {@code "0x"} beginnen soll.
 	 * @return Textdarstellung. */
 	public final String toString(final boolean header) {
-		final StringCollector target = new StringCollector(header, this._length_);
+		final StringCollector target = new StringCollector(header, this.length);
 		this.extract(target);
 		return new String(target.array, 0, target.array.length);
 	}
@@ -736,16 +736,16 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	public final Iterator<Byte> iterator() {
 		return new Iterator<Byte>() {
 
-			int _index_ = 0;
+			int index = 0;
 
 			@Override
 			public Byte next() {
-				return new Byte(FEMBinary.this._get_(this._index_++));
+				return new Byte(FEMBinary.this.customGet(this.index++));
 			}
 
 			@Override
 			public boolean hasNext() {
-				return this._index_ < FEMBinary.this._length_;
+				return this.index < FEMBinary.this.length;
 			}
 
 			@Override

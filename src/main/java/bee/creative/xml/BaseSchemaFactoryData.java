@@ -33,7 +33,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 		/** {@inheritDoc} */
 		@Override
-		protected final FeatureData<GOwner> _this_() {
+		protected final FeatureData<GOwner> customThis() {
 			return this;
 		}
 
@@ -55,7 +55,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 		/** {@inheritDoc} */
 		@Override
-		protected final PropertyData<GOwner> _this_() {
+		protected final PropertyData<GOwner> customThis() {
 			return this;
 		}
 
@@ -77,7 +77,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 		/** {@inheritDoc} */
 		@Override
-		protected final HandlerData<GOwner> _this_() {
+		protected final HandlerData<GOwner> customThis() {
 			return this;
 		}
 
@@ -99,7 +99,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 		/** {@inheritDoc} */
 		@Override
-		protected final ResolverData<GOwner> _this_() {
+		protected final ResolverData<GOwner> customThis() {
 			return this;
 		}
 
@@ -145,7 +145,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 		/** {@inheritDoc} */
 		@Override
-		protected final LanguageData<GOwner> _this_() {
+		protected final LanguageData<GOwner> customThis() {
 			return this;
 		}
 
@@ -154,54 +154,54 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	{}
 
 	/** Dieses Feld speichert die {@link SchemaFactory}. */
-	SchemaFactory _factory_;
+	SchemaFactory factory;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}. */
-	final FeatureData<GThis> _featureData_ = new FeatureData<GThis>() {
+	final FeatureData<GThis> featureData = new FeatureData<GThis>() {
 
 		@Override
 		public final GThis closeFeatureData() {
-			return BaseSchemaFactoryData.this._this_();
+			return BaseSchemaFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openPropertyData()}. */
-	final PropertyData<GThis> _propertyData_ = new PropertyData<GThis>() {
+	final PropertyData<GThis> propertyData = new PropertyData<GThis>() {
 
 		@Override
 		public final GThis closePropertyData() {
-			return BaseSchemaFactoryData.this._this_();
+			return BaseSchemaFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openHandlerData()}. */
-	final HandlerData<GThis> _handlerData_ = new HandlerData<GThis>() {
+	final HandlerData<GThis> handlerData = new HandlerData<GThis>() {
 
 		@Override
 		public final GThis closeHandlerData() {
-			return BaseSchemaFactoryData.this._this_();
+			return BaseSchemaFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openResolverData()}. */
-	final ResolverData<GThis> _resolverData_ = new ResolverData<GThis>() {
+	final ResolverData<GThis> resolverData = new ResolverData<GThis>() {
 
 		@Override
 		public final GThis closeResolverData() {
-			return BaseSchemaFactoryData.this._this_();
+			return BaseSchemaFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openLanguageData()}. */
-	final LanguageData<GThis> _languageData_ = new LanguageData<GThis>() {
+	final LanguageData<GThis> languageData = new LanguageData<GThis>() {
 
 		@Override
 		public final GThis closeLanguageData() {
-			return BaseSchemaFactoryData.this._this_();
+			return BaseSchemaFactoryData.this.customThis();
 		}
 
 	};
@@ -213,14 +213,14 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseSchemaFactoryData<?> data) {
-		if (data == null) return this._this_();
-		this._factory_ = data._factory_;
-		this._featureData_.use(data._featureData_);
-		this._propertyData_.use(data._propertyData_);
-		this._handlerData_.use(data._handlerData_);
-		this._resolverData_.use(data._resolverData_);
-		this._languageData_.use(data._languageData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.factory = data.factory;
+		this.featureData.use(data.featureData);
+		this.propertyData.use(data.propertyData);
+		this.handlerData.use(data.handlerData);
+		this.resolverData.use(data.resolverData);
+		this.languageData.use(data.languageData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt das {@link SchemaFactory} zurück.<br>
@@ -233,9 +233,9 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @return {@link SchemaFactory}.
 	 * @throws SAXException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst. */
 	public final SchemaFactory getFactory() throws SAXException {
-		SchemaFactory result = this._factory_;
+		SchemaFactory result = this.factory;
 		if (result != null) return result;
-		result = SchemaFactory.newInstance(this._languageData_.build());
+		result = SchemaFactory.newInstance(this.languageData.build());
 		this.useFactory(result);
 		this.updateFactory();
 		return result;
@@ -246,8 +246,8 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @param factory {@link SchemaFactory} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useFactory(final SchemaFactory factory) {
-		this._factory_ = factory;
-		return this._this_();
+		this.factory = factory;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die {@link SchemaFactory} auf {@code null} und gibt {@code this} zurück.
@@ -267,19 +267,19 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 *         eine entsprechende Ausnahme auslöst. */
 	public final GThis updateFactory() throws SAXException {
 		final SchemaFactory factory = this.getFactory();
-		for (final ErrorHandler value: this._handlerData_) {
+		for (final ErrorHandler value: this.handlerData) {
 			factory.setErrorHandler(value);
 		}
-		for (final LSResourceResolver value: this._resolverData_) {
+		for (final LSResourceResolver value: this.resolverData) {
 			factory.setResourceResolver(value);
 		}
-		for (final Entry<String, Boolean> entry: this._featureData_) {
+		for (final Entry<String, Boolean> entry: this.featureData) {
 			factory.setFeature(entry.getKey(), entry.getValue());
 		}
-		for (final Entry<String, Object> entry: this._propertyData_) {
+		for (final Entry<String, Object> entry: this.propertyData) {
 			factory.setProperty(entry.getKey(), entry.getValue());
 		}
-		return this._this_();
+		return this.customThis();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
@@ -287,7 +287,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setFeature(String, boolean)
 	 * @return Konfigurator. */
 	public final FeatureData<GThis> openFeatureData() {
-		return this._featureData_;
+		return this.featureData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Eigenschaften der und gibt ihn zurück.
@@ -295,7 +295,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setProperty(String, Object)
 	 * @return Konfigurator. */
 	public final PropertyData<GThis> openPropertyData() {
-		return this._propertyData_;
+		return this.propertyData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link ErrorHandler} und gibt ihn zurück.
@@ -303,7 +303,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setErrorHandler(ErrorHandler)
 	 * @return Konfigurator. */
 	public final HandlerData<GThis> openHandlerData() {
-		return this._handlerData_;
+		return this.handlerData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link LSResourceResolver} und gibt ihn zurück.
@@ -311,7 +311,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setResourceResolver(LSResourceResolver)
 	 * @return Konfigurator. */
 	public final ResolverData<GThis> openResolverData() {
-		return this._resolverData_;
+		return this.resolverData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Schemasprache und gibt ihn zurück.
@@ -319,14 +319,14 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#newInstance(String)
 	 * @return Konfigurator. */
 	public final LanguageData<GThis> openLanguageData() {
-		return this._languageData_;
+		return this.languageData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc} */
 	@Override
@@ -341,7 +341,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._featureData_, this._propertyData_, this._handlerData_, this._resolverData_, this._languageData_);
+		return Objects.toInvokeString(this, this.featureData, this.propertyData, this.handlerData, this.resolverData, this.languageData);
 	}
 
 }

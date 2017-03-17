@@ -64,13 +64,13 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	{}
 
 	/** Dieses Feld speichert die interne Darstellung des Wahrheitswerts. */
-	final boolean _value_;
+	final boolean value;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung des Wahrheitswerts.
 	 *
 	 * @param value interne Darstellung des Wahrheitswerts. */
 	FEMBoolean(final boolean value) {
-		this._value_ = value;
+		this.value = value;
 	}
 
 	{}
@@ -79,14 +79,14 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	 *
 	 * @return interne Darstellung des Wahrheitswerts. */
 	public final boolean value() {
-		return this._value_;
+		return this.value;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		return this._value_ ? 1231 : 1237;
+		return this.value ? 1231 : 1237;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wahrheitswert gleich dem gegebenen ist.
@@ -95,7 +95,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMBoolean that) throws NullPointerException {
-		return this._value_ == that._value_;
+		return this.value == that.value;
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn dieser Wahrheitswert kleiner, gleich oder größer als der gegebene Wahrheitswert ist.
@@ -104,14 +104,14 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMBoolean that) throws NullPointerException {
-		return Boolean.compare(this._value_, that._value_);
+		return Boolean.compare(this.value, that.value);
 	}
 
 	/** Diese Methode gibt diesen Wahrheitswert als {@link Boolean} zurück.
 	 *
 	 * @return {@link Boolean}. */
 	public final Boolean toBoolean() {
-		return Boolean.valueOf(this._value_);
+		return Boolean.valueOf(this.value);
 	}
 
 	{}
@@ -170,7 +170,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		return this._value_ ? "true" : "false";
+		return this.value ? "true" : "false";
 	}
 
 }

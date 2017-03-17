@@ -23,10 +23,10 @@ import bee.creative.util.Objects;
 public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 
 	/** Dieses Feld speichert das {@link Result}. */
-	Result _result_;
+	Result result;
 
 	/** Dieses Feld speichert den System-Identifikator. */
-	String _systemId_;
+	String systemId;
 
 	{}
 
@@ -35,10 +35,10 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseResultData<?> data) {
-		if (data == null) return this._this_();
-		this._result_ = data._result_;
-		this._systemId_ = data._systemId_;
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.result = data.result;
+		this.systemId = data.systemId;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten auf ein {@link StreamResult} mit dem gegebenen {@link File} und gibt {@code this} zurück.
@@ -106,10 +106,10 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	 * @param systemId System-Identifikator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useSystemId(final String systemId) {
-		this._systemId_ = systemId;
-		if (this._result_ == null) return this._this_();
-		this._result_.setSystemId(systemId);
-		return this._this_();
+		this.systemId = systemId;
+		if (this.result == null) return this.customThis();
+		this.result.setSystemId(systemId);
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten und gibt {@code this} zurück. Der aktuelle System-Identifikator wird beibehalten, sofern er nicht {@code null} ist.
@@ -119,9 +119,9 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	 * @param result Ergebnisdaten oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useResult(final Result result) {
-		this._result_ = result;
-		if (result == null) return this._this_();
-		return this.useSystemId(this._systemId_ != null ? this._systemId_ : result.getSystemId());
+		this.result = result;
+		if (result == null) return this.customThis();
+		return this.useSystemId(this.systemId != null ? this.systemId : result.getSystemId());
 	}
 
 	/** Diese Methode gibt die aktuell konfigurierten Ergebnisdaten zurück.
@@ -137,7 +137,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	 * @see StreamResult
 	 * @return Quelldaten oder {@code null}. */
 	public final Result getResult() {
-		return this._result_;
+		return this.result;
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten sowie den System-Identifikator auf {@code null} und gibt {@code this} zurück.
@@ -161,7 +161,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._result_, this._systemId_);
+		return Objects.toInvokeString(this, this.result, this.systemId);
 	}
 
 }

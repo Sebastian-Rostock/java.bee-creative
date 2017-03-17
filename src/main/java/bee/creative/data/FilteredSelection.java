@@ -12,7 +12,7 @@ import bee.creative.util.Iterables;
 public final class FilteredSelection<GItem> implements Selection<GItem> {
 
 	/** Dieses Feld speichert das {@link Iterable}. */
-	final Iterable<? extends GItem> _items_;
+	final Iterable<? extends GItem> items;
 
 	/** Dieser Konstruktor initialisiert das {@link Iterable}.
 	 *
@@ -20,7 +20,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public FilteredSelection(final Iterable<? extends GItem> items) throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
-		this._items_ = items;
+		this.items = items;
 	}
 
 	{}
@@ -40,14 +40,14 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	@Override
 	public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
-		return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.navigatedFilter(field, Filters.containsFilter(value)), this._items_));
+		return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.navigatedFilter(field, Filters.containsFilter(value)), this.items));
 	}
 
 	/** {@inheritDoc} */
 	@SuppressWarnings ("unchecked")
 	@Override
 	public Iterator<GItem> iterator() {
-		return (Iterator<GItem>)this._items_.iterator();
+		return (Iterator<GItem>)this.items.iterator();
 	}
 
 }

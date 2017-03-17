@@ -33,7 +33,7 @@ public final class XMLFormatter {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SourceData _this_() {
+		protected final SourceData customThis() {
 			return this;
 		}
 
@@ -56,7 +56,7 @@ public final class XMLFormatter {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final ResultData _this_() {
+		protected final ResultData customThis() {
 			return this;
 		}
 
@@ -78,7 +78,7 @@ public final class XMLFormatter {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final TransformerData _this_() {
+		protected final TransformerData customThis() {
 			return this;
 		}
 
@@ -87,13 +87,13 @@ public final class XMLFormatter {
 	{}
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final SourceData _sourceData_ = new SourceData();
+	final SourceData sourceData = new SourceData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openResultData()}. */
-	final ResultData _resultData_ = new ResultData();
+	final ResultData resultData = new ResultData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openTransformerData()}. */
-	final TransformerData _transformerData_ = new TransformerData();
+	final TransformerData transformerData = new TransformerData();
 
 	{}
 
@@ -103,9 +103,9 @@ public final class XMLFormatter {
 	 * @return {@code this}. */
 	public final XMLFormatter use(final XMLFormatter data) {
 		if (data == null) return this;
-		this._sourceData_.use(data._sourceData_);
-		this._resultData_.use(data._resultData_);
-		this._transformerData_.use(data._transformerData_);
+		this.sourceData.use(data.sourceData);
+		this.resultData.use(data.resultData);
+		this.transformerData.use(data.transformerData);
 		return this;
 	}
 
@@ -117,10 +117,10 @@ public final class XMLFormatter {
 	 * @return {@code this}.
 	 * @throws TransformerException Wenn {@link Transformer#transform(Source, Result)} eine entsprechende Ausnahme auslöst. */
 	public final XMLFormatter transform() throws TransformerException {
-		final Transformer transformer = this._transformerData_.getTransformer();
+		final Transformer transformer = this.transformerData.getTransformer();
 		synchronized (transformer) {
-			final Source source = this._sourceData_.getSource();
-			final Result result = this._resultData_.getResult();
+			final Source source = this.sourceData.getSource();
+			final Result result = this.resultData.getResult();
 			transformer.transform(source, result);
 		}
 		return this;
@@ -158,7 +158,7 @@ public final class XMLFormatter {
 	 * @see Transformer#transform(Source, Result)
 	 * @return Konfigurator. */
 	public final SourceData openSourceData() {
-		return this._sourceData_;
+		return this.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabedaten und gibt ihn zurück.
@@ -166,14 +166,14 @@ public final class XMLFormatter {
 	 * @see Transformer#transform(Source, Result)
 	 * @return Konfigurator. */
 	public final ResultData openResultData() {
-		return this._resultData_;
+		return this.resultData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Transformer} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
 	public final TransformerData openTransformerData() {
-		return this._transformerData_;
+		return this.transformerData;
 	}
 
 	{}
@@ -181,7 +181,7 @@ public final class XMLFormatter {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._sourceData_, this._resultData_, this._transformerData_);
+		return Objects.toInvokeString(this, this.sourceData, this.resultData, this.transformerData);
 	}
 
 }

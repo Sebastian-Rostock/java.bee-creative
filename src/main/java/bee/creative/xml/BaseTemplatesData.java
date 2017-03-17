@@ -31,7 +31,7 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SourceData<GOwner> _this_() {
+		protected final SourceData<GOwner> customThis() {
 			return this;
 		}
 
@@ -52,7 +52,7 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 
 		/** {@inheritDoc} */
 		@Override
-		protected final FactoryData<GOwner> _this_() {
+		protected final FactoryData<GOwner> customThis() {
 			return this;
 		}
 
@@ -61,24 +61,24 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	{}
 
 	/** Dieses Feld speichert die {@link Templates}. */
-	Templates _templates_;
+	Templates templates;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openScriptData()}. */
-	final SourceData<GThis> _scriptData_ = new SourceData<GThis>() {
+	final SourceData<GThis> scriptData = new SourceData<GThis>() {
 
 		@Override
 		public final GThis closeSourceData() {
-			return BaseTemplatesData.this._this_();
+			return BaseTemplatesData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}. */
-	final FactoryData<GThis> _factoryData_ = new FactoryData<GThis>() {
+	final FactoryData<GThis> factoryData = new FactoryData<GThis>() {
 
 		@Override
 		public final GThis closeFactoryData() {
-			return BaseTemplatesData.this._this_();
+			return BaseTemplatesData.this.customThis();
 		}
 
 	};
@@ -90,11 +90,11 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseTemplatesData<?> data) {
-		if (data == null) return this._this_();
-		this._templates_ = data._templates_;
-		this._scriptData_.use(data._scriptData_);
-		this._factoryData_.use(data._factoryData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.templates = data.templates;
+		this.scriptData.use(data.scriptData);
+		this.factoryData.use(data.factoryData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt die {@link Templates} zurück.<br>
@@ -107,11 +107,11 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	 * @throws TransformerConfigurationException Wenn {@link FactoryData#getFactory()} bzw. {@link TransformerFactory#newTemplates(Source)} eine entsprechende
 	 *         Ausnahme auslöst. */
 	public final Templates getTemplates() throws TransformerConfigurationException {
-		Templates result = this._templates_;
+		Templates result = this.templates;
 		if (result != null) return result;
-		final Source source = this._scriptData_.getSource();
+		final Source source = this.scriptData.getSource();
 		if (source == null) return null;
-		result = this._factoryData_.getFactory().newTemplates(source);
+		result = this.factoryData.getFactory().newTemplates(source);
 		this.useTemplates(result);
 		return result;
 	}
@@ -121,8 +121,8 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	 * @param templates {@link Templates} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useTemplates(final Templates templates) {
-		this._templates_ = templates;
-		return this._this_();
+		this.templates = templates;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die {@link Templates} auf {@code null} und gibt {@code this} zurück. Wenn {@link #getTemplates()} {@code null} liefern soll, müssen
@@ -138,7 +138,7 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	 * @see TransformerFactory#newTemplates(Source)
 	 * @return Konfigurator. */
 	public final SourceData<GThis> openScriptData() {
-		return this._scriptData_;
+		return this.scriptData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die {@link TransformerFactory} und gibt ihn zurück.
@@ -146,14 +146,14 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	 * @see TransformerFactory#newTemplates(Source)
 	 * @return Konfigurator. */
 	public final FactoryData<GThis> openFactoryData() {
-		return this._factoryData_;
+		return this.factoryData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc}
 	 *
@@ -170,7 +170,7 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._scriptData_, this._factoryData_);
+		return Objects.toInvokeString(this, this.scriptData, this.factoryData);
 	}
 
 }

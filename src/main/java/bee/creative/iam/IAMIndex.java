@@ -116,7 +116,7 @@ public abstract class IAMIndex {
 			} else {
 				this.type = SizeStats.computeSizeType(this.dataOffset[count]);
 				this.dataLength = 0;
-				final int dataOffsetBytes = this.dataOffset.length * IAMLoader._byteCount_(this.type);
+				final int dataOffsetBytes = this.dataOffset.length * IAMLoader.byteCount(this.type);
 				this.bytes = (dataOffsetBytes + 3) & -4;
 			}
 
@@ -234,7 +234,7 @@ public abstract class IAMIndex {
 				}
 			}
 			this.type = Math.max(DataStats.computeDataType(minValue), DataStats.computeDataType(maxValue));
-			final int dataValueBytes = this.dataValue.length * IAMLoader._byteCount_(this.type);
+			final int dataValueBytes = this.dataValue.length * IAMLoader.byteCount(this.type);
 			this.bytes = (dataValueBytes + 3) & -4;
 		}
 
@@ -252,23 +252,23 @@ public abstract class IAMIndex {
 	@SuppressWarnings ("javadoc")
 	static final class Listingss extends AbstractList<IAMListing> {
 
-		final IAMIndex _owner_;
+		final IAMIndex owner;
 
 		Listingss(final IAMIndex owner) {
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
 
 		@Override
 		public IAMListing get(final int index) {
-			if ((index < 0) || (index >= this._owner_.listingCount())) throw new IndexOutOfBoundsException();
-			return this._owner_.listing(index);
+			if ((index < 0) || (index >= this.owner.listingCount())) throw new IndexOutOfBoundsException();
+			return this.owner.listing(index);
 		}
 
 		@Override
 		public int size() {
-			return this._owner_.listingCount();
+			return this.owner.listingCount();
 		}
 
 	}
@@ -276,23 +276,23 @@ public abstract class IAMIndex {
 	@SuppressWarnings ("javadoc")
 	static final class Mappings extends AbstractList<IAMMapping> {
 
-		final IAMIndex _owner_;
+		final IAMIndex owner;
 
 		Mappings(final IAMIndex owner) {
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
 
 		@Override
 		public IAMMapping get(final int index) {
-			if ((index < 0) || (index >= this._owner_.mappingCount())) throw new IndexOutOfBoundsException();
-			return this._owner_.mapping(index);
+			if ((index < 0) || (index >= this.owner.mappingCount())) throw new IndexOutOfBoundsException();
+			return this.owner.mapping(index);
 		}
 
 		@Override
 		public int size() {
-			return this._owner_.mappingCount();
+			return this.owner.mappingCount();
 		}
 
 	}

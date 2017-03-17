@@ -31,25 +31,25 @@ public final class FEMFuture extends FEMValue {
 	/** Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
 	 *
 	 * @see FEMFunction#invoke(FEMFrame) */
-	FEMValue _result_;
+	FEMValue result;
 
 	/** Dieses Feld speichert die Stapelrahmen zur Auswertung der Funktion oder {@code null}.
 	 *
 	 * @see FEMFunction#invoke(FEMFrame) */
-	FEMFrame _frame_;
+	FEMFrame frame;
 
 	/** Dieses Feld speichert die Funktion oder {@code null}.
 	 *
 	 * @see FEMFunction#invoke(FEMFrame) */
-	FEMFunction _function_;
+	FEMFunction function;
 
 	/** Dieser Konstruktor initialisiert Stapelrahmen und Funktion.
 	 *
 	 * @param frame Stapelrahmen.
 	 * @param function Funktion. */
 	FEMFuture(final FEMFrame frame, final FEMFunction function) {
-		this._frame_ = frame;
-		this._function_ = function;
+		this.frame = frame;
+		this.function = function;
 	}
 
 	{}
@@ -59,7 +59,7 @@ public final class FEMFuture extends FEMValue {
 	 *
 	 * @return Stapelrahmen oder {@code null}. */
 	public final synchronized FEMFrame frame() {
-		return this._frame_;
+		return this.frame;
 	}
 
 	/** Diese Methode gibt die Funktion oder {@code null} zurück.<br>
@@ -67,7 +67,7 @@ public final class FEMFuture extends FEMValue {
 	 *
 	 * @return Funktion oder {@code null}. */
 	public final synchronized FEMFunction function() {
-		return this._function_;
+		return this.function;
 	}
 
 	{}
@@ -97,20 +97,20 @@ public final class FEMFuture extends FEMValue {
 	 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist. */
 	@Override
 	public final synchronized FEMValue result(final boolean recursive) throws NullPointerException {
-		FEMValue result = this._result_;
+		FEMValue result = this.result;
 		if (result != null) {
 			if (!recursive) return result;
 			final FEMValue result2 = result.result(true);
 			if (result == result2) return result;
-			this._result_ = result2;
+			this.result = result2;
 			return result;
 		} else {
-			result = this._function_.invoke(this._frame_);
+			result = this.function.invoke(this.frame);
 			if (result == null) throw new NullPointerException("function().invoke(frame()) = null");
 			result = result.result(recursive);
-			this._result_ = result;
-			this._frame_ = null;
-			this._function_ = null;
+			this.result = result;
+			this.frame = null;
+			this.function = null;
 			return result;
 		}
 	}
@@ -118,10 +118,10 @@ public final class FEMFuture extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final synchronized void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		if (this._result_ != null) {
-			target.putFunction(this._result_);
+		if (this.result != null) {
+			target.putFunction(this.result);
 		} else {
-			target.putHandler(this._function_).put(this._frame_);
+			target.putHandler(this.function).put(this.frame);
 		}
 	}
 

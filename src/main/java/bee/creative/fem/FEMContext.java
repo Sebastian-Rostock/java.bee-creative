@@ -118,9 +118,9 @@ public class FEMContext {
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann. */
 	public FEMArray arrayFrom(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data instanceof FEMArray) return (FEMArray)data;
-		if (data instanceof Object[]) return this._arrayFrom_((Object[])data);
-		if (data instanceof Collection<?>) return this._arrayFrom_((Collection<?>)data);
-		if (data instanceof Iterable<?>) return this._arrayFrom_((Iterable<?>)data);
+		if (data instanceof Object[]) return this.arrayFromImpl((Object[])data);
+		if (data instanceof Collection<?>) return this.arrayFromImpl((Collection<?>)data);
+		if (data instanceof Iterable<?>) return this.arrayFromImpl((Iterable<?>)data);
 		final int length = Array.getLength(data);
 		if (length == 0) return FEMArray.EMPTY;
 		final FEMValue[] values = new FEMValue[length];
@@ -131,7 +131,7 @@ public class FEMContext {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray _arrayFrom_(final Object[] data) throws NullPointerException, IllegalArgumentException {
+	final FEMArray arrayFromImpl(final Object[] data) throws NullPointerException, IllegalArgumentException {
 		final int length = data.length;
 		if (length == 0) return FEMArray.EMPTY;
 		final FEMValue[] values = new FEMValue[length];
@@ -142,15 +142,15 @@ public class FEMContext {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray _arrayFrom_(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
+	final FEMArray arrayFromImpl(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
 		final List<Object> array = new ArrayList<>();
 		Iterables.appendAll(array, data);
-		return this._arrayFrom_(array);
+		return this.arrayFromImpl(array);
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray _arrayFrom_(final Collection<?> data) throws NullPointerException, IllegalArgumentException {
-		return this._arrayFrom_(data.toArray());
+	final FEMArray arrayFromImpl(final Collection<?> data) throws NullPointerException, IllegalArgumentException {
+		return this.arrayFromImpl(data.toArray());
 	}
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
@@ -228,7 +228,7 @@ public class FEMContext {
 			case FEMVoid.ID:
 				return null;
 			case FEMArray.ID:
-				return this._objectFrom_((FEMArray)value.data());
+				return this.objectFromImpl((FEMArray)value.data());
 			case FEMBinary.ID:
 				return ((FEMBinary)value.data()).value();
 			case FEMString.ID:
@@ -246,7 +246,7 @@ public class FEMContext {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final Object[] _objectFrom_(final FEMArray array) {
+	final Object[] objectFromImpl(final FEMArray array) {
 		final int length = array.length();
 		final Object[] result = new Object[length];
 		for (int i = 0; i < length; i++) {

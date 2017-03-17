@@ -32,7 +32,7 @@ public final class XMLEvaluator {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final XPathData _this_() {
+		protected final XPathData customThis() {
 			return this;
 		}
 
@@ -48,7 +48,7 @@ public final class XMLEvaluator {
 		@Override
 		protected final XPathExpression compile(final String input) {
 			try {
-				final XPath xxath = XMLEvaluator.this._xpathData_.getXPath();
+				final XPath xxath = XMLEvaluator.this.xpathData.getXPath();
 				return xxath.compile(input);
 			} catch (final XPathExpressionException | XPathFactoryConfigurationException cause) {
 				throw new IllegalStateException(cause);
@@ -60,16 +60,16 @@ public final class XMLEvaluator {
 	{}
 
 	/** Dieses Feld speichert des Basisknoten. */
-	Node _base_;
+	Node base;
 
 	/** Dieses Feld speichert den aktuellen Ausdruck. */
-	XPathExpression _expression_;
+	XPathExpression expression;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openXpathData()}. */
-	final XPathData _xpathData_ = new XPathData();
+	final XPathData xpathData = new XPathData();
 
 	/** Dieses Feld speichert den Cache für {@link #compile(String)}. */
-	final CacheData _cacheData_ = new CacheData();
+	final CacheData cacheData = new CacheData();
 
 	{}
 
@@ -78,7 +78,7 @@ public final class XMLEvaluator {
 	 * @see #useBase(Node)
 	 * @return Basisknoten. */
 	public final Node getBase() {
-		return this._base_;
+		return this.base;
 	}
 
 	/** Diese Methode setzt den Basisknoten und gibt {@code this} zurück.
@@ -87,7 +87,7 @@ public final class XMLEvaluator {
 	 * @param base Basisknoten, auf den sich die Pfadangaben beziehen.
 	 * @return {@code this}. */
 	public final XMLEvaluator useBase(final Node base) {
-		this._base_ = base;
+		this.base = base;
 		return this;
 	}
 
@@ -95,14 +95,14 @@ public final class XMLEvaluator {
 	 *
 	 * @return Puffer der Ausdrücke. */
 	public final CacheData getCache() {
-		return this._cacheData_;
+		return this.cacheData;
 	}
 
 	/** Diese Methode gibt den aktuellen Ausdruck zurück.
 	 *
 	 * @return Ausdruck oder {@code null}. */
 	public final XPathExpression getExpression() {
-		return this._expression_;
+		return this.expression;
 	}
 
 	/** Diese Methode setzt den {@link #getExpression() aktuellen Ausdruck} und gibt {@code this} zurück.
@@ -122,7 +122,7 @@ public final class XMLEvaluator {
 	 * @param expression Ausdruck oder {@code null}.
 	 * @return {@code this}. */
 	public final XMLEvaluator useExpression(final XPathExpression expression) {
-		this._expression_ = expression;
+		this.expression = expression;
 		return this;
 	}
 
@@ -130,7 +130,7 @@ public final class XMLEvaluator {
 	 *
 	 * @return {@code this}. */
 	public final XMLEvaluator resetCache() {
-		this._cacheData_.entryMap().clear();
+		this.cacheData.entryMap().clear();
 		return this;
 	}
 
@@ -152,7 +152,7 @@ public final class XMLEvaluator {
 	public final XPathExpression compile(final String expression) throws XPathExpressionException, XPathFactoryConfigurationException {
 		if (expression == null) return null;
 		try {
-			final XPathExpression result = this._cacheData_.get(expression);
+			final XPathExpression result = this.cacheData.get(expression);
 			return result;
 		} catch (final RuntimeException exception) {
 			final Throwable cause = exception.getCause();
@@ -170,8 +170,8 @@ public final class XMLEvaluator {
 	 * @return Ergebnis oser {@code null}.
 	 * @throws XPathExpressionException Wenn {@link XPathExpression#evaluate(Object, QName)} eine entsprechende Ausnahme auslöst. */
 	public final Object evaluate(final QName resultType) throws XPathExpressionException {
-		if (this._expression_ == null) return null;
-		final Object result = this._expression_.evaluate(this._base_, resultType);
+		if (this.expression == null) return null;
+		final Object result = this.expression.evaluate(this.base, resultType);
 		return result;
 	}
 
@@ -234,7 +234,7 @@ public final class XMLEvaluator {
 	 *
 	 * @return Konfigurator. */
 	public final XPathData openXpathData() {
-		return this._xpathData_;
+		return this.xpathData;
 	}
 
 	{}
@@ -242,7 +242,7 @@ public final class XMLEvaluator {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._base_, this._expression_, this._xpathData_, this._cacheData_);
+		return Objects.toInvokeString(this, this.base, this.expression, this.xpathData, this.cacheData);
 	}
 
 }

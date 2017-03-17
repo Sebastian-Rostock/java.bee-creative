@@ -57,23 +57,23 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	@SuppressWarnings ("javadoc")
 	static final class Entries extends AbstractList<IAMEntry> {
 
-		final IAMMapping _owner_;
+		final IAMMapping owner;
 
 		Entries(final IAMMapping owner) {
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
 
 		@Override
 		public final IAMEntry get(final int index) {
-			if ((index < 0) || (index >= this._owner_.entryCount())) throw new IndexOutOfBoundsException();
-			return this._owner_.entry(index);
+			if ((index < 0) || (index >= this.owner.entryCount())) throw new IndexOutOfBoundsException();
+			return this.owner.entry(index);
 		}
 
 		@Override
 		public final int size() {
-			return this._owner_.entryCount();
+			return this.owner.entryCount();
 		}
 
 	}
@@ -251,7 +251,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			rangeCount = rangeMask + 2;
 			rangeData = new int[rangeCount];
 			rangeDataType = SizeStats.computeSizeType(entryCount);
-			rangeDataBytes = rangeCount * IAMLoader._byteCount_(rangeDataType);
+			rangeDataBytes = rangeCount * IAMLoader.byteCount(rangeDataType);
 			rangeBytes = ((rangeDataBytes + 3) & -4) + 4;
 
 			final int[] rangeIndex = new int[entryCount];

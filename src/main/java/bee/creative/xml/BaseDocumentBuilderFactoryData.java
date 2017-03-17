@@ -31,7 +31,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 
 		/** {@inheritDoc} */
 		@Override
-		protected final FeatureData<GOwner> _this_() {
+		protected final FeatureData<GOwner> customThis() {
 			return this;
 		}
 
@@ -53,7 +53,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SchemaData<GOwner> _this_() {
+		protected final SchemaData<GOwner> customThis() {
 			return this;
 		}
 
@@ -145,7 +145,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 
 		/** {@inheritDoc} */
 		@Override
-		protected final PropertyData<GOwner> _this_() {
+		protected final PropertyData<GOwner> customThis() {
 			return this;
 		}
 
@@ -167,7 +167,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 
 		/** {@inheritDoc} */
 		@Override
-		protected final AttributeData<GOwner> _this_() {
+		protected final AttributeData<GOwner> customThis() {
 			return this;
 		}
 
@@ -176,14 +176,14 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	{}
 
 	/** Dieses Feld speichert die {@link DocumentBuilderFactory}. */
-	DocumentBuilderFactory _factory_;
+	DocumentBuilderFactory factory;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}. */
-	final FeatureData<GThis> _featureData_ = new FeatureData<GThis>() {
+	final FeatureData<GThis> featureData = new FeatureData<GThis>() {
 
 		@Override
 		public final GThis closeFeatureData() {
-			return BaseDocumentBuilderFactoryData.this._this_();
+			return BaseDocumentBuilderFactoryData.this.customThis();
 		}
 
 	};
@@ -193,27 +193,27 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 
 		@Override
 		public final GThis closeSchemaData() {
-			return BaseDocumentBuilderFactoryData.this._this_();
+			return BaseDocumentBuilderFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator {@link #openPropertyData()}. */
-	final PropertyData<GThis> _propertyData_ = new PropertyData<GThis>() {
+	final PropertyData<GThis> propertyData = new PropertyData<GThis>() {
 
 		@Override
 		public final GThis closePropertyData() {
-			return BaseDocumentBuilderFactoryData.this._this_();
+			return BaseDocumentBuilderFactoryData.this.customThis();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openAttributeData()}. */
-	final AttributeData<GThis> _attributeData_ = new AttributeData<GThis>() {
+	final AttributeData<GThis> attributeData = new AttributeData<GThis>() {
 
 		@Override
 		public final GThis closeAttributeData() {
-			return BaseDocumentBuilderFactoryData.this._this_();
+			return BaseDocumentBuilderFactoryData.this.customThis();
 		}
 
 	};
@@ -225,12 +225,12 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseDocumentBuilderFactoryData<?> data) {
-		if (data == null) return this._this_();
-		this._factory_ = data._factory_;
-		this._featureData_.use(data._featureData_);
-		this._propertyData_.use(data._propertyData_);
-		this._attributeData_.use(data._attributeData_);
-		return this._this_();
+		if (data == null) return this.customThis();
+		this.factory = data.factory;
+		this.featureData.use(data.featureData);
+		this.propertyData.use(data.propertyData);
+		this.attributeData.use(data.attributeData);
+		return this.customThis();
 	}
 
 	/** Diese Methode gibt die {@link DocumentBuilderFactory} zurück.<br>
@@ -244,7 +244,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * @throws SAXException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst. */
 	public final DocumentBuilderFactory getFactory() throws SAXException, ParserConfigurationException {
-		DocumentBuilderFactory result = this._factory_;
+		DocumentBuilderFactory result = this.factory;
 		if (result != null) return result;
 		result = DocumentBuilderFactory.newInstance();
 		this.useFactory(result);
@@ -257,8 +257,8 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * @param factory {@link DocumentBuilderFactory} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useFactory(final DocumentBuilderFactory factory) {
-		this._factory_ = factory;
-		return this._this_();
+		this.factory = factory;
+		return this.customThis();
 	}
 
 	/** Diese Methode setzt die {@link DocumentBuilderFactory} auf {@code null} und gibt {@code this} zurück.
@@ -279,7 +279,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	public final GThis updateFactory() throws SAXException, ParserConfigurationException {
 		final DocumentBuilderFactory factory = this.getFactory();
 		factory.setSchema(this._schemaData_.getSchema());
-		final PropertyData<GThis> propertyData = this._propertyData_;
+		final PropertyData<GThis> propertyData = this.propertyData;
 		factory.setCoalescing(propertyData.forCoalescing().getBoolean());
 		factory.setExpandEntityReferences(propertyData.forExpandEntityReferences().getBoolean());
 		factory.setIgnoringComments(propertyData.forIgnoringComments().getBoolean());
@@ -287,13 +287,13 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		factory.setNamespaceAware(propertyData.forNamespaceAware().getBoolean());
 		factory.setValidating(propertyData.forValidating().getBoolean());
 		factory.setXIncludeAware(propertyData.forXIncludeAware().getBoolean());
-		for (final Entry<String, Boolean> entry: this._featureData_) {
+		for (final Entry<String, Boolean> entry: this.featureData) {
 			factory.setFeature(entry.getKey(), Boolean.TRUE.equals(entry.getValue()));
 		}
-		for (final Entry<String, Object> entry: this._attributeData_) {
+		for (final Entry<String, Object> entry: this.attributeData) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
-		return this._this_();
+		return this.customThis();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
@@ -301,7 +301,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setFeature(String, boolean)
 	 * @return Konfigurator. */
 	public final FeatureData<GThis> openFeatureData() {
-		return this._featureData_;
+		return this.featureData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link Schema} und gibt ihn zurück.
@@ -323,7 +323,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 	 * @return Konfigurator. */
 	public final PropertyData<GThis> openPropertyData() {
-		return this._propertyData_;
+		return this.propertyData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Attribute und gibt ihn zurück.
@@ -331,14 +331,14 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
 	 * @return Konfigurator. */
 	public final AttributeData<GThis> openAttributeData() {
-		return this._attributeData_;
+		return this.attributeData;
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected abstract GThis _this_();
+	protected abstract GThis customThis();
 
 	/** {@inheritDoc}
 	 *
@@ -355,7 +355,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._featureData_, this._schemaData_, this._propertyData_, this._attributeData_);
+		return Objects.toInvokeString(this, this.featureData, this._schemaData_, this.propertyData, this.attributeData);
 	}
 
 }

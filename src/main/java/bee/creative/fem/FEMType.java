@@ -21,13 +21,13 @@ public class FEMType<GData> {
 	}
 
 	/** Dieses Feld speichert den Identifikator. */
-	final int _id_;
+	final int id;
 
 	/** Dieser Konstruktor initialisiert den Identifikator.
 	 *
 	 * @param id Identifikator. */
 	FEMType(final int id) {
-		this._id_ = id;
+		this.id = id;
 	}
 
 	{}
@@ -37,7 +37,7 @@ public class FEMType<GData> {
 	 *
 	 * @return Identifikator dieses Datentyps. */
 	public final int id() {
-		return this._id_;
+		return this.id;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist. Dies kann der Fall sein, wenn der gegebene
@@ -47,7 +47,7 @@ public class FEMType<GData> {
 	 * @param type Datentyp.
 	 * @return {@code true}, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist. */
 	public boolean is(final FEMType<?> type) {
-		return (type == this) || ((type != null) && (type._id_ == this._id_));
+		return (type == this) || ((type != null) && (type.id == this.id));
 	}
 
 	/** Diese Methode gibt die in den Datentyp {@code GData} kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
@@ -71,7 +71,7 @@ public class FEMType<GData> {
 	 * @see #id() */
 	@Override
 	public final int hashCode() {
-		return this._id_;
+		return this.id;
 	}
 
 	/** {@inheritDoc}
@@ -82,13 +82,13 @@ public class FEMType<GData> {
 		if (object == this) return true;
 		if (!(object instanceof FEMType<?>)) return false;
 		final FEMType<?> data = (FEMType<?>)object;
-		return this._id_ == data._id_;
+		return this.id == data.id;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this._id_);
+		return Objects.toInvokeString(this, this.id);
 	}
 
 }
