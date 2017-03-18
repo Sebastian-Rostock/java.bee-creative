@@ -68,32 +68,32 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _arrayLength_(final double[] array) {
+	protected int customGetLength(final double[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _hashCode_(final double[] array, final int index) {
+	protected int customGetHash(final double[] array, final int index) {
 		final long value = Double.doubleToLongBits(array[index]);
 		return (int)(value ^ (value >>> 32));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _equals_(final double[] array1, final double[] array2, final int index1, final int index2) {
+	protected boolean customEquals(final double[] array1, final double[] array2, final int index1, final int index2) {
 		return Double.doubleToLongBits(array1[index1]) == Double.doubleToLongBits(array2[index2]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _compareTo_(final double[] array1, final double[] array2, final int index1, final int index2) {
+	protected int customCompare(final double[] array1, final double[] array2, final int index1, final int index2) {
 		return Double.compare(array1[index1], array2[index2]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _toString_(final double[] array, final int index, final StringBuilder target) {
+	protected void customFormat(final double[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -102,7 +102,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof DoubleArraySection)) return false;
-		return this._equals_((DoubleArraySection)object);
+		return this.defaultEquals((DoubleArraySection)object);
 	}
 
 }

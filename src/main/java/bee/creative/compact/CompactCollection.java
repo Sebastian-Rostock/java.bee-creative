@@ -30,7 +30,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 		/** {@inheritDoc} */
 		@Override
 		protected GItem _next_(final int index) {
-			return this._data_.getItem(index);
+			return this.data.getItem(index);
 		}
 
 	}
@@ -55,7 +55,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 		/** {@inheritDoc} */
 		@Override
 		protected GItem _next_(final int index) {
-			return this._data_.getItem(index);
+			return this.data.getItem(index);
 		}
 
 	}

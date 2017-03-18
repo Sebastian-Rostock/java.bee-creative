@@ -68,31 +68,31 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _arrayLength_(final short[] array) {
+	protected int customGetLength(final short[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _hashCode_(final short[] array, final int index) {
+	protected int customGetHash(final short[] array, final int index) {
 		return array[index];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _equals_(final short[] array1, final short[] array2, final int index1, final int index2) {
+	protected boolean customEquals(final short[] array1, final short[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _compareTo_(final short[] array1, final short[] array2, final int index1, final int index2) {
+	protected int customCompare(final short[] array1, final short[] array2, final int index1, final int index2) {
 		return array1[index1] - array2[index2];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _toString_(final short[] array, final int index, final StringBuilder target) {
+	protected void customFormat(final short[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -101,7 +101,7 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof ShortArraySection)) return false;
-		return this._equals_((ShortArraySection)object);
+		return this.defaultEquals((ShortArraySection)object);
 	}
 
 }

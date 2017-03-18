@@ -179,7 +179,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
 	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
-	 * 
+	 *
 	 * @param array Zahlenfolge.
 	 * @param offset Beginn der Abschnitts.
 	 * @param length Länge des Abschnitts.
@@ -204,7 +204,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
 	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
-	 * 
+	 *
 	 * @param array Zahlenfolge.
 	 * @param offset Beginn der Abschnitts.
 	 * @param length Länge des Abschnitts.
@@ -229,7 +229,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
 	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
-	 * 
+	 *
 	 * @param array Zahlenfolge.
 	 * @param offset Beginn der Abschnitts.
 	 * @param length Länge des Abschnitts.
@@ -254,7 +254,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
 	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
-	 * 
+	 *
 	 * @param array Zahlenfolge.
 	 * @param offset Beginn der Abschnitts.
 	 * @param length Länge des Abschnitts.

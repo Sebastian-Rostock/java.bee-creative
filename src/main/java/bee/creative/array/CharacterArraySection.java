@@ -68,31 +68,31 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _arrayLength_(final char[] array) {
+	protected int customGetLength(final char[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _hashCode_(final char[] array, final int index) {
+	protected int customGetHash(final char[] array, final int index) {
 		return array[index];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _equals_(final char[] array1, final char[] array2, final int index1, final int index2) {
+	protected boolean customEquals(final char[] array1, final char[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _compareTo_(final char[] array1, final char[] array2, final int index1, final int index2) {
+	protected int customCompare(final char[] array1, final char[] array2, final int index1, final int index2) {
 		return array1[index1] - array2[index2];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _toString_(final char[] array, final int index, final StringBuilder target) {
+	protected void customFormat(final char[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -101,7 +101,7 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof CharacterArraySection)) return false;
-		return this._equals_((CharacterArraySection)object);
+		return this.defaultEquals((CharacterArraySection)object);
 	}
 
 }

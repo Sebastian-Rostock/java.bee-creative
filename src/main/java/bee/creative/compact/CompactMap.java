@@ -76,7 +76,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		/** {@inheritDoc} */
 		@Override
 		protected GKey _next_(final int index) {
-			return this._data_.getKey(index);
+			return this.data.getKey(index);
 		}
 
 	}
@@ -101,7 +101,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		/** {@inheritDoc} */
 		@Override
 		protected GKey _next_(final int index) {
-			return this._data_.getKey(index);
+			return this.data.getKey(index);
 		}
 
 	}
@@ -191,7 +191,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		/** {@inheritDoc} */
 		@Override
 		protected V _next_(final int index) {
-			return this._data_.getValue(index);
+			return this.data.getValue(index);
 		}
 
 	}
@@ -295,7 +295,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		/** {@inheritDoc} */
 		@Override
 		protected Entry<GKey, V> _next_(final int index) {
-			return this._data_.getEntry(index);
+			return this.data.getEntry(index);
 		}
 
 	}

@@ -29,7 +29,7 @@ public abstract class CompactData {
 	protected static final class CompactDataArray extends CompactObjectArray<Object> {
 
 		/** Dieses Feld speichert das leere Array. */
-		protected static final Object[] _empty_ = new Object[0];
+		protected static final Object[] empty = new Object[0];
 
 		{}
 
@@ -41,8 +41,8 @@ public abstract class CompactData {
 
 		/** {@inheritDoc} */
 		@Override
-		protected Object[] _allocArray_(final int length) {
-			if (length == 0) return CompactDataArray._empty_;
+		protected Object[] customNewArray(final int length) {
+			if (length == 0) return CompactDataArray.empty;
 			return new Object[length];
 		}
 
@@ -55,14 +55,14 @@ public abstract class CompactData {
 	protected static abstract class CompactDataOwner<GData extends CompactData> {
 
 		/** Dieses Feld speichert die {@link CompactData}. */
-		protected final GData _data_;
+		protected final GData data;
 
 		/** Dieser Konstruktor initialisiert die {@link CompactData}.
 		 *
 		 * @param data {@link CompactData}. */
 		public CompactDataOwner(final GData data) {
 			if (data == null) throw new NullPointerException("data = null");
-			this._data_ = data;
+			this.data = data;
 		}
 
 	}
@@ -114,7 +114,7 @@ public abstract class CompactData {
 		public void remove() {
 			final int item = this._item_;
 			if (item < 0) throw new IllegalStateException();
-			this._data_._remove_(item, 1);
+			this.data._remove_(item, 1);
 			this._item_ = -1;
 		}
 
@@ -239,7 +239,7 @@ public abstract class CompactData {
 		 * @param index Index.
 		 * @return {@code true}, wenn der gegebene Index zu groß bzw. das {@code index}-te Element zu klein ist. */
 		protected final boolean _isTooLow_(final int index) {
-			final CompactObjectArray<Object> array = this._data_._items_;
+			final CompactObjectArray<Object> array = this.data._items_;
 			if (index >= array.size()) return true;
 			if (index < 0) return false;
 			return this._isTooLow_(array.get(index));
@@ -257,7 +257,7 @@ public abstract class CompactData {
 		protected final boolean _isTooLow_(final Object key) {
 			final Object fromItem = this._fromItem_;
 			if (fromItem == CompactSubData._open_) return false;
-			final int comp = this._data_._itemCompare_(key, 0, fromItem);
+			final int comp = this.data._itemCompare_(key, 0, fromItem);
 			return ((comp < 0) || ((comp == 0) && !this._fromInclusive_));
 		}
 
@@ -268,7 +268,7 @@ public abstract class CompactData {
 		 * @param index Index.
 		 * @return {@code true}, wenn der gegebene Index bzw. das {@code index}-te Element zu groß ist. */
 		protected final boolean _isTooHigh_(final int index) {
-			final CompactObjectArray<Object> array = this._data_._items_;
+			final CompactObjectArray<Object> array = this.data._items_;
 			if (index >= array.size()) return true;
 			if (index < 0) return false;
 			return this._isTooHigh_(array.get(index));
@@ -286,7 +286,7 @@ public abstract class CompactData {
 		protected final boolean _isTooHigh_(final Object key) {
 			final Object lastItem = this._lastItem_;
 			if (lastItem == CompactSubData._open_) return false;
-			final int comp = this._data_._itemCompare_(key, 0, lastItem);
+			final int comp = this.data._itemCompare_(key, 0, lastItem);
 			return ((comp > 0) || ((comp == 0) && !this._lastInclusive_));
 		}
 
@@ -319,7 +319,7 @@ public abstract class CompactData {
 		 * @param key Element.
 		 * @return {@code true}, wenn das gegebene Element im gültigen Bereich oder auf dessen Grenzen liegt. */
 		protected final boolean _isInClosedRange_(final Object key) {
-			final GData data = this._data_;
+			final GData data = this.data;
 			final Object fromItem = this._fromItem_, lastItem = this._lastItem_;
 			return ((fromItem == CompactSubData._open_) || (data._itemCompare_(key, 0, fromItem) >= 0))
 				&& ((lastItem == CompactSubData._open_) || (data._itemCompare_(key, 0, lastItem) <= 0));
@@ -329,7 +329,7 @@ public abstract class CompactData {
 		 *
 		 * @return Index des ersten Elements. */
 		protected final int _firstIndex_() {
-			final GData data = this._data_;
+			final GData data = this.data;
 			final Object fromItem = this._fromItem_;
 			if (fromItem == CompactSubData._open_) return data._firstIndex_();
 			if (this._fromInclusive_) return data._ceilingIndex_(fromItem);
@@ -340,7 +340,7 @@ public abstract class CompactData {
 		 *
 		 * @return Index des letzten Elements. */
 		protected final int _lastIndex_() {
-			final GData data = this._data_;
+			final GData data = this.data;
 			final Object lastItem = this._lastItem_;
 			if (lastItem == CompactSubData._open_) return data._lastIndex_();
 			if (this._lastInclusive_) return data._floorIndex_(lastItem);
@@ -375,7 +375,7 @@ public abstract class CompactData {
 		 * @return Index des größten Elements, dass kleiner dem gegebenen ist, oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _lowerIndex_(final Object item) {
 			if (this._isTooHigh_(item)) return this._highestIndex_();
-			final int index = this._data_._lowerIndex_(item);
+			final int index = this.data._lowerIndex_(item);
 			if (this._isTooLow_(index)) return -index - 1;
 			return index;
 		}
@@ -388,7 +388,7 @@ public abstract class CompactData {
 		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist, oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _floorIndex_(final Object item) {
 			if (this._isTooHigh_(item)) return this._highestIndex_();
-			final int index = this._data_._floorIndex_(item);
+			final int index = this.data._floorIndex_(item);
 			if (this._isTooLow_(index)) return -index - 1;
 			return index;
 		}
@@ -401,7 +401,7 @@ public abstract class CompactData {
 		 * @return Index des größten Elements, dass größer oder gleich dem gegebenen ist, oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _ceilingIndex_(final Object item) {
 			if (this._isTooLow_(item)) return this._lowestIndex_();
-			final int index = this._data_._ceilingIndex_(item);
+			final int index = this.data._ceilingIndex_(item);
 			if (this._isTooHigh_(index)) return -index - 1;
 			return index;
 		}
@@ -414,7 +414,7 @@ public abstract class CompactData {
 		 * @return Index des größten Elements, dass größer dem gegebenen ist, oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _higherIndex_(final Object item) {
 			if (this._isTooLow_(item)) return this._lowestIndex_();
-			final int index = this._data_._higherIndex_(item);
+			final int index = this.data._higherIndex_(item);
 			if (this._isTooHigh_(index)) return -index - 1;
 			return index;
 		}
@@ -423,7 +423,7 @@ public abstract class CompactData {
 		protected final void _clearItems_() {
 			final int fromIndex = this._firstIndex_(), lastIndex = this._lastIndex_();
 			if (fromIndex > lastIndex) return;
-			this._data_._remove_(fromIndex, (lastIndex - fromIndex) + 1);
+			this.data._remove_(fromIndex, (lastIndex - fromIndex) + 1);
 		}
 
 		/** Diese Methode gibt die Anzahl der Elemente in der Teilmenge zurück.

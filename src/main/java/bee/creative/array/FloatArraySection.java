@@ -68,31 +68,31 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _arrayLength_(final float[] array) {
+	protected int customGetLength(final float[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _hashCode_(final float[] array, final int index) {
+	protected int customGetHash(final float[] array, final int index) {
 		return Float.floatToIntBits(array[index]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _equals_(final float[] array1, final float[] array2, final int index1, final int index2) {
+	protected boolean customEquals(final float[] array1, final float[] array2, final int index1, final int index2) {
 		return Float.floatToIntBits(array1[index1]) == Float.floatToIntBits(array2[index2]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _compareTo_(final float[] array1, final float[] array2, final int index1, final int index2) {
+	protected int customCompare(final float[] array1, final float[] array2, final int index1, final int index2) {
 		return Float.compare(array1[index1], array2[index2]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _toString_(final float[] array, final int index, final StringBuilder target) {
+	protected void customFormat(final float[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -101,7 +101,7 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FloatArraySection)) return false;
-		return this._equals_((FloatArraySection)object);
+		return this.defaultEquals((FloatArraySection)object);
 	}
 
 }

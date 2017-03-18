@@ -353,46 +353,46 @@ public final class BEXBuilder {
 	public static final class BEXFileBuilder {
 
 		/** Dieses Feld speichert den Puffer zur Zusammenfassung benachbarter Textknoten. */
-		final StringBuilder _text_ = new StringBuilder();
+		final StringBuilder text = new StringBuilder();
 
 		/** Dieses Feld speichert den aktuellen Knoten. */
-		BEXStack _stack_ = new BEXStack();
+		BEXStack stack = new BEXStack();
 
 		/** Dieses Feld speichert die einzigartigen URI der Attributknoten. */
-		final BEXTextPool _attrUriText_ = new BEXTextPool();
+		final BEXTextPool attrUriText = new BEXTextPool();
 
 		/** Dieses Feld speichert die einzigartigen Namen der Attributknoten. */
-		final BEXTextPool _attrNameText_ = new BEXTextPool();
+		final BEXTextPool attrNameText = new BEXTextPool();
 
 		/** Dieses Feld speichert die einzigartigen Werte der Attributknoten. */
-		final BEXTextPool _attrValueText_ = new BEXTextPool();
+		final BEXTextPool attrValueText = new BEXTextPool();
 
 		/** Dieses Feld speichert die Abschnitte der Attributknotentabelle. */
-		final BEXGroupPool _attrTablePart_ = new BEXGroupPool();
+		final BEXGroupPool attrTablePart = new BEXGroupPool();
 
 		/** Dieses Feld speichert die Aktivierung der URI von Attributknoten. */
-		boolean _attrUriEnabled_ = true;
+		boolean attrUriEnabled = true;
 
 		/** Dieses Feld speichert die Aktivierung der Elternknoten von Attributknoten. */
-		boolean _attrParentEnabled_ = false;
+		boolean attrParentEnabled = false;
 
 		/** Dieses Feld speichert die einzigartigen URI der Elementknoten. */
-		final BEXTextPool _chldUriText_ = new BEXTextPool();
+		final BEXTextPool chldUriText = new BEXTextPool();
 
 		/** Dieses Feld speichert die einzigartigen Namen der Elementknoten. */
-		final BEXTextPool _chldNameText_ = new BEXTextPool();
+		final BEXTextPool chldNameText = new BEXTextPool();
 
 		/** Dieses Feld speichert die einzigartigen Werte der Textknoten. */
-		final BEXTextPool _chldValueText_ = new BEXTextPool();
+		final BEXTextPool chldValueText = new BEXTextPool();
 
 		/** Dieses Feld speichert die Abschnitte der Kindknotentabelle. */
-		final BEXGroupPool _chldTablePart_ = new BEXGroupPool();
+		final BEXGroupPool chldTablePart = new BEXGroupPool();
 
 		/** Dieses Feld speichert die Aktivierung der URI von Kindknoten. */
-		boolean _chldUriEnabled_ = true;
+		boolean chldUriEnabled = true;
 
 		/** Dieses Feld speichert die Aktivierung der Elternknoten von Kindknoten. */
-		boolean _chldParentEnabled_ = false;
+		boolean chldParentEnabled = false;
 
 		/** Dieser Konstruktor initialisiert einen leeren {@link BEXFileBuilder}. */
 		public BEXFileBuilder() {
@@ -407,14 +407,14 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Attributknoten bestückt wird oder dessen Name unbestimmt ist. */
 		public final BEXFileBuilder putAttr() throws IllegalStateException {
-			final BEXStack stack = this._stack_;
+			final BEXStack stack = this.stack;
 			if ((stack.type != BEXStack.ATTR) || (stack.name == null)) throw new IllegalStateException();
 			final BEXStack parent = stack.parent;
-			final BEXItem uri = this._attrUriText_.get(this._attrUriEnabled_ ? stack.uri : null);
-			final BEXItem name = this._attrNameText_.get(stack.name);
-			final BEXItem value = this._attrValueText_.get(stack.value);
-			parent.attributes.put(uri).put(name).put(value).put(null).put(this._attrParentEnabled_ ? parent.item : null);
-			this._stack_ = parent;
+			final BEXItem uri = this.attrUriText.get(this.attrUriEnabled ? stack.uri : null);
+			final BEXItem name = this.attrNameText.get(stack.name);
+			final BEXItem value = this.attrValueText.get(stack.value);
+			parent.attributes.put(uri).put(name).put(value).put(null).put(this.attrParentEnabled ? parent.item : null);
+			this.stack = parent;
 			return this;
 		}
 
@@ -426,12 +426,12 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Elementknoten bestückt wird. */
 		public final BEXFileBuilder newAttr() throws IllegalStateException {
-			final BEXStack parent = this._stack_;
+			final BEXStack parent = this.stack;
 			if (parent.type != BEXStack.ELEM) throw new IllegalStateException();
 			final BEXStack stack = new BEXStack();
 			stack.type = BEXStack.ATTR;
 			stack.parent = parent;
-			this._stack_ = stack;
+			this.stack = stack;
 			return this;
 		}
 
@@ -441,12 +441,12 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird. */
 		public final BEXFileBuilder putText() throws IllegalStateException {
-			final BEXStack stack = this._stack_;
+			final BEXStack stack = this.stack;
 			if (stack.type != BEXStack.TEXT) throw new IllegalStateException();
 			stack.type = BEXStack.ELEM;
 			final String value = stack.value;
 			if (value == null) return this;
-			this._text_.append(value);
+			this.text.append(value);
 			return this;
 		}
 
@@ -457,7 +457,7 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Elementknoten bestückt wird. */
 		public final BEXFileBuilder newText() throws IllegalStateException {
-			final BEXStack stack = this._stack_;
+			final BEXStack stack = this.stack;
 			if (stack.type != BEXStack.ELEM) throw new IllegalStateException();
 			stack.type = BEXStack.TEXT;
 			stack.value = null;
@@ -470,23 +470,22 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird. */
 		public final BEXFileBuilder putElem() throws IllegalStateException {
-			final BEXStack stack = this._stack_;
+			final BEXStack stack = this.stack;
 			if (stack.type != BEXStack.ELEM) throw new IllegalStateException();
-			this._putText_(stack);
+			this.putTextImpl(stack);
 			final BEXStack parent = stack.parent;
 			final List<BEXItem> chldItems = stack.children.items;
 			final List<BEXItem> attrItems = stack.attributes.items;
-			final BEXItem uri = this._chldUriText_.get(this._chldUriEnabled_ ? stack.uri : null);
-			final BEXItem name = this._chldNameText_.get(stack.name);
+			final BEXItem uri = this.chldUriText.get(this.chldUriEnabled ? stack.uri : null);
+			final BEXItem name = this.chldNameText.get(stack.name);
 			final BEXItem content = ((chldItems.size() == 5) && (chldItems.get(1) == null)) ? //
 				chldItems.get(2) : //
-				(stack.children = this._chldParentEnabled_ && !chldItems.isEmpty() ? this._chldTablePart_.put(stack.children) : this._chldTablePart_.get(chldItems));
+				(stack.children = this.chldParentEnabled && !chldItems.isEmpty() ? this.chldTablePart.put(stack.children) : this.chldTablePart.get(chldItems));
 			final BEXItem attributes = //
-				(stack.attributes =
-					this._attrParentEnabled_ && !attrItems.isEmpty() ? this._attrTablePart_.put(stack.attributes) : this._attrTablePart_.get(attrItems));
+				(stack.attributes = this.attrParentEnabled && !attrItems.isEmpty() ? this.attrTablePart.put(stack.attributes) : this.attrTablePart.get(attrItems));
 			if (parent == null) return this;
-			this._stack_ = parent;
-			parent.children.put(uri).put(name).put(content).put(attributes).put(this._chldParentEnabled_ ? parent.item : null);
+			this.stack = parent;
+			parent.children.put(uri).put(name).put(content).put(attributes).put(this.chldParentEnabled ? parent.item : null);
 			if (parent.type != BEXStack.VOID) return this;
 			parent.type = BEXStack.ELEM;
 			this.putElem();
@@ -502,28 +501,28 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
 		public final BEXFileBuilder newElem() throws IllegalStateException {
-			final BEXStack parent = this._stack_;
+			final BEXStack parent = this.stack;
 			if ((parent.type != BEXStack.VOID) && (parent.type != BEXStack.ELEM)) throw new IllegalStateException();
-			this._putText_(parent);
+			this.putTextImpl(parent);
 			final BEXStack stack = new BEXStack();
 			stack.type = BEXStack.ELEM;
 			stack.item = new BEXParentItem(parent.children, parent.children.items.size() / 5);
 			stack.parent = parent;
 			stack.children = new BEXGroupItem();
 			stack.attributes = new BEXGroupItem();
-			this._stack_ = stack;
+			this.stack = stack;
 			return this;
 		}
 
-		/** Diese Methode fügt die in {@link #_text_} gesammelte Zeichenkette als Textknoten an den gegebenen Elternknoten an.
+		/** Diese Methode fügt die in {@link #text} gesammelte Zeichenkette als Textknoten an den gegebenen Elternknoten an.
 		 *
 		 * @param parent Elternknoten. */
-		final void _putText_(final BEXStack parent) {
-			final StringBuilder text = this._text_;
+		final void putTextImpl(final BEXStack parent) {
+			final StringBuilder text = this.text;
 			if (text.length() == 0) return;
-			final BEXItem value = this._chldValueText_.get(text.toString());
+			final BEXItem value = this.chldValueText.get(text.toString());
 			text.setLength(0);
-			parent.children.put(null).put(null).put(value).put(null).put(this._chldParentEnabled_ ? parent.item : null);
+			parent.children.put(null).put(null).put(value).put(null).put(this.chldParentEnabled ? parent.item : null);
 		}
 
 		/** Diese Methode ließt die gegebene {@code XML} Datei ein, fügt das darin beschriebenen Wurzelelement an und gibt {@code this} zurück.
@@ -568,10 +567,10 @@ public final class BEXBuilder {
 				}
 				case Node.TEXT_NODE:
 				case Node.CDATA_SECTION_NODE: {
-					if (this._stack_.type != BEXStack.ELEM) throw new IllegalStateException();
+					if (this.stack.type != BEXStack.ELEM) throw new IllegalStateException();
 					final String value = node.getNodeValue();
 					if (value == null) return this;
-					this._text_.append(value);
+					this.text.append(value);
 					return this;
 				}
 				case Node.ELEMENT_NODE: {
@@ -619,8 +618,8 @@ public final class BEXBuilder {
 
 				@Override
 				public final void characters(final char[] ch, final int start, final int length) throws SAXException {
-					if (BEXFileBuilder.this._stack_.type != BEXStack.ELEM) throw new IllegalStateException();
-					BEXFileBuilder.this._text_.append(ch, start, length);
+					if (BEXFileBuilder.this.stack.type != BEXStack.ELEM) throw new IllegalStateException();
+					BEXFileBuilder.this.text.append(ch, start, length);
 				}
 
 				@Override
@@ -642,7 +641,7 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten weder ein Element- noch ein Attributknoten ist. */
 		public final BEXFileBuilder useUri(final String uri) throws IllegalStateException {
-			final BEXStack node = this._stack_;
+			final BEXStack node = this.stack;
 			if ((node.type != BEXStack.ATTR) && (node.type != BEXStack.ELEM)) throw new IllegalStateException();
 			node.uri = uri;
 			return this;
@@ -659,7 +658,7 @@ public final class BEXBuilder {
 		 * @throws NullPointerException Wenn {@code name} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn {@code name} leer ist. */
 		public final BEXFileBuilder useName(final String name) throws IllegalStateException, NullPointerException, IllegalArgumentException {
-			final BEXStack stack = this._stack_;
+			final BEXStack stack = this.stack;
 			if ((stack.type != BEXStack.ATTR) && (stack.type != BEXStack.ELEM)) throw new IllegalStateException();
 			if (name == null) throw new IllegalArgumentException("name = null");
 			if (name.isEmpty()) throw new IllegalArgumentException();
@@ -676,7 +675,7 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten weder ein Text- noch ein Attributknoten ist. */
 		public final BEXFileBuilder useValue(final String value) throws IllegalStateException {
-			final BEXStack node = this._stack_;
+			final BEXStack node = this.stack;
 			if ((node.type != BEXStack.ATTR) && (node.type != BEXStack.TEXT)) throw new IllegalStateException();
 			node.value = value;
 			return this;
@@ -688,7 +687,7 @@ public final class BEXBuilder {
 		 * @see #useAttrUriEnabled(boolean)
 		 * @return {@code true}, wenn die URI von Attributknoten erfasst werden. */
 		public final boolean isAttrUriEnabled() {
-			return this._attrUriEnabled_;
+			return this.attrUriEnabled;
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die Elternknoten von Attributknoten erfasst werden. Andernfalls werden diese ignoriert.
@@ -696,7 +695,7 @@ public final class BEXBuilder {
 		 * @see #useAttrParentEnabled(boolean)
 		 * @return {@code true}, wenn die Elternknoten von Attributknoten erfasst werden. */
 		public final boolean isAttrParentEnabled() {
-			return this._attrParentEnabled_;
+			return this.attrParentEnabled;
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die URI von Elementknoten erfasst werden. Andernfalls werden diese ignoriert.
@@ -705,7 +704,7 @@ public final class BEXBuilder {
 		 * @see #useChldUriEnabled(boolean)
 		 * @return {@code true}, wenn die URI von Elementknoten erfasst werden. */
 		public final boolean isChldUriEnabled() {
-			return this._chldUriEnabled_;
+			return this.chldUriEnabled;
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die Elternknoten von Kindknoten erfasst werden. Andernfalls werden diese ignoriert.
@@ -713,7 +712,7 @@ public final class BEXBuilder {
 		 * @see #useChldParentEnabled(boolean)
 		 * @return {@code true}, wenn die Elternknoten von Kindknoten erfasst werden. */
 		public final boolean isChldParentEnabled() {
-			return this._chldParentEnabled_;
+			return this.chldParentEnabled;
 		}
 
 		/** Diese Methode setzt die Aktivierung der URI an Attributknoten und gibt {@code this} zurück.
@@ -727,8 +726,8 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell Text-, Element- oder Attributknoten bestückt werden. */
 		public final BEXFileBuilder useAttrUriEnabled(final boolean value) throws IllegalStateException {
-			if (this._stack_.type != BEXStack.VOID) throw new IllegalStateException();
-			this._attrUriEnabled_ = value;
+			if (this.stack.type != BEXStack.VOID) throw new IllegalStateException();
+			this.attrUriEnabled = value;
 			return this;
 		}
 
@@ -740,10 +739,10 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell Text-, Element- oder Attributknoten bestückt werden. */
 		public final BEXFileBuilder useAttrParentEnabled(final boolean value) throws IllegalStateException {
-			if (this._stack_.type != BEXStack.VOID) throw new IllegalStateException();
-			this._attrParentEnabled_ = value;
+			if (this.stack.type != BEXStack.VOID) throw new IllegalStateException();
+			this.attrParentEnabled = value;
 			if (!value) return this;
-			this._chldParentEnabled_ = true;
+			this.chldParentEnabled = true;
 			return this;
 		}
 
@@ -758,8 +757,8 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell Text-, Element- oder Attributknoten bestückt werden. */
 		public final BEXFileBuilder useChldUriEnabled(final boolean value) throws IllegalStateException {
-			if (this._stack_.type != BEXStack.VOID) throw new IllegalStateException();
-			this._chldUriEnabled_ = value;
+			if (this.stack.type != BEXStack.VOID) throw new IllegalStateException();
+			this.chldUriEnabled = value;
 			return this;
 		}
 
@@ -771,29 +770,29 @@ public final class BEXBuilder {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell Text-, Element- oder Attributknoten bestückt werden. */
 		public final BEXFileBuilder useChldParentEnabled(final boolean value) throws IllegalStateException {
-			if (this._stack_.type != BEXStack.VOID) throw new IllegalStateException();
-			this._chldParentEnabled_ = value;
+			if (this.stack.type != BEXStack.VOID) throw new IllegalStateException();
+			this.chldParentEnabled = value;
 			if (value) return this;
-			this._attrParentEnabled_ = false;
+			this.attrParentEnabled = false;
 			return this;
 		}
 
 		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
 		public final void clear() {
-			this._text_.setLength(0);
-			this._stack_ = new BEXStack();
-			this._stack_.type = BEXStack.VOID;
-			this._stack_.children = new BEXGroupItem();
-			this._stack_.attributes = new BEXGroupItem();
-			this._stack_.item = new BEXParentItem(this._stack_.children, 0);
-			this._attrUriText_.clear();
-			this._attrNameText_.clear();
-			this._attrValueText_.clear();
-			this._attrTablePart_.clear();
-			this._chldUriText_.clear();
-			this._chldNameText_.clear();
-			this._chldValueText_.clear();
-			this._chldTablePart_.clear();
+			this.text.setLength(0);
+			this.stack = new BEXStack();
+			this.stack.type = BEXStack.VOID;
+			this.stack.children = new BEXGroupItem();
+			this.stack.attributes = new BEXGroupItem();
+			this.stack.item = new BEXParentItem(this.stack.children, 0);
+			this.attrUriText.clear();
+			this.attrNameText.clear();
+			this.attrValueText.clear();
+			this.attrTablePart.clear();
+			this.chldUriText.clear();
+			this.chldNameText.clear();
+			this.chldValueText.clear();
+			this.chldTablePart.clear();
 		}
 
 		/** Diese Methode kodiert die gesammelten Daten in einen {@link IAMIndex} und gibt diesen zurück.
@@ -801,28 +800,28 @@ public final class BEXBuilder {
 		 * @return {@link IAMIndex}.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten nicht das Wurzelelement ist. */
 		public final IAMIndexBuilder toIndex() throws IllegalStateException {
-			if (this._stack_.type != BEXStack.ROOT) throw new IllegalStateException();
-			this._updatePART_(this._attrTablePart_, +1);
-			this._updatePART_(this._chldTablePart_, -1);
+			if (this.stack.type != BEXStack.ROOT) throw new IllegalStateException();
+			this.updatePART(this.attrTablePart, +1);
+			this.updatePART(this.chldTablePart, -1);
 			final IAMIndexBuilder result = new IAMIndexBuilder();
-			result.putListing(this._encodeHEAD_());
-			result.putListing(this._encodeTEXT_(this._attrUriText_));
-			result.putListing(this._encodeTEXT_(this._attrNameText_));
-			result.putListing(this._encodeTEXT_(this._attrValueText_));
-			result.putListing(this._encodeTEXT_(this._chldUriText_));
-			result.putListing(this._encodeTEXT_(this._chldNameText_));
-			result.putListing(this._encodeTEXT_(this._chldValueText_));
-			result.putListing(this._encodePROP_(this._attrTablePart_, 0));
-			result.putListing(this._encodePROP_(this._attrTablePart_, 1));
-			result.putListing(this._encodePROP_(this._attrTablePart_, 2));
-			result.putListing(this._encodePROP_(this._attrTablePart_, 4));
-			result.putListing(this._encodePROP_(this._chldTablePart_, 0));
-			result.putListing(this._encodePROP_(this._chldTablePart_, 1));
-			result.putListing(this._encodePROP_(this._chldTablePart_, 2));
-			result.putListing(this._encodePROP_(this._chldTablePart_, 3));
-			result.putListing(this._encodePROP_(this._chldTablePart_, 4));
-			result.putListing(this._encodePART_(this._attrTablePart_));
-			result.putListing(this._encodePART_(this._chldTablePart_));
+			result.putListing(this.encodeHEAD());
+			result.putListing(this.encodeTEXT(this.attrUriText));
+			result.putListing(this.encodeTEXT(this.attrNameText));
+			result.putListing(this.encodeTEXT(this.attrValueText));
+			result.putListing(this.encodeTEXT(this.chldUriText));
+			result.putListing(this.encodeTEXT(this.chldNameText));
+			result.putListing(this.encodeTEXT(this.chldValueText));
+			result.putListing(this.encodePROP(this.attrTablePart, 0));
+			result.putListing(this.encodePROP(this.attrTablePart, 1));
+			result.putListing(this.encodePROP(this.attrTablePart, 2));
+			result.putListing(this.encodePROP(this.attrTablePart, 4));
+			result.putListing(this.encodePROP(this.chldTablePart, 0));
+			result.putListing(this.encodePROP(this.chldTablePart, 1));
+			result.putListing(this.encodePROP(this.chldTablePart, 2));
+			result.putListing(this.encodePROP(this.chldTablePart, 3));
+			result.putListing(this.encodePROP(this.chldTablePart, 4));
+			result.putListing(this.encodePART(this.attrTablePart));
+			result.putListing(this.encodePART(this.chldTablePart));
 			return result;
 		}
 
@@ -831,7 +830,7 @@ public final class BEXBuilder {
 		 *
 		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @param step Inkrement für den Zähler der Schlüssel (-1=Kindknoten, +1=Attributknoten). */
-		final void _updatePART_(final BEXGroupPool pool, final int step) {
+		final void updatePART(final BEXGroupPool pool, final int step) {
 			final List<BEXGroupItem> groups = pool.items;
 			Collections.sort(groups, BEXGroupItem.ORDER);
 			int key = 0, offset = 0;
@@ -848,7 +847,7 @@ public final class BEXBuilder {
 		 *
 		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @return Auflistung mit einer Zahlenfolge. */
-		final IAMListingBuilder _encodePART_(final BEXGroupPool pool) {
+		final IAMListingBuilder encodePART(final BEXGroupPool pool) {
 			final List<BEXGroupItem> groups = pool.items;
 			final int length = groups.size();
 			final int[] value = new int[length + 1];
@@ -866,7 +865,7 @@ public final class BEXBuilder {
 		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @param prop Spaltenindex (0..4).
 		 * @return Auflistung mit einer Zahlenfolge. */
-		final IAMListingBuilder _encodePROP_(final BEXGroupPool pool, final int prop) {
+		final IAMListingBuilder encodePROP(final BEXGroupPool pool, final int prop) {
 			final List<BEXGroupItem> groups = pool.items;
 			final int length = pool.length;
 			final int[] value = new int[length];
@@ -891,7 +890,7 @@ public final class BEXBuilder {
 		 * @see BEXFile#valueFrom(String)
 		 * @param pool Auflistung von Zeichenketten.
 		 * @return Auflistung von Zahlenfolgen. */
-		final IAMListingBuilder _encodeTEXT_(final BEXTextPool pool) {
+		final IAMListingBuilder encodeTEXT(final BEXTextPool pool) {
 			final List<BEXTextItem> texts = pool.items;
 			Collections.sort(texts, BEXTextItem.ORDER);
 			final IAMListingBuilder encoder = new IAMListingBuilder();
@@ -904,9 +903,9 @@ public final class BEXBuilder {
 		/** Diese Methode kodiert die Datentypkennung sowie den Verweis auf das Wurzelelement in eine Auflistung von Zahlenfolgen und gibt diese zurück.
 		 *
 		 * @return Auflistung von Zahlenfolgen. */
-		final IAMListing _encodeHEAD_() {
+		final IAMListing encodeHEAD() {
 			final IAMListingBuilder header = new IAMListingBuilder();
-			header.put(new int[]{0xBE10BA5E, this._stack_.children.offset});
+			header.put(new int[]{0xBE10BA5E, this.stack.children.offset});
 			return header;
 		}
 
@@ -915,7 +914,7 @@ public final class BEXBuilder {
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
-			return Objects.toInvokeString(this, this._attrTablePart_.items.size(), this._chldTablePart_.items.size());
+			return Objects.toInvokeString(this, this.attrTablePart.items.size(), this.chldTablePart.items.size());
 		}
 
 	}

@@ -39,25 +39,25 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		/** {@inheritDoc} */
 		@Override
 		public GValue get(final int index) {
-			return this._owner_.get(this._ownerIndex_(index));
+			return this.owner.get(this.ownerIndex(index));
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public void get(final int index, final GValue[] values) {
-			this.get(index, ObjectArraySection.from(this._owner_, values));
+			this.get(index, ObjectArraySection.from(this.owner, values));
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final GValue value) {
-			this._owner_.set(this._ownerIndex_(index), value);
+			this.owner.set(this.ownerIndex(index), value);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final GValue[] values) {
-			this.set(index, ObjectArraySection.from(this._owner_, values));
+			this.set(index, ObjectArraySection.from(this.owner, values));
 		}
 
 		/** {@inheritDoc} */
@@ -82,13 +82,13 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final GValue[] values) {
-			this.add(this.size(), ObjectArraySection.from(this._owner_, values));
+			this.add(this.size(), ObjectArraySection.from(this.owner, values));
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public ObjectArray<GValue> subArray(final int fromIndex, final int toIndex) {
-			return (ObjectArray<GValue>)this._ownerSubArray_(fromIndex, toIndex);
+			return (ObjectArray<GValue>)this.ownerSubArray(fromIndex, toIndex);
 		}
 
 	}
@@ -100,7 +100,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	protected static class CompactObjectArraySection<GValue> extends ObjectArraySection<GValue> {
 
 		/** Dieses Feld speichert den Besitzer. */
-		protected final CompactObjectArray<GValue> _owner_;
+		protected final CompactObjectArray<GValue> owner;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
 		 *
@@ -108,40 +108,40 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactObjectArraySection(final CompactObjectArray<GValue> owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
 
 		/** {@inheritDoc} */
 		@Override
-		protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
-			return Comparators.compare(array1[index1], array2[index2], this._owner_);
+		protected int customCompare(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+			return Comparators.compare(array1[index1], array2[index2], this.owner);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
-			return this._owner_._size_;
+			return this.owner.size;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public GValue[] array() {
-			return this._owner_._array_;
+			return this.owner.array;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
-			return this._owner_._from_;
+			return this.owner.from;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
-			final CompactObjectArray<GValue> owner = this._owner_;
-			return owner._from_ + owner._size_;
+			final CompactObjectArray<GValue> owner = this.owner;
+			return owner.from + owner.size;
 		}
 
 	}
@@ -153,7 +153,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	protected static class CompactObjectSubArraySection<GValue> extends ObjectArraySection<GValue> {
 
 		/** Dieses Feld speichert den Besitzer. */
-		protected final CompactObjectSubArray<GValue> _owner_;
+		protected final CompactObjectSubArray<GValue> owner;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
 		 *
@@ -161,39 +161,39 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactObjectSubArraySection(final CompactObjectSubArray<GValue> owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
 
 		/** {@inheritDoc} */
 		@Override
-		protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
-			return Comparators.compare(array1[index1], array2[index2], this._owner_._owner_);
+		protected int customCompare(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+			return Comparators.compare(array1[index1], array2[index2], this.owner.owner);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
-			return this._owner_.size();
+			return this.owner.size();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public GValue[] array() {
-			return this._owner_._owner_._array_;
+			return this.owner.owner.array;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
-			return this._owner_._startIndex_;
+			return this.owner.startIndex;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
-			return this._owner_._finalIndex_;
+			return this.owner.finalIndex;
 		}
 
 	}
@@ -201,7 +201,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	{}
 
 	/** Dieses Feld speichert das {@code GValue}-Array. */
-	protected GValue[] _array_;
+	protected GValue[] array;
 
 	/** Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}. */
 	public CompactObjectArray() {
@@ -234,38 +234,38 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	/** {@inheritDoc} */
 	@Override
-	protected GValue[] _array_() {
-		return this._array_;
+	protected GValue[] customGetArray() {
+		return this.array;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _array_(final GValue[] array) {
-		this._array_ = array;
+	protected void customSetArray(final GValue[] array) {
+		this.array = array;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected GValue _value_(final int index) {
+	protected GValue customGet(final int index) {
 		return this.get(index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _value_(final int index, final GValue value) {
+	protected void customSet(final int index, final GValue value) {
 		this.set(index, value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customCapacity() {
-		return this._array_.length;
+	protected int customGetCapacity() {
+		return this.array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public GValue get(final int index) {
-		return this._array_[this._inclusiveIndex_(index)];
+		return this.array[this.inclusiveIndex(index)];
 	}
 
 	/** {@inheritDoc} */
@@ -277,7 +277,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final GValue value) {
-		this._array_[this._inclusiveIndex_(index)] = value;
+		this.array[this.inclusiveIndex(index)] = value;
 	}
 
 	/** {@inheritDoc} */
@@ -289,13 +289,13 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/** {@inheritDoc} */
 	@Override
 	public void add(final GValue value) {
-		this.add(this._size_, value);
+		this.add(this.size, value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void add(final GValue[] values) {
-		this.add(this._size_, values);
+		this.add(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -308,13 +308,13 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final GValue[] values) {
-		this.add(this._size_, ObjectArraySection.from(this, values));
+		this.add(this.size, ObjectArraySection.from(this, values));
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public GValue[] array() {
-		return this._array_;
+		return this.array;
 	}
 
 	/** {@inheritDoc} */

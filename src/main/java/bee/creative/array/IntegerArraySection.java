@@ -68,25 +68,25 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _arrayLength_(final int[] array) {
+	protected int customGetLength(final int[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _hashCode_(final int[] array, final int index) {
+	protected int customGetHash(final int[] array, final int index) {
 		return array[index];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _equals_(final int[] array1, final int[] array2, final int index1, final int index2) {
+	protected boolean customEquals(final int[] array1, final int[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _compareTo_(final int[] array1, final int[] array2, final int index1, final int index2) {
+	protected int customCompare(final int[] array1, final int[] array2, final int index1, final int index2) {
 		final int value1 = array1[index1], value2 = array2[index2];
 		if (value1 == value2) return 0;
 		if (value1 < value2) return -1;
@@ -95,7 +95,7 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _toString_(final int[] array, final int index, final StringBuilder target) {
+	protected void customFormat(final int[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -104,7 +104,7 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof IntegerArraySection)) return false;
-		return this._equals_((IntegerArraySection)object);
+		return this.defaultEquals((IntegerArraySection)object);
 	}
 
 }

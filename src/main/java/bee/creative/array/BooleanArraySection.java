@@ -68,25 +68,25 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _arrayLength_(final boolean[] array) {
+	protected int customGetLength(final boolean[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _hashCode_(final boolean[] array, final int index) {
+	protected int customGetHash(final boolean[] array, final int index) {
 		return (array[index] ? 1231 : 1237);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _equals_(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
+	protected boolean customEquals(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _compareTo_(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
+	protected int customCompare(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
 		final boolean value1 = array1[index1], value2 = array2[index2];
 		if (value1 == value2) return 0;
 		if (value2) return -1;
@@ -95,7 +95,7 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _toString_(final boolean[] array, final int index, final StringBuilder target) {
+	protected void customFormat(final boolean[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -104,7 +104,7 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof BooleanArraySection)) return false;
-		return this._equals_((BooleanArraySection)object);
+		return this.defaultEquals((BooleanArraySection)object);
 	}
 
 }

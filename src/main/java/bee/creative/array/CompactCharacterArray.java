@@ -34,7 +34,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		/** {@inheritDoc} */
 		@Override
 		public char get(final int index) {
-			return this._owner_.get(this._ownerIndex_(index));
+			return this.owner.get(this.ownerIndex(index));
 		}
 
 		/** {@inheritDoc} */
@@ -46,7 +46,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final char value) {
-			this._owner_.set(this._ownerIndex_(index), value);
+			this.owner.set(this.ownerIndex(index), value);
 		}
 
 		/** {@inheritDoc} */
@@ -83,7 +83,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		/** {@inheritDoc} */
 		@Override
 		public CharacterArray subArray(final int fromIndex, final int toIndex) {
-			return (CharacterArray)this._ownerSubArray_(fromIndex, toIndex);
+			return (CharacterArray)this.ownerSubArray(fromIndex, toIndex);
 		}
 
 	}
@@ -94,7 +94,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	protected static class CompactCharacterArraySection extends CharacterArraySection {
 
 		/** Dieses Feld speichert den Besitzer. */
-		protected final CompactCharacterArray _owner_;
+		protected final CompactCharacterArray owner;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
 		 *
@@ -102,7 +102,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactCharacterArraySection(final CompactCharacterArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
@@ -110,26 +110,26 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
-			return this._owner_._size_;
+			return this.owner.size;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public char[] array() {
-			return this._owner_._array_;
+			return this.owner.array;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
-			return this._owner_._from_;
+			return this.owner.from;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
-			final CompactCharacterArray owner = this._owner_;
-			return owner._from_ + owner._size_;
+			final CompactCharacterArray owner = this.owner;
+			return owner.from + owner.size;
 		}
 
 	}
@@ -140,7 +140,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	protected static class CompactCharacterSubArraySection extends CharacterArraySection {
 
 		/** Dieses Feld speichert den Besitzer. */
-		protected final CompactCharacterSubArray _owner_;
+		protected final CompactCharacterSubArray owner;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
 		 *
@@ -148,7 +148,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactCharacterSubArraySection(final CompactCharacterSubArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
@@ -156,25 +156,25 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
-			return this._owner_.size();
+			return this.owner.size();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public char[] array() {
-			return this._owner_._owner_._array_;
+			return this.owner.owner.array;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
-			return this._owner_._startIndex_;
+			return this.owner.startIndex;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
-			return this._owner_._finalIndex_;
+			return this.owner.finalIndex;
 		}
 
 	}
@@ -182,7 +182,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	{}
 
 	/** Dieses Feld speichert das {@code char}-Array. */
-	protected char[] _array_;
+	protected char[] array;
 
 	/** Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}. */
 	public CompactCharacterArray() {
@@ -215,44 +215,44 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	/** {@inheritDoc} */
 	@Override
-	protected char[] _array_() {
-		return this._array_;
+	protected char[] customGetArray() {
+		return this.array;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _array_(final char[] array) {
-		this._array_ = array;
+	protected void customSetArray(final char[] array) {
+		this.array = array;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected char[] _allocArray_(final int length) {
+	protected char[] customNewArray(final int length) {
 		return new char[length];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected Character _value_(final int index) {
+	protected Character customGet(final int index) {
 		return Character.valueOf(this.get(index));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _value_(final int index, final Character value) {
+	protected void customSet(final int index, final Character value) {
 		this.set(index, value.charValue());
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customCapacity() {
-		return this._array_.length;
+	protected int customGetCapacity() {
+		return this.array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public char get(final int index) {
-		return this._array_[this._inclusiveIndex_(index)];
+		return this.array[this.inclusiveIndex(index)];
 	}
 
 	/** {@inheritDoc} */
@@ -264,7 +264,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final char value) {
-		this._array_[this._inclusiveIndex_(index)] = value;
+		this.array[this.inclusiveIndex(index)] = value;
 	}
 
 	/** {@inheritDoc} */
@@ -276,13 +276,13 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	/** {@inheritDoc} */
 	@Override
 	public void add(final char value) {
-		this.add(this._size_, value);
+		this.add(this.size, value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void add(final char[] values) {
-		this.add(this._size_, values);
+		this.add(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -295,13 +295,13 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final char[] values) {
-		this.add(this._size_, CharacterArraySection.from(values));
+		this.add(this.size, CharacterArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public char[] array() {
-		return this._array_;
+		return this.array;
 	}
 
 	/** {@inheritDoc} */

@@ -34,7 +34,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		/** {@inheritDoc} */
 		@Override
 		public short get(final int index) {
-			return this._owner_.get(this._ownerIndex_(index));
+			return this.owner.get(this.ownerIndex(index));
 		}
 
 		/** {@inheritDoc} */
@@ -46,7 +46,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final short value) {
-			this._owner_.set(this._ownerIndex_(index), value);
+			this.owner.set(this.ownerIndex(index), value);
 		}
 
 		/** {@inheritDoc} */
@@ -83,7 +83,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		/** {@inheritDoc} */
 		@Override
 		public ShortArray subArray(final int fromIndex, final int toIndex) {
-			return (ShortArray)this._ownerSubArray_(fromIndex, toIndex);
+			return (ShortArray)this.ownerSubArray(fromIndex, toIndex);
 		}
 
 	}
@@ -94,7 +94,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	protected static class CompactShortArraySection extends ShortArraySection {
 
 		/** Dieses Feld speichert den Besitzer. */
-		protected final CompactShortArray _owner_;
+		protected final CompactShortArray owner;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
 		 *
@@ -102,7 +102,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactShortArraySection(final CompactShortArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
@@ -110,26 +110,26 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
-			return this._owner_._size_;
+			return this.owner.size;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public short[] array() {
-			return this._owner_._array_;
+			return this.owner.array;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
-			return this._owner_._from_;
+			return this.owner.from;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
-			final CompactShortArray owner = this._owner_;
-			return owner._from_ + owner._size_;
+			final CompactShortArray owner = this.owner;
+			return owner.from + owner.size;
 		}
 
 	}
@@ -140,7 +140,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	protected static class CompactShortSubArraySection extends ShortArraySection {
 
 		/** Dieses Feld speichert den Besitzer. */
-		protected final CompactShortSubArray _owner_;
+		protected final CompactShortSubArray owner;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
 		 *
@@ -148,7 +148,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactShortSubArraySection(final CompactShortSubArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this._owner_ = owner;
+			this.owner = owner;
 		}
 
 		{}
@@ -156,25 +156,25 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
-			return this._owner_.size();
+			return this.owner.size();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public short[] array() {
-			return this._owner_._owner_._array_;
+			return this.owner.owner.array;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
-			return this._owner_._startIndex_;
+			return this.owner.startIndex;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
-			return this._owner_._finalIndex_;
+			return this.owner.finalIndex;
 		}
 
 	}
@@ -182,7 +182,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	{}
 
 	/** Dieses Feld speichert das {@code short}-Array. */
-	protected short[] _array_;
+	protected short[] array;
 
 	/** Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}. */
 	public CompactShortArray() {
@@ -215,44 +215,44 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	/** {@inheritDoc} */
 	@Override
-	protected short[] _array_() {
-		return this._array_;
+	protected short[] customGetArray() {
+		return this.array;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _array_(final short[] array) {
-		this._array_ = array;
+	protected void customSetArray(final short[] array) {
+		this.array = array;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected short[] _allocArray_(final int length) {
+	protected short[] customNewArray(final int length) {
 		return new short[length];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected Short _value_(final int index) {
+	protected Short customGet(final int index) {
 		return Short.valueOf(this.get(index));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _value_(final int index, final Short value) {
+	protected void customSet(final int index, final Short value) {
 		this.set(index, value.shortValue());
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customCapacity() {
-		return this._array_.length;
+	protected int customGetCapacity() {
+		return this.array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public short get(final int index) {
-		return this._array_[this._inclusiveIndex_(index)];
+		return this.array[this.inclusiveIndex(index)];
 	}
 
 	/** {@inheritDoc} */
@@ -264,7 +264,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final short value) {
-		this._array_[this._inclusiveIndex_(index)] = value;
+		this.array[this.inclusiveIndex(index)] = value;
 	}
 
 	/** {@inheritDoc} */
@@ -276,13 +276,13 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	/** {@inheritDoc} */
 	@Override
 	public void add(final short value) {
-		this.add(this._size_, value);
+		this.add(this.size, value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void add(final short[] values) {
-		this.add(this._size_, values);
+		this.add(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -295,13 +295,13 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final short[] values) {
-		this.add(this._size_, ShortArraySection.from(values));
+		this.add(this.size, ShortArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public short[] array() {
-		return this._array_;
+		return this.array;
 	}
 
 	/** {@inheritDoc} */

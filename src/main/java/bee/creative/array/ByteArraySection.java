@@ -68,31 +68,31 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _arrayLength_(final byte[] array) {
+	protected int customGetLength(final byte[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _hashCode_(final byte[] array, final int index) {
+	protected int customGetHash(final byte[] array, final int index) {
 		return array[index];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _equals_(final byte[] array1, final byte[] array2, final int index1, final int index2) {
+	protected boolean customEquals(final byte[] array1, final byte[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _compareTo_(final byte[] array1, final byte[] array2, final int index1, final int index2) {
+	protected int customCompare(final byte[] array1, final byte[] array2, final int index1, final int index2) {
 		return array1[index1] - array2[index2];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _toString_(final byte[] array, final int index, final StringBuilder target) {
+	protected void customFormat(final byte[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -101,7 +101,7 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof ByteArraySection)) return false;
-		return this._equals_((ByteArraySection)object);
+		return this.defaultEquals((ByteArraySection)object);
 	}
 
 }

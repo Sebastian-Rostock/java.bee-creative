@@ -657,13 +657,13 @@ public class BEXAdapter {
 
 			@Override
 			public DOMStringList getParameterNames() {
-				return BEXDocuAdapter._defaultParameterList_;
+				return BEXDocuAdapter.defaultParameterList;
 			}
 
 			@Override
 			public Object getParameter(final String name) throws DOMException {
-				if (BEXDocuAdapter._defaultParameterListTrue_.contains(name)) return Boolean.TRUE;
-				if (BEXDocuAdapter._defaultParameterListFalse_.contains(name)) return Boolean.FALSE;
+				if (BEXDocuAdapter.defaultParameterListTrue.contains(name)) return Boolean.TRUE;
+				if (BEXDocuAdapter.defaultParameterListFalse.contains(name)) return Boolean.FALSE;
 				throw new DOMException(DOMException.NOT_FOUND_ERR, null);
 			}
 
@@ -702,23 +702,23 @@ public class BEXAdapter {
 		/** Dieses Feld speichert die {@link DOMStringList} der leeren {@link DOMConfiguration}.
 		 *
 		 * @see DOMConfiguration#getParameterNames() */
-		static final DOMStringList _defaultParameterList_ = new DOMStringList() {
+		static final DOMStringList defaultParameterList = new DOMStringList() {
 
 			@Override
 			public String item(final int index) {
-				final int offset = BEXDocuAdapter._defaultParameterListTrue_.size();
-				if (index < offset) return BEXDocuAdapter._defaultParameterListTrue_.get(index);
-				return BEXDocuAdapter._defaultParameterListFalse_.get(index - offset);
+				final int offset = BEXDocuAdapter.defaultParameterListTrue.size();
+				if (index < offset) return BEXDocuAdapter.defaultParameterListTrue.get(index);
+				return BEXDocuAdapter.defaultParameterListFalse.get(index - offset);
 			}
 
 			@Override
 			public int getLength() {
-				return BEXDocuAdapter._defaultParameterListTrue_.size() + BEXDocuAdapter._defaultParameterListFalse_.size();
+				return BEXDocuAdapter.defaultParameterListTrue.size() + BEXDocuAdapter.defaultParameterListFalse.size();
 			}
 
 			@Override
 			public boolean contains(final String str) {
-				return BEXDocuAdapter._defaultParameterListTrue_.contains(str) || BEXDocuAdapter._defaultParameterListFalse_.contains(str);
+				return BEXDocuAdapter.defaultParameterListTrue.contains(str) || BEXDocuAdapter.defaultParameterListFalse.contains(str);
 			}
 
 		};
@@ -726,13 +726,13 @@ public class BEXAdapter {
 		/** Dieses Feld speichert die {@code true-Parameter} der leeren {@link DOMConfiguration}.
 		 *
 		 * @see DOMConfiguration#getParameter(String) */
-		static final List<String> _defaultParameterListTrue_ = Collections.unmodifiableList(
+		static final List<String> defaultParameterListTrue = Collections.unmodifiableList(
 			Arrays.asList("comments", "datatype-normalization", "well-formed", "namespaces", "namespace-declarations", "element-content-whitespace"));
 
 		/** Dieses Feld speichert die {@code false-Parameter} der leeren {@link DOMConfiguration}.
 		 *
 		 * @see DOMConfiguration#getParameter(String) */
-		static final List<String> _defaultParameterListFalse_ = Collections.unmodifiableList(Arrays.asList("cdata-sections", "entities", "split-cdata-sections",
+		static final List<String> defaultParameterListFalse = Collections.unmodifiableList(Arrays.asList("cdata-sections", "entities", "split-cdata-sections",
 			"validate", "infoset", "normalize-characters", "canonical-form", "validate-if-schema", "check-character-normalization"));
 
 		{}
@@ -1475,14 +1475,14 @@ public class BEXAdapter {
 		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		final void _collectElements_(final BEXNodeAdapter node, final boolean self) {
+		final void collectElements(final BEXNodeAdapter node, final boolean self) {
 			if (node.node.type() == BEXNode.ELEM_NODE) {
 				if (self) {
 					this.list.add(node);
 				}
 				final NodeList children = node.getChildNodes();
 				for (int i = 0, length = children.getLength(); i < length; i++) {
-					this._collectElements_((BEXNodeAdapter)children.item(i), true);
+					this.collectElements((BEXNodeAdapter)children.item(i), true);
 				}
 			}
 		}
@@ -1491,14 +1491,14 @@ public class BEXAdapter {
 		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		final void _collectElementsByUri_(final BEXNodeAdapter node, final boolean self) {
+		final void collectElementsByUri(final BEXNodeAdapter node, final boolean self) {
 			if (node.node.type() == BEXNode.ELEM_NODE) {
 				if (self && this.uri.equals(node.node.uri())) {
 					this.list.add(node);
 				}
 				final NodeList children = node.getChildNodes();
 				for (int i = 0, length = children.getLength(); i < length; i++) {
-					this._collectElementsByUri_((BEXNodeAdapter)children.item(i), true);
+					this.collectElementsByUri((BEXNodeAdapter)children.item(i), true);
 				}
 			}
 		}
@@ -1507,14 +1507,14 @@ public class BEXAdapter {
 		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		final void _collectElementsByName_(final BEXNodeAdapter node, final boolean self) {
+		final void collectElementsByName(final BEXNodeAdapter node, final boolean self) {
 			if (node.node.type() == BEXNode.ELEM_NODE) {
 				if (self && this.name.equals(node.node.name())) {
 					this.list.add(node);
 				}
 				final NodeList children = node.getChildNodes();
 				for (int i = 0, length = children.getLength(); i < length; i++) {
-					this._collectElementsByName_((BEXNodeAdapter)children.item(i), true);
+					this.collectElementsByName((BEXNodeAdapter)children.item(i), true);
 				}
 			}
 		}
@@ -1523,14 +1523,14 @@ public class BEXAdapter {
 		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		final void _collectElementsByLabel_(final BEXNodeAdapter node, final boolean self) {
+		final void collectElementsByLabel(final BEXNodeAdapter node, final boolean self) {
 			if (node.node.type() == BEXNode.ELEM_NODE) {
 				if (self && this.name.equals(node.node.name()) && this.uri.equals(node.node.uri())) {
 					this.list.add(node);
 				}
 				final NodeList children = node.getChildNodes();
 				for (int i = 0, length = children.getLength(); i < length; i++) {
-					this._collectElementsByLabel_((BEXNodeAdapter)children.item(i), true);
+					this.collectElementsByLabel((BEXNodeAdapter)children.item(i), true);
 				}
 			}
 		}
@@ -1565,15 +1565,15 @@ public class BEXAdapter {
 			this.list = new ArrayList<Node>();
 			if ("*".equals(uri)) {
 				if ("*".equals(name)) {
-					this._collectElements_(node, self);
+					this.collectElements(node, self);
 				} else {
-					this._collectElementsByName_(node, self);
+					this.collectElementsByName(node, self);
 				}
 			} else {
 				if ("*".equals(name)) {
-					this._collectElementsByUri_(node, self);
+					this.collectElementsByUri(node, self);
 				} else {
-					this._collectElementsByLabel_(node, self);
+					this.collectElementsByLabel(node, self);
 				}
 			}
 			this.size = this.list.size();
