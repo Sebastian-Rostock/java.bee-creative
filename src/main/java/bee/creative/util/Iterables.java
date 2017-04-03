@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import bee.creative.array.Array;
 import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert grundlegende {@link Iterable}.
@@ -38,11 +39,11 @@ public class Iterables {
 
 	};
 
-	/** Dieses Feld speichert den {@link Converter}, der den {@link Iterator} eines {@link Iterable} ermittelt. */
-	public static final Converter<?, ?> ITERABLE_ITERATOR = new Converter<Iterable<?>, Iterator<?>>() {
+	/** Dieses Feld speichert den {@link Getter}, der den {@link Iterator} eines {@link Iterable} ermittelt. */
+	public static final Getter<?, ?> ITERABLE_ITERATOR = new Getter<Iterable<?>, Iterator<?>>() {
 
 		@Override
-		public Iterator<?> convert(final Iterable<?> input) {
+		public Iterator<?> get(final Iterable<?> input) {
 			return input.iterator();
 		}
 
@@ -61,6 +62,8 @@ public class Iterables {
 	 * @return Anzahl der gelieferten Elemente.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
 	public static int size(final Iterable<?> iterable) throws NullPointerException {
+		if (iterable instanceof Collection<?>) return ((Collection<?>)iterable).size();
+		if (iterable instanceof Array<?, ?>) return ((Array<?, ?>)iterable).size();
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return -Iterators.skip(iterable.iterator(), -1) - 1;
 	}
@@ -242,14 +245,14 @@ public class Iterables {
 		};
 	}
 
-	/** Diese Methode gibt den {@link Converter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.
+	/** Diese Methode gibt den {@link Getter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.
 	 *
 	 * @see Iterable#iterator()
 	 * @param <GItem> Typ der Elemente.
 	 * @return {@link #ITERABLE_ITERATOR}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Converter<Iterable<? extends GItem>, Iterator<GItem>> iterableIterator() {
-		return (Converter<Iterable<? extends GItem>, Iterator<GItem>>)Iterables.ITERABLE_ITERATOR;
+	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> iterableIterator() {
+		return (Getter<Iterable<? extends GItem>, Iterator<GItem>>)Iterables.ITERABLE_ITERATOR;
 	}
 
 	/** Diese Methode gibt ein {@link Iterable} zurück, das die gegebene maximale Anzahl an Elementen des gegebenen {@link Iterable} liefert.
@@ -357,8 +360,8 @@ public class Iterables {
 		};
 	}
 
-	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Converter} konvertierten Elemente der gegebenen
-	 * {@link Iterable} in der gegebenen Reihenfolge liefert.
+	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
+	 * in der gegebenen Reihenfolge liefert.
 	 *
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
@@ -371,8 +374,8 @@ public class Iterables {
 		return Iterables.chainedIterable(Arrays.asList(iterables));
 	}
 
-	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Converter} konvertierten Elemente der gegebenen
-	 * {@link Iterable} in der gegebenen Reihenfolge liefert.
+	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
+	 * in der gegebenen Reihenfolge liefert.
 	 *
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
@@ -387,17 +390,17 @@ public class Iterables {
 		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
 	}
 
-	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Converter} konvertierten Elemente der gegebenen
-	 * {@link Iterable} in der gegebenen Reihenfolge liefert.
+	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
+	 * in der gegebenen Reihenfolge liefert.
 	 *
-	 * @see Iterators#convertedIterator(Converter, Iterator)
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter} sowie der Elemente des gegebenen {@link Iterable}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie der Elemente des erzeugten {@link Iterable}.
-	 * @param converter {@link Converter}.
+	 * @see Iterators#convertedIterator(Getter, Iterator)
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterable}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterable}.
+	 * @param converter {@link Getter}.
 	 * @param iterable {@link Iterable}.
 	 * @return {@code converted}-{@link Iterable}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static <GInput, GOutput> Iterable<GOutput> convertedIterable(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Iterable<GOutput> convertedIterable(final Getter<? super GInput, ? extends GOutput> converter,
 		final Iterable<? extends GInput> iterable) throws NullPointerException {
 		return new BaseIterable<GOutput>() {
 
@@ -422,7 +425,7 @@ public class Iterables {
 	 * @return {@code unmodifiable}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
 	public static <GItem> Iterable<GItem> unmodifiableIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
-		if (iterable == null) throw new NullPointerException("iterable = null");
+		Objects.assertNotNull(iterable);
 		return new BaseIterable<GItem>() {
 
 			@Override

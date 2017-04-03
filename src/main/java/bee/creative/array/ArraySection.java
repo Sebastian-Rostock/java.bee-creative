@@ -1,6 +1,7 @@
 package bee.creative.array;
 
 import java.util.Comparator;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Abschnitt eines Arrays. Definiert wird ein Abschnitt für ein Array {@link #array()} der Länge
  * {@link #arrayLength()} mit dem Index des ersten Werts im Abschnitt ({@link #startIndex()}) sowie dem Index des ersten Werts nach dem Abschnitt (
@@ -23,8 +24,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
 	public static <GSection extends ArraySection<?>> GSection validate(final GSection section)
 		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		if (section == null) throw new NullPointerException("section = null");
-		if (section.array() == null) throw new NullPointerException("array = null");
+		Objects.assertNotNull(section.array());
 		if (section.startIndex() < 0) throw new IndexOutOfBoundsException("startIndex < 0");
 		if (section.finalIndex() < section.startIndex()) throw new IllegalArgumentException("finalIndex < startIndex");
 		if (section.finalIndex() > section.arrayLength()) throw new IndexOutOfBoundsException("finalIndex > arrayLength");

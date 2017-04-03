@@ -65,16 +65,20 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 
 	{}
 
-	/** Diese Methode ist eine Abkürzung für {@code new IAMListingLoader(MMFArray.from(object))}.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMListing} und gibt dieses zurück.<br>
+	 * Wenn das Objekt ein {@link IAMListing} ist, wird dieses geliefert. Andernfalls wird {@code new IAMListingLoader(MMFArray.from(object).withOrder(...))}
+	 * geliefert, wobei die Bytereihenfolge über {@link IAMListingLoader#HEADER} ermittelt wird.
 	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMListingLoader#IAMListingLoader(MMFArray)
 	 * @param object Objekt.
-	 * @return {@link IAMListingLoader}.
+	 * @return {@link IAMListing}.
 	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link IAMListingLoader#IAMListingLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
-	public static IAMListingLoader from(final Object object) throws IOException, IAMException {
-		return new IAMListingLoader(MMFArray.from(object));
+	public static IAMListing from(final Object object) throws IOException, IAMException {
+		if (object instanceof IAMListing) return (IAMListing)object;
+		final MMFArray array = MMFArray.from(object);
+		return new IAMListingLoader(array.withOrder(IAMListingLoader.HEADER.orderOf(array)));
 	}
 
 	{}

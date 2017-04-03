@@ -9,22 +9,22 @@ public class Translators {
 	/** Diese Methode gibt einen {@link Translator} zurück, dessen Metoden an die gegebenen Objekte delegieren.<br>
 	 * Die Methoden {@link Translator#isSource(Object)} und {@link Translator#isTarget(Object)} delegieren an {@link Class#isInstance(Object)} der gegebenen
 	 * Klassen. Die Methoden {@link Translator#toSource(Object)} und {@link Translator#toTarget(Object)} delegieren an {@link Class#cast(Object)} der gegebenen
-	 * Klassen sowie {@link Converter#convert(Object)} der gegebenen Konvertierungsmethode.
+	 * Klassen sowie {@link Getter#get(Object)} der gegebenen Konvertierungsmethode.
 	 *
 	 * @param <GSource> Typ der Quellobjekte.
 	 * @param <GTarget> Typ der Zielobjekte.
 	 * @param sourceClass {@link Class} der Quellobjekte.
 	 * @param targetClass {@link Class} der Zielobjekte.
-	 * @param sourceConverter {@link Converter} zur übersetzung von Quellobjekten in Zielobjekte.
-	 * @param targetConverter {@link Converter} zur übersetzung von Zielobjekten in Quellobjekte.
+	 * @param sourceGetter {@link Getter} zur übersetzung von Quellobjekten in Zielobjekte.
+	 * @param targetGetter {@link Getter} zur übersetzung von Zielobjekten in Quellobjekte.
 	 * @return {@link Translator}.
-	 * @throws NullPointerException Wenn {@code sourceClass}, {@code targetClass}, {@code sourceConverter} bzw. {@code targetConverter} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code sourceClass}, {@code targetClass}, {@code sourceGetter} bzw. {@code targetGetter} {@code null} ist. */
 	public static <GSource, GTarget> Translator<GSource, GTarget> simpleTranslator(final Class<GSource> sourceClass, final Class<GTarget> targetClass,
-		final Converter<GSource, GTarget> sourceConverter, final Converter<GTarget, GSource> targetConverter) throws NullPointerException {
-		if (sourceClass == null) throw new NullPointerException("sourceClass = null");
-		if (targetClass == null) throw new NullPointerException("targetClass = null");
-		if (sourceConverter == null) throw new NullPointerException("sourceConverter = null");
-		if (targetConverter == null) throw new NullPointerException("targetConverter = null");
+		final Getter<GSource, GTarget> sourceGetter, final Getter<GTarget, GSource> targetGetter) throws NullPointerException {
+		Objects.assertNotNull(sourceClass);
+		Objects.assertNotNull(targetClass);
+		Objects.assertNotNull(sourceGetter);
+		Objects.assertNotNull(targetGetter);
 		return new Translator<GSource, GTarget>() {
 
 			@Override
@@ -39,17 +39,17 @@ public class Translators {
 
 			@Override
 			public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-				return sourceConverter.convert(sourceClass.cast(object));
+				return sourceGetter.get(sourceClass.cast(object));
 			}
 
 			@Override
 			public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-				return targetConverter.convert(targetClass.cast(object));
+				return targetGetter.get(targetClass.cast(object));
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("simpleTranslator", sourceClass, targetClass, sourceConverter, targetConverter);
+				return Objects.toInvokeString("simpleTranslator", sourceClass, targetClass, sourceGetter, targetGetter);
 			}
 
 		};
@@ -64,7 +64,7 @@ public class Translators {
 	 * @return {@code neutral}-{@link Translator}.
 	 * @throws NullPointerException Wenn {@code itemClass} {@code null} ist. */
 	public static <GValue> Translator<GValue, GValue> neutralTranslator(final Class<GValue> itemClass) throws NullPointerException {
-		if (itemClass == null) throw new NullPointerException("itemClass = null");
+		Objects.assertNotNull(itemClass);
 		return new Translator<GValue, GValue>() {
 
 			@Override
@@ -104,7 +104,7 @@ public class Translators {
 	 * @return {@code reverse}-{@link Translator}.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
 	public static <GSource, GTarget> Translator<GSource, GTarget> reverseTranslator(final Translator<GTarget, GSource> translator) throws NullPointerException {
-		if (translator == null) throw new NullPointerException("translator = null");
+		Objects.assertNotNull(translator);
 		return new Translator<GSource, GTarget>() {
 
 			@Override
@@ -148,8 +148,8 @@ public class Translators {
 	 * @throws NullPointerException Wenn {@code translator1} bzw. {@code translator2} {@code null} ist. */
 	public static <GSource, GCenter, GTarget> Translator<GSource, GTarget> chainedTranslator(final Translator<GSource, GCenter> translator1,
 		final Translator<GCenter, GTarget> translator2) throws NullPointerException {
-		if (translator1 == null) throw new NullPointerException("translator1 = null");
-		if (translator2 == null) throw new NullPointerException("translator2 = null");
+		Objects.assertNotNull(translator1);
+		Objects.assertNotNull(translator2);
 		return new Translator<GSource, GTarget>() {
 
 			@Override
@@ -186,8 +186,8 @@ public class Translators {
 	 * @param translator {@link Translator}.
 	 * @return {@link Filter}, der nur Quellobjekte von {@code translator} akzeptiert.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static Filter<Object> isSource(final Translator<?, ?> translator) throws NullPointerException {
-		if (translator == null) throw new NullPointerException("translator = null");
+	public static Filter<Object> toSourceFilter(final Translator<?, ?> translator) throws NullPointerException {
+		Objects.assertNotNull(translator);
 		return new Filter<Object>() {
 
 			@Override
@@ -209,8 +209,8 @@ public class Translators {
 	 * @param translator {@link Translator}.
 	 * @return {@link Filter}, der nur Zielobjekte von {@code translator} akzeptiert.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static Filter<Object> isTarget(final Translator<?, ?> translator) throws NullPointerException {
-		if (translator == null) throw new NullPointerException("translator = null");
+	public static Filter<Object> toTargetFilter(final Translator<?, ?> translator) throws NullPointerException {
+		Objects.assertNotNull(translator);
 		return new Filter<Object>() {
 
 			@Override
@@ -226,19 +226,19 @@ public class Translators {
 		};
 	}
 
-	/** Diese Methode gibt einen {@link Converter} zu {@link Translator#toTarget(Object)} des gegebenen {@link Translator} zurück.<br>
+	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toTarget(Object)} des gegebenen {@link Translator} zurück.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code translator.toTarget(input)}.
 	 *
 	 * @param <GTarget> Typ der Zielobjekte des {@link Translator}.
 	 * @param translator {@link Translator}.
-	 * @return {@link Converter}, der Quellobjekte in Zielobjekte des {@code translator} umwandelt.
+	 * @return {@link Getter}, der Quellobjekte in Zielobjekte des {@code translator} umwandelt.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static <GTarget> Converter<Object, GTarget> toTarget(final Translator<?, GTarget> translator) throws NullPointerException {
-		if (translator == null) throw new NullPointerException("translator = null");
-		return new Converter<Object, GTarget>() {
+	public static <GTarget> Getter<Object, GTarget> toTargetGetter(final Translator<?, GTarget> translator) throws NullPointerException {
+		Objects.assertNotNull(translator);
+		return new Getter<Object, GTarget>() {
 
 			@Override
-			public GTarget convert(final Object input) {
+			public GTarget get(final Object input) {
 				return translator.toTarget(input);
 			}
 
@@ -250,19 +250,19 @@ public class Translators {
 		};
 	}
 
-	/** Diese Methode gibt einen {@link Converter} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück.<br>
+	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code translator.toSource(input)}.
 	 *
 	 * @param <GSource> Typ der Quellobjekte des {@link Translator}.
 	 * @param translator {@link Translator}.
-	 * @return {@link Converter}, der Zielobjekte in Quellobjekte des {@code translator} umwandelt.
+	 * @return {@link Getter}, der Zielobjekte in Quellobjekte des {@code translator} umwandelt.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static <GSource> Converter<Object, GSource> toSource(final Translator<GSource, ?> translator) throws NullPointerException {
-		if (translator == null) throw new NullPointerException("translator = null");
-		return new Converter<Object, GSource>() {
+	public static <GSource> Getter<Object, GSource> toSourceGetter(final Translator<GSource, ?> translator) throws NullPointerException {
+		Objects.assertNotNull(translator);
+		return new Getter<Object, GSource>() {
 
 			@Override
-			public GSource convert(final Object input) {
+			public GSource get(final Object input) {
 				return translator.toSource(input);
 			}
 

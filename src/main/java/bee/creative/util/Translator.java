@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /** Diese Schnittstelle definiert einen Übersetzer, der Quellobjekte in Zielobjekte und umgekehrt übersetzen kann. Ein {@link Translator} ähnelt damit einem
- * {@link Converter} in beide Reichtungen.
+ * bidirektionalen {@link Getter}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GSource> Typ der Quellobjekte.

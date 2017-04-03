@@ -80,7 +80,6 @@ public final class INIWriter implements Closeable {
 	 * @throws NullPointerException Wenn {@code token} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Typkennung des Elements ungültig ist. */
 	public final void write(final INIToken token) throws IOException, NullPointerException, IllegalArgumentException {
-		if (token == null) throw new NullPointerException("token = null");
 		switch (token.type()) {
 			case INIToken.SECTION:
 				this.writeSection(token.section());
@@ -100,7 +99,7 @@ public final class INIWriter implements Closeable {
 	 * @param section Name eines Abschnitts.
 	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst. */
 	public final void writeSection(final String section) throws IOException {
-		if (section == null) throw new NullPointerException("section = null");
+		Objects.assertNotNull(section);
 		final Writer target = this.writer;
 		target.write('[');
 		this.write(section);
@@ -113,8 +112,8 @@ public final class INIWriter implements Closeable {
 	 * @param value Wert der Eigenschaft.
 	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst. */
 	public final void writeProperty(final String key, final String value) throws IOException {
-		if (key == null) throw new NullPointerException("key = null");
-		if (value == null) throw new NullPointerException("value = null");
+		Objects.assertNotNull(key);
+		Objects.assertNotNull(value);
 		final Writer target = this.writer;
 		this.write(key);
 		target.write('=');
@@ -127,7 +126,7 @@ public final class INIWriter implements Closeable {
 	 * @param comment Text des Kommentar.
 	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst. */
 	public final void writeComment(final String comment) throws IOException {
-		if (comment == null) throw new NullPointerException("comment = null");
+		Objects.assertNotNull(comment);
 		final Writer target = this.writer;
 		target.write(';');
 		this.write(comment);

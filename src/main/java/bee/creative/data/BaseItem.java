@@ -2,7 +2,7 @@ package bee.creative.data;
 
 import bee.creative.util.Assigner;
 import bee.creative.util.Assignment;
-import bee.creative.util.Converter;
+import bee.creative.util.Getter;
 import bee.creative.util.Field;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
@@ -17,14 +17,14 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class BaseItem implements Item {
 
-	/** Dieses Feld speichert den {@link Converter} für {@link #assigners(Assignment)}, welcher seine Eingabe ({@link Field}) als {@link Assigner} zurück gibt,
+	/** Dieses Feld speichert den {@link Getter} für {@link #assigners(Assignment)}, welcher seine Eingabe ({@link Field}) als {@link Assigner} zurück gibt,
 	 * sofern diese ein solcher ist ({@code instanceof}). Andernfalls wird {@code null} geliefert. */
-	protected static final Converter<Field<?, ?>, Assigner<? super Item, ? super Item>> FIELD_ASSIGNER_CONVERTER =
-		new Converter<Field<?, ?>, Assigner<? super Item, ? super Item>>() {
+	protected static final Getter<Field<?, ?>, Assigner<? super Item, ? super Item>> FIELD_ASSIGNER_CONVERTER =
+		new Getter<Field<?, ?>, Assigner<? super Item, ? super Item>>() {
 
 			@SuppressWarnings ("unchecked")
 			@Override
-			public Assigner<? super Item, ? super Item> convert(final Field<?, ?> input) {
+			public Assigner<? super Item, ? super Item> get(final Field<?, ?> input) {
 				return input instanceof Assigner<?, ?> ? (Assigner<? super Item, ? super Item>)input : null;
 			}
 

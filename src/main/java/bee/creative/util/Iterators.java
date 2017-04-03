@@ -484,8 +484,7 @@ public class Iterators {
 	 * @return {@code unique}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static <GItem> Iterator<GItem> uniqueIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
-		return Iterators.uniqueIterator(new HashSet<GItem>(), iterator);
+		return Iterators.uniqueIterator(new HashSet<GItem>(), Objects.assertNotNull(iterator));
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}
@@ -498,8 +497,6 @@ public class Iterators {
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static <GItem> Iterator<GItem> uniqueIterator(final Collection<GItem> collection, final Iterator<? extends GItem> iterator)
 		throws NullPointerException {
-		if (collection == null) throw new NullPointerException("collection = null");
-		if (iterator == null) throw new NullPointerException("iterator = null");
 		final Iterator<GItem> iterator2 = Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(collection)), iterator);
 		return new BaseIterator<GItem>() {
 
@@ -597,17 +594,17 @@ public class Iterators {
 		};
 	}
 
-	/** Diese Methode gibt einen umgewandelten {@link Iterator} zurück, der die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen
-	 * {@link Iterator} liefert.
+	/** Diese Methode gibt einen umgewandelten {@link Iterator} zurück, der die vom gegebenen {@link Getter} konvertierten Elemente des gegebenen {@link Iterator}
+	 * liefert.
 	 *
-	 * @see Converter#convert(Object)
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter} sowie der Elemente des gegebenen {@link Iterator}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie der Elemente des erzeugten {@link Iterator}.
+	 * @see Getter#get(Object)
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterator}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterator}.
 	 * @param iterator {@link Iterator}.
-	 * @param converter {@link Converter}.
+	 * @param converter {@link Getter}.
 	 * @return {@code converted}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Iterator<GOutput> convertedIterator(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Iterator<GOutput> convertedIterator(final Getter<? super GInput, ? extends GOutput> converter,
 		final Iterator<? extends GInput> iterator) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (iterator == null) throw new NullPointerException("iterator = null");
@@ -620,7 +617,7 @@ public class Iterators {
 
 			@Override
 			public GOutput next() {
-				return converter.convert(iterator.next());
+				return converter.get(iterator.next());
 			}
 
 			@Override
@@ -644,7 +641,7 @@ public class Iterators {
 	 * @return {@code unmodifiable}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static <GItem> Iterator<GItem> unmodifiableIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
+		Objects.assertNotNull(iterator);
 		return new BaseIterator<GItem>() {
 
 			@Override

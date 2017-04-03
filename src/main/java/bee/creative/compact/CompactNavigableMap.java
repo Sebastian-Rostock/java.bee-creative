@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link NavigableMap}, deren Daten in einem Array verwaltet werden.
  *
@@ -37,8 +38,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * @param data {@link NavigableMap}.
 		 * @throws NullPointerException Wenn die gegebene {@link NavigableMap} {@code null} ist. */
 		public AbstractNavigableKeySet(final GData data) throws NullPointerException {
-			if (data == null) throw new NullPointerException("data = null");
-			this.data = data;
+			this.data = Objects.assertNotNull(data);
 		}
 
 		{}

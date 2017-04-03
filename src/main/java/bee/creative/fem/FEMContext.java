@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import bee.creative.util.Converter;
+import bee.creative.util.Getter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
@@ -38,19 +38,19 @@ public class FEMContext {
 
 	{}
 
-	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
 	 * Ausgabe überführt.
 	 *
-	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
+	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Getter}.
 	 * @param type Datentyp.
-	 * @return {@code dataFrom}-{@link Converter}.
+	 * @return {@code dataFrom}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist. */
-	public final <GData> Converter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
+	public final <GData> Getter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
 		if (type == null) throw new NullPointerException("type = null");
-		return new Converter<FEMValue, GData>() {
+		return new Getter<FEMValue, GData>() {
 
 			@Override
-			public GData convert(final FEMValue value) {
+			public GData get(final FEMValue value) {
 				return FEMContext.this.dataFrom(value, type);
 			}
 
@@ -79,15 +79,15 @@ public class FEMContext {
 		return result;
 	}
 
-	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #arrayFrom(Object) valueFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #arrayFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
-	 * @return {@code arrayFrom}-{@link Converter}. */
-	public final Converter<Object, FEMArray> arrayFrom() {
-		return new Converter<Object, FEMArray>() {
+	 * @return {@code arrayFrom}-{@link Getter}. */
+	public final Getter<Object, FEMArray> arrayFrom() {
+		return new Getter<Object, FEMArray>() {
 
 			@Override
-			public FEMArray convert(final Object object) {
+			public FEMArray get(final Object object) {
 				return FEMContext.this.arrayFrom(object);
 			}
 
@@ -153,15 +153,15 @@ public class FEMContext {
 		return this.arrayFromImpl(data.toArray());
 	}
 
-	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
-	 * @return {@code valueFrom}-{@link Converter}. */
-	public final Converter<Object, FEMValue> valueFrom() {
-		return new Converter<Object, FEMValue>() {
+	 * @return {@code valueFrom}-{@link Getter}. */
+	public final Getter<Object, FEMValue> valueFrom() {
+		return new Getter<Object, FEMValue>() {
 
 			@Override
-			public FEMValue convert(final Object object) {
+			public FEMValue get(final Object object) {
 				return FEMContext.this.valueFrom(object);
 			}
 
@@ -195,15 +195,15 @@ public class FEMContext {
 		return this.arrayFrom(object);
 	}
 
-	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
-	 * @return {@code objectFrom}-{@link Converter}. */
-	public final Converter<FEMValue, Object> objectFrom() {
-		return new Converter<FEMValue, Object>() {
+	 * @return {@code objectFrom}-{@link Getter}. */
+	public final Getter<FEMValue, Object> objectFrom() {
+		return new Getter<FEMValue, Object>() {
 
 			@Override
-			public Object convert(final FEMValue value) {
+			public Object get(final FEMValue value) {
 				return FEMContext.this.objectFrom(value);
 			}
 

@@ -1311,7 +1311,8 @@ public class Builders {
 		throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
 		final Object object = Natives.parse(memberText);
 		if (object instanceof java.lang.reflect.Method) return Builders.nativeBuilder((java.lang.reflect.Method)object);
-		return Builders.nativeBuilder((java.lang.reflect.Constructor<?>)object);
+		if (object instanceof java.lang.reflect.Constructor<?>) return Builders.nativeBuilder((java.lang.reflect.Constructor<?>)object);
+		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode gibt einen {@link Builder} zur gegebenen {@link java.lang.reflect.Method nativen statischen Methode} zurück.<br>
@@ -1425,16 +1426,16 @@ public class Builders {
 		};
 	}
 
-	/** Diese Methode gibt einen umgewandelten {@link Builder} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Converter} aus dem Datensatz des gegebenen
+	/** Diese Methode gibt einen umgewandelten {@link Builder} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Getter} aus dem Datensatz des gegebenen
 	 * {@link Builder} ermittelt wird.
 	 *
-	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder} sowie der Eingabe des gegebenen {@link Converter}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie des Datensatzes.
-	 * @param converter {@link Converter}.
+	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder} sowie der Eingabe des gegebenen {@link Getter}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
+	 * @param converter {@link Getter}.
 	 * @param builder {@link Builder}.
 	 * @return {@code converted}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code builder} {@code null} ist. */
-	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(final Getter<? super GInput, ? extends GOutput> converter,
 		final Builder<? extends GInput> builder) throws NullPointerException {
 		if (builder == null) throw new NullPointerException("builder = null");
 		if (converter == null) throw new NullPointerException("converter = null");
@@ -1442,7 +1443,7 @@ public class Builders {
 
 			@Override
 			public final GOutput build() throws IllegalStateException {
-				return converter.convert(builder.build());
+				return converter.get(builder.build());
 			}
 
 			@Override

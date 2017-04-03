@@ -442,31 +442,31 @@ public class Comparators {
 		};
 	}
 
-	/** Diese Methode gibt einen navigierten {@link Comparator} zurück, der von seinen Eingaben mit dem gegebenen {@link Converter} zu den Eingaben des gegebenen
+	/** Diese Methode gibt einen navigierten {@link Comparator} zurück, der von seinen Eingaben mit dem gegebenen {@link Getter} zu den Eingaben des gegebenen
 	 * {@link Comparator} navigiert. Der Vergleichswert zweier Elemente {@code item1} und {@code item2} ergibt sich aus
 	 * {@code comparator.compare(converter.convert(item1), converter.convert(item2))}.
 	 *
-	 * @see Converter
-	 * @param <GItem> Typ der Eingabe des {@link Converter} sowie der Elemente des erzeugten {@link Comparator}.
-	 * @param <GItem2> Typ der Ausgabe des {@link Converter} sowie der Elemente des gegebenen {@link Comparator}.
-	 * @param converter {@link Converter}.
+	 * @see Getter
+	 * @param <GItem> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparator}.
+	 * @param <GItem2> Typ der Ausgabe des {@link Getter} sowie der Elemente des gegebenen {@link Comparator}.
+	 * @param navigator {@link Getter} zur Navigation.
 	 * @param comparator {@link Comparator}.
 	 * @return {@code navigated}-{@link Comparator}.
-	 * @throws NullPointerException Wenn {@code converter} bzw. {@code comparator} {@code null} ist. */
-	public static <GItem, GItem2> Comparator<GItem> navigatedComparator(final Converter<? super GItem, ? extends GItem2> converter,
+	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparator} {@code null} ist. */
+	public static <GItem, GItem2> Comparator<GItem> navigatedComparator(final Getter<? super GItem, ? extends GItem2> navigator,
 		final Comparator<? super GItem2> comparator) throws NullPointerException {
-		if (converter == null) throw new NullPointerException("converter = null");
-		if (comparator == null) throw new NullPointerException("comparator = null");
+		Objects.assertNotNull(navigator);
+		Objects.assertNotNull(comparator);
 		return new Comparator<GItem>() {
 
 			@Override
 			public int compare(final GItem item1, final GItem item2) {
-				return comparator.compare(converter.convert(item1), converter.convert(item2));
+				return comparator.compare(navigator.get(item1), navigator.get(item2));
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("navigatedComparator", converter, comparator);
+				return Objects.toInvokeString("navigatedComparator", navigator, comparator);
 			}
 
 		};

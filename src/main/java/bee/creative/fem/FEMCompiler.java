@@ -658,9 +658,8 @@ public final class FEMCompiler extends Parser {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public synchronized final FEMCompiler useDomain(final FEMDomain value) throws NullPointerException, IllegalStateException {
-		if (value == null) throw new NullPointerException("value = null");
 		this.check();
-		this.domain = value;
+		this.domain = Objects.assertNotNull(value);
 		return this;
 	}
 

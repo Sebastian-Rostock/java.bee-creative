@@ -3,6 +3,7 @@ package bee.creative.array;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.RandomAccess;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein abstraktes {@link Array} auf Basis einer {@link ArrayData}.
  *
@@ -52,7 +53,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final GValue value) {
-			if (value == null) throw new NullPointerException("value = null");
+			Objects.assertNotNull(value);
 			final CompactArray<?, GValue> owner = this.owner;
 			owner.insert(index, 1);
 			owner.customSet(index, value);
@@ -87,8 +88,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public UnmodifiableValues(final CompactArray<GArray, GValue> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this.owner = Objects.assertNotNull(owner);
 		}
 
 		{}
@@ -272,14 +272,12 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-			if (values == null) throw new NullPointerException("values = null");
 			this.add(index, values.section());
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-			if (values == null) throw new NullPointerException("values = null");
 			this.insert(index, values.size());
 			this.set(index, values);
 		}
@@ -537,14 +535,12 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final Array<GArray, GValue> values) {
-		if (values == null) throw new NullPointerException("values = null");
 		this.add(index, values.section());
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-		if (values == null) throw new NullPointerException("values = null");
 		final int valuesSize = values.size();
 		if (valuesSize == 0) return;
 		this.insert(index, valuesSize);

@@ -21,7 +21,7 @@ import java.util.List;
  * </pre>
  *
  * @see Converter
- * @see Converters
+ * @see Getters
  * @see Conversions
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ des Eingabe.

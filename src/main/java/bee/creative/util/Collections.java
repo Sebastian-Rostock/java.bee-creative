@@ -755,7 +755,7 @@ public class Collections {
 
 			@Override
 			public Iterator<GTarget> iterator() {
-				return Iterators.convertedIterator(Translators.toTarget(translator), items.iterator());
+				return Iterators.convertedIterator(Translators.toTargetGetter(translator), items.iterator());
 			}
 
 			@Override
@@ -839,7 +839,7 @@ public class Collections {
 
 			@Override
 			public Iterator<GTarget> iterator() {
-				return Iterators.convertedIterator(Translators.toTarget(translator), items.iterator());
+				return Iterators.convertedIterator(Translators.toTargetGetter(translator), items.iterator());
 			}
 
 		};
@@ -911,7 +911,7 @@ public class Collections {
 
 			@Override
 			public Iterator<GTarget> iterator() {
-				return Iterators.convertedIterator(Translators.toTarget(translator), items.iterator());
+				return Iterators.convertedIterator(Translators.toTargetGetter(translator), items.iterator());
 			}
 
 		};

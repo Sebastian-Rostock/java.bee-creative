@@ -13,7 +13,7 @@ import bee.creative.util.Pointers.SoftPointer;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Filters {
 
-	/** Dieses Feld speichert den {@link Filter}, der die {@code null}-Eingabe ablehnt und alle anderen Eingaben akzeptiert. */
+	/** Dieses Feld speichert den {@link Filter}, der außer {@code null} alle Eingaben akzeptiert. */
 	public static final Filter<?> NULL_FILTER = new Filter<Object>() {
 
 		@Override
@@ -60,26 +60,25 @@ public class Filters {
 
 	{}
 
-	/** Diese Methode gibt einen {@link Filter} als Adapter zu einem {@link Converter} zurück.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code Boolean.TRUE.equals(converter.convert(input))}.
+	/** Diese Methode gibt einen {@link Getter} als Adapter zu einem {@link Filter} zurück.<br>
+	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code Boolean.valueOf(filter.accept(input))}.
 	 *
 	 * @param <GInput> Typ der Eingabe.
-	 * @param converter {@link Converter}.
-	 * @return {@link Converter}-Adapter.
-	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GInput> Filter<GInput> converterAdapter(final Converter<? super GInput, Boolean> converter) throws NullPointerException {
-		if (converter == null) throw new NullPointerException("converter = null");
-		return new Filter<GInput>() {
+	 * @param filter {@link Filter}.
+	 * @return {@link Filter}-Adapter.
+	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
+	public static <GInput> Getter<GInput, Boolean> toGetter(final Filter<? super GInput> filter) throws NullPointerException {
+		filter.getClass();
+		return new Getter<GInput, Boolean>() {
 
 			@Override
-			public boolean accept(final GInput input) {
-				final Boolean result = converter.convert(input);
-				return (result != null) && result.booleanValue();
+			public Boolean get(final GInput input) {
+				return Boolean.valueOf(filter.accept(input));
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("converterAdapter", converter);
+				return Objects.toInvokeString("toGetter", filter);
 			}
 
 		};
@@ -154,9 +153,9 @@ public class Filters {
 	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
 	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link Pointer} auf Eingaben bestückt.
 	 *
-	 * @see #converterAdapter(Converter)
-	 * @see Converters#filterAdapter(Filter)
-	 * @see Converters#bufferedConverter(int, int, int, Converter)
+	 * @see Getters#toFilter(Getter)
+	 * @see Filters#toGetter(Filter)
+	 * @see Getters#bufferedGetter(int, int, int, Getter)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param limit Maximum für die Anzahl der Einträge in der internen {@link Map}.
 	 * @param mode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link Map} erzeugt werden ({@link Pointers#HARD},
@@ -164,11 +163,10 @@ public class Filters {
 	 * @param filter {@link Filter}.
 	 * @return {@code buffered}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Converters#bufferedConverter(int, int, int, Converter)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IllegalArgumentException Wenn {@link Getters#bufferedGetter(int, int, int, Getter)} eine entsprechende Ausnahme auslöst. */
 	public static <GInput> Filter<GInput> bufferedFilter(final int limit, final int mode, final Filter<? super GInput> filter)
 		throws NullPointerException, IllegalArgumentException {
-		if (filter == null) throw new NullPointerException("filter = null");
-		return Filters.converterAdapter(Converters.bufferedConverter(limit, mode, Pointers.HARD, Converters.filterAdapter(filter)));
+		return Getters.toFilter(Getters.bufferedGetter(limit, mode, Pointers.HARD, Filters.toGetter(filter)));
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
@@ -179,7 +177,6 @@ public class Filters {
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static <GInput> Filter<GInput> containsFilter(final Object... items) throws NullPointerException {
-		if (items == null) throw new NullPointerException("items = null");
 		if (items.length == 0) return Filters.rejectFilter();
 		if (items.length == 1) return Filters.containsFilter(Collections.singleton(items[0]));
 		return Filters.containsFilter(new HashSet<>(Arrays.asList(items)));
@@ -193,7 +190,6 @@ public class Filters {
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code collection} {@code null} ist. */
 	public static <GInput> Filter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
-		if (collection == null) throw new NullPointerException("collection = null");
 		if (collection.isEmpty()) return Filters.rejectFilter();
 		return new Filter<GInput>() {
 
@@ -218,7 +214,7 @@ public class Filters {
 	 * @return {@code equal}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GInput> Filter<GInput> equalFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		if (comparable == null) throw new NullPointerException("comparable = null");
+		Objects.assertNotNull(comparable);
 		return new Filter<GInput>() {
 
 			@Override
@@ -242,7 +238,7 @@ public class Filters {
 	 * @return {@code lower}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GInput> Filter<GInput> lowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		if (comparable == null) throw new NullPointerException("comparable = null");
+		Objects.assertNotNull(comparable);
 		return new Filter<GInput>() {
 
 			@Override
@@ -266,7 +262,7 @@ public class Filters {
 	 * @return {@code higher}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GInput> Filter<GInput> higherFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		if (comparable == null) throw new NullPointerException("comparable = null");
+		Objects.assertNotNull(comparable);
 		return new Filter<GInput>() {
 
 			@Override
@@ -282,54 +278,25 @@ public class Filters {
 		};
 	}
 
-	/** Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Field} zur Eingabe des gegebenen
-	 * {@link Filter} navigiert.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(field.get(input))}.
-	 *
-	 * @param <GInput> Typ der Eingabe des gelieferten {@link Filter} sowie der Eingabe des {@link Field}.
-	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie des Werts des {@link Field}.
-	 * @param field {@link Field} zur Navigation.
-	 * @param filter {@link Field}.
-	 * @return {@code navigated}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code field} bzw. {@code filter} {@code null} ist. */
-	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Field<? super GInput, ? extends GOutput> field, final Filter<? super GOutput> filter)
-		throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
-		if (filter == null) throw new NullPointerException("filter = null");
-		return new Filter<GInput>() {
-
-			@Override
-			public boolean accept(final GInput input) {
-				return filter.accept(field.get(input));
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("navigatedFilter", field, filter);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
+	/** Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Getter} zur Eingabe des gegebenen
 	 * {@link Filter} navigiert.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(converter.convert(input))}.
 	 *
 	 * @param <GInput> Typ der Eingabe des gelieferten {@link Filter} sowie der Eingabe des {@link Field}.
-	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie der Ausgabe des {@link Converter}.
-	 * @param converter {@link Converter} zur Navigation.
+	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie der Ausgabe des {@link Getter}.
+	 * @param converter {@link Getter} zur Navigation.
 	 * @param filter {@link Field}.
 	 * @return {@code navigated}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code filter} {@code null} ist. */
-	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Getter<? super GInput, ? extends GOutput> converter,
 		final Filter<? super GOutput> filter) throws NullPointerException {
-		if (converter == null) throw new NullPointerException("converter = null");
-		if (filter == null) throw new NullPointerException("filter = null");
+		Objects.assertNotNull(converter);
+		Objects.assertNotNull(filter);
 		return new Filter<GInput>() {
 
 			@Override
 			public boolean accept(final GInput input) {
-				return filter.accept(converter.convert(input));
+				return filter.accept(converter.get(input));
 			}
 
 			@Override
@@ -348,7 +315,7 @@ public class Filters {
 	 * @return {@code negation}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
 	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		if (filter == null) throw new NullPointerException("filter = null");
+		Objects.assertNotNull(filter);
 		return new Filter<GInput>() {
 
 			@Override
@@ -374,8 +341,8 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist. */
 	public static <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		if (filter1 == null) throw new NullPointerException("filter1 = null");
-		if (filter2 == null) throw new NullPointerException("filter2 = null");
+		Objects.assertNotNull(filter1);
+		Objects.assertNotNull(filter2);
 		return new Filter<GInput>() {
 
 			@Override

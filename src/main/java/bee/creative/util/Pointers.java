@@ -279,29 +279,24 @@ public class Pointers {
 		return new SoftPointer<>(data);
 	}
 
-	/** Diese Methode gibt einen {@link Pointer} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Converter} aus dem des gegebenen {@link Pointer}
-	 * ermittelt wird.
+	/** Diese Methode gibt einen {@link Pointer} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Getter} aus dem des gegebenen {@link Pointer} ermittelt
+	 * wird.
 	 *
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter} sowie des Datensatzes des gegebenen {@link Pointer}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie des Datensatzes.
-	 * @param converter {@link Converter}.
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie des Datensatzes des gegebenen {@link Pointer}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
+	 * @param navigator {@link Getter}.
 	 * @param pointer {@link Pointer}.
 	 * @return {@code converted}-{@link Pointer}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code pointer} {@code null} ist. */
-	public static <GInput, GOutput> Pointer<GOutput> convertedPointer(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Pointer<GOutput> navigatedPointer(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Pointer<? extends GInput> pointer) throws NullPointerException {
-		if (converter == null) throw new NullPointerException("converter = null");
-		if (pointer == null) throw new NullPointerException("pointer = null");
+		Objects.assertNotNull(navigator);
+		Objects.assertNotNull(pointer);
 		return new BasePointer<GOutput>() {
 
 			@Override
 			public GOutput data() {
-				return converter.convert(pointer.data());
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("convertedPointer", converter, pointer);
+				return navigator.get(pointer.data());
 			}
 
 		};

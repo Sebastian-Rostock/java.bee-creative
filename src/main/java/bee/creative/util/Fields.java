@@ -1,12 +1,10 @@
 package bee.creative.util;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -156,26 +154,12 @@ public final class Fields {
 
 	}
 
-	/** Diese Klasse implementiert ein abstraktes {@link Field}, welches das Schreiben ignoriert.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabeobjekts.
-	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	public static abstract class BaseField<GInput, GValue> implements Field<GInput, GValue> {
-
-		/** {@inheritDoc} */
-		@Override
-		public void set(final GInput input, final GValue value) {
-		}
-
-	}
-
 	/** Diese Klasse implementiert ein abstraktes {@link SetField}.
 	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GItem> Typ der Elemente. */
-	public static abstract class BaseSetField<GInput, GItem> extends BaseField<GInput, Set<GItem>> implements SetField<GInput, GItem> {
+	public static abstract class BaseSetField<GInput, GItem> implements SetField<GInput, GItem> {
 
 		/** Diese Methode gibt ein {@link SetField} zurück, welches das {@link Set} über das gegebene {@link Field} liest und schreibt.
 		 *
@@ -185,7 +169,7 @@ public final class Fields {
 		 * @return {@link SetField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 		public static <GInput, GItem> BaseSetField<GInput, GItem> from(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
-			if (field == null) throw new NullPointerException("field = null");
+			Objects.assertNotNull(field);
 			return new BaseSetField<GInput, GItem>() {
 
 				@Override
@@ -266,7 +250,7 @@ public final class Fields {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GEntry> Typ der Elemente. */
-	public static abstract class BaseListField<GInput, GEntry> extends BaseField<GInput, List<GEntry>> implements ListField<GInput, GEntry> {
+	public static abstract class BaseListField<GInput, GEntry> implements ListField<GInput, GEntry> {
 
 		/** Diese Methode gibt ein {@link ListField} zurück, welches das {@link List} über das gegebene {@link Field} liest und schreibt.
 		 *
@@ -276,7 +260,7 @@ public final class Fields {
 		 * @return {@link ListField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 		public static <GInput, GItem> BaseListField<GInput, GItem> from(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
-			if (field == null) throw new NullPointerException("field = null");
+			Objects.assertNotNull(field);
 			return new BaseListField<GInput, GItem>() {
 
 				@Override
@@ -284,7 +268,6 @@ public final class Fields {
 					return field.get(input);
 				}
 
-				/** {@inheritDoc} */
 				@Override
 				public void set(final GInput input, final List<GItem> value) {
 					field.set(input, value);
@@ -380,7 +363,7 @@ public final class Fields {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
-	public static abstract class BaseMapField<GInput, GKey, GValue> extends BaseField<GInput, Map<GKey, GValue>> implements MapField<GInput, GKey, GValue> {
+	public static abstract class BaseMapField<GInput, GKey, GValue> implements MapField<GInput, GKey, GValue> {
 
 		/** Diese Methode gibt ein {@link MapField} zurück, welches die {@link Map} über das gegebene {@link Field} liest und schreibt.
 		 *
@@ -392,7 +375,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 		public static <GInput, GKey, GValue> BaseMapField<GInput, GKey, GValue> from(final Field<? super GInput, Map<GKey, GValue>> field)
 			throws NullPointerException {
-			if (field == null) throw new NullPointerException("field = null");
+			Objects.assertNotNull(field);
 			return new BaseMapField<GInput, GKey, GValue>() {
 
 				@Override
@@ -474,26 +457,38 @@ public final class Fields {
 
 	{}
 
-	/** Diese Methode gibt ein initialisierendes Datenfeld zurück. Das Schreiben wird direkt an das gegebene {@link Field} delegiert. Beim Lesen wird der Wert
-	 * zuerst über das gelesene {@link Field} ermittelt. Wenn dieser {@code null} ist, wird er initialisiert, d.h. über den gegebenen {@link Getter} ermittelt,
-	 * über das {@link Field} geschrieben und zurückgegeben. Andernfalls wird er direkt zurückgegeben.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.valueGetter(value), Setters.neutralSetter())}.
+	 *
+	 * @see #compositeField(Getter, Setter)
+	 * @see Getters#valueGetter(Object)
+	 * @see Setters#neutralSetter() */
+	@SuppressWarnings ("javadoc")
+	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
+		return Fields.compositeField(Getters.valueGetter(value), Setters.neutralSetter());
+	}
+
+	/** Diese Methode gibt ein initialisierendes {@link Field} zurück.<br>
+	 * Das Schreiben wird direkt an das gegebene {@link Field Datenfeld} {@code field} delegiert. Beim Lesen wird der Wert zuerst über das gegebene {@link Field
+	 * Datenfeld} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. gemäß der gegebenen {@link Getter Initialisierung} {@code setupGetter}
+	 * ermittelt, über das {@link Field Datenfeld} {@code field} geschrieben und zurückgegeben. Andernfalls wird der Wertt er direkt zurückgegeben.
 	 *
 	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param field {@link Field} zur Manipulation.
-	 * @param getter {@link Getter} zur Initialisierung.
+	 * @param <GValue> Typ des Werts.
+	 * @param field Datenfeld zur Manipulation.
+	 * @param setupGetter Methode zur Initialisierung.
 	 * @return {@code setup}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} bzw. {@code getter} {@code null} ist. */
-	public static <GInput, GValue> Field<GInput, GValue> setupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> getter)
+	 * @throws NullPointerException Wenn {@code field} bzw. {@code setupGetter} {@code null} ist. */
+	public static <GInput, GValue> Field<GInput, GValue> setupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> setupGetter)
 		throws NullPointerException {
-		if ((field == null) || (getter == null)) throw new NullPointerException();
+		Objects.assertNotNull(field);
+		Objects.assertNotNull(setupGetter);
 		return new Field<GInput, GValue>() {
 
 			@Override
 			public GValue get(final GInput input) {
 				GValue result = field.get(input);
 				if (result != null) return result;
-				result = getter.get(input);
+				result = setupGetter.get(input);
 				field.set(input, result);
 				return result;
 			}
@@ -505,108 +500,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("setupField", field, getter);
-			}
-
-		};
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.defaultField(field, null)}.
-	 *
-	 * @see #defaultField(Field, Object)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param field {@link Field} zur Manipulation.
-	 * @return {@code composite}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GInput, GValue> Field<GInput, GValue> defaultField(final Field<? super GInput, GValue> field) throws NullPointerException {
-		return Fields.defaultField(field, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Fields.defaultGetter(field, value), Fields.defaultSetter(field))}.
-	 *
-	 * @see #compositeField(Getter, Setter)
-	 * @see #defaultSetter(Setter)
-	 * @see #defaultGetter(Getter, Object)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param field {@link Field} zur Manipulation.
-	 * @param value Rückfallwert.
-	 * @return {@code composite}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GInput, GValue> Field<GInput, GValue> defaultField(final Field<? super GInput, GValue> field, final GValue value) throws NullPointerException {
-		return Fields.compositeField(Fields.defaultGetter(field, value), Fields.defaultSetter(field));
-	}
-
-	/** Diese Methode gibt einen {@link Getter} zurück, rder seine Eingabe nur dann an den gegebenen {@link Getter} delegiert, wenn diese nicht {@code null} ist
-	 * und sonst den gegebenen Rückfallwert liefert.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param getter {@link Getter} zum Lesen der Eigenschaft.
-	 * @param value Rückfallwert
-	 * @return {@code default}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GInput, GValue> Getter<GInput, GValue> defaultGetter(final Getter<? super GInput, GValue> getter, final GValue value)
-		throws NullPointerException {
-		if (getter == null) throw new NullPointerException();
-		return new Getter<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				if (input == null) return value;
-				return getter.get(input);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("defaultGetter", getter, value);
-			}
-
-		};
-	}
-
-	/** Diese Methode einen {@link Setter} zurück, der seine Eingabe nur dann an den gegebenen {@link Setter} delegiert, wenn diese nicht {@code null} ist.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param setter {@link Setter} zum Schreiben der Eigenschaft.
-	 * @return {@code default}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
-	public static <GInput, GValue> Setter<GInput, GValue> defaultSetter(final Setter<? super GInput, GValue> setter) throws NullPointerException {
-		if (setter == null) throw new NullPointerException();
-		return new Setter<GInput, GValue>() {
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				if (input == null) return;
-				setter.set(input, value);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("defaultSetter", setter);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
-	 *
-	 * @param <GValue> Typ des Werts.
-	 * @param value Wert.
-	 * @return {@code value}-{@link Field}. */
-	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
-		return new BaseField<Object, GValue>() {
-
-			@Override
-			public GValue get(final Object input) {
-				return value;
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("valueField", value);
+				return Objects.toInvokeString("setupField", field, setupGetter);
 			}
 
 		};
@@ -615,13 +509,8 @@ public final class Fields {
 	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldText))}.
 	 *
 	 * @see #nativeField(java.lang.reflect.Field)
-	 * @see Natives#parseField(String)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param fieldText Datenfeldtext.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@link Natives#parseField(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parseField(String)} eine entsprechende Ausnahme auslöst. */
+	 * @see Natives#parseField(String) */
+	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String fieldText) throws NullPointerException, IllegalArgumentException {
 		return Fields.nativeField(Natives.parseField(fieldText));
 	}
@@ -636,9 +525,14 @@ public final class Fields {
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param field Datenfeld.
 	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException {
-		field.setAccessible(true);
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn das native Datenfeld nicht zugrifbar ist. */
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+		try {
+			field.setAccessible(true);
+		} catch (final SecurityException cause) {
+			throw new IllegalArgumentException(cause);
+		}
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -669,261 +563,92 @@ public final class Fields {
 		};
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Fields.nativeGetter(getMethodText), Fields.nativeSetter(setMethodText))}.
-	 *
-	 * @see #nativeField(java.lang.reflect.Method, java.lang.reflect.Method)
-	 * @see Natives#parseMethod(String)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param getMethodText Methodentext der Methode zum Lesen der Eigenschaft.
-	 * @param setMethodText Methodentext der Methode zum Schreiben der Eigenschaft.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst. */
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String getMethodText, final String setMethodText)
-		throws NullPointerException, IllegalArgumentException {
-		return Fields.compositeField(Fields.<GInput, GValue>nativeGetter(getMethodText), Fields.<GInput, GValue>nativeSetter(setMethodText));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Fields.nativeGetter(getMethod), Fields.nativeSetter(setMethod))}.
-	 *
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param getMethod Methode zum Lesen der Eigenschaft.
-	 * @param setMethod Methode zum Schreiben der Eigenschaft.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Methoden keine passende Parameteranzahl besitzen. */
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
-		throws NullPointerException, IllegalArgumentException {
-		return Fields.compositeField(Fields.<GInput, GValue>nativeGetter(getMethod), Fields.<GInput, GValue>nativeSetter(setMethod));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(inputClass.getDeclaredField(fieldName))}.
-	 *
-	 * @see #nativeField(java.lang.reflect.Field)
-	 * @see Class#getDeclaredField(String)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param inputClass Klasse, desssen Datenfeld ermittelt wird.
-	 * @param fieldName Name des Datenfelds.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code inputClass} bzw. {@code fieldName} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Class#getDeclaredField(String)} eine Ausnahme auslöst. */
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<GInput> inputClass, final String fieldName)
-		throws NullPointerException, IllegalArgumentException {
-		try {
-			return Fields.nativeField(inputClass.getDeclaredField(fieldName));
-		} catch (NoSuchFieldException | SecurityException cause) {
-			throw new IllegalArgumentException(cause);
-		}
-	}
-
-	/** Diese Methode ist eine Abkürzung für
-	 * {@code Fields.compositeField(Fields.<GInput, GValue>nativeGetter(inputClass, getterName), Fields.nativeSetter(inputClass, valueClass, setterName))}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.nativeGetter(getMemberText), Setters.nativeSetter(setMemberText))}.
 	 *
 	 * @see #compositeField(Getter, Setter)
-	 * @see #nativeGetter(Class, String)
-	 * @see #nativeSetter(Class, Class, String)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param inputClass Klasse, deren Methoden ermittelt werden.
-	 * @param valueClass Klasse des Werts der Eigenschaft.
-	 * @param getterName Name der Methode zum Lesen.
-	 * @param setterName Name der Methode zum Schreiben.
-	 * @return {@code composite}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code inputClass}, {@code valueClass}, {@code getterName} bzw. {@code setterName} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link #nativeGetter(Class, String)} bzw. {@link #nativeSetter(Class, Class, String)} eine entsprechende Ausnahme
-	 *         auslöst. */
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<GInput> inputClass, final Class<GValue> valueClass, final String getterName,
-		final String setterName) throws NullPointerException, IllegalArgumentException {
-		return Fields.compositeField(Fields.<GInput, GValue>nativeGetter(inputClass, getterName), Fields.nativeSetter(inputClass, valueClass, setterName));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeGetter(Natives.parseMethod(methodText))}.
-	 *
-	 * @see #nativeGetter(java.lang.reflect.Method)
-	 * @see Natives#parseMethod(String)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param methodText Methodentext der Methode zum Lesen der Eigenschaft.
-	 * @return {@code native}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst. */
-	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final String methodText) throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeGetter(Natives.parseMethod(methodText));
-	}
-
-	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
-	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Getter} über {@code method.invoke(input)}.
-	 *
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param method Methode zum Lesen der Eigenschaft.
-	 * @return {@code native}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzt. */
-	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final java.lang.reflect.Method method)
+	 * @see Getters#nativeGetter(String)
+	 * @see Setters#nativeSetter(String) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String getMemberText, final String setMemberText)
 		throws NullPointerException, IllegalArgumentException {
-		if (method.getParameterTypes().length != 0) throw new IllegalArgumentException();
-		method.setAccessible(true);
-		return new Getter<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				try {
-					@SuppressWarnings ("unchecked")
-					final GValue result = (GValue)method.invoke(input);
-					return result;
-				} catch (IllegalAccessException | InvocationTargetException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nativeGetter", Natives.formatMethod(method));
-			}
-
-		};
+		return Fields.compositeField(Getters.<GInput, GValue>nativeGetter(getMemberText), Setters.<GInput, GValue>nativeSetter(setMemberText));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeGetter(inputClass.getDeclaredMethod(getterName))}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.nativeGetter(getMethod), Setters.nativeSetter(setMethod))}.
 	 *
-	 * @see #nativeGetter(java.lang.reflect.Method)
-	 * @see Class#getDeclaredMethod(String, Class...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param inputClass Klasse, deren Methode ermittelt wird.
-	 * @param getterName Name der Methode.
-	 * @return {@code native}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@code inputClass} bzw. {@code getterName} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Class#getDeclaredMethod(String, Class...)} eine Ausnahme auslöst. */
-	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final Class<GInput> inputClass, final String getterName)
+	 * @see #compositeField(Getter, Setter)
+	 * @see Getters#nativeGetter(java.lang.reflect.Method)
+	 * @see Setters#nativeSetter(java.lang.reflect.Method) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
 		throws NullPointerException, IllegalArgumentException {
-		try {
-			return Fields.nativeGetter(inputClass.getDeclaredMethod(getterName));
-		} catch (NoSuchMethodException | SecurityException cause) {
-			throw new IllegalArgumentException(cause);
-		}
+		return Fields.compositeField(Getters.<GInput, GValue>nativeGetter(getMethod), Setters.<GInput, GValue>nativeSetter(setMethod));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(Natives.parseMethod(methodText))}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.defaultField(field, null)}.
 	 *
-	 * @see #nativeSetter(java.lang.reflect.Method)
-	 * @see Natives#parseMethod(String)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param methodText Methodentext der Methode zum Schreiben der Eigenschaft.
-	 * @return {@code native}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst. */
-	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final String methodText) throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeSetter(Natives.parseMethod(methodText));
+	 * @see #defaultField(Field, Object) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> defaultField(final Field<? super GInput, GValue> field) throws NullPointerException {
+		return Fields.defaultField(field, null);
 	}
 
-	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
-	 * Für eine Eingabe {@code input} erfolgt das Schreiben des Werts {@code value} über {@code method.invoke(input, value)}.
+	/** Diese Methode ist eine effiziente Alternative zu {@code Fields.compositeField(Fields.defaultGetter(field, value), Fields.defaultSetter(field))}.
 	 *
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param method Methode zum Schreiben der Eigenschaft.
-	 * @return {@code native}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
-	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final java.lang.reflect.Method method)
-		throws NullPointerException, IllegalArgumentException {
-		if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
-		method.setAccessible(true);
-		return new Setter<GInput, GValue>() {
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				try {
-					method.invoke(input, value);
-				} catch (IllegalAccessException | InvocationTargetException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nativeSetter", Natives.formatMethod(method));
-			}
-
-		};
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(inputClass.getDeclaredMethod(setterName, valueClass))}.
-	 *
-	 * @see #nativeSetter(java.lang.reflect.Method)
-	 * @see Class#getDeclaredMethod(String, Class...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param inputClass Klasse, deren Methode ermittelt wird.
-	 * @param valueClass Klasse des Werts der Eigenschaft.
-	 * @param setterName Name der Methode.
-	 * @return {@code native}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@code inputClass}, {@code valueClass} bzw. {@code setterName} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Class#getDeclaredMethod(String, Class...)} eine Ausnahme auslöst. */
-	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final Class<GInput> inputClass, final Class<GValue> valueClass, final String setterName)
-		throws NullPointerException, IllegalArgumentException {
-		try {
-			return Fields.nativeSetter(inputClass.getDeclaredMethod(setterName, valueClass));
-		} catch (NoSuchMethodException | SecurityException cause) {
-			throw new IllegalArgumentException(cause);
-		}
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.navigatedField(Converters.getterAdapter(getter), field)}.
-	 *
-	 * @see #navigatedField(Converter, Field)
-	 * @see Converters#getterAdapter(Getter)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GInput2> Typ des Elements als Ausgabe des {@link Getter} sowie als Eingabe des {@link Field}.
-	 * @param <GValue> Typ des Werts.
-	 * @param getter {@link Getter} zur Navigation.
-	 * @param field {@link Field} zur Manipulation.
-	 * @return {@code navigated}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code getter} bzw. {@code field} {@code null} ist. */
-	public static <GInput, GInput2, GValue> Field<GInput, GValue> navigatedField(final Getter<? super GInput, ? extends GInput2> getter,
-		final Field<? super GInput2, GValue> field) throws NullPointerException {
-		return Fields.navigatedField(Converters.getterAdapter(getter), field);
-	}
-
-	/** Diese Methode gibt ein navigiertes {@link Field} zurück, dass von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
-	 * {@link Field} navigiert. Das Lesen der Eigenschaft einer Einagbe {@code input} erfolgt damit über {@code field.get(converter.convert(input))} und ein Wert
-	 * {@code value} wird dann via {@code field.set(converter.convert(input), value)} geschrieben.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GInput2> Typ des Elements als Ausgabe des {@link Converter}s sowie als Eingabe des {@link Field}s.
-	 * @param <GValue> Typ des Werts.
-	 * @param converter {@link Converter} zur Navigation.
-	 * @param field {@link Field} zur Manipulation.
-	 * @return {@code navigated}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code converter} bzw. {@code field} {@code null} ist. */
-	public static <GInput, GInput2, GValue> Field<GInput, GValue> navigatedField(final Converter<? super GInput, ? extends GInput2> converter,
-		final Field<? super GInput2, GValue> field) throws NullPointerException {
-		if (converter == null) throw new NullPointerException("converter = null");
-		if (field == null) throw new NullPointerException("field = null");
+	 * @see #compositeField(Getter, Setter)
+	 * @see Getters#defaultGetter(Getter, Object)
+	 * @see Setters#defaultSetter(Setter) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> defaultField(final Field<? super GInput, GValue> field, final GValue value) throws NullPointerException {
+		Objects.assertNotNull(field);
 		return new Field<GInput, GValue>() {
 
 			@Override
 			public GValue get(final GInput input) {
-				return field.get(converter.convert(input));
+				if (input == null) return value;
+				return field.get(input);
 			}
 
 			@Override
 			public void set(final GInput input, final GValue value) {
-				field.set(converter.convert(input), value);
+				if (input == null) return;
+				field.set(input, value);
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("navigatedField", converter, field);
+				return Objects.toInvokeString("defaultField", field, value);
+			}
+
+		};
+	}
+
+	/** Diese Methode ist eine effiziente Alternative zu
+	 * {@code Fields.compositeField(Getters.navigatedGetter(navigator, field), Setters.navigatedField(navigator, field))}.
+	 *
+	 * @see #compositeField(Getter, Setter)
+	 * @see Getters#navigatedGetter(Getter, Getter)
+	 * @see Setters#navigatedField(Getter, Setter) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GInput2, GValue> Field<GInput, GValue> navigatedField(final Getter<? super GInput, ? extends GInput2> navigator,
+		final Field<? super GInput2, GValue> field) throws NullPointerException {
+		Objects.assertNotNull(navigator);
+		Objects.assertNotNull(field);
+		return new Field<GInput, GValue>() {
+
+			@Override
+			public GValue get(final GInput input) {
+				return field.get(navigator.get(input));
+			}
+
+			@Override
+			public void set(final GInput input, final GValue value) {
+				field.set(navigator.get(input), value);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("navigatedField", navigator, field);
 			}
 
 		};
@@ -960,158 +685,116 @@ public final class Fields {
 		};
 	}
 
-	/** Diese Methode gibt ein umkodierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren nutzt. Wenn {@code parser}
-	 * {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen immer {@code null} geliefert.
-	 * <p>
-	 * Das gelieferte {@link Field} gibt beim Lesen den (externen) Wert zurück, der über den gegebenen {@code formatter} aus dem über das gegebene {@link Field}
-	 * ermittelten (internen) Wert berechnet wird. Beim Schreiben eines (externen) Werts wird dieser über den {@code parser} in einen (internen) Wert überfüght,
-	 * welcher anschließend an das gegebene {@link Field} delegiert wird.
+	/** Diese Methode ist eine effiziente Alternative zu
+	 * {@code Fields.translatedField(field, Translators.toTargetGetter(translator), Translators.toSourceGetter(translator))}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param <GValue2> Typ des internen Werts des {@link Field}s.
-	 * @param field {@link Field}.
-	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
-	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
-	 * @return {@code converted}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GInput, GValue, GValue2> Field<GInput, GValue> convertedField(final Field<? super GInput, GValue2> field,
-		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
+	 * @see #translatedField(Field, Getter, Getter)
+	 * @see Translators#toTargetGetter(Translator)
+	 * @see Translators#toSourceGetter(Translator) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue, GValue2> Field<GInput, GValue> translatedField(final Field<? super GInput, GValue2> field,
+		final Translator<? extends GValue2, ? extends GValue> translator) throws NullPointerException {
+		Objects.assertNotNull(field);
+		Objects.assertNotNull(translator);
 		return new Field<GInput, GValue>() {
 
 			@Override
 			public GValue get(final GInput input) {
-				if (formatter == null) return null;
-				return formatter.convert(field.get(input));
+				return translator.toTarget(field.get(input));
 			}
 
 			@Override
 			public void set(final GInput input, final GValue value) {
-				if (parser == null) return;
-				field.set(input, parser.convert(value));
+				field.set(input, translator.toSource(value));
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("convertedField", field, parser, formatter);
+				return Objects.toInvokeString("translatedField", translator, field);
 			}
 
 		};
 	}
 
-	/** Diese Methode gibt ein aggregierendes {@link Field} zurück, welches keine Umwandlungen durchführt sowie {@code null} als Leer- und Mischwert nutzt.
+	/** Diese Methode gibt ein übersetztes {@link Field} zurück, welches die gegebenen {@link Getter} zum Parsen und Formatieren nutzt.
+	 * <p>
+	 * Das erzeugte {@link Field} liefert beim Lesen den (externen) Wert, der gemäß dem gegebenen {@link Getter Leseformat} {@code getFormat} aus dem über das
+	 * gegebene {@link Field Datenfeld} ermittelten (internen) Wert berechnet wird. Beim Schreiben eines (externen) Werts wird dieser gemäß dem gegebenen
+	 * {@link Getter Schreibformat} {@code setFormat} in einen (internen) Wert überfüght, welcher anschließend an das gegebene {@link Field Datenfeld} delegiert
+	 * wird.
 	 *
-	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
-	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
-	 * @param field {@link Field}.
-	 * @return {@code aggregated}-{@link Field}.
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts des erzeugten Datenfelds.
+	 * @param <GValue2> Typ des Werts des gegebenen Datenfelds.
+	 * @param field Datenfeld.
+	 * @param getFormat {@link Getter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen.
+	 * @param setFormat {@link Getter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben.
+	 * @return {@code translated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	public static <GInput, GValue, GValue2> Field<GInput, GValue> translatedField(final Field<? super GInput, GValue2> field,
+		final Getter<? super GValue2, ? extends GValue> getFormat, final Getter<? super GValue, ? extends GValue2> setFormat) throws NullPointerException {
+		Objects.assertNotNull(field);
+		Objects.assertNotNull(getFormat);
+		Objects.assertNotNull(setFormat);
+		return new Field<GInput, GValue>() {
+
+			@Override
+			public GValue get(final GInput input) {
+				return getFormat.get(field.get(input));
+			}
+
+			@Override
+			public void set(final GInput input, final GValue value) {
+				field.set(input, setFormat.get(value));
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("translatedField", field, getFormat, setFormat);
+			}
+
+		};
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(field, Getters.neutralGetter(), Getters.neutralGetter(), null, null)}. <br>
+	 *
+	 * @see #aggregatedField(Field, Getter, Getter, Object, Object) */
+	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Field<Iterable<? extends GInput>, GValue> aggregatedField(final Field<? super GInput, GValue> field)
 		throws NullPointerException {
-		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), null, null);
+		return Fields.aggregatedField(field, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter(), null, null);
 	}
 
-	/** Diese Methode gibt ein aggregierendes {@link Field} zurück, welches keine Umwandlungen durchführt sowie die gegebenen Leer- und Mischwerte nutzt.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(field, Getters.neutralGetter(), Getters.neutralGetter(), emptyValue, mixedValue)}. <br>
 	 *
-	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
-	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
-	 * @param field {@link Field}.
-	 * @param emptyValue Leerwert.
-	 * @param mixedValue Mischwert.
-	 * @return {@code aggregated}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	 * @see #aggregatedField(Field, Getter, Getter, Object, Object) */
+	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field, final GValue emptyValue,
 		final GValue mixedValue) throws NullPointerException {
-		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), emptyValue, mixedValue);
+		return Fields.aggregatedField(field, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter(), emptyValue, mixedValue);
 	}
 
-	/** Diese Methode gibt ein aggregierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren sowie {@code null} als
-	 * Leer- und Mischwert nutzt. Wenn {@code parser} {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen
-	 * immer {@code null} geliefert.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(field, getFormat, setFormat, null, null)}. <br>
 	 *
-	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
-	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts dieses {@link Field}s.
-	 * @param <GValue2> Typ des Werts der Elemente.
-	 * @param field {@link Field}.
-	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
-	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
-	 * @return {@code aggregated}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	 * @see #aggregatedField(Field, Getter, Getter, Object, Object) */
+	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
-		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
-		return Fields.aggregatedField(field, parser, formatter, null, null);
+		final Getter<? super GValue2, ? extends GValue> getFormat, final Getter<? super GValue, ? extends GValue2> setFormat) throws NullPointerException {
+		return Fields.aggregatedField(field, getFormat, setFormat, null, null);
 	}
 
-	/** Diese Methode gibt ein aggregierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren sowie die gegebenen Leer-
-	 * und Mischwerte nutzt. Wenn {@code parser} {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen immer
-	 * {@code null} geliefert.
-	 * <p>
-	 * Das gelieferte {@link Field} gibt beim Lesen den Wert zurück, der unter allen Elementen der iterierbaren Eingabe {@link Objects#equals(Object) äquivalent}
-	 * ist. Ermittelt wird der Wert der Eigenschaft eines Elements mit Hilfe des gegebenen {@link Field}. Wenn kein einheitlicher Wert existiert, wird beim Lesen
-	 * der gegebene Mischwert geliefert. Beim Schreiben wird der Wert der Eigenschaft für alle Elemente der iterierbaren Eingabe über das gegebene {@link Field}
-	 * zugewiesen.
-	 * <p>
-	 * Mit einem aggregierenden {@link Field} können mehrere Elemente parallel modifiziert werden, indem jedes aus der iterierbaren Eingabe stammende Elemente zur
-	 * Bearbeitung an das gegebene {@link Field} weitergeleitet wird. Ein dabei gegebenenfalls notwendiges Standardverhalten wird dazu über entsprechende Werte
-	 * bereit gestellt.<br>
-	 * Für das Standardverhalten beim Lesen des Wert der Eigenschaft lassen sich drei Zustände unterscheiden:
-	 * <ul>
-	 * <li>Der {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) ist {@code null}. Hier wird der Wert {@code null} geliefert.</li>
-	 * <li>Die Eingabe ist leer oder {@code null}. Hier wird der gegebene Leerwert geliefert.</li>
-	 * <li>Die für jedes Element ermittelten Werte der Eigenschaft unterscheiden sich. Hier wird der gegebene Mischwert geliefert.</li>
-	 * </ul>
+	/** Diese Methode ist eine Abkürzung für
+	 * {@code Fields.compositeField(Getters.aggregatedGetter(field, formatter, emptyValue, mixedValue), Setters.aggregatedSetter(field, parser))}. <br>
+	 * Mit einem aggregierten {@link Field} können die Elemente der iterierbaren Eingabe parallel modifiziert werden.
 	 *
-	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts dieses {@link Field}s.
-	 * @param <GValue2> Typ des Werts der Elemente.
-	 * @param field {@link Field}.
-	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
-	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
-	 * @param emptyValue Leerwert.
-	 * @param mixedValue Mischwert.
-	 * @return {@code aggregated}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	 * @see #compositeField(Getter, Setter)
+	 * @see Getters#aggregatedGetter(Getter, Getter, Object, Object)
+	 * @see Setters#aggregatedSetter(Setter, Getter) */
+	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
-		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter, final GValue emptyValue,
+		final Getter<? super GValue2, ? extends GValue> getFormat, final Getter<? super GValue, ? extends GValue2> setFormat, final GValue emptyValue,
 		final GValue mixedValue) throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
-		return new Field<Iterable<? extends GItem>, GValue>() {
-
-			@Override
-			public GValue get(final Iterable<? extends GItem> input) {
-				if (formatter == null) return null;
-				if (input == null) return emptyValue;
-				final Iterator<? extends GItem> iterator = input.iterator();
-				if (!iterator.hasNext()) return emptyValue;
-				final GItem item = iterator.next();
-				final GValue2 value = field.get(item);
-				while (iterator.hasNext()) {
-					final GItem item2 = iterator.next();
-					final GValue2 value2 = field.get(item2);
-					if (!Objects.equals(value, value2)) return mixedValue;
-				}
-				return formatter.convert(value);
-			}
-
-			@Override
-			public void set(final Iterable<? extends GItem> input, final GValue value) {
-				if ((input == null) || (parser == null)) return;
-				final GValue2 value2 = parser.convert(value);
-				for (final GItem entry: input) {
-					field.set(entry, value2);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("aggregatedField", field, parser, formatter, emptyValue, mixedValue);
-			}
-
-		};
+		return Fields.compositeField(Getters.aggregatedGetter(field, getFormat, emptyValue, mixedValue), Setters.aggregatedSetter(field, setFormat));
 	}
 
 	/** Diese Methode gibt ein bedingtes {@link Field} zurück, welches über die Weiterleitug der Eingabe mit Hilfe eines {@link Filter} entscheiden. Wenn der

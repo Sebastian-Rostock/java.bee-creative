@@ -174,6 +174,7 @@ public class MMFArray extends IAMArray {
 	 * @param order Bytereihenfolge.
 	 * @return {@link MMFArray}. */
 	public MMFArray withOrder(final ByteOrder order) {
+		if ((this.order() == ByteOrder.BIG_ENDIAN) == (order == ByteOrder.BIG_ENDIAN)) return this;
 		return new MMFArray(this.length, this.byteBuffer.duplicate().order(order), this.byteOffset, this.byteLength);
 	}
 

@@ -95,16 +95,20 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	{}
 
-	/** Diese Methode ist eine Abkürzung für {@code new IAMMappingLoader(MMFArray.from(object))}.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMMapping} und gibt dieses zurück.<br>
+	 * Wenn das Objekt ein {@link IAMMapping} ist, wird dieses geliefert. Andernfalls wird {@code new IAMMappingLoader(MMFArray.from(object).withOrder(...))}
+	 * geliefert, wobei die Bytereihenfolge über {@link IAMMappingLoader#HEADER} ermittelt wird.
 	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMMappingLoader#IAMMappingLoader(MMFArray)
 	 * @param object Objekt.
-	 * @return {@link IAMMappingLoader}.
+	 * @return {@link IAMMapping}.
 	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link IAMMappingLoader#IAMMappingLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
-	public static IAMMappingLoader from(final Object object) throws IOException, IAMException {
-		return new IAMMappingLoader(MMFArray.from(object));
+	public static IAMMapping from(final Object object) throws IOException, IAMException {
+		if (object instanceof IAMMapping) return (IAMMapping)object;
+		final MMFArray array = MMFArray.from(object);
+		return new IAMMappingLoader(array.withOrder(IAMMappingLoader.HEADER.orderOf(array)));
 	}
 
 	{}

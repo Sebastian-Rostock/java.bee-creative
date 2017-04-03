@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import bee.creative.util.Converter;
+import bee.creative.util.Getter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
@@ -383,12 +383,11 @@ public final class FEMFormatter {
 
 	/** Diese Methode gibt setzt die zu nutzenden Formatierungsmethoden und gibt {@code this} zurück.
 	 *
-	 * @param domain Formatierungsmethoden.
+	 * @param value Formatierungsmethoden.
 	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code domain} {@code null} ist. */
-	public synchronized final FEMFormatter useDomain(final FEMDomain domain) throws NullPointerException {
-		if (domain == null) throw new NullPointerException("domain = null");
-		this.domain = domain;
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	public synchronized final FEMFormatter useDomain(final FEMDomain value) throws NullPointerException {
+		this.domain = Objects.assertNotNull(value);
 		return this;
 	}
 
@@ -421,32 +420,32 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode formatiert die gegebenen Elemente in einen Quelltext und gibt diesen zurück.<br>
-	 * Die Elemente werden über den gegebenen {@link Converter} angefügt und mit {@code ';'} separiert. In der Methode {@link Converter#convert(Object)} sollten
-	 * hierfür {@link #putData(Object)} bzw. {@link #putFunction(FEMFunction)} aufgerufen werden.
+	 * Die Elemente werden über den gegebenen {@link Getter} angefügt und mit {@code ';'} separiert. In der Methode {@link Getter#get(Object)} sollten hierfür
+	 * {@link #putData(Object)} bzw. {@link #putFunction(FEMFunction)} aufgerufen werden.
 	 *
 	 * @see #formatDatas(Iterable)
 	 * @see #formatFunctions(Iterable)
 	 * @param <GItem> Typ der Elemente.
 	 * @param items Elemente.
-	 * @param formatter {@link Converter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
+	 * @param formatter {@link Getter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
 	 * @return formatierter Quelltext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann. */
-	final <GItem> String formatIterable(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter)
+	final <GItem> String formatIterable(final Iterable<? extends GItem> items, final Getter<GItem, ?> formatter)
 		throws NullPointerException, IllegalArgumentException {
 		final Iterator<? extends GItem> iter = items.iterator();
 		if (!iter.hasNext()) return "";
 		GItem item = iter.next();
 		if (iter.hasNext()) {
 			this.putIndent();
-			formatter.convert(item);
+			formatter.get(item);
 			do {
 				item = iter.next();
 				this.put(";").putBreakSpace();
-				formatter.convert(item);
+				formatter.get(item);
 			} while (iter.hasNext());
 		} else {
-			formatter.convert(item);
+			formatter.get(item);
 		}
 		return this.format();
 	}
@@ -472,10 +471,10 @@ public final class FEMFormatter {
 	 * @throws NullPointerException Wenn {@code objects} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn ein Objekt nicht formatiert werden kann. */
 	public final String formatDatas(final Iterable<?> objects) throws NullPointerException, IllegalArgumentException {
-		return this.formatIterable(objects, new Converter<Object, Object>() {
+		return this.formatIterable(objects, new Getter<Object, Object>() {
 
 			@Override
-			public Object convert(final Object input) {
+			public Object get(final Object input) {
 				return FEMFormatter.this.putData(input);
 			}
 
@@ -503,10 +502,10 @@ public final class FEMFormatter {
 	 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann. */
 	public final String formatFunctions(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalArgumentException {
-		return this.formatIterable(functions, new Converter<FEMFunction, Object>() {
+		return this.formatIterable(functions, new Getter<FEMFunction, Object>() {
 
 			@Override
-			public Object convert(final FEMFunction input) {
+			public Object get(final FEMFunction input) {
 				return FEMFormatter.this.putFunction(input);
 			}
 

@@ -291,30 +291,30 @@ public class Comparables {
 		};
 	}
 
-	/** Diese Methode gint einen navigierten {@link Comparable} zurück, der von seinem Element mit dem gegebenen {@link Converter} zum Element des gegebenen
+	/** Diese Methode gint einen navigierten {@link Comparable} zurück, der von seinem Element mit dem gegebenen {@link Getter} zum Element des gegebenen
 	 * {@link Comparable} navigiert. Der Navigationswert für ein Element {@code item} ist {@code comparable.compareTo(converter.convert(item))}.
 	 *
-	 * @see Converter
-	 * @param <GItem> Typ der Eingabe des {@link Converter}s sowie der Elemente.
-	 * @param <GItem2> Typ der Ausgabe des {@link Converter}s sowie der Elemente des gegebenen {@link Comparable}s.
-	 * @param converter {@link Converter}.
+	 * @see Getter
+	 * @param <GItem> Typ der Eingabe des {@link Getter}s sowie der Elemente.
+	 * @param <GItem2> Typ der Ausgabe des {@link Getter}s sowie der Elemente des gegebenen {@link Comparable}s.
+	 * @param navigator {@link Getter}.
 	 * @param comparable {@link Comparable}.
 	 * @return {@code navigated}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code converter} bzw. {@code comparable} {@code null} ist. */
-	public static <GItem, GItem2> Comparable<GItem> navigatedComparable(final Converter<? super GItem, ? extends GItem2> converter,
+	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparable} {@code null} ist. */
+	public static <GItem, GItem2> Comparable<GItem> navigatedComparable(final Getter<? super GItem, ? extends GItem2> navigator,
 		final Comparable<? super GItem2> comparable) throws NullPointerException {
-		if (converter == null) throw new NullPointerException("converter = null");
-		if (comparable == null) throw new NullPointerException("comparable = null");
+		Objects.assertNotNull(navigator);
+		Objects.assertNotNull(comparable);
 		return new Comparable<GItem>() {
 
 			@Override
 			public int compareTo(final GItem item) {
-				return comparable.compareTo(converter.convert(item));
+				return comparable.compareTo(navigator.get(item));
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("navigatedComparable", converter, comparable);
+				return Objects.toInvokeString("navigatedComparable", navigator, comparable);
 			}
 
 		};

@@ -304,16 +304,20 @@ public abstract class IAMIndex {
 
 	{}
 
-	/** Diese Methode ist eine Abkürzung für {@code new IAMIndexLoader(MMFArray.from(object))}.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMIndex} und gibt diesen zurück.<br>
+	 * Wenn das Objekt ein {@link IAMIndex} ist, wird dieser geliefert. Andernfalls wird {@code new IAMIndexLoader(MMFArray.from(object).withOrder(...))}
+	 * geliefert, wobei die Bytereihenfolge über {@link IAMIndexLoader#HEADER} ermittelt wird.
 	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMIndexLoader#IAMIndexLoader(MMFArray)
 	 * @param object Objekt.
-	 * @return {@link IAMIndexLoader}.
+	 * @return {@link IAMIndex}.
 	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link IAMIndexLoader#IAMIndexLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
-	public static IAMIndexLoader from(final Object object) throws IOException, IAMException {
-		return new IAMIndexLoader(MMFArray.from(object));
+	public static IAMIndex from(final Object object) throws IOException, IAMException {
+		if (object instanceof IAMIndex) return (IAMIndex)object;
+		final MMFArray array = MMFArray.from(object);
+		return new IAMIndexLoader(array.withOrder(IAMIndexLoader.HEADER.orderOf(array)));
 	}
 
 	{}

@@ -3,6 +3,7 @@ package bee.creative.fem;
 import java.util.Iterator;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
+import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert einen Stapelrahmen ({@code stack-frame}), über welchen einer Funktion eine Liste von Parameterwerten sowie ein Kontextobjekt zur
@@ -49,8 +50,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		@Override
 		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
-			if (context == null) throw new NullPointerException("context = null");
-			return new ArrayFrame(this.parent, this.params, context);
+			return new ArrayFrame(this.parent, this.params, Objects.assertNotNull(context));
 		}
 
 	}
@@ -75,8 +75,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		@Override
 		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
-			if (context == null) throw new NullPointerException("context = null");
-			return new ArrayFrame(this, FEMArray.EMPTY, context);
+			return new ArrayFrame(this, FEMArray.EMPTY, Objects.assertNotNull(context));
 		}
 
 	}
@@ -166,8 +165,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		@Override
 		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
-			if (context == null) throw new NullPointerException("context = null");
-			return new InvokeFrame(this.parent, this.params, context);
+			return new InvokeFrame(this.parent, this.params, Objects.assertNotNull(context));
 		}
 
 	}

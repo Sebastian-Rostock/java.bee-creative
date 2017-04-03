@@ -124,8 +124,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useListener(final Listener value) throws NullPointerException {
-		if (value == null) throw new NullPointerException("value = null");
-		this.listener = value;
+		this.listener = Objects.assertNotNull(value);
 		return this;
 	}
 
@@ -136,8 +135,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useResult(final FEMValue value) throws NullPointerException {
-		if (value == null) throw new NullPointerException("value = null");
-		this.result = value;
+		this.result = Objects.assertNotNull(value);
 		this.exception = null;
 		return this;
 	}
@@ -149,8 +147,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useFrame(final FEMFrame value) throws NullPointerException {
-		if (value == null) throw new NullPointerException("value = null");
-		this.frame = value;
+		this.frame = Objects.assertNotNull(value);
 		return this;
 	}
 
@@ -160,8 +157,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useFunction(final FEMFunction value) throws NullPointerException {
-		if (value == null) throw new NullPointerException("value = null");
-		this.function = value;
+		this.function = Objects.assertNotNull(value);
 		return this;
 	}
 
@@ -172,9 +168,8 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useException(final RuntimeException value) throws NullPointerException {
-		if (value == null) throw new NullPointerException("value = null");
+		this.exception = Objects.assertNotNull(value);
 		this.result = null;
-		this.exception = value;
 		return this;
 	}
 

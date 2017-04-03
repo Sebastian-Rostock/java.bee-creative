@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.util.Objects;
+
 /** Diese Klasse implementiert eine Variable als veränderlichen Verweis auf einen Wert.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -60,8 +62,7 @@ public final class FEMVariable extends FEMValue {
 	 * @param value aktuellen Wert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final synchronized void update(final FEMValue value) throws NullPointerException {
-		if (value == null) throw new NullPointerException("value = null");
-		this.value = value;
+		this.value = Objects.assertNotNull(value);
 	}
 
 	{}

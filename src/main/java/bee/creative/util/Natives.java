@@ -17,11 +17,11 @@ public class Natives {
 	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
 	static final Map<String, Class<?>> parseClass = new HashMap<>(9);
 
-	/** Dieses Feld speichert den {@link Converter} zu {@link #formatClass(Class)}. */
-	static final Converter<Class<?>, Object> formatClass = new Converter<Class<?>, Object>() {
+	/** Dieses Feld speichert den {@link Getter} zu {@link #formatClass(Class)}. */
+	static final Getter<Class<?>, Object> formatClass = new Getter<Class<?>, Object>() {
 
 		@Override
-		public Object convert(final Class<?> input) {
+		public Object get(final Class<?> input) {
 			return Natives.formatClass(input);
 		}
 

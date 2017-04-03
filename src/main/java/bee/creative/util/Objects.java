@@ -582,4 +582,15 @@ public class Objects {
 		return Objects.toFormatString(format, label, object.getClass().getSimpleName(), args);
 	}
 
+	/** Diese Methode gibt das gegebene Objekt zurück, wenn dieses nicht {@code null} ist.
+	 *
+	 * @param <GObject> Typ des Objekts.
+	 * @param object Objekt oder {@code null}.
+	 * @return Objekt.
+	 * @throws NullPointerException Wenn {@code object} {@code null} ist. */
+	public static <GObject> GObject assertNotNull(final GObject object) throws NullPointerException {
+		if (object == null) throw new NullPointerException("object = null");
+		return object;
+	}
+
 }
