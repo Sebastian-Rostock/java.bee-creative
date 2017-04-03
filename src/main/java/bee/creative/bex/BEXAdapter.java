@@ -47,8 +47,7 @@ public class BEXAdapter {
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
 		public BEXAttrAdapter(final BEXNode node, final Element parent) throws NullPointerException {
 			super(node);
-			if (parent == null) throw new NullPointerException();
-			this.parent = parent;
+			this.parent = Objects.assertNotNull(parent);
 		}
 
 		{}
@@ -1083,8 +1082,7 @@ public class BEXAdapter {
 		 * @param node {@link BEXNode}.
 		 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
 		public BEXNodeAdapter(final BEXNode node) throws NullPointerException {
-			if (node == null) throw new NullPointerException("node = null");
-			this.node = node;
+			this.node = Objects.assertNotNull(node);
 		}
 
 		{}
@@ -1336,10 +1334,8 @@ public class BEXAdapter {
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
 		public BEXAttrListAdapter(final BEXList list, final Element parent) throws NullPointerException {
-			if (list == null) throw new NullPointerException("list = null");
-			if (parent == null) throw new NullPointerException("parent = null");
-			this.list = list;
-			this.parent = parent;
+			this.list = Objects.assertNotNull(list);
+			this.parent = Objects.assertNotNull(parent);
 		}
 
 		{}
@@ -1427,10 +1423,8 @@ public class BEXAdapter {
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
 		public BEXChldListAdapter(final BEXList list, final Node parent) throws NullPointerException {
-			if (list == null) throw new NullPointerException("list = null");
-			if (parent == null) throw new NullPointerException("parent = null");
-			this.list = list;
-			this.parent = parent;
+			this.list = Objects.assertNotNull(list);
+			this.parent = Objects.assertNotNull(parent);
 		}
 
 		{}
@@ -1557,11 +1551,8 @@ public class BEXAdapter {
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst auch analysiert werden soll.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 		public BEXElemCollector(final BEXNodeAdapter node, final String uri, final String name, final boolean self) throws NullPointerException {
-			if (node == null) throw new NullPointerException("node = null");
-			if (uri == null) throw new NullPointerException("uri = null");
-			if (name == null) throw new NullPointerException("name = null");
-			this.uri = uri;
-			this.name = name;
+			this.uri = Objects.assertNotNull(uri);
+			this.name = Objects.assertNotNull(name);
 			this.list = new ArrayList<Node>();
 			if ("*".equals(uri)) {
 				if ("*".equals(name)) {

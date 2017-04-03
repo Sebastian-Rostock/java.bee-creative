@@ -64,7 +64,6 @@ public class Iterables {
 	public static int size(final Iterable<?> iterable) throws NullPointerException {
 		if (iterable instanceof Collection<?>) return ((Collection<?>)iterable).size();
 		if (iterable instanceof Array<?, ?>) return ((Array<?, ?>)iterable).size();
-		if (iterable == null) throw new NullPointerException("iterable = null");
 		return -Iterators.skip(iterable.iterator(), -1) - 1;
 	}
 
@@ -77,9 +76,7 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen am {@link Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist. */
 	public static boolean retainAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
-		if (iterable == null) throw new NullPointerException("iterable = null");
-		if (collection == null) throw new NullPointerException("collection = null");
-		return Iterators.retainAll(iterable.iterator(), collection);
+		return Iterators.retainAll(iterable.iterator(), Objects.assertNotNull(collection));
 	}
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, und gibt nur bei Veränderung der
@@ -91,8 +88,6 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist. */
 	public static boolean retainAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
-		if (collection == null) throw new NullPointerException("collection = null");
-		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.retainAll(collection, iterable.iterator());
 	}
 
@@ -106,8 +101,6 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static <GItem> boolean appendAll(final Collection<GItem> collection, final Iterable<? extends GItem> iterable) throws NullPointerException {
-		if (collection == null) throw new NullPointerException("collection = null");
-		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.appendAll(collection, iterable.iterator());
 	}
 
@@ -118,7 +111,6 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen am {@link Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist. */
 	public static boolean removeAll(final Iterable<?> iterable) throws NullPointerException {
-		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.removeAll(iterable.iterator());
 	}
 
@@ -131,8 +123,6 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen am {@link Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist. */
 	public static boolean removeAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
-		if (iterable == null) throw new NullPointerException("iterable = null");
-		if (collection == null) throw new NullPointerException("collection = null");
 		return Iterators.removeAll(iterable.iterator(), collection);
 	}
 
@@ -145,8 +135,6 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist. */
 	public static boolean removeAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
-		if (collection == null) throw new NullPointerException("collection = null");
-		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.removeAll(collection, iterable.iterator());
 	}
 
@@ -158,8 +146,6 @@ public class Iterables {
 	 * @return {@code true} bei vollständiger Inklusion.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist. */
 	public static boolean containsAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
-		if (collection == null) throw new NullPointerException("collection = null");
-		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.containsAll(collection, iterable.iterator());
 	}
 
@@ -266,8 +252,8 @@ public class Iterables {
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static <GItem> Iterable<GItem> limitedIterable(final int count, final Iterable<? extends GItem> iterable)
 		throws NullPointerException, IllegalArgumentException {
+		Objects.assertNotNull(iterable);
 		if (count < 0) throw new IllegalArgumentException("count < 0");
-		if (iterable == null) throw new NullPointerException("iterable = null");
 		if (count == 0) return Iterables.emptyIterable();
 		return new BaseIterable<GItem>() {
 
@@ -295,8 +281,8 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code filter} bzw. {@code iterable} {@code null} ist. */
 	public static <GItem> Iterable<GItem> filteredIterable(final Filter<? super GItem> filter, final Iterable<? extends GItem> iterable)
 		throws NullPointerException {
-		if (filter == null) throw new NullPointerException("filter = null");
-		if (iterable == null) throw new NullPointerException("iterable = null");
+		Objects.assertNotNull(filter);
+		Objects.assertNotNull(iterable);
 		return new BaseIterable<GItem>() {
 
 			@Override
@@ -320,7 +306,7 @@ public class Iterables {
 	 * @return {@code unique}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
 	public static <GItem> Iterable<GItem> uniqueIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
-		if (iterable == null) throw new NullPointerException("iterable = null");
+		Objects.assertNotNull(iterable);
 		return new BaseIterable<GItem>() {
 
 			@Override
@@ -344,12 +330,12 @@ public class Iterables {
 	 * @return {@code chained}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist. */
 	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends Iterable<? extends GItem>> iterables) throws NullPointerException {
-		if (iterables == null) throw new NullPointerException("iterables = null");
+		Objects.assertNotNull(iterables);
 		return new BaseIterable<GItem>() {
 
 			@Override
 			public Iterator<GItem> iterator() {
-				return Iterators.chainedIterator(Iterators.convertedIterator(Iterables.<GItem>iterableIterator(), iterables.iterator()));
+				return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>iterableIterator(), iterables.iterator()));
 			}
 
 			@Override
@@ -370,8 +356,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem>... iterables) throws NullPointerException {
-		if (iterables == null) throw new NullPointerException("iterables = null");
-		return Iterables.chainedIterable(Arrays.asList(iterables));
+		return Iterables.chainedIterable(Arrays.asList(Objects.assertNotNull(iterables)));
 	}
 
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
@@ -385,15 +370,13 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code iterable1} bzw. {@code iterable2} {@code null} ist. */
 	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2)
 		throws NullPointerException {
-		if (iterable1 == null) throw new NullPointerException("iterable1 = null");
-		if (iterable2 == null) throw new NullPointerException("iterable2 = null");
-		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
+		return Iterables.chainedIterable(Arrays.asList(Objects.assertNotNull(iterable1), Objects.assertNotNull(iterable2)));
 	}
 
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
 	 * in der gegebenen Reihenfolge liefert.
 	 *
-	 * @see Iterators#convertedIterator(Getter, Iterator)
+	 * @see Iterators#navigatedIterator(Getter, Iterator)
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterable}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterable}.
 	 * @param converter {@link Getter}.
@@ -406,7 +389,7 @@ public class Iterables {
 
 			@Override
 			public Iterator<GOutput> iterator() {
-				return Iterators.convertedIterator(converter, iterable.iterator());
+				return Iterators.navigatedIterator(converter, iterable.iterator());
 			}
 
 			@Override

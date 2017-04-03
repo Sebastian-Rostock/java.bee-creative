@@ -102,7 +102,7 @@ public class Filters {
 	 * @return {@code type}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code inputType} {@code null} ist. */
 	public static <GInput> Filter<GInput> typeFilter(final Class<?> inputType) throws NullPointerException {
-		if (inputType == null) throw new NullPointerException("inputType = null");
+		Objects.assertNotNull(inputType);
 		return new Filter<GInput>() {
 
 			@Override
@@ -284,24 +284,24 @@ public class Filters {
 	 *
 	 * @param <GInput> Typ der Eingabe des gelieferten {@link Filter} sowie der Eingabe des {@link Field}.
 	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie der Ausgabe des {@link Getter}.
-	 * @param converter {@link Getter} zur Navigation.
+	 * @param navigator {@link Getter} zur Navigation.
 	 * @param filter {@link Field}.
 	 * @return {@code navigated}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code filter} {@code null} ist. */
-	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Getter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Filter<? super GOutput> filter) throws NullPointerException {
-		Objects.assertNotNull(converter);
+		Objects.assertNotNull(navigator);
 		Objects.assertNotNull(filter);
 		return new Filter<GInput>() {
 
 			@Override
 			public boolean accept(final GInput input) {
-				return filter.accept(converter.get(input));
+				return filter.accept(navigator.get(input));
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("navigatedFilter", converter, filter);
+				return Objects.toInvokeString("navigatedFilter", navigator, filter);
 			}
 
 		};
@@ -368,8 +368,8 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist. */
 	public static <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		if (filter1 == null) throw new NullPointerException("filter1 = null");
-		if (filter2 == null) throw new NullPointerException("filter2 = null");
+		Objects.assertNotNull(filter1);
+		Objects.assertNotNull(filter2);
 		return new Filter<GInput>() {
 
 			@Override
@@ -396,8 +396,8 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist. */
 	public static <GInput> Filter<GInput> equivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		if (filter1 == null) throw new NullPointerException("filter1 = null");
-		if (filter2 == null) throw new NullPointerException("filter2 = null");
+		Objects.assertNotNull(filter1);
+		Objects.assertNotNull(filter2);
 		return new Filter<GInput>() {
 
 			@Override
@@ -420,7 +420,7 @@ public class Filters {
 	 * @return {@code synchronized}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
 	public static <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		if (filter == null) throw new NullPointerException("filter = null");
+		Objects.assertNotNull(filter);
 		return new Filter<GInput>() {
 
 			@Override

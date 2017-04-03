@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Bytes;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@code Integer Array Model} Datenstrukturen.
  *
@@ -547,7 +548,7 @@ public class IAMLoader {
 		/** {@inheritDoc} */
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
-			if (key == null) throw new NullPointerException("key = null");
+			Objects.assertNotNull(key);
 			int i = this.rangeMask;
 			if (i != 0) {
 				final IAMArray range = this.rangeOffset;

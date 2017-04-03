@@ -156,8 +156,7 @@ public class Builders {
 		 * @param items Sammlung.
 		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 		protected BaseItemsBuilder(final GItems items) throws NullPointerException {
-			if (items == null) throw new NullPointerException("items = null");
-			this.items = items;
+			this.items = Objects.assertNotNull(items);
 		}
 
 		{}
@@ -279,8 +278,7 @@ public class Builders {
 		 * @param entries interne {@link Map}.
 		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
 		protected BaseEntriesBuilder(final GEntries entries) throws NullPointerException {
-			if (entries == null) throw new NullPointerException("entries = null");
-			this.entries = entries;
+			this.entries = Objects.assertNotNull(entries);
 		}
 
 		{}
@@ -1323,9 +1321,9 @@ public class Builders {
 	 * @param method Native statische Methode.
 	 * @return {@code native}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die gegebene Methode nicht statisch ist. */
+	 * @throws IllegalArgumentException Wenn die gegebene Methode nicht statisch ist TODO . */
 	public static <GValue> Builder<GValue> nativeBuilder(final java.lang.reflect.Method method) throws NullPointerException, IllegalArgumentException {
-		if (!Modifier.isStatic(method.getModifiers())) throw new IllegalArgumentException();
+		if (!Modifier.isStatic(method.getModifiers()) || (method.getParameterTypes().length != 0)) throw new IllegalArgumentException();
 		return new Builder<GValue>() {
 
 			@Override
@@ -1355,7 +1353,7 @@ public class Builders {
 	 * @return {@code native}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
 	public static <GValue> Builder<GValue> nativeBuilder(final java.lang.reflect.Constructor<?> constructor) throws NullPointerException {
-		if (constructor == null) throw new NullPointerException("constructor = null");
+		Objects.assertNotNull(constructor);
 		return new Builder<GValue>() {
 
 			@Override
@@ -1399,7 +1397,7 @@ public class Builders {
 	 * @throws IllegalArgumentException Wenn {@code mode} ungültig ist. */
 	public static <GValue> Builder<GValue> bufferedBuilder(final int mode, final Builder<? extends GValue> builder)
 		throws NullPointerException, IllegalArgumentException {
-		if (builder == null) throw new NullPointerException("builder = null");
+		Objects.assertNotNull(builder);
 		Pointers.pointer(mode, null);
 		return new Builder<GValue>() {
 
@@ -1431,24 +1429,24 @@ public class Builders {
 	 *
 	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder} sowie der Eingabe des gegebenen {@link Getter}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
-	 * @param converter {@link Getter}.
+	 * @param navigator {@link Getter}.
 	 * @param builder {@link Builder}.
 	 * @return {@code converted}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code builder} {@code null} ist. */
-	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(final Getter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Builder<GOutput> navigatedBuilder(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Builder<? extends GInput> builder) throws NullPointerException {
-		if (builder == null) throw new NullPointerException("builder = null");
-		if (converter == null) throw new NullPointerException("converter = null");
+		Objects.assertNotNull(navigator);
+		Objects.assertNotNull(builder);
 		return new Builder<GOutput>() {
 
 			@Override
 			public final GOutput build() throws IllegalStateException {
-				return converter.get(builder.build());
+				return navigator.get(builder.build());
 			}
 
 			@Override
 			public final String toString() {
-				return Objects.toInvokeString("convertedBuilder", converter, builder);
+				return Objects.toInvokeString("navigatedBuilder", navigator, builder);
 			}
 
 		};
@@ -1461,7 +1459,7 @@ public class Builders {
 	 * @return {@code synchronized}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code builder} {@code null} ist. */
 	public static <GValue> Builder<GValue> synchronizedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
-		if (builder == null) throw new NullPointerException("builder = null");
+Objects.assertNotNull(builder );
 		return new Builder<GValue>() {
 
 			@Override

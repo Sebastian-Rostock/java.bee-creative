@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import bee.creative.util.Iterables;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein abstraktes {@link Set}, dessen Daten in einem Array verwaltet werden.
  *
@@ -26,8 +27,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 		 * @param set {@link Set}.
 		 * @throws NullPointerException Wennd as gegebene {@link Set} {@code null} ist. */
 		public CompactSetItems(final Set<GItem> set) throws NullPointerException {
-			if (set == null) throw new NullPointerException("set = null");
-			this.set = set;
+			this.set = Objects.assertNotNull(set);
 		}
 
 		{}
@@ -67,7 +67,6 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	 * @param collection Elemente.
 	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist. */
 	public CompactSet(final Collection<? extends GItem> collection) {
-		if (collection == null) throw new NullPointerException("collection = null");
 		this.allocate(collection.size());
 		this.addAll(collection);
 	}

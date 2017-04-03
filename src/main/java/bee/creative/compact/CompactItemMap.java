@@ -1,6 +1,7 @@
 package bee.creative.compact;
 
 import java.util.Map;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link CompactMap}, deren Werte in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren. Diese
  * Implementation erlaubt deshalb {@code null} nicht als Wert.
@@ -67,7 +68,7 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	/** {@inheritDoc} */
 	@Override
 	protected final void setEntry(final int index, final GKey key, final GValue value) {
-		if (value == null) throw new NullPointerException("value = null");
+		Objects.assertNotNull(value);
 		this._items_.set(index, value);
 		this.setKey(key, value);
 	}
@@ -75,7 +76,7 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	/** {@inheritDoc} */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		if (value == null) throw new NullPointerException("value = null");
+		Objects.assertNotNull(value);
 		return super.put(key, value);
 	}
 

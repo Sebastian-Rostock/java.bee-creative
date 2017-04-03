@@ -54,7 +54,6 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableEntryMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator) throws NullPointerException {
 		this(comparator);
-		if (map == null) throw new NullPointerException("map = null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}

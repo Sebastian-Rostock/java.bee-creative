@@ -663,8 +663,8 @@ public final class Fields {
 	 * @return {@code composite}-{@link Field}. */
 	public static <GInput, GValue> Field<GInput, GValue> compositeField(final Getter<? super GInput, ? extends GValue> getter,
 		final Setter<? super GInput, ? super GValue> setter) {
-		if (getter == null) throw new NullPointerException("getter = null");
-		if (setter == null) throw new NullPointerException("setter = null");
+		Objects.assertNotNull(getter);
+		Objects.assertNotNull(setter);
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -797,40 +797,38 @@ public final class Fields {
 		return Fields.compositeField(Getters.aggregatedGetter(field, getFormat, emptyValue, mixedValue), Setters.aggregatedSetter(field, setFormat));
 	}
 
-	/** Diese Methode gibt ein bedingtes {@link Field} zurück, welches über die Weiterleitug der Eingabe mit Hilfe eines {@link Filter} entscheiden. Wenn der
-	 * gegebene {@link Filter} eine Eingabe akzeptiert, wird diese an {@code accept} delegiert. Andernfalls wird sie an {@code reject} delegiert.
+	/** Diese Methode ist eine effiziente Alternative zu
+	 * {@code Fields.compositeField(Getters.conditionalGetter(condition, acceptField, rejectField), Setters.conditionalSetter(condition, acceptField, rejectField))}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param condition {@link Filter}.
-	 * @param accept {@code accept}-{@link Field}.
-	 * @param reject {@code reject}-{@link Field}.
-	 * @return {@code conditional}-{@link Field}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> accept,
-		final Field<? super GInput, GValue> reject) throws NullPointerException {
-		if (condition == null) throw new NullPointerException("condition = null");
-		if (accept == null) throw new NullPointerException("accept = null");
-		if (reject == null) throw new NullPointerException("reject = null");
+	 * @see #compositeField(Getter, Setter)
+	 * @see Getters#conditionalGetter(Filter, Getter, Getter)
+	 * @see Setters#conditionalSetter(Filter, Setter, Setter) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> acceptField,
+		final Field<? super GInput, GValue> rejectField) throws NullPointerException {
+		Objects.assertNotNull(condition);
+		Objects.assertNotNull(acceptField);
+		Objects.assertNotNull(rejectField);
 		return new Field<GInput, GValue>() {
 
 			@Override
 			public GValue get(final GInput input) {
-				return condition.accept(input) ? accept.get(input) : reject.get(input);
+				if (condition.accept(input)) return acceptField.get(input);
+				return rejectField.get(input);
 			}
 
 			@Override
 			public void set(final GInput input, final GValue value) {
 				if (condition.accept(input)) {
-					accept.set(input, value);
+					acceptField.set(input, value);
 				} else {
-					reject.set(input, value);
+					rejectField.set(input, value);
 				}
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("conditionalField", condition, accept, reject);
+				return Objects.toInvokeString("conditionalField", condition, acceptField, rejectField);
 			}
 
 		};
@@ -844,7 +842,7 @@ public final class Fields {
 	 * @return {@code synchronized}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GInput, GValue> Field<GInput, GValue> synchronizedField(final Field<? super GInput, GValue> field) throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
+		Objects.assertNotNull(field );
 		return new Field<GInput, GValue>() {
 
 			@Override

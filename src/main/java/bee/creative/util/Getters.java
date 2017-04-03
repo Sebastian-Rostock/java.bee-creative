@@ -251,7 +251,7 @@ public class Getters {
 	 * @throws IllegalArgumentException Wenn {@link Pointers#pointer(int, Object)} eine entsprechende Ausnahme auslöst. */
 	public static <GInput, GValue> Getter<GInput, GValue> bufferedGetter(final int limit, final int inputMode, final int outputMode,
 		final Getter<? super GInput, ? extends GValue> getter) throws NullPointerException, IllegalArgumentException {
-		if (getter == null) throw new NullPointerException("getter = null");
+		Objects.assertNotNull(getter);
 		Pointers.pointer(inputMode, null);
 		Pointers.pointer(outputMode, null);
 		return new Getter<GInput, GValue>() {

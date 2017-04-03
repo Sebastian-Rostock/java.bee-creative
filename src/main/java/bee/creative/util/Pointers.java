@@ -197,7 +197,6 @@ public class Pointers {
 	 * @return {@link Pointer}-Validität.
 	 * @throws NullPointerException Wenn {@code pointer} {@code null} ist. */
 	public static boolean isValid(final Pointer<?> pointer) throws NullPointerException {
-		if (pointer == null) throw new NullPointerException("pointer = null");
 		return (pointer == Pointers.NULL) || (pointer.data() != null);
 	}
 

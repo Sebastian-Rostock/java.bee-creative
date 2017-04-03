@@ -798,8 +798,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableMap(final Comparator<? super GKey> comparator) throws NullPointerException {
-		if (comparator == null) throw new NullPointerException("comparator = null");
-		this.comparator = comparator;
+		this.comparator = Objects.assertNotNull(comparator);
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
@@ -823,7 +822,6 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist. */
 	public CompactNavigableMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator) throws NullPointerException {
 		this(comparator);
-		if (map == null) throw new NullPointerException("map = null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}

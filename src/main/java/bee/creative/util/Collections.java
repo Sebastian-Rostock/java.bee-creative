@@ -24,8 +24,8 @@ public class Collections {
 	 * @return {@code union}-{@link Set}.
 	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static <GItem> Set<GItem> unionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
-		if (items1 == null) throw new NullPointerException("items1 = null");
-		if (items2 == null) throw new NullPointerException("items2 = null");
+		Objects.assertNotNull(items1);
+		Objects.assertNotNull(items2);
 		return new AbstractSet<GItem>() {
 
 			@Override
@@ -57,8 +57,8 @@ public class Collections {
 	 * @return {@code intersection}-{@link Set}.
 	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static <GItem> Set<GItem> intersectionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
-		if (items1 == null) throw new NullPointerException("items1 = null");
-		if (items2 == null) throw new NullPointerException("items2 = null");
+		Objects.assertNotNull(items1);
+		Objects.assertNotNull(items2);
 		return new AbstractSet<GItem>() {
 
 			@Override
@@ -89,7 +89,7 @@ public class Collections {
 	 * @return {@code reverse}-{@link List}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static <GItem> List<GItem> reverseList(final List<GItem> items) throws NullPointerException {
-		if (items == null) throw new NullPointerException("items = null");
+		Objects.assertNotNull(items);
 		return new AbstractList<GItem>() {
 
 			@Override
@@ -259,8 +259,8 @@ public class Collections {
 	 * @return verkettete {@link List}-Sicht.
 	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static <GItem> List<GItem> chainedList(final List<GItem> items1, final List<GItem> items2, final boolean extendMode) throws NullPointerException {
-		if (items1 == null) throw new NullPointerException("items1 = null");
-		if (items2 == null) throw new NullPointerException("items2 = null");
+		Objects.assertNotNull(items1);
+		Objects.assertNotNull(items2);
 		return new AbstractList<GItem>() {
 
 			@Override
@@ -462,8 +462,8 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static <GItem> Collection<GItem> chainedCollection(final Collection<GItem> items1, final Collection<GItem> items2, final boolean extendMode)
 		throws NullPointerException {
-		if (items1 == null) throw new NullPointerException("items1 = null");
-		if (items2 == null) throw new NullPointerException("items2 = null");
+		Objects.assertNotNull(items1);
+		Objects.assertNotNull(items2);
 		return new AbstractCollection<GItem>() {
 
 			@Override
@@ -532,9 +532,9 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code entries}, {@code keyTranslator} bzw. {@code valueTranslator} {@code null} ist. */
 	public static <GSourceKey, GSourceValue, GTargetKey, GTargetValue> Map<GTargetKey, GTargetValue> translatedMap(final Map<GSourceKey, GSourceValue> entries,
 		final Translator<GSourceKey, GTargetKey> keyTranslator, final Translator<GSourceValue, GTargetValue> valueTranslator) throws NullPointerException {
-		if (entries == null) throw new NullPointerException("entries = null");
-		if (keyTranslator == null) throw new NullPointerException("keyTranslator = null");
-		if (valueTranslator == null) throw new NullPointerException("valueTranslator = null");
+		Objects.assertNotNull(entries);
+		Objects.assertNotNull(keyTranslator);
+		Objects.assertNotNull(valueTranslator);
 		return new AbstractMap<GTargetKey, GTargetValue>() {
 
 			@Override
@@ -668,8 +668,8 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static <GSource, GTarget> List<GTarget> translatedList(final List<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
-		if (items == null) throw new NullPointerException("items = null");
-		if (translator == null) throw new NullPointerException("translator = null");
+		Objects.assertNotNull(items);
+		Objects.assertNotNull(translator);
 		return new AbstractList<GTarget>() {
 
 			@Override
@@ -755,7 +755,7 @@ public class Collections {
 
 			@Override
 			public Iterator<GTarget> iterator() {
-				return Iterators.convertedIterator(Translators.toTargetGetter(translator), items.iterator());
+				return Iterators.navigatedIterator(Translators.toTargetGetter(translator), items.iterator());
 			}
 
 			@Override
@@ -783,8 +783,8 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static <GSource, GTarget> Set<GTarget> translatedSet(final Set<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
-		if (items == null) throw new NullPointerException("items = null");
-		if (translator == null) throw new NullPointerException("translator = null");
+		Objects.assertNotNull(items);
+		Objects.assertNotNull(translator);
 		return new AbstractSet<GTarget>() {
 
 			@Override
@@ -839,7 +839,7 @@ public class Collections {
 
 			@Override
 			public Iterator<GTarget> iterator() {
-				return Iterators.convertedIterator(Translators.toTargetGetter(translator), items.iterator());
+				return Iterators.navigatedIterator(Translators.toTargetGetter(translator), items.iterator());
 			}
 
 		};
@@ -855,8 +855,8 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static <GSource, GTarget> Collection<GTarget> translatedCollection(final Collection<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
-		if (items == null) throw new NullPointerException("items = null");
-		if (translator == null) throw new NullPointerException("translator = null");
+		Objects.assertNotNull(items);
+		Objects.assertNotNull(translator);
 		return new AbstractCollection<GTarget>() {
 
 			@Override
@@ -911,7 +911,7 @@ public class Collections {
 
 			@Override
 			public Iterator<GTarget> iterator() {
-				return Iterators.convertedIterator(Translators.toTargetGetter(translator), items.iterator());
+				return Iterators.navigatedIterator(Translators.toTargetGetter(translator), items.iterator());
 			}
 
 		};

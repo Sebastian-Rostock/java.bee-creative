@@ -35,8 +35,7 @@ public final class INIWriter implements Closeable {
 	 * @param writer {@link Writer}.
 	 * @throws NullPointerException Wenn {@code writer} {@code null} ist. */
 	public INIWriter(final Writer writer) throws NullPointerException {
-		if (writer == null) throw new NullPointerException("writer = null");
-		this.writer = writer;
+		this.writer = Objects.assertNotNull(writer);
 	}
 
 	{}

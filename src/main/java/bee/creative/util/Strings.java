@@ -32,8 +32,6 @@ public class Strings {
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
 	static List<String> apply(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
-		if (regex == null) throw new NullPointerException("regex = null");
-		if (string == null) throw new NullPointerException("string = null");
 		if (index < 0) throw new IllegalArgumentException("index < 0");
 		return Strings.apply(Strings.PATTERN_COMPILER.get(regex), string, index, split, match);
 	}
@@ -52,8 +50,6 @@ public class Strings {
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
 	static List<String> apply(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
-		if (pattern == null) throw new NullPointerException("pattern = null");
-		if (string == null) throw new NullPointerException("string = null");
 		if (index < 0) throw new IllegalArgumentException("index < 0");
 		final Matcher matcher = pattern.matcher(string);
 		if (index > matcher.groupCount()) throw new IllegalArgumentException();
@@ -89,8 +85,6 @@ public class Strings {
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
 	static List<List<String>> applyAll(final String regex, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
-		if (regex == null) throw new NullPointerException("regex = null");
-		if (string == null) throw new NullPointerException("string = null");
 		return Strings.applyAll(Strings.PATTERN_COMPILER.get(regex), string, split, match);
 	}
 
@@ -105,8 +99,6 @@ public class Strings {
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
 	static List<List<String>> applyAll(final Pattern pattern, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
-		if (pattern == null) throw new NullPointerException("pattern = null");
-		if (string == null) throw new NullPointerException("string = null");
 		final Matcher matcher = pattern.matcher(string);
 		final int count = matcher.groupCount() + 1;
 		final List<List<String>> result = new ArrayList<>();
@@ -155,7 +147,6 @@ public class Strings {
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static String join(final Object... items) throws NullPointerException {
-		if (items == null) throw new NullPointerException("items = null");
 		return Strings.join("", items);
 	}
 
@@ -168,8 +159,6 @@ public class Strings {
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code space} bzw. {@code items} {@code null} ist. */
 	public static String join(final String space, final Object... items) throws NullPointerException {
-		if (space == null) throw new NullPointerException("space = null");
-		if (items == null) throw new NullPointerException("items = null");
 		return Strings.join(space, Arrays.asList(items));
 	}
 
@@ -181,7 +170,6 @@ public class Strings {
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static String join(final Iterable<?> items) {
-		if (items == null) throw new NullPointerException("items = null");
 		return Strings.join("", items);
 	}
 
@@ -193,8 +181,6 @@ public class Strings {
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code space} bzw. {@code items} {@code null} ist. */
 	public static String join(final String space, final Iterable<?> items) {
-		if (space == null) throw new NullPointerException("space = null");
-		if (items == null) throw new NullPointerException("items = null");
 		final StringBuilder builder = new StringBuilder();
 		if (!space.isEmpty()) {
 			String join = "";

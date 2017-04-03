@@ -6,6 +6,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import bee.creative.util.Natives;
+import bee.creative.util.Objects;
 
 /** Diese Funktion kann zum Lesen und Schreiben von {@link Field nativen Datenfeldern} sowie zum Aufrufen von {@link Method nativen Methoden} und
  * {@link Constructor nativen Konstruktoren} eingesetzt werden. Der dieser Funktion zugrundeliegende {@link Member} kann hierbei als {@link Field},
@@ -269,8 +270,7 @@ public abstract class FEMReflection extends FEMFunction {
 	 * @return Funktion zum gegebenen Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
 	public static FEMReflection from(final Constructor<?> constructor) throws NullPointerException {
-		if (constructor == null) throw new NullPointerException("constructor = null");
-		return new StaticConstructor(constructor);
+		return new StaticConstructor(Objects.assertNotNull(constructor));
 	}
 
 	@SuppressWarnings ("javadoc")

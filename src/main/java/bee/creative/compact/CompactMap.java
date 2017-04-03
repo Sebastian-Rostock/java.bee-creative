@@ -325,7 +325,6 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */
 	public CompactMap(final Map<? extends GKey, ? extends GValue> map) throws NullPointerException {
 		this();
-		if (map == null) throw new NullPointerException("map = null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}

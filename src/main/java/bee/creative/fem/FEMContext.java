@@ -46,7 +46,7 @@ public class FEMContext {
 	 * @return {@code dataFrom}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist. */
 	public final <GData> Getter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
-		if (type == null) throw new NullPointerException("type = null");
+		Objects.assertNotNull(type);
 		return new Getter<FEMValue, GData>() {
 
 			@Override

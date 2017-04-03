@@ -43,7 +43,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		/** {@inheritDoc} */
 		@Override
 		public GValue set(final int index, final GValue value) {
-			if (value == null) throw new NullPointerException("value = null");
+			Objects.assertNotNull(value);
 			final CompactArray<?, GValue> owner = this.owner;
 			final GValue entry = owner.customGet(index);
 			owner.customSet(index, value);
@@ -175,7 +175,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder
 		 *         {@code startIndex > finalIndex}). */
 		public CompactSubArray(final GOwner owner, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException {
-			if (owner == null) throw new NullPointerException("owner = null");
 			if (startIndex > finalIndex) throw new IndexOutOfBoundsException("startIndex > finalIndex");
 			this.startIndex = owner.exclusiveIndex(startIndex);
 			this.finalIndex = owner.exclusiveIndex(finalIndex);
@@ -487,14 +486,12 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	/** {@inheritDoc} */
 	@Override
 	public void get(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-		if (values == null) throw new NullPointerException("values = null");
 		this.get(index, values.section());
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void get(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-		if (values == null) throw new NullPointerException("values = null");
 		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
 		if ((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
@@ -505,14 +502,12 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-		if (values == null) throw new NullPointerException("values = null");
 		this.set(index, values.section());
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-		if (values == null) throw new NullPointerException("values = null");
 		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
 		if ((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");

@@ -8,6 +8,7 @@ import java.util.ListIterator;
 import java.util.RandomAccess;
 import bee.creative.array.Array;
 import bee.creative.array.CompactArray;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine {@link List}, deren Daten in einem Array verwaltet werden. Der Speicherverbrauch einer {@link CompactList} liegt bei ca.
  * {@code 100%} des Speicherverbrauchs einer {@link ArrayList}.
@@ -35,8 +36,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactListItems(final CompactList<GItem> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this.owner = Objects.assertNotNull(owner);
 		}
 
 		{}

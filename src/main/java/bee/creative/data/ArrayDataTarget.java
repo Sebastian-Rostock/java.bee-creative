@@ -2,6 +2,7 @@ package bee.creative.data;
 
 import java.io.IOException;
 import bee.creative.array.CompactByteArray;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link CompactByteArray}.
  *
@@ -34,8 +35,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die Nutzdaten {@code null} sind. */
 	public ArrayDataTarget(final CompactByteArray data) throws NullPointerException {
-		if (data == null) throw new NullPointerException("data = null");
-		this.data = data;
+		this.data = Objects.assertNotNull(data);
 	}
 
 	{}

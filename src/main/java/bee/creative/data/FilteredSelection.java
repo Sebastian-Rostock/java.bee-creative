@@ -4,6 +4,7 @@ import java.util.Iterator;
 import bee.creative.util.Field;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine {@link Selection}, die auf einem {@link Iterable} aufsetzt.
  *
@@ -19,8 +20,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	 * @param items {@link Iterable} der {@link Item}s.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public FilteredSelection(final Iterable<? extends GItem> items) throws NullPointerException {
-		if (items == null) throw new NullPointerException("items = null");
-		this.items = items;
+		this.items = Objects.assertNotNull(items);
 	}
 
 	{}
@@ -39,7 +39,6 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	/** {@inheritDoc} */
 	@Override
 	public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
 		return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.navigatedFilter(field, Filters.containsFilter(value)), this.items));
 	}
 

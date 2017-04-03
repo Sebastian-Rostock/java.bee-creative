@@ -55,7 +55,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @throws NullPointerException Wenn das gegebene Array bzw. der gegebenen {@link Comparator} {@code null} ist. */
 	@SafeVarargs
 	public static <GValue> ObjectArraySection<GValue> from(final Comparator<? super GValue> comparator, final GValue... array) throws NullPointerException {
-		if (comparator == null) throw new NullPointerException("comparator is null");
+		Objects.assertNotNull(comparator);
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
 			@Override
@@ -132,7 +132,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
 	public static <GValue> ObjectArraySection<GValue> from(final Comparator<? super GValue> comparator, final GValue[] array, final int startIndex,
 		final int finalIndex) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		if (comparator == null) throw new NullPointerException("comparator is null");
+		Objects.assertNotNull(comparator);
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
 			@Override

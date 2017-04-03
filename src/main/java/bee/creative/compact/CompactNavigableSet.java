@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import bee.creative.util.Iterables;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein {@link NavigableSet}, dessen Daten in einem Array verwaltet werden. Der Speicherverbrauch eines {@link CompactNavigableSet}
  * liegt bei ca. {@code 13%} des Speicherverbrauchs eines {@link TreeSet}s.
@@ -408,8 +409,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableSet(final Comparator<? super GItem> comparator) throws NullPointerException {
 		super();
-		if (comparator == null) throw new NullPointerException("comparator = null");
-		this.comparator = comparator;
+		this.comparator = Objects.assertNotNull(comparator);
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
@@ -431,7 +431,6 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @throws NullPointerException Wenn die gegebene {@link Collection} bzw. der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableSet(final Collection<? extends GItem> collection, final Comparator<? super GItem> comparator) throws NullPointerException {
 		this(comparator);
-		if (collection == null) throw new NullPointerException("collection = null");
 		this.allocate(collection.size());
 		this.addAll(collection);
 	}

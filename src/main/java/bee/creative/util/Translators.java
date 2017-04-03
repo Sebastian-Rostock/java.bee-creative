@@ -180,6 +180,53 @@ public class Translators {
 		};
 	}
 
+	public static <GSource, GTarget> Translator<GSource, GTarget> synchronizedTranslator(final Translator<GSource, GTarget> translator)
+		throws NullPointerException {
+		return synchronizedTranslator(translator, translator);
+	}
+
+	public static <GSource, GTarget> Translator<GSource, GTarget> synchronizedTranslator(final Translator<GSource, GTarget> translator, final Object mutex)
+		throws NullPointerException {
+		Objects.assertNotNull(translator);
+		Objects.assertNotNull(mutex);
+		return new Translator<GSource, GTarget>() {
+	
+			@Override
+			public boolean isTarget(final Object object) {
+				synchronized (mutex) {
+					return translator.isSource(object);
+				}
+			}
+	
+			@Override
+			public boolean isSource(final Object object) {
+				synchronized (mutex) {
+					return translator.isTarget(object);
+				}
+			}
+	
+			@Override
+			public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+				synchronized (mutex) {
+					return translator.toTarget(object);
+				}
+			}
+	
+			@Override
+			public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+				synchronized (mutex) {
+					return translator.toSource(object);
+				}
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("synchronizedTranslator", translator, mutex);
+			}
+	
+		};
+	}
+
 	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isSource(Object)} des gegebenen {@link Translator} zurück.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code translator.isSource(input)}.
 	 *

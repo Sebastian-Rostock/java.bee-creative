@@ -96,7 +96,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMDecimal that) throws NullPointerException {
-		if (that == null) throw new NullPointerException("that = null");
 		return (this.value == that.value) || (Double.isNaN(this.value) && Double.isNaN(that.value));
 	}
 

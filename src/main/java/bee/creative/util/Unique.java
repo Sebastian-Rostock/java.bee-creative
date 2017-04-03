@@ -111,12 +111,9 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		 * @param outputs Ausgaben.
 		 * @throws NullPointerException Wenn {@code owner}, {@code inputs} bzw. {@code outputs} {@code null} ist. */
 		public BaseListData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
-			if (owner == null) throw new NullPointerException("owner = null");
-			if (inputs == null) throw new NullPointerException("inputs = null");
-			if (outputs == null) throw new NullPointerException("outputs = null");
-			this.owner = owner;
-			this.inputs = inputs;
-			this.outputs = outputs;
+			this.owner = Objects.assertNotNull(owner);
+			this.inputs = Objects.assertNotNull(inputs);
+			this.outputs = Objects.assertNotNull(outputs);
 		}
 
 		{}
@@ -254,8 +251,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
 		public BaseHashData(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this.owner = Objects.assertNotNull(owner);
 			this.verifyLength(16);
 		}
 
@@ -321,7 +317,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<Entry<GInput, GOutput>> iterator() {
-			return Iterators.convertedIterator(this, this.getEntries());
+			return Iterators.navigatedIterator(this, this.getEntries());
 		}
 
 		/** {@inheritDoc} */
@@ -596,8 +592,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		 * @param data Nutzdaten.
 		 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
 		public UniqueSet(final Data<GValue, GValue> data) throws NullPointerException {
-			if (data == null) throw new NullPointerException("data = null");
-			this.data = data;
+			this.data = Objects.assertNotNull(data);
 		}
 
 		{}

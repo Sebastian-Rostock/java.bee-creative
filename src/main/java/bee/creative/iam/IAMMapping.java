@@ -48,7 +48,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
-			if (key == null) throw new NullPointerException("key = null");
+			Objects.assertNotNull(key);
 			return -1;
 		}
 

@@ -29,7 +29,6 @@ public class BufferDataSource extends BaseDataSource {
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public BufferDataSource(final ByteBuffer data) throws NullPointerException {
-		if (data == null) throw new NullPointerException("data = null");
 		this.data = data.slice().order(ByteOrder.BIG_ENDIAN);
 	}
 

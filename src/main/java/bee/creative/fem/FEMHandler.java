@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.util.Objects;
+
 /** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. ein als {@link FEMValue} verpackter Verweis auf eine {@link FEMFunction
  * Funktion}.<br>
  * Intern wird der Funktionszeiger als {@link FEMFunction} dargestellt.
@@ -22,8 +24,7 @@ public final class FEMHandler extends FEMValue {
 	 * @return Funktionszeiger.
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
 	public static FEMHandler from(final FEMFunction function) throws NullPointerException {
-		if (function == null) throw new NullPointerException("function = null");
-		return new FEMHandler(function);
+		return new FEMHandler(Objects.assertNotNull(function));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMMethod.TYPE)}.

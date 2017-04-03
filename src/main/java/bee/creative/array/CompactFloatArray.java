@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import bee.creative.util.Objects;
+
 /** Diese Klasse implementiert ein {@link FloatArray} als {@link CompactArray}.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -101,8 +103,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactFloatArraySection(final CompactFloatArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this.owner = Objects.assertNotNull(owner);
 		}
 
 		{}
@@ -147,8 +148,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactFloatSubArraySection(final CompactFloatSubArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this.owner = Objects.assertNotNull(owner);
 		}
 
 		{}

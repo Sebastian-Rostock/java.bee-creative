@@ -158,7 +158,7 @@ public class Tester {
 	 * @throws IllegalArgumentException Wenn {@code millis < 0} ist. */
 	public Tester(final int millis, final Method method) throws NullPointerException, IllegalArgumentException {
 		if (millis < 0) throw new IllegalArgumentException("millis < 0");
-		if (method == null) throw new NullPointerException("method = null");
+		Objects.assertNotNull(method);
 		final Runtime runtime = Runtime.getRuntime();
 		Throwable cause = null;
 		final long enterMemory, enterTime, leaveMemory, leaveTime;

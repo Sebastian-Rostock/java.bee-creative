@@ -65,7 +65,6 @@ public class Iterators {
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist.
 	 * @throws NoSuchElementException Wenn kein {@code index}-tes Element existiert. */
 	public static <GItem> GItem get(final Iterator<? extends GItem> iterator, final int index) throws NullPointerException, NoSuchElementException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
 		if ((index < 0) || (Iterators.skip(iterator, index) != 0) || !iterator.hasNext()) throw new NoSuchElementException();
 		return iterator.next();
 	}
@@ -81,7 +80,7 @@ public class Iterators {
 	 * @return Anzahl der noch zu überspringenden Elemente.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static int skip(final Iterator<?> iterator, int count) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
+		Objects.assertNotNull(iterator );
 		while ((count != 0) && iterator.hasNext()) {
 			count--;
 			iterator.next();
@@ -98,8 +97,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean retainAll(final Iterator<?> iterator, final Collection<?> collection) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
-		if (collection == null) throw new NullPointerException("collection = null");
+		Objects.assertNotNull(collection);
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (!collection.contains(iterator.next())) {
@@ -119,8 +117,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean retainAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		if (collection == null) throw new NullPointerException("collection = null");
-		if (iterator == null) throw new NullPointerException("iterator = null");
+		Objects.assertNotNull(collection);
 		final List<Object> list = new ArrayList<>();
 		Iterators.appendAll(list, iterator);
 		return collection.retainAll(list);
@@ -136,8 +133,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static <GItem> boolean appendAll(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) throws NullPointerException {
-		if (collection == null) throw new NullPointerException("collection = null");
-		if (iterator == null) throw new NullPointerException("iterator = null");
+		Objects.assertNotNull(collection);
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.add(iterator.next())) {
@@ -154,7 +150,6 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static boolean removeAll(final Iterator<?> iterator) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			iterator.next();
@@ -173,8 +168,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean removeAll(final Iterator<?> iterator, final Collection<?> collection) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
-		if (collection == null) throw new NullPointerException("collection = null");
+		Objects.assertNotNull(collection );
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.contains(iterator.next())) {
@@ -194,8 +188,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean removeAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
-		if (collection == null) throw new NullPointerException("collection = null");
+		Objects.assertNotNull(collection );
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.remove(iterator.next())) {
@@ -213,8 +206,7 @@ public class Iterators {
 	 * @return {@code true} bei vollständiger Inklusion.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean containsAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
-		if (collection == null) throw new NullPointerException("collection = null");
+		Objects.assertNotNull(collection);
 		while (iterator.hasNext())
 			if (!collection.contains(iterator.next())) return false;
 		return true;
@@ -304,7 +296,7 @@ public class Iterators {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
 	public static <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
-		if (items == null) throw new NullPointerException("items = null");
+		Objects.assertNotNull(items);
 		Comparables.check(fromIndex, toIndex);
 		return new BaseIterator<GItem>() {
 
@@ -389,8 +381,8 @@ public class Iterators {
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static <GItem> Iterator<GItem> limitedIterator(final int count, final Iterator<? extends GItem> iterator)
 		throws NullPointerException, IllegalArgumentException {
+		Objects.assertNotNull(iterator);
 		if (count < 0) throw new IllegalArgumentException("count < 0");
-		if (iterator == null) throw new NullPointerException("iterator = null");
 		if (count == 0) return Iterators.emptyIterator();
 		return new BaseIterator<GItem>() {
 
@@ -433,8 +425,8 @@ public class Iterators {
 	 * @throws NullPointerException Wenn {@code filter} bzw. {@code iterator} {@code null} ist. */
 	public static <GItem> Iterator<GItem> filteredIterator(final Filter<? super GItem> filter, final Iterator<? extends GItem> iterator)
 		throws NullPointerException {
-		if (filter == null) throw new NullPointerException("filter = null");
-		if (iterator == null) throw new NullPointerException("iterator = null");
+		Objects.assertNotNull(filter);
+		Objects.assertNotNull(iterator);
 		return new BaseIterator<GItem>() {
 
 			Boolean has;
@@ -545,7 +537,6 @@ public class Iterators {
 	 * @return {@code chained}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
 	public static <GItem> Iterator<GItem> chainedIterator(final Iterable<? extends Iterator<? extends GItem>> iterable) throws NullPointerException {
-		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.chainedIterator(iterable.iterator());
 	}
 
@@ -557,7 +548,7 @@ public class Iterators {
 	 * @return {@code chained}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterators} {@code null} ist. */
 	public static <GItem> Iterator<GItem> chainedIterator(final Iterator<? extends Iterator<? extends GItem>> iterators) throws NullPointerException {
-		if (iterators == null) throw new NullPointerException("iterators = null");
+		Objects.assertNotNull(iterators);
 		return new BaseIterator<GItem>() {
 
 			Iterator<? extends GItem> iterator;
@@ -601,13 +592,13 @@ public class Iterators {
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterator}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterator}.
 	 * @param iterator {@link Iterator}.
-	 * @param converter {@link Getter}.
+	 * @param navigator {@link Getter}.
 	 * @return {@code converted}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Iterator<GOutput> convertedIterator(final Getter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Iterator<GOutput> navigatedIterator(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Iterator<? extends GInput> iterator) throws NullPointerException {
-		if (converter == null) throw new NullPointerException("converter = null");
-		if (iterator == null) throw new NullPointerException("iterator = null");
+		Objects.assertNotNull(navigator);
+		Objects.assertNotNull(iterator);
 		return new BaseIterator<GOutput>() {
 
 			@Override
@@ -617,7 +608,7 @@ public class Iterators {
 
 			@Override
 			public GOutput next() {
-				return converter.get(iterator.next());
+				return navigator.get(iterator.next());
 			}
 
 			@Override
@@ -627,7 +618,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("convertedIterator", converter, iterator);
+				return Objects.toInvokeString("navigatedIterator", navigator, iterator);
 			}
 
 		};

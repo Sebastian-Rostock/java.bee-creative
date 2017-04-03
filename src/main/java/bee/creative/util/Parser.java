@@ -160,7 +160,6 @@ public class Parser {
 	 * @see #target()
 	 * @throws NullPointerException Wenn die Zeichenkette {@code null} ist. */
 	public final void take(final String symbols) throws NullPointerException {
-		if (symbols == null) throw new NullPointerException("symbols = null");
 		this.target.append(symbols.toString());
 	}
 
@@ -192,7 +191,7 @@ public class Parser {
 	 * @param value Ausgabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void target(final String value) throws NullPointerException {
-		if (value == null) throw new NullPointerException("value = null");
+		Objects.assertNotNull(value );
 		this.target.setLength(0);
 		this.target.append(value);
 	}

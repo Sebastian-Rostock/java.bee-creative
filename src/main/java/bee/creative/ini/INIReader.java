@@ -46,8 +46,7 @@ public final class INIReader implements Closeable {
 	 * @param reader {@link Reader}.
 	 * @throws NullPointerException Wenn {@code reader} {@code null} ist. */
 	public INIReader(final Reader reader) throws NullPointerException {
-		if (reader == null) throw new NullPointerException("reader = null");
-		this.reader = reader;
+		this.reader = Objects.assertNotNull(reader);
 		this.builder = new StringBuilder();
 	}
 

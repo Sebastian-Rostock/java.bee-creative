@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die {@link DataSource}-Schnittstelle zu einem {@link RandomAccessFile}.
  *
@@ -37,8 +38,7 @@ public class FileDataSource extends BaseDataSource {
 	 * @param file {@link RandomAccessFile}.
 	 * @throws NullPointerException Wenn das {@link RandomAccessFile} {@code null} ist. */
 	public FileDataSource(final RandomAccessFile file) throws NullPointerException {
-		if (file == null) throw new NullPointerException("file = null");
-		this.data = file;
+		this.data = Objects.assertNotNull(file);
 	}
 
 	{}

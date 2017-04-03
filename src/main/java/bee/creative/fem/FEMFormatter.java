@@ -217,8 +217,7 @@ public final class FEMFormatter {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
 	public final FEMFormatter putData(final Object data) throws NullPointerException, IllegalArgumentException {
-		if (data == null) throw new NullPointerException("data = null");
-		this.domain.formatData(this, data);
+		this.domain.formatData(this, Objects.assertNotNull(data));
 		return this;
 	}
 
@@ -340,7 +339,7 @@ public final class FEMFormatter {
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
 	public final FEMFormatter putHandler(final FEMFunction function) throws NullPointerException, IllegalArgumentException {
-		if (function == null) throw new NullPointerException("function = null");
+		Objects.assertNotNull(function);
 		return this.put("{: ").putFunction(function).put("}");
 	}
 
@@ -352,8 +351,7 @@ public final class FEMFormatter {
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
 	public final FEMFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalArgumentException {
-		if (function == null) throw new NullPointerException("function = null");
-		this.domain.formatFunction(this, function);
+		this.domain.formatFunction(this, Objects.assertNotNull(function));
 		return this;
 	}
 

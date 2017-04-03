@@ -10,6 +10,7 @@ import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
  *
@@ -358,8 +359,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	public static FEMArray from(final FEMValue item, final int length) throws NullPointerException, IllegalArgumentException {
+		Objects.assertNotNull(item );
 		if (length == 0) return FEMArray.EMPTY;
-		if (item == null) throw new NullPointerException("value = null");
 		return new UniformArray(length, item);
 	}
 
@@ -552,7 +553,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean extract(final Collector target) throws NullPointerException {
-		if (target == null) throw new NullPointerException("target = null");
+		Objects.assertNotNull(target);
 		if (this.length == 0) return true;
 		return this.customExtract(target, 0, this.length, true);
 	}

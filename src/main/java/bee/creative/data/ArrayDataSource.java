@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import bee.creative.array.ByteArraySection;
 import bee.creative.util.Bytes;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einer {@link ByteArraySection}. Die Dekidierung der Zahlen erfolgt via {@link Bytes} und
  * damit in {@link ByteOrder#BIG_ENDIAN}.
@@ -32,8 +33,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public ArrayDataSource(final ByteArraySection data) throws NullPointerException {
-		if (data == null) throw new NullPointerException("data = null");
-		this.data = data;
+		this.data = Objects.assertNotNull(data);
 	}
 
 	{}

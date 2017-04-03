@@ -730,8 +730,7 @@ public final class FEMCompiler extends Parser {
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final void formatScript(final FEMFormatter target) throws NullPointerException, IllegalStateException {
 		this.start();
-		if (target == null) throw new NullPointerException("target = null");
-		this.formatter = target;
+		this.formatter = Objects.assertNotNull(target);
 		try {
 			this.format();
 		} finally {

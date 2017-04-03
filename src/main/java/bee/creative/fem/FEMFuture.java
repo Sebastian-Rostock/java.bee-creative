@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.util.Objects;
+
 /** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
  * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann.<br>
  * Der Wert kapselt dazu eine gegebene {@link #function() Funktion} sowie einen gegebenen {@link #frame() Stapelrahmen} und wertet diese Funktion erst dann mit
@@ -21,9 +23,7 @@ public final class FEMFuture extends FEMValue {
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist. */
 	public static FEMFuture from(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
-		if (frame == null) throw new NullPointerException("frame = null");
-		if (function == null) throw new NullPointerException("function = null");
-		return new FEMFuture(frame, function);
+		return new FEMFuture(Objects.assertNotNull(frame), Objects.assertNotNull(function));
 	}
 
 	{}

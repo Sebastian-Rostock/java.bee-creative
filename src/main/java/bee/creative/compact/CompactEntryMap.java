@@ -36,7 +36,6 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */
 	public CompactEntryMap(final Map<? extends GKey, ? extends GValue> map) {
 		this();
-		if (map == null) throw new NullPointerException("map = null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}

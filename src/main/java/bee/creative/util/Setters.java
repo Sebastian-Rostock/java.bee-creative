@@ -96,7 +96,7 @@ public class Setters {
 	 * @return {@code default}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
 	public static <GInput, GValue> Setter<GInput, GValue> defaultSetter(final Setter<? super GInput, GValue> setter) throws NullPointerException {
-		if (setter == null) throw new NullPointerException();
+		Objects.assertNotNull(setter);
 		return new Setter<GInput, GValue>() {
 
 			@Override

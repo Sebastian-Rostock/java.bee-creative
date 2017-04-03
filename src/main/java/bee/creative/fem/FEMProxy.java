@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.util.Objects;
+
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert.
  *
@@ -30,8 +32,7 @@ public final class FEMProxy extends FEMFunction {
 	 * @param name Name.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
 	public FEMProxy(final String name) throws NullPointerException {
-		if (name == null) throw new NullPointerException("name = null");
-		this.name = name;
+		this.name = Objects.assertNotNull(name);
 	}
 
 	{}

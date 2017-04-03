@@ -2,6 +2,7 @@ package bee.creative.array;
 
 import java.util.Comparator;
 import bee.creative.util.Comparators;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein {@link ObjectArray} als {@link CompactArray}.
  *
@@ -107,8 +108,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactObjectArraySection(final CompactObjectArray<GValue> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this.owner = Objects.assertNotNull(owner);
 		}
 
 		{}
@@ -160,8 +160,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactObjectSubArraySection(final CompactObjectSubArray<GValue> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this.owner = Objects.assertNotNull(owner);
 		}
 
 		{}

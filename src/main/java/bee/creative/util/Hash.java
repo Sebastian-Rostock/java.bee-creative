@@ -101,8 +101,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		 * @param hash Abbildung.
 		 * @throws NullPointerException Wenn {@code hash} {@code null} ist. */
 		public HashIterator(final Hash<GKey, ?, GEntry> hash) throws NullPointerException {
-			if (hash == null) throw new NullPointerException("hash = null");
-			this.hash = hash;
+			this.hash = Objects.assertNotNull(hash);
 			this.seek();
 		}
 

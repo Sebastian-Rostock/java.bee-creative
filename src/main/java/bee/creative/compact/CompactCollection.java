@@ -84,7 +84,6 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist. */
 	public CompactCollection(final Collection<? extends GItem> collection) {
 		super();
-		if (collection == null) throw new NullPointerException("collection = null");
 		this.allocate(collection.size());
 		this.addAll(collection);
 	}

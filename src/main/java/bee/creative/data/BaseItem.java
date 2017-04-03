@@ -73,7 +73,6 @@ public abstract class BaseItem implements Item {
 	 * @see Assignment#assign(Object, Object, Assigner) */
 	@Override
 	public void assign(final Assignment<? extends Item> assignment) throws NullPointerException, IllegalArgumentException {
-		if (assignment == null) throw new NullPointerException("assignment = null");
 		final Item value = assignment.value();
 		if (value == null) throw new IllegalArgumentException("value = null");
 		for (final Assigner<? super Item, ? super Item> assigner: this.assigners(assignment)) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import bee.creative.iam.IAMLoader.IAMListingLoader;
 import bee.creative.util.Comparators;
+import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueMap;
 
 /** Diese Klasse implementiert Klassen und Methoden zur erzeugung der {code Integer Array Model} Datenstrukturen.
@@ -328,8 +329,8 @@ public class IAMBuilder {
 		 * @param value Wert.
 		 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
 		public final void put(final int[] key, final int[] value) throws NullPointerException {
-			if (key == null) throw new NullPointerException("key = null");
-			if (value == null) throw new NullPointerException("value = null");
+			Objects.assertNotNull(key);
+			Objects.assertNotNull(value);
 			this.entries.get(key).value = value;
 		}
 

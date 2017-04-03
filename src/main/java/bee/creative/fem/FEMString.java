@@ -3,6 +3,7 @@ package bee.creative.fem;
 import java.util.Iterator;
 import bee.creative.iam.IAMArray;
 import bee.creative.util.Comparators;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine unveränderliche Zeichenkette sowie Methoden zur Erzeugung solcher Zeichenketten aus nativen Arrays.
  *
@@ -1144,7 +1145,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean extract(final Collector target) throws NullPointerException {
-		if (target == null) throw new NullPointerException("target = null");
+		Objects.assertNotNull(target);
 		if (this.length == 0) return true;
 		return this.customExtract(target, 0, this.length, true);
 	}

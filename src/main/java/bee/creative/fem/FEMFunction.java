@@ -1,6 +1,7 @@
 package bee.creative.fem;
 
 import java.util.Arrays;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte Funktion, deren {@link #invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen
  * werden kann, um einen Ergebniswert zu ermitteln.<br>
@@ -22,8 +23,7 @@ public abstract class FEMFunction {
 		final FEMFunction function;
 
 		TraceFunction(final FEMTracer tracer, final FEMFunction function) throws NullPointerException {
-			if (tracer == null) throw new NullPointerException("tracer = null");
-			this.tracer = tracer;
+			this.tracer = Objects.assertNotNull(tracer);
 			this.function = function;
 		}
 
@@ -72,8 +72,7 @@ public abstract class FEMFunction {
 		final FEMFunction function;
 
 		FrameFunction(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
-			if (frame == null) throw new NullPointerException("frame = null");
-			this.frame = frame;
+			this.frame = Objects.assertNotNull(frame);
 			this.function = function;
 		}
 
@@ -370,8 +369,7 @@ public abstract class FEMFunction {
 	 * @return Ergebniswert ggf. als {@link FEMFuture}.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
 	public FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
-		if (frame == null) throw new NullPointerException("frame = null");
-		return new FEMFuture(frame, this);
+		return new FEMFuture(Objects.assertNotNull(frame), this);
 	}
 
 	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapelrahmen}

@@ -3,6 +3,7 @@ package bee.creative.fem;
 import java.util.Iterator;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
@@ -626,7 +627,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean extract(final Collector target) throws NullPointerException {
-		if (target == null) throw new NullPointerException("target = null");
+		Objects.assertNotNull(target);
 		if (this.length == 0) return true;
 		return this.customExtract(target, 0, this.length, true);
 	}
