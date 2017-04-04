@@ -45,49 +45,49 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	/** {@inheritDoc} */
 	@SuppressWarnings ("unchecked")
 	@Override
-	protected GKey getKey(final int index) {
-		return (GKey)this._items_.get(index);
+	protected GKey customGetKey(final int index) {
+		return (GKey)this.items.get(index);
 	}
 
 	/** {@inheritDoc} */
 	@SuppressWarnings ("unchecked")
 	@Override
-	protected GValue getValue(final int index) {
+	protected GValue customGetValue(final int index) {
 		return (GValue)this.values.get(index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void setEntry(final int index, final GKey key, final GValue value) {
-		this._items_.set(index, key);
+	protected void customSetEntry(final int index, final GKey key, final GValue value) {
+		this.items.set(index, key);
 		this.values.set(index, value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _insert_(final int index, final int count) throws IllegalArgumentException {
-		super._insert_(index, count);
+	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
+		super.customInsert(index, count);
 		this.values.insert(index, count);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _remove_(final int index, final int count) throws IllegalArgumentException {
-		super._remove_(index, count);
+	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
+		super.customRemove(index, count);
 		this.values.remove(index, count);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _allocate_(final int count) {
-		super._allocate_(count);
+	protected void customAllocate(final int count) {
+		super.customAllocate(count);
 		this.values.allocate(count);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void _compact_() {
-		super._compact_();
+	protected void customCompact() {
+		super.customCompact();
 		this.values.compact();
 	}
 

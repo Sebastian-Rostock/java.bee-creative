@@ -8,23 +8,6 @@ package bee.creative.util;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Conversions {
 
-	/** Dieses Feld speichert den {@link Getter} zurück, der eine gegebene {@link Conversion} umkehrt.
-	 *
-	 * @see #inverseConversion(Conversion) */
-	public static final Getter<?, ?> INVERSE_GETTER = new Getter<Conversion<?, ?>, Object>() {
-
-		@Override
-		public Object get(final Conversion<?, ?> input) {
-			return Conversions.inverseConversion(input);
-		}
-
-		@Override
-		public String toString() {
-			return "INVERSE_GETTER";
-		}
-
-	};
-
 	/** Dieses Feld speichert den {@link Getter} zurück, der die Eingabe einer {@link Conversion} ermittelt. */
 	public static final Getter<?, ?> INPUT_GETTER = new Getter<Conversion<?, ?>, Object>() {
 
@@ -53,6 +36,23 @@ public class Conversions {
 			return "OUTPUT_GETTER";
 		}
 
+	};
+
+	/** Dieses Feld speichert den {@link Getter} zurück, der eine gegebene {@link Conversion} umkehrt.
+	 *
+	 * @see #inverseConversion(Conversion) */
+	public static final Getter<?, ?> INVERSE_GETTER = new Getter<Conversion<?, ?>, Object>() {
+	
+		@Override
+		public Object get(final Conversion<?, ?> input) {
+			return Conversions.inverseConversion(input);
+		}
+	
+		@Override
+		public String toString() {
+			return "INVERSE_GETTER";
+		}
+	
 	};
 
 	{}

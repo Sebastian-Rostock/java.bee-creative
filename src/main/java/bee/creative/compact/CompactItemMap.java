@@ -6,8 +6,8 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert eine abstrakte {@link CompactMap}, deren Werte in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren. Diese
  * Implementation erlaubt deshalb {@code null} nicht als Wert.
  *
- * @see CompactItemMap#getKey(Object)
- * @see CompactItemMap#setKey(Object, Object)
+ * @see CompactItemMap#customGetKey(Object)
+ * @see CompactItemMap#customSetKey(Object, Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
@@ -42,35 +42,35 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	 *
 	 * @param value Wert.
 	 * @return Schlüssel. */
-	protected abstract GKey getKey(final GValue value);
+	protected abstract GKey customGetKey(final GValue value);
 
 	/** Diese Methode setzt den Schlüssel des gegebenen Werts.
 	 *
 	 * @param key Schlüssel.
 	 * @param value Wert. */
-	protected abstract void setKey(GKey key, final GValue value);
+	protected abstract void customSetKey(GKey key, final GValue value);
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected final GKey getKey(final int index) {
-		return this.getKey(this.getValue(index));
+	protected final GKey customGetKey(final int index) {
+		return this.customGetKey(this.customGetValue(index));
 	}
 
 	/** {@inheritDoc} */
 	@SuppressWarnings ("unchecked")
 	@Override
-	protected final GValue getValue(final int index) {
-		return (GValue)this._items_.get(index);
+	protected final GValue customGetValue(final int index) {
+		return (GValue)this.items.get(index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected final void setEntry(final int index, final GKey key, final GValue value) {
+	protected final void customSetEntry(final int index, final GKey key, final GValue value) {
 		Objects.assertNotNull(value);
-		this._items_.set(index, value);
-		this.setKey(key, value);
+		this.items.set(index, value);
+		this.customSetKey(key, value);
 	}
 
 	/** {@inheritDoc} */
@@ -84,7 +84,7 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	@Override
 	public boolean containsValue(final Object value) {
 		if (value == null) return false;
-		return this._items_.values().contains(value);
+		return this.items.values().contains(value);
 	}
 
 }

@@ -2,9 +2,9 @@ package bee.creative.data;
 
 import bee.creative.util.Assigner;
 import bee.creative.util.Assignment;
-import bee.creative.util.Getter;
 import bee.creative.util.Field;
 import bee.creative.util.Filters;
+import bee.creative.util.Getter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
@@ -19,7 +19,7 @@ public abstract class BaseItem implements Item {
 
 	/** Dieses Feld speichert den {@link Getter} für {@link #assigners(Assignment)}, welcher seine Eingabe ({@link Field}) als {@link Assigner} zurück gibt,
 	 * sofern diese ein solcher ist ({@code instanceof}). Andernfalls wird {@code null} geliefert. */
-	protected static final Getter<Field<?, ?>, Assigner<? super Item, ? super Item>> FIELD_ASSIGNER_CONVERTER =
+	protected static final Getter<Field<?, ?>, Assigner<? super Item, ? super Item>> FIELD_AS_ASSIGNER =
 		new Getter<Field<?, ?>, Assigner<? super Item, ? super Item>>() {
 
 			@SuppressWarnings ("unchecked")
@@ -39,12 +39,12 @@ public abstract class BaseItem implements Item {
 	 * {@link Assigner}-Schnittstelle implementieren. Die genutzten {@link Field}s ergeben sich aus:
 	 * {@code this.type().is(value.type()) ? value.type().fields() : value.type().is(this.type()) ? this.type().fields() : Iterables.voidIterable())}.
 	 *
-	 * @see #FIELD_ASSIGNER_CONVERTER
+	 * @see #FIELD_AS_ASSIGNER
 	 * @param assignment {@link Item} als Quellobjekt des in {@link #assign(Assignment)} gegebenen {@link Assignment}s.
 	 * @return {@link Assigner}s. */
 	protected Iterable<? extends Assigner<? super Item, ? super Item>> assigners(final Assignment<? extends Item> assignment) {
 		final Type<?> thisType = this.type(), thatType = assignment.value().type();
-		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.convertedIterable(BaseItem.FIELD_ASSIGNER_CONVERTER, //
+		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.navigatedIterable(BaseItem.FIELD_AS_ASSIGNER, //
 			thisType.is(thatType) ? thatType.fields() : thatType.is(thisType) ? thisType.fields() : Iterables.<Field<?, ?>>emptyIterable()));
 	}
 

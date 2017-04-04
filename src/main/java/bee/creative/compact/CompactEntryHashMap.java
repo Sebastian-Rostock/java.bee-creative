@@ -49,21 +49,21 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _itemIndex_(final Object key) {
-		if (key == null) return this._itemIndexEquals_(null, 0);
-		return this._itemIndexEquals_(key, key.hashCode());
+	protected int customItemIndex(final Object key) {
+		if (key == null) return this.defaultItemIndexEquals(null, 0);
+		return this.defaultItemIndexEquals(key, key.hashCode());
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _itemEquals_(final Object key, final int hash, final Object item) {
+	protected boolean customItemEquals(final Object key, final int hash, final Object item) {
 		if (key == null) return item == null;
 		return key.equals(item);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _itemCompare_(final Object key, final int hash, final Object item) {
+	protected int customItemCompare(final Object key, final int hash, final Object item) {
 		if (item == null) return hash;
 		return Comparators.compare(hash, item.hashCode());
 	}

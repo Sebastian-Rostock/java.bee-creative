@@ -474,12 +474,12 @@ public class Getters {
 	}
 
 	/** Diese Methode gibt einen {@link Filter} als Adapter zu einer {@code boolean}-{@link Getter Eigenschaft} zurück.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code Boolean.TRUE.equals(getter.get(input))}.
+	 * Die Akzeptanz einer Eingabe {@code input} entspricht {@code Boolean.TRUE.equals(getter.get(input))}.
 	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param getter Eigenschaft mit {@code boolean}-Wert.
 	 * @return {@link Filter} als {@link Getter}-Adapter.
-	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GInput> Filter<GInput> toFilter(final Getter<? super GInput, Boolean> getter) throws NullPointerException {
 		Objects.assertNotNull(getter);
 		return new Filter<GInput>() {
@@ -488,6 +488,32 @@ public class Getters {
 			public boolean accept(final GInput input) {
 				final Boolean result = getter.get(input);
 				return (result != null) && result.booleanValue();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("toFilter", getter);
+			}
+
+		};
+	}
+
+	/** /** Diese Methode gibt ein {@link Comparable} als Adapter zu einer {@link Number}-{@link Getter Eigenschaft} zurück.<br>
+	 * Der Vergleichswert einer Eingabe {@code input} entspricht {@code getter.get(input).intValue()}, wenn diese nicht {@code null} ist. Andernfalls ist der
+	 * Vergleichswert {@code 0}.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param getter Eigenschaft mit {@link Number}-Wert.
+	 * @return {@link Comparable} als {@link Getter}-Adapter.
+	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
+	public static <GInput> Comparable<GInput> toComparable(final Getter<? super GInput, ? extends Number> getter) throws NullPointerException {
+		Objects.assertNotNull(getter);
+		return new Comparable<GInput>() {
+
+			@Override
+			public int compareTo(final GInput input) {
+				final Number result = getter.get(input);
+				return result != null ? result.intValue() : 0;
 			}
 
 			@Override

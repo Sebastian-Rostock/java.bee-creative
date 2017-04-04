@@ -12,11 +12,11 @@ import bee.creative.util.Objects;
  * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl
  * im Mittel auf ca. {@code 245%} der Rechenzeit, die ein {@link HashSet} dazu benötigen würde. Bei einer Anzahl von ca. {@code 100} Elementen benötigen Beide
  * {@link Set}s dafür in etwa die gleichen Rechenzeiten. Bei weniger Elementen ist das {@link CompactHashSet} schneller, bei mehr Elementen ist das
- * {@link HashSet} schneller. * Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ( {@code 5} Verdopplungen) steigt die Rechenzeit beim
- * Hinzufügen und Entfernen von Elementen in einem {@link CompactHashSet} auf {@code 8827%} der Rechenzeit, die ein {@link HashSet} hierfür benötigen würde.
+ * {@link HashSet} schneller. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim Hinzufügen
+ * und Entfernen von Elementen in einem {@link CompactHashSet} auf {@code 8827%} der Rechenzeit, die ein {@link HashSet} hierfür benötigen würde.
  * <p>
  * Für das Finden von Elementen und das Iterieren über die Elemente benötigt das {@link CompactHashSet} im Mittel nur noch {@code 75%} der Rechenzeit des
- * {@link HashSet}s, unabhängig von der Anzahl der Elemente.
+ * {@link HashSet}, unabhängig von der Anzahl der Elemente.
  *
  * @see Object#hashCode()
  * @see Object#equals(Object)
@@ -50,21 +50,21 @@ public class CompactHashSet<GItem> extends CompactSet<GItem> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _itemIndex_(final Object item) {
-		if (item == null) return this._itemIndexEquals_(null, 0);
-		return this._itemIndexEquals_(item, Objects.hash(item));
+	protected int customItemIndex(final Object item) {
+		if (item == null) return this.defaultItemIndexEquals(null, 0);
+		return this.defaultItemIndexEquals(item, Objects.hash(item));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean _itemEquals_(final Object key, final int hash, final Object item) {
+	protected boolean customItemEquals(final Object key, final int hash, final Object item) {
 		if (key == null) return item == null;
 		return key.equals(item);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int _itemCompare_(final Object key, final int hash, final Object item) {
+	protected int customItemCompare(final Object key, final int hash, final Object item) {
 		if (item == null) return hash;
 		return Comparators.compare(hash, item.hashCode());
 	}

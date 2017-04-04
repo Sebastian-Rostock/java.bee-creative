@@ -1452,26 +1452,36 @@ public class Builders {
 		};
 	}
 
-	/** Diese Methode gibt einen synchronisierten {@link Builder} zurück, der den gegebenen {@link Builder} via {@code synchronized(builder)} synchronisiert.
+	/** Diese Methode ist eine Abkürzung für {@code Builders.synchronizedBuilder(builder, builder)}.
+	 *
+	 * @see #synchronizedBuilder(Builder, Object) */
+	@SuppressWarnings ("javadoc")
+	public static <GValue> Builder<GValue> synchronizedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
+		return Builders.synchronizedBuilder(builder, builder);
+	}
+
+	/** Diese Methode gibt einen synchronisierten {@link Builder} zurück, der den gegebenen {@link Builder} via {@code synchronized(mutex)} synchronisiert.
 	 *
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
+	 * @param mutex Synchronisationsobjekt.
 	 * @return {@code synchronized}-{@link Builder}.
-	 * @throws NullPointerException Wenn {@code builder} {@code null} ist. */
-	public static <GValue> Builder<GValue> synchronizedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
-Objects.assertNotNull(builder );
+	 * @throws NullPointerException Wenn der {@code builder} bzw. {@code mutex} {@code null} ist. */
+	public static <GValue> Builder<GValue> synchronizedBuilder(final Builder<? extends GValue> builder, final Object mutex) throws NullPointerException {
+		Objects.assertNotNull(builder);
+		Objects.assertNotNull(mutex);
 		return new Builder<GValue>() {
 
 			@Override
 			public final GValue build() throws IllegalStateException {
-				synchronized (builder) {
+				synchronized (mutex) {
 					return builder.build();
 				}
 			}
 
 			@Override
 			public final String toString() {
-				return Objects.toInvokeString("synchronizedBuilder", builder);
+				return Objects.toInvokeString("synchronizedBuilder", builder, mutex);
 			}
 
 		};

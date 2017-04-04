@@ -182,30 +182,6 @@ public class Comparables {
 		};
 	}
 
-	/** Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
-	 * {@link Comparable} delegiert. Der Navigationswert für ein Element {@code item} ist {@code ((item == null) ? 1 : comparable.compareTo(item))}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param comparable {@link Comparable}.
-	 * @return {@code null}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<GItem> nullComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
-		Objects.assertNotNull(comparable);
-		return new Comparable<GItem>() {
-
-			@Override
-			public int compareTo(final GItem item) {
-				return item == null ? 1 : comparable.compareTo(item);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nullComparable", comparable);
-			}
-
-		};
-	}
-
 	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie das gegebene Element zur Berechnung des Navigationswert
 	 * verwendet. Das gegebene Element wird als erstes Argument des {@link Comparator}s verwendet. Der Navigationswert für ein Element {@code item2} ist
 	 * {@code comparator.compare(item, item2)}.
@@ -229,6 +205,30 @@ public class Comparables {
 				return Objects.toInvokeString("itemComparable", item, comparator);
 			}
 
+		};
+	}
+
+	/** Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
+	 * {@link Comparable} delegiert. Der Navigationswert für ein Element {@code item} ist {@code ((item == null) ? 1 : comparable.compareTo(item))}.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param comparable {@link Comparable}.
+	 * @return {@code default}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
+	public static <GItem> Comparable<GItem> defaultComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
+		Objects.assertNotNull(comparable);
+		return new Comparable<GItem>() {
+	
+			@Override
+			public int compareTo(final GItem item) {
+				return item == null ? 1 : comparable.compareTo(item);
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("defaultComparable", comparable);
+			}
+	
 		};
 	}
 

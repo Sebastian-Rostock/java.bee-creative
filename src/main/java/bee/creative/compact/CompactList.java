@@ -44,7 +44,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 		/** {@inheritDoc} */
 		@Override
 		protected void removeRange(final int fromIndex, final int toIndex) {
-			this.owner._remove_(fromIndex, toIndex - fromIndex);
+			this.owner.customRemove(fromIndex, toIndex - fromIndex);
 		}
 
 		/** {@inheritDoc} */
@@ -114,7 +114,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	 * @see CompactArray#getAlignment()
 	 * @return relative Ausrichtungsposition ({@code 0..1}). */
 	public final float getAlignment() {
-		return this._items_.getAlignment();
+		return this.items.getAlignment();
 	}
 
 	/** Diese Methode setzt die relative Ausrichtungsposition der Elemente im Array. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am
@@ -126,26 +126,26 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	 * @param alignment relative Ausrichtungsposition ({@code 0..1}).
 	 * @throws IllegalArgumentException Wenn die gegebene relative Ausrichtungsposition kleiner {@code 0}, größer {@code 1} ist oder {@link Float#NaN}. */
 	public final void setAlignment(final float alignment) throws IllegalArgumentException {
-		this._items_.setAlignment(alignment);
+		this.items.setAlignment(alignment);
 	}
 
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	protected final int _itemIndex_(final Object item) {
+	protected final int customItemIndex(final Object item) {
 		return this.indexOf(item);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected final boolean _itemEquals_(final Object key, final int hash, final Object item) {
+	protected final boolean customItemEquals(final Object key, final int hash, final Object item) {
 		return false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected final int _itemCompare_(final Object key, final int hash, final Object item) {
+	protected final int customItemCompare(final Object key, final int hash, final Object item) {
 		return 0;
 	}
 
@@ -173,7 +173,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	/** {@inheritDoc} */
 	@Override
 	public final void add(final int index, final GItem element) {
-		this._insert_(index, 1);
+		this.customInsert(index, 1);
 		this.setItem(index, element);
 	}
 
@@ -190,7 +190,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 		final Object[] items = collection.toArray();
 		final int count = items.length;
 		if (count == 0) return false;
-		this._insert_(index, count);
+		this.customInsert(index, count);
 		this.setItems(index, items);
 		return true;
 	}
@@ -199,20 +199,20 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	@Override
 	public final GItem remove(final int index) {
 		final GItem item = this.getItem(index);
-		this._remove_(index, 1);
+		this.customRemove(index, 1);
 		return item;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final int indexOf(final Object item) {
-		return this._items_.values().indexOf(item);
+		return this.items.values().indexOf(item);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final int lastIndexOf(final Object item) {
-		return this._items_.values().lastIndexOf(item);
+		return this.items.values().lastIndexOf(item);
 	}
 
 	/** {@inheritDoc} */

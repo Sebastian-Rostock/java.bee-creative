@@ -75,8 +75,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 
 		/** {@inheritDoc} */
 		@Override
-		protected GKey _next_(final int index) {
-			return this.data.getKey(index);
+		protected GKey customNext(final int index) {
+			return this.data.customGetKey(index);
 		}
 
 	}
@@ -100,8 +100,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 
 		/** {@inheritDoc} */
 		@Override
-		protected GKey _next_(final int index) {
-			return this.data.getKey(index);
+		protected GKey customNext(final int index) {
+			return this.data.customGetKey(index);
 		}
 
 	}
@@ -190,8 +190,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 
 		/** {@inheritDoc} */
 		@Override
-		protected V _next_(final int index) {
-			return this.data.getValue(index);
+		protected V customNext(final int index) {
+			return this.data.customGetValue(index);
 		}
 
 	}
@@ -216,7 +216,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		 * @param data {@link CompactMap}.
 		 * @param index Index. */
 		public CompactMapEntry(final CompactMap<GKey, GValue> data, final int index) {
-			super(data.getKey(index), data.getValue(index));
+			super(data.customGetKey(index), data.customGetValue(index));
 			this.data = data;
 		}
 
@@ -227,9 +227,9 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		public GValue setValue(final GValue value) {
 			final GKey key = this.getKey();
 			final GValue result = super.setValue(value);
-			final int index = this.data._itemIndex_(this.getKey());
+			final int index = this.data.customItemIndex(this.getKey());
 			if (index < 0) throw new IllegalStateException();
-			this.data.setEntry(index, key, value);
+			this.data.customSetEntry(index, key, value);
 			return result;
 		}
 
@@ -294,8 +294,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 
 		/** {@inheritDoc} */
 		@Override
-		protected Entry<GKey, V> _next_(final int index) {
-			return this.data.getEntry(index);
+		protected Entry<GKey, V> customNext(final int index) {
+			return this.data.defaultGetEntry(index);
 		}
 
 	}
@@ -335,57 +335,57 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 *
 	 * @param index Index.
 	 * @return Schlüssel des {@code index}-ten Elements. */
-	protected abstract GKey getKey(int index);
+	protected abstract GKey customGetKey(int index);
 
 	/** Diese Methode gibt den Wert des {@code index}-ten Elements zurück.
 	 *
 	 * @param index Index.
 	 * @return Wert des {@code index}-ten Elements. */
-	protected abstract GValue getValue(int index);
-
-	/** Diese Methode gibt das {@code index}-te Element zurück.
-	 *
-	 * @param index Index.
-	 * @return {@code index}-tes Element */
-	protected final Entry<GKey, GValue> getEntry(final int index) {
-		return new CompactMapEntry<GKey, GValue>(this, index);
-	}
+	protected abstract GValue customGetValue(int index);
 
 	/** Diese Methode setzt Schlüssel und Wert des {@code index}-ten Elements.
 	 *
 	 * @param index Index.
 	 * @param key Schlüssel.
 	 * @param value Wert. */
-	protected abstract void setEntry(int index, GKey key, GValue value);
+	protected abstract void customSetEntry(int index, GKey key, GValue value);
+
+	/** Diese Methode gibt das {@code index}-te Element zurück.
+	 *
+	 * @param index Index.
+	 * @return {@code index}-tes Element */
+	protected final Entry<GKey, GValue> defaultGetEntry(final int index) {
+		return new CompactMapEntry<GKey, GValue>(this, index);
+	}
 
 	{}
 
 	/** Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses Elements oder
 	 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 *
-	 * @see CompactData#_itemIndexEquals_(Object, int)
-	 * @see CompactData#_itemIndexCompare_(Object, int)
+	 * @see CompactData#defaultItemIndexEquals(Object, int)
+	 * @see CompactData#defaultItemIndexCompare(Object, int)
 	 * @param key Syhlüssel.
 	 * @return Index oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 	@Override
-	protected abstract int _itemIndex_(final Object key);
+	protected abstract int customItemIndex(final Object key);
 
 	/** {@inheritDoc} */
 	@Override
 	public final int size() {
-		return this._items_.size();
+		return this.items.size();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final void clear() {
-		this._remove_(0, this.size());
+		this.customRemove(0, this.size());
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final boolean isEmpty() {
-		return this._items_.isEmpty();
+		return this.items.isEmpty();
 	}
 
 	/** {@inheritDoc} */
@@ -409,29 +409,29 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	/** {@inheritDoc} */
 	@Override
 	public final boolean containsKey(final Object key) {
-		return this._itemIndex_(key) >= 0;
+		return this.customItemIndex(key) >= 0;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final GValue get(final Object key) {
-		final int index = this._itemIndex_(key);
+		final int index = this.customItemIndex(key);
 		if (index < 0) return null;
-		return this.getValue(index);
+		return this.customGetValue(index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		int index = this._itemIndex_(key);
+		int index = this.customItemIndex(key);
 		if (index >= 0) {
-			final GValue item = this.getValue(index);
-			this.setEntry(index, this.getKey(index), value);
+			final GValue item = this.customGetValue(index);
+			this.customSetEntry(index, this.customGetKey(index), value);
 			return item;
 		}
 		index = -index - 1;
-		this._insert_(index, 1);
-		this.setEntry(index, key, value);
+		this.customInsert(index, 1);
+		this.customSetEntry(index, key, value);
 		return null;
 	}
 
@@ -446,10 +446,10 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	/** {@inheritDoc} */
 	@Override
 	public GValue remove(final Object key) {
-		final int index = this._itemIndex_(key);
+		final int index = this.customItemIndex(key);
 		if (index < 0) return null;
-		final GValue item = this.getValue(index);
-		this._remove_(index, 1);
+		final GValue item = this.customGetValue(index);
+		this.customRemove(index, 1);
 		return item;
 	}
 

@@ -374,27 +374,29 @@ public class Iterables {
 	}
 
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
-	 * in der gegebenen Reihenfolge liefert.
+	 * liefert.
 	 *
 	 * @see Iterators#navigatedIterator(Getter, Iterator)
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterable}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterable}.
-	 * @param converter {@link Getter}.
+	 * @param navigator {@link Getter} zur Navigation.
 	 * @param iterable {@link Iterable}.
-	 * @return {@code converted}-{@link Iterable}.
+	 * @return {@code navigated}-{@link Iterable}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static <GInput, GOutput> Iterable<GOutput> convertedIterable(final Getter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Iterable<GOutput> navigatedIterable(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Iterable<? extends GInput> iterable) throws NullPointerException {
+		Objects.assertNotNull(navigator);
+		Objects.assertNotNull(iterable);
 		return new BaseIterable<GOutput>() {
 
 			@Override
 			public Iterator<GOutput> iterator() {
-				return Iterators.navigatedIterator(converter, iterable.iterator());
+				return Iterators.navigatedIterator(navigator, iterable.iterator());
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("convertedIterable", converter, iterable);
+				return Objects.toInvokeString("navigatedIterable", navigator, iterable);
 			}
 
 		};

@@ -2,8 +2,8 @@ package bee.creative.util;
 
 import java.nio.ByteOrder;
 
-/** Diese Klasse implementiert Methoden zum konvertierenden Kopieren von {@code byte}-, {@code int} und {@code long}-Arrays in {@link ByteOrder#BIG_ENDIAN}
- * sowie {@link ByteOrder#LITTLE_ENDIAN}.
+/** Diese Klasse implementiert Methoden zur Interpretation von {@code byte}-Arrays als Dezimalzahlen in {@link ByteOrder#BIG_ENDIAN} sowie
+ * {@link ByteOrder#LITTLE_ENDIAN} unterschiedlicher Längen.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Bytes {

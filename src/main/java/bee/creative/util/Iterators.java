@@ -80,7 +80,7 @@ public class Iterators {
 	 * @return Anzahl der noch zu überspringenden Elemente.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static int skip(final Iterator<?> iterator, int count) throws NullPointerException {
-		Objects.assertNotNull(iterator );
+		Objects.assertNotNull(iterator);
 		while ((count != 0) && iterator.hasNext()) {
 			count--;
 			iterator.next();
@@ -168,7 +168,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean removeAll(final Iterator<?> iterator, final Collection<?> collection) throws NullPointerException {
-		Objects.assertNotNull(collection );
+		Objects.assertNotNull(collection);
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.contains(iterator.next())) {
@@ -188,7 +188,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean removeAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		Objects.assertNotNull(collection );
+		Objects.assertNotNull(collection);
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.remove(iterator.next())) {
@@ -585,15 +585,15 @@ public class Iterators {
 		};
 	}
 
-	/** Diese Methode gibt einen umgewandelten {@link Iterator} zurück, der die vom gegebenen {@link Getter} konvertierten Elemente des gegebenen {@link Iterator}
+	/** Diese Methode gibt einen umwandelnden {@link Iterator} zurück, der die vom gegebenen {@link Getter} konvertierten Elemente des gegebenen {@link Iterator}
 	 * liefert.
 	 *
 	 * @see Getter#get(Object)
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterator}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterator}.
 	 * @param iterator {@link Iterator}.
-	 * @param navigator {@link Getter}.
-	 * @return {@code converted}-{@link Iterator}.
+	 * @param navigator {@link Getter} nur Navigation.
+	 * @return {@code navigated}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code converter} {@code null} ist. */
 	public static <GInput, GOutput> Iterator<GOutput> navigatedIterator(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Iterator<? extends GInput> iterator) throws NullPointerException {

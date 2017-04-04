@@ -330,15 +330,25 @@ public class Comparators {
 		}
 	}
 
-	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der {@code null}-Eingaben vergleicht sowie alle anderen Eingaben an einen gegebenen
-	 * {@link Comparator} weiterleitet
+	/** Diese Methode gibt den {@link Comparator} für die natürliche Ordnung zurück.
+	 *
+	 * @see Comparable
+	 * @param <GEntry> Typ der Elemente.
+	 * @return {@link #NATURAL_COMPARATOR}. */
+	@SuppressWarnings ("unchecked")
+	public static <GEntry extends Comparable<? super GEntry>> Comparator<GEntry> naturalComparator() {
+		return (Comparator<GEntry>)Comparators.NATURAL_COMPARATOR;
+	}
+
+	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der {@code null}-Eingaben {@link #compare(Object, Object, Comparator) selbst vergleicht} und
+	 * alle anderen Eingaben an den gegebenen {@link Comparator} weiterleitet.
 	 *
 	 * @see #compare(Object, Object, Comparator)
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparator {@link Comparator}.
-	 * @return {@code null}-{@link Comparator}.
+	 * @return {@code default}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparator<GItem> nullComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static <GItem> Comparator<GItem> defaultComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
 		Objects.assertNotNull(comparator);
 		return new Comparator<GItem>() {
 
@@ -349,20 +359,10 @@ public class Comparators {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nullComparator", comparator);
+				return Objects.toInvokeString("defaultComparator", comparator);
 			}
 
 		};
-	}
-
-	/** Diese Methode gibt den {@link Comparator} für die natürliche Ordnung zurück.
-	 *
-	 * @see Comparable
-	 * @param <GEntry> Typ der Elemente.
-	 * @return {@link #NATURAL_COMPARATOR}. */
-	@SuppressWarnings ("unchecked")
-	public static <GEntry extends Comparable<? super GEntry>> Comparator<GEntry> naturalComparator() {
-		return (Comparator<GEntry>)Comparators.NATURAL_COMPARATOR;
 	}
 
 	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der den Vergleichswert des gegebenen {@link Comparator} umkehrt.
