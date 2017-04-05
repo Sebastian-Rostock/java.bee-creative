@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -424,6 +425,21 @@ public class Iterables {
 			}
 
 		};
+	}
+
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Collection} zurück.<br>
+	 * Wenn das gegebene {@link Iterable} eine {@link Collection} ist, wird diese geliefert. Andernfalls wird eine über {@link #appendAll(Collection, Iterable)}
+	 * befüllte {@link ArrayList} geliefert.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param iterable {@link Iterable}.
+	 * @return {@link Collection} der Elemente.
+	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
+	public static <GItem> Collection<GItem> toCollection(final Iterable<GItem> iterable) throws NullPointerException {
+		if (iterable instanceof Collection<?>) return (Collection<GItem>)iterable;
+		final ArrayList<GItem> result = new ArrayList<>();
+		Iterables.appendAll(result, iterable);
+		return result;
 	}
 
 }

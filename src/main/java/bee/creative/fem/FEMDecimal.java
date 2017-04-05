@@ -113,10 +113,10 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		return undefined;
 	}
 
-	/** Diese Methode gibt diesen Dezimalbruch als {@link Number} zurück.
+	/** Diese Methode gibt diesen Dezimalbruch als {@link Double} zurück.
 	 *
-	 * @return {@link Number}. */
-	public final Number toNumber() {
+	 * @return {@link Double}. */
+	public final Double toNumber() {
 		return new Double(this.value);
 	}
 

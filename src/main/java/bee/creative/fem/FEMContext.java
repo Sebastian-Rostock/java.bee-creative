@@ -2,10 +2,8 @@ package bee.creative.fem;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.List;
 import bee.creative.util.Getter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
@@ -143,9 +141,7 @@ public class FEMContext {
 
 	@SuppressWarnings ("javadoc")
 	final FEMArray arrayFromImpl(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
-		final List<Object> array = new ArrayList<>();
-		Iterables.appendAll(array, data);
-		return this.arrayFromImpl(array);
+		return this.arrayFromImpl(Iterables.toCollection(data));
 	}
 
 	@SuppressWarnings ("javadoc")

@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -359,7 +358,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	public static FEMArray from(final FEMValue item, final int length) throws NullPointerException, IllegalArgumentException {
-		Objects.assertNotNull(item );
+		Objects.assertNotNull(item);
 		if (length == 0) return FEMArray.EMPTY;
 		return new UniformArray(length, item);
 	}
@@ -371,9 +370,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
-		final ArrayList<FEMValue> result = new ArrayList<>();
-		Iterables.appendAll(result, items);
-		return FEMArray.from(result);
+		return FEMArray.from(Iterables.toCollection(items));
 	}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.

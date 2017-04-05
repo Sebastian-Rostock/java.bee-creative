@@ -110,10 +110,10 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		return Comparators.compare(this.value, that.value);
 	}
 
-	/** Diese Methode gibt diese Dezimalzahl als {@link Number} zurück.
+	/** Diese Methode gibt diese Dezimalzahl als {@link Long} zurück.
 	 *
-	 * @return {@link Number}. */
-	public final Number toNumber() {
+	 * @return {@link Long}. */
+	public final Long toNumber() {
 		return new Long(this.value);
 	}
 

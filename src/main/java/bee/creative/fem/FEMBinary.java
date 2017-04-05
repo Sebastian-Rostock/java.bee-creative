@@ -67,12 +67,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 		StringCollector(final boolean header, final int length) {
 			if (header) {
-				this.array = new char[length + 2];
+				this.array = new char[(length << 1) + 2];
 				this.array[0] = '0';
 				this.array[1] = 'x';
 				this.index = 2;
 			} else {
-				this.array = new char[length];
+				this.array = new char[length << 1];
 			}
 		}
 
@@ -80,9 +80,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 		@Override
 		public final boolean push(final byte value) {
-			this.array[this.index + 0] = FEMBinary.toChar((value >> 4) & 0xF);
-			this.array[this.index + 1] = FEMBinary.toChar((value >> 0) & 0xF);
-			this.index += 2;
+			int index = this.index;
+			this.array[index] = FEMBinary.toChar((value >> 4) & 0xF);
+			++index;
+			this.array[index] = FEMBinary.toChar((value >> 0) & 0xF);
+			++index;
+			this.index = index;
 			return true;
 		}
 

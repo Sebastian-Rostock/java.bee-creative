@@ -283,6 +283,17 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return FEMDatetime.EMPTY.withDate(year, month, date);
 	}
 
+	/** Diese Methode gibt eine Zeitangabe mit dem Datum der gegebenen zurück.<br>
+	 * Wenn die gegebene Zeitangabe kein Datum {@link #hasDate() besitzt}, hat die gelieferte Zeitangabe auch kein Datum.
+	 * 
+	 * @see #withDate(FEMDatetime)
+	 * @param datetime Zeitangabe.
+	 * @return Datum oder leere Zeitangabe.
+	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
+	public static FEMDatetime fromDate(FEMDatetime datetime) throws NullPointerException {
+		return FEMDatetime.EMPTY.withDate(datetime);
+	}
+
 	/** Diese Methode gibt eine Zeitangabe mit der Uhrzeit zu den gegebenen Tagesmillis zurück und ist eine Abkürzung für
 	 * {@code FEE_Datetime.EMPTY.withTime(daymillis)}.
 	 *
@@ -356,6 +367,17 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		if ((zone < -840) || (zone > 840)) throw new IllegalArgumentException();
 	}
 
+	/** Diese Methode gibt eine Zeitangabe mit der Uhrzeit der gegebenen zurück.<br>
+	 * Wenn die gegebene Zeitangabe keine Uhrzeit {@link #hasTime() besitzt}, hat die gelieferte Zeitangabe auch keine Uhrzeit.
+	 * 
+	 * @see #withTime(FEMDatetime)
+	 * @param datetime Zeitangabe.
+	 * @return Uhrzeit oder leere Zeitangabe.
+	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
+	public static FEMDatetime fromTime(FEMDatetime datetime) throws NullPointerException {
+		return FEMDatetime.EMPTY.withTime(datetime);
+	}
+
 	/** Diese Methode gibt eine Zeitangabe mit der gegebenen Zeitzone zurück und ist eine Abkürzung für {@code FEE_Datetime.EMPTY.withZone(zone)}.
 	 *
 	 * @see #withZone(int)
@@ -375,6 +397,17 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalArgumentException Wenn {@link #withZone(int, int)} eine entsprechende Ausnahme auslöst. */
 	public static FEMDatetime fromZone(final int zoneHour, final int zoneMinute) throws IllegalArgumentException {
 		return FEMDatetime.EMPTY.withZone(zoneHour, zoneMinute);
+	}
+
+	/** Diese Methode gibt eine Zeitangabe mit der Zeitzone der gegebenen zurück.<br>
+	 * Wenn die gegebene Zeitangabe keine Zeitzone {@link #hasTime() besitzt}, hat die gelieferte Zeitangabe auch keine Zeitzone.
+	 * 
+	 * @see #withZone(FEMDatetime)
+	 * @param datetime Zeitangabe.
+	 * @return Zeitzone oder leere Zeitangabe.
+	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
+	public static FEMDatetime fromZone(FEMDatetime datetime) throws NullPointerException {
+		return FEMDatetime.EMPTY.withZone(datetime);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Jahr ein Schaltjahr im Gregorianischen Kalender ist.<br>

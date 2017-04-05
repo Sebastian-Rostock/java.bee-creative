@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
@@ -258,15 +259,31 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return new ArrayFrame(this, params.length == 0 ? FEMArray.EMPTY : params, this.context);
 	}
 
-	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher die gegebenen {@link #params() zugesicherten Parameterwerte} besitzt, das {@link #context()
-	 * Kontextobjekt} dieses Stapelrahmens übernimmt und diesen als {@link #parent() übergeordneten Stapelrahmen} nutzt.
+	/** Diese Methode ist eine Abkürzung für {@code this.newFrame(FEMArray.from(params))}.
 	 *
-	 * @see FEMArray#from(FEMValue...)
-	 * @param params zugesicherte Parameterwerte.
-	 * @return neuer Stapelrahmen.
-	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
+	 * @see #newFrame(FEMArray)
+	 * @see FEMArray#from(FEMValue...) */
+	@SuppressWarnings ("javadoc")
 	public final FEMFrame newFrame(final FEMValue... params) throws NullPointerException {
-		return new ArrayFrame(this, FEMArray.from(params), this.context);
+		return this.newFrame(FEMArray.from(params));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.newFrame(FEMArray.from(params))}.
+	 *
+	 * @see #newFrame(FEMArray)
+	 * @see FEMArray#from(Iterable) */
+	@SuppressWarnings ("javadoc")
+	public final FEMFrame newFrame(final Iterable<? extends FEMValue> params) throws NullPointerException {
+		return this.newFrame(FEMArray.from(params));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.newFrame(FEMArray.from(params))}.
+	 *
+	 * @see #newFrame(FEMArray)
+	 * @see FEMArray#from(Collection) */
+	@SuppressWarnings ("javadoc")
+	public final FEMFrame newFrame(final Collection<? extends FEMValue> params) throws NullPointerException {
+		return this.newFrame(FEMArray.from(params));
 	}
 
 	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher die gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten
@@ -298,16 +315,31 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return new ArrayFrame(this.parent, params.length == 0 ? FEMArray.EMPTY : params, this.context);
 	}
 
-	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen {@link #params() zugesicherten Parameterwerten} zurück.<br>
-	 * Sie ist eine Abkürzung für {@code this.parent().newFrame(params).withContext(this.context())}.
+	/** Diese Methode ist eine Abkürzung für {@code this.withParams(FEMArray.from(params))}.
 	 *
-	 * @see #newFrame(FEMValue...)
-	 * @see #withContext(FEMContext)
-	 * @param params zugesicherte Parameterwerte.
-	 * @return neuer Stapelrahmen.
-	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
+	 * @see #withParams(FEMArray)
+	 * @see FEMArray#from(FEMValue...) */
+	@SuppressWarnings ("javadoc")
 	public final FEMFrame withParams(final FEMValue... params) throws NullPointerException {
-		return new ArrayFrame(this.parent, FEMArray.from(params), this.context);
+		return this.withParams(FEMArray.from(params));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.withParams(FEMArray.from(params))}.
+	 *
+	 * @see #withParams(FEMArray)
+	 * @see FEMArray#from(Iterable) */
+	@SuppressWarnings ("javadoc")
+	public final FEMFrame withParams(final Iterable<? extends FEMValue> params) throws NullPointerException {
+		return this.withParams(FEMArray.from(params));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.withParams(FEMArray.from(params))}.
+	 *
+	 * @see #withParams(FEMArray)
+	 * @see FEMArray#from(Collection) */
+	@SuppressWarnings ("javadoc")
+	public final FEMFrame withParams(final Collection<? extends FEMValue> params) throws NullPointerException {
+		return this.withParams(FEMArray.from(params));
 	}
 
 	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten Parameterwerte} zurück.<br>
