@@ -3,7 +3,6 @@ package bee.creative.util;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 /** Diese Klasse implementiert mehrere Hilfsfunktionen zur binären Suche mit {@link Comparable}s als Suchkriterium sowie zur Erzeugung von {@link Comparable}s.
@@ -84,44 +83,6 @@ public class Comparables {
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
 		Objects.assertNotNull(comparable);
 		Comparables.check(items.length, fromIndex, toIndex);
-	}
-
-	/** Diese Methode wählt aus den gegebenen Elementen ein Element mit der kleinsten Ordnung und gibt es zurück. Der Navigationswert eines solchen Elements ist
-	 * bezogen auf jedes der gegebenen Elemente immer kleiner oder gleich {@code 0}. Bei erfolgloser Sucht wird {@code null} geliefert.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param items Elemente.
-	 * @return Element mit der kleinsten Ordnung oder {@code null}. */
-	public static <GItem extends Comparable<? super GItem>> GItem minItem(final Iterable<? extends GItem> items) {
-		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
-		if (!iterator.hasNext()) return null;
-		GItem result = iterator.next();
-		while (iterator.hasNext()) {
-			final GItem item = iterator.next();
-			if (item.compareTo(result) < 0) {
-				result = item;
-			}
-		}
-		return result;
-	}
-
-	/** Diese Methode wählt aus den gegebenen Elementen ein Element mit der größten Ordnung und gibt es zurück. Der Navigationswert eines solchen Elements ist
-	 * bezogen auf jedes der gegebenen Elemente immer größer oder gleich {@code 0}. Bei erfolgloser Sucht wird {@code null} geliefert.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param items Elemente.
-	 * @return Element mit der größten Ordnung oder {@code null}. */
-	public static <GItem extends Comparable<? super GItem>> GItem maxItem(final Iterable<? extends GItem> items) {
-		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
-		if (!iterator.hasNext()) return null;
-		GItem result = iterator.next();
-		while (iterator.hasNext()) {
-			final GItem item = iterator.next();
-			if (item.compareTo(result) > 0) {
-				result = item;
-			}
-		}
-		return result;
 	}
 
 	/** Diese Methode gibt eine beliebig sortierte Sicht auf die Elemente des gegebenen {@link Items}. Die Methode {@link Items#get(int)} liefert hierbei
@@ -218,17 +179,17 @@ public class Comparables {
 	public static <GItem> Comparable<GItem> defaultComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
 		Objects.assertNotNull(comparable);
 		return new Comparable<GItem>() {
-	
+
 			@Override
 			public int compareTo(final GItem item) {
 				return item == null ? 1 : comparable.compareTo(item);
 			}
-	
+
 			@Override
 			public String toString() {
 				return Objects.toInvokeString("defaultComparable", comparable);
 			}
-	
+
 		};
 	}
 

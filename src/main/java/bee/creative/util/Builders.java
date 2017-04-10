@@ -1321,7 +1321,7 @@ public class Builders {
 	 * @param method Native statische Methode.
 	 * @return {@code native}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die gegebene Methode nicht statisch ist TODO . */
+	 * @throws IllegalArgumentException Wenn die gegebene Methode nicht statisch oder nicht parameterlos ist. */
 	public static <GValue> Builder<GValue> nativeBuilder(final java.lang.reflect.Method method) throws NullPointerException, IllegalArgumentException {
 		if (!Modifier.isStatic(method.getModifiers()) || (method.getParameterTypes().length != 0)) throw new IllegalArgumentException();
 		return new Builder<GValue>() {

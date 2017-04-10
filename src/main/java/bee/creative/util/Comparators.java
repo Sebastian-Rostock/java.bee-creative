@@ -9,7 +9,7 @@ import java.util.Iterator;
  * @author Sebastian Rostock 2011. */
 public class Comparators {
 
-	/** Dieses Feld speichert den {@link Comparator} für die natürliche Ordnung. */
+	/** Dieses Feld speichert den {@link Comparator} für die {@link Comparable#compareTo(Object) natürliche Ordnung}. */
 	public static final Comparator<?> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {
 
 		@Override
@@ -30,8 +30,28 @@ public class Comparators {
 		@Override
 		public int compare(final String item1, final String item2) {
 			final int s1 = item1.length(), s2 = item2.length();
-			// TODO vorzeichen
 			int a1 = 0, a2 = 0;
+			boolean n1 = false, n2 = false;
+			{ // Vorzeichen ermitteln und überspringen
+				if (a1 < s1) {
+					final int c1 = item1.charAt(a1);
+					if (c1 == '-') {
+						n1 = true;
+						a1++;
+					} else if (c1 == '+') {
+						a1++;
+					}
+				}
+				if (a2 < s2) {
+					final int c2 = item2.charAt(a2);
+					if (c2 == '-') {
+						n2 = true;
+						a2++;
+					} else if (c2 == '+') {
+						a2++;
+					}
+				}
+			}
 			{ // '0' überspringen
 				while ((a1 < s1) && (item1.charAt(a1) == '0')) {
 					a1++;
@@ -41,10 +61,14 @@ public class Comparators {
 				}
 			}
 			{ // War eine der Eingaben Leer oder "0"
-				if (a1 == s1) return ((a2 == s2) ? 0 : -1);
-				if (a2 == s2) return 1;
+				if (a1 == s1) {
+					if (a2 == s2) return 0;
+					return n2 ? +1 : -1;
+				}
+				if (a2 == s2) return n1 ? -1 : +1;
 			}
 			{ // Zahlen vergleichen
+				if (n1 != n2) return n1 ? -1 : +1;
 				final int comp = (s1 - a1) - (s2 - a2);
 				if (comp != 0) return comp;
 				return item1.substring(a1, s1).compareTo(item2.substring(a2, s2));
@@ -82,7 +106,13 @@ public class Comparators {
 			final int s1 = item1.length(), s2 = item2.length();
 			int a1 = 0, a2 = 0, e1, e2;
 			while ((a1 < s1) && (a2 < s2)) {
-				{ // Buchstaben überspringen = Halt, wenn Ziffer gefunden
+				{ // Buchstaben
+					// überspringen
+					// =
+					// Halt,
+					// wenn
+					// Ziffer
+					// gefunden
 					for (e1 = a1; e1 < s1; e1++) {
 						final char c1 = item1.charAt(e1);
 						if (('0' <= c1) && (c1 <= '9')) {
@@ -96,7 +126,8 @@ public class Comparators {
 						}
 					}
 				}
-				{ // Buchstaben vergleichen
+				{ // Buchstaben
+					// vergleichen
 					if (a1 == e1) {
 						if (a2 != e2) return -1;
 					} else if (a2 != e2) {
@@ -104,7 +135,14 @@ public class Comparators {
 						if (comp != 0) return comp;
 					} else return 1;
 				}
-				{ // '0' überspringen = Halt, wenn nicht '0' gefunden
+				{ // '0'
+					// überspringen
+					// =
+					// Halt,
+					// wenn
+					// nicht
+					// '0'
+					// gefunden
 					for (a1 = e1; a1 < s1; a1++) {
 						if (item1.charAt(a1) != '0') {
 							break;
@@ -116,7 +154,8 @@ public class Comparators {
 						}
 					}
 				}
-				{ // Ziffern überspringen = Halt, wenn nicht Ziffer gefunden
+				{ // Ziffern überspringen = Halt, wenn nicht
+					// Ziffer gefunden
 					for (e1 = a1; e1 < s1; e1++) {
 						final char c1 = item1.charAt(e1);
 						if (('0' > c1) || (c1 > '9')) {
@@ -130,7 +169,8 @@ public class Comparators {
 						}
 					}
 				}
-				{ // Ziffern vergleichen
+				{ // Ziffern
+					// vergleichen
 					if (a1 == e1) {
 						if (a2 != e2) return -1;
 					} else if (a2 != e2) {
@@ -223,6 +263,130 @@ public class Comparators {
 
 	{}
 
+	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der kleinsten Ordnung zurück. Dieses ergibt sich aus
+	 * {@code  Comparators.compare(item1, item2) <= 0 ? item1 : item2}.
+	 *
+	 * @see #compare(Comparable, Comparable)
+	 * @param <GItem> Typ der Objekte.
+	 * @param item1 erstes Objekt oder {@code null}.
+	 * @param item2 zweites Objekt oder {@code null}.
+	 * @return Objekt mit der kleinsten ordnung oder {@code null}. */
+	public static <GItem extends Comparable<? super GItem>> GItem min(final GItem item1, final GItem item2) {
+		return Comparators.compare(item1, item2) <= 0 ? item1 : item2;
+	}
+
+	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der kleinsten Ordnung zurück. Dieses ergibt sich aus
+	 * {@code  Comparators.compare(item1, item2, comparator) <= 0 ? item1 : item2}.
+	 *
+	 * @see #compare(Object, Object, Comparator)
+	 * @param <GItem> Typ der Objekte.
+	 * @param item1 erstes Objekt oder {@code null}.
+	 * @param item2 zweites Objekt oder {@code null}.
+	 * @param comparator {@link Comparator}.
+	 * @return Objekt mit der kleinsten ordnung oder {@code null}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
+	public static <GItem> GItem min(final GItem item1, final GItem item2, final Comparator<? super GItem> comparator) throws NullPointerException {
+		return Comparators.compare(item1, item2, comparator) <= 0 ? item1 : item2;
+	}
+
+	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der kleinsten Ordnung zurück.
+	 *
+	 * @see #min(Comparable, Comparable)
+	 * @see Iterators#iterator(Iterator)
+	 * @param <GItem> Typ der Objekte.
+	 * @param items Objekte oder {@code null}.
+	 * @return Objekt mit der kleinsten Ordnung oder {@code null}. */
+	public static <GItem extends Comparable<? super GItem>> GItem min(final Iterable<? extends GItem> items) {
+		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
+		if (!iterator.hasNext()) return null;
+		GItem result = iterator.next();
+		while (iterator.hasNext()) {
+			result = Comparators.min(iterator.next(), result);
+		}
+		return result;
+	}
+
+	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der kleinsten Ordnung zurück.
+	 *
+	 * @see #min(Object, Object, Comparator)
+	 * @see Iterators#iterator(Iterator)
+	 * @param <GItem> Typ der Objekte.
+	 * @param items Objekte oder {@code null}.
+	 * @param comparator {@link Comparator}.
+	 * @return Objekt mit der kleinsten Ordnung oder {@code null}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
+	public static <GItem> GItem min(final Iterable<? extends GItem> items, final Comparator<? super GItem> comparator) {
+		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
+		if (!iterator.hasNext()) return null;
+		GItem result = iterator.next();
+		while (iterator.hasNext()) {
+			result = Comparators.min(iterator.next(), result, comparator);
+		}
+		return result;
+	}
+
+	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der größten Ordnung zurück. Dieses ergibt sich aus
+	 * {@code  Comparators.compare(item1, item2) >= 0 ? item1 : item2}.
+	 *
+	 * @see #compare(Comparable, Comparable)
+	 * @param <GItem> Typ der Objekte.
+	 * @param item1 erstes Objekt oder {@code null}.
+	 * @param item2 zweites Objekt oder {@code null}.
+	 * @return Objekt mit der kleinsten ordnung oder {@code null}. */
+	public static <GItem extends Comparable<? super GItem>> GItem max(final GItem item1, final GItem item2) {
+		return Comparators.compare(item1, item2) >= 0 ? item1 : item2;
+	}
+
+	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der größten Ordnung zurück. Dieses ergibt sich aus
+	 * {@code  Comparators.compare(item1, item2, comparator) >= 0 ? item1 : item2}.
+	 *
+	 * @see #compare(Object, Object, Comparator)
+	 * @param <GItem> Typ der Objekte.
+	 * @param item1 erstes Objekt oder {@code null}.
+	 * @param item2 zweites Objekt oder {@code null}.
+	 * @param comparator {@link Comparator}.
+	 * @return Objekt mit der kleinsten ordnung oder {@code null}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
+	public static <GItem> GItem max(final GItem item1, final GItem item2, final Comparator<? super GItem> comparator) throws NullPointerException {
+		return Comparators.compare(item1, item2, comparator) >= 0 ? item1 : item2;
+	}
+
+	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der größten Ordnung zurück.
+	 *
+	 * @see #max(Comparable, Comparable)
+	 * @see Iterators#iterator(Iterator)
+	 * @param <GItem> Typ der Objekte.
+	 * @param items Objekte oder {@code null}.
+	 * @return Objekt mit der größten Ordnung oder {@code null}. */
+	public static <GItem extends Comparable<? super GItem>> GItem max(final Iterable<? extends GItem> items) {
+		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
+		if (!iterator.hasNext()) return null;
+		GItem result = iterator.next();
+		while (iterator.hasNext()) {
+			result = Comparators.max(iterator.next(), result);
+		}
+		return result;
+	}
+
+	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der größten Ordnung zurück.
+	 *
+	 * @see #max(Object, Object, Comparator)
+	 * @see Iterators#iterator(Iterator)
+	 * @param <GItem> Typ der Objekte.
+	 * @param items Objekte oder {@code null}.
+	 * @param comparator {@link Comparator}.
+	 * @return Objekt mit der größten Ordnung oder {@code null}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
+	public static <GItem> GItem max(final Iterable<? extends GItem> items, final Comparator<? super GItem> comparator) {
+		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
+		if (!iterator.hasNext()) return null;
+		GItem result = iterator.next();
+		while (iterator.hasNext()) {
+			result = Comparators.max(iterator.next(), result, comparator);
+		}
+		return result;
+	}
+
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der
 	 * berechnete Vergleichswert entspricht: <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
 	 *
@@ -264,32 +428,31 @@ public class Comparators {
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr als, gleich bzw. größer als das zweite
-	 * Objekt ist.
+	 * Objekt ist. Wenn nur eines der Objekte {@code null} ist, wird dieses als das kleiner angesehen. Der berechnete Vergleichswert entspricht:
+	 * {@code item1 == null ? (item2 == null ? 0 : -1) : (item2 == null ? 1 : item1.compareTo(item2))}.
 	 *
 	 * @see #compare(Object, Object, Comparator)
-	 * @see #naturalComparator()
 	 * @param <GItem> Typ der Objekte.
-	 * @param item1 erstes Objekt.
-	 * @param item2 zweites Objekt.
+	 * @param item1 erstes Objekt oder {@code null}.
+	 * @param item2 zweites Objekt oder {@code null}.
 	 * @return Vergleichswert. */
 	public static <GItem extends Comparable<? super GItem>> int compare(final GItem item1, final GItem item2) {
-		return Comparators.compare(item1, item2, Comparators.<GItem>naturalComparator());
+		return item1 == null ? (item2 == null ? 0 : -1) : (item2 == null ? 1 : item1.compareTo(item2));
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr als, gleich bzw. größer als das zweite
-	 * Objekt ist. Der berechnete Vergleichswert entspricht: <pre>
-	 * ((item1 == null) ? ((item2 == null) ? 0 : -1) : ((item2 == null) ? 1 : comparator.compare(item1, item2)))
-	 * </pre>
+	 * Objekt ist. Wenn nur eines der Objekte {@code null} ist, wird dieses als das kleiner angesehen. Der berechnete Vergleichswert entspricht:
+	 * {@code item1 == null ? (item2 == null ? 0 : -1) : (item2 == null ? 1 : comparator.compare(item1, item2))}.
 	 *
 	 * @param <GItem> Typ der Objekte.
-	 * @param item1 erstes Objekt.
-	 * @param item2 zweites Objekt.
+	 * @param item1 erstes Objekt oder {@code null}.
+	 * @param item2 zweites Objekt oder {@code null}.
 	 * @param comparator {@link Comparator}.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
 	public static <GItem> int compare(final GItem item1, final GItem item2, final Comparator<? super GItem> comparator) throws NullPointerException {
 		Objects.assertNotNull(comparator);
-		return ((item1 == null) ? ((item2 == null) ? 0 : -1) : ((item2 == null) ? 1 : comparator.compare(item1, item2)));
+		return item1 == null ? (item2 == null ? 0 : -1) : (item2 == null ? 1 : comparator.compare(item1, item2));
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste {@link Iterable} kleienr als, gleich bzw. größer als das
