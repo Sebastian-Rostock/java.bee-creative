@@ -7,10 +7,8 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import bee.creative.fem.FEMBinary;
 import bee.creative.fem.FEMString;
-import bee.creative.iam.IAMLoader.IAMIndexLoader;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
-import bee.creative.mmf.MMFArray;
 import bee.creative.util.Builders.HashMapBuilder;
 import bee.creative.util.IO;
 
@@ -33,10 +31,7 @@ public final class IAMCodec {
 			@Override
 			public IAMIndex decode(final IAMCodec codec) throws IOException, IllegalArgumentException {
 				try {
-					final MMFArray array = MMFArray.from(codec.getSourceData());
-					final ByteOrder order = IAMIndexLoader.HEADER.orderOf(array);
-					codec.useByteOrder(IAMByteOrder.from(order));
-					return new IAMIndexLoader(array.withOrder(order));
+					return IAMIndex.from(codec.getSourceData());
 				} catch (IOException | IllegalArgumentException cause) {
 					throw cause;
 				} catch (final Exception cause) {
@@ -696,7 +691,7 @@ public final class IAMCodec {
 	/** Diese Methode gibt das Format der Eingabedaten zurück.
 	 * <dl>
 	 * <dt>{@link IAMDataType#IAM}</dt>
-	 * <dd>{@link MMFArray#from(Object)}</dd>
+	 * <dd>{@link IAMIndex#from(Object)}</dd>
 	 * <dt>{@link IAMDataType#INI}</dt>
 	 * <dd>{@link INIReader#from(Object)}</dd>
 	 * <dt>{@link IAMDataType#XML}</dt>
