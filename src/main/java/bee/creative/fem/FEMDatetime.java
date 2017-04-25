@@ -2,7 +2,6 @@ package bee.creative.fem;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 
@@ -106,7 +105,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public static final FEMDatetime MAXIMUM = FEMDatetime.fromDate(9999, 12, 31).withTime(24, 0, 0, 0).withZone(-14, 0);
 
 	@SuppressWarnings ("javadoc")
-	static final FEMDatetime utcbase = FEMDatetime.EMPTY.withDate(1970, 1, 1).withTime(0).withZone(0).withZone(TimeZone.getDefault().getRawOffset() / 60000);
+	static final FEMDatetime utcbase = FEMDatetime.EMPTY.withDate(1970, 1, 1).withTime(0).withZone(0);
 
 	{}
 
@@ -1235,7 +1234,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return normalisierte Zeitangabe. */
 	public final FEMDatetime normalize() {
 		if (!this.hasDate() || !this.hasTime()) return this;
-		if ((this.hourValueImpl() == 24) && (this.yearValueImpl() == 9999) && (this.monthValueImpl() == 12) && (this.dateValueImpl() == 31)) return this;
+		if (this.hourValueImpl() != 24) return this;
+		if ((this.yearValueImpl() == 9999) && (this.monthValueImpl() == 12) && (this.dateValueImpl() == 31)) return this;
 		return this.moveDateImpl(0, 1).withTimeImpl(0, 0, 0, 0);
 	}
 
