@@ -339,15 +339,33 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	{}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
-	 * Das gegebene Array wird Kopiert, sodass spätere Anderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden.
+	 * Das gegebene Array wird kopiert.
 	 *
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMArray from(final FEMValue... items) throws NullPointerException {
 		if (items.length == 0) return FEMArray.EMPTY;
-		if (items.length == 1) return FEMArray.from(items[0], 1);
+		if (items.length == 1) return new UniformArray(1, items[0]);
 		return new CompactArray(items.clone());
+	}
+
+	/** Diese Methode gibt eine Wertliste mit den Werten im gegebenen Abschnitt zurück.<br>
+	 * Der gegebene Abschnitt wird kopiert.
+	 *
+	 * @param items Werte.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMArray from(final FEMValue[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMArray.EMPTY;
+		if (length == 1) return new UniformArray(1, Objects.assertNotNull(items[offset]));
+		final FEMValue[] result = new FEMValue[length];
+		System.arraycopy(items, offset, result, 0, length);
+		return new CompactArray(result);
 	}
 
 	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.

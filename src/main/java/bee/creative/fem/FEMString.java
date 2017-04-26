@@ -654,14 +654,34 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	{}
 
-	/** Diese Methode eine Zeichenkette mit den gegebenen UTF32-kodierten Codepoints zurück.
+	/** Diese Methode eine Zeichenkette mit den gegebenen UTF32-kodierten Codepoints zurück.<br>
+	 * Das gegebene Array wird kopiert.
 	 *
 	 * @param items UTF32-kodierte Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMString from(final int[] items) throws NullPointerException {
 		if (items.length == 0) return FEMString.EMPTY;
+		if (items.length == 1) return new UniformString(1, items[0]);
 		return new UTF32CompactString(items.clone());
+	}
+
+	/** Diese Methode gibt eine Zeichenkette mit den UTF32-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
+	 * Der gegebene Abschnitt wird kopiert.
+	 *
+	 * @param items UTF32-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final int[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMString.EMPTY;
+		if (length == 1) return new UniformString(1, items[offset]);
+		final int[] result = new int[length];
+		System.arraycopy(items, offset, result, 0, length);
+		return new UTF32CompactString(result);
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück.
@@ -675,6 +695,23 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 		return new UTF8CompactString(items.clone());
 	}
 
+	/** Diese Methode gibt eine Zeichenkette mit den UTF8-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
+	 * Der gegebene Abschnitt wird kopiert.
+	 *
+	 * @param items UTF8-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final byte[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMString.EMPTY;
+		final byte[] result = new byte[length];
+		System.arraycopy(items, offset, result, 0, length);
+		return new UTF8CompactString(result);
+	}
+
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück.
 	 *
 	 * @param items UTF16-kodierte Codepoints.
@@ -684,6 +721,23 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	public static FEMString from(final char[] items) throws NullPointerException, IllegalArgumentException {
 		if (items.length == 0) return FEMString.EMPTY;
 		return new UTF16CompactString(items.clone());
+	}
+
+	/** Diese Methode gibt eine Zeichenkette mit den UTF16-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
+	 * Der gegebene Abschnitt wird kopiert.
+	 *
+	 * @param items UTF16-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final char[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMString.EMPTY;
+		final char[] result = new char[length];
+		System.arraycopy(items, offset, result, 0, length);
+		return new UTF16CompactString(result);
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen Codepoints zurück.

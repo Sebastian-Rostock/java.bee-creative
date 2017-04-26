@@ -354,15 +354,33 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	{}
 
 	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.<br>
-	 * Das gegebene Array wird hierbei kopiert.
+	 * Das gegebene Array wird kopiert.
 	 *
 	 * @param items Bytes.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMBinary from(final byte[] items) throws NullPointerException {
 		if (items.length == 0) return FEMBinary.EMPTY;
-		if (items.length == 1) return FEMBinary.from(items[0], 1);
+		if (items.length == 1) return new UniformBinary(1, items[0]);
 		return new CompactBinary(items.clone());
+	}
+
+	/** Diese Methode gibt eine Bytefolge mit den Bytes im gegebenen Abschnitt zurück.<br>
+	 * Der gegebene Abschnitt wird kopiert.
+	 *
+	 * @param items Bytes.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Bytefolge.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMBinary from(final byte[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMBinary.EMPTY;
+		if (length == 1) return new UniformBinary(1, items[offset]);
+		final byte[] result = new byte[length];
+		System.arraycopy(items, offset, result, 0, length);
+		return new CompactBinary(result);
 	}
 
 	/** Diese Methode gibt eine uniforme Bytefolge mit der gegebenen Länge zurück, deren Bytes alle gleich dem gegebenen sind.
@@ -406,10 +424,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 			count -= 2;
 		}
 		count >>= 1;
+		if (count == 0) return FEMBinary.EMPTY;
 		final byte[] bytes = new byte[count];
 		for (int i = 0; i < count; i++, index += 2) {
 			bytes[i] = (byte)((FEMBinary.toDigit(string.charAt(index + 0)) << 4) | (FEMBinary.toDigit(string.charAt(index + 1)) << 0));
 		}
+		if (count == 1) return new UniformBinary(1, bytes[0]);
 		return new CompactBinary(bytes);
 	}
 
