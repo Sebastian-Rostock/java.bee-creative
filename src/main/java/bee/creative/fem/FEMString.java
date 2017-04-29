@@ -1204,6 +1204,18 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 		return this.customExtract(target, 0, this.length, true);
 	}
 
+	/** Diese Methode kopiert alle Codepoints dieser Zeichenkette vom ersten zum letzten geordnet in den an der gegebenen Position beginnenden Abschnitt des
+	 * gegebenen Arrays.
+	 *
+	 * @param result Array, in welchem der Abschnitt liegt.
+	 * @param offset Beginn des Abschnitts.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschitt außerhalb des gegebenen Arrays liegt. */
+	public final void extract(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || ((offset + this.length) > result.length)) throw new IllegalArgumentException();
+		this.extract(new UTF32Encoder(result, offset));
+	}
+
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */

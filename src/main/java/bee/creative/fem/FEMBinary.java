@@ -98,8 +98,9 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 		public int index;
 
-		ValueCollector(final int length) {
-			this.array = new byte[length];
+		public ValueCollector(final byte[] array, final int index) {
+			this.array = array;
+			this.index = index;
 		}
 
 		{}
@@ -538,7 +539,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 *
 	 * @return Array mit den Bytes dieser Bytefolge. */
 	public byte[] value() {
-		final ValueCollector target = new ValueCollector(this.length);
+		final ValueCollector target = new ValueCollector(new byte[this.length], 0);
 		this.extract(target);
 		return target.array;
 	}
@@ -653,6 +654,18 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		Objects.assertNotNull(target);
 		if (this.length == 0) return true;
 		return this.customExtract(target, 0, this.length, true);
+	}
+
+	/** Diese Methode kopiert alle Bytes dieser Bytefolge vom ersten zum letzten geordnet in den an der gegebenen Position beginnenden Abschnitt des gegebenen
+	 * Arrays.
+	 *
+	 * @param result Array, in welchem der Abschnitt liegt.
+	 * @param offset Beginn des Abschnitts.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschitt außerhalb des gegebenen Arrays liegt. */
+	public final void extract(final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || ((offset + this.length) > result.length)) throw new IllegalArgumentException();
+		this.extract(new ValueCollector(result, offset));
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
