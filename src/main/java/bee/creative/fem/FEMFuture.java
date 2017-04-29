@@ -117,6 +117,20 @@ public final class FEMFuture extends FEMValue {
 
 	/** {@inheritDoc} */
 	@Override
+	public final int hashCode() {
+		return this.result().hashCode();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final boolean equals(final Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMValue)) return false;
+		return this.equals((FEMValue)object);
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public final synchronized void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		if (this.result != null) {
 			target.putFunction(this.result);

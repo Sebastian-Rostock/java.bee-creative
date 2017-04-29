@@ -322,6 +322,20 @@ public abstract class FEMReflection extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
+	public final int hashCode() {
+		return this.member().hashCode();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final boolean equals(final Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMReflection)) return false;
+		return this.member().equals(((FEMReflection)object).member());
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put(FEMParser.formatValue(this.toString()));
 	}

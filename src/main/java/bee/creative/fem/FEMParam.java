@@ -115,6 +115,20 @@ public final class FEMParam extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
+	public final int hashCode() {
+		return this.index;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final boolean equals(final Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMParam)) return false;
+		return this.index == ((FEMParam)object).index;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put("$").put(Integer.valueOf(this.index + 1));
 	}
