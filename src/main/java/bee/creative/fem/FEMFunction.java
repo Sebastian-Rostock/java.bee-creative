@@ -60,6 +60,19 @@ public abstract class FEMFunction {
 		}
 
 		@Override
+		public final int hashCode() {
+			return this.function.hashCode() ^ 123456789;
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof TraceFunction)) return false;
+			final TraceFunction data = (TraceFunction)object;
+			return this.function.equals(data.function);
+		}
+
+		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 			target.putFunction(this.function);
 		}
@@ -93,6 +106,19 @@ public abstract class FEMFunction {
 		@Override
 		public final FEMFunction withoutTracer() {
 			return this.function.withoutTracer().toClosure(this.frame);
+		}
+
+		@Override
+		public final int hashCode() {
+			return this.frame.hashCode() ^ this.function.hashCode();
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof FrameFunction)) return false;
+			final FrameFunction data = (FrameFunction)object;
+			return this.frame.equals(data.frame) && this.function.equals(data.function);
 		}
 
 		@Override
@@ -136,6 +162,19 @@ public abstract class FEMFunction {
 		@Override
 		public final FEMFunction withoutTracer() {
 			return this.function.withoutTracer().toFuture();
+		}
+
+		@Override
+		public final int hashCode() {
+			return this.function.hashCode() ^ 456789123;
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof FutureFunction)) return false;
+			final FutureFunction data = (FutureFunction)object;
+			return this.function.equals(data.function);
 		}
 
 		@Override
@@ -193,6 +232,19 @@ public abstract class FEMFunction {
 		}
 
 		@Override
+		public final int hashCode() {
+			return this.function.hashCode() ^ Objects.hash((Object[])this.params);
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof ConcatFunction)) return false;
+			final ConcatFunction data = (ConcatFunction)object;
+			return this.function.equals(data.function) && Objects.equals(this.params, data.params);
+		}
+
+		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 			target.putFunction(this.function).putParams(Arrays.asList(this.params));
 		}
@@ -226,6 +278,19 @@ public abstract class FEMFunction {
 		@Override
 		public FEMFunction withoutTracer() {
 			return this.function.withoutTracer().toClosure();
+		}
+
+		@Override
+		public final int hashCode() {
+			return this.function.hashCode() ^ 789123456;
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof ClosureFunction)) return false;
+			final ClosureFunction data = (ClosureFunction)object;
+			return this.function.equals(data.function);
 		}
 
 		/** {@inheritDoc} */
@@ -271,6 +336,19 @@ public abstract class FEMFunction {
 				params[i] = params[i].withoutTracer();
 			}
 			return new CompositeFunction(this.function.withoutTracer(), params);
+		}
+
+		@Override
+		public final int hashCode() {
+			return this.function.hashCode() ^ Objects.hash((Object[])this.params);
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof ConcatFunction)) return false;
+			final ConcatFunction data = (ConcatFunction)object;
+			return this.function.equals(data.function) && Objects.equals(this.params, data.params);
 		}
 
 		@Override

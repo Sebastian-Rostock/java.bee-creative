@@ -13,19 +13,19 @@ import bee.creative.util.Objects;
  * {@link Method} oder {@link Constructor} gegeben sein.<br>
  * <h4>Datenfelder</h4>
  * <p>
- * Native Funktionen zu klassengebundenen Datenfeldern nutzen zum Lesen die Signatur
- * {@code (): FEMNative» und liefern den Ergebniswert «new FEMNative(this.member().get(null))}. Zum Schreiben verwenden sie dagegen die Signatur
- * {@code (value: FEMNative): FEMNative}, führen {@code this.member().set(null, value.data())} aus und liefern {@link FEMNative#NULL}. Analog dazu nutzen die
- * Funktionen zu instanzgebundenen Datenfeldern zum Lesen die Signatur {@code (object: FEMNative): FEMNative} und liefern den Ergebniswert
- * {@code new FEMNative(this.member().get(object.data()))}. Zum Schreiben verwenden sie dann die Signatur {@code ( object, value: FEMNative): FEMNative}, führen
- * {@code this.member().set(object.data(), value.data())} aus und liefern ebenfalls {@link FEMNative#NULL}.
+ * Native Funktionen zu klassengebundenen Datenfeldern nutzen zum Lesen die Signatur {@code (): FEMNative} und liefern den Ergebniswert
+ * {@code new FEMNative(this.member().get(null))}. Zum Schreiben verwenden sie dagegen die Signatur {@code (value: FEMNative): FEMNative}, führen
+ * {@code this.member().set(null, value.data())} aus und liefern {@link FEMNative#NULL}. Analog dazu nutzen die Funktionen zu instanzgebundenen Datenfeldern zum
+ * Lesen die Signatur {@code (object: FEMNative): FEMNative} und liefern den Ergebniswert {@code new FEMNative(this.member().get(object.data()))}. Zum Schreiben
+ * verwenden sie dann die Signatur {@code (object, value: FEMNative): FEMNative}, führen {@code this.member().set(object.data(), value.data())} aus und liefern
+ * ebenfalls {@link FEMNative#NULL}.
  * </p>
  * <h4>Methoden</h4>
  * <p>
  * Native Funktionen zu klassengebundenen Methoden haben die Signatur {@code (param1, ..., paramN: FEMNative): FEMNative} und liefern den Ergebniswert
  * {@code new FEMNative(this.member().invoke(null, param1.data(), ..., paramN.data()))}. Analog dazu haben die Funktionen zu instanzgebundenen Methoden die
  * Signatur {@code (object, param1, ..., paramN: FEMNative): FEMNative} und liefern den Ergebniswert
- * {@code new FEMNative-(this.member().invoke(object.data(), param1.data(), ..., paramN.data()))}.
+ * {@code new FEMNative(this.member().invoke(object.data(), param1.data(), ..., paramN.data()))}.
  * <p>
  * <h4>Konstruktoren</h4>
  * <p>

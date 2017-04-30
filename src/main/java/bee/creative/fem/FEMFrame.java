@@ -390,21 +390,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return Iterators.itemsIterator(this, 0, this.size());
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final int hashCode() {
-		return this.params().hash();
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMFrame)) return false;
-		final FEMFrame that = (FEMFrame)object;
-		return this.params().equals(that.params());
-	}
-
 	/** Diese Methode formatiert diesen Stapelrahmen in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an. Sie kann von einem
 	 * {@link FEMDomain} im Rahmen der Methode {@link FEMDomain#formatData(FEMFormatter, Object)} eingesetzt werden.
 	 *
