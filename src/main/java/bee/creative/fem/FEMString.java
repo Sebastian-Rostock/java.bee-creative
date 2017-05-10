@@ -1273,7 +1273,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	 *
 	 * @return Array mit den Codepoints in UTF16-Kodierung. */
 	public final char[] toChars() {
-		final UTF8Counter counter = new UTF8Counter();
+		final UTF16Counter counter = new UTF16Counter();
 		this.extract(counter);
 		final UTF16Encoder encoder = new UTF16Encoder(new char[counter.count], 0);
 		this.extract(encoder);
