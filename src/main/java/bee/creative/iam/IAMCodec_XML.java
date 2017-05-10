@@ -22,28 +22,28 @@ import bee.creative.util.IO;
 @SuppressWarnings ("javadoc")
 final class IAMCodec_XML {
 
-	@XmlType (name = "IAM_ITEM_TYPE")
+	@XmlType
 	@XmlAccessorType (XmlAccessType.FIELD)
 	public static final class IAMITEMTYPE {
 
-		@XmlAttribute (name = "data", required = true)
+		@XmlAttribute (required = true)
 		public String data;
 
 	}
 
-	@XmlType (name = "IAM_ENTRY_TYPE")
+	@XmlType
 	@XmlAccessorType (XmlAccessType.FIELD)
 	public static final class IAMENTRYTYPE {
 
-		@XmlAttribute (name = "key", required = true)
+		@XmlAttribute (required = true)
 		public String key;
 
-		@XmlAttribute (name = "value", required = true)
+		@XmlAttribute (required = true)
 		public String value;
 
 	}
 
-	@XmlType (name = "IAM_INDEX_TYPE", propOrder = {"mappingOrListing"})
+	@XmlType
 	@XmlRootElement (name = "index")
 	@XmlAccessorType (XmlAccessType.FIELD)
 	public static final class IAMINDEXTYPE {
@@ -51,49 +51,49 @@ final class IAMCodec_XML {
 		@XmlElements ({@XmlElement (name = "mapping", type = IAMMAPPINGTYPE.class), @XmlElement (name = "listing", type = IAMLISTINGTYPE.class)})
 		public ArrayList<Object> mappingOrListing = new ArrayList<>();
 
-		@XmlAttribute (name = "byteOrder", required = false)
+		@XmlAttribute
 		public String byteOrder;
 
-		@XmlAttribute (name = "mappingCount", required = true)
+		@XmlAttribute (required = true)
 		public String mappingCount;
 
-		@XmlAttribute (name = "listingCount", required = true)
+		@XmlAttribute (required = true)
 		public String listingCount;
 
 	}
 
-	@XmlType (name = "IAM_LISTING_TYPE", propOrder = {"item"})
+	@XmlType
 	@XmlAccessorType (XmlAccessType.FIELD)
 	public static final class IAMLISTINGTYPE {
 
 		@XmlElement (required = true)
 		public ArrayList<IAMITEMTYPE> item = new ArrayList<>();
 
-		@XmlAttribute (name = "index", required = true)
+		@XmlAttribute (required = true)
 		public String index;
 
-		@XmlAttribute (name = "itemFormat", required = false)
+		@XmlAttribute
 		public String itemFormat;
 
 	}
 
-	@XmlType (name = "IAM_MAPPING_TYPE", propOrder = {"entry"})
+	@XmlType
 	@XmlAccessorType (XmlAccessType.FIELD)
 	public static final class IAMMAPPINGTYPE {
 
 		@XmlElement (required = true)
 		public ArrayList<IAMENTRYTYPE> entry = new ArrayList<>();
 
-		@XmlAttribute (name = "index", required = true)
+		@XmlAttribute (required = true)
 		public String index;
 
-		@XmlAttribute (name = "findMode", required = false)
+		@XmlAttribute
 		public String findMode;
 
-		@XmlAttribute (name = "keyFormat", required = false)
+		@XmlAttribute
 		public String keyFormat;
 
-		@XmlAttribute (name = "valueFormat", required = false)
+		@XmlAttribute
 		public String valueFormat;
 
 	}
