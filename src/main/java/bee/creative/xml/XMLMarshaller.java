@@ -2,7 +2,6 @@ package bee.creative.xml;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Arrays;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -95,10 +94,26 @@ public final class XMLMarshaller {
 	 * @param classes Klasse.
 	 * @return {@link XMLMarshaller}. */
 	public static XMLMarshaller from(final Class<?>... classes) {
-		return new XMLMarshaller() //
-			.openMarshallerData().openContextData().openClassData() //
-			.useItems(Arrays.asList(classes)) //
-			.closeClassesData().closeContextData().closeMarshallerData();
+		return new XMLMarshaller().openMarshallerData().openContextData().openClassData().useItems(classes).closeClassesData().closeContextData()
+			.closeMarshallerData();
+	}
+
+	/** Diese Methode ist eine Abkürtung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode()}.
+	 * 
+	 * @see #from(Class...)
+	 * @see #marshalString() */
+	@SuppressWarnings ("javadoc")
+	public static Node marshalNode(final Object object) throws SAXException, JAXBException {
+		return XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode();
+	}
+
+	/** Diese Methode ist eine Abkürtung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString()}.
+	 * 
+	 * @see #from(Class...)
+	 * @see #marshalString() */
+	@SuppressWarnings ("javadoc")
+	public static String marshalString(final Object object) throws SAXException, JAXBException {
+		return XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString();
 	}
 
 	{}
@@ -152,7 +167,7 @@ public final class XMLMarshaller {
 	 * @return Dokumentknoten.
 	 * @throws SAXException Wenn {@link #marshal} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #marshal()} eine entsprechende Ausnahme auslöst. */
-	public final Node marshalToNode() throws SAXException, JAXBException {
+	public final Node marshalNode() throws SAXException, JAXBException {
 		final DOMResult result = new DOMResult();
 		this.openResultData().useResult(result).closeResultData().marshal().openResultData().resetResult();
 		return result.getNode();
@@ -167,7 +182,7 @@ public final class XMLMarshaller {
 	 * @return Zeichenkette.
 	 * @throws SAXException Wenn {@link #marshal} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #marshal()} eine entsprechende Ausnahme auslöst. */
-	public final String marshalToString() throws SAXException, JAXBException {
+	public final String marshalString() throws SAXException, JAXBException {
 		final StringWriter result = new StringWriter();
 		this.openResultData().useWriter(result).closeResultData().marshal().openResultData().resetResult();
 		return result.toString();
