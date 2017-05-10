@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -190,6 +191,15 @@ public class Builders {
 			if (items == null) return this.customThis();
 			Iterables.appendAll(this.items, items);
 			return this.customThis();
+		}
+
+		/** Diese Methode ist eine Abkürtung für {@code this.useItems(Arrays.asList(items))}.
+		 *
+		 * @see #useItems(Iterable)
+		 * @see Arrays#asList(Object...) */
+		@SuppressWarnings ({"javadoc", "unchecked"})
+		public final GThis useItems(final GItem... items) {
+			return this.useItems(Arrays.asList(items));
 		}
 
 		/** Diese Methode gibt die interne Sammlung zurück.
