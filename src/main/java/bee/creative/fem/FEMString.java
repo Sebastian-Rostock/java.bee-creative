@@ -4,11 +4,12 @@ import java.util.Iterator;
 import bee.creative.iam.IAMArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
+import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert eine unveränderliche Zeichenkette sowie Methoden zur Erzeugung solcher Zeichenketten aus nativen Arrays.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMString extends FEMValue implements Iterable<Integer> {
+public abstract class FEMString extends FEMValue implements Iterable<Integer>, UseToString {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Codepoints einer Zeichenkette in der Methode {@link FEMString#extract(Collector)}. */
 	public static interface Collector {

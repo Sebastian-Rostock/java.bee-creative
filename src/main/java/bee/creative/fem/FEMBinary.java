@@ -4,11 +4,12 @@ import java.util.Iterator;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
+import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
+public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseToString {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#extract(Collector)}. */
 	public static interface Collector {
