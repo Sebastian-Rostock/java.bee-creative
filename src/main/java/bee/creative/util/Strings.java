@@ -146,7 +146,7 @@ public class Strings {
 	 * @param items Objekte.
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static String join(final Object... items) throws NullPointerException {
+	public static String join(final Object[] items) throws NullPointerException {
 		return Strings.join("", items);
 	}
 
