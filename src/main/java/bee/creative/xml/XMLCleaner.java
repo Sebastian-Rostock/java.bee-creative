@@ -77,7 +77,7 @@ public final class XMLCleaner {
 	static final String listFieldReplace = "$1 public Array$2$3 = new Array$2();";
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern listMethodPattern = Pattern.compile("^\\s+public List<");
+	static final Pattern listMethodPattern = Pattern.compile("^(\\s+)public List<");
 
 	@SuppressWarnings ("javadoc")
 	static final Pattern itemFieldPattern = Pattern.compile("^(\\s+)(?:protected|private) (.*)");
@@ -86,7 +86,7 @@ public final class XMLCleaner {
 	static final String itemFieldReplace = "$1public $2";
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern itemMethodPattern = Pattern.compile("^\\s+public \\S+ (value\\(\\)|([gs]et|is)\\S+)");
+	static final Pattern itemMethodPattern = Pattern.compile("^(\\s+)public \\S+ (value\\(\\)|([gs]et|is)\\S+)");
 
 	@SuppressWarnings ("javadoc")
 	static final Pattern commentPattern = Pattern.compile("^\\s*[*/]");
@@ -131,28 +131,41 @@ public final class XMLCleaner {
 			final StringBuffer target = new StringBuffer();
 			int index = 0;
 			Matcher matcher;
+			String space = null;
 			while (index < count) {
 				final String source = sourceList.get(index);
+				String value;
 				if (source.isEmpty()) {
-					index += 1;
+					value = null;
+				} else if (space != null) {
+					space = source.startsWith(space) ? null : space;
+					value = null;
 				} else if ((matcher = XMLCleaner.commentPattern.matcher(source)).find()) {
-					index += 1;
+					value = source;
 				} else if ((matcher = XMLCleaner.listMethodPattern.matcher(source)).find()) {
-					index += 6;
+					space = matcher.group(1) + "}";
+					value = null;
 				} else if ((matcher = XMLCleaner.itemMethodPattern.matcher(source)).find()) {
-					index += 3;
+					space = matcher.group(1) + "}";
+					value = null;
 				} else if ((matcher = XMLCleaner.listFieldPattern.matcher(source)).find()) {
-					index += 1;
 					target.setLength(0);
 					matcher.appendReplacement(target, XMLCleaner.listFieldReplace);
-					targetList.add(target.toString());
+					value = target.toString();
 				} else if ((matcher = XMLCleaner.itemFieldPattern.matcher(source)).find()) {
-					index += 1;
 					target.setLength(0);
 					matcher.appendReplacement(target, XMLCleaner.itemFieldReplace);
-					targetList.add(target.toString());
+					value = target.toString();
 				} else {
-					index += 1;
+					value = source;
+				}
+				index += 1;
+				if (!source.equals(value)) {
+					targetList.add("//" + source);
+					if (value != null) {
+						targetList.add(value);
+					}
+				} else {
 					targetList.add(source);
 				}
 			}
