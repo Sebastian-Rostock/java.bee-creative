@@ -292,6 +292,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		CompactArray(final FEMValue[] items) throws IllegalArgumentException {
 			super(items.length);
 			this.items = items;
+			final int length = items.length;
+			for (int i = 0; i < length; i++) {
+				if (items[i] == null) throw new NullPointerException();
+			}
 		}
 
 		{}
@@ -345,11 +349,22 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 *
 	 * @param items Werte.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
 	public static FEMArray from(final FEMValue... items) throws NullPointerException {
 		if (items.length == 0) return FEMArray.EMPTY;
 		if (items.length == 1) return new UniformArray(1, items[0]);
 		return new CompactArray(items.clone());
+	}
+
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
+	 * @param items Werte.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
+	public static FEMArray from(final boolean copy, final FEMValue... items) throws NullPointerException {
+		if (copy) return FEMArray.from(items);
+		return new CompactArray(items);
 	}
 
 	/** Diese Methode gibt eine Wertliste mit den Werten im gegebenen Abschnitt zurück.<br>
@@ -359,7 +374,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder der Abschnitt {@code null} enthält.
 	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
 	public static FEMArray from(final FEMValue[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
@@ -577,7 +592,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Diese Methode kopiert alle Werte dieser Wertliste vom ersten zum letzten geordnet in den an der gegebenen Position beginnenden Abschnitt des gegebenen
 	 * Arrays.
-	 * 
+	 *
 	 * @param result Array, in welchem der Abschnitt liegt.
 	 * @param offset Beginn des Abschnitts.
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.

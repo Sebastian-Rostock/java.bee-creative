@@ -367,6 +367,17 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 		return new CompactBinary(items.clone());
 	}
 
+	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
+	 * @param items Bytes.
+	 * @return Bytefolge.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMBinary from(final boolean copy, final byte[] items) throws NullPointerException {
+		if (copy) return FEMBinary.from(items);
+		return new CompactBinary(items);
+	}
+
 	/** Diese Methode gibt eine Bytefolge mit den Bytes im gegebenen Abschnitt zurück.<br>
 	 * Der gegebene Abschnitt wird kopiert.
 	 *

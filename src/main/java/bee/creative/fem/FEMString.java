@@ -667,6 +667,17 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 		return new UTF32CompactString(items.clone());
 	}
 
+	/** Diese Methode eine Zeichenkette mit den gegebenen UTF32-kodierten Codepoints zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
+	 * @param items UTF32-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMString from(final boolean copy, final int[] items) throws NullPointerException {
+		if (copy) return FEMString.from(items);
+		return new UTF32CompactString(items);
+	}
+
 	/** Diese Methode gibt eine Zeichenkette mit den UTF32-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
 	 * Der gegebene Abschnitt wird kopiert.
 	 *
@@ -685,7 +696,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 		return new UTF32CompactString(result);
 	}
 
-	/** Diese Methode eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück.
+	/** Diese Methode eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück.<br>
+	 * Das gegebene Array wird kopiert.
 	 *
 	 * @param items UTF8-kodierte Codepoints.
 	 * @return Zeichenkette.
@@ -694,6 +706,18 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 	public static FEMString from(final byte[] items) throws NullPointerException, IllegalArgumentException {
 		if (items.length == 0) return FEMString.EMPTY;
 		return new UTF8CompactString(items.clone());
+	}
+
+	/** Diese Methode eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
+	 * @param items UTF8-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	public static FEMString from(final boolean copy, final byte[] items) throws NullPointerException, IllegalArgumentException {
+		if (copy) return FEMString.from(items);
+		return new UTF8CompactString(items);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den UTF8-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
@@ -713,7 +737,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 		return new UTF8CompactString(result);
 	}
 
-	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück.
+	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück.<br>
+	 * Das gegebene Array wird kopiert.
 	 *
 	 * @param items UTF16-kodierte Codepoints.
 	 * @return Zeichenkette.
@@ -722,6 +747,18 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 	public static FEMString from(final char[] items) throws NullPointerException, IllegalArgumentException {
 		if (items.length == 0) return FEMString.EMPTY;
 		return new UTF16CompactString(items.clone());
+	}
+
+	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
+	 * @param items UTF16-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	public static FEMString from(final boolean copy, final char[] items) throws NullPointerException, IllegalArgumentException {
+		if (copy) return FEMString.from(items);
+		return new UTF16CompactString(items);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den UTF16-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
