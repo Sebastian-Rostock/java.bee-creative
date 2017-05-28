@@ -418,7 +418,7 @@ public abstract class IAMIndex {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString("IAMIndex", this.mappings(), this.listings());
+		return Objects.toInvokeString(this, this.mappings(), this.listings());
 	}
 
 }

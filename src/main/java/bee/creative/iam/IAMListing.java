@@ -32,6 +32,91 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 			return 0;
 		}
 
+		@Override
+		public final IAMListing toListing() {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class CompactListing extends IAMListing {
+
+		final int[] itemData;
+
+		final int[] itemOffset;
+
+		final int itemLength;
+
+		final int itemCount;
+
+		public CompactListing(final IAMListing that) {
+			final int itemCount = that.itemCount();
+			final int[] itemOffset = new int[itemCount + 1];
+			int itemLength = that.itemLength(0), itemDatalength = 0;
+			for (int index = 0; index < itemCount;) {
+				final int itemLength2 = that.itemLength(index);
+				itemDatalength += itemLength2;
+				index++;
+				itemOffset[index] = itemDatalength;
+				if (itemLength2 != itemLength) {
+					itemLength = -1;
+				}
+			}
+			final int[] itemData = new int[itemDatalength];
+			for (int index = 0; index < itemCount; index++) {
+				that.item(index).toArray(itemData, itemOffset[index]);
+			}
+			this.itemData = itemData;
+			this.itemOffset = itemLength < 0 ? itemOffset : null;
+			this.itemLength = itemLength;
+			this.itemCount = itemCount;
+		}
+
+		{}
+
+		@Override
+		public final IAMArray item(final int itemIndex) {
+			if ((itemIndex < 0) || (itemIndex >= this.itemCount)) return IAMArray.EMPTY;
+			if (this.itemOffset == null) {
+				final int length = this.itemLength;
+				return IAMArray.from(this.itemData, length * itemIndex, length);
+			} else {
+				final int offset = this.itemOffset[itemIndex];
+				return IAMArray.from(this.itemData, offset, this.itemOffset[itemIndex + 1] - offset);
+			}
+		}
+
+		@Override
+		public final int item(final int itemIndex, final int index) {
+			if ((index < 0) || (itemIndex < 0) || (itemIndex >= this.itemCount)) return 0;
+			if (this.itemOffset == null) {
+				if (index >= this.itemLength) return 0;
+				return this.itemData[(itemIndex * this.itemLength) + index];
+			} else {
+				final int offset = this.itemOffset[itemIndex] + index;
+				if (index >= this.itemOffset[itemIndex + 1]) return 0;
+				return this.itemData[offset];
+			}
+		}
+
+		@Override
+		public final int itemLength(final int itemIndex) {
+			if ((itemIndex < 0) || (itemIndex >= this.itemCount)) return 0;
+			if (this.itemOffset == null) return this.itemLength;
+			return this.itemOffset[itemIndex + 1] - this.itemOffset[itemIndex];
+		}
+
+		@Override
+		public final int itemCount() {
+			return this.itemCount;
+		}
+
+		@Override
+		public final IAMListing toListing() {
+			return this;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -100,7 +185,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	 * @param itemIndex Index des Elements.
 	 * @param index Index der Zahl.
 	 * @return {@code index}-te Zahl des {@code itemIndex}-ten Elements. */
-	public final int item(final int itemIndex, final int index) {
+	public int item(final int itemIndex, final int index) {
 		return this.item(index).get(index);
 	}
 
@@ -111,7 +196,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	 * @see #itemCount()
 	 * @param itemIndex Index des Elements.
 	 * @return Länge des {@code itemIndex}-ten Elements. */
-	public final int itemLength(final int itemIndex) {
+	public int itemLength(final int itemIndex) {
 		return this.item(itemIndex).length();
 	}
 
@@ -122,13 +207,22 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	 * @return Anzahl der Elemente. */
 	public abstract int itemCount();
 
+	/** Diese Methode ist eine Abkürzung für {@code this.find(IAMArray.from(item))}.
+	 *
+	 * @see #find(IAMArray)
+	 * @see IAMArray#from(int...) */
+	@SuppressWarnings ("javadoc")
+	public final int find(final int... item) throws NullPointerException {
+		return this.find(IAMArray.from(item));
+	}
+
 	/** Diese Methode gibt den Index des Elements zurück, das äquivalenten zum gegebenen ist. Die Suche erfolgt linear vom ersten zum letzten Element. Bei
 	 * erfolgloser Suche wird {@code -1} geliefert.
 	 *
 	 * @param item Element.
 	 * @return Index des Elements.
 	 * @throws NullPointerException Wenn {@code item} {@code null} ist. */
-	public final int find(final IAMArray item) throws NullPointerException {
+	public int find(final IAMArray item) throws NullPointerException {
 		Objects.assertNotNull(item);
 		for (int i = 0, count = this.itemCount(); i < count; i++) {
 			if (item.equals(this.item(i))) return i;
@@ -179,6 +273,14 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 		return result;
 	}
 
+	/** Diese Methode kodiert dieses {@link IAMListing} in eine für den Arbeitsspeicher optimierte Datenstruktur aus {@code int[]} und gibt diese zurück.
+	 *
+	 * @return optimiertes {@link IAMListing}. */
+	public IAMListing toListing() {
+		if (this.itemCount() == 0) return this;
+		return new CompactListing(this);
+	}
+
 	{}
 
 	/** {@inheritDoc} */
@@ -190,7 +292,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString("IAMList", this.itemCount());
+		return Objects.toInvokeString(this, this.itemCount());
 	}
 
 }

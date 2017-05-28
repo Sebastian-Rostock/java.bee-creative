@@ -198,7 +198,8 @@ public class MMFArray extends IAMArray {
 	/** {@inheritDoc} */
 	@Override
 	public final MMFArray section(final int offset, final int length) {
-		return (MMFArray)super.section(offset, length);
+		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length)) return this.customSection(0, 0);
+		return this.customSection(offset, length);
 	}
 
 }

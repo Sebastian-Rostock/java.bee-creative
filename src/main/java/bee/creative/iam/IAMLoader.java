@@ -505,8 +505,6 @@ public class IAMLoader {
 			return this.rangeMask != 0;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final MMFArray key(final int entryIndex) {

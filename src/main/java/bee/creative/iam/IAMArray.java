@@ -32,8 +32,34 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
+		protected final IAMArray customSection(final int offset, final int length) {
+			return new IntArray(this.array, this.offset + offset, length);
+		}
+
+		@Override
 		public final int mode() {
 			return 4;
+		}
+
+		@Override
+		public final int hashCode() {
+			int hash = 0x811C9DC5;
+			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
+				hash = (hash * 0x01000193) ^ this.array[i];
+			}
+			return hash;
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (object instanceof IntArray) return IAMArray.equals(this, (IntArray)object);
+			if (object instanceof ByteArray) return IAMArray.equals(this, (ByteArray)object);
+			if (object instanceof CharArray) return IAMArray.equals(this, (CharArray)object);
+			if (object instanceof ShortArray) return IAMArray.equals(this, (ShortArray)object);
+			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
+			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
+			return false;
 		}
 
 	}
@@ -59,8 +85,34 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
+		protected final IAMArray customSection(final int offset, final int length) {
+			return new ByteArray(this.array, this.offset + offset, length);
+		}
+
+		@Override
 		public final int mode() {
 			return 1;
+		}
+
+		@Override
+		public final int hashCode() {
+			int hash = 0x811C9DC5;
+			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
+				hash = (hash * 0x01000193) ^ this.array[i];
+			}
+			return hash;
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
+			if (object instanceof ByteArray) return IAMArray.equals(this, (ByteArray)object);
+			if (object instanceof CharArray) return IAMArray.equals(this, (CharArray)object);
+			if (object instanceof ShortArray) return IAMArray.equals(this, (ShortArray)object);
+			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
+			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
+			return false;
 		}
 
 	}
@@ -86,8 +138,34 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
+		protected final IAMArray customSection(final int offset, final int length) {
+			return new CharArray(this.array, this.offset + offset, length);
+		}
+
+		@Override
 		public final int mode() {
 			return 2;
+		}
+
+		@Override
+		public final int hashCode() {
+			int hash = 0x811C9DC5;
+			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
+				hash = (hash * 0x01000193) ^ this.array[i];
+			}
+			return hash;
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
+			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
+			if (object instanceof CharArray) return IAMArray.equals(this, (CharArray)object);
+			if (object instanceof ShortArray) return IAMArray.equals(this, (ShortArray)object);
+			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
+			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
+			return false;
 		}
 
 	}
@@ -113,8 +191,34 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
+		protected final IAMArray customSection(final int offset, final int length) {
+			return new ShortArray(this.array, this.offset + offset, length);
+		}
+
+		@Override
 		public final int mode() {
 			return 2;
+		}
+
+		@Override
+		public final int hashCode() {
+			int hash = 0x811C9DC5;
+			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
+				hash = (hash * 0x01000193) ^ this.array[i];
+			}
+			return hash;
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
+			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
+			if (object instanceof CharArray) return IAMArray.equals((CharArray)object, this);
+			if (object instanceof ShortArray) return IAMArray.equals(this, (ShortArray)object);
+			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
+			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
+			return false;
 		}
 
 	}
@@ -156,6 +260,27 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		@Override
 		public final int mode() {
 			return this.array.mode();
+		}
+
+		@Override
+		public final int hashCode() {
+			int hash = 0x811C9DC5;
+			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
+				hash = (hash * 0x01000193) ^ this.array.customGet(i);
+			}
+			return hash;
+		}
+
+		@Override
+		public final boolean equals(final Object object) {
+			if (object == this) return true;
+			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
+			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
+			if (object instanceof CharArray) return IAMArray.equals((CharArray)object, this);
+			if (object instanceof ShortArray) return IAMArray.equals((ShortArray)object, this);
+			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
+			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
+			return false;
 		}
 
 	}
@@ -351,6 +476,230 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 	}
 
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final IntArray array1, final IntArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final int[] a1 = array1.array;
+		final int[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final IntArray array1, final ByteArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final int[] a1 = array1.array;
+		final byte[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final IntArray array1, final CharArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final int[] a1 = array1.array;
+		final char[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final IntArray array1, final ShortArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final int[] a1 = array1.array;
+		final short[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final IntArray array1, final SectionArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final int[] a1 = array1.array;
+		final IAMArray a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final IntArray array1, final IAMArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final int[] a1 = array1.array;
+		for (int i1 = array1.offset, i2 = 0; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != array2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final ByteArray array1, final ByteArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final byte[] a1 = array1.array;
+		final byte[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final ByteArray array1, final CharArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final byte[] a1 = array1.array;
+		final char[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final ByteArray array1, final ShortArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final byte[] a1 = array1.array;
+		final short[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final ByteArray array1, final SectionArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final byte[] a1 = array1.array;
+		final IAMArray a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final ByteArray array1, final IAMArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final byte[] a1 = array1.array;
+		for (int i1 = array1.offset, i2 = 0; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != array2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final CharArray array1, final CharArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final char[] a1 = array1.array;
+		final char[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final CharArray array1, final ShortArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final char[] a1 = array1.array;
+		final short[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final CharArray array1, final SectionArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final char[] a1 = array1.array;
+		final IAMArray a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final CharArray array1, final IAMArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final char[] a1 = array1.array;
+		for (int i1 = array1.offset, i2 = 0; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != array2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final ShortArray array1, final ShortArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final short[] a1 = array1.array;
+		final short[] a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2[i2]) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final ShortArray array1, final SectionArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final short[] a1 = array1.array;
+		final IAMArray a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1[i1] != a2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final ShortArray array1, final IAMArray array2) {
+		int length = array1.length;
+		if (length != array2.length) return false;
+		final short[] a1 = array1.array;
+		for (int i1 = array1.offset, i2 = 0; length != 0; ++i1, ++i2, --length)
+			if (a1[i1] != array2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final SectionArray array1, final SectionArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final IAMArray a1 = array1.array;
+		final IAMArray a2 = array2.array;
+		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
+			if (a1.customGet(i1) != a2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final SectionArray array1, final IAMArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		final IAMArray a1 = array1.array;
+		for (int i1 = array1.offset, i2 = 0; l != 0; ++i1, ++i2, --l)
+			if (a1.customGet(i1) != array2.customGet(i2)) return false;
+		return true;
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final boolean equals(final IAMArray array1, final IAMArray array2) {
+		int l = array1.length;
+		if (l != array2.length) return false;
+		for (int i2 = 0; l != 0; ++i2, --l)
+			if (array1.customGet(i2) != array2.customGet(i2)) return false;
+		return true;
+	}
+
 	{}
 
 	/** Dieses Feld speichert die Länge. */
@@ -419,11 +768,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		int hash = 0x811C9DC5;
-		for (int i = 0, size = this.length; i < size; i++) {
-			hash = (hash * 0x01000193) ^ this.customGet(i);
-		}
-		return hash;
+		return this.hashCode();
 	}
 
 	/** Diese Methode gibt nur dann true zurück, wenn diese Zahlenfolge gleich der gegebenen Zahlenfolge ist. <pre>
@@ -437,11 +782,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final IAMArray that) throws NullPointerException {
-		final int length = this.length;
-		if (length != that.length) return false;
-		for (int i = 0; i < length; i++)
-			if (this.customGet(i) != that.customGet(i)) return false;
-		return true;
+		return this.equals(Objects.<Object>assertNotNull(that));
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung dieser Zahlenfolge lexikografisch kleiner, gleich bzw.
@@ -526,8 +867,12 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** {@inheritDoc} */
 	@Override
-	public final int hashCode() {
-		return this.hash();
+	public int hashCode() {
+		int hash = 0x811C9DC5;
+		for (int i = 0, l = this.length; l != 0; ++i, --l) {
+			hash = (hash * 0x01000193) ^ this.customGet(i);
+		}
+		return hash;
 	}
 
 	/** {@inheritDoc} */
@@ -538,17 +883,22 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean equals(final Object object) {
+	public boolean equals(final Object object) {
 		if (object == this) return true;
-		if (!(object instanceof IAMArray)) return false;
-		return this.equals((IAMArray)object);
+		if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
+		if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
+		if (object instanceof CharArray) return IAMArray.equals((CharArray)object, this);
+		if (object instanceof ShortArray) return IAMArray.equals((ShortArray)object, this);
+		if (object instanceof SectionArray) return IAMArray.equals((SectionArray)object, this);
+		if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
+		return false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this.length() > 50 ? //
-			Objects.formatIterable(false, Iterables.chainedIterable(this.section(0, 45), Iterables.itemIterable(Objects.toStringObject("...")))) : //
+			Objects.formatIterable(false, Iterables.chainedIterable(this.section(0, 25), Iterables.itemIterable(Objects.toStringObject("...")))) : //
 			Objects.formatIterable(false, this);
 	}
 }

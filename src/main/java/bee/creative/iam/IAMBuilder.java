@@ -165,9 +165,8 @@ public class IAMBuilder {
 		 * @return Index des {@link IAMMapping}.
 		 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
 		public final int putMapping(final IAMMapping mapping) throws NullPointerException {
-			mapping.entryCount();
 			final int result = this.mappings.size();
-			this.mappings.add(result, mapping);
+			this.mappings.add(result, Objects.assertNotNull(mapping));
 			return result;
 		}
 
@@ -177,9 +176,8 @@ public class IAMBuilder {
 		 * @return Index des {@link IAMListing}.
 		 * @throws NullPointerException Wenn {@code listing} {@code null} ist. */
 		public final int putListing(final IAMListing listing) throws NullPointerException {
-			listing.itemCount();
 			final int result = this.listings.size();
-			this.listings.add(result, listing);
+			this.listings.add(result, Objects.assertNotNull(listing));
 			return result;
 		}
 

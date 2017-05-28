@@ -52,6 +52,219 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			return -1;
 		}
 
+		@Override
+		public final IAMMapping toMapping() {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class CompactMapping extends IAMMapping {
+
+		final int[] keyData;
+
+		final int[] keyOffset;
+
+		final int keyLength;
+
+		final int[] valueData;
+
+		final int[] valueOffset;
+
+		final int valueLength;
+
+		final int rangeMask;
+
+		final int[] rangeOffset;
+
+		final int entryCount;
+
+		public CompactMapping(final IAMMapping that) {
+			final int entryCount = that.entryCount();
+			final Integer[] indexArray = new Integer[entryCount];
+			for (int i = 0; i < entryCount; i++) {
+				indexArray[i] = new Integer(i);
+			}
+			final int rangeMask;
+			final int[] rangeOffset;
+			if (that.mode()) {
+				int limit = 2;
+				while (limit < entryCount) {
+					limit <<= 1;
+				}
+				rangeMask = (limit - 1) & 536870911;
+				final int rangeCount = rangeMask + 2;
+				final int[] bucketIndex = new int[entryCount];
+				rangeOffset = new int[rangeCount];
+				for (int i = 0; i < entryCount; i++) {
+					final int bucket = that.key(i).hash() & rangeMask;
+					rangeOffset[bucket]++;
+					bucketIndex[i] = bucket;
+				}
+				for (int i = 0, indexOffset = 0; i < rangeCount; i++) {
+					final int bucketSize = rangeOffset[i];
+					rangeOffset[i] = indexOffset;
+					indexOffset += bucketSize;
+				}
+				Arrays.sort(indexArray, new Comparator<Integer>() {
+
+					@Override
+					public int compare(final Integer index1, final Integer index2) {
+						return bucketIndex[index1.intValue()] - bucketIndex[index2.intValue()];
+					}
+
+				});
+			} else {
+				Arrays.sort(indexArray, new Comparator<Integer>() {
+
+					@Override
+					public int compare(final Integer index1, final Integer index2) {
+						return that.key(index1.intValue()).compare(that.key(index2.intValue()));
+					}
+
+				});
+				rangeMask = 0;
+				rangeOffset = null;
+			}
+			final int[] keyOffset = new int[entryCount + 1], valueOffset = new int[entryCount + 1];
+			int keyLength = that.keyLength(0), valueLength = that.valueLength(0), keyDatalength = 0, valueDatalength = 0;
+			for (int i = 0; i < entryCount;) {
+				int index = indexArray[i].intValue();
+				final int keyLength2 = that.keyLength(index), valueLength2 = that.valueLength(index);
+				keyDatalength += keyLength2;
+				valueDatalength += valueLength2;
+				i++;
+				keyOffset[i] = keyDatalength;
+				valueOffset[i] = valueDatalength;
+				if (keyLength2 != keyLength) {
+					keyLength = -1;
+				}
+				if (valueLength2 != valueLength) {
+					valueLength = -1;
+				}
+			}
+			final int[] keyData = new int[keyDatalength], valueData = new int[valueDatalength];
+			for (int i = 0; i < entryCount; i++) {
+				final int index = indexArray[i].intValue();
+				that.key(index).toArray(keyData, keyOffset[i]);
+				that.value(index).toArray(valueData, valueOffset[i]);
+			}
+			this.keyData = keyData;
+			this.keyOffset = keyOffset;
+			this.keyLength = keyLength;
+			this.valueData = valueData;
+			this.valueOffset = valueOffset;
+			this.valueLength = valueLength;
+			this.rangeMask = rangeMask;
+			this.rangeOffset = rangeOffset;
+			this.entryCount = entryCount;
+		}
+
+		@Override
+		public final boolean mode() {
+			return this.rangeMask != 0;
+		}
+
+		@Override
+		public final int find(final IAMArray key) throws NullPointerException {
+			Objects.assertNotNull(key);
+			int i = this.rangeMask;
+			if (i != 0) {
+				final int[] range = this.rangeOffset;
+				i = key.hash() & i;
+				for (int l = range[i], r = range[i + 1]; l < r; l++) {
+					if (key.equals(this.key(l))) return l;
+				}
+			} else {
+				int l = 0, r = this.entryCount;
+				while (l < r) {
+					final int c = (l + r) >> 1;
+					i = key.compare(this.key(c));
+					if (i < 0) {
+						r = c;
+					} else if (i > 0) {
+						l = c + 1;
+					} else return c;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public final IAMArray key(final int entryIndex) {
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMArray.EMPTY;
+			if (this.keyOffset == null) {
+				final int length = this.keyLength;
+				return IAMArray.from(this.keyData, length * entryIndex, length);
+			} else {
+				final int offset = this.keyOffset[entryIndex];
+				return IAMArray.from(this.keyData, offset, this.keyOffset[entryIndex + 1] - offset);
+			}
+		}
+
+		@Override
+		public final int key(final int entryIndex, final int index) {
+			if ((index < 0) || (entryIndex < 0) || (entryIndex >= this.entryCount)) return 0;
+			if (this.keyOffset == null) {
+				if (index >= this.keyLength) return 0;
+				return this.keyData[(entryIndex * this.keyLength) + index];
+			} else {
+				final int offset = this.keyOffset[entryIndex] + index;
+				if (index >= this.keyOffset[entryIndex + 1]) return 0;
+				return this.keyData[offset];
+			}
+		}
+
+		@Override
+		public final int keyLength(final int entryIndex) {
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return 0;
+			if (this.keyOffset == null) return this.keyLength;
+			return this.keyOffset[entryIndex + 1] - this.keyOffset[entryIndex];
+		}
+
+		@Override
+		public final IAMArray value(final int entryIndex) {
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMArray.EMPTY;
+			if (this.valueOffset == null) {
+				final int length = this.valueLength;
+				return IAMArray.from(this.valueData, length * entryIndex, length);
+			} else {
+				final int offset = this.valueOffset[entryIndex];
+				return IAMArray.from(this.valueData, offset, this.valueOffset[entryIndex + 1] - offset);
+			}
+		}
+
+		@Override
+		public final int value(final int entryIndex, final int index) {
+			if ((index < 0) || (entryIndex < 0) || (entryIndex >= this.entryCount)) return 0;
+			if (this.valueOffset == null) {
+				if (index >= this.valueLength) return 0;
+				return this.valueData[(entryIndex * this.valueLength) + index];
+			} else {
+				final int offset = this.valueOffset[entryIndex] + index;
+				if (index >= this.valueOffset[entryIndex + 1]) return 0;
+				return this.valueData[offset];
+			}
+		}
+
+		@Override
+		public final int valueLength(final int entryIndex) {
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return 0;
+			if (this.valueOffset == null) return this.valueLength;
+			return this.valueOffset[entryIndex + 1] - this.valueOffset[entryIndex];
+		}
+
+		@Override
+		public final int entryCount() {
+			return this.entryCount;
+		}
+
+		@Override
+		public final IAMMapping toMapping() {
+			return this;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -138,7 +351,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @param entryIndex Index des Eintrags.
 	 * @param index Index der Zahl.
 	 * @return {@code index}-te Zahl des Schlüssels des {@code entryIndex}-ten Eintrags. */
-	public final int key(final int entryIndex, final int index) {
+	public int key(final int entryIndex, final int index) {
 		return this.key(entryIndex).get(index);
 	}
 
@@ -147,7 +360,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 *
 	 * @param entryIndex Index des Eintrags.
 	 * @return Länge eines Schlüssel. */
-	public final int keyLength(final int entryIndex) {
+	public int keyLength(final int entryIndex) {
 		return this.key(entryIndex).length();
 	}
 
@@ -166,7 +379,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @param entryIndex Index des Eintrags.
 	 * @param index Index der Zahl.
 	 * @return {@code index}-te Zahl des Werts des {@code entryIndex}-ten Eintrags. */
-	public final int value(final int entryIndex, final int index) {
+	public int value(final int entryIndex, final int index) {
 		return this.value(entryIndex).get(index);
 	}
 
@@ -175,7 +388,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 *
 	 * @param entryIndex Index des Eintrags.
 	 * @return Länge eines Werts. */
-	public final int valueLength(final int entryIndex) {
+	public int valueLength(final int entryIndex) {
 		return this.value(entryIndex).length();
 	}
 
@@ -201,6 +414,15 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @return Einträge. */
 	public final List<IAMEntry> entries() {
 		return new Entries(this);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.find(IAMArray.from(key))}.
+	 *
+	 * @see #find(IAMArray)
+	 * @see IAMArray#from(int...) */
+	@SuppressWarnings ("javadoc")
+	public final int find(final int... key) throws NullPointerException {
+		return this.find(IAMArray.from(key));
 	}
 
 	/** Diese Methode gibt den Index des Eintrags zurück, dessen Schlüssel äquivalenten zum gegebenen Schlüssel ist. Die Suche erfolgt ordnungs- oder
@@ -330,6 +552,14 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		return result;
 	}
 
+	/** Diese Methode kodiert dieses {@link IAMMapping} in eine für den Arbeitsspeicher optimierte Datenstruktur aus {@code int[]} und gibt diese zurück.
+	 *
+	 * @return optimiertes {@link IAMMapping}. */
+	public IAMMapping toMapping() {
+		if (this.entryCount() == 0) return IAMMapping.EMPTY;
+		return new CompactMapping(this);
+	}
+
 	{}
 
 	/** {@inheritDoc} */
@@ -341,7 +571,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString("IAMMap", this.entryCount());
+		return Objects.toInvokeString(this, this.entryCount());
 	}
 
 }
