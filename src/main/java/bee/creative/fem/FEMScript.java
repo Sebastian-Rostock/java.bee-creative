@@ -235,7 +235,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 
 	{}
 
-	/** Diese Methode gibt die Zeichenkette zurück.
+	/** Diese Methode gibt die Zeichenkette des Quelltexts zurück.
 	 *
 	 * @return Zeichenkette. */
 	public final String source() {
@@ -276,7 +276,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		return this.ranges.length;
 	}
 
-	/** Diese Methode gibt diesen Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette}, der nicht in
+	/** Diese Methode gibt diesen aufbereiteten Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette}, der nicht in
 	 * einem der {@link #ranges() Bereiche} enthalten ist.
 	 *
 	 * @return normalisierter Quelltext. */

@@ -89,11 +89,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			final int rangeMask;
 			final int[] rangeOffset;
 			if (that.mode()) {
-				int limit = 2;
-				while (limit < entryCount) {
-					limit <<= 1;
-				}
-				rangeMask = (limit - 1) & 536870911;
+				rangeMask = IAMMapping.mask(entryCount);
 				final int rangeCount = rangeMask + 2;
 				final int[] bucketIndex = new int[entryCount];
 				rangeOffset = new int[rangeCount];
@@ -130,7 +126,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			final int[] keyOffset = new int[entryCount + 1], valueOffset = new int[entryCount + 1];
 			int keyLength = that.keyLength(0), valueLength = that.valueLength(0), keyDatalength = 0, valueDatalength = 0;
 			for (int i = 0; i < entryCount;) {
-				int index = indexArray[i].intValue();
+				final int index = indexArray[i].intValue();
 				final int keyLength2 = that.keyLength(index), valueLength2 = that.valueLength(index);
 				keyDatalength += keyLength2;
 				valueDatalength += valueLength2;
@@ -324,6 +320,26 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		return new IAMMappingLoader(array.withOrder(IAMMappingLoader.HEADER.orderOf(array)));
 	}
 
+	/** Diese Methode gibt die Bitmaske zurück, die der Umrechnung des {@link IAMArray#hash() Streuwerts} eines gesuchten {@link #key(int) Schlüssels} in den
+	 * Index des einzigen Schlüsselbereichs dient, in dem ein gesuchter Schlüssel enthalten sein kann. Die Bitmaske ist eine um {@code 1} verringerte Potenz von
+	 * {@code 2}. Ein Algorithmus zur Ermittlung der Bitmaske ist:<pre>
+	 * int result = 2;
+	 * while (result < entryCount) result = result << 1;
+	 * return (result – 1) & 536870911;</pre>
+	 *
+	 * @param entryCount Anzahl der Einträge der Abbildung.
+	 * @return Bitmaske. */
+	public static int mask(int entryCount) {
+		if (entryCount <= 0) return 0;
+		--entryCount;
+		entryCount |= (entryCount >> 1);
+		entryCount |= (entryCount >> 2);
+		entryCount |= (entryCount >> 4);
+		entryCount |= (entryCount >> 8);
+		entryCount |= (entryCount >> 16);
+		return entryCount & 536870911;
+	}
+
 	{}
 
 	/** Diese Methode gibt nur dann {@link #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden.<br>
@@ -468,12 +484,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 		if (this.mode()) {
 
-			int limit = 2;
-			while (limit < entryCount) {
-				limit <<= 1;
-			}
-			rangeMask = (limit - 1) & 536870911;
-
+			rangeMask = IAMMapping.mask(entryCount);
 			rangeCount = rangeMask + 2;
 			rangeData = new int[rangeCount];
 			rangeDataType = SizeStats.computeSizeType(entryCount);

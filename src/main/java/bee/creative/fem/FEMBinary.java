@@ -468,6 +468,26 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 		return context.dataFrom(value, FEMBinary.TYPE);
 	}
 
+	/** Diese Methode gibt die Verkettung der gegebenen Bytefolgen zurück.
+	 * 
+	 * @see #concat(FEMBinary)
+	 * @param values Bytefolgen.
+	 * @return Verkettung der Bytefolgen.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
+	public static FEMBinary concatAll(final FEMBinary... values) throws NullPointerException {
+		final int length = values.length;
+		if (length == 0) return FEMBinary.EMPTY;
+		if (length == 1) return values[0].data();
+		return FEMBinary.concatAll(values, 0, length - 1);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMBinary concatAll(final FEMBinary[] values, final int min, final int max) throws NullPointerException {
+		if (min == max) return values[min];
+		final int mid = (min + max) >> 1;
+		return FEMBinary.concatAll(values, min, mid).concat(FEMBinary.concatAll(values, mid + 1, max));
+	}
+
 	/** Diese Methode gibt das Zeichen zur gegebenen hexadezimalen Ziffer zurück.
 	 *
 	 * @param hexDigit hexadezimale Ziffer ({@code 0..15}).

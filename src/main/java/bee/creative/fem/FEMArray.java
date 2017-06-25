@@ -430,6 +430,26 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return context.dataFrom(value, FEMArray.TYPE);
 	}
 
+	/** Diese Methode gibt die Verkettung der gegebenen Wertlisten zurück.
+	 * 
+	 * @see #concat(FEMArray)
+	 * @param values Wertlisten.
+	 * @return Verkettung der Wertlisten.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
+	public static FEMArray concatAll(final FEMArray... values) throws NullPointerException {
+		final int length = values.length;
+		if (length == 0) return FEMArray.EMPTY;
+		if (length == 1) return values[0].data();
+		return FEMArray.concatAll(values, 0, length - 1);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMArray concatAll(final FEMArray[] values, final int min, final int max) throws NullPointerException {
+		if (min == max) return values[min];
+		final int mid = (min + max) >> 1;
+		return FEMArray.concatAll(values, min, mid).concat(FEMArray.concatAll(values, mid + 1, max));
+	}
+
 	{}
 
 	/** Dieses Feld speichert den Streuwert. */

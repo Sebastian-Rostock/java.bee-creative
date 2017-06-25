@@ -872,6 +872,26 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 		return context.dataFrom(value, FEMString.TYPE);
 	}
 
+	/** Diese Methode gibt die Verkettung der gegebenen Zeichenketten zurück.
+	 * 
+	 * @see #concat(FEMString)
+	 * @param values Zeichenketten.
+	 * @return Verkettung der Zeichenketten.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
+	public static FEMString concatAll(final FEMString... values) throws NullPointerException {
+		final int length = values.length;
+		if (length == 0) return FEMString.EMPTY;
+		if (length == 1) return values[0].data();
+		return FEMString.concatAll(values, 0, length - 1);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMString concatAll(final FEMString[] values, final int min, final int max) throws NullPointerException {
+		if (min == max) return values[min];
+		final int mid = (min + max) >> 1;
+		return FEMString.concatAll(values, min, mid).concat(FEMString.concatAll(values, mid + 1, max));
+	}
+
 	/** Diese Methode gibt die Anzahl der Token für den UTF8-kodierten Codepoint zurück, der am gegebenen Token beginnt.
 	 *
 	 * @param item Token, an dem ein UTF8-kodierter Codepoint beginnt.
