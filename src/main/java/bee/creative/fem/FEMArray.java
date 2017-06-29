@@ -645,7 +645,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;
 		for (int i = 0; i < length; i++) {
-			if (this.customGet(i).equals(that.customGet(i))) return false;
+			if (!this.customGet(i).equals(that.customGet(i))) return false;
 		}
 		return true;
 	}
