@@ -33,10 +33,10 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	public static final FEMDuration EMPTY = new FEMDuration(0, 0);
 
 	/** Dieses Feld speichert die größte negative Zeitspanne. */
-	public static final FEMDuration MINIMUM = FEMDuration.from(-119999, -12622780799999L);
+	public static final FEMDuration MINIMUM = new FEMDuration(-1673560325, -1901318169);
 
 	/** Dieses Feld speichert die größte positive Zeitspanne. */
-	public static final FEMDuration MAXIMUM = FEMDuration.from(119999, 12622780799999L);
+	public static final FEMDuration MAXIMUM = new FEMDuration(-1673691397, -1901318169);
 
 	/** Dieses Feld speichert die Ergebnisse von {@link #rangeOf(int)}. */
 	static final byte[] ranges = {0, 18, 33, 18, 33, 18, 33, 33, 33, 48, 33, 48, 16, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49,
@@ -757,6 +757,28 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	final FEMDuration moveImpl(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
 		if (this.signValue() < 0) return FEMDuration.from(durationmonths - this.durationmonthsValue(), durationmillis - this.durationmillisValue());
 		return FEMDuration.from(durationmonths + this.durationmonthsValue(), durationmillis + this.durationmillisValue());
+	}
+
+	/** Diese Methode multipliziert die Gesamtanzahlen an Monate und Millisekunden diese Zeitspanne mit dem gegebenen Faktor und gibt die resultierenden
+	 * Gesamtanzahlen als neue Zeitspanne zurück.
+	 *
+	 * @param factor Faktor.
+	 * @return Multiplizierte Zeitspanne.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
+	public final FEMDuration multiply(final int factor) throws IllegalArgumentException {
+		return FEMDuration.from(this.durationmonthsValue() * factor, this.durationmillisValue() * factor);
+	}
+
+	/** Diese Methode multipliziert die Gesamtanzahlen an Monate und Millisekunden diese Zeitspanne mit dem gegebenen Zähler, dividiert sie mit dem gegebenen
+	 * Nenner und gibt die resultierenden Gesamtanzahlen als neue Zeitspanne zurück.
+	 *
+	 * @param numerator Zähler.
+	 * @param denominator Nenner.
+	 * @return Multiplizierte Zeitspanne.
+	 * @throws IllegalArgumentException Wenn der Nenner {@code 0} ist oder die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
+	public final FEMDuration multiply(final int numerator, final int denominator) throws IllegalArgumentException {
+		if (denominator == 0) throw new IllegalArgumentException();
+		return FEMDuration.from((this.durationmonthsValue() * numerator) / denominator, (this.durationmillisValue() * numerator) / denominator);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.

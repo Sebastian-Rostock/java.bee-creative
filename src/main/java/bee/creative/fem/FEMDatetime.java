@@ -8,7 +8,7 @@ import bee.creative.util.Integers;
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
  * Intern wird die Zeitangabe als ein {@code long} dargestellt.
  * <p>
- * Das <u>Datum</u> kann unspezifiziert sein oder aus Jahr, Monat sowie Tag bestehen und im Bereich {@code 15.10.1582..31.12.9999} liegen. Die <u>Uhrzeit</u>
+ * Das <u>Datum</u> kann unspezifiziert sein oder aus Jahr, Monat sowie Tag bestehen und im Bereich {@code 1582-10-15..9999-12-31} liegen. Die <u>Uhrzeit</u>
  * kann unspezifiziert sein oder aus Stunde, Minute, Sekunde sowie Millisekunde bestehen und im Bereich {@code 00:00:00.000..24:00:00.000} liegen. Die
  * <u>Zeitzone</u> kann unspezifiziert sein oder aus Stunde sowie Minute bestehen und im Bereich {@code -14:00..+14:00} liegen.
  * </p>
@@ -64,7 +64,7 @@ import bee.creative.util.Integers;
  * <h5><a name="calendarday">Kalendertag (Tag im Kalender)</a></h5>
  * <p>
  * Der Zahlenwert für den {@link #calendardayValue() Kalendertag} entspricht der Anzahl der Tage seit dem Beginn des Gregorianischen Kalenders am Freitag dem
- * {@code 15.10.1582}. Unterstützte Zahlenwerte für den Kalendertag sind {@code 0..3074323}.
+ * {@code 1582-10-15}. Unterstützte Zahlenwerte für den Kalendertag sind {@code 0..3074323}.
  * </p>
  * <h5><a name="daymillis">Tagesmillis (Millisekunden am Tag)</a></h5>
  * <p>
@@ -96,16 +96,13 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public static final FEMType<FEMDatetime> TYPE = FEMType.from(FEMDatetime.ID);
 
 	/** Dieses Feld speichert die leere Zeitangabe ohne Datum, ohne Uhrzeit und ohne Zeitzone. */
-	public static final FEMDatetime EMPTY = new FEMDatetime(0x00, 0x40000000);
+	public static final FEMDatetime EMPTY = new FEMDatetime(0, 1073741824);
 
 	/** Dieses Feld speichert die früheste darstellbare Zeitangabe. */
-	public static final FEMDatetime MINIMUM = FEMDatetime.fromDate(1582, 10, 15).withTime(0, 0, 0, 0).withZone(14, 0);
+	public static final FEMDatetime MINIMUM = new FEMDatetime(414875651, -192446464);
 
 	/** Dieses Feld speichert die späteste darstellbare Zeitangabe. */
-	public static final FEMDatetime MAXIMUM = FEMDatetime.fromDate(9999, 12, 31).withTime(24, 0, 0, 0).withZone(-14, 0);
-
-	@SuppressWarnings ("javadoc")
-	static final FEMDatetime utcbase = FEMDatetime.EMPTY.withDate(1970, 1, 1).withTime(0).withZone(0);
+	public static final FEMDatetime MAXIMUM = new FEMDatetime(-1673592829, -1953505280);
 
 	{}
 
@@ -119,12 +116,13 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt einen Zeitpunkt zurück, der die gegebene Anzahl an Millisekunden nach dem Zeitpunkt {@code 1970-01-01T00:00:00Z} liegt.
 	 *
+	 * @see #toTime()
 	 * @see Calendar#setTimeInMillis(long)
 	 * @param millis Anzahl der Millisekunden.
 	 * @return Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
 	public static FEMDatetime from(final long millis) throws IllegalArgumentException {
-		return FEMDatetime.utcbase.moveTimeImpl(millis);
+		return new FEMDatetime(516440067, -1073709056).moveTimeImpl(millis);
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit den in der gegebenen Zeitangabe kodierten Komponenten zurück.<br>
@@ -284,12 +282,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt eine Zeitangabe mit dem Datum der gegebenen zurück.<br>
 	 * Wenn die gegebene Zeitangabe kein Datum {@link #hasDate() besitzt}, hat die gelieferte Zeitangabe auch kein Datum.
-	 * 
+	 *
 	 * @see #withDate(FEMDatetime)
 	 * @param datetime Zeitangabe.
 	 * @return Datum oder leere Zeitangabe.
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
-	public static FEMDatetime fromDate(FEMDatetime datetime) throws NullPointerException {
+	public static FEMDatetime fromDate(final FEMDatetime datetime) throws NullPointerException {
 		return FEMDatetime.EMPTY.withDate(datetime);
 	}
 
@@ -368,12 +366,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt eine Zeitangabe mit der Uhrzeit der gegebenen zurück.<br>
 	 * Wenn die gegebene Zeitangabe keine Uhrzeit {@link #hasTime() besitzt}, hat die gelieferte Zeitangabe auch keine Uhrzeit.
-	 * 
+	 *
 	 * @see #withTime(FEMDatetime)
 	 * @param datetime Zeitangabe.
 	 * @return Uhrzeit oder leere Zeitangabe.
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
-	public static FEMDatetime fromTime(FEMDatetime datetime) throws NullPointerException {
+	public static FEMDatetime fromTime(final FEMDatetime datetime) throws NullPointerException {
 		return FEMDatetime.EMPTY.withTime(datetime);
 	}
 
@@ -400,12 +398,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt eine Zeitangabe mit der Zeitzone der gegebenen zurück.<br>
 	 * Wenn die gegebene Zeitangabe keine Zeitzone {@link #hasTime() besitzt}, hat die gelieferte Zeitangabe auch keine Zeitzone.
-	 * 
+	 *
 	 * @see #withZone(FEMDatetime)
 	 * @param datetime Zeitangabe.
 	 * @return Zeitzone oder leere Zeitangabe.
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
-	public static FEMDatetime fromZone(FEMDatetime datetime) throws NullPointerException {
+	public static FEMDatetime fromZone(final FEMDatetime datetime) throws NullPointerException {
 		return FEMDatetime.EMPTY.withZone(datetime);
 	}
 
@@ -1348,6 +1346,16 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 				}
 			}
 		}
+	}
+
+	/** Diese Methode gibt diese Zeitangabe als Anzahl an Millisekunden seit dem Zeitpunkt {@code 1970-01-01T00:00:00Z} zurück. Wenn diese Zeitangabe
+	 * {@link #hasZone() keine Zeitzone} besitzt, wird {@code 0} angenommen. Wenn sie {@link #hasTime() keine Uhrzeit} besitzt, wird {@code 00:00:00.000}
+	 * angenommen.
+	 *
+	 * @return Anzahl an Millisekunden.
+	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
+	public final long toTime() {
+		return FEMDuration.durationmillisOfImpl(this.calendardayValue() - 141427, 0, this.zoneValueImpl(), 0, this.daymillisValueImpl());
 	}
 
 	/** Diese Methode gibt diese Zeitangabe als {@link Calendar} zurück.
