@@ -1,6 +1,7 @@
 package bee.creative.csv;
 
 import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 import bee.creative.util.IO;
@@ -12,7 +13,7 @@ import bee.creative.util.Objects;
  *
  * @see CSVReader
  * @author Sebastian Rostock 2014. */
-public final class CSVWriter implements Closeable {
+public final class CSVWriter implements Closeable, Flushable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVWriter} und gibt diesen zurück.<br>
 	 * Wenn das Objekt ein {@link CSVWriter} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object)
@@ -199,6 +200,22 @@ public final class CSVWriter implements Closeable {
 		return this;
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values[0]).writeValue(values[1])...}.
+	 *
+	 * @sell #writeValue(String)
+	 * @param values Werte.
+	 * @return {@code this}.
+	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
+	public final CSVWriter writeValue(final String... values) throws IOException, NullPointerException {
+		synchronized (this.writer) {
+			for (final String value: values) {
+				this.writeValueImpl(value);
+			}
+		}
+		return this;
+	}
+
 	@SuppressWarnings ("javadoc")
 	final void writeValueImpl(final String value) throws IOException {
 		final Writer target = this.writer;
@@ -246,6 +263,14 @@ public final class CSVWriter implements Closeable {
 	public final void close() throws IOException {
 		synchronized (this.writer) {
 			this.writer.close();
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void flush() throws IOException {
+		synchronized (this.writer) {
+			this.writer.flush();
 		}
 	}
 

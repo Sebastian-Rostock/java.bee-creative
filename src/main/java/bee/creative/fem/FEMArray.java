@@ -1,6 +1,6 @@
 package bee.creative.fem;
 
-import java.util.Arrays;
+import java.util.AbstractList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -400,24 +400,25 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 *
-	 * @see #from(Collection)
-	 * @param items Werte.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
-		return FEMArray.from(Iterables.toCollection(items));
-	}
-
-	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
-	 *
 	 * @see Collection#toArray(Object[])
 	 * @see #from(FEMValue...)
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMArray from(final Collection<? extends FEMValue> items) throws NullPointerException {
+	public static FEMArray from(final List<? extends FEMValue> items) throws NullPointerException {
 		if (items.size() == 0) return FEMArray.EMPTY;
 		return FEMArray.from(items.toArray(new FEMValue[items.size()]));
+	}
+
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	 *
+	 * @see #from(List)
+	 * @see Iterables#toList(Iterable)
+	 * @param items Werte.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
+		return FEMArray.from(Iterables.toList(items));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMArray.TYPE)}.
@@ -431,7 +432,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt die Verkettung der gegebenen Wertlisten zurück.
-	 * 
+	 *
 	 * @see #concat(FEMArray)
 	 * @param values Wertlisten.
 	 * @return Verkettung der Wertlisten.
@@ -667,12 +668,25 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return Comparators.compare(this.length, that.length);
 	}
 
-	/** Diese Methode gibt diese Wertliste als {@link List} zurück.
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf diese Wertliste zurück.
 	 *
-	 * @see Arrays#asList(Object...)
-	 * @return {@link List}. */
+	 * @see #get(int)
+	 * @see #length()
+	 * @return {@link List}-Sicht. */
 	public final List<FEMValue> toList() {
-		return Arrays.asList(this.value());
+		return new AbstractList<FEMValue>() {
+
+			@Override
+			public FEMValue get(final int index) {
+				return FEMArray.this.get(index);
+			}
+
+			@Override
+			public int size() {
+				return FEMArray.this.length;
+			}
+
+		};
 	}
 
 	{}

@@ -1,15 +1,18 @@
 package bee.creative.fem;
 
+import java.util.AbstractList;
 import java.util.Iterator;
+import java.util.List;
 import bee.creative.iam.IAMArray;
 import bee.creative.util.Comparators;
+import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert eine unveränderliche Zeichenkette sowie Methoden zur Erzeugung solcher Zeichenketten aus nativen Arrays.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMString extends FEMValue implements Iterable<Integer>, UseToString {
+public abstract class FEMString extends FEMValue implements Iterable<Integer>, Comparable<FEMString>, UseToString {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Codepoints einer Zeichenkette in der Methode {@link FEMString#extract(Collector)}. */
 	public static interface Collector {
@@ -799,6 +802,35 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 		return new UniformString(length, item);
 	}
 
+	/** Diese Methode konvertiert die gegebenen Codepoints in eine Zeichenkette und gibt diese zurück.
+	 *
+	 * @see #from(int[])
+	 * @see Number#intValue()
+	 * @param items Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
+	public static FEMString from(final List<? extends Number> items) throws NullPointerException {
+		final int length = items.size();
+		if (length == 0) return FEMString.EMPTY;
+		if (length == 1) return FEMString.from(items.get(0).intValue(), 1);
+		final int[] result = new int[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = items.get(i).intValue();
+		}
+		return FEMString.from(false, result);
+	}
+
+	/** Diese Methode konvertiert die gegebenen Codepoints in eine Zeichenkette und gibt diese zurück.
+	 *
+	 * @see #from(List)
+	 * @see Iterables#toList(Iterable)
+	 * @param items Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
+	public static FEMString from(final Iterable<? extends Number> items) throws NullPointerException {
+		return FEMString.from(Iterables.toList(items));
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@code from(array, false)} und die Umkehroperation zu {@link #toArray(int)}.
 	 *
 	 * @see #from(IAMArray, boolean)
@@ -873,7 +905,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 	}
 
 	/** Diese Methode gibt die Verkettung der gegebenen Zeichenketten zurück.
-	 * 
+	 *
 	 * @see #concat(FEMString)
 	 * @param values Zeichenketten.
 	 * @return Verkettung der Zeichenketten.
@@ -1316,6 +1348,27 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 		return Comparators.compare(this.length, that.length);
 	}
 
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Codepoints dieser Zeichenkette zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @return {@link List}-Sicht. */
+	public final List<Integer> toList() {
+		return new AbstractList<Integer>() {
+
+			@Override
+			public Integer get(final int index) {
+				return new Integer(FEMString.this.get(index));
+			}
+
+			@Override
+			public int size() {
+				return FEMString.this.length;
+			}
+
+		};
+	}
+
 	/** Diese Methode gibt die Codepoint in UTF8-Kodierung zurück.
 	 *
 	 * @return Array mit den Codepoints in UTF8-Kodierung. */
@@ -1466,6 +1519,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, U
 			}
 
 		};
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public int compareTo(final FEMString o) {
+		return this.compare(o);
 	}
 
 	/** {@inheritDoc} */

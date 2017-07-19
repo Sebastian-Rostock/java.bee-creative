@@ -190,7 +190,7 @@ public final class CSVReader implements Closeable {
 	/** Diese Methode ließt den nächsten Wert und gibt ihn zurück.<br>
 	 * Wenn es auf der aktuellen Zeile keinen weiteren Wert gibt, wird {@code ""} geliefert. Wenn der Wert nicht in {@link #getQuote() Maskierungszeichen}
 	 * eingeschlossen ist, endet er spätentens am Ende der Eingabe, am Ende der Zeile oder an einem {@link #getComma() Trennzeichen}. Andernfalls endet er nach
-	 * dem ersten {@link #getQuote() Maskierungszeichen}, dem kein weiteres {@link #getComma() Maskierungszeichen} folgt.<br>
+	 * dem ersten {@link #getQuote() Maskierungszeichen}, dem kein weiteres {@link #getQuote() Maskierungszeichen} folgt.<br>
 	 *
 	 * @see #getQuote()
 	 * @see #getComma()
@@ -216,10 +216,8 @@ public final class CSVReader implements Closeable {
 					if (symbol == quote) {
 						symbol = reader.read();
 						if (symbol != quote) return result.toString().intern();
-						result.append(quote);
-					} else {
-						result.append((char)symbol);
 					}
+					result.append((char)symbol);
 					symbol = reader.read();
 				}
 				throw new IllegalArgumentException();

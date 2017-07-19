@@ -141,7 +141,7 @@ public class FEMContext {
 
 	@SuppressWarnings ("javadoc")
 	final FEMArray arrayFromImpl(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
-		return this.arrayFromImpl(Iterables.toCollection(data));
+		return this.arrayFromImpl(Iterables.toList(data));
 	}
 
 	@SuppressWarnings ("javadoc")

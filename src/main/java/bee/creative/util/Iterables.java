@@ -3,7 +3,10 @@ package bee.creative.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import bee.creative.array.Array;
 import bee.creative.util.Objects.UseToString;
 
@@ -427,18 +430,34 @@ public class Iterables {
 		};
 	}
 
-	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Collection} zurück.<br>
-	 * Wenn das gegebene {@link Iterable} eine {@link Collection} ist, wird diese geliefert. Andernfalls wird eine über {@link #appendAll(Collection, Iterable)}
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück.<br>
+	 * Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses geliefert. Andernfalls wird ein über {@link #appendAll(Collection, Iterable)} befülltes
+	 * {@link HashSet} geliefert.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param iterable {@link Iterable}.
+	 * @return {@link Set} der Elemente.
+	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
+	public static <GItem> Set<GItem> toSet(final Iterable<GItem> iterable) throws NullPointerException {
+		if (iterable instanceof Set<?>) return (Set<GItem>)iterable;
+		final HashSet<GItem> result = new HashSet<>();
+		Iterables.appendAll(result, iterable);
+		return result;
+	}
+
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link List} zurück.<br>
+	 * Wenn das gegebene {@link Iterable} eine {@link List} ist, wird diese geliefert. Andernfalls wird eine über {@link #appendAll(Collection, Iterable)}
 	 * befüllte {@link ArrayList} geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable}.
-	 * @return {@link Collection} der Elemente.
+	 * @return {@link List} der Elemente.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
-	public static <GItem> Collection<GItem> toCollection(final Iterable<GItem> iterable) throws NullPointerException {
-		if (iterable instanceof Collection<?>) return (Collection<GItem>)iterable;
+	public static <GItem> List<GItem> toList(final Iterable<GItem> iterable) throws NullPointerException {
+		if (iterable instanceof List<?>) return (List<GItem>)iterable;
 		final ArrayList<GItem> result = new ArrayList<>();
 		Iterables.appendAll(result, iterable);
+		result.trimToSize();
 		return result;
 	}
 

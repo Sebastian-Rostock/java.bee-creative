@@ -2,6 +2,7 @@ package bee.creative.fem;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
@@ -378,22 +379,22 @@ public abstract class FEMFunction {
 		return new ConcatFunction(this, params.clone());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.concat(Iterables.toCollection(params))}.
-	 *
-	 * @see #concat(Collection)
-	 * @see Iterables#toCollection(Iterable) */
-	@SuppressWarnings ("javadoc")
-	public final FEMFunction concat(final Iterable<? extends FEMFunction> params) throws NullPointerException {
-		return this.concat(Iterables.toCollection(params));
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@code this.concat(params.toArray(new FEMFunction[params.size()]))}.
 	 *
 	 * @see #concat(FEMFunction...)
 	 * @see Collection#toArray(Object[]) */
 	@SuppressWarnings ("javadoc")
-	public final FEMFunction concat(final Collection<? extends FEMFunction> params) throws NullPointerException {
+	public final FEMFunction concat(final List<? extends FEMFunction> params) throws NullPointerException {
 		return this.concat(params.toArray(new FEMFunction[params.size()]));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.concat(Iterables.toList(params))}.
+	 *
+	 * @see #concat(List)
+	 * @see Iterables#toList(Iterable) */
+	@SuppressWarnings ("javadoc")
+	public final FEMFunction concat(final Iterable<? extends FEMFunction> params) throws NullPointerException {
+		return this.concat(Iterables.toList(params));
 	}
 
 	/** Diese Methode gibt eine komponierte Funktion zurück, welche diese Funktion mit den gegebenen Parameterfunktionen aufruft. Der Ergebniswert der gelieferten
@@ -407,22 +408,22 @@ public abstract class FEMFunction {
 		return new CompositeFunction(this, params.clone());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.compose(Iterables.toCollection(params))}.
-	 *
-	 * @see #compose(Collection)
-	 * @see Iterables#toCollection(Iterable) */
-	@SuppressWarnings ("javadoc")
-	public final FEMFunction compose(final Iterable<? extends FEMFunction> params) throws NullPointerException {
-		return this.compose(Iterables.toCollection(params));
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@code this.compose(params.toArray(new FEMFunction[params.size()]))}.
 	 *
 	 * @see #compose(FEMFunction...)
 	 * @see Collection#toArray(Object[]) */
 	@SuppressWarnings ("javadoc")
-	public final FEMFunction compose(final Collection<? extends FEMFunction> params) throws NullPointerException {
+	public final FEMFunction compose(final List<? extends FEMFunction> params) throws NullPointerException {
 		return this.compose(params.toArray(new FEMFunction[params.size()]));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.compose(Iterables.toList(params))}.
+	 *
+	 * @see #compose(List)
+	 * @see Iterables#toList(Iterable) */
+	@SuppressWarnings ("javadoc")
+	public final FEMFunction compose(final Iterable<? extends FEMFunction> params) throws NullPointerException {
+		return this.compose(Iterables.toList(params));
 	}
 
 	/** Diese Methode gibt diese Funktion mit Verfolgung bzw. Überwachung der Verarbeitung durch das gegebene {@link FEMTracer Überwachungsobjekt} zurück.

@@ -1,15 +1,19 @@
 package bee.creative.fem;
 
+import java.nio.ByteOrder;
+import java.util.AbstractList;
 import java.util.Iterator;
+import java.util.List;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
+import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseToString {
+public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comparable<FEMBinary>, UseToString {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#extract(Collector)}. */
 	public static interface Collector {
@@ -150,6 +154,64 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 		@Override
 		public final FEMBinary reverse() {
 			return this;
+		}
+
+		@Override
+		public final FEMBinary compact() {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class IntegerBinaryBE extends FEMBinary {
+
+		public final long value;
+
+		IntegerBinaryBE(final int length, final long value) {
+			super(length);
+			this.value = value;
+		}
+
+		{}
+
+		@Override
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+			return (byte)(this.value >> ((this.length - index - 1) << 3));
+		}
+
+		@Override
+		public final FEMBinary reverse() {
+			return new IntegerBinaryLE(this.length, this.value);
+		}
+
+		@Override
+		public final FEMBinary compact() {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class IntegerBinaryLE extends FEMBinary {
+
+		public final long value;
+
+		IntegerBinaryLE(final int length, final long value) {
+			super(length);
+			this.value = value;
+		}
+
+		{}
+
+		@Override
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+			return (byte)(this.value >> (index << 3));
+		}
+
+		@Override
+		public final FEMBinary reverse() {
+			return new IntegerBinaryBE(this.length, this.value);
 		}
 
 		@Override
@@ -446,6 +508,25 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 		return new CompactBinary(bytes);
 	}
 
+	/** Diese Methode überführt die gegebene Dezimalzahl interpretiert als Binärzahl in eine Bytefolge mit der gegebenen Länge sowie der gegebenen Bytereihenfolge
+	 * und gibt diese zurück.<br>
+	 * Bei einer Länge von {@code 3} Byte hat die Dezimalzahl {@code 16909060} ({@code 0x01020304}) die Bytefolge {@code 0x020304} in {@link ByteOrder#BIG_ENDIAN
+	 * big-endian} und die die Bytefolge {@code 0x040302} in {@link ByteOrder#LITTLE_ENDIAN little-endian}.
+	 *
+	 * @see #toInteger(boolean)
+	 * @param value Dezimalzahl.
+	 * @param length Länge ({@code 0..8})
+	 * @param bigEndian {@code true} für {@link ByteOrder#BIG_ENDIAN big-endian};<br>
+	 *        {@code false} für als {@link ByteOrder#LITTLE_ENDIAN little-endian}.
+	 * @return Bytefolge.
+	 * @throws IllegalArgumentException Wenn die Länge ungültig ist. */
+	public static FEMBinary from(final long value, final int length, final boolean bigEndian) throws IllegalArgumentException {
+		if (length == 0) return FEMBinary.EMPTY;
+		if (length == 1) return new UniformBinary(1, (byte)value);
+		if ((length < 0) || (length > 8)) throw new IllegalArgumentException();
+		return bigEndian ? new IntegerBinaryBE(length, value) : new IntegerBinaryLE(length, value);
+	}
+
 	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
 	 *
 	 * @param array Zahlenfolge.
@@ -468,8 +549,37 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 		return context.dataFrom(value, FEMBinary.TYPE);
 	}
 
+	/** Diese Methode konvertiert die gegebenen Zahlen in eine Bytefolge und gibt diese zurück.
+	 *
+	 * @see #from(byte[])
+	 * @see Number#byteValue()
+	 * @param items Zahlen.
+	 * @return Bytefolge.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
+	public static FEMBinary from(final List<? extends Number> items) throws NullPointerException {
+		final int length = items.size();
+		if (length == 0) return FEMBinary.EMPTY;
+		if (length == 1) return FEMBinary.from(items.get(0).byteValue(), 1);
+		final byte[] result = new byte[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = items.get(i).byteValue();
+		}
+		return FEMBinary.from(false, result);
+	}
+
+	/** Diese Methode konvertiert die gegebenen Zahlen in eine Bytefolge und gibt diese zurück.
+	 *
+	 * @see #from(List)
+	 * @see Iterables#toList(Iterable)
+	 * @param items Zahlen.
+	 * @return Bytefolge.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
+	public static FEMBinary from(final Iterable<? extends Number> items) throws NullPointerException {
+		return FEMBinary.from(Iterables.toList(items));
+	}
+
 	/** Diese Methode gibt die Verkettung der gegebenen Bytefolgen zurück.
-	 * 
+	 *
 	 * @see #concat(FEMBinary)
 	 * @param values Bytefolgen.
 	 * @return Verkettung der Bytefolgen.
@@ -517,6 +627,31 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 		if (upper < 0) throw new IllegalArgumentException("'9' < hexChar < 'A'");
 		if (upper <= 5) return upper + 10;
 		throw new IllegalArgumentException("'F' < hexChar < 'a'");
+	}
+
+	@SuppressWarnings ("javadoc")
+	private static int toInteger(final byte a) {
+		return a & 255;
+	}
+
+	@SuppressWarnings ("javadoc")
+	private static long toInteger(final int a, final int b) {
+		return ((long)a << 32) | b;
+	}
+
+	@SuppressWarnings ("javadoc")
+	private static int toInteger(final byte a, final byte b) {
+		return (FEMBinary.toInteger(a) << 8) | FEMBinary.toInteger(b);
+	}
+
+	@SuppressWarnings ("javadoc")
+	private static int toInteger(final byte a, final byte b, final byte c) {
+		return (FEMBinary.toInteger(a) << 16) | (FEMBinary.toInteger(b) << 8) | FEMBinary.toInteger(c);
+	}
+
+	@SuppressWarnings ("javadoc")
+	private static int toInteger(final byte a, final byte b, final byte c, final byte d) {
+		return (a << 24) | (FEMBinary.toInteger(b) << 16) | (FEMBinary.toInteger(c) << 8) | FEMBinary.toInteger(d);
 	}
 
 	{}
@@ -743,6 +878,27 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 		return Comparators.compare(this.length, that.length);
 	}
 
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Bytes dieser Bytefolge zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @return {@link List}-Sicht. */
+	public final List<Byte> toList() {
+		return new AbstractList<Byte>() {
+
+			@Override
+			public Byte get(final int index) {
+				return new Byte(FEMBinary.this.get(index));
+			}
+
+			@Override
+			public int size() {
+				return FEMBinary.this.length;
+			}
+
+		};
+	}
+
 	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
 	 * Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} (header) und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen
 	 * Ziffern, d.h. {@code 0123456789ABCDEF}.
@@ -753,6 +909,67 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 		final StringCollector target = new StringCollector(header, this.length);
 		this.extract(target);
 		return new String(target.array, 0, target.array.length);
+	}
+
+	/** Diese Methode interpretiert diese Bytefolge als Binärzahl mit der gegebenen Bytereihenfolge und gibt diese als Dezimalzahl zurück.
+	 * 
+	 * @see #from(long, int, boolean)
+	 * @param bigEndian {@code true} für {@link ByteOrder#BIG_ENDIAN big-endian} und {@code false} für als {@link ByteOrder#LITTLE_ENDIAN little-endian}.
+	 * @return Dezimalzahl.
+	 * @throws IllegalStateException Wenn die Länge der Bytefolge größer als {@code 8} ist. */
+	public final long toInteger(final boolean bigEndian) throws IllegalStateException {
+		if (bigEndian) {
+			switch (this.length) {
+				case 0:
+					return 0;
+				case 1:
+					return FEMBinary.toInteger(this.customGet(0));
+				case 2:
+					return FEMBinary.toInteger(this.customGet(0), this.customGet(1));
+				case 3:
+					return FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2));
+				case 4:
+					return FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3));
+				case 5:
+					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(0)),
+						FEMBinary.toInteger(this.customGet(1), this.customGet(2), this.customGet(3), this.customGet(4)));
+				case 6:
+					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(0), this.customGet(1)),
+						FEMBinary.toInteger(this.customGet(2), this.customGet(3), this.customGet(4), this.customGet(5)));
+				case 7:
+					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2)),
+						FEMBinary.toInteger(this.customGet(3), this.customGet(4), this.customGet(5), this.customGet(6)));
+				case 8:
+					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3)),
+						FEMBinary.toInteger(this.customGet(4), this.customGet(5), this.customGet(6), this.customGet(7)));
+			}
+		} else {
+			switch (this.length) {
+				case 0:
+					return 0;
+				case 1:
+					return FEMBinary.toInteger(this.customGet(0));
+				case 2:
+					return FEMBinary.toInteger(this.customGet(1), this.customGet(0));
+				case 3:
+					return FEMBinary.toInteger(this.customGet(2), this.customGet(1), this.customGet(0));
+				case 4:
+					return FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0));
+				case 5:
+					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(4)),
+						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+				case 6:
+					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(5), this.customGet(4)),
+						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+				case 7:
+					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(6), this.customGet(5), this.customGet(4)),
+						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+				case 8:
+					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(7), this.customGet(6), this.customGet(5), this.customGet(4)),
+						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+			}
+		}
+		throw new IllegalStateException();
 	}
 
 	{}
@@ -823,6 +1040,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, UseT
 			}
 
 		};
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final int compareTo(final FEMBinary that) {
+		return this.compare(that);
 	}
 
 	/** {@inheritDoc} */
