@@ -739,6 +739,15 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return new ConcatBinary(this, that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length - offset)}.
+	 * 
+	 * @see #length()
+	 * @see #section(int, int) */
+	@SuppressWarnings ("javadoc")
+	public FEMBinary section(final int offset) throws IllegalArgumentException {
+		return this.section(offset, this.length - offset);
+	}
+
 	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Bytefolge zurück.
 	 *
 	 * @param offset Position, an welcher der Abschnitt beginnt.
@@ -912,7 +921,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	/** Diese Methode interpretiert diese Bytefolge als Binärzahl mit der gegebenen Bytereihenfolge und gibt diese als Dezimalzahl zurück.
-	 * 
+	 *
 	 * @see #from(long, int, boolean)
 	 * @param bigEndian {@code true} für {@link ByteOrder#BIG_ENDIAN big-endian} und {@code false} für als {@link ByteOrder#LITTLE_ENDIAN little-endian}.
 	 * @return Dezimalzahl.

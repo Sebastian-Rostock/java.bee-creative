@@ -1210,6 +1210,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return new ConcatString(this, that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length - offset)}.
+	 *
+	 * @see #length()
+	 * @see #section(int, int) */
+	@SuppressWarnings ("javadoc")
+	public FEMString section(final int offset) throws IllegalArgumentException {
+		return this.section(offset, this.length - offset);
+	}
+
 	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Zeichenkette zurück.
 	 *
 	 * @param offset Position, an welcher der Abschnitt beginnt.
