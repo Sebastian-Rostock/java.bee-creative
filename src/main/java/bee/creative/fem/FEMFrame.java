@@ -20,9 +20,9 @@ import bee.creative.util.Objects.UseToString;
 public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, UseToString {
 
 	@SuppressWarnings ("javadoc")
-	static final class ArrayFrame extends FEMFrame {
+	public static final class ArrayFrame extends FEMFrame {
 
-		final FEMArray params;
+		public final FEMArray params;
 
 		ArrayFrame(final FEMFrame parent, final FEMArray params, final FEMContext context) {
 			super(parent, context);
@@ -32,7 +32,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		{}
 
 		@Override
-		public FEMValue get(final int index) throws IndexOutOfBoundsException {
+		public final FEMValue get(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.params.length;
 			if (index2 >= 0) return this.parent.get(index2);
 			final FEMValue result = this.params.customGet(index);
@@ -40,24 +40,24 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		}
 
 		@Override
-		public int size() {
+		public final int size() {
 			return this.params.length;
 		}
 
 		@Override
-		public FEMArray params() {
+		public final FEMArray params() {
 			return this.params;
 		}
 
 		@Override
-		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
+		public final FEMFrame withContext(final FEMContext context) throws NullPointerException {
 			return new ArrayFrame(this.parent, this.params, Objects.assertNotNull(context));
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyFrame extends FEMFrame {
+	public static final class EmptyFrame extends FEMFrame {
 
 		@Override
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
@@ -65,32 +65,34 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		}
 
 		@Override
-		public int size() {
+		public final int size() {
 			return 0;
 		}
 
 		@Override
-		public FEMArray params() {
+		public final FEMArray params() {
 			return FEMArray.EMPTY;
 		}
 
 		@Override
-		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
+		public final FEMFrame withContext(final FEMContext context) throws NullPointerException {
 			return new ArrayFrame(this, FEMArray.EMPTY, Objects.assertNotNull(context));
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class InvokeFrame extends FEMFrame {
+	public static final class InvokeFrame extends FEMFrame {
 
-		static final class Params extends FEMArray {
+		public static final class Params extends FEMArray {
 
-			final FEMFrame frame;
+			public final FEMFrame frame;
 
-			final FEMValue[] values;
+			/** Dieses Feld speichert das Array der Parameterwerte, das nicht verändert werden darf. */
+			public final FEMValue[] values;
 
-			final FEMFunction[] functions;
+			/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
+			public final FEMFunction[] functions;
 
 			Params(final FEMFrame frame, final FEMFunction[] params) {
 				super(params.length);
@@ -101,7 +103,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 			{}
 
-			FEMValue frameGet(final int index) {
+			final FEMValue frameGet(final int index) {
 				final int index2 = index - this.length;
 				if (index2 >= 0) return this.frame.get(index2);
 				synchronized (this.values) {
@@ -116,8 +118,10 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 				}
 			}
 
+			{}
+
 			@Override
-			protected FEMValue customGet(final int index) {
+			protected final FEMValue customGet(final int index) {
 				synchronized (this.values) {
 					FEMValue result = this.values[index];
 					if (result != null) return result;
@@ -133,7 +137,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		{}
 
-		final Params params;
+		public final Params params;
 
 		InvokeFrame(final FEMFrame parent, final Params params, final FEMContext context) {
 			super(parent, context);
@@ -148,24 +152,24 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		{}
 
 		@Override
-		public FEMValue get(final int index) throws IndexOutOfBoundsException {
+		public final FEMValue get(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.params.length;
 			if (index2 >= 0) return this.parent.get(index2);
 			return this.params.frameGet(index);
 		}
 
 		@Override
-		public int size() {
+		public final int size() {
 			return this.params.length;
 		}
 
 		@Override
-		public FEMArray params() {
+		public final FEMArray params() {
 			return this.params;
 		}
 
 		@Override
-		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
+		public final FEMFrame withContext(final FEMContext context) throws NullPointerException {
 			return new InvokeFrame(this.parent, this.params, Objects.assertNotNull(context));
 		}
 

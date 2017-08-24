@@ -51,13 +51,13 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	@SuppressWarnings ("javadoc")
 	static final class HashCollector implements Collector {
 
-		public int hash = 0x811C9DC5;
+		public int hash = Objects.hashInit();
 
 		{}
 
 		@Override
 		public final boolean push(final byte value) {
-			this.hash = (this.hash * 0x01000193) ^ value;
+			this.hash = Objects.hashPush(this.hash, value);
 			return true;
 		}
 
@@ -119,7 +119,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ArrayBinary extends FEMBinary {
+	public static final class ArrayBinary extends FEMBinary {
 
 		public final MMFArray array;
 
@@ -143,7 +143,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyBinary extends FEMBinary {
+	public static final class EmptyBinary extends FEMBinary {
 
 		EmptyBinary() {
 			super(0);
@@ -164,7 +164,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class IntegerBinaryBE extends FEMBinary {
+	public static final class IntegerBinaryBE extends FEMBinary {
 
 		public final long value;
 
@@ -193,7 +193,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class IntegerBinaryLE extends FEMBinary {
+	public static final class IntegerBinaryLE extends FEMBinary {
 
 		public final long value;
 
@@ -222,7 +222,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ConcatBinary extends FEMBinary {
+	public static final class ConcatBinary extends FEMBinary {
 
 		public final FEMBinary binary1;
 
@@ -267,7 +267,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class SectionBinary extends FEMBinary {
+	public static final class SectionBinary extends FEMBinary {
 
 		public final FEMBinary binary;
 
@@ -299,7 +299,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ReverseBinary extends FEMBinary {
+	public static final class ReverseBinary extends FEMBinary {
 
 		public final FEMBinary binary;
 
@@ -338,7 +338,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UniformBinary extends FEMBinary {
+	public static final class UniformBinary extends FEMBinary {
 
 		public final byte item;
 
@@ -376,8 +376,9 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class CompactBinary extends FEMBinary {
+	public static final class CompactBinary extends FEMBinary {
 
+		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden darf. */
 		public final byte[] items;
 
 		CompactBinary(final byte[] items) throws IllegalArgumentException {
@@ -740,7 +741,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length - offset)}.
-	 * 
+	 *
 	 * @see #length()
 	 * @see #section(int, int) */
 	@SuppressWarnings ("javadoc")

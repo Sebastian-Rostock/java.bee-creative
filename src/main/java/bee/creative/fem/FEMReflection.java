@@ -37,7 +37,7 @@ import bee.creative.util.Objects;
 public abstract class FEMReflection extends FEMFunction {
 
 	@SuppressWarnings ("javadoc")
-	static final class StaticField extends FEMReflection {
+	public static final class StaticField extends FEMReflection {
 
 		public final Field field;
 
@@ -78,7 +78,7 @@ public abstract class FEMReflection extends FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class StaticMethod extends FEMReflection {
+	public static final class StaticMethod extends FEMReflection {
 
 		public final Method method;
 
@@ -112,7 +112,7 @@ public abstract class FEMReflection extends FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class StaticConstructor extends FEMReflection {
+	public static final class StaticConstructor extends FEMReflection {
 
 		public final Constructor<?> constructor;
 
@@ -146,7 +146,7 @@ public abstract class FEMReflection extends FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class InstanceField extends FEMReflection {
+	public static final class InstanceField extends FEMReflection {
 
 		public final Field field;
 
@@ -189,7 +189,7 @@ public abstract class FEMReflection extends FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class InstanceMethod extends FEMReflection {
+	public static final class InstanceMethod extends FEMReflection {
 
 		public final Method method;
 

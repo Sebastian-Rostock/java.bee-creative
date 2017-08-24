@@ -50,13 +50,13 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	static final class StringHasher implements Collector {
 
-		public int hash = 0x811C9DC5;
+		public int hash = Objects.hashInit();
 
 		{}
 
 		@Override
 		public final boolean push(final int value) {
-			this.hash = (this.hash * 0x01000193) ^ value;
+			this.hash = Objects.hashPush(this.hash, value);
 			return true;
 		}
 
@@ -333,6 +333,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	static final class UTF8CompactString extends FEMString {
 
+		/** Dieses Feld speichert das Array der UTF-8-Token, das nicht verändert werden darf. */
 		public final byte[] items;
 
 		UTF8CompactString(final byte[] items) throws IllegalArgumentException {
@@ -391,6 +392,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	static final class UTF16CompactString extends FEMString {
 
+		/** Dieses Feld speichert das Array der UTF-16-Token, das nicht verändert werden darf. */
 		public final char[] items;
 
 		UTF16CompactString(final char[] items) throws IllegalArgumentException {
@@ -447,8 +449,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF32CompactString extends FEMString {
+	public static final class UTF32CompactString extends FEMString {
 
+		/** Dieses Feld speichert das Array der UTF-32-Token, das nicht verändert werden darf. */
 		public final int[] items;
 
 		UTF32CompactString(final int[] items) throws IllegalArgumentException {
@@ -471,7 +474,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyString extends FEMString {
+	public static final class EmptyString extends FEMString {
 
 		EmptyString() {
 			super(0);
@@ -492,7 +495,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ConcatString extends FEMString {
+	public static final class ConcatString extends FEMString {
 
 		public final FEMString string1;
 
@@ -537,7 +540,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class SectionString extends FEMString {
+	public static final class SectionString extends FEMString {
 
 		public final FEMString string;
 
@@ -569,7 +572,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ReverseString extends FEMString {
+	public static final class ReverseString extends FEMString {
 
 		public final FEMString string;
 
@@ -608,7 +611,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UniformString extends FEMString {
+	public static final class UniformString extends FEMString {
 
 		public final int item;
 

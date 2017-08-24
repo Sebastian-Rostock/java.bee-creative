@@ -53,13 +53,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	@SuppressWarnings ("javadoc")
 	static final class HashCollector implements Collector {
 
-		public int hash = 0x811C9DC5;
+		public int hash = Objects.hashInit();
 
 		{}
 
 		@Override
 		public final boolean push(final FEMValue value) {
-			this.hash = (this.hash * 0x01000193) ^ value.hashCode();
+			this.hash = Objects.hashPush(this.hash, value.hashCode());
 			return true;
 		}
 
@@ -88,7 +88,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyArray extends FEMArray {
+	public static final class EmptyArray extends FEMArray {
 
 		EmptyArray() throws IllegalArgumentException {
 			super(0);
@@ -109,7 +109,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ConcatArray extends FEMArray {
+	public static final class ConcatArray extends FEMArray {
 
 		public final FEMArray array1;
 
@@ -154,7 +154,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class SectionArray extends FEMArray {
+	public static final class SectionArray extends FEMArray {
 
 		public final FEMArray array;
 
@@ -186,7 +186,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ReverseArray extends FEMArray {
+	public static final class ReverseArray extends FEMArray {
 
 		public final FEMArray array;
 
@@ -225,7 +225,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static class UniformArray extends FEMArray {
+	public static class UniformArray extends FEMArray {
 
 		public final FEMValue item;
 
@@ -269,7 +269,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UniformResultArray extends UniformArray {
+	public static final class UniformResultArray extends UniformArray {
 
 		UniformResultArray(final int length, final FEMValue item) throws IllegalArgumentException {
 			super(length, item);
@@ -285,8 +285,9 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static class CompactArray extends FEMArray {
+	public static class CompactArray extends FEMArray {
 
+		/** Dieses Feld speichert das Array der Werte, das nicht verändert werden darf. */
 		public final FEMValue[] items;
 
 		CompactArray(final FEMValue[] items) throws IllegalArgumentException {
@@ -318,7 +319,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class CompactResultArray extends CompactArray {
+	public static final class CompactResultArray extends CompactArray {
 
 		CompactResultArray(final FEMValue[] items) throws IllegalArgumentException {
 			super(items);

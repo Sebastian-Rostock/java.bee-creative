@@ -19,11 +19,11 @@ import bee.creative.util.Objects;
 public abstract class FEMFunction {
 
 	@SuppressWarnings ("javadoc")
-	static final class TraceFunction extends FEMFunction {
+	public static final class TraceFunction extends FEMFunction {
 
-		final FEMTracer tracer;
+		public final FEMTracer tracer;
 
-		final FEMFunction function;
+		public final FEMFunction function;
 
 		TraceFunction(final FEMTracer tracer, final FEMFunction function) throws NullPointerException {
 			this.tracer = Objects.assertNotNull(tracer);
@@ -81,11 +81,11 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class FrameFunction extends FEMFunction {
+	public static final class FrameFunction extends FEMFunction {
 
-		final FEMFrame frame;
+		public final FEMFrame frame;
 
-		final FEMFunction function;
+		public final FEMFunction function;
 
 		FrameFunction(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
 			this.frame = Objects.assertNotNull(frame);
@@ -135,9 +135,9 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class FutureFunction extends FEMFunction {
+	public static final class FutureFunction extends FEMFunction {
 
-		final FEMFunction function;
+		public final FEMFunction function;
 
 		FutureFunction(final FEMFunction function) {
 			this.function = function;
@@ -196,11 +196,12 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ConcatFunction extends FEMFunction {
+	public static final class ConcatFunction extends FEMFunction {
 
-		final FEMFunction[] params;
+		/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
+		public final FEMFunction[] params;
 
-		final FEMFunction function;
+		public final FEMFunction function;
 
 		ConcatFunction(final FEMFunction function, final FEMFunction... params) {
 			this.params = params;
@@ -253,11 +254,9 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ClosureFunction extends FEMFunction {
+	public static final class ClosureFunction extends FEMFunction {
 
-		{}
-
-		final FEMFunction function;
+		public final FEMFunction function;
 
 		ClosureFunction(final FEMFunction function) throws NullPointerException {
 			this.function = function;
@@ -303,11 +302,12 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class CompositeFunction extends FEMFunction {
+	public static final class CompositeFunction extends FEMFunction {
 
-		final FEMFunction[] params;
+		/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
+		public final FEMFunction[] params;
 
-		final FEMFunction function;
+		public final FEMFunction function;
 
 		CompositeFunction(final FEMFunction function, final FEMFunction... params) {
 			this.params = params;
@@ -347,8 +347,8 @@ public abstract class FEMFunction {
 		@Override
 		public final boolean equals(final Object object) {
 			if (object == this) return true;
-			if (!(object instanceof ConcatFunction)) return false;
-			final ConcatFunction data = (ConcatFunction)object;
+			if (!(object instanceof CompositeFunction)) return false;
+			final CompositeFunction data = (CompositeFunction)object;
 			return this.function.equals(data.function) && Objects.equals(this.params, data.params);
 		}
 
