@@ -69,16 +69,10 @@ public final class FEMProxy extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEMParser.formatValue(this.name));
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public String toString() {
-		final FEMFunction function = this.function;
-		if (function != null) return new FEMFormatter().put(FEMParser.formatValue(this.name)).putHandler(this.function).format();
-		return FEMParser.formatValue(this.name);
+		final String result = FEMDomain.NORMAL.formatConst(this.name);
+		if (this.function == null) return result;
+		return result + FEMHandler.from(this.function).toString();
 	}
 
 }

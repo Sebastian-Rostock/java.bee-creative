@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import bee.creative.fem.FEMScript.Range;
+import bee.creative.fem.FEMScript.Token;
 import bee.creative.util.Comparables;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
@@ -14,77 +14,77 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMScript implements Items<Range>, Iterable<Range> {
+public final class FEMScript implements Items<Token>, Iterable<Token> {
 
-	/** Diese Klasse implementiert ein Objekt, das einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Range)}
+	/** Diese Klasse implementiert ein Objekt, das einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Token)}
 	 * erfolgt gemäß ihrer Startposition.
 	 *
 	 * @see FEMScript
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class Range implements Comparable<Range> {
+	public static final class Token implements Comparable<Token> {
 
 		/** Dieses Feld speichert den leeren Bereich, dessen Komponenten alle {@code 0} sind. */
-		public static final Range EMPTY = new Range((char)0, 0, 0);
+		public static final Token EMPTY = new Token((char)0, 0, 0);
 
 		{}
 
-		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
-		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
-		 * {@link Range#start() Startposition} ist, größer der {@link Range#end() Endposition} ist bzw. innerhalb der oder gleich den Grenzen des Bereichs liegt.
-		 *
-		 * @see Range#end()
-		 * @see Range#start()
-		 * @see Comparables
-		 * @see Comparators#compare(int, int)
-		 * @param index Position.
-		 * @return {@link Comparable} für Startposition von Bereichen. */
-		public static Comparable<Range> contains(final int index) {
-			return new Comparable<Range>() {
-
-				@Override
-				public int compareTo(final Range value) {
-					final int start = value.offset;
-					return index < start ? -1 : index > (value.length + start) ? +1 : 0;
-				}
-
-			};
-		}
-
-		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#end() Endposition}en mit der gegebenen Position vergleicht.
+		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Token#end() Endposition}en mit der gegebenen Position vergleicht.
 		 * Der Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position
-		 * kleiner, gleich bzw. größer der {@link Range#end() Endposition} eines gegebenen Bereichs ist.
+		 * kleiner, gleich bzw. größer der {@link Token#end() Endposition} eines gegebenen Bereichs ist.
 		 *
-		 * @see Range#end()
+		 * @see Token#end()
 		 * @see Comparables
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
-		 * @return {@link Comparable} für das Ende von {@link Range}s. */
-		public static Comparable<Range> endingAt(final int index) {
-			return new Comparable<Range>() {
+		 * @return {@link Comparable} für das Ende von {@link Token}s. */
+		public static Comparable<Token> endingAt(final int index) {
+			return new Comparable<Token>() {
 
 				@Override
-				public int compareTo(final Range value) {
+				public int compareTo(final Token value) {
 					return Comparators.compare(index, value.offset + value.length);
 				}
 
 			};
 		}
 
-		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#start() Startposition}en mit der gegebenen Position
+		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Token#start() Startposition}en mit der gegebenen Position
 		 * vergleicht. Der Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene
-		 * Position kleiner, gleich bzw. größer der {@link Range#start() Startposition} eines gegebenen Bereichs ist.
+		 * Position kleiner, gleich bzw. größer der {@link Token#start() Startposition} eines gegebenen Bereichs ist.
 		 *
-		 * @see Range#start()
+		 * @see Token#start()
 		 * @see Comparables
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Bereichen. */
-		public static Comparable<Range> startingAt(final int index) {
-			return new Comparable<Range>() {
+		public static Comparable<Token> startingAt(final int index) {
+			return new Comparable<Token>() {
 
 				@Override
-				public int compareTo(final Range value) {
+				public int compareTo(final Token value) {
 					return Comparators.compare(index, value.offset);
+				}
+
+			};
+		}
+
+		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
+		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
+		 * {@link Token#start() Startposition} ist, größer der {@link Token#end() Endposition} ist bzw. innerhalb der oder auf den Grenzen des Bereichs liegt.
+		 *
+		 * @see Token#end()
+		 * @see Token#start()
+		 * @see Comparables
+		 * @see Comparators#compare(int, int)
+		 * @param index Position.
+		 * @return {@link Comparable} für Startposition von Bereichen. */
+		public static Comparable<Token> containing(final int index) {
+			return new Comparable<Token>() {
+
+				@Override
+				public int compareTo(final Token value) {
+					final int start = value.offset;
+					return index < start ? -1 : index > (value.length + start) ? +1 : 0;
 				}
 
 			};
@@ -107,7 +107,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		 * @param offset Startposition.
 		 * @param length Länge.
 		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind. */
-		public Range(final char type, final int offset, final int length) throws IllegalArgumentException {
+		public Token(final char type, final int offset, final int length) throws IllegalArgumentException {
 			if (offset < 0) throw new IllegalArgumentException("offset < 0");
 			if (length < 0) throw new IllegalArgumentException("length < 0");
 			this.type = type;
@@ -160,7 +160,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 
 		/** {@inheritDoc} */
 		@Override
-		public final int compareTo(final Range value) {
+		public final int compareTo(final Token value) {
 			return Comparators.compare(this.offset, value.offset);
 		}
 
@@ -174,8 +174,8 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		@Override
 		public final boolean equals(final Object object) {
 			if (object == this) return true;
-			if (!(object instanceof Range)) return false;
-			final Range that = (Range)object;
+			if (!(object instanceof Token)) return false;
+			final Token that = (Token)object;
 			return (this.offset == that.offset) && (this.length == that.length) && (this.type == that.type);
 		}
 
@@ -190,50 +190,71 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 	{}
 
 	/** Dieses Feld speichert den leeren Quelltext ohne Bereiche. */
-	public static final FEMScript EMPTY = new FEMScript("", new Range[0]);
+	public static final FEMScript EMPTY = new FEMScript(0, "", new Token[0]);
 
 	{}
+
+	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
+	 *
+	 * @see Token
+	 * @param source Zeichenkette.
+	 * @param tokens Bereiche.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code tokens} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
+	 *         gehen. */
+	public static FEMScript from(int mode, final String source, final Token... tokens) throws NullPointerException, IllegalArgumentException {
+		FEMScript.checkToken(source, tokens);
+		return new FEMScript(mode, source, tokens.clone());
+	}
+
+	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
+	 *
+	 * @see Token
+	 * @param source Zeichenkette.
+	 * @param tokens Bereiche.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code tokens} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
+	 *         gehen. */
+	public static FEMScript from(int mode, final String source, final Collection<Token> tokens) throws NullPointerException, IllegalArgumentException {
+		return FEMScript.from(mode, source, tokens.toArray(new Token[tokens.size()]));
+	}
+
+	static void checkSource(final String source, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
+		final int index = tokens.length - 1, length = source.length();
+		if ((index >= 0) && (tokens[index].end() > length)) throw new IllegalArgumentException("tokens exceeding");
+	}
+
+	static void checkToken(final String source, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
+		int offset = 0;
+		for (final Token token: tokens) {
+			final int start = token.offset;
+			if (start < offset) throw new IllegalArgumentException("tokens overlapping");
+			offset = start + token.length;
+		}
+		FEMScript.checkSource(source, tokens);
+	}
+
+	{}
+
+	final int mode;
 
 	/** Dieses Feld speichert die Zeichenkette. */
 	final String source;
 
 	/** Dieses Feld speichert die Bereiche. */
-	final Range[] ranges;
+	final Token[] tokens;
 
-	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
-	 *
-	 * @see Range
-	 * @param source Zeichenkette.
-	 * @param ranges Bereiche.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
-	 *         gehen. */
-	public FEMScript(final String source, final Range[] ranges) throws NullPointerException, IllegalArgumentException {
-		int offset = 0;
-		final int length = source.length();
-		for (final Range range: ranges) {
-			final int start = range.offset;
-			if (start < offset) throw new IllegalArgumentException("ranges overlapping");
-			offset = start + range.length;
-		}
-		if (offset > length) throw new IllegalArgumentException("ranges exceeding");
+	FEMScript(int mode, String source, Token[] tokens) {
+		this.mode = mode;
 		this.source = source;
-		this.ranges = ranges.clone();
-	}
-
-	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
-	 *
-	 * @see Range
-	 * @param source Zeichenkette.
-	 * @param ranges Bereiche.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
-	 *         gehen. */
-	public FEMScript(final String source, final Collection<Range> ranges) throws NullPointerException, IllegalArgumentException {
-		this(source, ranges.toArray(new Range[ranges.size()]));
+		this.tokens = tokens;
 	}
 
 	{}
+
+	public int mode() {
+		return this.mode;
+	}
 
 	/** Diese Methode gibt die Zeichenkette des Quelltexts zurück.
 	 *
@@ -242,16 +263,16 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		return this.source;
 	}
 
-	/** Diese Methode gibt die Verkettung der {@link Range#type() Typen} der {@link #ranges() Bereiche} als Zeichenkette zurück.
+	/** Diese Methode gibt die Verkettung der {@link Token#type() Typen} der {@link #tokens() Bereiche} als Zeichenkette zurück.
 	 *
-	 * @see Range#type()
-	 * @see #ranges()
+	 * @see Token#type()
+	 * @see #tokens()
 	 * @return Bereichstypen als Zeichenkette. */
 	public final char[] types() {
-		final int length = this.ranges.length;
+		final int length = this.tokens.length;
 		final char[] types = new char[length];
 		for (int i = 0; i < length; i++) {
-			types[i] = this.ranges[i].type;
+			types[i] = this.tokens[i].type;
 		}
 		return types;
 	}
@@ -262,55 +283,80 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 	 * @see #length()
 	 * @see #iterator()
 	 * @return Bereiche. */
-	public final Range[] ranges() {
-		return this.ranges.clone();
+	public final Token[] tokens() {
+		return this.tokens.clone();
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn einer der Bereiche den gegebenen Bereichstyp trägt.
+	 *
+	 * @param type Bereichstyp.
+	 * @return {@code true}, wenn ein Bereich mit dem gegebenen Bereichstyp enthalten ist. */
+	public final boolean contains(int type) {
+		if ((type < 0) || (type > 65535)) return false;
+		for (final Token token: this.tokens)
+			if (token.type == type) return true;
+		return false;
 	}
 
 	/** Diese Methode gibt die Anzahl der Bereiche zurück.
 	 *
 	 * @see #get(int)
-	 * @see #ranges()
+	 * @see #tokens()
 	 * @see #iterator()
 	 * @return Anzahl der Bereiche. */
 	public final int length() {
-		return this.ranges.length;
+		return this.tokens.length;
 	}
 
-	/** Diese Methode gibt diesen aufbereiteten Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette}, der nicht in
-	 * einem der {@link #ranges() Bereiche} enthalten ist.
+	/** Diese Methode gibt diesen aufbereiteten Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette},
+	 * der nicht in einem der {@link #tokens() Bereiche} enthalten ist.
 	 *
 	 * @return normalisierter Quelltext. */
 	public final FEMScript normalize() {
-		final List<Range> normalRanges = new ArrayList<>(this.ranges.length);
-		final StringBuilder normalSource = new StringBuilder();
+		final List<Token> resultTokens = new ArrayList<>(this.tokens.length);
+		final StringBuilder resultSource = new StringBuilder();
 		int start = 0;
-		for (final Range range: this.ranges) {
-			final int length = range.length;
-			normalSource.append(range.extract(this.source));
-			normalRanges.add(new Range(range.type, start, length));
+		for (final Token token: this.tokens) {
+			final int length = token.length;
+			resultSource.append(token.extract(this.source));
+			resultTokens.add(new Token(token.type, start, length));
 			start += length;
 		}
-		return new FEMScript(normalSource.toString(), normalRanges);
+		return FEMScript.from(this.mode, resultSource.toString(), resultTokens);
+	}
+
+	public final FEMScript withMode(int value) {
+		return new FEMScript(value, this.source, this.tokens);
+	}
+
+	public final FEMScript withSource(String value) throws NullPointerException, IllegalArgumentException {
+		FEMScript.checkSource(value, this.tokens);
+		return new FEMScript(this.mode, value, this.tokens);
+	}
+
+	public final FEMScript withTokens(Token... value) throws NullPointerException, IllegalArgumentException {
+		FEMScript.checkToken(this.source, value);
+		return new FEMScript(this.mode, this.source, value);
 	}
 
 	{}
 
 	/** Diese Methode gibt den {@code index}-ten Bereich zurück. */
 	@Override
-	public final Range get(final int index) throws IndexOutOfBoundsException {
-		return this.ranges[index];
+	public final Token get(final int index) throws IndexOutOfBoundsException {
+		return this.tokens[index];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final Iterator<Range> iterator() {
+	public final Iterator<Token> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length());
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
-		return Objects.hash(this.source) ^ Objects.hash((Object[])this.ranges);
+		return Objects.hashPush(this.source.hashCode(), Objects.hash((Object[])this.tokens));
 	}
 
 	/** {@inheritDoc} */
@@ -319,7 +365,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		if (object == this) return true;
 		if (!(object instanceof FEMScript)) return false;
 		final FEMScript that = (FEMScript)object;
-		return this.source.equals(that.source) && Objects.equals(this.ranges, that.ranges);
+		return this.source.equals(that.source) && Objects.equals(this.tokens, that.tokens);
 	}
 
 	/** {@inheritDoc} */

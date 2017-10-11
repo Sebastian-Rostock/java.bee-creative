@@ -394,19 +394,10 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return Iterators.itemsIterator(this, 0, this.size());
 	}
 
-	/** Diese Methode formatiert diesen Stapelrahmen in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an. Sie kann von einem
-	 * {@link FEMDomain} im Rahmen der Methode {@link FEMDomain#formatData(FEMFormatter, Object)} eingesetzt werden.
-	 *
-	 * @param target {@link FEMFormatter}.
-	 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann. */
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.putFrame(this.params());
-	}
-
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return new FEMFormatter().formatData(this);
+		return FEMDomain.NORMAL.formatFrame(this);
 	}
 
 }

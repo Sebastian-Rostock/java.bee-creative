@@ -162,13 +162,13 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final GValue[] array) {
+	protected int customLength(final GValue[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final GValue[] array, final int index) {
+	protected int customHash(final GValue[] array, final int index) {
 		return Objects.hash(array[index]);
 	}
 
@@ -180,7 +180,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final GValue[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final GValue[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 

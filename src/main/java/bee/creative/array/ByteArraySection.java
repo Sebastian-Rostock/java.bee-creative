@@ -68,13 +68,13 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final byte[] array) {
+	protected int customLength(final byte[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final byte[] array, final int index) {
+	protected int customHash(final byte[] array, final int index) {
 		return array[index];
 	}
 
@@ -92,7 +92,7 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final byte[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final byte[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 

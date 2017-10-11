@@ -9,9 +9,7 @@ import bee.creative.util.Objects;
  * einen gegebenen Datentyp {@code type} kann im Rahmen eines gegebenen {@link FEMContext Kontextobjekts} {@code context} über den Befehl
  * {@code context.dataFrom(this, type)} erfolgen.
  * <p>
- * Die Methode {@link #invoke(FEMFrame)} des Werts liefert {@code this}, sodass ein Wert direkt als Parameterfunktion eingesetzt werden kann.<br>
- * Die {@link #toString() Textdarstellung} des Werts wird über {@link #toScript(FEMFormatter)} ermittelt. Diese Methode delegiert selbst an {@link #toString()},
- * sodass mindestens eine dieser Methoden überschrieben werden muss.
+ * Die Methode {@link #invoke(FEMFrame)} des Werts liefert {@code this}, sodass ein Wert direkt als Parameterfunktion eingesetzt werden kann.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMValue extends FEMFunction {
@@ -77,12 +75,6 @@ public abstract class FEMValue extends FEMFunction {
 		return Objects.equals(this.type(), that.type()) && Objects.equals(this.data(), that.data());
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final FEMValue toValue() {
-		return this;
-	}
-
 	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück.<br>
 	 * Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen {@link FEMHandler#value() Funktion}. Jeder andere Wert liefert sich selbst.
 	 *
@@ -102,14 +94,8 @@ public abstract class FEMValue extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMFunction toClosure(final FEMFrame frame) {
+	public final FEMValue toValue() {
 		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(this.toString());
 	}
 
 	/** {@inheritDoc} */
@@ -121,7 +107,13 @@ public abstract class FEMValue extends FEMFunction {
 	/** {@inheritDoc} */
 	@Override
 	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
-		Objects.assertNotNull(frame );
+		Objects.assertNotNull(frame);
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMFunction toClosure(final FEMFrame frame) {
 		return this;
 	}
 

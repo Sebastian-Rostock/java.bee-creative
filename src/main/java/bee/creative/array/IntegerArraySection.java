@@ -68,13 +68,13 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final int[] array) {
+	protected int customLength(final int[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final int[] array, final int index) {
+	protected int customHash(final int[] array, final int index) {
 		return array[index];
 	}
 
@@ -95,7 +95,7 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final int[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final int[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 

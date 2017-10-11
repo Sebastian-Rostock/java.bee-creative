@@ -881,12 +881,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return this.compare(that, 0);
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEMParser.formatValue(this.toString()));
-	}
-
 	/** Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück.<br>
 	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#duration-lexical-repr">xsd:duration</a> aus
 	 * <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf genau drei optionale Nachkommastellen für die Sekunden.

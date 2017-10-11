@@ -79,20 +79,4 @@ public final class FEMVariable extends FEMValue {
 		return this;
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final synchronized FEMValue result(final boolean recursive) {
-		final FEMValue oldValue = this.value;
-		final FEMValue newValue = oldValue.result(recursive);
-		if (oldValue == newValue) return newValue;
-		this.value = newValue;
-		return newValue;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		this.value().toScript(target);
-	}
-
 }

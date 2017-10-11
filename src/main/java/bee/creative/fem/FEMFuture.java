@@ -131,12 +131,9 @@ public final class FEMFuture extends FEMValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final synchronized void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		if (this.result != null) {
-			target.putFunction(this.result);
-		} else {
-			target.putHandler(this.function).put(this.frame);
-		}
+	public final synchronized String toString() {
+		if (this.result != null) return this.result.toString();
+		return this.function.toString() + this.frame.toString();
 	}
 
 }

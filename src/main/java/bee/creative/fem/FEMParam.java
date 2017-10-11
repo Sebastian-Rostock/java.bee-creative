@@ -7,9 +7,10 @@ package bee.creative.fem;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMParam extends FEMFunction {
 
-	/** Dieses Feld speichert die projezierenden Funktionen für die Indizes {@code 0..9}. */
-	static final FEMParam[] CACHE = {new FEMParam(0), new FEMParam(1), new FEMParam(2), new FEMParam(3), new FEMParam(4), new FEMParam(5), new FEMParam(6),
-		new FEMParam(7), new FEMParam(8), new FEMParam(9)};
+	/** Dieses Feld speichert die projezierenden Funktionen für die Indizes {@code 0..15}. */
+	static final FEMParam[] CACHE = { //
+		new FEMParam(0), new FEMParam(1), new FEMParam(2), new FEMParam(3), new FEMParam(4), new FEMParam(5), new FEMParam(6), new FEMParam(7), new FEMParam(8),
+		new FEMParam(9), new FEMParam(10), new FEMParam(11), new FEMParam(12), new FEMParam(13), new FEMParam(14), new FEMParam(15)};
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (index: Integer): Value}, deren Ergebniswert dem {@code index}-ten Parameterwert des
 	 * Stapelrahmens entspricht. */
@@ -25,8 +26,8 @@ public final class FEMParam extends FEMFunction {
 		}
 
 		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("$#");
+		public String toString() {
+			return "$#";
 		}
 
 	};
@@ -44,8 +45,8 @@ public final class FEMParam extends FEMFunction {
 		}
 
 		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("$");
+		public String toString() {
+			return "$";
 		}
 
 	};
@@ -62,8 +63,8 @@ public final class FEMParam extends FEMFunction {
 		}
 
 		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("$");
+		public String toString() {
+			return "$";
 		}
 
 	};
@@ -129,8 +130,8 @@ public final class FEMParam extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put("$").put(Integer.valueOf(this.index + 1));
+	public String toString() {
+		return "$" + (this.index + 1);
 	}
 
 }

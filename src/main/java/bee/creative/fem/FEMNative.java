@@ -108,8 +108,8 @@ public final class FEMNative extends FEMValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.putData(this.data);
+	public final String toString() {
+		return String.valueOf(this.data);
 	}
 
 }

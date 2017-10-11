@@ -68,13 +68,13 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final boolean[] array) {
+	protected int customLength(final boolean[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final boolean[] array, final int index) {
+	protected int customHash(final boolean[] array, final int index) {
 		return (array[index] ? 1231 : 1237);
 	}
 
@@ -95,7 +95,7 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final boolean[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final boolean[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 

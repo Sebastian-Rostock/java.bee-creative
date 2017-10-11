@@ -55,7 +55,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @see ArraySection#arrayLength()
 	 * @param array Array.
 	 * @return Länge des gegebenen Arrays. */
-	protected abstract int customGetLength(GArray array);
+	protected abstract int customLength(GArray array);
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des {@code index}-ten Elements des gegebenen Arrays zurück und wird in
 	 * {@link ArraySection#hashCode()} verwendet.
@@ -63,17 +63,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @param array Array.
 	 * @param index Index.
 	 * @return {@link Object#hashCode() Streuwert} des {@code index}-ten Elements. */
-	protected abstract int customGetHash(GArray array, int index);
-
-	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Elemente der gegebenen Arrays zurück und wird in
-	 * {@link ArraySection#equals(Object)} verwendet.
-	 *
-	 * @param array1 Array 1.
-	 * @param array2 Array 2.
-	 * @param index1 Index für Array 1.
-	 * @param index2 Index für Array 2.
-	 * @return {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Elemente der gegebenen Arrays. */
-	protected abstract boolean customEquals(GArray array1, GArray array2, int index1, int index2);
+	protected abstract int customHash(GArray array, int index);
 
 	/** Diese Methode fügt das {@code index}-ten Element des gegebenen Arrays an den gegebenen {@link StringBuilder} an und wird in
 	 * {@link ArraySection#toString()} verwendet.
@@ -87,7 +77,17 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @param array Array.
 	 * @param index Index.
 	 * @param target {@link StringBuilder}. */
-	protected abstract void customFormat(GArray array, int index, StringBuilder target);
+	protected abstract void customPrint(GArray array, int index, StringBuilder target);
+
+	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Elemente der gegebenen Arrays zurück und wird in
+	 * {@link ArraySection#equals(Object)} verwendet.
+	 *
+	 * @param array1 Array 1.
+	 * @param array2 Array 2.
+	 * @param index1 Index für Array 1.
+	 * @param index2 Index für Array 2.
+	 * @return {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Elemente der gegebenen Arrays. */
+	protected abstract boolean customEquals(GArray array1, GArray array2, int index1, int index2);
 
 	/** Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Elemente der gegebenen Arrays zurück und wird in
 	 * {@link ArraySection#compareTo(ArraySection)} verwendet.
@@ -115,7 +115,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 *
 	 * @return Länge des Arrays. */
 	public int arrayLength() {
-		return this.customGetLength(this.array());
+		return this.customLength(this.array());
 	}
 
 	/** Diese Methode gibt den Index des ersten Elements im Abschnitt zurück.
@@ -162,7 +162,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		int hash = 1;
 		final GArray array = this.array();
 		for (int index = this.startIndex(), finalIndex = this.finalIndex(); index < finalIndex; index++) {
-			hash = (31 * hash) + this.customGetHash(array, index);
+			hash = (31 * hash) + this.customHash(array, index);
 		}
 		return hash;
 	}
@@ -176,9 +176,9 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		final StringBuilder builder = new StringBuilder();
 		builder.append('[');
 		final GArray array = this.array();
-		this.customFormat(array, index++, builder);
+		this.customPrint(array, index++, builder);
 		for (; index < finalIndex; index++) {
-			this.customFormat(array, index, builder.append(", "));
+			this.customPrint(array, index, builder.append(", "));
 		}
 		return builder.append(']').toString();
 	}

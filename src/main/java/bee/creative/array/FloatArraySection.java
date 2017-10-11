@@ -68,13 +68,13 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final float[] array) {
+	protected int customLength(final float[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final float[] array, final int index) {
+	protected int customHash(final float[] array, final int index) {
 		return Float.floatToIntBits(array[index]);
 	}
 
@@ -92,7 +92,7 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final float[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final float[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 

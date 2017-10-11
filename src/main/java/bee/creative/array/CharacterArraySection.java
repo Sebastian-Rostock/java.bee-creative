@@ -68,13 +68,13 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final char[] array) {
+	protected int customLength(final char[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final char[] array, final int index) {
+	protected int customHash(final char[] array, final int index) {
 		return array[index];
 	}
 
@@ -92,7 +92,7 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final char[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final char[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 

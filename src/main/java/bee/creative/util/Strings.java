@@ -473,4 +473,90 @@ public class Strings {
 		};
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code parseSequence(string, maskSymbol, maskSymbol, maskSymbol)}.
+	 *
+	 * @param string Zeichenkette.
+	 * @param maskSymbol Maskierungszeichen.
+	 * @return geparste Zeichenkette oder {@code null}.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public static String parseSequence(final CharSequence string, final char maskSymbol) throws NullPointerException {
+		return Strings.parseSequence(string, maskSymbol, maskSymbol, maskSymbol);
+	}
+
+	/** Diese Methode parst die gegebene Zeichenkette mit den gegebenen Symbolen und gibt die geparste Zeichenkette zurück. Sie realisiert dazu die
+	 * Umkehroperation zu {@link #formatSequence(CharSequence, char, char, char)} und liefert {@code null}, wenn das Format ungültig ist. Das Parsen erwartet,
+	 * dass die gegebene Zeichenkette mit {@code openSymbol} beginnt, mit {@code closeSymbol} endet und dass vor allen Vorkommen von {@code maskSymbol} und
+	 * {@code closeSymbol} zwischen dem ersten und letzten Symbol ein {@code maskSymbol} steht.
+	 *
+	 * @see #parseSequence(CharSequence, char, char, char)
+	 * @param string Zeichenkette.
+	 * @param openSymbol Erstes Symbol der gegebenen Zeichenkette.
+	 * @param maskSymbol Symbol vor jedem Vorkommen von {@code maskSymbol} und {@code closeSymbol} zwischen dem erste und letzten Symbol der gegebenen
+	 *        Zeichenkette.
+	 * @param closeSymbol Letztes Symbol der gegebenen Zeichenkette.
+	 * @return geparste Zeichenkette oder {@code null}.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public static String parseSequence(final CharSequence string, final char openSymbol, final char maskSymbol, final char closeSymbol)
+		throws NullPointerException {
+		final int length = string.length();
+		if (length < 2) return null;
+		if (string.charAt(0) != openSymbol) return null;
+		final char[] result = new char[length - 2];
+		int index = 1, offset = 0;
+		while (index < length) {
+			final char symbol = string.charAt(index++);
+			if (symbol == maskSymbol) {
+				if (index == length) return maskSymbol == closeSymbol ? new String(result, 0, offset) : null;
+				result[offset++] = string.charAt(index++);
+			} else if (symbol != closeSymbol) {
+				result[offset++] = symbol;
+			} else return index == length ? new String(result, 0, offset) : null;
+		}
+		return null;
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code formatSequence(string, maskSymbol, maskSymbol, maskSymbol)}.
+	 *
+	 * @param string Zeichenkette.
+	 * @param maskSymbol Maskierungszeichen.
+	 * @return formatierte Zeichenkette.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public static String formatSequence(final CharSequence string, final char maskSymbol) throws NullPointerException {
+		return Strings.formatSequence(string, maskSymbol, maskSymbol, maskSymbol);
+	}
+
+	/** Diese Methode formatiert die gegebene Zeichenkette mit den gegebenen Symbolen und gibt die formatierte Zeichenkette zurück. Beim Formatieren werden das
+	 * {@code openSymbol} vorn und das {@code closeSymbol} hinten an die Zeichenkette angefügt sowie allen Vorkommen von {@code maskSymbol} und
+	 * {@code closeSymbol} ein {@code maskSymbol} vorangestellt.
+	 *
+	 * @see #parseSequence(CharSequence, char, char, char)
+	 * @param string Zeichenkette.
+	 * @param openSymbol Erstes Symbol der formatierten Zeichenkette.
+	 * @param maskSymbol Symbol vor jedem Vorkommen von {@code maskSymbol} und {@code closeSymbol} innerhalb der gegebenen Zeichenkette.
+	 * @param closeSymbol Letztes Symbol der formatierten Zeichenkette.
+	 * @return formatierte Zeichenkette.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public static String formatSequence(final CharSequence string, final char openSymbol, final char maskSymbol, final char closeSymbol)
+		throws NullPointerException {
+		final int length = string.length();
+		int offset = length + 2;
+		for (int i = length; i != 0;) {
+			final char symbol = string.charAt(--i);
+			if ((symbol == maskSymbol) || (symbol == closeSymbol)) {
+				++offset;
+			}
+		}
+		final char[] result = new char[offset];
+		result[--offset] = closeSymbol;
+		for (int i = length; i != 0;) {
+			final char symbol = string.charAt(--i);
+			result[--offset] = symbol;
+			if ((symbol == maskSymbol) || (symbol == closeSymbol)) {
+				result[--offset] = maskSymbol;
+			}
+		}
+		result[--offset] = openSymbol;
+		return new String(result);
+	}
+
 }

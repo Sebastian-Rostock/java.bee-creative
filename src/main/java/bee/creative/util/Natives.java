@@ -54,10 +54,8 @@ public class Natives {
 	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
 	 * @return Objekt zur Pfadangabe.
 	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link #parseMethod(String)} bzw. {@link #parseConstructor(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws ReflectiveOperationException Wenn {@link #parseField(String)}, {@link #parseMethod(String)}, {@link #parseConstructor(String)} bzw.
-	 *         {@link #parseClass(String)} eine entsprechende Ausnahme auslöst. */
-	public static Object parse(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
+	 * @throws IllegalArgumentException Wenn {@link #parseMethod(String)} bzw. {@link #parseConstructor(String)} eine entsprechende Ausnahme auslöst. */
+	public static Object parse(final String memberPath) throws NullPointerException, IllegalArgumentException {
 		if (memberPath.endsWith(".class")) return Natives.parseClass(memberPath.substring(0, memberPath.length() - 6));
 		if (memberPath.contains(".new(")) return Natives.parseConstructor(memberPath);
 		if (memberPath.contains("(")) return Natives.parseMethod(memberPath);

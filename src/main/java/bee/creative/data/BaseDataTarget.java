@@ -66,7 +66,7 @@ public abstract class BaseDataTarget implements DataTarget {
 	@Override
 	public void writeInt(final int v, final int size) throws IOException {
 		final byte[] array = this.array;
-		Bytes.setIntBE(array, 0, v, size);
+		Bytes.setIntBE(array, 0, size, v);
 		this.write(array, 0, size);
 	}
 
@@ -82,7 +82,7 @@ public abstract class BaseDataTarget implements DataTarget {
 	@Override
 	public void writeLong(final long v, final int size) throws IOException {
 		final byte[] array = this.array;
-		Bytes.setLongBE(array, 0, v, size);
+		Bytes.setLongBE(array, 0, size, v);
 		this.write(array, 0, size);
 	}
 

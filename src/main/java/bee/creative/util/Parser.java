@@ -12,7 +12,7 @@ public class Parser {
 	private char[] chars;
 
 	/** Dieses Feld speichert die Ausgabe. */
-	private final StringBuffer target = new StringBuffer();
+	private final StringBuilder target = new StringBuilder();
 
 	/** Dieses Feld speichert das aktuelle Zeichen oder {@code -1}. */
 	private int symbol;
@@ -70,10 +70,10 @@ public class Parser {
 	 * @see #target()
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}. */
 	public final int skip() {
-		final int index = this.index + 1, symbol = index < this.length ? this.chars[index] : -1;
-		this.index = index;
-		this.symbol = symbol;
-		return symbol;
+		final int index = this.index + 1;
+		if (index < this.length) return this.symbol = this.chars[this.index = index];
+		this.index = this.length;
+		return this.symbol = -1;
 	}
 
 	/** Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
@@ -126,8 +126,6 @@ public class Parser {
 	public final boolean isParsed() {
 		return this.symbol < 0;
 	}
-
-	{}
 
 	/** Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #target() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
 	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #source() Eingabe} befindet, wird kein Zeichen in die Ausgabe übernommen.
@@ -190,9 +188,19 @@ public class Parser {
 	 *
 	 * @param value Ausgabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
+	protected void target(final char[] value) throws NullPointerException {
+		Objects.assertNotNull(value);
+		this.clear();
+		this.target.append(value);
+	}
+
+	/** Diese Methode setzt die Ausgabe.
+	 *
+	 * @param value Ausgabe.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void target(final String value) throws NullPointerException {
-		Objects.assertNotNull(value );
-		this.target.setLength(0);
+		Objects.assertNotNull(value);
+		this.clear();
 		this.target.append(value);
 	}
 
@@ -231,7 +239,10 @@ public class Parser {
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void source(final char[] source) throws NullPointerException {
-		this.source(new String(source));
+		this.chars = source;
+		this.length = source.length;
+		this.source = new String(source);
+		this.reset();
 	}
 
 	{}

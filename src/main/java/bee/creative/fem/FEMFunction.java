@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import bee.creative.util.Iterables;
@@ -11,7 +10,7 @@ import bee.creative.util.Objects;
  * Aus den {@link FEMFrame#params() Parameterwerten} sowie dem {@link FEMFrame#context() Kontextobjekt} der Stapelrahmens können hierbei Informationen für die
  * Berechnungen extrahiert werden. Der Zustand des Kontextobjekts kann auch modifiziert werden.
  * <p>
- * Die {@link #toString() Textdarstellung} der Funktion wird über {@link #toScript(FEMFormatter)} ermittelt.
+ * Als {@link #toString() Textdarstellung} wird der {@link Class#getSimpleName() Klassenname} verwendet.
  *
  * @see FEMValue
  * @see FEMFrame
@@ -21,13 +20,23 @@ public abstract class FEMFunction {
 	@SuppressWarnings ("javadoc")
 	public static final class TraceFunction extends FEMFunction {
 
-		public final FEMTracer tracer;
+		final FEMTracer tracer;
 
-		public final FEMFunction function;
+		final FEMFunction function;
 
 		TraceFunction(final FEMTracer tracer, final FEMFunction function) throws NullPointerException {
 			this.tracer = Objects.assertNotNull(tracer);
 			this.function = function;
+		}
+
+		{}
+
+		public final FEMTracer tracer() {
+			return this.tracer;
+		}
+
+		public final FEMFunction function() {
+			return this.function;
 		}
 
 		{}
@@ -73,23 +82,28 @@ public abstract class FEMFunction {
 			return this.function.equals(data.function);
 		}
 
-		@Override
-		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.function);
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
 	public static final class FrameFunction extends FEMFunction {
 
-		public final FEMFrame frame;
+		final FEMFrame frame;
 
-		public final FEMFunction function;
+		final FEMFunction function;
 
 		FrameFunction(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
 			this.frame = Objects.assertNotNull(frame);
 			this.function = function;
+		}
+
+		{}
+
+		public final FEMFrame frame() {
+			return this.frame;
+		}
+
+		public final FEMFunction function() {
+			return this.function;
 		}
 
 		{}
@@ -127,20 +141,21 @@ public abstract class FEMFunction {
 			return this.function.toClosure(frame);
 		}
 
-		@Override
-		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.function);
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
 	public static final class FutureFunction extends FEMFunction {
 
-		public final FEMFunction function;
+		final FEMFunction function;
 
 		FutureFunction(final FEMFunction function) {
 			this.function = function;
+		}
+
+		{}
+
+		public final FEMFunction function() {
+			return this.function;
 		}
 
 		{}
@@ -179,11 +194,6 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.function);
-		}
-
-		@Override
 		public final FEMFunction toFuture() {
 			return this;
 		}
@@ -198,14 +208,23 @@ public abstract class FEMFunction {
 	@SuppressWarnings ("javadoc")
 	public static final class ConcatFunction extends FEMFunction {
 
-		/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
-		public final FEMFunction[] params;
+		final FEMFunction[] params;
 
-		public final FEMFunction function;
+		final FEMFunction function;
 
 		ConcatFunction(final FEMFunction function, final FEMFunction... params) {
 			this.params = params;
 			this.function = function;
+		}
+
+		{}
+
+		public final FEMFunction[] params() {
+			return this.params.clone();
+		}
+
+		public final FEMFunction function() {
+			return this.function;
 		}
 
 		{}
@@ -246,23 +265,22 @@ public abstract class FEMFunction {
 			return this.function.equals(data.function) && Objects.equals(this.params, data.params);
 		}
 
-		@Override
-		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.function).putParams(Arrays.asList(this.params));
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
 	public static final class ClosureFunction extends FEMFunction {
 
-		public final FEMFunction function;
+		final FEMFunction function;
 
 		ClosureFunction(final FEMFunction function) throws NullPointerException {
 			this.function = function;
 		}
 
 		{}
+
+		public final FEMFunction function() {
+			return this.function;
+		}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
@@ -293,25 +311,28 @@ public abstract class FEMFunction {
 			return this.function.equals(data.function);
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putHandler(this.function);
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
 	public static final class CompositeFunction extends FEMFunction {
 
-		/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
-		public final FEMFunction[] params;
+		final FEMFunction[] params;
 
-		public final FEMFunction function;
+		final FEMFunction function;
 
 		CompositeFunction(final FEMFunction function, final FEMFunction... params) {
 			this.params = params;
 			this.function = function;
+		}
+
+		{}
+
+		public final FEMFunction[] params() {
+			return this.params.clone();
+		}
+
+		public final FEMFunction function() {
+			return this.function;
 		}
 
 		{}
@@ -352,11 +373,6 @@ public abstract class FEMFunction {
 			return this.function.equals(data.function) && Objects.equals(this.params, data.params);
 		}
 
-		@Override
-		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.function).putParams(Arrays.asList(this.params));
-		}
-
 	}
 
 	{}
@@ -372,6 +388,7 @@ public abstract class FEMFunction {
 	 * der gelieferten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht
 	 * {@code FEMHandler.from(this.invoke(frame), frame.context()).value().invoke(frame.newFrame(this.params())}.
 	 *
+	 * @see ConcatFunction
 	 * @param params Parameterfunktionen.
 	 * @return verkette Funktion.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
@@ -400,6 +417,7 @@ public abstract class FEMFunction {
 	/** Diese Methode gibt eine komponierte Funktion zurück, welche diese Funktion mit den gegebenen Parameterfunktionen aufruft. Der Ergebniswert der gelieferten
 	 * Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht {@code this.invoke(frame.newFrame(params)}.
 	 *
+	 * @see CompositeFunction
 	 * @see FEMFrame#withParams(FEMFunction[])
 	 * @param params Parameterfunktionen.
 	 * @return komponierte Funktion.
@@ -445,6 +463,7 @@ public abstract class FEMFunction {
 	 * In jedem Fall wird der Zustand des Überwachungsobjekts beim Verlassen dieser Methode {@link FEMTracer#clear() bereinigt}.<br>
 	 * Der verwendete {@link FEMTracer.Listener} wird nur einmalig zu Beginn der Auswertung ermittelt.
 	 *
+	 * @see TraceFunction
 	 * @see #withoutTracer()
 	 * @param tracer {@link FEMTracer}.
 	 * @return Funktion.
@@ -474,6 +493,7 @@ public abstract class FEMFunction {
 	/** Diese Methode gibt diese Funktion mit {@code return-by-reference}-Semantik zurück. Der Ergebniswert der gelieferten Funktion wird über
 	 * {@link #toFuture(FEMFrame)} ermittelt.
 	 *
+	 * @see FutureFunction
 	 * @return {@link FEMFuture}-Funktion. */
 	public FEMFunction toFuture() {
 		return new FutureFunction(this);
@@ -493,6 +513,7 @@ public abstract class FEMFunction {
 	 * {@code frame} einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapelrahmen entspricht, d.h.
 	 * {@code this.toClosure(frame).toHandler()}.
 	 *
+	 * @see ClosureFunction
 	 * @return Funktionszeiger mit Stapalrahmenbindung. */
 	public final FEMFunction toClosure() {
 		return new ClosureFunction(this);
@@ -504,6 +525,7 @@ public abstract class FEMFunction {
 	 * der Methode {@link #invoke(FEMFrame)} übergeben Stapelrahmen {@code frame}. Die zusätzlichen Parameterwerte stammen dagegen aus dem gegebenen Stapelrahmen
 	 * {@code params}, d.h. {@code this.invoke(params.withParams(frame.params()))}.
 	 *
+	 * @see FrameFunction
 	 * @param params {@link FEMFrame Stapelrahmen} mit den zugesicherten Parameterwerten.
 	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame}.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
@@ -513,20 +535,10 @@ public abstract class FEMFunction {
 
 	{}
 
-	/** Diese Methode formatiert diese Funktion in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.<br>
-	 * Sie kann von einer {@link FEMDomain} im Rahmen der Methoden {@link FEMDomain#formatData(FEMFormatter, Object)} bzw.
-	 * {@link FEMDomain#formatFunction(FEMFormatter, FEMFunction)} eingesetzt werden.
-	 *
-	 * @param target {@link FEMFormatter}.
-	 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann. */
-	public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(this.getClass().getName());
-	}
-
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return new FEMFormatter().formatFunction(this);
+		return this.getClass().getSimpleName();
 	}
 
 }

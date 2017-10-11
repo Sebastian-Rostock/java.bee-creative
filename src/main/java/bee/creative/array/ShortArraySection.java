@@ -68,13 +68,13 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final short[] array) {
+	protected int customLength(final short[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final short[] array, final int index) {
+	protected int customHash(final short[] array, final int index) {
 		return array[index];
 	}
 
@@ -92,7 +92,7 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final short[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final short[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 

@@ -762,17 +762,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return Iterators.itemsIterator(this, 0, this.length);
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.putArray(this);
-	}
-
 	/** Diese Methode gibt die Textdarstellung zurück. Diese Besteht aus den in eckige Klammern eingeschlossenen und mit Semikolon separierten Textdarstellungen
 	 * der Elemente. */
 	@Override
 	public final String toString() {
-		return super.toString();
+		return FEMDomain.NORMAL.formatArray(this);
 	}
 
 }

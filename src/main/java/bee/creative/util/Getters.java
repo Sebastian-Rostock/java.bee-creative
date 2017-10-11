@@ -64,14 +64,10 @@ public class Getters {
 	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst oder eine {@link Class} bzw. ein nicht zugrifbares
 	 *         Objekt liefert. */
 	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final String memberText) throws NullPointerException, IllegalArgumentException {
-		try {
-			final Object object = Natives.parse(memberText);
-			if (object instanceof java.lang.reflect.Field) return Getters.nativeGetter((java.lang.reflect.Field)object);
-			if (object instanceof java.lang.reflect.Method) return Getters.nativeGetter((java.lang.reflect.Method)object);
-			if (object instanceof java.lang.reflect.Constructor<?>) return Getters.nativeGetter((java.lang.reflect.Constructor<?>)object);
-		} catch (final ReflectiveOperationException cause) {
-			new IllegalArgumentException(cause);
-		}
+		final Object object = Natives.parse(memberText);
+		if (object instanceof java.lang.reflect.Field) return Getters.nativeGetter((java.lang.reflect.Field)object);
+		if (object instanceof java.lang.reflect.Method) return Getters.nativeGetter((java.lang.reflect.Method)object);
+		if (object instanceof java.lang.reflect.Constructor<?>) return Getters.nativeGetter((java.lang.reflect.Constructor<?>)object);
 		throw new IllegalArgumentException();
 	}
 

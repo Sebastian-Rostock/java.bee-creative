@@ -236,9 +236,8 @@ public abstract class FEMReflection extends FEMFunction {
 	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
 	 * @return {@link FEMReflection}.
 	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws ReflectiveOperationException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
-	public static FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
+	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	public static FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberPath);
 		if (object instanceof Class<?>) return new FEMNative(object);
 		if (object instanceof Constructor<?>) return FEMReflection.from((Constructor<?>)object);
@@ -332,12 +331,6 @@ public abstract class FEMReflection extends FEMFunction {
 		if (object == this) return true;
 		if (!(object instanceof FEMReflection)) return false;
 		return this.member().equals(((FEMReflection)object).member());
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEMParser.formatValue(this.toString()));
 	}
 
 }

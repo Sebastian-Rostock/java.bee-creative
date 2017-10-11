@@ -1535,14 +1535,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	/** {@inheritDoc} */
 	@Override
-	public int compareTo(final FEMString o) {
+	public final int compareTo(final FEMString o) {
 		return this.compare(o);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEMParser.formatString(this.toString()));
 	}
 
 	/** Diese Methode gibt diesen Zeichenkette als {@link String} zurück.

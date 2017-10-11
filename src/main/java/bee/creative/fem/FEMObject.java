@@ -250,19 +250,13 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return this.compare(that);
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEMParser.formatValue(this.toString()));
-	}
-
 	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück.<br>
 	 * Das Format der Textdarstellung ist {@code #}{@link #refValue() REF}{@code .}{@link #ownerValue() OWNER}{@code :}{@link #typeValue() TYPE}.
 	 *
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		return String.format("#%s.%s:%s", this.refValue(), this.ownerValue(), this.typeValue());
+		return "#" + this.refValue() + "." + this.ownerValue() + ":" + this.typeValue();
 	}
 
 }

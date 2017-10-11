@@ -68,13 +68,13 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final double[] array) {
+	protected int customLength(final double[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final double[] array, final int index) {
+	protected int customHash(final double[] array, final int index) {
 		final long value = Double.doubleToLongBits(array[index]);
 		return (int)(value ^ (value >>> 32));
 	}
@@ -93,7 +93,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final double[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final double[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 

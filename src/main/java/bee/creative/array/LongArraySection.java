@@ -68,13 +68,13 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetLength(final long[] array) {
+	protected int customLength(final long[] array) {
 		return array.length;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected int customGetHash(final long[] array, final int index) {
+	protected int customHash(final long[] array, final int index) {
 		final long value = array[index];
 		return (int)(value ^ (value >>> 32));
 	}
@@ -96,7 +96,7 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customFormat(final long[] array, final int index, final StringBuilder target) {
+	protected void customPrint(final long[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
