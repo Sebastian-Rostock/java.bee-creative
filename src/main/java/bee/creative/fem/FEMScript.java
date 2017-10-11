@@ -1,7 +1,6 @@
 package bee.creative.fem;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.fem.FEMScript.Token;
@@ -103,14 +102,14 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 
 		/** Dieser Konstruktor initialisiert Typ, Startposition und Länge.
 		 *
-		 * @param type Typ.
-		 * @param offset Startposition.
-		 * @param length Länge.
+		 * @param type Typ des Bereichs.
+		 * @param offset Startposition des Bereichs.
+		 * @param length Länge des Bereichs.
 		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind. */
-		public Token(final char type, final int offset, final int length) throws IllegalArgumentException {
+		public Token(final int type, final int offset, final int length) throws IllegalArgumentException {
 			if (offset < 0) throw new IllegalArgumentException("offset < 0");
 			if (length < 0) throw new IllegalArgumentException("length < 0");
-			this.type = type;
+			this.type = (char)type;
 			this.offset = offset;
 			this.length = length;
 		}
@@ -194,11 +193,13 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 
 	{}
 
-	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
+	/** Diese Methode gibt einen aufbereiteten Quelltext mit den gegebenen Eigenschaften zurück.
 	 *
 	 * @see Token
+	 * @param mode Quelltextmodus.
 	 * @param source Zeichenkette.
 	 * @param tokens Bereiche.
+	 * @return aufbereiteten Quelltext.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code tokens} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
 	 *         gehen. */
@@ -207,23 +208,27 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		return new FEMScript(mode, source, tokens.clone());
 	}
 
-	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
+	/** Diese Methode gibt einen aufbereiteten Quelltext mit den gegebenen Eigenschaften zurück.
 	 *
 	 * @see Token
+	 * @param mode Quelltextmodus.
 	 * @param source Zeichenkette.
 	 * @param tokens Bereiche.
+	 * @return aufbereiteten Quelltext.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code tokens} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
 	 *         gehen. */
-	public static FEMScript from(int mode, final String source, final Collection<Token> tokens) throws NullPointerException, IllegalArgumentException {
+	public static FEMScript from(int mode, final String source, final List<Token> tokens) throws NullPointerException, IllegalArgumentException {
 		return FEMScript.from(mode, source, tokens.toArray(new Token[tokens.size()]));
 	}
 
+	@SuppressWarnings ("javadoc")
 	static void checkSource(final String source, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
 		final int index = tokens.length - 1, length = source.length();
 		if ((index >= 0) && (tokens[index].end() > length)) throw new IllegalArgumentException("tokens exceeding");
 	}
 
+	@SuppressWarnings ("javadoc")
 	static void checkToken(final String source, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
 		int offset = 0;
 		for (final Token token: tokens) {
@@ -236,6 +241,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 
 	{}
 
+	/** Dieses Feld speichert den Quelltextmodus. */
 	final int mode;
 
 	/** Dieses Feld speichert die Zeichenkette. */
@@ -244,6 +250,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	/** Dieses Feld speichert die Bereiche. */
 	final Token[] tokens;
 
+	@SuppressWarnings ("javadoc")
 	FEMScript(int mode, String source, Token[] tokens) {
 		this.mode = mode;
 		this.source = source;
@@ -251,17 +258,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	}
 
 	{}
-
-	public int mode() {
-		return this.mode;
-	}
-
-	/** Diese Methode gibt die Zeichenkette des Quelltexts zurück.
-	 *
-	 * @return Zeichenkette. */
-	public final String source() {
-		return this.source;
-	}
 
 	/** Diese Methode gibt die Verkettung der {@link Token#type() Typen} der {@link #tokens() Bereiche} als Zeichenkette zurück.
 	 *
@@ -275,6 +271,20 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 			types[i] = this.tokens[i].type;
 		}
 		return types;
+	}
+
+	/** Diese Methode gibt die Kennung der Methode bzw. des Algorithmus zurück, durch welchen dieser Quelltext aufbereitet wurde.
+	 *
+	 * @return Quelltextmodus. */
+	public final int mode() {
+		return this.mode;
+	}
+
+	/** Diese Methode gibt die Zeichenkette des Quelltexts zurück.
+	 *
+	 * @return Zeichenkette. */
+	public final String source() {
+		return this.source;
 	}
 
 	/** Diese Methode gibt eine Kopie der Bereiche zurück.
@@ -325,18 +335,48 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		return FEMScript.from(this.mode, resultSource.toString(), resultTokens);
 	}
 
-	public final FEMScript withMode(int value) {
-		return new FEMScript(value, this.source, this.tokens);
+	/** Diese Methode gibt diesen aufbereiteten Quelltext mit dem gegebenen Quelltextmodus zurück.
+	 *
+	 * @see #mode()
+	 * @param mode Quelltextmodus.
+	 * @return aufbereiteten Quelltext. */
+	public final FEMScript withMode(int mode) {
+		return new FEMScript(mode, this.source, this.tokens);
 	}
 
-	public final FEMScript withSource(String value) throws NullPointerException, IllegalArgumentException {
-		FEMScript.checkSource(value, this.tokens);
-		return new FEMScript(this.mode, value, this.tokens);
+	/** Diese Methode gibt diesen aufbereiteten Quelltext mit der gegebenen Zeichenkette zurück.
+	 *
+	 * @see #source()
+	 * @param source Zeichenkette.
+	 * @return aufbereiteten Quelltext.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Bereiche über die Zeichenkette hinaus gehen. */
+	public final FEMScript withSource(String source) throws NullPointerException, IllegalArgumentException {
+		FEMScript.checkSource(source, this.tokens);
+		return new FEMScript(this.mode, source, this.tokens);
 	}
 
-	public final FEMScript withTokens(Token... value) throws NullPointerException, IllegalArgumentException {
-		FEMScript.checkToken(this.source, value);
-		return new FEMScript(this.mode, this.source, value);
+	/** Diese Methode gibt diesen aufbereiteten Quelltext mit der gegebenen Bereichen zurück.
+	 *
+	 * @param tokens Bereiche.
+	 * @return aufbereiteten Quelltext.
+	 * @throws NullPointerException Wenn {@code tokens} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
+	 *         gehen. */
+	public final FEMScript withTokens(Token... tokens) throws NullPointerException, IllegalArgumentException {
+		FEMScript.checkToken(this.source, tokens);
+		return new FEMScript(this.mode, this.source, tokens);
+	}
+
+	/** Diese Methode gibt diesen aufbereiteten Quelltext mit der gegebenen Bereichen zurück.
+	 *
+	 * @param tokens Bereiche.
+	 * @return aufbereiteten Quelltext.
+	 * @throws NullPointerException Wenn {@code tokens} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
+	 *         gehen. */
+	public final FEMScript withTokens(List<Token> tokens) throws NullPointerException, IllegalArgumentException {
+		return this.withTokens(tokens.toArray(new Token[tokens.size()]));
 	}
 
 	{}
@@ -371,7 +411,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return this.source();
+		return this.source;
 	}
 
 }

@@ -5,26 +5,9 @@ import java.util.List;
 import bee.creative.fem.FEMScript.Token;
 import bee.creative.util.Parser;
 
-/** Diese Klasse implementiert den Parser, der eine Zeichenkette in einen aufbereiteten Quelltext überführt. Ein solcher Quelltext kann anschließend mit einem
- * {@link FEMCompiler} in Werte und Funktionen überführt werden.
- * <p>
- * Die Erzeugung von {@link Token Bereichen} erfolgt gemäß dieser Regeln:
- * <ul>
- * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
- * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der
- * Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.</li>
- * <li>Das Zeichen <code>'&lt;'</code> erzeugen einen Bereich, der mit dem Zeichen <code>'&gt;'</code> endet und beide Zeichen zwischen dem ersten und letzten
- * jeweils nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.
- * Andernfalls hat er den Bereichstyp {@code '!'}.</li>
- * <li>Jedes der Zeichen {@code '$'}, {@code ';'}, {@code ':'}, {@code '('}, {@code ')'}, <code>'{'</code> und <code>'}'</code> erzeugt eine eigene Bereich, der
- * das entsprechende Zeichen als Bereichstyp verwendet.</li>
- * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
- * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
- * </ul>
- * <p>
- * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
+/** Diese Klasse implementiert den Parser zur Zerlegung einer Zeichenkette in {@link Token Bereiche} eines {@link FEMScript aufbereiteten Quelltexts}.
  *
- * @see #parseRanges()
+ * @see FEMDomain#parseScript(String, int)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMParser extends Parser {
 
@@ -33,54 +16,91 @@ public final class FEMParser extends Parser {
 
 	{}
 
+	/** Diese Methode gibt die Auflistung aller {@link #putToken(Token) erfassten Bereiche} zurück.
+	 *
+	 * @return Bereichsliste. */
 	public final List<Token> tokens() {
 		return this.tokens;
 	}
 
-	public final void setToken(final int index, final int type) {
-		if (index < 0) return;
-		final Token range = this.tokens.get(index);
-		this.tokens.set(index, new Token((char)type, range.offset, range.length));
+	/** Diese Methode ersetzt den Bereich an der gegebenen Position in der {@link #tokens() Auflistung aller erfassten Bereiche} durch einen gleichwertigen mit
+	 * dem gegebenen Bereichstyp und gibt {@code this} zurück. Wenn die Position negativ ist, wird {@code this} unverändert geliefert.
+	 *
+	 * @param index Position.
+	 * @param type Typ des Bereichs.
+	 * @return {@code this}. */
+	public final FEMParser setToken(final int index, final int type) {
+		if (index < 0) return this;
+		final Token token = this.tokens.get(index);
+		return this.setToken(index, new Token(type, token.offset, token.length));
 	}
 
-	/** Diese Methode erzeugt einen neuen Bereich ab der {@link #index() aktuellen Position} mit dem gegebenen Bereichstyp sowie der Länge {@code 1} und gibt
-	 * dessen Position in {@link #tokens()} zurück. Sie ist eine Abkürzung für {@code this.putRange(type, this.index(), 1)}.
+	/** Diese Methode ersetzt den Bereich an der gegebenen Position in der {@link #tokens() Auflistung aller erfassten Bereiche} durch den gegebenen und gibt
+	 * {@code this} zurück. Wenn die Position negativ bzw. der Bereich {@code null} ist, wird {@code this} unverändert geliefert.
+	 *
+	 * @param index Position.
+	 * @param token Bereich.
+	 * @return {@code this}. */
+	public final FEMParser setToken(final int index, final Token token) {
+		if ((index < 0) || (token == null)) return this;
+		this.tokens.set(index, token);
+		return this;
+	}
+
+	/** Diese Methode erfasst einen an der {@link #index() aktuellen Position} beginnenden Bereich der Länge {@code 1} und gibt seine Position in der
+	 * {@link #tokens() Auflistung aller erfassten Bereiche} zurück. Sie ist eine Abkürzung für {@code this.putToken(type, this.index(), 1)}.
 	 *
 	 * @see #putToken(int, int, int)
 	 * @param type Typ des Bereichs.
-	 * @return Position des Bereichs oder {@code -1}. */
-	public final int putToken(final int type) {
+	 * @return Position des Bereichs oder {@code -1}.
+	 * @throws IllegalArgumentException Wenn die Startposition ungültig ist. */
+	public final int putToken(final int type) throws IllegalArgumentException {
 		return this.putToken(type, this.index(), 1);
 	}
 
-	/** Diese Methode fügt eine neue Bereich mit dem gegebenen Bereichstyp, der an der gegebenen Position Beginnt und vor der {@link #index() aktuellen Position}
-	 * endet.
+	/** Diese Methode erfasst einen vor der {@link #index() aktuellen Position} endenden Bereich und gibt seine Position in der {@link #tokens() Auflistung aller
+	 * erfassten Bereiche} zurück. Sie ist eine Abkürzung für {@code this.putToken(type, offset, this.index() - offset)}.
 	 *
 	 * @param type Typ des Bereichs.
-	 * @param offset Start des Bereichs.
-	 * @return Position des Bereichs oder {@code -1}. */
-	public final int putToken(final int type, final int offset) {
+	 * @param offset Startposition des Bereichs.
+	 * @return Position des Bereichs oder {@code -1}.
+	 * @throws IllegalArgumentException Wenn die Startposition ungültig ist. */
+	public final int putToken(final int type, final int offset) throws IllegalArgumentException {
 		return this.putToken(type, offset, this.index() - offset);
 	}
 
-	public final int putToken(final int type, final int offset, final int length) {
-		return this.putToken(new Token((char)type, offset, length));
+	/** Diese Methode ist eine Abkürzung für {@code this.putToken(new Token(type, offset, length))}.
+	 *
+	 * @param type Typ des Bereichs.
+	 * @param offset Startposition des Bereichs.
+	 * @param length Länge des Bereichs.
+	 * @return Position des Bereichs oder {@code -1}.
+	 * @throws IllegalArgumentException Wenn die Startposition ungültig ist. */
+	public final int putToken(final int type, final int offset, final int length) throws IllegalArgumentException {
+		return this.putToken(new Token(type, offset, length));
 	}
 
-	public final int putToken(final Token range) {
-		if ((range == null) || (range.length() == 0)) return -1;
+	/** Diese Methode erfasst den gegebenen {@link Token Bereich} und gibt seine Position in der {@link #tokens() Auflistung aller erfassten Bereiche} zurück.
+	 * Wenn der Bereiche {@code null} oder {@link Token#length() leer} ist, wird {@code -1} geliefert.
+	 *
+	 * @see #tokens()
+	 * @see #setToken(int, int)
+	 * @param token Bereiche.
+	 * @return Position des Bereichs oder {@code -1}. */
+	public final int putToken(final Token token) {
+		if ((token == null) || (token.length() == 0)) return -1;
 		final int result = this.tokens.size();
-		this.tokens.add(result, range);
+		this.tokens.add(result, token);
 		return result;
 	}
 
 	/** Diese Methode setzt die Eingabe, ruft {@link #reset()} auf und gibt {@code this} zurück.
 	 *
-	 * @param value Eingabe.
+	 * @param source Eingabe.
 	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final FEMParser useSource(final String value) throws NullPointerException {
-		this.source(value);
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+	public final FEMParser useSource(final String source) throws NullPointerException {
+		this.source(source);
 		return this;
 	}
 
