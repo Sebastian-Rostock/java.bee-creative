@@ -24,7 +24,7 @@ import bee.creative.util.Strings;
  * {@link FEMParser#putToken(Token) erfassen} diese falls nötig im gegebenen {@link FEMParser}. Die {@code putAs*}-Methoden zum Formatieren eines gegebenen
  * Objekts erzeugen dagegen die Bedeutung tragenden Bereiche der Textdarstellung und {@link FEMFormatter#putToken(Object) erfassen} diese im gegebenen
  * {@link FEMFormatter}.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMDomain {
 
@@ -32,7 +32,7 @@ public class FEMDomain {
 	 * <dl>
 	 * <dt>{@link #formatData(FEMFormatter, Object)}</dt>
 	 * <dd>Siehe {@link #NORMAL}.</dd>
-	 * <dt>{@link #putTokensFromFunction(FEMFormatter, FEMFunction)}</dt>
+	 * <dt>{@link #_putAsFunction(FEMFormatter, FEMFunction)}</dt>
 	 * <dd>Siehe {@link #NORMAL}.</dd>
 	 * <dt>{@link #compileName(FEMCompiler)}</dt>
 	 * <dd>Siehe {@link #NORMAL}.</dd>
@@ -80,9 +80,9 @@ public class FEMDomain {
 	 * <dl>
 	 * <dt>{@link #formatData(FEMFormatter, Object)}</dt>
 	 * <dd>{@link FEMScript Aufbereitete Quelltexte} werden über {@link FEMCompiler#formatScript(FEMFormatter)} formatiert.<br>
-	 * {@link FEMFrame Stapelrahmen} und {@link FEMFunction Funktionen} werden über {@link #putTokensFromFunction(FEMFormatter, FEMFunction)} formatiert.<br>
+	 * {@link FEMFrame Stapelrahmen} und {@link FEMFunction Funktionen} werden über {@link #_putAsFunction(FEMFormatter, FEMFunction)} formatiert.<br>
 	 * Alle anderen Objekte werden über {@link String#valueOf(Object)} formatieren.</dd>
-	 * <dt>{@link #putTokensFromFunction(FEMFormatter, FEMFunction)}</dt>
+	 * <dt>{@link #_putAsFunction(FEMFormatter, FEMFunction)}</dt>
 	 * <dd>{@link FEMFunction Funktionen} werden über {@link FEMFunction#toScript(FEMFormatter)} formatiert.</dd>
 	 * <dt>{@link #compileName(FEMCompiler)}</dt>
 	 * <dd>Als Name wird der {@link FEMCompiler#section() aktuelle Bereich} geliefert.</dd>
@@ -147,325 +147,67 @@ public class FEMDomain {
 
 	/** Diese Methode gibt die Textdarstellung des gegebenen aufbereiteten Quelltextes zurück.
 	 *
-	 * @see #putTokensFromScript(FEMFormatter, FEMCompiler)
+	 * @see #_putAsScript(FEMFormatter, FEMCompiler)
 	 * @param source aufbereiteter Quelltext.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
 	public String formatScript(final FEMScript source) {
 		final FEMFormatter target = new FEMFormatter();
-		this.putTokensFromScript(target, new FEMCompiler().useScript(source));
-		return target.format();
-	}
-
-	public String formatString(final FEMString source) {
-		return Strings.formatSequence(source.toString(), '"');
-	}
-
-	/** Diese Methode gibt die Textdarstellung des gegebenen Funktionszeigers zurück.
-	 *
-	 * @see #putAsHandler(FEMFormatter, FEMFunction)
-	 * @param source Funktionszeiger.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatHandler(final FEMHandler source) {
-		final FEMFormatter target = new FEMFormatter();
-		this.putAsHandler(target, source.value());
+		this._putAsScript(target, new FEMCompiler().useScript(source));
 		return target.format();
 	}
 
 	/** Diese Methode gibt die Textdarstellung einer Wertliste mit den gegebenen Werten zurück.
 	 *
-	 * @see #putTokensFromArray(FEMFormatter, Iterable)
+	 * @see #_putAsArray(FEMFormatter, Iterable)
 	 * @param array Wertliste.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code array} nicht formatiert werden kann. */
 	public String formatArray(final Iterable<? extends FEMValue> array) {
 		final FEMFormatter target = new FEMFormatter();
-		this.putTokensFromArray(target, array);
+		this._putAsArray(target, array);
 		return target.format();
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen Parameterwerte zurück.
 	 *
-	 * @see #putTokensFromFrame(FEMFormatter, Iterable)
+	 * @see #putAsFrame(FEMFormatter, Iterable)
 	 * @param params Parameterwerte.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
 	public String formatFrame(final Iterable<? extends FEMValue> params) throws NullPointerException, IllegalArgumentException {
 		final FEMFormatter target = new FEMFormatter();
-		this.putTokensFromFrame(target, params);
+		this.putAsFrame(target, params);
 		return target.format();
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen Parameterfunktionen zurück.
 	 *
-	 * @see #putTokensFromParams(FEMFormatter, Iterable)
+	 * @see #_putAsParams(FEMFormatter, Iterable)
 	 * @param params Parameterfunktionen.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
 	public String formatParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalArgumentException {
 		final FEMFormatter target = new FEMFormatter();
-		this.putTokensFromParams(target, params);
+		this._putAsParams(target, params);
 		return target.format();
 	}
 
-	/** Diese Methode fügt die Textdarstellung der Liste der gegebenen Elemente an den gegebenen {@link FEMFormatter} an.<br>
-	 * Die Elemente werden über den gegebenen {@link Setter} {@link Setter#set(Object, Object) formatiert} und mit {@code commaSymbol} separiert sowie in
-	 * {@code openSymbol} und {@code closeSymbol} eingeschlossen.
-	 * <p>
-	 * Wenn die Liste leer ist, werden nur {@code openSymbol} und {@code closeSymbol} angefügt. Andernfalls {@link FEMFormatter#putBreakInc() beginnt} nach
-	 * {@code openSymbol} eine neue Hierarchieebene, die vor {@code closeSymbol} {@link FEMFormatter#putBreakDec() endet}. Nach jedem {@code commaSymbol} wird ein
-	 * {@link FEMFormatter#putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
-	 * Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Liste mehr als ein Element enthält.
+	/** Diese Methode gibt die Textdarstellung der gegebenen Funktion zurück.
 	 *
-	 * @see FEMFormatter#putBreakInc()
-	 * @see FEMFormatter#putBreakDec()
-	 * @see FEMFormatter#putBreakSpace()
-	 * @see FEMFormatter#putIndent()
-	 * @param <GItem> Typ der Elemente.
-	 * @param target Cursor in gelieferter Textdarstellung.
-	 * @param items Elemente.
-	 * @param openSymbol {@code null} oder Symbol, das vor der Liste angefügt wird.
-	 * @param commaSymbol {@code null} oder Symbol, das zwischen die Elemente eingefügt wird.
-	 * @param closeSymbol {@code null} oder Symbol, das nach der Liste angefügt wird.
-	 * @param itemFormatter {@link Setter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann. */
-	protected <GItem> void putTokensFromItems(final FEMFormatter target, final Iterable<? extends GItem> items, final Object openSymbol, final Object commaSymbol,
-		final Object closeSymbol, final Setter<? super FEMFormatter, ? super GItem> itemFormatter) throws NullPointerException, IllegalArgumentException {
-		final Iterator<? extends GItem> iterator = items.iterator();
-		if (iterator.hasNext()) {
-			GItem value = iterator.next();
-			if (iterator.hasNext()) {
-				target.putIndent().putToken(openSymbol).putBreakInc();
-				itemFormatter.set(target, value);
-				do {
-					value = iterator.next();
-					target.putToken(commaSymbol).putBreakSpace();
-					itemFormatter.set(target, value);
-				} while (iterator.hasNext());
-				target.putBreakDec().putToken(closeSymbol);
-			} else {
-				target.putToken(openSymbol).putBreakInc();
-				itemFormatter.set(target, value);
-				target.putBreakDec().putToken(closeSymbol);
-			}
-		} else {
-			target.putToken(openSymbol).putToken(closeSymbol);
-		}
-	}
-
-	/** Diese Methode formatiert den aktuellen Quelltext als Sequenz von Werten und Stoppzeichen. */
-	protected void putTokensFromScript(final FEMFormatter target, final FEMCompiler source) {
-		while (true) {
-			this.putTokensFromScript(target, source, false);
-			if (source.symbol() < 0) return;
-			target.putToken(source.section()).putBreakSpace();
-			source.skip();
-		}
-	}
-
-	/** Diese Methode fügt die Textdarstellung der Liste der gegebenen Parameterwerte eines Stapelrahmens an den gegebenen {@link FEMFormatter} an.<br>
-	 * Wenn diese Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die nummerierten und {@link #putAsValue(FEMFormatter, FEMValue) formatierten}
-	 * Parameterwerte mit {@code ";"} separiert sowie in {@code "("} und {@code ")"} eingeschlossen angefügt. Vor jedem Parameterwert wird dessen logische
-	 * Position {@code i} als {@code "$i: "} angefügt.<br>
-	 * Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
-	 *
-	 * @see #putTokensFromItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #putTokensFromFunction(FEMFormatter, FEMFunction)
-	 * @param target Cursor in gelieferter Textdarstellung.
-	 * @param params Parameterwerte.
-	 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
-	protected void putTokensFromFrame(FEMFormatter target, Iterable<? extends FEMValue> params) throws NullPointerException, IllegalArgumentException {
-		this.putTokensFromItems(target, params, "(", ";", ")", new Setter<FEMFormatter, FEMValue>() {
-
-			int index = 1;
-
-			@Override
-			public void set(final FEMFormatter input, final FEMValue value) {
-				input.putToken("$").putToken(new Integer(this.index)).putToken(": ");
-				FEMDomain.this.putTokensFromFunction(input, value);
-				this.index++;
-			}
-
-		});
-	}
-
-	/** Diese Methode formatiert die aktuelle Wertsequenz, die bei einer schließenden Klammer oder Doppelpunkt endet.
-	 *
-	 * @param space {@code true}, wenn hinter Kommentaren und Semikola ein Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll. */
-	protected void putTokensFromScript(final FEMFormatter target, final FEMCompiler source, final boolean space) {
-		int count = 0;
-		while (true) {
-			switch (source.symbol()) {
-				case '/': {
-					target.putToken(source.section());
-					if (space) {
-						target.putToken(" ");
-					} else {
-						target.putBreakSpace();
-					}
-					source.skip();
-					count++;
-					break;
-				}
-				case ';': {
-					target.putToken(";");
-					if (space) {
-						target.putToken(" ");
-					} else {
-						target.putBreakSpace();
-					}
-					source.skip();
-					count++;
-					break;
-				}
-				case '(': {
-					this.putTokensFromParams(target, source);
-					break;
-				}
-				case '[': {
-					this.putTokensFromArray(target, source);
-					break;
-				}
-				case '{': {
-					this.putAsHandler(target, source);
-					break;
-				}
-				default: {
-					target.putToken(source.section());
-					source.skip();
-					break;
-				}
-				case ':':
-				case ']':
-				case '}':
-				case ')':
-				case -1: {
-					if (count < 2) return;
-					target.putIndent();
-					return;
-				}
-			}
-		}
-	}
-
-	protected void putTokensFromArray(final FEMFormatter target, final FEMCompiler source) {
-		target.putToken("[").putBreakInc();
-		source.skip();
-		this.putTokensFromScript(target, source, false);
-		if (source.symbol() == ']') {
-			target.putBreakDec().putToken("]");
-			source.skip();
-		}
-	}
-
-	/** Diese Methode fügt die Textdarstellung der gegebenen Wertliste an den gegebenen {@link FEMFormatter} an.<br>
-	 * Wenn die Liste leer ist, wird {@code "[]"} angefügt. Andernfalls werden die {@link #putAsValue(FEMFormatter, FEMValue) formatierten} Werte mit {@code ";"}
-	 * separiert sowie in {@code "["} und {@code "]"} eingeschlossen angefügt.<br>
-	 * Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
-	 *
-	 * @see #putTokensFromItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #putAsValue(FEMFormatter, FEMValue)
-	 * @param target Cursor in gelieferter Textdarstellung.
-	 * @param array Wertliste.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code array} nicht formatiert werden kann. */
-	protected void putTokensFromArray(FEMFormatter target, Iterable<? extends FEMValue> array) throws NullPointerException, IllegalArgumentException {
-		this.putTokensFromItems(target, array, "[", ";", "]", new Setter<FEMFormatter, FEMValue>() {
-
-			@Override
-			public void set(final FEMFormatter input, final FEMValue value) {
-				FEMDomain.this.putAsValue(input, value);
-			}
-
-		});
-	}
-
-	protected void putTokensFromFuture(final FEMFormatter target, final FEMFuture value) throws IllegalArgumentException {
-		synchronized (value) {
-			if (value.result != null) {
-				this.putAsValue(target, value.result);
-			} else {
-				this.putAsHandler(target, value.function);
-				this.putTokensFromFrame(target, value.frame);
-			}
-		}
-	}
-
-	/** Diese Methode formatiert die gegebene Funktion in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.
-	 *
-	 * @param target {@link FEMFormatter}.
-	 * @param function Funktion.
-	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
-	protected void putTokensFromFunction(final FEMFormatter target, final FEMFunction function) throws IllegalArgumentException {
-		if (function instanceof TraceFunction) {
-			final TraceFunction traceFunction = (TraceFunction)function;
-			this.putTokensFromFunction(target, traceFunction.function);
-		} else if (function instanceof FrameFunction) {
-			final FrameFunction frameFunction = (FrameFunction)function;
-			this.putTokensFromFunction(target, frameFunction.function);
-		} else if (function instanceof FutureFunction) {
-			final FutureFunction futureFunction = (FutureFunction)function;
-			this.putTokensFromFunction(target, futureFunction.function);
-		} else if (function instanceof ClosureFunction) {
-			final ClosureFunction closureFunction = (ClosureFunction)function;
-			this.putTokensFromFunction(target, closureFunction.function);
-		} else if (function instanceof ConcatFunction) {
-			final ConcatFunction concatFunction = (ConcatFunction)function;
-			this.putTokensFromFunction(target, concatFunction.function);
-			this.putTokensFromParams(target, Arrays.asList(concatFunction.params));
-		} else if (function instanceof CompositeFunction) {
-			final CompositeFunction value = (CompositeFunction)function;
-			this.putTokensFromFunction(target, value.function);
-			this.putTokensFromParams(target, Arrays.asList(value.params));
-		} else if (function instanceof FEMProxy) {
-			final FEMProxy value = (FEMProxy)function;
-			this.putAsConst(target, value.name);
-		} else if (function instanceof FEMValue) {
-			final FEMValue value = (FEMValue)function;
-			this.putAsValue(target, value);
-		} else {
-			this.putAsConst(target, function.toString());
-		}
-	}
-
-	protected void putTokensFromParams(final FEMFormatter target, final FEMCompiler source) {
-		target.putToken("(").putBreakInc();
-		source.skip();
-		this.putTokensFromScript(target, source, false);
-		if (source.symbol() == ')') {
-			target.putBreakDec().putToken(")");
-			source.skip();
-		}
-	}
-
-	/** Diese Methode formateirt die Bereiche fügt die Textdarstellung der gegebenen Liste von Parameterfunktionen.<br>
-	 * Wenn die Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die {@link #putTokensFromFunction(FEMFormatter, FEMFunction) formatierten}
-	 * Parameterfunktionen mit {@code ";"} separiert sowie in {@code "("} und {@code ")"} eingeschlossen angefügt.<br>
-	 * Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Funktionsliste mehr als ein Element enthält.
-	 *
-	 * @see #putTokensFromItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #putTokensFromFunction(FEMFormatter, FEMFunction)
-	 * @param target Cursor in gelieferter Textdarstellung.
-	 * @param source Parameterfunktionen.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
+	 * @see #_putAsFunction(FEMFormatter, FEMFunction)
+	 * @param source Funktion.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void putTokensFromParams(FEMFormatter target, Iterable<? extends FEMFunction> source) throws NullPointerException, IllegalArgumentException {
-		this.putTokensFromItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMFunction>() {
-
-			@Override
-			public void set(final FEMFormatter input, final FEMFunction value) {
-				FEMDomain.this.putTokensFromFunction(input, value);
-			}
-
-		});
+	public String formatFunction(final FEMFunction source) throws NullPointerException, IllegalArgumentException {
+		final FEMFormatter target = new FEMFormatter();
+		this._putAsFunction(target, source);
+		return target.format();
 	}
 
 	{}
@@ -489,7 +231,7 @@ public class FEMDomain {
 		Filter<FEMParser> filter;
 		switch (scriptMode) {
 			default:
-				return !this.putAsError(target);
+				return !this._putAsError(target);
 			case PARSE_VALUE_LIST:
 				limit = 0;
 			case PARSE_VALUE:
@@ -497,7 +239,7 @@ public class FEMDomain {
 
 					@Override
 					public boolean accept(FEMParser input) {
-						return FEMDomain.this.putAsValue(input);
+						return FEMDomain.this._putAsValue(input);
 					}
 
 				};
@@ -509,7 +251,7 @@ public class FEMDomain {
 
 					@Override
 					public boolean accept(FEMParser input) {
-						return FEMDomain.this.putAsProxy(input);
+						return FEMDomain.this._putAsProxy(input);
 					}
 
 				};
@@ -521,7 +263,7 @@ public class FEMDomain {
 
 					@Override
 					public boolean accept(FEMParser input) {
-						return FEMDomain.this.putAsFunction(input);
+						return FEMDomain.this._putAsFunction(input);
 					}
 
 				};
@@ -532,122 +274,98 @@ public class FEMDomain {
 
 	/** Diese Methode parst die {@link Token Bereiche} einer mit Semikolon separierten Auflistung von über den gegebenen {@code itemParser} erkannten Elementen
 	 * und gibt nur dann {@code true} zurück, wenn diese am ersten Element erkannt wurden. Das Symbol {@code ';'} wird direkt als Bereichstyp des erfassten
-	 * Bereichs eingesetzt. Zwischen all diesen Komponenten können beliebig viele {@link #putAsComments(FEMParser) Kommentare/Leerraum} stehen.
+	 * Bereichs eingesetzt. Zwischen all diesen Komponenten können beliebig viele {@link #_putAsComments(FEMParser) Kommentare/Leerraum} stehen.
 	 *
-	 * @param target Bereichsparser.
+	 * @param target Parser.
 	 * @param limit Maximale Anzahl der Elemente in der Auflistung, wobei Werte kleiner {@code 0} für eine unbeschränkte Anzahl stehen.
 	 * @param filter {@link Filter} zum Erkennen und Parsen der {@link Token Bereiche} eines Elements.
 	 * @return {@code true}, wenn die Auflistung erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code filter} {@code null} ist. */
 	protected boolean putAsItems(final FEMParser target, int limit, Filter<? super FEMParser> filter) throws NullPointerException {
-		this.putAsComments(target);
+		this._putAsComments(target);
 		if (!filter.accept(target)) return false;
 		while (true) {
 			--limit;
-			this.putAsComments(target);
+			this._putAsComments(target);
 			if (target.isParsed()) return true;
-			if ((limit == 0) || (target.symbol() != ';')) return this.putAsError(target);
+			if ((limit == 0) || (target.symbol() != ';')) return this._putAsError(target);
 			target.putToken(';');
 			target.skip();
-			this.putAsComments(target);
-			if (!filter.accept(target)) return this.putAsError(target);
+			this._putAsComments(target);
+			if (!filter.accept(target)) return this._putAsError(target);
 		}
 	}
 
-	/** Diese Methode parst die {@link Token Bereiche} einer {@link FEMProxy benannten Funktion} und gibt nur dann {@code true} zurück, wenn diese an ihrer
-	 * {@link #putAsConst(FEMParser) Bezeichnung} erkannt wurde. Der Bezeichnung folg die als {@link #putAsHandler(FEMParser) Funktionszeiger} angegebene
-	 * Funktion, wobei zwischen diesen beiden Komponenten beliebig viele {@link #putAsComments(FEMParser) Kommentare/Leerraum} stehen können.
+	/** Diese Methode fügt die Textdarstellung der Liste der gegebenen Elemente an den gegebenen {@link FEMFormatter} an.<br>
+	 * Die Elemente werden über den gegebenen {@link Setter} {@link Setter#set(Object, Object) formatiert} und mit {@code commaSymbol} separiert sowie in
+	 * {@code openSymbol} und {@code closeSymbol} eingeschlossen.
+	 * <p>
+	 * Wenn die Liste leer ist, werden nur {@code openSymbol} und {@code closeSymbol} angefügt. Andernfalls {@link FEMFormatter#putBreakInc() beginnt} nach
+	 * {@code openSymbol} eine neue Hierarchieebene, die vor {@code closeSymbol} {@link FEMFormatter#putBreakDec() endet}. Nach jedem {@code commaSymbol} wird ein
+	 * {@link FEMFormatter#putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
+	 * Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Liste mehr als ein Element enthält.
 	 *
-	 * @param target Bereichsparser.
+	 * @see FEMFormatter#putBreakInc()
+	 * @see FEMFormatter#putBreakDec()
+	 * @see FEMFormatter#putBreakSpace()
+	 * @see FEMFormatter#putIndent()
+	 * @param <GItem> Typ der Elemente.
+	 * @param target Formatierer.
+	 * @param items Elemente.
+	 * @param openSymbol {@code null} oder Symbol, das vor der Liste angefügt wird.
+	 * @param commaSymbol {@code null} oder Symbol, das zwischen die Elemente eingefügt wird.
+	 * @param closeSymbol {@code null} oder Symbol, das nach der Liste angefügt wird.
+	 * @param itemFormatter {@link Setter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann. */
+	protected <GItem> void putAsItems(final FEMFormatter target, final Iterable<? extends GItem> items, final Object openSymbol, final Object commaSymbol,
+		final Object closeSymbol, final Setter<? super FEMFormatter, ? super GItem> itemFormatter) throws NullPointerException, IllegalArgumentException {
+		final Iterator<? extends GItem> iterator = items.iterator();
+		if (iterator.hasNext()) {
+			GItem value = iterator.next();
+			if (iterator.hasNext()) {
+				target.putIndent().putToken(openSymbol).putBreakInc();
+				itemFormatter.set(target, value);
+				do {
+					value = iterator.next();
+					target.putToken(commaSymbol).putBreakSpace();
+					itemFormatter.set(target, value);
+				} while (iterator.hasNext());
+				target.putBreakDec().putToken(closeSymbol);
+			} else {
+				target.putToken(openSymbol).putBreakInc();
+				itemFormatter.set(target, value);
+				target.putBreakDec().putToken(closeSymbol);
+			}
+		} else {
+			target.putToken(openSymbol).putToken(closeSymbol);
+		}
+	}
+
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer {@link FEMProxy benannten Funktion} und gibt nur dann {@code true} zurück, wenn diese an
+	 * ihrer {@link #_putAsConst(FEMParser) Bezeichnung} erkannt wurde. Der Bezeichnung folg die als {@link #_putAsHandler(FEMParser) Funktionszeiger} angegebene
+	 * Funktion, wobei zwischen diesen beiden Komponenten beliebig viele {@link #_putAsComments(FEMParser) Kommentare/Leerraum} stehen können.
+	 *
+	 * @param target Parser.
 	 * @return {@code true}, wenn die benannten Funktion erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsProxy(final FEMParser target) throws NullPointerException { // OKAY
-		if (!this.putAsConst(target)) return false;
-		this.putAsComments(target);
-		if (!this.putAsHandler(target)) return this.putAsError(target);
+	protected boolean _putAsProxy(final FEMParser target) throws NullPointerException {
+		if (!this._putAsConst(target)) return false;
+		this._putAsComments(target);
+		if (!this._putAsHandler(target)) return this._putAsError(target);
 		return true;
 	}
 
-	/** Diese Methode parst die {@link Token Bereiche} einer Wertliste und gibt nur dann {@code true} zurück, wenn diese an der öffnenden eckigen Klammer erkannt
-	 * wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #putAsValue(FEMParser) Werte}. Die Wertliste endet mit der schließenden
-	 * eckigen Klammer. Die Symbole {@code '['}, {@code ';'} und {@code ']'} werden direkt als Bereichstyp der erfassten Bereiche eingesetzt. Wenn die Wertliste
-	 * fehlerhaft ist, wird für die öffnende eckige Klammer der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können beliebig viele
-	 * {@link #putAsComments(FEMParser) Kommentare/Leerraum} stehen.
+	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Konstante und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert
+	 * hierfür in spitze Klammen eingeschlossene und mit Schrägstrich {@link #_putAsSequence(FEMParser, char, char, char) maskierte} Zeichenkette sowie
+	 * unmaskierte Bezeichner durch. Ein unmaskierter Bezeichner ist eine Zeichenkette ohne Leerraum, Schrägstrich, Semikolon sowie ohne runde, eckige oder
+	 * geschweifte Klammer und nutzen den Bereichstyp {@code '?'}.
 	 *
-	 * @param target Bereichsparser.
-	 * @return {@code true}, wenn die Wertliste erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsArray(final FEMParser target) throws NullPointerException { // OKAY
-		if (target.symbol() != '[') return false;
-		final int openIndex = target.putToken('[');
-		target.skip();
-		this.putAsComments(target);
-		if (target.symbol() == ']') {
-			target.putToken(']');
-			target.skip();
-			return true;
-		} else if (target.isParsed() || !this.putAsValue(target)) {
-			target.setToken(openIndex, '!');
-			return this.putAsError(target);
-		} else {
-			while (true) {
-				this.putAsComments(target);
-				if (target.symbol() == ']') {
-					target.putToken(']');
-					target.skip();
-					return true;
-				} else if (target.isParsed() || (target.symbol() != ';')) {
-					target.setToken(openIndex, '!');
-					return this.putAsError(target);
-				} else {
-					target.putToken(';');
-					target.skip();
-					this.putAsComments(target);
-					if (!this.putAsValue(target)) {
-						target.setToken(openIndex, '!');
-						return this.putAsError(target);
-					}
-				}
-			}
-		}
-	}
-
-	/** Diese Methode parst die {@link Token Bereiche} eines Werts als Element einer {@link #putAsArray(FEMParser) Wertliste} und gibt nur dann {@code true}
-	 * zurück, wenn dieser erkannt wurde. Sie probiert hierfür {@link #putAsArray(FEMParser) Wertlisten}, {@link #putAsString(FEMParser) Zeichenketten},
-	 * {@link #putAsHandler(FEMParser) Funktionszeiger} und {@link #putAsConst(FEMParser) Konstanten} durch.
-	 *
-	 * @param target Bereichsparser.
-	 * @return {@code true}, wenn der Wert erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsValue(final FEMParser target) throws NullPointerException { // OKAY
-		return this.putAsArray(target) || this.putAsString(target) || this.putAsHandler(target) || this.putAsConst(target);
-	}
-
-	protected void putAsValue(final FEMFormatter target, final FEMValue value) throws NullPointerException, IllegalArgumentException {
-		if (value instanceof FEMArray) {
-			final FEMArray array = (FEMArray)value;
-			this.putTokensFromArray(target, array);
-		} else if (value instanceof FEMString) {
-			final FEMString string = (FEMString)value;
-			this.putAsString(target, string);
-		} else if (value instanceof FEMFuture) {
-			final FEMFuture future = (FEMFuture)value;
-			this.putTokensFromFuture(target, future);
-		} else {
-			this.putAsConst(target, value.toString());
-		}
-	}
-
-	/** Diese Methode parst den {@link Token Bereich} einer Konstante und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert hierfür in
-	 * spitze Klammen eingeschlossene und mit Schrägstrich {@link #putAsSequence(FEMParser, char, char, char) maskierte} Zeichenkette sowie unmaskierte Bezeichner
-	 * durch. Ein unmaskierter Bezeichner ist eine Zeichenkette ohne Leerraum, Schrägstrich, Semikolon sowie ohne runde, eckige oder geschweifte Klammer und
-	 * nutzen den Bereichstyp {@code '?'}.
-	 *
-	 * @param target Bereichsparser.
+	 * @param target Parser.
 	 * @return {@code true}, wenn die Konstante erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsConst(final FEMParser target) throws NullPointerException { // OKAY
-		if (this.putAsSequence(target, '<', '/', '>')) return true;
+	protected boolean _putAsConst(final FEMParser target) throws NullPointerException {
+		if (this._putAsSequence(target, '<', '/', '>')) return true;
 		final int offset = target.index();
 		int symbol = target.symbol();
 		LOOP: while (true) {
@@ -672,197 +390,395 @@ public class FEMDomain {
 		return true;
 	}
 
-	protected void putAsConst(final FEMFormatter target, final String source) {
-		target.putToken(this.formatConst(source, false));
-	}
-
-	/** Diese Methode parst den {@link Token Bereich} einer Zeichenkette und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert hierfür mit
-	 * einfachen und doppelten Anführungszeichen {@link #putAsSequence(FEMParser, char) maskierte} Zeichenketten durch.
+	/** Diese Methode formateirt und erfasst die Textdarstellung der Konstanten mit der gegebenen Bezeichnung.<br>
+	 * Die Formatierung der Bezeichnung erfolgt dazu über {@link #formatConst(String)}.
 	 *
-	 * @param target Bereichsparser.
-	 * @return {@code true}, wenn die Zeichenkette erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsString(final FEMParser target) throws NullPointerException { // OKAY
-		return this.putAsSequence(target, '\'') || this.putAsSequence(target, '\"');
+	 * @param target Formatierer.
+	 * @param source Bezeichnung.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
+	protected void _putAsConst(final FEMFormatter target, final String source) throws NullPointerException {
+		target.putToken(this.formatConst(source));
 	}
 
-	protected void putAsString(final FEMFormatter target, final FEMString source) throws IllegalArgumentException {
-		target.putToken(this.formatString(source));
-	}
-
-	/** Diese Methode parst die {@link Token Bereiche} einer Parameterliste und gibt nur dann {@code true} zurück, wenn diese an der öffnenden runden Klammer
-	 * erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #putAsFunction(FEMParser) Parameterfunktionen}. Die Parameterliste
-	 * endet mit der schließenden runden Klammer. Die Symbole {@code '('}, {@code ';'} und {@code ')'} werden direkt als Bereichstyp der erfassten Bereiche
-	 * eingesetzt. Wenn die Wertliste fehlerhaft ist, wird für die öffnende runde Klammer der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten
-	 * können beliebig viele {@link #putAsComments(FEMParser) Kommentare/Leerraum} stehen.
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Wertliste und gibt nur dann {@code true} zurück, wenn diese an der öffnenden eckigen
+	 * Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #_putAsValue(FEMParser) Werte}. Die Wertliste endet mit
+	 * der schließenden eckigen Klammer. Die Symbole {@code '['}, {@code ';'} und {@code ']'} werden direkt als Bereichstyp der erfassten Bereiche eingesetzt.
+	 * Wenn die Wertliste fehlerhaft ist, wird für die öffnende eckige Klammer der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können
+	 * beliebig viele {@link #_putAsComments(FEMParser) Kommentare/Leerraum} stehen.
 	 *
-	 * @param target Bereichsparser.
-	 * @return {@code true}, wenn die Parameterliste erkannt wurde.
+	 * @param target Parser.
+	 * @return {@code true}, wenn die Wertliste erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsParams(final FEMParser target) throws NullPointerException { // OKAY
-		if (target.symbol() != '(') return false;
-		final int openIndex = target.putToken('(');
+	protected boolean _putAsArray(final FEMParser target) throws NullPointerException {
+		if (target.symbol() != '[') return false;
+		final int openIndex = target.putToken('[');
 		target.skip();
-		this.putAsComments(target);
-		if (target.symbol() == ')') {
-			target.putToken(')');
+		this._putAsComments(target);
+		if (target.symbol() == ']') {
+			target.putToken(']');
 			target.skip();
 			return true;
-		} else if (target.isParsed() || !this.putAsFunction(target)) {
+		} else if (target.isParsed() || !this._putAsValue(target)) {
 			target.setToken(openIndex, '!');
-			return this.putAsError(target);
+			return this._putAsError(target);
 		} else {
 			while (true) {
-				this.putAsComments(target);
-				if (target.symbol() == ')') {
-					target.putToken(')');
+				this._putAsComments(target);
+				if (target.symbol() == ']') {
+					target.putToken(']');
 					target.skip();
 					return true;
 				} else if (target.isParsed() || (target.symbol() != ';')) {
 					target.setToken(openIndex, '!');
-					return this.putAsError(target);
+					return this._putAsError(target);
 				} else {
 					target.putToken(';');
 					target.skip();
-					this.putAsComments(target);
-					if (!this.putAsFunction(target)) {
+					this._putAsComments(target);
+					if (!this._putAsValue(target)) {
 						target.setToken(openIndex, '!');
-						return this.putAsError(target);
+						return this._putAsError(target);
 					}
 				}
 			}
 		}
 	}
 
-	/** Diese Methode parst die {@link Token Bereiche} eines Funktionszeigers und gibt nur dann {@code true} zurück, wenn dieser an der öffnenden geschweiften
-	 * Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #putAsName(FEMParser) Parameternamen}. Auf diese folgen
-	 * dann ein Doppelpunkt, die {@link #putAsFunction(FEMParser) Funktion} sowie die schließenden geschweifte Klammer. Die Symbole <code>'{'</code>, {@code ';'},
-	 * {@code ':'} und <code>'}'</code> werden direkt als Bereichstyp der erfassten Bereiche eingesetzt. Wenn die Wertliste fehlerhaft ist, wird für die öffnende
-	 * geschweifte Klammer sowie den Doppelpunkt der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können beliebig viele
-	 * {@link #putAsComments(FEMParser) Kommentare/Leerraum} stehen.
+	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Wertliste.<br>
+	 * Hierbei werden die {@link #_putAsValue(FEMFormatter, FEMValue) formatierten} Werte mit {@code ";"} separiert sowie in {@code "["} und {@code "]"}
+	 * eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Wertliste mehr als
+	 * ein Element enthält.
 	 *
-	 * @param target Bereichsparser.
+	 * @see #putAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
+	 * @see #_putAsValue(FEMFormatter, FEMValue)
+	 * @param target Formatierer.
+	 * @param source Wertliste.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	protected void _putAsArray(FEMFormatter target, Iterable<? extends FEMValue> source) throws NullPointerException, IllegalArgumentException {
+		this.putAsItems(target, source, "[", ";", "]", new Setter<FEMFormatter, FEMValue>() {
+
+			@Override
+			public void set(final FEMFormatter input, final FEMValue value) {
+				FEMDomain.this._putAsValue(input, value);
+			}
+
+		});
+	}
+
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Werts als Element einer {@link #_putAsArray(FEMParser) Wertliste} und gibt nur dann
+	 * {@code true} zurück, wenn dieser erkannt wurde. Sie probiert hierfür {@link #_putAsArray(FEMParser) Wertlisten}, {@link #_putAsString(FEMParser)
+	 * Zeichenketten}, {@link #_putAsHandler(FEMParser) Funktionszeiger} und {@link #_putAsConst(FEMParser) Konstanten} durch.
+	 *
+	 * @param target Parser.
+	 * @return {@code true}, wenn der Wert erkannt wurde.
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+	protected boolean _putAsValue(final FEMParser target) throws NullPointerException {
+		return this._putAsArray(target) || this._putAsString(target) || this._putAsHandler(target) || this._putAsConst(target);
+	}
+
+	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Werts.<br>
+	 * Für ein {@link FEMArray}, einen {@link FEMString} und eine {@link FEMFuture} wird die Textdarstellung über {@link #_putAsArray(FEMFormatter, Iterable)},
+	 * {@link #_putAsString(FEMFormatter, FEMString)} bzw. {@link #putAsFuture(FEMFormatter, FEMFuture)} erfasst. Jeder andere {@link FEMValue} wird über
+	 * {@link FEMValue#toString()} in eine Zeichenkette überführt, welche anschließend über {@link #_putAsConst(FEMFormatter, String)} erfasst wird.
+	 *
+	 * @param target Formatierer.
+	 * @param source Wert.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	protected void _putAsValue(final FEMFormatter target, final FEMValue source) throws NullPointerException, IllegalArgumentException {
+		if (source instanceof FEMArray) {
+			final FEMArray array = (FEMArray)source;
+			this._putAsArray(target, array);
+		} else if (source instanceof FEMString) {
+			final FEMString string = (FEMString)source;
+			this._putAsString(target, string);
+		} else if (source instanceof FEMFuture) {
+			final FEMFuture future = (FEMFuture)source;
+			this.putAsFuture(target, future);
+		} else {
+			this._putAsConst(target, source.toString());
+		}
+	}
+
+	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Zeichenkette und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert
+	 * hierfür mit einfachen und doppelten Anführungszeichen {@link #_putAsSequence(FEMParser, char) maskierte} Zeichenketten durch.
+	 *
+	 * @param target Parser.
+	 * @return {@code true}, wenn die Zeichenkette erkannt wurde.
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+	protected boolean _putAsString(final FEMParser target) throws NullPointerException {
+		return this._putAsSequence(target, '\'') || this._putAsSequence(target, '\"');
+	}
+
+	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Zeichenkette.<br>
+	 * Die Formatierung erfolgt dazu über {@link Strings#formatSequence(CharSequence, char)} mit dem einfachen Anführungszeichen zur Maskierung.
+	 *
+	 * @param target Formatierer.
+	 * @param source Zeichenkette.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
+	protected void _putAsString(final FEMFormatter target, final FEMString source) throws NullPointerException {
+		target.putToken(Strings.formatSequence(source.toString(), '"'));
+	}
+
+	protected void putAsFuture(final FEMFormatter target, final FEMFuture value) throws IllegalArgumentException {
+		synchronized (value) {
+			if (value.result != null) {
+				this._putAsValue(target, value.result);
+			} else {
+				this._putAsHandler(target, value.function);
+				this.putAsFrame(target, value.frame);
+			}
+		}
+	}
+
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Funktionszeigers und gibt nur dann {@code true} zurück, wenn dieser an der öffnenden
+	 * geschweiften Klammer erkannt wurde.<br>
+	 * Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #_putAsName(FEMParser) Parameternamen}. Auf diese folgen dann ein Doppelpunkt,
+	 * die {@link #_putAsFunction(FEMParser) Funktion} sowie die schließenden geschweifte Klammer. Die Symbole <code>'{'</code>, {@code ';'}, {@code ':'} und
+	 * <code>'}'</code> werden direkt als Typ der erfassten Bereiche eingesetzt. Wenn de Funktionszeiger fehlerhaft ist, wird für die öffnende geschweifte Klammer
+	 * sowie den Doppelpunkt der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können beliebig viele {@link #_putAsComments(FEMParser)
+	 * Kommentare/Leerraum} stehen.
+	 *
+	 * @param target Parser.
 	 * @return {@code true}, wenn der Funktionszeiger erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsHandler(final FEMParser target) throws NullPointerException { // OKAY
+	protected boolean _putAsHandler(final FEMParser target) throws NullPointerException {
 		if (target.symbol() != '{') return false;
 		final int openIndex = target.putToken('{'), closeIndex;
 		target.skip();
-		this.putAsComments(target);
+		this._putAsComments(target);
 		if (target.symbol() == ':') {
 			closeIndex = target.putToken(':');
 			target.skip();
-		} else if (target.isParsed() || !this.putAsName(target)) {
+		} else if (target.isParsed() || !this._putAsName(target)) {
 			target.setToken(openIndex, '!');
-			return this.putAsError(target);
+			return this._putAsError(target);
 		} else {
 			while (true) {
-				this.putAsComments(target);
+				this._putAsComments(target);
 				if (target.symbol() == ':') {
 					closeIndex = target.putToken(':');
 					target.skip();
 					break;
 				} else if (target.isParsed() || (target.symbol() != ';')) {
 					target.setToken(openIndex, '!');
-					return this.putAsError(target);
+					return this._putAsError(target);
 				} else {
 					target.putToken(';');
 					target.skip();
-					this.putAsComments(target);
-					if (!this.putAsName(target)) {
+					this._putAsComments(target);
+					if (!this._putAsName(target)) {
 						target.setToken(openIndex, '!');
-						return this.putAsError(target);
+						return this._putAsError(target);
 					}
 				}
 			}
 		}
-		this.putAsComments(target);
-		if (target.isParsed() || !this.putAsFunction(target)) {
+		this._putAsComments(target);
+		if (target.isParsed() || !this._putAsFunction(target)) {
 			target.setToken(openIndex, '!');
 			target.setToken(closeIndex, '!');
-			return this.putAsError(target);
+			return this._putAsError(target);
 		}
-		this.putAsComments(target);
+		this._putAsComments(target);
 		if (target.isParsed() || (target.symbol() != '}')) {
 			target.setToken(openIndex, '!');
 			target.setToken(closeIndex, '!');
-			return this.putAsError(target);
+			return this._putAsError(target);
 		}
 		target.putToken('}');
 		target.skip();
 		return true;
 	}
 
-	/** Diese Methode formatiert einen Funktionszeiger auf die gegebene Funktion.<br>
-	 * Die {@link #putTokensFromFunction(FEMFormatter, FEMFunction) formatierte} Funktion wird dabei in <code>"{:"</code> und <code>"}"</code> eingeschlossen.
+	/** Diese Methode formatiert und erfasst die Textdarstellung eines Funktionszeigers auf die gegebene Funktion.<br>
+	 * Die {@link #_putAsFunction(FEMFormatter, FEMFunction) formatierte} Funktion wird dabei in <code>"{:"</code> und <code>"}"</code> eingeschlossen.
 	 *
-	 * @see #putTokensFromFunction(FEMFormatter, FEMFunction)
-	 * @param target Cursor in gelieferter Textdarstellung.
+	 * @see #_putAsFunction(FEMFormatter, FEMFunction)
+	 * @param target Formatierer.
 	 * @param source Funktion.
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void putAsHandler(final FEMFormatter target, final FEMFunction source) throws NullPointerException, IllegalArgumentException {
+	protected void _putAsHandler(final FEMFormatter target, final FEMFunction source) throws NullPointerException, IllegalArgumentException {
 		target.putToken("{:");
-		this.putTokensFromFunction(target, source);
+		this._putAsFunction(target, source);
 		target.putToken("}");
 	}
 
-	/** Diese Methode formatiert den aufbereiteten Quelltext eines Funktionszeigers.
-	 * 
-	 * @param target Cursor in gelieferter Textdarstellung.
-	 * @param source Cursor im aufbereiteten Quelltext. */
-	protected void putAsHandler(final FEMFormatter target, final FEMCompiler source) throws NullPointerException {
-		target.putToken("{");
-		source.skip();
-		this.putTokensFromScript(target, source, true);
-		if (source.symbol() == ':') {
-			target.putToken(": ");
-			source.skip();
-			this.putTokensFromScript(target, source, false);
-		}
-		if (source.symbol() == '}') {
-			target.putToken("}");
-			source.skip();
-		}
-	}
-
-	/** Diese Methode parst die {@link Token Bereiche} einer Funktion und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert hierfür
-	 * {@link #putAsArray(FEMParser) Wertlisten}, {@link #putAsString(FEMParser) Zeichenketten}, {@link #putAsLocale(FEMParser) Parameterverweise},
-	 * {@link #putAsHandler(FEMParser) Funktionszeiger} und {@link #putAsConst(FEMParser) Konstanten} durch, wobei die letzten drei noch von beliebig viel
-	 * {@link #putAsComments(FEMParser) Leerraum/Kommentaren} und {@link #putAsParams(FEMParser) Parameterlisten} gefolgt werden können.
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Funktion und gibt nur dann {@code true} zurück, wenn diese erkannt wurde.<br>
+	 * Sie probiert hierfür {@link #_putAsArray(FEMParser) Wertlisten}, {@link #_putAsString(FEMParser) Zeichenketten}, {@link #_putAsLocale(FEMParser)
+	 * Parameterverweise}, {@link #_putAsHandler(FEMParser) Funktionszeiger} und {@link #_putAsConst(FEMParser) Konstanten} durch, wobei die letzten drei noch von
+	 * beliebig viel {@link #_putAsComments(FEMParser) Leerraum/Kommentaren} und {@link #_putAsParams(FEMParser) Parameterlisten} gefolgt werden können.
 	 *
-	 * @param target Bereichsparser.
+	 * @param target Parser.
 	 * @return {@code true}, wenn die Funktion erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsFunction(final FEMParser target) throws NullPointerException { // OKAY
-		if (this.putAsArray(target) || this.putAsString(target)) return true;
-		if (!this.putAsLocale(target) && !this.putAsHandler(target) && !this.putAsConst(target)) return false;
+	protected boolean _putAsFunction(final FEMParser target) throws NullPointerException {
+		if (this._putAsArray(target) || this._putAsString(target)) return true;
+		if (!this._putAsLocale(target) && !this._putAsHandler(target) && !this._putAsConst(target)) return false;
 		while (true) {
-			this.putAsComments(target);
-			if (!this.putAsParams(target)) return true;
+			this._putAsComments(target);
+			if (!this._putAsParams(target)) return true;
 		}
 	}
 
-	/** Diese Methode erfassten die verbleibende Zeichenkette des gegebenen {@link FEMParser} als {@link Token Fehlerbereich} mit dem Bereichstyp {@code '!'} und
-	 * gibt {@code true} zurück.
+	/** Diese Methode formatiert und erfasst die Textdarstellung der gegebene Funktion.<br>
+	 * Für eine {@link TraceFunction}, eine {@link FrameFunction}, eine {@link FutureFunction} oder eine {@link ClosureFunction} wird die Textdarstellung ihrer
+	 * referenzierten Funktion mit dieser Methode erfasst. Bei einer {@link ConcatFunction} oder einer {@link CompositeFunction} werden die Textdarstellungen der
+	 * aufzurufenden Funktion mit dieser Methode sowie die der Parameterliste mit {@link #_putAsParams(FEMFormatter, Iterable)} erfasst. Bei einem
+	 * {@link FEMProxy} wird dessen {@link FEMProxy#name() Name} über {@link #_putAsConst(FEMFormatter, String)} erfasst. Jeder andere {@link FEMValue} würd über
+	 * {@link #_putAsValue(FEMFormatter, FEMValue)} erfasst. Jede andere {@link FEMFunction} wird über {@link FEMFunction#toString()} in eine Zeichenkette
+	 * überführt, welche anschließend über {@link #_putAsConst(FEMFormatter, String)} erfasst wird.
 	 *
-	 * @param target Bereichsparser.
+	 * @param target Formatierer.
+	 * @param source Funktion.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	protected void _putAsFunction(final FEMFormatter target, final FEMFunction source) throws NullPointerException, IllegalArgumentException {
+		if (source instanceof FEMValue) {
+			final FEMValue value = (FEMValue)source;
+			this._putAsValue(target, value);
+		} else if (source instanceof FEMProxy) {
+			final FEMProxy value = (FEMProxy)source;
+			this._putAsConst(target, value.name);
+		} else if (source instanceof CompositeFunction) {
+			final CompositeFunction value = (CompositeFunction)source;
+			this._putAsFunction(target, value.function);
+			this._putAsParams(target, Arrays.asList(value.params));
+		} else if (source instanceof ConcatFunction) {
+			final ConcatFunction concatFunction = (ConcatFunction)source;
+			this._putAsFunction(target, concatFunction.function);
+			this._putAsParams(target, Arrays.asList(concatFunction.params));
+		} else if (source instanceof ClosureFunction) {
+			final ClosureFunction closureFunction = (ClosureFunction)source;
+			this._putAsFunction(target, closureFunction.function);
+		} else if (source instanceof FrameFunction) {
+			final FrameFunction frameFunction = (FrameFunction)source;
+			this._putAsFunction(target, frameFunction.function);
+		} else if (source instanceof FutureFunction) {
+			final FutureFunction futureFunction = (FutureFunction)source;
+			this._putAsFunction(target, futureFunction.function);
+		} else if (source instanceof TraceFunction) {
+			final TraceFunction traceFunction = (TraceFunction)source;
+			this._putAsFunction(target, traceFunction.function);
+		} else {
+			this._putAsConst(target, source.toString());
+		}
+	}
+
+	/** Diese Methode fügt die Textdarstellung der Liste der gegebenen Parameterwerte eines Stapelrahmens an den gegebenen {@link FEMFormatter} an.<br>
+	 * Wenn diese Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die nummerierten und {@link #_putAsValue(FEMFormatter, FEMValue) formatierten}
+	 * Parameterwerte mit {@code ";"} separiert sowie in {@code "("} und {@code ")"} eingeschlossen angefügt. Vor jedem Parameterwert wird dessen logische
+	 * Position {@code i} als {@code "$i: "} angefügt.<br>
+	 * Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
+	 *
+	 * @see #putAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
+	 * @see #_putAsFunction(FEMFormatter, FEMFunction)
+	 * @param target Formatierer.
+	 * @param params Parameterwerte.
+	 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
+	protected void putAsFrame(FEMFormatter target, Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalArgumentException {
+		this.putAsItems(target, params, "(", ";", ")", new Setter<FEMFormatter, FEMFunction>() {
+
+			int index = 1;
+
+			@Override
+			public void set(final FEMFormatter input, final FEMFunction value) {
+				input.putToken("$").putToken(new Integer(this.index)).putToken(": ");
+				FEMDomain.this._putAsFunction(input, value);
+				this.index++;
+			}
+
+		});
+	}
+
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Parameterliste und gibt nur dann {@code true} zurück, wenn diese an der öffnenden runden
+	 * Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #_putAsFunction(FEMParser) Parameterfunktionen}. Die
+	 * Parameterliste endet mit der schließenden runden Klammer. Die Symbole {@code '('}, {@code ';'} und {@code ')'} werden direkt als Bereichstyp der erfassten
+	 * Bereiche eingesetzt. Wenn die Wertliste fehlerhaft ist, wird für die öffnende runde Klammer der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen
+	 * Komponenten können beliebig viele {@link #_putAsComments(FEMParser) Kommentare/Leerraum} stehen.
+	 *
+	 * @param target Parser.
+	 * @return {@code true}, wenn die Parameterliste erkannt wurde.
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+	protected boolean _putAsParams(final FEMParser target) throws NullPointerException {
+		if (target.symbol() != '(') return false;
+		final int openIndex = target.putToken('(');
+		target.skip();
+		this._putAsComments(target);
+		if (target.symbol() == ')') {
+			target.putToken(')');
+			target.skip();
+			return true;
+		} else if (target.isParsed() || !this._putAsFunction(target)) {
+			target.setToken(openIndex, '!');
+			return this._putAsError(target);
+		} else {
+			while (true) {
+				this._putAsComments(target);
+				if (target.symbol() == ')') {
+					target.putToken(')');
+					target.skip();
+					return true;
+				} else if (target.isParsed() || (target.symbol() != ';')) {
+					target.setToken(openIndex, '!');
+					return this._putAsError(target);
+				} else {
+					target.putToken(';');
+					target.skip();
+					this._putAsComments(target);
+					if (!this._putAsFunction(target)) {
+						target.setToken(openIndex, '!');
+						return this._putAsError(target);
+					}
+				}
+			}
+		}
+	}
+
+	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Parameterfunktionsliste.<br>
+	 * Hierbei werden die {@link #_putAsFunction(FEMFormatter, FEMFunction) formatierten} Parameterfunktionen mit {@code ";"} separiert sowie in {@code "("} und
+	 * {@code ")"} eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die
+	 * Funktionsliste mehr als ein Element enthält.
+	 *
+	 * @see #putAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
+	 * @see #_putAsFunction(FEMFormatter, FEMFunction)
+	 * @param target Formatierer.
+	 * @param source Parameterfunktionen.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	protected void _putAsParams(FEMFormatter target, Iterable<? extends FEMFunction> source) throws NullPointerException, IllegalArgumentException {
+		this.putAsItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMFunction>() {
+
+			@Override
+			public void set(final FEMFormatter input, final FEMFunction value) {
+				FEMDomain.this._putAsFunction(input, value);
+			}
+
+		});
+	}
+
+	/** Diese Methode erfassten die verbleibende Eingabe als {@link Token Fehlerbereich} mit dem Typ {@code '!'} und gibt {@code true} zurück.
+	 *
+	 * @param target Parser.
 	 * @return {@code true}.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsError(final FEMParser target) throws NullPointerException { // OKAY
+	protected boolean _putAsError(final FEMParser target) throws NullPointerException {
 		final int index = target.index(), length = target.length();
 		target.putToken('!', index, length - index);
 		target.seek(length);
 		return true;
 	}
 
-	/** Diese Methode parst den {@link Token Bereich} eines Parameterindexes und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie sucht dazu eine
-	 * Zeichenkette aus dezimalen Ziffern und nutzt das Symbole {@code '#'} als Bereichstyp des erfassten Parameterindex.
+	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameterindexes und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde.<br>
+	 * Sie sucht dazu eine nicht leere Zeichenkette aus dezimalen Ziffern und nutzt das Symbole {@code '#'} als Typ des erfassten Bereichs.
 	 *
-	 * @param target Bereichsparser.
+	 * @param target Parser.
 	 * @return {@code true}, wenn der Parameterindex erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsIndex(final FEMParser target) throws NullPointerException { // OKAY
+	protected boolean _putAsIndex(final FEMParser target) throws NullPointerException {
 		final int offset = target.index();
 		for (int symbol = target.symbol(); ('0' <= symbol) && (symbol <= '9'); symbol = target.skip()) {}
 		if (target.index() == offset) return false;
@@ -870,14 +786,14 @@ public class FEMDomain {
 		return true;
 	}
 
-	/** Diese Methode parst den {@link Token Bereich} eines Parameternamen und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie sucht dazu eine
-	 * Zeichenkette ohne Leerraum, Schrägstrich, Doppelpunkt, Semikolon sowie ohne runde, eckige oder geschweifte Klammer. Das Symbole {@code '~'} wird als
-	 * Bereichstyp des erfassten Parameternamen eingesetzt.
+	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameternamen und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde.<br>
+	 * Sie sucht dazu eine nicht leere Zeichenkette ohne Leerraum, Schrägstrich, Doppelpunkt, Semikolon sowie ohne runde, eckige oder geschweifte Klammer. Das
+	 * Symbol {@code '~'} wird als Typ des erfassten Bereichs eingesetzt.
 	 *
-	 * @param target Bereichsparser.
+	 * @param target Parser.
 	 * @return {@code true}, wenn der Parametername erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsName(final FEMParser target) throws NullPointerException { // OKAY
+	protected boolean _putAsName(final FEMParser target) throws NullPointerException {
 		final int offset = target.index();
 		int symbol = target.symbol();
 		LOOP: while (true) {
@@ -903,63 +819,66 @@ public class FEMDomain {
 		return true;
 	}
 
-	/** Diese Methode parst die {@link Token Bereiche} eines Parameterverweises und gibt nur dann {@code true} zurück, wenn dieser am Dollarzeichen erkannt wurde.
-	 * Diesem Zeichen kann ein {@link #putAsIndex(FEMParser) Parameterindex} oder {@link #putAsName(FEMParser) Parametername} folgen. Das Symbol {@code '$'} wird
-	 * direkt als Bereichstyp des erfassten Bereichs eingesetzt.
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Parameterverweises und gibt nur dann {@code true} zurück, wenn dieser am Dollarzeichen
+	 * erkannt wurde.<br>
+	 * Diesem Zeichen kann ein {@link #_putAsIndex(FEMParser) Parameterindex} oder ein {@link #_putAsName(FEMParser) Parametername} folgen. Das Symbol {@code '$'}
+	 * wird direkt als Typ des erfassten Bereichs eingesetzt.
 	 *
 	 * @param source Parser.
 	 * @return {@code true}, wenn der Parameterverweis erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsLocale(final FEMParser source) throws NullPointerException { // OKAY
+	protected boolean _putAsLocale(final FEMParser source) throws NullPointerException {
 		if (source.symbol() != '$') return false;
 		source.putToken('$');
 		source.skip();
-		if (this.putAsIndex(source)) return true;
-		this.putAsName(source);
+		if (this._putAsIndex(source)) return true;
+		this._putAsName(source);
 		return true;
 	}
 
-	/** Diese Methode parst den {@link Token Bereich} von Leerraum, erfasst diese jedoch nicht. Zum Leerraum zählen alle Symbole kleiner oder gleich {@code ' '}.
+	/** Diese Methode parst den {@link Token Bereich} von Leerraum, erfasst diese jedoch nicht.<br>
+	 * Zum Leerraum zählen alle Symbole kleiner oder gleich {@code ' '}.
 	 *
 	 * @param source Parser.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void putAsSpace(final FEMParser source) throws NullPointerException { // OKAY
+	protected void _putAsSpace(final FEMParser source) throws NullPointerException {
 		for (int symbol = source.symbol(); (symbol >= 0) && (symbol <= ' '); symbol = source.skip()) {}
 	}
 
-	/** Diese Methode parst die {@link Token Bereiche} von Kommentaren und {@link #putAsSpace(FEMParser) Leerraum}. Ein Kommentar wird als mit Schrägstrich
-	 * {@link #putAsSequence(FEMParser, char)} maskierte} Zeichenkette erkannt und erfasst.
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} von Kommentaren.<br>
+	 * Ein Kommentar wird als mit Schrägstrich {@link #_putAsSequence(FEMParser, char)} maskierte} Zeichenkette erkannt und erfasst. Vor und nach einem Kommentar
+	 * kann beliebig viel {@link #_putAsSpace(FEMParser) Leerraum} stehen.
 	 *
 	 * @param source Parser.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void putAsComments(final FEMParser source) throws NullPointerException { // OKAY
+	protected void _putAsComments(final FEMParser source) throws NullPointerException {
 		do {
-			this.putAsSpace(source);
-		} while (this.putAsSequence(source, '/'));
+			this._putAsSpace(source);
+		} while (this._putAsSequence(source, '/'));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #putAsSequence(FEMParser, char, char, char) this.parseTokensFromSequence(source, maskSymbol, maskSymbol,
-	 * maskSymbol)}.
+	/** Diese Methode ist eine Abkürzung für {@link #_putAsSequence(FEMParser, char, char, char) this.putAsSequence(source, maskSymbol, maskSymbol, maskSymbol)}.
 	 *
 	 * @param source Parser.
 	 * @param maskSymbol Maskierungszeichen.
 	 * @return {@code true}, wenn die Sequenz erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsSequence(final FEMParser source, final char maskSymbol) throws NullPointerException { // OKAY
-		return this.putAsSequence(source, maskSymbol, maskSymbol, maskSymbol);
+	protected boolean _putAsSequence(final FEMParser source, final char maskSymbol) throws NullPointerException {
+		return this._putAsSequence(source, maskSymbol, maskSymbol, maskSymbol);
 	}
 
 	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Zeichenkette analog zu {@link Strings#parseSequence(CharSequence, char, char, char)} und
-	 * gibt nur dann {@code true} zurück, wenn diese am {@code openSymbol} erkannt wurde. Als Bereichstyp für eine fehlerfreie Sequenz wird {@code openSymbol}
-	 * eingesetzt. Eine fehlerhafte Sequenz geht dagegen bis zum Ende der Eingabe und wird mit dem Bereichstyp {@code '!'} erfasst.
+	 * gibt nur dann {@code true} zurück, wenn diese am {@code openSymbol} erkannt wurde.<br>
+	 * Für eine fehlerfreie Sequenz wird {@code openSymbol} als Typ des Bereichs eingesetzt. Eine fehlerhafte Sequenz geht dagegen bis zum Ende der Eingabe und
+	 * wird mit dem Bereichstyp {@code '!'} erfasst.
 	 *
-	 * @param target Bereichsparser.
+	 * @param target Parser.
 	 * @param openSymbol Erstes Symbol der Zeichenkette.
 	 * @param maskSymbol Symbol zur Maskierungszeichen.
 	 * @param closeSymbol Letztes Symbol der Zeichenkette.
 	 * @return {@code true}, wenn die Sequenz erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean putAsSequence(final FEMParser target, final char openSymbol, final char maskSymbol, final char closeSymbol) throws NullPointerException { // OKAY
+	protected boolean _putAsSequence(final FEMParser target, final char openSymbol, final char maskSymbol, final char closeSymbol) throws NullPointerException {
 		if (target.symbol() != openSymbol) return false;
 		final int offset = target.index();
 		while (true) {
@@ -979,6 +898,103 @@ public class FEMDomain {
 					return true;
 				}
 			} else if (symbol == closeSymbol) return true;
+		}
+	}
+
+	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltexts.
+	 *
+	 * @param target Formatierer.
+	 * @param source Parser zum aufbereiteten Quelltext.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	protected void _putAsScript(final FEMFormatter target, final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
+		while (true) {
+			this._putAsScript(target, source, false);
+			if (source.symbol() < 0) return;
+			target.putToken(source.section()).putBreakSpace();
+			source.skip();
+		}
+	}
+
+	/** Diese Methode formatiert und erfasst die Textdarstellung der im aufbereiteten Quelltext gegebenen Sequenz von Namen, Werten und Funktionen.
+	 *
+	 * @param target Formatierer.
+	 * @param source Parser zum aufbereiteten Quelltext.
+	 * @param simpleSpace {@code true}, wenn hinter Kommentaren und Semikola ein einfaches Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	protected void _putAsScript(final FEMFormatter target, final FEMCompiler source, final boolean simpleSpace)
+		throws NullPointerException, IllegalArgumentException {
+		int count = 0;
+		while (true) {
+			switch (source.symbol()) {
+				case '/': {
+					target.putToken(source.section());
+					if (simpleSpace) {
+						target.putToken(" ");
+					} else {
+						target.putBreakSpace();
+					}
+					source.skip();
+					count++;
+					break;
+				}
+				case ';': {
+					target.putToken(";");
+					if (simpleSpace) {
+						target.putToken(" ");
+					} else {
+						target.putBreakSpace();
+					}
+					source.skip();
+					count++;
+					break;
+				}
+				case '(':
+					target.putToken("(").putBreakInc();
+					source.skip();
+					this._putAsScript(target, source, false);
+					if (source.symbol() == ')') {
+						target.putBreakDec().putToken(")");
+						source.skip();
+					}
+				break;
+				case '[':
+					target.putToken("[").putBreakInc();
+					source.skip();
+					this._putAsScript(target, source, false);
+					if (source.symbol() == ']') {
+						target.putBreakDec().putToken("]");
+						source.skip();
+					}
+				break;
+				case '{':
+					target.putToken("{");
+					source.skip();
+					this._putAsScript(target, source, true);
+					if (source.symbol() == ':') {
+						target.putToken(": ");
+						source.skip();
+						this._putAsScript(target, source, false);
+					}
+					if (source.symbol() == '}') {
+						target.putToken("}");
+						source.skip();
+					}
+				break;
+				default:
+					target.putToken(source.section());
+					source.skip();
+				break;
+				case ':':
+				case ']':
+				case '}':
+				case ')':
+				case -1:
+					if (count < 2) return;
+					target.putIndent();
+					return;
+			}
 		}
 	}
 

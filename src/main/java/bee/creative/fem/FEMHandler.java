@@ -126,7 +126,7 @@ public final class FEMHandler extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return FEMDomain.NORMAL.formatHandler(this);
+		return FEMDomain.NORMAL.formatFunction(this);
 	}
 
 	/** {@inheritDoc} */

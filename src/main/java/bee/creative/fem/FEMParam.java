@@ -130,7 +130,7 @@ public final class FEMParam extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return "$" + (this.index + 1);
 	}
 
