@@ -76,7 +76,7 @@ public abstract class FEMValue extends FEMFunction {
 	}
 
 	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück.<br>
-	 * Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen {@link FEMHandler#value() Funktion}. Jeder andere Wert liefert sich selbst.
+	 * Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen {@link FEMHandler#value() referenzierte Funktion}. Jeder andere Wert liefert sich selbst.
 	 *
 	 * @see FEMHandler
 	 * @return Funktion des Werts. */

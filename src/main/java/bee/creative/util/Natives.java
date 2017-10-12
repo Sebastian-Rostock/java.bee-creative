@@ -51,7 +51,7 @@ public class Natives {
 	 * @see #parseField(String)
 	 * @see #parseMethod(String)
 	 * @see #parseConstructor(String)
-	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
+	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktors oder eines Datenfelds.
 	 * @return Objekt zur Pfadangabe.
 	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #parseMethod(String)} bzw. {@link #parseConstructor(String)} eine entsprechende Ausnahme auslöst. */

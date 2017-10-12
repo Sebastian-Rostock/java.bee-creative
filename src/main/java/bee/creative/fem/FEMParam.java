@@ -75,9 +75,9 @@ public final class FEMParam extends FEMFunction {
 	 *
 	 * @param index Index des Parameterwerts.
 	 * @return {@link FEMParam}.
-	 * @throws IndexOutOfBoundsException Wenn {@code index < 0} ist. */
-	public static FEMParam from(final int index) throws IndexOutOfBoundsException {
-		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
+	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
+	public static FEMParam from(final int index) throws IllegalArgumentException {
+		if (index < 0) throw new IllegalArgumentException("index < 0");
 		if (index < FEMParam.CACHE.length) return FEMParam.CACHE[index];
 		return new FEMParam(index);
 	}

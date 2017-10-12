@@ -231,7 +231,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			return FEMHandler.from(this.function.invoke(frame), frame.context).value().invoke(frame.newFrame(this.params));
+			return this.function.invoke(frame).toFunction().invoke(frame.newFrame(this.params));
 		}
 
 		@Override
@@ -384,9 +384,10 @@ public abstract class FEMFunction {
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
 	public abstract FEMValue invoke(FEMFrame frame) throws NullPointerException;
 
-	/** Diese Methode gibt eine verkette Funktion zurück, welche den Ergebniswert dieser Funktion mit den gegebenen Parameterfunktionen aufruft. Der Ergebniswert
-	 * der gelieferten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht
-	 * {@code FEMHandler.from(this.invoke(frame), frame.context()).value().invoke(frame.newFrame(this.params())}.
+	/** Diese Methode gibt eine verkette Funktion zurück, welche den Ergebniswert dieser Funktion in einen {@link FEMHandler Funktionszeiger}
+	 * {@link FEMHandler#from(FEMValue, FEMContext) umwandelt}, die davon {@link FEMHandler#value() referenzierte} Funktion mit den gegebenen Parameterfunktionen
+	 * aufruft und deren Ergebniswert liefert. Der Ergebniswert der gelieferten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht
+	 * {@code this.invoke(frame).toFunction().invoke(frame.newFrame(this.params())}.
 	 *
 	 * @see ConcatFunction
 	 * @param params Parameterfunktionen.
@@ -480,7 +481,7 @@ public abstract class FEMFunction {
 		return this;
 	}
 
-	/** Diese Methode gibt einen Funktionszeiger auf diese Funktion als {@link FEMValue Wert} zurück.<br>
+	/** Diese Methode gibt eine diese Funktion repräsentierenden {@link FEMValue Wert} zurück.<br>
 	 * Ein Wert liefert hierbei sich selbst. Jede andere Funktion liefert einen {@link FEMHandler}, sodass die über {@code this.toValue().toFunction()} ermittelte
 	 * Funktion gleich zu dieser ist.
 	 *
@@ -511,7 +512,7 @@ public abstract class FEMFunction {
 
 	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapelrahmen}
 	 * {@code frame} einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapelrahmen entspricht, d.h.
-	 * {@code this.toClosure(frame).toHandler()}.
+	 * {@code this.toClosure(frame).toValue()}.
 	 *
 	 * @see ClosureFunction
 	 * @return Funktionszeiger mit Stapalrahmenbindung. */

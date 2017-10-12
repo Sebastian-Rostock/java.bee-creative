@@ -1,8 +1,6 @@
 package bee.creative.fem;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,11 +43,10 @@ public final class FEMCompiler extends Parser {
 	FEMScript script = FEMScript.EMPTY;
 
 	/** Dieses Feld speichert die über {@link #proxy(String)} erzeugten Platzhalter. */
-	final Map<String, FEMProxy> proxies = new LinkedHashMap<String, FEMProxy>();
+	final Map<String, FEMProxy> proxies = new LinkedHashMap<>();
 
 	/** Dieses Feld speichert die Parameternamen. */
-	final List<String> params = new LinkedList<String>();
-
+	final List<String> params = new LinkedList<>();
 
 	@SuppressWarnings ("javadoc")
 	// TODO die positionen/texte als getter am compiler
@@ -71,7 +68,7 @@ public final class FEMCompiler extends Parser {
 				this.section(), row, col, (100 * offset) / Math.max(length, 0), source.substring(Math.max(offset - 10, 0), Math.min(offset + 10, length)), hint),
 			cause);
 	}
- 
+
 	/** Diese Methode gibt den Platzhalter der Funktion mit dem gegebenen Namen zurück.
 	 *
 	 * @param name Name des Platzhalters.
@@ -163,6 +160,18 @@ public final class FEMCompiler extends Parser {
 		return this;
 	}
 
+	public final int getParams(final String name) throws NullPointerException {
+		return this.params.indexOf(name);
+	}
+
+	public void addParam(final int index, final String param) {
+		this.params.add(index, param);
+	}
+
+	public final void popParams(final int count) throws NullPointerException {
+		this.params.subList(0, count).clear();
+	}
+
 	/** Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
 	 *
 	 * @param value Parameternamen.
@@ -186,13 +195,8 @@ public final class FEMCompiler extends Parser {
 		return this;
 	}
 
-	public final void putParams(final String name) throws NullPointerException {
-		
-	}
+	
 
-	public final void popParams(final int count) throws NullPointerException {
-		
-	}
 	// /** Diese Methode setzt die Zulässigkeit von Wertlisten.
 	// *
 	// * @see #isArrayEnabled()
@@ -229,91 +233,91 @@ public final class FEMCompiler extends Parser {
 	// return this;
 	// }
 
-//	/** Diese Methode kompiliert den Quelltext in eine Liste von Werten und gibt diese zurück.<br>
-//	 * Die Werte müssen durch Bereiche vom Typ {@code ';'} separiert sein. Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Wertliste
-//	 * geliefert.
-//	 *
-//	 * @return Werte.
-//	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
-//	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-//	public final FEMValue[] compileValues() throws IllegalArgumentException {
-//		// this.start();
-//		try {
-//			if (this.compileType() < 0) return new FEMValue[0];
-//			final List<FEMValue> result = new ArrayList<FEMValue>();
-//			while (true) {
-//				result.add(this.compileParamAsValue());
-//				switch (this.compileType()) {
-//					case -1: {
-//						return result.toArray(new FEMValue[result.size()]);
-//					}
-//					case ';': {
-//						this.skip();
-//					}
-//				}
-//			}
-//		} finally {
-//			// this.stop();
-//		}
-//	}
-//
-//	/** Diese Methode kompiliert den Quelltext in eine Liste von Parameterfunktion und gibt diese zurück.<br>
-//	 * Die Parameterfunktion müssen durch Bereiche vom Typ {@code ';'} separiert sein. Eine Parameterfunktion beginnt mit einem
-//	 * {@link FEMDomain#compileName(FEMCompiler) Namen} und endet dann mit einer in geschweifte Klammern eingeschlossenen parametrisierten Funktion. Wenn der
-//	 * Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Funktionsliste geliefert. Nach dem Aufruf dieser Methode ist Abbildung {@link #proxies()}
-//	 * entsprechend bestückt.
-//	 *
-//	 * @return Funktionen.
-//	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
-//	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-//	public final FEMProxy[] compileProxies() throws IllegalArgumentException {
-//		// this.start();
-//		try {
-//			final List<FEMProxy> result = new ArrayList<FEMProxy>();
-//			if (this.compileType() < 0) return new FEMProxy[0];
-//			while (true) {
-//				result.add(this.compileProxy());
-//				switch (this.compileType()) {
-//					case -1: {
-//						return result.toArray(new FEMProxy[result.size()]);
-//					}
-//					case ';': {
-//						this.skip();
-//					}
-//				}
-//			}
-//		} finally {
-//			// this.stop();
-//		}
-//	}
-//
-//	/** Diese Methode kompiliert den Quelltext in eine Liste von Funktionen und gibt diese zurück. Die Funktionen müssen durch Bereiche vom Typ {@code ';'}
-//	 * separiert sein.<br>
-//	 * Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Funktionsliste geliefert.
-//	 *
-//	 * @return Funktionen.
-//	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
-//	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-//	public final FEMFunction[] compileFunctions() throws IllegalArgumentException {
-//		// this.start();
-//		try {
-//			if (this.compileType() < 0) return new FEMFunction[0];
-//			final List<FEMFunction> result = new ArrayList<FEMFunction>();
-//			while (true) {
-//				result.add(this.compileParamAsFunction());
-//				switch (this.compileType()) {
-//					case -1: {
-//						return result.toArray(new FEMFunction[result.size()]);
-//					}
-//					case ';': {
-//						this.skip();
-//					}
-//				}
-//			}
-//		} finally {
-//			// this.stop();
-//		}
-//	}
+	// /** Diese Methode kompiliert den Quelltext in eine Liste von Werten und gibt diese zurück.<br>
+	// * Die Werte müssen durch Bereiche vom Typ {@code ';'} separiert sein. Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Wertliste
+	// * geliefert.
+	// *
+	// * @return Werte.
+	// * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
+	// * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
+	// public final FEMValue[] compileValues() throws IllegalArgumentException {
+	// // this.start();
+	// try {
+	// if (this.compileType() < 0) return new FEMValue[0];
+	// final List<FEMValue> result = new ArrayList<FEMValue>();
+	// while (true) {
+	// result.add(this.compileParamAsValue());
+	// switch (this.compileType()) {
+	// case -1: {
+	// return result.toArray(new FEMValue[result.size()]);
+	// }
+	// case ';': {
+	// this.skip();
+	// }
+	// }
+	// }
+	// } finally {
+	// // this.stop();
+	// }
+	// }
+	//
+	// /** Diese Methode kompiliert den Quelltext in eine Liste von Parameterfunktion und gibt diese zurück.<br>
+	// * Die Parameterfunktion müssen durch Bereiche vom Typ {@code ';'} separiert sein. Eine Parameterfunktion beginnt mit einem
+	// * {@link FEMDomain#compileName(FEMCompiler) Namen} und endet dann mit einer in geschweifte Klammern eingeschlossenen parametrisierten Funktion. Wenn der
+	// * Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Funktionsliste geliefert. Nach dem Aufruf dieser Methode ist Abbildung {@link #proxies()}
+	// * entsprechend bestückt.
+	// *
+	// * @return Funktionen.
+	// * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
+	// * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
+	// public final FEMProxy[] compileProxies() throws IllegalArgumentException {
+	// // this.start();
+	// try {
+	// final List<FEMProxy> result = new ArrayList<FEMProxy>();
+	// if (this.compileType() < 0) return new FEMProxy[0];
+	// while (true) {
+	// result.add(this.compileProxy());
+	// switch (this.compileType()) {
+	// case -1: {
+	// return result.toArray(new FEMProxy[result.size()]);
+	// }
+	// case ';': {
+	// this.skip();
+	// }
+	// }
+	// }
+	// } finally {
+	// // this.stop();
+	// }
+	// }
+	//
+	// /** Diese Methode kompiliert den Quelltext in eine Liste von Funktionen und gibt diese zurück. Die Funktionen müssen durch Bereiche vom Typ {@code ';'}
+	// * separiert sein.<br>
+	// * Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Funktionsliste geliefert.
+	// *
+	// * @return Funktionen.
+	// * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
+	// * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
+	// public final FEMFunction[] compileFunctions() throws IllegalArgumentException {
+	// // this.start();
+	// try {
+	// if (this.compileType() < 0) return new FEMFunction[0];
+	// final List<FEMFunction> result = new ArrayList<FEMFunction>();
+	// while (true) {
+	// result.add(this.compileParamAsFunction());
+	// switch (this.compileType()) {
+	// case -1: {
+	// return result.toArray(new FEMFunction[result.size()]);
+	// }
+	// case ';': {
+	// this.skip();
+	// }
+	// }
+	// }
+	// } finally {
+	// // this.stop();
+	// }
+	// }
 
 	{}
 

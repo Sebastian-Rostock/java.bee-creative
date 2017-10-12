@@ -233,7 +233,7 @@ public abstract class FEMReflection extends FEMFunction {
 	 * @see #from(Field)
 	 * @see #from(Method)
 	 * @see #from(Constructor)
-	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
+	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktors oder eines Datenfelds.
 	 * @return {@link FEMReflection}.
 	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */

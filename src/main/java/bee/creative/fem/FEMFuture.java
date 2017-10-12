@@ -54,6 +54,13 @@ public final class FEMFuture extends FEMValue {
 
 	{}
 
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #result() Ergebniswert} noch nicht ausgewertet wurde.
+	 *
+	 * @return Auswertungsstatus. */
+	public final synchronized boolean ready() {
+		return this.result != null;
+	}
+
 	/** Diese Methode gibt die Stapelrahmen oder {@code null} zurück.<br>
 	 * Der erste Aufruf von {@link #result(boolean)} setzt die Stapelrahmen auf {@code null}.
 	 *
