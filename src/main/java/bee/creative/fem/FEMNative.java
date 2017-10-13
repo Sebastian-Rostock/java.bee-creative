@@ -109,7 +109,7 @@ public final class FEMNative extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return String.valueOf(this.data);
+		return Objects.toString(this.data);
 	}
 
 }
