@@ -79,4 +79,10 @@ public final class FEMVariable extends FEMValue {
 		return this;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public String toString() {
+		return Objects.toInvokeString(this, this.value);
+	}
+
 }
