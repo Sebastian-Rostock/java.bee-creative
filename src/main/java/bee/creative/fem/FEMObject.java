@@ -251,12 +251,12 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück.<br>
-	 * Das Format der Textdarstellung ist {@code #}{@link #refValue() REF}{@code .}{@link #ownerValue() OWNER}{@code :}{@link #typeValue() TYPE}.
+	 * Das Format der Textdarstellung ist {@code @}{@link #refValue() REF}{@code .}{@link #ownerValue() OWNER}{@code :}{@link #typeValue() TYPE}.
 	 *
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		return "#" + this.refValue() + "." + this.ownerValue() + ":" + this.typeValue();
+		return "@" + this.refValue() + "." + this.ownerValue() + ":" + this.typeValue();
 	}
 
 }
