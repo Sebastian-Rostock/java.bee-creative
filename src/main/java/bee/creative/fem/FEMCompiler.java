@@ -13,23 +13,6 @@ import bee.creative.util.Parser;
  * überführen und diese im Rahmen eines {@link FEMFormatter} auch formatieren kann.
  * <p>
  * Die Bereichestypen der Quelltexte haben folgende Bedeutung:
- * <ul>
- * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) sind bedeutungslos, dürfen an jeder Position vorkommen und werden
- * ignoriert.</li>
- * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link FEMArray}s an, dessen Elemente mit Bereichen vom Typ
- * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente nur dann zulässig, wenn das {@link FEMArray} als Funktion bzw. Parameterwert
- * kompiliert wird.</li>
- * <li>Bereiche mit den Typen {@code '('} und {@code ')'} zeigen den Beginn bzw. das Ende der Parameterliste eines Funktionsaufrufs an, deren Parameter mit
- * Bereichen vom Typ {@code ';'} separiert werden müssen und als Funktionen kompiliert werden.</li>
- * <li>Bereiche mit den Typen <code>'{'</code> und <code>'}'</code> zeigen den Beginn bzw. das Ende einer parametrisierten Funktion an. Die Parameterliste
- * besteht aus beliebig vielen Parameternamen, die mit Bereichen vom Typ {@code ';'} separiert werden müssen und welche mit einem Bereich vom Typ {@code ':'}
- * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über {@link FEMDomain#compileName(FEMCompiler)} aufgelöst werden
- * kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu genau einer
- * Funktion kompiliert werden.</li>
- * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link FEMParam} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines Parameters
- * folgen ({@code $1} wird zu {@code FEMParam.from(0)}). Andernfalls steht der Bereich für {@link FEMParam#VIEW}.</li>
- * <li>Alle restlichen Bereiche werden über {@link FEMDomain#compileFunction(FEMCompiler)} in Parameterfunktionen überführt.</li>
- * </ul>
  * <p>
  * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
  *
@@ -67,6 +50,37 @@ public final class FEMCompiler extends Parser {
 			String.format("Unerwartete Zeichenkette «%s» an Position %s:%s (%s%%) bei Textstelle «%s».%s", //
 				this.section(), row, col, (100 * offset) / Math.max(length, 0), source.substring(Math.max(offset - 10, 0), Math.min(offset + 10, length)), hint),
 			cause);
+	}
+
+	public int scriptOffset() {
+		return this.range().offset;
+	}
+
+	public int scriptLength() {
+		return this.script.source.length();
+	}
+
+	public int scriptRowIndex() {
+		final String source = this.script.source;
+		final int offset = this.range().start();
+		int pos = source.lastIndexOf('\n', offset);
+		int row = 1;
+		while (pos >= 0) {
+			pos = source.lastIndexOf('\n', pos - 1);
+			row++;
+		}
+		return row;
+	}
+
+	public int scriptColIndex() {
+		final String source = this.script.source;
+		final int offset = this.range().offset;
+		final int index = source.lastIndexOf('\n', offset);
+		return index < 0 ? offset : offset - index;
+	}
+
+	public float scriptPercent() {
+		return (100 * this.scriptOffset()) / Math.max(this.scriptLength(), 0);
 	}
 
 	/** Diese Methode gibt den Platzhalter der Funktion mit dem gegebenen Namen zurück.
@@ -121,8 +135,6 @@ public final class FEMCompiler extends Parser {
 		return this.range().extract(this.script.source());
 	}
 
- 
-
 	/** Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
 	 *
 	 * @param value Quelltext.
@@ -135,16 +147,29 @@ public final class FEMCompiler extends Parser {
 		return this;
 	}
 
+	public final FEMCompiler putProxies(FEMProxy... proxies) {
+		return this.putProxies(Arrays.asList(proxies));
+	}
+
+	public final FEMCompiler putProxies(Iterable<FEMProxy> proxies) {
+		for (final FEMProxy proxy: proxies) {
+			this.proxies.put(proxy.name(), proxy);
+		}
+		return this;
+	}
+
+	public final FEMCompiler putParam(final int index, final String param) {
+		this.params.add(index, param);
+		return this;
+	}
+
 	public final int getParams(final String name) throws NullPointerException {
 		return this.params.indexOf(name);
 	}
 
-	public void addParam(final int index, final String param) {
-		this.params.add(index, param);
-	}
-
-	public final void popParams(final int count) throws NullPointerException {
+	public final FEMCompiler popParams(final int count) throws NullPointerException {
 		this.params.subList(0, count).clear();
+		return this;
 	}
 
 	/** Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
@@ -169,7 +194,6 @@ public final class FEMCompiler extends Parser {
 		this.params.addAll(value);
 		return this;
 	}
- 
 
 	{}
 

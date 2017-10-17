@@ -16,17 +16,18 @@ import bee.creative.fem.FEMScript.Token;
 import bee.creative.util.Filter;
 import bee.creative.util.Getter;
 import bee.creative.util.Natives;
+import bee.creative.util.Objects;
 import bee.creative.util.Setter;
 import bee.creative.util.Strings;
 
-/** Diese Klasse implementiert domänenspezifische Pars, Formatierungs und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
+/** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
  * Quelltexten und Funktionen ineinander dienen.
  * <p>
  * Die {@code parseAs*}-Methoden zum Parsen einer {@link FEMParser#source() Zeichenkette} erkennen darin Bedeutung tragende {@link FEMScript.Token Bereiche} und
  * {@link FEMParser#putToken(Token) erfassen} diese falls nötig im gegebenen {@link FEMParser}. Die {@code formatAs*}-Methoden zum Formatieren eines gegebenen
  * Objekts erzeugen dagegen die Bedeutung tragenden Bereiche der Textdarstellung und {@link FEMFormatter#putToken(Object) erfassen} diese im gegebenen
  * {@link FEMFormatter}. Die {@code compileAs*}-Methoden zum Kompilieren {@link FEMScript aufbereiteter Quelltexte} übersetzen schließlich erkannte Bedeutung
- * tragende {@link FEMScript.Token Bereiche} in Werte und Funktionen.
+ * tragende {@link FEMScript.Token Bereiche} in Funktionen.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMDomain {
@@ -86,23 +87,20 @@ public class FEMDomain {
 	/** Dieses Feld speichert die normale {@link FEMDomain}. */
 	public static final FEMDomain NORMAL = new FEMDomain();
 
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen eines Einzelwerts ({@code FEMValue}). */
-	public static final int PARSE_VALUE = 0;
+	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren eines Einzelwerts ({@code FEMValue}). */
+	public static final int PARSE_VALUE = 2;
 
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen einer Wertliste ({@code FEMValue[]}). */
-	public static final int PARSE_VALUE_LIST = 1;
+	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Wertliste ({@code List<FEMValue>}). */
+	public static final int PARSE_VALUE_LIST = 3;
 
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen eines Einzelwerts ({@code FEMProxy}). */
-	public static final int PARSE_PROXY = 2;
-
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen einer Wertliste ({@code FEMProxy[]}). */
-	public static final int PARSE_PROXY_LIST = 3;
-
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen eines Einzelwerts ({@code FEMFunction}). */
+	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Funktion ({@code FEMFunction}). */
 	public static final int PARSE_FUNCTION = 4;
 
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen eines Einzelwerts ({@code FEMFunction[]}). */
+	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Funktionsliste ({@code List<FEMFunction>}). */
 	public static final int PARSE_FUNCTION_LIST = 5;
+
+	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Wertliste ({@code Map<String, FEMProxy>}). */
+	public static final int PARSE_PROXY_MAP = 6;
 
 	{}
 
@@ -118,37 +116,35 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode überführt die gegebene Zeichenkette in einen {@link FEMScript aufbereiteten Quelltext} und gibt diesen zurück. Sie erzeugt dazu einen
-	 * {@link FEMParser} und delegiert diesen zusammen mit dem gegebenen Skriptmodus an {@link #parseAsItems(FEMParser, int)}.
+	 * {@link FEMParser} und delegiert diesen zusammen mit dem gegebenen Skriptmodus an {@link #parseAsScript(FEMParser, int)}.
 	 *
 	 * @see #PARSE_VALUE
 	 * @see #PARSE_VALUE_LIST
-	 * @see #PARSE_PROXY
-	 * @see #PARSE_PROXY_LIST
 	 * @see #PARSE_FUNCTION
 	 * @see #PARSE_FUNCTION_LIST
+	 * @see #PARSE_PROXY_MAP
 	 * @param source Zeichenkette, die geparst werden soll.
 	 * @param scriptMode Modus für {@link FEMScript#mode()}.
-	 * @return aufbereiteten Quelltext.
+	 * @return aufbereiteter Quelltext.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 	public FEMScript parseScript(final String source, final int scriptMode) throws NullPointerException {
 		final FEMParser parser = new FEMParser().useSource(source);
-		this.parseAsItems(parser, scriptMode);
+		this.parseAsScript(parser, scriptMode);
 		return FEMScript.from(scriptMode, source, parser.tokens());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.parseAsItems(target, itemLimit, itemParser)}, wobei {@code itemLimit} und {@code itemParser} abhängig vom
-	 * gegebenen {@link FEMScript#mode() Skriptmodus} bestückt werden.<br>
-	 * Die Implementation in {@link FEMDomain} unterstützt nur die Skriptmodus {@code 0..5} ({@link #PARSE_VALUE}..{@link #PARSE_FUNCTION_LIST}) und erfasst für
-	 * alle anderen Modus einen {@link #parseAsError(FEMParser) Fehlerbereich}. Die maximale Elementanzahl {@code itemLimit} ist für {@link #PARSE_VALUE},
-	 * {@link #PARSE_PROXY} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code null}. Der {@code itemParser} delegiert für {@link #PARSE_VALUE} und
-	 * {@link #PARSE_VALUE_LIST} an {@link #parseAsValue(FEMParser)}, für {@link #PARSE_PROXY} und {@link #PARSE_PROXY_LIST} an {@link #parseAsProxy(FEMParser)}
-	 * sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #parseAsFunction(FEMParser)}.
+	/** Diese Methode implementiert {@link #parseScript(String, int)} und ist eine Abkürzung für {@code this.parseAsItems(target, itemLimit, itemParser)}, wobei
+	 * {@code itemLimit} und {@code itemParser} abhängig vom gegebenen {@link FEMScript#mode() Skriptmodus} bestückt werden.<br>
+	 * Die Implementation in {@link FEMDomain} erfasst für alle nicht unterstützten Skriptmodus einen {@link #parseAsError(FEMParser) Fehlerbereich}. Die maximale
+	 * Elementanzahl {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der {@code itemParser}
+	 * delegiert für {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #parseAsValue(FEMParser)}, für {@link #PARSE_PROXY_MAP} an
+	 * {@link #parseAsProxy(FEMParser)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #parseAsFunction(FEMParser)}.
 	 *
 	 * @see #parseAsItems(FEMParser, int, Filter)
 	 * @param target Parser.
 	 * @param scriptMode Skriptmodus.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void parseAsItems(FEMParser target, int scriptMode) throws NullPointerException {
+	protected void parseAsScript(FEMParser target, int scriptMode) throws NullPointerException {
 		int itemLimit = 1;
 		Filter<FEMParser> itemParser;
 		switch (scriptMode) {
@@ -167,9 +163,8 @@ public class FEMDomain {
 
 				};
 			break;
-			case PARSE_PROXY_LIST:
+			case PARSE_PROXY_MAP:
 				itemLimit = 0;
-			case PARSE_PROXY:
 				itemParser = new Filter<FEMParser>() {
 
 					@Override
@@ -203,7 +198,7 @@ public class FEMDomain {
 	 * @param itemLimit Maximale Anzahl der Elemente in der Auflistung, wobei Werte kleiner oder gleich {@code 0} für eine unbeschränkte Anzahl stehen.
 	 * @param itemParser {@link Filter} zum Erkennen, Parsen und Erfassen der {@link Token Bereiche} eines Elements.
 	 * @return {@code true}, wenn die Auflistung erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code filter} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code itemParser} {@code null} ist. */
 	protected boolean parseAsItems(final FEMParser target, int itemLimit, Filter<? super FEMParser> itemParser) throws NullPointerException {
 		this.parseAsComments(target);
 		if (!itemParser.accept(target)) return false;
@@ -1085,16 +1080,49 @@ public class FEMDomain {
 
 	{}
 
+	/** Diese Methode ist eine Abkürzung für {@code this.compileScript(this.parseScript(source, scriptMode))}.
+	 *
+	 * @see #parseScript(String, int)
+	 * @see #compileScript(FEMScript)
+	 * @param source Zeichenkette, die geparst werden soll.
+	 * @param scriptMode Skriptmodus für {@link FEMScript#mode()}.
+	 * @return Kompiliertes Objekt abhängig vom Skriptmodus.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	public Object compileScript(final String source, final int scriptMode) throws NullPointerException, IllegalArgumentException {
 		return this.compileScript(this.parseScript(source, scriptMode));
 	}
 
-	public Object compileScript(final FEMScript script) throws NullPointerException, IllegalArgumentException {
-		if (script.contains('!')) throw new IllegalArgumentException();
-		return this.compileAsScript(new FEMCompiler().useScript(script));
+	/** Diese Methode kompiliert den gegebenen {@link FEMScript aufbereiteten Quelltext} in ein von dessen {@link FEMScript#mode() Skriptmodus} abhängiges Objekt
+	 * und gibt dieses zurück.
+	 *
+	 * @see #PARSE_VALUE
+	 * @see #PARSE_VALUE_LIST
+	 * @see #PARSE_FUNCTION
+	 * @see #PARSE_FUNCTION_LIST
+	 * @see #PARSE_PROXY_MAP
+	 * @see #parseScript(String, int)
+	 * @param source aufbereiteter Quelltext.
+	 * @return Kompiliertes Objekt abhängig vom Skriptmodus.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist oder einen Fehlerbereich vom Typ {@code '!'} enthält. */
+	public Object compileScript(final FEMScript source) throws NullPointerException, IllegalArgumentException {
+		if (source.contains('!')) throw new IllegalArgumentException();
+		return this.compileAsScript(new FEMCompiler().useScript(source));
 	}
 
-	protected Object compileAsScript(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
+	/** Diese Methode implementiert {@link #compileScript(FEMScript)} und ist eine Abkürzung für {@code this.compileAsItems(source, itemLimit, itemCompiler)},
+	 * wobei {@code itemLimit} und {@code itemCompiler} abhängig vom {@link FEMScript#mode() Skriptmodus} bestückt werden.<br>
+	 * Die maximale Elementanzahl {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der
+	 * {@code itemCompiler} delegiert für {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #compileAsValue(FEMCompiler)}, für {@link #PARSE_PROXY_MAP}
+	 * an {@link #compileAsProxy(FEMCompiler)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #compileAsFunction(FEMCompiler)}.
+	 * 
+	 * @see #parseAsScript(FEMParser, int)
+	 * @param source Kompiler.
+	 * @return Kompiliertes Objekt abhängig vom Skriptmodus.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist ider der Skriptmodus nicht unterstützt wird. */
+	protected Object compileAsScript(FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		int itemLimit = 1;
 		switch (source.script().mode()) {
 			case PARSE_VALUE_LIST:
@@ -1108,11 +1136,9 @@ public class FEMDomain {
 					}
 
 				});
-				return itemLimit != 0 ? values.get(0) : values.toArray(new FEMValue[values.size()]);
-			case PARSE_PROXY_LIST:
-				itemLimit = 0;
-			case PARSE_PROXY:
-				final List<FEMProxy> proxies = this.compileAsItems(source, itemLimit, new Getter<FEMCompiler, FEMProxy>() {
+				return itemLimit != 0 ? values.get(0) : values;
+			case PARSE_PROXY_MAP:
+				this.compileAsItems(source, 0, new Getter<FEMCompiler, FEMProxy>() {
 
 					@Override
 					public FEMProxy get(FEMCompiler input) {
@@ -1120,7 +1146,7 @@ public class FEMDomain {
 					}
 
 				});
-				return itemLimit != 0 ? proxies.get(0) : proxies.toArray(new FEMValue[proxies.size()]);
+				return source.proxies();
 			case PARSE_FUNCTION_LIST:
 				itemLimit = 0;
 			case PARSE_FUNCTION:
@@ -1132,11 +1158,21 @@ public class FEMDomain {
 					}
 
 				});
-				return itemLimit != 0 ? functions.get(0) : functions.toArray(new FEMValue[functions.size()]);
+				return itemLimit != 0 ? functions.get(0) : functions;
 		}
 		throw new IllegalArgumentException();
 	}
 
+	/** Diese Methode kompiliert eine mit Semikolon separierten Auflistung von über den gegebenen {@code itemCompiler} kompilierten Elementen und gibt diese
+	 * zurück.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param source Kompiler.
+	 * @param itemLimit Maximale Anzahl der Elemente in der Auflistung, wobei Werte kleiner oder gleich {@code 0} für eine unbeschränkte Anzahl stehen.
+	 * @param itemCompiler {@link Getter} zum Kompilieren eines Elements.
+	 * @return Auflistung der Elemente.
+	 * @throws NullPointerException Wenn {@code source} bzw. {@code itemCompiler} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected <GItem> List<GItem> compileAsItems(final FEMCompiler source, int itemLimit, final Getter<? super FEMCompiler, ? extends GItem> itemCompiler)
 		throws NullPointerException, IllegalArgumentException {
 		final List<GItem> result = new ArrayList<>();
@@ -1156,9 +1192,13 @@ public class FEMDomain {
 		}
 	}
 
-	/** Diese Methode kompiliert die beim aktuellen Bereich beginnende Parameterfunktion und gibt diese zurück.
+	/** Diese Methode kompiliert eine benannte Funktion und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} keine
+	 * {@link #compileAsConst(FEMCompiler) Konstante} ist, wird {@code null} geliefert.
 	 *
-	 * @return Parameterfunktion.
+	 * @see #parseAsProxy(FEMParser)
+	 * @param source Kompiler.
+	 * @return benannte Funktion oder {@code null}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected FEMProxy compileAsProxy(FEMCompiler source) throws IllegalArgumentException {
 		final String name = this.compileAsConst(source);
@@ -1171,9 +1211,13 @@ public class FEMDomain {
 		return result;
 	}
 
-	/** Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMValue} und gibt diesen zurück.
+	/** Diese Methode kompiliert eine Wertliste und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '['} ist, wird
+	 * {@code null} geliefert.
 	 *
-	 * @return Wertliste als {@link FEMValue}.
+	 * @see #parseAsArray(FEMParser)
+	 * @param source Kompiler.
+	 * @return Wertliste oder {@code null}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected FEMArray compileAsArray(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		if (source.symbol() != '[') return null;
@@ -1200,6 +1244,15 @@ public class FEMDomain {
 	}
 
 	/** value, null, illegal */
+	/** Diese Methode kompiliert einen Wert und gibt diesen zurück. Sie probiert hierfür {@link #compileAsArray(FEMCompiler) Wertlisten},
+	 * {@link #compileAsString(FEMCompiler) Zeichenketten}, {@link #compileAsHandler(FEMCompiler) Funktionszeiger} und {@link #compileAsConst(FEMCompiler)
+	 * Konstanten} durch. Wenn hierbei kein Wert ermittelt werden konnte, wird {@code null} geliefert.
+	 *
+	 * @see #parseAsValue(FEMParser)
+	 * @param source Kompiler.
+	 * @return Wert oder {@code null}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected FEMValue compileAsValue(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		FEMValue result = this.compileAsArray(source);
 		if (result != null) return result;
@@ -1214,6 +1267,16 @@ public class FEMDomain {
 		throw new IllegalArgumentException("Wert '" + string + "' ungültig.");
 	}
 
+	/** Diese Methode kompiliert den mit der gegebenen Zeichenkette beschriebenen Wert und gibt dieses zurück. Sie versucht dazu die Zeichenkette als
+	 * {@link FEMVoid}, {@link FEMBoolean}, {@link FEMBinary}, {@link FEMDuration}, {@link FEMDatetime}, {@link FEMInteger} und {@link FEMDecimal} zu
+	 * interpretieren. Wenn hierbei keine Konstante ermittelt werden konnte, wird {@code null} geliefert.
+	 *
+	 * @see #parseAsValue(FEMParser)
+	 * @param source Kompiler.
+	 * @param string Zeichenkette, bspw. einer Konstanten oder eines Objektnamens.
+	 * @return Funktion.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected FEMValue compileAsValue(final FEMCompiler source, final String string) throws NullPointerException, IllegalArgumentException {
 		if (string.equals("void")) return FEMVoid.INSTANCE;
 		if (string.equals("true")) return FEMBoolean.TRUE;
@@ -1240,7 +1303,14 @@ public class FEMDomain {
 		return null;
 	}
 
-	/** string, null, illegal */
+	/** Diese Methode kompiliert eine Zeichenkette und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '\''} oder
+	 * {@code '\"'} ist, wird {@code null} geliefert.
+	 *
+	 * @see #parseAsString(FEMParser)
+	 * @param source Kompiler.
+	 * @return Zeichenkette oder {@code null}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected FEMValue compileAsString(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		final int symbol = source.symbol();
 		if ((symbol != '\"') && (symbol != '\'')) return null;
@@ -1249,13 +1319,20 @@ public class FEMDomain {
 		return FEMString.from(result);
 	}
 
-	/** Diese Methode gibt das zurück.
+	/** Diese Methode kompiliert einen Parameterverweise und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '$'}
+	 * ist, wird {@code null} geliefert. Wenn diesem Bereich ein {@link #compileAsIndex(FEMCompiler) Parameterindex} bzw. {@link #compileAsName(FEMCompiler)
+	 * Parametername} folgt, wird ein {@link FEMParam} mit dem entsprechenden geliefert. Der Parameterindex für den ersten Parameter ist {@code 1}. Kleinere Werte
+	 * sind ungültig. Ein Parametername ist ungültig über {@link FEMCompiler#getParams(String)} dazu kein positiver Index ermittelt werden kann. Wenn dem ersten
+	 * Bereich weder ein Parameterindex noch ein Parametername folgt, wird {@link FEMParam#VIEW} geliefert.
 	 *
+	 * @see #parseAsLocale(FEMParser)
 	 * @see FEMParam#VIEW
 	 * @see FEMParam#from(int)
-	 * @param source
-	 * @return */
-	protected FEMFunction compileAsLocale(final FEMCompiler source) {
+	 * @param source Kompiler.
+	 * @return Parameterverweise oder {@code null}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
+	protected FEMFunction compileAsLocale(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		if (source.symbol() != '$') return null;
 		source.skip();
 		final String name = this.compileAsName(source);
@@ -1272,9 +1349,10 @@ public class FEMDomain {
 		return FEMParam.VIEW;
 	}
 
-	/** Diese Methode kompiliert einen {@link FEMHandler Funktionszeiger} und gibt diesen nur dann zurück, wenn er an der öffnenden geschweiften Klammer erkannt
-	 * wurde. Andernfalls wird {@code null} geliefert.
+	/** Diese Methode kompiliert einen Funktionszeiger und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ
+	 * <code>'{'</code> ist, wird {@code null} geliefert.
 	 *
+	 * @see #parseAsHandler(FEMParser)
 	 * @param source Kompiler.
 	 * @return Funktionszeiger oder {@code null}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -1288,7 +1366,7 @@ public class FEMDomain {
 			if (source.symbol() < 0) throw new IllegalArgumentException();
 			final String name = this.compileAsName(source);
 			if (name != null) {
-				source.addParam(count++, name);
+				source.putParam(count++, name);
 				this.compileAsComments(source);
 			}
 			if (source.symbol() == ';') {
@@ -1307,7 +1385,16 @@ public class FEMDomain {
 		}
 	}
 
-	/** value, null, illegal */
+	/** Diese Methode kompiliert eine Funktion und gibt diese zurück. Sie probiert hierfür {@link #compileAsArray(FEMCompiler) Wertlisten},
+	 * {@link #compileAsString(FEMCompiler) Zeichenketten}, {@link #compileAsHandler(FEMCompiler) Funktionszeiger}, {@link #compileAsLocale(FEMCompiler)
+	 * Parameterverweise} und {@link #compileAsConst(FEMCompiler) Konstanten} durch. Wenn hierbei keine Funktion ermittelt werden konnte, wird {@code null}
+	 * geliefert.
+	 *
+	 * @see #parseAsFunction(FEMParser)
+	 * @param source Kompiler.
+	 * @return Funktion oder {@code null}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected FEMFunction compileAsFunction(final FEMCompiler source) throws NullPointerException, IllegalArgumentException { // OKAY
 		FEMFunction result = this.compileAsArray(source);
 		if (result != null) return result;
@@ -1324,6 +1411,30 @@ public class FEMDomain {
 		throw new IllegalArgumentException("Funktion '" + string + "' ungültig.");
 	}
 
+	/** Diese Methode kompiliert die mit der gegebenen Zeichenkette beschriebene Funktion und gibt diese zurück. Sie versucht dazu die Zeichenkette über
+	 * {@link #compileAsValue(FEMCompiler, String)} in einen konstanten Wert zu übersetzen. Wenn hierbei keine Konstante ermittelt werden konnte, wird ein
+	 * {@link FEMCompiler#proxy(String) Platzhalter mit dem gegebenen Namen} geliefert.
+	 *
+	 * @see #parseAsFunction(FEMParser)
+	 * @param source Kompiler.
+	 * @param string Zeichenkette, bspw. einer Konstanten oder eines Funktionsnamens.
+	 * @return Funktion.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
+	protected FEMFunction compileAsFunction(final FEMCompiler source, final String string) throws NullPointerException, IllegalArgumentException {
+		final FEMValue result = this.compileAsValue(source, string);
+		return result != null ? result : source.proxy(string);
+	}
+
+	/** Diese Methode kompiliert eine Parameterliste und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '('} ist,
+	 * wird {@code null} geliefert. Die Parameterfunktionen werden hierzu über {@link #compileAsClosure(FEMFunction)} aus den Funktionen abgeleitet, die über
+	 * {@link #compileAsFunction(FEMCompiler)} ermittelt wurden.
+	 *
+	 * @see #parseAsParams(FEMParser)
+	 * @param source Kompiler.
+	 * @return Parameterliste oder {@code null}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected List<FEMFunction> compileAsParams(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		if (source.symbol() != '(') return null;
 		source.skip();
@@ -1360,29 +1471,54 @@ public class FEMDomain {
 	 * @param source Funktion.
 	 * @return Parameterfunktion. */
 	protected FEMFunction compileAsClosure(final FEMFunction source) {
-		return source instanceof FEMHandler ? ((FEMHandler)source).toFunction().toClosure() : source;
+		return source instanceof FEMHandler ? ((FEMHandler)source).value().toClosure() : source;
 	}
 
+	/** Diese Methode ist eine Abkürzung für
+	 * {@code this.compileAsComposite(source, result, (result instanceof FEMHandler) || (result instanceof ClosureFunction))}.
+	 *
+	 * @param source Kompiler.
+	 * @param result aufzurufende Funktion.
+	 * @return Funktionsaufruf oder {@code result}.
+	 * @throws NullPointerException Wenn {@code source} bzw. {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected FEMFunction compileAsComposite(FEMCompiler source, FEMFunction result) throws NullPointerException, IllegalArgumentException {
 		return this.compileAsComposite(source, result, (result instanceof FEMHandler) || (result instanceof ClosureFunction));
 	}
 
+	/** Diese Methode kompiliert den Aufruf der gegebenen Funktion mit den aus {@link #compileAsParams(FEMCompiler) Parameterlisten} stammenden
+	 * Parameterfunktionen und gibt diesen zurück. Dazu werden beliebig viele {@link #compileAsParams(FEMCompiler) Parameterlisten} kompiliert und alle außer der
+	 * ersten Parameterliste über {@link FEMFunction#concat(List)} mit der aufzurufenden Funktion verkettet. Die Art der Anbindung für die erste Parameterliste
+	 * wird über die Verkettungsoption {@code concat} bestimmt. Diese sollte {@code true} sein, wenn die gegebene Funktion ein {@link FEMHandler Funktionszeiger},
+	 * ein {@link ClosureFunction Funktionszeiger mit Stapalrahmenbindung} oder eine Funktion ist, die erst bei ihrer Auswertung einen Funktionszeiger liefert.
+	 *
+	 * @param source Kompiler.
+	 * @param result aufzurufende Funktion.
+	 * @param concat {@code true}, wenn die erste Parameterliste über {@link FEMFunction#concat(List)} angebunden werden soll.<br>
+	 *        {@code false}, wenn sie über {@link FEMFunction#compose(List)} angebunden werden soll.
+	 * @return Funktionsaufruf oder {@code result}.
+	 * @throws NullPointerException Wenn {@code source} bzw. {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected FEMFunction compileAsComposite(final FEMCompiler source, FEMFunction result, boolean concat) throws NullPointerException, IllegalArgumentException {
+		List<FEMFunction> params = this.compileAsParams(source);
+		if (params == null) return Objects.assertNotNull(result);
+		result = concat ? result.concat(params) : result.compose(params);
 		while (true) {
-			final List<FEMFunction> params = this.compileAsParams(source);
+			params = this.compileAsParams(source);
 			if (params == null) return result;
-			result = concat ? result.concat(params) : result.compose(params);
-			concat = true;
+			result = result.concat(params);
 			this.compileAsComments(source);
 		}
 	}
 
-	protected FEMFunction compileAsFunction(final FEMCompiler source, final String string) throws NullPointerException, IllegalArgumentException {
-		final FEMValue result = this.compileAsValue(source, string);
-		return result != null ? result : source.proxy(string);
-	}
-
-	/** string, null, illegal */
+	/** Diese Methode kompiliert die Zeichenkette einer Konatenten und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ
+	 * {@code '?'} oder {@code '<'} ist, wird {@code null} geliefert.
+	 *
+	 * @see #parseAsConst(FEMParser)
+	 * @param source Kompiler.
+	 * @return Parametername oder {@code null}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	protected String compileAsConst(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		final int symbol = source.symbol();
 		if (symbol == '?') {
@@ -1397,8 +1533,8 @@ public class FEMDomain {
 		} else return null;
 	}
 
-	/** Diese Methode kompiliert den {@link FEMCompiler#section() aktuellen Bereich} zu einem Parameternamen und gibt diesen zurück. Wenn der
-	 * {@link FEMScript.Token Bereich} nicht den Typ {@code '~'} ist, wird {@code null} geliefert.
+	/** Diese Methode kompiliert einen Parameternamen und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '~'}
+	 * ist, wird {@code null} geliefert.
 	 *
 	 * @see #parseAsName(FEMParser)
 	 * @param source Kompiler.
@@ -1412,8 +1548,8 @@ public class FEMDomain {
 		return result;
 	}
 
-	/** Diese Methode kompiliert den {@link FEMCompiler#section() aktuellen Bereich} zu einem Parameterindex und gibt diesen zurück. Wenn der
-	 * {@link FEMScript.Token Bereich} nicht den Typ {@code '#'} ist, wird {@code null} geliefert.
+	/** Diese Methode kompiliert einen Parameterindex und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '#'}
+	 * ist, wird {@code null} geliefert.
 	 *
 	 * @see #parseAsIndex(FEMParser)
 	 * @param source Kompiler.
