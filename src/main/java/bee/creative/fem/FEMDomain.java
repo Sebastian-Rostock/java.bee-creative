@@ -579,14 +579,17 @@ public class FEMDomain {
 			}
 			if (symbol == maskSymbol) {
 				symbol = target.skip();
-				if (symbol < 0) {
-					if (maskSymbol == closeSymbol) {
-						target.putToken(openSymbol, offset);
-						return true;
-					}
-					target.putToken('!', offset);
+				if ((symbol == openSymbol) || (symbol == maskSymbol) || (symbol == closeSymbol)) {
+					continue;
+				} else if (maskSymbol == closeSymbol) {
+					target.putToken(openSymbol, offset);
 					return true;
 				}
+				target.putToken('!', offset);
+				return true;
+			} else if ((symbol == openSymbol) && (openSymbol != closeSymbol)) {
+				target.putToken('!', offset);
+				return true;
 			} else if (symbol == closeSymbol) return true;
 		}
 	}
@@ -639,8 +642,8 @@ public class FEMDomain {
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
-	public String formatScript(final FEMScript script) {
-		final FEMFormatter target = new FEMFormatter();
+	public String formatScript(final FEMScript script, final String indent) {
+		final FEMFormatter target = new FEMFormatter().useIndent(indent);
 		this.formatAsScript(target, new FEMCompiler().useScript(script));
 		return target.format();
 	}
@@ -1116,7 +1119,7 @@ public class FEMDomain {
 	 * Die maximale Elementanzahl {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der
 	 * {@code itemCompiler} delegiert für {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #compileAsValue(FEMCompiler)}, für {@link #PARSE_PROXY_MAP}
 	 * an {@link #compileAsProxy(FEMCompiler)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #compileAsFunction(FEMCompiler)}.
-	 * 
+	 *
 	 * @see #parseAsScript(FEMParser, int)
 	 * @param source Kompiler.
 	 * @return Kompiliertes Objekt abhängig vom Skriptmodus.
@@ -1228,17 +1231,20 @@ public class FEMDomain {
 			return FEMArray.EMPTY;
 		}
 		final List<FEMValue> result = new ArrayList<>();
+		FEMValue item = this.compileAsValue(source);
+		if (item == null) throw new IllegalArgumentException();
+		result.add(item);
 		while (true) {
-			final FEMValue value = this.compileAsValue(source);
-			if (value == null) throw new IllegalArgumentException();
-			result.add(value);
 			this.compileAsComments(source);
 			if (source.symbol() == ']') {
 				source.skip();
-				return FEMArray.EMPTY;
+				return FEMArray.from(result);
 			} else if (source.symbol() == ';') {
 				source.skip();
 				this.compileAsComments(source);
+				item = this.compileAsValue(source);
+				if (item == null) throw new IllegalArgumentException();
+				result.add(item);
 			} else throw new IllegalArgumentException();
 		}
 	}
@@ -1316,13 +1322,14 @@ public class FEMDomain {
 		if ((symbol != '\"') && (symbol != '\'')) return null;
 		final String result = Strings.parseSequence(source.section(), (char)symbol);
 		if (result == null) throw new IllegalArgumentException("Zeichenkette '" + source.section() + "' ungültig.");
+		source.skip();
 		return FEMString.from(result);
 	}
 
 	/** Diese Methode kompiliert einen Parameterverweise und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '$'}
 	 * ist, wird {@code null} geliefert. Wenn diesem Bereich ein {@link #compileAsIndex(FEMCompiler) Parameterindex} bzw. {@link #compileAsName(FEMCompiler)
 	 * Parametername} folgt, wird ein {@link FEMParam} mit dem entsprechenden geliefert. Der Parameterindex für den ersten Parameter ist {@code 1}. Kleinere Werte
-	 * sind ungültig. Ein Parametername ist ungültig über {@link FEMCompiler#getParams(String)} dazu kein positiver Index ermittelt werden kann. Wenn dem ersten
+	 * sind ungültig. Ein Parametername ist ungültig über {@link FEMCompiler#getParam(String)} dazu kein positiver Index ermittelt werden kann. Wenn dem ersten
 	 * Bereich weder ein Parameterindex noch ein Parametername folgt, wird {@link FEMParam#VIEW} geliefert.
 	 *
 	 * @see #parseAsLocale(FEMParser)
@@ -1337,7 +1344,7 @@ public class FEMDomain {
 		source.skip();
 		final String name = this.compileAsName(source);
 		if (name != null) {
-			final int index = source.getParams(name);
+			final int index = source.getParam(name);
 			if (index < 0) throw new IllegalArgumentException("Parametername '" + name + "' ist unbekannt.");
 			return FEMParam.from(index);
 		}
@@ -1522,13 +1529,13 @@ public class FEMDomain {
 	protected String compileAsConst(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		final int symbol = source.symbol();
 		if (symbol == '?') {
+			String result = source.section();
 			source.skip();
-			return source.section();
+			return result;
 		} else if (symbol == '<') {
-			source.skip();
-			final String result;
-			result = Strings.parseSequence(source.section(), '<', '/', '>');
+			final String result = Strings.parseSequence(source.section(), '<', '/', '>');
 			if (result == null) throw new IllegalArgumentException("Konstante '" + source.section() + "' ungültig.");
+			source.skip();
 			return result;
 		} else return null;
 	}

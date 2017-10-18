@@ -22,7 +22,7 @@ public interface DataTarget extends DataBase, DataOutput, Closeable {
 
 	/** Diese Methode schreibt die gegebene Anzahl an {@code byte}s des gegebenen Zahlenwerts.
 	 *
-	 * @see Bytes#setLongBE(byte[], int, long, int)
+	 * @see Bytes#setLongBE(byte[], int, int, long)
 	 * @param v Zahlenwert.
 	 * @param size Anzahl der {@code byte}s (0..8).
 	 * @throws IOException Wenn ein I/O Fehler eintritt. */

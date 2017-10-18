@@ -105,10 +105,9 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		 * @param type Typ des Bereichs.
 		 * @param offset Startposition des Bereichs.
 		 * @param length Länge des Bereichs.
-		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind. */
+		 * @throws IllegalArgumentException Wenn die Länge negativ sind. */
 		public Token(final int type, final int offset, final int length) throws IllegalArgumentException {
-			if (offset < 0) throw new IllegalArgumentException("offset < 0");
-			if (length < 0) throw new IllegalArgumentException("length < 0");
+			if (length < 0) throw new IllegalArgumentException();
 			this.type = (char)type;
 			this.offset = offset;
 			this.length = length;
@@ -138,6 +137,13 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 			return this.offset;
 		}
 
+		/** Diese Methode gibt die Position zurück, die in der Mitte des dieses Bereichs liegt.
+		 *
+		 * @return Mittelposition. */
+		public final int center() {
+			return this.offset + (this.length / 2);
+		}
+
 		/** Diese Methode gibt die Länge des die Position zurück, an der dieser Bereich beginnt.
 		 *
 		 * @return Startposition. */
@@ -145,14 +151,25 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 			return this.length;
 		}
 
-		/** Diese Methode gibt den durch diesen Bereich beschriebenen Abschnitt der gegebenen Zeichenkette zurück.
+		/** Diese Methode gibt diesen Bereich um den gegebenen Zeichenanzahl vergrößert zurück. Genauer wird die gegebene Anzahl von {@link #start()} subtrahiert
+		 * und zu {@link #end()} addiert.
+		 *
+		 * @param count Zeichenanzahl zur symmentrischen Vergrößerung.
+		 * @return vergrößerter Bereich.
+		 * @throws IllegalArgumentException Wenn der resultierende Bereich eine negative Länge hätte. */
+		public final Token inflate(final int count) throws IllegalArgumentException {
+			return new Token(this.type, this.offset - count, this.length + (count << 1));
+		}
+
+		/** Diese Methode gibt den durch diesen Bereich beschriebenen Abschnitt der gegebenen Zeichenkette zurück.<br>
+		 * Der Bereich wird dazu auf die gegebene Zeichenkette eingegrenzt.
 		 *
 		 * @param source Zeichenkette.
-		 * @return Abschnitt.
+		 * @return Abschnitt der Zeichenkette.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 		public final String extract(final String source) throws NullPointerException {
 			final int start = this.offset;
-			return source.substring(start, start + this.length);
+			return source.substring(Math.max(start, 0), Math.min(start + this.length, source.length()));
 		}
 
 		{}

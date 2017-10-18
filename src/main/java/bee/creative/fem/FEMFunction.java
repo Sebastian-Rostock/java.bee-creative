@@ -82,6 +82,11 @@ public abstract class FEMFunction {
 			return this.function.equals(data.function);
 		}
 
+		@Override
+		public final String toString() {
+			return FEMDomain.NORMAL.formatFunction(this);
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -139,6 +144,11 @@ public abstract class FEMFunction {
 		@Override
 		public final FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
 			return this.function.toClosure(frame);
+		}
+
+		@Override
+		public final String toString() {
+			return FEMDomain.NORMAL.formatFunction(this);
 		}
 
 	}
@@ -203,6 +213,11 @@ public abstract class FEMFunction {
 			return this.function.toFuture(frame);
 		}
 
+		@Override
+		public final String toString() {
+			return FEMDomain.NORMAL.formatFunction(this);
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -265,6 +280,11 @@ public abstract class FEMFunction {
 			return this.function.equals(data.function) && Objects.equals(this.params, data.params);
 		}
 
+		@Override
+		public final String toString() {
+			return FEMDomain.NORMAL.formatFunction(this);
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -309,6 +329,11 @@ public abstract class FEMFunction {
 			if (!(object instanceof ClosureFunction)) return false;
 			final ClosureFunction data = (ClosureFunction)object;
 			return this.function.equals(data.function);
+		}
+
+		@Override
+		public final String toString() {
+			return FEMDomain.NORMAL.formatFunction(this);
 		}
 
 	}
@@ -371,6 +396,11 @@ public abstract class FEMFunction {
 			if (!(object instanceof CompositeFunction)) return false;
 			final CompositeFunction data = (CompositeFunction)object;
 			return this.function.equals(data.function) && Objects.equals(this.params, data.params);
+		}
+
+		@Override
+		public final String toString() {
+			return FEMDomain.NORMAL.formatFunction(this);
 		}
 
 	}

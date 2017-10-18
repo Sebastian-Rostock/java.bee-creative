@@ -485,8 +485,8 @@ public class Strings {
 
 	/** Diese Methode parst die gegebene Zeichenkette mit den gegebenen Symbolen und gibt die geparste Zeichenkette zurück. Sie realisiert dazu die
 	 * Umkehroperation zu {@link #formatSequence(CharSequence, char, char, char)} und liefert {@code null}, wenn das Format ungültig ist. Das Parsen erwartet,
-	 * dass die gegebene Zeichenkette mit {@code openSymbol} beginnt, mit {@code closeSymbol} endet und dass vor allen Vorkommen von {@code maskSymbol} und
-	 * {@code closeSymbol} zwischen dem ersten und letzten Symbol ein {@code maskSymbol} steht.
+	 * dass die gegebene Zeichenkette mit {@code openSymbol} beginnt, mit {@code closeSymbol} endet und dass vor allen Vorkommen von {@code openSymbol},
+	 * {@code maskSymbol} und {@code closeSymbol} zwischen dem ersten und letzten Symbol der Zeichenkette ein {@code maskSymbol} steht.
 	 *
 	 * @see #parseSequence(CharSequence, char, char, char)
 	 * @param string Zeichenkette.
@@ -504,10 +504,14 @@ public class Strings {
 		final char[] result = new char[length - 2];
 		int index = 1, offset = 0;
 		while (index < length) {
-			final char symbol = string.charAt(index++);
+			char symbol = string.charAt(index++);
 			if (symbol == maskSymbol) {
 				if (index == length) return maskSymbol == closeSymbol ? new String(result, 0, offset) : null;
-				result[offset++] = string.charAt(index++);
+				symbol = string.charAt(index++);
+				if ((symbol != openSymbol) && (symbol != maskSymbol) && (symbol != closeSymbol)) return null;
+				result[offset++] = symbol;
+			} else if ((symbol == openSymbol) && (openSymbol != closeSymbol)) {
+				break;
 			} else if (symbol != closeSymbol) {
 				result[offset++] = symbol;
 			} else return index == length ? new String(result, 0, offset) : null;
@@ -526,8 +530,8 @@ public class Strings {
 	}
 
 	/** Diese Methode formatiert die gegebene Zeichenkette mit den gegebenen Symbolen und gibt die formatierte Zeichenkette zurück. Beim Formatieren werden das
-	 * {@code openSymbol} vorn und das {@code closeSymbol} hinten an die Zeichenkette angefügt sowie allen Vorkommen von {@code maskSymbol} und
-	 * {@code closeSymbol} ein {@code maskSymbol} vorangestellt.
+	 * {@code openSymbol} vorn und das {@code closeSymbol} hinten an die Zeichenkette angefügt sowie allen Vorkommen von {@code openSymbol}, {@code maskSymbol}
+	 * und {@code closeSymbol} ein {@code maskSymbol} vorangestellt.
 	 *
 	 * @see #parseSequence(CharSequence, char, char, char)
 	 * @param string Zeichenkette.
@@ -542,7 +546,7 @@ public class Strings {
 		int offset = length + 2;
 		for (int i = length; i != 0;) {
 			final char symbol = string.charAt(--i);
-			if ((symbol == maskSymbol) || (symbol == closeSymbol)) {
+			if ((symbol == openSymbol) || (symbol == maskSymbol) || (symbol == closeSymbol)) {
 				++offset;
 			}
 		}
@@ -551,7 +555,7 @@ public class Strings {
 		for (int i = length; i != 0;) {
 			final char symbol = string.charAt(--i);
 			result[--offset] = symbol;
-			if ((symbol == maskSymbol) || (symbol == closeSymbol)) {
+			if ((symbol == openSymbol) || (symbol == maskSymbol) || (symbol == closeSymbol)) {
 				result[--offset] = maskSymbol;
 			}
 		}

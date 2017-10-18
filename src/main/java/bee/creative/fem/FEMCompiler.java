@@ -9,16 +9,9 @@ import bee.creative.fem.FEMScript.Token;
 import bee.creative.util.Objects;
 import bee.creative.util.Parser;
 
-/** Diese Klasse implementiert einen Kompiler, der {@link FEMScript aufbereitete Quelltexte} in {@link FEMValue Werte} sowie {@link FEMFunction Funktionen}
- * überführen und diese im Rahmen eines {@link FEMFormatter} auch formatieren kann.
- * <p>
- * Die Bereichestypen der Quelltexte haben folgende Bedeutung:
- * <p>
- * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
+/** Diese Klasse implementiert einen Kompiler, welcher als {@link Parser} auf den {@link FEMScript#types() Bereichstypen} eines {@link FEMScript aufbereiteten
+ * Quelltexts} arbeitet.
  *
- * @see #formatScript(FEMFormatter)
- * @see #compileValue()
- * @see #compileFunction()
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMCompiler extends Parser {
 
@@ -31,56 +24,72 @@ public final class FEMCompiler extends Parser {
 	/** Dieses Feld speichert die Parameternamen. */
 	final List<String> params = new LinkedList<>();
 
-	@SuppressWarnings ("javadoc")
-	// TODO die positionen/texte als getter am compiler
-	final IllegalArgumentException illegal(final Throwable cause, final String format, final Object... args) {
-		final String hint = String.format(format, args);
-		if (this.isParsed()) return new IllegalArgumentException("Unerwartetes Ende der Zeichenkette." + hint, cause);
+	/** Diese Methode gibt den zu kompilierenden Quelltext zurück.
+	 *
+	 * @return Quelltext. */
+	public final FEMScript script() {
+		return this.script;
+	}
+
+	/** Diese Methode gibt die {@link #index() aktuelle Position} als {@link Token#start() Startposition} des {@link #range() aktuellen Bereichs} bezogen auf die
+	 * {@link #scriptSource() Zeichenkette des aufbereiteten Quelltexts} zurück.
+	 *
+	 * @see #range()
+	 * @see Token#start()
+	 * @return Startposition des aktuellen Quelltextbereichs. */
+	public final int scriptOffset() {
+		return this.range().start();
+	}
+
+	/** Diese Methode gibt die Zeichenkette des {@link #script() aufbereiteten Quelltexts} zurück.
+	 *
+	 * @see #script()
+	 * @see FEMScript#source()
+	 * @return Zeichenkette des Quelltexts. */
+	public final String scriptSource() {
+		return this.script().source();
+	}
+
+	/** Diese Methode gibt die Länge der Zeichenkette des {@link #script() aufbereiteten Quelltexts} zurück.
+	 *
+	 * @see #script()
+	 * @see FEMScript#source()
+	 * @return Länge des Quelltexts. */
+	public final int scriptLength() {
+		return this.script().source().length();
+	}
+
+	/** Diese Methode gibt die Spaltennummer zur {@link #scriptOffset() aktuellen Quelltextposition} zurück.
+	 *
+	 * @return aktuelle Spaltennummer. */
+	public final int scriptColIndex() {
 		final String source = this.script().source();
-		final int offset = this.range().start();
-		final int length = source.length();
-		int pos = source.lastIndexOf('\n', offset);
-		int row = 1;
-		final int col = offset - pos;
-		while (pos >= 0) {
-			pos = source.lastIndexOf('\n', pos - 1);
-			row++;
+		final int offset = this.scriptOffset(), index = source.lastIndexOf('\n', offset);
+		return (offset + 1) - (index < 0 ? 0 : index);
+	}
+
+	/** Diese Methode gibt die Zeilennummer zur {@link #scriptOffset() aktuellen Quelltextposition} zurück.
+	 *
+	 * @return aktuelle Zeilennummer. */
+	public final int scriptRowIndex() {
+		final String source = this.script().source();
+		int result = 0;
+		for (int index = this.scriptOffset() + 1; index >= 0; index = source.lastIndexOf('\n', index - 1)) {
+			result++;
 		}
-		return new IllegalArgumentException(
-			String.format("Unerwartete Zeichenkette «%s» an Position %s:%s (%s%%) bei Textstelle «%s».%s", //
-				this.section(), row, col, (100 * offset) / Math.max(length, 0), source.substring(Math.max(offset - 10, 0), Math.min(offset + 10, length)), hint),
-			cause);
+		return result;
 	}
 
-	public int scriptOffset() {
-		return this.range().offset;
-	}
-
-	public int scriptLength() {
-		return this.script.source.length();
-	}
-
-	public int scriptRowIndex() {
-		final String source = this.script.source;
-		final int offset = this.range().start();
-		int pos = source.lastIndexOf('\n', offset);
-		int row = 1;
-		while (pos >= 0) {
-			pos = source.lastIndexOf('\n', pos - 1);
-			row++;
-		}
-		return row;
-	}
-
-	public int scriptColIndex() {
-		final String source = this.script.source;
-		final int offset = this.range().offset;
-		final int index = source.lastIndexOf('\n', offset);
-		return index < 0 ? offset : offset - index;
-	}
-
-	public float scriptPercent() {
-		return (100 * this.scriptOffset()) / Math.max(this.scriptLength(), 0);
+	/** Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
+	 *
+	 * @param script Quelltext.
+	 * @return {@code this}.
+	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
+	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
+	public final FEMCompiler useScript(final FEMScript script) throws NullPointerException {
+		this.source(script.types());
+		this.script = script;
+		return this;
 	}
 
 	/** Diese Methode gibt den Platzhalter der Funktion mit dem gegebenen Namen zurück.
@@ -95,28 +104,33 @@ public final class FEMCompiler extends Parser {
 		return result;
 	}
 
-	/** Diese Methode gibt den aktuellen Bereich zurück.
-	 *
-	 * @see #index()
-	 * @see #script()
-	 * @see FEMScript#get(int)
-	 * @return aktueller Bereich. */
-	public final Token range() {
-		return this.isParsed() ? Token.EMPTY : this.script.get(this.index());
-	}
-
-	/** Diese Methode gibt den zu kompilierenden Quelltext zurück.
-	 *
-	 * @return Quelltext. */
-	public final FEMScript script() {
-		return this.script;
-	}
-
 	/** Diese Methode gibt die über {@link #proxy(String)} erzeugten Platzhalter zurück.
 	 *
 	 * @return Abbildung von Namen auf Platzhalter. */
 	public final Map<String, FEMProxy> proxies() {
 		return this.proxies;
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.putProxies(Arrays.asList(proxies))}.
+	 *
+	 * @see #putProxies(Iterable)
+	 * @param proxies Platzhalter.
+	 * @return {@code this}.
+	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
+	public final FEMCompiler putProxies(final FEMProxy... proxies) throws NullPointerException {
+		return this.putProxies(Arrays.asList(proxies));
+	}
+
+	/** Diese Methode fügt die gegebenen Platzhalter in {@link #proxies()} ein und gibt {@code this} zurück.
+	 *
+	 * @param proxies Platzhalter.
+	 * @return {@code this}.
+	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
+	public final FEMCompiler putProxies(final Iterable<FEMProxy> proxies) throws NullPointerException {
+		for (final FEMProxy proxy: proxies) {
+			this.proxies.put(proxy.name(), proxy);
+		}
+		return this;
 	}
 
 	/** Diese Methode gibt die Liste der aktellen Parameternamen zurück.
@@ -126,49 +140,26 @@ public final class FEMCompiler extends Parser {
 		return this.params;
 	}
 
-	/** Diese Methode gibt die Zeichenkette im {@link #range() aktuellen Abschnitt} des {@link #script() Quelltexts} zurück.
-	 *
-	 * @see #range()
-	 * @see Token#extract(String)
-	 * @return Aktuelle Zeichenkette. */
-	public final String section() {
-		return this.range().extract(this.script.source());
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Parameternames in {@link #params()} zurück.
+	 * 
+	 * @see List#indexOf(Object)
+	 * @param name Parametername.
+	 * @return Position oder {@code -1}.
+	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
+	public final int getParam(final String name) throws NullPointerException {
+		return this.params.indexOf(name.toString());
 	}
 
-	/** Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
-	 *
-	 * @param value Quelltext.
+	/** Diese Methode fügt den gegebenen Parameternamen an der gegebenen Position in {@link #params()} ein und gibt {@code this} zurück.
+	 * 
+	 * @see List#add(int, Object)
+	 * @param index Einfügelosition.
+	 * @param name Parameternamen.
 	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code vslue} {@code null} ist.
-	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	public final FEMCompiler useScript(final FEMScript value) throws NullPointerException {
-		this.source(value.types());
-		this.script = value;
-		return this;
-	}
-
-	public final FEMCompiler putProxies(FEMProxy... proxies) {
-		return this.putProxies(Arrays.asList(proxies));
-	}
-
-	public final FEMCompiler putProxies(Iterable<FEMProxy> proxies) {
-		for (final FEMProxy proxy: proxies) {
-			this.proxies.put(proxy.name(), proxy);
-		}
-		return this;
-	}
-
-	public final FEMCompiler putParam(final int index, final String param) {
-		this.params.add(index, param);
-		return this;
-	}
-
-	public final int getParams(final String name) throws NullPointerException {
-		return this.params.indexOf(name);
-	}
-
-	public final FEMCompiler popParams(final int count) throws NullPointerException {
-		this.params.subList(0, count).clear();
+	 * @throws NullPointerException Wenn {@code name} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code index} ungültig ist. */
+	public final FEMCompiler putParam(final int index, final String name) throws NullPointerException, IllegalArgumentException {
+		this.params.add(index, name.toString());
 		return this;
 	}
 
@@ -193,6 +184,35 @@ public final class FEMCompiler extends Parser {
 		this.params.clear();
 		this.params.addAll(value);
 		return this;
+	}
+
+	/** Diese Methode entfernt die gegebene Anzahl der an Parameternamen ab dem BEginn der Liste aus {@link #params()} und gibt {@code this} zurück.
+	 * 
+	 * @param count Anzahl.
+	 * @return {@code this}.
+	 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist. */
+	public final FEMCompiler popParams(final int count) throws IllegalArgumentException {
+		this.params.subList(0, count).clear();
+		return this;
+	}
+
+	/** Diese Methode gibt den aktuellen Bereich zurück.
+	 *
+	 * @see #index()
+	 * @see #script()
+	 * @see FEMScript#get(int)
+	 * @return aktueller Bereich. */
+	public final Token range() {
+		return this.isParsed() ? Token.EMPTY : this.script.get(this.index());
+	}
+
+	/** Diese Methode gibt die Zeichenkette im {@link #range() aktuellen Abschnitt} des {@link #script() Quelltexts} zurück.
+	 *
+	 * @see #range()
+	 * @see Token#extract(String)
+	 * @return Aktuelle Zeichenkette. */
+	public final String section() {
+		return this.range().extract(this.script.source());
 	}
 
 	{}
