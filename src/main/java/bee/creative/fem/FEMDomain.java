@@ -590,7 +590,11 @@ public class FEMDomain {
 			} else if ((symbol == openSymbol) && (openSymbol != closeSymbol)) {
 				target.putToken('!', offset);
 				return true;
-			} else if (symbol == closeSymbol) return true;
+			} else if (symbol == closeSymbol) {
+				target.skip();
+				target.putToken(openSymbol, offset);
+				return true;
+			}
 		}
 	}
 
@@ -642,8 +646,8 @@ public class FEMDomain {
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
-	public String formatScript(final FEMScript script, final String indent) {
-		final FEMFormatter target = new FEMFormatter().useIndent(indent);
+	public String formatScript(final FEMScript script) {
+		final FEMFormatter target = new FEMFormatter();
 		this.formatAsScript(target, new FEMCompiler().useScript(script));
 		return target.format();
 	}
@@ -888,7 +892,7 @@ public class FEMDomain {
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
 	protected void formatAsHandler(final FEMFormatter target, final FEMHandler source) throws NullPointerException, IllegalArgumentException {
 		target.putToken("{:");
-		this.formatAsFunction(target, source);
+		this.formatAsFunction(target, source.value());
 		target.putToken("}");
 	}
 
@@ -1188,6 +1192,7 @@ public class FEMDomain {
 			this.compileAsComments(source);
 			if (source.isParsed()) return result;
 			if ((itemLimit == 0) || (source.symbol() != ';')) throw new IllegalArgumentException();
+			source.skip();
 			this.compileAsComments(source);
 			item = itemCompiler.get(source);
 			if (item == null) throw new IllegalArgumentException();
@@ -1529,7 +1534,7 @@ public class FEMDomain {
 	protected String compileAsConst(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		final int symbol = source.symbol();
 		if (symbol == '?') {
-			String result = source.section();
+			final String result = source.section();
 			source.skip();
 			return result;
 		} else if (symbol == '<') {
