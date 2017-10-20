@@ -646,75 +646,228 @@ public class FEMDomain {
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
-	public String formatScript(final FEMScript script) {
+	public String formatScript(final FEMScript script) throws NullPointerException, IllegalArgumentException {
 		final FEMFormatter target = new FEMFormatter();
-		this.formatAsScript(target, new FEMCompiler().useScript(script));
+		this.formatScript(target, script);
 		return target.format();
+	}
+
+	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes.
+	 * 
+	 * @param target Formatierer.
+	 * @param script aufbereiteter Quelltext.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code script} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
+	public void formatScript(final FEMFormatter target, final FEMScript script) throws NullPointerException, IllegalArgumentException {
+		this.formatAsScript(target, new FEMCompiler().useScript(script));
 	}
 
 	/** Diese Methode gibt die Textdarstellung des gegebenen Werts zurück.
 	 *
-	 * @see #formatAsValue(FEMFormatter, FEMValue)
+	 * @see #formatValue(FEMFormatter, FEMValue)
 	 * @param value Funktion.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann. */
 	public String formatValue(final FEMValue value) throws NullPointerException, IllegalArgumentException {
 		final FEMFormatter target = new FEMFormatter();
-		this.formatAsValue(target, value);
+		this.formatValue(target, value);
 		return target.format();
+	}
+
+	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Werts.<br>
+	 * Für ein {@link FEMArray}, einen {@link FEMString}, eine {@link FEMFuture}, ein {@link FEMNative} ein {@link FEMObject} uns ein {@link FEMHandler} wird die
+	 * Textdarstellung über {@link #formatArray(FEMFormatter, Iterable)}, {@link #formatAsString(FEMFormatter, FEMString)},
+	 * {@link #formatAsFuture(FEMFormatter, FEMFuture)}, {@link #formatAsNative(FEMFormatter, FEMNative)}, {@link #formatAsObject(FEMFormatter, FEMObject)} bzw.
+	 * {@link #formatAsHandler(FEMFormatter, FEMHandler)} erfasst. Jeder andere {@link FEMValue} wird über {@link FEMValue#toString()} in eine Zeichenkette
+	 * überführt, welche anschließend über {@link #formatAsConst(FEMFormatter, String)} erfasst wird.
+	 *
+	 * @param target Formatierer.
+	 * @param source Wert.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public void formatValue(final FEMFormatter target, final FEMValue source) throws NullPointerException, IllegalArgumentException {
+		if (source instanceof FEMArray) {
+			this.formatArray(target, (FEMArray)source);
+		} else if (source instanceof FEMString) {
+			this.formatAsString(target, (FEMString)source);
+		} else if (source instanceof FEMFuture) {
+			this.formatAsFuture(target, (FEMFuture)source);
+		} else if (source instanceof FEMNative) {
+			this.formatAsNative(target, (FEMNative)source);
+		} else if (source instanceof FEMObject) {
+			this.formatAsObject(target, (FEMObject)source);
+		} else if (source instanceof FEMHandler) {
+			this.formatAsHandler(target, (FEMHandler)source);
+		} else {
+			this.formatAsConst(target, source.toString());
+		}
 	}
 
 	/** Diese Methode gibt die Textdarstellung einer Wertliste mit den gegebenen Werten zurück.
 	 *
-	 * @see #formatAsArray(FEMFormatter, Iterable)
+	 * @see #formatArray(FEMFormatter, Iterable)
 	 * @param array Wertliste.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code array} nicht formatiert werden kann. */
 	public String formatArray(final Iterable<? extends FEMValue> array) {
 		final FEMFormatter target = new FEMFormatter();
-		this.formatAsArray(target, array);
+		this.formatArray(target, array);
 		return target.format();
+	}
+
+	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Wertliste.<br>
+	 * Hierbei werden die {@link #formatValue(FEMFormatter, FEMValue) formatierten} Werte mit {@code ";"} separiert sowie in {@code "["} und {@code "]"}
+	 * eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Wertliste mehr als
+	 * ein Element enthält.
+	 *
+	 * @see #formatAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
+	 * @see #formatValue(FEMFormatter, FEMValue)
+	 * @param target Formatierer.
+	 * @param source Wertliste.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public void formatArray(FEMFormatter target, Iterable<? extends FEMValue> source) throws NullPointerException, IllegalArgumentException {
+		this.formatAsItems(target, source, "[", ";", "]", new Setter<FEMFormatter, FEMValue>() {
+
+			@Override
+			public void set(final FEMFormatter input, final FEMValue value) {
+				FEMDomain.this.formatValue(input, value);
+			}
+
+		});
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen Parameterwerte zurück.
 	 *
-	 * @see #formatAsFrame(FEMFormatter, Iterable)
+	 * @see #formatFrame(FEMFormatter, Iterable)
 	 * @param frame Parameterwerte.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code frame} nicht formatiert werden kann. */
 	public String formatFrame(final Iterable<? extends FEMValue> frame) throws NullPointerException, IllegalArgumentException {
 		final FEMFormatter target = new FEMFormatter();
-		this.formatAsFrame(target, frame);
+		this.formatFrame(target, frame);
 		return target.format();
+	}
+
+	/** Diese Methode formateirt und erfasst die Textdarstellung gegebenen Parameterwertliste.<br>
+	 * Hierbei werden die nummerierten und {@link #formatFunction(FEMFormatter, FEMFunction) formatierten} Parameterwerte mit {@code ";"} separiert sowie in
+	 * {@code "("} und {@code ")"} eingeschlossen erfasst. Die Nummerierung wird vor jedem Parameterwert als Ordnungsposition {@code i} im Format {@code "$i: "}
+	 * angefügt. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
+	 *
+	 * @see #formatAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
+	 * @see #formatFunction(FEMFormatter, FEMFunction)
+	 * @param target Formatierer.
+	 * @param source Parameterwerte.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public void formatFrame(FEMFormatter target, Iterable<? extends FEMValue> source) throws NullPointerException, IllegalArgumentException {
+		this.formatAsItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMValue>() {
+
+			int index = 1;
+
+			@Override
+			public void set(final FEMFormatter input, final FEMValue value) {
+				input.putToken("$").putToken(new Integer(this.index)).putToken(": ");
+				FEMDomain.this.formatValue(input, value);
+				this.index++;
+			}
+
+		});
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen Parameterfunktionen zurück.
 	 *
-	 * @see #formatAsParams(FEMFormatter, Iterable)
+	 * @see #formatParams(FEMFormatter, Iterable)
 	 * @param params Parameterfunktionen.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
 	public String formatParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalArgumentException {
 		final FEMFormatter target = new FEMFormatter();
-		this.formatAsParams(target, params);
+		this.formatParams(target, params);
 		return target.format();
+	}
+
+	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Parameterfunktionsliste.<br>
+	 * Hierbei werden die {@link #formatFunction(FEMFormatter, FEMFunction) formatierten} Parameterfunktionen mit {@code ";"} separiert sowie in {@code "("} und
+	 * {@code ")"} eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die
+	 * Funktionsliste mehr als ein Element enthält.
+	 *
+	 * @see #formatAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
+	 * @see #formatFunction(FEMFormatter, FEMFunction)
+	 * @param target Formatierer.
+	 * @param source Parameterfunktionen.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public void formatParams(FEMFormatter target, Iterable<? extends FEMFunction> source) throws NullPointerException, IllegalArgumentException {
+		this.formatAsItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMFunction>() {
+
+			@Override
+			public void set(final FEMFormatter input, final FEMFunction value) {
+				FEMDomain.this.formatFunction(input, value);
+			}
+
+		});
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen Funktion zurück.
 	 *
-	 * @see #formatAsFunction(FEMFormatter, FEMFunction)
+	 * @see #formatFunction(FEMFormatter, FEMFunction)
 	 * @param function Funktion.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
 	public String formatFunction(final FEMFunction function) throws NullPointerException, IllegalArgumentException {
 		final FEMFormatter target = new FEMFormatter();
-		this.formatAsFunction(target, function);
+		this.formatFunction(target, function);
 		return target.format();
+	}
+
+	/** Diese Methode formatiert und erfasst die Textdarstellung der gegebene Funktion.<br>
+	 * Für eine {@link TraceFunction}, eine {@link FrameFunction}, eine {@link FutureFunction} oder eine {@link ClosureFunction} wird die Textdarstellung ihrer
+	 * referenzierten Funktion mit dieser Methode erfasst. Bei einer {@link ConcatFunction} oder einer {@link CompositeFunction} werden die Textdarstellungen der
+	 * aufzurufenden Funktion mit dieser Methode sowie die der Parameterliste mit {@link #formatParams(FEMFormatter, Iterable)} erfasst. Bei einem
+	 * {@link FEMProxy} wird dessen {@link FEMProxy#name() Name} über {@link #formatAsConst(FEMFormatter, String)} erfasst. Jeder andere {@link FEMValue} würd
+	 * über {@link #formatValue(FEMFormatter, FEMValue)} erfasst. Jede andere {@link FEMFunction} wird über {@link FEMFunction#toString()} in eine Zeichenkette
+	 * überführt, welche anschließend über {@link #formatAsConst(FEMFormatter, String)} erfasst wird.
+	 *
+	 * @param target Formatierer.
+	 * @param source Funktion.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public void formatFunction(final FEMFormatter target, final FEMFunction source) throws NullPointerException, IllegalArgumentException {
+		if (source instanceof FEMValue) {
+			final FEMValue value = (FEMValue)source;
+			this.formatValue(target, value);
+		} else if (source instanceof FEMProxy) {
+			final FEMProxy value = (FEMProxy)source;
+			this.formatAsConst(target, value.name);
+		} else if (source instanceof CompositeFunction) {
+			final CompositeFunction value = (CompositeFunction)source;
+			this.formatFunction(target, value.function);
+			this.formatParams(target, Arrays.asList(value.params));
+		} else if (source instanceof ConcatFunction) {
+			final ConcatFunction concatFunction = (ConcatFunction)source;
+			this.formatFunction(target, concatFunction.function);
+			this.formatParams(target, Arrays.asList(concatFunction.params));
+		} else if (source instanceof ClosureFunction) {
+			final ClosureFunction closureFunction = (ClosureFunction)source;
+			this.formatFunction(target, closureFunction.function);
+		} else if (source instanceof FrameFunction) {
+			final FrameFunction frameFunction = (FrameFunction)source;
+			this.formatFunction(target, frameFunction.function);
+		} else if (source instanceof FutureFunction) {
+			final FutureFunction futureFunction = (FutureFunction)source;
+			this.formatFunction(target, futureFunction.function);
+		} else if (source instanceof TraceFunction) {
+			final TraceFunction traceFunction = (TraceFunction)source;
+			this.formatFunction(target, traceFunction.function);
+		} else {
+			this.formatAsConst(target, source.toString());
+		}
 	}
 
 	/** Diese Methode formateirt und erfasst die Textdarstellung der Liste der gegebenen Elemente.<br>
@@ -771,57 +924,6 @@ public class FEMDomain {
 		target.putToken(this.formatConst(source));
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Wertliste.<br>
-	 * Hierbei werden die {@link #formatAsValue(FEMFormatter, FEMValue) formatierten} Werte mit {@code ";"} separiert sowie in {@code "["} und {@code "]"}
-	 * eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Wertliste mehr als
-	 * ein Element enthält.
-	 *
-	 * @see #formatAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #formatAsValue(FEMFormatter, FEMValue)
-	 * @param target Formatierer.
-	 * @param source Wertliste.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatAsArray(FEMFormatter target, Iterable<? extends FEMValue> source) throws NullPointerException, IllegalArgumentException {
-		this.formatAsItems(target, source, "[", ";", "]", new Setter<FEMFormatter, FEMValue>() {
-
-			@Override
-			public void set(final FEMFormatter input, final FEMValue value) {
-				FEMDomain.this.formatAsValue(input, value);
-			}
-
-		});
-	}
-
-	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Werts.<br>
-	 * Für ein {@link FEMArray}, einen {@link FEMString}, eine {@link FEMFuture}, ein {@link FEMNative} ein {@link FEMObject} uns ein {@link FEMHandler} wird die
-	 * Textdarstellung über {@link #formatAsArray(FEMFormatter, Iterable)}, {@link #formatAsString(FEMFormatter, FEMString)},
-	 * {@link #formatAsFuture(FEMFormatter, FEMFuture)}, {@link #formatAsNative(FEMFormatter, FEMNative)}, {@link #formatAsObject(FEMFormatter, FEMObject)} bzw.
-	 * {@link #formatAsHandler(FEMFormatter, FEMHandler)} erfasst. Jeder andere {@link FEMValue} wird über {@link FEMValue#toString()} in eine Zeichenkette
-	 * überführt, welche anschließend über {@link #formatAsConst(FEMFormatter, String)} erfasst wird.
-	 *
-	 * @param target Formatierer.
-	 * @param source Wert.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatAsValue(final FEMFormatter target, final FEMValue source) throws NullPointerException, IllegalArgumentException {
-		if (source instanceof FEMArray) {
-			this.formatAsArray(target, (FEMArray)source);
-		} else if (source instanceof FEMString) {
-			this.formatAsString(target, (FEMString)source);
-		} else if (source instanceof FEMFuture) {
-			this.formatAsFuture(target, (FEMFuture)source);
-		} else if (source instanceof FEMNative) {
-			this.formatAsNative(target, (FEMNative)source);
-		} else if (source instanceof FEMObject) {
-			this.formatAsObject(target, (FEMObject)source);
-		} else if (source instanceof FEMHandler) {
-			this.formatAsHandler(target, (FEMHandler)source);
-		} else {
-			this.formatAsConst(target, source.toString());
-		}
-	}
-
 	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Zeichenkette.<br>
 	 * Die Formatierung erfolgt dazu über {@link Strings#formatSequence(CharSequence, char)} mit dem einfachen Anführungszeichen zur Maskierung.
 	 *
@@ -834,8 +936,8 @@ public class FEMDomain {
 
 	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Ergebniswerts.<br>
 	 * Die Formatierung erfolgt dazu für eine bereits ausgewertete {@link FEMFuture} mit deren {@link FEMFuture#result(boolean) Ergebniswert} über
-	 * {@link #formatAsValue(FEMFormatter, FEMValue)}. Andernfalls werden deren {@link FEMFuture#function() Funktion} über
-	 * {@link #formatAsFunction(FEMFormatter, FEMFunction)} und deren {@link FEMFuture#frame() Stapelrahmen} über {@link #formatAsFrame(FEMFormatter, Iterable)}
+	 * {@link #formatValue(FEMFormatter, FEMValue)}. Andernfalls werden deren {@link FEMFuture#function() Funktion} über
+	 * {@link #formatFunction(FEMFormatter, FEMFunction)} und deren {@link FEMFuture#frame() Stapelrahmen} über {@link #formatFrame(FEMFormatter, Iterable)}
 	 * erfasst.
 	 *
 	 * @param target Formatierer.
@@ -845,10 +947,10 @@ public class FEMDomain {
 	protected void formatAsFuture(final FEMFormatter target, final FEMFuture source) throws NullPointerException, IllegalArgumentException {
 		synchronized (source) {
 			if (source.ready()) {
-				this.formatAsValue(target, source.result());
+				this.formatValue(target, source.result());
 			} else {
-				this.formatAsFunction(target, source.function());
-				this.formatAsFrame(target, source.frame());
+				this.formatFunction(target, source.function());
+				this.formatFrame(target, source.frame());
 			}
 		}
 	}
@@ -883,109 +985,17 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Funktionszeigers.<br>
-	 * Die {@link #formatAsFunction(FEMFormatter, FEMFunction) formatierte} Funktion wird dabei in <code>"{:"</code> und <code>"}"</code> eingeschlossen.
+	 * Die {@link #formatFunction(FEMFormatter, FEMFunction) formatierte} Funktion wird dabei in <code>"{:"</code> und <code>"}"</code> eingeschlossen.
 	 *
-	 * @see #formatAsFunction(FEMFormatter, FEMFunction)
+	 * @see #formatFunction(FEMFormatter, FEMFunction)
 	 * @param target Formatierer.
 	 * @param source Funktion.
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
 	protected void formatAsHandler(final FEMFormatter target, final FEMHandler source) throws NullPointerException, IllegalArgumentException {
 		target.putToken("{:");
-		this.formatAsFunction(target, source.value());
+		this.formatFunction(target, source.value());
 		target.putToken("}");
-	}
-
-	/** Diese Methode formatiert und erfasst die Textdarstellung der gegebene Funktion.<br>
-	 * Für eine {@link TraceFunction}, eine {@link FrameFunction}, eine {@link FutureFunction} oder eine {@link ClosureFunction} wird die Textdarstellung ihrer
-	 * referenzierten Funktion mit dieser Methode erfasst. Bei einer {@link ConcatFunction} oder einer {@link CompositeFunction} werden die Textdarstellungen der
-	 * aufzurufenden Funktion mit dieser Methode sowie die der Parameterliste mit {@link #formatAsParams(FEMFormatter, Iterable)} erfasst. Bei einem
-	 * {@link FEMProxy} wird dessen {@link FEMProxy#name() Name} über {@link #formatAsConst(FEMFormatter, String)} erfasst. Jeder andere {@link FEMValue} würd
-	 * über {@link #formatAsValue(FEMFormatter, FEMValue)} erfasst. Jede andere {@link FEMFunction} wird über {@link FEMFunction#toString()} in eine Zeichenkette
-	 * überführt, welche anschließend über {@link #formatAsConst(FEMFormatter, String)} erfasst wird.
-	 *
-	 * @param target Formatierer.
-	 * @param source Funktion.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatAsFunction(final FEMFormatter target, final FEMFunction source) throws NullPointerException, IllegalArgumentException {
-		if (source instanceof FEMValue) {
-			final FEMValue value = (FEMValue)source;
-			this.formatAsValue(target, value);
-		} else if (source instanceof FEMProxy) {
-			final FEMProxy value = (FEMProxy)source;
-			this.formatAsConst(target, value.name);
-		} else if (source instanceof CompositeFunction) {
-			final CompositeFunction value = (CompositeFunction)source;
-			this.formatAsFunction(target, value.function);
-			this.formatAsParams(target, Arrays.asList(value.params));
-		} else if (source instanceof ConcatFunction) {
-			final ConcatFunction concatFunction = (ConcatFunction)source;
-			this.formatAsFunction(target, concatFunction.function);
-			this.formatAsParams(target, Arrays.asList(concatFunction.params));
-		} else if (source instanceof ClosureFunction) {
-			final ClosureFunction closureFunction = (ClosureFunction)source;
-			this.formatAsFunction(target, closureFunction.function);
-		} else if (source instanceof FrameFunction) {
-			final FrameFunction frameFunction = (FrameFunction)source;
-			this.formatAsFunction(target, frameFunction.function);
-		} else if (source instanceof FutureFunction) {
-			final FutureFunction futureFunction = (FutureFunction)source;
-			this.formatAsFunction(target, futureFunction.function);
-		} else if (source instanceof TraceFunction) {
-			final TraceFunction traceFunction = (TraceFunction)source;
-			this.formatAsFunction(target, traceFunction.function);
-		} else {
-			this.formatAsConst(target, source.toString());
-		}
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung gegebenen Parameterwertliste.<br>
-	 * Hierbei werden die nummerierten und {@link #formatAsFunction(FEMFormatter, FEMFunction) formatierten} Parameterwerte mit {@code ";"} separiert sowie in
-	 * {@code "("} und {@code ")"} eingeschlossen erfasst. Die Nummerierung wird vor jedem Parameterwert als Ordnungsposition {@code i} im Format {@code "$i: "}
-	 * angefügt. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
-	 *
-	 * @see #formatAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #formatAsFunction(FEMFormatter, FEMFunction)
-	 * @param target Formatierer.
-	 * @param source Parameterwerte.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatAsFrame(FEMFormatter target, Iterable<? extends FEMValue> source) throws NullPointerException, IllegalArgumentException {
-		this.formatAsItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMValue>() {
-
-			int index = 1;
-
-			@Override
-			public void set(final FEMFormatter input, final FEMValue value) {
-				input.putToken("$").putToken(new Integer(this.index)).putToken(": ");
-				FEMDomain.this.formatAsValue(input, value);
-				this.index++;
-			}
-
-		});
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Parameterfunktionsliste.<br>
-	 * Hierbei werden die {@link #formatAsFunction(FEMFormatter, FEMFunction) formatierten} Parameterfunktionen mit {@code ";"} separiert sowie in {@code "("} und
-	 * {@code ")"} eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die
-	 * Funktionsliste mehr als ein Element enthält.
-	 *
-	 * @see #formatAsItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #formatAsFunction(FEMFormatter, FEMFunction)
-	 * @param target Formatierer.
-	 * @param source Parameterfunktionen.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatAsParams(FEMFormatter target, Iterable<? extends FEMFunction> source) throws NullPointerException, IllegalArgumentException {
-		this.formatAsItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMFunction>() {
-
-			@Override
-			public void set(final FEMFormatter input, final FEMFunction value) {
-				FEMDomain.this.formatAsFunction(input, value);
-			}
-
-		});
 	}
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltexts.
@@ -1115,7 +1125,7 @@ public class FEMDomain {
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist oder einen Fehlerbereich vom Typ {@code '!'} enthält. */
 	public Object compileScript(final FEMScript source) throws NullPointerException, IllegalArgumentException {
 		if (source.contains('!')) throw new IllegalArgumentException();
-		return this.compileAsScript(new FEMCompiler().useScript(source));
+		return this.compileScript(new FEMCompiler().useScript(source));
 	}
 
 	/** Diese Methode implementiert {@link #compileScript(FEMScript)} und ist eine Abkürzung für {@code this.compileAsItems(source, itemLimit, itemCompiler)},
@@ -1129,7 +1139,7 @@ public class FEMDomain {
 	 * @return Kompiliertes Objekt abhängig vom Skriptmodus.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist ider der Skriptmodus nicht unterstützt wird. */
-	protected Object compileAsScript(FEMCompiler source) throws NullPointerException, IllegalArgumentException {
+	public Object compileScript(FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		int itemLimit = 1;
 		switch (source.script().mode()) {
 			case PARSE_VALUE_LIST:

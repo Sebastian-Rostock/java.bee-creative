@@ -39,6 +39,26 @@ public class Integers {
 		}
 	}
 
+	/** Diese Methode liest die positiven Dezimalzahl aus dem gegebenen Bereich der gegebenen Zeichenkette und gibt sie zurück.
+	 * <p>
+	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
+	 *
+	 * @param buffer Zeichenkette mit Dezimalziffern im gegebenen Bereich.
+	 * @param offset Position der ersten Dezimalziffer.
+	 * @param length Anzahl der einzulesenden Dezimalziffern.
+	 * @return positiven Dezimalzahl. */
+	public static int parseInt(final String buffer, int offset, int length) {
+		if (length == 0) return 0;
+		int result = 0;
+		length += offset;
+		while (true) {
+			result += buffer.charAt(offset) - '0';
+			offset += 1;
+			if (offset >= length) return result;
+			result *= 10;
+		}
+	}
+
 	/** Diese Methode liest die positiven Dezimalzahl aus dem gegebenen Bereich des gegebenen Puffers und gibt sie zurück.
 	 * <p>
 	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
@@ -48,6 +68,19 @@ public class Integers {
 	 * @param length Anzahl der einzulesenden Dezimalziffern.
 	 * @return positiven Dezimalzahl. */
 	public static long parseLong(final char[] buffer, final int offset, final int length) {
+		if (length < 10) return Integers.parseInt(buffer, offset, length);
+		return (Integers.parseLong(buffer, offset, length - 9) * 1000000000) + Integers.parseLong(buffer, (offset + length) - 9, 9);
+	}
+
+	/** Diese Methode liest die positiven Dezimalzahl aus dem gegebenen Bereich der gegebenen Zeichenkette und gibt sie zurück.
+	 * <p>
+	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
+	 *
+	 * @param buffer Zeichenkette mit Dezimalziffern im gegebenen Bereich.
+	 * @param offset Position der ersten Dezimalziffer.
+	 * @param length Anzahl der einzulesenden Dezimalziffern.
+	 * @return positiven Dezimalzahl. */
+	public static long parseLong(final String buffer, final int offset, final int length) {
 		if (length < 10) return Integers.parseInt(buffer, offset, length);
 		return (Integers.parseLong(buffer, offset, length - 9) * 1000000000) + Integers.parseLong(buffer, (offset + length) - 9, 9);
 	}
@@ -165,11 +198,11 @@ public class Integers {
 		return div != 0 ? Integers.stringSize(div) + 9 : Integers.stringSize((int)mod);
 	}
 
-	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position des gegebenen Puffersdas zurück.
+	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position des gegebenen Puffers zurück.
 	 * <p>
 	 * Ungültige Eingaben werden nicht geprüft!
 	 *
-	 * @param buffer Puffer mit Zeichen.
+	 * @param buffer Puffer mit Dezimalziffern.
 	 * @param offset Position des ersten untersuchten Zeichens.
 	 * @param length Anzahl der zu untersuchenden Zeichen.
 	 * @return Anzahl der Dezimalziffern. */
@@ -178,6 +211,25 @@ public class Integers {
 		int index = offset;
 		while (index < limit) {
 			final char digit = buffer[index];
+			if ((digit < '0') || (digit > '9')) return index - offset;
+			index++;
+		}
+		return length;
+	}
+
+	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position der gegebenen Zeichenkette zurück.
+	 * <p>
+	 * Ungültige Eingaben werden nicht geprüft!
+	 *
+	 * @param buffer Zeichenkette mit Dezimalziffern.
+	 * @param offset Position des ersten untersuchten Zeichens.
+	 * @param length Anzahl der zu untersuchenden Zeichen.
+	 * @return Anzahl der Dezimalziffern. */
+	public static int integerSize(final String buffer, final int offset, final int length) {
+		final int limit = offset + length;
+		int index = offset;
+		while (index < limit) {
+			final char digit = buffer.charAt(index);
 			if ((digit < '0') || (digit > '9')) return index - offset;
 			index++;
 		}

@@ -1,7 +1,5 @@
 package bee.creative.fem;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine unveränderliche Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue()
@@ -24,9 +22,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	/** Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind. */
 	public static final FEMObject EMPTY = new FEMObject(0, (short)0, (short)0);
 
-	@SuppressWarnings ("javadoc")
-	static final Pattern pattern = Pattern.compile("^#(\\d+)\\.(\\d+):(\\d+)$");
-
 	{}
 
 	/** Diese Methode gibt eine neue Referenz mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
@@ -39,11 +34,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMObject from(final String string) throws NullPointerException, IllegalArgumentException {
 		try {
-			final Matcher matcher = FEMObject.pattern.matcher(string);
-			if (!matcher.find()) throw new IllegalArgumentException();
-			final int ref = Integer.parseInt(matcher.group(1));
-			final int type = Integer.parseInt(matcher.group(3));
-			final int owner = Integer.parseInt(matcher.group(2));
+			final int index2 = string.indexOf('.');
+			if (index2 < 0) throw new IllegalArgumentException();
+			final int index3 = string.indexOf(':');
+			if (index3 < 0) throw new IllegalArgumentException();
+			if (string.charAt(0) != '@') throw new IllegalArgumentException();
+			final int ref = Integer.parseInt(string.substring(1, index2));
+			final int type = Integer.parseInt(string.substring(index2 + 1, index3));
+			final int owner = Integer.parseInt(string.substring(index3 + 1));
 			return FEMObject.from(ref, type, owner);
 		} catch (final NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
@@ -58,9 +56,9 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz.
 	 * @throws IllegalArgumentException Wenn {@code ref}, {@code type} bzw. {@code owner} ungültig ist. */
 	public static FEMObject from(final int ref, final int type, final int owner) throws IllegalArgumentException {
-		if (ref < 0) throw new IllegalArgumentException();
-		if ((type < 0) || (type > 65535)) throw new IllegalArgumentException();
-		if ((owner < 0) || (owner > 65535)) throw new IllegalArgumentException();
+		FEMObject.checkMin(ref);
+		FEMObject.checkMax(type);
+		FEMObject.checkMax(owner);
 		return new FEMObject(ref, (short)type, (short)owner);
 	}
 
@@ -72,6 +70,17 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
 	public static FEMObject from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMObject.TYPE);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void checkMin(int value) throws IllegalArgumentException {
+		if (value < 0) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void checkMax(int value) throws IllegalArgumentException {
+		FEMObject.checkMin(value);
+		if (value > 65535) throw new IllegalArgumentException();
 	}
 
 	{}
@@ -147,6 +156,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Objektschlüssel.
 	 * @throws IllegalArgumentException Wenn {@code ref} ungültig ist. */
 	public final FEMObject withRef(final int ref) throws IllegalArgumentException {
+		FEMObject.checkMin(ref);
 		return new FEMObject(ref, this.typeValue, this.ownerValue);
 	}
 
@@ -157,6 +167,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Typkennung.
 	 * @throws IllegalArgumentException Wenn {@code type} ungültig ist. */
 	public final FEMObject withType(final int type) throws IllegalArgumentException {
+		FEMObject.checkMax(type);
 		return new FEMObject(this.refValue, (short)type, this.ownerValue);
 	}
 
@@ -167,6 +178,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Besitzerkennung.
 	 * @throws IllegalArgumentException Wenn {@code owner} ungültig ist. */
 	public final FEMObject withOwner(final int owner) throws IllegalArgumentException {
+		FEMObject.checkMax(owner);
 		return new FEMObject(this.refValue, this.typeValue, (short)owner);
 	}
 
