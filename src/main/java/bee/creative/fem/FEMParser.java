@@ -31,8 +31,7 @@ public final class FEMParser extends Parser {
 	 * @return {@code this}. */
 	public final FEMParser setToken(final int index, final int type) {
 		if (index < 0) return this;
-		final Token token = this.tokens.get(index);
-		return this.setToken(index, new Token(type, token.offset, token.length));
+		return this.setToken(index, this.tokens.get(index).withType(type));
 	}
 
 	/** Diese Methode ersetzt den Bereich an der gegebenen Position in der {@link #tokens() Auflistung aller erfassten Bereiche} durch den gegebenen und gibt

@@ -1389,7 +1389,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMDatetime> type() {
 		return FEMDatetime.TYPE;

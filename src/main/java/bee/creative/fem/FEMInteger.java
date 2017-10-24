@@ -125,7 +125,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMInteger> type() {
 		return FEMInteger.TYPE;

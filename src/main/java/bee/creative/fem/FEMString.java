@@ -1471,7 +1471,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMString> type() {
 		return FEMString.TYPE;

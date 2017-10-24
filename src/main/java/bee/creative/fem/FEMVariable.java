@@ -67,16 +67,16 @@ public final class FEMVariable extends FEMValue {
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
-	public final FEMType<FEMVariable> type() {
-		return FEMVariable.TYPE;
+	public final FEMVariable data() {
+		return this;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMVariable data() {
-		return this;
+	public final FEMType<FEMVariable> type() {
+		return FEMVariable.TYPE;
 	}
 
 	/** {@inheritDoc} */

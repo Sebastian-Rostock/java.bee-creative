@@ -714,7 +714,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMArray> type() {
 		return FEMArray.TYPE;
@@ -766,7 +766,9 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * der Elemente. */
 	@Override
 	public final String toString() {
-		return FEMDomain.NORMAL.formatArray(this);
+		final FEMFormatter target = new FEMFormatter();
+		FEMDomain.NORMAL.formatArray(target, this);
+		return target.format();
 	}
 
 }

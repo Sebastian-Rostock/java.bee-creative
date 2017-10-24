@@ -31,14 +31,14 @@ public final class FEMCompiler extends Parser {
 		return this.script;
 	}
 
-	/** Diese Methode gibt die {@link #index() aktuelle Position} als {@link Token#start() Startposition} des {@link #range() aktuellen Bereichs} bezogen auf die
+	/** Diese Methode gibt die {@link #index() aktuelle Position} als {@link Token#start() Startposition} des {@link #token() aktuellen Bereichs} bezogen auf die
 	 * {@link #scriptSource() Zeichenkette des aufbereiteten Quelltexts} zurück.
 	 *
-	 * @see #range()
+	 * @see #token()
 	 * @see Token#start()
 	 * @return Startposition des aktuellen Quelltextbereichs. */
 	public final int scriptOffset() {
-		return this.range().start();
+		return this.token().start();
 	}
 
 	/** Diese Methode gibt die Zeichenkette des {@link #script() aufbereiteten Quelltexts} zurück.
@@ -202,17 +202,17 @@ public final class FEMCompiler extends Parser {
 	 * @see #script()
 	 * @see FEMScript#get(int)
 	 * @return aktueller Bereich. */
-	public final Token range() {
+	public final Token token() {
 		return this.isParsed() ? Token.EMPTY : this.script.get(this.index());
 	}
 
-	/** Diese Methode gibt die Zeichenkette im {@link #range() aktuellen Abschnitt} des {@link #script() Quelltexts} zurück.
+	/** Diese Methode gibt die Zeichenkette im {@link #token() aktuellen Abschnitt} des {@link #script() Quelltexts} zurück.
 	 *
-	 * @see #range()
+	 * @see #token()
 	 * @see Token#extract(String)
 	 * @return Aktuelle Zeichenkette. */
 	public final String section() {
-		return this.range().extract(this.script.source());
+		return this.token().extract(this.script.source());
 	}
 
 	{}

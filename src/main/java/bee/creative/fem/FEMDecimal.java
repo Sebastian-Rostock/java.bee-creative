@@ -128,7 +128,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMDecimal> type() {
 		return FEMDecimal.TYPE;

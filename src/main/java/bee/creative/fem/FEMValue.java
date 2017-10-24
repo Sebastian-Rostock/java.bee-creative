@@ -31,7 +31,7 @@ public abstract class FEMValue extends FEMFunction {
 		return context.dataFrom(this, type);
 	}
 
-	/** Diese Methode gibt den Datentyp zurück.
+	/** Diese Methode gibt den Datentyp der {@link #data() Nutzdaten} zurück.
 	 *
 	 * @return Datentyp. */
 	public abstract FEMType<?> type();

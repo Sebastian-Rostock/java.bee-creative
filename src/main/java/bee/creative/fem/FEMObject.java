@@ -220,7 +220,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMObject> type() {
 		return FEMObject.TYPE;

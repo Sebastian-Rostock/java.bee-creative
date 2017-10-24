@@ -990,7 +990,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMBinary> type() {
 		return FEMBinary.TYPE;

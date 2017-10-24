@@ -80,7 +80,7 @@ public final class FEMHandler extends FEMValue {
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMHandler> type() {
 		return FEMHandler.TYPE;
@@ -126,7 +126,9 @@ public final class FEMHandler extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return FEMDomain.NORMAL.formatValue(this);
+		final FEMFormatter target = new FEMFormatter();
+		FEMDomain.NORMAL.formatHandler(target, this);
+		return target.format();
 	}
 
 	/** {@inheritDoc} */

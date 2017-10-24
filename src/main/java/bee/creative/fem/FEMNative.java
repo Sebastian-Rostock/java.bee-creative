@@ -75,7 +75,7 @@ public final class FEMNative extends FEMValue {
 		return this.data;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<Object> type() {
 		return FEMNative.TYPE;

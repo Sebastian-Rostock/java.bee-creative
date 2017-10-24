@@ -117,7 +117,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 
 		/** Diese Methode gibt den Typ des Bereichs zurück.
 		 *
-		 * @see FEMScript
 		 * @return Bereichstyp. */
 		public final char type() {
 			return this.type;
@@ -146,7 +145,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 
 		/** Diese Methode gibt die Länge des die Position zurück, an der dieser Bereich beginnt.
 		 *
-		 * @return Startposition. */
+		 * @return Länge. */
 		public final int length() {
 			return this.length;
 		}
@@ -170,6 +169,32 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		public final String extract(final String source) throws NullPointerException {
 			final int start = this.offset;
 			return source.substring(Math.max(start, 0), Math.min(start + this.length, source.length()));
+		}
+
+		/** Diese Methode gibt diesen Bereich mit der gegebenen Endposition zurück. Die {@link #start() Startposition} bleibt erhalten.
+		 *
+		 * @param end Endposition.
+		 * @return neuer Bereich mit der gegebenen Endposition.
+		 * @throws IllegalArgumentException Wenn der resultierende Bereich eine negative Länge hätte. */
+		public final Token withEnd(final int end) throws IllegalArgumentException {
+			return new Token(this.type, this.offset, end - this.offset);
+		}
+
+		/** Diese Methode gibt diesen Bereich mit der gegebenen Startposition zurück. Die {@link #end() Endposition} bleibt erhalten.
+		 *
+		 * @param start Startposition.
+		 * @return neuer Bereich mit der gegebenen Endposition.
+		 * @throws IllegalArgumentException Wenn der resultierende Bereich eine negative Länge hätte. */
+		public final Token withStart(final int start) throws IllegalArgumentException {
+			return new Token(this.type, start, (this.offset + this.length) - start);
+		}
+
+		/** Diese Methode gibt diesen Bereich mit dem gegebenen Bereichstyp zurück.
+		 *
+		 * @param type Bereichstyp.
+		 * @return neuer Bereich. */
+		public final Token withType(final int type) {
+			return new Token(type, this.offset, this.length);
 		}
 
 		{}
@@ -220,7 +245,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code tokens} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
 	 *         gehen. */
-	public static FEMScript from(int mode, final String source, final Token... tokens) throws NullPointerException, IllegalArgumentException {
+	public static FEMScript from(final int mode, final String source, final Token... tokens) throws NullPointerException, IllegalArgumentException {
 		FEMScript.checkToken(source, tokens);
 		return new FEMScript(mode, source, tokens.clone());
 	}
@@ -235,7 +260,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code tokens} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
 	 *         gehen. */
-	public static FEMScript from(int mode, final String source, final List<Token> tokens) throws NullPointerException, IllegalArgumentException {
+	public static FEMScript from(final int mode, final String source, final List<Token> tokens) throws NullPointerException, IllegalArgumentException {
 		return FEMScript.from(mode, source, tokens.toArray(new Token[tokens.size()]));
 	}
 
@@ -268,7 +293,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	final Token[] tokens;
 
 	@SuppressWarnings ("javadoc")
-	FEMScript(int mode, String source, Token[] tokens) {
+	FEMScript(final int mode, final String source, final Token[] tokens) {
 		this.mode = mode;
 		this.source = source;
 		this.tokens = tokens;
@@ -318,7 +343,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	 *
 	 * @param type Bereichstyp.
 	 * @return {@code true}, wenn ein Bereich mit dem gegebenen Bereichstyp enthalten ist. */
-	public final boolean contains(int type) {
+	public final boolean contains(final int type) {
 		if ((type < 0) || (type > 65535)) return false;
 		for (final Token token: this.tokens)
 			if (token.type == type) return true;
@@ -357,7 +382,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	 * @see #mode()
 	 * @param mode Quelltextmodus.
 	 * @return aufbereiteten Quelltext. */
-	public final FEMScript withMode(int mode) {
+	public final FEMScript withMode(final int mode) {
 		return new FEMScript(mode, this.source, this.tokens);
 	}
 
@@ -368,7 +393,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	 * @return aufbereiteten Quelltext.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Bereiche über die Zeichenkette hinaus gehen. */
-	public final FEMScript withSource(String source) throws NullPointerException, IllegalArgumentException {
+	public final FEMScript withSource(final String source) throws NullPointerException, IllegalArgumentException {
 		FEMScript.checkSource(source, this.tokens);
 		return new FEMScript(this.mode, source, this.tokens);
 	}
@@ -380,7 +405,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	 * @throws NullPointerException Wenn {@code tokens} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
 	 *         gehen. */
-	public final FEMScript withTokens(Token... tokens) throws NullPointerException, IllegalArgumentException {
+	public final FEMScript withTokens(final Token... tokens) throws NullPointerException, IllegalArgumentException {
 		FEMScript.checkToken(this.source, tokens);
 		return new FEMScript(this.mode, this.source, tokens);
 	}
@@ -392,7 +417,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	 * @throws NullPointerException Wenn {@code tokens} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
 	 *         gehen. */
-	public final FEMScript withTokens(List<Token> tokens) throws NullPointerException, IllegalArgumentException {
+	public final FEMScript withTokens(final List<Token> tokens) throws NullPointerException, IllegalArgumentException {
 		return this.withTokens(tokens.toArray(new Token[tokens.size()]));
 	}
 

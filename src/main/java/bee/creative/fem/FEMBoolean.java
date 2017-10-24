@@ -122,7 +122,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		return this;
 	}
 
-	/** Diese Methode gibt {@link #TYPE} zurück. */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMBoolean> type() {
 		return FEMBoolean.TYPE;
