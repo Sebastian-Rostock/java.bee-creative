@@ -190,6 +190,63 @@ public class FEMDomain {
 		return true;
 	}
 
+	/** Diese Methode implementiert {@link #parseScript(String, int)} und ist eine Abkürzung für {@code this.parseItems(target, itemLimit, itemParser)}, wobei
+	 * {@code itemLimit} und {@code itemParser} abhängig vom gegebenen {@link FEMScript#mode() Skriptmodus} bestückt werden.<br>
+	 * Die Implementation in {@link FEMDomain} erfasst für alle nicht unterstützten Skriptmodus einen {@link #parseError(FEMParser) Fehlerbereich}. Die maximale
+	 * Elementanzahl {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der {@code itemParser}
+	 * delegiert für {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #parseValue(FEMParser)}, für {@link #PARSE_PROXY_MAP} an
+	 * {@link #parseProxy(FEMParser)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #parseFunction(FEMParser)}.
+	 *
+	 * @see #parseItems(FEMParser, int, Filter)
+	 * @param target Parser.
+	 * @param scriptMode Skriptmodus.
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+	protected void parseScript(final FEMParser target, final int scriptMode) throws NullPointerException {
+		int itemLimit = 1;
+		Filter<FEMParser> itemParser;
+		switch (scriptMode) {
+			default:
+				this.parseError(target);
+				return;
+			case PARSE_VALUE_LIST:
+				itemLimit = 0;
+			case PARSE_VALUE:
+				itemParser = new Filter<FEMParser>() {
+
+					@Override
+					public boolean accept(final FEMParser input) {
+						return FEMDomain.this.parseValue(input);
+					}
+
+				};
+			break;
+			case PARSE_PROXY_MAP:
+				itemLimit = 0;
+				itemParser = new Filter<FEMParser>() {
+
+					@Override
+					public boolean accept(final FEMParser input) {
+						return FEMDomain.this.parseProxy(input);
+					}
+
+				};
+			break;
+			case PARSE_FUNCTION_LIST:
+				itemLimit = 0;
+			case PARSE_FUNCTION:
+				itemParser = new Filter<FEMParser>() {
+
+					@Override
+					public boolean accept(final FEMParser input) {
+						return FEMDomain.this.parseFunction(input);
+					}
+
+				};
+			break;
+		}
+		this.parseItems(target, itemLimit, itemParser);
+	}
+
 	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Wertliste und gibt nur dann {@code true} zurück, wenn diese an der öffnenden eckigen
 	 * Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #parseValue(FEMParser) Werte}. Die Wertliste endet mit der
 	 * schließenden eckigen Klammer. Die Symbole {@code '['}, {@code ';'} und {@code ']'} werden direkt als Typ der erfassten Bereiche eingesetzt. Wenn die
@@ -534,63 +591,6 @@ public class FEMDomain {
 		return FEMScript.from(scriptMode, source, parser.tokens());
 	}
 
-	/** Diese Methode implementiert {@link #parseScript(String, int)} und ist eine Abkürzung für {@code this.parseItems(target, itemLimit, itemParser)}, wobei
-	 * {@code itemLimit} und {@code itemParser} abhängig vom gegebenen {@link FEMScript#mode() Skriptmodus} bestückt werden.<br>
-	 * Die Implementation in {@link FEMDomain} erfasst für alle nicht unterstützten Skriptmodus einen {@link #parseError(FEMParser) Fehlerbereich}. Die maximale
-	 * Elementanzahl {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der {@code itemParser}
-	 * delegiert für {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #parseValue(FEMParser)}, für {@link #PARSE_PROXY_MAP} an
-	 * {@link #parseProxy(FEMParser)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #parseFunction(FEMParser)}.
-	 *
-	 * @see #parseItems(FEMParser, int, Filter)
-	 * @param target Parser.
-	 * @param scriptMode Skriptmodus.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	public void parseScript(final FEMParser target, final int scriptMode) throws NullPointerException {
-		int itemLimit = 1;
-		Filter<FEMParser> itemParser;
-		switch (scriptMode) {
-			default:
-				this.parseError(target);
-				return;
-			case PARSE_VALUE_LIST:
-				itemLimit = 0;
-			case PARSE_VALUE:
-				itemParser = new Filter<FEMParser>() {
-
-					@Override
-					public boolean accept(final FEMParser input) {
-						return FEMDomain.this.parseValue(input);
-					}
-
-				};
-			break;
-			case PARSE_PROXY_MAP:
-				itemLimit = 0;
-				itemParser = new Filter<FEMParser>() {
-
-					@Override
-					public boolean accept(final FEMParser input) {
-						return FEMDomain.this.parseProxy(input);
-					}
-
-				};
-			break;
-			case PARSE_FUNCTION_LIST:
-				itemLimit = 0;
-			case PARSE_FUNCTION:
-				itemParser = new Filter<FEMParser>() {
-
-					@Override
-					public boolean accept(final FEMParser input) {
-						return FEMDomain.this.parseFunction(input);
-					}
-
-				};
-			break;
-		}
-		this.parseItems(target, itemLimit, itemParser);
-	}
-
 	/** Diese Methode parst die als maskierte Zeichenkette gegebene Konstante und gibt diese ohne Maskierung zurück. Sie realisiert damit die Umkehroperation von
 	 * {@link #formatConst(String)}.
 	 *
@@ -603,6 +603,31 @@ public class FEMDomain {
 	}
 
 	{}
+
+	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes.
+	 *
+	 * @param target Formatierer.
+	 * @param script aufbereiteter Quelltext.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code script} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
+	protected void formatScript(final FEMFormatter target, final FEMScript script) throws NullPointerException, IllegalArgumentException {
+		this.formatScript(target, new FEMCompiler().useScript(script));
+	}
+
+	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltexts.
+	 *
+	 * @param target Formatierer.
+	 * @param source Parser zum aufbereiteten Quelltext.
+	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	protected void formatScript(final FEMFormatter target, final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
+		while (true) {
+			this.formatScript(target, source, false);
+			if (source.symbol() < 0) return;
+			target.putToken(source.section()).putBreakSpace();
+			source.skip();
+		}
+	}
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung der im aufbereiteten Quelltext gegebenen Sequenz von Namen, Werten und Funktionen.
 	 *
@@ -774,7 +799,7 @@ public class FEMDomain {
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
 	protected void formatFrame(final FEMFormatter target, final FEMFrame source) throws NullPointerException, IllegalArgumentException {
-		this.formatItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMValue>() {
+		this.formatItems(target, source.params(), "(", ";", ")", new Setter<FEMFormatter, FEMValue>() {
 
 			int index = 1;
 
@@ -1063,44 +1088,6 @@ public class FEMDomain {
 		target.putToken(source.toString());
 	}
 
-	/** Diese Methode gibt die Textdarstellung des gegebenen aufbereiteten Quelltextes zurück.
-	 *
-	 * @see #formatScript(FEMFormatter, FEMCompiler)
-	 * @param script aufbereiteter Quelltext.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
-	public String formatScript(final FEMScript script) throws NullPointerException, IllegalArgumentException {
-		final FEMFormatter target = new FEMFormatter();
-		this.formatScript(target, script);
-		return target.format();
-	}
-
-	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes.
-	 *
-	 * @param target Formatierer.
-	 * @param script aufbereiteter Quelltext.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code script} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
-	public void formatScript(final FEMFormatter target, final FEMScript script) throws NullPointerException, IllegalArgumentException {
-		this.formatScript(target, new FEMCompiler().useScript(script));
-	}
-
-	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltexts.
-	 *
-	 * @param target Formatierer.
-	 * @param source Parser zum aufbereiteten Quelltext.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public void formatScript(final FEMFormatter target, final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
-		while (true) {
-			this.formatScript(target, source, false);
-			if (source.symbol() < 0) return;
-			target.putToken(source.section()).putBreakSpace();
-			source.skip();
-		}
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@code this.formatConst(name, false)}.
 	 *
 	 * @see #formatConst(String, boolean)
@@ -1138,6 +1125,81 @@ public class FEMDomain {
 			}
 		}
 		return string;
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatScript(source, null)}.
+	 *
+	 * @see #formatScript(FEMScript, String)
+	 * @param source aufbereiteter Quelltext.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatScript(final FEMScript source) throws NullPointerException, IllegalArgumentException {
+		return this.formatScript(source, null);
+	}
+
+	/** Diese Methode gibt die Textdarstellung des gegebenen aufbereiteten Quelltextes zurück.
+	 *
+	 * @see #formatScript(FEMFormatter, FEMScript)
+	 * @param source aufbereiteter Quelltext.
+	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatScript(final FEMScript source, final String indent) throws NullPointerException, IllegalArgumentException {
+		final FEMFormatter target = new FEMFormatter().useIndent(indent);
+		this.formatScript(target, source);
+		return target.format();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source, null)}.
+	 *
+	 * @see #formatFrame(FEMFrame, String)
+	 * @param source Stapelrahmen.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFrame(final FEMFrame source) throws NullPointerException, IllegalArgumentException {
+		return this.formatFrame(source, null);
+	}
+
+	/** Diese Methode gibt die Textdarstellung des gegebenen Stapelrahmen zurück.
+	 *
+	 * @see #formatFrame(FEMFormatter, FEMFrame)
+	 * @param source Stapelrahmen.
+	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFrame(final FEMFrame source, final String indent) throws NullPointerException, IllegalArgumentException {
+		final FEMFormatter target = new FEMFormatter().useIndent(indent);
+		this.formatFrame(target, source);
+		return target.format();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatFunction(source, null)}.
+	 *
+	 * @see #formatFunction(FEMFunction, String)
+	 * @param source Stapelrahmen.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFunction(final FEMFunction source) throws NullPointerException, IllegalArgumentException {
+		return this.formatFunction(source, null);
+	}
+
+	/** Diese Methode gibt die Textdarstellung der gegebenen Funktion zurück.
+	 *
+	 * @see #formatFunction(FEMFormatter, FEMFunction)
+	 * @param source Funktion.
+	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFunction(final FEMFunction source, final String indent) throws NullPointerException, IllegalArgumentException {
+		final FEMFormatter target = new FEMFormatter().useIndent(indent);
+		this.formatFunction(target, source);
+		return target.format();
 	}
 
 	{}
