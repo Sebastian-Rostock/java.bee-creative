@@ -276,7 +276,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	/** Diese Methode gibt einen {@link Iterator} über die Einträge zurück.
 	 *
 	 * @return {@link Iterator} über die Einträge. */
-	protected final Iterator<GEntry> getEntries() {
+	protected Iterator<GEntry> getEntries() {
 		if (this.size == 0) return Iterators.emptyIterator();
 		return new HashIterator<>(this);
 	}
@@ -300,7 +300,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	/** Diese Methode aktualisiert die Größe der Tabelle mit der via {@link Hash#getLength(int, int)} berechneten.
 	 *
 	 * @see Hash#verifyLength(int) */
-	protected final void verifyLength() {
+	protected void verifyLength() {
 		this.verifyLength(this.getLength(this.size, this.table.length));
 	}
 
@@ -309,7 +309,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 *
 	 * @param newLength neue Größe der Tabelle. */
 	@SuppressWarnings ("unchecked")
-	protected final void verifyLength(final int newLength) {
+	protected void verifyLength(final int newLength) {
 		final Object[] oldTable = this.table;
 		final int oldLength = oldTable.length;
 		if (oldLength == newLength) return;
