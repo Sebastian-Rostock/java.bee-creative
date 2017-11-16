@@ -104,7 +104,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
 	 * Wenn das Objekt {@code null} ist, wird es ignoriert.
-	 * 
+	 *
 	 * @see Object#toString()
 	 * @param token Objekt oder {@code null}.
 	 * @return {@code this}.

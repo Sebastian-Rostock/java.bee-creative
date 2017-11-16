@@ -141,7 +141,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Parameternames in {@link #params()} zurück.
-	 * 
+	 *
 	 * @see List#indexOf(Object)
 	 * @param name Parametername.
 	 * @return Position oder {@code -1}.
@@ -151,7 +151,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode fügt den gegebenen Parameternamen an der gegebenen Position in {@link #params()} ein und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see List#add(int, Object)
 	 * @param index Einfügelosition.
 	 * @param name Parameternamen.
@@ -187,7 +187,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode entfernt die gegebene Anzahl der an Parameternamen ab dem BEginn der Liste aus {@link #params()} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param count Anzahl.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist. */

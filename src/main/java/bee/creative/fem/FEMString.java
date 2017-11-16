@@ -1262,6 +1262,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final int that, final int offset) throws IllegalArgumentException {
 		final int length = this.length - offset;
+		if (length == 0) return -1;
 		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		final ValueFinder finder = new ValueFinder(that);
 		if (this.customExtract(finder, offset, length, true)) return -1;
@@ -1277,10 +1278,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMString that, final int offset) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
 		final int count = that.length;
+		if (count == 1) return this.find(that.customGet(0), offset);
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
 		if (count == 0) return offset;
-		final int value = that.customGet(0), length = this.length - count;
+		final int value = that.customGet(0);
+		final int length = (this.length - count) + 1;
 		FIND: for (int i = offset; i < length; i++) {
 			if (value == this.customGet(i)) {
 				for (int i2 = 1; i2 < count; i2++) {

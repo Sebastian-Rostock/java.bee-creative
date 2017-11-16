@@ -29,13 +29,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class FindCollector implements Collector {
+	static final class ValueFinder implements Collector {
 
 		public final FEMValue that;
 
 		public int index;
 
-		FindCollector(final FEMValue that) {
+		ValueFinder(final FEMValue that) {
 			this.that = that;
 		}
 
@@ -576,10 +576,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMValue that, final int offset) throws IllegalArgumentException {
 		final int length = this.length - offset;
+		if (length == 0) return -1;
 		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
-		final FindCollector collector = new FindCollector(that);
-		if (this.customExtract(collector, offset, length, true)) return -1;
-		return collector.index + offset;
+		final ValueFinder finder = new ValueFinder(that);
+		if (this.customExtract(finder, offset, length, true)) return -1;
+		return finder.index + offset;
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück.<br>
@@ -591,11 +592,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMArray that, final int offset) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
 		final int count = that.length;
+		if (count == 1) return this.find(that.customGet(0), offset);
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
 		if (count == 0) return offset;
 		final FEMValue value = that.customGet(0);
-		final int length = this.length - count;
+		final int length = (this.length - count) + 1;
 		FIND: for (int i = offset; i < length; i++) {
 			if (value.equals(this.customGet(i))) {
 				for (int i2 = 1; i2 < count; i2++) {

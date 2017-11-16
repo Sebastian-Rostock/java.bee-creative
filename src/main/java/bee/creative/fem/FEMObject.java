@@ -73,12 +73,12 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void checkMin(int value) throws IllegalArgumentException {
+	static void checkMin(final int value) throws IllegalArgumentException {
 		if (value < 0) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void checkMax(int value) throws IllegalArgumentException {
+	static void checkMax(final int value) throws IllegalArgumentException {
 		FEMObject.checkMin(value);
 		if (value > 65535) throw new IllegalArgumentException();
 	}
