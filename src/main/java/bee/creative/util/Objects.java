@@ -93,7 +93,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (final Entry<?, ?> entry: object.entrySet()) {
-			result.append(space).append(Objects.format(format, format, entry.getKey())).append(": ").append(Objects.format(format, format, entry.getValue()));
+			result.append(space).append(Objects.format(format, format, entry.getKey())).append(" = ").append(Objects.format(format, format, entry.getValue()));
 			space = comma;
 		}
 		return result.append((format ? "\n}" : "}")).toString();
