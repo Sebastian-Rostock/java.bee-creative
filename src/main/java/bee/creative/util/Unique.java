@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import bee.creative.hash.HashData;
 
 /** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene
  * Eingaben über eine interne {@link Data Abbildung} mit {@link #compile(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer

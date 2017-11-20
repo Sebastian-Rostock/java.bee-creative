@@ -1,15 +1,70 @@
-package bee.creative.hash;
+package bee.creative.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
-import bee.creative.util.Iterators;
-import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert ein auf {@link HashData} aufbauendes {@link Set}.<br>
- * <b>Die Ermittlung von {@link Object#hashCode() Streuwerte} und {@link Object#equals(Object) Äquivalenz} der Elemente erfolgt nicht wie in {@link Set}
- * beschrieben über {@link Object#hashCode()} bzw. {@link Object#equals(Object)}, sondern über {@link #customHash(Object)} bzw.
- * {@link #customEquals(Object, Object)}.</b>
+/** Diese Klasse implementiert ein auf {@link HashData} aufbauendes {@link Set}.
+ * <p>
+ * <b>Achtung:<br>
+ * Die Ermittlung von {@link Object#hashCode() Streuwerte} und {@link Object#equals(Object) Äquivalenz} der Elemente erfolgt nicht wie in {@link Set}
+ * beschrieben über Methoden der Elemente, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEquals(Object, Object)} dieses
+ * {@link HashSet}.</b>
+ * <p>
+ * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung bei bis zu 32 GB RAM. Die relativen Rechenzeiten wurden zu 2<sup>18</sup>
+ * {@link Random#nextInt(int) zufälligen} {@link Integer} ermittelt.
+ * <p>
+ * <table border="1" cellspacing="0" cellpadding="4">
+ * <tr>
+ * <th>CLASS</th>
+ * <th>SIZE = 0</th>
+ * <th>SIZE = 2<sup>1..29</sup></th>
+ * <th>{@link #add(Object) add}-TIME</th>
+ * <th>{@link #contains(Object) contains}-TIME</th>
+ * <th>{@link #remove(Object) remove}-TIME</th>
+ * </tr>
+ * <tr>
+ * <td>{@link java.util.HashSet} 32bit</td>
+ * <td>72..120 Byte</td>
+ * <td>SIZE x 28 + 72..120 Byte</td>
+ * </tr>
+ * <tr>
+ * <td>{@link java.util.HashSet} 64bit</td>
+ * <td>88..136 Byte</td>
+ * <td>SIZE x 36 + 80..128 Byte</td>
+ * <td>100%</td>
+ * <td>100%</td>
+ * <td>100%</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashSet} 32bit ohne Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 12 + 88 Byte</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashSet} 64bit ohne Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 12 + 88 Byte</td>
+ * <td>60%</td>
+ * <td>40%</td>
+ * <td>45%</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashSet} 32bit mit Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 16 + 104 Byte</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashSet} 64bit mit Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 16 + 104 Byte</td>
+ * <td>70%</td>
+ * <td>50%</td>
+ * <td>50%</td>
+ * </tr>
+ * </table>
+ * </p>
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
@@ -21,7 +76,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSet} mit {@link #HashSet(int, boolean) Streuwertpuffer} und der gegebenen Kapazität.
-	 * 
+	 *
 	 * @param capacity Kapazität. */
 	public HashSet(final int capacity) {
 		super(false, true);
@@ -29,7 +84,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSet} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @param capacity Kapazität.
 	 * @param withHashes {@code true}, wenn die Streuwerte der Elemente gepuffert werden sollen;<br>
 	 *        {@code false}, wenn der Streuwerte eines Elements schnell ermittelt werden kann. */
@@ -39,7 +94,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSet} mit Kapazität {@code 0}.
-	 * 
+	 *
 	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
 	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
 	public HashSet(final boolean withHashes) {
@@ -117,11 +172,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		int result = 0;
-		for (final Object item: this) {
-			result += Objects.hash(item);
-		}
-		return result;
+		return this.getKeys().hashCode();
 	}
 
 	/** {@inheritDoc} */

@@ -1,4 +1,4 @@
-package bee.creative.hash;
+package bee.creative.util;
 
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
@@ -11,9 +11,6 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import bee.creative.iam.IAMMapping;
-import bee.creative.util.Objects;
-
-// HashMap: H + 4P + 4I + 3(H + P) + (H + I) + n(H + 3P+I) + b(P)
 
 /** Diese abstrakte Klasse implementiert eine {@link Object#hashCode() Streuwert}-basierte Datenhaltung, die als Grundlage einer {@link Map} oder eines
  * {@link Set} verwendet werden kann.<br>
@@ -22,7 +19,9 @@ import bee.creative.util.Objects;
  * <p>
  * Über die Methoden {@link #customHash(Object)} und {@link #customEquals(Object, Object)} kann die Berechnung der {@link Object#hashCode() Streuwerte} bzw. der
  * {@link Object#equals(Object) Äquivalenz} von Schlüsseln angepasst werden.
- *
+ * 
+ * @see HashSet
+ * @see HashMap
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */

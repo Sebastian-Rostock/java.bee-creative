@@ -1,14 +1,75 @@
-package bee.creative.hash;
+package bee.creative.util;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
-/** Diese Klasse implementiert eine auf {@link HashData} aufbauende {@link Map}.<br>
- * <b>Die Ermittlung von {@link Object#hashCode() Streuwerte} und {@link Object#equals(Object) Äquivalenz} der Schlüssel erfolgt nicht wie in {@link Map}
- * beschrieben über {@link Object#hashCode()} bzw. {@link Object#equals(Object)}, sondern über {@link #customHash(Object)} bzw.
- * {@link #customEquals(Object, Object)}.</b>
+/** Diese Klasse implementiert eine auf {@link HashData} aufbauende {@link Map}.
+ * <p>
+ * <b>Achtung:<br>
+ * Die Ermittlung von {@link Object#hashCode() Streuwerte} und {@link Object#equals(Object) Äquivalenz} der Schlüssel erfolgt nicht wie in {@link Map}
+ * beschrieben über Methoden der Schlüssel, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEquals(Object, Object)} dieser
+ * {@link HashMap}.</b>
+ * <p>
+ * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung bei bis zu 32 GB RAM. Die relativen Rechenzeiten wurden zu 2<sup>18</sup>
+ * {@link Random#nextInt(int) zufälligen} {@link Integer} ermittelt.
+ * <p>
+ * <table border="1" cellspacing="0" cellpadding="4">
+ * <tr>
+ * <th>CLASS</th>
+ * <th>SIZE = 0</th>
+ * <th>SIZE = 2<sup>1..29</sup></th>
+ * <th>{@link #put(Object, Object) put}-TIME</th>
+ * <th>{@link #get(Object) get}-TIME</th>
+ * <th>{@link #remove(Object) pop}-TIME</th>
+ * <th>{@link java.util.Map.Entry#setValue(Object) set}-TIME</th>
+ * </tr>
+ * <tr>
+ * <td>{@link java.util.HashMap} 32bit</td>
+ * <td>56..104 Byte</td>
+ * <td>SIZE x 28 + 56..104 Byte</td>
+ * </tr>
+ * <tr>
+ * <td>{@link java.util.HashMap} 64bit</td>
+ * <td>72..120 Byte</td>
+ * <td>SIZE x 36 + 64..112 Byte</td>
+ * <td>100%</td>
+ * <td>100%</td>
+ * <td>100%</td>
+ * <td>100%</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashMap} 32bit ohne Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 16 + 104 Byte</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashMap} 64bit ohne Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 16 + 104 Byte</td>
+ * <td>65%</td>
+ * <td>50%</td>
+ * <td>50%</td>
+ * <td>300%</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashMap} 32bit mit Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 20 + 120 Byte</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashMap} 64bit mit Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 20 + 120 Byte</td>
+ * <td>75%</td>
+ * <td>60%</td>
+ * <td>55%</td>
+ * <td>275%</td>
+ * </tr>
+ * </table>
+ * </p>
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
@@ -21,7 +82,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link HashMap} mit {@link #HashMap(int, boolean) Streuwertpuffer} und der gegebenen Kapazität.
-	 * 
+	 *
 	 * @param capacity Kapazität. */
 	public HashMap(final int capacity) {
 		super(true, true);
@@ -29,7 +90,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link HashMap} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @param capacity Kapazität.
 	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel gepuffert werden sollen;<br>
 	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
@@ -39,7 +100,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link HashMap} mit Kapazität {@code 0}.
-	 * 
+	 *
 	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
 	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
 	public HashMap(final boolean withHashes) {
@@ -134,11 +195,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		int result = 0;
-		for (final Iterator<?> entries = this.getEntriesIterator(); entries.hasNext();) {
-			result += entries.next().hashCode();
-		}
-		return result;
+		return this.getMapping().hashCode();
 	}
 
 	/** {@inheritDoc} */
@@ -163,7 +220,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return getMapping().toString();
+		return this.getMapping().toString();
 	}
 
 }
