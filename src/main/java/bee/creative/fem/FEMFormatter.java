@@ -175,7 +175,7 @@ public final class FEMFormatter {
 			indents.set(i, Boolean.TRUE);
 		}
 		final List<Object> items = this.items;
-		for (int i = items.size() - 2; i >= 0; i--) {
+		for (int i = items.size() - 1; i >= 0; i--) {
 			final Object item = items.get(i);
 			if (item instanceof Token) {
 				final Token token = (Token)item;
@@ -221,7 +221,7 @@ public final class FEMFormatter {
 				final Token token = (Token)item;
 				if (token.isEnabled() && (indent != null)) {
 					result.append('\n');
-					for (int count = token.level() - (token.isLast() ? 2 : 1); count > 0; count--) {
+					for (int count = token.level() - (token.isLast() ? 3 : 2); count >= 0; count--) {
 						result.append(indent);
 					}
 				} else if (token.isSpace()) {
