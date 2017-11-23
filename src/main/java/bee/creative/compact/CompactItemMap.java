@@ -10,7 +10,8 @@ import bee.creative.util.Objects;
  * @see CompactItemMap#customSetKey(Object, Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte. */
+ * @param <GValue> Typ der Werte.
+ * @deprecated {@link bee.creative.util.HashMap} */
 public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GValue> {
 
 	/** Dieser Konstruktor initialisiert die {@link Map}. */
