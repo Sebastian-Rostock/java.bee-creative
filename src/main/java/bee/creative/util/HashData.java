@@ -19,7 +19,7 @@ import bee.creative.iam.IAMMapping;
  * <p>
  * Über die Methoden {@link #customHash(Object)} und {@link #customEquals(Object, Object)} kann die Berechnung der {@link Object#hashCode() Streuwerte} bzw. der
  * {@link Object#equals(Object) Äquivalenz} von Schlüsseln angepasst werden.
- * 
+ *
  * @see HashSet
  * @see HashMap
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

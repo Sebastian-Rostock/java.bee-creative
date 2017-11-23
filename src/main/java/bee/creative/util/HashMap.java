@@ -13,7 +13,7 @@ import java.util.Set;
  * beschrieben über Methoden der Schlüssel, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEquals(Object, Object)} dieser
  * {@link HashMap}.</b>
  * <p>
- * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung bei bis zu 32 GB RAM. Die relativen Rechenzeiten wurden zu 2<sup>18</sup>
+ * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung (32 Bit). Die relativen Rechenzeiten wurden zu 2<sup>18</sup>
  * {@link Random#nextInt(int) zufälligen} {@link Integer} ermittelt.
  * <p>
  * <table border="1" cellspacing="0" cellpadding="4">
@@ -26,13 +26,7 @@ import java.util.Set;
  * <th>{@link #remove(Object) pop}-TIME</th>
  * <th>{@link java.util.Map.Entry#setValue(Object) set}-TIME</th>
  * </tr>
- * <tr>
- * <td>{@link java.util.HashMap} 32bit</td>
- * <td>56..104 Byte</td>
- * <td>SIZE x 28 + 56..104 Byte</td>
- * </tr>
- * <tr>
- * <td>{@link java.util.HashMap} 64bit</td>
+ * <td>{@link java.util.HashMap}</td>
  * <td>72..120 Byte</td>
  * <td>SIZE x 36 + 64..112 Byte</td>
  * <td>100%</td>
@@ -41,32 +35,22 @@ import java.util.Set;
  * <td>100%</td>
  * </tr>
  * <tr>
- * <td>{@link bee.creative.util.HashMap} 32bit ohne Streuwertpuffer</td>
- * <td>40 Byte</td>
- * <td>SIZE x 16 + 104 Byte</td>
- * </tr>
  * <tr>
- * <td>{@link bee.creative.util.HashMap} 64bit ohne Streuwertpuffer</td>
- * <td>40 Byte</td>
- * <td>SIZE x 16 + 104 Byte</td>
- * <td>65%</td>
- * <td>50%</td>
- * <td>50%</td>
- * <td>300%</td>
- * </tr>
- * <tr>
- * <td>{@link bee.creative.util.HashMap} 32bit mit Streuwertpuffer</td>
- * <td>40 Byte</td>
- * <td>SIZE x 20 + 120 Byte</td>
- * </tr>
- * <tr>
- * <td>{@link bee.creative.util.HashMap} 64bit mit Streuwertpuffer</td>
+ * <td>{@link bee.creative.util.HashMap} mit Streuwertpuffer</td>
  * <td>40 Byte</td>
  * <td>SIZE x 20 + 120 Byte</td>
  * <td>75%</td>
  * <td>60%</td>
  * <td>55%</td>
  * <td>275%</td>
+ * </tr>
+ * <td>{@link bee.creative.util.HashMap} ohne Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 16 + 104 Byte</td>
+ * <td>65%</td>
+ * <td>50%</td>
+ * <td>50%</td>
+ * <td>300%</td>
  * </tr>
  * </table>
  * </p>
@@ -89,6 +73,14 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 		this.allocate(capacity);
 	}
 
+	/** Dieser Konstruktor initialisiert die {@link HashMap} mit Kapazität {@code 0}.
+	 *
+	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
+	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
+	public HashMap(final boolean withHashes) {
+		super(true, withHashes);
+	}
+
 	/** Dieser Konstruktor initialisiert die {@link HashMap} mit der gegebenen Kapazität.
 	 *
 	 * @param capacity Kapazität.
@@ -99,12 +91,13 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 		this.allocate(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMap} mit Kapazität {@code 0}.
+	/** Dieser Konstruktor initialisiert die {@link HashMap} mit den gegebenen Einträgen.
 	 *
-	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
-	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
-	public HashMap(final boolean withHashes) {
-		super(true, withHashes);
+	 * @param source Einträge.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+	public HashMap(final Map<? extends GKey, ? extends GValue> source) throws NullPointerException {
+		this(source.size());
+		this.putAll(source);
 	}
 
 	{}

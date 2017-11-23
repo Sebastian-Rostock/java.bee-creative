@@ -12,7 +12,7 @@ import java.util.Set;
  * beschrieben über Methoden der Elemente, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEquals(Object, Object)} dieses
  * {@link HashSet}.</b>
  * <p>
- * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung bei bis zu 32 GB RAM. Die relativen Rechenzeiten wurden zu 2<sup>18</sup>
+ * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung (32 Bit). Die relativen Rechenzeiten wurden zu 2<sup>18</sup>
  * {@link Random#nextInt(int) zufälligen} {@link Integer} ermittelt.
  * <p>
  * <table border="1" cellspacing="0" cellpadding="4">
@@ -25,12 +25,7 @@ import java.util.Set;
  * <th>{@link #remove(Object) remove}-TIME</th>
  * </tr>
  * <tr>
- * <td>{@link java.util.HashSet} 32bit</td>
- * <td>72..120 Byte</td>
- * <td>SIZE x 28 + 72..120 Byte</td>
- * </tr>
- * <tr>
- * <td>{@link java.util.HashSet} 64bit</td>
+ * <td>{@link java.util.HashSet}</td>
  * <td>88..136 Byte</td>
  * <td>SIZE x 36 + 80..128 Byte</td>
  * <td>100%</td>
@@ -38,30 +33,20 @@ import java.util.Set;
  * <td>100%</td>
  * </tr>
  * <tr>
- * <td>{@link bee.creative.util.HashSet} 32bit ohne Streuwertpuffer</td>
- * <td>40 Byte</td>
- * <td>SIZE x 12 + 88 Byte</td>
- * </tr>
- * <tr>
- * <td>{@link bee.creative.util.HashSet} 64bit ohne Streuwertpuffer</td>
- * <td>40 Byte</td>
- * <td>SIZE x 12 + 88 Byte</td>
- * <td>60%</td>
- * <td>40%</td>
- * <td>45%</td>
- * </tr>
- * <tr>
- * <td>{@link bee.creative.util.HashSet} 32bit mit Streuwertpuffer</td>
- * <td>40 Byte</td>
- * <td>SIZE x 16 + 104 Byte</td>
- * </tr>
- * <tr>
- * <td>{@link bee.creative.util.HashSet} 64bit mit Streuwertpuffer</td>
+ * <td>{@link bee.creative.util.HashSet} mit Streuwertpuffer</td>
  * <td>40 Byte</td>
  * <td>SIZE x 16 + 104 Byte</td>
  * <td>70%</td>
  * <td>50%</td>
  * <td>50%</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashSet} ohne Streuwertpuffer</td>
+ * <td>40 Byte</td>
+ * <td>SIZE x 12 + 88 Byte</td>
+ * <td>60%</td>
+ * <td>40%</td>
+ * <td>45%</td>
  * </tr>
  * </table>
  * </p>
@@ -83,6 +68,14 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 		this.allocate(capacity);
 	}
 
+	/** Dieser Konstruktor initialisiert das {@link HashSet} mit Kapazität {@code 0}.
+	 *
+	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
+	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
+	public HashSet(final boolean withHashes) {
+		super(false, withHashes);
+	}
+
 	/** Dieser Konstruktor initialisiert das {@link HashSet} mit der gegebenen Kapazität.
 	 *
 	 * @param capacity Kapazität.
@@ -93,12 +86,13 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 		this.allocate(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert das {@link HashSet} mit Kapazität {@code 0}.
+	/** Dieser Konstruktor initialisiert das {@link HashSet} mit den gegebenen Elemente.
 	 *
-	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
-	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
-	public HashSet(final boolean withHashes) {
-		super(false, withHashes);
+	 * @param source Einträge.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+	public HashSet(final Collection<? extends GItem> source) throws NullPointerException {
+		this(source.size());
+		this.addAll(source);
 	}
 
 	{}
