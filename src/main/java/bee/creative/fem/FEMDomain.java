@@ -885,7 +885,7 @@ public class FEMDomain {
 		} else {
 			switch (source.type().id()) {
 				case FEMNative.ID:
-					this.formatNative(target, (FEMNative)source.data());
+					this.formatNative(target, (FEMNative)source.result());
 				break;
 				case FEMVoid.ID:
 					this.formatVoid(target, (FEMVoid)source.data());
