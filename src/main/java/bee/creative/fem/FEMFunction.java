@@ -18,7 +18,19 @@ import bee.creative.util.Objects;
 public abstract class FEMFunction {
 
 	@SuppressWarnings ("javadoc")
-	public static final class TraceFunction extends FEMFunction {
+	public static abstract class BaseFunction extends FEMFunction {
+
+		@Override
+		public String toString() {
+			final FEMFormatter target = new FEMFormatter();
+			FEMDomain.NORMAL.formatFunction(target, this);
+			return target.format();
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static final class TraceFunction extends BaseFunction {
 
 		final FEMTracer tracer;
 
@@ -85,7 +97,7 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class FrameFunction extends FEMFunction {
+	public static final class FrameFunction extends BaseFunction {
 
 		final FEMFrame frame;
 
@@ -144,7 +156,7 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class FutureFunction extends FEMFunction {
+	public static final class FutureFunction extends BaseFunction {
 
 		final FEMFunction function;
 
@@ -206,7 +218,7 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatFunction extends FEMFunction {
+	public static final class ConcatFunction extends BaseFunction {
 
 		final FEMFunction[] params;
 
@@ -268,7 +280,7 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ClosureFunction extends FEMFunction {
+	public static final class ClosureFunction extends BaseFunction {
 
 		final FEMFunction function;
 
@@ -314,7 +326,7 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompositeFunction extends FEMFunction {
+	public static final class CompositeFunction extends BaseFunction {
 
 		final FEMFunction[] params;
 
@@ -539,9 +551,7 @@ public abstract class FEMFunction {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		final FEMFormatter target = new FEMFormatter();
-		FEMDomain.NORMAL.formatFunction(target, this);
-		return target.format();
+		return this.getClass().getSimpleName();
 	}
 
 }
