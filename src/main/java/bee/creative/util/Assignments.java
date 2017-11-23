@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -199,7 +198,7 @@ public class Assignments {
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> Assignment<GObject> assignment(final GObject source) {
-			return new ChildAssignment<GObject>(this, source);
+			return new ChildAssignment<>(this, source);
 		}
 
 		/** {@inheritDoc} */

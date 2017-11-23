@@ -3,8 +3,6 @@ package bee.creative.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -197,7 +195,7 @@ public final class Fields {
 		 * @param value {@link Set}.
 		 * @return Bearbeitungskopie. */
 		protected Set<GItem> customCopy(final Set<GItem> value) {
-			return new HashSet<GItem>(value);
+			return new HashSet<>(value);
 		}
 
 		/** {@inheritDoc} */
@@ -288,7 +286,7 @@ public final class Fields {
 		 * @param value {@link List}.
 		 * @return Bearbeitungskopie. */
 		protected List<GEntry> customCopy(final List<GEntry> value) {
-			return new ArrayList<GEntry>(value);
+			return new ArrayList<>(value);
 		}
 
 		/** {@inheritDoc} */
@@ -403,7 +401,7 @@ public final class Fields {
 		 * @param value {@link Map}.
 		 * @return Bearbeitungskopie. */
 		protected Map<GKey, GValue> customCopy(final Map<GKey, GValue> value) {
-			return new HashMap<GKey, GValue>(value);
+			return new HashMap<>(value);
 		}
 
 		/** {@inheritDoc} */
@@ -842,7 +840,7 @@ public final class Fields {
 	 * @return {@code synchronized}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GInput, GValue> Field<GInput, GValue> synchronizedField(final Field<? super GInput, GValue> field) throws NullPointerException {
-		Objects.assertNotNull(field );
+		Objects.assertNotNull(field);
 		return new Field<GInput, GValue>() {
 
 			@Override

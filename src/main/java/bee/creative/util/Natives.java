@@ -5,8 +5,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /** Diese Klasse implementiert Methoden zum Parsen von {@link Class Klassen}, {@link Field Datenfeldern}, {@link Method Methoden} und {@link Constructor
  * Konstruktoren} aus deren Textdarstellung sowie zur Erzeugung dieser Textdarstellungen.
@@ -15,7 +13,7 @@ import java.util.Map;
 public class Natives {
 
 	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
-	static final Map<String, Class<?>> parseClass = new HashMap<>(9);
+	static final HashMap<String, Class<?>> parseClass = new HashMap<>(9);
 
 	/** Dieses Feld speichert den {@link Getter} zu {@link #formatClass(Class)}. */
 	static final Getter<Class<?>, Object> formatClass = new Getter<Class<?>, Object>() {

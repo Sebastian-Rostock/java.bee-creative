@@ -42,17 +42,17 @@ public class Conversions {
 	 *
 	 * @see #inverseConversion(Conversion) */
 	public static final Getter<?, ?> INVERSE_GETTER = new Getter<Conversion<?, ?>, Object>() {
-	
+
 		@Override
 		public Object get(final Conversion<?, ?> input) {
 			return Conversions.inverseConversion(input);
 		}
-	
+
 		@Override
 		public String toString() {
 			return "INVERSE_GETTER";
 		}
-	
+
 	};
 
 	{}
