@@ -12,10 +12,10 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import bee.creative.iam.IAMMapping;
 
-/** Diese abstrakte Klasse implementiert eine {@link Object#hashCode() Streuwert}-basierte Datenhaltung, die als Grundlage einer {@link Map} oder eines
- * {@link Set} verwendet werden kann.<br>
- * Um die Verwaltungsdaten je Eintrag zu minimieren, wird die Tabelle mit den Eigenschaften der Einträge spaltenweise in bis zu fünf Arrays
- * {@link #allocate(int) reserviert} und werden die Verweise auf die nächsten Einträge in den verketteten Listen über Indexpositionen abgebildet.
+/** Diese abstrakte Klasse implementiert eine transponierte {@link Object#hashCode() streuwertbasierte} Datenhaltung, die als Grundlage einer {@link Map} oder
+ * eines {@link Set} verwendet werden kann.<br>
+ * Um die Verwaltungsdaten je Eintrag zu minimieren, werden die Tabelle mit den Eigenschaften der Einträge spaltenweise in bis zu fünf Arrays
+ * {@link #allocate(int) reserviert} und die Verweise auf die nächsten Einträge in den verketteten Listen über Indexpositionen abgebildet.
  * <p>
  * Über die Methoden {@link #customHash(Object)} und {@link #customEquals(Object, Object)} kann die Berechnung der {@link Object#hashCode() Streuwerte} bzw. der
  * {@link Object#equals(Object) Äquivalenz} von Schlüsseln angepasst werden.
@@ -30,11 +30,11 @@ public abstract class HashData<GKey, GValue> {
 	@SuppressWarnings ("javadoc")
 	protected static class HashEntry<GKey, GValue> implements Entry<GKey, GValue> {
 
-		protected final HashData<?, ?> entryData;
+		protected final HashData<GKey, GValue> entryData;
 
 		protected final int entryIndex;
 
-		public HashEntry(final HashData<?, ?> entryData, final int entryIndex) {
+		public HashEntry(final HashData<GKey, GValue> entryData, final int entryIndex) {
 			this.entryData = entryData;
 			this.entryIndex = entryIndex;
 		}
@@ -42,34 +42,30 @@ public abstract class HashData<GKey, GValue> {
 		{}
 
 		@Override
-		@SuppressWarnings ("unchecked")
 		public GKey getKey() {
-			return (GKey)this.entryData.keys[this.entryIndex];
+			return this.entryData.key(this.entryIndex);
 		}
 
 		@Override
-		@SuppressWarnings ("unchecked")
 		public GValue getValue() {
-			return (GValue)this.entryData.values[this.entryIndex];
+			return this.entryData.value(this.entryIndex);
 		}
 
 		@Override
 		public GValue setValue(final GValue value) {
-			final GValue result = this.getValue();
-			this.entryData.values[this.entryIndex] = value;
-			return result;
+			return this.entryData.value(this.entryIndex, value);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.getKey()) ^ Objects.hash(this.getValue());
+			return this.entryData.customHash(this.getKey()) ^ Objects.hash(this.getValue());
 		}
 
 		@Override
 		public boolean equals(final Object object) {
 			if (!(object instanceof Entry)) return false;
 			final Entry<?, ?> that = (Entry<?, ?>)object;
-			return Objects.equals(this.getKey(), that.getKey()) && Objects.equals(this.getValue(), that.getValue());
+			return this.entryData.customEquals(this.getKey(), that.getKey()) && Objects.equals(this.getValue(), that.getValue());
 		}
 
 		@Override
@@ -80,9 +76,9 @@ public abstract class HashData<GKey, GValue> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected static abstract class HashIterator<GItem> implements Iterator<GItem> {
+	protected static abstract class HashIterator<GKey, GValue, GItem> implements Iterator<GItem> {
 
-		protected final HashData<?, ?> entryData;
+		protected final HashData<GKey, GValue> entryData;
 
 		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link HashData#keys}. */
 		protected int nextIndex;
@@ -93,7 +89,7 @@ public abstract class HashData<GKey, GValue> {
 		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link HashData#keys}. */
 		protected int entryIndex = -1;
 
-		public HashIterator(final HashData<?, ?> entryData) {
+		public HashIterator(final HashData<GKey, GValue> entryData) {
 			this.entryData = entryData;
 			this.seekEntry();
 		}
@@ -112,6 +108,21 @@ public abstract class HashData<GKey, GValue> {
 			}
 			this.nextIndex = -1;
 			this.tableIndex = -1;
+		}
+
+		/** Diese Methode gibt den nächsten Schlüssel zurück. */
+		protected final GKey nextKey() {
+			return this.entryData.key(this.nextIndex());
+		}
+
+		/** Diese Methode gibt den nächsten Wert zurück. */
+		protected final GValue nextValue() {
+			return this.entryData.value(this.nextIndex());
+		}
+
+		/** Diese Methode gibt den nächsten Eintrag zurück. */
+		protected final HashEntry<GKey, GValue> nextEntry() {
+			return new HashEntry<>(this.entryData, this.nextIndex());
 		}
 
 		/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
@@ -182,18 +193,17 @@ public abstract class HashData<GKey, GValue> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected static class KeysIterator<GKey> extends HashIterator<GKey> {
+	protected static class KeysIterator<GKey, GValue> extends HashIterator<GKey, GValue, GKey> {
 
-		public KeysIterator(final HashData<GKey, ?> entryData) {
+		public KeysIterator(final HashData<GKey, GValue> entryData) {
 			super(entryData);
 		}
 
 		{}
 
 		@Override
-		@SuppressWarnings ("unchecked")
 		public GKey next() {
-			return (GKey)this.entryData.keys[this.nextIndex()];
+			return this.nextKey();
 		}
 
 	}
@@ -227,18 +237,17 @@ public abstract class HashData<GKey, GValue> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected static class ValuesIterator<GValue> extends HashIterator<GValue> {
+	protected static class ValuesIterator<GKey, GValue> extends HashIterator<GKey, GValue, GValue> {
 
-		public ValuesIterator(final HashData<?, GValue> entryData) {
+		public ValuesIterator(final HashData<GKey, GValue> entryData) {
 			super(entryData);
 		}
 
 		{}
 
 		@Override
-		@SuppressWarnings ("unchecked")
 		public GValue next() {
-			return (GValue)this.entryData.values[this.nextIndex()];
+			return this.nextValue();
 		}
 
 	}
@@ -286,7 +295,7 @@ public abstract class HashData<GKey, GValue> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected static class EntriesIterator<GKey, GValue> extends HashIterator<Entry<GKey, GValue>> {
+	protected static class EntriesIterator<GKey, GValue> extends HashIterator<GKey, GValue, Entry<GKey, GValue>> {
 
 		public EntriesIterator(final HashData<GKey, GValue> entryData) {
 			super(entryData);
@@ -296,7 +305,7 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public Entry<GKey, GValue> next() {
-			return new HashEntry<>(this.entryData, this.nextIndex());
+			return this.nextEntry();
 		}
 
 	}
@@ -380,6 +389,9 @@ public abstract class HashData<GKey, GValue> {
 	/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
 	private static final Object[] EMPTY_OBJECTS = {};
 
+	/** Dieses Feld speichert die maximale Kapazität. */
+	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
+
 	{}
 
 	@SuppressWarnings ("javadoc")
@@ -402,24 +414,25 @@ public abstract class HashData<GKey, GValue> {
 
 	{}
 
-	/** Dieses Feld bildet von dem Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	protected Object[] keys = HashData.EMPTY_OBJECTS;
 
-	/** Dieses Feld bildet von dem Index eines Eintrags auf den Index des nächsten Eintrags ab. Für alle anderen Indizes bildet es auf den Index des nächsten
-	 * freien Elements ab. */
+	/** Dieses Feld bildet vom Index eines Eintrags auf den Index des nächsten Eintrags ab. Für alle anderen Indizes bildet es auf den Index des nächsten
+	 * reservierten Speicherbereiches ab. */
 	protected int[] nexts = HashData.EMPTY_INTEGERS;
 
-	/** Dieses Feld bildet von dem Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	protected Object[] values;
 
-	/** Dieses Feld bildet von dem Index eines Eintrags auf den Streuwert seines Schlüssels ab oder ist {@code null}. */
+	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab oder ist {@code null}. */
 	protected int[] hashes;
 
-	/** Dieses Feld bildet von dem maskierten Streuwert eines Schlüssels auf den um 1 erhöhten Index des Eintrags ab, dessen Schlüssel den gleichen maskierten
-	 * Streuwert besitzt. Die Länge dieser Liste entspricht stets einer Potenz von 2. */
+	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
+	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. */
 	protected int[] table = HashData.EMPTY_TABLE;
 
-	/** Dieses Feld speichert den Index des nächsten freien Elements in {@link #nexts}. */
+	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
+	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
 	protected int entry = 0;
 
 	/** Dieses Feld speichert die Anzahl der Einträge. */
@@ -460,7 +473,7 @@ public abstract class HashData<GKey, GValue> {
 			this.values = this.values != null ? HashData.EMPTY_OBJECTS : null;
 			this.hashes = this.hashes != null ? HashData.EMPTY_INTEGERS : null;
 			this.table = HashData.EMPTY_TABLE;
-		} else {
+		} else if (capacity <= HashData.MAX_CAPACITY) {
 			final int newMask = IAMMapping.mask(capacity);
 			final int[] oldTable = this.table;
 			final int[] newTable = new int[newMask + 1];
@@ -497,12 +510,43 @@ public abstract class HashData<GKey, GValue> {
 			this.nexts = newNexts;
 			this.values = newValues;
 			this.hashes = newHashes;
-		}
+		} else throw new OutOfMemoryError();
 	}
 
 	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
 	public final void compact() {
 		this.allocate(this.count);
+	}
+
+	/** Diese Methode gibt den Schlüssel des gegebenen Eintrags zurück.
+	 * 
+	 * @param entryIndex Index eines Eintrags.
+	 * @return Schlüssel oder {@code null}. */
+	@SuppressWarnings ("unchecked")
+	protected final GKey key(final int entryIndex) {
+		return (GKey)this.keys[entryIndex];
+	}
+
+	/** Diese Methode gibt den Wert des gegebenen Eintrags zurück.
+	 * 
+	 * @param entryIndex Index eines Eintrags.
+	 * @return Wert oder {@code null}. */
+	@SuppressWarnings ("unchecked")
+	protected final GValue value(final int entryIndex) {
+		return (GValue)this.values[entryIndex];
+	}
+
+	/** Diese Methode ersetzt den Wert des gegebenen Eintrags und gibt den vorherigen zurück.
+	 * 
+	 * @param entryIndex Index eines Eintrags.
+	 * @param value neuer Wert oder {@code null}.
+	 * @return alter Wert oder {@code null}. */
+	@SuppressWarnings ("unchecked")
+	protected final GValue value(final int entryIndex, final GValue value) {
+		final Object[] values = this.values;
+		final Object result = values[entryIndex];
+		values[entryIndex] = value;
+		return (GValue)result;
 	}
 
 	/** Diese Methode gibt das {@link Set} der Schlüssel in {@link #keys} zurück.
@@ -515,7 +559,7 @@ public abstract class HashData<GKey, GValue> {
 	/** Diese Methode gibt den {@link Iterator} über die Schlüssel in {@link #keys} zurück.
 	 *
 	 * @return Interator für {@link #getKeys()}. */
-	protected final KeysIterator<GKey> getKeysIterator() {
+	protected final KeysIterator<GKey, GValue> getKeysIterator() {
 		return new KeysIterator<>(this);
 	}
 
@@ -529,7 +573,7 @@ public abstract class HashData<GKey, GValue> {
 	/** Diese Methode gibt den {@link Iterator} über die Werte in {@link #values} zurück.
 	 *
 	 * @return Interator für {@link #getValues()}. */
-	protected final ValuesIterator<GValue> getValuesIterator() {
+	protected final ValuesIterator<GKey, GValue> getValuesIterator() {
 		return new ValuesIterator<>(this);
 	}
 
@@ -636,10 +680,11 @@ public abstract class HashData<GKey, GValue> {
 		final int hash = this.customHash(key), result = this.getEntry(key, hash);
 		if (result >= 0) return result;
 		final int count = this.count + 1, capacity = this.capacity();
+		if (count > HashData.MAX_CAPACITY) throw new OutOfMemoryError();
 		this.count = count;
 		if (count <= capacity) return this.putEntry(key, hash);
-		final int allocate = capacity + (capacity >> 1);
-		this.allocate(count > allocate ? count : allocate);
+		final int allocate = count + (count >> 1);
+		this.allocate((allocate < 0) || (allocate > HashData.MAX_CAPACITY) ? HashData.MAX_CAPACITY : allocate);
 		return this.putEntry(key, hash);
 	}
 
@@ -670,13 +715,9 @@ public abstract class HashData<GKey, GValue> {
 	 * @param key Schlüssel des Eintrags.
 	 * @param value neuer Wert des Eintrags.
 	 * @return alert Wert des gefundenen Eintrags oder {@code null}. */
-	@SuppressWarnings ("unchecked")
 	protected final GValue putValue(final GKey key, final GValue value) {
 		final int index = this.putEntry(key);
-		final Object[] values = this.values;
-		final Object result = values[index];
-		values[index] = value;
-		return (GValue)result;
+		return this.value(index, value);
 	}
 
 	/** Diese Methode entfernt den gegeben Schlüssel und liefet nur dann {@code true}, wenn dieser zuvor über {@link #putKey(Object)} hinzugefügt wurde.
@@ -786,11 +827,14 @@ public abstract class HashData<GKey, GValue> {
 		if ((tableIndex < 0) || (entryIndex < 0)) return false;
 		int prevIndex = table[tableIndex];
 		if (prevIndex < 0) return false;
+		final Object[] values = this.values;
 		if (prevIndex == entryIndex) {
 			table[tableIndex] = nexts[prevIndex];
 			nexts[prevIndex] = this.entry;
 			this.keys[prevIndex] = null;
-			this.values[prevIndex] = null;
+			if (values != null) {
+				values[prevIndex] = null;
+			}
 			this.entry = prevIndex;
 			this.count--;
 			return true;
@@ -800,7 +844,9 @@ public abstract class HashData<GKey, GValue> {
 				nexts[prevIndex] = nexts[nextIndex];
 				nexts[nextIndex] = this.entry;
 				this.keys[nextIndex] = null;
-				this.values[nextIndex] = null;
+				if (values != null) {
+					values[nextIndex] = null;
+				}
 				this.entry = nextIndex;
 				this.count--;
 				return true;
@@ -820,7 +866,6 @@ public abstract class HashData<GKey, GValue> {
 		final int entry = this.popEntry(key);
 		if (entry < 0) return null;
 		final Object[] values = this.values;
-		if (values == null) return null;
 		final Object result = values[entry];
 		values[entry] = null;
 		return (GValue)result;
@@ -838,16 +883,16 @@ public abstract class HashData<GKey, GValue> {
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Schlüssels zurück.
 	 *
-	 * @param key Schlüssel.
+	 * @param key Schlüssel oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} des Schlüssels. */
 	protected int customHash(final Object key) {
 		return Objects.hash(key);
 	}
 
-	/** /** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Schlüssel zurück.
+	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Schlüssel zurück.
 	 *
-	 * @param thisKey alter bzw. verwalteter Schlüssel.
-	 * @param thatKey neuer bzw. gesuchter Schlüssel.
+	 * @param thisKey alter bzw. verwalteter Schlüssel oder {@code null}.
+	 * @param thatKey neuer bzw. gesuchter Schlüssel oder {@code null}.
 	 * @return Äquivalenz der gegebenen Schlüssel. */
 	protected boolean customEquals(final Object thisKey, final Object thatKey) {
 		return Objects.equals(thisKey, thatKey);

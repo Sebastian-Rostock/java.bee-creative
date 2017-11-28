@@ -12,48 +12,123 @@ import java.util.Set;
  * beschrieben über Methoden der Elemente, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEquals(Object, Object)} dieses
  * {@link HashSet}.</b>
  * <p>
- * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung (32 Bit). Die relativen Rechenzeiten wurden zu 2<sup>18</sup>
- * {@link Random#nextInt(int) zufälligen} {@link Integer} ermittelt.
+ * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung (32 Bit). Die relativen Rechenzeiten wurden für {@link Random#nextInt(int)
+ * zufällig} gemischte {@link Integer} ermittelt.
  * <p>
  * <table border="1" cellspacing="0" cellpadding="4">
  * <tr>
- * <th>CLASS</th>
- * <th>SIZE = 0</th>
- * <th>SIZE = 2<sup>1..29</sup></th>
- * <th>{@link #add(Object) add}-TIME</th>
- * <th>{@link #contains(Object) contains}-TIME</th>
- * <th>{@link #remove(Object) remove}-TIME</th>
+ * <th rowspan="2">Klasse</th>
+ * <th colspan="4">Speicherverbrauch</th>
+ * <th colspan="3">Rechenzeit ({@link #size()} = 4K)</th>
+ * <th colspan="3">Rechenzeit ({@link #size()} = 4M)</th>
+ * </tr>
+ * <tr>
+ * <th>{@link #size()} = 0</th>
+ * <th>{@link #size()} = 1..500M</th>
+ * <th>{@link #size()} = 500M..1G</th>
+ * <th>{@link #size()} = 1G..2G</th>
+ * <th>{@link #add(Object) add}</th>
+ * <th>{@link #contains(Object) contains}</th>
+ * <th>{@link #remove(Object) remove}</th>
+ * <th>{@link #add(Object) add}</th>
+ * <th>{@link #contains(Object) contains}</th>
+ * <th>{@link #remove(Object) remove}</th>
  * </tr>
  * <tr>
  * <td>{@link java.util.HashSet}</td>
- * <td>88..136 Byte</td>
- * <td>SIZE x 36 + 80..128 Byte</td>
- * <td>100%</td>
- * <td>100%</td>
- * <td>100%</td>
+ * <td>88..136</td>
+ * <td colspan="2">{@link #size()} * 36 + 80..128 Byte (= 100 %)</td>
+ * <td>{@link #size()} * 34..36 + 80..128 Byte (~ 95..100 %)</td>
+ * <td>(= 100 %)</td>
+ * <td>(~ 41 %)</td>
+ * <td>(~ 46 %)</td>
+ * <td>(= 100 %)</td>
+ * <td>(~ 92 %)</td>
+ * <td>(~ 98 %)</td>
  * </tr>
  * <tr>
- * <td>{@link bee.creative.util.HashSet} mit Streuwertpuffer</td>
+ * <td>{@link bee.creative.util.HashSet}<br>
+ * mit Streuwertpuffer</td>
  * <td>40 Byte</td>
- * <td>SIZE x 16 + 104 Byte</td>
- * <td>70%</td>
- * <td>50%</td>
- * <td>50%</td>
+ * <td>{@link #size()} * 16 + 104 Byte (~ 44 %)</td>
+ * <td colspan="2">{@link #size()} * 13..16 + 104 Byte (~ 36..44 %)</td>
+ * <td>(~ 46 %)</td>
+ * <td>(~ 29 %)</td>
+ * <td>(~ 55 %)</td>
+ * <td>(~ 81 %)</td>
+ * <td>(~ 74 %)</td>
+ * <td>(~ 83 %)</td>
  * </tr>
  * <tr>
- * <td>{@link bee.creative.util.HashSet} ohne Streuwertpuffer</td>
+ * <td>{@link bee.creative.util.HashSet}<br>
+ * ohne Streuwertpuffer</td>
  * <td>40 Byte</td>
- * <td>SIZE x 12 + 88 Byte</td>
- * <td>60%</td>
- * <td>40%</td>
- * <td>45%</td>
+ * <td>{@link #size()} * 12 + 88 Byte (~33%)</td>
+ * <td colspan="2">{@link #size()} * 9..12 + 88 Byte (~25..33%)</td>
+ * <td>(~ 43 %)</td>
+ * <td>(~ 33 %)</td>
+ * <td>(~ 55 %)</td>
+ * <td>(~ 91 %)</td>
+ * <td>(~ 84 %)</td>
+ * <td>(~ 95 %)</td>
  * </tr>
  * </table>
  * </p>
- *
+ * 
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
 public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem> {
+
+	/** Diese Methode gibt ein {@link HashSet} zurück, welches zur Ermittlung von {@link #customHash(Object) Streuwerte} und {@link #customEquals(Object, Object)
+	 * Äquivalenz} der Elemente den gegebenne {@link Hasher} einsetzt.
+	 * 
+	 * @param <GItem> Typ der Elemente.
+	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Elemente.
+	 * @return {@link HashSet}. */
+	public static <GItem> HashSet<GItem> from(final Hasher<? super Object> hasher) {
+		return new HashSet<GItem>() {
+
+			@Override
+			protected int customHash(final Object key) {
+				return hasher.hash(key);
+			}
+
+			@Override
+			protected boolean customEquals(final Object thisKey, final Object thatKey) {
+				return hasher.equals(thisKey, thatKey);
+			}
+
+		};
+	}
+
+	/** Diese Methode gibt ein {@link HashSet} zurück, welches nur die vom gegebenen {@link Filter} akzeptierten Elemente zulässt und zur Ermittlung von
+	 * {@link #customHash(Object) Streuwerte} und {@link #customEquals(Object, Object) Äquivalenz} der Elemente den gegebenne {@link Hasher} einsetzt.
+	 * 
+	 * @param <GItem> Typ der Elemente.
+	 * @param filter {@link Filter} zur Erkennugn der akzeptierten Elemente, welche als {@code GKey} interpretiert werden können.
+	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Elemente.
+	 * @return {@link HashSet}. */
+	public static <GItem> HashSet<GItem> from(final Filter<Object> filter, final Hasher<? super GItem> hasher) {
+		return new HashSet<GItem>() {
+
+			@Override
+			@SuppressWarnings ("unchecked")
+			protected int customHash(final Object key) {
+				if (!filter.accept(key)) return 0;
+				return hasher.hash((GItem)key);
+			}
+
+			@Override
+			@SuppressWarnings ("unchecked")
+			protected boolean customEquals(final Object thisKey, final Object thatKey) {
+				if (!filter.accept(thatKey)) return false;
+				return hasher.equals((GItem)thisKey, (GItem)thatKey);
+			}
+
+		};
+	}
+
+	{}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSet} mit {@link #HashSet(int, boolean) Streuwertpuffer} und der Kapazität {@code 0}. */
 	public HashSet() {

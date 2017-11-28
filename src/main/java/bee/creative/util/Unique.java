@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 /** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene
  * Eingaben über eine interne {@link Data Abbildung} mit {@link #compile(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer
@@ -21,11 +22,12 @@ import java.util.Set;
  * @see Unique#compile(Object)
  * @see Hasher
  * @see Getter
+ * @see Filter
  * @see Comparator
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ der Eingabe.
  * @param <GOutput> Typ der Ausgabe. */
-public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<GInput, GOutput>, Comparator<GInput>, Iterable<GOutput> {
+public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<GInput, GOutput>, Filter<Object>, Comparator<GInput>, Iterable<GOutput> {
 
 	/** Diese Schnittstelle definiert die Verwaltung der Einträge eines {@link Unique} als Abbildung von Eingaben auf Ausgaben, analog zu einer {@link Map}.
 	 *
@@ -417,12 +419,11 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 
 		/** {@inheritDoc} */
 		@Override
-		@SuppressWarnings ("unchecked")
 		public GValue getOutput() throws RuntimeException {
 			final int entry = this.index;
 			this.clearInput();
 			if (entry < 0) throw new IllegalStateException();
-			return (GValue)this.keys[entry];
+			return this.key(entry);
 		}
 
 		/** {@inheritDoc} */
@@ -464,12 +465,11 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 
 		/** {@inheritDoc} */
 		@Override
-		@SuppressWarnings ("unchecked")
 		public GOutput getOutput() throws RuntimeException {
 			final int entry = this.index;
 			this.clearInput();
 			if (entry < 0) throw new IllegalStateException();
-			return (GOutput)this.values[entry];
+			return this.value(entry);
 		}
 
 		/** {@inheritDoc} */
@@ -639,7 +639,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput get(final Object key) {
-			if (!Unique.this.check(key)) return null;
+			if (!Unique.this.accept(key)) return null;
 			final Data<GInput, GOutput> data = Unique.this.data;
 			data.forInput((GInput)key);
 			if (data.hasOutput()) return data.getOutput();
@@ -650,7 +650,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput remove(final Object key) {
-			if (!Unique.this.check(key)) return null;
+			if (!Unique.this.accept(key)) return null;
 			final Data<GInput, GOutput> data = Unique.this.data;
 			data.forInput((GInput)key);
 			if (data.hasOutput()) {
@@ -666,7 +666,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		@SuppressWarnings ("unchecked")
 		@Override
 		public boolean containsKey(final Object key) {
-			if (!Unique.this.check(key)) return false;
+			if (!Unique.this.accept(key)) return false;
 			final Data<GInput, GOutput> data = Unique.this.data;
 			data.forInput((GInput)key);
 			return data.hasOutput();
@@ -675,15 +675,6 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 	};
 
 	{}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object} nach {@code GInput} zulässig ist. Sie wird von der
-	 * {@link Map}-Sich {@link #entryMap()} verwendet.
-	 *
-	 * @param input {@link Object}.
-	 * @return {@code true}, wenn {@code input instanceOf GInput}. */
-	protected boolean check(final Object input) {
-		return true;
-	}
 
 	/** Diese Methode wird bei der Wiederverwendung der gegebenen Ausgabe für die gegebene Eingabe von aufgerufen. Ein- und Ausgabe sind nie {@code null}.
 	 *
@@ -740,37 +731,34 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 
 	{}
 
-	/** Der berechnete {@link Object#hashCode() Streuwert} wird von den Schlüsseln der {@link Map} verwendet.
-	 * <p>
-	 * {@inheritDoc}
+	/** {@inheritDoc}
 	 *
-	 * @see HashSetData
-	 * @see HashMapData
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
+	 * @see HashMap */
 	@Override
 	public int hash(final GInput input) throws NullPointerException {
 		return input.hashCode();
 	}
 
-	/** Die berechnete {@link Object#equals(Object) Äquivalenz} wird von den Schlüsseln der {@link Map} verwendet.
-	 * <p>
-	 * {@inheritDoc}
+	/** {@inheritDoc}
 	 *
-	 * @see HashSetData
-	 * @see HashMapData
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
+	 * @see HashMap */
 	@Override
 	public boolean equals(final GInput input1, final GInput input2) throws NullPointerException {
 		return Objects.equals(input1, input2);
 	}
 
-	/** Der berechnete {@link Comparator#compare(Object, Object) Vergleichswert} wird von den Schlüsseln der {@link Map} verwendet.
-	 * <p>
-	 * {@inheritDoc}
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object} nach {@code GInput} zulässig ist. Sie wird von der
+	 * internen Abbildung verwendet.
 	 *
-	 * @see ListSetData
-	 * @see ListMapData
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
+	 * @return {@code true}, wenn {@code input instanceOf GInput}. */
+	@Override
+	public boolean accept(final Object input) {
+		return true;
+	}
+
+	/** Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der gegebenen Schlüssel zurück.
+	 *
+	 * @see TreeMap */
 	@Override
 	public int compare(final GInput input1, final GInput input2) throws NullPointerException {
 		return Comparators.compare(this.hash(input1), this.hash(input2));

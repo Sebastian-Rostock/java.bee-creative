@@ -85,7 +85,7 @@ public class IAMBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final boolean check(final Object input) {
+		public final boolean accept(final Object input) {
 			return input instanceof int[];
 		}
 

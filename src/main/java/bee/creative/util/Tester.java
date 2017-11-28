@@ -140,6 +140,28 @@ public class Tester {
 	/** Dieses Feld speichert die Fehlerursache, wenn die Testmethode eiene ausnahme auslöst, oder {@code null}. */
 	public final Throwable cause;
 
+	/** Dieser Konstruktor initialisiert diesen {@link Tester} als arithmetisches Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
+	 * 
+	 * @param testers {@link Tester}, deren arithmetisches Mittel errechnet wird.
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code testers} leer ist. */
+	public Tester(final Tester... testers) throws NullPointerException, IllegalArgumentException {
+		final int count = testers.length;
+		if (count == 0) throw new IllegalArgumentException();
+		long usedTime = 0, usedMemory = 0;
+		for (int i = 0; i < count; i++) {
+			usedTime += testers[i].usedTime;
+			usedMemory += testers[i].usedMemory;
+		}
+		this.usedTime = usedTime / count;
+		this.usedMemory = usedMemory / count;
+		this.enterTime = 0;
+		this.enterMemory = 0;
+		this.leaveTime = this.usedTime;
+		this.leaveMemory = this.usedMemory;
+		this.cause = null;
+	}
+
 	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der Speicherbelegung erfolgt synchron von und nach dem
 	 * Aufruf der Testmethode.
 	 *
