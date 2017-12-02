@@ -262,7 +262,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		/** {@inheritDoc} */
 		@Override
 		public void forInput(final GInput input) throws RuntimeException {
-			this.index = this.getEntry(input);
+			this.index = this.getIndexImpl(input);
 			this.input = input;
 		}
 
@@ -288,7 +288,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<Entry<GInput, GOutput>> iterator() {
-			return this.getEntriesIterator();
+			return this.newEntriesIteratorImpl();
 		}
 
 		/** {@inheritDoc} */
@@ -423,13 +423,13 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 			final int entry = this.index;
 			this.clearInput();
 			if (entry < 0) throw new IllegalStateException();
-			return this.key(entry);
+			return this.getKeyImpl(entry);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public void setOutput(final GValue output) {
-			this.putKey(output);
+			this.putKeyImpl(output);
 			this.clearInput();
 		}
 
@@ -439,7 +439,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 			final int entry = this.index;
 			this.clearInput();
 			if (entry < 0) return;
-			this.popKey(this.input);
+			this.popKeyImpl(this.input);
 		}
 
 	}
@@ -469,13 +469,13 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 			final int entry = this.index;
 			this.clearInput();
 			if (entry < 0) throw new IllegalStateException();
-			return this.value(entry);
+			return this.getValueImpl(entry);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public void setOutput(final GOutput output) {
-			this.putValue(this.input, output);
+			this.putImpl(this.input, output);
 			this.clearInput();
 		}
 
@@ -485,7 +485,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<
 			final int entry = this.index;
 			this.clearInput();
 			if (entry < 0) return;
-			this.popValue(this.input);
+			this.popImpl(this.input);
 		}
 
 	}

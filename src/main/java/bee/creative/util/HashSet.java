@@ -74,14 +74,14 @@ import java.util.Set;
  * </tr>
  * </table>
  * </p>
- * 
+ *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
 public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem> {
 
 	/** Diese Methode gibt ein {@link HashSet} zurück, welches zur Ermittlung von {@link #customHash(Object) Streuwerte} und {@link #customEquals(Object, Object)
 	 * Äquivalenz} der Elemente den gegebenne {@link Hasher} einsetzt.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Elemente.
 	 * @return {@link HashSet}. */
@@ -103,7 +103,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 
 	/** Diese Methode gibt ein {@link HashSet} zurück, welches nur die vom gegebenen {@link Filter} akzeptierten Elemente zulässt und zur Ermittlung von
 	 * {@link #customHash(Object) Streuwerte} und {@link #customEquals(Object, Object) Äquivalenz} der Elemente den gegebenne {@link Hasher} einsetzt.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param filter {@link Filter} zur Erkennugn der akzeptierten Elemente, welche als {@code GKey} interpretiert werden können.
 	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Elemente.
@@ -187,25 +187,25 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	/** {@inheritDoc} */
 	@Override
 	public boolean contains(final Object o) {
-		return this.getKey(o);
+		return this.hasKeyImpl(o);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public Iterator<GItem> iterator() {
-		return this.getKeysIterator();
+		return this.newKeysIteratorImpl();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean add(final GItem e) {
-		return this.putKey(e);
+		return this.putKeyImpl(e);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean remove(final Object o) {
-		return this.popKey(o);
+		return this.popKeyImpl(o);
 	}
 
 	/** {@inheritDoc} */
@@ -229,7 +229,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	/** {@inheritDoc} */
 	@Override
 	public boolean removeAll(final Collection<?> c) {
-		return this.getKeys().removeAll(c);
+		return this.newKeysImpl().removeAll(c);
 	}
 
 	/** {@inheritDoc} */
@@ -241,7 +241,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		return this.getKeys().hashCode();
+		return this.newKeysImpl().hashCode();
 	}
 
 	/** {@inheritDoc} */
@@ -257,19 +257,19 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	/** {@inheritDoc} */
 	@Override
 	public Object[] toArray() {
-		return this.getKeys().toArray();
+		return this.newKeysImpl().toArray();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public <T> T[] toArray(final T[] a) {
-		return this.getKeys().toArray(a);
+		return this.newKeysImpl().toArray(a);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return this.getKeys().toString();
+		return this.newKeysImpl().toString();
 	}
 
 }

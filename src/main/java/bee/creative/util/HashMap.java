@@ -85,7 +85,7 @@ import java.util.Set;
  * </p>
  * <sup>1</sup> Iteration über die {@link #entrySet() Menge der Einträge} und {@link java.util.Map.Entry#setValue(Object) Setzen des Werts} jedes
  * {@link java.util.Map.Entry Eintrags}.
- * 
+ *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
@@ -93,7 +93,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 
 	/** Diese Methode gibt eine {@link HashMap} zurück, welche zur Ermittlung von {@link #customHash(Object) Streuwerte} und {@link #customEquals(Object, Object)
 	 * Äquivalenz} der Schlüssel den gegebenne {@link Hasher} einsetzt.
-	 * 
+	 *
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Schlüssel.
@@ -116,7 +116,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 
 	/** Diese Methode gibt eine {@link HashMap} zurück, welche nur die vom gegebenen {@link Filter} akzeptierten Schlüssel zulässt und zur Ermittlung von
 	 * {@link #customHash(Object) Streuwerte} und {@link #customEquals(Object, Object) Äquivalenz} der Schlüssel den gegebenne {@link Hasher} einsetzt.
-	 * 
+	 *
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param filter {@link Filter} zur Erkennugn der akzeptierten Schlüssel, welche als {@code GKey} interpretiert werden können.
@@ -201,18 +201,18 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public boolean containsKey(final Object key) {
-		return this.getKey(key);
+		return this.hasKeyImpl(key);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean containsValue(final Object value) {
 		if (value == null) {
-			for (final Iterator<GValue> iterator = this.getValuesIterator(); iterator.hasNext();) {
+			for (final Iterator<GValue> iterator = this.newValuesIteratorImpl(); iterator.hasNext();) {
 				if (iterator.next() == null) return true;
 			}
 		} else {
-			for (final Iterator<GValue> iterator = this.getValuesIterator(); iterator.hasNext();) {
+			for (final Iterator<GValue> iterator = this.newValuesIteratorImpl(); iterator.hasNext();) {
 				if (value.equals(iterator.next())) return true;
 			}
 		}
@@ -222,26 +222,26 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public GValue get(final Object key) {
-		return this.getValue(key);
+		return this.getImpl(key);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		return this.putValue(key, value);
+		return this.putImpl(key, value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public GValue remove(final Object key) {
-		return this.popValue(key);
+		return this.popImpl(key);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void putAll(final Map<? extends GKey, ? extends GValue> map) {
 		for (final Entry<? extends GKey, ? extends GValue> entry: map.entrySet()) {
-			this.putValue(entry.getKey(), entry.getValue());
+			this.putImpl(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -254,25 +254,25 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public Set<GKey> keySet() {
-		return this.getKeys();
+		return this.newKeysImpl();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public Collection<GValue> values() {
-		return this.getValues();
+		return this.newValuesImpl();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public Set<Entry<GKey, GValue>> entrySet() {
-		return this.getEntries();
+		return this.newEntriesImpl();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		return this.getMapping().hashCode();
+		return this.newMappingImpl().hashCode();
 	}
 
 	/** {@inheritDoc} */
@@ -282,7 +282,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 		if (!(object instanceof Map<?, ?>)) return false;
 		final Map<?, ?> that = (Map<?, ?>)object;
 		if (that.size() != this.size()) return false;
-		for (final Iterator<Entry<GKey, GValue>> entries = this.getEntriesIterator(); entries.hasNext();) {
+		for (final Iterator<Entry<GKey, GValue>> entries = this.newEntriesIteratorImpl(); entries.hasNext();) {
 			final Entry<?, ?> entry = entries.next();
 			final Object key = entry.getKey(), value = entry.getValue();
 			if (value == null) {
@@ -297,7 +297,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return this.getMapping().toString();
+		return this.newMappingImpl().toString();
 	}
 
 }

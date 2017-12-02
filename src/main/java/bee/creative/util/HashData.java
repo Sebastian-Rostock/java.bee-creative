@@ -5,6 +5,7 @@ import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,17 +44,17 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public GKey getKey() {
-			return this.entryData.key(this.entryIndex);
+			return this.entryData.getKeyImpl(this.entryIndex);
 		}
 
 		@Override
 		public GValue getValue() {
-			return this.entryData.value(this.entryIndex);
+			return this.entryData.getValueImpl(this.entryIndex);
 		}
 
 		@Override
 		public GValue setValue(final GValue value) {
-			return this.entryData.value(this.entryIndex, value);
+			return this.entryData.putValueImpl(this.entryIndex, value);
 		}
 
 		@Override
@@ -91,38 +92,22 @@ public abstract class HashData<GKey, GValue> {
 
 		public HashIterator(final HashData<GKey, GValue> entryData) {
 			this.entryData = entryData;
-			this.seekEntry();
-		}
-
-		/** Diese Methode sucht den Index des nächsten Eintrags. */
-		private final void seekEntry() {
-			final int[] tableArray = this.entryData.table;
-			final int tableLength = tableArray.length;
-			for (int tableIndex = this.tableIndex + 1; tableIndex < tableLength; ++tableIndex) {
-				final int entryIndex = tableArray[tableIndex];
-				if (entryIndex >= 0) {
-					this.tableIndex = tableIndex;
-					this.nextIndex = entryIndex;
-					return;
-				}
-			}
-			this.nextIndex = -1;
-			this.tableIndex = -1;
+			this.nextIndex2();
 		}
 
 		/** Diese Methode gibt den nächsten Schlüssel zurück. */
 		protected final GKey nextKey() {
-			return this.entryData.key(this.nextIndex());
-		}
-
-		/** Diese Methode gibt den nächsten Wert zurück. */
-		protected final GValue nextValue() {
-			return this.entryData.value(this.nextIndex());
+			return this.entryData.getKeyImpl(this.nextIndex());
 		}
 
 		/** Diese Methode gibt den nächsten Eintrag zurück. */
 		protected final HashEntry<GKey, GValue> nextEntry() {
 			return new HashEntry<>(this.entryData, this.nextIndex());
+		}
+
+		/** Diese Methode gibt den nächsten Wert zurück. */
+		protected final GValue nextValue() {
+			return this.entryData.getValueImpl(this.nextIndex());
 		}
 
 		/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
@@ -134,9 +119,25 @@ public abstract class HashData<GKey, GValue> {
 			if (nextIndex >= 0) {
 				this.nextIndex = nextIndex;
 			} else {
-				this.seekEntry();
+				this.nextIndex2();
 			}
 			return prevIndex;
+		}
+
+		/** Diese Methode sucht den Index des nächsten Eintrags. */
+		final void nextIndex2() {
+			final int[] table = this.entryData.table;
+			final int length = table.length;
+			for (int tableIndex = this.tableIndex + 1; tableIndex < length; ++tableIndex) {
+				final int nextIndex = table[tableIndex];
+				if (nextIndex >= 0) {
+					this.nextIndex = nextIndex;
+					this.tableIndex = tableIndex;
+					return;
+				}
+			}
+			this.nextIndex = -1;
+			this.tableIndex = -1;
 		}
 
 		{}
@@ -148,7 +149,7 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public void remove() {
-			if (this.entryData.popEntry(this.tableIndex, this.entryIndex)) return;
+			if (this.entryData.popEntryImpl(this.tableIndex, this.entryIndex)) return;
 			throw new IllegalStateException();
 		}
 
@@ -177,17 +178,17 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public Iterator<GKey> iterator() {
-			return this.entryData.getKeysIterator();
+			return this.entryData.newKeysIteratorImpl();
 		}
 
 		@Override
 		public boolean remove(final Object item) {
-			return this.entryData.popKey(item);
+			return this.entryData.popKeyImpl(item);
 		}
 
 		@Override
 		public boolean contains(final Object item) {
-			return this.entryData.getKey(item);
+			return this.entryData.hasKeyImpl(item);
 		}
 
 	}
@@ -231,7 +232,17 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public Iterator<GValue> iterator() {
-			return this.entryData.getValuesIterator();
+			return this.entryData.newValuesIteratorImpl();
+		}
+
+		@Override
+		public boolean remove(final Object o) {
+			return this.entryData.popValueImpl(o);
+		}
+
+		@Override
+		public boolean contains(final Object o) {
+			return this.entryData.hasValueImpl(o);
 		}
 
 	}
@@ -275,21 +286,21 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public Iterator<Entry<GKey, GValue>> iterator() {
-			return this.entryData.getEntriesIterator();
+			return this.entryData.newEntriesIteratorImpl();
 		}
 
 		@Override
 		public boolean remove(final Object object) {
 			if (!(object instanceof Entry)) return false;
 			final Entry<?, ?> entry = (Entry<?, ?>)object;
-			return this.entryData.popEntry(entry.getKey(), entry.getValue());
+			return this.entryData.popEntryImpl(entry.getKey(), entry.getValue());
 		}
 
 		@Override
 		public boolean contains(final Object object) {
 			if (!(object instanceof Entry)) return false;
 			final Entry<?, ?> entry = (Entry<?, ?>)object;
-			return this.entryData.getEntry(entry.getKey(), entry.getValue());
+			return this.entryData.hasEntryImpl(entry.getKey(), entry.getValue());
 		}
 
 	}
@@ -338,7 +349,7 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public boolean containsKey(final Object key) {
-			return this.entryData.getKey(key);
+			return this.entryData.hasKeyImpl(key);
 		}
 
 		@Override
@@ -348,32 +359,32 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public GValue get(final Object key) {
-			return this.entryData.getValue(key);
+			return this.entryData.getImpl(key);
 		}
 
 		@Override
 		public Set<GKey> keySet() {
-			return this.entryData.getKeys();
+			return this.entryData.newKeysImpl();
 		}
 
 		@Override
 		public GValue put(final GKey key, final GValue value) {
-			return this.entryData.putValue(key, value);
+			return this.entryData.putImpl(key, value);
 		}
 
 		@Override
 		public GValue remove(final Object key) {
-			return this.entryData.popValue(key);
+			return this.entryData.popImpl(key);
 		}
 
 		@Override
 		public Values<GValue> values() {
-			return this.entryData.getValues();
+			return this.entryData.newValuesImpl();
 		}
 
 		@Override
 		public Entries<GKey, GValue> entrySet() {
-			return this.entryData.getEntries();
+			return this.entryData.newEntriesImpl();
 		}
 
 	}
@@ -381,33 +392,33 @@ public abstract class HashData<GKey, GValue> {
 	{}
 
 	/** Dieses Feld speichert den initialwert für {@link #table}. */
-	private static final int[] EMPTY_TABLE = {-1};
+	static final int[] EMPTY_TABLE = {-1};
 
 	/** Dieses Feld speichert den initialwert für {@link #nexts} und {@link #hashes}. */
-	private static final int[] EMPTY_INTEGERS = {};
+	static final int[] EMPTY_INTEGERS = {};
 
 	/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
-	private static final Object[] EMPTY_OBJECTS = {};
+	static final Object[] EMPTY_OBJECTS = {};
 
 	/** Dieses Feld speichert die maximale Kapazität. */
-	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
+	static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
 
 	{}
 
 	@SuppressWarnings ("javadoc")
-	private static void clearNexts(final int[] array) {
+	static void clearNexts(final int[] array) {
 		for (int i = 0, size = array.length; i < size;) {
 			array[i] = ++i;
 		}
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static void clearTable(final int[] array) {
+	static void clearTable(final int[] array) {
 		Arrays.fill(array, -1);
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static void clearObjects(final Object[] array) {
+	static void clearObjects(final Object[] array) {
 		if (array == null) return;
 		Arrays.fill(array, null);
 	}
@@ -415,25 +426,25 @@ public abstract class HashData<GKey, GValue> {
 	{}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	protected Object[] keys = HashData.EMPTY_OBJECTS;
+	Object[] keys = HashData.EMPTY_OBJECTS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Index des nächsten Eintrags ab. Für alle anderen Indizes bildet es auf den Index des nächsten
 	 * reservierten Speicherbereiches ab. */
-	protected int[] nexts = HashData.EMPTY_INTEGERS;
+	int[] nexts = HashData.EMPTY_INTEGERS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	protected Object[] values;
+	Object[] values;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab oder ist {@code null}. */
-	protected int[] hashes;
+	int[] hashes;
 
 	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
 	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. */
-	protected int[] table = HashData.EMPTY_TABLE;
+	int[] table = HashData.EMPTY_TABLE;
 
 	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
 	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
-	protected int entry = 0;
+	int entry = 0;
 
 	/** Dieses Feld speichert die Anzahl der Einträge. */
 	protected int count = 0;
@@ -455,7 +466,7 @@ public abstract class HashData<GKey, GValue> {
 	 *
 	 * @return Kapazität. */
 	public final int capacity() {
-		return this.nexts.length;
+		return this.keys.length;
 	}
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann.
@@ -518,121 +529,30 @@ public abstract class HashData<GKey, GValue> {
 		this.allocate(this.count);
 	}
 
-	/** Diese Methode gibt den Schlüssel des gegebenen Eintrags zurück.
-	 * 
-	 * @param entryIndex Index eines Eintrags.
-	 * @return Schlüssel oder {@code null}. */
-	@SuppressWarnings ("unchecked")
-	protected final GKey key(final int entryIndex) {
-		return (GKey)this.keys[entryIndex];
-	}
-
-	/** Diese Methode gibt den Wert des gegebenen Eintrags zurück.
-	 * 
-	 * @param entryIndex Index eines Eintrags.
-	 * @return Wert oder {@code null}. */
-	@SuppressWarnings ("unchecked")
-	protected final GValue value(final int entryIndex) {
-		return (GValue)this.values[entryIndex];
-	}
-
-	/** Diese Methode ersetzt den Wert des gegebenen Eintrags und gibt den vorherigen zurück.
-	 * 
-	 * @param entryIndex Index eines Eintrags.
-	 * @param value neuer Wert oder {@code null}.
-	 * @return alter Wert oder {@code null}. */
-	@SuppressWarnings ("unchecked")
-	protected final GValue value(final int entryIndex, final GValue value) {
-		final Object[] values = this.values;
-		final Object result = values[entryIndex];
-		values[entryIndex] = value;
-		return (GValue)result;
-	}
-
-	/** Diese Methode gibt das {@link Set} der Schlüssel in {@link #keys} zurück.
-	 *
-	 * @return Schlüssel. */
-	protected final Keys<GKey> getKeys() {
-		return new Keys<>(this);
-	}
-
-	/** Diese Methode gibt den {@link Iterator} über die Schlüssel in {@link #keys} zurück.
-	 *
-	 * @return Interator für {@link #getKeys()}. */
-	protected final KeysIterator<GKey, GValue> getKeysIterator() {
-		return new KeysIterator<>(this);
-	}
-
-	/** Diese Methode gibt die {@link Collection} der Werte in {@link #values} zurück.
-	 *
-	 * @return Werte. */
-	protected final Values<GValue> getValues() {
-		return new Values<>(this);
-	}
-
-	/** Diese Methode gibt den {@link Iterator} über die Werte in {@link #values} zurück.
-	 *
-	 * @return Interator für {@link #getValues()}. */
-	protected final ValuesIterator<GKey, GValue> getValuesIterator() {
-		return new ValuesIterator<>(this);
-	}
-
-	/** Diese Methode gibt das {@link Set} der Einträge zurück.
-	 *
-	 * @return Einträge. */
-	protected final Entries<GKey, GValue> getEntries() {
-		return new Entries<>(this);
-	}
-
-	/** Diese Methode gibt den {@link Iterator} über die Einträge zurück.
-	 *
-	 * @return Interator für {@link #getEntries()}. */
-	protected final EntriesIterator<GKey, GValue> getEntriesIterator() {
-		return new EntriesIterator<>(this);
-	}
-
-	/** Diese Methode gibt die {@link Map} zu den Schlüsseln in {@link #keys} und Werten in {@link #values} zurück.
-	 *
-	 * @return Abbildung. */
-	protected final Mapping<GKey, GValue> getMapping() {
-		return new Mapping<>(this);
-	}
-
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt nur dann {@code true} zurück, wenn ein solcher Eintrag existiert.
 	 *
-	 * @see Set#contains(Object)
+	 * @see Map#containsKey(Object)
 	 * @param key Schlüssel des Eintrags.
 	 * @return {@code true}, wenn der Eintrag gefundenen wurde. */
-	protected final boolean getKey(final Object key) {
-		return 0 <= this.getEntry(key);
+	protected final boolean hasKeyImpl(final Object key) {
+		return 0 <= this.getIndexImpl(key);
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	/** Diese Methode sucht einen Eintrag mit dem gegebenen Wert und gibt nur dann {@code true} zurück, wenn ein solcher Eintrag existiert.
 	 *
-	 * @param key Schlüssel des Eintrags.
-	 * @return Index des gefundenen Eintrags oder {@code -1}. */
-	protected final int getEntry(final Object key) {
-		return this.getEntry(key, this.customHash(key));
-	}
-
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel sowie Streuwert und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
-	 *
-	 * @param key Schlüssel des Eintrags.
-	 * @param hash Streuwert des Schlüssels.
-	 * @return Index des gefundenen Eintrags oder {@code -1}. */
-	protected final int getEntry(final Object key, final int hash) {
+	 * @see Map#containsValue(Object)
+	 * @param value Wert des Eintrags.
+	 * @return {@code true}, wenn der Eintrag gefundenen wurde. */
+	protected final boolean hasValueImpl(final Object value) {
 		final int[] table = this.table;
 		final int[] nexts = this.nexts;
-		final int[] hashes = this.hashes;
-		final Object[] keys = this.keys;
-		final int index = hash & (table.length - 1);
-		final int entry = table[index];
-		for (int result = entry; 0 <= result; result = nexts[result]) {
-			if (((hashes == null) || (hashes[result] == hash)) && this.customEquals(keys[result], key)) return result;
+		final Object[] values = this.values;
+		for (int i = table.length - 1; 0 <= i; --i) {
+			for (int entryIndex = table[i]; 0 <= entryIndex; entryIndex = nexts[entryIndex]) {
+				if (Objects.equals(value, values[entryIndex])) return true;
+			}
 		}
-		return -1;
+		return false;
 	}
 
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel sowie Wert und gibt nur dann {@code true} zurück, wenn ein solcher Eintrag existiert.
@@ -641,8 +561,8 @@ public abstract class HashData<GKey, GValue> {
 	 * @param key Schlüssel des Eintrags.
 	 * @param value Wert des Eintrags.
 	 * @return {@code true}, wenn der Eintrag gefundenen wurde. */
-	protected final boolean getEntry(final Object key, final Object value) {
-		final int index = this.getEntry(key);
+	protected final boolean hasEntryImpl(final Object key, final Object value) {
+		final int index = this.getIndexImpl(key);
 		return (index >= 0) && Objects.equals(this.values[index], value);
 	}
 
@@ -653,10 +573,69 @@ public abstract class HashData<GKey, GValue> {
 	 * @param key Schlüssel des Eintrags.
 	 * @return Wert des gefundenen Eintrags oder {@code null}. */
 	@SuppressWarnings ("unchecked")
-	protected final GValue getValue(final Object key) {
-		final int index = this.getEntry(key);
+	protected final GValue getImpl(final Object key) {
+		final int index = this.getIndexImpl(key);
 		if (index < 0) return null;
 		return (GValue)this.values[index];
+	}
+
+	/** Diese Methode gibt den Schlüssel des gegebenen Eintrags zurück.
+	 *
+	 * @param entryIndex Index eines Eintrags.
+	 * @return Schlüssel oder {@code null}. */
+	@SuppressWarnings ("unchecked")
+	protected final GKey getKeyImpl(final int entryIndex) {
+		return (GKey)this.keys[entryIndex];
+	}
+
+	/** Diese Methode gibt den Wert des gegebenen Eintrags zurück.
+	 *
+	 * @param entryIndex Index eines Eintrags.
+	 * @return Wert oder {@code null}. */
+	@SuppressWarnings ("unchecked")
+	protected final GValue getValueImpl(final int entryIndex) {
+		return (GValue)this.values[entryIndex];
+	}
+
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
+	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	 *
+	 * @param key Schlüssel des Eintrags.
+	 * @return Index des gefundenen Eintrags oder {@code -1}. */
+	protected final int getIndexImpl(final Object key) {
+		return this.getIndexImpl2(key, this.customHash(key));
+	}
+
+	@SuppressWarnings ("javadoc")
+	final int getIndexImpl2(final Object key, final int hash) {
+		final int[] table = this.table;
+		final int[] nexts = this.nexts;
+		final int[] hashes = this.hashes;
+		final Object[] keys = this.keys;
+		final int index = hash & (table.length - 1); // Streuwert "hash" maskieren
+		final int entry = table[index];
+		if (hashes == null) {
+			for (int result = entry; 0 <= result; result = nexts[result]) {
+				if (this.customEquals(keys[result], key)) return result;
+			}
+		} else {
+			for (int result = entry; 0 <= result; result = nexts[result]) {
+				if ((hashes[result] == hash) && this.customEquals(keys[result], key)) return result;
+			}
+		}
+		return -1;
+	}
+
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück.<br>
+	 * Wenn kein solcher Eintrag existierte, wird {@code null} geliefert.
+	 *
+	 * @see Map#put(Object, Object)
+	 * @param key Schlüssel des Eintrags.
+	 * @param value neuer Wert des Eintrags.
+	 * @return alert Wert des gefundenen Eintrags oder {@code null}. */
+	protected final GValue putImpl(final GKey key, final GValue value) {
+		final int index = this.putIndexImpl(key);
+		return this.putValueImpl(index, value);
 	}
 
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt nur dann {@code false} zurück, wenn ein solcher Eintrag existiert. Wenn kein solcher
@@ -665,10 +644,23 @@ public abstract class HashData<GKey, GValue> {
 	 * @see Set#add(Object)
 	 * @param key Schlüssel des Eintrags.
 	 * @return {@code true}, wenn der Eintrag erzeugt wurde. */
-	protected final boolean putKey(final GKey key) {
+	protected final boolean putKeyImpl(final GKey key) {
 		final int count = this.count;
-		this.putEntry(key);
+		this.putIndexImpl(key);
 		return count != this.count;
+	}
+
+	/** Diese Methode ersetzt den Wert des gegebenen Eintrags und gibt den vorherigen zurück.
+	 *
+	 * @param entryIndex Index eines Eintrags.
+	 * @param value neuer Wert oder {@code null}.
+	 * @return alter Wert oder {@code null}. */
+	@SuppressWarnings ("unchecked")
+	protected final GValue putValueImpl(final int entryIndex, final GValue value) {
+		final Object[] values = this.values;
+		final Object result = values[entryIndex];
+		values[entryIndex] = value;
+		return (GValue)result;
 	}
 
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
@@ -676,25 +668,20 @@ public abstract class HashData<GKey, GValue> {
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final int putEntry(final GKey key) {
-		final int hash = this.customHash(key), result = this.getEntry(key, hash);
+	protected final int putIndexImpl(final GKey key) {
+		final int hash = this.customHash(key), result = this.getIndexImpl2(key, hash);
 		if (result >= 0) return result;
 		final int count = this.count + 1, capacity = this.capacity();
 		if (count > HashData.MAX_CAPACITY) throw new OutOfMemoryError();
 		this.count = count;
-		if (count <= capacity) return this.putEntry(key, hash);
+		if (count <= capacity) return this.putIndexImpl2(key, hash);
 		final int allocate = count + (count >> 1);
 		this.allocate((allocate < 0) || (allocate > HashData.MAX_CAPACITY) ? HashData.MAX_CAPACITY : allocate);
-		return this.putEntry(key, hash);
+		return this.putIndexImpl2(key, hash);
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel sowie Streuwert und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird er erzeugt.
-	 *
-	 * @param key Schlüssel des Eintrags.
-	 * @param hash Streuwert des Schlüssels.
-	 * @return Index des gefundenen oder erzeugten Eintrags. */
-	protected final int putEntry(final GKey key, final int hash) {
+	@SuppressWarnings ("javadoc")
+	final int putIndexImpl2(final GKey key, final int hash) {
 		final int[] table = this.table;
 		final int[] nexts = this.nexts;
 		final int[] hashes = this.hashes;
@@ -708,108 +695,45 @@ public abstract class HashData<GKey, GValue> {
 		return result;
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorheriten Wert zurück.<br>
-	 * Wenn kein solcher Eintrag existierte, wird {@code null} geliefert.
+	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück.<br>
+	 * Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
 	 *
-	 * @see Map#put(Object, Object)
-	 * @param key Schlüssel des Eintrags.
-	 * @param value neuer Wert des Eintrags.
-	 * @return alert Wert des gefundenen Eintrags oder {@code null}. */
-	protected final GValue putValue(final GKey key, final GValue value) {
-		final int index = this.putEntry(key);
-		return this.value(index, value);
+	 * @see Map#remove(Object)
+	 * @param key Schlüssel.
+	 * @return Wert oder {@code null}. */
+	@SuppressWarnings ("unchecked")
+	protected final GValue popImpl(final Object key) {
+		final int entry = this.popIndexImpl(key);
+		if (entry < 0) return null;
+		final Object[] values = this.values;
+		final Object result = values[entry];
+		values[entry] = null;
+		return (GValue)result;
 	}
 
-	/** Diese Methode entfernt den gegeben Schlüssel und liefet nur dann {@code true}, wenn dieser zuvor über {@link #putKey(Object)} hinzugefügt wurde.
+	/** Diese Methode entfernt den gegeben Schlüssel und liefet nur dann {@code true}, wenn dieser zuvor über {@link #putKeyImpl(Object)} hinzugefügt wurde.
 	 *
 	 * @see Set#remove(Object)
 	 * @param key Schlüssel.
 	 * @return {@code true}, wenn der Eintrag existierte. */
-	protected final boolean popKey(final Object key) {
+	protected final boolean popKeyImpl(final Object key) {
 		final int count = this.count;
-		this.popEntry(key);
+		this.popIndexImpl(key);
 		return count != this.count;
 	}
 
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	/** Diese Methode entfernt einen Eintrag mit dem gegebenen Wert.
 	 *
-	 * @param key Schlüssel des Eintrags.
-	 * @return Index des entfernten Eintrags oder {@code -1}. */
-	protected final int popEntry(final Object key) {
-		return this.popEntry(key, this.customHash(key));
-	}
-
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel sowie Streuwert und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
-	 *
-	 * @param key Schlüssel des Eintrags.
-	 * @param hash Streuwert des Schlüssels.
-	 * @return Index des entfernten Eintrags oder {@code -1}. */
-	protected final int popEntry(final Object key, final int hash) {
-		final int[] table = this.table;
-		final int[] nexts = this.nexts;
-		final int[] hashes = this.hashes;
-		final Object[] keys = this.keys;
-		final int index = hash & (table.length - 1);
-		int prevIndex = table[index];
-		if (0 <= prevIndex) {
-			if (((hashes == null) || (hashes[prevIndex] == hash)) && this.customEquals(keys[prevIndex], key)) {
-				keys[prevIndex] = null;
-				table[index] = nexts[prevIndex];
-				nexts[prevIndex] = this.entry;
-				this.entry = prevIndex;
-				this.count--;
-				return prevIndex;
-			}
-			for (int nextIndex = nexts[prevIndex]; 0 <= nextIndex; prevIndex = nextIndex, nextIndex = nexts[nextIndex]) {
-				if (((hashes == null) || (hashes[nextIndex] == hash)) && this.customEquals(keys[nextIndex], key)) {
-					keys[nextIndex] = null;
-					nexts[prevIndex] = nexts[nextIndex];
-					nexts[nextIndex] = this.entry;
-					this.entry = nextIndex;
-					this.count--;
-					return nextIndex;
-				}
-			}
-		}
-		return -1;
-	}
-
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel sowie dem gegebenen Wert und liefet nur dann {@code true}, wenn dieser zuvor über
-	 * {@link #putValue(Object, Object)} hinzugefügt wurde.
-	 *
-	 * @param key Schlüssel des Eintrags.
+	 * @see Map#containsValue(Object)
 	 * @param value Wert des Eintrags.
-	 * @return {@code true}, wenn der Eintrag existierte. */
-	protected final boolean popEntry(final Object key, final Object value) {
-		final int hash = this.customHash(key);
+	 * @return {@code true}, wenn der Eintrag gefunden und entfernt wurde. */
+	protected final boolean popValueImpl(final Object value) {
 		final int[] table = this.table;
 		final int[] nexts = this.nexts;
-		final int[] hashes = this.hashes;
-		final Object[] keys = this.keys;
 		final Object[] values = this.values;
-		final int index = hash & (table.length - 1);
-		int prevIndex = table[index];
-		if (prevIndex < 0) return false;
-		if (((hashes == null) || (hashes[prevIndex] == hash)) && this.customEquals(keys[prevIndex], key) && Objects.equals(values[prevIndex], value)) {
-			table[index] = nexts[prevIndex];
-			nexts[prevIndex] = this.entry;
-			keys[prevIndex] = null;
-			values[prevIndex] = null;
-			this.entry = prevIndex;
-			this.count--;
-			return true;
-		}
-		for (int nextIndex = nexts[prevIndex]; 0 <= nextIndex; prevIndex = nextIndex, nextIndex = nexts[nextIndex]) {
-			if (((hashes == null) || (hashes[nextIndex] == hash)) && this.customEquals(keys[nextIndex], key) && Objects.equals(values[nextIndex], value)) {
-				nexts[prevIndex] = nexts[nextIndex];
-				nexts[nextIndex] = this.entry;
-				keys[nextIndex] = null;
-				values[nextIndex] = null;
-				this.entry = nextIndex;
-				this.count--;
-				return true;
+		for (int tableIndex = table.length - 1; 0 <= tableIndex; --tableIndex) {
+			for (int entryIndex = table[tableIndex]; 0 <= entryIndex; entryIndex = nexts[entryIndex]) {
+				if (Objects.equals(value, values[entryIndex])) return this.popEntryImpl(tableIndex, entryIndex);
 			}
 		}
 		return false;
@@ -821,7 +745,7 @@ public abstract class HashData<GKey, GValue> {
 	 * @param tableIndex Index der Liste in {@link #table}.
 	 * @param entryIndex Index des Elements in {@link #keys}.
 	 * @return {@code true}, wenn der Eintrag gefunden und entfernt wurde. */
-	protected final boolean popEntry(final int tableIndex, final int entryIndex) {
+	protected final boolean popEntryImpl(final int tableIndex, final int entryIndex) {
 		final int[] table = this.table;
 		final int[] nexts = this.nexts;
 		if ((tableIndex < 0) || (entryIndex < 0)) return false;
@@ -855,20 +779,153 @@ public abstract class HashData<GKey, GValue> {
 		return false;
 	}
 
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
+	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel sowie dem gegebenen Wert und liefet nur dann {@code true}, wenn dieser zuvor über
+	 * {@link #putImpl(Object, Object)} hinzugefügt wurde.
 	 *
-	 * @see Map#remove(Object)
-	 * @param key Schlüssel.
-	 * @return Wert oder {@code null}. */
-	@SuppressWarnings ("unchecked")
-	protected final GValue popValue(final Object key) {
-		final int entry = this.popEntry(key);
-		if (entry < 0) return null;
+	 * @param key Schlüssel des Eintrags.
+	 * @param value Wert des Eintrags.
+	 * @return {@code true}, wenn der Eintrag existierte. */
+	protected final boolean popEntryImpl(final Object key, final Object value) {
+		final int hash = this.customHash(key);
+		final int[] table = this.table;
+		final int[] nexts = this.nexts;
+		final int[] hashes = this.hashes;
+		final Object[] keys = this.keys;
 		final Object[] values = this.values;
-		final Object result = values[entry];
-		values[entry] = null;
-		return (GValue)result;
+		final int index = hash & (table.length - 1);
+		int prevIndex = table[index];
+		if (prevIndex < 0) return false;
+		if (((hashes == null) || (hashes[prevIndex] == hash)) && this.customEquals(keys[prevIndex], key) && Objects.equals(values[prevIndex], value)) {
+			table[index] = nexts[prevIndex];
+			nexts[prevIndex] = this.entry;
+			keys[prevIndex] = null;
+			values[prevIndex] = null;
+			this.entry = prevIndex;
+			this.count--;
+			return true;
+		}
+		for (int nextIndex = nexts[prevIndex]; 0 <= nextIndex; prevIndex = nextIndex, nextIndex = nexts[nextIndex]) {
+			if (((hashes == null) || (hashes[nextIndex] == hash)) && this.customEquals(keys[nextIndex], key) && Objects.equals(values[nextIndex], value)) {
+				nexts[prevIndex] = nexts[nextIndex];
+				nexts[nextIndex] = this.entry;
+				keys[nextIndex] = null;
+				values[nextIndex] = null;
+				this.entry = nextIndex;
+				this.count--;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
+	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	 *
+	 * @param key Schlüssel des Eintrags.
+	 * @return Index des entfernten Eintrags oder {@code -1}. */
+	protected final int popIndexImpl(final Object key) {
+		return this.popIndexImpl2(key, this.customHash(key));
+	}
+
+	@SuppressWarnings ("javadoc")
+	final int popIndexImpl2(final Object key, final int hash) {
+		final int[] table = this.table;
+		final int[] nexts = this.nexts;
+		final int[] hashes = this.hashes;
+		final Object[] keys = this.keys;
+		final int index = hash & (table.length - 1);
+		int prevIndex = table[index];
+		if (0 <= prevIndex) {
+			if (hashes == null) {
+				if (this.customEquals(keys[prevIndex], key)) {
+					keys[prevIndex] = null;
+					table[index] = nexts[prevIndex];
+					nexts[prevIndex] = this.entry;
+					this.entry = prevIndex;
+					this.count--;
+					return prevIndex;
+				}
+				for (int nextIndex = nexts[prevIndex]; 0 <= nextIndex; prevIndex = nextIndex, nextIndex = nexts[nextIndex]) {
+					if (this.customEquals(keys[nextIndex], key)) {
+						keys[nextIndex] = null;
+						nexts[prevIndex] = nexts[nextIndex];
+						nexts[nextIndex] = this.entry;
+						this.entry = nextIndex;
+						this.count--;
+						return nextIndex;
+					}
+				}
+			} else {
+				if ((hashes[prevIndex] == hash) && this.customEquals(keys[prevIndex], key)) {
+					keys[prevIndex] = null;
+					table[index] = nexts[prevIndex];
+					nexts[prevIndex] = this.entry;
+					this.entry = prevIndex;
+					this.count--;
+					return prevIndex;
+				}
+				for (int nextIndex = nexts[prevIndex]; 0 <= nextIndex; prevIndex = nextIndex, nextIndex = nexts[nextIndex]) {
+					if ((hashes[nextIndex] == hash) && this.customEquals(keys[nextIndex], key)) {
+						keys[nextIndex] = null;
+						nexts[prevIndex] = nexts[nextIndex];
+						nexts[nextIndex] = this.entry;
+						this.entry = nextIndex;
+						this.count--;
+						return nextIndex;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
+	/** Diese Methode gibt das {@link Set} der Schlüssel in {@link #keys} zurück.
+	 *
+	 * @return Schlüssel. */
+	protected final Keys<GKey> newKeysImpl() {
+		return new Keys<>(this);
+	}
+
+	/** Diese Methode gibt den {@link Iterator} über die Schlüssel in {@link #keys} zurück.
+	 *
+	 * @return Interator für {@link #newKeysImpl()}. */
+	protected final KeysIterator<GKey, GValue> newKeysIteratorImpl() {
+		return new KeysIterator<>(this);
+	}
+
+	/** Diese Methode gibt die {@link Collection} der Werte in {@link #values} zurück.
+	 *
+	 * @return Werte. */
+	protected final Values<GValue> newValuesImpl() {
+		return new Values<>(this);
+	}
+
+	/** Diese Methode gibt den {@link Iterator} über die Werte in {@link #values} zurück.
+	 *
+	 * @return Interator für {@link #newValuesImpl()}. */
+	protected final ValuesIterator<GKey, GValue> newValuesIteratorImpl() {
+		return new ValuesIterator<>(this);
+	}
+
+	/** Diese Methode gibt das {@link Set} der Einträge zurück.
+	 *
+	 * @return Einträge. */
+	protected final Entries<GKey, GValue> newEntriesImpl() {
+		return new Entries<>(this);
+	}
+
+	/** Diese Methode gibt den {@link Iterator} über die Einträge zurück.
+	 *
+	 * @return Interator für {@link #newEntriesImpl()}. */
+	protected final EntriesIterator<GKey, GValue> newEntriesIteratorImpl() {
+		return new EntriesIterator<>(this);
+	}
+
+	/** Diese Methode gibt die {@link Map} zu den Schlüsseln in {@link #keys} und Werten in {@link #values} zurück.
+	 *
+	 * @return Abbildung. */
+	protected final Mapping<GKey, GValue> newMappingImpl() {
+		return new Mapping<>(this);
 	}
 
 	/** Diese Methode entfernt alle Einträge. Hierbei werden die Anzahl der Einträge auf {@code 0} gesetzt und die Tabellen initialisiert. */
@@ -896,6 +953,32 @@ public abstract class HashData<GKey, GValue> {
 	 * @return Äquivalenz der gegebenen Schlüssel. */
 	protected boolean customEquals(final Object thisKey, final Object thatKey) {
 		return Objects.equals(thisKey, thatKey);
+	}
+
+	{}
+
+	/** {@inheritDoc} */
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		try {
+			final HashData<?, ?> result = (HashData<?, ?>)super.clone();
+			if (this.capacity() == 0) {
+				result.keys = HashData.EMPTY_OBJECTS;
+				result.nexts = HashData.EMPTY_INTEGERS;
+				result.table = HashData.EMPTY_TABLE;
+				result.values = result.values != null ? HashData.EMPTY_OBJECTS : null;
+				result.hashes = result.hashes != null ? HashData.EMPTY_INTEGERS : null;
+			} else {
+				result.keys = this.keys.clone();
+				result.nexts = this.nexts.clone();
+				result.table = this.table.clone();
+				result.values = result.values == null ? null : this.values.clone();
+				result.hashes = result.hashes == null ? null : this.hashes.clone();
+			}
+			return result;
+		} catch (final Exception cause) {
+			throw new CloneNotSupportedException(cause.getMessage());
+		}
 	}
 
 }
