@@ -437,22 +437,22 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 			if (!datetime2.hasDate()) throw new IllegalArgumentException();
 			if (datetime1.hasTime()) {
 				if (!datetime2.hasTime()) throw new IllegalArgumentException();
-				return FEMDuration.from(0, 0, datetime1.calendardayValueImpl() - datetime2.calendardayValueImpl(), //
-					0, datetime2.zoneValueImpl() - datetime1.zoneValueImpl(), 0, datetime1.daymillisValueImpl() - datetime2.daymillisValueImpl());
+				return FEMDuration.from(0, 0, datetime2.calendardayValueImpl() - datetime1.calendardayValueImpl(), //
+					0, datetime1.zoneValueImpl() - datetime2.zoneValueImpl(), 0, datetime2.daymillisValueImpl() - datetime1.daymillisValueImpl());
 			} else {
 				if (datetime2.hasTime()) throw new IllegalArgumentException();
-				return FEMDuration.from(0, 0, datetime1.calendardayValueImpl() - datetime2.calendardayValueImpl(), //
-					0, datetime2.zoneValueImpl() - datetime1.zoneValueImpl(), 0, 0);
+				return FEMDuration.from(0, 0, datetime2.calendardayValueImpl() - datetime1.calendardayValueImpl(), //
+					0, datetime1.zoneValueImpl() - datetime2.zoneValueImpl(), 0, 0);
 			}
 		} else {
 			if (datetime2.hasDate()) throw new IllegalArgumentException();
 			if (datetime1.hasTime()) {
 				if (!datetime2.hasTime()) throw new IllegalArgumentException();
-				return FEMDuration.from(0, 0, 0, 0, datetime2.zoneValueImpl() - datetime1.zoneValueImpl(), 0,
-					datetime1.daymillisValueImpl() - datetime2.daymillisValueImpl());
+				return FEMDuration.from(0, 0, 0, 0, datetime1.zoneValueImpl() - datetime2.zoneValueImpl(), 0,
+					datetime2.daymillisValueImpl() - datetime1.daymillisValueImpl());
 			} else {
 				if (datetime2.hasTime()) throw new IllegalArgumentException();
-				return FEMDuration.from(0, 0, 0, 0, datetime2.zoneValueImpl() - datetime1.zoneValueImpl(), 0, 0);
+				return FEMDuration.from(0, 0, 0, 0, datetime1.zoneValueImpl() - datetime2.zoneValueImpl(), 0, 0);
 			}
 		}
 	}
