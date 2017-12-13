@@ -122,7 +122,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
 	public static FEMDatetime from(final long millis) throws IllegalArgumentException {
-		return new FEMDatetime(516440067, -1073709056).moveTimeImpl(millis);
+		return new FEMDatetime(516440067, -1073709056).move(0, millis);
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit den in der gegebenen Zeitangabe kodierten Komponenten zurück.<br>
@@ -362,6 +362,41 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	@SuppressWarnings ("javadoc")
 	static void checkZone(final int zone) throws IllegalArgumentException {
 		if ((zone < -840) || (zone > 840)) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void checkDays(final int days) throws IllegalArgumentException {
+		if (days > 3652424) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void checkYears(final int years) throws IllegalArgumentException {
+		if (years > 8417) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void checkMonths(final int months) throws IllegalArgumentException {
+		if (months > 101015) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void checkHours(final int hours) throws IllegalArgumentException {
+		if (hours > 73783776) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void minutes(final long minutes) throws IllegalArgumentException {
+		if (minutes > 4427026560L) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void checkSeconds(final long seconds) throws IllegalArgumentException {
+		if (seconds > 265621593600L) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static void checkMilliseconds(final long milliseconds) throws IllegalArgumentException {
+		if (milliseconds > 265621593600000L) throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit der Uhrzeit der gegebenen zurück.<br>
@@ -1057,20 +1092,60 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return new FEMDatetime(this.valueH, (this.valueL & 0xFFFFF) | (1024 << 20));
 	}
 
-	/** Diese Methode gibt diese Zeitangabe mit verschobenem Zeitpunkt zurück.<br>
-	 * Sie ist eine Abkürzung für {@code this.moveDate(duration).moveTime(duration)}.
+	/** Diese Methode gibt diese Zeitangabe verschoben um die gegebenen Gesamtanzahlen an Monate und Millisekunden zurück.
 	 *
-	 * @see #moveDate(FEMDuration)
-	 * @see #moveTime(FEMDuration)
-	 * @param duration Zeitspanne.
-	 * @return verschobene Zeitangabe.
-	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
-	public final FEMDatetime move(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
-		return this.moveDate(duration).moveTime(duration);
+	 * @see #move(int, int, int, int, long, long, long)
+	 * @param durationmonths Gesamtanzahl der Monate ({@code -101015..101015}).
+	 * @param durationmillis Gesamtanzahl der Millisekunden.
+	 * @return verschobene Zeitspanne.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
+	public final FEMDatetime move(final int durationmonths, final int durationmillis) throws IllegalArgumentException {
+		FEMDatetime.checkMonths(+durationmonths);
+		FEMDatetime.checkMonths(-durationmonths);
+		return this.moveImpl(durationmonths, durationmillis);
 	}
 
-	/** Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.
+	/** Diese Methode gibt diese Zeitangabe verschoben um die gegebenen Gesamtanzahlen an Monate und Millisekunden zurück.
+	 *
+	 * @see #move(int, int, int, int, long, long, long)
+	 * @param durationmonths Gesamtanzahl der Monate ({@code -101015..101015}).
+	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593599999}).
+	 * @return verschobene Zeitspanne.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
+	public final FEMDatetime move(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
+		FEMDatetime.checkMonths(+durationmonths);
+		FEMDatetime.checkMonths(-durationmonths);
+		FEMDatetime.checkMilliseconds(+durationmillis);
+		FEMDatetime.checkMilliseconds(-durationmillis);
+		return this.moveImpl(durationmonths, durationmillis);
+	}
+
+	/** Diese Methode gibt diese Zeitangabe verschoben um die Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	 *
+	 * @see #move(int, int, int, int, long, long, long)
+	 * @param years Anzahl der Jahre ({@code -8417..8417}).
+	 * @param months Anzahl der Monate ({@code -101015..101015}).
+	 * @param days Anzahl der Tage ({@code -3074323..3074323}).
+	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
+	 * @param minutes Anzahl der Minuten.
+	 * @param seconds Anzahl der Sekunden.
+	 * @param milliseconds Anzahl der Millisekunden.
+	 * @return verschobene Zeitangabe.
+	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
+	public final FEMDatetime move(final int years, final int months, final int days, final int hours, final int minutes, final int seconds,
+		final int milliseconds) throws IllegalArgumentException {
+		FEMDatetime.checkYear(+years);
+		FEMDatetime.checkYear(-years);
+		FEMDatetime.checkMonths(+months);
+		FEMDatetime.checkMonths(-months);
+		FEMDatetime.checkDays(+days);
+		FEMDatetime.checkDays(-days);
+		FEMDatetime.checkHours(+hours);
+		FEMDatetime.checkHours(-hours);
+		return this.moveImpl(FEMDuration.durationmonthsOfImpl(years, months), FEMDuration.durationmillisOfImpl(days, hours, minutes, seconds, milliseconds));
+	}
+
+	/** Diese Methode gibt diese Zeitangabe verschoben um die Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
 	 * <p>
 	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
 	 * durations to dateTimes</a>:
@@ -1086,121 +1161,72 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @param years Anzahl der Jahre ({@code -8417..8417}).
 	 * @param months Anzahl der Monate ({@code -101015..101015}).
 	 * @param days Anzahl der Tage ({@code -3074323..3074323}).
-	 * @return Zeitangabe mit verschobenem Datum.
-	 * @throws IllegalStateException Wenn diese Zeitangabe kein Datum besitzt.
-	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
-	public final FEMDatetime moveDate(final int years, final int months, final int days) throws IllegalStateException, IllegalArgumentException {
-		if (!this.hasDate()) throw new IllegalStateException();
-		if ((years == 0) && (months == 0) && (days == 0)) return this;
-		if ((years < -8417) || (years > 8417)) throw new IllegalArgumentException();
-		if ((months < -101015) || (months > 101015)) throw new IllegalArgumentException();
-		if ((days < -3074323) || (days > 3074323)) throw new IllegalArgumentException();
-		return this.moveDateImpl((years * 12) + months, days);
-	}
-
-	/** Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.
-	 *
-	 * @see #moveDate(int, int, int)
-	 * @param duration Zeitspanne.
-	 * @return Zeitangabe mit verschobenem Datum.
-	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
-	public final FEMDatetime moveDate(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
-		final int sign = duration.signValue();
-		if (sign < 0) return this.moveDate(-duration.yearsValue(), -duration.monthsValue(), -duration.daysValue());
-		if (sign > 0) return this.moveDate(+duration.yearsValue(), +duration.monthsValue(), +duration.daysValue());
-		return this;
-	}
-
-	@SuppressWarnings ("javadoc")
-	final FEMDatetime moveDateImpl(final int monthsAdd, final int daysAdd) throws IllegalArgumentException {
-		int value = ((12 * this.yearValueImpl()) + this.monthValueImpl() + monthsAdd) - 1;
-		final int year = value / 12, month = (value % 12) + 1;
-		FEMDatetime.checkYear(year);
-		value = this.dateValueImpl();
-		final int length = FEMDatetime.lengthOf(month, year), date = value > length ? length : value;
-		value = FEMDatetime.calendardayOfImpl(year, month, date) + daysAdd;
-		return this.withDate(value);
-	}
-
-	/** Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück. Wenn die Zeitangabe ein Datum {@link #hasDate() besitzt}, wird dieses falls nötig
-	 * ebenfalls verschoben.
-	 * <p>
-	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
-	 * durations to dateTimes</a>.
-	 * </p>
-	 *
-	 * @see #moveDate(int, int, int)
-	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
-	 * @param minutes Anzahl der Minuten.
-	 * @param seconds Anzahl der Sekunden.
-	 * @param milliseconds Anzahl der Millisekunden.
-	 * @return Zeitangabe mit verschobener Uhrzeit.
-	 * @throws IllegalStateException Wenn diese Zeitangabe keine Uhrzeit besitzt.
-	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
-	public final FEMDatetime moveTime(final int hours, final int minutes, final int seconds, final int milliseconds)
-		throws IllegalStateException, IllegalArgumentException {
-		if (!this.hasTime()) throw new IllegalStateException();
-		if ((hours == 0) && (minutes == 0) && (seconds == 0) && (milliseconds == 0)) return this;
-		if ((hours < -73783776) || (hours > 73783775)) throw new IllegalArgumentException();
-		return this.moveTimeImpl((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
-	}
-
-	/** Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.<br>
-	 * Wenn die Zeitangabe ein Datum {@link #hasDate() besitzt}, wird dieses falls nötig ebenfalls verschoben.
-	 * <p>
-	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
-	 * durations to dateTimes</a>.
-	 * </p>
-	 *
-	 * @see #moveDate(int, int, int)
 	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
 	 * @param minutes Anzahl der Minuten ({@code -4427026560..4427026559}).
 	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593599}).
 	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593599999}).
-	 * @return Zeitangabe mit verschobener Uhrzeit.
-	 * @throws IllegalStateException Wenn diese Zeitangabe keine Uhrzeit besitzt.
+	 * @return verschobene Zeitangabe.
 	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
-	public final FEMDatetime moveTime(final int hours, final long minutes, final long seconds, final long milliseconds)
-		throws IllegalStateException, IllegalArgumentException {
-		if (!this.hasTime()) throw new IllegalStateException();
-		if ((hours == 0) && (minutes == 0) && (seconds == 0) && (milliseconds == 0)) return this;
-		if ((hours < -73783776) || (hours > 73783775)) throw new IllegalArgumentException();
-		if ((minutes < -4427026560L) || (minutes > 4427026559L)) throw new IllegalArgumentException();
-		if ((seconds < -265621593600L) || (seconds > 265621593599L)) throw new IllegalArgumentException();
-		if ((milliseconds < -265621593600000L) || (milliseconds > 265621593599999L)) throw new IllegalArgumentException();
-		return this.moveTimeImpl((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
+	public final FEMDatetime move(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
+		final long milliseconds) throws IllegalArgumentException {
+		FEMDatetime.checkYear(+years);
+		FEMDatetime.checkYear(-years);
+		FEMDatetime.checkMonths(+months);
+		FEMDatetime.checkMonths(-months);
+		FEMDatetime.checkDays(+days);
+		FEMDatetime.checkDays(-days);
+		FEMDatetime.checkHours(+hours);
+		FEMDatetime.checkHours(-hours);
+		FEMDatetime.checkMilliseconds(+minutes);
+		FEMDatetime.checkMilliseconds(-minutes);
+		FEMDatetime.checkSeconds(+seconds);
+		FEMDatetime.checkSeconds(-seconds);
+		FEMDatetime.checkMilliseconds(-milliseconds);
+		FEMDatetime.checkMilliseconds(+milliseconds);
+		return this.moveImpl(FEMDuration.durationmonthsOfImpl(years, months), FEMDuration.durationmillisOfImpl(days, hours, minutes, seconds, milliseconds));
 	}
 
-	/** Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.
+	/** Diese Methode gibt diese Zeitangabe verschoben um die Gesamtanzahlen an Monate und Millisekunden der gegebenen Zeitspanne zurück.
 	 *
-	 * @see #moveTime(int, int, int, int)
-	 * @param duration Zeitspanne.
-	 * @return verschobener Zeitpunkt.
+	 * @see #move(int, int, int, int, long, long, long)
+	 * @param duration Gesamtanzahlen an Monate und Millisekunden.
+	 * @param negate {@code true}, wenn die Verschiebung in die der gegebenen Zeitspanne entgegengesetzte Richtung erfolgen soll.
+	 * @return verschobene Zeitangabe.
 	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
-	public final FEMDatetime moveTime(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
-		final int sign = duration.signValue();
-		if (sign < 0) return this.moveTime(-duration.hoursValue(), -duration.minutesValue(), -duration.secondsValue(), -duration.millisecondsValue());
-		if (sign > 0) return this.moveTime(+duration.hoursValue(), +duration.minutesValue(), +duration.secondsValue(), +duration.millisecondsValue());
-		return this;
+	public final FEMDatetime move(final FEMDuration duration, final boolean negate) throws NullPointerException, IllegalArgumentException {
+		if ((duration.signValue() > 0) == negate) return this.moveImpl(-duration.durationmonthsValue(), -duration.durationmillisValue());
+		return this.moveImpl(duration.durationmonthsValue(), duration.durationmillisValue());
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime moveTimeImpl(final long millisecondsAdd) {
-		final long value = this.daymillisValueImpl() + millisecondsAdd;
-		int daysAdd = (int)(value / 86400000), daymillis = (int)(value % 86400000);
-		if (daymillis < 0) {
-			daysAdd--;
-			daymillis += 86400000;
+	final FEMDatetime moveImpl(final int months, final long millis) {
+		int days = 0;
+		FEMDatetime result = this;
+		if (millis != 0) {
+			final long datetimemillis = millis + this.daymillisValueImpl();
+			int daymillis = (int)(datetimemillis % 86400000);
+			days = (int)(datetimemillis / 86400000);
+			if (daymillis < 0) {
+				days--;
+				daymillis += 86400000;
+			}
+			if (result.hasTime()) {
+				result = result.withTimeImpl(daymillis);
+			}
 		}
-		return ((daysAdd != 0) && this.hasDate() ? this.moveDateImpl(0, daysAdd) : this).withTimeImpl(daymillis);
+		if (!this.hasDate() || ((days | months) == 0)) return result;
+		final int datetimemonths = (months + this.monthValueImpl()) - 1;
+		final int year = (datetimemonths / 12) + this.yearValueImpl(), month = (datetimemonths % 12) + 1;
+		final int value = this.dateValueImpl(), length = FEMDatetime.lengthOf(month, year), date = value > length ? length : value;
+		if (days == 0) return result.withDateImpl(year, month, date);
+		return result.withDate(FEMDatetime.calendardayOfImpl(year, month, date) + days);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobener Zeitzone zurück.<br>
 	 * Wenn die Zeitangabe eine Uhrzeit {@link #hasTime() besitzt}, wird diese falls nötig ebenfalls verschoben.
 	 *
-	 * @see #moveTime(int, int, int, int)
+	 * @see #move(int, int, int, int, long, long, long)
 	 * @param hours Anzahl der Stunden ({@code -28..28}).
 	 * @param minutes Anzahl der Minuten ({@code -1680..1680}).
 	 * @return Zeitangabe mit verschobener Zeitzone.
@@ -1215,15 +1241,15 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMDatetime moveZoneImpl(final int zoneAdd) {
-		if (zoneAdd == 0) return this;
-		final int zoneNew = zoneAdd + this.zoneValueImpl();
-		FEMDatetime.checkZone(zoneNew);
-		if (this.hasTime()) return this.moveTimeImpl(zoneAdd * 60000).withZoneImpl(zoneNew);
-		if (!this.hasDate()) return this.withZoneImpl(zoneNew);
-		final int daysAdd = (zoneAdd - 1439) / 1440;
-		if (daysAdd != 0) return this.moveDateImpl(0, daysAdd).withZoneImpl(zoneNew);
-		return this.withZoneImpl(zoneNew);
+	final FEMDatetime moveZoneImpl(final int minutes) {
+		if (minutes == 0) return this;
+		final int zone = minutes + this.zoneValueImpl();
+		FEMDatetime.checkZone(zone);
+		if (this.hasTime()) return this.moveImpl(0, minutes * 60000).withZoneImpl(zone);
+		if (!this.hasDate()) return this.withZoneImpl(zone);
+		final int days = (minutes - 1439) / 1440;
+		if (days != 0) return this.moveImpl(0, days * 86400000L).withZoneImpl(zone);
+		return this.withZoneImpl(zone);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe normalisiert zurück.<br>
@@ -1234,7 +1260,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		if (!this.hasDate() || !this.hasTime()) return this;
 		if (this.hourValueImpl() != 24) return this;
 		if ((this.yearValueImpl() == 9999) && (this.monthValueImpl() == 12) && (this.dateValueImpl() == 31)) return this;
-		return this.moveDateImpl(0, 1).withTimeImpl(0, 0, 0, 0);
+		return this.withTimeImpl(0, 0, 0, 0).moveImpl(0, 86400000);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.

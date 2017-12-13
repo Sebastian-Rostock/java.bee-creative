@@ -364,6 +364,25 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param months Anzahl der Monate ({@code -119999..119999}).
 	 * @param days Anzahl der Tage ({@code -3652424..3652424}).
 	 * @param hours Anzahl der Stunden ({@code -87658199..87658199}).
+	 * @param minutes Anzahl der Minuten.
+	 * @param seconds Anzahl der Sekunden.
+	 * @param milliseconds Anzahl der Millisekunden.
+	 * @return Zeitspanne.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
+	public static FEMDuration from(final int years, final int months, final int days, final int hours, final int minutes, final int seconds,
+		final int milliseconds) throws IllegalArgumentException {
+		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
+	}
+
+	/** Diese Methode gibt eine Zeitspanne mit den Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	 *
+	 * @see #from(int, long)
+	 * @see #durationmonthsOf(int, int)
+	 * @see #durationmillisOf(int, int, long, long, long)
+	 * @param years Anzahl der Jahre ({@code -9999..9999}).
+	 * @param months Anzahl der Monate ({@code -119999..119999}).
+	 * @param days Anzahl der Tage ({@code -3652424..3652424}).
+	 * @param hours Anzahl der Stunden ({@code -87658199..87658199}).
 	 * @param minutes Anzahl der Minuten ({@code -5259491999..5259491999}).
 	 * @param seconds Anzahl der Sekunden ({@code -315569519999..315569519999}).
 	 * @param milliseconds Anzahl der Millisekunden ({@code -315569519999999..315569519999999}).
@@ -459,7 +478,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 
 	/** Diese Methode gibt die minimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
 	 *
-	 * @see FEMDatetime#moveDate(int, int, int)
+	 * @see FEMDatetime#move(int, int, int, int, long, long, long)
 	 * @param months Anzahl der Monate ({@code 0..119999}).
 	 * @return minimale Anzahl an Tagen in den gegebenen Monaten.
 	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist. */
@@ -471,7 +490,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 
 	/** Diese Methode gibt die maximale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
 	 *
-	 * @see FEMDatetime#moveDate(int, int, int)
+	 * @see FEMDatetime#move(int, int, int, int, long, long, long)
 	 * @param months Anzahl der Monate ({@code 0..119999}).
 	 * @return maximale Anzahl an Tagen in den gegebenen Monaten.
 	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist. */
@@ -507,6 +526,27 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 *
 	 * @param days Anzahl der Tage ({@code -3652424..3652424}).
 	 * @param hours Anzahl der Stunden ({@code -87658199..87658199}).
+	 * @param minutes Anzahl der Minuten.
+	 * @param seconds Anzahl der Sekunden.
+	 * @param milliseconds Anzahl der Millisekunden.
+	 * @return die Gesamtanzahl der Millisekunden.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
+	public static long durationmillisOf(final int days, final int hours, final int minutes, final int seconds, final int milliseconds)
+		throws IllegalArgumentException {
+		FEMDuration.checkDays(+days);
+		FEMDuration.checkDays(-days);
+		FEMDuration.checkHours(+hours);
+		FEMDuration.checkHours(-hours);
+		final long result = FEMDuration.durationmillisOfImpl(days, hours, minutes, seconds, milliseconds);
+		FEMDuration.checkMilliseconds(+result);
+		FEMDuration.checkMilliseconds(-result);
+		return result;
+	}
+
+	/** Diese Methode gibt die Gesamtanzahl der Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	 *
+	 * @param days Anzahl der Tage ({@code -3652424..3652424}).
+	 * @param hours Anzahl der Stunden ({@code -87658199..87658199}).
 	 * @param minutes Anzahl der Minuten ({@code -5259491999..5259491999}).
 	 * @param seconds Anzahl der Sekunden ({@code -315569519999..315569519999}).
 	 * @param milliseconds Anzahl der Millisekunden ({@code -315569519999999..315569519999999}).
@@ -514,8 +554,8 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
 	public static long durationmillisOf(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
 		throws IllegalArgumentException {
-		FEMDuration.checkDays(-days);
 		FEMDuration.checkDays(+days);
+		FEMDuration.checkDays(-days);
 		FEMDuration.checkHours(+hours);
 		FEMDuration.checkHours(-hours);
 		FEMDuration.checkMinutes(+minutes);
@@ -712,6 +752,18 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	/** Diese Methode gibt diese Zeitspanne verschoben um die gegebenen Gesamtanzahlen an Monate und Millisekunden zurück.
 	 *
 	 * @param durationmonths Gesamtanzahl der Monate ({@code -119999..119999}).
+	 * @param durationmillis Gesamtanzahl der Millisekunden.
+	 * @return verschobene Zeitspanne.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
+	public final FEMDuration move(final int durationmonths, final int durationmillis) throws IllegalArgumentException {
+		FEMDuration.checkMonths(-durationmonths);
+		FEMDuration.checkMonths(+durationmonths);
+		return this.moveImpl(durationmonths, durationmillis);
+	}
+
+	/** Diese Methode gibt diese Zeitspanne verschoben um die gegebenen Gesamtanzahlen an Monate und Millisekunden zurück.
+	 *
+	 * @param durationmonths Gesamtanzahl der Monate ({@code -119999..119999}).
 	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -315569519999999..315569519999999}).
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
@@ -721,6 +773,25 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		FEMDuration.checkMilliseconds(+durationmillis);
 		FEMDuration.checkMilliseconds(-durationmillis);
 		return this.moveImpl(durationmonths, durationmillis);
+	}
+
+	/** Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	 *
+	 * @see #move(int, long)
+	 * @see #durationmonthsOf(int, int)
+	 * @see #durationmillisOf(int, int, long, long, long)
+	 * @param years Anzahl der Jahre ({@code -9999..9999}).
+	 * @param months Anzahl der Monate ({@code -119999..119999}).
+	 * @param days Anzahl der Tage ({@code -3652424..3652424}).
+	 * @param hours Anzahl der Stunden ({@code -87658199..87658199}).
+	 * @param minutes Anzahl der Minuten.
+	 * @param seconds Anzahl der Sekunden.
+	 * @param milliseconds Anzahl der Millisekunden.
+	 * @return verschobene Zeitspanne.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
+	public final FEMDuration move(final int years, final int months, final int days, final int hours, final int minutes, final int seconds,
+		final int milliseconds) throws IllegalArgumentException {
+		return this.moveImpl(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, minutes, seconds, milliseconds));
 	}
 
 	/** Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
@@ -745,11 +816,12 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	/** Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monate und Millisekunden der gegebenen Zeitspanne zurück.
 	 *
 	 * @param duration Gesamtanzahlen an Monate und Millisekunden.
+	 * @param negate {@code true}, wenn die Verschiebung in die der gegebenen Zeitspanne entgegengesetzte Richtung erfolgen soll.
 	 * @return verschobene Zeitspanne.
 	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public final FEMDuration move(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
-		if (duration.signValue() < 0) return this.move(-duration.durationmonthsValue(), -duration.durationmillisValue());
+	public final FEMDuration move(final FEMDuration duration, final boolean negate) throws NullPointerException, IllegalArgumentException {
+		if ((duration.signValue() > 0) == negate) return this.move(-duration.durationmonthsValue(), -duration.durationmillisValue());
 		return this.move(duration.durationmonthsValue(), duration.durationmillisValue());
 	}
 
