@@ -1,5 +1,9 @@
 package bee.creative.util;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 /** Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Method Testmethode} benötigt werden.
  * <p>
  * Im nachfolgenden Beispiel wird eine anonyme {@link Method Testmethode} instanziiert und vermessen: <pre>
@@ -104,6 +108,26 @@ public class Tester {
 
 	{}
 
+	public static final Comparator<Tester> USED_TIME_ORDER = new Comparator<Tester>() {
+
+		@Override
+		public int compare(Tester o1, Tester o2) {
+			return Comparators.compare(o1.usedTime, o2.usedTime);
+		}
+
+	};
+
+	public static final Comparator<Tester> USED_MEMORY_ORDER = new Comparator<Tester>() {
+
+		@Override
+		public int compare(Tester o1, Tester o2) {
+			return Comparators.compare(o1.usedMemory, o2.usedMemory);
+		}
+
+	};
+
+	{}
+
 	/** Dieses Feld speichert die Rechenzeit in Nanosekunden, die von der Testmethode benötigt wurde.
 	 *
 	 * @see System#nanoTime() */
@@ -146,12 +170,21 @@ public class Tester {
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code testers} leer ist. */
 	public Tester(final Tester... testers) throws NullPointerException, IllegalArgumentException {
-		final int count = testers.length;
+		this(Arrays.asList(testers));
+	}
+
+	/** Dieser Konstruktor initialisiert diesen {@link Tester} als arithmetisches Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
+	 * 
+	 * @param testers {@link Tester}, deren arithmetisches Mittel errechnet wird.
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code testers} leer ist. */
+	public Tester(final List<Tester> testers) throws NullPointerException, IllegalArgumentException {
+		final int count = testers.size();
 		if (count == 0) throw new IllegalArgumentException();
 		long usedTime = 0, usedMemory = 0;
-		for (int i = 0; i < count; i++) {
-			usedTime += testers[i].usedTime;
-			usedMemory += testers[i].usedMemory;
+		for (Tester tester: testers) {
+			usedTime += tester.usedTime;
+			usedMemory += tester.usedMemory;
 		}
 		this.usedTime = usedTime / count;
 		this.usedMemory = usedMemory / count;

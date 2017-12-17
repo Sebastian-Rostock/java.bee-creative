@@ -1216,8 +1216,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 			}
 		}
 		if (!this.hasDate() || ((days | months) == 0)) return result;
-		final int datetimemonths = (months + this.monthValueImpl()) - 1;
-		final int year = (datetimemonths / 12) + this.yearValueImpl(), month = (datetimemonths % 12) + 1;
+		final int datetimemonths = (this.yearValueImpl() * 12) + this.monthValueImpl() + months + -1;
+		final int year = datetimemonths / 12, month = (datetimemonths % 12) + 1;
 		final int value = this.dateValueImpl(), length = FEMDatetime.lengthOf(month, year), date = value > length ? length : value;
 		if (days == 0) return result.withDateImpl(year, month, date);
 		return result.withDate(FEMDatetime.calendardayOfImpl(year, month, date) + days);
