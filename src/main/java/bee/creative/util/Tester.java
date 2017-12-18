@@ -7,14 +7,13 @@ import java.util.List;
 /** Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Method Testmethode} benötigt werden.
  * <p>
  * Im nachfolgenden Beispiel wird eine anonyme {@link Method Testmethode} instanziiert und vermessen: <pre>
- * Tester result = new Tester(new Test() {
- *
- * 	public void run() throws Throwable {
- * 		// ...
- * 	}
- *
- * });
- * </pre>
+ * Tester result = new Tester(new Method() {
+ *   public void run() throws Throwable {
+ *     ...
+ *   }
+ * });</pre><br>
+ * Als Lambda-Ausdruck wird der TEst entsprechend kürzer: <pre>
+ * Tester result = new Tester(() -> { ... });</pre>
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Tester {
@@ -108,19 +107,21 @@ public class Tester {
 
 	{}
 
+	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
 	public static final Comparator<Tester> USED_TIME_ORDER = new Comparator<Tester>() {
 
 		@Override
-		public int compare(Tester o1, Tester o2) {
+		public int compare(final Tester o1, final Tester o2) {
 			return Comparators.compare(o1.usedTime, o2.usedTime);
 		}
 
 	};
 
+	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedMemory}. */
 	public static final Comparator<Tester> USED_MEMORY_ORDER = new Comparator<Tester>() {
 
 		@Override
-		public int compare(Tester o1, Tester o2) {
+		public int compare(final Tester o1, final Tester o2) {
 			return Comparators.compare(o1.usedMemory, o2.usedMemory);
 		}
 
@@ -165,7 +166,7 @@ public class Tester {
 	public final Throwable cause;
 
 	/** Dieser Konstruktor initialisiert diesen {@link Tester} als arithmetisches Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
-	 * 
+	 *
 	 * @param testers {@link Tester}, deren arithmetisches Mittel errechnet wird.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code testers} leer ist. */
@@ -174,7 +175,7 @@ public class Tester {
 	}
 
 	/** Dieser Konstruktor initialisiert diesen {@link Tester} als arithmetisches Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
-	 * 
+	 *
 	 * @param testers {@link Tester}, deren arithmetisches Mittel errechnet wird.
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code testers} leer ist. */
@@ -182,7 +183,7 @@ public class Tester {
 		final int count = testers.size();
 		if (count == 0) throw new IllegalArgumentException();
 		long usedTime = 0, usedMemory = 0;
-		for (Tester tester: testers) {
+		for (final Tester tester: testers) {
 			usedTime += tester.usedTime;
 			usedMemory += tester.usedMemory;
 		}

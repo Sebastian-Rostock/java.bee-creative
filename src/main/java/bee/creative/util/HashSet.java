@@ -35,16 +35,17 @@ import java.util.Set;
  * <th>{@link #remove(Object) remove}</th>
  * </tr>
  * <tr>
- * <td>{@link java.util.HashSet}</td>
+ * <td>{@link java.util.HashSet}<br>
+ * Java 1.7</td>
  * <td>88..136</td>
  * <td colspan="2">{@link #size()} * 36 + 80..128 Byte (= 100 %)</td>
  * <td>{@link #size()} * 34..36 + 80..128 Byte (~ 95..100 %)</td>
  * <td>(= 100 %)</td>
- * <td>(~ 41 %)</td>
- * <td>(~ 46 %)</td>
+ * <td>(~ 50 %)</td>
+ * <td>(~ 67 %)</td>
  * <td>(= 100 %)</td>
- * <td>(~ 92 %)</td>
  * <td>(~ 98 %)</td>
+ * <td>(~ 78 %)</td>
  * </tr>
  * <tr>
  * <td>{@link bee.creative.util.HashSet}<br>
@@ -52,12 +53,12 @@ import java.util.Set;
  * <td>40 Byte</td>
  * <td>{@link #size()} * 16 + 104 Byte (~ 44 %)</td>
  * <td colspan="2">{@link #size()} * 13..16 + 104 Byte (~ 36..44 %)</td>
- * <td>(~ 46 %)</td>
- * <td>(~ 29 %)</td>
- * <td>(~ 55 %)</td>
- * <td>(~ 81 %)</td>
- * <td>(~ 74 %)</td>
- * <td>(~ 83 %)</td>
+ * <td>(~ 57 %)</td>
+ * <td>(~ 48 %)</td>
+ * <td>(~ 57 %)</td>
+ * <td>(~ 100 %)</td>
+ * <td>(~ 100 %)</td>
+ * <td>(~ 69 %)</td>
  * </tr>
  * <tr>
  * <td>{@link bee.creative.util.HashSet}<br>
@@ -65,12 +66,12 @@ import java.util.Set;
  * <td>40 Byte</td>
  * <td>{@link #size()} * 12 + 88 Byte (~33%)</td>
  * <td colspan="2">{@link #size()} * 9..12 + 88 Byte (~25..33%)</td>
- * <td>(~ 43 %)</td>
- * <td>(~ 33 %)</td>
  * <td>(~ 55 %)</td>
- * <td>(~ 91 %)</td>
- * <td>(~ 84 %)</td>
+ * <td>(~ 43 %)</td>
+ * <td>(~ 55 %)</td>
  * <td>(~ 95 %)</td>
+ * <td>(~ 93 %)</td>
+ * <td>(~ 69 %)</td>
  * </tr>
  * </table>
  * </p>

@@ -1134,8 +1134,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
 	public final FEMDatetime move(final int years, final int months, final int days, final int hours, final int minutes, final int seconds,
 		final int milliseconds) throws IllegalArgumentException {
-		FEMDatetime.checkYear(+years);
-		FEMDatetime.checkYear(-years);
+		FEMDatetime.checkYears(+years);
+		FEMDatetime.checkYears(-years);
 		FEMDatetime.checkMonths(+months);
 		FEMDatetime.checkMonths(-months);
 		FEMDatetime.checkDays(+days);
@@ -1169,8 +1169,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
 	public final FEMDatetime move(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
 		final long milliseconds) throws IllegalArgumentException {
-		FEMDatetime.checkYear(+years);
-		FEMDatetime.checkYear(-years);
+		FEMDatetime.checkYears(+years);
+		FEMDatetime.checkYears(-years);
 		FEMDatetime.checkMonths(+months);
 		FEMDatetime.checkMonths(-months);
 		FEMDatetime.checkDays(+days);
