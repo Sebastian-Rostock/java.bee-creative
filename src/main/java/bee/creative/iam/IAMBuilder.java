@@ -5,7 +5,7 @@ import java.util.List;
 import bee.creative.iam.IAMLoader.IAMListingLoader;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
-import bee.creative.util.Unique.UniqueMap;
+import bee.creative.util.Unique;
 
 /** Diese Klasse implementiert Klassen und Methoden zur erzeugung der {code Integer Array Model} Datenstrukturen.
  *
@@ -44,23 +44,16 @@ public class IAMBuilder {
 
 	}
 
-	/** Diese Klasse implementiert eine abstrakte {@link UniqueMap} mit Zahlenlisten als Eingabe.
+	/** Diese Klasse implementiert ein abstraktes {@link Unique} mit Zahlenlisten als Eingabe.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ der Nutzdaten (Ausgabe). */
-	static abstract class UniquePool<GData> extends UniqueMap<int[], GData> {
+	static abstract class UniquePool<GData> extends Unique<int[], GData> {
 
 		/** Dieses Feld speichert die gesammelten Nutzdaten. */
 		public final List<GData> datas = new ArrayList<>();
 
 		{}
-
-		/** Diese Methode erzeugt einen neuen Nutzdatensatz und gibt diesen zurück.
-		 *
-		 * @param index Index, unter dem der Nutzdatensatz in {@link #datas} verwaltet wird.
-		 * @param array Zahlenliste.
-		 * @return Nutzdatensatz. */
-		protected abstract GData create(int index, int[] array);
 
 		/** Diese Methode nimmt einen neuen Nutzdatensatz mit der gegebenen Zahlenliste in die Verwaltung auf und gibt den Index zurück, unter dem diese in
 		 * {@link #datas} verwaltet werden.
@@ -74,12 +67,18 @@ public class IAMBuilder {
 			return data;
 		}
 
-		/** {@inheritDoc} */
-		@Override
+		/** Diese Methode leert diesen Pool. */
 		public final void clear() {
-			super.clear();
+			this.mapping().clear();
 			this.datas.clear();
 		}
+
+		/** Diese Methode erzeugt einen neuen Nutzdatensatz und gibt diesen zurück.
+		 *
+		 * @param index Index, unter dem der Nutzdatensatz in {@link #datas} verwaltet wird.
+		 * @param array Zahlenliste.
+		 * @return Nutzdatensatz. */
+		protected abstract GData create(int index, int[] array);
 
 		{}
 
@@ -87,12 +86,6 @@ public class IAMBuilder {
 		@Override
 		public final boolean accept(final Object input) {
 			return input instanceof int[];
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final GData compile(final int[] array) {
-			return this.put(array);
 		}
 
 		/** {@inheritDoc} */
@@ -111,6 +104,12 @@ public class IAMBuilder {
 		@Override
 		public final int compare(final int[] array1, final int[] array2) throws NullPointerException {
 			return IAMBuilder.compare(array1, array2);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected final GData build(final int[] array) {
+			return this.put(array);
 		}
 
 	}
@@ -379,7 +378,7 @@ public class IAMBuilder {
 		/** {@inheritDoc} */
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
-			final EntryData result = this.entries.entryMap().get(key.toArray());
+			final EntryData result = this.entries.mapping().get(key.toArray());
 			return result == null ? -1 : result.index;
 		}
 

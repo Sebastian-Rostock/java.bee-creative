@@ -26,6 +26,38 @@ public class Objects {
 
 	{}
 
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link #deepHash(Object)} und {@link #deepEquals(Object, Object)} delegiert. */
+	public static final Hasher<Object> DEEP_HASHER = new Hasher<Object>() {
+
+		@Override
+		public int hash(final Object input) {
+			return Objects.deepHash(input);
+		}
+
+		@Override
+		public boolean equals(final Object input1, final Object input2) {
+			return Objects.deepEquals(input1, input2);
+		}
+
+	};
+
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link #hash(Object)} und {@link #equals(Object, Object)} delegiert. */
+	public static final Hasher<Object> DEFAULT_HASHER = new Hasher<Object>() {
+
+		@Override
+		public int hash(final Object input) {
+			return Objects.hash(input);
+		}
+
+		@Override
+		public boolean equals(final Object input1, final Object input2) {
+			return Objects.equals(input1, input2);
+		}
+
+	};
+
+	{}
+
 	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
 	 *
 	 * @param value Zeichenkette.
@@ -398,7 +430,7 @@ public class Objects {
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben und Arrays. Für
 	 * Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet. Wenn beide Objekte keine Arrays sind, entspricht der
 	 * Rückgabewert: <pre>
-	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equalsEx(object2))
+	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))
 	 * </pre>
 	 *
 	 * @see Arrays#equals(int[], int[])

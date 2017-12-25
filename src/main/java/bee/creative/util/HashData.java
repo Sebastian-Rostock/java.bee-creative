@@ -16,7 +16,7 @@ import bee.creative.iam.IAMMapping;
 /** Diese abstrakte Klasse implementiert eine transponierte {@link Object#hashCode() streuwertbasierte} Datenhaltung, die als Grundlage einer {@link Map} oder
  * eines {@link Set} verwendet werden kann.<br>
  * Um die Verwaltungsdaten je Eintrag zu minimieren, werden die Tabelle mit den Eigenschaften der Einträge spaltenweise in bis zu fünf Arrays
- * {@link #allocate(int) reserviert} und die Verweise auf die nächsten Einträge in den verketteten Listen über Indexpositionen abgebildet.
+ * {@link #allocateImpl(int) reserviert} und die Verweise auf die nächsten Einträge in den verketteten Listen über Indexpositionen abgebildet.
  * <p>
  * Über die Methoden {@link #customHash(Object)} und {@link #customEquals(Object, Object)} kann die Berechnung der {@link Object#hashCode() Streuwerte} bzw. der
  * {@link Object#equals(Object) Äquivalenz} von Schlüsseln angepasst werden.
@@ -392,33 +392,33 @@ public abstract class HashData<GKey, GValue> {
 	{}
 
 	/** Dieses Feld speichert den initialwert für {@link #table}. */
-	static final int[] EMPTY_TABLE = {-1};
+	private static final int[] EMPTY_TABLE = {-1};
 
 	/** Dieses Feld speichert den initialwert für {@link #nexts} und {@link #hashes}. */
-	static final int[] EMPTY_INTEGERS = {};
+	private static final int[] EMPTY_INTEGERS = {};
 
 	/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
-	static final Object[] EMPTY_OBJECTS = {};
+	private static final Object[] EMPTY_OBJECTS = {};
 
 	/** Dieses Feld speichert die maximale Kapazität. */
-	static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
+	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
 
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static void clearNexts(final int[] array) {
+	private static void clearNexts(final int[] array) {
 		for (int i = 0, size = array.length; i < size;) {
 			array[i] = ++i;
 		}
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void clearTable(final int[] array) {
+	private static void clearTable(final int[] array) {
 		Arrays.fill(array, -1);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void clearObjects(final Object[] array) {
+	private static void clearObjects(final Object[] array) {
 		if (array == null) return;
 		Arrays.fill(array, null);
 	}
@@ -447,13 +447,13 @@ public abstract class HashData<GKey, GValue> {
 	int entry = 0;
 
 	/** Dieses Feld speichert die Anzahl der Einträge. */
-	protected int count = 0;
+	int count = 0;
 
 	/** Dieser Konstruktor initialisiert die streuwertbasierte Datenhaltung.
 	 *
-	 * @param withValues {@code true} für eine Abbildung von {@link #keys} auf {@link #values};<br>
-	 *        {@code false} für eine Menge von {@link #keys}.
-	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
+	 * @param withValues {@code true} für eine Abbildung von {@link #keys Schlüsseln} auf {@link #values Werte};<br>
+	 *        {@code false} für eine Menge von {@link #keys Elementen}.
+	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel {@link #hashes gepuffert} werden sollen;<br>
 	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
 	public HashData(final boolean withValues, final boolean withHashes) {
 		this.values = withValues ? HashData.EMPTY_OBJECTS : null;
@@ -462,10 +462,17 @@ public abstract class HashData<GKey, GValue> {
 
 	{}
 
+	/** Diese Methode gibt die Anzahl der Einträge zurück.
+	 *
+	 * @return Anzahl der Einträge. */
+	protected final int countImpl() {
+		return this.count;
+	}
+
 	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
 	 *
 	 * @return Kapazität. */
-	public final int capacity() {
+	protected final int capacityImpl() {
 		return this.keys.length;
 	}
 
@@ -473,7 +480,7 @@ public abstract class HashData<GKey, GValue> {
 	 *
 	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
-	public final void allocate(final int capacity) throws IllegalArgumentException {
+	protected final void allocateImpl(final int capacity) throws IllegalArgumentException {
 		if (capacity < this.count) throw new IllegalArgumentException();
 		final int[] oldNexts = this.nexts;
 		if (oldNexts.length == capacity) return;
@@ -522,11 +529,6 @@ public abstract class HashData<GKey, GValue> {
 			this.values = newValues;
 			this.hashes = newHashes;
 		} else throw new OutOfMemoryError();
-	}
-
-	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
-	public final void compact() {
-		this.allocate(this.count);
 	}
 
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt nur dann {@code true} zurück, wenn ein solcher Eintrag existiert.
@@ -671,12 +673,12 @@ public abstract class HashData<GKey, GValue> {
 	protected final int putIndexImpl(final GKey key) {
 		final int hash = this.customHash(key), result = this.getIndexImpl2(key, hash);
 		if (result >= 0) return result;
-		final int count = this.count + 1, capacity = this.capacity();
+		final int count = this.count + 1, capacity = this.capacityImpl();
 		if (count > HashData.MAX_CAPACITY) throw new OutOfMemoryError();
 		this.count = count;
 		if (count <= capacity) return this.putIndexImpl2(key, hash);
 		final int allocate = count + (count >> 1);
-		this.allocate((allocate < 0) || (allocate > HashData.MAX_CAPACITY) ? HashData.MAX_CAPACITY : allocate);
+		this.allocateImpl((allocate < 0) || (allocate > HashData.MAX_CAPACITY) ? HashData.MAX_CAPACITY : allocate);
 		return this.putIndexImpl2(key, hash);
 	}
 
@@ -962,7 +964,7 @@ public abstract class HashData<GKey, GValue> {
 	protected Object clone() throws CloneNotSupportedException {
 		try {
 			final HashData<?, ?> result = (HashData<?, ?>)super.clone();
-			if (this.capacity() == 0) {
+			if (this.capacityImpl() == 0) {
 				result.keys = HashData.EMPTY_OBJECTS;
 				result.nexts = HashData.EMPTY_INTEGERS;
 				result.table = HashData.EMPTY_TABLE;

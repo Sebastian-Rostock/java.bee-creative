@@ -186,6 +186,28 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 
 	{}
 
+	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann.
+	 *
+	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
+	public void allocate(final int capacity) throws IllegalArgumentException {
+		this.allocateImpl(capacity);
+	}
+
+	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
+	 *
+	 * @return Kapazität. */
+	public int capacity() {
+		return this.capacityImpl();
+	}
+
+	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
+	public void compact() {
+		this.allocateImpl(countImpl());
+	}
+
+	{}
+
 	/** {@inheritDoc} */
 	@Override
 	public int size() {

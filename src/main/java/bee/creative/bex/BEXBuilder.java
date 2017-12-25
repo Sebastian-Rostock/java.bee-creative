@@ -24,7 +24,7 @@ import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
-import bee.creative.util.Unique.UniqueMap;
+import bee.creative.util.Unique;
 
 /** Diese Klasse implementiert die Algorithmen zur Kodierung der {@code Binary Encoded XML} Datenstrukturen.
  *
@@ -191,20 +191,15 @@ public final class BEXBuilder {
 
 	}
 
-	/** Diese Klasse implementiert eine abstrakte {@link UniqueMap} zur Verwaltung einzigartiger Datensätze.
+	/** Diese Klasse implementiert einen abstrakten {@link Unique} zur Verwaltung einzigartiger Datensätze.
 	 *
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ der Eingabedaten.
 	 * @param <GItem> Typ der Datensätze. */
-	static abstract class BEXPool<GData, GItem extends BEXItem> extends UniqueMap<GData, GItem> {
+	static abstract class BEXPool<GData, GItem extends BEXItem> extends Unique<GData, GItem> {
 
 		/** Dieses Feld speichert die Liste aller einzigartigen Datensätze. */
 		public final List<GItem> items = new ArrayList<>();
-
-		/** Dieser Konstruktor ruft {@link #clear()} auf. */
-		public BEXPool() {
-			this.clear();
-		}
 
 		{}
 
@@ -217,10 +212,9 @@ public final class BEXBuilder {
 			return item;
 		}
 
-		/** {@inheritDoc} */
-		@Override
+		/** Diese Methode leert den Pool. */
 		public void clear() {
-			super.clear();
+			this.mapping().clear();
 			this.items.clear();
 		}
 
@@ -249,7 +243,7 @@ public final class BEXBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final BEXTextItem compile(final String input) {
+		protected final BEXTextItem build(final String input) {
 			return this.put(new BEXTextItem(input));
 		}
 
@@ -280,7 +274,7 @@ public final class BEXBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final BEXGroupItem compile(final List<BEXItem> input) {
+		protected final BEXGroupItem build(final List<BEXItem> input) {
 			return this.put(new BEXGroupItem(input));
 		}
 

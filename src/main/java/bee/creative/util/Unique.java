@@ -1,779 +1,335 @@
 package bee.creative.util;
 
-import java.util.AbstractMap;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.AbstractSet;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
+import javax.xml.crypto.Data;
 
 /** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene
- * Eingaben über eine interne {@link Data Abbildung} mit {@link #compile(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer
- * gegebenen Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe zuvor bereits {@link #compile(Object) erzeugt} wurde, wird deren
+ * Eingaben über eine interne {@link Map Abbildung} mit daraus {@link #build(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit
+ * einer gegebenen Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe zuvor bereits {@link #build(Object) erzeugt} wurde, wird deren
  * Wiederverwendung via {@link #reuse(Object, Object)} signalisiert.
  *
- * @see Unique#get(Object)
- * @see Unique#reuse(Object, Object)
- * @see Unique#compile(Object)
- * @see Hasher
- * @see Getter
- * @see Filter
- * @see Comparator
+ * @see HashMap#from(Filter, Hasher)
+ * @see TreeMap#from(Filter, Comparator)
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ der Eingabe.
  * @param <GOutput> Typ der Ausgabe. */
-public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Getter<GInput, GOutput>, Filter<Object>, Comparator<GInput>, Iterable<GOutput> {
+public abstract class Unique<GInput, GOutput> implements Getter<GInput, GOutput>, Hasher<GInput>, Filter<Object>, Comparator<GInput>, Iterable<GOutput> {
 
-	/** Diese Schnittstelle definiert die Verwaltung der Einträge eines {@link Unique} als Abbildung von Eingaben auf Ausgaben, analog zu einer {@link Map}.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe. */
-	public static interface Data<GInput, GOutput> extends Iterable<Entry<GInput, GOutput>> {
-
-		/** Diese Methode wählt die gegebene Eingabe.
-		 *
-		 * @param input Eingabe.
-		 * @throws RuntimeException Wenn {@code input} ungültig ist, z.B. {@code null}. */
-		public void forInput(GInput input) throws RuntimeException;
-
-		/** Diese Methode leert die gewählte Eingabe. */
-		public void clearInput();
-
-		/** Diese Methode gibt die Ausgabe zur gewählten Eingabe zurück.
-		 *
-		 * @see #forInput(Object)
-		 * @see #hasOutput()
-		 * @return Ausgabe.
-		 * @throws RuntimeException Wenn keine Eingabe {@link #forInput(Object) gewählt} ist oder keine Ausgabe {@link #hasOutput() existiert}. */
-		public GOutput getOutput() throws RuntimeException;
-
-		/** Diese Methode gibt nur dann {@code true} zurück, wenn zur {@link #forInput(Object) gewählten} Eingabe eine Ausgabe existiert.
-		 *
-		 * @see #forInput(Object)
-		 * @return {@code true}, wenn eine Ausgabe existiert. */
-		public boolean hasOutput();
-
-		/** Diese Methode ordnet der {@link #forInput(Object) gewählten} Eingabe die gegebene Ausgabe zu.
-		 *
-		 * @see #forInput(Object)
-		 * @param output Ausgabe.
-		 * @throws RuntimeException Wenn {@code output} ungültig ist, z.B. {@code null}. */
-		public void setOutput(GOutput output) throws RuntimeException;
-
-		/** Diese Methode entfernt die Zuordnung der {@link #forInput(Object) gewählten} Eingabe zu ihrer Ausgabe.
-		 *
-		 * @see #forInput(Object) */
-		public void popOutput();
-
-		/** Diese Methode gibt die Anzahl der Einträge zurück.
-		 *
-		 * @return Anzahl der Einträge. */
-		public int size();
-
-		/** Diese Methode gibt einen {@link Iterator} über die Paare aus Ein- und Ausgaben zurück. */
-		@Override
-		public Iterator<Entry<GInput, GOutput>> iterator();
-
+	/** Diese Methode ist eine Abkürzung für {@link #newHashed(Filter, Hasher, Getter, Setter) newHashed(null, null, null, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput> Unique<GInput, GInput> newHashed() {
+		return Unique.newHashed(null, null, null, null);
 	}
 
-	/** Diese Klasse implementiert eine abstrakte Verwaltung der Einträge eines {@link Unique} in sortierten Listen mit Zugriff über eine binäre Suche.
+	/** Diese Methode ist eine Abkürzung für {@link #newHashed(Filter, Hasher, Getter, Setter) newHashed(null, hasher, null, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GOutput> Unique<GInput, GOutput> newHashed(final Hasher<? super Object> hasher) {
+		return Unique.newHashed(null, hasher, null, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newHashed(Filter, Hasher, Getter, Setter) newHashed(filter, hasher, null, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GOutput> Unique<GInput, GOutput> newHashed(final Filter<? super Object> filter, final Hasher<? super GInput> hasher) {
+		return Unique.newHashed(filter, hasher, null, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newHashed(Filter, Hasher, Getter, Setter) newHashed(null, null, compiler, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GOutput> Unique<GInput, GOutput> newHashed(final Getter<? super GInput, ? extends GOutput> compiler) {
+		return Unique.newHashed(null, null, compiler, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newHashed(Filter, Hasher, Getter, Setter) newHashed(null, hasher, compiler, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GOutput> Unique<GInput, GOutput> newHashed(final Hasher<? super Object> hasher,
+		final Getter<? super GInput, ? extends GOutput> compiler) {
+		return Unique.newHashed(null, hasher, compiler, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newHashedImpl(Filter, Hasher, Getter, Setter) newHashed(filter, hasher, compiler, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GOutput> Unique<GInput, GOutput> newHashed(final Filter<? super Object> filter, final Hasher<? super GInput> hasher,
+		final Getter<? super GInput, ? extends GOutput> compiler) {
+		return Unique.newHashed(filter, hasher, compiler, null);
+	}
+
+	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Filter} geprüft, über den gegebenen
+	 * {@link Hasher} miteinander verglichen und über den gegebenen {@link Getter} in die Ausgaben überführt werden. Die Wiederverwendung einer Ausgabe wird dem
+	 * gegebenen {@link Setter} signalisiert.
 	 *
-	 * @see Unique#compare(Object, Object)
-	 * @see Comparables#binarySearch(List, Comparable)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe. */
-	public static abstract class BaseListData<GInput, GOutput> implements Data<GInput, GOutput> {
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param filter {@link Filter} zur Erkennugn der akzeptierten Eingaben, welche als {@code GInput} interpretiert werden können in {@link #accept(Object)}.<br>
+	 *        Bei {@code null} wird {@link Filters#ACCEPT_FILTER} verwendet, sodass alle Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}
+	 *        akzeptiert werden.
+	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}.<br>
+	 *        Bei {@code null} wird {@link Objects#DEFAULT_HASHER} verwendet.
+	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #build(Object)}.<br>
+	 *        Bei {@code null} wird {@link Getters#NEUTRAL_GETTER} verwendet, sodass die Ausgaben gleich den Eingaben sind.
+	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #reuse(Object, Object)}.<br>
+	 *        Bei {@code null} wird {@link Setters#NEUTRAL_SETTER} verwendet.
+	 * @return streuwertbasierte {@link Unique}-Map. */
+	public static <GInput, GOutput> Unique<GInput, GOutput> newHashed(final Filter<? super Object> filter, final Hasher<? super GInput> hasher,
+		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
+		@SuppressWarnings ("unchecked")
+		final Unique<GInput, GOutput> result = Unique.<GInput, GOutput>newHashedImpl( //
+			filter != null ? filter : Filters.ACCEPT_FILTER, //
+			(Hasher<? super GInput>)(hasher != null ? hasher : Objects.DEFAULT_HASHER), //
+			(Getter<? super GInput, ? extends GOutput>)(compiler != null ? compiler : Getters.NEUTRAL_GETTER), //
+			(Setter<? super GInput, ? super GOutput>)(reuser != null ? reuser : Setters.NEUTRAL_SETTER));
+		return result;
+	}
 
-		/** Dieses Feld speichert den Besitzer. */
-		protected final Unique<GInput, GOutput> owner;
+	@SuppressWarnings ("javadoc")
+	static <GInput, GOutput> Unique<GInput, GOutput> newHashedImpl(final Filter<? super Object> filter, final Hasher<? super GInput> hasher,
+		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
+		return new Unique<GInput, GOutput>(Unique.HASHED) {
 
-		/** Dieses Feld speichert die Eingaben. */
-		protected final List<GInput> inputs;
-
-		/** Dieses Feld speichert die Ausgaben. */
-		protected final List<GOutput> outputs;
-
-		/** Dieses Feld speichert die gewählte Eingabe. */
-		protected GInput input;
-
-		/** Dieses Feld speichert den Index der Eingabe. */
-		protected int index;
-
-		/** Dieser Konstruktor initialisiert Besitzer, Eingaben und Ausgaben.
-		 *
-		 * @param owner Besitzer.
-		 * @param inputs Eingaben.
-		 * @param outputs Ausgaben.
-		 * @throws NullPointerException Wenn {@code owner}, {@code inputs} bzw. {@code outputs} {@code null} ist. */
-		public BaseListData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
-			this.inputs = Objects.assertNotNull(inputs);
-			this.outputs = Objects.assertNotNull(outputs);
-		}
-
-		{}
-
-		/** Diese Methode fügt die gegebene Ein- und Ausgabe an der gegebenen Position in {@link #inputs} bzw. {@link #outputs} ein.
-		 *
-		 * @param index Position.
-		 * @param key Eingabe.
-		 * @param value Ausgebe. */
-		protected abstract void insert(final int index, final GInput key, final GOutput value);
-
-		/** Diese Methode entfernt den Eintrag an der gegebenen Position aus {@link #inputs} und {@link #outputs}.
-		 *
-		 * @param index Position. */
-		protected abstract void remove(final int index);
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public void forInput(final GInput input) throws RuntimeException {
-			this.index = Comparables.binarySearch(this.inputs, Comparables.itemComparable(input, this.owner));
-			this.input = input;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void clearInput() {
-			this.index = -1;
-			this.input = null;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public GOutput getOutput() throws RuntimeException {
-			final int index = this.index;
-			this.clearInput();
-			if (index < 0) throw new IllegalStateException();
-			return this.outputs.get(index);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean hasOutput() {
-			return this.index >= 0;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void setOutput(final GOutput output) throws RuntimeException {
-			int index = this.index;
-			if (index < 0) {
-				index = -index - 1;
-				this.insert(index, this.input, output);
-			} else {
-				this.outputs.set(index, output);
+			@Override
+			public boolean accept(final Object input) {
+				return filter.accept(input);
 			}
-			this.clearInput();
-		}
 
-		/** {@inheritDoc} */
-		@Override
-		public void popOutput() {
-			final int index = this.index;
-			this.clearInput();
-			if (index < 0) return;
-			this.remove(index);
-		}
+			@Override
+			public int hash(final GInput input) throws NullPointerException {
+				return hasher.hash(input);
+			}
 
-		/** {@inheritDoc} */
-		@Override
-		public int size() {
-			return this.inputs.size();
-		}
+			@Override
+			public boolean equals(final GInput input1, final GInput input2) throws NullPointerException {
+				return hasher.equals(input1, input2);
+			}
 
-		/** {@inheritDoc} */
-		@Override
-		public Iterator<Entry<GInput, GOutput>> iterator() {
-			return new Iterator<Entry<GInput, GOutput>>() {
+			@Override
+			public void reuse(final GInput input, final GOutput output) {
+				reuser.set(input, output);
+			}
 
-				int _index_ = 0;
+			@Override
+			public GOutput build(final GInput input) {
+				return compiler.get(input);
+			}
 
-				int _count_ = BaseListData.this.size();
-
-				@Override
-				public boolean hasNext() {
-					return this._index_ < this._count_;
-				}
-
-				@Override
-				public Entry<GInput, GOutput> next() {
-					final int index = this._index_++;
-					return new SimpleImmutableEntry<>(BaseListData.this.inputs.get(index), BaseListData.this.outputs.get(index));
-				}
-
-				@Override
-				public void remove() {
-					BaseListData.this.remove(this._index_ - 1);
-					this._count_--;
-				}
-
-			};
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this);
-		}
-
+		};
 	}
 
-	/** Diese Klasse implementiert eine abstrakte Verwaltung der Einträge eines {@link Unique} in einem {@link HashData}.
+	/** Diese Methode ist eine Abkürzung für {@link #newSorted(Filter, Hasher, Getter, Setter) newSorted(null, null, null, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput extends Comparable<? super GInput>> Unique<GInput, GInput> newSorted() {
+		return Unique.newSorted(null, null, null, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newSorted(Filter, Hasher, Getter, Setter) newSorted(null, comparator, null, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput> Unique<GInput, GInput> newSorted(final Comparator<? super Object> comparator) {
+		return Unique.newSorted(null, comparator, null, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newSorted(Filter, Hasher, Getter, Setter) newSorted(filter, comparator, null, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput> Unique<GInput, GInput> newSorted(final Filter<? super Object> filter, final Comparator<? super GInput> comparator) {
+		return Unique.newSorted(filter, comparator, null, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newSorted(Filter, Hasher, Getter, Setter) newSorted(null, null, compiler, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput extends Comparable<? super GInput>, GOutput> Unique<GInput, GOutput> newSorted(
+		final Getter<? super GInput, ? extends GOutput> compiler) {
+		return Unique.newSorted(null, null, compiler, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newSorted(Filter, Hasher, Getter, Setter) newSorted(null, comparator, compiler, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GOutput> Unique<GInput, GOutput> newSorted(final Comparator<? super Object> comparator,
+		final Getter<? super GInput, ? extends GOutput> compiler) {
+		return Unique.newSorted(null, comparator, compiler, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #newSorted(Filter, Hasher, Getter, Setter) newSorted(filter, comparator, compiler, null)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GOutput> Unique<GInput, GOutput> newSorted(final Filter<? super Object> filter, final Comparator<? super GInput> comparator,
+		final Getter<? super GInput, ? extends GOutput> compiler) {
+		return Unique.newSorted(filter, comparator, compiler, null);
+	}
+
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Filter} geprüft, über den gegebenen
+	 * {@link Comparator} miteinander verglichen und über den gegebenen {@link Getter} in die Ausgaben überführt werden. Die Wiederverwendung einer Ausgabe wird
+	 * dem gegebenen {@link Setter} signalisiert.
 	 *
-	 * @see Unique#hash(Object)
-	 * @see Unique#equals(Object, Object)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe. */
-	public static abstract class BaseHashData<GInput, GOutput> extends HashData<GInput, GOutput> implements Data<GInput, GOutput> {
-
-		/** Dieses Feld speichert den Besitzer. */
-		protected final Unique<GInput, GOutput> owner;
-
-		/** Dieses Feld speichert die gewählte Eingabe. */
-		protected GInput input;
-
-		/** Dieses Feld speichert den gewählten Eintrag. */
-		protected int index;
-
-		/** Dieser Konstruktor initialisiert den Besitzer.
-		 *
-		 * @param owner Besitzer.
-		 * @param withValues {@code true} für {@link Map}; {@code false} für {@link Set}.
-		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
-		public BaseHashData(final Unique<GInput, GOutput> owner, final boolean withValues) throws NullPointerException {
-			super(withValues, true);
-			this.owner = Objects.assertNotNull(owner);
-			this.allocate(16);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public void forInput(final GInput input) throws RuntimeException {
-			this.index = this.getIndexImpl(input);
-			this.input = input;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void clearInput() {
-			this.index = -1;
-			this.input = null;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean hasOutput() {
-			return this.index >= 0;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public int size() {
-			return this.count;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public Iterator<Entry<GInput, GOutput>> iterator() {
-			return this.newEntriesIteratorImpl();
-		}
-
-		/** {@inheritDoc} */
-		@Override
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param filter {@link Filter} zur Erkennugn der akzeptierten Eingaben, welche als {@code GInput} interpretiert werden können in {@link #accept(Object)}.<br>
+	 *        Bei {@code null} wird {@link Filters#ACCEPT_FILTER} verwendet, sodass alle Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}
+	 *        akzeptiert werden.
+	 * @param comparator {@link Comparator} zur Ermittlung des Vergleichswerts der Eingaben in {@link #compare(Object, Object)}.<br>
+	 *        Bei {@code null} wird {@link Comparators#NATURAL_COMPARATOR} verwendet.
+	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #build(Object)}.<br>
+	 *        Bei {@code null} wird {@link Getters#NEUTRAL_GETTER} verwendet, sodass die Ausgaben gleich den Eingaben sind.
+	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #reuse(Object, Object)}.<br>
+	 *        Bei {@code null} wird {@link Setters#NEUTRAL_SETTER} verwendet.
+	 * @return streuwertbasierte {@link Unique}-Map. */
+	public static <GInput, GOutput> Unique<GInput, GOutput> newSorted(final Filter<Object> filter, final Comparator<? super GInput> comparator,
+		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
 		@SuppressWarnings ("unchecked")
-		protected int customHash(final Object key) {
-			return this.owner.hash((GInput)key);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		@SuppressWarnings ("unchecked")
-		protected boolean customEquals(final Object thisKey, final Object thatKey) {
-			return this.owner.equals((GInput)thisKey, (GInput)thatKey);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this);
-		}
-
+		final Unique<GInput, GOutput> result = Unique.newSortedImpl(//
+			filter != null ? filter : Filters.ACCEPT_FILTER, //
+			(Comparator<? super GInput>)(comparator != null ? comparator : Comparators.NATURAL_COMPARATOR), //
+			(Getter<? super GInput, ? extends GOutput>)(compiler != null ? compiler : Getters.NEUTRAL_GETTER), //
+			(Setter<? super GInput, ? super GOutput>)(reuser != null ? reuser : Setters.NEUTRAL_SETTER));
+		return result;
 	}
 
-	/** Diese Klasse implementiert eine Verwaltung der Einträge eines {@link Unique.UniqueSet} Listen mit Zugriff über eine binäre Suche.
-	 *
-	 * @see Unique#compare(Object, Object)
-	 * @see Comparables#binarySearch(List, Comparable)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der Werte. */
-	public static final class ListSetData<GValue> extends BaseListData<GValue, GValue> {
+	@SuppressWarnings ("javadoc")
+	static <GInput, GOutput> Unique<GInput, GOutput> newSortedImpl(final Filter<Object> filter, final Comparator<? super GInput> comparator,
+		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
+		return new Unique<GInput, GOutput>(Unique.SORTED) {
 
-		/** Dieser Konstruktor initialisiert den Besitzer.
-		 *
-		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
-		public ListSetData(final Unique<GValue, GValue> owner) throws NullPointerException {
-			this(owner, new ArrayList<GValue>());
-		}
+			@Override
+			public boolean accept(final Object input) {
+				return filter.accept(input);
+			}
 
-		/** Dieser Konstruktor initialisiert Besitzer und Werte.
-		 *
-		 * @param owner Besitzer.
-		 * @param values Werte.
-		 * @throws NullPointerException Wenn {@code owner} bzw. {@code values} {@code null} ist. */
-		public ListSetData(final Unique<GValue, GValue> owner, final List<GValue> values) throws NullPointerException {
-			super(owner, values, values);
-		}
+			@Override
+			public int compare(final GInput input1, final GInput input2) throws NullPointerException {
+				return comparator.compare(input1, input2);
+			}
 
-		{}
+			@Override
+			public void reuse(final GInput input, final GOutput output) {
+				reuser.set(input, output);
+			}
 
-		/** {@inheritDoc} */
-		@Override
-		protected void insert(final int index, final GValue key, final GValue value) {
-			this.inputs.add(index, value);
-		}
+			@Override
+			public GOutput build(final GInput input) {
+				return compiler.get(input);
+			}
 
-		/** {@inheritDoc} */
-		@Override
-		protected void remove(final int index) {
-			this.inputs.remove(index);
-		}
-
-	}
-
-	/** Diese Klasse implementiert die Verwaltung der Einträge einer {@link Unique.UniqueMap} in Listen mit Zugriff über eine binäre Suche.
-	 *
-	 * @see Unique#compare(Object, Object)
-	 * @see Comparables#binarySearch(List, Comparable)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe. */
-	public static final class ListMapData<GInput, GOutput> extends BaseListData<GInput, GOutput> {
-
-		/** Dieser Konstruktor initialisiert den Besitzer.
-		 *
-		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
-		public ListMapData(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			this(owner, new ArrayList<GInput>(), new ArrayList<GOutput>());
-		}
-
-		/** Dieser Konstruktor initialisiert Besitzer, Eingaben und Ausgaben.
-		 *
-		 * @param owner Besitzer.
-		 * @param inputs Eingaben.
-		 * @param outputs Ausgaben.
-		 * @throws NullPointerException Wenn {@code owner}, {@code inputs} bzw. {@code outputs} {@code null} ist. */
-		public ListMapData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
-			super(owner, inputs, outputs);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected void insert(final int index, final GInput key, final GOutput value) {
-			this.inputs.add(index, key);
-			this.outputs.add(index, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected void remove(final int index) {
-			this.inputs.remove(index);
-			this.outputs.remove(index);
-		}
-
-	}
-
-	/** Diese Klasse implementiert eine Verwaltung der Einträge eines {@link Unique.UniqueSet} in einem {@link HashData}.
-	 *
-	 * @see Unique#hash(Object)
-	 * @see Unique#equals(Object, Object)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der Werte. */
-	public static final class HashSetData<GValue> extends BaseHashData<GValue, GValue> {
-
-		/** Dieser Konstruktor initialisiert den Besitzer.
-		 *
-		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
-		public HashSetData(final Unique<GValue, GValue> owner) throws NullPointerException {
-			super(owner, false);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public GValue getOutput() throws RuntimeException {
-			final int entry = this.index;
-			this.clearInput();
-			if (entry < 0) throw new IllegalStateException();
-			return this.getKeyImpl(entry);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void setOutput(final GValue output) {
-			this.putKeyImpl(output);
-			this.clearInput();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void popOutput() {
-			final int entry = this.index;
-			this.clearInput();
-			if (entry < 0) return;
-			this.popKeyImpl(this.input);
-		}
-
-	}
-
-	/** Diese Klasse implementiert die Verwaltung der Einträge einer {@link Unique.UniqueMap} in einem {@link HashData}.
-	 *
-	 * @see Unique#hash(Object)
-	 * @see Unique#equals(Object, Object)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe. */
-	public static final class HashMapData<GInput, GOutput> extends BaseHashData<GInput, GOutput> {
-
-		/** Dieser Konstruktor initialisiert den Besitzer.
-		 *
-		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
-		public HashMapData(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			super(owner, true);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public GOutput getOutput() throws RuntimeException {
-			final int entry = this.index;
-			this.clearInput();
-			if (entry < 0) throw new IllegalStateException();
-			return this.getValueImpl(entry);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void setOutput(final GOutput output) {
-			this.putImpl(this.input, output);
-			this.clearInput();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void popOutput() {
-			final int entry = this.index;
-			this.clearInput();
-			if (entry < 0) return;
-			this.popImpl(this.input);
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein {@link Unique} mit gleichem Typ für Ein- und Ausgabe.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der Werte. */
-	public static class UniqueSet<GValue> extends Unique<GValue, GValue> {
-
-		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashSetData}.
-		 *
-		 * @see Unique.HashSetData */
-		public UniqueSet() {
-			this(Unique.HASH);
-		}
-
-		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashSetData} oder {@link Unique.ListSetData}.
-		 *
-		 * @see Unique#LIST
-		 * @see Unique#HASH
-		 * @see Unique.HashSetData
-		 * @see Unique.ListSetData
-		 * @param mode {@code true}, wenn {@link Unique.ListSetData} bzw. {@code false}, wenn {@link Unique.HashSetData} verwendet werden soll. */
-		public UniqueSet(final boolean mode) {
-			this.data = mode ? new ListSetData<>(this) : new HashSetData<>(this);
-		}
-
-		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.ListSetData} und den gegebenen Werten.
-		 *
-		 * @see Unique.ListSetData
-		 * @param values Werte.
-		 * @throws NullPointerException Wenn {@code values} {@code null} sind. */
-		public UniqueSet(final List<GValue> values) throws NullPointerException {
-			this.data = new ListSetData<>(this, Objects.assertNotNull(values));
-		}
-
-		/** Dieser Konstruktor initialisiert die Nutzdaten mit den gegebenen {@link Unique.Data}.
-		 *
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
-		public UniqueSet(final Data<GValue, GValue> data) throws NullPointerException {
-			this.data = Objects.assertNotNull(data);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final GValue compile(final GValue input) {
-			return input;
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein {@link Unique} mit unterschiedlichen Typen für Ein- und Ausgabe.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe. */
-	public static abstract class UniqueMap<GInput, GOutput> extends Unique<GInput, GOutput> {
-
-		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashMapData}.
-		 *
-		 * @see Unique.HashMapData */
-		public UniqueMap() {
-			this(Unique.HASH);
-		}
-
-		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashMapData} oder {@link Unique.ListMapData}.
-		 *
-		 * @see Unique#LIST
-		 * @see Unique#HASH
-		 * @see Unique.HashMapData
-		 * @see Unique.ListMapData
-		 * @param mode {@code true}, wenn {@link Unique.ListMapData} bzw. {@code false}, wenn {@link Unique.HashMapData} verwendet werden soll. */
-		public UniqueMap(final boolean mode) {
-			this.data = mode ? new ListMapData<>(this) : new HashMapData<>(this);
-		}
-
-		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.ListMapData} und den gegebenen Eingaben und Ausgaben.
-		 *
-		 * @see Unique.ListMapData
-		 * @param inputs Eingaben.
-		 * @param outputs Ausgaben.
-		 * @throws NullPointerException Wenn {@code inputs} bzw. {@code outputs} {@code null} ist. */
-		public UniqueMap(final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
-			this.data = new ListMapData<>(this, inputs, outputs);
-		}
-
-		/** Dieser Konstruktor initialisiert die Nutzdaten mit den gegebenen {@link Unique.Data}.
-		 *
-		 * @param data {@link Unique.Data}.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
-		public UniqueMap(final Data<GInput, GOutput> data) throws NullPointerException {
-			this.data = Objects.assertNotNull(data);
-		}
-
+		};
 	}
 
 	{}
 
-	/** Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code List}-{@link Data}.<br>
-	 * Derartige Nutzdaten basieren auf {@link #compare(Object, Object)}.
-	 *
-	 * @see ListSetData
-	 * @see ListMapData */
-	public static final boolean LIST = true;
+	/** Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit ordnungsbasierter Abbildung.<br>
+	 * Derartige Nutzdaten basieren auf {@link #compare(Object, Object)}. */
+	public static final boolean SORTED = true;
 
-	/** Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code Hash}-{@link Data}.<br>
-	 * Derartige Nutzdaten basieren auf {@link #hash(Object)} und {@link #equals(Object, Object)}.
-	 *
-	 * @see HashSetData
-	 * @see HashMapData */
-	public static final boolean HASH = false;
+	/** Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit streuwertbasierter Abbildung.<br>
+	 * Derartige Nutzdaten basieren auf {@link #hash(Object)} und {@link #equals(Object, Object)}. */
+	public static final boolean HASHED = false;
 
 	{}
 
 	/** Dieses Feld speichert die {@link Data}. */
-	protected Data<GInput, GOutput> data;
+	protected final Map<GInput, GOutput> mapping;
 
-	/** Dieses Feld speichert das {@link Set} zu {@link Map#entrySet()}. */
-	protected final Set<Entry<GInput, GOutput>> entrySet = new AbstractSet<Entry<GInput, GOutput>>() {
-
-		@Override
-		public int size() {
-			return Unique.this.data.size();
-		}
-
-		@Override
-		public Iterator<Entry<GInput, GOutput>> iterator() {
-			return Unique.this.data.iterator();
-		}
-
-	};
-
-	/** Dieses Feld speichert die {@link Map}-Sicht auf die internen Einträge, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge eingefügt
-	 * werden können. */
-	protected final Map<GInput, GOutput> entryMap = new AbstractMap<GInput, GOutput>() {
-
-		@Override
-		public int size() {
-			return Unique.this.data.size();
-		}
-
-		@Override
-		public Set<Entry<GInput, GOutput>> entrySet() {
-			return Unique.this.entrySet;
-		}
-
-		@SuppressWarnings ("unchecked")
-		@Override
-		public GOutput get(final Object key) {
-			if (!Unique.this.accept(key)) return null;
-			final Data<GInput, GOutput> data = Unique.this.data;
-			data.forInput((GInput)key);
-			if (data.hasOutput()) return data.getOutput();
-			data.clearInput();
-			return null;
-		}
-
-		@SuppressWarnings ("unchecked")
-		@Override
-		public GOutput remove(final Object key) {
-			if (!Unique.this.accept(key)) return null;
-			final Data<GInput, GOutput> data = Unique.this.data;
-			data.forInput((GInput)key);
-			if (data.hasOutput()) {
-				final GOutput value = data.getOutput();
-				data.popOutput();
-				return value;
-			} else {
-				data.clearInput();
-				return null;
-			}
-		}
-
-		@SuppressWarnings ("unchecked")
-		@Override
-		public boolean containsKey(final Object key) {
-			if (!Unique.this.accept(key)) return false;
-			final Data<GInput, GOutput> data = Unique.this.data;
-			data.forInput((GInput)key);
-			return data.hasOutput();
-		}
-
-	};
-
-	{}
-
-	/** Diese Methode wird bei der Wiederverwendung der gegebenen Ausgabe für die gegebene Eingabe von aufgerufen. Ein- und Ausgabe sind nie {@code null}.
-	 *
-	 * @see Unique#get(Object)
-	 * @param input Eingabe
-	 * @param output Ausgabe. */
-	protected void reuse(final GInput input, final GOutput output) {
+	/** Dieser Konstruktor initialisiert das {@link Unique} streuwertbasiert. */
+	public Unique() {
+		this.mapping = HashMap.from(this, this);
 	}
 
-	/** Diese Methode kompiliert die gegebene Eingabe in die zugeordnete Ausgabe und gibt diese zurück. Die Eingabe ist nie {@code null}.
+	/** Dieser Konstruktor initialisiert das {@link Unique} entsprechend dem gegebenen Modus.
 	 *
-	 * @see Unique#get(Object)
-	 * @param input Eingabe.
-	 * @return Ausgabe. */
-	protected abstract GOutput compile(GInput input);
+	 * @param mappingType {@value #HASHED}, wenn intern eine streuwertbasierte Abbildung genutzt werden soll;<br>
+	 *        {@link #SORTED}, wenn intern eine ordnungsbasierte Abbildung genutzt werden soll. */
+	public Unique(final boolean mappingType) {
+		this.mapping = mappingType == Unique.HASHED ? HashMap.<GInput, GOutput>from(this, this) : TreeMap.<GInput, GOutput>from(this, this);
+	}
+
+	/** Dieser Konstruktor initialisiert die intere Abbildung über den gegebenen {@link Getter}, der mit {@code this} aufgerufen wird.
+	 *
+	 * @param mappingBuilder {@link Getter} zur Erzeugung der {@link Map Abbildung}. */
+	public Unique(final Getter<Unique<GInput, GOutput>, Map<GInput, GOutput>> mappingBuilder) {
+		this.mapping = Objects.assertNotNull(mappingBuilder.get(this));
+	}
+ 
+	{}
 
 	/** Diese Methode gibt die mit der gegebenen Eingabe assoziierte Ausgabe zurück. Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet
-	 * {@link Data#hasOutput() ist}, wird deren Wiederverwendung via {@link Unique#reuse(Object, Object)} signalisiert. Sollte der Eingabe noch keine Ausgabe
-	 * zugeordnet sein, wird diese via {@link Unique#compile(Object)} erzeugt und mit der Eingabe {@link Data#setOutput(Object) assoziiert}.
+	 * {@link Map#get(Object) ist}, wird deren Wiederverwendung via {@link Unique#reuse(Object, Object)} signalisiert. Sollte der Eingabe noch keine Ausgabe
+	 * zugeordnet sein, wird diese via {@link Unique#build(Object)} erzeugt und mit der Eingabe {@link Map#put(Object, Object) assoziiert}.
 	 *
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
+	 * @see Unique#accept(Object)
 	 * @see Unique#compare(Object, Object)
-	 * @param input Eingabe.
-	 * @return Ausgabe.
+	 * @param input Eingabe oder {@code null}.
+	 * @return Ausgabe oder {@code null}.
 	 * @throws RuntimeException Wenn die gegebene Eingabe bzw. die erzeugte Ausgabe ungültig ist. */
 	@Override
 	public GOutput get(final GInput input) throws RuntimeException {
-		final Data<GInput, GOutput> data = this.data;
-		data.forInput(input);
-		if (data.hasOutput()) {
-			final GOutput output = data.getOutput();
+		GOutput output = this.mapping.get(input);
+		if ((output != null) || this.mapping.containsKey(input)) {
 			this.reuse(input, output);
-			return output;
 		} else {
-			final GOutput output = this.compile(input);
-			data.setOutput(output);
-			return output;
+			output = this.build(input);
+			this.mapping.put(input, output);
 		}
+		return output;
 	}
 
-	/** Diese Methode entfern alle internen Einträge. */
-	public void clear() {
-		Iterables.removeAll(this.data);
-	}
-
-	/** Diese Methode gibt eine {@link Map} als Sicht auf die internen Einträge zurück, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge
-	 * eingefügt werden können.
+	/** Diese Methode gibt die interne {@link Map} zurück.
 	 *
 	 * @return {@link Map} der Einträge. */
-	public final Map<GInput, GOutput> entryMap() {
-		return this.entryMap;
+	public final Map<GInput, GOutput> mapping() {
+		return this.mapping;
+	}
+
+	/** Diese Methode kompiliert die gegebene Eingabe in die zugeordnete Ausgabe und gibt diese zurück.
+	 *
+	 * @see Unique#get(Object)
+	 * @param input Eingabe oder {@code null}.
+	 * @return Ausgabe oder {@code null}. */
+	protected abstract GOutput build(GInput input);
+
+	/** Diese Methode wird bei der Wiederverwendung der gegebenen Ausgabe für die gegebene Eingabe von aufgerufen.
+	 *
+	 * @see Unique#get(Object)
+	 * @param input Eingabe oder {@code null}.
+	 * @param output Ausgabe oder {@code null}. */
+	protected void reuse(final GInput input, final GOutput output) {
 	}
 
 	{}
 
-	/** {@inheritDoc}
-	 *
-	 * @see HashMap */
-	@Override
-	public int hash(final GInput input) throws NullPointerException {
-		return input.hashCode();
-	}
-
-	/** {@inheritDoc}
-	 *
-	 * @see HashMap */
-	@Override
-	public boolean equals(final GInput input1, final GInput input2) throws NullPointerException {
-		return Objects.equals(input1, input2);
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object} nach {@code GInput} zulässig ist. Sie wird von der
-	 * internen Abbildung verwendet.
-	 *
-	 * @return {@code true}, wenn {@code input instanceOf GInput}. */
+	/** {@inheritDoc}<br>
+	 * Sie wird in {@link #mapping()} zur Prüfung der Schlüssel eingesetzt und soll nur dann {@code true} liefern, wenn ein Schlüssel als {@code GInput}
+	 * interpretiert werden kann. */
 	@Override
 	public boolean accept(final Object input) {
 		return true;
 	}
 
-	/** Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der gegebenen Schlüssel zurück.
-	 *
-	 * @see TreeMap */
+	/** {@inheritDoc} **/
 	@Override
-	public int compare(final GInput input1, final GInput input2) throws NullPointerException {
-		return Comparators.compare(this.hash(input1), this.hash(input2));
+	public int hash(final GInput input) throws NullPointerException {
+		return Objects.hash(input);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final Iterator<GOutput> iterator() {
-		return this.entryMap.values().iterator();
+	public boolean equals(final GInput input1, final GInput input2) throws NullPointerException {
+		return Objects.equals(input1, input2);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	@SuppressWarnings ({"rawtypes", "unchecked"})
+	public int compare(final GInput input1, final GInput input2) throws NullPointerException {
+		return Comparators.compare((Comparable)input1, (Comparable)input2);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Iterator<GOutput> iterator() {
+		return this.mapping.values().iterator();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.data);
+		return Objects.toInvokeString(this, this.mapping);
 	}
 
 }

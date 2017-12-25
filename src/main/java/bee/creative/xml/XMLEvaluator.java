@@ -9,7 +9,7 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import bee.creative.util.Objects;
-import bee.creative.util.Unique.UniqueMap;
+import bee.creative.util.Unique;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #compile(String) Kompilieren} sowie {@link #evaluate(QName) Auswerten} von {@link XPathExpression}.
  *
@@ -42,11 +42,17 @@ public final class XMLEvaluator {
 	 *
 	 * @see XMLEvaluator#compile(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class CacheData extends UniqueMap<String, XPathExpression> {
+	public final class CacheData extends Unique<String, XPathExpression> {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final XPathExpression compile(final String input) {
+		public boolean accept(Object input) {
+			return input instanceof String;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected final XPathExpression build(final String input) {
 			try {
 				final XPath xxath = XMLEvaluator.this.xpathData.getXPath();
 				return xxath.compile(input);
@@ -130,7 +136,7 @@ public final class XMLEvaluator {
 	 *
 	 * @return {@code this}. */
 	public final XMLEvaluator resetCache() {
-		this.cacheData.entryMap().clear();
+		this.cacheData.mapping().clear();
 		return this;
 	}
 
