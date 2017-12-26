@@ -1,7 +1,26 @@
 package bee.creative.util;
 
+import java.nio.channels.NetworkChannel;
+import java.util.AbstractCollection;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.Map.Entry;
+import bee.creative.iam.IAMMapping;
+import bee.creative.util.HashData.Entries;
+import bee.creative.util.HashData.EntriesIterator;
+import bee.creative.util.HashData.HashEntry;
+import bee.creative.util.HashData.HashIterator;
+import bee.creative.util.HashData.Keys;
+import bee.creative.util.HashData.KeysIterator;
+import bee.creative.util.HashData.Mapping;
+import bee.creative.util.HashData.Values;
+import bee.creative.util.HashData.ValuesIterator;
 
 // TODO CURSOR = int, das in prevs/next zeigt, wo der Index des gesuchten Eintrags drin steht
 // nagativ, wenn prevs, positiv, wenn nexts gemeint
@@ -12,14 +31,478 @@ class _TreeData_ {
 	// Die Algorithmen zur Balanzierung sind dem "Skriptum Informatik - eine konventionelle Einführung" von Hans-Jürgen Appelrath und Jochen Ludewig entnommen.
 	static class TreeData<GKey, GValue> {
 
+		@SuppressWarnings ("javadoc")
+		protected static class TreeEntry<GKey, GValue> implements Entry<GKey, GValue> {
+
+			protected final TreeData<GKey, GValue> entryData;
+
+			protected final int entryIndex;
+
+			public TreeEntry(final TreeData<GKey, GValue> entryData, final int entryIndex) {
+				this.entryData = entryData;
+				this.entryIndex = entryIndex;
+			}
+
+			{}
+
+			@Override
+			public GKey getKey() {
+				return this.entryData.getKeyImpl(this.entryIndex);
+			}
+
+			@Override
+			public GValue getValue() {
+				return this.entryData.getValueImpl(this.entryIndex);
+			}
+
+			@Override
+			public GValue setValue(final GValue value) {
+				return this.entryData.putValueImpl(this.entryIndex, value);
+			}
+
+			@Override
+			public int hashCode() {
+				return Objects.hash(this.getKey()) ^ Objects.hash(this.getValue());
+			}
+
+			@Override
+			public boolean equals(final Object object) {
+				if (!(object instanceof Entry)) return false;
+				final Entry<?, ?> that = (Entry<?, ?>)object;
+				return Objects.equals(this.getKey(), that.getKey()) && Objects.equals(this.getValue(), that.getValue());
+			}
+
+			@Override
+			public String toString() {
+				return this.getKey() + "=" + this.getValue();
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static abstract class TreeIterator<GKey, GValue, GItem> implements Iterator<GItem> {
+
+			protected final TreeData<GKey, GValue> entryData;
+
+			/** Dieses Feld speichert den Index des nächsten Eintrags in {@link HashData#keys}. */
+			protected int nextIndex;
+
+			/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link HashData#keys}. */
+			protected int entryIndex = -1;
+
+			public TreeIterator(final TreeData<GKey, GValue> entryData) {
+				this.entryData = entryData;
+			}
+
+			/** Diese Methode gibt den nächsten Schlüssel zurück. */
+			protected final GKey nextKey() {
+				return this.entryData.getKeyImpl(this.nextIndex());
+			}
+
+			/** Diese Methode gibt den nächsten Eintrag zurück. */
+			protected final TreeEntry<GKey, GValue> nextEntry() {
+				return new TreeEntry<>(this.entryData, this.nextIndex());
+			}
+
+			/** Diese Methode gibt den nächsten Wert zurück. */
+			protected final GValue nextValue() {
+				return this.entryData.getValueImpl(this.nextIndex());
+			}
+
+			/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
+			protected final int nextIndex() {
+				return getNodePosition(nextNode());
+			}
+
+			protected final int nextNode() {
+				// TODO
+				return 0;
+			}
+			
+			{}
+
+			@Override
+			public boolean hasNext() {
+				return this.nextIndex >= 0;
+			}
+
+			@Override
+			public void remove() {
+				// if (this.entryData.popEntryImpl(this.tableIndex, this.entryIndex)) return;
+				throw new IllegalStateException();
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class Keys<GKey> extends AbstractSet<GKey> {
+
+			protected final TreeData<GKey, ?> entryData;
+
+			public Keys(final TreeData<GKey, ?> entryData) {
+				this.entryData = entryData;
+			}
+
+			{}
+
+			@Override
+			public int size() {
+				return this.entryData.count;
+			}
+
+			@Override
+			public void clear() {
+				this.entryData.clearEntries();
+			}
+
+			@Override
+			public Iterator<GKey> iterator() {
+				return this.entryData.newKeysIteratorImpl();
+			}
+
+			@Override
+			public boolean remove(final Object item) {
+				return this.entryData.popKeyImpl(item);
+			}
+
+			@Override
+			public boolean contains(final Object item) {
+				return this.entryData.hasKeyImpl(item);
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class KeysIterator<GKey, GValue> extends TreeIterator<GKey, GValue, GKey> {
+
+			public KeysIterator(final TreeData<GKey, GValue> entryData) {
+				super(entryData);
+			}
+
+			{}
+
+			@Override
+			public GKey next() {
+				return this.nextKey();
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class Values<GValue> extends AbstractCollection<GValue> {
+
+			protected final TreeData<?, GValue> entryData;
+
+			public Values(final TreeData<?, GValue> entryData) {
+				this.entryData = entryData;
+			}
+
+			{}
+
+			@Override
+			public int size() {
+				return this.entryData.count;
+			}
+
+			@Override
+			public void clear() {
+				this.entryData.clearEntries();
+			}
+
+			@Override
+			public Iterator<GValue> iterator() {
+				return this.entryData.newValuesIteratorImpl();
+			}
+
+			@Override
+			public boolean remove(final Object o) {
+				return this.entryData.popValueImpl(o);
+			}
+
+			@Override
+			public boolean contains(final Object o) {
+				return this.entryData.hasValueImpl(o);
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class ValuesIterator<GKey, GValue> extends TreeIterator<GKey, GValue, GValue> {
+
+			public ValuesIterator(final TreeData<GKey, GValue> entryData) {
+				super(entryData);
+			}
+
+			{}
+
+			@Override
+			public GValue next() {
+				return this.nextValue();
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class Entries<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
+
+			protected final TreeData<GKey, GValue> entryData;
+
+			public Entries(final TreeData<GKey, GValue> entryData) {
+				this.entryData = entryData;
+			}
+
+			{}
+
+			@Override
+			public int size() {
+				return this.entryData.count;
+			}
+
+			@Override
+			public void clear() {
+				this.entryData.clearEntries();
+			}
+
+			@Override
+			public Iterator<Entry<GKey, GValue>> iterator() {
+				return this.entryData.newEntriesIteratorImpl();
+			}
+
+			@Override
+			public boolean remove(final Object object) {
+				if (!(object instanceof Entry)) return false;
+				final Entry<?, ?> entry = (Entry<?, ?>)object;
+				return this.entryData.popEntryImpl(entry.getKey(), entry.getValue());
+			}
+
+			@Override
+			public boolean contains(final Object object) {
+				if (!(object instanceof Entry)) return false;
+				final Entry<?, ?> entry = (Entry<?, ?>)object;
+				return this.entryData.hasEntryImpl(entry.getKey(), entry.getValue());
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class EntriesIterator<GKey, GValue> extends TreeIterator<GKey, GValue, Entry<GKey, GValue>> {
+
+			public EntriesIterator(final TreeData<GKey, GValue> entryData) {
+				super(entryData);
+			}
+
+			{}
+
+			@Override
+			public Entry<GKey, GValue> next() {
+				return this.nextEntry();
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class Mapping<GKey, GValue> extends AbstractMap<GKey, GValue> {
+
+			protected final TreeData<GKey, GValue> entryData;
+
+			public Mapping(final TreeData<GKey, GValue> entryData) {
+				this.entryData = entryData;
+			}
+
+			{}
+
+			@Override
+			public int size() {
+				return this.entryData.count;
+			}
+
+			@Override
+			public void clear() {
+				this.entryData.clearEntries();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return this.entryData.count == 0;
+			}
+
+			@Override
+			public boolean containsKey(final Object key) {
+				return this.entryData.hasKeyImpl(key);
+			}
+
+			@Override
+			public boolean containsValue(final Object value) {
+				return this.values().contains(value);
+			}
+
+			@Override
+			public GValue get(final Object key) {
+				return this.entryData.getImpl(key);
+			}
+
+			@Override
+			public Set<GKey> keySet() {
+				return this.entryData.newKeysImpl();
+			}
+
+			@Override
+			public GValue put(final GKey key, final GValue value) {
+				return this.entryData.putImpl(key, value);
+			}
+
+			@Override
+			public GValue remove(final Object key) {
+				return this.entryData.popImpl(key);
+			}
+
+			@Override
+			public Values<GValue> values() {
+				return this.entryData.newValuesImpl();
+			}
+
+			@Override
+			public Entries<GKey, GValue> entrySet() {
+				return this.entryData.newEntriesImpl();
+			}
+
+		}
+
+		{}
+
 		/** Dieses Feld speichert den initialwert für {@link #prevs} und {@link #nexts}. */
-		static final int[] EMPTY_INTEGERS = {-1};
+		private static final int[] EMPTY_INTEGERS = {-1};
 
 		/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
-		static final Object[] EMPTY_OBJECTS = {};
+		private static final Object[] EMPTY_OBJECTS = {};
 
 		/** Dieses Feld speichert die maximale Kapazität. */
-		static final int MAX_CAPACITY = 0x40000000;
+		private static final int MAX_CAPACITY = 0x40000000;
+
+		{}
+
+		/** Diese Methode gibt den Wert des Knoten mit den gegebenen Eigenschaften zurück.
+		 * 
+		 * @param nodeIndex Knotenposition.
+		 * @param nodeBalance Knotenbalanz mit {@code 0} für gleichgewicht, {@code 1} für rechtslastig und {@code 2} für linkslastig.
+		 * @return Knotenwert als Element aus {@link #prevs} oder {@link #nexts}. */
+		private static int getNodeValue(final int nodeIndex, final int nodeBalance) {
+			return (nodeIndex << 2) | nodeBalance;
+		}
+
+		public boolean popEntryImpl(Object key, Object value) {
+			// TODO
+			return false;
+		}
+
+		/** Diese Methode gibt die Balanz des gegebenen Knoten zurück.
+		 *
+		 * @param nodeValue Knotenwert als Element aus {@link #prevs} oder {@link #nexts}.
+		 * @return Knotenbalanz mit {@code 0} und {@code 3} für gleichgewicht, {@code 1} für rechtslastig und {@code 2} für linkslastig. */
+		private static int getNodeBalance(final int nodeValue) {
+			return nodeValue & 3;
+		}
+
+		/** Diese Methode gibt die Position des gegebenen Knoten zurück.
+		 *
+		 * @param nodeValue Knotenwert als Element aus {@link #prevs} oder {@link #nexts}.
+		 * @return Knotenposition zum Zugriff auf Eigenschaften des Knoten als Index in {@link #keys}, {@link #prevs} oder {@link #nexts}. */
+		private static int getNodePosition(final int nodeValue) {
+			return nodeValue >>> 2;
+		}
+
+		/** Diese Methode gibt die inversen Balanz zur gegebenen zurück.<br>
+		 * Diese sollte vor seiner Verwendung noch maskiert werden, bspw. mit {@code & 1} oder {@code & 2}.
+		 *
+		 * @param nodeBalance Knotenwert als Element aus {@link #prevs} oder {@link #nexts}.
+		 * @return inverse Knotenbalanz mit {@code 0} und {@code 4} für gleichgewicht, {@code 2} für rechtslastig und {@code 1} für linkslastig. */
+		private static int getInverseBalance(final int nodeBalance) {
+			return 4 >> nodeBalance;
+		}
+
+		/** Diese Methode führt die Rechtsrotation des gegebenen Knoten durch und gibt den Index des diesen ersetzenden Knoten zurück.
+		 *
+		 * @param prevs {@link #prevs}.
+		 * @param nexts {@link #nexts}.
+		 * @param nodePosition {@link #getNodePosition(int) Index} des Knoten, der rotiert werden soll.
+		 * @return neuer Index des Knoten, der den gegebenen ersetzt. */
+		private static int rotateRightImpl(final int[] prevs, final int[] nexts, final int nodePosition) {
+			// balance(node) = -2 & balance(node.prev) = -1
+			final int nodePrevPosition = TreeData.getNodePosition(prevs[nodePosition]);
+			prevs[nodePosition] = nexts[nodePrevPosition];
+			nexts[nodePrevPosition] = (nodePosition << 2) | 0;
+			return nodePrevPosition;
+		}
+
+		/** Diese Methode führt die Rechtslinksrotation des gegebenen Knoten durch und gibt den Index des diesen ersetzenden Knoten zurück.
+		 *
+		 * @param prevs {@link #prevs}.
+		 * @param nexts {@link #nexts}.
+		 * @param nodePosition {@link #getNodePosition(int) Index} des Knoten, der rotiert werden soll.
+		 * @return neuer Index des Knoten, der den gegebenen ersetzt. */
+		private static int rotateRightLeftImpl(final int[] prevs, final int[] nexts, final int nodePosition) {
+			// balance(node) = +1 & balance(node.next) = -1
+			final int nodeNextPosition = TreeData.getNodePosition(nexts[nodePosition]);
+			final int nodeNextPrevValue = prevs[nodeNextPosition];
+			final int nodeNextPrevPosition = TreeData.getNodePosition(nodeNextPrevValue);
+			final int nodeNextPrevInverseBalance = TreeData.getInverseBalance(TreeData.getNodeBalance(nodeNextPrevValue));
+			prevs[nodeNextPosition] = nexts[nodeNextPrevPosition];
+			nexts[nodeNextPrevPosition] = TreeData.getNodeValue(nodeNextPosition, nodeNextPrevInverseBalance & 1);
+			nexts[nodePosition] = prevs[nodeNextPrevPosition];
+			prevs[nodeNextPrevPosition] = TreeData.getNodeValue(nodePosition, nodeNextPrevInverseBalance & 2);
+			return nodeNextPrevPosition;
+		}
+
+		/** Diese Methode führt die Linksrotation des gegebenen Knoten durch und gibt den Index des diesen ersetzenden Knoten zurück.
+		 *
+		 * @param prevs {@link #prevs}.
+		 * @param nexts {@link #nexts}.
+		 * @param nodePosition {@link #getNodePosition(int) Index} des Knoten, der rotiert werden soll.
+		 * @return neuer Index des Knoten, der den gegebenen ersetzt. */
+		private static int rotateLeftImpl(final int[] prevs, final int[] nexts, final int nodePosition) {
+			// balance(node) = +1 & balance(node.next) = +1
+			final int nodeNextPosition = TreeData.getNodePosition(nexts[nodePosition]);
+			nexts[nodePosition] = prevs[nodeNextPosition];
+			prevs[nodeNextPosition] = TreeData.getNodeValue(nodePosition, 0);
+			return nodeNextPosition;
+		}
+
+		/** Diese Methode führt die Linksrechtsrotation des gegebenen Knoten durch und gibt den Index des diesen ersetzenden Knoten zurück.
+		 *
+		 * @param prevs {@link #prevs}.
+		 * @param nexts {@link #nexts}.
+		 * @param nodePosition {@link #getNodePosition(int) Index} des Knoten, der rotiert werden soll.
+		 * @return neuer Index des Knoten, der den gegebenen ersetzt. */
+		private static int rotateLeftRightImpl(final int[] prevs, final int[] nexts, final int nodePosition) {
+			// balance(node) = -1 & balance(node.prev) = +1
+			final int nodePrevPosition = TreeData.getNodePosition(prevs[nodePosition]);
+			final int nodePrevNextValue = nexts[nodePrevPosition];
+			final int nodePrevNextPosition = TreeData.getNodePosition(nodePrevNextValue);
+			final int nodeNextPrevInverseBalance = TreeData.getInverseBalance(TreeData.getNodeBalance(nodePrevNextValue));
+			nexts[nodePrevPosition] = prevs[nodePrevNextPosition];
+			prevs[nodePrevNextPosition] = TreeData.getNodeValue(nodePrevPosition, nodeNextPrevInverseBalance & 2);
+			prevs[nodePosition] = nexts[nodePrevNextPosition];
+			nexts[nodePrevNextPosition] = TreeData.getNodeValue(nodePosition, nodeNextPrevInverseBalance & 1);
+			return nodePrevNextPosition;
+		}
+
+		@SuppressWarnings ("javadoc")
+		private static void clearNexts(final int[] array) {
+			for (int i = 0, size = array.length; i < size;) {
+				array[i] = ++i;
+			}
+		}
+
+		@SuppressWarnings ("javadoc")
+		private static void clearPrevs(final int[] array) {
+			Arrays.fill(array, -1);
+		}
+
+		@SuppressWarnings ("javadoc")
+		private static void clearObjects(final Object[] array) {
+			if (array == null) return;
+			Arrays.fill(array, null);
+		}
 
 		{}
 
@@ -41,13 +524,20 @@ class _TreeData_ {
 		int entry = 0;
 
 		/** Dieses Feld speichert die Anzahl der Einträge. */
-		protected int count = 0;
+		int count = 0;
 
 		public TreeData(final boolean withValues) {
 			this.values = withValues ? TreeData.EMPTY_OBJECTS : null;
 		}
 
 		{}
+
+		/** Diese Methode gibt die Anzahl der Einträge zurück.
+		 *
+		 * @return Anzahl der Einträge. */
+		protected final int countImpl() {
+			return this.count;
+		}
 
 		/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
 		 *
@@ -56,21 +546,56 @@ class _TreeData_ {
 			return this.keys.length;
 		}
 
-		public final void allocate(final int capacity) throws IllegalArgumentException {
+		protected final void allocateImpl(final int capacity) throws IllegalArgumentException {
+			if (capacity < this.count) throw new IllegalArgumentException();
+			final Object[] oldKeys = this.keys;
+			if (oldKeys.length == capacity) return;
+			if (capacity == 0) {
+				this.entry = 0;
+				this.keys = EMPTY_OBJECTS;
+				this.nexts = EMPTY_INTEGERS;
+				this.prevs = EMPTY_INTEGERS;
+				this.values = this.values != null ? EMPTY_OBJECTS : null;
+			} else if (capacity <= MAX_CAPACITY) {
+				final int[] oldNexts = this.nexts;
+				final int[] newNexts = new int[capacity + 1];
+				final int[] oldPrevs = this.prevs;
+				final int[] newPrevs = new int[capacity];
+				final Object[] newKeys = new Object[capacity];
+				final Object[] oldValues = this.values;
+				final Object[] newValues = oldValues != null ? new Object[capacity] : null;
+				clearNexts(newNexts);
+				clearPrevs(newPrevs);
 
+				int newEntry = 0;
+				newNexts[capacity] = allocateImpl2(oldNexts, newNexts, oldPrevs, newPrevs, oldKeys, newKeys, oldNexts[oldKeys.length], 0);
+
+				this.entry = newEntry;
+				this.keys = newKeys;
+				this.prevs = newPrevs;
+				this.nexts = newNexts;
+				this.values = newValues;
+			} else throw new OutOfMemoryError();
 		}
 
-		/** Diese Methode verkleinert die Kapazität auf das Minimum. */
-		public final void compact() {
-			this.allocate(this.count);
-		}
+		private int allocateImpl2(int[] oldNexts, int[] newNexts, int[] oldPrevs, int[] newPrevs, Object[] oldKeys, Object[] newKeys,
+// TODO
+			int oldNodeValue, int newNodePosition) {
 
-		protected final GKey key(final int entryIndex) {
-			return (GKey)this.keys[entryIndex];
-		}
+			if (oldNodeValue == -1) return newNodePosition; // nächste freie zelle liefern
+			int oldNodeBalance = getNodeBalance(oldNodeValue);
+			int oldNodePosition = getNodePosition(oldNodeValue);
 
-		protected final GValue value(final int entryIndex) {
-			return (GValue)this.values[entryIndex];
+			newKeys[newNodePosition] = oldKeys[oldNodePosition];
+
+			int newPrevValue = allocateImpl2(oldNexts, newNexts, oldPrevs, newPrevs, oldKeys, newKeys, oldNexts[oldNodePosition]
+
+				, //
+				allocateImpl2(oldNexts, newNexts, oldPrevs, newPrevs, oldKeys, newKeys, //
+					oldPrevs[oldNodePosition], //
+					newNodePosition + 1));
+
+			return getNodeValue(newNodePosition, oldNodeBalance);
 		}
 
 		protected final GValue value(final int entryIndex, final GValue value) {
@@ -223,12 +748,10 @@ class _TreeData_ {
 
 			if (count <= capacity) return this.putIndexImpl2(key, this.nexts, capacity) & 0x7FFFFFFF;
 			final int allocate = count + (count >> 1);
-			this.allocate((allocate < 0) || (allocate > TreeData.MAX_CAPACITY) ? TreeData.MAX_CAPACITY : allocate);
+			this.allocateImpl((allocate < 0) || (allocate > TreeData.MAX_CAPACITY) ? TreeData.MAX_CAPACITY : allocate);
 			return this.putIndexImpl2(key, this.nexts, this.capacityImpl()) & 0x7FFFFFFF;
 		}
 
-		// TODO
-		// suchen, , einfügen
 		@SuppressWarnings ("javadoc")
 		final int putIndexImpl2(final GKey key, final int[] fields, final int fieldIndex) {
 			final int[] prevs = this.prevs, nexts = this.nexts;
@@ -261,8 +784,8 @@ class _TreeData_ {
 				if (nodeBalance2 == 2) { // wenn linkslastig
 					fields[fieldIndex] = TreeData.getNodeValue( //
 						TreeData.getNodeBalance(prevs[nodePosition2]) == 2 // wenn linkslastig
-							? TreeData.rotateToNextImpl(prevs, nexts, nodePosition2) //
-							: TreeData.rotateToPrevNextImpl(prevs, nexts, nodePosition2), //
+							? TreeData.rotateRightImpl(prevs, nexts, nodePosition2) //
+							: TreeData.rotateLeftRightImpl(prevs, nexts, nodePosition2), //
 						0);
 					return result & 0x7FFFFFFF;
 				}
@@ -282,8 +805,8 @@ class _TreeData_ {
 				if (nodeBalance2 == 1) { // wenn rechtslastig
 					fields[fieldIndex] = TreeData.getNodeValue( //
 						TreeData.getNodeBalance(nexts[nodePosition2]) == 1 // wenn rechtslastig
-							? TreeData.rotateToPrevImpl(prevs, nexts, nodePosition2) //
-							: TreeData.rotateToNextPrevImpl(prevs, nexts, nodePosition2), //
+							? TreeData.rotateLeftImpl(prevs, nexts, nodePosition2) //
+							: TreeData.rotateRightLeftImpl(prevs, nexts, nodePosition2), //
 						0);
 					return result & 0x7FFFFFFF;
 				}
@@ -291,101 +814,6 @@ class _TreeData_ {
 				return result;
 			}
 			return nodePosition; // positiv, da Teilbaum unverändert
-		}
-
-		static int getNodeValue(final int nodeIndex, final int nodeBalance) {
-			return (nodeIndex << 2) | nodeBalance;
-		}
-
-		/** Diese Methode gibt die Balanz des gegebenen Knoten zurück.
-		 *
-		 * @param nodeValue Knotenwert als Element aus {@link #prevs} oder {@link #nexts}.
-		 * @return Knotenbalanz mit {@code 0} und {@code 3} für gleichgewicht, {@code 1} für rechtslastig und {@code 2} für linkslastig. */
-		static int getNodeBalance(final int nodeValue) {
-			return nodeValue & 3;
-		}
-
-		/** Diese Methode gibt die Position des gegebenen Knoten zurück.
-		 *
-		 * @param nodeValue Knotenwert als Element aus {@link #prevs} oder {@link #nexts}.
-		 * @return Knotenposition zum Zugriff auf Eigenschaften des Knoten als Index in {@link #keys}, {@link #prevs} oder {@link #nexts}. */
-		static int getNodePosition(final int nodeValue) {
-			return nodeValue >>> 2;
-		}
-
-		/** Diese Methode gibt die inversen Balanz zur gegebenen zurück.<br>
-		 * Diese sollte vor seiner Verwendung noch maskiert werden, bspw. mit {@code & 1} oder {@code & 2}.
-		 *
-		 * @param nodeBalance Knotenwert als Element aus {@link #prevs} oder {@link #nexts}.
-		 * @return inverse Knotenbalanz mit {@code 0} und {@code 4} für gleichgewicht, {@code 2} für rechtslastig und {@code 1} für linkslastig. */
-		static int getInverseBalance(final int nodeBalance) {
-			return 4 >> nodeBalance;
-		}
-
-		/** Diese Methode führt die Rechtsrotation des gegebenen Knoten durch und gibt den Index des diesen ersetzenden Knoten zurück.
-		 *
-		 * @param prevs {@link #prevs}.
-		 * @param nexts {@link #nexts}.
-		 * @param nodePosition {@link #getNodePosition(int) Index} des Knoten, der rotiert werden soll.
-		 * @return neuer Index des Knoten, der den gegebenen ersetzt. */
-		static int rotateToNextImpl(final int[] prevs, final int[] nexts, final int nodePosition) {
-			// balance(node) = -2 & balance(node.prev) = -1
-			final int nodePrevPosition = TreeData.getNodePosition(prevs[nodePosition]);
-			prevs[nodePosition] = nexts[nodePrevPosition];
-			nexts[nodePrevPosition] = (nodePosition << 2) | 0;
-			return nodePrevPosition;
-		}
-
-		/** Diese Methode führt die Rechtslinksrotation des gegebenen Knoten durch und gibt den Index des diesen ersetzenden Knoten zurück.
-		 *
-		 * @param prevs {@link #prevs}.
-		 * @param nexts {@link #nexts}.
-		 * @param nodePosition {@link #getNodePosition(int) Index} des Knoten, der rotiert werden soll.
-		 * @return neuer Index des Knoten, der den gegebenen ersetzt. */
-		static int rotateToNextPrevImpl(final int[] prevs, final int[] nexts, final int nodePosition) {
-			// balance(node) = +1 & balance(node.next) = -1
-			final int nodeNextPosition = TreeData.getNodePosition(nexts[nodePosition]);
-			final int nodeNextPrevValue = prevs[nodeNextPosition];
-			final int nodeNextPrevPosition = TreeData.getNodePosition(nodeNextPrevValue);
-			final int nodeNextPrevInverseBalance = TreeData.getInverseBalance(TreeData.getNodeBalance(nodeNextPrevValue));
-			prevs[nodeNextPosition] = nexts[nodeNextPrevPosition];
-			nexts[nodeNextPrevPosition] = TreeData.getNodeValue(nodeNextPosition, nodeNextPrevInverseBalance & 1);
-			nexts[nodePosition] = prevs[nodeNextPrevPosition];
-			prevs[nodeNextPrevPosition] = TreeData.getNodeValue(nodePosition, nodeNextPrevInverseBalance & 2);
-			return nodeNextPrevPosition;
-		}
-
-		/** Diese Methode führt die Linksrotation des gegebenen Knoten durch und gibt den Index des diesen ersetzenden Knoten zurück.
-		 *
-		 * @param prevs {@link #prevs}.
-		 * @param nexts {@link #nexts}.
-		 * @param nodePosition {@link #getNodePosition(int) Index} des Knoten, der rotiert werden soll.
-		 * @return neuer Index des Knoten, der den gegebenen ersetzt. */
-		static int rotateToPrevImpl(final int[] prevs, final int[] nexts, final int nodePosition) {
-			// balance(node) = +1 & balance(node.next) = +1
-			final int nodeNextPosition = TreeData.getNodePosition(nexts[nodePosition]);
-			nexts[nodePosition] = prevs[nodeNextPosition];
-			prevs[nodeNextPosition] = TreeData.getNodeValue(nodePosition, 0);
-			return nodeNextPosition;
-		}
-
-		/** Diese Methode führt die Linksrechtsrotation des gegebenen Knoten durch und gibt den Index des diesen ersetzenden Knoten zurück.
-		 *
-		 * @param prevs {@link #prevs}.
-		 * @param nexts {@link #nexts}.
-		 * @param nodePosition {@link #getNodePosition(int) Index} des Knoten, der rotiert werden soll.
-		 * @return neuer Index des Knoten, der den gegebenen ersetzt. */
-		static int rotateToPrevNextImpl(final int[] prevs, final int[] nexts, final int nodePosition) {
-			// balance(node) = -1 & balance(node.prev) = +1
-			final int nodePrevPosition = TreeData.getNodePosition(prevs[nodePosition]);
-			final int nodePrevNextValue = nexts[nodePrevPosition];
-			final int nodePrevNextPosition = TreeData.getNodePosition(nodePrevNextValue);
-			final int nodeNextPrevInverseBalance = TreeData.getInverseBalance(TreeData.getNodeBalance(nodePrevNextValue));
-			nexts[nodePrevPosition] = prevs[nodePrevNextPosition];
-			prevs[nodePrevNextPosition] = TreeData.getNodeValue(nodePrevPosition, nodeNextPrevInverseBalance & 2);
-			prevs[nodePosition] = nexts[nodePrevNextPosition];
-			nexts[nodePrevNextPosition] = TreeData.getNodeValue(nodePosition, nodeNextPrevInverseBalance & 1);
-			return nodePrevNextPosition;
 		}
 
 		/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück.<br>
@@ -639,8 +1067,99 @@ class _TreeData_ {
 		//
 		// };
 
+		/** Diese Methode gibt das {@link Set} der Schlüssel in {@link #keys} zurück.
+		 *
+		 * @return Schlüssel. */
+		protected final Keys<GKey> newKeysImpl() {
+			return new Keys<>(this);
+		}
+
+		/** Diese Methode gibt den {@link Iterator} über die Schlüssel in {@link #keys} zurück.
+		 *
+		 * @return Interator für {@link #newKeysImpl()}. */
+		protected final KeysIterator<GKey, GValue> newKeysIteratorImpl() {
+			return new KeysIterator<>(this);
+		}
+
+		/** Diese Methode gibt die {@link Collection} der Werte in {@link #values} zurück.
+		 *
+		 * @return Werte. */
+		protected final Values<GValue> newValuesImpl() {
+			return new Values<>(this);
+		}
+
+		/** Diese Methode gibt den {@link Iterator} über die Werte in {@link #values} zurück.
+		 *
+		 * @return Interator für {@link #newValuesImpl()}. */
+		protected final ValuesIterator<GKey, GValue> newValuesIteratorImpl() {
+			return new ValuesIterator<>(this);
+		}
+
+		/** Diese Methode gibt das {@link Set} der Einträge zurück.
+		 *
+		 * @return Einträge. */
+		protected final Entries<GKey, GValue> newEntriesImpl() {
+			return new Entries<>(this);
+		}
+
+		/** Diese Methode gibt den {@link Iterator} über die Einträge zurück.
+		 *
+		 * @return Interator für {@link #newEntriesImpl()}. */
+		protected final EntriesIterator<GKey, GValue> newEntriesIteratorImpl() {
+			return new EntriesIterator<>(this);
+		}
+
+		/** Diese Methode gibt die {@link Map} zu den Schlüsseln in {@link #keys} und Werten in {@link #values} zurück.
+		 *
+		 * @return Abbildung. */
+		protected final Mapping<GKey, GValue> newMappingImpl() {
+			return new Mapping<>(this);
+		}
+
+		/** Diese Methode entfernt alle Einträge. Hierbei werden die Anzahl der Einträge auf {@code 0} gesetzt und die Tabellen initialisiert. */
+		protected final void clearEntries() {
+			if (this.count == 0) return;
+			clearPrevs(this.prevs);
+			clearNexts(this.nexts);
+			clearObjects(this.keys);
+			clearObjects(this.values);
+			this.count = 0;
+		}
+
+		/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Schlüssel kleienr als, gleich bzw. größer als der
+		 * zweite Schlüssel ist.
+		 *
+		 * @see Comparators#compare(Comparable, Comparable)
+		 * @param thisKey alter bzw. verwalteter Schlüssel oder {@code null}.
+		 * @param thatKey neuer bzw. gesuchter Schlüssel oder {@code null}.
+		 * @return Vergleichswert der gegebenen Schlüssel. */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
 		protected int customCompare(final Object thatKey, final Object thisKey) {
 			return Comparators.compare((Comparable)thisKey, (Comparable)thatKey);
+		}
+
+		{}
+
+		/** {@inheritDoc} */
+		@Override
+		protected Object clone() throws CloneNotSupportedException {
+			try {
+				final TreeData<?, ?> result = (TreeData<?, ?>)super.clone();
+				if (this.capacityImpl() == 0) {
+					result.keys = TreeData.EMPTY_OBJECTS;
+					result.nexts = TreeData.EMPTY_INTEGERS;
+					result.prevs = TreeData.EMPTY_INTEGERS;
+					result.values = result.values != null ? TreeData.EMPTY_OBJECTS : null;
+				} else {
+					result.keys = this.keys.clone();
+					result.nexts = this.nexts.clone();
+					result.prevs = this.prevs.clone();
+					result.values = result.values == null ? null : this.values.clone();
+				}
+				return result;
+			} catch (final Exception cause) {
+				throw new CloneNotSupportedException(cause.getMessage());
+			}
 		}
 
 	}
