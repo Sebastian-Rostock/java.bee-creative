@@ -5,25 +5,26 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/** Diese Klasse implementiert mehrere Hilfsfunktionen zur binären Suche mit {@link Comparable}s als Suchkriterium sowie zur Erzeugung von {@link Comparable}s.
+/** Diese Klasse implementiert mehrere Hilfsfunktionen zur stabilen binären Suche mit {@link Comparable} als Suchkriterium sowie zur Erzeugung von
+ * {@link Comparable}.
  * <p>
  * <a name="comparables_old"><u>Binäre Suche mit {@link Arrays} und {@link Collections}</u></a>
  * <p>
  * Die Schwächen der Hilfsmethoden {@link Arrays#binarySearch(Object[], Object, Comparator)} und {@link Collections#binarySearch(List, Object, Comparator)}
- * liegen zum einen bei ihrer Beschränkung auf Suchkriterien, die zum Typ der Elemente in den Arrays bzw. {@link List}s kompatibel sein müssel, und zum anderen
- * im Indererminismus bei merhfach vorkommenden Elemente.
+ * liegen zum einen bei ihrer Beschränkung auf Suchkriterien, die zum Typ der Elemente in den Arrays bzw. Listen kompatibel sein müssen, und zum anderen im
+ * Indeterminismus bei merhfach vorkommenden Elementen.
  * <p>
  * <a name="comparables_new"><u>Binäre Suche mit {@link Comparables}</u></a>
  * <p>
- * Die hier in {@link Comparables} implementierten Hilfsmethoden zur binären Suche abstrahieren Suchkriterien als {@link Comparable}s, welche zu einem gegebenen
- * Element einen Navigationswert berechnen. Bei einer binären Suche mit dem einem {@link Comparable} {@code comparable} als Suchkriterium gilt ein Element
+ * Die hier in {@link Comparables} implementierten Hilfsmethoden zur binären Suche abstrahieren Suchkriterien als {@link Comparable}, welche zu einem gegebenen
+ * Element einen Navigationswert berechnen. Bei einer binären Suche mit einem {@link Comparable} {@code comparable} als Suchkriterium gilt ein Element
  * {@code element} an Position {@code index} als Treffer, wenn der Navigationswert {@code comparable.compareTo(element)} gleich {@code 0} ist. Wenn der
  * Navigationswert dagegen kleier oder größer als {@code 0} ist, wird die binäre Suche bei den Positionen kleier bzw. größer als {@code index} fortgesetzt. Bei
  * einer erfolglosen benären Suche geben die Hilfsmethoden <code>(-(<em>Einfügeposition</em>)-1)</code> zurück, sodass ein positiver Rückgabewert immer einen
- * Treffer signalisiert. Die <em>Einfügeposition</em> ist dabei die Position, an der ein Element seiner Ordnung entsprechend in das Array bzw. die {@link List}
- * eingefügt werden müsste. Das gegebene Array bzw. die gegebene {@link List} muss bezüglich der Ordnung des {@link Comparable}s aufsteigend sortiert sein.
+ * Treffer signalisiert. Die <em>Einfügeposition</em> ist dabei die Position, an der ein Element seiner Ordnung entsprechend in das Array bzw. die Liste
+ * eingefügt werden müsste. Das gegebene Array bzw. die gegebene Liste muss bezüglich der Ordnung des {@link Comparable} aufsteigend sortiert sein.
  * <p>
- * Nebn den für merhfach vorkommenden Elemente indererministischen {@code binarySearch()}-Methoden gibt es hier auch die deterministischen
+ * Neben den für merhfach vorkommende Elemente indeterministischen {@code binarySearch()}-Methoden gibt es hier auch die deterministischen
  * {@code binarySearchFirst()}- und {@code binarySearchLast()}-Methoden, welche nach der kleinsten bzw. größten Position eines Treffers suchen.
  *
  * @see Arrays#binarySearch(Object[], Object)
@@ -144,11 +145,11 @@ public class Comparables {
 	}
 
 	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie das gegebene Element zur Berechnung des Navigationswert
-	 * verwendet. Das gegebene Element wird als erstes Argument des {@link Comparator}s verwendet. Der Navigationswert für ein Element {@code item2} ist
+	 * verwendet. Das gegebene Element wird als erstes Argument des {@link Comparator} verwendet. Der Navigationswert für ein Element {@code item2} ist
 	 * {@code comparator.compare(item, item2)}.
 	 *
 	 * @param <GItem> Typ der Elemente.
-	 * @param item erstes Argument des {@link Comparator}s.
+	 * @param item erstes Argument des {@link Comparator}.
 	 * @param comparator {@link Comparator}.
 	 * @return {@code entry}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
@@ -251,8 +252,8 @@ public class Comparables {
 	 * {@link Comparable} navigiert. Der Navigationswert für ein Element {@code item} ist {@code comparable.compareTo(converter.convert(item))}.
 	 *
 	 * @see Getter
-	 * @param <GItem> Typ der Eingabe des {@link Getter}s sowie der Elemente.
-	 * @param <GItem2> Typ der Ausgabe des {@link Getter}s sowie der Elemente des gegebenen {@link Comparable}s.
+	 * @param <GItem> Typ der Eingabe des {@link Getter} sowie der Elemente.
+	 * @param <GItem2> Typ der Ausgabe des {@link Getter} sowie der Elemente des gegebenen {@link Comparable}.
 	 * @param navigator {@link Getter}.
 	 * @param comparable {@link Comparable}.
 	 * @return {@code navigated}-{@link Comparable}.
