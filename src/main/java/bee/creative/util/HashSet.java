@@ -258,7 +258,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	/** {@inheritDoc} */
 	@Override
 	public void clear() {
-		this.clearEntries();
+		this.clearImpl();
 	}
 
 	/** {@inheritDoc} */

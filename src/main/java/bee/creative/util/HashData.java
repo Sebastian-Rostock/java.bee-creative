@@ -173,7 +173,7 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public void clear() {
-			this.entryData.clearEntries();
+			this.entryData.clearImpl();
 		}
 
 		@Override
@@ -227,7 +227,7 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public void clear() {
-			this.entryData.clearEntries();
+			this.entryData.clearImpl();
 		}
 
 		@Override
@@ -281,7 +281,7 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public void clear() {
-			this.entryData.clearEntries();
+			this.entryData.clearImpl();
 		}
 
 		@Override
@@ -339,7 +339,7 @@ public abstract class HashData<GKey, GValue> {
 
 		@Override
 		public void clear() {
-			this.entryData.clearEntries();
+			this.entryData.clearImpl();
 		}
 
 		@Override
@@ -931,7 +931,7 @@ public abstract class HashData<GKey, GValue> {
 	}
 
 	/** Diese Methode entfernt alle Einträge. Hierbei werden die Anzahl der Einträge auf {@code 0} gesetzt und die Tabellen initialisiert. */
-	protected final void clearEntries() {
+	protected final void clearImpl() {
 		if (this.count == 0) return;
 		HashData.clearTable(this.table);
 		HashData.clearNexts(this.nexts);

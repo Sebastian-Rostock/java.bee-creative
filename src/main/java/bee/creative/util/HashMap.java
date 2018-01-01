@@ -270,7 +270,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public void clear() {
-		this.clearEntries();
+		this.clearImpl();
 	}
 
 	/** {@inheritDoc} */

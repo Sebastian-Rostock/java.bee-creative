@@ -1,26 +1,19 @@
 package bee.creative.util;
 
-import java.nio.channels.NetworkChannel;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.Map.Entry;
-import bee.creative.iam.IAMMapping;
-import bee.creative.util.HashData.Entries;
-import bee.creative.util.HashData.EntriesIterator;
-import bee.creative.util.HashData.HashEntry;
-import bee.creative.util.HashData.HashIterator;
-import bee.creative.util.HashData.Keys;
-import bee.creative.util.HashData.KeysIterator;
-import bee.creative.util.HashData.Mapping;
-import bee.creative.util.HashData.Values;
-import bee.creative.util.HashData.ValuesIterator;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 // TODO CURSOR = int, das in prevs/next zeigt, wo der Index des gesuchten Eintrags drin steht
 // nagativ, wenn prevs, positiv, wenn nexts gemeint
@@ -111,14 +104,14 @@ class _TreeData_ {
 
 			/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
 			protected final int nextIndex() {
-				return getNodePosition(nextNode());
+				return TreeData.getNodePosition(this.nextNode());
 			}
 
 			protected final int nextNode() {
 				// TODO
 				return 0;
 			}
-			
+
 			{}
 
 			@Override
@@ -135,7 +128,7 @@ class _TreeData_ {
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected static class Keys<GKey> extends AbstractSet<GKey> {
+		protected static class Keys<GKey> extends AbstractSet<GKey> implements NavigableSet<GKey> {
 
 			protected final TreeData<GKey, ?> entryData;
 
@@ -152,7 +145,7 @@ class _TreeData_ {
 
 			@Override
 			public void clear() {
-				this.entryData.clearEntries();
+				this.entryData.clearImpl();
 			}
 
 			@Override
@@ -168,6 +161,91 @@ class _TreeData_ {
 			@Override
 			public boolean contains(final Object item) {
 				return this.entryData.hasKeyImpl(item);
+			}
+
+			@Override
+			public Comparator<? super GKey> comparator() {
+				return null;
+			}
+
+			@Override
+			public GKey first() {
+				return null;
+			}
+
+			@Override
+			public GKey last() {
+				return null;
+			}
+
+			@Override
+			public GKey lower(final GKey e) {
+				return null;
+			}
+
+			@Override
+			public GKey floor(final GKey e) {
+				return null;
+			}
+
+			@Override
+			public GKey ceiling(final GKey e) {
+				return null;
+			}
+
+			@Override
+			public GKey higher(final GKey e) {
+				return null;
+			}
+
+			@Override
+			public GKey pollFirst() {
+				return null;
+			}
+
+			@Override
+			public GKey pollLast() {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GKey> descendingSet() {
+				return null;
+			}
+
+			@Override
+			public Iterator<GKey> descendingIterator() {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GKey> subSet(final GKey fromElement, final boolean fromInclusive, final GKey toElement, final boolean toInclusive) {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GKey> headSet(final GKey toElement, final boolean inclusive) {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GKey> tailSet(final GKey fromElement, final boolean inclusive) {
+				return null;
+			}
+
+			@Override
+			public SortedSet<GKey> subSet(final GKey fromElement, final GKey toElement) {
+				return null;
+			}
+
+			@Override
+			public SortedSet<GKey> headSet(final GKey toElement) {
+				return null;
+			}
+
+			@Override
+			public SortedSet<GKey> tailSet(final GKey fromElement) {
+				return null;
 			}
 
 		}
@@ -206,7 +284,7 @@ class _TreeData_ {
 
 			@Override
 			public void clear() {
-				this.entryData.clearEntries();
+				this.entryData.clearImpl();
 			}
 
 			@Override
@@ -260,7 +338,7 @@ class _TreeData_ {
 
 			@Override
 			public void clear() {
-				this.entryData.clearEntries();
+				this.entryData.clearImpl();
 			}
 
 			@Override
@@ -301,7 +379,7 @@ class _TreeData_ {
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected static class Mapping<GKey, GValue> extends AbstractMap<GKey, GValue> {
+		protected static class Mapping<GKey, GValue> extends AbstractMap<GKey, GValue> implements NavigableMap<GKey, GValue> {
 
 			protected final TreeData<GKey, GValue> entryData;
 
@@ -318,7 +396,7 @@ class _TreeData_ {
 
 			@Override
 			public void clear() {
-				this.entryData.clearEntries();
+				this.entryData.clearImpl();
 			}
 
 			@Override
@@ -366,6 +444,126 @@ class _TreeData_ {
 				return this.entryData.newEntriesImpl();
 			}
 
+			@Override
+			public Comparator<? super GKey> comparator() {
+				return null;
+			}
+
+			@Override
+			public GKey firstKey() {
+				return null;
+			}
+
+			@Override
+			public GKey lastKey() {
+				return null;
+			}
+
+			@Override
+			public java.util.Map.Entry<GKey, GValue> lowerEntry(final GKey key) {
+				return null;
+			}
+
+			@Override
+			public GKey lowerKey(final GKey key) {
+				return null;
+			}
+
+			@Override
+			public java.util.Map.Entry<GKey, GValue> floorEntry(final GKey key) {
+				return null;
+			}
+
+			@Override
+			public GKey floorKey(final GKey key) {
+				return null;
+			}
+
+			@Override
+			public java.util.Map.Entry<GKey, GValue> ceilingEntry(final GKey key) {
+				return null;
+			}
+
+			@Override
+			public GKey ceilingKey(final GKey key) {
+				return null;
+			}
+
+			@Override
+			public java.util.Map.Entry<GKey, GValue> higherEntry(final GKey key) {
+				return null;
+			}
+
+			@Override
+			public GKey higherKey(final GKey key) {
+				return null;
+			}
+
+			@Override
+			public java.util.Map.Entry<GKey, GValue> firstEntry() {
+				return null;
+			}
+
+			@Override
+			public java.util.Map.Entry<GKey, GValue> lastEntry() {
+				return null;
+			}
+
+			@Override
+			public java.util.Map.Entry<GKey, GValue> pollFirstEntry() {
+				return null;
+			}
+
+			@Override
+			public java.util.Map.Entry<GKey, GValue> pollLastEntry() {
+				return null;
+			}
+
+			@Override
+			public NavigableMap<GKey, GValue> descendingMap() {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GKey> navigableKeySet() {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GKey> descendingKeySet() {
+				return null;
+			}
+
+			@Override
+			public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
+				return null;
+			}
+
+			@Override
+			public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
+				return null;
+			}
+
+			@Override
+			public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
+				return null;
+			}
+
+			@Override
+			public SortedMap<GKey, GValue> subMap(final GKey fromKey, final GKey toKey) {
+				return null;
+			}
+
+			@Override
+			public SortedMap<GKey, GValue> headMap(final GKey toKey) {
+				return null;
+			}
+
+			@Override
+			public SortedMap<GKey, GValue> tailMap(final GKey fromKey) {
+				return null;
+			}
+
 		}
 
 		{}
@@ -382,7 +580,7 @@ class _TreeData_ {
 		{}
 
 		/** Diese Methode gibt den Wert des Knoten mit den gegebenen Eigenschaften zurück.
-		 * 
+		 *
 		 * @param nodeIndex Knotenposition.
 		 * @param nodeBalance Knotenbalanz mit {@code 0} für gleichgewicht, {@code 1} für rechtslastig und {@code 2} für linkslastig.
 		 * @return Knotenwert als Element aus {@link #prevs} oder {@link #nexts}. */
@@ -390,7 +588,7 @@ class _TreeData_ {
 			return (nodeIndex << 2) | nodeBalance;
 		}
 
-		public boolean popEntryImpl(Object key, Object value) {
+		boolean popEntryImpl(final Object key, final Object value) {
 			// TODO
 			return false;
 		}
@@ -488,8 +686,8 @@ class _TreeData_ {
 
 		@SuppressWarnings ("javadoc")
 		private static void clearNexts(final int[] array) {
-			for (int i = 0, size = array.length; i < size;) {
-				array[i] = ++i;
+			for (int i = array.length - 1; i >= 0;) {
+				array[i] = --i;
 			}
 		}
 
@@ -552,11 +750,11 @@ class _TreeData_ {
 			if (oldKeys.length == capacity) return;
 			if (capacity == 0) {
 				this.entry = 0;
-				this.keys = EMPTY_OBJECTS;
-				this.nexts = EMPTY_INTEGERS;
-				this.prevs = EMPTY_INTEGERS;
-				this.values = this.values != null ? EMPTY_OBJECTS : null;
-			} else if (capacity <= MAX_CAPACITY) {
+				this.keys = TreeData.EMPTY_OBJECTS;
+				this.nexts = TreeData.EMPTY_INTEGERS;
+				this.prevs = TreeData.EMPTY_INTEGERS;
+				this.values = this.values != null ? TreeData.EMPTY_OBJECTS : null;
+			} else if (capacity <= TreeData.MAX_CAPACITY) {
 				final int[] oldNexts = this.nexts;
 				final int[] newNexts = new int[capacity + 1];
 				final int[] oldPrevs = this.prevs;
@@ -564,38 +762,68 @@ class _TreeData_ {
 				final Object[] newKeys = new Object[capacity];
 				final Object[] oldValues = this.values;
 				final Object[] newValues = oldValues != null ? new Object[capacity] : null;
-				clearNexts(newNexts);
-				clearPrevs(newPrevs);
-
-				int newEntry = 0;
-				newNexts[capacity] = allocateImpl2(oldNexts, newNexts, oldPrevs, newPrevs, oldKeys, newKeys, oldNexts[oldKeys.length], 0);
-
+				TreeData.clearNexts(newNexts);
+				TreeData.clearPrevs(newPrevs);
+				int newEntry = capacity - 1;
+				{
+					final int[] nodeValues = new int[32];
+					final byte[] nodeStates = new byte[32];
+					final int[][] nodeFields = new int[32][];
+					nodeFields[0] = newNexts;
+					nodeValues[0] = oldNexts[oldKeys.length];
+					newNexts[capacity] = -1;
+					int nodeLevel = 0;
+					while (nodeLevel >= 0) {
+						final byte stackState = nodeStates[nodeLevel];
+						if (stackState == 0) { // "prev" expandieren
+							final int nodeValue = nodeValues[nodeLevel];
+							if (nodeValue == -1) { // null-Zeiger bleibt erhalten
+								--nodeLevel;
+								continue;
+							}
+							final int nodePosition = TreeData.getNodePosition(nodeValue);
+							nodeStates[nodeLevel] = 1;
+							++nodeLevel;
+							nodeStates[nodeLevel] = 0;
+							nodeValues[nodeLevel] = oldPrevs[nodePosition];
+							nodeFields[nodeLevel] = newPrevs;
+							continue;
+						}
+						if (stackState == 1) { // "next" hinter "prev" expandieren
+							final int nodePosition = TreeData.getNodePosition(nodeValues[nodeLevel]);
+							++nodeLevel;
+							nodeStates[nodeLevel] = 2;
+							++nodeLevel;
+							nodeStates[nodeLevel] = 0;
+							nodeValues[nodeLevel] = oldNexts[nodePosition];
+							nodeFields[nodeLevel] = newNexts;
+							continue;
+						}
+						if (stackState == 2) { // "prev" und "next" fertig
+							newPrevs[newEntry] = nodeValues[nodeLevel];
+							newNexts[newEntry] = nodeValues[nodeLevel + 1];
+							--nodeLevel;
+							final int nodeValue = nodeValues[nodeLevel];
+							final int nodePosition = TreeData.getNodePosition(nodeValues[nodeLevel]);
+							nodeValues[nodeLevel] = nodeFields[nodeLevel][newEntry] = //
+								TreeData.getNodeValue(newEntry, TreeData.getNodeBalance(nodeValue));
+							newKeys[newEntry] = oldKeys[nodePosition];
+							if (oldValues != null) {
+								newValues[newEntry] = oldValues[nodePosition];
+							}
+							--nodeLevel;
+							--newEntry;
+							continue;
+						}
+						throw new IllegalStateException();
+					}
+				}
 				this.entry = newEntry;
 				this.keys = newKeys;
 				this.prevs = newPrevs;
 				this.nexts = newNexts;
 				this.values = newValues;
 			} else throw new OutOfMemoryError();
-		}
-
-		private int allocateImpl2(int[] oldNexts, int[] newNexts, int[] oldPrevs, int[] newPrevs, Object[] oldKeys, Object[] newKeys,
-// TODO
-			int oldNodeValue, int newNodePosition) {
-
-			if (oldNodeValue == -1) return newNodePosition; // nächste freie zelle liefern
-			int oldNodeBalance = getNodeBalance(oldNodeValue);
-			int oldNodePosition = getNodePosition(oldNodeValue);
-
-			newKeys[newNodePosition] = oldKeys[oldNodePosition];
-
-			int newPrevValue = allocateImpl2(oldNexts, newNexts, oldPrevs, newPrevs, oldKeys, newKeys, oldNexts[oldNodePosition]
-
-				, //
-				allocateImpl2(oldNexts, newNexts, oldPrevs, newPrevs, oldKeys, newKeys, //
-					oldPrevs[oldNodePosition], //
-					newNodePosition + 1));
-
-			return getNodeValue(newNodePosition, oldNodeBalance);
 		}
 
 		protected final GValue value(final int entryIndex, final GValue value) {
@@ -689,14 +917,12 @@ class _TreeData_ {
 			final Object[] keys = this.keys;
 			final int[] prevs = this.prevs;
 			final int[] nexts = this.nexts;
-			int parent = keys.length;
-			int result = nexts[parent];
-			while (result == -1) {
-				result >>>= 2;
+			int result = nexts[keys.length];
+			while (result != -1) {
+				result = TreeData.getNodePosition(result);
 				final int compare = this.customCompare(keys[result], key);
 				if (compare == 0) return result;
-				parent = result;
-				result = compare < 0 ? nexts[parent] : prevs[parent];
+				result = compare < 0 ? prevs[result] : nexts[result];
 			}
 			return -1;
 		}
@@ -766,12 +992,12 @@ class _TreeData_ {
 				keys[result] = key;
 				prevs[result] = -1;
 				nexts[result] = -1;
-				fields[fieldIndex] = (result << 2) | 0;
+				fields[fieldIndex] = TreeData.getNodeValue(result, 0);
 				return result | 0x80000000; // negativ, da Teilbaum zu balanziren
 			}
 			final int nodePosition = TreeData.getNodePosition(nodeValue);
 			final int compare = this.customCompare(this.keys[nodePosition], key);
-			if (compare > 0) { // positiv, wenn im rechten Teilbaum einzufügen
+			if (compare < 0) { // negativ, wenn im rechten Teilbaum einzufügen
 				final int result = this.putIndexImpl2(key, prevs, nodePosition);
 				if (result >= 0) return result; // positiv, wenn Teilbaum bereits balanziert
 				final int nodeValue2 = fields[fieldIndex]; // kann durch einfügen anders sein
@@ -792,7 +1018,7 @@ class _TreeData_ {
 				fields[fieldIndex] = TreeData.getNodeValue(nodePosition2, 2);
 				return result;
 			}
-			if (compare < 0) { // negativ, wenn im rechten Teilbaum einzufügen
+			if (compare > 0) { // positiv, wenn im rechten Teilbaum einzufügen
 				final int result = this.putIndexImpl2(key, nexts, nodePosition);
 				if (result >= 0) return result; // positiv, wenn Teilbaum bereits balanziert
 				final int nodeValue2 = fields[fieldIndex]; // kann durch einfügen anders sein
@@ -1117,12 +1343,12 @@ class _TreeData_ {
 		}
 
 		/** Diese Methode entfernt alle Einträge. Hierbei werden die Anzahl der Einträge auf {@code 0} gesetzt und die Tabellen initialisiert. */
-		protected final void clearEntries() {
+		protected final void clearImpl() {
 			if (this.count == 0) return;
-			clearPrevs(this.prevs);
-			clearNexts(this.nexts);
-			clearObjects(this.keys);
-			clearObjects(this.values);
+			TreeData.clearPrevs(this.prevs);
+			TreeData.clearNexts(this.nexts);
+			TreeData.clearObjects(this.keys);
+			TreeData.clearObjects(this.values);
 			this.count = 0;
 		}
 
@@ -1162,5 +1388,33 @@ class _TreeData_ {
 			}
 		}
 
+		public void print() {
+			System.out.println("map: " + this.countImpl());
+			this.printImpl(this.nexts[this.keys.length], 1);
+		}
+
+		private void printImpl(final int nodeValue, final int level) {
+			if (nodeValue == -1) {
+				// System.out.append('>');
+				// for (int i = 0; i < level; i++) System.out.append(" ");
+				// System.out.println("0 null");
+			} else {
+				final int nodePosition = TreeData.getNodePosition(nodeValue);
+				final int nodeBalance = TreeData.getNodeBalance(nodeValue);
+				this.printImpl(this.prevs[nodePosition], level + 1);
+				System.out.append('>');
+				for (int i = 0; i < level; i++) {
+					System.out.append("  ");
+				}
+				System.out.print(Integer.toBinaryString(4 + nodeBalance).substring(1));
+				System.out.print(" ");
+				System.out.print(Objects.toString(this.keys[nodePosition]));
+				System.out.print(" -> ");
+				System.out.println(Objects.toString(this.values[nodePosition]));
+				this.printImpl(this.nexts[nodePosition], level + 1);
+			}
+		}
+
 	}
+
 }
