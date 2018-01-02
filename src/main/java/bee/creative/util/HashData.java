@@ -407,9 +407,7 @@ public abstract class HashData<GKey, GValue> {
 
 	@SuppressWarnings ("javadoc")
 	private static void clearNexts(final int[] array) {
-		for (int i = 0, size = array.length; i < size;) {
-			array[i] = ++i;
-		}
+		for (int i = 0, size = array.length; i < size; array[i] = ++i) {}
 	}
 
 	@SuppressWarnings ("javadoc")

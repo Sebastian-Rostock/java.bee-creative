@@ -10,7 +10,7 @@ import bee.creative.util._TreeData_.TreeData;
 class TreeMap<GKey, GValue> extends TreeData<GKey, GValue> implements Map<GKey, GValue> {
 
 	public static void main(String[] args) throws Exception {
-		TreeMap map = new TreeMap(10);
+		TreeMap map = new TreeMap(5);
 		map.print();
 		map.put("a", "1");
 		map.print();
@@ -22,13 +22,15 @@ class TreeMap<GKey, GValue> extends TreeData<GKey, GValue> implements Map<GKey, 
 		map.print();
 		map.put("e", "5");
 		map.print();
- 
+ System.out.println("get");
 		System.out.println(map.get("a"));
 		System.out.println(map.get("b"));
 		System.out.println(map.get("c"));
 		System.out.println(map.get("d"));
 		System.out.println(map.get("e"));
-		System.out.println(map.capacityImpl());
+		System.out.println("all");
+		map.allocateImpl(10);
+		map.print();
 	}
 	
 	
