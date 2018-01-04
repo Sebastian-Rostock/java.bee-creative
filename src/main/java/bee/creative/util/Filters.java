@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -178,7 +177,7 @@ public class Filters {
 	public static <GInput> Filter<GInput> containsFilter(final Object... items) throws NullPointerException {
 		if (items.length == 0) return Filters.rejectFilter();
 		if (items.length == 1) return Filters.containsFilter(Collections.singleton(items[0]));
-		return Filters.containsFilter(new HashSet<>(Arrays.asList(items)));
+		return Filters.containsFilter(new HashSet<>().allocate(items.length).insertAll(items));
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind.<br>

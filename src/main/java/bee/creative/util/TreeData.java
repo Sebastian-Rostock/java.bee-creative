@@ -78,13 +78,42 @@ class _TreeData_ {
 			protected final TreeData<GKey, GValue> entryData;
 
 			/** Dieses Feld speichert den Index des nächsten Eintrags in {@link HashData#keys}. */
-			protected int nextIndex;
+			protected int nodeIndex;
 
 			/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link HashData#keys}. */
 			protected int entryIndex = -1;
 
 			public TreeIterator(final TreeData<GKey, GValue> entryData) {
 				this.entryData = entryData;
+			}
+
+			/** Diese Methode gibt den vorherigen Schlüssel zurück. */
+			protected final GKey prevKey() {
+				return this.entryData.getKeyImpl(this.prevIndex());
+			}
+
+			/** Diese Methode gibt den vorherigen Eintrag zurück. */
+			protected final TreeEntry<GKey, GValue> prevEntry() {
+				return new TreeEntry<>(this.entryData, this.prevIndex());
+			}
+
+			/** Diese Methode gibt den vorherigen Wert zurück. */
+			protected final GValue prevValue() {
+				return this.entryData.getValueImpl(this.prevIndex());
+			}
+
+			/** Diese Methode ermitteln den Index des vorherigen Eintrags und gibt den des aktuellen zurück. */
+			protected final int prevIndex() {
+				return TreeData.getNodeIndex(this.prevNode());
+			}
+
+			protected final int prevNode() {
+				// TODO
+				return 0;
+			}
+
+			protected final void prevRemove() {
+				throw new UnsupportedOperationException();
 			}
 
 			/** Diese Methode gibt den nächsten Schlüssel zurück. */
@@ -112,17 +141,15 @@ class _TreeData_ {
 				return 0;
 			}
 
+			protected final void nextRemove() {
+				throw new UnsupportedOperationException();
+			}
+
 			{}
 
 			@Override
 			public boolean hasNext() {
-				return this.nextIndex >= 0;
-			}
-
-			@Override
-			public void remove() {
-				// if (this.entryData.popEntryImpl(this.tableIndex, this.entryIndex)) return;
-				throw new IllegalStateException();
+				return this.nodeIndex >= 0;
 			}
 
 		}
@@ -150,7 +177,7 @@ class _TreeData_ {
 
 			@Override
 			public Iterator<GKey> iterator() {
-				return this.entryData.newKeysIteratorImpl();
+				return this.entryData.newKeysIteratorAImpl();
 			}
 
 			@Override
@@ -250,10 +277,26 @@ class _TreeData_ {
 
 		}
 
-		@SuppressWarnings ("javadoc")
-		protected static class KeysIterator<GKey, GValue> extends TreeIterator<GKey, GValue, GKey> {
+		protected static class KeysA<GKey> extends Keys<GKey> {
 
-			public KeysIterator(final TreeData<GKey, GValue> entryData) {
+			public KeysA(final TreeData<GKey, ?> entryData) {
+				super(entryData);
+			}
+
+		}
+
+		protected static class KeysD<GKey> extends Keys<GKey> {
+
+			public KeysD(final TreeData<GKey, ?> entryData) {
+				super(entryData);
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class KeysIteratorA<GKey, GValue> extends TreeIterator<GKey, GValue, GKey> {
+
+			public KeysIteratorA(final TreeData<GKey, GValue> entryData) {
 				super(entryData);
 			}
 
@@ -262,6 +305,32 @@ class _TreeData_ {
 			@Override
 			public GKey next() {
 				return this.nextKey();
+			}
+
+			@Override
+			public void remove() {
+				this.nextRemove();
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		protected static class KeysIteratorD<GKey, GValue> extends TreeIterator<GKey, GValue, GKey> {
+
+			public KeysIteratorD(final TreeData<GKey, GValue> entryData) {
+				super(entryData);
+			}
+
+			{}
+
+			@Override
+			public GKey next() {
+				return this.prevKey();
+			}
+
+			@Override
+			public void remove() {
+				this.prevRemove();
 			}
 
 		}
@@ -305,9 +374,9 @@ class _TreeData_ {
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected static class ValuesIterator<GKey, GValue> extends TreeIterator<GKey, GValue, GValue> {
+		protected static class ValuesIteratorA<GKey, GValue> extends TreeIterator<GKey, GValue, GValue> {
 
-			public ValuesIterator(final TreeData<GKey, GValue> entryData) {
+			public ValuesIteratorA(final TreeData<GKey, GValue> entryData) {
 				super(entryData);
 			}
 
@@ -316,6 +385,11 @@ class _TreeData_ {
 			@Override
 			public GValue next() {
 				return this.nextValue();
+			}
+
+			@Override
+			public void remove() {
+				this.nextRemove();
 			}
 
 		}
@@ -363,9 +437,9 @@ class _TreeData_ {
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected static class EntriesIterator<GKey, GValue> extends TreeIterator<GKey, GValue, Entry<GKey, GValue>> {
+		protected static class EntriesIteratorA<GKey, GValue> extends TreeIterator<GKey, GValue, Entry<GKey, GValue>> {
 
-			public EntriesIterator(final TreeData<GKey, GValue> entryData) {
+			public EntriesIteratorA(final TreeData<GKey, GValue> entryData) {
 				super(entryData);
 			}
 
@@ -374,6 +448,11 @@ class _TreeData_ {
 			@Override
 			public Entry<GKey, GValue> next() {
 				return this.nextEntry();
+			}
+
+			@Override
+			public void remove() {
+				this.nextRemove();
 			}
 
 		}
@@ -421,7 +500,7 @@ class _TreeData_ {
 
 			@Override
 			public Set<GKey> keySet() {
-				return this.entryData.newKeysImpl();
+				return this.entryData.newKeysAImpl();
 			}
 
 			@Override
@@ -436,12 +515,12 @@ class _TreeData_ {
 
 			@Override
 			public Values<GValue> values() {
-				return this.entryData.newValuesImpl();
+				return this.entryData.newValuesAImpl();
 			}
 
 			@Override
 			public Entries<GKey, GValue> entrySet() {
-				return this.entryData.newEntriesImpl();
+				return this.entryData.newEntriesAImpl();
 			}
 
 			@Override
@@ -737,8 +816,12 @@ class _TreeData_ {
 			return this.keys.length;
 		}
 
+		/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann.
+		 *
+		 * @param capacity Anzahl der maximal verwaltbaren Einträge.
+		 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
 		protected final void allocateImpl(final int capacity) throws IllegalArgumentException {
-			int count = this.count;
+			final int count = this.count;
 			if (capacity < count) throw new IllegalArgumentException();
 			final Object[] oldKeys = this.keys;
 			if (oldKeys.length == capacity) return;
@@ -759,44 +842,42 @@ class _TreeData_ {
 				TreeData.clearNexts(newNexts);
 				TreeData.clearPrevs(newPrevs);
 				int newEntry = capacity - 1;
-				{
-					final int[] nodeValues = new int[32];
-					int swapValues = 0, pushValues = 0, levelIndex = 0;
-					nodeValues[0] = oldNexts[oldKeys.length];
-					while (levelIndex >= 0) {
-						final int nodeValue = nodeValues[levelIndex];
-						if (nodeValue == -1) {
-							levelIndex--;
-						} else {
-							final int selectMask = 1 << levelIndex, nodeIndex = TreeData.getNodeIndex(nodeValue);
-							if ((pushValues & selectMask) != 0) {
-								final int nodeBalance = TreeData.getNodeBalance(nodeValue);
-								newPrevs[newEntry] = nodeValues[levelIndex + 1]; // 4. pop newPrev
-								newNexts[newEntry] = nodeValues[--levelIndex]; // 5. pop newNext, pop oldNode
-								nodeValues[levelIndex] = TreeData.getNodeValue(newEntry, nodeBalance); // 6. push newNode
-								newKeys[newEntry] = oldKeys[nodeIndex];
-								if (oldValues != null) {
-									newValues[newEntry] = oldValues[nodeIndex];
-								}
-								final int resetMask = ~(-1 << levelIndex);
-								swapValues &= resetMask;
-								pushValues &= resetMask;
-								levelIndex--;
-								newEntry--;
-							} else if ((swapValues & selectMask) != 0) {
-								nodeValues[levelIndex] = nodeValues[++levelIndex]; // 2. swap oldNode and newNext
-								nodeValues[levelIndex] = nodeValue;
-								nodeValues[++levelIndex] = oldPrevs[nodeIndex]; // 3. push oldPrev
-								pushValues |= selectMask << 1;
-
-							} else {
-								nodeValues[++levelIndex] = oldNexts[nodeIndex]; // 1. push oldNext
-								swapValues |= selectMask;
+				final int[] nodeValues = new int[32];
+				int swapValues = 0, pushValues = 0, levelIndex = 0;
+				nodeValues[0] = oldNexts[oldKeys.length];
+				while (levelIndex >= 0) {
+					final int nodeValue = nodeValues[levelIndex];
+					if (~nodeValue == 0) {
+						levelIndex--;
+					} else {
+						final int selectMask = 1 << levelIndex, nodeIndex = TreeData.getNodeIndex(nodeValue);
+						if ((pushValues & selectMask) != 0) {
+							final int nodeBalance = TreeData.getNodeBalance(nodeValue);
+							newPrevs[newEntry] = nodeValues[levelIndex + 1]; // 4. pop newPrev
+							newNexts[newEntry] = nodeValues[--levelIndex]; // 5. pop newNext, pop oldNode
+							nodeValues[levelIndex] = TreeData.getNodeValue(newEntry, nodeBalance); // 6. push newNode
+							newKeys[newEntry] = oldKeys[nodeIndex];
+							if (oldValues != null) {
+								newValues[newEntry] = oldValues[nodeIndex];
 							}
+							final int resetMask = ~(-1 << levelIndex);
+							swapValues &= resetMask;
+							pushValues &= resetMask;
+							levelIndex--;
+							newEntry--;
+						} else if ((swapValues & selectMask) != 0) {
+							nodeValues[levelIndex] = nodeValues[++levelIndex]; // 2. swap oldNode and newNext
+							nodeValues[levelIndex] = nodeValue;
+							nodeValues[++levelIndex] = oldPrevs[nodeIndex]; // 3. push oldPrev
+							pushValues |= selectMask << 1;
+
+						} else {
+							nodeValues[++levelIndex] = oldNexts[nodeIndex]; // 1. push oldNext
+							swapValues |= selectMask;
 						}
 					}
-					newNexts[capacity] = nodeValues[0];
 				}
+				newNexts[capacity] = nodeValues[0];
 				this.entry = newEntry;
 				this.keys = newKeys;
 				this.prevs = newPrevs;
@@ -826,7 +907,7 @@ class _TreeData_ {
 		@SuppressWarnings ("javadoc")
 		final boolean hasValueImpl2(final Object value, final int[] fieldArray, final int fieldIndex) {
 			int entryIndex = fieldArray[fieldIndex];
-			if (entryIndex == -1) return false;
+			if (~entryIndex == 0) return false;
 			entryIndex = TreeData.getNodeIndex(entryIndex);
 			return Objects.equals(this.values[entryIndex], value) //
 				|| this.hasValueImpl2(value, this.prevs, entryIndex) //
@@ -890,7 +971,7 @@ class _TreeData_ {
 			final int[] prevs = this.prevs;
 			final int[] nexts = this.nexts;
 			int nodeValue = nexts[keys.length];
-			while (nodeValue != -1) {
+			while (~nodeValue != 0) {
 				final int nodeIndex = TreeData.getNodeIndex(nodeValue);
 				final int compare = this.customCompare(keys[nodeIndex], key);
 				if (compare == 0) return nodeIndex;
@@ -954,7 +1035,7 @@ class _TreeData_ {
 		final int putIndexImpl2(final GKey key, final int[] fields, final int fieldIndex) {
 			final int[] prevs = this.prevs, nexts = this.nexts;
 			final int nodeValue = fields[fieldIndex];
-			if (nodeValue == -1) { // leres Blatt überschreiben
+			if (~nodeValue == 0) { // leres Blatt überschreiben
 				final Object[] keys = this.keys;
 				final int count = this.count + 1;
 				final int result = this.entry;
@@ -1273,43 +1354,43 @@ class _TreeData_ {
 		/** Diese Methode gibt das {@link Set} der Schlüssel in {@link #keys} zurück.
 		 *
 		 * @return Schlüssel. */
-		protected final Keys<GKey> newKeysImpl() {
-			return new Keys<>(this);
+		protected final Keys<GKey> newKeysAImpl() {
+			return new KeysA<>(this);
 		}
 
 		/** Diese Methode gibt den {@link Iterator} über die Schlüssel in {@link #keys} zurück.
 		 *
-		 * @return Interator für {@link #newKeysImpl()}. */
-		protected final KeysIterator<GKey, GValue> newKeysIteratorImpl() {
-			return new KeysIterator<>(this);
+		 * @return Interator für {@link #newKeysAImpl()}. */
+		protected final KeysIteratorA<GKey, GValue> newKeysIteratorAImpl() {
+			return new KeysIteratorA<>(this);
 		}
 
 		/** Diese Methode gibt die {@link Collection} der Werte in {@link #values} zurück.
 		 *
 		 * @return Werte. */
-		protected final Values<GValue> newValuesImpl() {
+		protected final Values<GValue> newValuesAImpl() {
 			return new Values<>(this);
 		}
 
 		/** Diese Methode gibt den {@link Iterator} über die Werte in {@link #values} zurück.
 		 *
-		 * @return Interator für {@link #newValuesImpl()}. */
-		protected final ValuesIterator<GKey, GValue> newValuesIteratorImpl() {
-			return new ValuesIterator<>(this);
+		 * @return Interator für {@link #newValuesAImpl()}. */
+		protected final ValuesIteratorA<GKey, GValue> newValuesIteratorImpl() {
+			return new ValuesIteratorA<>(this);
 		}
 
 		/** Diese Methode gibt das {@link Set} der Einträge zurück.
 		 *
 		 * @return Einträge. */
-		protected final Entries<GKey, GValue> newEntriesImpl() {
+		protected final Entries<GKey, GValue> newEntriesAImpl() {
 			return new Entries<>(this);
 		}
 
 		/** Diese Methode gibt den {@link Iterator} über die Einträge zurück.
 		 *
-		 * @return Interator für {@link #newEntriesImpl()}. */
-		protected final EntriesIterator<GKey, GValue> newEntriesIteratorImpl() {
-			return new EntriesIterator<>(this);
+		 * @return Interator für {@link #newEntriesAImpl()}. */
+		protected final EntriesIteratorA<GKey, GValue> newEntriesIteratorImpl() {
+			return new EntriesIteratorA<>(this);
 		}
 
 		/** Diese Methode gibt die {@link Map} zu den Schlüsseln in {@link #keys} und Werten in {@link #values} zurück.
@@ -1371,7 +1452,7 @@ class _TreeData_ {
 		}
 
 		private void printImpl(final int nodeValue, final int level) {
-			if (nodeValue == -1) {
+			if (~nodeValue == 0) {
 				// System.out.append('>');
 				// for (int i = 0; i < level; i++) System.out.append(" ");
 				// System.out.println("0 null");
@@ -1381,7 +1462,7 @@ class _TreeData_ {
 				this.printImpl(this.prevs[nodeIndex], level + 1);
 				System.out.append('>');
 				for (int i = 0; i < level; i++) {
-					System.out.append("  ");
+					System.out.append("        ");
 				}
 				System.out.print(Integer.toBinaryString(4 + nodeBalance).substring(1));
 				System.out.print(" ");

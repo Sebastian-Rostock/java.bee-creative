@@ -87,6 +87,26 @@ public class Iterators {
 		return count;
 	}
 
+	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterator} in die gegebene {@link Collection} ein und gibt nur dann {@code true} zurück, wenn
+	 * Elemente eingefügt wurden.
+	 *
+	 * @see Collection#addAll(Collection)
+	 * @param <GItem> Typ der Elemente.
+	 * @param collection {@link Collection}.
+	 * @param iterator {@link Iterator}.
+	 * @return {@code true} bei Veränderungen an der {@link Collection}.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
+	public static <GItem> boolean addAll(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) throws NullPointerException {
+		Objects.assertNotNull(collection);
+		boolean modified = false;
+		while (iterator.hasNext()) {
+			if (collection.add(iterator.next())) {
+				modified = true;
+			}
+		}
+		return modified;
+	}
+
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur dann
 	 * {@code true} zurück, wenn Elemente entfernt wurden.
 	 *
@@ -118,28 +138,8 @@ public class Iterators {
 	public static boolean retainAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
 		Objects.assertNotNull(collection);
 		final List<Object> list = new ArrayList<>();
-		Iterators.appendAll(list, iterator);
+		Iterators.addAll(list, iterator);
 		return collection.retainAll(list);
-	}
-
-	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterator} in die gegebene {@link Collection} ein und gibt nur dann {@code true} zurück, wenn
-	 * Elemente eingefügt wurden.
-	 *
-	 * @see Collection#addAll(Collection)
-	 * @param <GItem> Typ der Elemente.
-	 * @param collection {@link Collection}.
-	 * @param iterator {@link Iterator}.
-	 * @return {@code true} bei Veränderungen an der {@link Collection}.
-	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
-	public static <GItem> boolean appendAll(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) throws NullPointerException {
-		Objects.assertNotNull(collection);
-		boolean modified = false;
-		while (iterator.hasNext()) {
-			if (collection.add(iterator.next())) {
-				modified = true;
-			}
-		}
-		return modified;
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator} und gibt nur dann {@code true} zurück, wenn Elemente entfernt wurden.

@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
+import java.util.Map;
 
 /** /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Setter}-Konstruktion und -Verarbeitung.
  *
@@ -111,6 +112,12 @@ public class Setters {
 			}
 
 		};
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Fields.mappingField(mapping)}. */
+	@SuppressWarnings ({"javadoc", "unchecked"})
+	public static <GInput, GValue> Setter<GInput, GValue> mappedGetter(final Map<? super GInput, ? super GValue> mapping) {
+		return (Setter<GInput, GValue>)Fields.mappingField(mapping);
 	}
 
 	/** Diese Methode gibt einen navigierten {@link Setter} zurück.<br>

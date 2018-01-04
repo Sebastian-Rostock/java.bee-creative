@@ -96,7 +96,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		/** {@inheritDoc} */
 		@Override
 		public boolean addAll(final Collection<? extends GItem> collection) {
-			return Iterables.appendAll(this, collection);
+			return Iterables.addAll(this, collection);
 		}
 
 		/** {@inheritDoc} */

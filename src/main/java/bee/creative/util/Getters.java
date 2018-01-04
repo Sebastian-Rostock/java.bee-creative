@@ -29,7 +29,7 @@ public class Getters {
 
 	{}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, welcher stats die gegebene Ausgabe liefert.
+	/** Diese Methode gibt einen {@link Getter} zurück, welcher stets die gegebene Ausgabe liefert.
 	 *
 	 * @param <GValue> Typ der Ausgabe.
 	 * @param value Ausgabe.
@@ -179,6 +179,15 @@ public class Getters {
 		};
 	}
 
+	/** Diese Methode gibt den neutralen {@link Getter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
+	 *
+	 * @param <GInput> Typ der Ein-/Ausgabe.
+	 * @return {@link #NEUTRAL_GETTER}. */
+	@SuppressWarnings ("unchecked")
+	public static <GInput> Getter<GInput, GInput> neutralGetter() {
+		return (Getter<GInput, GInput>)Getters.NEUTRAL_GETTER;
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@code Getters.defaultGetter(getter, null)}.
 	 *
 	 * @see #defaultGetter(Getter, Object) **/
@@ -212,13 +221,10 @@ public class Getters {
 		};
 	}
 
-	/** Diese Methode gibt den neutralen {@link Getter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
-	 *
-	 * @param <GInput> Typ der Ein-/Ausgabe.
-	 * @return {@link #NEUTRAL_GETTER}. */
-	@SuppressWarnings ("unchecked")
-	public static <GInput> Getter<GInput, GInput> neutralGetter() {
-		return (Getter<GInput, GInput>)Getters.NEUTRAL_GETTER;
+	/** Diese Methode ist eine Abkürzung für {@code Fields.mappingField(mapping)}. */
+	@SuppressWarnings ({"javadoc", "unchecked"})
+	public static <GValue> Getter<Object, GValue> mappedGetter(final Map<?, ? extends GValue> mapping) {
+		return (Getter<Object, GValue>)Fields.mappingField(mapping);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Getters.bufferedGetter(-1, Pointers.SOFT, Pointers.SOFT, getter)}.

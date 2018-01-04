@@ -187,7 +187,7 @@ public class Builders {
 		 * @return {@code this}. */
 		public final GThis useItems(final Iterable<? extends GItem> items) {
 			if (items == null) return this.customThis();
-			Iterables.appendAll(this.items, items);
+			Iterables.addAll(this.items, items);
 			return this.customThis();
 		}
 

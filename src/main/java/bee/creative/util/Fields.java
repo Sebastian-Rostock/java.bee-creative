@@ -195,7 +195,7 @@ public final class Fields {
 		 * @param value {@link Set}.
 		 * @return Bearbeitungskopie. */
 		protected Set<GItem> customCopy(final Set<GItem> value) {
-			return new HashSet<>(value);
+			return new HashSet<GItem>().allocate(value.size()).insertAll(value);
 		}
 
 		/** {@inheritDoc} */
@@ -219,7 +219,7 @@ public final class Fields {
 		@Override
 		public void appendAll(final GInput input, final Iterable<? extends GItem> items) {
 			final Set<GItem> value = this.customCopy(this.get(input));
-			if (!Iterables.appendAll(value, items)) return;
+			if (!Iterables.addAll(value, items)) return;
 			this.set(input, value);
 		}
 
@@ -308,7 +308,7 @@ public final class Fields {
 		@Override
 		public void appendAll(final GInput input, final Iterable<? extends GEntry> items) {
 			final List<GEntry> value = this.customCopy(this.get(input));
-			if (!Iterables.appendAll(value, items)) return;
+			if (!Iterables.addAll(value, items)) return;
 			this.set(input, value);
 		}
 
@@ -324,7 +324,7 @@ public final class Fields {
 		@Override
 		public void appendAll(final GInput input, final int index, final Iterable<? extends GEntry> items) {
 			final List<GEntry> value = this.customCopy(this.get(input));
-			if (!Iterables.appendAll(value.subList(index, index), items)) return;
+			if (!Iterables.addAll(value.subList(index, index), items)) return;
 			this.set(input, value);
 		}
 
@@ -401,7 +401,7 @@ public final class Fields {
 		 * @param value {@link Map}.
 		 * @return Bearbeitungskopie. */
 		protected Map<GKey, GValue> customCopy(final Map<GKey, GValue> value) {
-			return new HashMap<>(value);
+			return new HashMap<GKey, GValue>().allocate(value.size()).insertAll(value);
 		}
 
 		/** {@inheritDoc} */
@@ -618,6 +618,36 @@ public final class Fields {
 				return Objects.toInvokeString("defaultField", field, value);
 			}
 
+		};
+	}
+
+	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen am {@link Map#get(Object)} sowie beim Schreiben an {@link Map#put(Object, Object)}
+	 * delegiert.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 * @param mapping {@link Map} zur Abbildung von einer Eingabe auf einen Wert.
+	 * @return {@code mapping}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
+	public static <GInput, GValue> Field<GInput, GValue> mappingField(final Map<GInput, GValue> mapping) throws NullPointerException {
+		Objects.assertNotNull(mapping);
+		return new Field<GInput, GValue>() {
+	
+			@Override
+			public GValue get(final GInput input) {
+				return mapping.get(input);
+			}
+	
+			@Override
+			public void set(final GInput input, final GValue value) {
+				mapping.put(input, value);
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("mappingField", mapping);
+			}
+	
 		};
 	}
 

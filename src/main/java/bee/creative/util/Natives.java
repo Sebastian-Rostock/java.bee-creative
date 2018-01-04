@@ -13,7 +13,15 @@ import java.util.Arrays;
 public class Natives {
 
 	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
-	static final HashMap<String, Class<?>> parseClass = new HashMap<>(9);
+	static final HashMap<Object, Class<?>> parseClass = new HashMap<Object, Class<?>>(false) //
+		.allocate(9).insertAllKeysFrom(new Getter<Class<?>, Object>() {
+
+			@Override
+			public Object get(final Class<?> input) {
+				return input.getName();
+			}
+
+		}, byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class);
 
 	/** Dieses Feld speichert den {@link Getter} zu {@link #formatClass(Class)}. */
 	static final Getter<Class<?>, Object> formatClass = new Getter<Class<?>, Object>() {
@@ -25,12 +33,7 @@ public class Natives {
 
 	};
 
-	static {
-		final Class<?>[] classes = {byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class};
-		for (final Class<?> clazz: classes) {
-			Natives.parseClass.put(clazz.getName(), clazz);
-		}
-	}
+	{}
 
 	/** Diese Methode gibt das native Objekt zur gegebenen Pfadangabe zurück.<br>
 	 * Die Pfadangabe kodiert hierbei eine Klasse, eine Methode, einen Konstruktor oder ein Datenfeld. Die folgenden Pfadangaben werden unterstützt:

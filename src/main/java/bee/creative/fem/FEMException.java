@@ -165,12 +165,12 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * Wenn die Nachrichten {@code null} sind, werden sie ignoriert.
 	 *
 	 * @see #getMessages()
-	 * @see Iterables#appendAll(Collection, Iterable)
+	 * @see Iterables#addAll(Collection, Iterable)
 	 * @param messages Nachrichten oder {@code null}.
 	 * @return {@code this}. */
 	public final FEMException pushAll(final Iterable<String> messages) {
 		if (messages == null) return this;
-		Iterables.appendAll(this.messages, Iterables.filteredIterable(Filters.nullFilter(), messages));
+		Iterables.addAll(this.messages, Iterables.filteredIterable(Filters.nullFilter(), messages));
 		return this;
 	}
 

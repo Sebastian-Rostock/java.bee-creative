@@ -70,6 +70,19 @@ public class Iterables {
 		return -Iterators.skip(iterable.iterator(), -1) - 1;
 	}
 
+	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterable}s in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
+	 * {@link Collection} {@code true} zurück.
+	 *
+	 * @see Iterators#addAll(Collection, Iterator)
+	 * @param <GItem> Typ der Elemente.
+	 * @param collection {@link Collection}.
+	 * @param iterable {@link Iterable}.
+	 * @return {@code true} bei Veränderungen an der {@link Collection}.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
+	public static <GItem> boolean addAll(final Collection<GItem> collection, final Iterable<? extends GItem> iterable) throws NullPointerException {
+		return Iterators.addAll(collection, iterable.iterator());
+	}
+
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei
 	 * Veränderung des {@link Iterable}s {@code true} zurück.
 	 *
@@ -92,19 +105,6 @@ public class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist. */
 	public static boolean retainAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
 		return Iterators.retainAll(collection, iterable.iterator());
-	}
-
-	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterable}s in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
-	 * {@link Collection} {@code true} zurück.
-	 *
-	 * @see Iterators#appendAll(Collection, Iterator)
-	 * @param <GItem> Typ der Elemente.
-	 * @param collection {@link Collection}.
-	 * @param iterable {@link Iterable}.
-	 * @return {@code true} bei Veränderungen an der {@link Collection}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static <GItem> boolean appendAll(final Collection<GItem> collection, final Iterable<? extends GItem> iterable) throws NullPointerException {
-		return Iterators.appendAll(collection, iterable.iterator());
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s und gibt nur bei Veränderung des {@link Iterable}s {@code true} zurück.
@@ -430,7 +430,7 @@ public class Iterables {
 	}
 
 	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück.<br>
-	 * Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses geliefert. Andernfalls wird ein über {@link #appendAll(Collection, Iterable)} befülltes
+	 * Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses geliefert. Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes
 	 * {@link HashSet} geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
@@ -440,12 +440,12 @@ public class Iterables {
 	public static <GItem> Set<GItem> toSet(final Iterable<GItem> iterable) throws NullPointerException {
 		if (iterable instanceof Set<?>) return (Set<GItem>)iterable;
 		final HashSet<GItem> result = new HashSet<>();
-		Iterables.appendAll(result, iterable);
+		Iterables.addAll(result, iterable);
 		return result;
 	}
 
 	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link List} zurück.<br>
-	 * Wenn das gegebene {@link Iterable} eine {@link List} ist, wird diese geliefert. Andernfalls wird eine über {@link #appendAll(Collection, Iterable)}
+	 * Wenn das gegebene {@link Iterable} eine {@link List} ist, wird diese geliefert. Andernfalls wird eine über {@link #addAll(Collection, Iterable)}
 	 * befüllte {@link ArrayList} geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
@@ -455,7 +455,7 @@ public class Iterables {
 	public static <GItem> List<GItem> toList(final Iterable<GItem> iterable) throws NullPointerException {
 		if (iterable instanceof List<?>) return (List<GItem>)iterable;
 		final ArrayList<GItem> result = new ArrayList<>();
-		Iterables.appendAll(result, iterable);
+		Iterables.addAll(result, iterable);
 		result.trimToSize();
 		return result;
 	}

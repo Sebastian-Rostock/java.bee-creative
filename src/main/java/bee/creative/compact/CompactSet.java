@@ -87,7 +87,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	/** {@inheritDoc} */
 	@Override
 	public final boolean addAll(final Collection<? extends GItem> collection) {
-		return Iterables.appendAll(this, collection);
+		return Iterables.addAll(this, collection);
 	}
 
 	/** {@inheritDoc} */
