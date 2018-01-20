@@ -9,21 +9,11 @@ import java.util.Map;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
-	/** Dieses Feld speichert den neutralen {@link Setter}, der seine Eingaben ignoriert. */
-	public static final Setter<?, ?> NEUTRAL_SETTER = new Setter<Object, Object>() {
-
-		@Override
-		public void set(final Object input, final Object value) {
-		}
-
-		@Override
-		public String toString() {
-			return "NEUTRAL_SETTER";
-		}
-
-	};
-
-	{}
+	/** Diese Methode ist eine Abkürzung für {@code Fields.emptyField()}. */
+	@SuppressWarnings ("javadoc")
+	public static <GValue> Setter<Object, GValue> emptySetter() {
+		return Fields.emptyField();
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(Natives.parseMethod(methodText))}.
 	 *
@@ -77,16 +67,6 @@ public class Setters {
 			}
 
 		};
-	}
-
-	/** Diese Methode gibt den neutralen {@link Setter} zurück, der Eingabe und Wert ignoriert.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts.
-	 * @return {@link #NEUTRAL_SETTER}. */
-	@SuppressWarnings ("unchecked")
-	public static <GInput, GValue> Setter<GInput, GValue> neutralSetter() {
-		return (Setter<GInput, GValue>)Setters.NEUTRAL_SETTER;
 	}
 
 	/** Diese Methode einen {@link Setter} zurück, der seine Eingabe nur dann an den gegebenen {@link Setter} delegiert, wenn diese nicht {@code null} ist.
@@ -185,7 +165,7 @@ public class Setters {
 
 	/** Diese Methode ist eine Abkürzung für {@code Setters.aggregatedSetter(setter, Getters.neutralGetter())}.
 	 *
-	 * @see #neutralSetter()
+	 * @see #emptySetter()
 	 * @see #aggregatedSetter(Setter, Setter, Object, Object) */
 	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<Iterable<? extends GItem>, GValue> aggregatedSetter(final Setter<? super GItem, GValue> setter)

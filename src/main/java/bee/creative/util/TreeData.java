@@ -19,10 +19,9 @@ import java.util.SortedSet;
 // nagativ, wenn prevs, positiv, wenn nexts gemeint
 // 0= wenn undefiniert, 1... in nexts, ...-1 in ptevs
 
-class _TreeData_ {
 
 	// Die Algorithmen zur Balanzierung sind dem "Skriptum Informatik - eine konventionelle Einführung" von Hans-Jürgen Appelrath und Jochen Ludewig entnommen.
-	static class TreeData<GKey, GValue> {
+	class TreeData<GKey, GValue> {
 
 		@SuppressWarnings ("javadoc")
 		protected static class TreeEntry<GKey, GValue> implements Entry<GKey, GValue> {
@@ -1475,4 +1474,3 @@ class _TreeData_ {
 
 	}
 
-}

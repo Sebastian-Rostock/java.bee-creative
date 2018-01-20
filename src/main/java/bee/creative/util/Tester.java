@@ -168,31 +168,27 @@ public class Tester {
 	/** Dieser Konstruktor initialisiert diesen {@link Tester} als arithmetisches Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
 	 *
 	 * @param testers {@link Tester}, deren arithmetisches Mittel errechnet wird.
-	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code testers} leer ist. */
-	public Tester(final Tester... testers) throws NullPointerException, IllegalArgumentException {
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
+	public Tester(final Tester... testers) throws NullPointerException {
 		this(Arrays.asList(testers));
 	}
 
-	/** Dieser Konstruktor initialisiert diesen {@link Tester} als arithmetisches Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
+	/** Dieser Konstruktor initialisiert diesen {@link Tester} mit dem Minimum von {@link #usedTime} und {@link #usedMemory} der gegebenen {@link Tester}.
 	 *
-	 * @param testers {@link Tester}, deren arithmetisches Mittel errechnet wird.
-	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code testers} leer ist. */
-	public Tester(final List<Tester> testers) throws NullPointerException, IllegalArgumentException {
-		final int count = testers.size();
-		if (count == 0) throw new IllegalArgumentException();
-		long usedTime = 0, usedMemory = 0;
+	 * @param testers {@link Tester}, deren Minimum ermittelt wird.
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
+	public Tester(final List<Tester> testers) throws NullPointerException {
+		long usedTime = Long.MAX_VALUE, usedMemory = Long.MAX_VALUE;
 		for (final Tester tester: testers) {
-			usedTime += tester.usedTime;
-			usedMemory += tester.usedMemory;
+			usedTime = Math.min(usedTime, tester.usedTime);
+			usedMemory = Math.min(usedMemory, tester.usedMemory);
 		}
-		this.usedTime = usedTime / count;
-		this.usedMemory = usedMemory / count;
+		this.usedTime = usedTime;
+		this.usedMemory = usedMemory;
 		this.enterTime = 0;
 		this.enterMemory = 0;
-		this.leaveTime = this.usedTime;
-		this.leaveMemory = this.usedMemory;
+		this.leaveTime = usedTime;
+		this.leaveMemory = usedMemory;
 		this.cause = null;
 	}
 

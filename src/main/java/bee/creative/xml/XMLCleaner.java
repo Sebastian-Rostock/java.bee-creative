@@ -106,8 +106,8 @@ public final class XMLCleaner {
 	 * @return {@code this}.
 	 * @throws IllegalStateException Wenn {@link File} oder {@link Charset} unzulässig konfiguriert sind. */
 	public final XMLCleaner cleanup() throws IllegalStateException {
-		final File path = this.fileData.get();
-		final Charset charset = this.charsetData.get();
+		final File path = this.fileData.build();
+		final Charset charset = this.charsetData.build();
 		if ((path == null) || (charset == null)) throw new IllegalStateException();
 		if (path.isDirectory()) {
 			final File[] list = path.listFiles();

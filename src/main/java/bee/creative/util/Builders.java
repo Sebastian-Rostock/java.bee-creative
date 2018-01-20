@@ -6,44 +6,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import bee.creative.util.Pointers.SoftPointer;
 
 /** Diese Klasse implementiert grundlegende {@link Builder}.
- * <p>
- * Im nachfolgenden Beispiel wird ein gepufferter {@link Builder} zur realisierung eines statischen Caches für Instanzen der exemplarischen Klasse
- * {@code Helper} verwendet: <pre>
- * public final class Helper {
- *
- *   static final {@literal Builder<Helper> CACHE = Builders.synchronizedBuilder(Builders.bufferedBuilder(new Builder<Helper>()} {
- *
- *     public Helper build() {
- *       return new Helper();
- *     }
- *
- *   }));
- *
- *   public static Helper get() {
- *     return Helper.CACHE.build();
- *   }
- *
- *   protected Helper() {
- *     ...
- *   }
- *
- *   ...
- *
- * }
- * </pre>
  *
  * @see Builder
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -66,12 +40,12 @@ public class Builders {
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für einen Wert.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ des Werts.
+	 * @param <GResult> Typ des Werts.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseValueBuilder<GValue, GThis> extends BaseBuilder<GValue, GThis> implements Iterable<GValue> {
+	public static abstract class BaseValueBuilder<GResult, GThis> extends BaseBuilder<GResult, GThis> implements Iterable<GResult> {
 
 		/** Dieses Feld speichert den Wert. */
-		protected GValue value;
+		protected GResult result;
 
 		/** Dieser Konstruktor initialisiert den Wert mit {@code null}. */
 		public BaseValueBuilder() {
@@ -79,39 +53,31 @@ public class Builders {
 
 		{}
 
-		/** Diese Methode gibt den Wert zurück.
-		 *
-		 * @see #use(Object)
-		 * @return Wert. */
-		public final GValue get() {
-			return this.value;
-		}
-
 		/** Diese Methode setzt den Wert und gibt {@code this} zurück.
 		 *
-		 * @see #get()
+		 * @see #build()
 		 * @param value Wert.
 		 * @return {@code this}. */
-		public final GThis use(final GValue value) {
-			this.value = value;
+		public GThis use(final GResult value) {
+			this.result = value;
 			return this.customThis();
 		}
 
 		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 		 *
 		 * @see #use(Object)
-		 * @param data Konfigurator oder {@code null}.
-		 * @return {@code this}. */
-		public final GThis use(final BaseValueBuilder<? extends GValue, ?> data) {
-			if (data == null) return this.customThis();
-			return this.use(data.value);
+		 * @param source Konfigurator.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+		public GThis use(final BaseValueBuilder<? extends GResult, ?> source) throws NullPointerException {
+			return this.use(source.result);
 		}
 
 		/** Diese Methode setzt den Wert auf {@code null} und gibt {@code this} zurück.
 		 *
 		 * @return {@code this}. */
-		public final GThis clear() {
-			this.value = null;
+		public GThis clear() {
+			this.result = null;
 			return this.customThis();
 		}
 
@@ -119,22 +85,22 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		public final GValue build() throws IllegalStateException {
-			return this.value;
+		public final GResult build() throws IllegalStateException {
+			return this.result;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final Iterator<GValue> iterator() {
-			final GValue value = this.value;
-			if (value == null) return Iterators.emptyIterator();
-			return Iterators.itemIterator(value);
+		public final Iterator<GResult> iterator() {
+			final GResult result = this.result;
+			if (result == null) return Iterators.emptyIterator();
+			return Iterators.itemIterator(result);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final String toString() {
-			return Objects.toString(true, this.value);
+		public String toString() {
+			return Objects.toString(true, this.result);
 		}
 
 	}
@@ -143,124 +109,135 @@ public class Builders {
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
-	 * @param <GItems> Typ der Sammlung.
+	 * @param <GResult> Typ der Sammlung.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseItemsBuilder<GItem, GItems extends Collection<GItem>, GThis> extends BaseBuilder<GItems, GThis> implements Iterable<GItem> {
+	public static abstract class BaseSetBuilder<GItem, GResult extends Collection<GItem>, GThis> extends BaseBuilder<GResult, GThis> implements Iterable<GItem> {
 
 		/** Dieses Feld speichert die Sammlung. */
-		protected GItems items;
+		protected GResult result;
 
 		/** Dieser Konstruktor initialisiert die interne Sammlung.
 		 *
-		 * @param items Sammlung.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		protected BaseItemsBuilder(final GItems items) throws NullPointerException {
-			this.items = Objects.assertNotNull(items);
+		 * @param result Sammlung.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		protected BaseSetBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.assertNotNull(result);
 		}
 
 		{}
 
 		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 		 *
-		 * @see #clearItems()
-		 * @see #useItems(Iterable)
-		 * @param data Konfigurator oder {@code null}.
-		 * @return {@code this}. */
-		public final GThis use(final BaseItemsBuilder<? extends GItem, ?, ?> data) {
-			if (data == null) return this.customThis();
-			this.clearItems();
-			return this.useItems(data);
+		 * @see #clear()
+		 * @see #putAll(Iterable)
+		 * @param source Konfigurator.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+		public GThis use(final BaseSetBuilder<? extends GItem, ?, ?> source) throws NullPointerException {
+			Objects.assertNotNull(source);
+			this.clear();
+			return this.putAll(source.result);
 		}
 
-		/** Diese Methode fügt das gegebene Element zur {@link #getItems() internen Sammlung} hinzu und gibt {@code this} zurück.
+		/** Diese Methode {@link Collection#add(Object) fügt das gegebene Element} der {@link #build() internen Sammlung} hinzu und gibt {@code this} zurück.
 		 *
 		 * @param item Element.
 		 * @return {@code this}. */
-		public final GThis useItem(final GItem item) {
-			this.items.add(item);
+		public GThis put(final GItem item) {
+			this.result.add(item);
 			return this.customThis();
 		}
 
-		/** Diese Methode fügt die gegebenen Elemente zur {@link #getItems() internen Sammlung} hinzu und gibt {@code this} zurück.
+		/** Diese Methode {@link Collection#add(Object) fügt die gegebenen Element} der {@link #build() internen Sammlung} hinzu und gibt {@code this} zurück.
 		 *
-		 * @param items Elemente oder {@code null}.
+		 * @param items Elemente.
 		 * @return {@code this}. */
-		public final GThis useItems(final Iterable<? extends GItem> items) {
-			if (items == null) return this.customThis();
-			Iterables.addAll(this.items, items);
+		@SuppressWarnings ("unchecked")
+		public GThis putAll(final GItem... items) {
+			return this.putAll(Arrays.asList(items));
+		}
+
+		/** Diese Methode {@link Collection#add(Object) fügt die gegebenen Element} der {@link #build() internen Sammlung} hinzu und gibt {@code this} zurück.
+		 *
+		 * @param items Elemente.
+		 * @return {@code this}. */
+		public GThis putAll(final Iterator<? extends GItem> items) {
+			while (items.hasNext()) {
+				this.result.add(items.next());
+			}
 			return this.customThis();
 		}
 
-		/** Diese Methode ist eine Abkürtung für {@code this.useItems(Arrays.asList(items))}.
+		/** Diese Methode {@link Collection#add(Object) fügt die gegebenen Element} der {@link #build() internen Sammlung} hinzu und gibt {@code this} zurück.
 		 *
-		 * @see #useItems(Iterable)
-		 * @see Arrays#asList(Object...) */
-		@SuppressWarnings ({"javadoc", "unchecked"})
-		public final GThis useItems(final GItem... items) {
-			return this.useItems(Arrays.asList(items));
-		}
-
-		/** Diese Methode gibt die interne Sammlung zurück.
-		 *
-		 * @return interne Sammlung. */
-		public final GItems getItems() {
-			return this.items;
-		}
-
-		/** Diese Methode leert die {@link #getItems() interne Sammlung} und gibt {@code this} zurück.
-		 *
+		 * @param items Elemente.
 		 * @return {@code this}. */
-		public final GThis clearItems() {
-			this.items.clear();
+		public GThis putAll(final Iterable<? extends GItem> items) {
+			return this.putAll(items.iterator());
+		}
+
+		/** Diese Methode {@link Collection#remove(Object) entfern das gegebene Element} und gibt {@code this} zurück.
+		 *
+		 * @param key Schlüssel.
+		 * @return {@code this}. */
+		public GThis pop(final Object key) {
+			this.result.remove(key);
 			return this.customThis();
 		}
 
-		/** Diese Methode macht die {@link #getItems() interne Sammlung} datentypsicher und gibt {@code this} zurück.
+		/** Diese Methode {@link Collection#remove(Object) entfern die gegebenen Elemente} und gibt {@code this} zurück.
 		 *
-		 * @see java.util.Collections#checkedSet(Set, Class)
-		 * @see java.util.Collections#checkedSortedSet(SortedSet, Class)
-		 * @see java.util.Collections#checkedList(List, Class)
-		 * @see java.util.Collections#checkedCollection(Collection, Class)
-		 * @param clazz Klasse der Elemente.
+		 * @param items Elemente.
 		 * @return {@code this}. */
-		protected abstract GThis makeChecked(Class<GItem> clazz);
+		public GThis popAll(final Object... items) {
+			return this.popAll(Arrays.asList(items));
+		}
 
-		/** Diese Methode macht die {@link #getItems() interne Sammlung} threadsicher und gibt {@code this} zurück.
+		/** Diese Methode {@link Collection#remove(Object) entfern die gegebenen Elemente} und gibt {@code this} zurück.
 		 *
-		 * @see java.util.Collections#synchronizedSet(Set)
-		 * @see java.util.Collections#synchronizedSortedSet(SortedSet)
-		 * @see java.util.Collections#synchronizedList(List)
-		 * @see java.util.Collections#synchronizedCollection(Collection)
+		 * @param items Elemente.
 		 * @return {@code this}. */
-		protected abstract GThis makeSynchronized();
+		public GThis popAll(final Iterator<?> items) {
+			while (items.hasNext()) {
+				this.result.remove(items.next());
+			}
+			return this.customThis();
+		}
 
-		/** Diese Methode macht die {@link #getItems() interne Sammlung} unveränderlich und gibt {@code this} zurück.
+		/** Diese Methode {@link Map#remove(Object) entfern die gegebenen Elemente} und gibt {@code this} zurück.
 		 *
-		 * @see java.util.Collections#unmodifiableSet(Set)
-		 * @see java.util.Collections#unmodifiableSortedSet(SortedSet)
-		 * @see java.util.Collections#unmodifiableList(List)
-		 * @see java.util.Collections#unmodifiableCollection(Collection)
+		 * @param items Elemente.
 		 * @return {@code this}. */
-		protected abstract GThis makeUnmodifiable();
+		public GThis popAll(final Iterable<?> items) {
+			return this.popAll(items.iterator());
+		}
+
+		/** Diese Methode {@link Collection#clear() entfern alle Elemente} und gibt {@code this} zurück.
+		 *
+		 * @return {@code this}. */
+		public GThis clear() {
+			this.result.clear();
+			return this.customThis();
+		}
 
 		{}
 
 		/** {@inheritDoc} */
 		@Override
-		public final GItems build() throws IllegalStateException {
-			return this.items;
+		public final GResult build() throws IllegalStateException {
+			return this.result;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<GItem> iterator() {
-			return this.items.iterator();
+			return this.result.iterator();
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final String toString() {
-			return Objects.toString(true, this.items);
+		public String toString() {
+			return Objects.toString(true, this.result);
 		}
 
 	}
@@ -268,91 +245,298 @@ public class Builders {
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link Map}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung.
-	 * @param <GEntries> Typ der {@link Map}.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 * @param <GResult> Typ der {@link Map}.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseEntriesBuilder<GKey, GValue, GEntries extends Map<GKey, GValue>, GThis> extends BaseBuilder<GEntries, GThis>
+	public static abstract class BaseMapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>, GThis> extends BaseBuilder<GResult, GThis>
 		implements Iterable<Entry<GKey, GValue>> {
 
-		/** Dieses Feld speichert den über {@link #forKey(Object)} gewählten Schlüssel. */
+		/** Dieses Feld speichert den über {@link #forKey(Object)} gewählten Schlüssel, der in {@link #useValue(Object)} eingesetzt wird. */
 		protected GKey key;
 
 		/** Dieses Feld speichert die interne {@link Map}. */
-		protected GEntries entries;
+		protected GResult result;
 
 		/** Dieser Konstruktor initialisiert die interne {@link Map}.
 		 *
-		 * @param entries interne {@link Map}.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		protected BaseEntriesBuilder(final GEntries entries) throws NullPointerException {
-			this.entries = Objects.assertNotNull(entries);
+		 * @param result interne {@link Map}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		protected BaseMapBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.assertNotNull(result);
 		}
 
 		{}
 
+		@SuppressWarnings ("javadoc")
+		void putImpl(final Entry<? extends GKey, ? extends GValue> entry) {
+			this.result.put(entry.getKey(), entry.getValue());
+		}
+
+		@SuppressWarnings ("javadoc")
+		void putKeyFromImpl(final Getter<? super GValue, ? extends GKey> key, final GValue value) {
+			this.result.put(key.get(value), value);
+		}
+
+		@SuppressWarnings ("javadoc")
+		void putValueFromImpl(final Getter<? super GKey, ? extends GValue> value, final GKey key) {
+			this.result.put(key, value.get(key));
+		}
+
+		@SuppressWarnings ("javadoc")
+		void putInverseImpl(final Entry<? extends GValue, ? extends GKey> entry) {
+			this.result.put(entry.getValue(), entry.getKey());
+		}
+
 		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 		 *
-		 * @see #clearEntries()
-		 * @see #useEntries(Iterable)
-		 * @param data Konfigurator oder {@code null}.
-		 * @return {@code this}. */
-		public final GThis use(final BaseEntriesBuilder<? extends GKey, ? extends GValue, ?, ?> data) {
-			if (data == null) return this.customThis();
-			this.clearEntries();
-			return this.useEntries(data.getEntries());
+		 * @see #clear()
+		 * @see #putAll(Map)
+		 * @param source Konfigurator.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+		public GThis use(final BaseMapBuilder<? extends GKey, ? extends GValue, ?, ?> source) throws NullPointerException {
+			Objects.assertNotNull(source);
+			return this.putAll(source.result);
 		}
 
-		/** Diese Methode fügt den gegebenen Eintrag zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
+		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
 		 *
-		 * @see #useEntry(Object, Object)
 		 * @param entry Eintrag.
 		 * @return {@code this}. */
-		public final GThis useEntry(final Entry<? extends GKey, ? extends GValue> entry) {
-			if (entry == null) return this.customThis();
-			return this.useEntry(entry.getKey(), entry.getValue());
-		}
-
-		/** Diese Methode fügt den gegebenen Eintrag zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
-		 *
-		 * @see Map#put(Object, Object)
-		 * @param key Schlüssel.
-		 * @param value Wert.
-		 * @return {@code this}. */
-		public final GThis useEntry(final GKey key, final GValue value) {
-			this.entries.put(key, value);
+		public GThis put(final Entry<? extends GKey, ? extends GValue> entry) {
+			this.putImpl(entry);
 			return this.customThis();
 		}
 
-		/** Diese Methode fügt die gegebenen Einträge zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
+		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
 		 *
-		 * @see #useEntries(Iterable)
-		 * @param entries Einträge oder {@code null}.
+		 * @param key Schlüssel des Eintrags.
+		 * @param value Wert des Eintrags.
 		 * @return {@code this}. */
-		public final GThis useEntries(final Map<? extends GKey, ? extends GValue> entries) {
-			if (entries == null) return this.customThis();
-			return this.useEntries(entries.entrySet());
+		public GThis put(final GKey key, final GValue value) {
+			this.result.put(key, value);
+			return this.customThis();
 		}
 
-		/** Diese Methode fügt die gegebenen Einträge zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
+		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
 		 *
-		 * @see #useEntry(Entry)
-		 * @param entries Einträge oder {@code null}.
+		 * @param key {@link Getter} zur Ermittlung des Schlüssels zum gegebenen Wert des Eintrags.
+		 * @param value Wert des Eintrags.
 		 * @return {@code this}. */
-		public final GThis useEntries(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-			if (entries == null) return this.customThis();
-			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
-				this.useEntry(entry);
+		public GThis putKeyFrom(final Getter<? super GValue, ? extends GKey> key, final GValue value) {
+			this.putKeyFromImpl(key, value);
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
+		 *
+		 * @param value {@link Getter} zur Ermittlung des Werts zum gegebenen Schlüssel des Eintrags.
+		 * @param key Schlüssel des Eintrags.
+		 * @return {@code this}. */
+		public GThis putValueFrom(final Getter<? super GKey, ? extends GValue> value, final GKey key) {
+			this.putValueFromImpl(value, key);
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag invertiert ein} und gibt {@code this} zurück.<br>
+		 * Schlüssel und Wert des Eintrags werden dazu als Wert bzw. Schlüssel verwendet.
+		 *
+		 * @param entry Eintrag.
+		 * @return {@code this}. */
+		public GThis putInverse(final Entry<? extends GValue, ? extends GKey> entry) {
+			this.putInverseImpl(entry);
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param entries Einträge.
+		 * @return {@code this}. */
+		public GThis putAll(final Map<? extends GKey, ? extends GValue> entries) {
+			return this.putAll(entries.entrySet());
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param entries Einträge.
+		 * @return {@code this}. */
+		public GThis putAll(final Iterator<? extends Entry<? extends GKey, ? extends GValue>> entries) {
+			while (entries.hasNext()) {
+				this.putImpl(entries.next());
 			}
 			return this.customThis();
 		}
 
-		/** Diese Methode gibt die interne {@link Map} zurück.
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
 		 *
-		 * @see BaseEntriesBuilder#BaseEntriesBuilder(Map)
-		 * @return interne Abbildung. */
-		public final GEntries getEntries() {
-			return this.entries;
+		 * @param entries Einträge.
+		 * @return {@code this}. */
+		public GThis putAll(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
+			return this.putAll(entries.iterator());
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param keys Schlüssel der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		public GThis putAll(final GKey[] keys, final GValue[] values) {
+			return this.putAll(Arrays.asList(keys), Arrays.asList(values));
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param keys Schlüssel der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		public GThis putAll(final Iterator<? extends GKey> keys, final Iterator<? extends GValue> values) {
+			while (keys.hasNext() && values.hasNext()) {
+				this.put(keys.next(), values.next());
+			}
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param keys Schlüssel der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		public GThis putAll(final Iterable<? extends GKey> keys, final Iterable<? extends GValue> values) {
+			return this.putAll(keys.iterator(), values.iterator());
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		@SuppressWarnings ("unchecked")
+		public GThis putAllKeysFrom(final Getter<? super GValue, ? extends GKey> key, final GValue... values) {
+			return this.putAllKeysFrom(key, Arrays.asList(values));
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		public GThis putAllKeysFrom(final Getter<? super GValue, ? extends GKey> key, final Iterator<? extends GValue> values) {
+			while (values.hasNext()) {
+				this.putKeyFromImpl(key, values.next());
+			}
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		public GThis putAllKeysFrom(final Getter<? super GValue, ? extends GKey> key, final Iterable<? extends GValue> values) {
+			return this.putAllKeysFrom(key, values.iterator());
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
+		 * @param keys Schlüssel der Einträge.
+		 * @return {@code this}. */
+		@SuppressWarnings ("unchecked")
+		public GThis putAllValuesFrom(final Getter<? super GKey, ? extends GValue> value, final GKey... keys) {
+			return this.putAllValuesFrom(value, Arrays.asList(keys));
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
+		 * @param keys Schlüssel der Einträge.
+		 * @return {@code this}. */
+		public GThis putAllValuesFrom(final Getter<? super GKey, ? extends GValue> value, final Iterator<? extends GKey> keys) {
+			while (keys.hasNext()) {
+				this.putValueFromImpl(value, keys.next());
+			}
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
+		 * @param keys Schlüssel der Einträge.
+		 * @return {@code this}. */
+		public GThis putAllValuesFrom(final Getter<? super GKey, ? extends GValue> value, final Iterable<? extends GKey> keys) {
+			return this.putAllValuesFrom(value, keys.iterator());
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge invertiert ein} und gibt {@code this} zurück.
+		 *
+		 * @param entries Einträge.
+		 * @return {@code this}. */
+		public GThis putAllInverse(final Map<? extends GValue, ? extends GKey> entries) {
+			return this.putAllInverse(entries.entrySet());
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge invertiert ein} und gibt {@code this} zurück.
+		 *
+		 * @param entries Einträge.
+		 * @return {@code this}. */
+		public GThis putAllInverse(final Iterator<? extends Entry<? extends GValue, ? extends GKey>> entries) {
+			while (entries.hasNext()) {
+				this.putInverseImpl(entries.next());
+			}
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge invertiert ein} und gibt {@code this} zurück.
+		 *
+		 * @param entries Einträge.
+		 * @return {@code this}. */
+		public GThis putAllInverse(final Iterable<? extends Entry<? extends GValue, ? extends GKey>> entries) {
+			return this.putAllInverse(entries.iterator());
+		}
+
+		/** Diese Methode {@link Map#remove(Object) entfern den Eintrag mit dem gegebenen Schlüssel} und gibt {@code this} zurück.
+		 *
+		 * @param key Schlüssel.
+		 * @return {@code this}. */
+		public GThis pop(final Object key) {
+			this.result.remove(key);
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#remove(Object) entfern die Einträge mit dem gegebenen Schlüssel} und gibt {@code this} zurück.
+		 *
+		 * @param keys Schlüssel der Einträge.
+		 * @return {@code this}. */
+		public GThis popAll(final Object... keys) {
+			return this.popAll(Arrays.asList(keys));
+		}
+
+		/** Diese Methode {@link Map#remove(Object) entfern die Einträge mit dem gegebenen Schlüssel} und gibt {@code this} zurück.
+		 *
+		 * @param keys Schlüssel der Einträge.
+		 * @return {@code this}. */
+		public GThis popAll(final Iterator<?> keys) {
+			while (keys.hasNext()) {
+				this.result.remove(keys.next());
+			}
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#remove(Object) entfern die Einträge mit dem gegebenen Schlüssel} und gibt {@code this} zurück.
+		 *
+		 * @param keys Schlüssel der Einträge.
+		 * @return {@code this}. */
+		public GThis popAll(final Iterable<?> keys) {
+			return this.popAll(keys.iterator());
+		}
+
+		/** Diese Methode {@link Map#clear() entfern alle Einträge} und gibt {@code this} zurück.
+		 *
+		 * @return {@code this}. */
+		public GThis clear() {
+			this.result.clear();
+			return this.customThis();
 		}
 
 		/** Diese Methode wählt den gegebenen Schlüssel und gibt {@code this} zurück. Dieser Schlüssel wird in den nachfolgenden Aufrufen von {@link #getValue()}
@@ -362,7 +546,7 @@ public class Builders {
 		 * @see #useValue(Object)
 		 * @param key Schlüssel.
 		 * @return {@code this}. */
-		public final GThis forKey(final GKey key) {
+		public GThis forKey(final GKey key) {
 			this.key = key;
 			return this.customThis();
 		}
@@ -372,8 +556,8 @@ public class Builders {
 		 * @see #forKey(Object)
 		 * @see #useValue(Object)
 		 * @return Wert zum gewählten Schlüssel. */
-		public final GValue getValue() {
-			return this.entries.get(this.key);
+		public GValue getValue() {
+			return this.result.get(this.key);
 		}
 
 		/** Diese Methode setzt den Wert zum {@link #forKey(Object) gewählten Schlüssel} und gibt {@code this} zurück.
@@ -382,678 +566,176 @@ public class Builders {
 		 * @see #getValue()
 		 * @param value Wert.
 		 * @return {@code this}. */
-		public final GThis useValue(final GValue value) {
-			this.useEntry(this.key, value);
+		public GThis useValue(final GValue value) {
+			this.put(this.key, value);
 			return this.customThis();
 		}
-
-		/** Diese Methode leert die {@link #getEntries() interne Abbildung} und gibt {@code this} zurück.
-		 *
-		 * @return {@code this}. */
-		public final GThis clearEntries() {
-			this.entries.clear();
-			return this.customThis();
-		}
-
-		/** Diese Methode macht die {@link #getEntries() interne Abbildung} datentypsicher und gibt {@code this} zurück.
-		 *
-		 * @see java.util.Collections#checkedMap(Map, Class, Class)
-		 * @see java.util.Collections#checkedSortedMap(SortedMap, Class, Class)
-		 * @param keyClazz Klasse der Schlüssel.
-		 * @param valueClazz Klasse der Werte.
-		 * @return {@code this}. */
-		protected abstract GThis makeChecked(Class<GKey> keyClazz, Class<GValue> valueClazz);
-
-		/** Diese Methode macht die {@link #getEntries() interne Abbildung} threadsicher und gibt {@code this} zurück.
-		 *
-		 * @see java.util.Collections#synchronizedMap(Map)
-		 * @see java.util.Collections#synchronizedSortedMap(SortedMap)
-		 * @return {@code this}. */
-		protected abstract GThis makeSynchronized();
-
-		/** Diese Methode macht die {@link #getEntries() interne Abbildung} unveränderlich und gibt {@code this} zurück.
-		 *
-		 * @see java.util.Collections#unmodifiableMap(Map)
-		 * @see java.util.Collections#unmodifiableSortedMap(SortedMap)
-		 * @return {@code this}. */
-		protected abstract GThis makeUnmodifiable();
 
 		{}
 
-		/** {@inheritDoc}
-		 *
-		 * @see #getEntries() */
+		/** Diese Methode gibt die intere Abbildung zurück. */
 		@Override
-		public final GEntries build() throws IllegalStateException {
-			return this.getEntries();
+		public final GResult build() throws IllegalStateException {
+			return this.result;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<Entry<GKey, GValue>> iterator() {
-			return this.entries.entrySet().iterator();
+			return this.result.entrySet().iterator();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
-			return Objects.toString(true, this.entries);
+			return Objects.toString(true, this.result);
 		}
 
 	}
 
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link Set}.
+	/** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link HashSet}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSetBuilder<GItem, GThis> extends BaseItemsBuilder<GItem, Set<GItem>, GThis> {
+	public static abstract class BaseSetData<GItem, GThis> extends BaseSetBuilder<GItem, Set<GItem>, GThis> {
 
 		/** Dieser Konstruktor initialisiert das interne {@link HashSet}. */
-		public BaseSetBuilder() {
+		public BaseSetData() {
 			super(new HashSet<GItem>());
 		}
 
-		/** Dieser Konstruktor initialisiert das interne {@link Set}.
-		 *
-		 * @param items {@link Set}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public BaseSetBuilder(final Set<GItem> items) throws NullPointerException {
-			super(items);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeChecked(final Class<GItem> clazz) {
-			this.items = Collections.checkedSet(this.items, clazz);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeSynchronized() {
-			this.items = Collections.synchronizedSet(this.items);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeUnmodifiable() {
-			this.items = Collections.unmodifiableSet(this.items);
-			return this.customThis();
-		}
-
 	}
 
-	/** Diese Klasse implementiert einen {@link BaseSetBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class)}, {@link #makeSynchronized()} und
-	 * {@link #makeUnmodifiable()}.
+	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link HashMap}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSetBuilder2<GItem, GThis> extends BaseSetBuilder<GItem, GThis> {
-
-		/** Dieser Konstruktor initialisiert das interne {@link Set}.
-		 *
-		 * @param items {@link Set}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public BaseSetBuilder2(final Set<GItem> items) throws NullPointerException {
-			super(items);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeChecked(final Class<GItem> clazz) {
-			return super.makeChecked(clazz);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeSynchronized() {
-			return super.makeSynchronized();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeUnmodifiable() {
-			return super.makeUnmodifiable();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link List}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseListBuilder<GItem, GThis> extends BaseItemsBuilder<GItem, List<GItem>, GThis> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link List}.
-		 *
-		 * @param items {@link List}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public BaseListBuilder(final List<GItem> items) throws NullPointerException {
-			super(items);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeChecked(final Class<GItem> clazz) {
-			this.items = Collections.checkedList(this.items, clazz);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeSynchronized() {
-			this.items = Collections.synchronizedList(this.items);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeUnmodifiable() {
-			this.items = Collections.unmodifiableList(this.items);
-			return this.customThis();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen {@link BaseListBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class)}, {@link #makeSynchronized()} und
-	 * {@link #makeUnmodifiable()}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseListBuilder2<GItem, GThis> extends BaseListBuilder<GItem, GThis> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link List}.
-		 *
-		 * @param items {@link List}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public BaseListBuilder2(final List<GItem> items) throws NullPointerException {
-			super(items);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeChecked(final Class<GItem> clazz) {
-			return super.makeChecked(clazz);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeSynchronized() {
-			this.items = Collections.synchronizedList(this.items);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeUnmodifiable() {
-			this.items = Collections.unmodifiableList(this.items);
-			return this.customThis();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link Map}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseMapBuilder<GKey, GValue, GThis> extends BaseEntriesBuilder<GKey, GValue, Map<GKey, GValue>, GThis> {
+	public static abstract class BaseMapData<GKey, GValue, GThis> extends BaseMapBuilder<GKey, GValue, Map<GKey, GValue>, GThis> {
 
 		/** Dieser Konstruktor initialisiert die interne {@link HashMap}. */
-		public BaseMapBuilder() {
+		public BaseMapData() {
 			super(new HashMap<GKey, GValue>());
 		}
 
-		/** Dieser Konstruktor initialisiert die interne Abbildung.
+	}
+
+	/** Diese Klasse implementiert . Diese Schnittstelle definiert .
+	 *
+	 * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 * @param <GResult> Typ der {@link Map}. */
+	public static class MapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>>
+		extends BaseMapBuilder<GKey, GValue, GResult, MapBuilder<GKey, GValue, GResult>> {
+
+		/** Diese Methode gibt einen {@link MapBuilder} zur gegebenen {@link Map} zurück.
 		 *
-		 * @param entries interne Abbildung.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public BaseMapBuilder(final Map<GKey, GValue> entries) throws NullPointerException {
-			super(entries);
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 * @param <GResult> Typ der {@link Map}.
+		 * @param result {@link Map}.
+		 * @return {@link MapBuilder}. */
+		public static <GKey, GValue, GResult extends Map<GKey, GValue>> MapBuilder<GKey, GValue, GResult> from(final GResult result) {
+			return new MapBuilder<>(result);
 		}
 
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
-			this.entries = Collections.checkedMap(this.entries, keyClazz, valueClazz);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeSynchronized() {
-			this.entries = Collections.synchronizedMap(this.entries);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeUnmodifiable() {
-			this.entries = Collections.unmodifiableMap(this.entries);
-			return this.customThis();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen {@link BaseMapBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class, Class)}, {@link #makeSynchronized()}
-	 * und {@link #makeUnmodifiable()}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseMapBuilder2<GKey, GValue, GThis> extends BaseMapBuilder<GKey, GValue, GThis> {
-
-		/** Dieser Konstruktor initialisiert die interne Abbildung.
+		/** Diese Methode gibt einen {@link MapBuilder} zu einer neuen {@link TreeMap} mit natürlicher Ordnung zurück.
 		 *
-		 * @param entries interne Abbildung.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public BaseMapBuilder2(final Map<GKey, GValue> entries) throws NullPointerException {
-			super(entries);
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 * @return {@link MapBuilder} einer {@link TreeMap}. */
+		public static <GKey, GValue> MapBuilder<GKey, GValue, TreeMap<GKey, GValue>> forTreeMap() {
+			return MapBuilder.forTreeMap(null);
 		}
 
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
-			return super.makeChecked(keyClazz, valueClazz);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeSynchronized() {
-			return super.makeSynchronized();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeUnmodifiable() {
-			return super.makeUnmodifiable();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link Collection}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseCollectionBuilder<GItem, GThis> extends BaseItemsBuilder<GItem, Collection<GItem>, GThis> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link Collection}.
+		/** Diese Methode gibt einen {@link MapBuilder} zu einer neuen {@link TreeMap} zurück.
 		 *
-		 * @param items {@link Collection}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public BaseCollectionBuilder(final Collection<GItem> items) throws NullPointerException {
-			super(items);
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 * @param comparator Ordnung der Schlüssel.
+		 * @return {@link MapBuilder} einer {@link TreeMap}. */
+		public static <GKey, GValue> MapBuilder<GKey, GValue, TreeMap<GKey, GValue>> forTreeMap(final Comparator<? super GKey> comparator) {
+			return MapBuilder.from(new TreeMap<GKey, GValue>(comparator));
 		}
 
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeChecked(final Class<GItem> clazz) {
-			this.items = Collections.checkedCollection(this.items, clazz);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeSynchronized() {
-			this.items = Collections.synchronizedCollection(this.items);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeUnmodifiable() {
-			this.items = Collections.unmodifiableCollection(this.items);
-			return this.customThis();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen {@link BaseCollectionBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class)}, {@link #makeSynchronized()}
-	 * und {@link #makeUnmodifiable()}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseCollectionBuilder2<GItem, GThis> extends BaseCollectionBuilder<GItem, GThis> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link Collection}.
+		/** Diese Methode gibt einen {@link MapBuilder} zu einer neuen {@link HashMap} mit Steuwertpuffer zurück.
 		 *
-		 * @param items {@link Collection}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public BaseCollectionBuilder2(final Collection<GItem> items) throws NullPointerException {
-			super(items);
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 * @return {@link MapBuilder} einer {@link HashMap}. */
+		public static <GKey, GValue> MapBuilder<GKey, GValue, HashMap<GKey, GValue>> forHashMap() {
+			return MapBuilder.forHashMap(true);
 		}
 
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeChecked(final Class<GItem> clazz) {
-			return super.makeChecked(clazz);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeSynchronized() {
-			return super.makeSynchronized();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeUnmodifiable() {
-			return super.makeUnmodifiable();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link SortedSet}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSortedSetBuilder<GItem, GThis> extends BaseItemsBuilder<GItem, SortedSet<GItem>, GThis> {
-
-		/** Dieser Konstruktor initialisiert das interne {@link TreeSet}. */
-		public BaseSortedSetBuilder() {
-			super(new TreeSet<GItem>());
-		}
-
-		/** Dieser Konstruktor initialisiert das interne {@link SortedSet}.
+		/** Diese Methode gibt einen {@link MapBuilder} zu einer neuen {@link HashMap} zurück.
 		 *
-		 * @param items {@link SortedSet}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public BaseSortedSetBuilder(final SortedSet<GItem> items) throws NullPointerException {
-			super(items);
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 * @param withHashes Aktivierung des Streuwertpuffers.
+		 * @return {@link MapBuilder} einer {@link HashMap}. */
+		public static <GKey, GValue> MapBuilder<GKey, GValue, HashMap<GKey, GValue>> forHashMap(final boolean withHashes) {
+			return MapBuilder.from(new HashMap<GKey, GValue>(withHashes));
 		}
 
 		{}
 
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeChecked(final Class<GItem> clazz) {
-			this.items = Collections.checkedSortedSet(this.items, clazz);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeSynchronized() {
-			this.items = Collections.synchronizedSortedSet(this.items);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeUnmodifiable() {
-			this.items = Collections.unmodifiableSortedSet(this.items);
-			return this.customThis();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen {@link BaseSortedSetBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class)}, {@link #makeSynchronized()}
-	 * und {@link #makeUnmodifiable()}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSortedSetBuilder2<GItem, GThis> extends BaseSortedSetBuilder<GItem, GThis> {
-
-		/** Dieser Konstruktor initialisiert das interne {@link SortedSet}.
+		/** Dieser Konstruktor initialisiert die interne {@link Map}.
 		 *
-		 * @param items {@link SortedSet}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public BaseSortedSetBuilder2(final SortedSet<GItem> items) throws NullPointerException {
-			super(items);
+		 * @param result interne {@link Map}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		public MapBuilder(final GResult result) throws NullPointerException {
+			super(result);
 		}
 
 		{}
 
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeChecked(final Class<GItem> clazz) {
-			return super.makeChecked(clazz);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeSynchronized() {
-			return super.makeSynchronized();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeUnmodifiable() {
-			return super.makeUnmodifiable();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link SortedMap}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSortedMapBuilder<GKey, GValue, GThis> extends BaseEntriesBuilder<GKey, GValue, SortedMap<GKey, GValue>, GThis> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link SortedMap}.
+		/** Diese Methode gibt einen neuen {@link MapBuilder} zur datentypsicheren {@link #build() Abbildung} zurück.
 		 *
-		 * @param entries interne {@link SortedMap}.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public BaseSortedMapBuilder(final SortedMap<GKey, GValue> entries) throws NullPointerException {
-			super(entries);
+		 * @see java.util.Collections#checkedMap(Map, Class, Class)
+		 * @param keyClazz Klasse der Schlüssel.
+		 * @param valueClazz Klasse der Werte.
+		 * @return neuer {@link MapBuilder} zur {@code checkedMap}. */
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
+			return MapBuilder.from(Collections.checkedMap(this.result, keyClazz, valueClazz));
 		}
 
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
-			this.entries = Collections.checkedSortedMap(this.entries, keyClazz, valueClazz);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeSynchronized() {
-			this.entries = Collections.synchronizedSortedMap(this.entries);
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected GThis makeUnmodifiable() {
-			this.entries = Collections.unmodifiableSortedMap(this.entries);
-			return this.customThis();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen {@link BaseMapBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class, Class)}, {@link #makeSynchronized()}
-	 * und {@link #makeUnmodifiable()}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSortedMapBuilder2<GKey, GValue, GThis> extends BaseSortedMapBuilder<GKey, GValue, GThis> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link SortedMap}.
+		/** Diese Methode gibt einen neuen {@link MapBuilder} zur übersetzten {@link #build() Abbildung} zurück.
 		 *
-		 * @param entries interne Abbildung.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public BaseSortedMapBuilder2(final SortedMap<GKey, GValue> entries) throws NullPointerException {
-			super(entries);
+		 * @see bee.creative.util.Collections#translatedMap(Map, Translator, Translator)
+		 * @param <GKey2> Typ der übersetzten Schlüssel.
+		 * @param <GValue2> Typ der übersetzten Werte.
+		 * @param keyTranslator {@link Translator} zur Übersetzung der Schlüssel.
+		 * @param valueTranslator {@link Translator} zur Übersetzung der Werte.
+		 * @return neuer {@link MapBuilder} zur {@code translatedMap}. */
+		public <GKey2, GValue2> MapBuilder<GKey2, GValue2, Map<GKey2, GValue2>> toTranslated(final Translator<GKey, GKey2> keyTranslator,
+			final Translator<GValue, GValue2> valueTranslator) {
+			return MapBuilder.from(bee.creative.util.Collections.translatedMap(this.result, keyTranslator, valueTranslator));
+		}
+
+		/** Diese Methode gibt einen neuen {@link MapBuilder} zur threadsicheren {@link #build() Abbildung} zurück.
+		 *
+		 * @see java.util.Collections#synchronizedMap(Map)
+		 * @return neuer {@link MapBuilder} zur {@code synchronizedMap}. */
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toSynchronized() {
+			return MapBuilder.from(Collections.synchronizedMap(this.result));
+		}
+
+		/** Diese Methode gibt einen neuen {@link MapBuilder} zur unveränderliche {@link #build() Abbildung} zurück.
+		 *
+		 * @see java.util.Collections#unmodifiableMap(Map)
+		 * @return neuer {@link MapBuilder} zur {@code unmodifiableMap}. */
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toUnmodifiable() {
+			return MapBuilder.from(Collections.unmodifiableMap(this.result));
 		}
 
 		{}
 
 		/** {@inheritDoc} */
 		@Override
-		public final GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
-			return super.makeChecked(keyClazz, valueClazz);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeSynchronized() {
-			return super.makeSynchronized();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final GThis makeUnmodifiable() {
-			return super.makeUnmodifiable();
-		}
-
-	}
-
-	/** Diese Klasse implementiert den Konfigurator eines {@link TreeSet}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static final class TreeSetBuilder<GItem> extends BaseSortedSetBuilder2<GItem, TreeSetBuilder<GItem>> {
-
-		/** Dieser Konstruktor initialisiert das interne {@link TreeSet}. */
-		public TreeSetBuilder() {
-			super(new TreeSet<GItem>());
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final TreeSetBuilder<GItem> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert den Konfigurator einer {@link TreeMap}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung. */
-	public static final class TreeMapBuilder<GKey, GValue> extends BaseSortedMapBuilder2<GKey, GValue, TreeMapBuilder<GKey, GValue>> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link TreeMap}. */
-		public TreeMapBuilder() {
-			super(new TreeMap<GKey, GValue>());
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final TreeMapBuilder<GKey, GValue> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert den Konfigurator eines {@link HashSet}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static final class HashSetBuilder<GItem> extends BaseSetBuilder2<GItem, HashSetBuilder<GItem>> {
-
-		/** Dieser Konstruktor initialisiert das interne {@link HashSet}. */
-		public HashSetBuilder() {
-			super(new HashSet<GItem>());
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final HashSetBuilder<GItem> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert den Konfigurator einer {@link HashMap}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung. */
-	public static final class HashMapBuilder<GKey, GValue> extends BaseMapBuilder2<GKey, GValue, HashMapBuilder<GKey, GValue>> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link HashMap}. */
-		public HashMapBuilder() {
-			super(new HashMap<GKey, GValue>());
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final HashMapBuilder<GKey, GValue> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert den Konfigurator einer {@link LinkedList}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static final class LinkedListBuilder<GItem> extends BaseListBuilder2<GItem, LinkedListBuilder<GItem>> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link LinkedList}. */
-		public LinkedListBuilder() {
-			super(new LinkedList<GItem>());
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final LinkedListBuilder<GItem> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert den Konfigurator einer {@link ArrayList}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static final class ArrayListBuilder<GItem> extends BaseListBuilder2<GItem, ArrayListBuilder<GItem>> {
-
-		/** Dieser Konstruktor initialisiert die interne {@link ArrayList}. */
-		public ArrayListBuilder() {
-			super(new ArrayList<GItem>());
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final ArrayListBuilder<GItem> customThis() {
+		protected MapBuilder<GKey, GValue, GResult> customThis() {
 			return this;
 		}
 
@@ -1062,34 +744,107 @@ public class Builders {
 	/** Diese Klasse implementiert einen Konfigurator für ein {@link Set}.
 	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static final class SimpleSetBuilder<GItem> extends BaseSetBuilder2<GItem, SimpleSetBuilder<GItem>> {
+	 * @param <GItem> Typ der Elemente.
+	 * @param <GResult> Typ des {@link Set}. */
+	public static class SetBuilder<GItem, GResult extends Set<GItem>> extends BaseSetBuilder<GItem, GResult, SetBuilder<GItem, GResult>> {
 
-		/** Diese Methode gibt einen neuen {@link SimpleSetBuilder} zum gegebenen {@link Set} zurück.
+		/** Diese Methode gibt einen {@link SetBuilder} zum gegebenen {@link Set} zurück.
 		 *
 		 * @param <GItem> Typ der Elemente.
-		 * @param items {@link Set}.
-		 * @return {@link SimpleSetBuilder}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public static <GItem> SimpleSetBuilder<GItem> from(final Set<GItem> items) throws NullPointerException {
-			return new SimpleSetBuilder<>(items);
+		 * @param <GResult> Typ des {@link Set}.
+		 * @param result {@link Set}.
+		 * @return {@link SetBuilder}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		public static <GItem, GResult extends Set<GItem>> SetBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+			return new SetBuilder<>(result);
+		}
+
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link TreeSet} mit natürlicher Ordnung zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @return {@link SetBuilder} eines {@link TreeSet}. */
+		public static <GItem> SetBuilder<GItem, TreeSet<GItem>> forTreeSet() {
+			return SetBuilder.forTreeSet(null);
+		}
+
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link TreeSet} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @param comparator Ordnung der Elemente.
+		 * @return {@link SetBuilder} eines {@link TreeSet}. */
+		public static <GItem> SetBuilder<GItem, TreeSet<GItem>> forTreeSet(final Comparator<? super GItem> comparator) {
+			return SetBuilder.from(new TreeSet<>(comparator));
+		}
+
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link HashSet} mit Steuwertpuffer zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @return {@link SetBuilder} eines {@link HashSet}. */
+		public static <GItem> SetBuilder<GItem, HashSet<GItem>> forHashSet() {
+			return SetBuilder.forHashSet(true);
+		}
+
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link HashSet} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @param withHashes Aktivierung des Streuwertpuffers.
+		 * @return {@link SetBuilder} eines {@link HashSet}. */
+		public static <GItem> SetBuilder<GItem, HashSet<GItem>> forHashSet(final boolean withHashes) {
+			return SetBuilder.from(new HashSet<GItem>(withHashes));
 		}
 
 		{}
 
 		/** Dieser Konstruktor initialisiert das {@link Set}.
 		 *
-		 * @param items {@link Set}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public SimpleSetBuilder(final Set<GItem> items) throws NullPointerException {
-			super(items);
+		 * @param result {@link Set}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		public SetBuilder(final GResult result) throws NullPointerException {
+			super(result);
+		}
+
+		{}
+
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #build() Menge} zurück.
+		 *
+		 * @see java.util.Collections#checkedSet(Set, Class)
+		 * @param itemClazz Klasse der Elemente.
+		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
+		public SetBuilder<GItem, Set<GItem>> toChecked(final Class<GItem> itemClazz) {
+			return SetBuilder.from(Collections.checkedSet(this.result, itemClazz));
+		}
+
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #build() Menge} zurück.
+		 *
+		 * @see bee.creative.util.Collections#translatedSet(Set, Translator)
+		 * @param <GItem2> Typ der übersetzten Elemente.
+		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
+		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
+		public <GItem2> SetBuilder<GItem2, Set<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
+			return SetBuilder.from(bee.creative.util.Collections.translatedSet(this.result, itemTranslator));
+		}
+
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die threadsichere {@link #build() Menge} zurück.
+		 *
+		 * @see java.util.Collections#synchronizedSet(Set)
+		 * @return {@code this}. */
+		public SetBuilder<GItem, Set<GItem>> toSynchronized() {
+			return SetBuilder.from(Collections.synchronizedSet(this.result));
+		}
+
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die unveränderliche {@link #build() Menge} zurück.
+		 *
+		 * @see java.util.Collections#unmodifiableSet(Set)
+		 * @return {@code this}. */
+		public SetBuilder<GItem, Set<GItem>> toUnmodifiable() {
+			return SetBuilder.from(Collections.unmodifiableSet(this.result));
 		}
 
 		{}
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SimpleSetBuilder<GItem> customThis() {
+		protected final SetBuilder<GItem, GResult> customThis() {
 			return this;
 		}
 
@@ -1098,182 +853,89 @@ public class Builders {
 	/** Diese Klasse implementiert einen Konfigurator für eine {@link List}.
 	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static final class SimpleListBuilder<GItem> extends BaseListBuilder2<GItem, SimpleListBuilder<GItem>> {
+	 * @param <GItem> Typ der Elemente.
+	 * @param <GResult> Typ der {@link List}. */
+	public static class ListBuilder<GItem, GResult extends List<GItem>> extends BaseSetBuilder<GItem, GResult, ListBuilder<GItem, GResult>> {
 
-		/** Diese Methode gibt einen neuen {@link SimpleListBuilder} zur gegebenen {@link List} zurück.
+		/** Diese Methode gibt einen {@link ListBuilder} zur gegebenen {@link List} zurück.
 		 *
 		 * @param <GItem> Typ der Elemente.
-		 * @param items {@link List}.
-		 * @return {@link SimpleListBuilder}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public static <GItem> SimpleListBuilder<GItem> from(final List<GItem> items) throws NullPointerException {
-			return new SimpleListBuilder<>(items);
+		 * @param <GResult> Typ des {@link List}.
+		 * @param result {@link List}.
+		 * @return {@link ListBuilder}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		public static <GItem, GResult extends List<GItem>> ListBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+			return new ListBuilder<>(result);
 		}
 
-		{}
-
-		/** Dieser Konstruktor initialisiert die {@link List}.
-		 *
-		 * @param items {@link List}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public SimpleListBuilder(final List<GItem> items) throws NullPointerException {
-			super(items);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final SimpleListBuilder<GItem> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen Konfigurator für ein {@link Map}.
-	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung. */
-	public static final class SimpleMapBuilder<GKey, GValue> extends BaseMapBuilder2<GKey, GValue, SimpleMapBuilder<GKey, GValue>> {
-
-		/** Diese Methode gibt einen neuen {@link SimpleMapBuilder} zum gegebenen {@link Map} zurück.
-		 *
-		 * @param <GKey> Typ der Schlüssel in der Abbildung.
-		 * @param <GValue> Typ der Werte in der Abbildung.
-		 * @param entries {@link Map}.
-		 * @return {@link SimpleMapBuilder}.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public static <GKey, GValue> SimpleMapBuilder<GKey, GValue> from(final Map<GKey, GValue> entries) throws NullPointerException {
-			return new SimpleMapBuilder<>(entries);
-		}
-
-		{}
-
-		/** Dieser Konstruktor initialisiert das {@link Map}.
-		 *
-		 * @param entries {@link Map}.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public SimpleMapBuilder(final Map<GKey, GValue> entries) throws NullPointerException {
-			super(entries);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final SimpleMapBuilder<GKey, GValue> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen Konfigurator für eine {@link Collection}.
-	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static final class SimpleCollectionBuilder<GItem> extends BaseCollectionBuilder2<GItem, SimpleCollectionBuilder<GItem>> {
-
-		/** Diese Methode gibt einen neuen {@link SimpleCollectionBuilder} zur gegebenen {@link Collection} zurück.
+		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link ArrayList} mit Steuwertpuffer zurück.
 		 *
 		 * @param <GItem> Typ der Elemente.
-		 * @param items {@link Collection}.
-		 * @return {@link SimpleCollectionBuilder}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public static <GItem> SimpleCollectionBuilder<GItem> from(final Collection<GItem> items) throws NullPointerException {
-			return new SimpleCollectionBuilder<>(items);
+		 * @return {@link ListBuilder} einer {@link ArrayList}. */
+		public static <GItem> ListBuilder<GItem, ArrayList<GItem>> forArrayList() {
+			return ListBuilder.from(new ArrayList<GItem>());
 		}
 
-		{}
-
-		/** Dieser Konstruktor initialisiert die {@link Collection}.
-		 *
-		 * @param items {@link Collection}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public SimpleCollectionBuilder(final Collection<GItem> items) throws NullPointerException {
-			super(items);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final SimpleCollectionBuilder<GItem> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen Konfigurator für ein {@link SortedSet}.
-	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static final class SimpleSortedSetBuilder<GItem> extends BaseSortedSetBuilder2<GItem, SimpleSortedSetBuilder<GItem>> {
-
-		/** Diese Methode gibt einen neuen {@link SimpleSortedSetBuilder} zur gegebenen {@link SortedSet} zurück.
+		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link LinkedList} mit zurück.
 		 *
 		 * @param <GItem> Typ der Elemente.
-		 * @param items {@link SortedSet}.
-		 * @return {@link SimpleSortedSetBuilder}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public static <GItem> SimpleSortedSetBuilder<GItem> from(final SortedSet<GItem> items) throws NullPointerException {
-			return new SimpleSortedSetBuilder<>(items);
+		 * @return {@link ListBuilder} einer {@link LinkedList}. */
+		public static <GItem> ListBuilder<GItem, LinkedList<GItem>> forLinkedList() {
+			return ListBuilder.from(new LinkedList<GItem>());
 		}
 
 		{}
 
-		/** Dieser Konstruktor initialisiert die {@link SortedSet}.
+		/** Dieser Konstruktor initialisiert das {@link List}.
 		 *
-		 * @param items {@link SortedSet}.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public SimpleSortedSetBuilder(final SortedSet<GItem> items) throws NullPointerException {
-			super(items);
+		 * @param result {@link List}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		public ListBuilder(final GResult result) throws NullPointerException {
+			super(result);
+		}
+
+		{}
+
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #build() Menge} zurück.
+		 *
+		 * @see java.util.Collections#checkedList(List, Class)
+		 * @param itemClazz Klasse der Elemente.
+		 * @return neuer {@link ListBuilder} zum {@code checkedList}. */
+		public ListBuilder<GItem, List<GItem>> toChecked(final Class<GItem> itemClazz) {
+			return ListBuilder.from(Collections.checkedList(this.result, itemClazz));
+		}
+
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #build() Menge} zurück.
+		 *
+		 * @see bee.creative.util.Collections#translatedList(List, Translator)
+		 * @param <GItem2> Typ der übersetzten Elemente.
+		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
+		 * @return neuer {@link ListBuilder} zum {@code checkedList}. */
+		public <GItem2> ListBuilder<GItem2, List<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
+			return ListBuilder.from(bee.creative.util.Collections.translatedList(this.result, itemTranslator));
+		}
+
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die threadsichere {@link #build() Menge} zurück.
+		 *
+		 * @see java.util.Collections#synchronizedList(List)
+		 * @return {@code this}. */
+		public ListBuilder<GItem, List<GItem>> toSynchronized() {
+			return ListBuilder.from(Collections.synchronizedList(this.result));
+		}
+
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die unveränderliche {@link #build() Menge} zurück.
+		 *
+		 * @see java.util.Collections#unmodifiableList(List)
+		 * @return {@code this}. */
+		public ListBuilder<GItem, List<GItem>> toUnmodifiable() {
+			return ListBuilder.from(Collections.unmodifiableList(this.result));
 		}
 
 		{}
 
 		/** {@inheritDoc} */
 		@Override
-		protected final SimpleSortedSetBuilder<GItem> customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen Konfigurator für ein {@link SortedMap}.
-	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel in der Abbildung.
-	 * @param <GValue> Typ der Werte in der Abbildung. */
-	public static final class SimpleSortedMapBuilder<GKey, GValue> extends BaseSortedMapBuilder2<GKey, GValue, SimpleSortedMapBuilder<GKey, GValue>> {
-
-		/** Diese Methode gibt einen neuen {@link SimpleSortedMapBuilder} zum gegebenen {@link SortedMap} zurück.
-		 *
-		 * @param <GKey> Typ der Schlüssel in der Abbildung.
-		 * @param <GValue> Typ der Werte in der Abbildung.
-		 * @param entries {@link SortedMap}.
-		 * @return {@link SimpleSortedMapBuilder}.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public static <GKey, GValue> SimpleSortedMapBuilder<GKey, GValue> from(final SortedMap<GKey, GValue> entries) throws NullPointerException {
-			return new SimpleSortedMapBuilder<>(entries);
-		}
-
-		{}
-
-		/** Dieser Konstruktor initialisiert das {@link SortedMap}.
-		 *
-		 * @param entries {@link SortedMap}.
-		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public SimpleSortedMapBuilder(final SortedMap<GKey, GValue> entries) throws NullPointerException {
-			super(entries);
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		protected final SimpleSortedMapBuilder<GKey, GValue> customThis() {
+		protected final ListBuilder<GItem, GResult> customThis() {
 			return this;
 		}
 
@@ -1286,7 +948,7 @@ public class Builders {
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param value Datensatz.
 	 * @return {@code value}-{@link Builder}. */
-	public static <GValue> Builder<GValue> valueBuilder(final GValue value) {
+	public static <GValue> Builder<GValue> itemBuilder(final GValue value) {
 		return new Builder<GValue>() {
 
 			@Override
@@ -1296,7 +958,7 @@ public class Builders {
 
 			@Override
 			public final String toString() {
-				return Objects.toInvokeString("valueBuilder", value);
+				return Objects.toInvokeString("itemBuilder", value);
 			}
 
 		};

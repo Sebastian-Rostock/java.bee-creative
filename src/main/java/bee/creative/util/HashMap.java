@@ -1,9 +1,7 @@
 package bee.creative.util;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -155,281 +153,50 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 
 	{}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMap} mit {@link #HashMap(boolean) Streuwertpuffer} und mit Kapazität {@code 0}. */
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashMap(true, 0)}. */
 	public HashMap() {
-		this(true);
+		this(true, 0);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMap} mit Kapazität {@code 0}.
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashMap(true, capacity)}. */
+	@SuppressWarnings ("javadoc")
+	public HashMap(final int capacity) {
+		this(true, 0);
+	}
+
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashMap(withHashes, 0)}. */
+	@SuppressWarnings ("javadoc")
+	public HashMap(final boolean withHashes) {
+		this(withHashes, 0);
+	}
+
+	/** Dieser Konstruktor initialisiert die {@link HashMap} mit der gegebenen Kapazität.
 	 *
 	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
-	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
-	public HashMap(final boolean withHashes) {
+	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann.
+	 * @param capacity Kapazität. */
+	public HashMap(final boolean withHashes, final int capacity) {
 		super(true, withHashes);
+		this.allocate(capacity);
+	}
+
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashMap(true, source)}. */
+	@SuppressWarnings ("javadoc")
+	public HashMap(final Map<? extends GKey, ? extends GValue> source) {
+		this(true, source);
+	}
+
+	/** Dieser Konstruktor initialisiert die {@link HashMap} als Kopie der gegebenen {@link Map}.
+	 *
+	 * @see #HashMap(boolean, int)
+	 * @param withHashes Aktivierung des Streuwertpuffers.
+	 * @param source gegebene Einträge. */
+	public HashMap(final boolean withHashes, final Map<? extends GKey, ? extends GValue> source) {
+		this(withHashes, source.size());
+		this.putAll(source);
 	}
 
 	{}
-
-	/** Diese Methode {@link #put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
-	 *
-	 * @param entry Eintrag.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insert(final Entry<? extends GKey, ? extends GValue> entry) {
-		return this.insertImpl(entry);
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
-	 *
-	 * @param key Schlüssel des Eintrags.
-	 * @param value Wert des Eintrags.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insert(final GKey key, final GValue value) {
-		this.putImpl(key, value);
-		return this;
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
-	 *
-	 * @param entry Eintrag.
-	 * @return {@code this}. */
-	protected final HashMap<GKey, GValue> insertImpl(final Entry<? extends GKey, ? extends GValue> entry) {
-		this.putImpl(entry.getKey(), entry.getValue());
-		return this;
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
-	 *
-	 * @param key {@link Getter} zur Ermittlung des Schlüssels zum gegebenen Wert des Eintrags.
-	 * @param value Wert des Eintrags.
-	 * @return {@code this}. */
-	protected final HashMap<GKey, GValue> insertKeyFromImpl(final Getter<? super GValue, ? extends GKey> key, final GValue value) {
-		this.putImpl(key.get(value), value);
-		return this;
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
-	 *
-	 * @param value {@link Getter} zur Ermittlung des Werts zum gegebenen Schlüssel des Eintrags.
-	 * @param key Schlüssel des Eintrags.
-	 * @return {@code this}. */
-	protected final HashMap<GKey, GValue> insertValueFromImpl(final Getter<? super GKey, ? extends GValue> value, final GKey key) {
-		this.putImpl(key, value.get(key));
-		return this;
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param entries Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAll(final Map<? extends GKey, ? extends GValue> entries) {
-		return this.insertAll(entries.entrySet());
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param entries Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAll(final Iterator<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-		return this.insertAllImpl(entries);
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param entries Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAll(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-		return this.insertAllImpl(entries.iterator());
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param keys Schlüssel der Einträge.
-	 * @param values Werte der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAll(final GKey[] keys, final GValue[] values) {
-		return this.insertAllImpl(Arrays.asList(keys).iterator(), Arrays.asList(values).iterator());
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param keys Schlüssel der Einträge.
-	 * @param values Werte der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAll(final Iterator<? extends GKey> keys, final Iterator<? extends GValue> values) {
-		return this.insertAllImpl(keys, values);
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param keys Schlüssel der Einträge.
-	 * @param values Werte der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAll(final Iterable<? extends GKey> keys, final Iterable<? extends GValue> values) {
-		return this.insertAllImpl(keys.iterator(), values.iterator());
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
-	 *
-	 * @param key {@link Getter} zur Ermittlung des Schlüssels zum gegebenen Wert des Eintrags.
-	 * @param value Wert des Eintrags.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertKeyFrom(final Getter<? super GValue, ? extends GKey> key, final GValue value) {
-		return this.insertKeyFromImpl(key, value);
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
-	 * @param values Werte der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAllKeysFrom(final Getter<? super GValue, ? extends GKey> key, @SuppressWarnings ("unchecked") final GValue... values) {
-		return this.insertAllKeysFromImpl(key, Arrays.asList(values).iterator());
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
-	 * @param values Werte der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAllKeysFrom(final Getter<? super GValue, ? extends GKey> key, final Iterator<? extends GValue> values) {
-		return this.insertAllKeysFromImpl(key, values);
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
-	 * @param values Werte der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAllKeysFrom(final Getter<? super GValue, ? extends GKey> key, final Iterable<? extends GValue> values) {
-		return this.insertAllKeysFromImpl(key, values.iterator());
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
-	 *
-	 * @param value {@link Getter} zur Ermittlung des Werts zum gegebenen Schlüssel des Eintrags.
-	 * @param key Schlüssel des Eintrags.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertValueFrom(final Getter<? super GKey, ? extends GValue> value, final GKey key) {
-		return this.insertValueFromImpl(value, key);
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
-	 * @param keys Schlüssel der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAllValuesFrom(final Getter<? super GKey, ? extends GValue> value, @SuppressWarnings ("unchecked") final GKey... keys) {
-		return this.insertAllValuesFromImpl(value, Arrays.asList(keys).iterator());
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
-	 * @param keys Schlüssel der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAllValuesFrom(final Getter<? super GKey, ? extends GValue> value, final Iterator<? extends GKey> keys) {
-		return this.insertAllValuesFromImpl(value, keys);
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
-	 * @param keys Schlüssel der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> insertAllValuesFrom(final Getter<? super GKey, ? extends GValue> value, final Iterable<? extends GKey> keys) {
-		return this.insertAllValuesFromImpl(value, keys.iterator());
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param entries Einträge.
-	 * @return {@code this}. */
-	protected final HashMap<GKey, GValue> insertAllImpl(final Iterator<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-		while (entries.hasNext()) {
-			this.insertImpl(entries.next());
-		}
-		return this;
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param keys Schlüssel der Einträge.
-	 * @param values Werte der Einträge.
-	 * @return {@code this}. */
-	protected final HashMap<GKey, GValue> insertAllImpl(final Iterator<? extends GKey> keys, final Iterator<? extends GValue> values) {
-		while (keys.hasNext() && values.hasNext()) {
-			this.insert(keys.next(), values.next());
-		}
-		return this;
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
-	 * @param values Werte der Einträge.
-	 * @return {@code this}. */
-	protected final HashMap<GKey, GValue> insertAllKeysFromImpl(final Getter<? super GValue, ? extends GKey> key, final Iterator<? extends GValue> values) {
-		while (values.hasNext()) {
-			this.insertKeyFromImpl(key, values.next());
-		}
-		return this;
-	}
-
-	/** Diese Methode {@link #put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-	 *
-	 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
-	 * @param keys Schlüssel der Einträge.
-	 * @return {@code this}. */
-	protected final HashMap<GKey, GValue> insertAllValuesFromImpl(final Getter<? super GKey, ? extends GValue> value, final Iterator<? extends GKey> keys) {
-		while (keys.hasNext()) {
-			this.insertValueFromImpl(value, keys.next());
-		}
-		return this;
-	}
-
-	/** Diese Methode {@link #remove(Object) entfern den Eintrag mit dem gegebenen Schlüssel} und gibt {@code this} zurück.
-	 *
-	 * @param key Schlüssel.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> delete(final Object key) {
-		this.popImpl(key);
-		return this;
-	}
-
-	/** Diese Methode {@link #remove(Object) entfern die Einträge mit dem gegebenen Schlüssel} und gibt {@code this} zurück.
-	 *
-	 * @param keys Schlüssel der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> deleteAll(final Object... keys) {
-		return this.deleteAllImpl(Arrays.asList(keys).iterator());
-	}
-
-	/** Diese Methode {@link #remove(Object) entfern die Einträge mit dem gegebenen Schlüssel} und gibt {@code this} zurück.
-	 *
-	 * @param keys Schlüssel der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> deleteAll(final Iterator<?> keys) {
-		return this.deleteAllImpl(keys);
-	}
-
-	/** Diese Methode {@link #remove(Object) entfern die Einträge mit dem gegebenen Schlüssel} und gibt {@code this} zurück.
-	 *
-	 * @param keys Schlüssel der Einträge.
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> deleteAll(final Iterable<?> keys) {
-		return this.deleteAllImpl(keys.iterator());
-	}
-
-	/** Diese Methode {@link #popKeyImpl(Object) entfern die Einträge mit den gegebenen Schlüsseln} und gibt {@code this} zurück.
-	 *
-	 * @param Keys Schlüssel.
-	 * @return {@code this}. */
-	protected final HashMap<GKey, GValue> deleteAllImpl(final Iterator<?> Keys) {
-		while (Keys.hasNext()) {
-			this.popImpl(Keys.next());
-		}
-		return this;
-	}
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
 	 *
@@ -478,16 +245,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public boolean containsValue(final Object value) {
-		if (value == null) {
-			for (final Iterator<GValue> iterator = this.newValuesIteratorImpl(); iterator.hasNext();) {
-				if (iterator.next() == null) return true;
-			}
-		} else {
-			for (final Iterator<GValue> iterator = this.newValuesIteratorImpl(); iterator.hasNext();) {
-				if (value.equals(iterator.next())) return true;
-			}
-		}
-		return false;
+		return this.hasValueImpl(value);
 	}
 
 	/** {@inheritDoc} */
@@ -511,7 +269,9 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public void putAll(final Map<? extends GKey, ? extends GValue> map) {
-		this.insertAll(map);
+		for (final Entry<? extends GKey, ? extends GValue> entry: map.entrySet()) {
+			this.putImpl(entry.getKey(), entry.getValue());
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -541,7 +301,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		return this.newMappingImpl().hashCode();
+		return this.newEntriesImpl().hashCode();
 	}
 
 	/** {@inheritDoc} */

@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
@@ -142,109 +141,66 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 
 	{}
 
-	/** Dieser Konstruktor initialisiert das {@link HashSet} mit {@link #HashSet(boolean) Streuwertpuffer} und mit Kapazität {@code 0}. */
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashSet(true, 0)}. */
 	public HashSet() {
-		this(true);
+		this(true, 0);
+	}
+
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashSet(withHashes, 0)}. */
+	@SuppressWarnings ("javadoc")
+	public HashSet(final boolean withHashes) {
+		this(withHashes, 0);
+	}
+
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashSet(true, capacity)}. */
+	@SuppressWarnings ("javadoc")
+	public HashSet(final int capacity) {
+		this(true, capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link HashSet} mit Kapazität {@code 0}.
 	 *
 	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
-	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann. */
-	public HashSet(final boolean withHashes) {
+	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann.
+	 * @param capacity Kapazität. */
+	public HashSet(final boolean withHashes, final int capacity) {
 		super(false, withHashes);
+		this.allocate(capacity);
+	}
+
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashSet(true, source)}. */
+	@SuppressWarnings ("javadoc")
+	public HashSet(final Set<? extends GItem> source) {
+		this(true, source);
+	}
+
+	/** Dieser Konstruktor initialisiert das {@link HashSet} als Kopie des gegebenen {@link Set}.
+	 *
+	 * @see #HashSet(boolean, int)
+	 * @param withHashes Aktivierung des Streuwertpuffers.
+	 * @param source gegebene Elemente. */
+	public HashSet(final boolean withHashes, final Set<? extends GItem> source) {
+		this(withHashes, source.size());
+		this.addAll(source);
+	}
+
+	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashSet(true, source)}. */
+	@SuppressWarnings ("javadoc")
+	public HashSet(final Collection<? extends GItem> source) {
+		this(true, source);
+	}
+
+	/** Dieser Konstruktor initialisiert das {@link HashSet} mit den gegebenen Elementen.
+	 *
+	 * @see #HashSet(boolean, int)
+	 * @param withHashes Aktivierung des Streuwertpuffers.
+	 * @param source gegebene Elemente. */
+	public HashSet(final boolean withHashes, final Collection<? extends GItem> source) {
+		this(withHashes);
+		this.addAll(source);
 	}
 
 	{}
-
-	/** Diese Methode {@link #add(Object) fügt das gegebenen Element ein} und gibt {@code this} zurück.
-	 *
-	 * @param item Element.
-	 * @return {@code this}. */
-	public HashSet<GItem> insert(final GItem item) {
-		this.putKeyImpl(item);
-		return this;
-	}
-
-	/** Diese Methode {@link #add(Object) fügt die gegebenen Elemente ein} und gibt {@code this} zurück.
-	 *
-	 * @param items Elemente.
-	 * @return {@code this}. */
-	public HashSet<GItem> insertAll(@SuppressWarnings ("unchecked") final GItem... items) {
-		return this.insertAllImpl(Arrays.asList(items).iterator());
-	}
-
-	/** Diese Methode {@link #add(Object) fügt die gegebenen Elemente ein} und gibt {@code this} zurück.
-	 *
-	 * @param items Elemente.
-	 * @return {@code this}. */
-	public HashSet<GItem> insertAll(final Iterator<? extends GItem> items) {
-		return this.insertAllImpl(items);
-	}
-
-	/** Diese Methode {@link #add(Object) fügt die gegebenen Elemente ein} und gibt {@code this} zurück.
-	 *
-	 * @param items Elemente.
-	 * @return {@code this}. */
-	public HashSet<GItem> insertAll(final Iterable<? extends GItem> items) {
-		return this.insertAllImpl(items.iterator());
-	}
-
-	/** Diese Methode {@link #putKeyImpl(Object) fügt die gegebenen Elemente ein} und gibt {@code this} zurück.
-	 *
-	 * @param items Elemente.
-	 * @return {@code this}. */
-	protected final HashSet<GItem> insertAllImpl(final Iterator<? extends GItem> items) {
-		while (items.hasNext()) {
-			this.putKeyImpl(items.next());
-		}
-		return this;
-	}
-
-	/** Diese Methode {@link #remove(Object) entfern das gegebenen Element} und gibt {@code this} zurück.
-	 *
-	 * @param item Element.
-	 * @return {@code this}. */
-	public HashSet<GItem> delete(final Object item) {
-		this.popKeyImpl(item);
-		return this;
-	}
-
-	/** Diese Methode {@link #remove(Object) entfern die gegebenen Element} und gibt {@code this} zurück.
-	 *
-	 * @param items Elemente.
-	 * @return {@code this}. */
-	public HashSet<GItem> deleteAll(final Object... items) {
-		return this.deleteAllImpl(Arrays.asList(items).iterator());
-	}
-
-	/** Diese Methode {@link #remove(Object) entfern die gegebenen Element} und gibt {@code this} zurück.
-	 *
-	 * @param items Elemente.
-	 * @return {@code this}. */
-	public HashSet<GItem> deleteAll(final Iterator<?> items) {
-		this.deleteAllImpl(items);
-		return this;
-	}
-
-	/** Diese Methode {@link #remove(Object) entfern die gegebenen Element} und gibt {@code this} zurück.
-	 *
-	 * @param items Elemente.
-	 * @return {@code this}. */
-	public HashSet<GItem> deleteAll(final Iterable<?> items) {
-		return this.deleteAllImpl(items.iterator());
-	}
-
-	/** Diese Methode {@link #popKeyImpl(Object) entfern die gegebenen Element} und gibt {@code this} zurück.
-	 *
-	 * @param items Elemente.
-	 * @return {@code this}. */
-	protected final HashSet<GItem> deleteAllImpl(final Iterator<?> items) {
-		while (items.hasNext()) {
-			this.popKeyImpl(items.next());
-		}
-		return this;
-	}
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
 	 *

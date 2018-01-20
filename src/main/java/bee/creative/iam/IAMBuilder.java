@@ -108,7 +108,7 @@ public class IAMBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final GData build(final int[] array) {
+		protected final GData customBuild(final int[] array) {
 			return this.put(array);
 		}
 

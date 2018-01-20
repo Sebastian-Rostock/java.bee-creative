@@ -6,7 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapBuilder;
+import bee.creative.util.Builders.BaseMapData;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory}.
@@ -63,7 +63,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, Boolean, PropertyData<GOwner>> {
+	public static abstract class PropertyData<GOwner> extends BaseMapData<String, Boolean, PropertyData<GOwner>> {
 
 		/** Diese Methode wählt {@code "Coalescing"} und gibt {@code this} zurück.
 		 *
@@ -135,6 +135,10 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		public final boolean getBoolean() {
 			return Boolean.TRUE.equals(this.getValue());
 		}
+		
+		public final PropertyData<GOwner> useTRUE() {
+			return useValue(Boolean.TRUE);
+		}
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -156,7 +160,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class AttributeData<GOwner> extends BaseMapBuilder<String, Object, AttributeData<GOwner>> {
+	public static abstract class AttributeData<GOwner> extends BaseMapData<String, Object, AttributeData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

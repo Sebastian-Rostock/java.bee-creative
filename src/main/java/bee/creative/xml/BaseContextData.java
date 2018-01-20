@@ -5,8 +5,8 @@ import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapBuilder;
-import bee.creative.util.Builders.BaseSetBuilder;
+import bee.creative.util.Builders.BaseMapData;
+import bee.creative.util.Builders.BaseSetData;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert den Konfigurator für einen {@link JAXBContext}.
@@ -21,7 +21,7 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	 * @see JAXBContext#newInstance(Class[], java.util.Map)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ClassData<GOwner> extends BaseSetBuilder<Class<?>, ClassData<GOwner>> {
+	public static abstract class ClassData<GOwner> extends BaseSetData<Class<?>, ClassData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -43,7 +43,7 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	 * @see JAXBContext#newInstance(Class[], java.util.Map)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, Object, PropertyData<GOwner>> {
+	public static abstract class PropertyData<GOwner> extends BaseMapData<String, Object, PropertyData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -110,8 +110,8 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	public final JAXBContext getContext() throws JAXBException {
 		JAXBContext result = this.context;
 		if (result != null) return result;
-		final Set<Class<?>> classes = this.classData.getItems();
-		result = JAXBContext.newInstance(classes.toArray(new Class<?>[classes.size()]), this.propertyData.getEntries());
+		final Set<Class<?>> classes = this.classData.build();
+		result = JAXBContext.newInstance(classes.toArray(new Class<?>[classes.size()]), this.propertyData.build());
 		this.useContext(result);
 		return result;
 	}

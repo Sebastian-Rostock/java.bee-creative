@@ -62,7 +62,7 @@ public class Objects {
 	 *
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug. */
-	static String indent(final String value) {
+	public static String indent(final String value) {
 		if (value == null) return "null";
 		final StringBuilder result = new StringBuilder();
 		int last = -1, next = 0;
@@ -83,7 +83,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param indent Aktivierung der Erhöhung des Einzugs.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	static String format(final boolean format, final boolean indent, final Object object) {
+	public static String format(final boolean format, final boolean indent, final Object object) {
 		if (object == null) return "null";
 		final String result;
 		if (object.getClass().isArray()) {

@@ -9,7 +9,7 @@ import bee.creative.fem.FEMBinary;
 import bee.creative.fem.FEMString;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
-import bee.creative.util.Builders.HashMapBuilder;
+import bee.creative.util.Builders.MapBuilder;
 import bee.creative.util.IO;
 
 /** Diese Klasse implementiert den Konfigurator, mit welchem ein {@link IAMIndex} aus bzw. in unterschiedliche Datenformate gelesen bzw. geschieben werden kann.
@@ -166,10 +166,10 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMFindMode> values = new HashMapBuilder<Object, IAMFindMode>() //
-			.useEntry(null, AUTO).useEntry("", AUTO).useEntry("A", AUTO).useEntry("AUTO", AUTO) //
-			.useEntry(IAMMapping.MODE_HASHED, SORTED).useEntry("H", HASHED).useEntry("HASHED", HASHED) //
-			.useEntry(IAMMapping.MODE_SORTED, SORTED).useEntry("S", SORTED).useEntry("SORTED", SORTED) //
+		static final Map<?, IAMFindMode> values = MapBuilder.<Object, IAMFindMode>forHashMap() //
+			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
+			.put(IAMMapping.MODE_HASHED, SORTED).put("H", HASHED).put("HASHED", HASHED) //
+			.put(IAMMapping.MODE_SORTED, SORTED).put("S", SORTED).put("SORTED", SORTED) //
 			.build();
 
 		{}
@@ -246,10 +246,10 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMByteOrder> values = new HashMapBuilder<Object, IAMByteOrder>() //
-			.useEntry(null, AUTO).useEntry("", AUTO).useEntry("A", AUTO).useEntry("AUTO", AUTO) //
-			.useEntry("B", BIGENDIAN).useEntry("BIGENDIAN", BIGENDIAN).useEntry(BIGENDIAN.toOrder(), BIGENDIAN) //
-			.useEntry("L", LITTLEENDIAN).useEntry("LITTLEENDIAN", LITTLEENDIAN).useEntry(LITTLEENDIAN.toOrder(), LITTLEENDIAN) //
+		static final Map<?, IAMByteOrder> values = MapBuilder.<Object, IAMByteOrder>forHashMap() //
+			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
+			.put("B", BIGENDIAN).put("BIGENDIAN", BIGENDIAN).put(BIGENDIAN.toOrder(), BIGENDIAN) //
+			.put("L", LITTLEENDIAN).put("LITTLEENDIAN", LITTLEENDIAN).put(LITTLEENDIAN.toOrder(), LITTLEENDIAN) //
 			.build();
 
 		{}
@@ -514,23 +514,23 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMArrayFormat> values = new HashMapBuilder<Object, IAMArrayFormat>() //
-			.useEntry(null, ARRAY).useEntry("", ARRAY).useEntry("A", ARRAY).useEntry("ARRAY", ARRAY) //
-			.useEntry("B", BINARY).useEntry("BINARY", BINARY) //
-			.useEntry("UTF-8", STRING_UTF_8).useEntry("UTF-16", STRING_UTF_16).useEntry("UTF-32", STRING_UTF_32) //
-			.useEntry("CP-1252", STRING_CP_1252) //
-			.useEntry("ISO-8859-1", STRING_ISO_8859_1).useEntry("ISO-8859-15", STRING_ISO_8859_15)//
-			.useEntry("FEM-8", STRING_FEM_8).useEntry("FEM-16", STRING_FEM_16).useEntry("FEM-32", STRING_FEM_32) //
+		static final Map<?, IAMArrayFormat> values = MapBuilder.<Object, IAMArrayFormat>forHashMap() //
+			.put(null, ARRAY).put("", ARRAY).put("A", ARRAY).put("ARRAY", ARRAY) //
+			.put("B", BINARY).put("BINARY", BINARY) //
+			.put("UTF-8", STRING_UTF_8).put("UTF-16", STRING_UTF_16).put("UTF-32", STRING_UTF_32) //
+			.put("CP-1252", STRING_CP_1252) //
+			.put("ISO-8859-1", STRING_ISO_8859_1).put("ISO-8859-15", STRING_ISO_8859_15)//
+			.put("FEM-8", STRING_FEM_8).put("FEM-16", STRING_FEM_16).put("FEM-32", STRING_FEM_32) //
 			.build();
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, String> strings = new HashMapBuilder<Object, String>() //
-			.useEntry(ARRAY, "ARRAY") //
-			.useEntry(BINARY, "BINARY") //
-			.useEntry(STRING_UTF_8, "UTF-8").useEntry(STRING_UTF_16, "UTF-16").useEntry(STRING_UTF_32, "UTF-32") //
-			.useEntry(STRING_CP_1252, "CP-1252") //
-			.useEntry(STRING_ISO_8859_1, "ISO-8859-1").useEntry(STRING_ISO_8859_15, "ISO-8859-15") //
-			.useEntry(STRING_FEM_8, "FEM-8").useEntry(STRING_FEM_16, "FEM-16").useEntry(STRING_FEM_32, "FEM-32") //
+		static final Map<?, String> strings = MapBuilder.<Object, String>forHashMap() //
+			.put(ARRAY, "ARRAY") //
+			.put(BINARY, "BINARY") //
+			.put(STRING_UTF_8, "UTF-8").put(STRING_UTF_16, "UTF-16").put(STRING_UTF_32, "UTF-32") //
+			.put(STRING_CP_1252, "CP-1252") //
+			.put(STRING_ISO_8859_1, "ISO-8859-1").put(STRING_ISO_8859_15, "ISO-8859-15") //
+			.put(STRING_FEM_8, "FEM-8").put(STRING_FEM_16, "FEM-16").put(STRING_FEM_32, "FEM-32") //
 			.build();
 
 		{}

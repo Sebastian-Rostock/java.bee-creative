@@ -94,7 +94,7 @@ public final class XMLMarshaller {
 	 * @param classes Klasse.
 	 * @return {@link XMLMarshaller}. */
 	public static XMLMarshaller from(final Class<?>... classes) {
-		return new XMLMarshaller().openMarshallerData().openContextData().openClassData().useItems(classes).closeClassesData().closeContextData()
+		return new XMLMarshaller().openMarshallerData().openContextData().openClassData().putAll(classes).closeClassesData().closeContextData()
 			.closeMarshallerData();
 	}
 
@@ -152,7 +152,7 @@ public final class XMLMarshaller {
 	public final XMLMarshaller marshal() throws SAXException, JAXBException {
 		final Marshaller marshaller = this.marshallerData.getMarshaller();
 		synchronized (marshaller) {
-			final Object source = this.sourceData.get();
+			final Object source = this.sourceData.build();
 			final Result result = this.resultData.getResult();
 			marshaller.marshal(source, result);
 		}

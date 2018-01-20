@@ -10,8 +10,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.validation.Schema;
 import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapBuilder;
-import bee.creative.util.Builders.BaseSetBuilder;
+import bee.creative.util.Builders.BaseMapData;
+import bee.creative.util.Builders.BaseSetData;
 import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 import bee.creative.xml.BaseDocumentBuilderFactoryData.SchemaData;
@@ -72,7 +72,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 	 * @see Marshaller#setAdapter(XmlAdapter)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class AdapterData<GOwner> extends BaseSetBuilder<XmlAdapter<?, ?>, AdapterData<GOwner>> {
+	public static abstract class AdapterData<GOwner> extends BaseSetData<XmlAdapter<?, ?>, AdapterData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -116,7 +116,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 	 * @see Marshaller#setProperty(String, Object)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, Object, PropertyData<GOwner>> {
+	public static abstract class PropertyData<GOwner> extends BaseMapData<String, Object, PropertyData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -286,8 +286,8 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 	public final GThis updateMarshaller() throws SAXException, JAXBException {
 		final Marshaller result = this.getMarshaller();
 		result.setSchema(this.shemaData.getSchema());
-		result.setListener(this.listenerData.get());
-		result.setEventHandler(this.validationData.get());
+		result.setListener(this.listenerData.build());
+		result.setEventHandler(this.validationData.build());
 		for (final XmlAdapter<?, ?> entry: this.adapterData) {
 			result.setAdapter(entry);
 		}

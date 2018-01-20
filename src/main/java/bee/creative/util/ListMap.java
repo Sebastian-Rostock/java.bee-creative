@@ -6,33 +6,18 @@ import java.util.Map;
 import java.util.Set;
 
 // TODO
-class TreeMap<GKey, GValue> extends TreeData<GKey, GValue> implements Map<GKey, GValue> {
+class ListMap<GKey, GValue> extends ListData<GKey, GValue> implements Map<GKey, GValue> {
 
-	  static void main(final String[] args) throws Exception {
-
-		final Map map1 = new java.util.TreeMap();
-		final TreeMap map2 = new TreeMap(5);
-
-		for (int i = 0; i < 100; i++) {
-			map1.put(i, i);
-			map2.put(i, i);
-		}
-		map2.print();
-
-		System.out.println(map1);
-
-	}
-
-	public TreeMap() {
+	public ListMap() {
 		super(true);
 	}
 
-	public TreeMap(final int capacity) {
+	public ListMap(final int capacity) {
 		super(true);
 		this.allocateImpl(capacity);
 	}
 
-	public static <GKey, GValue> java.util.TreeMap<GKey, GValue> from(final Filter<Object> filter, final Comparator<? super GKey> comparator) {
+	public static <GKey, GValue> Map<GKey, GValue> from(final Filter<Object> filter, final Comparator<? super GKey> comparator) {
 		return new java.util.TreeMap(comparator);
 	}
 
@@ -60,6 +45,7 @@ class TreeMap<GKey, GValue> extends TreeData<GKey, GValue> implements Map<GKey, 
 		return this.hasValueImpl(value);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public GValue get(final Object key) {
 		return this.getImpl(key);
@@ -74,9 +60,10 @@ class TreeMap<GKey, GValue> extends TreeData<GKey, GValue> implements Map<GKey, 
 	/** {@inheritDoc} */
 	@Override
 	public GValue remove(final Object key) {
-		return popImpl(key);
+		return this.popImpl(key);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void putAll(final Map<? extends GKey, ? extends GValue> m) {
 		for (final Map.Entry<? extends GKey, ? extends GValue> entry: m.entrySet()) {

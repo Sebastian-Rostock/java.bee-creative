@@ -9,7 +9,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapBuilder;
+import bee.creative.util.Builders.BaseMapData;
 import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 
@@ -49,7 +49,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setAttribute(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class AttributeData<GOwner> extends BaseMapBuilder<String, String, AttributeData<GOwner>> {
+	public static abstract class AttributeData<GOwner> extends BaseMapData<String, String, AttributeData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

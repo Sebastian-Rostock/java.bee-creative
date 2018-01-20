@@ -7,7 +7,7 @@ import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapBuilder;
+import bee.creative.util.Builders.BaseMapData;
 import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 
@@ -44,7 +44,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setProperty(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, Object, PropertyData<GOwner>> {
+	public static abstract class PropertyData<GOwner> extends BaseMapData<String, Object, PropertyData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

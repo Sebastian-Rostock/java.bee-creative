@@ -60,7 +60,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	{}
 
 	/** Dieses Feld speichert das {@link Schema}. */
-	Schema schema;
+	Schema result;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}. */
 	final FactoryData<GThis> factoryData = new FactoryData<GThis>() {
@@ -90,7 +90,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 * @return {@code this}. */
 	public final GThis use(final BaseSchemaData<?> data) {
 		if (data == null) return this.customThis();
-		this.schema = data.schema;
+		this.result = data.result;
 		this.sourceData.use(data.sourceData);
 		this.factoryData.use(data.factoryData);
 		return this.customThis();
@@ -105,7 +105,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 * @return {@link Schema} oder {@code null}.
 	 * @throws SAXException Wenn {@link SchemaFactory#newSchema(Source)} eine entsprechende Ausnahme auslöst. */
 	public final Schema getSchema() throws SAXException {
-		Schema result = this.schema;
+		Schema result = this.result;
 		if (result != null) return result;
 		final Source source = this.sourceData.getSource();
 		if (source == null) return null;
@@ -119,7 +119,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 * @param schema {@link Schema} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useSchema(final Schema schema) {
-		this.schema = schema;
+		this.result = schema;
 		return this.customThis();
 	}
 

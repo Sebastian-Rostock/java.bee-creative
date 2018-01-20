@@ -222,7 +222,7 @@ public final class BEXBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final void reuse(final GData input, final GItem output) {
+		protected final void customReuse(final GData input, final GItem output) {
 			output.key--;
 		}
 
@@ -243,7 +243,7 @@ public final class BEXBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final BEXTextItem build(final String input) {
+		protected final BEXTextItem customBuild(final String input) {
 			return this.put(new BEXTextItem(input));
 		}
 
@@ -274,7 +274,7 @@ public final class BEXBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final BEXGroupItem build(final List<BEXItem> input) {
+		protected final BEXGroupItem customBuild(final List<BEXItem> input) {
 			return this.put(new BEXGroupItem(input));
 		}
 

@@ -195,7 +195,7 @@ public final class Fields {
 		 * @param value {@link Set}.
 		 * @return Bearbeitungskopie. */
 		protected Set<GItem> customCopy(final Set<GItem> value) {
-			return new HashSet<GItem>().allocate(value.size()).insertAll(value);
+			return new HashSet<>(value);
 		}
 
 		/** {@inheritDoc} */
@@ -401,7 +401,7 @@ public final class Fields {
 		 * @param value {@link Map}.
 		 * @return Bearbeitungskopie. */
 		protected Map<GKey, GValue> customCopy(final Map<GKey, GValue> value) {
-			return new HashMap<GKey, GValue>().allocate(value.size()).insertAll(value);
+			return new HashMap<>(value);
 		}
 
 		/** {@inheritDoc} */
@@ -455,14 +455,44 @@ public final class Fields {
 
 	{}
 
+	/** Dieses Feld speichert das leere {@link Field}, welches stets {@code null} liefert und das Schreiben ignoriert. */
+	public static final Field<?, ?> EMPTY_FIELD = new Field<Object, Object>() {
+
+		@Override
+		public Object get(final Object input) {
+			return null;
+		}
+
+		@Override
+		public void set(final Object input, final Object value) {
+		}
+
+		@Override
+		public String toString() {
+			return "EMPTY_FIELD";
+		}
+
+	};
+
+	{}
+
+	/** Diese Methode gibt das leere {@link Field} zurück, das stets {@code null} liefert und das Schreiben ignoriert.
+	 *
+	 * @param <GValue> Typ des Werts.
+	 * @return {@link #EMPTY_FIELD}. */
+	@SuppressWarnings ("unchecked")
+	public static <GValue> Field<Object, GValue> emptyField() {
+		return (Field<Object, GValue>)Fields.EMPTY_FIELD;
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.valueGetter(value), Setters.neutralSetter())}.
 	 *
 	 * @see #compositeField(Getter, Setter)
 	 * @see Getters#valueGetter(Object)
-	 * @see Setters#neutralSetter() */
+	 * @see Setters#emptySetter() */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
-		return Fields.compositeField(Getters.valueGetter(value), Setters.neutralSetter());
+		return Fields.compositeField(Getters.valueGetter(value), Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein initialisierendes {@link Field} zurück.<br>
@@ -632,22 +662,22 @@ public final class Fields {
 	public static <GInput, GValue> Field<GInput, GValue> mappingField(final Map<GInput, GValue> mapping) throws NullPointerException {
 		Objects.assertNotNull(mapping);
 		return new Field<GInput, GValue>() {
-	
+
 			@Override
 			public GValue get(final GInput input) {
 				return mapping.get(input);
 			}
-	
+
 			@Override
 			public void set(final GInput input, final GValue value) {
 				mapping.put(input, value);
 			}
-	
+
 			@Override
 			public String toString() {
 				return Objects.toInvokeString("mappingField", mapping);
 			}
-	
+
 		};
 	}
 
