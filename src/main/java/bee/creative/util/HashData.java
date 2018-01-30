@@ -423,6 +423,17 @@ public abstract class HashData<GKey, GValue> {
 
 	{}
 
+	/** Dieses Feld speichert die Anzahl der Einträge. */
+	int count = 0;
+
+	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
+	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
+	int empty = 0;
+
+	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
+	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. */
+	int[] table = HashData.EMPTY_TABLE;
+
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	Object[] keys = HashData.EMPTY_OBJECTS;
 
@@ -430,22 +441,11 @@ public abstract class HashData<GKey, GValue> {
 	 * reservierten Speicherbereiches ab. */
 	int[] nexts = HashData.EMPTY_INTEGERS;
 
-	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	Object[] values;
-
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab oder ist {@code null}. */
 	int[] hashes;
 
-	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
-	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. */
-	int[] table = HashData.EMPTY_TABLE;
-
-	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
-	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
-	int entry = 0;
-
-	/** Dieses Feld speichert die Anzahl der Einträge. */
-	int count = 0;
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	Object[] values;
 
 	/** Dieser Konstruktor initialisiert die streuwertbasierte Datenhaltung.
 	 *
@@ -483,7 +483,7 @@ public abstract class HashData<GKey, GValue> {
 		final int[] oldNexts = this.nexts;
 		if (oldNexts.length == capacity) return;
 		if (capacity == 0) {
-			this.entry = 0;
+			this.empty = 0;
 			this.keys = HashData.EMPTY_OBJECTS;
 			this.nexts = HashData.EMPTY_INTEGERS;
 			this.values = this.values != null ? HashData.EMPTY_OBJECTS : null;
@@ -520,7 +520,7 @@ public abstract class HashData<GKey, GValue> {
 					newEntry++;
 				}
 			}
-			this.entry = newEntry;
+			this.empty = newEntry;
 			this.table = newTable;
 			this.keys = newKeys;
 			this.nexts = newNexts;
@@ -685,8 +685,8 @@ public abstract class HashData<GKey, GValue> {
 		final int[] table = this.table;
 		final int[] nexts = this.nexts;
 		final int[] hashes = this.hashes;
-		final int index = hash & (table.length - 1), result = this.entry;
-		this.entry = nexts[result];
+		final int index = hash & (table.length - 1), result = this.empty;
+		this.empty = nexts[result];
 		nexts[result] = table[index];
 		table[index] = result;
 		this.keys[result] = key;
@@ -754,24 +754,24 @@ public abstract class HashData<GKey, GValue> {
 		final Object[] values = this.values;
 		if (prevIndex == entryIndex) {
 			table[tableIndex] = nexts[prevIndex];
-			nexts[prevIndex] = this.entry;
+			nexts[prevIndex] = this.empty;
 			this.keys[prevIndex] = null;
 			if (values != null) {
 				values[prevIndex] = null;
 			}
-			this.entry = prevIndex;
+			this.empty = prevIndex;
 			this.count--;
 			return true;
 		}
 		for (int nextIndex = nexts[prevIndex]; 0 <= nextIndex; prevIndex = nextIndex, nextIndex = nexts[nextIndex]) {
 			if (nextIndex == entryIndex) {
 				nexts[prevIndex] = nexts[nextIndex];
-				nexts[nextIndex] = this.entry;
+				nexts[nextIndex] = this.empty;
 				this.keys[nextIndex] = null;
 				if (values != null) {
 					values[nextIndex] = null;
 				}
-				this.entry = nextIndex;
+				this.empty = nextIndex;
 				this.count--;
 				return true;
 			}
@@ -797,20 +797,20 @@ public abstract class HashData<GKey, GValue> {
 		if (prevIndex < 0) return false;
 		if (((hashes == null) || (hashes[prevIndex] == hash)) && this.customEquals(keys[prevIndex], key) && Objects.equals(values[prevIndex], value)) {
 			table[index] = nexts[prevIndex];
-			nexts[prevIndex] = this.entry;
+			nexts[prevIndex] = this.empty;
 			keys[prevIndex] = null;
 			values[prevIndex] = null;
-			this.entry = prevIndex;
+			this.empty = prevIndex;
 			this.count--;
 			return true;
 		}
 		for (int nextIndex = nexts[prevIndex]; 0 <= nextIndex; prevIndex = nextIndex, nextIndex = nexts[nextIndex]) {
 			if (((hashes == null) || (hashes[nextIndex] == hash)) && this.customEquals(keys[nextIndex], key) && Objects.equals(values[nextIndex], value)) {
 				nexts[prevIndex] = nexts[nextIndex];
-				nexts[nextIndex] = this.entry;
+				nexts[nextIndex] = this.empty;
 				keys[nextIndex] = null;
 				values[nextIndex] = null;
-				this.entry = nextIndex;
+				this.empty = nextIndex;
 				this.count--;
 				return true;
 			}
@@ -840,8 +840,8 @@ public abstract class HashData<GKey, GValue> {
 				if (this.customEquals(keys[prevIndex], key)) {
 					keys[prevIndex] = null;
 					table[index] = nexts[prevIndex];
-					nexts[prevIndex] = this.entry;
-					this.entry = prevIndex;
+					nexts[prevIndex] = this.empty;
+					this.empty = prevIndex;
 					this.count--;
 					return prevIndex;
 				}
@@ -849,8 +849,8 @@ public abstract class HashData<GKey, GValue> {
 					if (this.customEquals(keys[nextIndex], key)) {
 						keys[nextIndex] = null;
 						nexts[prevIndex] = nexts[nextIndex];
-						nexts[nextIndex] = this.entry;
-						this.entry = nextIndex;
+						nexts[nextIndex] = this.empty;
+						this.empty = nextIndex;
 						this.count--;
 						return nextIndex;
 					}
@@ -859,8 +859,8 @@ public abstract class HashData<GKey, GValue> {
 				if ((hashes[prevIndex] == hash) && this.customEquals(keys[prevIndex], key)) {
 					keys[prevIndex] = null;
 					table[index] = nexts[prevIndex];
-					nexts[prevIndex] = this.entry;
-					this.entry = prevIndex;
+					nexts[prevIndex] = this.empty;
+					this.empty = prevIndex;
 					this.count--;
 					return prevIndex;
 				}
@@ -868,8 +868,8 @@ public abstract class HashData<GKey, GValue> {
 					if ((hashes[nextIndex] == hash) && this.customEquals(keys[nextIndex], key)) {
 						keys[nextIndex] = null;
 						nexts[prevIndex] = nexts[nextIndex];
-						nexts[nextIndex] = this.entry;
-						this.entry = nextIndex;
+						nexts[nextIndex] = this.empty;
+						this.empty = nextIndex;
 						this.count--;
 						return nextIndex;
 					}

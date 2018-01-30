@@ -218,6 +218,27 @@ public class Comparables {
 		};
 	}
 
+	public static <GItem> Comparable<Iterable<? extends GItem>> iterableComparable(final Comparable<? super GItem> comparable) {
+		Objects.assertNotNull(comparable);
+		return new Comparable<Iterable<? extends GItem>>() {
+
+			@Override
+			public int compareTo(final Iterable<? extends GItem> that) {
+				for (final GItem item: that) {
+					final int result = this.compareTo(that);
+					if (result != 0) return result;
+				}
+				return 0;
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("reverseComparable", comparable);
+			}
+
+		};
+	}
+
 	/** Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet
 	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat. Der Navigationswert
 	 * für ein Element {@code item} ist {@code (comparable1.compareTo(item) != 0) ? comparable1.compareTo(item) : comparable2.compareTo(item)}.

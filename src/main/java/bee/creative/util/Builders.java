@@ -805,6 +805,24 @@ public class Builders {
 
 		{}
 
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Vereinigungsmenge dieser {@link #build() Menge} und der gegebenen Menge zurück.
+		 *
+		 * @see bee.creative.util.Collections#unionSet(Set, Set)
+		 * @param items zweite Menge.
+		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
+		public SetBuilder<GItem, Set<GItem>> toUnion(final Set<? extends GItem> items) {
+			return SetBuilder.from(bee.creative.util.Collections.unionSet(this.result, items));
+		}
+
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Schnittmenge dieser {@link #build() Menge} und der gegebenen Menge zurück.
+		 *
+		 * @see bee.creative.util.Collections#intersectionSet(Set, Set)
+		 * @param items zweite Menge.
+		 * @return neuer {@link SetBuilder} zum {@code intersectionSet}. */
+		public SetBuilder<GItem, Set<GItem>> toIntersection(final Set<? extends GItem> items) {
+			return SetBuilder.from(bee.creative.util.Collections.intersectionSet(this.result, items));
+		}
+
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #build() Menge} zurück.
 		 *
 		 * @see java.util.Collections#checkedSet(Set, Class)
@@ -819,7 +837,7 @@ public class Builders {
 		 * @see bee.creative.util.Collections#translatedSet(Set, Translator)
 		 * @param <GItem2> Typ der übersetzten Elemente.
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
-		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
+		 * @return neuer {@link SetBuilder} zum {@code translatedSet}. */
 		public <GItem2> SetBuilder<GItem2, Set<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
 			return SetBuilder.from(bee.creative.util.Collections.translatedSet(this.result, itemTranslator));
 		}
@@ -827,7 +845,7 @@ public class Builders {
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die threadsichere {@link #build() Menge} zurück.
 		 *
 		 * @see java.util.Collections#synchronizedSet(Set)
-		 * @return {@code this}. */
+		 * @return neuer {@link SetBuilder} zum {@code synchronizedSet}. */
 		public SetBuilder<GItem, Set<GItem>> toSynchronized() {
 			return SetBuilder.from(Collections.synchronizedSet(this.result));
 		}
@@ -835,7 +853,7 @@ public class Builders {
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die unveränderliche {@link #build() Menge} zurück.
 		 *
 		 * @see java.util.Collections#unmodifiableSet(Set)
-		 * @return {@code this}. */
+		 * @return neuer {@link SetBuilder} zum {@code unmodifiableSet}. */
 		public SetBuilder<GItem, Set<GItem>> toUnmodifiable() {
 			return SetBuilder.from(Collections.unmodifiableSet(this.result));
 		}
@@ -896,37 +914,64 @@ public class Builders {
 
 		{}
 
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #build() Menge} zurück.
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die rückwärts geordnete {@link #build() Liste} zurück.
+		 *
+		 * @see bee.creative.util.Collections#reverseList(List)
+		 * @return neuer {@link ListBuilder} zur {@code reverseList}. */
+		public ListBuilder<GItem, List<GItem>> toReverse() {
+			return ListBuilder.from(bee.creative.util.Collections.reverseList(this.result));
+		}
+
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #build() Liste} mit der gegebenen zurück.
+		 *
+		 * @see bee.creative.util.Collections#chainedList(List, List)
+		 * @param items zweite Liste.
+		 * @return neuer {@link ListBuilder} zur {@code chained}. */
+		public ListBuilder<GItem, List<GItem>> toChained(final List<GItem> items) {
+			return ListBuilder.from(bee.creative.util.Collections.chainedList(this.result, items));
+		}
+
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #build() Liste} mit der gegebenen zurück.
+		 *
+		 * @see bee.creative.util.Collections#chainedList(List, List, boolean)
+		 * @param items zweite Liste.
+		 * @param extendMode Erweiterungsmodus.
+		 * @return neuer {@link ListBuilder} zur {@code chained}. */
+		public ListBuilder<GItem, List<GItem>> toChained(final List<GItem> items, final boolean extendMode) {
+			return ListBuilder.from(bee.creative.util.Collections.chainedList(this.result, items, extendMode));
+		}
+
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #build() Liste} zurück.
 		 *
 		 * @see java.util.Collections#checkedList(List, Class)
 		 * @param itemClazz Klasse der Elemente.
-		 * @return neuer {@link ListBuilder} zum {@code checkedList}. */
+		 * @return neuer {@link ListBuilder} zur {@code checkedList}. */
 		public ListBuilder<GItem, List<GItem>> toChecked(final Class<GItem> itemClazz) {
 			return ListBuilder.from(Collections.checkedList(this.result, itemClazz));
 		}
 
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #build() Menge} zurück.
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #build() Liste} zurück.
 		 *
 		 * @see bee.creative.util.Collections#translatedList(List, Translator)
 		 * @param <GItem2> Typ der übersetzten Elemente.
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
-		 * @return neuer {@link ListBuilder} zum {@code checkedList}. */
+		 * @return neuer {@link ListBuilder} zur {@code translatedList}. */
 		public <GItem2> ListBuilder<GItem2, List<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
 			return ListBuilder.from(bee.creative.util.Collections.translatedList(this.result, itemTranslator));
 		}
 
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die threadsichere {@link #build() Menge} zurück.
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die threadsichere {@link #build() Liste} zurück.
 		 *
 		 * @see java.util.Collections#synchronizedList(List)
-		 * @return {@code this}. */
+		 * @return neuer {@link ListBuilder} zur {@code synchronizedList}. */
 		public ListBuilder<GItem, List<GItem>> toSynchronized() {
 			return ListBuilder.from(Collections.synchronizedList(this.result));
 		}
 
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die unveränderliche {@link #build() Menge} zurück.
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die unveränderliche {@link #build() Liste} zurück.
 		 *
 		 * @see java.util.Collections#unmodifiableList(List)
-		 * @return {@code this}. */
+		 * @return neuer {@link ListBuilder} zur {@code unmodifiableList}. */
 		public ListBuilder<GItem, List<GItem>> toUnmodifiable() {
 			return ListBuilder.from(Collections.unmodifiableList(this.result));
 		}
@@ -937,6 +982,132 @@ public class Builders {
 		@Override
 		protected final ListBuilder<GItem, GResult> customThis() {
 			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc") // TODO
+	public static class ComparatorBuilder<GItem, GResult extends Comparator<GItem>> extends BaseBuilder<GResult, ComparatorBuilder<GItem, GResult>> {
+
+		public static final <GItem, GResult extends Comparator<GItem>> ComparatorBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+			return new ComparatorBuilder<>(result);
+		}
+
+		public static final <GItem extends Comparable<? super GItem>> ComparatorBuilder<GItem, Comparator<GItem>> fromNatural() {
+			return ComparatorBuilder.from(Comparators.<GItem>naturalComparator());
+		}
+
+		{}
+
+		protected GResult result;
+
+		protected ComparatorBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.assertNotNull(result);
+		}
+
+		{}
+
+		public ComparatorBuilder<GItem, Comparator<GItem>> toDefault() {
+			return ComparatorBuilder.from(Comparators.defaultComparator(this.result));
+		}
+
+		public ComparatorBuilder<GItem, Comparator<GItem>> toReverse() {
+			return ComparatorBuilder.from(Comparators.reverseComparator(this.result));
+		}
+
+		public ComparatorBuilder<Iterable<? extends GItem>, Comparator<Iterable<? extends GItem>>> toIterable() {
+			return ComparatorBuilder.from(Comparators.iterableComparator(this.result));
+		}
+
+		public ComparatorBuilder<GItem, Comparator<GItem>> toChained(final Comparator<? super GItem> comparator) {
+			return ComparatorBuilder.from(Comparators.chainedComparator(this.result, comparator));
+		}
+
+		public <GItem2> ComparatorBuilder<GItem2, Comparator<GItem2>> toNavigated(final Getter<? super GItem2, ? extends GItem> navigator) {
+			return ComparatorBuilder.from(Comparators.navigatedComparator(navigator, this.result));
+		}
+
+		public ComparableBuilder<GItem, Comparable<GItem>> toComparable(final GItem item) {
+			return ComparableBuilder.from(Comparables.itemComparable(item, this.result));
+		}
+
+		{}
+
+		/** {@inheritDoc} */
+		@Override
+		protected ComparatorBuilder<GItem, GResult> customThis() {
+			return this;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public GResult build() throws IllegalStateException {
+			return this.result;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return Objects.toString(true, this.result);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc") // TODO
+	public static class ComparableBuilder<GItem, GResult extends Comparable<GItem>> extends BaseBuilder<GResult, ComparableBuilder<GItem, GResult>> {
+
+		public static final <GItem, GResult extends Comparable<GItem>> ComparableBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+			return new ComparableBuilder<>(result);
+		}
+
+		{}
+
+		protected GResult result;
+
+		protected ComparableBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.assertNotNull(result);
+		}
+
+		{}
+
+		public ComparableBuilder<GItem, Comparable<GItem>> toDefault() {
+			return ComparableBuilder.from(Comparables.defaultComparable(this.result));
+		}
+
+		public ComparableBuilder<GItem, Comparable<GItem>> toReverse() {
+			return ComparableBuilder.from(Comparables.reverseComparable(this.result));
+		}
+
+		public ComparableBuilder<Iterable<? extends GItem>, Comparable<Iterable<? extends GItem>>> toIterable() {
+			return ComparableBuilder.from(Comparables.iterableComparable(this.result));
+		}
+
+		public ComparableBuilder<GItem, Comparable<GItem>> toChained(final Comparable<? super GItem> comparator) {
+			return ComparableBuilder.from(Comparables.chainedComparable(this.result, comparator));
+		}
+
+		public <GItem2> ComparableBuilder<GItem2, Comparable<GItem2>> toNavigated(final Getter<? super GItem2, ? extends GItem> navigator) {
+			return ComparableBuilder.from(Comparables.navigatedComparable(navigator, this.result));
+		}
+
+		{}
+
+		/** {@inheritDoc} */
+		@Override
+		protected ComparableBuilder<GItem, GResult> customThis() {
+			return this;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public GResult build() throws IllegalStateException {
+			return this.result;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return Objects.toString(true, this.result);
 		}
 
 	}
