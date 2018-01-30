@@ -29,7 +29,7 @@ class ListData<GKey, GValue> {
 
 	{}
 
-	private static final int[] EMPTY_PAGES = {0,0};
+	private static final int[] EMPTY_TABLE = {0, 0};
 
 	/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
 	private static final Object[] EMPTY_OBJECTS = {};
@@ -74,9 +74,7 @@ class ListData<GKey, GValue> {
 		if (lo < hi) {
 			if (lo < 0) throw new IllegalArgumentException();
 			if (lo == 0) return;
-			
-			
-			
+
 			if (lo == 1) {
 				ListData.rotateLo1(array, offset, length);
 			}
@@ -121,16 +119,10 @@ class ListData<GKey, GValue> {
 
 	{}
 
-	/** Dieses Feld speichert die Anzahl der Einträge ab {@link #empty}. */
-	int count = 0;
-
-	/** Dieses Feld speichert den Index der nächsten freien Page in {@link #keys}. */
-	int empty = 0;
-
-	// an positionen [0, 1] steht der von-bis-bereich, der in "pages" mit verweisen gefüllt ist 
+	// an positionen [0, 1] steht der von-bis-bereich, der in "pages" mit verweisen gefüllt ist
 	// an positionen [n, n + 1] steht der von-bis-bereich, der in der "n/64"-ten Page in "keys" belegt ist
 	// unbeutzte von-bis-bereiche zeigen auf die Mitte einer Seite
-	int[] pages = ListData.EMPTY_PAGES;
+	int[] table = ListData.EMPTY_TABLE;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. eine leere page enthält im ersten element einen integer, der auf die nächste freie
 	 * seite zeigt Für alle anderen Indizes bildet es auf {@code null} ab. */
@@ -138,6 +130,9 @@ class ListData<GKey, GValue> {
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	Object[] values;
+
+	/** Dieses Feld speichert die Anzahl der Einträge ab {@link #empty}. */
+	int count = 0;
 
 	public ListData(final boolean withValues) {
 		this.values = withValues ? ListData.EMPTY_OBJECTS : null;
@@ -148,14 +143,14 @@ class ListData<GKey, GValue> {
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
 	 *
 	 * @return Anzahl der Einträge. */
-	protected final int countImpl() {
+	protected final int OKAY_countImpl() {
 		return this.count;
 	}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
 	 *
 	 * @return Kapazität. */
-	protected final int capacityImpl() {
+	protected final int OKAY_capacityImpl() {
 		return this.keys.length;
 	}
 
@@ -169,20 +164,12 @@ class ListData<GKey, GValue> {
 		final Object[] oldKeys = this.keys;
 		if (oldKeys.length == capacity) return;
 		if (capacity == 0) {
+			this.table = ListData.EMPTY_TABLE;
 			this.keys = ListData.EMPTY_OBJECTS;
 			this.values = this.values != null ? ListData.EMPTY_OBJECTS : null;
-			this.empty = 0;
 		} else if (capacity <= ListData.MAX_CAPACITY) {
-			final int oldEntry = this.empty, newEntry = (capacity - count) >>> 1;
-			final Object[] newKeys = new Object[capacity], oldValues = this.values;
-			System.arraycopy(oldKeys, oldEntry, newKeys, newEntry, count);
-			if (oldValues != null) {
-				final Object[] newValues = new Object[capacity];
-				System.arraycopy(oldValues, oldEntry, newValues, newEntry, count);
-				this.values = newValues;
-			}
-			this.keys = newKeys;
-			this.empty = newEntry;
+			// TODO
+
 		} else throw new OutOfMemoryError();
 	}
 
@@ -191,7 +178,7 @@ class ListData<GKey, GValue> {
 	 * @see Map#containsKey(Object)
 	 * @param key Schlüssel des Eintrags.
 	 * @return {@code true}, wenn der Eintrag gefundenen wurde. */
-	protected final boolean hasKeyImpl(final Object key) {
+	protected final boolean OKAY_hasKeyImpl(final Object key) {
 		return 0 <= this.getIndexImpl(key);
 	}
 
@@ -214,7 +201,7 @@ class ListData<GKey, GValue> {
 	 * @param key Schlüssel des Eintrags.
 	 * @param value Wert des Eintrags.
 	 * @return {@code true}, wenn der Eintrag gefundenen wurde. */
-	protected final boolean hasEntryImpl(final Object key, final Object value) {
+	protected final boolean OKAY_hasEntryImpl(final Object key, final Object value) {
 		final int index = this.getIndexImpl(key);
 		return (index >= 0) && Objects.equals(this.values[index], value);
 	}
@@ -226,7 +213,7 @@ class ListData<GKey, GValue> {
 	 * @param key Schlüssel des Eintrags.
 	 * @return Wert des gefundenen Eintrags oder {@code null}. */
 	@SuppressWarnings ("unchecked")
-	protected final GValue getImpl(final Object key) {
+	protected final GValue OKAY_getImpl(final Object key) {
 		final int index = this.getIndexImpl(key);
 		if (index < 0) return null;
 		return (GValue)this.values[index];
@@ -237,7 +224,7 @@ class ListData<GKey, GValue> {
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Schlüssel oder {@code null}. */
 	@SuppressWarnings ("unchecked")
-	protected final GKey getKeyImpl(final int entryIndex) {
+	protected final GKey OKAY_getKeyImpl(final int entryIndex) {
 		return (GKey)this.keys[entryIndex];
 	}
 
@@ -246,7 +233,7 @@ class ListData<GKey, GValue> {
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Wert oder {@code null}. */
 	@SuppressWarnings ("unchecked")
-	protected final GValue getValueImpl(final int entryIndex) {
+	protected final GValue OKAY_getValueImpl(final int entryIndex) {
 		return (GValue)this.values[entryIndex];
 	}
 
@@ -256,81 +243,33 @@ class ListData<GKey, GValue> {
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen Eintrags oder {@code -1}. */
 	protected final int getIndexImpl(final Object key) {
-		final int[] pages = this.pages;
-		int maxPage = pages.length - this.empty;
-		// empty nennt die anzahl der am ende von pages verwalteten freien pages
-		// pages könnte größer als nötig reserviert werden, wobei dann hi und lo guards nötig werden,
-		// aber das einfügen/löschen von pages schneller geht
-		// alternativ enthalten die leeren pages in ihrer mitte den integer mit dem pointer
-
-		// kein Treffer iin leerem Baum möglich
-		if (maxPage <= 0) return -1;
+		final int[] table = this.table;
 		final Object[] keys = this.keys;
-		int minPage = 0;
-		// binäre Suche nach der Page, die den gesuchten key enthalten kann
-		while (minPage != maxPage) {
-			final int midPage = (minPage + maxPage) >>> 1;
-			if (midPage < 0) {
-				if (midPage == ListData.HI_PAGE) {
-					maxPage = midPage;
-				} else {
-					minPage = midPage + 1;
-				}
-			} else {
-				final int midIndex = (pages[midPage] & ~63) | 32;
-				final int this2that = this.customCompare(keys[midIndex], key);
-				if (this2that > 0) {
-					maxPage = midPage;
-				} else if (this2that < 0) {
-					minPage = midPage + 1;
-				} else return midIndex;
-			}
-		}
-		// einzufügen bei midPage
-		// muss in midPage vor 30 oder in midPage-1 nach 32. element liegen
-
-		final Object lo = ListData.LO_OBJECT;
-		final Object hi = ListData.HI_OBJECT;
-		int minIndex = pages[minPage] & ~63;
-		int maxIndex = minIndex + 31;
+		// 1) Binäre Suche nach der passenden Bereich
+		int minIndex = table[0], maxIndex = table[1];
 		while (minIndex != maxIndex) {
 			final int midIndex = (minIndex + maxIndex) >>> 1;
-			final Object thisKey = keys[midIndex];
-			if (thisKey == hi) {
+			// 1.1) Abgleich des Letzten Elements einer Page, sodass "minIndex" die Page nennt, in welcher der Treffer enthalten sein muss
+			final int result = table[(midIndex << 1) + 1] - 1;
+			final int this2that = this.customCompare(keys[result], key);
+			if (this2that > 0) {
 				maxIndex = midIndex;
-			} else if (thisKey == lo) {
+			} else if (this2that < 0) {
 				minIndex = midIndex + 1;
-			} else {
-				final int this2that = this.customCompare(thisKey, key);
-				if (this2that > 0) {
-					maxIndex = midIndex;
-				} else if (this2that > 0) {
-					minIndex = midIndex + 1;
-				} else return midIndex;
-			}
+			} else return result;
 		}
-		// vor der ersten page ist keine
-		if (minPage == 0) return -1;
-		// hintere hälfte der vorderen page durchsuchen
-		maxIndex = (pages[minPage - 1] + 1) & ~63;
-		minIndex = maxIndex - 32;
-		while (minIndex != maxIndex) {
-			final int midIndex = (minIndex + maxIndex) >>> 1;
-			final Object thisKey = keys[midIndex];
-			if (thisKey == hi) {
-				maxIndex = midIndex;
-			} else if (thisKey == lo) {
-				minIndex = midIndex + 1;
-			} else {
-				final int this2that = this.customCompare(thisKey, key);
-				if (this2that > 0) {
-					maxIndex = midIndex;
-				} else if (this2that > 0) {
-					minIndex = midIndex + 1;
-				} else return midIndex;
-			}
+		// 2) Binäre Suche nach dem passenden Element
+		final int minRange = table[minIndex], maxRange = table[minIndex + 1];
+		int minItem = minRange, maxItem = maxRange;
+		while (minItem != maxItem) {
+			final int result = (minItem + maxItem) >>> 1;
+			final int this2that = this.customCompare(keys[result], key);
+			if (this2that > 0) {
+				maxItem = result;
+			} else if (this2that > 0) {
+				minItem = result + 1;
+			} else return result;
 		}
-
 		return -1;
 	}
 
@@ -339,7 +278,9 @@ class ListData<GKey, GValue> {
 	 * @see NavigableSet#first()
 	 * @return Index des ersten Elements. */
 	protected final int getFirstIndex() {
-		return this.empty;
+		if (this.count == 0) return -1;
+		final int[] table = this.table;
+		return table[table[0] << 1];
 	}
 
 	/** Diese Methode gibt den Index des größten Elements zurück, dass kleiner dem gegebenen ist. Dieser Index kann die Werte {@code -1} und {@code from+size}
@@ -388,12 +329,14 @@ class ListData<GKey, GValue> {
 		return index + 1;
 	}
 
-	/** Diese Methode gibt den Index des letzten Elements zurück. Dieser Index kann deb Wert {@code -1} annehmen.
+	/** Diese Methode gibt den Index des letzten Elements zurück. Dieser Index kann den Wert {@code -1} annehmen.
 	 *
 	 * @see NavigableSet#last()
 	 * @return Index des letzten Elements. */
 	protected final int getIastIndex() {
-		return this.empty + this.count;
+		if (this.count == 0) return -1;
+		final int[] table = this.table;
+		return table[(table[1] << 1) - 1] - 1;
 	}
 
 	/** Diese Methode gibt die gegebenen Position als Index des internen Arrays zurück. Wenn ({@code index < 0} oder {@code index >= size}) wird eine
@@ -680,7 +623,7 @@ class ListData<GKey, GValue> {
 		ListData.clearObjects(this.keys);
 		ListData.clearObjects(this.values);
 		this.count = 0;
-		this.empty = this.capacityImpl() >>> 2;
+		// TODO
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Schlüssel kleienr als, gleich bzw. größer als der zweite
@@ -715,12 +658,12 @@ class ListData<GKey, GValue> {
 
 		@Override
 		public GKey getKey() {
-			return this.entryData.getKeyImpl(this.entryIndex);
+			return this.entryData.OKAY_getKeyImpl(this.entryIndex);
 		}
 
 		@Override
 		public GValue getValue() {
-			return this.entryData.getValueImpl(this.entryIndex);
+			return this.entryData.OKAY_getValueImpl(this.entryIndex);
 		}
 
 		@Override
@@ -764,7 +707,7 @@ class ListData<GKey, GValue> {
 
 		/** Diese Methode gibt den vorherigen Schlüssel zurück. */
 		protected final GKey prevKey() {
-			return this.entryData.getKeyImpl(this.prevIndex());
+			return this.entryData.OKAY_getKeyImpl(this.prevIndex());
 		}
 
 		/** Diese Methode gibt den vorherigen Eintrag zurück. */
@@ -774,7 +717,7 @@ class ListData<GKey, GValue> {
 
 		/** Diese Methode gibt den vorherigen Wert zurück. */
 		protected final GValue prevValue() {
-			return this.entryData.getValueImpl(this.prevIndex());
+			return this.entryData.OKAY_getValueImpl(this.prevIndex());
 		}
 
 		/** Diese Methode ermitteln den Index des vorherigen Eintrags und gibt den des aktuellen zurück. */
@@ -794,7 +737,7 @@ class ListData<GKey, GValue> {
 
 		/** Diese Methode gibt den nächsten Schlüssel zurück. */
 		protected final GKey nextKey() {
-			return this.entryData.getKeyImpl(this.nextIndex());
+			return this.entryData.OKAY_getKeyImpl(this.nextIndex());
 		}
 
 		/** Diese Methode gibt den nächsten Eintrag zurück. */
@@ -804,7 +747,7 @@ class ListData<GKey, GValue> {
 
 		/** Diese Methode gibt den nächsten Wert zurück. */
 		protected final GValue nextValue() {
-			return this.entryData.getValueImpl(this.nextIndex());
+			return this.entryData.OKAY_getValueImpl(this.nextIndex());
 		}
 
 		/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
@@ -864,7 +807,7 @@ class ListData<GKey, GValue> {
 
 		@Override
 		public boolean contains(final Object item) {
-			return this.entryData.hasKeyImpl(item);
+			return this.entryData.OKAY_hasKeyImpl(item);
 		}
 
 		@Override
@@ -1108,7 +1051,7 @@ class ListData<GKey, GValue> {
 		public boolean contains(final Object object) {
 			if (!(object instanceof Entry)) return false;
 			final Entry<?, ?> entry = (Entry<?, ?>)object;
-			return this.entryData.hasEntryImpl(entry.getKey(), entry.getValue());
+			return this.entryData.OKAY_hasEntryImpl(entry.getKey(), entry.getValue());
 		}
 
 	}
@@ -1162,7 +1105,7 @@ class ListData<GKey, GValue> {
 
 		@Override
 		public boolean containsKey(final Object key) {
-			return this.entryData.hasKeyImpl(key);
+			return this.entryData.OKAY_hasKeyImpl(key);
 		}
 
 		@Override
@@ -1172,7 +1115,7 @@ class ListData<GKey, GValue> {
 
 		@Override
 		public GValue get(final Object key) {
-			return this.entryData.getImpl(key);
+			return this.entryData.OKAY_getImpl(key);
 		}
 
 		@Override
@@ -1329,7 +1272,7 @@ class ListData<GKey, GValue> {
 	protected Object clone() throws CloneNotSupportedException {
 		try {
 			final ListData<?, ?> result = (ListData<?, ?>)super.clone();
-			if (this.capacityImpl() == 0) {
+			if (this.OKAY_capacityImpl() == 0) {
 				result.keys = ListData.EMPTY_OBJECTS;
 				result.values = result.values != null ? ListData.EMPTY_OBJECTS : null;
 			} else {

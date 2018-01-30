@@ -423,13 +423,6 @@ public abstract class HashData<GKey, GValue> {
 
 	{}
 
-	/** Dieses Feld speichert die Anzahl der Einträge. */
-	int count = 0;
-
-	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
-	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
-	int empty = 0;
-
 	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
 	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. */
 	int[] table = HashData.EMPTY_TABLE;
@@ -446,6 +439,13 @@ public abstract class HashData<GKey, GValue> {
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	Object[] values;
+
+	/** Dieses Feld speichert die Anzahl der Einträge. */
+	int count = 0;
+
+	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
+	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
+	int empty = 0;
 
 	/** Dieser Konstruktor initialisiert die streuwertbasierte Datenhaltung.
 	 *
