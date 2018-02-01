@@ -1,6 +1,7 @@
 package bee.creative.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -17,6 +18,7 @@ import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -40,6 +42,88 @@ import bee.creative.data.FileDataTarget;
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class IO {
+
+	/** Diese Methode kopiert den Inhalt des gegebenen {@link Reader} in den gegebenen {@link Writer}.
+	 *
+	 * @param input Quellobjekt.
+	 * @param output Zielobjekt.
+	 * @return Anzahl der kopierten Zeichen.
+	 * @throws IOException - */
+	public static long copy(final Reader input, final Writer output) throws IOException {
+		final char[] buffer = new char[128 * 1024];
+		long result = 0;
+		while (true) {
+			final int count = input.read(buffer);
+			if (count < 0) return result;
+			output.write(buffer, 0, count);
+			result += count;
+		}
+	}
+
+	/** Diese Methode kopiert den Inhalt des gegebenen {@link InputStream} in den gegebenen {@link OutputStream}.
+	 *
+	 * @param input Quellobjekt.
+	 * @param output Zielobjekt.
+	 * @return Anzahl der kopierten Bytes.
+	 * @throws IOException - */
+	public static long copy(final InputStream input, final OutputStream output) throws IOException {
+		final byte[] buffer = new byte[256 * 1024];
+		long result = 0;
+		while (true) {
+			final int count = input.read(buffer);
+			if (count < 0) return result;
+			output.write(buffer, 0, count);
+			result += count;
+		}
+	}
+
+	/** Diese Methode liest den Inhalt des {@link #inputStreamFrom(Object) zum gegebenen Quellobjekt ermittelten} {@link InputStream} und gibt ihn als Bytefolge
+	 * zurück.
+	 *
+	 * @param input Quellobjekt.
+	 * @return Bytefolge.
+	 * @throws IOException - */
+	public static byte[] readBytes(final Object input) throws IOException {
+		try (InputStream stream = IO.inputStreamFrom(input); ByteArrayOutputStream result = new ByteArrayOutputStream()) {
+			IO.copy(stream, result);
+			return result.toByteArray();
+		}
+	}
+
+	/** Diese Methode liest den Inhalt des {@link #inputReaderFrom(Object) zum gegebenen Quellobjekt ermittelten} {@link Reader} und gibt ihn als Zeichenkette
+	 * zurück.
+	 *
+	 * @param input Quellobjekt.
+	 * @return Zeichenkette.
+	 * @throws IOException - */
+	public static String readString(final Object input) throws IOException {
+		try (Reader reader = IO.inputReaderFrom(input); StringWriter result = new StringWriter()) {
+			IO.copy(reader, result);
+			return result.toString();
+		}
+	}
+
+	/** Diese Methode schreibt die gegebene Bytefolge in den {@link #outputStreamFrom(Object) zum gegebenen Zielobjekt ermittelten} {@link OutputStream}.
+	 *
+	 * @param output Zielobjekt.
+	 * @param value Bytefolge.
+	 * @throws IOException - */
+	public static void writeBytes(final Object output, final byte[] value) throws IOException {
+		try (OutputStream stream = IO.outputStreamFrom(output)) {
+			stream.write(value);
+		}
+	}
+
+	/** Diese Methode schreibt die gegebene Zeichenkette in den {@link #outputWriterFrom(Object) zum gegebenen Zielobjekt ermittelten} {@link Writer}.
+	 *
+	 * @param output Zielobjekt.
+	 * @param value Zeichenkette.
+	 * @throws IOException - */
+	public static void writeString(final Object output, final String value) throws IOException {
+		try (Writer writer = IO.outputWriterFrom(output)) {
+			writer.write(value);
+		}
+	}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt eine {@link DataSource} und gibt diese zurück.<br>
 	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
