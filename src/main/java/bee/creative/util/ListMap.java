@@ -24,31 +24,31 @@ class ListMap<GKey, GValue> extends ListData<GKey, GValue> implements Map<GKey, 
 	/** {@inheritDoc} */
 	@Override
 	public int size() {
-		return this.countImpl();
+		return this.OKAY_countImpl();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean isEmpty() {
-		return this.countImpl() == 0;
+		return this.OKAY_countImpl() == 0;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean containsKey(final Object key) {
-		return this.hasKeyImpl(key);
+		return this.OKAY_hasKeyImpl(key);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean containsValue(final Object value) {
-		return this.hasValueImpl(value);
+		return this.OKAY_hasValueImpl(value);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public GValue get(final Object key) {
-		return this.getImpl(key);
+		return this.OKAY_getImpl(key);
 	}
 
 	/** {@inheritDoc} */
@@ -111,7 +111,7 @@ class ListMap<GKey, GValue> extends ListData<GKey, GValue> implements Map<GKey, 
 		for (final Entry<?, ?> entry: that.entrySet()) {
 			final int entryIndex = this.getIndexImpl(entry.getKey());
 			if (entryIndex < 0) return false;
-			if (!Objects.equals(this.getValueImpl(entryIndex), entry.getValue())) return false;
+			if (!Objects.equals(this.OKAY_getValueImpl(entryIndex), entry.getValue())) return false;
 		}
 		return true;
 	}

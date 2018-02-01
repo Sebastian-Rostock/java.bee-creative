@@ -187,10 +187,19 @@ class ListData<GKey, GValue> {
 	 * @see Map#containsValue(Object)
 	 * @param value Wert des Eintrags.
 	 * @return {@code true}, wenn der Eintrag gefundenen wurde. */
-	protected final boolean hasValueImpl(final Object value) {
+	protected final boolean OKAY_hasValueImpl(final Object value) {
+		final int[] table = this.table;
 		final Object[] values = this.values;
-		for (int lo = this.empty, hi = lo + this.count; lo < hi; lo++) {
-			if (Objects.equals(values[lo], value)) return true;
+		int minPage = table[0];
+		final int maxPage = table[1];
+		while (minPage < maxPage) {
+			int minItem = table[minPage];
+			final int maxItem = table[minPage + 1];
+			while (minItem < maxItem) {
+				if (Objects.equals(values[minItem], value)) return true;
+				++minItem;
+			}
+			++minPage;
 		}
 		return false;
 	}
@@ -245,32 +254,29 @@ class ListData<GKey, GValue> {
 	protected final int getIndexImpl(final Object key) {
 		final int[] table = this.table;
 		final Object[] keys = this.keys;
-		// 1) Binäre Suche nach der passenden Bereich
-		int minIndex = table[0], maxIndex = table[1];
-		while (minIndex != maxIndex) {
-			final int midIndex = (minIndex + maxIndex) >>> 1;
-			// 1.1) Abgleich des Letzten Elements einer Page, sodass "minIndex" die Page nennt, in welcher der Treffer enthalten sein muss
-			final int result = table[(midIndex << 1) + 1] - 1;
+		int minPage = table[0], midPage = minPage, maxPage = table[1];
+		while (minPage != maxPage) {
+			midPage = (minPage + maxPage) >>> 1;
+			final int result = table[midPage << 1];
 			final int this2that = this.customCompare(keys[result], key);
 			if (this2that > 0) {
-				maxIndex = midIndex;
+				maxPage = midPage;
 			} else if (this2that < 0) {
-				minIndex = midIndex + 1;
+				minPage = midPage + 1;
 			} else return result;
 		}
-		// 2) Binäre Suche nach dem passenden Element
-		final int minRange = table[minIndex], maxRange = table[minIndex + 1];
-		int minItem = minRange, maxItem = maxRange;
+		final int page = minPage == midPage ? midPage - 1 : midPage; // TODO prüfen
+		int minItem = table[page], maxItem = table[page + 1];
 		while (minItem != maxItem) {
-			final int result = (minItem + maxItem) >>> 1;
-			final int this2that = this.customCompare(keys[result], key);
+			final int midItem = (minItem + maxItem) >>> 1;
+			final int this2that = this.customCompare(keys[midItem], key);
 			if (this2that > 0) {
-				maxItem = result;
+				maxItem = midItem;
 			} else if (this2that > 0) {
-				minItem = result + 1;
-			} else return result;
+				minItem = midItem + 1;
+			} else return midItem;
 		}
-		return -1;
+		return -minItem - 1;
 	}
 
 	/** Diese Methode gibt den Index des ersten Elements zurück. Dieser Index kann den Wert {@code size} annehmen.
@@ -988,7 +994,7 @@ class ListData<GKey, GValue> {
 
 		@Override
 		public boolean contains(final Object o) {
-			return this.entryData.hasValueImpl(o);
+			return this.entryData.OKAY_hasValueImpl(o);
 		}
 
 	}
