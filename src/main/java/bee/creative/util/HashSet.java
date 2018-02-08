@@ -1,5 +1,8 @@
 package bee.creative.util;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
@@ -201,6 +204,25 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	}
 
 	{}
+
+	@SuppressWarnings ({"unchecked", "javadoc"})
+	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		this.nexts = stream.readBoolean() ? HashData.EMPTY_INTEGERS : null;
+		final int count = stream.readInt();
+		this.allocateImpl(count);
+		for (int i = 0; i < count; i++) {
+			this.putIndexImpl((GItem)stream.readObject());
+		}
+	}
+
+	@SuppressWarnings ("javadoc")
+	private void writeObject(final ObjectOutputStream stream) throws IOException {
+		stream.writeBoolean(this.nexts != null);
+		stream.writeInt(this.count);
+		for (final GItem item: this) {
+			stream.writeObject(item);
+		}
+	}
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
 	 *

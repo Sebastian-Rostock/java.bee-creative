@@ -225,7 +225,7 @@ public class Comparables {
 			@Override
 			public int compareTo(final Iterable<? extends GItem> that) {
 				for (final GItem item: that) {
-					final int result = this.compareTo(that);
+					final int result = comparable.compareTo(item);
 					if (result != 0) return result;
 				}
 				return 0;
@@ -233,7 +233,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("reverseComparable", comparable);
+				return Objects.toInvokeString("iterableComparable", comparable);
 			}
 
 		};

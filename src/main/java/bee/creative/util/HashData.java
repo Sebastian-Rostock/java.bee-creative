@@ -392,31 +392,31 @@ public abstract class HashData<GKey, GValue> {
 	{}
 
 	/** Dieses Feld speichert den initialwert für {@link #table}. */
-	private static final int[] EMPTY_TABLE = {-1};
+	static final int[] EMPTY_TABLE = {-1};
 
 	/** Dieses Feld speichert den initialwert für {@link #nexts} und {@link #hashes}. */
-	private static final int[] EMPTY_INTEGERS = {};
+	static final int[] EMPTY_INTEGERS = {};
 
 	/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
-	private static final Object[] EMPTY_OBJECTS = {};
+	static final Object[] EMPTY_OBJECTS = {};
 
 	/** Dieses Feld speichert die maximale Kapazität. */
-	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
+	static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
 
 	{}
 
 	@SuppressWarnings ("javadoc")
-	private static void clearNexts(final int[] array) {
+	static void clearNexts(final int[] array) {
 		for (int i = 0, size = array.length; i < size; array[i] = ++i) {}
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static void clearTable(final int[] array) {
+	static void clearTable(final int[] array) {
 		Arrays.fill(array, -1);
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static void clearObjects(final Object[] array) {
+	static void clearObjects(final Object[] array) {
 		if (array == null) return;
 		Arrays.fill(array, null);
 	}
@@ -425,27 +425,27 @@ public abstract class HashData<GKey, GValue> {
 
 	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
 	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. */
-	int[] table = HashData.EMPTY_TABLE;
+	transient int[] table = HashData.EMPTY_TABLE;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	Object[] keys = HashData.EMPTY_OBJECTS;
+	transient Object[] keys = HashData.EMPTY_OBJECTS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Index des nächsten Eintrags ab. Für alle anderen Indizes bildet es auf den Index des nächsten
 	 * reservierten Speicherbereiches ab. */
-	int[] nexts = HashData.EMPTY_INTEGERS;
+	transient int[] nexts = HashData.EMPTY_INTEGERS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab oder ist {@code null}. */
-	int[] hashes;
+	transient int[] hashes;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	Object[] values;
+	transient Object[] values;
 
 	/** Dieses Feld speichert die Anzahl der Einträge. */
-	int count = 0;
+	transient int count = 0;
 
 	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
 	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
-	int empty = 0;
+	transient int empty = 0;
 
 	/** Dieser Konstruktor initialisiert die streuwertbasierte Datenhaltung.
 	 *

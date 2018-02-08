@@ -1,5 +1,8 @@
 package bee.creative.util;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
@@ -197,6 +200,29 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	}
 
 	{}
+
+	@SuppressWarnings ({"unchecked", "javadoc"})
+	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		this.nexts = stream.readBoolean() ? HashData.EMPTY_INTEGERS : null;
+		final int count = stream.readInt();
+		this.allocateImpl(count);
+		for (int i = 0; i < count; i++) {
+			final GKey key = (GKey)stream.readObject();
+			final GValue value = (GValue)stream.readObject();
+			final int index = this.putIndexImpl(key);
+			this.putValueImpl(index, value);
+		}
+	}
+
+	@SuppressWarnings ("javadoc")
+	private void writeObject(final ObjectOutputStream stream) throws IOException {
+		stream.writeBoolean(this.nexts != null);
+		stream.writeInt(this.count);
+		for (final Entry<GKey, GValue> entry: this.newEntriesImpl()) {
+			stream.writeObject(entry.getKey());
+			stream.writeObject(entry.getValue());
+		}
+	}
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
 	 *
