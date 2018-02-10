@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -14,6 +13,9 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Serializable {
+
+	/** Dieses Feld speichert das serialVersionUID. */
+	private static final long serialVersionUID = 2146674771303938589L;
 
 	protected static class SectionIterator<GItem> {
 
@@ -114,7 +116,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		protected final void removeImpl() {
 			final int index = this.result;
 			if (index < 0) throw new IllegalStateException();
-			this.array.removeImpl(this.offset + index, 1);
+			this.array.deleteImpl(this.offset + index, 1);
 			this.result = -1;
 			this.length--;
 			if (index >= this.cursor) return;
@@ -124,13 +126,13 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected static class IteratorA<GItem> extends SectionIterator<GItem> implements ListIterator<GItem> {
+	protected static class IterA<GItem> extends SectionIterator<GItem> implements ListIterator<GItem> {
 
-		public IteratorA(final ArrayList_<GItem> array) {
+		public IterA(final ArrayList_<GItem> array) {
 			super(array);
 		}
 
-		public IteratorA(final ArrayList_<GItem> array, final int offset, final int length) {
+		public IterA(final ArrayList_<GItem> array, final int offset, final int length) {
 			super(array, offset, length);
 		}
 
@@ -184,9 +186,9 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected static class IteratorD<GItem> extends SectionIterator<GItem> implements Iterator<GItem> {
+	protected static class IterD<GItem> extends SectionIterator<GItem> implements Iterator<GItem> {
 
-		public IteratorD(final ArrayList_<GItem> array) {
+		public IterD(final ArrayList_<GItem> array) {
 			super(array);
 		}
 
@@ -209,7 +211,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	}
 
-	static class SectionList<GItem> implements List<GItem> {
+	static class SubList<GItem> implements List<GItem> {
 
 		final ArrayList_<GItem> items;
 
@@ -217,7 +219,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 		int length;
 
-		SectionList(final ArrayList_<GItem> items, final int offset, final int length) {
+		SubList(final ArrayList_<GItem> items, final int offset, final int length) {
 			if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IndexOutOfBoundsException();
 			this.items = items;
 			this.offset = offset;
@@ -245,7 +247,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GItem> iterator() {
-			return new IteratorA<>(this.items, this.offset, this.length);
+			return new IterA<>(this.items, this.offset, this.length);
 		}
 
 		/** {@inheritDoc} */
@@ -303,7 +305,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		/** {@inheritDoc} */
 		@Override
 		public void clear() {
-			this.items.removeImpl(this.offset, this.length);
+			this.items.deleteImpl(this.offset, this.length);
 			this.length = 0;
 		}
 
@@ -351,13 +353,13 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		/** {@inheritDoc} */
 		@Override
 		public ListIterator<GItem> listIterator() {
-			return new IteratorA<>(this.items, this.offset, this.length);
+			return new IterA<>(this.items, this.offset, this.length);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public ListIterator<GItem> listIterator(final int index) {
-			final IteratorA<GItem> result = new IteratorA<>(this.items, this.offset, this.length);
+			final IterA<GItem> result = new IterA<>(this.items, this.offset, this.length);
 			result.skip(index);
 			return result;
 		}
@@ -389,74 +391,34 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	}
 
-	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = 6729907505658682274L;
-
-	/** Dieses Feld speichert den initialwert für {@link #items}. */
+	/** Dieses Feld speichert den initialwert für {@link #array}. */
 	static final Object[] EMPTY_OBJECTS = {};
 
 	/** Dieses Feld speichert die maximale Kapazität. */
 	static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
 
-	transient Object[] items;
+	/** Dieses Feld speichert die Elemente. */
+	transient Object[] array;
 
-	transient int length;
-
+	/** Dieses Feld speichert die Position des ersten Elements in {@link #array}. */
 	transient int offset;
 
+	/** Dieses Feld speichert die Länge der Liste. */
+	transient int length;
+
+	/** Dieser Konstruktor initialisiert die leere Liste. */
 	public ArrayList_() {
-		this.items = ArrayList_.EMPTY_OBJECTS;
+		this.array = ArrayList_.EMPTY_OBJECTS;
 	}
 
+	/** Dieser Konstruktor initialisiert die Liste mit der gegebenen Kapazität.
+	 *
+	 * @param capacity Kapazität. */
 	public ArrayList_(final int capacity) {
-		this.items = capacity != 0 ? new Object[capacity] : ArrayList_.EMPTY_OBJECTS;
+		this.array = capacity != 0 ? new Object[capacity] : ArrayList_.EMPTY_OBJECTS;
 	}
 
 	{}
-
-	static int calcPos(final Object[] array, final int offset, final int index) {
-		final int min = offset + index, max = array.length;
-		return min >= max ? min - max : min;
-	}
-
-	/** Diese Methode gibt das Element an der gegebenen Position zurück.<br>
-	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
-	 *
-	 * @param index Position.
-	 * @return Element. */
-	protected final GItem getImpl(final int index) {
-		final Object[] array = this.items;
-		@SuppressWarnings ("unchecked")
-		final GItem result = (GItem)array[ArrayList_.calcPos(array, this.offset, index)];
-		return result;
-	}
-
-	/** Diese Methode ersetzt das Element an der gegebenen Position und gibt alten Wert zurück.<br>
-	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
-	 *
-	 * @param index Position.
-	 * @param item neses Element.
-	 * @return altes Element. */
-	protected final GItem setImpl(final int index, final GItem item) {
-		final Object[] array = this.items;
-		final int pos = ArrayList_.calcPos(array, this.offset, index);
-		@SuppressWarnings ("unchecked")
-		final GItem result = (GItem)array[pos];
-		array[pos] = item;
-		return result;
-	}
-
-	/** Diese Methode fügt das Element an der gegebenen Position ein.
-	 *
-	 * @param index Position, an der das Element eingefügt werden soll.
-	 * @param item Element.
-	 * @return {@code true}, wenn das Element eingefügt werden konnte. */
-	protected final boolean offerImpl(final int index, final GItem item) throws IndexOutOfBoundsException {
-		if (!this.insertImpl(index, 1)) return false;
-		final Object[] array = this.items;
-		array[ArrayList_.calcPos(array, this.offset, index)] = item;
-		return true;
-	}
 
 	protected final boolean addImpl(final int index, final GItem item) throws OutOfMemoryError {
 		if (!this.offerImpl(index, item)) throw new OutOfMemoryError();
@@ -471,6 +433,21 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return false;
 	}
 
+	/** Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position ein und gibt nur dann {@code true} zurück, wenn dies erfolgreich war.
+	 *
+	 * @param index Position, an der die Elemente eingefügt werden sollen.
+	 * @param count Anzahl der einzufügenden Elemente.
+	 * @return {@code true}, wenn der Speicherbereich eingefügt werden konnte. */
+	protected final boolean insertImpl(final int index, final int count) throws IndexOutOfBoundsException {
+		// TODO
+		return false;
+	}
+
+	protected void deleteImpl(final int offset2, final int length) {
+	}
+
+	{}
+
 	/** Diese Methode gibt die kleinste Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück.<br>
 	 * Achtung: Es erfolgt keine Prüfung von {@code offset} und {@code length}.
 	 *
@@ -479,35 +456,27 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	 * @param length Länge des Abschnitts.
 	 * @return Position des ersten Treffers relativ zum Abschnitt oder {@code -1}. */
 	protected final int firstIndexOfImpl(final Object object, final int offset, final int length) {
-		final Object[] array = this.items;
+		final Object[] array = this.array;
 		final int capacity = array.length;
-		final int min = this.offset + offset;
-		int max = min + length;
-		if (max <= capacity) {
-			for (int i = min; i < max; i++) {
-				if (Objects.equals(array[i], object)) return i - min;
-			}
-		} else {
-			for (int i = min; i < capacity; i++) {
-				if (Objects.equals(array[i], object)) return i - min;
-			}
-			max -= capacity;
-			for (int i = 0; i < max; i++) {
-				if (Objects.equals(array[i], object)) return (i - min) + capacity;
-			}
+		final int min = this.offset + offset, max = min + length;
+		for (int i = min, c = max < capacity ? max : capacity; i < c; i++) {
+			if (Objects.equals(array[i], object)) return i - min;
+		}
+		for (int i = 0, c = max - capacity; i < c; i++) {
+			if (Objects.equals(array[i], object)) return (i - min) + capacity;
 		}
 		return -1;
 	}
 
 	/** Diese Methode gibt die größte Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück.<br>
-	 * Achtung: Es erfolgt keine Prüfung von {@code offset} und {@code length}.
+	 * <b>Achtung:</b> Es erfolgt keine Prüfung von {@code offset} und {@code length}.
 	 *
 	 * @param item gesuchtes Element.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
 	 * @return Position des ersten Treffers relativ zum Abschnitt oder {@code -1}. */
 	protected final int lastIndexOfImpl(final Object item, final int offset, final int length) {
-		final Object[] array = this.items;
+		final Object[] array = this.array;
 		final int capacity = array.length;
 		final int min = this.offset + offset;
 		final int max = min + length;
@@ -526,58 +495,13 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return -1;
 	}
 
-	/** Diese Methode kopiert alle Elemente des gegebenen Abschnitts in das gegebene Array und gibt dieses zurück. Wenn das gegebene Array hierfür zuklein ist,
-	 * wird ein neues mit passender Größe erzeugt. Überflüssige Bereiche werden mit {@code null} gefüllt.
-	 *
-	 * @param <T> Typ der Elemente im gegebenen Array.
-	 * @param result gegebene Array.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return gegebenes oder neues Array. */
-	@SuppressWarnings ("unchecked")
-	protected final <T> T[] toArrayImpl(T[] result, final int offset, final int length) {
-		final Object[] array = this.items;
-		final int capacity = array.length;
-		final int min = this.offset + offset;
-		int max = min + length, j = 0;
-		if (result.length < length) {
-			final Class<? extends Object[]> clazz = result.getClass();
-			result = (T[])(clazz == Object[].class ? new Object[length] : Array.newInstance(clazz.getComponentType(), length));
-		}
-		if (max <= capacity) {
-			for (int i = min; i < max; i++, j++) {
-				result[j] = (T)array[i];
-			}
-		} else {
-			for (int i = min; i < capacity; i++, j++) {
-				result[j] = (T)array[i];
-			}
-			max -= capacity;
-			for (int i = 0; i < max; i++, j++) {
-				result[j] = (T)array[i];
-			}
-		}
-		for (int i = result.length; j < i;) {
-			result[--i] = null;
-		}
-		return result;
-	}
-
-	final void checkIntern(final int index) {
-		if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
-	}
-
-	final void checkExtern(final int index) {
-		if ((index < 0) || (index > this.length)) throw new IndexOutOfBoundsException();
-	}
-
 	/** Diese Methode implementiert {@link #hashCode()} für den gegebenen Abschnitt.
 	 *
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
 	 * @return Streuwert. */
 	protected final int hashCodeImpl(final int offset, final int length) {
-		final ListIterator<GItem> iter = new IteratorA<>(this, offset, length);
+		final ListIterator<GItem> iter = new IterA<>(this, offset, length);
 		int result = 1;
 		while (iter.hasNext()) {
 			result = (31 * result) + Objects.hash(iter.next());
@@ -596,7 +520,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		if (!(object instanceof List<?>)) return false;
 		final List<?> that = (List<?>)object;
 		if (that.size() != length) return false;
-		final Iterator<?> thisIter = new IteratorA<>(this, offset, length), thatIter = that.iterator();
+		final Iterator<?> thisIter = new IterA<>(this, offset, length), thatIter = that.iterator();
 		while (thisIter.hasNext() && thatIter.hasNext()) {
 			if (!Objects.equals(thisIter.next(), thatIter.next())) return false;
 		}
@@ -609,13 +533,98 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	 * @param length Länge des Abschnitts.
 	 * @return Textdarstellung. */
 	protected final String toStringImpl(final int offset, final int length) {
-		final ListIterator<GItem> iter = new IteratorA<>(this, offset, length);
+		final Iterator<GItem> iter = new IterA<>(this, offset, length);
 		if (!iter.hasNext()) return "[]";
 		final StringBuilder result = new StringBuilder().append('[').append(iter.next());
 		while (iter.hasNext()) {
 			result.append(", ").append(iter.next());
 		}
 		return result.append(']').toString();
+	}
+
+	@SuppressWarnings ("javadoc")
+	private final void writeObject(final ObjectOutputStream stream) throws IOException {
+		final Object[] array = this.array;
+		final int length = this.length;
+		final int capacity = array.length;
+		final int min = this.offset;
+		int max1 = min + length;
+		stream.writeInt(length);
+		if (max1 <= capacity) {
+			for (int i = min; i < max1; i++) {
+				stream.writeObject(array[i]);
+			}
+		} else {
+			for (int i = min; i < capacity; i++) {
+				stream.writeObject(array[i]);
+			}
+			max1 -= capacity;
+			for (int i = 0; i < max1; i++) {
+				stream.writeObject(array[i]);
+			}
+		}
+	}
+
+	{}
+	{}
+
+	static int DONE = 0;
+
+	{}
+
+	private final int calcPos(final Object[] array, final int index) {
+		final int min = this.offset + index, max = array.length;
+		return min >= max ? min - max : min;
+	}
+
+	@SuppressWarnings ("javadoc")
+	private final void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		final int length = stream.readInt();
+		if (length == 0) return;
+		final Object[] array = new Object[length];
+		this.insertImpl(0, length);
+		for (int i = 0; i < length; array[i++] = stream.readObject()) {}
+		this.array = array;
+		this.length = length;
+	}
+
+	/** Diese Methode gibt das Element an der gegebenen Position zurück.<br>
+	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
+	 *
+	 * @param index Position.
+	 * @return Element. */
+	protected final GItem getImpl(final int index) {
+		final Object[] array = this.array;
+		@SuppressWarnings ("unchecked")
+		final GItem result = (GItem)array[this.calcPos(array, index)];
+		return result;
+	}
+
+	/** Diese Methode ersetzt das Element an der gegebenen Position und gibt alten Wert zurück.<br>
+	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
+	 *
+	 * @param index Position.
+	 * @param item neses Element.
+	 * @return altes Element. */
+	protected final GItem setImpl(final int index, final GItem item) {
+		final Object[] array = this.array;
+		final int pos = this.calcPos(array, index);
+		@SuppressWarnings ("unchecked")
+		final GItem result = (GItem)array[pos];
+		array[pos] = item;
+		return result;
+	}
+
+	/** Diese Methode fügt das Element an der gegebenen Position ein.
+	 *
+	 * @param index Position, an der das Element eingefügt werden soll.
+	 * @param item Element.
+	 * @return {@code true}, wenn das Element eingefügt werden konnte. */
+	protected final boolean offerImpl(final int index, final GItem item) throws IndexOutOfBoundsException {
+		if (!this.insertImpl(index, 1)) return false;
+		final Object[] array = this.array;
+		array[this.calcPos(array, index)] = item;
+		return true;
 	}
 
 	/** Diese Methode implementiert {@link #contains(Object)} für den gegebenen Abschnitt.
@@ -641,50 +650,63 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return true;
 	}
 
-	protected void allocateImpl(final int count) {
-		final int length = this.length;
-		if (count < length) throw new IllegalArgumentException();
-		if (!this.insertImpl(length, count - this.items.length)) throw new OutOfMemoryError();
-	}
-
-	/** Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position ein und gibt nur dann {@code true} zurück, wenn dies erfolgreich war.
+	/** Diese Methode kopiert alle Elemente des gegebenen Abschnitts in das gegebene Array und gibt dieses zurück.<br>
+	 * Wenn die Kapazität des gegebenen Arrays hierfür nicht ausreicht, wird ein neues mit passender Größe erzeugt. Überflüssige Bereiche werden mit {@code null}
+	 * gefüllt.
 	 *
-	 * @param index Position, an der die Elemente eingefügt werden sollen.
-	 * @param count Anzahl der einzufügenden Elemente.
-	 * @return {@code true}, wenn der Speicherbereich eingefügt werden konnte. */
-	protected final boolean insertImpl(final int index, final int count) throws IndexOutOfBoundsException {
-		// TODO
-		return false;
-	}
-
-	protected void removeImpl(final int offset2, final int length) {
-	}
-
-	@SuppressWarnings ({"unchecked", "javadoc"})
-	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		final int count = stream.readInt();
-		if (count == 0) return;
-		final Object[] _items = new Object[count];
-		this.insertImpl(0, count);
-		for (int i = 0; i < count; i++) {
-			this.items[i] = stream.readObject();
+	 * @param <T> Typ der Elemente im gegebenen Array.
+	 * @param result gegebene Array.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return gegebenes oder neues Array. */
+	@SuppressWarnings ("unchecked")
+	protected final <T> T[] toArrayImpl(T[] result, final int offset, final int length) {
+		final Object[] array = this.array;
+		final int capacity = array.length;
+		final int min = this.offset + offset, max = min + length;
+		if (result.length < length) {
+			final Class<? extends Object[]> clazz = result.getClass();
+			result = (T[])(clazz == Object[].class ? new Object[length] : Array.newInstance(clazz.getComponentType(), length));
 		}
+		int j = 0;
+		for (int i = min, size = max < capacity ? max : capacity; i < size; result[j++] = (T)array[i++]) {}
+		for (int i = 0, size = max - capacity; i < size; result[j++] = (T)array[i++]) {}
+		for (int i = result.length; j < i; result[--i] = null) {}
+		return result;
 	}
 
-	@SuppressWarnings ("javadoc")
-	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.length);
-		int max = Math.max(this.offset + this.length, this.items.length);
-		for (int i = this.offset; i < max; i++) {
-			stream.writeObject(this.items[i]);
-		}
-		max = Math.max((this.offset + this.length) - this.items.length, 0);
-		for (int i = 0; i < max; i++) {
-			stream.writeObject(this.items[i]);
-		}
+	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
+	 *
+	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
+	 * @return {@code this}.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
+	public ArrayList_<GItem> allocate(final int capacity) {
+		final int length = this.length;
+		if (capacity < length) throw new IllegalArgumentException();
+		if (!this.insertImpl(length, capacity - this.array.length)) throw new OutOfMemoryError();
+		return this;
 	}
 
-	{}
+	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
+	 *
+	 * @return Kapazität. */
+	public int capacity() {
+		return this.array.length;
+	}
+
+	/** Diese Methode verkleinert die Kapazität auf das Minimum und gibt {@code this} zurück.
+	 *
+	 * @return {@code this}. */
+	public ArrayList_<GItem> compact() {
+		return this.allocate(this.length);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public GItem get(final int index) {
+		if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
+		return this.getImpl(index);
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -704,6 +726,30 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean add(final GItem item) {
+		return this.addImpl(this.length, item);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void add(final int index, final GItem item) {
+		this.addImpl(index, item);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean addAll(final Collection<? extends GItem> items) {
+		return this.addAllImpl(this.length, items);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean addAll(final int index, final Collection<? extends GItem> items) {
+		return this.addAllImpl(index, items);
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public void addFirst(final GItem item) {
 		if (!this.offerImpl(0, item)) throw new IllegalStateException();
 	}
@@ -716,11 +762,21 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	/** {@inheritDoc} */
 	@Override
+	public GItem poll() {
+		final int count = this.length;
+		if (count == 0) return null;
+		final GItem result = this.getImpl(0);
+		this.deleteImpl(0, 1);
+		return result;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public GItem pollFirst() {
 		final int count = this.length;
 		if (count == 0) return null;
 		final GItem result = this.getImpl(0);
-		this.removeImpl(0, 1);
+		this.deleteImpl(0, 1);
 		return result;
 	}
 
@@ -730,8 +786,16 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		final int index = this.length - 1;
 		if (index < 0) return null;
 		final GItem result = this.getImpl(index);
-		this.removeImpl(index, 1);
+		this.deleteImpl(index, 1);
 		return result;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public GItem peek() {
+		final int count = this.length;
+		if (count == 0) return null;
+		return this.getImpl(0);
 	}
 
 	/** {@inheritDoc} */
@@ -752,6 +816,12 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	/** {@inheritDoc} */
 	@Override
+	public boolean offer(final GItem item) {
+		return this.offerImpl(this.length, item);
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public boolean offerFirst(final GItem item) {
 		return this.offerImpl(0, item);
 	}
@@ -764,11 +834,39 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	/** {@inheritDoc} */
 	@Override
+	public GItem remove() {
+		final int count = this.length;
+		if (count == 0) throw new NoSuchElementException();
+		final GItem result = this.getImpl(0);
+		this.deleteImpl(0, 1);
+		return result;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public GItem remove(final int index) {
+		if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
+		final GItem result = this.getImpl(index);
+		this.deleteImpl(index, 1);
+		return result;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean remove(final Object object) {
+		final int index = this.lastIndexOfImpl(object, 0, this.length);
+		if (index < 0) return false;
+		this.deleteImpl(index, 1);
+		return true;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public GItem removeFirst() {
 		final int count = this.length;
 		if (count == 0) throw new NoSuchElementException();
 		final GItem result = this.getImpl(0);
-		this.removeImpl(0, 1);
+		this.deleteImpl(0, 1);
 		return result;
 	}
 
@@ -778,7 +876,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		final int index = this.length - 1;
 		if (index < 0) throw new NoSuchElementException();
 		final GItem result = this.getImpl(index);
-		this.removeImpl(index, 1);
+		this.deleteImpl(index, 1);
 		return result;
 	}
 
@@ -787,7 +885,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	public boolean removeFirstOccurrence(final Object item) {
 		final int index = this.firstIndexOfImpl(item, 0, this.length);
 		if (index < 0) return false;
-		this.removeImpl(index, 1);
+		this.deleteImpl(index, 1);
 		return true;
 	}
 
@@ -796,30 +894,39 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	public boolean removeLastOccurrence(final Object item) {
 		final int index = this.lastIndexOfImpl(item, 0, this.length);
 		if (index < 0) return false;
-		this.removeImpl(index, 1);
+		this.deleteImpl(index, 1);
 		return true;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean add(final GItem item) {
-		return this.addImpl(this.length, item);
+	public boolean removeAll(final Collection<?> items) {
+		return Iterators.removeAll(this.iterator(), items);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final GItem item) {
-		this.addImpl(index, item);
+	public boolean retainAll(final Collection<?> items) {
+		return Iterators.retainAll(this.iterator(), items);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public GItem poll() {
-		final int count = this.length;
-		if (count == 0) return null;
-		final GItem result = this.getImpl(0);
-		this.removeImpl(0, 1);
-		return result;
+	public boolean contains(final Object item) {
+		return this.containsImpl(item, 0, this.length);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean containsAll(final Collection<?> items) {
+		return this.containsAllImpl(items, 0, this.length);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public GItem set(final int index, final GItem item) {
+		if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
+		return this.setImpl(index, item);
 	}
 
 	/** {@inheritDoc} */
@@ -828,38 +935,14 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		final int count = this.length;
 		if (count == 0) throw new NoSuchElementException();
 		final GItem result = this.getImpl(0);
-		this.removeImpl(0, 1);
+		this.deleteImpl(0, 1);
 		return result;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public GItem peek() {
-		final int count = this.length;
-		if (count == 0) return null;
-		return this.getImpl(0);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean offer(final GItem item) {
-		return this.offerImpl(this.length, item);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void push(final GItem item) {
 		if (!this.offerImpl(0, item)) throw new IllegalStateException();
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public GItem remove() {
-		final int count = this.length;
-		if (count == 0) throw new NoSuchElementException();
-		final GItem result = this.getImpl(0);
-		this.removeImpl(0, 1);
-		return result;
 	}
 
 	/** {@inheritDoc} */
@@ -873,27 +956,27 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public Iterator<GItem> iterator() {
-		return new IteratorA<>(this);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public Iterator<GItem> descendingIterator() {
-		return new IteratorD<>(this);
+		return new IterA<>(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public ListIterator<GItem> listIterator() {
-		return new IteratorA<>(this);
+		return new IterA<>(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public ListIterator<GItem> listIterator(final int index) {
-		final IteratorA<GItem> result = new IteratorA<>(this);
+		final IterA<GItem> result = new IterA<>(this);
 		result.skip(index);
 		return result;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Iterator<GItem> descendingIterator() {
+		return new IterD<>(this);
 	}
 
 	/** {@inheritDoc} */
@@ -905,7 +988,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public void clear() {
-		this.removeImpl(0, this.length);
+		this.deleteImpl(0, this.length);
 	}
 
 	/** {@inheritDoc} */
@@ -928,26 +1011,8 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean contains(final Object item) {
-		return this.containsImpl(item, 0, this.length);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean containsAll(final Collection<?> items) {
-		return this.containsAllImpl(items, 0, this.length);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean retainAll(final Collection<?> items) {
-		return Iterables.retainAll((Iterable<?>)this, items);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean removeAll(final Collection<?> items) {
-		return Iterables.removeAll((Iterable<?>)this, items);
+	public List<GItem> subList(final int fromIndex, final int toIndex) {
+		return new SubList<>(this, fromIndex, toIndex - fromIndex);
 	}
 
 	/** {@inheritDoc} */
@@ -960,63 +1025,6 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	@Override
 	public <T> T[] toArray(final T[] result) {
 		return this.toArrayImpl(result, 0, this.length);
-	}
-
-	{}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean addAll(final Collection<? extends GItem> item) {
-		return this.addAllImpl(this.length, item);
-	}
-
-	@Override
-	public boolean addAll(final int index, final Collection<? extends GItem> item) {
-		return this.addAllImpl(index, item);
-	}
-
-	static void clearArray(final Object[] array, final int offset, final int length) {
-		Arrays.fill(array, offset, offset + length, null);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	@SuppressWarnings ("unchecked")
-	public GItem get(final int index) {
-		this.checkIntern(index);
-		final Object[] array = this.items;
-		final int offset = this.offset + index, capacity = array.length;
-		return (GItem)array[offset >= capacity ? offset - capacity : offset];
-	}
-
-	@Override
-	public GItem set(final int index, final GItem element) {
-		this.checkIntern(index);
-		return null;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public GItem remove(final int index) {
-		this.checkIntern(index);
-		final GItem result = this.getImpl(index);
-		this.removeImpl(index, 1);
-		return result;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean remove(final Object object) {
-		final int index = this.lastIndexOfImpl(object, 0, this.length);
-		if (index < 0) return false;
-		this.removeImpl(index, 1);
-		return true;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public List<GItem> subList(final int fromIndex, final int toIndex) {
-		return new SectionList<>(this, fromIndex, toIndex - fromIndex);
 	}
 
 	/** {@inheritDoc} */

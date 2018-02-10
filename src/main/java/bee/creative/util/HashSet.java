@@ -245,7 +245,8 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 	 *
 	 * @return {@code this}. */
 	public HashSet<GItem> compact() {
-		return this.allocate(this.countImpl());
+		this.allocateImpl(this.countImpl());
+		return this;
 	}
 
 	{}

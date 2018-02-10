@@ -245,7 +245,8 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 	 *
 	 * @return {@code this}. */
 	public HashMap<GKey, GValue> compact() {
-		return this.allocate(this.countImpl());
+		this.allocateImpl(this.countImpl());
+		return this;
 	}
 
 	{}
