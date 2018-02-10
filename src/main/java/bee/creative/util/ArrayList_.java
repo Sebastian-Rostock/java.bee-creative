@@ -339,14 +339,14 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		/** {@inheritDoc} */
 		@Override
 		public int indexOf(final Object object) {
-			final int offset = this.offset, result = this.items.firstIndexOfImpl(object, offset, this.length);
+			final int offset = this.offset, result = this.items.firstIndexImpl(object, offset, this.length);
 			return result >= 0 ? result + offset : -1;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int lastIndexOf(final Object object) {
-			final int offset = this.offset, result = this.items.lastIndexOfImpl(object, offset, this.length);
+			final int offset = this.offset, result = this.items.lastIndexImpl(object, offset, this.length);
 			return result >= 0 ? result + offset : -1;
 		}
 
@@ -374,13 +374,15 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
-			return this.items.hashCodeImpl(this.offset, this.length);
+			return this.items.hashImpl(this.offset, this.length);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public boolean equals(final Object object) {
-			return this.items.equalsImpl(object, this.offset, this.length);
+			if (object == this) return true;
+			if (!(object instanceof List<?>)) return false;
+			return this.items.equalsImpl((List<?>)object, this.offset, this.length);
 		}
 
 		/** {@inheritDoc} */
@@ -391,11 +393,22 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	}
 
+	{}
+
 	/** Dieses Feld speichert den initialwert für {@link #array}. */
 	static final Object[] EMPTY_OBJECTS = {};
 
 	/** Dieses Feld speichert die maximale Kapazität. */
 	static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
+
+	{}
+
+	static final int getIndex(final Object[] array, final int offset, final int index) {
+		final int min = offset + index, max = array.length;
+		return min >= max ? min - max : min;
+	}
+
+	{}
 
 	/** Dieses Feld speichert die Elemente. */
 	transient Object[] array;
@@ -443,29 +456,108 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return false;
 	}
 
-	protected void deleteImpl(final int offset2, final int length) {
+	protected void deleteImpl(final int index, final int count) {
+		final Object[] array = this.array;
+		final int index2 = index + count, count2 = this.length - index2;
+		if (index <= count2) { // vordere hinterschieben
+			this.moveRImpl(array, 0, index, count);
+			this.clearImpl(array, 0, count);
+			offset = getIndex(array, offset, count);
+		} else { // hintere vorschieben
+			this.moveLImpl(array, 0, index2, count2);
+			this.clearImpl(array, index2, count);
+		}
+	}
+
+	final void moveRImpl(final Object[] array, final int offset, final int length, final int count) {
+
+	}
+
+	final void moveLImpl(final Object[] array, final int offset, final int length, final int count) {
+
+	}
+
+	final void clearImpl(final Object[] array, final int offset, final int length) {
+		final int capacity = array.length, min = this.offset + offset, max = min + length;
+		for (int i = min, size = max < capacity ? max : capacity; i < size; i++) {
+			array[i] = null;
+		}
+		for (int i = 0, size = max - capacity; i < size; i++) {
+			array[i] = null;
+		}
 	}
 
 	{}
 
-	/** Diese Methode gibt die kleinste Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück.<br>
-	 * Achtung: Es erfolgt keine Prüfung von {@code offset} und {@code length}.
-	 *
-	 * @param object gesuchtes Element.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return Position des ersten Treffers relativ zum Abschnitt oder {@code -1}. */
-	protected final int firstIndexOfImpl(final Object object, final int offset, final int length) {
+	{}
+
+	static int DONE = 0;
+
+	{}
+
+	@SuppressWarnings ("javadoc")
+	private final void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		final int length = stream.readInt();
+		if (length == 0) return;
+		final Object[] array = new Object[length];
+		this.insertImpl(0, length);
+		for (int i = 0; i < length; array[i++] = stream.readObject()) {}
+		this.array = array;
+		this.length = length;
+	}
+
+	@SuppressWarnings ("javadoc")
+	private final void writeObject(final ObjectOutputStream stream) throws IOException {
 		final Object[] array = this.array;
+		final int length = this.length;
 		final int capacity = array.length;
-		final int min = this.offset + offset, max = min + length;
-		for (int i = min, c = max < capacity ? max : capacity; i < c; i++) {
-			if (Objects.equals(array[i], object)) return i - min;
+		final int min = this.offset, max = min + length;
+		for (int i = min, size = max < capacity ? max : capacity; i < size;) {
+			stream.writeObject(array[i]);
 		}
-		for (int i = 0, c = max - capacity; i < c; i++) {
-			if (Objects.equals(array[i], object)) return (i - min) + capacity;
+		for (int i = 0, size = max - capacity; i < size;) {
+			stream.writeObject(array[i]);
 		}
-		return -1;
+	}
+
+	/** Diese Methode gibt das Element an der gegebenen Position zurück.<br>
+	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
+	 *
+	 * @param index Position.
+	 * @return Element. */
+	protected final GItem getImpl(final int index) {
+		final Object[] array = this.array;
+		@SuppressWarnings ("unchecked")
+		final GItem result = (GItem)array[ArrayList_.getIndex(array, this.offset, index)];
+		return result;
+	}
+
+	/** Diese Methode ersetzt das Element an der gegebenen Position und gibt alten Wert zurück.<br>
+	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
+	 *
+	 * @param index Position.
+	 * @param item neses Element.
+	 * @return altes Element. */
+	protected final GItem setImpl(final int index, final GItem item) {
+		final Object[] array = this.array;
+		final int index2 = ArrayList_.getIndex(array, this.offset, index);
+		@SuppressWarnings ("unchecked")
+		final GItem result = (GItem)array[index2];
+		array[index2] = item;
+		return result;
+	}
+
+	/** Diese Methode fügt das Element an der gegebenen Position ein.
+	 *
+	 * @param index Position, an der das Element eingefügt werden soll.
+	 * @param item Element.
+	 * @return {@code true}, wenn das Element eingefügt werden konnte.
+	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist. */
+	protected final boolean offerImpl(final int index, final GItem item) throws IndexOutOfBoundsException {
+		if (!this.insertImpl(index, 1)) return false;
+		final Object[] array = this.array;
+		array[ArrayList_.getIndex(array, this.offset, index)] = item;
+		return true;
 	}
 
 	/** Diese Methode gibt die größte Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück.<br>
@@ -475,11 +567,10 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
 	 * @return Position des ersten Treffers relativ zum Abschnitt oder {@code -1}. */
-	protected final int lastIndexOfImpl(final Object item, final int offset, final int length) {
+	protected final int lastIndexImpl(final Object item, final int offset, final int length) {
 		final Object[] array = this.array;
-		final int capacity = array.length;
-		final int min = this.offset + offset;
-		final int max = min + length;
+		final int capacity = array.length, min = this.offset + offset, max = min + length;
+		// TODO
 		if (max <= capacity) {
 			for (int i = max; min < i;) {
 				if (Objects.equals(array[--i], item)) return i - min;
@@ -495,136 +586,23 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return -1;
 	}
 
-	/** Diese Methode implementiert {@link #hashCode()} für den gegebenen Abschnitt.
+	/** Diese Methode gibt die kleinste Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück.<br>
+	 * <b>Achtung:</b> Es erfolgt keine Prüfung von {@code offset} und {@code length}.
 	 *
+	 * @param object gesuchtes Element.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
-	 * @return Streuwert. */
-	protected final int hashCodeImpl(final int offset, final int length) {
-		final ListIterator<GItem> iter = new IterA<>(this, offset, length);
-		int result = 1;
-		while (iter.hasNext()) {
-			result = (31 * result) + Objects.hash(iter.next());
-		}
-		return result;
-	}
-
-	/** Diese Methode implementiert {@link #equals(Object)} für den gegebenen Abschnitt.
-	 *
-	 * @param object Objekt zum Vergleich.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return Vergleichswert. */
-	protected final boolean equalsImpl(final Object object, final int offset, final int length) {
-		if (object == this) return true;
-		if (!(object instanceof List<?>)) return false;
-		final List<?> that = (List<?>)object;
-		if (that.size() != length) return false;
-		final Iterator<?> thisIter = new IterA<>(this, offset, length), thatIter = that.iterator();
-		while (thisIter.hasNext() && thatIter.hasNext()) {
-			if (!Objects.equals(thisIter.next(), thatIter.next())) return false;
-		}
-		return thisIter.hasNext() == thatIter.hasNext();
-	}
-
-	/** Diese Methode implementiert {@link #toString()} für den gegebenen Abschnitt.
-	 *
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return Textdarstellung. */
-	protected final String toStringImpl(final int offset, final int length) {
-		final Iterator<GItem> iter = new IterA<>(this, offset, length);
-		if (!iter.hasNext()) return "[]";
-		final StringBuilder result = new StringBuilder().append('[').append(iter.next());
-		while (iter.hasNext()) {
-			result.append(", ").append(iter.next());
-		}
-		return result.append(']').toString();
-	}
-
-	@SuppressWarnings ("javadoc")
-	private final void writeObject(final ObjectOutputStream stream) throws IOException {
+	 * @return Position des ersten Treffers relativ zum Abschnitt oder {@code -1}. */
+	protected final int firstIndexImpl(final Object object, final int offset, final int length) {
 		final Object[] array = this.array;
-		final int length = this.length;
-		final int capacity = array.length;
-		final int min = this.offset;
-		int max1 = min + length;
-		stream.writeInt(length);
-		if (max1 <= capacity) {
-			for (int i = min; i < max1; i++) {
-				stream.writeObject(array[i]);
-			}
-		} else {
-			for (int i = min; i < capacity; i++) {
-				stream.writeObject(array[i]);
-			}
-			max1 -= capacity;
-			for (int i = 0; i < max1; i++) {
-				stream.writeObject(array[i]);
-			}
+		final int capacity = array.length, min = this.offset + offset, max = min + length;
+		for (int i = min, size = max < capacity ? max : capacity; i < size; i++) {
+			if (Objects.equals(array[i], object)) return i - min;
 		}
-	}
-
-	{}
-	{}
-
-	static int DONE = 0;
-
-	{}
-
-	private final int calcPos(final Object[] array, final int index) {
-		final int min = this.offset + index, max = array.length;
-		return min >= max ? min - max : min;
-	}
-
-	@SuppressWarnings ("javadoc")
-	private final void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		final int length = stream.readInt();
-		if (length == 0) return;
-		final Object[] array = new Object[length];
-		this.insertImpl(0, length);
-		for (int i = 0; i < length; array[i++] = stream.readObject()) {}
-		this.array = array;
-		this.length = length;
-	}
-
-	/** Diese Methode gibt das Element an der gegebenen Position zurück.<br>
-	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
-	 *
-	 * @param index Position.
-	 * @return Element. */
-	protected final GItem getImpl(final int index) {
-		final Object[] array = this.array;
-		@SuppressWarnings ("unchecked")
-		final GItem result = (GItem)array[this.calcPos(array, index)];
-		return result;
-	}
-
-	/** Diese Methode ersetzt das Element an der gegebenen Position und gibt alten Wert zurück.<br>
-	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
-	 *
-	 * @param index Position.
-	 * @param item neses Element.
-	 * @return altes Element. */
-	protected final GItem setImpl(final int index, final GItem item) {
-		final Object[] array = this.array;
-		final int pos = this.calcPos(array, index);
-		@SuppressWarnings ("unchecked")
-		final GItem result = (GItem)array[pos];
-		array[pos] = item;
-		return result;
-	}
-
-	/** Diese Methode fügt das Element an der gegebenen Position ein.
-	 *
-	 * @param index Position, an der das Element eingefügt werden soll.
-	 * @param item Element.
-	 * @return {@code true}, wenn das Element eingefügt werden konnte. */
-	protected final boolean offerImpl(final int index, final GItem item) throws IndexOutOfBoundsException {
-		if (!this.insertImpl(index, 1)) return false;
-		final Object[] array = this.array;
-		array[this.calcPos(array, index)] = item;
-		return true;
+		for (int i = 0, size = max - capacity; i < size; i++) {
+			if (Objects.equals(array[i], object)) return (i - min) + capacity;
+		}
+		return -1;
 	}
 
 	/** Diese Methode implementiert {@link #contains(Object)} für den gegebenen Abschnitt.
@@ -634,7 +612,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	 * @param length Länge des Abschnitts.
 	 * @return Enthaltensein. */
 	protected final boolean containsImpl(final Object object, final int offset, final int length) {
-		return this.firstIndexOfImpl(object, offset, length) >= 0;
+		return this.firstIndexImpl(object, offset, length) >= 0;
 	}
 
 	/** Diese Methode implementiert {@link #containsAll(Collection)} für den gegebenen Abschnitt.
@@ -650,6 +628,40 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return true;
 	}
 
+	/** Diese Methode implementiert {@link #hashCode()} für den gegebenen Abschnitt.
+	 *
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Streuwert. */
+	protected final int hashImpl(final int offset, final int length) {
+		int result = 1;
+		final Object[] array = this.array;
+		final int capacity = array.length, min = this.offset + offset, max = min + length;
+		for (int i = min, size = max < capacity ? max : capacity; i < size; result = (31 * result) + Objects.hash(array[i++])) {}
+		for (int i = 0, size = max - capacity; i < size; result = (31 * result) + Objects.hash(array[i++])) {}
+		return result;
+	}
+
+	/** Diese Methode implementiert {@link #equals(Object)} für den gegebenen Abschnitt.
+	 *
+	 * @param that Liste zum Vergleich.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Vergleichswert. */
+	protected final boolean equalsImpl(final List<?> that, final int offset, final int length) {
+		if (that.size() != length) return false;
+		final Object[] array = this.array;
+		final int capacity = array.length, min = this.offset + offset, max = min + length;
+		final Iterator<?> iter = that.iterator();
+		for (int i = min, size = max < capacity ? max : capacity; i < size;) {
+			if (!iter.hasNext() || !Objects.equals(array[i++], iter.next())) return false;
+		}
+		for (int i = 0, size = max - capacity; i < size;) {
+			if (!iter.hasNext() || !Objects.equals(array[i++], iter.next())) return false;
+		}
+		return !iter.hasNext();
+	}
+
 	/** Diese Methode kopiert alle Elemente des gegebenen Abschnitts in das gegebene Array und gibt dieses zurück.<br>
 	 * Wenn die Kapazität des gegebenen Arrays hierfür nicht ausreicht, wird ein neues mit passender Größe erzeugt. Überflüssige Bereiche werden mit {@code null}
 	 * gefüllt.
@@ -661,33 +673,78 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	 * @return gegebenes oder neues Array. */
 	@SuppressWarnings ("unchecked")
 	protected final <T> T[] toArrayImpl(T[] result, final int offset, final int length) {
-		final Object[] array = this.array;
-		final int capacity = array.length;
-		final int min = this.offset + offset, max = min + length;
 		if (result.length < length) {
 			final Class<? extends Object[]> clazz = result.getClass();
 			result = (T[])(clazz == Object[].class ? new Object[length] : Array.newInstance(clazz.getComponentType(), length));
 		}
-		int j = 0;
-		for (int i = min, size = max < capacity ? max : capacity; i < size; result[j++] = (T)array[i++]) {}
-		for (int i = 0, size = max - capacity; i < size; result[j++] = (T)array[i++]) {}
-		for (int i = result.length; j < i; result[--i] = null) {}
+		this.collectImpl(result, offset, length);
+		for (int i = result.length; length < i;) {
+			result[--i] = null;
+		}
 		return result;
+	}
+
+	/** Diese Methode implementiert {@link #toString()} für den gegebenen Abschnitt.
+	 *
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Textdarstellung. */
+	protected final String toStringImpl(final int offset, final int length) {
+		if (length == 0) return "[]";
+		final Object[] array = this.array;
+		final int capacity = array.length, min = this.offset + offset, max = min + length;
+		final StringBuilder result = new StringBuilder().append('[').append(array[min]);
+		for (int i = min + 1, size = max < capacity ? max : capacity; i < size; result.append(", ").append(array[i++])) {}
+		for (int i = 0, size = max - capacity; i < size; result.append(", ").append(array[i++])) {}
+		return result.append(']').toString();
+	}
+
+	/** Diese Methode kopiert alle Elemente des gegebenen Abschnitts in das gegebene Array.
+	 *
+	 * @param target gegebene Array.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts. */
+	protected final void collectImpl(final Object[] target, final int offset, final int length) {
+		final Object[] array = this.array;
+		final int capacity = array.length;
+		final int min = this.offset + offset, max = min + length;
+		int index = 0;
+		for (int i = min, size = max < capacity ? max : capacity; i < size; target[index++] = array[i++]) {}
+		for (int i = 0, size = max - capacity; i < size; target[index++] = array[i++]) {}
+	}
+
+	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
+	 *
+	 * @param capacity Anzahl der verwaltbaren Einträge.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Elementen ist. */
+	protected final void allocateImpl(final int capacity) throws IllegalArgumentException {
+		if (capacity == this.capacityImpl()) return;
+		final int length = this.length;
+		if (capacity < length) throw new IllegalArgumentException();
+		final Object[] array = new Object[capacity];
+		this.collectImpl(array, 0, length);
+		this.array = array;
+		this.offset = 0;
+	}
+
+	/** Diese Methode gibt die Anzahl der aktuell verwaltbaren Elemente zurück.
+	 *
+	 * @return Länge von {@link #array}. */
+	protected final int capacityImpl() {
+		return this.array.length;
 	}
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
 	 *
 	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
 	 * @return {@code this}.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Elementen ist. */
 	public ArrayList_<GItem> allocate(final int capacity) {
-		final int length = this.length;
-		if (capacity < length) throw new IllegalArgumentException();
-		if (!this.insertImpl(length, capacity - this.array.length)) throw new OutOfMemoryError();
+		this.allocateImpl(capacity);
 		return this;
 	}
 
-	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
+	/** Diese Methode gibt die Anzahl der Elemente zurück, die ohne erneuter Speicherreservierung verwaltet werden kann.
 	 *
 	 * @return Kapazität. */
 	public int capacity() {
@@ -698,7 +755,8 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	 *
 	 * @return {@code this}. */
 	public ArrayList_<GItem> compact() {
-		return this.allocate(this.length);
+		this.allocateImpl(this.length);
+		return this;
 	}
 
 	/** {@inheritDoc} */
@@ -854,7 +912,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public boolean remove(final Object object) {
-		final int index = this.lastIndexOfImpl(object, 0, this.length);
+		final int index = this.lastIndexImpl(object, 0, this.length);
 		if (index < 0) return false;
 		this.deleteImpl(index, 1);
 		return true;
@@ -883,7 +941,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public boolean removeFirstOccurrence(final Object item) {
-		final int index = this.firstIndexOfImpl(item, 0, this.length);
+		final int index = this.firstIndexImpl(item, 0, this.length);
 		if (index < 0) return false;
 		this.deleteImpl(index, 1);
 		return true;
@@ -892,7 +950,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public boolean removeLastOccurrence(final Object item) {
-		final int index = this.lastIndexOfImpl(item, 0, this.length);
+		final int index = this.lastIndexImpl(item, 0, this.length);
 		if (index < 0) return false;
 		this.deleteImpl(index, 1);
 		return true;
@@ -1000,13 +1058,13 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public int indexOf(final Object item) {
-		return this.firstIndexOfImpl(item, 0, this.length);
+		return this.firstIndexImpl(item, 0, this.length);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public int lastIndexOf(final Object item) {
-		return this.lastIndexOfImpl(item, 0, this.length);
+		return this.lastIndexImpl(item, 0, this.length);
 	}
 
 	/** {@inheritDoc} */
@@ -1030,13 +1088,15 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		return this.hashCodeImpl(0, this.length);
+		return this.hashImpl(0, this.length);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
-		return this.equalsImpl(object, 0, this.length);
+		if (object == this) return true;
+		if (!(object instanceof List<?>)) return false;
+		return this.equalsImpl((List<?>)object, 0, this.length);
 	}
 
 	/** {@inheritDoc} */

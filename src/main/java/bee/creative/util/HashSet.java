@@ -234,7 +234,7 @@ public class HashSet<GItem> extends HashData<GItem, GItem> implements Set<GItem>
 		return this;
 	}
 
-	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
+	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreservierung verwaltet werden kann.
 	 *
 	 * @return Kapazität. */
 	public int capacity() {

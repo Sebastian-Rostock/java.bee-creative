@@ -234,7 +234,7 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 		return this;
 	}
 
-	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
+	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreservierung verwaltet werden kann.
 	 *
 	 * @return Kapazität. */
 	public int capacity() {

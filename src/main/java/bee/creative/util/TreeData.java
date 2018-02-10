@@ -808,7 +808,7 @@ import java.util.SortedSet;
 			return this.count;
 		}
 
-		/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
+		/** Diese Methode gibt die Anzahl der aktuell verwaltbaren Einträge zurück.
 		 *
 		 * @return Kapazität. */
 		protected final int capacityImpl() {
