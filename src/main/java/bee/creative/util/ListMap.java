@@ -109,7 +109,7 @@ class ListMap<GKey, GValue> extends ListData<GKey, GValue> implements Map<GKey, 
 		final Map<?, ?> that = (Map<?, ?>)object;
 		if (that.size() != this.size()) return false;
 		for (final Entry<?, ?> entry: that.entrySet()) {
-			final int entryIndex = this.getIndexImpl(entry.getKey());
+			final int entryIndex = this.OKAY_getIndexImpl(entry.getKey());
 			if (entryIndex < 0) return false;
 			if (!Objects.equals(this.OKAY_getValueImpl(entryIndex), entry.getValue())) return false;
 		}
