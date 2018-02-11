@@ -14,32 +14,219 @@ import java.util.NoSuchElementException;
 
 class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Serializable {
 
-	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = 2146674771303938589L;
-
-	protected static class SectionIterator<GItem> {
+	@SuppressWarnings ("javadoc")
+	protected static class Sub<GItem> implements List<GItem> {
 
 		final ArrayList_<GItem> array;
 
-		final int offset;
+		final int index;
 
-		int length;
+		int count;
+
+		public Sub(final ArrayList_<GItem> array, final int index, final int count) {
+			if ((index < 0) || (count < 0) || ((index + count) > array.length)) throw new IndexOutOfBoundsException();
+			this.array = array;
+			this.index = index;
+			this.count = count;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int size() {
+			return this.count;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean isEmpty() {
+			return this.count == 0;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public Iterator<GItem> iterator() {
+			return new IterA<>(this.array, this.index, this.count);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public GItem get(final int index) {
+			if ((index < 0) || (index >= this.count)) throw new IndexOutOfBoundsException();
+			return this.array.getImpl(this.index + index);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public GItem set(final int index, final GItem item) {
+			if ((index < 0) || (index >= this.count)) throw new IndexOutOfBoundsException();
+			return this.array.setImpl(this.index + index, item);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean add(final GItem item) {
+			return this.array.addImpl(this.index + this.count, item);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void add(final int index, final GItem item) {
+			if ((index < 0) || (index >= this.count)) throw new IndexOutOfBoundsException();
+			this.array.addImpl(this.index + index, item);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean addAll(final Collection<? extends GItem> items) {
+			return this.array.addAllImpl(this.index, items);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean addAll(final int index, final Collection<? extends GItem> items) {
+			return this.array.addAllImpl(this.index + index, items);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean contains(final Object item) {
+			return this.array.containsImpl(item, this.index, this.count);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean containsAll(final Collection<?> items) {
+			return this.array.containsAllImpl(items, this.index, this.count);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public GItem remove(final int index) {
+			if ((index < 0) || (index >= this.count)) throw new IndexOutOfBoundsException();
+			return this.array.remove(this.index + index);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean remove(final Object item) {
+			final int index = this.index, result = this.array.lastIndexImpl(item, index, this.count);
+			if (result < 0) return false;
+			this.array.deleteImpl(index + result, 1);
+			return true;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean removeAll(final Collection<?> items) {
+			return Iterators.removeAll(this.iterator(), items);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean retainAll(final Collection<?> items) {
+			return Iterators.retainAll(this.iterator(), items);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void clear() {
+			this.array.deleteImpl(this.index, this.count);
+			this.count = 0;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int indexOf(final Object item) {
+			final int index = this.index, result = this.array.firstIndexImpl(item, index, this.count);
+			return result >= 0 ? result + index : -1;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int lastIndexOf(final Object item) {
+			final int index = this.index, result = this.array.lastIndexImpl(item, index, this.count);
+			return result >= 0 ? result + index : -1;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public ListIterator<GItem> listIterator() {
+			return new IterA<>(this.array, this.index, this.count);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public ListIterator<GItem> listIterator(final int index) {
+			final IterA<GItem> result = new IterA<>(this.array, this.index, this.count);
+			result.skip(index);
+			return result;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public List<GItem> subList(final int fromIndex, final int toIndex) {
+			final int index = this.index;
+			return this.array.subList(index + fromIndex, index + toIndex);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public Object[] toArray() {
+			return this.array.toArrayImpl(ArrayList_.EMPTY_OBJECTS, this.index, this.count);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public <T> T[] toArray(final T[] array) {
+			return this.array.toArrayImpl(array, this.index, this.count);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int hashCode() {
+			return this.array.hashImpl(this.index, this.count);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof List<?>)) return false;
+			return this.array.equalsImpl((List<?>)object, this.index, this.count);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return this.array.toStringImpl(this.index, this.count);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	protected static class Iter<GItem> {
+
+		final ArrayList_<GItem> array;
+
+		final int index;
+
+		int count;
 
 		int cursor = 0;
 
 		int result = -1;
 
-		public SectionIterator(final ArrayList_<GItem> array) {
+		public Iter(final ArrayList_<GItem> array) {
 			this.array = array;
-			this.offset = 0;
-			this.length = array.length;
+			this.index = 0;
+			this.count = array.length;
 		}
 
-		public SectionIterator(final ArrayList_<GItem> array, final int offset, final int length) {
-			if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
+		public Iter(final ArrayList_<GItem> array, final int index, final int count) {
+			if ((index < 0) || (count < 0) || ((index + count) > array.length)) throw new IndexOutOfBoundsException();
 			this.array = array;
-			this.offset = offset;
-			this.length = length;
+			this.index = index;
+			this.count = count;
 		}
 
 		{}
@@ -50,7 +237,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		 * @throws IndexOutOfBoundsException Wenn die erreichte Position ungültig ist. */
 		protected final void skip(final int count) throws IndexOutOfBoundsException {
 			final int index = this.cursor + count;
-			if ((index < 0) || (index > this.length)) throw new IndexOutOfBoundsException();
+			if ((index < 0) || (index > this.count)) throw new IndexOutOfBoundsException();
 			this.cursor = index;
 			this.result = -1;
 		}
@@ -67,7 +254,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 				if (index < 0) throw new NoSuchElementException();
 				this.cursor = index;
 				this.result = index;
-				return this.array.getImpl(this.offset + index);
+				return this.array.getImpl(this.index + index);
 			} catch (final IndexOutOfBoundsException e) {
 				throw new NoSuchElementException();
 			}
@@ -80,16 +267,16 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 		/** Diese Methode implementiert {@link ListIterator#hasNext()}. */
 		protected final boolean hasNextImpl() {
-			return this.cursor < this.length;
+			return this.cursor < this.count;
 		}
 
 		/** Diese Methode implementiert {@link ListIterator#next()}. */
 		protected final GItem nextImpl() {
 			final int index = this.cursor;
-			if (index >= this.length) throw new NoSuchElementException();
+			if (index >= this.count) throw new NoSuchElementException();
 			this.cursor = index + 1;
 			this.result = index;
-			return this.array.getImpl(this.offset + index);
+			return this.array.getImpl(this.index + index);
 		}
 
 		/** Diese Methode implementiert {@link ListIterator#nextIndex()}. */
@@ -101,13 +288,13 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		protected final void setImpl(final GItem item) throws IllegalStateException {
 			final int index = this.result;
 			if (index < 0) throw new IllegalStateException();
-			this.array.set(this.offset + index, item);
+			this.array.set(this.index + index, item);
 		}
 
 		/** Diese Methode implementiert {@link ListIterator#add(Object)}. */
 		protected final void addImpl(final GItem item) throws IllegalStateException {
 			final int index = this.cursor;
-			if (!this.array.offerImpl(this.offset + index, item)) throw new IllegalStateException();
+			if (!this.array.offerImpl(this.index + index, item)) throw new IllegalStateException();
 			this.cursor = index + 1;
 			this.result = -1;
 		}
@@ -116,9 +303,9 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		protected final void removeImpl() {
 			final int index = this.result;
 			if (index < 0) throw new IllegalStateException();
-			this.array.deleteImpl(this.offset + index, 1);
+			this.array.deleteImpl(this.index + index, 1);
 			this.result = -1;
-			this.length--;
+			this.count--;
 			if (index >= this.cursor) return;
 			this.cursor--;
 		}
@@ -126,7 +313,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected static class IterA<GItem> extends SectionIterator<GItem> implements ListIterator<GItem> {
+	protected static class IterA<GItem> extends Iter<GItem> implements ListIterator<GItem> {
 
 		public IterA(final ArrayList_<GItem> array) {
 			super(array);
@@ -186,7 +373,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected static class IterD<GItem> extends SectionIterator<GItem> implements Iterator<GItem> {
+	protected static class IterD<GItem> extends Iter<GItem> implements Iterator<GItem> {
 
 		public IterD(final ArrayList_<GItem> array) {
 			super(array);
@@ -211,190 +398,10 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 
 	}
 
-	static class SubList<GItem> implements List<GItem> {
-
-		final ArrayList_<GItem> items;
-
-		final int offset;
-
-		int length;
-
-		SubList(final ArrayList_<GItem> items, final int offset, final int length) {
-			if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IndexOutOfBoundsException();
-			this.items = items;
-			this.offset = offset;
-			this.length = length;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public int size() {
-			return this.length;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean isEmpty() {
-			return this.length == 0;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public Iterator<GItem> iterator() {
-			return new IterA<>(this.items, this.offset, this.length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public GItem get(final int index) {
-			if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
-			return this.items.getImpl(this.offset + index);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public GItem set(final int index, final GItem element) {
-			if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
-			return this.items.setImpl(this.offset + index, element);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean add(final GItem item) {
-			return this.items.addImpl(this.offset + this.length, item);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void add(final int index, final GItem element) {
-			if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
-			this.items.addImpl(this.offset + index, element);
-		}
-
-		@Override
-		public boolean addAll(final Collection<? extends GItem> objects) {
-			return false;
-		}
-
-		@Override
-		public boolean addAll(final int index, final Collection<? extends GItem> objects) {
-			return false;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean contains(final Object object) {
-			return this.items.containsImpl(object, this.offset, this.length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean containsAll(final Collection<?> c) {
-			return this.items.containsAllImpl(c, this.offset, this.length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public GItem remove(final int index) {
-			if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
-			return this.items.remove(this.offset + index);
-		}
-
-		@Override
-		public boolean remove(final Object o) {
-
-			return false;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean removeAll(final Collection<?> elements) {
-			return Iterables.removeAll((Iterable<?>)this, elements);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean retainAll(final Collection<?> elements) {
-			return Iterables.retainAll((Iterable<?>)this, elements);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void clear() {
-			this.items.deleteImpl(this.offset, this.length);
-			this.length = 0;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public int indexOf(final Object object) {
-			final int offset = this.offset, result = this.items.firstIndexImpl(object, offset, this.length);
-			return result >= 0 ? result + offset : -1;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public int lastIndexOf(final Object object) {
-			final int offset = this.offset, result = this.items.lastIndexImpl(object, offset, this.length);
-			return result >= 0 ? result + offset : -1;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public ListIterator<GItem> listIterator() {
-			return new IterA<>(this.items, this.offset, this.length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public ListIterator<GItem> listIterator(final int index) {
-			final IterA<GItem> result = new IterA<>(this.items, this.offset, this.length);
-			result.skip(index);
-			return result;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public List<GItem> subList(final int fromIndex, final int toIndex) {
-			final int offset = this.offset;
-			return this.items.subList(offset + fromIndex, offset + toIndex);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public Object[] toArray() {
-			return this.items.toArrayImpl(ArrayList_.EMPTY_OBJECTS, this.offset, this.length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public <T> T[] toArray(final T[] array) {
-			return this.items.toArrayImpl(array, this.offset, this.length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public int hashCode() {
-			return this.items.hashImpl(this.offset, this.length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof List<?>)) return false;
-			return this.items.equalsImpl((List<?>)object, this.offset, this.length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return this.items.toStringImpl(this.offset, this.length);
-		}
-
-	}
-
 	{}
+
+	/** Dieses Feld speichert das serialVersionUID. */
+	private static final long serialVersionUID = 1727164646735088421L;
 
 	/** Dieses Feld speichert den initialwert für {@link #array}. */
 	static final Object[] EMPTY_OBJECTS = {};
@@ -439,11 +446,11 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return true;
 	}
 
-	protected boolean addAllImpl(final int index, final Collection<? extends GItem> item) throws IndexOutOfBoundsException, OutOfMemoryError {
+	protected final boolean addAllImpl(final int index, final Collection<? extends GItem> item) throws IndexOutOfBoundsException, OutOfMemoryError {
 		final int size = item.size();
 		if (!this.insertImpl(index, size)) throw new OutOfMemoryError();
 		if (size == 0) return false;
-		
+
 		// TODO
 		return false;
 	}
@@ -541,7 +548,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	 * @param thatOffset Position, ab der die Elemente in das gegebene Array geschriben werden sollen.
 	 * @param index Beginn des Abschnitts.
 	 * @param count Länge des Abschnitts. */
-	protected final void collectImpl(final Object[] thatArray, int thatOffset, final int index, final int count) {
+	protected final void collectImpl(final Object[] thatArray, final int thatOffset, final int index, final int count) {
 		final Object[] array = this.array;
 		final int capacity = array.length;
 		final int min = this.offset + index, max = min + count;
@@ -1105,7 +1112,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 	/** {@inheritDoc} */
 	@Override
 	public List<GItem> subList(final int fromIndex, final int toIndex) {
-		return new SubList<>(this, fromIndex, toIndex - fromIndex);
+		return new Sub<>(this, fromIndex, toIndex - fromIndex);
 	}
 
 	/** {@inheritDoc} */
