@@ -170,7 +170,7 @@ public final class FEMFormatter {
 	public final FEMFormatter putIndent() {
 		final LinkedList<Boolean> indents = this.indents;
 		if (this.indents.getLast().booleanValue()) return this;
-		final int value = indents.size();
+		int value = indents.size();
 		for (int i = 0; i < value; i++) {
 			indents.set(i, Boolean.TRUE);
 		}
@@ -179,9 +179,11 @@ public final class FEMFormatter {
 			final Object item = items.get(i);
 			if (item instanceof Token) {
 				final Token token = (Token)item;
-				if (token.level() <= value) { // ALTERNATIV: else if (token.level() < value) return this;
+				int level = token.level();
+				if (level <= value) { // ALTERNATIV: else if (token.level() < value) return this;
 					if (token.isEnabled()) return this;
 					token.enable();
+					value = level;
 				}
 				i--;
 			}

@@ -46,11 +46,11 @@ public interface ByteArray extends Array<byte[], Byte> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<byte[], Byte> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super byte[], ? super Byte> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -71,11 +71,11 @@ public interface ByteArray extends Array<byte[], Byte> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<byte[], Byte> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends byte[], ? extends Byte> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -92,11 +92,11 @@ public interface ByteArray extends Array<byte[], Byte> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<byte[], Byte> values) throws NullPointerException;
+	public void add(Array<? extends byte[], ? extends Byte> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<byte[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends byte[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -117,11 +117,11 @@ public interface ByteArray extends Array<byte[], Byte> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<byte[], Byte> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends byte[], ? extends Byte> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

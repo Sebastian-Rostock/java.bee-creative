@@ -1272,8 +1272,8 @@ public class Builders {
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
 	 * @param navigator {@link Getter}.
 	 * @param builder {@link Builder}.
-	 * @return {@code converted}-{@link Builder}.
-	 * @throws NullPointerException Wenn {@code converter} bzw. {@code builder} {@code null} ist. */
+	 * @return {@code navigated}-{@link Builder}.
+	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code builder} {@code null} ist. */
 	public static <GInput, GOutput> Builder<GOutput> navigatedBuilder(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Builder<? extends GInput> builder) throws NullPointerException {
 		Objects.assertNotNull(navigator);

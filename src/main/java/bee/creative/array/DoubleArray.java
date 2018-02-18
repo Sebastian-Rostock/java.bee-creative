@@ -46,11 +46,11 @@ public interface DoubleArray extends Array<double[], Double> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<double[], Double> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super double[], ? super Double> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<double[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super double[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -71,11 +71,11 @@ public interface DoubleArray extends Array<double[], Double> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<double[], Double> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends double[], ? extends Double> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<double[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends double[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -92,11 +92,11 @@ public interface DoubleArray extends Array<double[], Double> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<double[], Double> values) throws NullPointerException;
+	public void add(Array<? extends double[], ? extends Double> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<double[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends double[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -117,11 +117,11 @@ public interface DoubleArray extends Array<double[], Double> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<double[], Double> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends double[], ? extends Double> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<double[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends double[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

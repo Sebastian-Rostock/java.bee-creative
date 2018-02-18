@@ -285,8 +285,8 @@ public class Pointers {
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
 	 * @param navigator {@link Getter}.
 	 * @param pointer {@link Pointer}.
-	 * @return {@code converted}-{@link Pointer}.
-	 * @throws NullPointerException Wenn {@code converter} bzw. {@code pointer} {@code null} ist. */
+	 * @return {@code navigated}-{@link Pointer}.
+	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code pointer} {@code null} ist. */
 	public static <GInput, GOutput> Pointer<GOutput> navigatedPointer(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Pointer<? extends GInput> pointer) throws NullPointerException {
 		Objects.assertNotNull(navigator);

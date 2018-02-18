@@ -46,11 +46,11 @@ public interface ShortArray extends Array<short[], Short> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<short[], Short> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super short[], ? super Short> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<short[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super short[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -71,11 +71,11 @@ public interface ShortArray extends Array<short[], Short> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<short[], Short> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends short[], ? extends Short> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<short[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends short[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -92,11 +92,11 @@ public interface ShortArray extends Array<short[], Short> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<short[], Short> values) throws NullPointerException;
+	public void add(Array<? extends short[], ? extends Short> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<short[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends short[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -117,11 +117,11 @@ public interface ShortArray extends Array<short[], Short> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<short[], Short> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends short[], ? extends Short> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<short[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends short[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

@@ -34,7 +34,7 @@ public interface Array<GArray, GValue> {
 	 * @param values {@link Array}.
 	 * @throws NullPointerException Wenn das gegebene {@link Array} {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void get(int index, Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super GArray, ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode füllt die gegebene {@link ArraySection} mit den Werten ab der gegebenen Position.
 	 *
@@ -42,7 +42,7 @@ public interface Array<GArray, GValue> {
 	 * @param values {@link ArraySection}.
 	 * @throws NullPointerException Wenn die gegebene {@link ArraySection} {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void get(int index, ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super GArray> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode kopiert die Werte des gegebenen {@link Array}s an die gegebene Position.
 	 *
@@ -50,7 +50,7 @@ public interface Array<GArray, GValue> {
 	 * @param values {@link Array}.
 	 * @throws NullPointerException Wenn das gegebene {@link Array} {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends GArray, ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode kopiert die Werte der gegebenen {@link ArraySection} an die gegebene Position.
 	 *
@@ -58,21 +58,21 @@ public interface Array<GArray, GValue> {
 	 * @param values {@link ArraySection}.
 	 * @throws NullPointerException Wenn die gegebene {@link ArraySection} {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt die Werte des gegebenen {@link Array}s am Ende ein.
 	 *
 	 * @see Array#add(int, Array)
 	 * @param values {@link Array}.
 	 * @throws NullPointerException Wenn das gegebene {@link Array} {@code null} ist. */
-	public void add(Array<GArray, GValue> values) throws NullPointerException;
+	public void add(Array<? extends GArray, ? extends GValue> values) throws NullPointerException;
 
 	/** Diese Methode fügt die Werte der gegebenen {@link ArraySection} am Ende ein.
 	 *
 	 * @see Array#add(int, ArraySection)
 	 * @param values {@link ArraySection}.
 	 * @throws NullPointerException Wenn die gegebene {@link ArraySection} {@code null} ist. */
-	public void add(ArraySection<GArray> values) throws NullPointerException;
+	public void add(ArraySection<? extends GArray> values) throws NullPointerException;
 
 	/** Diese Methode fügt die Werte des gegebenen {@link Array}s an der gegebenen Position ein.
 	 *
@@ -82,7 +82,7 @@ public interface Array<GArray, GValue> {
 	 * @param values {@link Array}.
 	 * @throws NullPointerException Wenn da gegebene {@link Array} {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends GArray, ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt die Werte der gegebenen {@link ArraySection} an der gegebenen Position ein.
 	 *
@@ -92,7 +92,7 @@ public interface Array<GArray, GValue> {
 	 * @param values {@link ArraySection}.
 	 * @throws NullPointerException Wenn die gegebene {@link ArraySection} {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt die gegebene Anzahl an Werten ab dem gegebenen Index in das Array ein.
 	 *

@@ -1,19 +1,9 @@
-package bee.creative.compact;
+package bee.creative._dev_;
 
-import java.util.HashMap;
 import java.util.Map;
 import bee.creative.util.Comparators;
 
-/** Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactEntryMap}. Der Speicherverbrauch einer
- * {@link CompactEntryHashMap} liegt bei ca. {@code 28%} des Speicherverbrauchs einer {@link HashMap}.
- * <p>
- * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl
- * im Mittel auf ca. {@code 150%}. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim
- * Hinzufügen und Entfernen von Elementen in einer {@link CompactEntryHashMap} auf {@code 760%} der Rechenzeit, die eine {@link HashMap} hierfür benötigen
- * würde.
- * <p>
- * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map}s in etwa die gleichen Rechenzeiten, unabhängig von der Anzahl der
- * Elemente.
+/** Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactItemMap}.
  *
  * @see Object#hashCode()
  * @see Object#equals(Object)
@@ -21,10 +11,10 @@ import bee.creative.util.Comparators;
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte.
  * @deprecated {@link bee.creative.util.HashMap} */
-public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GValue> {
+public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GKey, GValue> {
 
 	/** Dieser Konstruktor initialisiert die {@link Map}. */
-	public CompactEntryHashMap() {
+	public CompactItemHashMap() {
 		super();
 	}
 
@@ -33,7 +23,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
-	public CompactEntryHashMap(final int capacity) {
+	public CompactItemHashMap(final int capacity) throws IllegalArgumentException {
 		super(capacity);
 	}
 
@@ -42,7 +32,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
 	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */
-	public CompactEntryHashMap(final Map<? extends GKey, ? extends GValue> map) {
+	public CompactItemHashMap(final Map<? extends GKey, ? extends GValue> map) throws NullPointerException {
 		super(map);
 	}
 
@@ -56,17 +46,20 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	}
 
 	/** {@inheritDoc} */
+	@SuppressWarnings ("unchecked")
 	@Override
 	protected boolean customItemEquals(final Object key, final int hash, final Object item) {
-		if (key == null) return item == null;
-		return key.equals(item);
+		if (key == null) return this.customGetKey((GValue)item) == null;
+		return key.equals(this.customGetKey((GValue)item));
 	}
 
 	/** {@inheritDoc} */
+	@SuppressWarnings ("unchecked")
 	@Override
 	protected int customItemCompare(final Object key, final int hash, final Object item) {
-		if (item == null) return hash;
-		return Comparators.compare(hash, item.hashCode());
+		final Object value = this.customGetKey((GValue)item);
+		if (value == null) return hash;
+		return Comparators.compare(hash, value.hashCode());
 	}
 
 }

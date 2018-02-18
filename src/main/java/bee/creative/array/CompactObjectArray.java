@@ -34,7 +34,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		/** {@inheritDoc} */
 		@Override
 		public ObjectArraySection<GValue> section() {
-			return new CompactObjectSubArraySection<GValue>(this);
+			return new CompactObjectSubArraySection<>(this);
 		}
 
 		/** {@inheritDoc} */
@@ -225,7 +225,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
 	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
 	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
-	public CompactObjectArray(final ArraySection<GValue[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public CompactObjectArray(final ArraySection<? extends GValue[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
 
@@ -259,6 +259,13 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected void customClearArray(final int startIndex, final int finalIndex) {
+		final Object[] array = this.array;
+		for (int i = startIndex, size = finalIndex; i < size; array[i++] = null) {}
 	}
 
 	/** {@inheritDoc} */
@@ -319,13 +326,20 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/** {@inheritDoc} */
 	@Override
 	public ObjectArraySection<GValue> section() {
-		return new CompactObjectArraySection<GValue>(this);
+		return new CompactObjectArraySection<>(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public ObjectArray<GValue> subArray(final int startIndex, final int finalIndex) {
-		return new CompactObjectSubArray<GValue>(this, startIndex, finalIndex);
+		return new CompactObjectSubArray<>(this, startIndex, finalIndex);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	@SuppressWarnings ({"unchecked", "rawtypes"})
+	public int compare(final GValue o1, final GValue o2) {
+		return Comparators.compare((Comparable)o1, (Comparable)o2);
 	}
 
 }

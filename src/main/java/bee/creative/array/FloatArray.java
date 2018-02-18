@@ -46,11 +46,11 @@ public interface FloatArray extends Array<float[], Float> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<float[], Float> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super float[], ? super Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<float[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -71,11 +71,11 @@ public interface FloatArray extends Array<float[], Float> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<float[], Float> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<float[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -92,11 +92,11 @@ public interface FloatArray extends Array<float[], Float> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<float[], Float> values) throws NullPointerException;
+	public void add(Array<? extends float[], ? extends Float> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<float[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends float[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -117,11 +117,11 @@ public interface FloatArray extends Array<float[], Float> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<float[], Float> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<float[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

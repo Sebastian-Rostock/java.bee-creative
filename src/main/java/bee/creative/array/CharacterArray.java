@@ -46,11 +46,11 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<char[], Character> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super char[], ? super Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<char[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -71,11 +71,11 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<char[], Character> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends char[], ? extends Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<char[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -92,11 +92,11 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<char[], Character> values) throws NullPointerException;
+	public void add(Array<? extends char[], ? extends Character> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<char[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends char[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -117,11 +117,11 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<char[], Character> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends char[], ? extends Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<char[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

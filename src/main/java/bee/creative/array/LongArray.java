@@ -46,11 +46,11 @@ public interface LongArray extends Array<long[], Long> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<long[], Long> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super long[], ? super Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<long[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -71,11 +71,11 @@ public interface LongArray extends Array<long[], Long> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<long[], Long> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends long[], ? extends Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<long[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -92,11 +92,11 @@ public interface LongArray extends Array<long[], Long> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<long[], Long> values) throws NullPointerException;
+	public void add(Array<? extends long[], ? extends Long> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<long[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends long[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -117,11 +117,11 @@ public interface LongArray extends Array<long[], Long> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<long[], Long> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends long[], ? extends Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<long[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

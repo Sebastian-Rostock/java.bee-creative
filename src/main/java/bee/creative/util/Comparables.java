@@ -144,36 +144,36 @@ public class Comparables {
 		};
 	}
 
-	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie das gegebene Element zur Berechnung des Navigationswert
-	 * verwendet. Das gegebene Element wird als erstes Argument des {@link Comparator} verwendet. Der Navigationswert für ein Element {@code item2} ist
-	 * {@code comparator.compare(item, item2)}.
+	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie die gegebene Eingabe zur Berechnung des Navigationswert
+	 * verwendet. Die gegebene Eingabe wird als erstes Argument des {@link Comparator} verwendet. Der Navigationswert für ein Element {@code item} ist
+	 * {@code comparator.compare(input, item)}.
 	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param item erstes Argument des {@link Comparator}.
+	 * @param <GItem> Typ der Eingabe.
+	 * @param input erstes Argument des {@link Comparator}.
 	 * @param comparator {@link Comparator}.
 	 * @return {@code entry}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparable<GItem> itemComparable(final GItem item, final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static <GItem> Comparable<GItem> itemComparable(final GItem input, final Comparator<? super GItem> comparator) throws NullPointerException {
 		Objects.assertNotNull(comparator);
 		return new Comparable<GItem>() {
 
 			@Override
 			public int compareTo(final GItem item2) {
-				return comparator.compare(item, item2);
+				return comparator.compare(input, item2);
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("itemComparable", item, comparator);
+				return Objects.toInvokeString("itemComparable", input, comparator);
 			}
 
 		};
 	}
 
-	/** Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
-	 * {@link Comparable} delegiert. Der Navigationswert für ein Element {@code item} ist {@code ((item == null) ? 1 : comparable.compareTo(item))}.
+	/** Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Eingaben als minimal betrachtet und alle anderen Eingaben an das gegebene
+	 * {@link Comparable} delegiert. Der Navigationswert für eine Eingaben {@code item} ist {@code ((item == null) ? 1 : comparable.compareTo(item))}.
 	 *
-	 * @param <GItem> Typ der Elemente.
+	 * @param <GItem> Typ der Eingabe.
 	 * @param comparable {@link Comparable}.
 	 * @return {@code default}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
@@ -194,10 +194,10 @@ public class Comparables {
 		};
 	}
 
-	/** Diese Methode gibt einen {@link Comparable} zurück, der den Navigationswert des gegebenen {@link Comparable} umkehrt. Der Navigationswert für ein Element
-	 * {@code item} ist {@code - comparable.compareTo(item)}.
+	/** Diese Methode gibt einen {@link Comparable} zurück, der den Navigationswert des gegebenen {@link Comparable} umkehrt. Der Navigationswert für eine Eingabe
+	 * {@code item} ist {@code -comparable.compareTo(item)}.
 	 *
-	 * @param <GItem> Typ der Elemente.
+	 * @param <GItem> Typ der Eingabe.
 	 * @param comparable {@link Comparable}.
 	 * @return {@code reverse}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
@@ -218,6 +218,13 @@ public class Comparables {
 		};
 	}
 
+	/** Diese Methode gibt einen {@link Comparable} zurück, der das gegebenen {@link Comparable} auf jedes Element der iterierbaren Eingabe anwendet und den
+	 * ersten Navigationswert ungleich {@code 0} liefert und welcher bei erfolgloser Suche {@code 0} liefert.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param comparable {@link Comparable}.
+	 * @return {@code iterable}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GItem> Comparable<Iterable<? extends GItem>> iterableComparable(final Comparable<? super GItem> comparable) {
 		Objects.assertNotNull(comparable);
 		return new Comparable<Iterable<? extends GItem>>() {
@@ -239,11 +246,11 @@ public class Comparables {
 		};
 	}
 
-	/** Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet
-	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat. Der Navigationswert
-	 * für ein Element {@code item} ist {@code (comparable1.compareTo(item) != 0) ? comparable1.compareTo(item) : comparable2.compareTo(item)}.
+	/** Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert einer Eingabe zuerst über den ersten {@link Comparable} berechnet
+	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste den Navigationswert {@code 0} ermittelt hat. Der Navigationswert für eine Eingabe
+	 * {@code item} ist {@code (comparable1.compareTo(item) != 0 ? comparable1 : comparable2).compareTo(item)}.
 	 *
-	 * @param <GItem> Typ der Elemente.
+	 * @param <GItem> Typ der Eingabe.
 	 * @param comparable1 erster {@link Comparable}.
 	 * @param comparable2 zweiter {@link Comparable}.
 	 * @return {@code chained}-{@link Comparable}.
@@ -269,12 +276,12 @@ public class Comparables {
 		};
 	}
 
-	/** Diese Methode gint einen navigierten {@link Comparable} zurück, der von seinem Element mit dem gegebenen {@link Getter} zum Element des gegebenen
-	 * {@link Comparable} navigiert. Der Navigationswert für ein Element {@code item} ist {@code comparable.compareTo(converter.convert(item))}.
+	/** Diese Methode gint einen navigierten {@link Comparable} zurück, der von seiner Eingabe mit dem gegebenen {@link Getter} zur Eingabe des gegebenen
+	 * {@link Comparable} navigiert. Der Navigationswert für eine Eingabe {@code item} ist {@code comparable.compareTo(navigator.get(item))}.
 	 *
 	 * @see Getter
-	 * @param <GItem> Typ der Eingabe des {@link Getter} sowie der Elemente.
-	 * @param <GItem2> Typ der Ausgabe des {@link Getter} sowie der Elemente des gegebenen {@link Comparable}.
+	 * @param <GItem> Typ der Eingabe des {@link Getter}.
+	 * @param <GItem2> Typ der Ausgabe des {@link Getter} sowie der Eingabe des gegebenen {@link Comparable}.
 	 * @param navigator {@link Getter}.
 	 * @param comparable {@link Comparable}.
 	 * @return {@code navigated}-{@link Comparable}.

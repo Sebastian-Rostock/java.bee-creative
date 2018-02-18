@@ -46,11 +46,11 @@ public interface IntegerArray extends Array<int[], Integer> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<int[], Integer> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super int[], ? super Integer> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<int[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super int[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -71,11 +71,11 @@ public interface IntegerArray extends Array<int[], Integer> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<int[], Integer> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends int[], ? extends Integer> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<int[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends int[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -92,11 +92,11 @@ public interface IntegerArray extends Array<int[], Integer> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<int[], Integer> values) throws NullPointerException;
+	public void add(Array<? extends int[], ? extends Integer> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<int[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends int[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -117,11 +117,11 @@ public interface IntegerArray extends Array<int[], Integer> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<int[], Integer> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends int[], ? extends Integer> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<int[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends int[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

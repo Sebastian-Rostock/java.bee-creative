@@ -593,7 +593,7 @@ public class Iterators {
 	 * @param iterator {@link Iterator}.
 	 * @param navigator {@link Getter} nur Navigation.
 	 * @return {@code navigated}-{@link Iterator}.
-	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code converter} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code navigator} {@code null} ist. */
 	public static <GInput, GOutput> Iterator<GOutput> navigatedIterator(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Iterator<? extends GInput> iterator) throws NullPointerException {
 		Objects.assertNotNull(navigator);

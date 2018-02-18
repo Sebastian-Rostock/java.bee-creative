@@ -611,7 +611,7 @@ public class Comparators {
 
 	/** Diese Methode gibt einen navigierten {@link Comparator} zurück, der von seinen Eingaben mit dem gegebenen {@link Getter} zu den Eingaben des gegebenen
 	 * {@link Comparator} navigiert. Der Vergleichswert zweier Elemente {@code item1} und {@code item2} ergibt sich aus
-	 * {@code comparator.compare(converter.convert(item1), converter.convert(item2))}.
+	 * {@code comparator.compare(navigator.get(item1), navigator.get(item2))}.
 	 *
 	 * @see Getter
 	 * @param <GItem> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparator}.

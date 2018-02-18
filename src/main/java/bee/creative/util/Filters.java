@@ -279,14 +279,14 @@ public class Filters {
 
 	/** Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Getter} zur Eingabe des gegebenen
 	 * {@link Filter} navigiert.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(converter.convert(input))}.
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(navigator.get(input))}.
 	 *
 	 * @param <GInput> Typ der Eingabe des gelieferten {@link Filter} sowie der Eingabe des {@link Field}.
 	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie der Ausgabe des {@link Getter}.
 	 * @param navigator {@link Getter} zur Navigation.
 	 * @param filter {@link Field}.
 	 * @return {@code navigated}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code converter} bzw. {@code filter} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code filter} {@code null} ist. */
 	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Filter<? super GOutput> filter) throws NullPointerException {
 		Objects.assertNotNull(navigator);

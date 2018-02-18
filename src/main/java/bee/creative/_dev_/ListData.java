@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative._dev_;
 
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
@@ -15,6 +15,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import bee.creative.array.ArrayData;
+import bee.creative.util.Comparators;
+import bee.creative.util.HashData;
+import bee.creative.util.Objects;
 
 /*
  * Idee: keys besteht aus partitionen mit je 64 elementen | ein int[] (pages) bildet den suchindex über den partitionen | die elemente im index sowie in den

@@ -47,11 +47,11 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<GValue[], GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super GValue[], ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -72,11 +72,11 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<GValue[], GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends GValue[], ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -93,11 +93,11 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<GValue[], GValue> values) throws NullPointerException;
+	public void add(Array<? extends GValue[], ? extends GValue> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<GValue[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends GValue[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -118,11 +118,11 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<GValue[], GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends GValue[], ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

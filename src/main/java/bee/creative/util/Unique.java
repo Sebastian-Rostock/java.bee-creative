@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.xml.crypto.Data;
 
 /** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene
@@ -11,7 +12,6 @@ import javax.xml.crypto.Data;
  * Wiederverwendung via {@link #customReuse(Object, Object)} signalisiert.
  *
  * @see HashMap#from(Filter, Hasher)
- * @see TreeMap#from(Filter, Comparator)
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ der Eingabe.
  * @param <GOutput> Typ der Ausgabe. */
@@ -184,7 +184,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	@SuppressWarnings ("javadoc")
 	static <GInput, GOutput> Unique<GInput, GOutput> fromTreeMapImpl(final Filter<Object> filter, final Comparator<? super GInput> comparator,
 		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
-		return new Unique<GInput, GOutput>(TreeMap.<GInput, GOutput>from(filter, comparator)) {
+		return new Unique<GInput, GOutput>(new TreeMap<GInput, GOutput>(comparator)) {
 
 			@Override
 			public boolean accept(final Object input) {
@@ -218,7 +218,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 
 		@Override
 		public Map get(final Unique input) {
-			return TreeMap.from(input, input);
+			return new TreeMap<>(input);
 		}
 
 	};

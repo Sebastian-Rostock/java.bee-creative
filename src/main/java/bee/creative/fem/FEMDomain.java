@@ -638,10 +638,12 @@ public class FEMDomain {
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
 	protected void formatScript(final FEMFormatter target, final FEMCompiler source, final boolean simpleSpace)
 		throws NullPointerException, IllegalArgumentException {
-		int count = 0;
+		boolean indent = false;
 		while (true) {
 			switch (source.symbol()) {
-				case '/': {
+				case ';':
+					indent = true;
+				case '/':
 					target.putToken(source.section());
 					if (simpleSpace) {
 						target.putToken(" ");
@@ -649,62 +651,37 @@ public class FEMDomain {
 						target.putBreakSpace();
 					}
 					source.skip();
-					count++;
-					break;
-				}
-				case ';': {
-					target.putToken(";");
-					if (simpleSpace) {
-						target.putToken(" ");
-					} else {
-						target.putBreakSpace();
-					}
-					source.skip();
-					count++;
-					break;
-				}
-				case '(':
-					target.putToken("(").putBreakInc();
-					source.skip();
-					this.formatScript(target, source, false);
-					if (source.symbol() == ')') {
-						target.putBreakDec().putToken(")");
-						source.skip();
-					}
 				break;
+				case '(':
 				case '[':
-					target.putToken("[").putBreakInc();
+					target.putToken(source.section()).putBreakInc();
 					source.skip();
 					this.formatScript(target, source, false);
-					if (source.symbol() == ']') {
-						target.putBreakDec().putToken("]");
-						source.skip();
-					}
 				break;
 				case '{':
-					target.putToken("{");
+					target.putToken(source.section());
 					source.skip();
 					this.formatScript(target, source, true);
-					if (source.symbol() == ':') {
-						target.putToken(": ");
-						source.skip();
-						this.formatScript(target, source, false);
-					}
-					if (source.symbol() == '}') {
-						target.putToken("}");
-						source.skip();
-					}
+					this.formatScript(target, source, false);
 				break;
 				default:
 					target.putToken(source.section());
 					source.skip();
 				break;
 				case ':':
+					target.putToken(": ");
+					source.skip();
+					return;
 				case ']':
 				case '}':
 				case ')':
+					target.putBreakDec().putToken(source.section());
+					source.skip();
+					if (!indent) return;
+					target.putIndent();
+					return;
 				case -1:
-					if (count < 2) return;
+					if (!indent) return;
 					target.putIndent();
 					return;
 			}

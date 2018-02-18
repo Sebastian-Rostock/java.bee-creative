@@ -46,11 +46,11 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<boolean[], Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, Array<? super boolean[], ? super Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void get(int index, ArraySection<? super boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -71,11 +71,11 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<boolean[], Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void set(int index, ArraySection<? extends boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -92,11 +92,11 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<boolean[], Boolean> values) throws NullPointerException;
+	public void add(Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<boolean[]> values) throws NullPointerException;
+	public void add(ArraySection<? extends boolean[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -117,11 +117,11 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<boolean[], Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void add(int index, ArraySection<? extends boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

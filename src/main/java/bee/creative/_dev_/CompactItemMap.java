@@ -1,4 +1,4 @@
-package bee.creative.compact;
+package bee.creative._dev_;
 
 import java.util.Map;
 import bee.creative.util.Objects;
