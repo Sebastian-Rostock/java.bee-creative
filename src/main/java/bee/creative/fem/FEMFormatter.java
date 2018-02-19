@@ -137,12 +137,10 @@ public final class FEMFormatter {
 	 * @see #putBreakInc()
 	 * @see #putBreakSpace()
 	 * @see #putIndent()
-	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde. */
-	public final FEMFormatter putBreakDec() throws IllegalStateException {
+	 * @return {@code this}. */
+	public final FEMFormatter putBreakDec() {
 		final LinkedList<Boolean> indents = this.indents;
 		final int value = indents.size();
-		if (value <= 1) throw new IllegalStateException();
 		this.items.add(new Token(value, true, false, indents.removeLast().booleanValue()));
 		return this;
 	}
