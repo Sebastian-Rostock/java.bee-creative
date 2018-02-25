@@ -4,14 +4,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Map;
 
-/** /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Setter}-Konstruktion und -Verarbeitung.
+/** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Setter}-Konstruktion und -Verarbeitung.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.emptyField()}. */
 	@SuppressWarnings ("javadoc")
-	public static <GValue> Setter<Object, GValue> emptySetter() {
+	public static Setter<Object, Object> emptySetter() {
 		return Fields.emptyField();
 	}
 

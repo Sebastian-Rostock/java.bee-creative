@@ -4,112 +4,38 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
-/** Diese Klasse implementiert eine auf {@link HashData} aufbauende {@link Map}.
- * <p>
- * <b>Achtung:<br>
- * Die Ermittlung von {@link Object#hashCode() Streuwerte} und {@link Object#equals(Object) Äquivalenz} der Schlüssel erfolgt nicht wie in {@link Map}
- * beschrieben über Methoden der Schlüssel, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEquals(Object, Object)} dieser
- * {@link HashMap}.</b>
- * <p>
- * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung (32 Bit). Die relativen Rechenzeiten wurden zu 2<sup>18</sup>
- * {@link Random#nextInt(int) zufälligen} {@link Integer} ermittelt.
- * <p>
- * <table border="1" cellspacing="0" cellpadding="4">
- * <tr>
- * <th rowspan="2">Klasse</th>
- * <th colspan="4">Speicherverbrauch</th>
- * <th colspan="4">Rechenzeit ({@link #size()} = 4K)</th>
- * <th colspan="4">Rechenzeit ({@link #size()} = 4M)</th>
- * </tr>
- * <tr>
- * <th>{@link #size()} = 0</th>
- * <th>{@link #size()} = 1..500M</th>
- * <th>{@link #size()} = 500M..1G</th>
- * <th>{@link #size()} = 1G..2G</th>
- * <th>{@link #put(Object, Object) put}</th>
- * <th>{@link #get(Object) get}</th>
- * <th>{@link #remove(Object) remove}</th>
- * <th>{@link java.util.Map.Entry#setValue(Object) setValue}<sup>1</sup></th>
- * <th>{@link #put(Object, Object) put}</th>
- * <th>{@link #get(Object) get}</th>
- * <th>{@link #remove(Object) remove}</th>
- * <th>{@link java.util.Map.Entry#setValue(Object) setValue}<sup>1</sup></th>
- * </tr>
- * <tr>
- * <td>{@link java.util.HashMap}</td>
- * <td>72..120 Byte</td>
- * <td colspan="2">{@link #size()} * 36 + 64..112 Byte (= 100 %)</td>
- * <td>{@link #size()} * 34..36 + 64..112 Byte (~ 94..100 %)</td>
- * <td>(= 100 %)</td>
- * <td>(~ 46 %)</td>
- * <td>(~ 50 %)</td>
- * <td>(~ 27 %)</td>
- * <td>(= 100 %)</td>
- * <td>(~ 92 %)</td>
- * <td>(~ 92 %)</td>
- * <td>(~ 7 %)</td>
- * </tr>
- * <tr>
- * <td>{@link bee.creative.util.HashMap}<br>
- * mit Streuwertpuffer</td>
- * <td>40 Byte</td>
- * <td>{@link #size()} * 20 + 120 Byte (~ 56 %)</td>
- * <td colspan="2">{@link #size()} * 17..20 + 120 Byte (~ 47..56 %)</td>
- * <td>(~ 75 %)</td>
- * <td>(~ 58 %)</td>
- * <td>(~ 48 %)</td>
- * <td>(~ 54 %)</td>
- * <td>(~ 76 %)</td>
- * <td>(~ 72 %)</td>
- * <td>(~ 78 %)</td>
- * <td>(~ 53 %)</td>
- * </tr>
- * <tr>
- * <td>{@link bee.creative.util.HashMap}<br>
- * ohne Streuwertpuffer</td>
- * <td>40 Byte</td>
- * <td>{@link #size()} * 16 + 104 Byte (~ 44 %)</td>
- * <td colspan="2">{@link #size()} * 13..16 + 104 Byte (~ 36..44 %)</td>
- * <td>(~ 67 %)</td>
- * <td>(~ 58 %)</td>
- * <td>(~ 57 %)</td>
- * <td>(~ 61 %)</td>
- * <td>(~ 94 %)</td>
- * <td>(~ 83 %)</td>
- * <td>(~ 95 %)</td>
- * <td>(~ 53 %)</td>
- * </tr>
- * </table>
- * </p>
- * <sup>1</sup> Iteration über die {@link #entrySet() Menge der Einträge} und {@link java.util.Map.Entry#setValue(Object) Setzen des Werts} jedes
- * {@link java.util.Map.Entry Eintrags}.
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüssel- und Wertobjekten.<br>
+ * Das {@link #get(Object) Finden} sowie {@link #put(Object, Object) Einfügen} von Einträgen benötigt ca. 50 % der Rechenzeit, die eine
+ * {@link java.util.HashMap} benötigen würde. Das {@link #remove(Object) Entfernen} von Einträge liegt dazu bei ca. 80 % der Rechenzeit.
  *
- * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
-public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map<GKey, GValue>, Serializable {
+public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> implements Serializable {
 
-	@SuppressWarnings ("javadoc")
-	private static final long serialVersionUID = -255533287357545135L;
+	/** Dieses Feld speichert das serialVersionUID. */
+	private static final long serialVersionUID = -8792297171308603896L;
+
+	/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
+	static final Object[] EMPTY_OBJECTS = {};
 
 	{}
 
-	/** Diese Methode gibt eine {@link HashMap} zurück, welche zur Ermittlung von {@link #customHash(Object) Streuwerte} und {@link #customEquals(Object, Object)
-	 * Äquivalenz} der Schlüssel den gegebenne {@link Hasher} einsetzt.
-	 *
+	/** Diese Methode gibt eine neue {@link HashMap} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt. .
+	 * 
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
-	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Schlüssel.
-	 * @return {@link HashMap}. */
-	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher<? super Object> hasher) {
+	 * @param hasher Methoden zum Abgleich der Schlüssel.
+	 * @return An {@link Hasher} gebundene {@link HashMap}.
+	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
+	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
+		Objects.assertNotNull(hasher);
 		return new HashMap<GKey, GValue>() {
 
-			private static final long serialVersionUID = -3247304797947783260L;
+			private static final long serialVersionUID = -4549473363883050977L;
 
 			@Override
 			protected int customHash(final Object key) {
@@ -117,38 +43,18 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 			}
 
 			@Override
-			protected boolean customEquals(final Object thisKey, final Object thatKey) {
-				return hasher.equals(thisKey, thatKey);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt eine {@link HashMap} zurück, welche nur die vom gegebenen {@link Filter} akzeptierten Schlüssel zulässt und zur Ermittlung von
-	 * {@link #customHash(Object) Streuwerte} und {@link #customEquals(Object, Object) Äquivalenz} der Schlüssel den gegebenne {@link Hasher} einsetzt.
-	 *
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 * @param filter {@link Filter} zur Erkennugn der akzeptierten Schlüssel, welche als {@code GKey} interpretiert werden können.
-	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Schlüssel.
-	 * @return {@link HashMap}. */
-	public static <GKey, GValue> HashMap<GKey, GValue> from(final Filter<Object> filter, final Hasher<? super GKey> hasher) {
-		return new HashMap<GKey, GValue>() {
-
-			private static final long serialVersionUID = -583615691658086667L;
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			protected int customHash(final Object key) {
-				if (!filter.accept(key)) return 0;
-				return hasher.hash((GKey)key);
+			protected int customHashKey(final int entryIndex) {
+				return hasher.hash(this.keys[entryIndex]);
 			}
 
 			@Override
-			@SuppressWarnings ("unchecked")
-			protected boolean customEquals(final Object thisKey, final Object thatKey) {
-				if (!filter.accept(thatKey)) return false;
-				return hasher.equals((GKey)thisKey, (GKey)thatKey);
+			protected boolean customEqualsKey(final int entryIndex, final Object key) {
+				return hasher.equals(this.keys[entryIndex], key);
+			}
+
+			@Override
+			protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
+				return this.customEqualsKey(entryIndex, key);
 			}
 
 		};
@@ -156,67 +62,48 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 
 	{}
 
-	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashMap(true, 0)}. */
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	transient Object[] keys = HashMap.EMPTY_OBJECTS;
+
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	transient Object[] values = HashMap.EMPTY_OBJECTS;
+
+	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMap() {
-		this(true, 0);
 	}
 
-	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashMap(true, capacity)}. */
-	@SuppressWarnings ("javadoc")
-	public HashMap(final int capacity) {
-		this(true, 0);
-	}
-
-	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashMap(withHashes, 0)}. */
-	@SuppressWarnings ("javadoc")
-	public HashMap(final boolean withHashes) {
-		this(withHashes, 0);
-	}
-
-	/** Dieser Konstruktor initialisiert die {@link HashMap} mit der gegebenen Kapazität.
+	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
-	 * @param withHashes {@code true}, wenn die Streuwerte der Schlüssel in {@link #hashes} gepuffert werden sollen;<br>
-	 *        {@code false}, wenn der Streuwerte eines Schlüssels schnell ermittelt werden kann.
 	 * @param capacity Kapazität. */
-	public HashMap(final boolean withHashes, final int capacity) {
-		super(true, withHashes);
-		this.allocate(capacity);
-	}
-
-	/** Dieser Konstruktor ist eine Abkürzung für {@code new HashMap(true, source)}. */
-	@SuppressWarnings ("javadoc")
-	public HashMap(final Map<? extends GKey, ? extends GValue> source) {
-		this(true, source);
+	public HashMap(final int capacity) {
+		this.allocateImpl(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link HashMap} als Kopie der gegebenen {@link Map}.
 	 *
-	 * @see #HashMap(boolean, int)
-	 * @param withHashes Aktivierung des Streuwertpuffers.
 	 * @param source gegebene Einträge. */
-	public HashMap(final boolean withHashes, final Map<? extends GKey, ? extends GValue> source) {
-		this(withHashes, source.size());
+	public HashMap(final Map<? extends GKey, ? extends GValue> source) {
+		this(source.size());
 		this.putAll(source);
 	}
 
 	{}
 
-	@SuppressWarnings ({"unchecked", "javadoc"})
+	@SuppressWarnings ("javadoc")
 	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		this.nexts = stream.readBoolean() ? HashData.EMPTY_INTEGERS : null;
 		final int count = stream.readInt();
 		this.allocateImpl(count);
 		for (int i = 0; i < count; i++) {
+			@SuppressWarnings ("unchecked")
 			final GKey key = (GKey)stream.readObject();
+			@SuppressWarnings ("unchecked")
 			final GValue value = (GValue)stream.readObject();
-			final int index = this.putIndexImpl(key);
-			this.putValueImpl(index, value);
+			this.putImpl(key, value);
 		}
 	}
 
 	@SuppressWarnings ("javadoc")
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeBoolean(this.nexts != null);
 		stream.writeInt(this.count);
 		for (final Entry<GKey, GValue> entry: this.newEntriesImpl()) {
 			stream.writeObject(entry.getKey());
@@ -224,132 +111,138 @@ public class HashMap<GKey, GValue> extends HashData<GKey, GValue> implements Map
 		}
 	}
 
-	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
-	 *
-	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
-	 * @return {@code this}.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
-	public HashMap<GKey, GValue> allocate(final int capacity) throws IllegalArgumentException {
-		this.allocateImpl(capacity);
-		return this;
-	}
-
-	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreservierung verwaltet werden kann.
-	 *
-	 * @return Kapazität. */
-	public int capacity() {
-		return this.capacityImpl();
-	}
-
-	/** Diese Methode verkleinert die Kapazität auf das Minimum und gibt {@code this} zurück.
-	 *
-	 * @return {@code this}. */
-	public HashMap<GKey, GValue> compact() {
-		this.allocateImpl(this.countImpl());
-		return this;
-	}
-
 	{}
 
 	/** {@inheritDoc} */
 	@Override
-	public int size() {
-		return this.count;
+	@SuppressWarnings ("unchecked")
+	protected GKey customGetKey(final int entryIndex) {
+		return ((GKey)this.keys[entryIndex]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isEmpty() {
-		return this.count == 0;
+	@SuppressWarnings ("unchecked")
+	protected GValue customGetValue(final int entryIndex) {
+		return (GValue)this.values[entryIndex];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean containsKey(final Object key) {
-		return this.hasKeyImpl(key);
+	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
+		this.keys[entryIndex] = key;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean containsValue(final Object value) {
-		return this.hasValueImpl(value);
+	protected GValue customSetValue(final int entryIndex, final GValue value) {
+		final Object[] values = this.values;
+		@SuppressWarnings ("unchecked")
+		final GValue result = (GValue)values[entryIndex];
+		values[entryIndex] = value;
+		return result;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public GValue get(final Object key) {
-		return this.getImpl(key);
+	protected int customHash(final Object key) {
+		return Objects.hash(key);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public GValue put(final GKey key, final GValue value) {
-		return this.putImpl(key, value);
+	protected int customHashKey(final int entryIndex) {
+		return Objects.hash(this.keys[entryIndex]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public GValue remove(final Object key) {
-		return this.popImpl(key);
+	protected int customHashValue(final int entryIndex) {
+		return Objects.hash(this.values[entryIndex]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void putAll(final Map<? extends GKey, ? extends GValue> map) {
-		for (final Entry<? extends GKey, ? extends GValue> entry: map.entrySet()) {
-			this.putImpl(entry.getKey(), entry.getValue());
+	protected boolean customEqualsKey(final int entryIndex, final Object key) {
+		return Objects.equals(this.keys[entryIndex], key);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
+		return Objects.equals(this.keys[entryIndex], key);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected boolean customEqualsValue(final int entryIndex, final Object value) {
+		return Objects.equals(this.values[entryIndex], value);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected void customClear() {
+		Arrays.fill(this.keys, null);
+		Arrays.fill(this.values, null);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected void customClearKey(final int entryIndex) {
+		this.keys[entryIndex] = null;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected void customClearValue(final int entryIndex) {
+		this.values[entryIndex] = null;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected HashAllocator customAllocator(final int capacity) {
+		final Object[] keys2;
+		final Object[] values2;
+		if (capacity == 0) {
+			keys2 = HashMap.EMPTY_OBJECTS;
+			values2 = HashMap.EMPTY_OBJECTS;
+		} else {
+			keys2 = new Object[capacity];
+			values2 = new Object[capacity];
 		}
+		return new HashAllocator() {
+
+			@Override
+			public void copy(final int sourceIndex, final int targetIndex) {
+				keys2[sourceIndex] = HashMap.this.keys[targetIndex];
+				values2[sourceIndex] = HashMap.this.values[targetIndex];
+			}
+
+			@Override
+			public void apply() {
+				HashMap.this.keys = keys2;
+				HashMap.this.values = values2;
+			}
+
+		};
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void clear() {
-		this.clearImpl();
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public Set<GKey> keySet() {
-		return this.newKeysImpl();
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public Collection<GValue> values() {
-		return this.newValuesImpl();
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public Set<Entry<GKey, GValue>> entrySet() {
-		return this.newEntriesImpl();
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public int hashCode() {
-		return this.newEntriesImpl().hashCode();
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof Map<?, ?>)) return false;
-		final Map<?, ?> that = (Map<?, ?>)object;
-		if (that.size() != this.size()) return false;
-		for (final Entry<?, ?> entry: that.entrySet()) {
-			final int entryIndex = this.getIndexImpl(entry.getKey());
-			if (entryIndex < 0) return false;
-			if (!Objects.equals(this.getValueImpl(entryIndex), entry.getValue())) return false;
+	public Object clone() throws CloneNotSupportedException {
+		try {
+			final HashMap<?, ?> result = (HashMap<?, ?>)super.clone();
+			if (this.capacityImpl() == 0) {
+				result.keys = HashMap.EMPTY_OBJECTS;
+				result.values = HashMap.EMPTY_OBJECTS;
+			} else {
+				result.keys = this.keys.clone();
+				result.values = this.values.clone();
+			}
+			return result;
+		} catch (final Exception cause) {
+			throw new CloneNotSupportedException(cause.getMessage());
 		}
-		return true;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String toString() {
-		return this.newMappingImpl().toString();
 	}
 
 }

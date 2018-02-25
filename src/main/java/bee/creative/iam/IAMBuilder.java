@@ -84,20 +84,14 @@ public class IAMBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		public final boolean accept(final Object input) {
-			return input instanceof int[];
+		public final int hash(final Object array) throws NullPointerException {
+			return IAMBuilder.hash((int[])array);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final int hash(final int[] array) throws NullPointerException {
-			return IAMBuilder.hash(array);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final boolean equals(final int[] array1, final int[] array2) throws NullPointerException {
-			return IAMBuilder.equals(array1, array2);
+		public final boolean equals(final Object array1, final Object array2) throws NullPointerException {
+			return IAMBuilder.equals((int[])array1, (int[])array2);
 		}
 
 		/** {@inheritDoc} */

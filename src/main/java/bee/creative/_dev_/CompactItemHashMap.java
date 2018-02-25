@@ -10,7 +10,7 @@ import bee.creative.util.Comparators;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte.
- * @deprecated {@link bee.creative.util.HashMap} */
+ * @deprecated {@link bee.creative.util.XX_HashMap} */
 public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GKey, GValue> {
 
 	/** Dieser Konstruktor initialisiert die {@link Map}. */

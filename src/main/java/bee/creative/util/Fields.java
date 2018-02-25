@@ -195,7 +195,7 @@ public final class Fields {
 		 * @param value {@link Set}.
 		 * @return Bearbeitungskopie. */
 		protected Set<GItem> customCopy(final Set<GItem> value) {
-			return new HashSet<>(value);
+			return new HashSet2<>(value);
 		}
 
 		/** {@inheritDoc} */
@@ -401,7 +401,7 @@ public final class Fields {
 		 * @param value {@link Map}.
 		 * @return Bearbeitungskopie. */
 		protected Map<GKey, GValue> customCopy(final Map<GKey, GValue> value) {
-			return new HashMap<>(value);
+			return new HashMap2<>(value);
 		}
 
 		/** {@inheritDoc} */

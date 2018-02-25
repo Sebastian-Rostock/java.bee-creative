@@ -55,7 +55,7 @@ public class Tester {
 		 * @throws IllegalArgumentException Wenn {@code millis <= 0} ist. */
 		public Sampler(final int millis) throws IllegalArgumentException {
 			super(Sampler.class.getSimpleName());
-			if (millis <= 0) throw new IllegalArgumentException("millis <= 0");
+			if (millis <= 0) throw new IllegalArgumentException();
 			this.millis = millis;
 			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
 		}
@@ -107,6 +107,9 @@ public class Tester {
 
 	{}
 
+	/** Dieses Feld speichert den leeren {@link Tester}. */
+	public static final Tester EMPTY = new Tester(0, 0);
+
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
 	public static final Comparator<Tester> USED_TIME_ORDER = new Comparator<Tester>() {
 
@@ -126,6 +129,57 @@ public class Tester {
 		}
 
 	};
+
+	{}
+
+	/** Diese Methode ist eine Abkürzung für liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen
+	 * Tester.
+	 *
+	 * @param testers {@link Tester}, deren arithmetisches Mittel ermitttelt wird.
+	 * @return {@code svg}-{@link Tester}.
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
+	public static Tester fromAvg(final Tester... testers) throws NullPointerException {
+		return Tester.fromAvg(Arrays.asList(testers));
+	}
+
+	/** Diese Methode liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
+	 *
+	 * @param testers {@link Tester}, deren arithmetisches Mittel ermitttelt wird.
+	 * @return {@code svg}-{@link Tester}.
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
+	public static Tester fromAvg(final List<Tester> testers) throws NullPointerException {
+		final int count = testers.size();
+		if (count == 0) return Tester.EMPTY;
+		long usedTime = 0, usedMemory = 0;
+		for (final Tester tester: testers) {
+			usedTime += tester.usedTime;
+			usedMemory += tester.usedMemory;
+		}
+		return new Tester(usedTime / count, usedMemory / count);
+	}
+
+	/** Diese Methode liefert den {@link Tester} zum Minimum ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
+	 *
+	 * @param testers {@link Tester}, deren Minimum ermitttelt wird.
+	 * @return {@code min}-{@link Tester}.
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
+	public static Tester fromMin(final Tester... testers) throws NullPointerException {
+		return Tester.fromMin(Arrays.asList(testers));
+	}
+
+	/** Diese Methode liefert den {@link Tester} zum Minimum ({@link #usedTime} und {@link #usedMemory}) der gegebenen.
+	 *
+	 * @param testers {@link Tester}, deren Minimum ermitttelt wird.
+	 * @return {@code min}-{@link Tester}.
+	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
+	public static Tester fromMin(final List<Tester> testers) throws NullPointerException {
+		long usedTime = Long.MAX_VALUE, usedMemory = Long.MAX_VALUE;
+		for (final Tester tester: testers) {
+			usedTime = Math.min(usedTime, tester.usedTime);
+			usedMemory = Math.min(usedMemory, tester.usedMemory);
+		}
+		return new Tester(usedTime, usedMemory);
+	}
 
 	{}
 
@@ -165,24 +219,8 @@ public class Tester {
 	/** Dieses Feld speichert die Fehlerursache, wenn die Testmethode eiene ausnahme auslöst, oder {@code null}. */
 	public final Throwable cause;
 
-	/** Dieser Konstruktor initialisiert diesen {@link Tester} als arithmetisches Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen Tester.
-	 *
-	 * @param testers {@link Tester}, deren arithmetisches Mittel errechnet wird.
-	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public Tester(final Tester... testers) throws NullPointerException {
-		this(Arrays.asList(testers));
-	}
-
-	/** Dieser Konstruktor initialisiert diesen {@link Tester} mit dem Minimum von {@link #usedTime} und {@link #usedMemory} der gegebenen {@link Tester}.
-	 *
-	 * @param testers {@link Tester}, deren Minimum ermittelt wird.
-	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
-	public Tester(final List<Tester> testers) throws NullPointerException {
-		long usedTime = Long.MAX_VALUE, usedMemory = Long.MAX_VALUE;
-		for (final Tester tester: testers) {
-			usedTime = Math.min(usedTime, tester.usedTime);
-			usedMemory = Math.min(usedMemory, tester.usedMemory);
-		}
+	@SuppressWarnings ("javadoc")
+	private Tester(final long usedTime, final long usedMemory) throws NullPointerException {
 		this.usedTime = usedTime;
 		this.usedMemory = usedMemory;
 		this.enterTime = 0;
@@ -192,30 +230,29 @@ public class Tester {
 		this.cause = null;
 	}
 
-	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der Speicherbelegung erfolgt synchron von und nach dem
-	 * Aufruf der Testmethode.
+	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte.<br>
+	 * Die Messung der Speicherbelegung erfolgt synchron mit Bereinigung durch {@link Runtime#gc()}.
 	 *
 	 * @param method Testmethode.
 	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist. */
 	public Tester(final Method method) throws NullPointerException {
-		this(0, method);
+		this(-1, method);
 	}
 
-	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Wenn das gegebene Interval größer als {@code 0} ist, wird ein
-	 * {@link Sampler} zur asynchronen Messung der maximalen Speicherbelegung verwendet.
+	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte.<br>
+	 * Wenn das gegebene Interval größer als {@code 0} ist, wird ein {@link Sampler} zur asynchronen Messung der maximalen Speicherbelegung verwendet. Wenn es
+	 * kleiner {@code 0} ist, erfolgt die Messung mit Bereinigung durch {@link Runtime#gc()}.
 	 *
-	 * @param millis Interval der asynchronen Messung der Speicherbelegung in Millisekunden oder {@code 0}.
+	 * @param mode Interval der asynchronen Messung der Speicherbelegung in Millisekunden, nagativ bei synchroner Messung und {@code 0} bei deaktivierter.
 	 * @param method Testmethode.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code millis < 0} ist. */
-	public Tester(final int millis, final Method method) throws NullPointerException, IllegalArgumentException {
-		if (millis < 0) throw new IllegalArgumentException("millis < 0");
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
+	public Tester(final int mode, final Method method) throws NullPointerException {
 		Objects.assertNotNull(method);
 		final Runtime runtime = Runtime.getRuntime();
 		Throwable cause = null;
 		final long enterMemory, enterTime, leaveMemory, leaveTime;
-		if (millis > 0) {
-			final Sampler sampler = new Sampler(millis);
+		if (mode > 0) {
+			final Sampler sampler = new Sampler(mode);
 			runtime.gc();
 			sampler.activate();
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
@@ -233,7 +270,10 @@ public class Tester {
 			this.usedTime = leaveTime - enterTime - sampler.usedTime;
 			this.usedMemory = Math.max(sampler.usedMemory, leaveMemory) - enterMemory;
 		} else {
-			runtime.gc();
+			if (mode < 0) {
+				runtime.gc();
+				Thread.yield();
+			}
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
 			enterTime = System.nanoTime();
 			try {
@@ -242,7 +282,10 @@ public class Tester {
 				cause = cause2;
 			}
 			leaveTime = System.nanoTime();
-			runtime.gc();
+			if (mode < 0) {
+				runtime.gc();
+				Thread.yield();
+			}
 			leaveMemory = runtime.totalMemory() - runtime.freeMemory();
 			this.usedTime = leaveTime - enterTime;
 			this.usedMemory = leaveMemory - enterMemory;

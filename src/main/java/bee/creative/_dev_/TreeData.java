@@ -9,14 +9,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import bee.creative.util.Comparators;
-import bee.creative.util.HashData;
-import bee.creative.util.Objects;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import bee.creative.util.Comparators;
+import bee.creative.util.Objects;
 
 // TODO CURSOR = int, das in prevs/next zeigt, wo der Index des gesuchten Eintrags drin steht
 // nagativ, wenn prevs, positiv, wenn nexts gemeint
@@ -79,10 +78,10 @@ import java.util.SortedSet;
 
 			protected final TreeData<GKey, GValue> entryData;
 
-			/** Dieses Feld speichert den Index des nächsten Eintrags in {@link HashData#keys}. */
+			/** Dieses Feld speichert den Index des nächsten Eintrags in {@link XX_HashData#keys}. */
 			protected int nodeIndex;
 
-			/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link HashData#keys}. */
+			/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link XX_HashData#keys}. */
 			protected int entryIndex = -1;
 
 			public TreeIterator(final TreeData<GKey, GValue> entryData) {

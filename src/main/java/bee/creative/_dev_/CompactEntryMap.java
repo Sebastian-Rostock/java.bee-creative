@@ -8,7 +8,7 @@ import bee.creative.array.Array;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte.
- * @deprecated {@link bee.creative.util.HashMap} */
+ * @deprecated {@link bee.creative.util.XX_HashMap} */
 public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GValue> {
 
 	/** Dieses Feld speichert das {@link Array} der Werte. */

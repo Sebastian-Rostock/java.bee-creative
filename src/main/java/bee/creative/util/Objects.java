@@ -27,7 +27,7 @@ public class Objects {
 	{}
 
 	/** Dieses Feld speichert den {@link Hasher}, der an {@link #deepHash(Object)} und {@link #deepEquals(Object, Object)} delegiert. */
-	public static final Hasher<Object> DEEP_HASHER = new Hasher<Object>() {
+	public static final Hasher ARRAY_HASHER = new Hasher() {
 
 		@Override
 		public int hash(final Object input) {
@@ -42,16 +42,16 @@ public class Objects {
 	};
 
 	/** Dieses Feld speichert den {@link Hasher}, der an {@link #hash(Object)} und {@link #equals(Object, Object)} delegiert. */
-	public static final Hasher<Object> DEFAULT_HASHER = new Hasher<Object>() {
+	public static final Hasher OBJECT_HASHER = new Hasher() {
 
 		@Override
 		public int hash(final Object input) {
-			return Objects.hash(input);
+			return this.hash(input);
 		}
 
 		@Override
 		public boolean equals(final Object input1, final Object input2) {
-			return Objects.equals(input1, input2);
+			return this.equals(input1, input2);
 		}
 
 	};
@@ -623,6 +623,36 @@ public class Objects {
 	public static <GObject> GObject assertNotNull(final GObject object) throws NullPointerException {
 		if (object == null) throw new NullPointerException("object = null");
 		return object;
+	}
+
+	/** Diese Methode gibt einen navigierten {@link Hasher} zurück.<br>
+	 * Der erzeugte {@link Hasher} liefert für eine Eingabe {@code input} den Streuwert {@code hasher.hash(navigator.get(input))}.
+	 *
+	 * @param navigator {@link Getter} zur Navigation.
+	 * @param hasher {@link Hasher} zur Abgleich.
+	 * @return {@code navigated}-{@link Hasher}.
+	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code hasher} {@code null} ist. */
+	public static Hasher navigatedHasher(final Getter<? super Object, ? extends Object> navigator, final Hasher hasher) throws NullPointerException {
+		Objects.assertNotNull(navigator);
+		Objects.assertNotNull(hasher);
+		return new Hasher() {
+
+			@Override
+			public int hash(final Object input) {
+				return hasher.hash(navigator.get(input));
+			}
+
+			@Override
+			public boolean equals(final Object input1, final Object input2) {
+				return hasher.equals(navigator.get(input1), navigator.get(input2));
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("navigatedHasher", navigator, hasher);
+			}
+
+		};
 	}
 
 }

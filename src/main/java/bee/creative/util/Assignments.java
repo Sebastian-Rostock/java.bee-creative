@@ -110,7 +110,7 @@ public class Assignments {
 	public static final class ParentAssignment implements Assignment<Object> {
 
 		/** Dieses Feld speichert die {@link Map} zur Abbildung der Quellobjekte auf die Zielobjekte. */
-		final Map<Object, Object> map = new HashMap<>();
+		final Map<Object, Object> map = new HashMap2<>();
 
 		/** Dieses Feld speichert die in {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} gesammelten
 		 * {@link Entry}s. */

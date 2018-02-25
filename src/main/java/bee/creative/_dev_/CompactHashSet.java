@@ -22,7 +22,7 @@ import bee.creative.util.Objects;
  * @see Object#equals(Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente.
- * @deprecated {@link bee.creative.util.HashSet} */
+ * @deprecated {@link bee.creative.util.XX_HashSet} */
 public class CompactHashSet<GItem> extends CompactSet<GItem> {
 
 	/** Dieser Konstruktor initialisiert das {@link Set}. */

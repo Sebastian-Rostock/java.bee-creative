@@ -467,7 +467,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}
-	 * gelieferten Elemente werden zur Erkennung von Mehrfachvorkommen in ein {@link HashSet} eingefügt.
+	 * gelieferten Elemente werden zur Erkennung von Mehrfachvorkommen in ein {@link HashSet2} eingefügt.
 	 *
 	 * @see #uniqueIterator(Collection, Iterator)
 	 * @param <GItem> Typ der Elemente.
@@ -475,7 +475,7 @@ public class Iterators {
 	 * @return {@code unique}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static <GItem> Iterator<GItem> uniqueIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-		return Iterators.uniqueIterator(new HashSet<GItem>(), Objects.assertNotNull(iterator));
+		return Iterators.uniqueIterator(new HashSet2<GItem>(), Objects.assertNotNull(iterator));
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}

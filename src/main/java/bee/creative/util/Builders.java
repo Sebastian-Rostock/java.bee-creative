@@ -674,10 +674,10 @@ public class Builders {
 		 *
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte.
-		 * @param withHashes Aktivierung des Streuwertpuffers.
+		 * @param withHashCache Aktivierung des Streuwertpuffers.
 		 * @return {@link MapBuilder} einer {@link HashMap}. */
-		public static <GKey, GValue> MapBuilder<GKey, GValue, HashMap<GKey, GValue>> forHashMap(final boolean withHashes) {
-			return MapBuilder.from(new HashMap<GKey, GValue>(withHashes));
+		public static <GKey, GValue> MapBuilder<GKey, GValue, HashMap<GKey, GValue>> forHashMap(final boolean withHashCache) {
+			return MapBuilder.from(withHashCache ? new HashMap2<GKey, GValue>() : new HashMap<GKey, GValue>());
 		}
 
 		{}
@@ -787,10 +787,10 @@ public class Builders {
 		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link HashSet} zurück.
 		 *
 		 * @param <GItem> Typ der Elemente.
-		 * @param withHashes Aktivierung des Streuwertpuffers.
+		 * @param withHashCache Aktivierung des Streuwertpuffers.
 		 * @return {@link SetBuilder} eines {@link HashSet}. */
-		public static <GItem> SetBuilder<GItem, HashSet<GItem>> forHashSet(final boolean withHashes) {
-			return SetBuilder.from(new HashSet<GItem>(withHashes));
+		public static <GItem> SetBuilder<GItem, HashSet<GItem>> forHashSet(final boolean withHashCache) {
+			return SetBuilder.from(withHashCache ? new HashSet2<GItem>() : new HashSet<GItem>());
 		}
 
 		{}

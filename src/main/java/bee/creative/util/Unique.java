@@ -4,55 +4,44 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.xml.crypto.Data;
 
-/** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene
- * Eingaben über eine interne {@link Map Abbildung} mit daraus {@link #customBuild(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die
- * mit einer gegebenen Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe zuvor bereits {@link #customBuild(Object) erzeugt} wurde, wird deren
- * Wiederverwendung via {@link #customReuse(Object, Object)} signalisiert.
+/** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten.<br>
+ * Dazu werden gegebene Eingabeobjekte mit daraus {@link #customBuild(Object) berechneten} Ausgabeobjekten über in einer {@link Map Abbildung} verwaltet. Wenn
+ * via {@link #get(Object)} das mit einem gegebenen Eingabeobjekten assoziierte Ausgabeobjekt ermittelt werden soll und dieses zuvor bereits
+ * {@link #customBuild(Object) erzeugt} wurde, wird dessen Wiederverwendung via {@link #customReuse(Object, Object)} signalisiert.
  *
- * @see HashMap#from(Filter, Hasher)
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ der Eingabe.
  * @param <GOutput> Typ der Ausgabe. */
-public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>, Hasher<GInput>, Filter<Object>, Comparator<GInput>, Iterable<GOutput> {
+public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>, Hasher, Comparator<GInput>, Iterable<GOutput> {
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromHashMap(Filter, Hasher, Getter, Setter) newHashed(null, null, null, null)}. */
+	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
+	 * fromHashMap(Objects.OBJECT_HASHER, Getters.neutralGetter(), Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
 	public static <GInput> Unique<GInput, GInput> fromHashMap() {
-		return Unique.fromHashMap(null, null, null, null);
+		return Unique.fromHashMap(Objects.OBJECT_HASHER, Getters.<GInput>neutralGetter(), Setters.emptySetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromHashMap(Filter, Hasher, Getter, Setter) newHashed(null, hasher, null, null)}. */
+	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
+	 * fromHashMap(hasher, Getters.neutralGetter(), Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Hasher<? super Object> hasher) {
-		return Unique.fromHashMap(null, hasher, null, null);
+	public static <GInput> Unique<GInput, GInput> fromHashMap(final Hasher hasher) throws NullPointerException {
+		return Unique.fromHashMap(hasher, Getters.<GInput>neutralGetter(), Setters.emptySetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromHashMap(Filter, Hasher, Getter, Setter) newHashed(filter, hasher, null, null)}. */
+	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
+	 * fromHashMap(Objects.OBJECT_HASHER, compiler, Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Filter<? super Object> filter, final Hasher<? super GInput> hasher) {
-		return Unique.fromHashMap(filter, hasher, null, null);
+	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Getter<? super GInput, ? extends GOutput> compiler) throws NullPointerException {
+		return Unique.fromHashMap(Objects.OBJECT_HASHER, compiler, Setters.emptySetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromHashMap(Filter, Hasher, Getter, Setter) newHashed(null, null, compiler, null)}. */
+	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMapImpl(Hasher, Getter, Setter)
+	 * fromHashMap(hasher, compiler, Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Getter<? super GInput, ? extends GOutput> compiler) {
-		return Unique.fromHashMap(null, null, compiler, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromHashMap(Filter, Hasher, Getter, Setter) newHashed(null, hasher, compiler, null)}. */
-	@SuppressWarnings ("javadoc")
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Hasher<? super Object> hasher,
-		final Getter<? super GInput, ? extends GOutput> compiler) {
-		return Unique.fromHashMap(null, hasher, compiler, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromHashMapImpl(Filter, Hasher, Getter, Setter) newHashed(filter, hasher, compiler, null)}. */
-	@SuppressWarnings ("javadoc")
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Filter<? super Object> filter, final Hasher<? super GInput> hasher,
-		final Getter<? super GInput, ? extends GOutput> compiler) {
-		return Unique.fromHashMap(filter, hasher, compiler, null);
+	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Hasher hasher, final Getter<? super GInput, ? extends GOutput> compiler)
+		throws NullPointerException {
+		return Unique.fromHashMap(hasher, compiler, Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Filter} geprüft, über den gegebenen
@@ -61,44 +50,25 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
-	 * @param filter {@link Filter} zur Erkennugn der akzeptierten Eingaben, welche als {@code GInput} interpretiert werden können in {@link #accept(Object)}.<br>
-	 *        Bei {@code null} wird {@link Filters#ACCEPT_FILTER} verwendet, sodass alle Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}
-	 *        akzeptiert werden.
-	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}.<br>
-	 *        Bei {@code null} wird {@link Objects#DEFAULT_HASHER} verwendet.
-	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.<br>
-	 *        Bei {@code null} wird {@link Getters#NEUTRAL_GETTER} verwendet, sodass die Ausgaben gleich den Eingaben sind.
-	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.<br>
-	 *        Bei {@code null} wird {@link Fields#EMPTY_FIELD} verwendet.
-	 * @return streuwertbasierte {@link Unique}-Map. */
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Filter<? super Object> filter, final Hasher<? super GInput> hasher,
-		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
-		@SuppressWarnings ("unchecked")
-		final Unique<GInput, GOutput> result = Unique.fromHashMapImpl( //
-			filter != null ? filter : Filters.acceptFilter(), //
-			(Hasher<? super GInput>)(hasher != null ? hasher : Objects.DEFAULT_HASHER), //
-			(Getter<? super GInput, ? extends GOutput>)(compiler != null ? compiler : Getters.neutralGetter()), //
-			(Setter<? super GInput, ? super GOutput>)(reuser != null ? reuser : Setters.emptySetter()));
-		return result;
-	}
-
-	@SuppressWarnings ("javadoc")
-	static <GInput, GOutput> Unique<GInput, GOutput> fromHashMapImpl(final Filter<? super Object> filter, final Hasher<? super GInput> hasher,
-		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
-		return new Unique<GInput, GOutput>(HashMap.<GInput, GOutput>from(filter, hasher)) {
+	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}.
+	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
+	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
+	 * @return streuwertbasiertes {@link Unique}.
+	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
+	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Hasher hasher, final Getter<? super GInput, ? extends GOutput> compiler,
+		final Setter<? super GInput, ? super GOutput> reuser) throws NullPointerException {
+		Objects.assertNotNull(hasher);
+		Objects.assertNotNull(compiler);
+		Objects.assertNotNull(reuser);
+		return new Unique<GInput, GOutput>(HashMap2.<GInput, GOutput>from(hasher)) {
 
 			@Override
-			public boolean accept(final Object input) {
-				return filter.accept(input);
-			}
-
-			@Override
-			public int hash(final GInput input) throws NullPointerException {
+			public int hash(final Object input) throws NullPointerException {
 				return hasher.hash(input);
 			}
 
 			@Override
-			public boolean equals(final GInput input1, final GInput input2) throws NullPointerException {
+			public boolean equals(final Object input1, final Object input2) throws NullPointerException {
 				return hasher.equals(input1, input2);
 			}
 
@@ -115,81 +85,44 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 		};
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Filter, Hasher, Getter, Setter) fromTreeMap(null, null, null, null)}. */
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
+	 * fromTreeMap(Comparators.naturalComparator(), Getters.neutralGetter(), Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
-	public static <GInput extends Comparable<? super GInput>> Unique<GInput, GInput> fromTreeMap() {
-		return Unique.fromTreeMap(null, null, null, null);
+	public static <GInput extends Comparable<? super GInput>> Unique<GInput, GInput> fromTreeMap() throws NullPointerException {
+		return Unique.fromTreeMap(Comparators.<GInput>naturalComparator(), Getters.<GInput>neutralGetter(), Setters.emptySetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Filter, Hasher, Getter, Setter) fromTreeMap(null, comparator, null, null)}. */
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
+	 * fromTreeMap(comparator, Getters.neutralGetter(), Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
-	public static <GInput> Unique<GInput, GInput> fromTreeMap(final Comparator<? super Object> comparator) {
-		return Unique.fromTreeMap(null, comparator, null, null);
+	public static <GInput> Unique<GInput, GInput> fromTreeMap(final Comparator<? super GInput> comparator) throws NullPointerException {
+		return Unique.fromTreeMap(comparator, Getters.<GInput>neutralGetter(), Setters.emptySetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Filter, Hasher, Getter, Setter) fromTreeMap(filter, comparator, null, null)}. */
-	@SuppressWarnings ("javadoc")
-	public static <GInput> Unique<GInput, GInput> fromTreeMap(final Filter<? super Object> filter, final Comparator<? super GInput> comparator) {
-		return Unique.fromTreeMap(filter, comparator, null, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Filter, Hasher, Getter, Setter) fromTreeMap(null, null, compiler, null)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter) fromTreeMap(Comparators.naturalComparator(), compiler,
+	 * Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
 	public static <GInput extends Comparable<? super GInput>, GOutput> Unique<GInput, GOutput> fromTreeMap(
-		final Getter<? super GInput, ? extends GOutput> compiler) {
-		return Unique.fromTreeMap(null, null, compiler, null);
+		final Getter<? super GInput, ? extends GOutput> compiler) throws NullPointerException {
+		return Unique.fromTreeMap(Comparators.<GInput>naturalComparator(), compiler, Setters.emptySetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Filter, Hasher, Getter, Setter) fromTreeMap(null, comparator, compiler, null)}. */
-	@SuppressWarnings ("javadoc")
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromTreeMap(final Comparator<? super Object> comparator,
-		final Getter<? super GInput, ? extends GOutput> compiler) {
-		return Unique.fromTreeMap(null, comparator, compiler, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Filter, Hasher, Getter, Setter) fromTreeMap(filter, comparator, compiler, null)}. */
-	@SuppressWarnings ("javadoc")
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromTreeMap(final Filter<? super Object> filter, final Comparator<? super GInput> comparator,
-		final Getter<? super GInput, ? extends GOutput> compiler) {
-		return Unique.fromTreeMap(filter, comparator, compiler, null);
-	}
-
-	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Filter} geprüft, über den gegebenen
-	 * {@link Comparator} miteinander verglichen und über den gegebenen {@link Getter} in die Ausgaben überführt werden. Die Wiederverwendung einer Ausgabe wird
-	 * dem gegebenen {@link Setter} signalisiert.
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Comparator} miteinander verglichen und
+	 * über den gegebenen {@link Getter} in die Ausgaben überführt werden. Die Wiederverwendung einer Ausgabe wird dem gegebenen {@link Setter} signalisiert.
 	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
-	 * @param filter {@link Filter} zur Erkennugn der akzeptierten Eingaben, welche als {@code GInput} interpretiert werden können in {@link #accept(Object)}.<br>
-	 *        Bei {@code null} wird {@link Filters#ACCEPT_FILTER} verwendet, sodass alle Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}
-	 *        akzeptiert werden.
-	 * @param comparator {@link Comparator} zur Ermittlung des Vergleichswerts der Eingaben in {@link #compare(Object, Object)}.<br>
-	 *        Bei {@code null} wird {@link Comparators#NATURAL_COMPARATOR} verwendet.
-	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.<br>
-	 *        Bei {@code null} wird {@link Getters#NEUTRAL_GETTER} verwendet, sodass die Ausgaben gleich den Eingaben sind.
-	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.<br>
-	 *        Bei {@code null} wird {@link Fields#EMPTY_FIELD} verwendet.
-	 * @return streuwertbasierte {@link Unique}-Map. */
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromTreeMap(final Filter<Object> filter, final Comparator<? super GInput> comparator,
-		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
-		@SuppressWarnings ("unchecked")
-		final Unique<GInput, GOutput> result = Unique.fromTreeMapImpl(//
-			filter != null ? filter : Filters.acceptFilter(), //
-			(Comparator<? super GInput>)(comparator != null ? comparator : Comparators.naturalComparator()), //
-			(Getter<? super GInput, ? extends GOutput>)(compiler != null ? compiler : Getters.neutralGetter()), //
-			(Setter<? super GInput, ? super GOutput>)(reuser != null ? reuser : Setters.emptySetter()));
-		return result;
-	}
-
-	@SuppressWarnings ("javadoc")
-	static <GInput, GOutput> Unique<GInput, GOutput> fromTreeMapImpl(final Filter<Object> filter, final Comparator<? super GInput> comparator,
-		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) {
+	 * @param comparator {@link Comparator} zur Ermittlung des Vergleichswerts der Eingaben in {@link #compare(Object, Object)}.
+	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
+	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
+	 * @return streuwertbasiertes {@link Unique}.
+	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
+	public static <GInput, GOutput> Unique<GInput, GOutput> fromTreeMap(final Comparator<? super GInput> comparator,
+		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) throws NullPointerException {
+		Objects.assertNotNull(comparator);
+		Objects.assertNotNull(compiler);
+		Objects.assertNotNull(reuser);
 		return new Unique<GInput, GOutput>(new TreeMap<GInput, GOutput>(comparator)) {
-
-			@Override
-			public boolean accept(final Object input) {
-				return filter.accept(input);
-			}
 
 			@Override
 			public int compare(final GInput input1, final GInput input2) throws NullPointerException {
@@ -197,13 +130,13 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 			}
 
 			@Override
-			public void customReuse(final GInput input, final GOutput output) {
-				reuser.set(input, output);
+			public GOutput customBuild(final GInput input) {
+				return compiler.get(input);
 			}
 
 			@Override
-			public GOutput customBuild(final GInput input) {
-				return compiler.get(input);
+			public void customReuse(final GInput input, final GOutput output) {
+				reuser.set(input, output);
 			}
 
 		};
@@ -223,26 +156,26 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 
 	};
 
-	/** Dieses Feld speichert den {@link Getter} zur Erzeugung eines {@link Unique} mit streuwertbasierter Abbildung ({@link HashMap}).<br>
+	/** Dieses Feld speichert den {@link Getter} zur Erzeugung eines {@link Unique} mit streuwertbasierter Abbildung ({@link HashMap2}).<br>
 	 * Derartige Nutzdaten basieren auf {@link #hash(Object)} und {@link #equals(Object, Object)}. */
-	@SuppressWarnings ({"unchecked", "rawtypes"})
+	@SuppressWarnings ("rawtypes")
 	public static final Getter<Unique, Map> HASHMAP = new Getter<Unique, Map>() {
 
 		@Override
 		public Map get(final Unique input) {
-			return HashMap.from(input, input);
+			return HashMap2.from(input);
 		}
 
 	};
 
 	{}
 
-	/** Dieses Feld speichert die {@link Data}. */
+	/** Dieses Feld bildet von Ein- auf Ausgabeobjekte ab. */
 	protected final Map<GInput, GOutput> mapping;
 
 	/** Dieser Konstruktor initialisiert das {@link Unique} streuwertbasiert. */
 	public Unique() {
-		this.mapping = HashMap.from(this, this);
+		this.mapping = HashMap2.from(this);
 	}
 
 	/** Dieser Konstruktor initialisiert die intere Abbildung.
@@ -253,7 +186,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	}
 
 	/** Dieser Konstruktor initialisiert die intere Abbildung über den gegebenen {@link Getter}, der mit {@code this} aufgerufen wird.<br>
-	 * Die auf diese Weise erzeugte {@link Map Abbildung} kann damit von den Methoden dieses Objekts abhängen, bspw. von {@link #hash(Object)},
+	 * Die auf diese Weise erzeugte {@link Map Abbildung} kann damit von den Methoden dieses {@link Unique} abhängen, bspw. von {@link #hash(Object)},
 	 * {@link #equals(Object, Object)} oder {@link #compare(Object, Object)}.
 	 *
 	 * @param mappingBuilder {@link Getter} zur Erzeugung der {@link Map Abbildung}. */
@@ -319,23 +252,15 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 
 	{}
 
-	/** {@inheritDoc}<br>
-	 * Sie wird in {@link #mapping()} zur Prüfung der Schlüssel eingesetzt und soll nur dann {@code true} liefern, wenn ein Schlüssel als {@code GInput}
-	 * interpretiert werden kann. */
-	@Override
-	public boolean accept(final Object input) {
-		return true;
-	}
-
 	/** {@inheritDoc} **/
 	@Override
-	public int hash(final GInput input) throws NullPointerException {
+	public int hash(final Object input) throws NullPointerException {
 		return Objects.hash(input);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean equals(final GInput input1, final GInput input2) throws NullPointerException {
+	public boolean equals(final Object input1, final Object input2) throws NullPointerException {
 		return Objects.equals(input1, input2);
 	}
 

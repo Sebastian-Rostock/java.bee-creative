@@ -46,12 +46,6 @@ public final class XMLEvaluator {
 
 		/** {@inheritDoc} */
 		@Override
-		public boolean accept(Object input) {
-			return input instanceof String;
-		}
-
-		/** {@inheritDoc} */
-		@Override
 		protected final XPathExpression customBuild(final String input) {
 			try {
 				final XPath xxath = XMLEvaluator.this.xpathData.getXPath();

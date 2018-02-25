@@ -640,50 +640,47 @@ public class FEMDomain {
 		throws NullPointerException, IllegalArgumentException {
 		boolean indent = false;
 		while (true) {
+			String string = source.section();
+			source.skip();
 			switch (source.symbol()) {
+				case '/':
+					target.putToken(source).putToken(" ");
+				break;
+				case ':':
+					target.putToken(string).putToken(" ");
+					return;
+				case '(':
+				case '[':
+					target.putToken(string).putBreakInc();
+					this.formatScript(target, source, false);
+				break;
+				case '{':
+					target.putToken(string);
+					this.formatScript(target, source, true);
+					this.formatScript(target, source, false);
+				break;
+				case ']':
+				case ')':
+					target.putBreakDec().putToken(string);
+				case -1:
+					if (!indent) return;
+					target.putIndent();
+					return;
+				case '}':
+					target.putToken(string);
+					return;
 				case ';':
 					indent = true;
-				case '/':
-					target.putToken(source.section());
+					target.putToken(string);
 					if (simpleSpace) {
 						target.putToken(" ");
 					} else {
 						target.putBreakSpace();
 					}
-					source.skip();
-				break;
-				case '(':
-				case '[':
-					target.putToken(source.section()).putBreakInc();
-					source.skip();
-					this.formatScript(target, source, false);
-				break;
-				case '{':
-					target.putToken(source.section());
-					source.skip();
-					this.formatScript(target, source, true);
-					this.formatScript(target, source, false);
 				break;
 				default:
-					target.putToken(source.section());
-					source.skip();
+					target.putToken(string);
 				break;
-				case ':':
-					target.putToken(": ");
-					source.skip();
-					return;
-				case ']':
-				case '}':
-				case ')':
-					target.putBreakDec().putToken(source.section());
-					source.skip();
-					if (!indent) return;
-					target.putIndent();
-					return;
-				case -1:
-					if (!indent) return;
-					target.putIndent();
-					return;
 			}
 		}
 	}

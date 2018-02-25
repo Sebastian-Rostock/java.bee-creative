@@ -431,7 +431,7 @@ public class Iterables {
 
 	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück.<br>
 	 * Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses geliefert. Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes
-	 * {@link HashSet} geliefert.
+	 * {@link HashSet2} geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable}.
@@ -439,14 +439,14 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
 	public static <GItem> Set<GItem> toSet(final Iterable<GItem> iterable) throws NullPointerException {
 		if (iterable instanceof Set<?>) return (Set<GItem>)iterable;
-		final HashSet<GItem> result = new HashSet<>();
+		final HashSet2<GItem> result = new HashSet2<>();
 		Iterables.addAll(result, iterable);
 		return result;
 	}
 
 	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link List} zurück.<br>
-	 * Wenn das gegebene {@link Iterable} eine {@link List} ist, wird diese geliefert. Andernfalls wird eine über {@link #addAll(Collection, Iterable)}
-	 * befüllte {@link ArrayList} geliefert.
+	 * Wenn das gegebene {@link Iterable} eine {@link List} ist, wird diese geliefert. Andernfalls wird eine über {@link #addAll(Collection, Iterable)} befüllte
+	 * {@link ArrayList} geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable}.

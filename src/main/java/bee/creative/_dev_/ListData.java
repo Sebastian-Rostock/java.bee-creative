@@ -16,7 +16,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import bee.creative.array.ArrayData;
 import bee.creative.util.Comparators;
-import bee.creative.util.HashData;
 import bee.creative.util.Objects;
 
 /*
@@ -757,10 +756,10 @@ class ListData<GKey, GValue> {
 
 		protected final ListData<GKey, GValue> entryData;
 
-		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link HashData#keys}. */
+		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link XX_HashData#keys}. */
 		protected int nodeIndex;
 
-		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link HashData#keys}. */
+		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link XX_HashData#keys}. */
 		protected int entryIndex = -1;
 
 		public TreeIterator(final ListData<GKey, GValue> entryData) {

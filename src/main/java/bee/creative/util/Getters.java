@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/** /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Getter}-Konstruktion und -Verarbeitung.
+/** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Getter}-Konstruktion und -Verarbeitung.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
@@ -320,7 +320,7 @@ public class Getters {
 	 * @param navigator {@link Getter} zur Navigation.
 	 * @param getter {@link Getter} zum Lesen.
 	 * @return {@code navigated}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@code getter1} bzw. {@code getter2} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code getter} {@code null} ist. */
 	public static <GInput, GValue, GOutput> Getter<GInput, GOutput> navigatedGetter(final Getter<? super GInput, ? extends GValue> navigator,
 		final Getter<? super GValue, ? extends GOutput> getter) throws NullPointerException {
 		Objects.assertNotNull(navigator);
@@ -507,7 +507,7 @@ public class Getters {
 		};
 	}
 
-	/** /** Diese Methode gibt ein {@link Comparable} als Adapter zu einer {@link Number}-{@link Getter Eigenschaft} zurück.<br>
+	/** Diese Methode gibt ein {@link Comparable} als Adapter zu einer {@link Number}-{@link Getter Eigenschaft} zurück.<br>
 	 * Der Vergleichswert einer Eingabe {@code input} entspricht {@code getter.get(input).intValue()}, wenn diese nicht {@code null} ist. Andernfalls ist der
 	 * Vergleichswert {@code 0}.
 	 *
