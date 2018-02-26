@@ -135,9 +135,12 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		public final boolean getBoolean() {
 			return Boolean.TRUE.equals(this.getValue());
 		}
-		
+
+		/** Diese Methode ist eine Abkürzung für {@code this.useValue(Boolean.TRUE)} und gibt {@code this} zurück.
+		 * 
+		 * @return {@code this}. */
 		public final PropertyData<GOwner> useTRUE() {
-			return useValue(Boolean.TRUE);
+			return this.useValue(Boolean.TRUE);
 		}
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.

@@ -16,7 +16,7 @@ import bee.creative.fem.FEMArray;
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
 @SuppressWarnings ("javadoc")
-public abstract class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
+ abstract class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
 
 	/** Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Schlüssel einer {@link CompactMap} delegiert.
 	 *

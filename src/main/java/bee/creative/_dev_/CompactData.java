@@ -22,7 +22,7 @@ import bee.creative.util.Objects;
  * Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des Arrays führ in jedem Fall zu einer erneuten Ausrichtung.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class CompactData {
+ abstract class CompactData {
 
 	/** Diese Klasse implementiert das {@link CompactObjectArray} der {@link CompactData}.
 	 *

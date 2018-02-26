@@ -51,14 +51,21 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 
 	/** {@inheritDoc} */
 	@Override
+	protected void customSetKey(final int entryIndex, final GItem item, final int itemHash) {
+		this.items[entryIndex] = item;
+		this.hashes[entryIndex] = itemHash;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	protected int customHashKey(final int entryIndex) {
 		return this.hashes[entryIndex];
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-		return (this.hashes[entryIndex] == keyHash) && this.customEqualsKey(entryIndex, key);
+	protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
+		return (this.hashes[entryIndex] == itemHash) && this.customEqualsKey(entryIndex, item);
 	}
 
 	/** {@inheritDoc} */

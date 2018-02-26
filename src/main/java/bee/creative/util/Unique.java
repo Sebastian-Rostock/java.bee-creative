@@ -144,38 +144,19 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 
 	{}
 
-	/** Dieses Feld speichert den {@link Getter} zur Erzeugung eines {@link Unique} mit ordnungsbasierter Abbildung ({@link TreeMap}).<br>
-	 * Derartige Nutzdaten basieren auf {@link #compare(Object, Object)}. */
-	@SuppressWarnings ({"unchecked", "rawtypes"})
-	public static final Getter<Unique, Map> TREEMAP = new Getter<Unique, Map>() {
-
-		@Override
-		public Map get(final Unique input) {
-			return new TreeMap<>(input);
-		}
-
-	};
-
-	/** Dieses Feld speichert den {@link Getter} zur Erzeugung eines {@link Unique} mit streuwertbasierter Abbildung ({@link HashMap2}).<br>
-	 * Derartige Nutzdaten basieren auf {@link #hash(Object)} und {@link #equals(Object, Object)}. */
-	@SuppressWarnings ("rawtypes")
-	public static final Getter<Unique, Map> HASHMAP = new Getter<Unique, Map>() {
-
-		@Override
-		public Map get(final Unique input) {
-			return HashMap2.from(input);
-		}
-
-	};
-
-	{}
-
 	/** Dieses Feld bildet von Ein- auf Ausgabeobjekte ab. */
 	protected final Map<GInput, GOutput> mapping;
 
-	/** Dieser Konstruktor initialisiert das {@link Unique} streuwertbasiert. */
+	/** Dieser Konstruktor initialisiert die {@link #mapping() Abbildung} mit einer {@link HashMap2}. */
 	public Unique() {
-		this.mapping = HashMap2.from(this);
+		this(true);
+	}
+
+	/** /** Dieser Konstruktor initialisiert die {@link #mapping() Abbildung} mit einer {@link HashMap2} oder {@link TreeMap}.
+	 *
+	 * @param useHashMap {@code true} für {@link HashMap2}; {@code false} für {@link TreeMap}. */
+	public Unique(final boolean useHashMap) {
+		this.mapping = useHashMap ? HashMap2.<GInput, GOutput>from(this) : new TreeMap<GInput, GOutput>(this);
 	}
 
 	/** Dieser Konstruktor initialisiert die intere Abbildung.
@@ -183,16 +164,6 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	 * @param mapping Abbildung. */
 	public Unique(final Map<GInput, GOutput> mapping) {
 		this.mapping = Objects.assertNotNull(mapping);
-	}
-
-	/** Dieser Konstruktor initialisiert die intere Abbildung über den gegebenen {@link Getter}, der mit {@code this} aufgerufen wird.<br>
-	 * Die auf diese Weise erzeugte {@link Map Abbildung} kann damit von den Methoden dieses {@link Unique} abhängen, bspw. von {@link #hash(Object)},
-	 * {@link #equals(Object, Object)} oder {@link #compare(Object, Object)}.
-	 *
-	 * @param mappingBuilder {@link Getter} zur Erzeugung der {@link Map Abbildung}. */
-	@SuppressWarnings ({"unchecked", "rawtypes"})
-	public Unique(final Getter<Unique, Map> mappingBuilder) {
-		this.mapping = Objects.assertNotNull(mappingBuilder.get(this));
 	}
 
 	{}
@@ -280,7 +251,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.mapping);
+		return Objects.toString(true, this.mapping);
 	}
 
 }

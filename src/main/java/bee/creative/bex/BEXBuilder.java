@@ -214,7 +214,7 @@ public final class BEXBuilder {
 
 		/** Diese Methode leert den Pool. */
 		public void clear() {
-			this.mapping().clear();
+			this.mapping.clear();
 			this.items.clear();
 		}
 

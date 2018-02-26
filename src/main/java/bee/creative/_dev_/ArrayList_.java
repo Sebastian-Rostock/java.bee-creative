@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
-public class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Serializable {
+ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Serializable {
 
 	@SuppressWarnings ("javadoc")
 	protected static class Sub<GItem> implements List<GItem> {

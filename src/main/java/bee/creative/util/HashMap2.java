@@ -18,7 +18,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	{}
 
 	/** Diese Methode gibt eine neue {@link HashMap2} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt. .
-	 * 
+	 *
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param hasher Methoden zum Abgleich der Schlüssel.
@@ -73,6 +73,13 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	}
 
 	{}
+
+	/** {@inheritDoc} */
+	@Override
+	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
+		this.keys[entryIndex] = key;
+		this.hashes[entryIndex] = keyHash;
+	}
 
 	/** {@inheritDoc} */
 	@Override

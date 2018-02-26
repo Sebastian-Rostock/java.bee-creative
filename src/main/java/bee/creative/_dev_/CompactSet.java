@@ -11,7 +11,7 @@ import bee.creative.util.Objects;
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-public abstract class CompactSet<GItem> extends CompactCollection<GItem> implements Set<GItem> {
+ abstract class CompactSet<GItem> extends CompactCollection<GItem> implements Set<GItem> {
 
 	/** Diese Klasse implementiert das {@link AbstractSet} eines {@link Set}s.
 	 *

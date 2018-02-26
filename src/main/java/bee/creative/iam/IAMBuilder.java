@@ -62,14 +62,14 @@ public class IAMBuilder {
 		 * @return Nutzdatensatz.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 		public final GData put(final int[] array) throws NullPointerException {
-			final GData data = this.create(this.datas.size(), array.clone());
+			final GData data = this.customBuild(this.datas.size(), array.clone());
 			this.datas.add(data);
 			return data;
 		}
 
 		/** Diese Methode leert diesen Pool. */
 		public final void clear() {
-			this.mapping().clear();
+			this.mapping.clear();
 			this.datas.clear();
 		}
 
@@ -78,7 +78,7 @@ public class IAMBuilder {
 		 * @param index Index, unter dem der Nutzdatensatz in {@link #datas} verwaltet wird.
 		 * @param array Zahlenliste.
 		 * @return Nutzdatensatz. */
-		protected abstract GData create(int index, int[] array);
+		protected abstract GData customBuild(int index, int[] array);
 
 		{}
 
@@ -112,7 +112,7 @@ public class IAMBuilder {
 	static final class UniqueItemPool extends UniquePool<ItemData> {
 
 		@Override
-		protected final ItemData create(final int index, final int[] array) {
+		protected final ItemData customBuild(final int index, final int[] array) {
 			final ItemData data = new ItemData();
 			data.index = index;
 			data.item = array;
@@ -125,7 +125,7 @@ public class IAMBuilder {
 	static final class UniqueEntryPool extends UniquePool<EntryData> {
 
 		@Override
-		protected final EntryData create(final int index, final int[] array) {
+		protected final EntryData customBuild(final int index, final int[] array) {
 			final EntryData data = new EntryData();
 			data.index = index;
 			data.key = array;

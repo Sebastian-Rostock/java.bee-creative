@@ -27,7 +27,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
 @SuppressWarnings ("javadoc")
-public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableSet<GItem> {
+ class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableSet<GItem> {
 
 	/** Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactNavigableSet}s.
 	 *

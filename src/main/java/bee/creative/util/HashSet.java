@@ -78,9 +78,10 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 
 	/** {@inheritDoc} */
 	@Override
-	@SuppressWarnings ("unchecked")
 	protected GItem customGetKey(final int entryIndex) {
-		return ((GItem)this.items[entryIndex]);
+		@SuppressWarnings ("unchecked")
+		final GItem result = (GItem)this.items[entryIndex];
+		return result;
 	}
 
 	/** {@inheritDoc} */

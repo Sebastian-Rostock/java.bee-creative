@@ -21,7 +21,7 @@ import bee.creative.util.Objects;
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
 @SuppressWarnings ("javadoc")
-public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue> implements NavigableMap<GKey, GValue> {
+ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue> implements NavigableMap<GKey, GValue> {
 
 	/** Diese Klasse implementiert die anstrakte Menge der Schlüssel einer {@link NavigableMap}.
 	 *

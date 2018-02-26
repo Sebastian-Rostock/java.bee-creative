@@ -18,7 +18,7 @@ import bee.creative.util.Objects;
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-public class CompactList<GItem> extends CompactCollection<GItem> implements List<GItem>, RandomAccess {
+ class CompactList<GItem> extends CompactCollection<GItem> implements List<GItem>, RandomAccess {
 
 	/** Diese Klasse implementiert eine {@link List} als modifizierbare Sicht auf die Werte.
 	 *

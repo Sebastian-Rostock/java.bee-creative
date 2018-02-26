@@ -25,7 +25,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	{}
 
 	/** Diese Methode gibt eine neue {@link HashMap} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt. .
-	 * 
+	 *
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param hasher Methoden zum Abgleich der Schlüssel.
@@ -115,16 +115,18 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 	/** {@inheritDoc} */
 	@Override
-	@SuppressWarnings ("unchecked")
 	protected GKey customGetKey(final int entryIndex) {
-		return ((GKey)this.keys[entryIndex]);
+		@SuppressWarnings ("unchecked")
+		final GKey result = (GKey)this.keys[entryIndex];
+		return result;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	@SuppressWarnings ("unchecked")
 	protected GValue customGetValue(final int entryIndex) {
-		return (GValue)this.values[entryIndex];
+		@SuppressWarnings ("unchecked")
+		final GValue result = (GValue)this.values[entryIndex];
+		return result;
 	}
 
 	/** {@inheritDoc} */

@@ -8,7 +8,7 @@ import bee.creative.util.Iterables;
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-public abstract class CompactCollection<GItem> extends CompactData implements Collection<GItem> {
+ abstract class CompactCollection<GItem> extends CompactData implements Collection<GItem> {
 
 	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} für {@link CompactCollection}s.
 	 *

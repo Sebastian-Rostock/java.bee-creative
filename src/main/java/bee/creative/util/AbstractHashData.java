@@ -75,7 +75,7 @@ import bee.creative.iam.IAMMapping;
  * <td colspan="2">13..16 x capacity + 104 ( 36..44 % )</td>
  * </tr>
  * </table>
- * 
+ *
  * @see HashMap
  * @see HashMap2
  * @see HashSet
@@ -662,6 +662,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 				for (int oldEntryIndex = oldTable[i]; 0 <= oldEntryIndex; oldEntryIndex = oldNexts[oldEntryIndex]) {
 					final int hash = this.customHashKey(oldEntryIndex);
 					final int index = hash & newMask;
+
 					newNexts[newEntryIndex] = newTable[index];
 					newTable[index] = newEntryIndex;
 					allocator.copy(oldEntryIndex, newEntryIndex);
@@ -771,15 +772,15 @@ public abstract class AbstractHashData<GKey, GValue> {
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
 	protected final int putIndexImpl(final GKey key) {
-		final int hash = this.customHash(key), result = this.getIndexImpl2(key, hash);
+		final int keyHash = this.customHash(key), result = this.getIndexImpl2(key, keyHash);
 		if (result >= 0) return result;
 		final int count = this.count + 1, capacity = this.capacityImpl();
 		if (count > AbstractHashData.MAX_CAPACITY) throw new OutOfMemoryError();
 		this.count = count;
-		if (count <= capacity) return this.putIndexImpl2(key, hash);
+		if (count <= capacity) return this.putIndexImpl2(key, keyHash);
 		final int allocate = count + (count >> 1);
 		this.allocateImpl((allocate < 0) || (allocate > AbstractHashData.MAX_CAPACITY) ? AbstractHashData.MAX_CAPACITY : allocate);
-		return this.putIndexImpl2(key, hash);
+		return this.putIndexImpl2(key, keyHash);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -993,6 +994,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 		if (this.count == 0) return;
 		AbstractHashData.setupTableImpl(this.table);
 		AbstractHashData.setupNextsImpl(this.nexts);
+		this.empty = 0;
 		this.customClear();
 		this.count = 0;
 	}
