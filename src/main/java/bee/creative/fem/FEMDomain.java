@@ -640,15 +640,13 @@ public class FEMDomain {
 		throws NullPointerException, IllegalArgumentException {
 		boolean indent = false;
 		while (true) {
-			String string = source.section();
+			final String string = source.section();
+			final int symbol = source.symbol();
 			source.skip();
-			switch (source.symbol()) {
+			switch (symbol) {
 				case '/':
 					target.putToken(source).putToken(" ");
 				break;
-				case ':':
-					target.putToken(string).putToken(" ");
-					return;
 				case '(':
 				case '[':
 					target.putToken(string).putBreakInc();
@@ -666,6 +664,7 @@ public class FEMDomain {
 					if (!indent) return;
 					target.putIndent();
 					return;
+				case ':':
 				case '}':
 					target.putToken(string);
 					return;
