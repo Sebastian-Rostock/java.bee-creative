@@ -662,7 +662,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 				for (int oldEntryIndex = oldTable[i]; 0 <= oldEntryIndex; oldEntryIndex = oldNexts[oldEntryIndex]) {
 					final int hash = this.customHashKey(oldEntryIndex);
 					final int index = hash & newMask;
-
 					newNexts[newEntryIndex] = newTable[index];
 					newTable[index] = newEntryIndex;
 					allocator.copy(oldEntryIndex, newEntryIndex);

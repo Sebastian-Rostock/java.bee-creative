@@ -645,7 +645,7 @@ public class FEMDomain {
 			source.skip();
 			switch (symbol) {
 				case '/':
-					target.putToken(source).putToken(" ");
+					target.putToken(string).putToken(" ");
 				break;
 				case '(':
 				case '[':
