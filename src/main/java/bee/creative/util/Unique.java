@@ -161,8 +161,9 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 
 	/** Dieser Konstruktor initialisiert die intere Abbildung.
 	 *
-	 * @param mapping Abbildung. */
-	public Unique(final Map<GInput, GOutput> mapping) {
+	 * @param mapping Abbildung.
+	 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
+	public Unique(final Map<GInput, GOutput> mapping) throws NullPointerException {
 		this.mapping = Objects.assertNotNull(mapping);
 	}
 

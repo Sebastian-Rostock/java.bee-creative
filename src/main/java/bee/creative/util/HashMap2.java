@@ -12,19 +12,16 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -8419791227943208230L;
 
-	/** Dieses Feld speichert den initialwert für {@link #hashes}. */
-	static final int[] EMPTY_HASHES = {};
-
 	{}
 
-	/** Diese Methode gibt eine neue {@link HashMap2} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt. .
+	/** Diese Methode gibt eine neue {@link HashMap2} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param hasher Methoden zum Abgleich der Schlüssel.
 	 * @return An {@link Hasher} gebundene {@link HashMap2}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
-	public static <GKey, GValue> HashMap2<GKey, GValue> from(final Hasher hasher) {
+	public static <GKey, GValue> HashMap2<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
 		Objects.assertNotNull(hasher);
 		return new HashMap2<GKey, GValue>() {
 
@@ -42,7 +39,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 
 			@Override
 			protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-				return this.customEqualsKey(entryIndex, key);
+				return (this.hashes[entryIndex] == keyHash) && hasher.equals(this.keys[entryIndex], key);
 			}
 
 		};
@@ -51,7 +48,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	{}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
-	transient int[] hashes = HashMap2.EMPTY_HASHES;
+	transient int[] hashes = AbstractHashData.EMPTY_INTEGERS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMap2() {
@@ -64,7 +61,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMap} als Kopie der gegebenen {@link Map}.
+	/** Dieser Konstruktor initialisiert die {@link HashMap} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
 	public HashMap2(final Map<? extends GKey, ? extends GValue> source) {
@@ -90,7 +87,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-		return (this.hashes[entryIndex] == keyHash) && this.customEqualsKey(entryIndex, key);
+		return (this.hashes[entryIndex] == keyHash) && Objects.equals(this.keys[entryIndex], key);
 	}
 
 	/** {@inheritDoc} */
@@ -100,9 +97,9 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		final Object[] values2;
 		final int[] hashes2;
 		if (capacity == 0) {
-			keys2 = HashMap.EMPTY_OBJECTS;
-			values2 = HashMap.EMPTY_OBJECTS;
-			hashes2 = HashMap2.EMPTY_HASHES;
+			keys2 = AbstractHashData.EMPTY_OBJECTS;
+			values2 = AbstractHashData.EMPTY_OBJECTS;
+			hashes2 = AbstractHashData.EMPTY_INTEGERS;
 		} else {
 			keys2 = new Object[capacity];
 			values2 = new Object[capacity];
@@ -132,11 +129,8 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	public Object clone() throws CloneNotSupportedException {
 		try {
 			final HashMap2<?, ?> result = (HashMap2<?, ?>)super.clone();
-			if (this.capacityImpl() == 0) {
-				result.hashes = HashMap2.EMPTY_HASHES;
-			} else {
-				result.hashes = this.hashes.clone();
-			}
+			if (this.capacityImpl() == 0) return result;
+			result.hashes = this.hashes.clone();
 			return result;
 		} catch (final Exception cause) {
 			throw new CloneNotSupportedException(cause.getMessage());

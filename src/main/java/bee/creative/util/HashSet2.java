@@ -12,13 +12,42 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -6978391927144580624L;
 
-	/** Dieses Feld speichert den initialwert für {@link #hashes}. */
-	static final int[] EMPTY_HASHES = {};
+	{}
+
+	/** Diese Methode gibt ein neues {@link HashSet2} zurück, welche Streuwert und Äquivalenz der Elemente über den gegebenen {@link Hasher} ermittelt.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param hasher Methoden zum Abgleich der Elemente.
+	 * @return An {@link Hasher} gebundenes {@link HashSet2}.
+	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
+	public static <GItem> HashSet2<GItem> from(final Hasher hasher) throws NullPointerException {
+		Objects.assertNotNull(hasher);
+		return new HashSet2<GItem>() {
+
+			private static final long serialVersionUID = 5185785086449129611L;
+
+			@Override
+			protected int customHash(final Object item) {
+				return hasher.hash(item);
+			}
+
+			@Override
+			protected boolean customEqualsKey(final int entryIndex, final Object item) {
+				return hasher.equals(this.items[entryIndex], item);
+			}
+
+			@Override
+			protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
+				return (this.hashes[entryIndex] == itemHash) && hasher.equals(this.items[entryIndex], item);
+			}
+
+		};
+	}
 
 	{}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
-	transient int[] hashes = HashSet2.EMPTY_HASHES;
+	transient int[] hashes = AbstractHashData.EMPTY_INTEGERS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashSet2() {
@@ -31,7 +60,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashSet} als Kopie der gegebenen {@link Set}.
+	/** Dieser Konstruktor initialisiert die {@link HashSet} mit dem Inhalt der gegebenen {@link Set}.
 	 *
 	 * @param source gegebene Einträge. */
 	public HashSet2(final Set<? extends GItem> source) {
@@ -39,11 +68,10 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		this.addAll(source);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashSet} als Kopie der gegebenen {@link Set}.
+	/** Dieser Konstruktor initialisiert die {@link HashSet} mit dem Inhalt der gegebenen {@link Collection}.
 	 *
 	 * @param source gegebene Einträge. */
 	public HashSet2(final Collection<? extends GItem> source) {
-		this.allocateImpl(source.size());
 		this.addAll(source);
 	}
 
@@ -65,7 +93,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
-		return (this.hashes[entryIndex] == itemHash) && this.customEqualsKey(entryIndex, item);
+		return (this.hashes[entryIndex] == itemHash) && Objects.equals(this.items[entryIndex], item);
 	}
 
 	/** {@inheritDoc} */
@@ -74,8 +102,8 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		final Object[] items2;
 		final int[] hashes2;
 		if (capacity == 0) {
-			items2 = HashSet.EMPTY_OBJECTS;
-			hashes2 = HashSet2.EMPTY_HASHES;
+			items2 = AbstractHashData.EMPTY_OBJECTS;
+			hashes2 = AbstractHashData.EMPTY_INTEGERS;
 		} else {
 			items2 = new Object[capacity];
 			hashes2 = new int[capacity];
@@ -102,11 +130,8 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	public Object clone() throws CloneNotSupportedException {
 		try {
 			final HashSet2<?> result = (HashSet2<?>)super.clone();
-			if (this.capacityImpl() == 0) {
-				result.hashes = HashSet2.EMPTY_HASHES;
-			} else {
-				result.hashes = this.hashes.clone();
-			}
+			if (this.capacityImpl() == 0) return result;
+			result.hashes = this.hashes.clone();
 			return result;
 		} catch (final Exception cause) {
 			throw new CloneNotSupportedException(cause.getMessage());

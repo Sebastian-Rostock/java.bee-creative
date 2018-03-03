@@ -465,14 +465,17 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	{}
 
+	/** Dieses Feld speichert die maximale Kapazität. */
+	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
+
 	/** Dieses Feld speichert den initialwert für {@link #table}. */
 	private static final int[] EMPTY_TABLE = {-1};
 
-	/** Dieses Feld speichert den initialwert für {@link #nexts}. */
-	private static final int[] EMPTY_NEXTS = {};
+	/** Dieses Feld speichert den initialwert für eine Objektliste. */
+	protected static final Object[] EMPTY_OBJECTS = {};
 
-	/** Dieses Feld speichert die maximale Kapazität. */
-	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
+	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
+	protected static final int[] EMPTY_INTEGERS = {};
 
 	{}
 
@@ -506,7 +509,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 	/** Dieser Konstruktor initialisiert das die {@link #capacityImpl() Kapazität} mit {@code 0}. */
 	public AbstractHashData() {
 		this.table = AbstractHashData.EMPTY_TABLE;
-		this.nexts = AbstractHashData.EMPTY_NEXTS;
+		this.nexts = AbstractHashData.EMPTY_INTEGERS;
 		this.customAllocator(0).apply();
 	}
 
@@ -650,7 +653,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 		if (capacity == 0) {
 			this.empty = 0;
 			this.table = AbstractHashData.EMPTY_TABLE;
-			this.nexts = AbstractHashData.EMPTY_NEXTS;
+			this.nexts = AbstractHashData.EMPTY_INTEGERS;
 		} else if (capacity <= AbstractHashData.MAX_CAPACITY) {
 			final int newMask = IAMMapping.mask(capacity);
 			final int[] oldTable = this.table, newTable = new int[newMask + 1];
@@ -1005,13 +1008,9 @@ public abstract class AbstractHashData<GKey, GValue> {
 	protected Object clone() throws CloneNotSupportedException {
 		try {
 			final AbstractHashData<?, ?> result = (AbstractHashData<?, ?>)super.clone();
-			if (this.capacityImpl() == 0) {
-				result.table = AbstractHashData.EMPTY_TABLE;
-				result.nexts = AbstractHashData.EMPTY_NEXTS;
-			} else {
-				result.table = this.table.clone();
-				result.nexts = this.nexts.clone();
-			}
+			if (this.capacityImpl() == 0) return result;
+			result.table = this.table.clone();
+			result.nexts = this.nexts.clone();
 			return result;
 		} catch (final Exception cause) {
 			throw new CloneNotSupportedException(cause.getMessage());

@@ -19,19 +19,16 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -8792297171308603896L;
 
-	/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
-	static final Object[] EMPTY_OBJECTS = {};
-
 	{}
 
-	/** Diese Methode gibt eine neue {@link HashMap} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt. .
+	/** Diese Methode gibt eine neue {@link HashMap} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param hasher Methoden zum Abgleich der Schlüssel.
 	 * @return An {@link Hasher} gebundene {@link HashMap}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
-	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
+	public static <GKey, GValue> AbstractHashData<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
 		Objects.assertNotNull(hasher);
 		return new HashMap<GKey, GValue>() {
 
@@ -54,7 +51,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 			@Override
 			protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-				return this.customEqualsKey(entryIndex, key);
+				return hasher.equals(this.keys[entryIndex], key);
 			}
 
 		};
@@ -63,10 +60,10 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	{}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	transient Object[] keys = HashMap.EMPTY_OBJECTS;
+	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	transient Object[] values = HashMap.EMPTY_OBJECTS;
+	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
 	public HashMap() {
@@ -79,7 +76,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMap} als Kopie der gegebenen {@link Map}.
+	/** Dieser Konstruktor initialisiert die {@link HashMap} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
 	public HashMap(final Map<? extends GKey, ? extends GValue> source) {
@@ -89,16 +86,14 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 	{}
 
-	@SuppressWarnings ("javadoc")
+	@SuppressWarnings ({"javadoc", "unchecked"})
 	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		final int count = stream.readInt();
 		this.allocateImpl(count);
 		for (int i = 0; i < count; i++) {
-			@SuppressWarnings ("unchecked")
-			final GKey key = (GKey)stream.readObject();
-			@SuppressWarnings ("unchecked")
-			final GValue value = (GValue)stream.readObject();
-			this.putImpl(key, value);
+			final Object key = stream.readObject();
+			final Object value = stream.readObject();
+			this.putImpl((GKey)key, (GValue)value);
 		}
 	}
 
@@ -115,18 +110,16 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 	/** {@inheritDoc} */
 	@Override
+	@SuppressWarnings ("unchecked")
 	protected GKey customGetKey(final int entryIndex) {
-		@SuppressWarnings ("unchecked")
-		final GKey result = (GKey)this.keys[entryIndex];
-		return result;
+		return (GKey)this.keys[entryIndex];
 	}
 
 	/** {@inheritDoc} */
 	@Override
+	@SuppressWarnings ("unchecked")
 	protected GValue customGetValue(final int entryIndex) {
-		@SuppressWarnings ("unchecked")
-		final GValue result = (GValue)this.values[entryIndex];
-		return result;
+		return (GValue)this.values[entryIndex];
 	}
 
 	/** {@inheritDoc} */
@@ -137,12 +130,12 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 	/** {@inheritDoc} */
 	@Override
+	@SuppressWarnings ("unchecked")
 	protected GValue customSetValue(final int entryIndex, final GValue value) {
 		final Object[] values = this.values;
-		@SuppressWarnings ("unchecked")
-		final GValue result = (GValue)values[entryIndex];
+		final Object result = values[entryIndex];
 		values[entryIndex] = value;
-		return result;
+		return (GValue)result;
 	}
 
 	/** {@inheritDoc} */
@@ -206,8 +199,8 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		final Object[] keys2;
 		final Object[] values2;
 		if (capacity == 0) {
-			keys2 = HashMap.EMPTY_OBJECTS;
-			values2 = HashMap.EMPTY_OBJECTS;
+			keys2 = AbstractHashData.EMPTY_OBJECTS;
+			values2 = AbstractHashData.EMPTY_OBJECTS;
 		} else {
 			keys2 = new Object[capacity];
 			values2 = new Object[capacity];
@@ -216,8 +209,8 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 			@Override
 			public void copy(final int sourceIndex, final int targetIndex) {
-				keys2[sourceIndex] = HashMap.this.keys[targetIndex];
-				values2[sourceIndex] = HashMap.this.values[targetIndex];
+				keys2[targetIndex] = HashMap.this.keys[sourceIndex];
+				values2[targetIndex] = HashMap.this.values[sourceIndex];
 			}
 
 			@Override
@@ -234,13 +227,9 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	public Object clone() throws CloneNotSupportedException {
 		try {
 			final HashMap<?, ?> result = (HashMap<?, ?>)super.clone();
-			if (this.capacityImpl() == 0) {
-				result.keys = HashMap.EMPTY_OBJECTS;
-				result.values = HashMap.EMPTY_OBJECTS;
-			} else {
-				result.keys = this.keys.clone();
-				result.values = this.values.clone();
-			}
+			if (this.capacityImpl() == 0) return result;
+			result.keys = this.keys.clone();
+			result.values = this.values.clone();
 			return result;
 		} catch (final Exception cause) {
 			throw new CloneNotSupportedException(cause.getMessage());

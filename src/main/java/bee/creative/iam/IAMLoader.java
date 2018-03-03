@@ -261,7 +261,7 @@ public class IAMLoader {
 				offset += itemValue;
 				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMLoader.checkArray(itemOffset);
+				// IAMLoader.checkArray(itemOffset);
 				itemValue = itemOffset.get(itemCount);
 
 			} else {
@@ -286,6 +286,16 @@ public class IAMLoader {
 			this.itemLength = itemLength;
 			this.itemCount = itemCount;
 
+		}
+
+		{}
+
+		/** Diese Methode prüft die Kodierung der {@link #itemLength(int) Längen der Zahlenfolgen}.
+		 *
+		 * @see IAMLoader#checkArray(IAMArray)
+		 * @throws IAMException Wenn die Kodierung ungültig ist. */
+		public final void check() throws IAMException {
+			IAMLoader.checkArray(this.itemOffset);
 		}
 
 		{}
@@ -408,7 +418,7 @@ public class IAMLoader {
 				offset += rangeValue;
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMLoader.checkArray(rangeOffset);
+				// IAMLoader.checkArray(rangeOffset);
 				rangeValue = rangeOffset.get(rangeMask + 1);
 				if (rangeValue != entryCount) throw new IAMException(IAMException.INVALID_OFFSET);
 
@@ -432,7 +442,7 @@ public class IAMLoader {
 				offset += keyValue;
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMLoader.checkArray(keyOffset);
+				// IAMLoader.checkArray(keyOffset);
 				keyValue = keyOffset.get(entryCount);
 
 			} else {
@@ -464,7 +474,7 @@ public class IAMLoader {
 				offset += valueValue;
 				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMLoader.checkArray(valueOffset);
+				// IAMLoader.checkArray(valueOffset);
 				valueValue = valueOffset.get(entryCount);
 
 			} else {
@@ -495,6 +505,18 @@ public class IAMLoader {
 			this.rangeOffset = rangeOffset;
 			this.entryCount = entryCount;
 
+		}
+
+		{}
+
+		/** Diese Methode prüft die Kodierung der {@link #keyLength(int) Längen der Schlüssel} ind {@link #valueLength(int) Werte}.
+		 *
+		 * @see IAMLoader#checkArray(IAMArray)
+		 * @throws IAMException Wenn die Kodierung ungültig ist. */
+		public final void check() throws IAMException {
+			IAMLoader.checkArray(this.rangeOffset);
+			IAMLoader.checkArray(this.keyOffset);
+			IAMLoader.checkArray(this.valueOffset);
 		}
 
 		{}
@@ -619,7 +641,8 @@ public class IAMLoader {
 	 *
 	 * @param array Zahlenfolge.
 	 * @throws IAMException Wenn die erste Zahl nicht {@code 0} ist oder die Zahlen nicht monoton steigen. */
-	static void checkArray(final IAMArray array) throws IAMException {
+	public static void checkArray(final IAMArray array) throws IAMException {
+		if (array == null) return;
 		int value = array.get(0);
 		if (value != 0) throw new IAMException(IAMException.INVALID_OFFSET);
 		for (int i = 0, length = array.length(); i < length; i++) {
