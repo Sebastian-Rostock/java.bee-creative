@@ -4,6 +4,7 @@ import java.nio.ByteOrder;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
@@ -137,7 +138,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 		@Override
 		public final byte[] value() {
-			return this.array.toBytes();
+			return IAMArray.toBytes(this.array);
 		}
 
 	}
