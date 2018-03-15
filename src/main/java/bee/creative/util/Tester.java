@@ -107,9 +107,6 @@ public class Tester {
 
 	{}
 
-	/** Dieses Feld speichert den leeren {@link Tester}. */
-	public static final Tester EMPTY = new Tester(0, 0);
-
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
 	public static final Comparator<Tester> USED_TIME_ORDER = new Comparator<Tester>() {
 
@@ -149,7 +146,7 @@ public class Tester {
 	 * @throws NullPointerException Wenn {@code testers} {@code null} ist oder enthält. */
 	public static Tester fromAvg(final List<Tester> testers) throws NullPointerException {
 		final int count = testers.size();
-		if (count == 0) return Tester.EMPTY;
+		if (count == 0) return new Tester(0, 0);
 		long usedTime = 0, usedMemory = 0;
 		for (final Tester tester: testers) {
 			usedTime += tester.usedTime;
