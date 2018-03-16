@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import bee.creative.iam.IAMArray;
-import bee.creative.io.MMFBuffer;
+import bee.creative.io.MappedBuffer;
 import bee.creative.util.IO;
 
-/** Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch einen {@link ByteBuffer} oder einen {@link MMFBuffer} gegeben sind.<br>
+/** Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch einen {@link ByteBuffer} oder einen {@link MappedBuffer} gegeben sind.<br>
  * Zur Interpretation derer Speicherbereiche können entsprechende Sichten über {@link #toINT8()}, {@link #toUINT8()}, {@link #toINT16()}, {@link #toUINT16()}
  * oder {@link #toINT32()} erzeugte werden.
  *
@@ -48,7 +48,7 @@ public abstract class MMFArray extends IAMArray {
 
 	{}
 
-	/** Diese Methode gibt die Bytereihenfolge zur Interpretation des internen {@link ByteBuffer} bzw. {@link MMFBuffer} zurück.
+	/** Diese Methode gibt die Bytereihenfolge zur Interpretation des internen {@link ByteBuffer} bzw. {@link MappedBuffer} zurück.
 	 *
 	 * @see #withOrder(ByteOrder)
 	 * @return Bytereihenfolge. */
