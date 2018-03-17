@@ -96,7 +96,7 @@ public class Setters {
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.mappingField(mapping)}. */
 	@SuppressWarnings ({"javadoc", "unchecked"})
-	public static <GInput, GValue> Setter<GInput, GValue> mappedGetter(final Map<? super GInput, ? super GValue> mapping) {
+	public static <GInput, GValue> Setter<GInput, GValue> mappedSetter(final Map<? super GInput, ? super GValue> mapping) {
 		return (Setter<GInput, GValue>)Fields.mappingField(mapping);
 	}
 

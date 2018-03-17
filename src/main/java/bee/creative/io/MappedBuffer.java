@@ -14,9 +14,12 @@ import java.nio.MappedByteBuffer;
 import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien per
  * momory-mapping zum Lesen und Schreiben zugänglich machen kann.
+ * <p>
+ * Die Anbindung der Datei erfolgt intern über {@link MappedByteBuffer} pro Gigabyte.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MappedBuffer {
@@ -30,7 +33,7 @@ public class MappedBuffer {
 
 	/** Dieses Feld speichert die Größe des Speicherbereichs, den je zwei in {@link #buffers} auf einander folgende {@link MappedByteBuffer} gleichzeitig
 	 * anbinden. */
-	private static final int BUFFER_GUARD = 1 << 19;
+	private static final int BUFFER_GUARD = 1 << 14;
 
 	/** Dieses Feld speichert die Größe der {@link MappedByteBuffer}, die vor dem letzten in {@link #buffers} verwaltet werden. */
 	private static final int BUFFER_LENGTH = MappedBuffer.BUFFER_GUARD + MappedBuffer.INDEX_MASK + 1;
@@ -68,7 +71,7 @@ public class MappedBuffer {
 	private final boolean readonly;
 
 	/** Dieses Feld speichert die Puffergröße.. */
-	private final long size = -1;
+	private long size = -1;
 
 	/** Dieses Feld speichert die aktuelle Bytereihenfolge. */
 	private ByteOrder order = ByteOrder.nativeOrder();
@@ -76,7 +79,7 @@ public class MappedBuffer {
 	/** Dieses Feld speichert die {@link MappedByteBuffer}, welche jeweils {@link #BUFFER_LENGTH} Byte der Datei anbinden. */
 	private MappedByteBuffer[] buffers;
 
-	/** Dieser Konstruktor initialisiert diesen Puffer zum Lese- und Schreibzugriff auf gegebene Datei.
+	/** Dieser Konstruktor initialisiert den Puffer zum Lesen und Schreiben der gegebenen Datei.
 	 *
 	 * @see #MappedBuffer(File, boolean)
 	 * @param file Datei.
@@ -85,28 +88,38 @@ public class MappedBuffer {
 		this(file, false);
 	}
 
-	/** Dieser Konstruktor initialisiert diesen Puffer zum Zugriff auf die gegebene Datei.
+	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei.
 	 *
 	 * @see #MappedBuffer(File, long, boolean)
 	 * @param file Datei.
-	 * @param readonly {@code true}, wenn die Datei nur zum Lesezugriff angebunden werden soll.
+	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public MappedBuffer(final File file, final boolean readonly) throws IOException {
 		this(file, file.length(), readonly);
 	}
 
-	/** Dieser Konstruktor initialisiert diesen Puffer zum Zugriff auf den Beginn der gegebenen Datei.
+	/** Dieser Konstruktor initialisiert den Puffer zum Lesen und Schreiben des Beginns der gegebenen Datei.
+	 *
+	 * @see #MappedBuffer(File, long, boolean)
+	 * @param file Datei.
+	 * @param size Größe des anzubindenden Speicherbereiches zu Beginn der Datei.
+	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
+	public MappedBuffer(final File file, final long size) throws IOException {
+		this(file, size, false);
+	}
+
+	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf den Beginn der gegebenen Datei.
 	 *
 	 * @see #resize(long)
 	 * @param file Datei.
-	 * @param size Anzahl der Byte ab dem Beginn der Datei, die angebunden werden sollen.
+	 * @param size Größe des anzubindenden Speicherbereiches zu Beginn der Datei.
 	 * @param readonly {@code true}, wenn die Datei nur zum Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public MappedBuffer(final File file, final long size, final boolean readonly) throws IOException {
 		if (size < 0) throw new IllegalArgumentException();
 		this.file = file.getAbsoluteFile();
-		this.readonly = readonly;
 		this.buffers = new MappedByteBuffer[1];
+		this.readonly = readonly;
 		this.resize(size);
 	}
 
@@ -133,7 +146,6 @@ public class MappedBuffer {
 		if (oldLength != newLength) {
 			newBuffers = new MappedByteBuffer[newLength];
 			System.arraycopy(oldBuffers, 0, newBuffers, 0, Math.min(oldLength, newLength));
-			this.buffers = newBuffers;
 		} else {
 			newBuffers = oldBuffers;
 		}
@@ -148,6 +160,8 @@ public class MappedBuffer {
 				(newBuffers[newLength - 1] = fileChannel.map(mode, offset, newSize - offset)).order(this.order);
 			}
 		}
+		this.size = newSize;
+		this.buffers = newBuffers;
 	}
 
 	/** Diese Methode versucht alle Änderungen auf den Festspeicher zu übertragen.
@@ -188,7 +202,7 @@ public class MappedBuffer {
 	}
 
 	/** Diese Methode setzt die Bytereihenfolge.
-	 * 
+	 *
 	 * @see ByteBuffer#order(ByteOrder)
 	 * @param order Bytereihenfolge. */
 	public void order(ByteOrder order) {
@@ -210,40 +224,6 @@ public class MappedBuffer {
 	 * @return Zugriffsmodus. */
 	public boolean isReadonly() {
 		return this.readonly;
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void getImpl(final long address, final byte[] target, final int offset, final int length) {
-		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_BYTE_THRESHOLD) {
-			final int targetLimit = offset + length;
-			int targetIndex = offset, sourceIndex = MappedBuffer.valueIndex(address);
-			while (targetIndex < targetLimit) {
-				target[targetIndex] = source.get(sourceIndex);
-				sourceIndex += 1;
-				targetIndex += 1;
-			}
-		} else {
-			source.position(MappedBuffer.valueIndex(address));
-			source.get(target, offset, length);
-		}
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void putImpl(final long address, final byte[] source, final int offset, final int length) {
-		final MappedByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_BYTE_THRESHOLD) {
-			final int sourceLimit = offset + length;
-			int sourceIndex = offset, targetIndex = MappedBuffer.valueIndex(address);
-			while (sourceIndex < sourceLimit) {
-				target.put(targetIndex, source[sourceIndex]);
-				sourceIndex += 1;
-				targetIndex += 1;
-			}
-		} else {
-			target.position(MappedBuffer.valueIndex(address));
-			target.put(source, offset, length);
-		}
 	}
 
 	/** Diese Methode gibt das {@code byte} an der gegebenen Adresse zurück.
@@ -272,13 +252,21 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void get(long address, final byte[] array, int offset, int length) {
-		while (length > MappedBuffer.BUFFER_GUARD) {
-			this.getImpl(address, array, offset, MappedBuffer.BUFFER_GUARD);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD;
-			length -= MappedBuffer.BUFFER_GUARD;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 1);
+			length -= count;
+			address += count * 1;
+			if (count < MappedBuffer.BUFFER_BYTE_THRESHOLD) {
+				for (count += offset; offset < count; index += 1, offset += 1) {
+					array[offset] = source.get(index);
+				}
+			} else {
+				source.position(index);
+				source.get(array, offset, count);
+			}
 		}
-		this.getImpl(address, array, offset, length);
 	}
 
 	/** Diese Methode schreibt den gegebenen {@code byte}-Wert an die gegebene Adresse.
@@ -307,46 +295,20 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void put(long address, final byte[] array, int offset, int length) {
-		while (length > MappedBuffer.BUFFER_GUARD) {
-			this.putImpl(address, array, offset, MappedBuffer.BUFFER_GUARD);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD;
-			length -= MappedBuffer.BUFFER_GUARD;
-		}
-		this.putImpl(address, array, offset, length);
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void getCharImpl(final long address, final char[] target, final int offset, final int length) {
-		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int targetLimit = offset + length;
-			int targetIndex = offset, sourceIndex = MappedBuffer.valueIndex(address);
-			while (targetIndex < targetLimit) {
-				target[targetIndex] = source.getChar(sourceIndex);
-				sourceIndex += 2;
-				targetIndex += 1;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 1);
+			length -= count;
+			address += count * 1;
+			if (count < MappedBuffer.BUFFER_BYTE_THRESHOLD) {
+				for (count += offset; offset < count; index += 1, offset += 1) {
+					source.put(index, array[offset]);
+				}
+			} else {
+				source.position(index);
+				source.put(array, offset, count);
 			}
-		} else {
-			source.position(MappedBuffer.valueIndex(address));
-			source.asCharBuffer().get(target, offset, length);
-		}
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void putCharImpl(final long address, final char[] source, final int offset, final int length) {
-		final MappedByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int sourceLimit = offset + length;
-			int sourceIndex = offset, targetIndex = MappedBuffer.valueIndex(address);
-			while (sourceIndex < sourceLimit) {
-				target.putChar(targetIndex, source[sourceIndex]);
-				sourceIndex += 1;
-				targetIndex += 2;
-			}
-		} else {
-			target.position(MappedBuffer.valueIndex(address));
-			target.asCharBuffer().put(source, offset, length);
 		}
 	}
 
@@ -376,13 +338,21 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void getChar(long address, final char[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 2)) {
-			this.getCharImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 2);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 2;
-			length -= MappedBuffer.BUFFER_GUARD / 2;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 2);
+			length -= count;
+			address += count * 2;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 2, offset += 1) {
+					array[offset] = source.getChar(index);
+				}
+			} else {
+				source.position(index);
+				source.asCharBuffer().get(array, offset, count);
+			}
 		}
-		this.getCharImpl(address, array, offset, length);
 	}
 
 	/** Diese Methode schreibt den gegebenen {@code char}-Wert an die gegebene Adresse.
@@ -411,46 +381,20 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void putChar(long address, final char[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 2)) {
-			this.putCharImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 2);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 2;
-			length -= MappedBuffer.BUFFER_GUARD / 2;
-		}
-		this.putCharImpl(address, array, offset, length);
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void getShortImpl(final long address, final short[] target, final int offset, final int length) {
-		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int targetLimit = offset + length;
-			int targetIndex = offset, sourceIndex = MappedBuffer.valueIndex(address);
-			while (targetIndex < targetLimit) {
-				target[targetIndex] = source.getShort(sourceIndex);
-				sourceIndex += 2;
-				targetIndex += 1;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 2);
+			length -= count;
+			address += count * 2;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 2, offset += 1) {
+					source.putChar(index, array[offset]);
+				}
+			} else {
+				source.position(index);
+				source.asCharBuffer().put(array, offset, count);
 			}
-		} else {
-			source.position(MappedBuffer.valueIndex(address));
-			source.asShortBuffer().get(target, offset, length);
-		}
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void putShortImpl(final long address, final short[] source, final int offset, final int length) {
-		final MappedByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int sourceLimit = offset + length;
-			int sourceIndex = offset, targetIndex = MappedBuffer.valueIndex(address);
-			while (sourceIndex < sourceLimit) {
-				target.putShort(targetIndex, source[sourceIndex]);
-				sourceIndex += 1;
-				targetIndex += 2;
-			}
-		} else {
-			target.position(MappedBuffer.valueIndex(address));
-			target.asShortBuffer().put(source, offset, length);
 		}
 	}
 
@@ -480,13 +424,21 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void getShort(long address, final short[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 2)) {
-			this.getShortImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 2);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 2;
-			length -= MappedBuffer.BUFFER_GUARD / 2;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 2);
+			length -= count;
+			address += count * 2;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 2, offset += 1) {
+					array[offset] = source.getShort(index);
+				}
+			} else {
+				source.position(index);
+				source.asShortBuffer().get(array, offset, count);
+			}
 		}
-		this.getShortImpl(address, array, offset, length);
 	}
 
 	/** Diese Methode schreibt den gegebenen {@code short}-Wert an die gegebene Adresse.
@@ -515,46 +467,20 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void putShort(long address, final short[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 2)) {
-			this.putShortImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 2);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 2;
-			length -= MappedBuffer.BUFFER_GUARD / 2;
-		}
-		this.putShortImpl(address, array, offset, length);
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void getIntImpl(final long address, final int[] target, final int offset, final int length) {
-		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int targetLimit = offset + length;
-			int targetIndex = offset, sourceIndex = MappedBuffer.valueIndex(address);
-			while (targetIndex < targetLimit) {
-				target[targetIndex] = source.getInt(sourceIndex);
-				sourceIndex += 4;
-				targetIndex += 1;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 2);
+			length -= count;
+			address += count * 2;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 2, offset += 1) {
+					source.putShort(index, array[offset]);
+				}
+			} else {
+				source.position(index);
+				source.asShortBuffer().put(array, offset, count);
 			}
-		} else {
-			source.position(MappedBuffer.valueIndex(address));
-			source.asIntBuffer().get(target, offset, length);
-		}
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void putIntImpl(final long address, final int[] source, final int offset, final int length) {
-		final MappedByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int sourceLimit = offset + length;
-			int sourceIndex = offset, targetIndex = MappedBuffer.valueIndex(address);
-			while (sourceIndex < sourceLimit) {
-				target.putInt(targetIndex, source[sourceIndex]);
-				sourceIndex += 1;
-				targetIndex += 4;
-			}
-		} else {
-			target.position(MappedBuffer.valueIndex(address));
-			target.asIntBuffer().put(source, offset, length);
 		}
 	}
 
@@ -584,13 +510,21 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void getInt(long address, final int[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 4)) {
-			this.getIntImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 4);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 4;
-			length -= MappedBuffer.BUFFER_GUARD / 4;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 4);
+			length -= count;
+			address += count * 4;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 4, offset += 1) {
+					array[offset] = source.getInt(index);
+				}
+			} else {
+				source.position(index);
+				source.asIntBuffer().get(array, offset, count);
+			}
 		}
-		this.getIntImpl(address, array, offset, length);
 	}
 
 	/** Diese Methode schreibt den gegebenen {@code int}-Wert an die gegebene Adresse.
@@ -619,46 +553,20 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void putInt(long address, final int[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 4)) {
-			this.putIntImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 4);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 4;
-			length -= MappedBuffer.BUFFER_GUARD / 4;
-		}
-		this.putIntImpl(address, array, offset, length);
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void getLongImpl(final long address, final long[] target, final int offset, final int length) {
-		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int targetLimit = offset + length;
-			int targetIndex = offset, sourceIndex = MappedBuffer.valueIndex(address);
-			while (targetIndex < targetLimit) {
-				target[targetIndex] = source.getLong(sourceIndex);
-				sourceIndex += 8;
-				targetIndex += 1;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 4);
+			length -= count;
+			address += count * 4;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 4, offset += 1) {
+					source.putInt(index, array[offset]);
+				}
+			} else {
+				source.position(index);
+				source.asIntBuffer().put(array, offset, count);
 			}
-		} else {
-			source.position(MappedBuffer.valueIndex(address));
-			source.asLongBuffer().get(target, offset, length);
-		}
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void putLongImpl(final long address, final long[] source, final int offset, final int length) {
-		final MappedByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int sourceLimit = offset + length;
-			int sourceIndex = offset, targetIndex = MappedBuffer.valueIndex(address);
-			while (sourceIndex < sourceLimit) {
-				target.putLong(targetIndex, source[sourceIndex]);
-				sourceIndex += 1;
-				targetIndex += 8;
-			}
-		} else {
-			target.position(MappedBuffer.valueIndex(address));
-			target.asLongBuffer().put(source, offset, length);
 		}
 	}
 
@@ -688,13 +596,21 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void getLong(long address, final long[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 8)) {
-			this.getLongImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 8);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 8;
-			length -= MappedBuffer.BUFFER_GUARD / 8;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 8);
+			length -= count;
+			address += count * 8;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 8, offset += 1) {
+					array[offset] = source.getLong(index);
+				}
+			} else {
+				source.position(index);
+				source.asLongBuffer().get(array, offset, count);
+			}
 		}
-		this.getLongImpl(address, array, offset, length);
 	}
 
 	/** Diese Methode schreibt den gegebenen {@code long}-Wert an die gegebene Adresse.
@@ -723,46 +639,20 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void putLong(long address, final long[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 8)) {
-			this.putLongImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 8);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 8;
-			length -= MappedBuffer.BUFFER_GUARD / 8;
-		}
-		this.putLongImpl(address, array, offset, length);
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void getFloatImpl(final long address, final float[] target, final int offset, final int length) {
-		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int targetLimit = offset + length;
-			int targetIndex = offset, sourceIndex = MappedBuffer.valueIndex(address);
-			while (targetIndex < targetLimit) {
-				target[targetIndex] = source.getFloat(sourceIndex);
-				sourceIndex += 4;
-				targetIndex += 1;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 8);
+			length -= count;
+			address += count * 8;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 8, offset += 1) {
+					source.putLong(index, array[offset]);
+				}
+			} else {
+				source.position(index);
+				source.asLongBuffer().put(array, offset, count);
 			}
-		} else {
-			source.position(MappedBuffer.valueIndex(address));
-			source.asFloatBuffer().get(target, offset, length);
-		}
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void putFloatImpl(final long address, final float[] source, final int offset, final int length) {
-		final MappedByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int sourceLimit = offset + length;
-			int sourceIndex = offset, targetIndex = MappedBuffer.valueIndex(address);
-			while (sourceIndex < sourceLimit) {
-				target.putFloat(targetIndex, source[sourceIndex]);
-				sourceIndex += 1;
-				targetIndex += 4;
-			}
-		} else {
-			target.position(MappedBuffer.valueIndex(address));
-			target.asFloatBuffer().put(source, offset, length);
 		}
 	}
 
@@ -792,13 +682,21 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void getFloat(long address, final float[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 4)) {
-			this.getFloatImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 4);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 4;
-			length -= MappedBuffer.BUFFER_GUARD / 4;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 4);
+			length -= count;
+			address += count * 4;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 4, offset += 1) {
+					array[offset] = source.getFloat(index);
+				}
+			} else {
+				source.position(index);
+				source.asFloatBuffer().get(array, offset, count);
+			}
 		}
-		this.getFloatImpl(address, array, offset, length);
 	}
 
 	/** Diese Methode schreibt den gegebenen {@code float}-Wert an die gegebene Adresse.
@@ -827,46 +725,20 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void putFloat(long address, final float[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 4)) {
-			this.putFloatImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 4);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 4;
-			length -= MappedBuffer.BUFFER_GUARD / 4;
-		}
-		this.putFloatImpl(address, array, offset, length);
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void getDoubleImpl(final long address, final double[] target, final int offset, final int length) {
-		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int targetLimit = offset + length;
-			int targetIndex = offset, sourceIndex = MappedBuffer.valueIndex(address);
-			while (targetIndex < targetLimit) {
-				target[targetIndex] = source.getDouble(sourceIndex);
-				sourceIndex += 8;
-				targetIndex += 1;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 4);
+			length -= count;
+			address += count * 4;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 4, offset += 1) {
+					source.putFloat(index, array[offset]);
+				}
+			} else {
+				source.position(index);
+				source.asFloatBuffer().put(array, offset, count);
 			}
-		} else {
-			source.position(MappedBuffer.valueIndex(address));
-			source.asDoubleBuffer().get(target, offset, length);
-		}
-	}
-
-	@SuppressWarnings ("javadoc")
-	private void putDoubleImpl(final long address, final double[] source, final int offset, final int length) {
-		final MappedByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)];
-		if (length < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
-			final int sourceLimit = offset + length;
-			int sourceIndex = offset, targetIndex = MappedBuffer.valueIndex(address);
-			while (sourceIndex < sourceLimit) {
-				target.putDouble(targetIndex, source[sourceIndex]);
-				sourceIndex += 1;
-				targetIndex += 8;
-			}
-		} else {
-			target.position(MappedBuffer.valueIndex(address));
-			target.asDoubleBuffer().put(source, offset, length);
 		}
 	}
 
@@ -896,13 +768,21 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void getDouble(long address, final double[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 8)) {
-			this.getDoubleImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 8);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 8;
-			length -= MappedBuffer.BUFFER_GUARD / 8;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 8);
+			length -= count;
+			address += count * 8;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 8, offset += 1) {
+					array[offset] = source.getDouble(index);
+				}
+			} else {
+				source.position(index);
+				source.asDoubleBuffer().get(array, offset, count);
+			}
 		}
-		this.getDoubleImpl(address, array, offset, length);
 	}
 
 	/** Diese Methode schreibt den gegebenen {@code double}-Wert an die gegebene Adresse.
@@ -931,13 +811,27 @@ public class MappedBuffer {
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts. */
 	public void putDouble(long address, final double[] array, int offset, int length) {
-		while (length > (MappedBuffer.BUFFER_GUARD / 8)) {
-			this.putDoubleImpl(address, array, offset, MappedBuffer.BUFFER_GUARD / 8);
-			address += MappedBuffer.BUFFER_GUARD;
-			offset += MappedBuffer.BUFFER_GUARD / 8;
-			length -= MappedBuffer.BUFFER_GUARD / 8;
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+			int index = MappedBuffer.valueIndex(address), count = Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 8);
+			length -= count;
+			address += count * 8;
+			if (count < MappedBuffer.BUFFER_OTHER_THRESHOLD) {
+				for (count += offset; offset < count; index += 8, offset += 1) {
+					source.putDouble(index, array[offset]);
+				}
+			} else {
+				source.position(index);
+				source.asDoubleBuffer().put(array, offset, count);
+			}
 		}
-		this.putDoubleImpl(address, array, offset, length);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString() {
+		return Objects.toInvokeString(this, this.file, this.size, this.readonly);
 	}
 
 }

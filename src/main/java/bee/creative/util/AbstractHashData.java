@@ -65,13 +65,13 @@ import bee.creative.iam.IAMMapping;
  * <tr>
  * <td>{@link bee.creative.util.HashSet}</td>
  * <td>32</td>
- * <td>80 + 12 x capacity ( 33 % )</td>
+ * <td>12 x capacity +80 ( 33 % )</td>
  * <td colspan="2">9..12 x capacity + 80 ( 25..33 % )</td>
  * </tr>
  * <tr>
  * <td>{@link bee.creative.util.HashSet2}</td>
  * <td>40</td>
- * <td>16 x capacity + 104( 44 % )</td>
+ * <td>16 x capacity + 104 ( 44 % )</td>
  * <td colspan="2">13..16 x capacity + 104 ( 36..44 % )</td>
  * </tr>
  * </table>
