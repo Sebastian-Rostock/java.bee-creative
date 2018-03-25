@@ -66,14 +66,8 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean contains(final Object item) {
-		return this.hasKeyImpl(item);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public Iterator<GItem> iterator() {
-		return this.newKeysIteratorImpl();
+	public void clear() {
+		this.clearImpl();
 	}
 
 	/** {@inheritDoc} */
@@ -84,26 +78,26 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean remove(final Object item) {
-		return this.popKeyImpl(item);
+	public boolean addAll(final Collection<? extends GItem> items) {
+		return this.newKeysImpl().addAll(items);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean contains(final Object item) {
+		return this.hasKeyImpl(item);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean containsAll(final Collection<?> items) {
-		return Iterators.containsAll(this, items.iterator());
+		return this.newKeysImpl().containsAll(items);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean addAll(final Collection<? extends GItem> items) {
-		return Iterators.addAll(this, items.iterator());
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean retainAll(final Collection<?> items) {
-		return Iterators.retainAll(this.iterator(), items);
+	public boolean remove(final Object item) {
+		return this.popKeyImpl(item);
 	}
 
 	/** {@inheritDoc} */
@@ -114,8 +108,14 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 
 	/** {@inheritDoc} */
 	@Override
-	public void clear() {
-		this.clearImpl();
+	public boolean retainAll(final Collection<?> items) {
+		return this.newKeysImpl().retainAll(items);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Iterator<GItem> iterator() {
+		return this.newKeysIteratorImpl();
 	}
 
 	/** {@inheritDoc} */

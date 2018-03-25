@@ -239,13 +239,47 @@ public abstract class AbstractHashData<GKey, GValue> {
 		}
 
 		@Override
+		public boolean contains(final Object item) {
+			return this.entryData.hasKeyImpl(item);
+		}
+
+		@Override
 		public boolean remove(final Object item) {
 			return this.entryData.popKeyImpl(item);
 		}
 
 		@Override
-		public boolean contains(final Object item) {
-			return this.entryData.hasKeyImpl(item);
+		public boolean removeAll(final Collection<?> items) {
+			final int size = this.size();
+			for (final Object item: items) {
+				this.remove(item);
+			}
+			return size != this.size();
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> items) {
+			// TODO
+			return super.retainAll(items);
+		}
+
+		@Override
+		public int hashCode() {
+			final AbstractHashData<GKey, ?> entryData = this.entryData;
+			int result = 0;
+			for (final KeysIterator<GKey, ?> iter = entryData.newKeysIteratorImpl(); iter.hasNext();) {
+				result += entryData.customHashKey(iter.nextIndex());
+			}
+			return result;
+		}
+
+		@Override
+		public boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof Set)) return false;
+			final Set<?> that = (Set<?>)object;
+			if (this.size() != that.size()) return false;
+			return this.containsAll(that);
 		}
 
 	}
@@ -293,13 +327,28 @@ public abstract class AbstractHashData<GKey, GValue> {
 		}
 
 		@Override
+		public boolean contains(final Object o) {
+			return this.entryData.hasValueImpl(o);
+		}
+
+		@Override
 		public boolean remove(final Object o) {
 			return this.entryData.popValueImpl(o);
 		}
 
 		@Override
-		public boolean contains(final Object o) {
-			return this.entryData.hasValueImpl(o);
+		public boolean removeAll(final Collection<?> items) {
+			final int size = this.size();
+			for (final Object item: items) {
+				this.remove(item);
+			}
+			return size != this.size();
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> items) {
+			// TODO
+			return super.retainAll(items);
 		}
 
 	}
@@ -351,6 +400,21 @@ public abstract class AbstractHashData<GKey, GValue> {
 			if (!(object instanceof Entry)) return false;
 			final Entry<?, ?> entry = (Entry<?, ?>)object;
 			return this.entryData.popEntryImpl(entry.getKey(), entry.getValue());
+		}
+
+		@Override
+		public boolean removeAll(final Collection<?> items) {
+			final int size = this.size();
+			for (final Object item: items) {
+				this.remove(item);
+			}
+			return size != this.size();
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> items) {
+			// TODO
+			return super.retainAll(items);
 		}
 
 		@Override
