@@ -53,7 +53,7 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 
 	{}
 
-	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] items = AbstractHashData.EMPTY_OBJECTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */

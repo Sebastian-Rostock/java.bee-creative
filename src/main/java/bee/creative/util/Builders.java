@@ -25,7 +25,6 @@ public class Builders {
 
 	/** Diese Klasse implementiert einen abstrakten Konfigurator zur Erzeugung eines Datensatzes.
 	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 	public static abstract class BaseBuilder<GValue, GThis> implements Builder<GValue> {
@@ -37,21 +36,34 @@ public class Builders {
 
 	}
 
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für einen Wert.
+	/** Diese Klasse implementiert einen abstrakten Konfigurator das auf Feld {@link #result} gespeicherte Objekt.
 	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GResult> Typ des Werts.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseValueBuilder<GResult, GThis> extends BaseBuilder<GResult, GThis> implements Iterable<GResult> {
+	public static abstract class BaseBuilder2<GResult, GThis> extends BaseBuilder<GResult, GThis> {
 
 		/** Dieses Feld speichert den Wert. */
 		protected GResult result;
 
-		/** Dieser Konstruktor initialisiert den Wert mit {@code null}. */
-		public BaseValueBuilder() {
+		/** {@inheritDoc} */
+		@Override
+		public final GResult build() throws IllegalStateException {
+			return this.result;
 		}
 
-		{}
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return Objects.toString(true, this.result);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen abstrakten Konfigurator für einen Wert. Der {@link #iterator()} liefert diesen, sofern er nicht {@code null} ist.
+	 *
+	 * @param <GResult> Typ des Werts.
+	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
+	public static abstract class BaseValueBuilder<GResult, GThis> extends BaseBuilder2<GResult, GThis> implements Iterable<GResult> {
 
 		/** Diese Methode setzt den Wert und gibt {@code this} zurück.
 		 *
@@ -85,36 +97,20 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		public final GResult build() throws IllegalStateException {
-			return this.result;
-		}
-
-		/** {@inheritDoc} */
-		@Override
 		public final Iterator<GResult> iterator() {
 			final GResult result = this.result;
 			if (result == null) return Iterators.emptyIterator();
 			return Iterators.itemIterator(result);
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toString(true, this.result);
-		}
-
 	}
 
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine Sammlung von Elementen.
+	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link Collection}.
 	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
-	 * @param <GResult> Typ der Sammlung.
+	 * @param <GResult> Typ der {@link Collection}.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSetBuilder<GItem, GResult extends Collection<GItem>, GThis> extends BaseBuilder<GResult, GThis> implements Iterable<GItem> {
-
-		/** Dieses Feld speichert die Sammlung. */
-		protected GResult result;
+	public static abstract class BaseSetBuilder<GItem, GResult extends Collection<GItem>, GThis> extends BaseBuilder2<GResult, GThis> implements Iterable<GItem> {
 
 		/** Dieser Konstruktor initialisiert die interne Sammlung.
 		 *
@@ -224,39 +220,23 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		public final GResult build() throws IllegalStateException {
-			return this.result;
-		}
-
-		/** {@inheritDoc} */
-		@Override
 		public final Iterator<GItem> iterator() {
 			return this.result.iterator();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toString(true, this.result);
 		}
 
 	}
 
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link Map}.
 	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param <GResult> Typ der {@link Map}.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseMapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>, GThis> extends BaseBuilder<GResult, GThis>
+	public static abstract class BaseMapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>, GThis> extends BaseBuilder2<GResult, GThis>
 		implements Iterable<Entry<GKey, GValue>> {
 
 		/** Dieses Feld speichert den über {@link #forKey(Object)} gewählten Schlüssel, der in {@link #useValue(Object)} eingesetzt wird. */
 		protected GKey key;
-
-		/** Dieses Feld speichert die interne {@link Map}. */
-		protected GResult result;
 
 		/** Dieser Konstruktor initialisiert die interne {@link Map}.
 		 *
@@ -573,32 +553,19 @@ public class Builders {
 
 		{}
 
-		/** Diese Methode gibt die intere Abbildung zurück. */
-		@Override
-		public final GResult build() throws IllegalStateException {
-			return this.result;
-		}
-
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<Entry<GKey, GValue>> iterator() {
 			return this.result.entrySet().iterator();
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		public final String toString() {
-			return Objects.toString(true, this.result);
-		}
-
 	}
 
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link HashSet}.
 	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSetData<GItem, GThis> extends BaseSetBuilder<GItem, Set<GItem>, GThis> {
+	public static abstract class BaseSetData<GItem, GThis> extends BaseSetBuilder<GItem, HashSet<GItem>, GThis> {
 
 		/** Dieser Konstruktor initialisiert das interne {@link HashSet}. */
 		public BaseSetData() {
@@ -609,11 +576,10 @@ public class Builders {
 
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link HashMap}.
 	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseMapData<GKey, GValue, GThis> extends BaseMapBuilder<GKey, GValue, Map<GKey, GValue>, GThis> {
+	public static abstract class BaseMapData<GKey, GValue, GThis> extends BaseMapBuilder<GKey, GValue, HashMap<GKey, GValue>, GThis> {
 
 		/** Dieser Konstruktor initialisiert die interne {@link HashMap}. */
 		public BaseMapData() {
@@ -622,9 +588,8 @@ public class Builders {
 
 	}
 
-	/** Diese Klasse implementiert . Diese Schnittstelle definiert .
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link Map}.
 	 *
-	 * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param <GResult> Typ der {@link Map}. */
@@ -743,7 +708,6 @@ public class Builders {
 
 	/** Diese Klasse implementiert einen Konfigurator für ein {@link Set}.
 	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GResult> Typ des {@link Set}. */
 	public static class SetBuilder<GItem, GResult extends Set<GItem>> extends BaseSetBuilder<GItem, GResult, SetBuilder<GItem, GResult>> {
@@ -870,7 +834,6 @@ public class Builders {
 
 	/** Diese Klasse implementiert einen Konfigurator für eine {@link List}.
 	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GResult> Typ der {@link List}. */
 	public static class ListBuilder<GItem, GResult extends List<GItem>> extends BaseSetBuilder<GItem, GResult, ListBuilder<GItem, GResult>> {
@@ -886,7 +849,7 @@ public class Builders {
 			return new ListBuilder<>(result);
 		}
 
-		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link ArrayList} mit Steuwertpuffer zurück.
+		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link ArrayList} zurück.
 		 *
 		 * @param <GItem> Typ der Elemente.
 		 * @return {@link ListBuilder} einer {@link ArrayList}. */
@@ -986,47 +949,91 @@ public class Builders {
 
 	}
 
-	@SuppressWarnings ("javadoc") // TODO
-	public static class ComparatorBuilder<GItem, GResult extends Comparator<GItem>> extends BaseBuilder<GResult, ComparatorBuilder<GItem, GResult>> {
+	/** Diese Klasse implementiert einen Konfigurator für einen {@link Comparator}.
+	 *
+	 * @param <GItem> Typ der verglichenen Elemente.
+	 * @param <GResult> Typ des {@link Comparator}. */
+	public static class ComparatorBuilder<GItem, GResult extends Comparator<GItem>> extends BaseBuilder2<GResult, ComparatorBuilder<GItem, GResult>> {
 
+		/** Diese Methode gibt einen {@link ComparatorBuilder} zum gegebenen {@link Comparator} zurück.
+		 *
+		 * @param <GItem> Typ der verglichenen Elemente.
+		 * @param <GResult> Typ des {@link Comparator}.
+		 * @param result {@link Comparator}.
+		 * @return {@link ComparatorBuilder}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
 		public static final <GItem, GResult extends Comparator<GItem>> ComparatorBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
 			return new ComparatorBuilder<>(result);
 		}
 
+		/** Diese Methode gibt einen {@link ComparatorBuilder} zur {@link Comparators#naturalComparator() natürlichen Ordnung} zurück.
+		 *
+		 * @param <GItem> Typ der {@link Comparable} Elemente.
+		 * @return {@link ComparatorBuilder}. */
 		public static final <GItem extends Comparable<? super GItem>> ComparatorBuilder<GItem, Comparator<GItem>> fromNatural() {
 			return ComparatorBuilder.from(Comparators.<GItem>naturalComparator());
 		}
 
 		{}
 
-		protected GResult result;
-
-		protected ComparatorBuilder(final GResult result) throws NullPointerException {
+		/** Dieser Konstruktor initialisiert den internen {@link Comparator}.
+		 *
+		 * @param result interner {@link Comparator}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		public ComparatorBuilder(final GResult result) throws NullPointerException {
 			this.result = Objects.assertNotNull(result);
 		}
 
 		{}
 
+		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum {@code null} vergleichenden {@link #build() Comparator} zurück.
+		 *
+		 * @see Comparators#defaultComparator(Comparator)
+		 * @return neuer {@link ComparatorBuilder} zu {@code defaultComparator}. */
 		public ComparatorBuilder<GItem, Comparator<GItem>> toDefault() {
 			return ComparatorBuilder.from(Comparators.defaultComparator(this.result));
 		}
 
+		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum umkehrenden {@link #build() Comparator} zurück.
+		 *
+		 * @see Comparators#reverseComparator(Comparator)
+		 * @return neuer {@link ComparatorBuilder} zu {@code reverseComparator}. */
 		public ComparatorBuilder<GItem, Comparator<GItem>> toReverse() {
 			return ComparatorBuilder.from(Comparators.reverseComparator(this.result));
 		}
 
+		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum iterierenden {@link #build() Comparator} zurück.
+		 *
+		 * @see Comparators#iterableComparator(Comparator)
+		 * @return neuer {@link ComparatorBuilder} zu {@code iterableComparator}. */
 		public ComparatorBuilder<Iterable<? extends GItem>, Comparator<Iterable<? extends GItem>>> toIterable() {
 			return ComparatorBuilder.from(Comparators.iterableComparator(this.result));
 		}
 
+		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum verkettenden {@link #build() Comparator} zurück.
+		 *
+		 * @see Comparators#chainedComparator(Comparator, Comparator)
+		 * @param comparator zweiter {@link Comparator}, das nach dem {@link #build() aktuell konfigurierten} angewandt wird.
+		 * @return neuer {@link ComparatorBuilder} zu {@code chainedComparator}. */
 		public ComparatorBuilder<GItem, Comparator<GItem>> toChained(final Comparator<? super GItem> comparator) {
 			return ComparatorBuilder.from(Comparators.chainedComparator(this.result, comparator));
 		}
 
+		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum navigierenden {@link #build() Comparator} zurück.
+		 *
+		 * @see Comparators#navigatedComparator(Getter, Comparator)
+		 * @param <GItem2> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparator}.
+		 * @param navigator {@link Getter} zur Navigation.
+		 * @return neuer {@link ComparatorBuilder} zu {@code navigatedComparator}. */
 		public <GItem2> ComparatorBuilder<GItem2, Comparator<GItem2>> toNavigated(final Getter<? super GItem2, ? extends GItem> navigator) {
 			return ComparatorBuilder.from(Comparators.navigatedComparator(navigator, this.result));
 		}
 
+		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum gegebenen Element sowie dem {@link #build() aktuell konfigurierten Comparator} zurück.
+		 *
+		 * @see Comparables#itemComparable(Getter, Comparator)
+		 * @param item Element, welches über den {@link #build() aktuellen Comparator} mit den Eingabe des erzeugten {@link Comparable} vergleichen wird.
+		 * @return neuer {@link ComparableBuilder} zu {@code itemComparable}. */
 		public ComparableBuilder<GItem, Comparable<GItem>> toComparable(final GItem item) {
 			return ComparableBuilder.from(Comparables.itemComparable(item, this.result));
 		}
@@ -1039,53 +1046,76 @@ public class Builders {
 			return this;
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		public GResult build() throws IllegalStateException {
-			return this.result;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toString(true, this.result);
-		}
-
 	}
 
-	@SuppressWarnings ("javadoc") // TODO
-	public static class ComparableBuilder<GItem, GResult extends Comparable<GItem>> extends BaseBuilder<GResult, ComparableBuilder<GItem, GResult>> {
+	/** Diese Klasse implementiert einen Konfigurator für einen {@link Comparable}.
+	 *
+	 * @param <GItem> Typ der verglichenen Elemente.
+	 * @param <GResult> Typ des {@link Comparable}. */
+	public static class ComparableBuilder<GItem, GResult extends Comparable<GItem>> extends BaseBuilder2<GResult, ComparableBuilder<GItem, GResult>> {
 
+		/** Diese Methode gibt einen {@link ComparableBuilder} zum gegebenen {@link Comparable} zurück.
+		 *
+		 * @param <GItem> Typ der verglichenen Elemente.
+		 * @param <GResult> Typ des {@link Comparable}.
+		 * @param result {@link Comparable}.
+		 * @return {@link ComparableBuilder}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
 		public static final <GItem, GResult extends Comparable<GItem>> ComparableBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
 			return new ComparableBuilder<>(result);
 		}
 
 		{}
 
-		protected GResult result;
-
+		/** Dieser Konstruktor initialisiert das interne {@link Comparable}.
+		 *
+		 * @param result internes {@link Comparable}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
 		protected ComparableBuilder(final GResult result) throws NullPointerException {
 			this.result = Objects.assertNotNull(result);
 		}
 
 		{}
 
+		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum {@code null} vergleichenden {@link #build() Comparable} zurück.
+		 *
+		 * @see Comparables#defaultComparable(Comparable)
+		 * @return neuer {@link ComparableBuilder} zu {@code defaultComparable}. */
 		public ComparableBuilder<GItem, Comparable<GItem>> toDefault() {
 			return ComparableBuilder.from(Comparables.defaultComparable(this.result));
 		}
 
+		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum umkehrenden {@link #build() Comparable} zurück.
+		 *
+		 * @see Comparables#reverseComparable(Comparable)
+		 * @return neuer {@link ComparableBuilder} zu {@code reverseComparable}. */
 		public ComparableBuilder<GItem, Comparable<GItem>> toReverse() {
 			return ComparableBuilder.from(Comparables.reverseComparable(this.result));
 		}
 
+		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum iterierenden {@link #build() Comparable} zurück.
+		 *
+		 * @see Comparables#iterableComparable(Comparable)
+		 * @return neuer {@link ComparableBuilder} zu {@code iterableComparable}. */
 		public ComparableBuilder<Iterable<? extends GItem>, Comparable<Iterable<? extends GItem>>> toIterable() {
 			return ComparableBuilder.from(Comparables.iterableComparable(this.result));
 		}
 
-		public ComparableBuilder<GItem, Comparable<GItem>> toChained(final Comparable<? super GItem> comparator) {
-			return ComparableBuilder.from(Comparables.chainedComparable(this.result, comparator));
+		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum verkettenden {@link #build() Comparable} zurück.
+		 *
+		 * @see Comparables#chainedComparable(Comparable, Comparable)
+		 * @param comparable zweites {@link Comparable}, das nach dem {@link #build() aktuell konfigurierten} angewandt wird.
+		 * @return neuer {@link ComparableBuilder} zu {@code chainedComparable}. */
+		public ComparableBuilder<GItem, Comparable<GItem>> toChained(final Comparable<? super GItem> comparable) {
+			return ComparableBuilder.from(Comparables.chainedComparable(this.result, comparable));
 		}
 
+		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum navigierenden {@link #build() Comparable} zurück.
+		 *
+		 * @see Comparables#navigatedComparable(Getter, Comparable)
+		 * @param <GItem2> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparable}.
+		 * @param navigator {@link Getter} zur Navigation.
+		 * @return neuer {@link ComparableBuilder} zu {@code iterableComparable}. */
 		public <GItem2> ComparableBuilder<GItem2, Comparable<GItem2>> toNavigated(final Getter<? super GItem2, ? extends GItem> navigator) {
 			return ComparableBuilder.from(Comparables.navigatedComparable(navigator, this.result));
 		}
@@ -1096,18 +1126,6 @@ public class Builders {
 		@Override
 		protected ComparableBuilder<GItem, GResult> customThis() {
 			return this;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public GResult build() throws IllegalStateException {
-			return this.result;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toString(true, this.result);
 		}
 
 	}
