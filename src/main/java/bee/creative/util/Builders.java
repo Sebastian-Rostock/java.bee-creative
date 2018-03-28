@@ -778,6 +778,16 @@ public class Builders {
 			return SetBuilder.from(bee.creative.util.Collections.unionSet(this.result, items));
 		}
 
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für das Kartesische Produkt dieser {@link #build() Menge} und der gegebenen Menge zurück.
+		 *
+		 * @see bee.creative.util.Collections#cartesianSet(Set, Set)
+		 * @param <GItem2> Typ der Elemente in der zweiten Menge.
+		 * @param items zweite Menge.
+		 * @return neuer {@link SetBuilder} zum {@code cartesianSet}. */
+		public <GItem2> SetBuilder<Entry<GItem, GItem2>, Set<Entry<GItem, GItem2>>> toCartesian(final Set<? extends GItem2> items) {
+			return SetBuilder.from(bee.creative.util.Collections.cartesianSet(this.result, items));
+		}
+
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Schnittmenge dieser {@link #build() Menge} und der gegebenen Menge zurück.
 		 *
 		 * @see bee.creative.util.Collections#intersectionSet(Set, Set)
@@ -1127,6 +1137,25 @@ public class Builders {
 		protected ComparableBuilder<GItem, GResult> customThis() {
 			return this;
 		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static class IterableBuilder<GItem, GResult extends Iterable<GItem>> extends BaseBuilder2<GResult, IterableBuilder<GItem, GResult>> {
+
+		@Override
+		protected IterableBuilder<GItem, GResult> customThis() {
+			return this;
+		}
+
+		// toSet
+		// toList
+		// toUnique
+		// toChained
+		// toLimited
+		// toFiltered
+		// toNavigated
+		// toUnmodifiable
 
 	}
 

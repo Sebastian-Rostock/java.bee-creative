@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /** Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}, {@link Map}, {@link List} und {@link Collection}.
@@ -30,7 +31,25 @@ public class Collections {
 
 			@Override
 			public int size() {
-				return Iterables.size(this);
+				final int size1 = items1.size(), size2 = items2.size();
+				int result = size1 + size2;
+				if (size1 < size2) {
+					for (final Object item: items1)
+						if (items2.contains(item)) {
+							result--;
+						}
+				} else {
+					for (final Object item: items2)
+						if (items1.contains(item)) {
+							result--;
+						}
+				}
+				return result;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return items1.isEmpty() && items2.isEmpty();
 			}
 
 			@Override
@@ -44,6 +63,74 @@ public class Collections {
 			@Override
 			public boolean contains(final Object item) {
 				return items1.contains(item) || items2.contains(item);
+			}
+
+		};
+	}
+
+	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf das Kartesische Produkt der gegebenen {@link Set} zurück.
+	 *
+	 * @param <GKey> Typ der Elemente der Schlüsselmenge.
+	 * @param <GValue> Typ der Elemente der Wertmenge.
+	 * @param keys Schlüsselmenge.
+	 * @param values Wertmenge.
+	 * @return {@code cartesian}-{@link Set}.
+	 * @throws NullPointerException Wenn {@code keys} bzw. {@code values} {@code null} ist. */
+	public static <GKey, GValue> Set<Entry<GKey, GValue>> cartesianSet(final Set<? extends GKey> keys, final Set<? extends GValue> values)
+		throws NullPointerException {
+		Objects.assertNotNull(keys);
+		Objects.assertNotNull(values);
+		return new AbstractSet<Entry<GKey, GValue>>() {
+
+			@Override
+			public int size() {
+				return keys.size() * values.size();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return keys.isEmpty() || values.isEmpty();
+			}
+
+			@Override
+			public Iterator<Entry<GKey, GValue>> iterator() {
+				if (keys.isEmpty() || values.isEmpty()) return Iterators.emptyIterator();
+				return new Iterator<Entry<GKey, GValue>>() {
+
+					GKey nextKey;
+
+					Iterator<? extends GKey> keyIter = keys.iterator();
+
+					Iterator<? extends GValue> valueIter = Iterators.emptyIterator();
+
+					@Override
+					public boolean hasNext() {
+						if (this.valueIter.hasNext()) return true;
+						if (!this.keyIter.hasNext()) return false;
+						this.nextKey = this.keyIter.next();
+						this.valueIter = values.iterator();
+						return this.valueIter.hasNext();
+					}
+
+					@Override
+					public Entry<GKey, GValue> next() {
+						final GValue nextValue = this.valueIter.next();
+						return new AbstractMap.SimpleImmutableEntry<>(this.nextKey, nextValue);
+					}
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+
+				};
+			}
+
+			@Override
+			public boolean contains(final Object item) {
+				if (!(item instanceof Entry<?, ?>)) return false;
+				final Entry<?, ?> entry = (Entry<?, ?>)item;
+				return keys.contains(entry.getKey()) && values.contains(entry.getValue());
 			}
 
 		};
@@ -63,7 +150,25 @@ public class Collections {
 
 			@Override
 			public int size() {
-				return Iterables.size(this);
+				final int size1 = items1.size(), size2 = items2.size();
+				int result = 0;
+				if (size1 < size2) {
+					for (final Object item: items1)
+						if (items2.contains(item)) {
+							result++;
+						}
+				} else {
+					for (final Object item: items2)
+						if (items1.contains(item)) {
+							result++;
+						}
+				}
+				return result;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return items1.isEmpty() || items2.isEmpty() || !this.iterator().hasNext();
 			}
 
 			@Override
