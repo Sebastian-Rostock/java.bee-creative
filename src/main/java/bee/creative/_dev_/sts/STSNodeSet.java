@@ -6,11 +6,11 @@ import bee.creative.array.IntegerArraySection;
 /** Diese Klasse implementiert eine abstract Menge von {@link STSNode Knoten}, über welche in aufsteigender Ordnung iteriert werden kann.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+@SuppressWarnings ("javadoc")
 public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	/** Diese Klasse implementiert die Menge der Knoten zu einer gegebenen Positionsliste.<br>
 	 * <b>Die Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b> */
-	@SuppressWarnings ("javadoc")
 	protected static class ArrayNodeSet extends STSNodeSet {
 
 		final IntegerArraySection items;
@@ -40,7 +40,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	}
 
 	/** Diese Klasse implementiert die Vereinigungsmenge zweier gegebener Knotenmengen. */
-	@SuppressWarnings ("javadoc")
 	protected static class UnionNodeSet extends STSNodeSet {
 
 		final STSNodeSet items1;
@@ -73,7 +72,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	}
 
 	/** Diese Klasse implementiert die Menge der Knoten zu einer Positionsliste, die aus einem ersten Element und einer Elementanzahl rekonstruiert wird. */
-	@SuppressWarnings ("javadoc")
 	protected static class SectionNodeSet extends STSNodeSet {
 
 		final int index;
@@ -106,7 +104,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	}
 
 	/** Diese Klasse implementiert die Schnittmenge zweier gegebener Knotenmengen. */
-	@SuppressWarnings ("javadoc")
 	protected static class IntersectionNodeSet extends STSNodeSet {
 
 		final STSNodeSet items1;
@@ -140,7 +137,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	{}
 
-	@SuppressWarnings ("javadoc")
 	protected STSNodeSet(final STSStore store) {
 		super(store);
 	}
@@ -186,7 +182,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 			public STSNode next() {
 				final STSNode result = this.result;
 				final int next = index.next();
-				this.result = next != Integer.MAX_VALUE ? STSNodeSet.this.store.customGetNode(next) : null;
+				this.result = next != Integer.MAX_VALUE ? STSNodeSet.this.store.getNodeImpl(next) : null;
 				return result;
 			}
 

@@ -19,21 +19,21 @@ public final class STSEdge extends STSItem implements Comparable<STSEdge> {
 	 *
 	 * @return Objekt. */
 	public STSNode object() {
-		return this.store.customGetNode(this.store.customGetEdgeObject(this.index));
+		return this.store.getNodeImpl(this.store.customGetEdgeObject(this.index));
 	}
 
 	/** Diese Methode gibt {@link STSNode Knoten} zurück, der für das Subjekt bzw. den Beginn der Kante steht.
 	 *
 	 * @return Subjekt. */
 	public STSNode subject() {
-		return this.store.customGetNode(this.store.customGetEdgeSubject(this.index));
+		return this.store.getNodeImpl(this.store.customGetEdgeSubject(this.index));
 	}
 
 	/** Diese Methode gibt {@link STSNode Knoten} zurück, der für das Prädikat bzw. die Bedeutung der Kante steht.
 	 *
 	 * @return Prädikat. */
 	public STSNode predicate() {
-		return this.store.customGetNode(this.store.customGetEdgePredicate(this.index));
+		return this.store.getNodeImpl(this.store.customGetEdgePredicate(this.index));
 	}
 
 	{}

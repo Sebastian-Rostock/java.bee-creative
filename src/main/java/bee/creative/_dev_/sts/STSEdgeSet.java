@@ -6,11 +6,11 @@ import bee.creative.array.IntegerArraySection;
 /** Diese Klasse implementiert eine abstract Menge von {@link STSEdge Kanten}, über welche in aufsteigender Ordnung iteriert werden kann.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+@SuppressWarnings ("javadoc")
 public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
 	/** Diese Klasse implementiert die Menge der Kanten zu einer gegebenen Positionsliste.<br>
 	 * <b>Die Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b> */
-	@SuppressWarnings ("javadoc")
 	protected static class ArrayEdgeSet extends STSEdgeSet {
 
 		final IntegerArraySection items;
@@ -40,7 +40,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 	}
 
 	/** Diese Klasse implementiert die Vereinigungsmenge zweier gegebener Kantenmengen. */
-	@SuppressWarnings ("javadoc")
 	protected static class UnionEdgeSet extends STSEdgeSet {
 
 		final STSEdgeSet items1;
@@ -73,7 +72,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 	}
 
 	/** Diese Klasse implementiert die Menge der Kanten zu einer Positionsliste, die aus einem ersten Element und einer Elementanzahl rekonstruiert wird. */
-	@SuppressWarnings ("javadoc")
 	protected static class SectionEdgeSet extends STSEdgeSet {
 
 		final int index;
@@ -106,7 +104,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 	}
 
 	/** Diese Klasse implementiert die Schnittmenge zweier gegebener Kantenmengen. */
-	@SuppressWarnings ("javadoc")
 	protected static class IntersectionEdgeSet extends STSEdgeSet {
 
 		final STSEdgeSet items1;
@@ -140,7 +137,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
 	{}
 
-	@SuppressWarnings ("javadoc")
 	protected STSEdgeSet(final STSStore store) {
 		super(store);
 	}
@@ -186,7 +182,7 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 			public STSEdge next() {
 				final STSEdge result = this.result;
 				final int next = index.next();
-				this.result = next != Integer.MAX_VALUE ? STSEdgeSet.this.store.customGetEdge(next) : null;
+				this.result = next != Integer.MAX_VALUE ? STSEdgeSet.this.store.getEdgeImpl(next) : null;
 				return result;
 			}
 

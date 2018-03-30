@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import bee.creative._dev_.sts.STSEdgeSet.ArrayEdgeSet;
 import bee.creative._dev_.sts.STSEdgeSet.SectionEdgeSet;
+import bee.creative._dev_.sts.STSItemSet.ItemIterator;
 import bee.creative._dev_.sts.STSNodeSet.ArrayNodeSet;
 import bee.creative._dev_.sts.STSNodeSet.SectionNodeSet;
 import bee.creative.array.CompactIntegerArray;
@@ -80,7 +81,7 @@ public abstract class STSStore {
 
 	{}
 
-	protected final IntegerArraySection toItemSetImpl(final Iterator<? extends STSItem> items) throws NullPointerException {
+	protected final IntegerArraySection toArrayImpl(final Iterator<? extends STSItem> items) throws NullPointerException {
 		final CompactIntegerArray result = new CompactIntegerArray();
 		result.setAlignment(0);
 		while (items.hasNext()) {
@@ -89,75 +90,126 @@ public abstract class STSStore {
 				result.add(item.index);
 			}
 		}
-		return this.cleanupArray(result);
-	}
-
-	protected final STSNodeSet toNodeSetImpl(final Iterator<? extends STSItem> nodes) throws NullPointerException {
-		return new ArrayNodeSet(this, this.toItemSetImpl(nodes));
+		final int[] array = result.array();
+		final int startIndex = result.startIndex(), finalIndex = result.finalIndex();
+		Arrays.sort(array, startIndex, finalIndex);
+		int sourceIndex = startIndex, targetIndex = startIndex, target = -1;
+		while (sourceIndex < finalIndex) {
+			final int source = array[sourceIndex];
+			if (source != target) {
+				array[targetIndex++] = target = source;
+			}
+			sourceIndex++;
+		}
+		return IntegerArraySection.from(Arrays.copyOfRange(array, startIndex, targetIndex));
 	}
 
 	protected final STSEdgeSet toEdgeSetImpl(final Iterator<? extends STSItem> edges) throws NullPointerException {
-		return new ArrayEdgeSet(this, this.toItemSetImpl(edges));
+		return new ArrayEdgeSet(this, this.toArrayImpl(edges));
 	}
 
-	{}
-	{}
-	{}
-	{}
-	{}
-	{}
-	{}
-	{}
-	{}
-	{}
-	{}
-	{}
-	{}
+	protected final STSNodeSet toNodeSetImpl(final Iterator<? extends STSItem> nodes) throws NullPointerException {
+		return new ArrayNodeSet(this, this.toArrayImpl(nodes));
+	}
 
-	protected final STSEdgeSet getEdgeSetImpl(final Iterator<? extends STSEdge> edges) throws NullPointerException {
-		return this.toEdgeSetImpl(new STSItemSet.ItemIterator() {
+	protected final STSNodeSet getNodeSetImpl(final STSNode edge) {
+		if (edge == null) return this.emptyNodeSet;
+		return new SectionNodeSet(this, edge.index, 1);
+	}
+
+	protected final STSNodeSet getNodeSetImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
+		return this.toNodeSetImpl(new ItemIterator() {
 
 			@Override
 			public STSItem next() {
-				return STSStore.this.getEdge(edges.next());
+				return STSStore.this.getNode(nodes.next());
 			}
 
 			@Override
 			public boolean hasNext() {
-				return edges.hasNext();
+				return nodes.hasNext();
 			}
 
 		});
 	}
 
-	protected final STSEdgeSet putEdgeSetImpl(final Iterator<? extends STSEdge> edges) throws NullPointerException {
-		return this.toEdgeSetImpl(new STSItemSet.ItemIterator() {
+	protected final STSNodeSet getNodeSetImpl(final Iterator<? extends String> namespaces, final Iterator<? extends String> localnames)
+		throws NullPointerException {
+		return this.toNodeSetImpl(new ItemIterator() {
 
 			@Override
 			public STSItem next() {
-				return STSStore.this.putEdge(edges.next());
+				return STSStore.this.getNode(namespaces.next(), localnames.next());
 			}
 
 			@Override
 			public boolean hasNext() {
-				return edges.hasNext();
+				return namespaces.hasNext() && localnames.hasNext();
 			}
 
 		});
 	}
+
+	protected final STSNodeSet putNodeSetImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
+		return this.toNodeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.putNode(nodes.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return nodes.hasNext();
+			}
+
+		});
+	}
+
+	protected final STSNodeSet putNodeSetImpl(final Iterator<? extends String> namespaces, final Iterator<? extends String> localnames)
+		throws NullPointerException {
+		return this.toNodeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.putNode(namespaces.next(), localnames.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return namespaces.hasNext() && localnames.hasNext();
+			}
+
+		});
+	}
+
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
 
 	public STSEdge getEdge(final STSEdge edge) throws NullPointerException {
-		return this.contains(edge) ? edge : this.getEdge(edge.subject(), edge.predicate(), edge.object());
+		if (this.contains(edge)) return edge;
+		return this.getEdge(edge.subject(), edge.predicate(), edge.object());
 	}
 
 	public STSEdge getEdge(final STSNode subject, final STSNode predicate, final STSNode object) throws NullPointerException {
-		final STSNode subjectNode = this.getNode(subject);
-		if (subjectNode == null) return null;
-		final STSNode predicateNode = this.getNode(predicate);
-		if (predicateNode == null) return null;
-		final STSNode objectNode = this.getNode(object);
-		if (objectNode == null) return null;
+		final STSNode subjectNode = this.getNode(subject), predicateNode = this.getNode(predicate), objectNode = this.getNode(object);
+		if ((subjectNode == null) || (predicateNode == null) || (objectNode == null)) return null;
 		return this.customGetEdge(subjectNode.index, predicateNode.index, objectNode.index);
+	}
+
+	protected final STSEdge getEdgeImpl(final int index) {
+		return new STSEdge(this, index);
 	}
 
 	/** Diese Methode gibt die {@link STSEdgeSet Menge aller verwalteten Kanten} zurück.
@@ -178,16 +230,106 @@ public abstract class STSStore {
 	}
 
 	public STSEdgeSet getEdgeSet(final List<? extends STSNode> subjects, final List<? extends STSNode> predicates, final List<? extends STSNode> objects)
-		throws NullPointerException {
-
-		return null;
+		throws NullPointerException, IllegalArgumentException {
+		if ((subjects.size() != predicates.size()) || (predicates.size() != objects.size())) throw new IllegalArgumentException();
+		return this.getEdgeSetImpl(subjects.iterator(), predicates.iterator(), objects.iterator());
 	}
 
-	public abstract STSEdge putEdge(STSEdge edge);
+	protected final STSEdgeSet getEdgeSetImpl(final STSEdge edge) {
+		if (edge == null) return this.emptyEdgeSet;
+		return new SectionEdgeSet(this, edge.index, 1);
+	}
+
+	/** Diese Methode implementiert {@link #getEdgeSet(Iterable)}. */
+	protected final STSEdgeSet getEdgeSetImpl(final Iterator<? extends STSEdge> edges) throws NullPointerException {
+		return this.toEdgeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.getEdge(edges.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return edges.hasNext();
+			}
+
+		});
+	}
+
+	/** Diese Methode implementiert {@link #getEdgeSet(List, List, List)}. */
+	protected final STSEdgeSet getEdgeSetImpl(final Iterator<? extends STSNode> subjects, final Iterator<? extends STSNode> predicates,
+		final Iterator<? extends STSNode> objects) throws NullPointerException {
+		return this.toEdgeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.getEdge(subjects.next(), predicates.next(), objects.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return subjects.hasNext() && predicates.hasNext() && objects.hasNext();
+			}
+
+		});
+	}
+
+	public STSEdge putEdge(final STSEdge edge) throws NullPointerException {
+		if (this.contains(edge)) return edge;
+		return this.putEdge(edge.subject(), edge.predicate(), edge.object());
+	}
 
 	public abstract STSEdge putEdge(STSNode s, STSNode p, STSNode o);
 
-	public abstract STSEdge[] putEdges(STSNode... edges);
+	public STSEdgeSet putEdgeSet(final STSEdgeSet edges) throws NullPointerException {
+		if (this.contains(edges)) return edges;
+		return this.putEdgeSetImpl(edges.iterator());
+	}
+
+	public STSEdgeSet putEdgeSet(final Iterable<? extends STSEdge> edges) throws NullPointerException {
+		if (edges instanceof STSEdgeSet) return this.putEdgeSet((STSEdgeSet)edges);
+		return this.putEdgeSetImpl(edges.iterator());
+	}
+
+	public STSEdgeSet putEdgeSet(final List<? extends STSNode> subjects, final List<? extends STSNode> predicates, final List<? extends STSNode> objects)
+		throws NullPointerException, IllegalArgumentException {
+		if ((subjects.size() != predicates.size()) || (predicates.size() != objects.size())) throw new IllegalArgumentException();
+		return this.putEdgeSetImpl(subjects.iterator(), predicates.iterator(), objects.iterator());
+	}
+
+	protected final STSEdgeSet putEdgeSetImpl(final Iterator<? extends STSEdge> edges) throws NullPointerException {
+		return this.toEdgeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.putEdge(edges.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return edges.hasNext();
+			}
+
+		});
+	}
+
+	protected final STSEdgeSet putEdgeSetImpl(final Iterator<? extends STSNode> subjects, final Iterator<? extends STSNode> predicates,
+		final Iterator<? extends STSNode> objects) throws NullPointerException {
+		return this.toEdgeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.putEdge(subjects.next(), predicates.next(), objects.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return subjects.hasNext() && predicates.hasNext() && objects.hasNext();
+			}
+
+		});
+	}
 
 	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} zurück, in denen die gegebenen Subjekte, Prädikate bzw. Objekte enthalten sind. Für
 	 * uneingeschränkte Komponenten ist {@code null} anzugeben.
@@ -221,70 +363,12 @@ public abstract class STSStore {
 
 	{}
 
-	protected final STSNodeSet getNodeSetImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
-		return this.toNodeSetImpl(new STSItemSet.ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.getNode(nodes.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return nodes.hasNext();
-			}
-
-		});
-	}
-
-	protected final STSNodeSet getNodeSetImpl(final Iterator<? extends String> namespaces, final Iterator<? extends String> localnames)
-		throws NullPointerException {
-		return this.toNodeSetImpl(new STSItemSet.ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.getNode(namespaces.next(), localnames.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return namespaces.hasNext() && localnames.hasNext();
-			}
-
-		});
-	}
-
-	protected final STSNodeSet putNodeSetImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
-		return this.toNodeSetImpl(new STSItemSet.ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.putNode(nodes.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return nodes.hasNext();
-			}
-
-		});
-	}
-
-	protected final STSNodeSet putNodeSetImpl(final Iterator<? extends String> namespaces, final Iterator<? extends String> localnames)
-		throws NullPointerException {
-		return this.toNodeSetImpl(new STSItemSet.ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.putNode(namespaces.next(), localnames.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return namespaces.hasNext() && localnames.hasNext();
-			}
-
-		});
+	/** Diese Methode gibt den Knoten mit der gegebenen Position zurück.
+	 *
+	 * @param index Position eines verwalteten Knoten.
+	 * @return Knoten. */
+	protected final STSNode getNodeImpl(final int index) {
+		return new STSNode(this, index);
 	}
 
 	/** Diese Methode gibt den Knoten mit den Merkmalen des gegebenen zurück.
@@ -333,10 +417,6 @@ public abstract class STSStore {
 		return this.getNodeSetImpl(namespaces.iterator(), localnames.iterator());
 	}
 
-	{}
-
-	{}
-
 	public STSNode putNode(final STSNode node) throws NullPointerException {
 		if (this == node.store) return node;
 		return this.putNode(node.namespace(), node.localname());
@@ -364,6 +444,10 @@ public abstract class STSStore {
 
 	{}
 
+	{}
+
+	{}
+
 	public abstract STSNodeSet selectNodeSet(String namespaceFilter, String localnameFilter);
 
 	{}
@@ -385,27 +469,6 @@ public abstract class STSStore {
 	}
 
 	{}
-
-	protected CompactIntegerArray setupArray() {
-		final CompactIntegerArray result = new CompactIntegerArray();
-		result.setAlignment(0);
-		return result;
-	}
-
-	protected IntegerArraySection cleanupArray(final CompactIntegerArray result) {
-		final int[] array = result.array();
-		final int startIndex = result.startIndex(), finalIndex = result.finalIndex();
-		Arrays.sort(array, startIndex, finalIndex);
-		int sourceIndex = startIndex, targetIndex = startIndex, target = -1;
-		while (sourceIndex < finalIndex) {
-			final int source = array[sourceIndex];
-			if (source != target) {
-				array[targetIndex++] = target = source;
-			}
-			sourceIndex++;
-		}
-		return IntegerArraySection.from(Arrays.copyOfRange(array, startIndex, targetIndex));
-	}
 
 	{}
 
@@ -461,39 +524,9 @@ public abstract class STSStore {
 
 	{}
 
-	protected final STSEdgeSet getEdgeSetImpl(final STSEdge edge) {
-		if (edge == null) return this.emptyEdgeSet;
-		return new SectionEdgeSet(this, edge.index, 1);
-	}
-
-	protected final STSNodeSet getNodeSetImpl(final STSNode edge) {
-		if (edge == null) return this.emptyNodeSet;
-		return new SectionNodeSet(this, edge.index, 1);
-	}
-
-	protected STSEdge customGetEdge(final int index) {
-		return new STSEdge(this, index);
-	}
-
 	protected abstract STSEdge customGetEdge(int subjectIndex, int predicateIndex, int objectIndex);
 
-	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeObject(int) Objekt} zurück.
-	 *
-	 * @param objectIndex {@link STSItem#index Position} des {@link STSEdge#object() Objektknoten}.
-	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectObjectEdgeSet(int objectIndex);
-
-	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeSubject(int) Subjekt} zurück.
-	 *
-	 * @param subjectIndex {@link STSItem#index Position} des {@link STSEdge#subject() Subjektknoten}.
-	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectSubjectEdgeSet(int subjectIndex);
-
-	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgePredicate(int) Prädikat} zurück.
-	 *
-	 * @param predicateIndex {@link STSItem#index Position} des {@link STSEdge#predicate() Prädikatknoten}.
-	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectPredicateEdgeSet(int predicateIndex);
+	protected abstract STSEdge customPutEdge(int subjectIndex, int predicateIndex, int objectIndex);
 
 	/** Diese Methode gibt die Position der ersten Kante zurück.
 	 *
@@ -509,14 +542,6 @@ public abstract class STSStore {
 	protected abstract int customGetEdgeSubject(int index);
 
 	protected abstract int customGetEdgePredicate(int index);
-
-	/** Diese Methode gibt den Knoten mit der gegebenen Position zurück.
-	 *
-	 * @param index Position eines verwalteten Knoten.
-	 * @return Knoten. */
-	protected STSNode customGetNode(final int index) {
-		return new STSNode(this, index);
-	}
 
 	/** Diese Methode gibt die Position des ersten Knoten zurück.
 	 *
@@ -545,5 +570,23 @@ public abstract class STSStore {
 	 * @param index Position eines verwalteten Knoten.
 	 * @return Namensraum. */
 	protected abstract String customGetNodeNamespace(int index);
+
+	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeObject(int) Objekt} zurück.
+	 *
+	 * @param objectIndex {@link STSItem#index Position} des {@link STSEdge#object() Objektknoten}.
+	 * @return Kantenmenge. */
+	protected abstract STSEdgeSet customSelectObjectEdgeSet(int objectIndex);
+
+	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeSubject(int) Subjekt} zurück.
+	 *
+	 * @param subjectIndex {@link STSItem#index Position} des {@link STSEdge#subject() Subjektknoten}.
+	 * @return Kantenmenge. */
+	protected abstract STSEdgeSet customSelectSubjectEdgeSet(int subjectIndex);
+
+	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgePredicate(int) Prädikat} zurück.
+	 *
+	 * @param predicateIndex {@link STSItem#index Position} des {@link STSEdge#predicate() Prädikatknoten}.
+	 * @return Kantenmenge. */
+	protected abstract STSEdgeSet customSelectPredicateEdgeSet(int predicateIndex);
 
 }

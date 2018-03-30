@@ -9,6 +9,7 @@ import bee.creative.util.Iterables;
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Datensätze. */
+@SuppressWarnings ("javadoc")
 public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GItem> {
 
 	/** Diese Schnittstelle definiert einen laufenden Zeiger, der ägnlich einem {@link Iterator} über eine aufsteigend geordneten Positionsmenge läuft und mit der
@@ -23,17 +24,17 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 
 	}
 
+	/** Diese Klasse implementiert einen abstrakten {@link Iterator} über {@link STSItem Datensätze}. */
 	protected static abstract class ItemIterator implements Iterator<STSItem> {
-	
+
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
-	
+
 	}
 
 	/** Diese Klasse implementiert einen {@link ItemIndex}, der über eine gegebene Positionsliste läuft. */
-	@SuppressWarnings ("javadoc")
 	protected static class ArrayIndex extends SequenceIndex {
 
 		final int[] indexArray;
@@ -56,7 +57,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	}
 
 	/** Diese Klasse implementiert einen {@link ItemIndex}, der über die Vereinigungsmenge zweier gegebener Positionsmengen läuft. */
-	@SuppressWarnings ("javadoc")
 	protected static class UnionIndex extends IntersectionIndex {
 
 		int next1;
@@ -90,7 +90,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	}
 
 	/** Diese Klasse implementiert einen {@link ItemIndex}, der sequenziell über einen gegebenen Bereich von Positionen läuft. */
-	@SuppressWarnings ("javadoc")
 	static protected class SequenceIndex implements ItemIndex {
 
 		int index;
@@ -114,7 +113,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	}
 
 	/** Diese Klasse implementiert einen {@link ItemIndex}, der über die Schnittmenge zweier gegebener Positionsmengen läuft. */
-	@SuppressWarnings ("javadoc")
 	protected static class IntersectionIndex implements ItemIndex {
 
 		final ItemIndex index1;
@@ -147,25 +145,21 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	{}
 
 	/** Diese Methode gibt {@link #minSize()} der Vereinigungsmenge der gegebenen Mengen zurück. */
-	@SuppressWarnings ("javadoc")
 	protected static int unionMinSizeImpl(final STSItemSet<?> items1, final STSItemSet<?> items2) {
 		return Math.max(items1.minSize(), items2.minSize());
 	}
 
 	/** Diese Methode gibt {@link #maxSize()} der Vereinigungsmenge der gegebenen Mengen zurück. */
-	@SuppressWarnings ("javadoc")
 	protected static int unionMaxSizeImpl(final STSItemSet<?> items1, final STSItemSet<?> items2, final int itemCount) {
 		return Math.min(items1.maxSize() + items2.maxSize(), itemCount);
 	}
 
 	/** Diese Methode gibt {@link #minSize()} der Schnittmenge der gegebenen Mengen zurück. */
-	@SuppressWarnings ("javadoc")
 	protected static int intersectionMinSizeImpl(final STSItemSet<?> items1, final STSItemSet<?> items2, final int itemCount) {
 		return Math.max((items1.minSize() + items2.minSize()) - itemCount, 0);
 	}
 
 	/** Diese Methode gibt {@link #maxSize()} der Schnittmenge der gegebenen Mengen zurück. */
-	@SuppressWarnings ("javadoc")
 	protected static int intersectionMaxSizeImpl(final STSItemSet<?> items1, final STSItemSet<?> items2) {
 		return Math.min(items1.maxSize(), items2.maxSize());
 	}
@@ -175,7 +169,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	/** Dieses Feld speichert den Graphspeicher, der dieses Objekt verwaltet. */
 	protected final STSStore store;
 
-	@SuppressWarnings ("javadoc")
 	protected STSItemSet(final STSStore store) {
 		this.store = store;
 	}
