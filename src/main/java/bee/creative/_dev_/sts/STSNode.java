@@ -1,31 +1,33 @@
 package bee.creative._dev_.sts;
 
+// TODO String durch STSText ersetzen -> Mapped-Sichten mit effizientem hash/equals
 /** Diese Klasse implementiert einen Knoten eines Graphen, der in einem {@link #store() Graphspeicher} verwaltet wird.<br>
  * Die korrekte Ermittlung von {@link #equals(Object) Äquivalenz} und {@link #compareTo(STSNode) Ordnung} zweier Knoten setzt deren Verwaltung im gleichen
  * Graphspeicher voraus.
- *
+ * 
+ * @see STSStore
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class STSNode extends STSItem implements Comparable<STSNode> {
+public final class STSNode extends STSItem implements Comparable<STSNode> {
 
 	@SuppressWarnings ("javadoc")
-	protected STSNode(final SPOStore store, final int index) {
+	protected STSNode(final STSStore store, final int index) {
 		super(store, index);
 	}
 
 	{}
 
-	/** Diese Methode gibt den Lokalnamen dieses Knoten zurück.
+	/** Diese Methode gibt den Lokalnamen dieses Knoten zurück. Dieser kennzeichnet den Knoten im Kontext seines {@link #namespace() Namensraums} eineindeutig.
 	 *
 	 * @return Lokalnamen. */
 	public String localname() {
-		return this.store.getNodeLocalname(this.index);
+		return this.store.customGetNodeLocalname(this.index);
 	}
 
 	/** Diese Methode gibt den Namensraum dieses Knoten zurück.
 	 *
 	 * @return Namensraum. */
 	public String namespace() {
-		return this.store.getNodeNamespace(this.index);
+		return this.store.customGetNodeNamespace(this.index);
 	}
 
 	{}

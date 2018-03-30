@@ -1,5 +1,5 @@
 package bee.creative._dev_.sts;
 
-public abstract class SPOHeapStore extends SPOStore {
+public abstract class SPOHeapStore extends STSStore {
 
 }

@@ -7,17 +7,14 @@ import bee.creative.util.Comparators;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class STSItem {
 
-	/** Dieses Feld speichert den Graphspeicher, der diesen Datensatz verwaltet. */
-	protected final SPOStore store;
+	/** Dieses Feld speichert den Graphspeicher, der dieses Objekt verwaltet. */
+	protected final STSStore store;
 
 	/** Dieses Feld speichert die Position dieses Datensatzes in der ihn vorhaltenden Datenstruktur des {@link #store Graphspeichers}. */
 	protected final int index;
 
-	/** Dieser Konstruktor initialisiert Graphspeicher und Position.
-	 *
-	 * @param store Graphspeicher.
-	 * @param index Position. */
-	protected STSItem(final SPOStore store, final int index) {
+	@SuppressWarnings ("javadoc")
+	protected STSItem(final STSStore store, final int index) {
 		this.store = store;
 		this.index = index;
 	}
@@ -27,11 +24,11 @@ public abstract class STSItem {
 	/** Diese Methode gibt den dieses Objekt verwaltenden Graphspeicher zurück.
 	 *
 	 * @return Graphspeicher. */
-	public SPOStore store() {
+	public STSStore store() {
 		return this.store;
 	}
 
-	/** Diese Methode gibt den Streuwert zurück, welcher auf {@link SPOStore#hash dem des Graphspeichers} sowie der {@link #index Position} dieses Datensatzes
+	/** Diese Methode gibt den Streuwert zurück, welcher auf {@link STSStore#hash dem des Graphspeichers} sowie der {@link #index Position} dieses Datensatzes
 	 * beruht.
 	 *
 	 * @return Streuwert. */
@@ -55,7 +52,7 @@ public abstract class STSItem {
 	 * @param that Datensatz.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	protected final int compareImpl(final STSNode that) throws NullPointerException {
+	protected final int compareImpl(final STSItem that) throws NullPointerException {
 		final int result = Comparators.compare(this.index, that.index);
 		if (result != 0) return result;
 		return Comparators.compare(this.store.hash, that.store.hash);
