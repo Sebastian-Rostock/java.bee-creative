@@ -1,8 +1,7 @@
 package bee.creative._dev_.sts;
 
 import java.util.Iterator;
-import bee.creative._dev_.sts.STSItemSet.ItemIndex;
-import bee.creative._dev_.sts.STSItemSet.SequenceIndex;
+import bee.creative._dev_.sts.STSStore.NodeIndexIterator;
 import bee.creative.array.IntegerArraySection;
 
 /** Diese Klasse implementiert eine abstract Menge von {@link STSNode Knoten}, über welche in aufsteigender Ordnung iteriert werden kann.
@@ -10,6 +9,8 @@ import bee.creative.array.IntegerArraySection;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
+	/** Diese Klasse implementiert die Menge der Knoten zu einer gegebenen Positionsliste.<br>
+	 * <b>Die Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b> */
 	@SuppressWarnings ("javadoc")
 	protected static class ArrayNodeSet extends STSNodeSet {
 
@@ -39,6 +40,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	}
 
+	/** Diese Klasse implementiert die Vereinigungsmenge zweier gegebener Knotenmengen. */
 	@SuppressWarnings ("javadoc")
 	protected static class UnionNodeSet extends STSNodeSet {
 
@@ -71,6 +73,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	}
 
+	/** Diese Klasse implementiert die Menge der Knoten zu einer Positionsliste, die aus einem ersten Element und einer Elementanzahl rekonstruiert wird. */
 	@SuppressWarnings ("javadoc")
 	protected static class SectionNodeSet extends STSNodeSet {
 
@@ -103,6 +106,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	}
 
+	/** Diese Klasse implementiert die Schnittmenge zweier gegebener Knotenmengen. */
 	@SuppressWarnings ("javadoc")
 	protected static class IntersectionNodeSet extends STSNodeSet {
 
@@ -171,7 +175,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	/** {@inheritDoc} */
 	@Override
 	protected Iterator<STSNode> customIterator(final ItemIndex index) {
-		return this.store.customGetNodeIterator(index);
+		return new NodeIndexIterator(this.store, index);
 	}
 
 }

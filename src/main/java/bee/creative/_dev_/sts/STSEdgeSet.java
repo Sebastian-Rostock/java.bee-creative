@@ -1,6 +1,7 @@
 package bee.creative._dev_.sts;
 
 import java.util.Iterator;
+import bee.creative._dev_.sts.STSStore.EdgeIndexIterator;
 import bee.creative.array.IntegerArraySection;
 
 /** Diese Klasse implementiert eine abstract Menge von {@link STSEdge Kanten}, über welche in aufsteigender Ordnung iteriert werden kann.
@@ -8,6 +9,8 @@ import bee.creative.array.IntegerArraySection;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
+	/** Diese Klasse implementiert die Menge der Kanten zu einer gegebenen Positionsliste.<br>
+	 * <b>Die Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b> */
 	@SuppressWarnings ("javadoc")
 	protected static class ArrayEdgeSet extends STSEdgeSet {
 
@@ -37,6 +40,7 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
 	}
 
+	/** Diese Klasse implementiert die Vereinigungsmenge zweier gegebener Kantenmengen. */
 	@SuppressWarnings ("javadoc")
 	protected static class UnionEdgeSet extends STSEdgeSet {
 
@@ -69,6 +73,7 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
 	}
 
+	/** Diese Klasse implementiert die Menge der Kanten zu einer Positionsliste, die aus einem ersten Element und einer Elementanzahl rekonstruiert wird. */
 	@SuppressWarnings ("javadoc")
 	protected static class SectionEdgeSet extends STSEdgeSet {
 
@@ -101,6 +106,7 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
 	}
 
+	/** Diese Klasse implementiert die Schnittmenge zweier gegebener Kantenmengen. */
 	@SuppressWarnings ("javadoc")
 	protected static class IntersectionEdgeSet extends STSEdgeSet {
 
@@ -169,7 +175,7 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 	/** {@inheritDoc} */
 	@Override
 	protected Iterator<STSEdge> customIterator(final ItemIndex index) {
-		return this.store.customGetEdgeIterator(index);
+		return new EdgeIndexIterator(this.store, index);
 	}
 
 }
