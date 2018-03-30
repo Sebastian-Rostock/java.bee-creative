@@ -3,8 +3,9 @@ package bee.creative._dev_.sts;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import bee.creative._dev_.sts.STSEdgeSet.ArrayEdgeSet;
 import bee.creative._dev_.sts.STSEdgeSet.SectionEdgeSet;
-import bee.creative._dev_.sts.STSItemSet.ItemIndex;
 import bee.creative._dev_.sts.STSNodeSet.ArrayNodeSet;
 import bee.creative._dev_.sts.STSNodeSet.SectionNodeSet;
 import bee.creative.array.CompactIntegerArray;
@@ -18,173 +19,6 @@ import bee.creative.util.Objects;
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class STSStore {
-
-	protected static abstract class BaseIterator<GItem> implements Iterator<GItem> {
-
-		final STSStore store;
-
-		public BaseIterator(final STSStore store) {
-			this.store = store;
-		}
-
-		{}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	protected static class EdgeIndexIterator extends BaseIterator<STSEdge> {
-
-		final ItemIndex itemIndex;
-
-		STSEdge next;
-
-		public EdgeIndexIterator(final STSStore store, final ItemIndex itemIndex) {
-			super(store);
-			this.itemIndex = itemIndex;
-			this.next();
-		}
-
-		{}
-
-		@Override
-		public STSEdge next() {
-			final STSEdge next = this.next;
-			final int index = this.itemIndex.next();
-			this.next = index != Integer.MAX_VALUE ? this.store.customGetEdge(index) : null;
-			return next;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return this.next != null;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	protected static class NodeIndexIterator extends BaseIterator<STSNode> {
-
-		final ItemIndex itemIndex;
-
-		STSNode next;
-
-		public NodeIndexIterator(final STSStore store, final ItemIndex itemIndex) {
-			super(store);
-			this.itemIndex = itemIndex;
-			this.next();
-		}
-
-		{}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public STSNode next() {
-			final STSNode next = this.next;
-			final int index = this.itemIndex.next();
-			this.next = index != Integer.MAX_VALUE ? this.store.customGetNode(index) : null;
-			return next;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return this.next != null;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	protected static class NodeObjectGetIterator extends BaseIterator<STSNode> {
-
-		final Iterator<? extends STSNode> nodes;
-
-		public NodeObjectGetIterator(final STSStore store, final Iterator<? extends STSNode> nodes) {
-			super(store);
-			this.nodes = nodes;
-		}
-
-		{}
-
-		@Override
-		public boolean hasNext() {
-			return this.nodes.hasNext();
-		}
-
-		@Override
-		public STSNode next() {
-			return this.store.getNode(this.nodes.next());
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	protected static class NodeObjectPutIterator extends NodeObjectGetIterator {
-
-		public NodeObjectPutIterator(final STSStore store, final Iterator<? extends STSNode> nodes) {
-			super(store, nodes);
-		}
-
-		{}
-
-		@Override
-		public STSNode next() {
-			return this.store.putNode(this.nodes.next());
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	protected static class NodePropertyGetIterator extends BaseIterator<STSNode> {
-
-		final Iterator<? extends String> namespaces;
-
-		final Iterator<? extends String> localnames;
-
-		public NodePropertyGetIterator(final STSStore store, final Iterator<? extends String> namespaces, final Iterator<? extends String> localnames) {
-			super(store);
-			this.namespaces = namespaces;
-			this.localnames = localnames;
-		}
-
-		{}
-
-		@Override
-		public boolean hasNext() {
-			return this.namespaces.hasNext() && this.localnames.hasNext();
-		}
-
-		@Override
-		public STSNode next() {
-			return this.store.getNode(this.namespaces.next(), this.localnames.next());
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	protected static class NodePropertyPutIterator extends NodePropertyGetIterator {
-
-		public NodePropertyPutIterator(final STSStore store, final Iterator<? extends String> namespaces, final Iterator<? extends String> localnames) {
-			super(store, namespaces, localnames);
-		}
-
-		{}
-
-		@Override
-		public STSNode next() {
-			return this.store.putNode(this.namespaces.next(), this.localnames.next());
-		}
-
-	}
-
-	{}
 
 	private static int nextHash;
 
@@ -246,6 +80,72 @@ public abstract class STSStore {
 
 	{}
 
+	protected final IntegerArraySection toItemSetImpl(final Iterator<? extends STSItem> items) throws NullPointerException {
+		final CompactIntegerArray result = new CompactIntegerArray();
+		result.setAlignment(0);
+		while (items.hasNext()) {
+			final STSItem item = items.next();
+			if (item != null) {
+				result.add(item.index);
+			}
+		}
+		return this.cleanupArray(result);
+	}
+
+	protected final STSNodeSet toNodeSetImpl(final Iterator<? extends STSItem> nodes) throws NullPointerException {
+		return new ArrayNodeSet(this, this.toItemSetImpl(nodes));
+	}
+
+	protected final STSEdgeSet toEdgeSetImpl(final Iterator<? extends STSItem> edges) throws NullPointerException {
+		return new ArrayEdgeSet(this, this.toItemSetImpl(edges));
+	}
+
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+	{}
+
+	protected final STSEdgeSet getEdgeSetImpl(final Iterator<? extends STSEdge> edges) throws NullPointerException {
+		return this.toEdgeSetImpl(new STSItemSet.ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.getEdge(edges.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return edges.hasNext();
+			}
+
+		});
+	}
+
+	protected final STSEdgeSet putEdgeSetImpl(final Iterator<? extends STSEdge> edges) throws NullPointerException {
+		return this.toEdgeSetImpl(new STSItemSet.ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.putEdge(edges.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return edges.hasNext();
+			}
+
+		});
+	}
+
 	public STSEdge getEdge(final STSEdge edge) throws NullPointerException {
 		return this.contains(edge) ? edge : this.getEdge(edge.subject(), edge.predicate(), edge.object());
 	}
@@ -267,79 +167,28 @@ public abstract class STSStore {
 		return new SectionEdgeSet(this, this.customGetEdgeIndex(), this.customGetEdgeCount());
 	}
 
-	{}
-	/** Diese Methode gibt den Knoten mit den Merkmalen des gegebenen zurück.
-	 *
-	 * @see #getNode(String, String)
-	 * @param node Knoten.
-	 * @return Knoten oder {@code null}.
-	 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
-	public STSNode getNode(final STSNode node) throws NullPointerException {
-		return this.contains(node) ? node : this.getNode(node.namespace(), node.localname());
+	public STSEdgeSet getEdgeSet(final STSEdgeSet edges) throws NullPointerException {
+		if (this.contains(edges)) return edges;
+		return this.getEdgeSetImpl(edges.iterator());
 	}
 
-	/** Diese Methode gibt den Knoten mit den gegebenen Merkmalen zurück.
-	 *
-	 * @param namespace Namensraum.
-	 * @param localname Lokalname.
-	 * @return Knoten oder {@code null}.
-	 * @throws NullPointerException Wenn {@code namespace} bzw. {@code localname} {@code null} ist. */
-	public abstract STSNode getNode(final String namespace, final String localname) throws NullPointerException;
-
-	/** Diese Methode gibt die {@link STSNodeSet Menge aller verwalteten Knoten} zurück.
-	 *
-	 * @return Knotenmenge. */
-	public STSNodeSet getNodeSet() {
-		return new SectionNodeSet(this, this.customGetNodeIndex(), this.customGetNodeCount());
+	public STSEdgeSet getEdgeSet(final Iterable<? extends STSEdge> edges) throws NullPointerException {
+		if (edges instanceof STSEdgeSet) return this.getEdgeSet((STSEdgeSet)edges);
+		return this.getEdgeSetImpl(edges.iterator());
 	}
 
-	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück.
-	 *
-	 * @param nodes Knoten.
-	 * @return Knotenmegne.
-	 * @throws NullPointerException Wenn {@code nodes} {@code null} ist. */
-	public STSNodeSet getNodeSet(final STSNodeSet nodes) throws NullPointerException {
-		return this.contains(nodes) ? nodes : this.getNodeSetImpl(new NodeObjectGetIterator(this, nodes.iterator()));
+	public STSEdgeSet getEdgeSet(final List<? extends STSNode> subjects, final List<? extends STSNode> predicates, final List<? extends STSNode> objects)
+		throws NullPointerException {
+
+		return null;
 	}
 
-	public STSNodeSet getNodeSet(final Iterable<? extends STSNode> nodes) throws NullPointerException {
-		return nodes instanceof STSNodeSet ? this.getNodeSet((STSNodeSet)nodes) : this.getNodeSetImpl(new NodeObjectGetIterator(this, nodes.iterator()));
-	}
+	public abstract STSEdge putEdge(STSEdge edge);
 
-	public STSNodeSet getNodeSet(final Iterable<? extends String> namespaces, final Iterable<? extends String> localnames) throws NullPointerException {
-		return this.getNodeSetImpl(new NodePropertyGetIterator(this, namespaces.iterator(), localnames.iterator()));
-	}
-
-	{}
 	public abstract STSEdge putEdge(STSNode s, STSNode p, STSNode o);
-
-	public abstract STSEdge[] putEdges(STSEdge... edges);
 
 	public abstract STSEdge[] putEdges(STSNode... edges);
 
-	{}
-	public STSNode putNode(final STSNode node) throws NullPointerException {
-		if (this == node.store) return node;
-		return this.putNode(node.namespace(), node.localname());
-	}
-
-	public abstract STSNode putNode(String namespace, String localname) throws NullPointerException;
-
-	public STSNodeSet putNodeSet(final STSNodeSet nodes) throws NullPointerException {
-		if (this == nodes.store) return nodes;
-		return this.getNodeSetImpl(new NodeObjectPutIterator(this, nodes.iterator()));
-	}
-
-	public STSNodeSet putNodeSet(final Iterable<? extends STSNode> nodes) throws NullPointerException {
-		if (nodes instanceof STSNodeSet) return this.getNodeSet((STSNodeSet)nodes);
-		return this.getNodeSetImpl(new NodeObjectPutIterator(this, nodes.iterator()));
-	}
-
-	public STSNodeSet putNodeSet(final Iterable<? extends String> namespaces, final Iterable<? extends String> localnames) throws NullPointerException {
-		return this.getNodeSetImpl(new NodePropertyPutIterator(this, namespaces.iterator(), localnames.iterator()));
-	}
-
-	{}
 	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} zurück, in denen die gegebenen Subjekte, Prädikate bzw. Objekte enthalten sind. Für
 	 * uneingeschränkte Komponenten ist {@code null} anzugeben.
 	 *
@@ -371,9 +220,154 @@ public abstract class STSStore {
 	}
 
 	{}
+
+	protected final STSNodeSet getNodeSetImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
+		return this.toNodeSetImpl(new STSItemSet.ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.getNode(nodes.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return nodes.hasNext();
+			}
+
+		});
+	}
+
+	protected final STSNodeSet getNodeSetImpl(final Iterator<? extends String> namespaces, final Iterator<? extends String> localnames)
+		throws NullPointerException {
+		return this.toNodeSetImpl(new STSItemSet.ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.getNode(namespaces.next(), localnames.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return namespaces.hasNext() && localnames.hasNext();
+			}
+
+		});
+	}
+
+	protected final STSNodeSet putNodeSetImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
+		return this.toNodeSetImpl(new STSItemSet.ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.putNode(nodes.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return nodes.hasNext();
+			}
+
+		});
+	}
+
+	protected final STSNodeSet putNodeSetImpl(final Iterator<? extends String> namespaces, final Iterator<? extends String> localnames)
+		throws NullPointerException {
+		return this.toNodeSetImpl(new STSItemSet.ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.putNode(namespaces.next(), localnames.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return namespaces.hasNext() && localnames.hasNext();
+			}
+
+		});
+	}
+
+	/** Diese Methode gibt den Knoten mit den Merkmalen des gegebenen zurück.
+	 *
+	 * @see #getNode(String, String)
+	 * @param node Knoten.
+	 * @return Knoten oder {@code null}.
+	 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
+	public STSNode getNode(final STSNode node) throws NullPointerException {
+		return this.contains(node) ? node : this.getNode(node.namespace(), node.localname());
+	}
+
+	/** Diese Methode gibt den Knoten mit den gegebenen Merkmalen zurück.
+	 *
+	 * @param namespace Namensraum.
+	 * @param localname Lokalname.
+	 * @return Knoten oder {@code null}.
+	 * @throws NullPointerException Wenn {@code namespace} bzw. {@code localname} {@code null} ist. */
+	public abstract STSNode getNode(final String namespace, final String localname) throws NullPointerException;
+
+	/** Diese Methode gibt die {@link STSNodeSet Menge aller verwalteten Knoten} zurück.
+	 *
+	 * @return Knotenmenge. */
+	public STSNodeSet getNodeSet() {
+		return new SectionNodeSet(this, this.customGetNodeIndex(), this.customGetNodeCount());
+	}
+
+	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück.
+	 *
+	 * @param nodes Knoten.
+	 * @return Knotenmegne.
+	 * @throws NullPointerException Wenn {@code nodes} {@code null} ist. */
+	public STSNodeSet getNodeSet(final STSNodeSet nodes) throws NullPointerException {
+		if (this.contains(nodes)) return nodes;
+		return this.getNodeSetImpl(nodes.iterator());
+	}
+
+	public STSNodeSet getNodeSet(final Iterable<? extends STSNode> nodes) throws NullPointerException {
+		if (nodes instanceof STSNodeSet) return this.getNodeSet((STSNodeSet)nodes);
+		return this.getNodeSetImpl(nodes.iterator());
+	}
+
+	public STSNodeSet getNodeSet(final List<? extends String> namespaces, final List<? extends String> localnames)
+		throws NullPointerException, IllegalArgumentException {
+		if (namespaces.size() != localnames.size()) throw new IllegalArgumentException();
+		return this.getNodeSetImpl(namespaces.iterator(), localnames.iterator());
+	}
+
+	{}
+
+	{}
+
+	public STSNode putNode(final STSNode node) throws NullPointerException {
+		if (this == node.store) return node;
+		return this.putNode(node.namespace(), node.localname());
+	}
+
+	public abstract STSNode putNode(String namespace, String localname) throws NullPointerException;
+
+	public STSNodeSet putNodeSet(final STSNodeSet nodes) throws NullPointerException {
+		if (this.contains(nodes)) return nodes;
+		return this.putNodeSetImpl(nodes.iterator());
+	}
+
+	public STSNodeSet putNodeSet(final Iterable<? extends STSNode> nodes) throws NullPointerException {
+		if (nodes instanceof STSNodeSet) return this.putNodeSet((STSNodeSet)nodes);
+		return this.putNodeSetImpl(nodes.iterator());
+	}
+
+	public STSNodeSet putNodeSet(final List<? extends String> namespaces, final List<? extends String> localnames)
+		throws NullPointerException, IllegalArgumentException {
+		if (namespaces.size() != localnames.size()) throw new IllegalArgumentException();
+		return this.putNodeSetImpl(namespaces.iterator(), localnames.iterator());
+	}
+
+	{}
+
+	{}
+
 	public abstract STSNodeSet selectNodeSet(String namespaceFilter, String localnameFilter);
 
 	{}
+
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Datensatz von diesem Graphspeicher verwaltet wird.
 	 *
 	 * @param item Datensatz oder {@code null}.
@@ -413,25 +407,9 @@ public abstract class STSStore {
 		return IntegerArraySection.from(Arrays.copyOfRange(array, startIndex, targetIndex));
 	}
 
-	protected final IntegerArraySection getItemArrayImpl(final Iterator<? extends STSItem> items) throws NullPointerException {
-		final CompactIntegerArray result = new CompactIntegerArray();
-		result.setAlignment(0);
-		while (items.hasNext()) {
-			final STSItem item = items.next();
-			if (item != null) {
-				result.add(item.index);
-			}
-		}
-		return this.cleanupArray(result);
-	}
-
 	{}
 
 	{}
-
-	protected final STSNodeSet getNodeSetImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
-		return this.getNodeSetImpl(getItemArrayImpl(nodes));
-	}
 
 	{}
 
@@ -491,17 +469,6 @@ public abstract class STSStore {
 	protected final STSNodeSet getNodeSetImpl(final STSNode edge) {
 		if (edge == null) return this.emptyNodeSet;
 		return new SectionNodeSet(this, edge.index, 1);
-	}
-
-	/** Diese Methode gibt die Menge der Knoten mit den gegebenen Positionen zurück.<br>
-	 * <b>Die gegebene Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b>
-	 *
-	 * @param indices Positionen verwalteter Knoten.
-	 * @return Knotenmenge.
-	 * @throws NullPointerException Wenn {@code indices} {@code null} ist. */
-	protected final STSNodeSet getNodeSetImpl(final IntegerArraySection indices) throws NullPointerException {
-		if (indices.size() == 0) return this.emptyNodeSet;
-		return new ArrayNodeSet(this, indices);
 	}
 
 	protected STSEdge customGetEdge(final int index) {

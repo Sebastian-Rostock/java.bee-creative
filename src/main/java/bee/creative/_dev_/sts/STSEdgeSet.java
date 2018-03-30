@@ -1,7 +1,6 @@
 package bee.creative._dev_.sts;
 
 import java.util.Iterator;
-import bee.creative._dev_.sts.STSStore.EdgeIndexIterator;
 import bee.creative.array.IntegerArraySection;
 
 /** Diese Klasse implementiert eine abstract Menge von {@link STSEdge Kanten}, über welche in aufsteigender Ordnung iteriert werden kann.
@@ -175,7 +174,33 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 	/** {@inheritDoc} */
 	@Override
 	protected Iterator<STSEdge> customIterator(final ItemIndex index) {
-		return new EdgeIndexIterator(this.store, index);
+		return new Iterator<STSEdge>() {
+
+			STSEdge result;
+
+			{
+				this.next();
+			}
+
+			@Override
+			public STSEdge next() {
+				final STSEdge result = this.result;
+				final int next = index.next();
+				this.result = next != Integer.MAX_VALUE ? STSEdgeSet.this.store.customGetEdge(next) : null;
+				return result;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return this.result != null;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+
+		};
 	}
 
 }

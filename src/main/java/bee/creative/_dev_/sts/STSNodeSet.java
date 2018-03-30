@@ -1,7 +1,6 @@
 package bee.creative._dev_.sts;
 
 import java.util.Iterator;
-import bee.creative._dev_.sts.STSStore.NodeIndexIterator;
 import bee.creative.array.IntegerArraySection;
 
 /** Diese Klasse implementiert eine abstract Menge von {@link STSNode Knoten}, über welche in aufsteigender Ordnung iteriert werden kann.
@@ -175,7 +174,33 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	/** {@inheritDoc} */
 	@Override
 	protected Iterator<STSNode> customIterator(final ItemIndex index) {
-		return new NodeIndexIterator(this.store, index);
+		return new Iterator<STSNode>() {
+
+			STSNode result;
+
+			{
+				this.next();
+			}
+
+			@Override
+			public STSNode next() {
+				final STSNode result = this.result;
+				final int next = index.next();
+				this.result = next != Integer.MAX_VALUE ? STSNodeSet.this.store.customGetNode(next) : null;
+				return result;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return this.result != null;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+
+		};
 	}
 
 }

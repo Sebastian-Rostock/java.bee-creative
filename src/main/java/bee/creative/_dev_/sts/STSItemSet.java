@@ -23,6 +23,15 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 
 	}
 
+	protected static abstract class ItemIterator implements Iterator<STSItem> {
+	
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+	
+	}
+
 	/** Diese Klasse implementiert einen {@link ItemIndex}, der über eine gegebene Positionsliste läuft. */
 	@SuppressWarnings ("javadoc")
 	protected static class ArrayIndex extends SequenceIndex {
