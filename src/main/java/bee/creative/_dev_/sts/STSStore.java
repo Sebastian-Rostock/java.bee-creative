@@ -1,6 +1,5 @@
 package bee.creative._dev_.sts;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -15,9 +14,9 @@ import bee.creative.array.IntegerArraySection;
 import bee.creative.fem.FEMBinary;
 import bee.creative.util.Getter;
 
-/** Diese Klasse implementiert einen Speicher zur Verwaltung eines Graphe aus {@link STSNode Knoten} und {@link STSEdge Kanten}, bei welchem jeder Knoten einen
- * {@link STSNode#localname() Lokalnamen} bezüglich eines {@link STSNode#namespace() Namensraums} besitzt und jede Kante eine Verbindung dreier Knoten in den
- * Rollen {@link STSEdge#subject() Subjekt}, {@link STSEdge#subject() Prädikat} und {@link STSEdge#subject() Objekt} darstellt.
+/** Diese Klasse implementiert einen abstrakten Speicher zur Verwaltung eines Graphe aus {@link STSNode Knoten} und {@link STSEdge Kanten}, bei welchem jeder
+ * Knoten einen ihn identifizierenden {@link STSNode#value() Wert} besitzt und jede Kante eine Verbindung dreier Knoten in den Rollen {@link STSEdge#subject()
+ * Subjekt}, {@link STSEdge#subject() Prädikat} und {@link STSEdge#subject() Objekt} darstellt.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class STSStore {
@@ -57,19 +56,8 @@ public abstract class STSStore {
 
 	{}
 
-	static AtomicInteger hashGen = new AtomicInteger(1);
-
-	{}
-
-	public static STSStore newHeapStore() {
-		// alles im ram
-		return null;
-	}
-
-	public static STSStore newFileStore(final File path) {
-		// verzeichnis, in welchem die dateien mit festgelegten namen enthalten sind
-		return null;
-	}
+	/** Dieses Feld speichert den Generator für {@link #hash}. */
+	protected static AtomicInteger hashGen = new AtomicInteger(1);
 
 	{}
 
@@ -251,7 +239,9 @@ public abstract class STSStore {
 	 *
 	 * @param index Position einer verwalteten Kante.
 	 * @return Textdarstellung. */
-	protected abstract String customGetEdgeString(int index);
+	protected String customGetEdgeString(final int index) {
+		return "(" + this.customGetEdgeSubjectNode(index) + " " + this.customGetEdgePredicateNode(index) + " " + this.customGetEdgePredicateNode(index) + ")";
+	}
 
 	/** Diese Methode gibt die Menge der verwalteten Kanten mit den Merkmalen der gegebenen zurück.
 	 *
@@ -392,7 +382,9 @@ public abstract class STSStore {
 	 *
 	 * @param index Position eines verwalteten Knoten.
 	 * @return Textdarstellung. */
-	protected abstract String customGetNodeString(int index);
+	protected String customGetNodeString(final int index) {
+		return this.customGetNodeValue(index).toString(false);
+	}
 
 	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück.
 	 *
