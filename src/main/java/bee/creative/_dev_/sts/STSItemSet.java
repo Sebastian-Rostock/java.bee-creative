@@ -38,11 +38,11 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	/** Diese Klasse implementiert einen {@link ItemIndex}, der über eine gegebene Positionsliste läuft. */
 	protected static class ArrayIndex extends SequenceIndex {
 
-		final int[] indexArray;
+		final int[] array;
 
 		public ArrayIndex(final IntegerArraySection indexArray) {
 			super(indexArray.startIndex(), indexArray.size());
-			this.indexArray = indexArray.array();
+			this.array = indexArray.array();
 		}
 
 		{}
@@ -52,7 +52,7 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 			final int next = this.index;
 			if (next >= this.limit) return Integer.MAX_VALUE;
 			this.index = next + 1;
-			return this.indexArray[next];
+			return this.array[next];
 		}
 
 	}
@@ -107,7 +107,8 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 		@Override
 		public int next() {
 			final int next = this.index;
-			this.index = next < this.limit ? next + 1 : Integer.MAX_VALUE;
+			if (next >= this.limit) return Integer.MAX_VALUE;
+			this.index = next + 1;
 			return next;
 		}
 

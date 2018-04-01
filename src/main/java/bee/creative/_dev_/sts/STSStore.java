@@ -240,7 +240,7 @@ public abstract class STSStore {
 	 * @param index Position einer verwalteten Kante.
 	 * @return Textdarstellung. */
 	protected String customGetEdgeString(final int index) {
-		return "(" + this.customGetEdgeSubjectNode(index) + " " + this.customGetEdgePredicateNode(index) + " " + this.customGetEdgePredicateNode(index) + ")";
+		return "<" + this.customGetEdgeSubjectNode(index) + " " + this.customGetEdgePredicateNode(index) + " " + this.customGetEdgeObjectNode(index) + ">";
 	}
 
 	/** Diese Methode gibt die Menge der verwalteten Kanten mit den Merkmalen der gegebenen zurück.
@@ -383,7 +383,7 @@ public abstract class STSStore {
 	 * @param index Position eines verwalteten Knoten.
 	 * @return Textdarstellung. */
 	protected String customGetNodeString(final int index) {
-		return this.customGetNodeValue(index).toString(false);
+		return this.customGetNodeValue(index).toString();
 	}
 
 	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück.
