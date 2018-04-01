@@ -68,10 +68,16 @@ public abstract class STSStore {
 
 	{}
 
-	protected final int hash = (int)System.nanoTime();
+	protected final int hash = (int)System.nanoTime(); // TODO
 
 	{}
 
+	/** Diese Methode überführt die gegebenen Datensätze in die duplikatfrei aufsteigend geordnete Liste ihrer {@link STSItem#index Positionen} und gibt diese
+	 * zurück.
+	 *
+	 * @param items Datensätze.
+	 * @return Positionsmenge.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	protected final IntegerArraySection toArrayImpl(final Iterator<? extends STSItem> items) throws NullPointerException {
 		final CompactIntegerArray result = new CompactIntegerArray();
 		result.setAlignment(0);
@@ -84,7 +90,7 @@ public abstract class STSStore {
 		final int[] array = result.array();
 		final int startIndex = result.startIndex(), finalIndex = result.finalIndex();
 		Arrays.sort(array, startIndex, finalIndex);
-		int sourceIndex = startIndex, targetIndex = startIndex, target = -1;
+		int sourceIndex = startIndex, targetIndex = startIndex, target = Integer.MAX_VALUE;
 		while (sourceIndex < finalIndex) {
 			final int source = array[sourceIndex];
 			if (source != target) {
@@ -148,12 +154,100 @@ public abstract class STSStore {
 		return this.customGetEdge(subjectNode.index, predicateNode.index, objectNode.index);
 	}
 
+	/** Diese Methode implementiert {@link #customGetEdge(int, int, int)}.
+	 * 
+	 * @see #customGetEdge(int)
+	 * @param subjectIndex Position des verwalteten Subjektknotens.
+	 * @param predicateIndex Position des verwalteten Prädikatknotens.
+	 * @param objectIndex Position des verwalteten Objektknotens.
+	 * @return Kante oder {@code null}. */
+	protected abstract STSEdge customGetEdge(int subjectIndex, int predicateIndex, int objectIndex);
+
 	/** Diese Methode gibt die {@link STSEdgeSet Menge aller verwalteten Kanten} zurück.
 	 *
 	 * @return Kantenmenge. */
 	public STSEdgeSet getEdgeSet() {
 		return new SequenceEdgeSet(this, this.customGetEdgeIndex(), this.customGetEdgeCount());
 	}
+
+	/** Diese Methode gibt die Kante mit der gegebenen Position zurück.
+	 *
+	 * @param index Position einer verwalteten Kante.
+	 * @return Kante. */
+	protected STSEdge customGetEdge(final int index) {
+		return new STSEdge(this, index);
+	}
+
+	/** Diese Methode gibt eine Kantenmenge zum gegebenen Knoten zurück. Wenn dieser {@code null} ist, wird die leere Menge geliefert.
+	 *
+	 * @param edge Kante oder {@code null}.
+	 * @return Kantenmenge. */
+	protected STSEdgeSet customGetEdgeSet(final STSEdge edge) {
+		if (edge == null) return new SequenceEdgeSet(this, 0, 0);
+		return new SequenceEdgeSet(this, edge.index, 1);
+	}
+
+	/** Diese Methode gibt die Position der ersten verwalteten Kante zurück.
+	 *
+	 * @return erste Kantenposition. */
+	protected int customGetEdgeIndex() {
+		return 0;
+	}
+
+	/** Diese Methode gibt die Anzahl der verwalteten Kanten zurück.
+	 * 
+	 * @see STSEdgeSet#minSize()
+	 * @see STSEdgeSet#maxSize()
+	 * @return Kantenanzahl. */
+	protected abstract int customGetEdgeCount();
+
+	/** Diese Methode gibt den Objektknoten der gegebenen Kante zurück.
+	 * 
+	 * @param index Position einer verwalteten Kante.
+	 * @return Objektknoten. */
+	protected STSNode customGetEdgeObjectNode(final int index) {
+		return this.customGetNode(this.customGetEdgeObjectIndex(index));
+	}
+
+	/** Diese Methode gibt die Position des Objektknotens der gegebenen Kante zurück.
+	 * 
+	 * @param index Position einer verwalteten Kante.
+	 * @return Position des Objektknotens. */
+	protected abstract int customGetEdgeObjectIndex(int index);
+
+	/** Diese Methode gibt den Subjektknoten der gegebenen Kante zurück.
+	 * 
+	 * @param index Position einer verwalteten Kante.
+	 * @return Subjektknoten. */
+	protected STSNode customGetEdgeSubjectNode(final int index) {
+		return this.customGetNode(this.customGetEdgeSubjectIndex(index));
+	}
+
+	/** Diese Methode gibt die Position des Subjektknotens der gegebenen Kante zurück.
+	 * 
+	 * @param index Position einer verwalteten Kante.
+	 * @return Position des Subjektknotens. */
+	protected abstract int customGetEdgeSubjectIndex(int index);
+
+	/** Diese Methode gibt den Prädikatknoten der gegebenen Kante zurück.
+	 * 
+	 * @param index Position einer verwalteten Kante.
+	 * @return Prädikatknoten. */
+	protected STSNode customGetEdgePredicateNode(final int index) {
+		return this.customGetNode(this.customGetEdgePredicateIndex(index));
+	}
+
+	/** Diese Methode gibt die Position des Prädikatknotens der gegebenen Kante zurück.
+	 * 
+	 * @param index Position einer verwalteten Kante.
+	 * @return Position des Prädikatknotens. */
+	protected abstract int customGetEdgePredicateIndex(int index);
+
+	/** Diese Methode gibt die Textdarstellung der gegebenen Kante zurück.
+	 * 
+	 * @param index Position einer verwalteten Kante.
+	 * @return Textdarstellung. */
+	protected abstract String customGetEdgeString(int index);
 
 	/** Diese Methode gibt die Menge der verwalteten Kanten mit den Merkmalen der gegebenen zurück.
 	 *
@@ -170,18 +264,182 @@ public abstract class STSStore {
 		return this.customGetEdgeSetByItem(edges.iterator());
 	}
 
+	/** Diese Methode implementiert {@link #getEdgeSet(Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	protected STSEdgeSet customGetEdgeSetByItem(final Iterator<? extends STSEdge> edges) throws NullPointerException {
+		return this.toEdgeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.getEdge(edges.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return edges.hasNext();
+			}
+
+		});
+	}
+
 	/** Diese Methode gibt die Menge der verwalteten Kanten mit den gegebenen Merkmalen zurück. Die gegebenen Listen stehen für die Spalten einer Merkmalstabelle.
 	 *
 	 * @param subjects {@link STSEdge#subject() Knotenliste der Subjektspalte}.
 	 * @param predicates {@link STSEdge#predicate() Knotenliste der Prädikatspalte}.
 	 * @param objects {@link STSEdge#object() Knotenliste der Objektspalte}.
 	 * @return Kantenmenge.
-	 * @throws NullPointerException Wenn eine der Lsite {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Listen {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Listen nicht die gleiche Länge haben. */
 	public STSEdgeSet getEdgeSet(final List<? extends STSNode> subjects, final List<? extends STSNode> predicates, final List<? extends STSNode> objects)
 		throws NullPointerException, IllegalArgumentException {
 		if ((subjects.size() != predicates.size()) || (predicates.size() != objects.size())) throw new IllegalArgumentException();
 		return this.customGetEdgeSetByFields(subjects.iterator(), predicates.iterator(), objects.iterator());
+	}
+
+	/** Diese Methode implementiert {@link #getEdgeSet(List, List, List)}. */
+	@SuppressWarnings ("javadoc")
+	protected STSEdgeSet customGetEdgeSetByFields(final Iterator<? extends STSNode> subjects, final Iterator<? extends STSNode> predicates,
+		final Iterator<? extends STSNode> objects) throws NullPointerException {
+		return this.toEdgeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.getEdge(subjects.next(), predicates.next(), objects.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return subjects.hasNext() && predicates.hasNext() && objects.hasNext();
+			}
+
+		});
+	}
+
+	/** Diese Methode gibt den Knoten mit dem Wert des gegebenen zurück. Bei erfolgloser Suche wird {@code null} geliefert.
+	 *
+	 * @see #contains(STSItem)
+	 * @see #getNode(FEMBinary)
+	 * @param node gegebener Knoten.
+	 * @return Knoten oder {@code null}.
+	 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
+	public STSNode getNode(final STSNode node) throws NullPointerException {
+		if (this.contains(node)) return node;
+		return this.getNode(node.value());
+	}
+
+	/** Diese Methode gibt den Knoten mit dem gegebenen Wert zurück. Bei erfolgloser Suche wird {@code null} geliefert.
+	 *
+	 * @param value {@link STSNode#value() Knotenwert}.
+	 * @return Knoten oder {@code null}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	public STSNode getNode(final FEMBinary value) throws NullPointerException {
+		return this.customGetNode(value.data());
+	}
+
+	protected abstract STSNode customGetNode(FEMBinary value);
+
+	/** Diese Methode gibt die {@link STSNodeSet Menge aller verwalteten Knoten} zurück.
+	 *
+	 * @return Knotenmenge. */
+	public STSNodeSet getNodeSet() {
+		return new SequenceNodeSet(this, this.customGetNodeIndex(), this.customGetNodeCount());
+	}
+
+	/** Diese Methode gibt den Knoten mit der gegebenen Position zurück.
+	 *
+	 * @param index Position eines verwalteten Knoten.
+	 * @return Knoten. */
+	protected STSNode customGetNode(final int index) {
+		return new STSNode(this, index);
+	}
+
+	protected STSNodeSet customGetNodeSet(final STSNode node) {
+		if (node == null) return new SequenceNodeSet(this, 0, 0);
+		return new SequenceNodeSet(this, node.index, 1);
+	}
+
+	/** Diese Methode gibt die Position des ersten Knoten zurück.
+	 *
+	 * @return erste Knotenposition. */
+	protected int customGetNodeIndex() {
+		return 0;
+	}
+
+	/** Diese Methode gibt die Anzahl der verwalteten Knoten zurück.
+	 *
+	 * @see STSNodeSet#minSize()
+	 * @see STSNodeSet#maxSize()
+	 * @return Knotenanzahl. */
+	protected abstract int customGetNodeCount();
+
+	/** Diese Methode gibt den Lokalnamen des Knoten mit der gegebenen Position zurück.
+	 *
+	 * @see STSNode#localname()
+	 * @param index Position eines verwalteten Knoten.
+	 * @return Lokalname. */
+	protected abstract FEMBinary customGetNodeValue(int index);
+
+	/** Diese Methode gibt den Namensraum des Knoten mit der gegebenen Position zurück.
+	 *
+	 * @see STSNode#namespace()
+	 * @param index Position eines verwalteten Knoten.
+	 * @return Namensraum. */
+	protected abstract String customGetNodeString(int index);
+
+	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück.
+	 *
+	 * @see #getNode(STSNode)
+	 * @see #contains(STSItemSet)
+	 * @param nodes gegebene Knoten.
+	 * @return Knotenmegne.
+	 * @throws NullPointerException Wenn {@code nodes} {@code null} ist. */
+	public STSNodeSet getNodeSet(final Iterable<? extends STSNode> nodes) throws NullPointerException {
+		if (nodes instanceof STSNodeSet) {
+			final STSNodeSet result = (STSNodeSet)nodes;
+			if (this.contains(result)) return result;
+		}
+		return this.customGetNodeSetByItem(nodes.iterator());
+	}
+
+	protected STSNodeSet customGetNodeSetByItem(final Iterator<? extends STSNode> nodes) throws NullPointerException {
+		return this.toNodeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.getNode(nodes.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return nodes.hasNext();
+			}
+
+		});
+	}
+
+	/** Diese Methode gibt die Menge der verwalteten Knoten mit den gegebenen Werten zurück.
+	 *
+	 * @param values {@link STSNode#value() Wertliste}.
+	 * @return Knotenmegne.
+	 * @throws NullPointerException Wenn eine der Listen {@code null} ist. */
+	public STSNodeSet getNodeSet(final List<? extends FEMBinary> values) throws NullPointerException {
+		return this.customGetNodeSetByFields(values.iterator());
+	}
+
+	protected STSNodeSet customGetNodeSetByFields(final Iterator<? extends FEMBinary> values) throws NullPointerException {
+		return this.toNodeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.customGetNode(values.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return values.hasNext();
+			}
+
+		});
 	}
 
 	/** Diese Methode gibt die verwaltete Kante mit den Merkmalen der gegebenen zurück und erzeugt diesen bei Bedarf.
@@ -202,14 +460,16 @@ public abstract class STSStore {
 	/** Diese Methode gibt die verwaltete Kante mit den Merkmalen der gegebenen zurück und erzeugt diesen bei Bedarf.
 	 *
 	 * @see #putNode(STSNode)
-	 * @param subject Subjekt.
-	 * @param predicate Prädikat.
-	 * @param object Objekt.
+	 * @param subject {@link STSEdge#subject() Subjektknoten}.
+	 * @param predicate {@link STSEdge#predicate() Prädikatknoten}.
+	 * @param object {@link STSEdge#object() Objektknoten}.
 	 * @return Kante.
 	 * @throws NullPointerException Wenn {@code subject}, {@code predicate} bzw. {@code object} {@code null} ist. */
 	public STSEdge putEdge(final STSNode subject, final STSNode predicate, final STSNode object) throws NullPointerException {
 		return this.customPutEdge(this.putNode(subject).index, this.putNode(predicate).index, this.putNode(object).index);
 	}
+
+	protected abstract STSEdge customPutEdge(int subjectIndex, int predicateIndex, int objectIndex);
 
 	/** Diese Methode gibt die Menge der verwalteten Kanten mit den Merkmalen der gegebenen zurück und erzeugt diese bei Bedarf.
 	 *
@@ -226,14 +486,32 @@ public abstract class STSStore {
 		return this.customPutEdgeSetByItem(edges.iterator());
 	}
 
+	/** Diese Methode implementiert {@link #putEdgeSet(Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	protected STSEdgeSet customPutEdgeSetByItem(final Iterator<? extends STSEdge> edges) throws NullPointerException {
+		return this.toEdgeSetImpl(new ItemIterator() {
+
+			@Override
+			public STSItem next() {
+				return STSStore.this.putEdge(edges.next());
+			}
+
+			@Override
+			public boolean hasNext() {
+				return edges.hasNext();
+			}
+
+		});
+	}
+
 	/** Diese Methode gibt die Menge der verwalteten Kanten mit den gegebenen Merkmalen zurück und erzeugt diese bei Bedarf. Die gegebenen Listen stehen für die
 	 * Spalten einer Merkmalstabelle.
 	 *
-	 * @param subjects Knotenliste der Subjektspalte.
-	 * @param predicates Knotenliste der Prädikatspalte.
-	 * @param objects Knotenliste der Objektspalte.
+	 * @param subjects {@link STSEdge#subject() Knotenliste der Subjektspalte}.
+	 * @param predicates {@link STSEdge#predicate() Knotenliste der Prädikatspalte}.
+	 * @param objects {@link STSEdge#object() Knotenliste der Objektspalte}.
 	 * @return Kantenmenge.
-	 * @throws NullPointerException Wenn eine der Lsite {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Listen {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Listen nicht die gleiche Länge haben. */
 	public STSEdgeSet putEdgeSet(final List<? extends STSNode> subjects, final List<? extends STSNode> predicates, final List<? extends STSNode> objects)
 		throws NullPointerException, IllegalArgumentException {
@@ -241,47 +519,78 @@ public abstract class STSStore {
 		return this.customPutEdgeSetByFields(subjects.iterator(), predicates.iterator(), objects.iterator());
 	}
 
-	{}
-	{}
-	{}
-	{}
-
-	protected final STSNodeSet getNodeSetImpl(final STSNode edge) {
-		if (edge == null) return this.emptyNodeSetImpl();
-		return new SequenceNodeSet(this, edge.index, 1);
-	}
-
-	protected final STSNodeSet getNodeSetByCopyImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
-		return this.toNodeSetImpl(new ItemIterator() {
+	/** Diese Methode implementiert {@link #putEdgeSet(List, List, List)}. */
+	@SuppressWarnings ("javadoc")
+	protected STSEdgeSet customPutEdgeSetByFields(final Iterator<? extends STSNode> subjects, final Iterator<? extends STSNode> predicates,
+		final Iterator<? extends STSNode> objects) throws NullPointerException {
+		return this.toEdgeSetImpl(new ItemIterator() {
 
 			@Override
 			public STSItem next() {
-				return STSStore.this.getNode(nodes.next());
+				return STSStore.this.putEdge(subjects.next(), predicates.next(), objects.next());
 			}
 
 			@Override
 			public boolean hasNext() {
-				return nodes.hasNext();
+				return subjects.hasNext() && predicates.hasNext() && objects.hasNext();
 			}
 
 		});
 	}
 
-	protected final STSNodeSet getNodeSetByFieldsImpl(final Iterator<? extends FEMBinary> values) throws NullPointerException {
-		return this.toNodeSetImpl(new ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.customGetNode(values.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return values.hasNext();
-			}
-
-		});
+	/** Diese Methode gibt den Knoten mit dem Wert des gegebenen zurück und erzeugt diesen bei Bedarf.
+	 *
+	 * @see #contains(STSItem)
+	 * @see #putNode(FEMBinary)
+	 * @param node gegebener Knoten.
+	 * @return Knoten.
+	 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
+	public STSNode putNode(final STSNode node) throws NullPointerException {
+		if (this == node.store) return node;
+		return this.putNode(node.value());
 	}
+
+	/** Diese Methode gibt den Knoten mit dem gegebenen Wert zurück und erzeugt diesen bei Bedarf.
+	 *
+	 * @param value {@link STSNode#value() Knotenwert}.
+	 * @return Knoten.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	public STSNode putNode(final FEMBinary value) throws NullPointerException {
+		return this.customPutNode(value.data());
+	}
+
+	protected abstract STSNode customPutNode(FEMBinary value);
+
+	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück und erzeugt diesen bei Bedarf.
+	 *
+	 * @see #getNode(STSNode)
+	 * @see #contains(STSItemSet)
+	 * @param nodes gegebene Knotenmegne.
+	 * @return Knotenmegne.
+	 * @throws NullPointerException Wenn {@code nodes} {@code null} ist. */
+	public STSNodeSet putNodeSet(final Iterable<? extends STSNode> nodes) throws NullPointerException {
+		if (nodes instanceof STSNodeSet) {
+			final STSNodeSet result = (STSNodeSet)nodes;
+			if (this.contains(result)) return result;
+		}
+		return this.putNodeSetByCopyImpl(nodes.iterator());
+	}
+
+	/** Diese Methode gibt die Menge der verwalteten Knoten mit den gegebenen Werten zurück und erzeugt diesen bei Bedarf.
+	 *
+	 * @param values {@link STSNode#value() Wertliste}.
+	 * @return Knotenmegne.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
+	public STSNodeSet putNodeSet(final List<? extends FEMBinary> values) throws NullPointerException {
+		return this.putNodeSetByFieldsImpl(values.iterator());
+	}
+
+	{}
+
+	{}
+
+	{}
+	{}
 
 	protected final STSNodeSet putNodeSetByCopyImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
 		return this.toNodeSetImpl(new ItemIterator() {
@@ -317,10 +626,13 @@ public abstract class STSStore {
 
 	{}
 	{}
+
+	{}
+
 	{}
 	{}
 	{}
-	{}
+
 	{}
 	{}
 	{}
@@ -418,216 +730,23 @@ public abstract class STSStore {
 		return result;
 	}
 
-	/** Diese Methode gibt die Kante mit der gegebenen Position zurück.
+	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeObjectIndex(int) Objekt} zurück.
 	 *
-	 * @param index Position einer verwalteten Kante.
-	 * @return Kante. */
-	protected STSEdge customGetEdge(final int index) {
-		return new STSEdge(this, index);
-	}
-
-	protected abstract STSEdge customGetEdge(int subjectIndex, int predicateIndex, int objectIndex);
-
-	/** Diese Methode gibt eine Kantenmenge zum gegebenen Knoten zurück. Wenn dieser {@code null} ist, wird die leere Menge geliefert.
-	 *
-	 * @param edge Kante oder {@code null}.
+	 * @param objectIndex {@link STSItem#index Position} des {@link STSEdge#object() Objektknoten}.
 	 * @return Kantenmenge. */
-	protected STSEdgeSet customGetEdgeSet(final STSEdge edge) {
-		if (edge == null) return new SequenceEdgeSet(this, 0, 0);
-		return new SequenceEdgeSet(this, edge.index, 1);
-	}
+	protected abstract STSEdgeSet customSelectObjectEdgeSet(int objectIndex);
 
-	/** Diese Methode implementiert {@link #getEdgeSet(Iterable)}. */
-	@SuppressWarnings ("javadoc")
-	protected STSEdgeSet customGetEdgeSetByItem(final Iterator<? extends STSEdge> edges) throws NullPointerException {
-		return this.toEdgeSetImpl(new ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.getEdge(edges.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return edges.hasNext();
-			}
-
-		});
-	}
-
-	/** Diese Methode implementiert {@link #getEdgeSet(List, List, List)}. */
-	@SuppressWarnings ("javadoc")
-	protected STSEdgeSet customGetEdgeSetByFields(final Iterator<? extends STSNode> subjects, final Iterator<? extends STSNode> predicates,
-		final Iterator<? extends STSNode> objects) throws NullPointerException {
-		return this.toEdgeSetImpl(new ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.getEdge(subjects.next(), predicates.next(), objects.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return subjects.hasNext() && predicates.hasNext() && objects.hasNext();
-			}
-
-		});
-	}
-
-	/** Diese Methode gibt die Position der ersten Kante zurück.
+	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeSubjectIndex(int) Subjekt} zurück.
 	 *
-	 * @return erste Kantenposition. */
-	protected int customGetEdgeIndex() {
-		return 0;
-	}
+	 * @param subjectIndex {@link STSItem#index Position} des {@link STSEdge#subject() Subjektknoten}.
+	 * @return Kantenmenge. */
+	protected abstract STSEdgeSet customSelectSubjectEdgeSet(int subjectIndex);
 
-	protected abstract int customGetEdgeCount();
-
-	protected abstract String customGetEdgeString(int index);
-
-	protected STSNode customGetEdgeObjectNode(final int index) {
-		return this.customGetNode(this.customGetEdgeObjectIndex(index));
-	}
-
-	protected STSNode customGetEdgeSubjectNode(final int index) {
-		return this.customGetNode(this.customGetEdgeSubjectIndex(index));
-	}
-
-	protected STSNode customGetEdgePredicateNode(final int index) {
-		return this.customGetNode(this.customGetEdgePredicateIndex(index));
-	}
-
-	protected abstract int customGetEdgeObjectIndex(int index);
-
-	protected abstract int customGetEdgeSubjectIndex(int index);
-
-	protected abstract int customGetEdgePredicateIndex(int index);
-
-	/** Diese Methode implementiert {@link #putEdgeSet(Iterable)}. */
-	@SuppressWarnings ("javadoc")
-	protected STSEdgeSet customPutEdgeSetByItem(final Iterator<? extends STSEdge> edges) throws NullPointerException {
-		return this.toEdgeSetImpl(new ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.putEdge(edges.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return edges.hasNext();
-			}
-
-		});
-	}
-
-	/** Diese Methode implementiert {@link #putEdgeSet(List, List, List)}. */
-	@SuppressWarnings ("javadoc")
-	protected STSEdgeSet customPutEdgeSetByFields(final Iterator<? extends STSNode> subjects, final Iterator<? extends STSNode> predicates,
-		final Iterator<? extends STSNode> objects) throws NullPointerException {
-		return this.toEdgeSetImpl(new ItemIterator() {
-
-			@Override
-			public STSItem next() {
-				return STSStore.this.putEdge(subjects.next(), predicates.next(), objects.next());
-			}
-
-			@Override
-			public boolean hasNext() {
-				return subjects.hasNext() && predicates.hasNext() && objects.hasNext();
-			}
-
-		});
-	}
-
-	{}
-
-	/** Diese Methode gibt den Knoten mit dem Wert des gegebenen zurück. Bei erfolgloser Suche wird {@code null} geliefert.
+	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgePredicateIndex(int) Prädikat} zurück.
 	 *
-	 * @see STSNode#value()
-	 * @see #getNode(FEMBinary)
-	 * @param node Knoten.
-	 * @return Knoten oder {@code null}.
-	 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
-	public STSNode getNode(final STSNode node) throws NullPointerException {
-		return this.contains(node) ? node : this.getNode(node.value());
-	}
-
-	/** Diese Methode gibt den Knoten mit den gegebenen Merkmalen zurück. Bei erfolgloser Suche wird {@code null} geliefert.
-	 *
-	 * @param namespace Namensraum.
-	 * @param localname Lokalname.
-	 * @return Knoten oder {@code null}.
-	 * @throws NullPointerException Wenn {@code namespace} bzw. {@code localname} {@code null} ist. */
-	public STSNode getNode(final FEMBinary value) throws NullPointerException {
-		return this.customGetNode(value.data());
-	}
-
-	/** Diese Methode gibt die {@link STSNodeSet Menge aller verwalteten Knoten} zurück.
-	 *
-	 * @return Knotenmenge. */
-	public STSNodeSet getNodeSet() {
-		return new SequenceNodeSet(this, this.customGetNodeIndex(), this.customGetNodeCount());
-	}
-
-	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück.
-	 *
-	 * @param nodes Knotenmegne.
-	 * @return Knotenmegne.
-	 * @throws NullPointerException Wenn {@code nodes} {@code null} ist. */
-	public STSNodeSet getNodeSet(final STSNodeSet nodes) throws NullPointerException {
-		if (this.contains(nodes)) return nodes;
-		return this.getNodeSetByCopyImpl(nodes.iterator());
-	}
-
-	public STSNodeSet getNodeSet(final Iterable<? extends STSNode> nodes) throws NullPointerException {
-		if (nodes instanceof STSNodeSet) return this.getNodeSet((STSNodeSet)nodes);
-		return this.getNodeSetByCopyImpl(nodes.iterator());
-	}
-
-	public STSNodeSet getNodeSet(final List<? extends FEMBinary> values) throws NullPointerException, IllegalArgumentException {
-		return this.getNodeSetByFieldsImpl(values.iterator());
-	}
-
-	public STSNode putNode(final STSNode node) throws NullPointerException {
-		if (this == node.store) return node;
-		return this.putNode(node.value());
-	}
-
-	public STSNode putNode(final FEMBinary value) throws NullPointerException {
-		return this.customPutNode(value.data());
-	}
-
-	public STSNodeSet putNodeSet(final STSNodeSet nodes) throws NullPointerException {
-		if (this.contains(nodes)) return nodes;
-		return this.putNodeSetByCopyImpl(nodes.iterator());
-	}
-
-	public STSNodeSet putNodeSet(final Iterable<? extends STSNode> nodes) throws NullPointerException {
-		if (nodes instanceof STSNodeSet) {
-			final STSNodeSet result = (STSNodeSet)nodes;
-			if (this.contains(result)) return result;
-
-			return this.putNodeSet((STSNodeSet)nodes);
-		}
-		return this.putNodeSetByCopyImpl(nodes.iterator());
-	}
-
-	public STSNodeSet putNodeSet(final List<? extends FEMBinary> values) throws NullPointerException {
-		return this.putNodeSetByFieldsImpl(values.iterator());
-	}
-
-	/** Diese Methode gibt den Knoten mit der gegebenen Position zurück.
-	 *
-	 * @param index Position eines verwalteten Knoten.
-	 * @return Knoten. */
-	protected STSNode customGetNode(final int index) {
-		return new STSNode(this, index);
-	}
-
-	protected abstract STSNode customGetNode(FEMBinary value);
-
-	protected abstract STSNode customPutNode(FEMBinary value);
+	 * @param predicateIndex {@link STSItem#index Position} des {@link STSEdge#predicate() Prädikatknoten}.
+	 * @return Kantenmenge. */
+	protected abstract STSEdgeSet customSelectPredicateEdgeSet(int predicateIndex);
 
 	{}
 
@@ -636,8 +755,6 @@ public abstract class STSStore {
 	{}
 
 	{}
-
-	public abstract STSNodeSet selectNodeSet(String namespaceFilter, String localnameFilter);
 
 	{}
 
@@ -668,60 +785,5 @@ public abstract class STSStore {
 	{}
 
 	{}
-
-	/** Diese Methode gibt die leere Knotenmenge zurück.
-	 *
-	 * @return Knotenmenge. */
-	protected STSNodeSet emptyNodeSetImpl() {
-		return new SequenceNodeSet(this, 0, 0);
-	}
-
-	protected abstract STSEdge customPutEdge(int subjectIndex, int predicateIndex, int objectIndex);
-
-	/** Diese Methode gibt die Position des ersten Knoten zurück.
-	 *
-	 * @return erste Knotenposition. */
-	protected int customGetNodeIndex() {
-		return 0;
-	}
-
-	/** Diese Methode gibt die Anzahl der verwalteten Knoten zurück.
-	 *
-	 * @see STSNodeSet#minSize()
-	 * @see STSNodeSet#maxSize()
-	 * @return Knotenanzahl. */
-	protected abstract int customGetNodeCount();
-
-	/** Diese Methode gibt den Lokalnamen des Knoten mit der gegebenen Position zurück.
-	 *
-	 * @see STSNode#localname()
-	 * @param index Position eines verwalteten Knoten.
-	 * @return Lokalname. */
-	protected abstract FEMBinary customGetNodeValue(int index);
-
-	/** Diese Methode gibt den Namensraum des Knoten mit der gegebenen Position zurück.
-	 *
-	 * @see STSNode#namespace()
-	 * @param index Position eines verwalteten Knoten.
-	 * @return Namensraum. */
-	protected abstract String customGetNodeString(int index);
-
-	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeObjectIndex(int) Objekt} zurück.
-	 *
-	 * @param objectIndex {@link STSItem#index Position} des {@link STSEdge#object() Objektknoten}.
-	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectObjectEdgeSet(int objectIndex);
-
-	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeSubjectIndex(int) Subjekt} zurück.
-	 *
-	 * @param subjectIndex {@link STSItem#index Position} des {@link STSEdge#subject() Subjektknoten}.
-	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectSubjectEdgeSet(int subjectIndex);
-
-	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgePredicateIndex(int) Prädikat} zurück.
-	 *
-	 * @param predicateIndex {@link STSItem#index Position} des {@link STSEdge#predicate() Prädikatknoten}.
-	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectPredicateEdgeSet(int predicateIndex);
 
 }
