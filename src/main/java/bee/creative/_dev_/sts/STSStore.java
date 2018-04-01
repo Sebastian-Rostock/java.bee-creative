@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import bee.creative._dev_.sts.STSEdgeSet.ArrayEdgeSet;
 import bee.creative._dev_.sts.STSEdgeSet.SequenceEdgeSet;
 import bee.creative._dev_.sts.STSItemSet.ItemIterator;
@@ -21,38 +22,42 @@ import bee.creative.util.Getter;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class STSStore {
 
-	/** Diese Klasse implementiert den {@link Getter} zu {@link STSStore#customSelectObjectEdgeSet(int)}. */
+	/** Diese Klasse implementiert den {@link Getter} zu {@link STSStore#customSelectEdgeSetByObject(int)}. */
 	protected final class SelectObjectEdgeSetGetter implements Getter<STSNode, STSEdgeSet> {
 
 		/** {@inheritDoc} */
 		@Override
 		public STSEdgeSet get(final STSNode input) {
-			return STSStore.this.customSelectObjectEdgeSet(input.index);
+			return STSStore.this.customSelectEdgeSetByObject(input.index);
 		}
 
 	}
 
-	/** Diese Klasse implementiert den {@link Getter} zu {@link STSStore#customSelectSubjectEdgeSet(int)}. */
+	/** Diese Klasse implementiert den {@link Getter} zu {@link STSStore#customSelectEdgeSetBySubject(int)}. */
 	protected final class SelectSubjectEdgeSetGetter implements Getter<STSNode, STSEdgeSet> {
 
 		/** {@inheritDoc} */
 		@Override
 		public STSEdgeSet get(final STSNode input) {
-			return STSStore.this.customSelectSubjectEdgeSet(input.index);
+			return STSStore.this.customSelectEdgeSetBySubject(input.index);
 		}
 
 	}
 
-	/** Diese Klasse implementiert den {@link Getter} zu {@link STSStore#customSelectPredicateEdgeSet(int)}. */
+	/** Diese Klasse implementiert den {@link Getter} zu {@link STSStore#customSelectEdgeSetByPredicate(int)}. */
 	protected final class SelectPredicateEdgeSetGetter implements Getter<STSNode, STSEdgeSet> {
 
 		/** {@inheritDoc} */
 		@Override
 		public STSEdgeSet get(final STSNode input) {
-			return STSStore.this.customSelectPredicateEdgeSet(input.index);
+			return STSStore.this.customSelectEdgeSetByPredicate(input.index);
 		}
 
 	}
+
+	{}
+
+	static AtomicInteger hashGen = new AtomicInteger(1);
 
 	{}
 
@@ -68,7 +73,8 @@ public abstract class STSStore {
 
 	{}
 
-	protected final int hash = (int)System.nanoTime(); // TODO
+	/** Dieses Feld speichert den Streuwert als Identifikator des Graphspeichers. */
+	protected final int hash = STSStore.hashGen.getAndIncrement();
 
 	{}
 
@@ -154,13 +160,8 @@ public abstract class STSStore {
 		return this.customGetEdge(subjectNode.index, predicateNode.index, objectNode.index);
 	}
 
-	/** Diese Methode implementiert {@link #customGetEdge(int, int, int)}.
-	 * 
-	 * @see #customGetEdge(int)
-	 * @param subjectIndex Position des verwalteten Subjektknotens.
-	 * @param predicateIndex Position des verwalteten Prädikatknotens.
-	 * @param objectIndex Position des verwalteten Objektknotens.
-	 * @return Kante oder {@code null}. */
+	/** Diese Methode implementiert {@link #getEdge(STSNode, STSNode, STSNode)}. */
+	@SuppressWarnings ("javadoc")
 	protected abstract STSEdge customGetEdge(int subjectIndex, int predicateIndex, int objectIndex);
 
 	/** Diese Methode gibt die {@link STSEdgeSet Menge aller verwalteten Kanten} zurück.
@@ -172,13 +173,14 @@ public abstract class STSStore {
 
 	/** Diese Methode gibt die Kante mit der gegebenen Position zurück.
 	 *
+	 * @see STSEdgeSet#iterator()
 	 * @param index Position einer verwalteten Kante.
 	 * @return Kante. */
 	protected STSEdge customGetEdge(final int index) {
 		return new STSEdge(this, index);
 	}
 
-	/** Diese Methode gibt eine Kantenmenge zum gegebenen Knoten zurück. Wenn dieser {@code null} ist, wird die leere Menge geliefert.
+	/** Diese Methode gibt eine Kantenmenge zur gegebenen Kante zurück. Wenn dieser {@code null} ist, wird die leere Menge geliefert.
 	 *
 	 * @param edge Kante oder {@code null}.
 	 * @return Kantenmenge. */
@@ -189,20 +191,22 @@ public abstract class STSStore {
 
 	/** Diese Methode gibt die Position der ersten verwalteten Kante zurück.
 	 *
+	 * @see #getEdgeSet()
 	 * @return erste Kantenposition. */
 	protected int customGetEdgeIndex() {
 		return 0;
 	}
 
 	/** Diese Methode gibt die Anzahl der verwalteten Kanten zurück.
-	 * 
+	 *
+	 * @see #getEdgeSet()
 	 * @see STSEdgeSet#minSize()
 	 * @see STSEdgeSet#maxSize()
 	 * @return Kantenanzahl. */
 	protected abstract int customGetEdgeCount();
 
-	/** Diese Methode gibt den Objektknoten der gegebenen Kante zurück.
-	 * 
+	/** Diese Methode implementiert {@link STSEdge#object()}.
+	 *
 	 * @param index Position einer verwalteten Kante.
 	 * @return Objektknoten. */
 	protected STSNode customGetEdgeObjectNode(final int index) {
@@ -210,13 +214,13 @@ public abstract class STSStore {
 	}
 
 	/** Diese Methode gibt die Position des Objektknotens der gegebenen Kante zurück.
-	 * 
+	 *
 	 * @param index Position einer verwalteten Kante.
 	 * @return Position des Objektknotens. */
 	protected abstract int customGetEdgeObjectIndex(int index);
 
-	/** Diese Methode gibt den Subjektknoten der gegebenen Kante zurück.
-	 * 
+	/** Diese Methode implementiert {@link STSEdge#subject()}.
+	 *
 	 * @param index Position einer verwalteten Kante.
 	 * @return Subjektknoten. */
 	protected STSNode customGetEdgeSubjectNode(final int index) {
@@ -224,13 +228,13 @@ public abstract class STSStore {
 	}
 
 	/** Diese Methode gibt die Position des Subjektknotens der gegebenen Kante zurück.
-	 * 
+	 *
 	 * @param index Position einer verwalteten Kante.
 	 * @return Position des Subjektknotens. */
 	protected abstract int customGetEdgeSubjectIndex(int index);
 
-	/** Diese Methode gibt den Prädikatknoten der gegebenen Kante zurück.
-	 * 
+	/** Diese Methode implementiert {@link STSEdge#predicate()}.
+	 *
 	 * @param index Position einer verwalteten Kante.
 	 * @return Prädikatknoten. */
 	protected STSNode customGetEdgePredicateNode(final int index) {
@@ -238,13 +242,13 @@ public abstract class STSStore {
 	}
 
 	/** Diese Methode gibt die Position des Prädikatknotens der gegebenen Kante zurück.
-	 * 
+	 *
 	 * @param index Position einer verwalteten Kante.
 	 * @return Position des Prädikatknotens. */
 	protected abstract int customGetEdgePredicateIndex(int index);
 
-	/** Diese Methode gibt die Textdarstellung der gegebenen Kante zurück.
-	 * 
+	/** Diese Methode implementiert {@link STSEdge#toString()}.
+	 *
 	 * @param index Position einer verwalteten Kante.
 	 * @return Textdarstellung. */
 	protected abstract String customGetEdgeString(int index);
@@ -336,6 +340,8 @@ public abstract class STSStore {
 		return this.customGetNode(value.data());
 	}
 
+	/** Diese Methode implementiert {@link #getNode(FEMBinary)}. */
+	@SuppressWarnings ("javadoc")
 	protected abstract STSNode customGetNode(FEMBinary value);
 
 	/** Diese Methode gibt die {@link STSNodeSet Menge aller verwalteten Knoten} zurück.
@@ -353,6 +359,10 @@ public abstract class STSStore {
 		return new STSNode(this, index);
 	}
 
+	/** Diese Methode gibt eine Knotenmenge zum gegebenen Knoten zurück. Wenn dieser {@code null} ist, wird die leere Menge geliefert.
+	 *
+	 * @param node Knoten oder {@code null}.
+	 * @return Knotenmenge. */
 	protected STSNodeSet customGetNodeSet(final STSNode node) {
 		if (node == null) return new SequenceNodeSet(this, 0, 0);
 		return new SequenceNodeSet(this, node.index, 1);
@@ -372,18 +382,16 @@ public abstract class STSStore {
 	 * @return Knotenanzahl. */
 	protected abstract int customGetNodeCount();
 
-	/** Diese Methode gibt den Lokalnamen des Knoten mit der gegebenen Position zurück.
+	/** Diese Methode implementiert {@link STSNode#value()}.
 	 *
-	 * @see STSNode#localname()
 	 * @param index Position eines verwalteten Knoten.
-	 * @return Lokalname. */
+	 * @return Knotenwert. */
 	protected abstract FEMBinary customGetNodeValue(int index);
 
-	/** Diese Methode gibt den Namensraum des Knoten mit der gegebenen Position zurück.
+	/** Diese Methode implementiert {@link STSNode#toString()}.
 	 *
-	 * @see STSNode#namespace()
 	 * @param index Position eines verwalteten Knoten.
-	 * @return Namensraum. */
+	 * @return Textdarstellung. */
 	protected abstract String customGetNodeString(int index);
 
 	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück.
@@ -401,6 +409,8 @@ public abstract class STSStore {
 		return this.customGetNodeSetByItem(nodes.iterator());
 	}
 
+	/** Diese Methode implementiert {@link #getNodeSet(Iterable)}. */
+	@SuppressWarnings ("javadoc")
 	protected STSNodeSet customGetNodeSetByItem(final Iterator<? extends STSNode> nodes) throws NullPointerException {
 		return this.toNodeSetImpl(new ItemIterator() {
 
@@ -426,6 +436,8 @@ public abstract class STSStore {
 		return this.customGetNodeSetByFields(values.iterator());
 	}
 
+	/** Diese Methode implementiert {@link #getNodeSet(List)}. */
+	@SuppressWarnings ("javadoc")
 	protected STSNodeSet customGetNodeSetByFields(final Iterator<? extends FEMBinary> values) throws NullPointerException {
 		return this.toNodeSetImpl(new ItemIterator() {
 
@@ -469,6 +481,8 @@ public abstract class STSStore {
 		return this.customPutEdge(this.putNode(subject).index, this.putNode(predicate).index, this.putNode(object).index);
 	}
 
+	/** Diese Methode implementiert {@link #putEdge(STSNode, STSNode, STSNode)}. */
+	@SuppressWarnings ("javadoc")
 	protected abstract STSEdge customPutEdge(int subjectIndex, int predicateIndex, int objectIndex);
 
 	/** Diese Methode gibt die Menge der verwalteten Kanten mit den Merkmalen der gegebenen zurück und erzeugt diese bei Bedarf.
@@ -559,6 +573,8 @@ public abstract class STSStore {
 		return this.customPutNode(value.data());
 	}
 
+	/** Diese Methode implementiert {@link #putNode(FEMBinary)}. */
+	@SuppressWarnings ("javadoc")
 	protected abstract STSNode customPutNode(FEMBinary value);
 
 	/** Diese Methode gibt die Megne der Knoten mit den Merkmalen der gegebenen zurück und erzeugt diesen bei Bedarf.
@@ -573,26 +589,12 @@ public abstract class STSStore {
 			final STSNodeSet result = (STSNodeSet)nodes;
 			if (this.contains(result)) return result;
 		}
-		return this.putNodeSetByCopyImpl(nodes.iterator());
+		return this.customPutNodeSetByItem(nodes.iterator());
 	}
 
-	/** Diese Methode gibt die Menge der verwalteten Knoten mit den gegebenen Werten zurück und erzeugt diesen bei Bedarf.
-	 *
-	 * @param values {@link STSNode#value() Wertliste}.
-	 * @return Knotenmegne.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
-	public STSNodeSet putNodeSet(final List<? extends FEMBinary> values) throws NullPointerException {
-		return this.putNodeSetByFieldsImpl(values.iterator());
-	}
-
-	{}
-
-	{}
-
-	{}
-	{}
-
-	protected final STSNodeSet putNodeSetByCopyImpl(final Iterator<? extends STSNode> nodes) throws NullPointerException {
+	/** Diese Methode implementiert {@link #putNodeSet(Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	protected STSNodeSet customPutNodeSetByItem(final Iterator<? extends STSNode> nodes) throws NullPointerException {
 		return this.toNodeSetImpl(new ItemIterator() {
 
 			@Override
@@ -608,7 +610,18 @@ public abstract class STSStore {
 		});
 	}
 
-	protected final STSNodeSet putNodeSetByFieldsImpl(final Iterator<? extends FEMBinary> values) throws NullPointerException {
+	/** Diese Methode gibt die Menge der verwalteten Knoten mit den gegebenen Werten zurück und erzeugt diesen bei Bedarf.
+	 *
+	 * @param values {@link STSNode#value() Wertliste}.
+	 * @return Knotenmegne.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
+	public STSNodeSet putNodeSet(final List<? extends FEMBinary> values) throws NullPointerException {
+		return this.customPutNodeSetByFields(values.iterator());
+	}
+
+	/** Diese Methode implementiert {@link #putNodeSet(List)}. */
+	@SuppressWarnings ("javadoc")
+	protected STSNodeSet customPutNodeSetByFields(final Iterator<? extends FEMBinary> values) throws NullPointerException {
 		return this.toNodeSetImpl(new ItemIterator() {
 
 			@Override
@@ -624,19 +637,6 @@ public abstract class STSStore {
 		});
 	}
 
-	{}
-	{}
-
-	{}
-
-	{}
-	{}
-	{}
-
-	{}
-	{}
-	{}
-
 	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} zurück, in denen die gegebenen Subjekte, Prädikate bzw. Objekte enthalten sind. Für
 	 * uneingeschränkte Komponenten ist {@code null} anzugeben.
 	 *
@@ -650,48 +650,7 @@ public abstract class STSStore {
 		final STSEdgeSet objectSet = this.selectEdgeSetImpl(objectFilter, new SelectObjectEdgeSetGetter());
 		final STSEdgeSet subjectSet = this.selectEdgeSetImpl(subjectFilter, new SelectSubjectEdgeSetGetter());
 		final STSEdgeSet predicateSet = this.selectEdgeSetImpl(predicateFilter, new SelectPredicateEdgeSetGetter());
-		return this.selectEdgeSetImpl(subjectSet, predicateSet, objectSet);
-	}
-
-	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} zurück, deren Subjekte, Prädikate bzw. Objekte in den gegebenen Mengen enthalten sind. Für
-	 * uneingeschränkte Komponenten ist {@code null} anzugeben.
-	 *
-	 * @param subjectFilter Subjektfilter oder {@code null}.
-	 * @param predicateFilter Prädikatfilter oder {@code null}.
-	 * @param objectFilter Objektfilter oder {@code null}.
-	 * @return gefilterte Kanten. */
-	public STSEdgeSet selectEdgeSet(final STSNodeSet subjectFilter, final STSNodeSet predicateFilter, final STSNodeSet objectFilter) {
-		final STSEdgeSet objectSet = this.selectEdgeSetImpl(objectFilter, new SelectObjectEdgeSetGetter());
-		final STSEdgeSet subjectSet = this.selectEdgeSetImpl(subjectFilter, new SelectSubjectEdgeSetGetter());
-		final STSEdgeSet predicateSet = this.selectEdgeSetImpl(predicateFilter, new SelectPredicateEdgeSetGetter());
-		return this.selectEdgeSetImpl(subjectSet, predicateSet, objectSet);
-	}
-
-	/** Diese Methode gibt die {@link STSEdgeSet#toIntersection(STSEdgeSet) Schnittmenge} der Kantenmengen zurück, die nicht {@code null} sind. Wenn alle Mengen
-	 * {@code null} sind, wird die {@link #getEdgeSet() Menge aller Kanten} geliefert.
-	 *
-	 * @param subjectSet Menge der Kanten mit bestimmten Subjekten.
-	 * @param predicateSet Menge der Kanten mit bestimmten Prädikaten.
-	 * @param objectSet Menge der Kanten mit bestimmten Objekten.
-	 * @return Schnittmenge der Kantenmengen. */
-	protected final STSEdgeSet selectEdgeSetImpl(final STSEdgeSet subjectSet, final STSEdgeSet predicateSet, final STSEdgeSet objectSet) {
-		if (subjectSet != null) {
-			if (predicateSet != null) {
-				if (objectSet != null) return subjectSet.toIntersection(predicateSet).toIntersection(objectSet);
-				return subjectSet.toIntersection(predicateSet);
-			} else {
-				if (objectSet != null) return subjectSet.toIntersection(objectSet);
-				return subjectSet;
-			}
-		} else {
-			if (predicateSet != null) {
-				if (objectSet != null) return predicateSet.toIntersection(objectSet);
-				return predicateSet;
-			} else {
-				if (objectSet != null) return objectSet;
-				return this.getEdgeSet();
-			}
-		}
+		return this.customSelectEdgeSet(subjectSet, predicateSet, objectSet);
 	}
 
 	/** Diese Methode implementiert für {@link #selectEdgeSet(STSNode, STSNode, STSNode)} die Überführung eines Filterknoten in eine Kantenmenge bzw.
@@ -707,6 +666,20 @@ public abstract class STSStore {
 		if (filter == null) return null;
 		final STSNode node = this.getNode(filter);
 		return node != null ? getter.get(node) : null;
+	}
+
+	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} zurück, deren Subjekte, Prädikate bzw. Objekte in den gegebenen Mengen enthalten sind. Für
+	 * uneingeschränkte Komponenten ist {@code null} anzugeben.
+	 *
+	 * @param subjectFilter Subjektfilter oder {@code null}.
+	 * @param predicateFilter Prädikatfilter oder {@code null}.
+	 * @param objectFilter Objektfilter oder {@code null}.
+	 * @return gefilterte Kanten. */
+	public STSEdgeSet selectEdgeSet(final STSNodeSet subjectFilter, final STSNodeSet predicateFilter, final STSNodeSet objectFilter) {
+		final STSEdgeSet objectSet = this.selectEdgeSetImpl(objectFilter, new SelectObjectEdgeSetGetter());
+		final STSEdgeSet subjectSet = this.selectEdgeSetImpl(subjectFilter, new SelectSubjectEdgeSetGetter());
+		final STSEdgeSet predicateSet = this.selectEdgeSetImpl(predicateFilter, new SelectPredicateEdgeSetGetter());
+		return this.customSelectEdgeSet(subjectSet, predicateSet, objectSet);
 	}
 
 	/** Diese Methode implementiert für {@link #selectEdgeSet(STSNodeSet, STSNodeSet, STSNodeSet)} die Überführung einer Filterknotenmenge in eine Kantenmenge
@@ -730,33 +703,50 @@ public abstract class STSStore {
 		return result;
 	}
 
+	/** Diese Methode gibt die {@link STSEdgeSet#toIntersection(STSEdgeSet) Schnittmenge} der Kantenmengen zurück, die nicht {@code null} sind. Wenn alle Mengen
+	 * {@code null} sind, wird die {@link #getEdgeSet() Menge aller Kanten} geliefert.
+	 *
+	 * @param subjectSet Menge der Kanten mit bestimmten Subjekten.
+	 * @param predicateSet Menge der Kanten mit bestimmten Prädikaten.
+	 * @param objectSet Menge der Kanten mit bestimmten Objekten.
+	 * @return Schnittmenge der Kantenmengen. */
+	protected STSEdgeSet customSelectEdgeSet(final STSEdgeSet subjectSet, final STSEdgeSet predicateSet, final STSEdgeSet objectSet) {
+		if (subjectSet != null) {
+			if (predicateSet != null) {
+				if (objectSet != null) return subjectSet.toIntersection(predicateSet).toIntersection(objectSet);
+				return subjectSet.toIntersection(predicateSet);
+			} else {
+				if (objectSet != null) return subjectSet.toIntersection(objectSet);
+				return subjectSet;
+			}
+		} else {
+			if (predicateSet != null) {
+				if (objectSet != null) return predicateSet.toIntersection(objectSet);
+				return predicateSet;
+			} else {
+				if (objectSet != null) return objectSet;
+				return this.getEdgeSet();
+			}
+		}
+	}
+
 	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeObjectIndex(int) Objekt} zurück.
 	 *
 	 * @param objectIndex {@link STSItem#index Position} des {@link STSEdge#object() Objektknoten}.
 	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectObjectEdgeSet(int objectIndex);
+	protected abstract STSEdgeSet customSelectEdgeSetByObject(int objectIndex);
 
 	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgeSubjectIndex(int) Subjekt} zurück.
 	 *
 	 * @param subjectIndex {@link STSItem#index Position} des {@link STSEdge#subject() Subjektknoten}.
 	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectSubjectEdgeSet(int subjectIndex);
+	protected abstract STSEdgeSet customSelectEdgeSetBySubject(int subjectIndex);
 
 	/** Diese Methode gibt die {@link STSEdgeSet Menge der Kanten} mit dem gegebenen {@link #customGetEdgePredicateIndex(int) Prädikat} zurück.
 	 *
 	 * @param predicateIndex {@link STSItem#index Position} des {@link STSEdge#predicate() Prädikatknoten}.
 	 * @return Kantenmenge. */
-	protected abstract STSEdgeSet customSelectPredicateEdgeSet(int predicateIndex);
-
-	{}
-
-	{}
-
-	{}
-
-	{}
-
-	{}
+	protected abstract STSEdgeSet customSelectEdgeSetByPredicate(int predicateIndex);
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Datensatz von diesem Graphspeicher verwaltet wird.
 	 *
@@ -776,14 +766,16 @@ public abstract class STSStore {
 
 	{}
 
-	{}
+	/** {@inheritDoc} */
+	@Override
+	public final int hashCode() {
+		return this.hash;
+	}
 
-	{}
-
-	{}
-
-	{}
-
-	{}
+	/** {@inheritDoc} */
+	@Override
+	public final boolean equals(final Object object) {
+		return (object == this) || ((object instanceof STSStore) && (this.hash == object.hashCode()));
+	}
 
 }
