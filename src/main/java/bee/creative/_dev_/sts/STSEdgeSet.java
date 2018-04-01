@@ -3,7 +3,8 @@ package bee.creative._dev_.sts;
 import java.util.Iterator;
 import bee.creative.array.IntegerArraySection;
 
-/** Diese Klasse implementiert eine abstract Menge von {@link STSEdge Kanten}, über welche in aufsteigender Ordnung iteriert werden kann.
+/** Diese Klasse implementiert eine abstract Menge von {@link STSEdge Kanten} eines {@link #store() Graphspeichers}, über welche in aufsteigender Ordnung
+ * iteriert werden kann.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")
@@ -72,13 +73,13 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 	}
 
 	/** Diese Klasse implementiert die Menge der Kanten zu einer Positionsliste, die aus einem ersten Element und einer Elementanzahl rekonstruiert wird. */
-	protected static class SectionEdgeSet extends STSEdgeSet {
+	protected static class SequenceEdgeSet extends STSEdgeSet {
 
 		final int index;
 
 		final int count;
 
-		public SectionEdgeSet(final STSStore store, final int index, final int count) {
+		public SequenceEdgeSet(final STSStore store, final int index, final int count) {
 			super(store);
 			this.index = index;
 			this.count = count;
@@ -150,7 +151,7 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn that von einem anderen {@link #store() Graphspeicher verwaltet wird}. */
 	public STSEdgeSet toUnion(final STSEdgeSet that) throws NullPointerException, IllegalArgumentException {
-		if (this.store == that.store) return new UnionEdgeSet(that, this);
+		if (this.store == that.store) return new UnionEdgeSet(this, that);
 		throw new IllegalArgumentException();
 	}
 
@@ -161,7 +162,7 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn that von einem anderen {@link #store() Graphspeicher verwaltet wird}. */
 	public STSEdgeSet toIntersection(final STSEdgeSet that) {
-		if (this.store == that.store) return new IntersectionEdgeSet(that, this);
+		if (this.store == that.store) return new IntersectionEdgeSet(this, that);
 		throw new IllegalArgumentException();
 	}
 
@@ -182,7 +183,7 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 			public STSEdge next() {
 				final STSEdge result = this.result;
 				final int next = index.next();
-				this.result = next != Integer.MAX_VALUE ? STSEdgeSet.this.store.getEdgeImpl(next) : null;
+				this.result = next != Integer.MAX_VALUE ? STSEdgeSet.this.store.customGetEdge(next) : null;
 				return result;
 			}
 

@@ -5,7 +5,8 @@ import java.util.Iterator;
 import bee.creative.array.IntegerArraySection;
 import bee.creative.util.Iterables;
 
-/** Diese Klasse implementiert eine abstrakte Menge von {@link STSItem Datensätzen}, über welche in aufsteigender Ordnung iteriert werden kann.
+/** Diese Klasse implementiert eine abstrakte Menge von {@link STSItem Datensätzen} eines {@link #store() Graphspeichers}, über welche in aufsteigender Ordnung
+ * iteriert werden kann.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Datensätze. */
@@ -166,7 +167,7 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 
 	{}
 
-	/** Dieses Feld speichert den Graphspeicher, der dieses Objekt verwaltet. */
+	/** Dieses Feld speichert den Graphspeicher, der die Elemente dieser Menge verwaltet. */
 	protected final STSStore store;
 
 	protected STSItemSet(final STSStore store) {
@@ -190,7 +191,7 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	 * @return Iterator über Datensätze. */
 	protected abstract Iterator<GItem> customIterator(ItemIndex index);
 
-	/** Diese Methode gibt den dieses Objekt verwaltenden Graphspeicher zurück.
+	/** Diese Methode gibt den die Elemente dieser Menge verwaltenden Graphspeicher zurück.
 	 *
 	 * @return Graphspeicher. */
 	public final STSStore store() {

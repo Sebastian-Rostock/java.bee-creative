@@ -3,7 +3,8 @@ package bee.creative._dev_.sts;
 import java.util.Iterator;
 import bee.creative.array.IntegerArraySection;
 
-/** Diese Klasse implementiert eine abstract Menge von {@link STSNode Knoten}, über welche in aufsteigender Ordnung iteriert werden kann.
+/** Diese Klasse implementiert eine abstract Menge von {@link STSNode Knoten} eines {@link #store() Graphspeichers}, über welche in aufsteigender Ordnung
+ * iteriert werden kann.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")
@@ -72,13 +73,13 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	}
 
 	/** Diese Klasse implementiert die Menge der Knoten zu einer Positionsliste, die aus einem ersten Element und einer Elementanzahl rekonstruiert wird. */
-	protected static class SectionNodeSet extends STSNodeSet {
+	protected static class SequenceNodeSet extends STSNodeSet {
 
 		final int index;
 
 		final int count;
 
-		public SectionNodeSet(final STSStore store, final int index, final int count) {
+		public SequenceNodeSet(final STSStore store, final int index, final int count) {
 			super(store);
 			this.index = index;
 			this.count = count;
@@ -150,7 +151,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn that von einem anderen {@link #store() Graphspeicher verwaltet wird}. */
 	public STSNodeSet toUnion(final STSNodeSet that) throws NullPointerException, IllegalArgumentException {
-		if (this.store == that.store) return new UnionNodeSet(that, this);
+		if (this.store == that.store) return new UnionNodeSet(this, that);
 		throw new IllegalArgumentException();
 	}
 
@@ -161,7 +162,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn that von einem anderen {@link #store() Graphspeicher verwaltet wird}. */
 	public STSNodeSet toIntersection(final STSNodeSet that) {
-		if (this.store == that.store) return new IntersectionNodeSet(that, this);
+		if (this.store == that.store) return new IntersectionNodeSet(this, that);
 		throw new IllegalArgumentException();
 	}
 
@@ -182,7 +183,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 			public STSNode next() {
 				final STSNode result = this.result;
 				final int next = index.next();
-				this.result = next != Integer.MAX_VALUE ? STSNodeSet.this.store.getNodeImpl(next) : null;
+				this.result = next != Integer.MAX_VALUE ? STSNodeSet.this.store.customGetNode(next) : null;
 				return result;
 			}
 

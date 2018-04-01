@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.AbstractList;
 import java.util.Iterator;
@@ -139,6 +140,25 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		@Override
 		public final byte[] value() {
 			return IAMArray.toBytes(this.array);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static final class BufferBinary extends FEMBinary {
+
+		public final ByteBuffer buffer;
+
+		BufferBinary(final ByteBuffer buffer) {
+			super(buffer.limit());
+			this.buffer = buffer;
+		}
+
+		{}
+
+		@Override
+		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+			return this.buffer.get(index);
 		}
 
 	}
@@ -365,6 +385,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
+		public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
+			if ((offset == 0) && (length == this.length)) return this;
+			if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
+			if (length == 0) return FEMBinary.EMPTY;
+			return new UniformBinary(length, this.item);
+		}
+
+		@Override
 		public final FEMBinary reverse() {
 			return this;
 		}
@@ -539,6 +567,17 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		if (array.length() == 0) return FEMBinary.EMPTY;
 		if (array.mode() == 1) return new ArrayBinary(array);
 		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
+	 *
+	 * @param buffer Zahlenfolge.
+	 * @return Bytefolge.
+	 * @throws NullPointerException Wenn {@code buffer} {@code null} ist. */
+	public static FEMBinary from(final ByteBuffer buffer) throws NullPointerException {
+		if (buffer.limit() == 0) return FEMBinary.EMPTY;
+		if (buffer.limit() == 1) return new UniformBinary(1, buffer.get(0));
+		return new BufferBinary(buffer);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBinary.TYPE)}.

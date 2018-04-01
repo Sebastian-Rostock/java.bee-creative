@@ -1,7 +1,10 @@
 package bee.creative._dev_.sts;
 
-// TODO String durch STSText ersetzen -> Mapped-Sichten mit effizientem hash/equals
-/** Diese Klasse implementiert einen Knoten eines Graphen, der in einem {@link #store() Graphspeicher} verwaltet wird.<br>
+import bee.creative.fem.FEMBinary;
+
+/** Diese Klasse implementiert den {@link STSStore#getNodeSet() Knoten eines Graphen}, der in einem {@link #store() Graphspeicher} verwaltet wird. Der Knoten
+ * ist dazu über seinen {@link #value() Wert} eindeutig gekennzeichnet und kann darüber {@link STSStore#getNode(FEMBinary) identifiziert} werden.
+ * <p>
  * Die korrekte Ermittlung von {@link #equals(Object) Äquivalenz} und {@link #compareTo(STSNode) Ordnung} zweier Knoten setzt deren Verwaltung im gleichen
  * Graphspeicher voraus.
  * 
@@ -16,18 +19,13 @@ public final class STSNode extends STSItem implements Comparable<STSNode> {
 
 	{}
 
-	/** Diese Methode gibt den Lokalnamen dieses Knoten zurück. Dieser kennzeichnet den Knoten im Kontext seines {@link #namespace() Namensraums} eineindeutig.
+	/** Diese Methode gibt den Wert dieses Knoten zurück. Dieser kennzeichnet den Knoten im Kontext seines {@link #store() Graphspeichers} eineindeutig und
+	 * verbindet ihn inhaltlich mit einem Element eines externen Wissensspeichers. Der Knotenwert könnte bspw. der Binärkodierung der Verkettung von
+	 * Namensraum(-prefix) und Lakolnamen entsprechen.
 	 *
-	 * @return Lokalnamen. */
-	public String localname() {
-		return this.store.customGetNodeLocalname(this.index);
-	}
-
-	/** Diese Methode gibt den Namensraum dieses Knoten zurück.
-	 *
-	 * @return Namensraum. */
-	public String namespace() {
-		return this.store.customGetNodeNamespace(this.index);
+	 * @return Knotenwert. */
+	public FEMBinary value() {
+		return this.store.customGetNodeValue(this.index);
 	}
 
 	{}
@@ -50,11 +48,10 @@ public final class STSNode extends STSItem implements Comparable<STSNode> {
 		return this.compareImpl(that);
 	}
 
-	/** Diese Methode gibt die Textdarstellung dieses Knoten zurück.<br>
-	 * Diese besteht aus {@code <}{@link #namespace() Namensraum}{@code #}{@link #localname() Lokalname}{@code >}. */
+	/** Diese Methode gibt die Textdarstellung dieses Knoten zurück. */
 	@Override
 	public String toString() {
-		return "<" + this.namespace() + "#" + this.localname() + ">";
+		return this.store.customGetNodeString(this.index);
 	}
 
 }

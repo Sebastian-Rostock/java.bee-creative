@@ -19,21 +19,21 @@ public final class STSEdge extends STSItem implements Comparable<STSEdge> {
 	 *
 	 * @return Objekt. */
 	public STSNode object() {
-		return this.store.getNodeImpl(this.store.customGetEdgeObject(this.index));
+		return this.store.customGetEdgeObjectNode(this.index);
 	}
 
 	/** Diese Methode gibt {@link STSNode Knoten} zurück, der für das Subjekt bzw. den Beginn der Kante steht.
 	 *
 	 * @return Subjekt. */
 	public STSNode subject() {
-		return this.store.getNodeImpl(this.store.customGetEdgeSubject(this.index));
+		return this.store.customGetEdgeSubjectNode(this.index);
 	}
 
 	/** Diese Methode gibt {@link STSNode Knoten} zurück, der für das Prädikat bzw. die Bedeutung der Kante steht.
 	 *
 	 * @return Prädikat. */
 	public STSNode predicate() {
-		return this.store.getNodeImpl(this.store.customGetEdgePredicate(this.index));
+		return this.store.customGetEdgePredicateNode(this.index);
 	}
 
 	{}
@@ -56,11 +56,10 @@ public final class STSEdge extends STSItem implements Comparable<STSEdge> {
 		return this.compareImpl(that);
 	}
 
-	/** Diese Methode gibt die Textdarstellung dieses Knoten zurück.<br>
-	 * Diese besteht aus {@code (}{@link #subject() Subjekt}{@code |}{@link #predicate() Prädikat}{@code |}{@link #object() Objekt}{@code )}. */
+	/** Diese Methode gibt die Textdarstellung dieses Knoten zurück. */
 	@Override
 	public String toString() {
-		return "(" + this.subject() + "|" + this.predicate() + "|" + this.object() + ")";
+		return this.store.customGetEdgeString(this.index);
 	}
 
 }
