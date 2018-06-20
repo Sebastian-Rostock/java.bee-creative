@@ -26,8 +26,23 @@ public class Objects {
 
 	{}
 
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link #deepHash(Object)} und {@link #deepEquals(Object, Object)} delegiert. */
-	public static final Hasher ARRAY_HASHER = new Hasher() {
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#hash(Object)} und {@link Objects#equals(Object, Object)} delegiert. */
+	public static final Hasher HASHER = new Hasher() {
+
+		@Override
+		public int hash(final Object input) {
+			return Objects.hash(input);
+		}
+
+		@Override
+		public boolean equals(final Object input1, final Object input2) {
+			return Objects.equals(input1, input2);
+		}
+
+	};
+
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#deepHash(Object)} und {@link Objects#deepEquals(Object, Object)} delegiert. */
+	public static final Hasher DEEP_HASHER = new Hasher() {
 
 		@Override
 		public int hash(final Object input) {
@@ -37,21 +52,6 @@ public class Objects {
 		@Override
 		public boolean equals(final Object input1, final Object input2) {
 			return Objects.deepEquals(input1, input2);
-		}
-
-	};
-
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link #hash(Object)} und {@link #equals(Object, Object)} delegiert. */
-	public static final Hasher OBJECT_HASHER = new Hasher() {
-
-		@Override
-		public int hash(final Object input) {
-			return this.hash(input);
-		}
-
-		@Override
-		public boolean equals(final Object input1, final Object input2) {
-			return this.equals(input1, input2);
 		}
 
 	};

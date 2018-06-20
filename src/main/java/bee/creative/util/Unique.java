@@ -19,7 +19,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	 * fromHashMap(Objects.OBJECT_HASHER, Getters.neutralGetter(), Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
 	public static <GInput> Unique<GInput, GInput> fromHashMap() {
-		return Unique.fromHashMap(Objects.OBJECT_HASHER, Getters.<GInput>neutralGetter(), Setters.emptySetter());
+		return Unique.fromHashMap(Objects.HASHER, Getters.<GInput>neutralGetter(), Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
@@ -33,7 +33,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	 * fromHashMap(Objects.OBJECT_HASHER, compiler, Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Getter<? super GInput, ? extends GOutput> compiler) throws NullPointerException {
-		return Unique.fromHashMap(Objects.OBJECT_HASHER, compiler, Setters.emptySetter());
+		return Unique.fromHashMap(Objects.HASHER, compiler, Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMapImpl(Hasher, Getter, Setter)
