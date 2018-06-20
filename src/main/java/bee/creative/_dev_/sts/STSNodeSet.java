@@ -10,7 +10,129 @@ import bee.creative.array.IntegerArraySection;
 @SuppressWarnings ("javadoc")
 public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
-	/** Diese Klasse implementiert die Menge der Knoten zu einer gegebenen Positionsliste.<br>
+	/** Diese Klasse implementiert die Menge aller Knoten eines Graphspeichers.
+	 * 
+	 * @see STSStore#getNodeSet() */
+	protected static class StoreNodeSet extends STSNodeSet {
+
+		public StoreNodeSet(final STSStore store) {
+			super(store);
+		}
+
+		{}
+
+		@Override
+		protected ItemIndex customIndex() {
+			return new SequenceIndex(this.store.customGetNodeIndex(), this.store.customGetNodeCount());
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return (item instanceof STSNode) && this.store.contains((STSNode)item);
+		}
+
+		@Override
+		public int minSize() {
+			return this.store.customGetNodeCount();
+		}
+
+		@Override
+		public int maxSize() {
+			return this.store.customGetNodeCount();
+		}
+
+		@Override
+		public STSNodeSet toUnion(STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+			if (!this.store.contains(that)) throw new IllegalArgumentException();
+			return this;
+		}
+
+		@Override
+		public STSNodeSet toIntersection(STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+			if (!this.store.contains(that)) throw new IllegalArgumentException();
+			return that;
+		}
+
+	}
+
+	/** Diese Klasse implementiert eine Menge mit einem Knoten. */
+	protected static class SingleNodeSet extends STSNodeSet {
+
+		final STSNode node;
+
+		public SingleNodeSet(final STSNode node) {
+			super(node.store);
+			this.node = node;
+		}
+
+		{}
+
+		@Override
+		protected ItemIndex customIndex() {
+			return new SequenceIndex(this.node.index, 1);
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.node.equals(item);
+		}
+
+		@Override
+		public int minSize() {
+			return 1;
+		}
+
+		@Override
+		public int maxSize() {
+			return 1;
+		}
+
+	}
+
+	/** Diese Klasse implementiert die leere Knotenmenge. */
+	protected static class EmptyNodeSet extends STSNodeSet {
+
+		public EmptyNodeSet(final STSStore store) {
+			super(store);
+		}
+
+		{}
+
+		@Override
+		protected ItemIndex customIndex() {
+			return new EmptyIndex();
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return false;
+		}
+
+		@Override
+		public int minSize() {
+			return 0;
+		}
+
+		@Override
+		public int maxSize() {
+			return 0;
+		}
+
+		@Override
+		public STSNodeSet toUnion(STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+			if (!this.store.contains(that)) throw new IllegalArgumentException();
+			return that;
+		}
+
+		@Override
+		public STSNodeSet toIntersection(STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+			if (!this.store.contains(that)) throw new IllegalArgumentException();
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert die Menge der Knoten zu einer gegebenen {@link IntegerArraySection Positionsliste}.<br>
 	 * <b>Die Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b> */
 	protected static class ArrayNodeSet extends STSNodeSet {
 
@@ -29,6 +151,11 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 		}
 
 		@Override
+		public boolean contains(final Object item) {
+			return (item instanceof STSNode) && this.containsImpl(this.items, (STSNode)item);
+		}
+
+		@Override
 		public int minSize() {
 			return this.items.size();
 		}
@@ -40,7 +167,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	}
 
-	/** Diese Klasse implementiert die Vereinigungsmenge zweier gegebener Knotenmengen. */
+	/** Diese Klasse implementiert die Vereinigungsmenge zweier Knotenmengen. */
 	protected static class UnionNodeSet extends STSNodeSet {
 
 		final STSNodeSet items1;
@@ -61,6 +188,11 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 		}
 
 		@Override
+		public boolean contains(final Object item) {
+			return this.items1.contains(item) || this.items2.contains(item);
+		}
+
+		@Override
 		public int minSize() {
 			return STSItemSet.unionMinSizeImpl(this.items1, this.items2);
 		}
@@ -72,39 +204,7 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	}
 
-	/** Diese Klasse implementiert die Menge der Knoten zu einer Positionsliste, die aus einem ersten Element und einer Elementanzahl rekonstruiert wird. */
-	protected static class SequenceNodeSet extends STSNodeSet {
-
-		final int index;
-
-		final int count;
-
-		public SequenceNodeSet(final STSStore store, final int index, final int count) {
-			super(store);
-			this.index = index;
-			this.count = count;
-		}
-
-		{}
-
-		@Override
-		public int minSize() {
-			return this.count;
-		}
-
-		@Override
-		public int maxSize() {
-			return this.count;
-		}
-
-		@Override
-		protected ItemIndex customIndex() {
-			return new SequenceIndex(this.index, this.count);
-		}
-
-	}
-
-	/** Diese Klasse implementiert die Schnittmenge zweier gegebener Knotenmengen. */
+	/** Diese Klasse implementiert die Schnittmenge zweier Knotenmengen. */
 	protected static class IntersectionNodeSet extends STSNodeSet {
 
 		final STSNodeSet items1;
@@ -122,6 +222,11 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 		@Override
 		protected ItemIndex customIndex() {
 			return new IntersectionIndex(this.items1.customIndex(), this.items2.customIndex());
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.items1.contains(item) && this.items2.contains(item);
 		}
 
 		@Override
@@ -151,8 +256,10 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn that von einem anderen {@link #store() Graphspeicher verwaltet wird}. */
 	public STSNodeSet toUnion(final STSNodeSet that) throws NullPointerException, IllegalArgumentException {
-		if (this.store == that.store) return new UnionNodeSet(this, that);
-		throw new IllegalArgumentException();
+		if (!this.store.contains(that)) throw new IllegalArgumentException();
+		if (that instanceof EmptyNodeSet) return this;
+		if (that instanceof StoreNodeSet) return that;
+		return new UnionNodeSet(this, that);
 	}
 
 	/** Diese Methode gibt die Schnittmenge dieser und der gegebenen Menge zurück.
@@ -161,9 +268,11 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 	 * @return Schnittmenge.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn that von einem anderen {@link #store() Graphspeicher verwaltet wird}. */
-	public STSNodeSet toIntersection(final STSNodeSet that) {
-		if (this.store == that.store) return new IntersectionNodeSet(this, that);
-		throw new IllegalArgumentException();
+	public STSNodeSet toIntersection(final STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+		if (!this.store.contains(that)) throw new IllegalArgumentException();
+		if (that instanceof EmptyNodeSet) return that;
+		if (that instanceof StoreNodeSet) return this;
+		return new IntersectionNodeSet(this, that);
 	}
 
 	{}

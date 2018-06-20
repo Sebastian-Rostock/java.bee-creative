@@ -10,7 +10,129 @@ import bee.creative.array.IntegerArraySection;
 @SuppressWarnings ("javadoc")
 public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
-	/** Diese Klasse implementiert die Menge der Kanten zu einer gegebenen Positionsliste.<br>
+	/** Diese Klasse implementiert die Menge aller Kanten eines Graphspeichers.
+	 *
+	 * @see STSStore#getEdgeSet() */
+	protected static class StoreEdgeSet extends STSEdgeSet {
+
+		public StoreEdgeSet(final STSStore store) {
+			super(store);
+		}
+
+		{}
+
+		@Override
+		protected ItemIndex customIndex() {
+			return new SequenceIndex(this.store.customGetEdgeIndex(), this.store.customGetEdgeCount());
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return (item instanceof STSEdge) && this.store.contains((STSEdge)item);
+		}
+
+		@Override
+		public int minSize() {
+			return this.store.customGetEdgeCount();
+		}
+
+		@Override
+		public int maxSize() {
+			return this.store.customGetEdgeCount();
+		}
+
+		@Override
+		public STSEdgeSet toUnion(final STSEdgeSet that) throws NullPointerException, IllegalArgumentException {
+			if (!this.store.contains(that)) throw new IllegalArgumentException();
+			return this;
+		}
+
+		@Override
+		public STSEdgeSet toIntersection(final STSEdgeSet that) throws NullPointerException, IllegalArgumentException {
+			if (!this.store.contains(that)) throw new IllegalArgumentException();
+			return that;
+		}
+
+	}
+
+	/** Diese Klasse implementiert eine Menge mit einre Kante. */
+	protected static class SingleEdgeSet extends STSEdgeSet {
+
+		final STSEdge edge;
+
+		public SingleEdgeSet(final STSEdge node) {
+			super(node.store);
+			this.edge = node;
+		}
+
+		{}
+
+		@Override
+		protected ItemIndex customIndex() {
+			return new SequenceIndex(this.edge.index, 1);
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.edge.equals(item);
+		}
+
+		@Override
+		public int minSize() {
+			return 1;
+		}
+
+		@Override
+		public int maxSize() {
+			return 1;
+		}
+
+	}
+
+	/** Diese Klasse implementiert die leere Kantenmenge. */
+	protected static class EmptyEdgeSet extends STSEdgeSet {
+
+		public EmptyEdgeSet(final STSStore store) {
+			super(store);
+		}
+
+		{}
+
+		@Override
+		protected ItemIndex customIndex() {
+			return new EmptyIndex();
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return false;
+		}
+
+		@Override
+		public int minSize() {
+			return 0;
+		}
+
+		@Override
+		public int maxSize() {
+			return 0;
+		}
+
+		@Override
+		public STSEdgeSet toUnion(final STSEdgeSet that) throws NullPointerException, IllegalArgumentException {
+			if (!this.store.contains(that)) throw new IllegalArgumentException();
+			return that;
+		}
+
+		@Override
+		public STSEdgeSet toIntersection(final STSEdgeSet that) throws NullPointerException, IllegalArgumentException {
+			if (!this.store.contains(that)) throw new IllegalArgumentException();
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert die Menge der Kanten zu einer gegebenen {@link IntegerArraySection Positionsliste}.<br>
 	 * <b>Die Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b> */
 	protected static class ArrayEdgeSet extends STSEdgeSet {
 
@@ -26,6 +148,11 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 		@Override
 		protected ItemIndex customIndex() {
 			return new ArrayIndex(this.items);
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return (item instanceof STSEdge) && this.containsImpl(this.items, (STSEdge)item);
 		}
 
 		@Override
@@ -56,6 +183,16 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 		{}
 
 		@Override
+		protected ItemIndex customIndex() {
+			return new UnionIndex(this.items1.customIndex(), this.items2.customIndex());
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.items1.contains(item) || this.items2.contains(item);
+		}
+
+		@Override
 		public int minSize() {
 			return STSItemSet.unionMinSizeImpl(this.items1, this.items2);
 		}
@@ -63,43 +200,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 		@Override
 		public int maxSize() {
 			return STSItemSet.unionMaxSizeImpl(this.items1, this.items2, this.store.customGetEdgeCount());
-		}
-
-		@Override
-		protected ItemIndex customIndex() {
-			return new UnionIndex(this.items1.customIndex(), this.items2.customIndex());
-		}
-
-	}
-
-	/** Diese Klasse implementiert die Menge der Kanten zu einer Positionsliste, die aus einem ersten Element und einer Elementanzahl rekonstruiert wird. */
-	protected static class SequenceEdgeSet extends STSEdgeSet {
-
-		final int index;
-
-		final int count;
-
-		public SequenceEdgeSet(final STSStore store, final int index, final int count) {
-			super(store);
-			this.index = index;
-			this.count = count;
-		}
-
-		{}
-
-		@Override
-		public int minSize() {
-			return this.count;
-		}
-
-		@Override
-		public int maxSize() {
-			return this.count;
-		}
-
-		@Override
-		protected ItemIndex customIndex() {
-			return new SequenceIndex(this.index, this.count);
 		}
 
 	}
@@ -120,6 +220,16 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 		{}
 
 		@Override
+		protected ItemIndex customIndex() {
+			return new IntersectionIndex(this.items1.customIndex(), this.items2.customIndex());
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.items1.contains(item) && this.items2.contains(item);
+		}
+
+		@Override
 		public int minSize() {
 			return STSItemSet.intersectionMinSizeImpl(this.items1, this.items2, this.store.customGetEdgeCount());
 		}
@@ -127,11 +237,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 		@Override
 		public int maxSize() {
 			return STSItemSet.intersectionMaxSizeImpl(this.items1, this.items2);
-		}
-
-		@Override
-		protected ItemIndex customIndex() {
-			return new IntersectionIndex(this.items1.customIndex(), this.items2.customIndex());
 		}
 
 	}

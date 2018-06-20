@@ -35,6 +35,15 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 
 	}
 
+	protected static class EmptyIndex implements ItemIndex {
+
+		@Override
+		public int next() {
+			return Integer.MAX_VALUE;
+		}
+
+	}
+
 	/** Diese Klasse implementiert einen {@link ItemIndex}, der über eine gegebene Positionsliste läuft. */
 	protected static class ArrayIndex extends SequenceIndex {
 
@@ -176,6 +185,16 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	}
 
 	{}
+
+	protected final boolean containsImpl(final IntegerArraySection items, final STSItem item) {
+		if (!this.store.contains(item)) return false;
+		final int[] array = items.array();
+		final int count = items.finalIndex(), index = item.index;
+		for (int i = items.startIndex(); i < count; i++) {
+			if (array[i] == index) return true;
+		}
+		return false;
+	}
 
 	/** Diese Methode gibt die Positionsmenge der Datensätze dieser Menge zurück.
 	 *

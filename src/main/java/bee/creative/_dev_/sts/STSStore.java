@@ -5,10 +5,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import bee.creative._dev_.sts.STSEdgeSet.ArrayEdgeSet;
-import bee.creative._dev_.sts.STSEdgeSet.SequenceEdgeSet;
+import bee.creative._dev_.sts.STSEdgeSet.EmptyEdgeSet;
+import bee.creative._dev_.sts.STSEdgeSet.SingleEdgeSet;
+import bee.creative._dev_.sts.STSEdgeSet.StoreEdgeSet;
 import bee.creative._dev_.sts.STSItemSet.ItemIterator;
 import bee.creative._dev_.sts.STSNodeSet.ArrayNodeSet;
-import bee.creative._dev_.sts.STSNodeSet.SequenceNodeSet;
+import bee.creative._dev_.sts.STSNodeSet.EmptyNodeSet;
+import bee.creative._dev_.sts.STSNodeSet.SingleNodeSet;
+import bee.creative._dev_.sts.STSNodeSet.StoreNodeSet;
 import bee.creative.array.CompactIntegerArray;
 import bee.creative.array.IntegerArraySection;
 import bee.creative.fem.FEMBinary;
@@ -152,11 +156,11 @@ public abstract class STSStore {
 	@SuppressWarnings ("javadoc")
 	protected abstract STSEdge customGetEdge(int subjectIndex, int predicateIndex, int objectIndex);
 
-	/** Diese Methode gibt die {@link STSEdgeSet Menge aller verwalteten Kanten} zurück.
+	/** Diese Methode gibt die Sicht auf die {@link STSEdgeSet Menge aller verwalteten Kanten} zurück.
 	 *
 	 * @return Kantenmenge. */
 	public STSEdgeSet getEdgeSet() {
-		return new SequenceEdgeSet(this, this.customGetEdgeIndex(), this.customGetEdgeCount());
+		return new StoreEdgeSet(this);
 	}
 
 	/** Diese Methode gibt die Kante mit der gegebenen Position zurück.
@@ -173,8 +177,8 @@ public abstract class STSStore {
 	 * @param edge Kante oder {@code null}.
 	 * @return Kantenmenge. */
 	protected STSEdgeSet customGetEdgeSet(final STSEdge edge) {
-		if (edge == null) return new SequenceEdgeSet(this, 0, 0);
-		return new SequenceEdgeSet(this, edge.index, 1);
+		if (edge == null) return new EmptyEdgeSet(this);
+		return new SingleEdgeSet(edge);
 	}
 
 	/** Diese Methode gibt die Position der ersten verwalteten Kante zurück.
@@ -334,11 +338,11 @@ public abstract class STSStore {
 	@SuppressWarnings ("javadoc")
 	protected abstract STSNode customGetNode(FEMBinary value);
 
-	/** Diese Methode gibt die {@link STSNodeSet Menge aller verwalteten Knoten} zurück.
+	/** Diese Methode gibt die Sicht auf die {@link STSNodeSet Menge aller verwalteten Knoten} zurück.
 	 *
 	 * @return Knotenmenge. */
 	public STSNodeSet getNodeSet() {
-		return new SequenceNodeSet(this, this.customGetNodeIndex(), this.customGetNodeCount());
+		return new StoreNodeSet(this);
 	}
 
 	/** Diese Methode gibt den Knoten mit der gegebenen Position zurück.
@@ -354,8 +358,8 @@ public abstract class STSStore {
 	 * @param node Knoten oder {@code null}.
 	 * @return Knotenmenge. */
 	protected STSNodeSet customGetNodeSet(final STSNode node) {
-		if (node == null) return new SequenceNodeSet(this, 0, 0);
-		return new SequenceNodeSet(this, node.index, 1);
+		if (node == null) return new EmptyNodeSet(this);
+		return new SingleNodeSet(node);
 	}
 
 	/** Diese Methode gibt die Position des ersten Knoten zurück.
