@@ -980,7 +980,7 @@ public class FEMDomain {
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
 	protected void formatHandler(final FEMFormatter target, final FEMHandler source) throws NullPointerException, IllegalArgumentException {
-		target.putToken("{:");
+		target.putToken("{: ");
 		this.formatFunction(target, source.value());
 		target.putToken("}");
 	}
