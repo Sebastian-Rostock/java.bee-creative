@@ -3,6 +3,7 @@ package bee.creative.bex;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -521,7 +522,7 @@ public final class BEXBuilder {
 
 		/** Diese Methode ließt die gegebene {@code XML} Datei ein, fügt das darin beschriebenen Wurzelelement an und gibt {@code this} zurück.
 		 *
-		 * @see #putNode(InputSource, XMLReader)
+		 * @see #putNode(InputStream)
 		 * @param file Datei.
 		 * @return {@code this}.
 		 * @throws IOException Wenn die Datei nicht geöffnet werden kann.
@@ -530,8 +531,21 @@ public final class BEXBuilder {
 		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
 		public final BEXFileBuilder putNode(final File file) throws IOException, SAXException, NullPointerException, IllegalStateException {
 			try (FileInputStream stream = new FileInputStream(file)) {
-				return this.putNode(new InputSource(stream), XMLReaderFactory.createXMLReader());
+				return this.putNode(stream);
 			}
+		}
+
+		/** Diese Methode ließt den gegebenen {@code XML} Datenstrom ein, fügt das darin beschriebenen Wurzelelement an und gibt {@code this} zurück.
+		 *
+		 * @see #putNode(InputSource, XMLReader)
+		 * @param stream Datenstrom.
+		 * @return {@code this}.
+		 * @throws IOException Wenn die Datei nicht geöffnet werden kann.
+		 * @throws SAXException Wenn die Datei nicht geparst werden kann.
+		 * @throws NullPointerException Wenn {@code stream} {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
+		public final BEXFileBuilder putNode(final InputStream stream) throws IOException, SAXException, NullPointerException, IllegalStateException {
+			return this.putNode(new InputSource(stream), XMLReaderFactory.createXMLReader());
 		}
 
 		/** Diese Methode fügt abhängig vom Typ des gegebenen Knoten einen Text-, Element- oder Attributknoten an und gibt {@code this} zurück.
