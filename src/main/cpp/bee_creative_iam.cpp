@@ -335,15 +335,13 @@ inline INT32 _iamArrayCompare_(PCVOID const _array1, PCVOID const _array2, UINT3
 	return _length1 - _length2;
 }
 
-/**
- * Diese Methode initialisiert ein @c IAMArray mit den gegebenen Daten.
+/** Diese Methode initialisiert ein @c IAMArray mit den gegebenen Daten.
  * @tparam PCDATA Datentyp zur Interpretation von _array.
- * @param _data _data_ des @c IAMArray.
- * @param _size _size_ des @c IAMArray.
+ * @param _data Daten der Zahlenfolge.
+ * @param _size Länge der Zahlenfolge.
  * @param _type Datentyp.
  * @param _array Zeiger auf den Speicherbereich mit Zahlen.
- * @param _length Anzahl der Zahlen.
- */
+ * @param _length Anzahl der Zahlen. */
 template<typename PCDATA>
 inline void _iamArrayNew_(PCVOID & _data, UINT32 & _size, UINT8 const _type, PCDATA const _array, INT32 _length) {
 	if (!_array || _length <= 0) {
@@ -366,12 +364,10 @@ inline void _iamArrayNew_(PCVOID & _data, UINT32 & _size, UINT8 const _type, PCD
 	}
 }
 
-/**
- * Diese Methode gibt die Zahlenfolge zurück, der im kopierenden Konstrukteur sowie im Zuweisungsoperator von @c IAMArray verwendet wird.
- * @param _data _data_ des @c IAMArray.
- * @param _size _size_ des @c IAMArray.
- * @return Zahlenfolge.
- */
+/** Diese Methode gibt die Zahlenfolge zurück, der im kopierenden Konstrukteur sowie im Zuweisungsoperator von @c IAMArray verwendet wird.
+ * @param _data Daten der Zahlenfolge.
+ * @param _size Länge der Zahlenfolge.
+ * @return Zahlenfolge. */
 inline PCVOID _iamArrayDataUse_(PCVOID const _data, UINT32 _size) {
 	if ((_size & 3) || !_data) return _data;
 	INT32 const* _array = (INT32 const*) _data - 1;
@@ -380,11 +376,9 @@ inline PCVOID _iamArrayDataUse_(PCVOID const _data, UINT32 _size) {
 	return _data;
 }
 
-/**
- * Diese Methode gibt den Speicher der gegebenen Zahlenfolge frei, wenn diese kopiert wurde.
- * @param _data _data_ des @c IAMArray.
- * @param _size _size_ des @c IAMArray.
- */
+/** Diese Methode gibt den Speicher der gegebenen Zahlenfolge frei, wenn diese kopiert wurde.
+ * @param _data Daten der Zahlenfolge.
+ * @param _size Länge der Zahlenfolge. */
 inline void _iamArrayDataFree_(PCVOID const _data, INT32 _size) {
 	if ((_size & 3) || !_data) return;
 	INT32 const* _array = (INT32 const*) _data - 1;

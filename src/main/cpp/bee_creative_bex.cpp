@@ -565,13 +565,13 @@ BEXFile::BEXFile(INT32 const* _array, INT32 const _length)
 	: _object_(new OBJECT(_array, _length)) {
 }
 
-BEXNode BEXFile::root() {
+BEXNode BEXFile::root() const {
 	INT32 _ref = _object_.get()->_rootRef_;
 	if (_ref < 0) return BEXNode(*this);
 	return BEXNode(_bexKey_(BEX_ELEM_NODE, _ref), *this);
 }
 
-BEXNode BEXFile::node(UINT32 const _key) {
+BEXNode BEXFile::node(UINT32 const _key) const {
 	switch (_bexType_(_key)) {
 		case BEX_ATTR_NODE: {
 			OBJECT* _object = _object_.get();
@@ -602,7 +602,7 @@ BEXNode BEXFile::node(UINT32 const _key) {
 	return BEXNode(*this);
 }
 
-BEXList BEXFile::list(UINT32 const _key) {
+BEXList BEXFile::list(UINT32 const _key) const {
 	switch (_bexType_(_key)) {
 		case BEX_ATTR_LIST:
 			return node(_bexKey_(BEX_ELEM_NODE, _bexRef_(_key))).attributes();

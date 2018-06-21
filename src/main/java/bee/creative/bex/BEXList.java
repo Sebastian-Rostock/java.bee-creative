@@ -5,7 +5,7 @@ import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
-/** Diese Schnittstelle definiert die homogene Sicht auf Kind- und Attributknotenlisten. Die aufsteigende Navigation von einer Knotenliste zu deren Elternknoten
+/** Diese Klasse implementiert die homogene Sicht auf Kind- und Attributknotenlisten. Die aufsteigende Navigation von einer Knotenliste zu deren Elternknoten
  * ist optional.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -67,8 +67,8 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 	 * @return Identifikator. */
 	public abstract int key();
 
-	/** Diese Methode gibt die Typkennung dieser Knotenliste zurück. Die Typkennung ist bei einer Attributknotenliste 1, bei einer allgemeinen Kindknotenliste 2
-	 * und bei einer undefinierten Knotenliste 0.
+	/** Diese Methode gibt die Typkennung dieser Knotenliste zurück. Die Typkennung ist bei einer Attributknotenliste {@link #ATTR_LIST}, bei einer allgemeinen
+	 * Kindknotenliste {@link #CHLD_LIST} und bei einer undefinierten Knotenliste {@link #VOID_LIST}.
 	 *
 	 * @return Typkennung. */
 	public abstract int type();

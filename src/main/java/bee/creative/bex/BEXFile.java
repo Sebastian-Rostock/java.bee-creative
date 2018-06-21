@@ -7,8 +7,8 @@ import bee.creative.iam.IAMException;
 import bee.creative.iam.IAMIndex;
 import bee.creative.util.Objects;
 
-/** Diese Schnittstelle definiert die Verwaltung aller Element-, Text- und Attributknoten sowie aller Kind- und Attributknotenlisten, die in einem Dokument
- * (vgl. {@code XML} Datei) enthalten sind.
+/** Diese Klasse implementiert die Verwaltung aller Element-, Text- und Attributknoten sowie aller Kind- und Attributknotenlisten, die in einem XML Dokument
+ * enthalten sind.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class BEXFile {

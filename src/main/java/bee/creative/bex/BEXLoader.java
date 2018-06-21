@@ -29,6 +29,9 @@ public final class BEXLoader {
 		/** Dieses Feld speichert die Referenz des Wurzelelements. */
 		final int rootRef;
 
+		/** Dieses Feld speichert das die Zahlenfolgen verwaltende Inhaltsverzeichnis. */
+		final IAMIndex nodeData;
+
 		/** Dieses Feld speichert die URI der Attributknoten. */
 		final BEXStringLoader attrUriText;
 
@@ -83,6 +86,7 @@ public final class BEXLoader {
 		/** Dieser Konstruktor initialisiert den leeren {@link BEXFileLoader}. */
 		BEXFileLoader() {
 			this.rootRef = -1;
+			this.nodeData = IAMIndex.EMPTY;
 			this.attrUriText = BEXStringLoader.EMPTY;
 			this.attrNameText = BEXStringLoader.EMPTY;
 			this.attrValueText = BEXStringLoader.EMPTY;
@@ -108,7 +112,6 @@ public final class BEXLoader {
 		 * @throws IAMException Wenn {@code index} strukturell oder referenzienn ungültig ist.
 		 * @throws NullPointerException Wenn {@code index} {@code null} ist. */
 		public BEXFileLoader(final IAMIndex index) throws IAMException, NullPointerException {
-
 			if (false || //
 				(index.mappingCount() != 0) || //
 				(index.listingCount() != 18) //
@@ -182,6 +185,7 @@ public final class BEXLoader {
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
 			this.rootRef = rootRef;
+			this.nodeData = index;
 			this.attrUriText = new BEXStringLoader(attrUriTextListing);
 			this.attrNameText = new BEXStringLoader(attrNameTextListing);
 			this.attrValueText = new BEXStringLoader(attrValueTextListing);
