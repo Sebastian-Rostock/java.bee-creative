@@ -96,7 +96,7 @@ public class IAMLoader {
 		/** Dieses Feld speichert die Abbildungen. */
 		final IAMMappingLoader[] mappings;
 
-		/** Dieses Feld speichert die Listen. */
+		/** Dieses Feld speichert die Auflistungen. */
 		final IAMListingLoader[] listings;
 
 		/** Dieser Konstruktor initialisiert das leere Inhaltsverzeichnis. */
@@ -167,6 +167,22 @@ public class IAMLoader {
 
 		{}
 
+		/** Diese Methode prüft die Kodierung der Längen der Zahlenfolgen in den Abbildungen und Auflistungen.
+		 *
+		 * @see IAMListingLoader#check()
+		 * @see IAMMappingLoader#check()
+		 * @throws IAMException Wenn die Kodierung ungültig ist. */
+		public final void check() throws IAMException {
+			for (final IAMListingLoader listing: this.listings) {
+				listing.check();
+			}
+			for (final IAMMappingLoader mapping: this.mappings) {
+				mapping.check();
+			}
+		}
+
+		{}
+
 		/** {@inheritDoc} */
 		@Override
 		public final IAMMappingLoader mapping(final int index) {
@@ -220,7 +236,7 @@ public class IAMLoader {
 		/** Dieses Feld speichert die Anzahl der Elemente. */
 		final int itemCount;
 
-		/** Dieser Konstruktor initialisiert die leere Liste. */
+		/** Dieser Konstruktor initialisiert die leere Auflistung. */
 		IAMListingLoader() {
 			this.itemData = null;
 			this.itemOffset = null;
@@ -509,7 +525,7 @@ public class IAMLoader {
 
 		{}
 
-		/** Diese Methode prüft die Kodierung der {@link #keyLength(int) Längen der Schlüssel} ind {@link #valueLength(int) Werte}.
+		/** Diese Methode prüft die Kodierung der {@link #keyLength(int) Längen der Schlüssel} und {@link #valueLength(int) Werte}.
 		 *
 		 * @see IAMLoader#checkArray(IAMArray)
 		 * @throws IAMException Wenn die Kodierung ungültig ist. */

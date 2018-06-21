@@ -9,7 +9,7 @@ import bee.creative.iam.IAMLoader.IAMIndexLoader;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert eine abstrakte Zusammenstellung beliebig vieler Listen ({@link IAMListing}) und Abbildungen ({@link IAMMapping}).
+/** Diese Klasse implementiert eine abstrakte Zusammenstellung beliebig vieler Auflistungen ({@link IAMListing}) und Abbildungen ({@link IAMMapping}).
  * <p>
  * Die Methoden {@link #mappings()} und {@link #listings()} delegieren an {@link #mapping(int)} und {@link #mappingCount()} bzw. {@link #listing(int)} und
  * {@link #listingCount()}.
@@ -344,24 +344,24 @@ public abstract class IAMIndex {
 		return new Mappings(this);
 	}
 
-	/** Diese Methode gibt die {@code index}-te Liste zurück. Bei einem ungültigen {@code index} wird eine leere Liste geliefert.
+	/** Diese Methode gibt die {@code index}-te Auflistung zurück. Bei einem ungültigen {@code index} wird eine leere Auflistung geliefert.
 	 *
 	 * @see #listingCount()
 	 * @param index Index.
-	 * @return {@code index}-te Liste. */
+	 * @return {@code index}-te Auflistung. */
 	public abstract IAMListing listing(final int index);
 
-	/** Diese Methode gibt die Anzahl der Listen zurück.
+	/** Diese Methode gibt die Anzahl der Auflistungen zurück.
 	 *
 	 * @see #listing(int)
-	 * @return Anzahl der Listen. */
+	 * @return Anzahl der Auflistungen. */
 	public abstract int listingCount();
 
-	/** Diese Methode gibt {@link List}-Sicht auf die Listen zurück.
+	/** Diese Methode gibt {@link List}-Sicht auf die Auflistungen zurück.
 	 *
 	 * @see #listing(int)
 	 * @see #listingCount()
-	 * @return Listen. */
+	 * @return Auflistungen. */
 	public final List<IAMListing> listings() {
 		return new Listingss(this);
 	}

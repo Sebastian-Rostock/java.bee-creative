@@ -4,7 +4,7 @@ import java.util.Iterator;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Liste ({@link IAMListing}) für die Elemente sowie einer Abbildung
+/** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Auflistung ({@link IAMListing}) für die Elemente sowie einer Abbildung
  * ({@link IAMMapping}) für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

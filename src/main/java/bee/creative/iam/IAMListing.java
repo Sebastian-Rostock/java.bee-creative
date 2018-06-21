@@ -11,7 +11,7 @@ import bee.creative.iam.IAMLoader.IAMListingLoader;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert eine abstrakte geordnete Liste von Elementen, welche selbst Zahlenfolgen ({@link IAMArray}) sind.
+/** Diese Klasse implementiert eine abstrakte geordnete Auflistung von Elementen, welche selbst Zahlenfolgen ({@link IAMArray}) sind.
  * <p>
  * Die von {@link #items()} gelieferte {@link List} delegiert an {@link #item(int)} und {@link #itemCount()}.<br>
  * Die Methoden {@link #item(int, int)} und {@link #itemLength(int)} delegieren an {@link #item(int)}.
