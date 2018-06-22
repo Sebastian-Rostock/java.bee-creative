@@ -30,7 +30,7 @@ public final class BEXLoader {
 		final int rootRef;
 
 		/** Dieses Feld speichert das die Zahlenfolgen verwaltende Inhaltsverzeichnis. */
-		final IAMIndex nodeData;
+		final IAMIndex fileData;
 
 		/** Dieses Feld speichert die URI der Attributknoten. */
 		final BEXStringLoader attrUriText;
@@ -86,7 +86,7 @@ public final class BEXLoader {
 		/** Dieser Konstruktor initialisiert den leeren {@link BEXFileLoader}. */
 		BEXFileLoader() {
 			this.rootRef = -1;
-			this.nodeData = IAMIndex.EMPTY;
+			this.fileData = IAMIndex.EMPTY;
 			this.attrUriText = BEXStringLoader.EMPTY;
 			this.attrNameText = BEXStringLoader.EMPTY;
 			this.attrValueText = BEXStringLoader.EMPTY;
@@ -108,33 +108,34 @@ public final class BEXLoader {
 
 		/** Dieser Kontrukteur initialisiert das {@link BEXFile} als Sicht auf den gegebenen {@link IAMIndex}.
 		 *
-		 * @param index {@link IAMIndex}.
+		 * @param fileData {@link IAMIndex}.
 		 * @throws IAMException Wenn {@code index} strukturell oder referenzienn ungültig ist.
 		 * @throws NullPointerException Wenn {@code index} {@code null} ist. */
-		public BEXFileLoader(final IAMIndex index) throws IAMException, NullPointerException {
+		public BEXFileLoader(final IAMIndex fileData) throws IAMException, NullPointerException {
+
 			if (false || //
-				(index.mappingCount() != 0) || //
-				(index.listingCount() != 18) //
+				(fileData.mappingCount() != 0) || //
+				(fileData.listingCount() != 18) //
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final IAMListing headRootListing = index.listing(0);
-			final IAMListing attrUriTextListing = index.listing(1);
-			final IAMListing attrNameTextListing = index.listing(2);
-			final IAMListing attrValueTextListing = index.listing(3);
-			final IAMListing chldUriTextListing = index.listing(4);
-			final IAMListing chldNameTextListing = index.listing(5);
-			final IAMListing chldValueTextListing = index.listing(6);
-			final IAMListing attrUriRefListing = index.listing(7);
-			final IAMListing attrNameRefListing = index.listing(8);
-			final IAMListing attrValueRefListing = index.listing(9);
-			final IAMListing attrParentRefListing = index.listing(11);
-			final IAMListing chldUriRefListing = index.listing(11);
-			final IAMListing chldNameRefListing = index.listing(12);
-			final IAMListing chldContentRefListing = index.listing(13);
-			final IAMListing chldAttributesRefListing = index.listing(14);
-			final IAMListing chldParentRefListing = index.listing(15);
-			final IAMListing attrListRangeListing = index.listing(16);
-			final IAMListing chldListRangeListing = index.listing(17);
+			final IAMListing headRootListing = fileData.listing(0);
+			final IAMListing attrUriTextListing = fileData.listing(1);
+			final IAMListing attrNameTextListing = fileData.listing(2);
+			final IAMListing attrValueTextListing = fileData.listing(3);
+			final IAMListing chldUriTextListing = fileData.listing(4);
+			final IAMListing chldNameTextListing = fileData.listing(5);
+			final IAMListing chldValueTextListing = fileData.listing(6);
+			final IAMListing attrUriRefListing = fileData.listing(7);
+			final IAMListing attrNameRefListing = fileData.listing(8);
+			final IAMListing attrValueRefListing = fileData.listing(9);
+			final IAMListing attrParentRefListing = fileData.listing(10);
+			final IAMListing chldUriRefListing = fileData.listing(11);
+			final IAMListing chldNameRefListing = fileData.listing(12);
+			final IAMListing chldContentRefListing = fileData.listing(13);
+			final IAMListing chldAttributesRefListing = fileData.listing(14);
+			final IAMListing chldParentRefListing = fileData.listing(15);
+			final IAMListing attrListRangeListing = fileData.listing(16);
+			final IAMListing chldListRangeListing = fileData.listing(17);
 
 			if (false || //
 				(headRootListing.itemCount() != 1) || //
@@ -185,7 +186,7 @@ public final class BEXLoader {
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
 			this.rootRef = rootRef;
-			this.nodeData = index;
+			this.fileData = fileData;
 			this.attrUriText = new BEXStringLoader(attrUriTextListing);
 			this.attrNameText = new BEXStringLoader(attrNameTextListing);
 			this.attrValueText = new BEXStringLoader(attrValueTextListing);

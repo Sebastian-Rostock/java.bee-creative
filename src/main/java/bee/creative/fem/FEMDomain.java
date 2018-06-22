@@ -655,6 +655,7 @@ public class FEMDomain {
 				case '{':
 					target.putToken(string);
 					this.formatScript(target, source, true);
+					target.putToken(" ");
 					this.formatScript(target, source, false);
 				break;
 				case ']':

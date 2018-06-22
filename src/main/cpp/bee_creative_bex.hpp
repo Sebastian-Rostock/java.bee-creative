@@ -47,19 +47,13 @@ struct BEXFile {
 
 		friend BEXList;
 
-		OBJECT(INT32 const* _array, INT32 const _length);
-
-		/** Dieses Feld speichert den Speicherbereich, aus dem diese Nutzdaten geladen wurden. */
-		MMFArray _fileData_;
-
-		/** Dieses Feld speichert den Speicherbereich, aus dem diese Nutzdaten geladen wurden. */
-		IAMArray _heapData_;
+		OBJECT(IAMIndex const& _fileData);
 
 		/** Dieses Feld speichert die Referenz des Wurzelelements. */
 		INT32 _rootRef_;
 
 		/** Dieses Feld speichert das die Zahlenfolgen verwaltende Inhaltsverzeichnis. */
-		IAMIndex _nodeData_;
+		IAMIndex _fileData_;
 
 		/** Dieses Feld speichert die URI der Attributknoten. */
 		IAMListing _attrUriText_;
@@ -117,21 +111,10 @@ struct BEXFile {
 	/** Dieser Kontrukteur erstellt eine leere Verwaltung. */
 	BEXFile();
 
-	/** Dieser Kontrukteur initialisiert die Verwaltung als Sicht auf den gegebenen Speicherbereich.
-	 * @param _heapData Speicherbereich.
-	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird. */
-	BEXFile(IAMArray const& _heapData);
-
-	/** Dieser Kontrukteur initialisiert die Verwaltung als Sicht auf den gegebenen Speicherbereich.
-	 * @param _fileData Speicherbereich.
-	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird. */
-	BEXFile(MMFArray const& _fileData);
-
-	/** Dieser Kontrukteur initialisiert die Verwaltung als Sicht auf den gegebenen Speicherbereich.
-	 * @param _array Zeiger auf den Speicherbereich mit @c INT32 Zahlen.
-	 * @param _length Anzahl der Zahlen.
-	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird. */
-	BEXFile(INT32 const* _array, INT32 const _length);
+	/** Dieser Kontrukteur initialisiert die Verwaltung als Sicht auf den gegebenen Auflistungen und Abbildungen.
+	 * @param _fileData Auflistungen und Abbildungen.
+	 * @throws IAMException Wenn beim dekodieren der Auflistungen und Abbildungen ein Fehler erkannt wird. */
+	BEXFile(IAMIndex const& _fileData);
 
 	/** Diese Methode gibt das Wurzelelement des Dokuments zurück.
 	 * @return Wurzelelement. */

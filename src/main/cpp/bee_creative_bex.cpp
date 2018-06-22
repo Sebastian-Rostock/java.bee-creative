@@ -70,92 +70,74 @@ inline IAMArray _bexArray_(string const& _string) {
 	return result;
 }
 
-/**
- * Diese Methode prüft die Größe des gegebenen Speicherbereichs zur Erzeugung eines neuen @c BEXFile.
- * @param _fileData Speicherbereich.
- * @throws IAMException Wenn die Größe ungültig ist.
- */
-inline INT32 const* _bexFileChecked_(MMFArray const& _fileData) {
-	if (_fileData.size() & 3) throw IAMException(IAMException::INVALID_LENGTH);
-	return (INT32 const*) _fileData.data();
-}
-
-/**
- * Diese Methode prüft die Größe des gegebenen Speicherbereichs zur Erzeugung eines neuen @c BEXFile.
- * @param _heapData Speicherbereich.
- * @throws IAMException Wenn die Größe ungültig ist.
- */
-inline INT32 const* _bexFileChecked_(IAMArray const& _heapData) {
-	if (_heapData.mode() != 4) throw IAMException(IAMException::INVALID_LENGTH);
-	return (INT32 const*) _heapData.data();
-}
-
 BEXFile::OBJECT::OBJECT()
 	: _rootRef_(-1) {
 }
 
 // class BEXNode
 
-BEXFile::OBJECT::OBJECT(INT32 const* _array, INT32 const _length)
+BEXFile::OBJECT::OBJECT(IAMIndex const& _fileData)
 	: OBJECT() {
-	if (_length < 3) throw IAMException(IAMException::INVALID_LENGTH);
 
-	UINT32 _header = _array[0];
-	if (_header != 0xBE10BA5E) throw IAMException(IAMException::INVALID_HEADER);
-
-	INT32 _rootRef = _array[1];
-	IAMIndex _nodeData(_array + 2, _length - 2);
 	if (false || //
-	    (_nodeData.mappingCount() != 0) || //
-	    (_nodeData.listingCount() != 17) //
+	    (_fileData.mappingCount() != 0) || //
+	    (_fileData.listingCount() != 18) //
 	    ) throw IAMException(IAMException::INVALID_VALUE);
 
-	IAMListing _attrUriTextList = _nodeData.listing(0);
-	IAMListing _attrNameTextList = _nodeData.listing(1);
-	IAMListing _attrValueTextList = _nodeData.listing(2);
-	IAMListing _chldUriTextList = _nodeData.listing(3);
-	IAMListing _chldNameTextList = _nodeData.listing(4);
-	IAMListing _chldValueTextList = _nodeData.listing(5);
-	IAMListing _attrUriRefList = _nodeData.listing(6);
-	IAMListing _attrNameRefList = _nodeData.listing(7);
-	IAMListing _attrValueRefList = _nodeData.listing(8);
-	IAMListing _attrParentRefList = _nodeData.listing(9);
-	IAMListing _chldUriRefList = _nodeData.listing(10);
-	IAMListing _chldNameRefList = _nodeData.listing(11);
-	IAMListing _chldContentRefList = _nodeData.listing(12);
-	IAMListing _chldAttributesRefList = _nodeData.listing(13);
-	IAMListing _chldParentRefList = _nodeData.listing(14);
-	IAMListing _attrListRangeList = _nodeData.listing(15);
-	IAMListing _chldListRangeList = _nodeData.listing(16);
+	IAMListing _headRootListing = _fileData.listing(0);
+	IAMListing _attrUriTextList = _fileData.listing(1);
+	IAMListing _attrNameTextList = _fileData.listing(2);
+	IAMListing _attrValueTextList = _fileData.listing(3);
+	IAMListing _chldUriTextList = _fileData.listing(4);
+	IAMListing _chldNameTextList = _fileData.listing(5);
+	IAMListing _chldValueTextList = _fileData.listing(6);
+	IAMListing _attrUriRefListing = _fileData.listing(7);
+	IAMListing _attrNameRefListing = _fileData.listing(8);
+	IAMListing _attrValueRefListing = _fileData.listing(9);
+	IAMListing _attrParentRefListing = _fileData.listing(10);
+	IAMListing _chldUriRefListing = _fileData.listing(11);
+	IAMListing _chldNameRefListing = _fileData.listing(12);
+	IAMListing _chldContentRefListing = _fileData.listing(13);
+	IAMListing _chldAttributesRefListing = _fileData.listing(14);
+	IAMListing _chldParentRefListing = _fileData.listing(15);
+	IAMListing _attrListRangeListing = _fileData.listing(16);
+	IAMListing _chldListRangeListing = _fileData.listing(17);
+
 	if (false || //
-	    (_attrUriRefList.itemCount() != 1) || //
-	    (_attrNameRefList.itemCount() != 1) || //
-	    (_attrValueRefList.itemCount() != 1) || //
-	    (_attrParentRefList.itemCount() != 1) || //
-	    (_chldUriRefList.itemCount() != 1) || //
-	    (_chldNameRefList.itemCount() != 1) || //
-	    (_chldContentRefList.itemCount() != 1) || //
-	    (_chldAttributesRefList.itemCount() != 1) || //
-	    (_chldParentRefList.itemCount() != 1) || //
-	    (_attrListRangeList.itemCount() != 1) || //
-	    (_chldListRangeList.itemCount() != 1) //
+	    (_headRootListing.itemCount() != 1) || //
+	    (_attrUriRefListing.itemCount() != 1) || //
+	    (_attrNameRefListing.itemCount() != 1) || //
+	    (_attrValueRefListing.itemCount() != 1) || //
+	    (_attrParentRefListing.itemCount() != 1) || //
+	    (_chldUriRefListing.itemCount() != 1) || //
+	    (_chldNameRefListing.itemCount() != 1) || //
+	    (_chldContentRefListing.itemCount() != 1) || //
+	    (_chldAttributesRefListing.itemCount() != 1) || //
+	    (_chldParentRefListing.itemCount() != 1) || //
+	    (_attrListRangeListing.itemCount() != 1) || //
+	    (_chldListRangeListing.itemCount() != 1) //
 	    ) throw IAMException(IAMException::INVALID_VALUE);
 
-	IAMArray _attrUriRef = _attrUriRefList.item(0);
-	IAMArray _attrNameRef = _attrNameRefList.item(0);
-	IAMArray _attrValueRef = _attrValueRefList.item(0);
-	IAMArray _attrParentRef = _attrParentRefList.item(0);
-	IAMArray _chldUriRef = _chldUriRefList.item(0);
-	IAMArray _chldNameRef = _chldNameRefList.item(0);
-	IAMArray _chldContentRef = _chldContentRefList.item(0);
-	IAMArray _chldAttributesRef = _chldAttributesRefList.item(0);
-	IAMArray _chldParentRef = _chldParentRefList.item(0);
-	IAMArray _chldListRange = _chldListRangeList.item(0);
-	IAMArray _attrListRange = _attrListRangeList.item(0);
+	IAMArray _headRoot = _headRootListing.item(0);
+	IAMArray _attrUriRef = _attrUriRefListing.item(0);
+	IAMArray _attrNameRef = _attrNameRefListing.item(0);
+	IAMArray _attrValueRef = _attrValueRefListing.item(0);
+	IAMArray _attrParentRef = _attrParentRefListing.item(0);
+	IAMArray _chldUriRef = _chldUriRefListing.item(0);
+	IAMArray _chldNameRef = _chldNameRefListing.item(0);
+	IAMArray _chldContentRef = _chldContentRefListing.item(0);
+	IAMArray _chldAttributesRef = _chldAttributesRefListing.item(0);
+	IAMArray _chldParentRef = _chldParentRefListing.item(0);
+	IAMArray _chldListRange = _chldListRangeListing.item(0);
+	IAMArray _attrListRange = _attrListRangeListing.item(0);
+
+	INT32 _headVal = _headRoot.get(0);
+	INT32 _rootRef = _headRoot.get(1);
 	INT32 _attrCount = _attrNameRef.length();
 	INT32 _chldCount = _chldNameRef.length();
 
 	if (false || //
+		(headVal != 0xBE10BA5E) || //
 	    (_rootRef < 0) || //
 	    (_chldCount <= _rootRef) || //
 	    ((_attrUriRef.length() != _attrCount) && (_attrUriRef.length() != 0)) || //
@@ -170,7 +152,7 @@ BEXFile::OBJECT::OBJECT(INT32 const* _array, INT32 const _length)
 	    ) throw IAMException(IAMException::INVALID_VALUE);
 
 	_rootRef_ = _rootRef;
-	_nodeData_ = _nodeData;
+	_fileData_ = _fileData;
 	_attrUriText_ = _attrUriTextList;
 	_attrNameText_ = _attrNameTextList;
 	_attrValueText_ = _attrValueTextList;
@@ -567,18 +549,8 @@ BEXFile::BEXFile()
 	: _object_(_BEX_FILE_OBJECT_) {
 }
 
-BEXFile::BEXFile(IAMArray const& _heapData)
-	: _object_(new OBJECT(_bexFileChecked_(_heapData), _heapData.length())) {
-	_object_->_heapData_ = _heapData;
-}
-
-BEXFile::BEXFile(MMFArray const& _fileData)
-	: _object_(new OBJECT(_bexFileChecked_(_fileData), _fileData.size() >> 2)) {
-	_object_->_fileData_ = _fileData;
-}
-
-BEXFile::BEXFile(INT32 const* _array, INT32 const _length)
-	: _object_(new OBJECT(_array, _length)) {
+BEXFile::BEXFile(IAMIndex const& _fileData)
+	: _object_(new OBJECT(_fileData)) {
 }
 
 BEXNode BEXFile::root() const {

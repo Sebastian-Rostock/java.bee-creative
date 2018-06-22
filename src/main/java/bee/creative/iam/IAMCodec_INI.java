@@ -17,27 +17,29 @@ final class IAMCodec_INI {
 
 	INIReader reader;
 
+	INIWriter writer;
+
 	{}
 
-	final INIToken readContent() throws IOException {
+	INIToken readContent() throws IOException {
 		while (true) {
 			final INIToken result = this.reader.read();
 			if ((result == null) || !result.isComment()) return result;
 		}
 	}
 
-	final INIToken readProperty(final String key) throws IOException, IllegalStateException {
+	INIToken readProperty(final String key) throws IOException, IllegalStateException {
 		final INIToken result = this.readContent();
 		if (result == null) throw new IllegalStateException(key + " missing");
 		if (!key.equals(result.key())) throw new IllegalStateException(key + " expected: " + result.key());
 		return result;
 	}
 
-	final IllegalArgumentException newIllegalProperty(final INIToken token, final Throwable cause) throws IllegalArgumentException {
+	IllegalArgumentException newIllegalProperty(final INIToken token, final Throwable cause) throws IllegalArgumentException {
 		return new IllegalArgumentException(token.key() + " invalid: " + token.value(), cause);
 	}
 
-	final int readPropertyAsInt(final String key, final int length) throws IOException, IllegalStateException, IllegalArgumentException {
+	int readPropertyAsInt(final String key, final int length) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this.readProperty(key);
 		try {
 			final int result = Integer.parseInt(token.value());
@@ -48,7 +50,7 @@ final class IAMCodec_INI {
 		}
 	}
 
-	final IAMByteOrder readPropertyAsOrder(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
+	IAMByteOrder readPropertyAsOrder(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this.readProperty(key);
 		try {
 			return IAMByteOrder.from(token.value());
@@ -57,7 +59,7 @@ final class IAMCodec_INI {
 		}
 	}
 
-	final IAMFindMode readPropertyAsMode(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
+	IAMFindMode readPropertyAsMode(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this.readProperty(key);
 		try {
 			return IAMFindMode.from(token.value());
@@ -66,7 +68,7 @@ final class IAMCodec_INI {
 		}
 	}
 
-	final IAMArrayFormat readPropertyAsFormat(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
+	IAMArrayFormat readPropertyAsFormat(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this.readProperty(key);
 		try {
 			return IAMArrayFormat.from(token.value());
@@ -75,7 +77,7 @@ final class IAMCodec_INI {
 		}
 	}
 
-	public final IAMIndexBuilder decode(final IAMCodec codec) throws IOException, IllegalStateException, IllegalArgumentException {
+	public IAMIndexBuilder decode(final IAMCodec codec) throws IOException, IllegalStateException, IllegalArgumentException {
 		INIToken token;
 		IAMByteOrder indexOrder = null;
 		IAMIndexBuilder indexBuilder = null;
@@ -168,62 +170,64 @@ final class IAMCodec_INI {
 		}
 	}
 
-	static void writeSection(final INIWriter writer, final String name) throws IOException {
-		writer.writeSection(name);
+	void writeSection(final String name) throws IOException {
+		this.writer.writeSection(name);
 	}
 
-	static void writeProperty(final INIWriter writer, final String key, final String value) throws IOException {
-		writer.writeProperty(key, value);
+	void writeProperty(final Object key, final Object value) throws IOException {
+		this.writer.writeProperty(key.toString(), value.toString());
 	}
 
-	static void writeListing(final INIWriter writer, final IAMListing source, final int index) throws IOException, IllegalArgumentException {
+	void writeListing(final IAMListing source, final int index) throws IOException, IllegalArgumentException {
 
 		final int itemCount = source.itemCount();
 		if (itemCount == 0) return;
 
-		IAMCodec_INI.writeSection(writer, "IAM_LISTING");
-		IAMCodec_INI.writeProperty(writer, "index", Integer.toString(index));
-		IAMCodec_INI.writeProperty(writer, "itemFormat", IAMArrayFormat.ARRAY.toString());
+		this.writeSection("IAM_LISTING");
+		this.writeProperty("index", index);
+		this.writeProperty("itemFormat", IAMArrayFormat.ARRAY);
 
 		for (int i = 0; i < itemCount; i++) {
-			IAMCodec_INI.writeProperty(writer, Integer.toString(i), IAMArrayFormat.ARRAY.format(source.item(i).toArray()));
+			this.writeProperty(i, IAMArrayFormat.ARRAY.format(source.item(i).toArray()));
 		}
 
 	}
 
-	static void writeMapping(final INIWriter writer, final IAMMapping source, final int index) throws IOException, IllegalArgumentException {
+	void writeMapping(final IAMMapping source, final int index) throws IOException, IllegalArgumentException {
 
 		final int entryCount = source.entryCount();
 		if (entryCount == 0) return;
 
-		IAMCodec_INI.writeSection(writer, "IAM_MAPPING");
-		IAMCodec_INI.writeProperty(writer, "index", Integer.toString(index));
-		IAMCodec_INI.writeProperty(writer, "findMode", IAMFindMode.from(source.mode()).toString());
-		IAMCodec_INI.writeProperty(writer, "keyFormat", IAMArrayFormat.ARRAY.toString());
-		IAMCodec_INI.writeProperty(writer, "valueFormat", IAMArrayFormat.ARRAY.toString());
+		this.writeSection("IAM_MAPPING");
+		this.writeProperty("index", index);
+		this.writeProperty("findMode", IAMFindMode.from(source.mode()));
+		this.writeProperty("keyFormat", IAMArrayFormat.ARRAY);
+		this.writeProperty("valueFormat", IAMArrayFormat.ARRAY);
 
 		for (int i = 0; i < entryCount; i++) {
-			IAMCodec_INI.writeProperty(writer, IAMArrayFormat.ARRAY.format(source.key(i).toArray()), IAMArrayFormat.ARRAY.format(source.value(i).toArray()));
+			this.writeProperty(IAMArrayFormat.ARRAY.format(source.key(i).toArray()), IAMArrayFormat.ARRAY.format(source.value(i).toArray()));
 		}
 
 	}
 
-	public final void encode(final IAMCodec codec, final IAMIndex source) throws IOException, IllegalStateException, IllegalArgumentException {
+	public void encode(final IAMCodec codec, final IAMIndex source) throws IOException, IllegalStateException, IllegalArgumentException {
 		try (final INIWriter writer = INIWriter.from(codec.getTargetData())) {
+			this.writer = writer;
+
 			final int mappingCount = source.mappingCount();
 			final int listingCount = source.listingCount();
 
-			IAMCodec_INI.writeSection(writer, "IAM_INDEX");
-			IAMCodec_INI.writeProperty(writer, "byteOrder", codec.getByteOrder().toString());
-			IAMCodec_INI.writeProperty(writer, "mappingCount", Integer.toString(mappingCount));
-			IAMCodec_INI.writeProperty(writer, "listingCount", Integer.toString(listingCount));
+			this.writeSection("IAM_INDEX");
+			this.writeProperty("byteOrder", codec.getByteOrder());
+			this.writeProperty("mappingCount", mappingCount);
+			this.writeProperty("listingCount", listingCount);
 
 			for (int i = 0; i < mappingCount; i++) {
-				IAMCodec_INI.writeMapping(writer, source.mapping(i), i);
+				this.writeMapping(source.mapping(i), i);
 			}
 
 			for (int i = 0; i < listingCount; i++) {
-				IAMCodec_INI.writeListing(writer, source.listing(i), i);
+				this.writeListing(source.listing(i), i);
 			}
 
 		}
