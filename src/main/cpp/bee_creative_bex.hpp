@@ -10,11 +10,9 @@ namespace bee {
 
 namespace creative {
 
-/**
- * Dieser Namensraum realisiert eine nurlesbare Implementation des <i>BEX</i>.<p>
- * Das <i>BEX – Binary Encoded XML</i> beschreibt eine nur lesbare Vereinfachung des <i>Document Object Model (DOM)</i> sowie ein binäres Datenformat zur redundanzarmen Abbildung der Daten eines <i>DOM</i> Dokuments. Ziel dieses Formats ist es, eine leichtgewichtige, nur lesende <i>DOM</i>-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch modifizierende Implementation einer Standard <i>XML</i> Bibliothek.
- * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+/**Dieser Namensraum realisiert eine nurlesbare Implementation des <i>BEX</i>.<p>
+ * Das <i>BEX – Binary Encoded XML</i> beschreibt eine nur lesbare Vereinfachung des <em>Document Object Model (DOM)</em> sowie ein binäres Datenformat zur redundanzarmen Abbildung der Daten eines <i>DOM</i> Dokuments. Ziel dieses Formats ist es, eine leichtgewichtige, nur lesende <i>DOM</i>-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch modifizierende Implementation einer Standard <em>XML</em> Bibliothek.
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 namespace bex {
 
 using std::string;
@@ -116,9 +114,7 @@ struct BEXFile {
 
 	};
 
-	/**
-	 * Dieser Kontrukteur erstellt eine leere Verwaltung.
-	 */
+	/** Dieser Kontrukteur erstellt eine leere Verwaltung. */
 	BEXFile();
 
 	/** Dieser Kontrukteur initialisiert die Verwaltung als Sicht auf den gegebenen Speicherbereich.

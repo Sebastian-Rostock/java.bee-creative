@@ -32,25 +32,41 @@ const UINT8 BEX_CHLD_LIST = 6;
 // Typkennung für die Kindknotenliste dem Textknoten eines Elementknoten.
 const UINT8 BEX_CHTX_LIST = 7;
 
-inline INT32 _bexRef_(UINT32 key) {
-	return key >> 3;
+/** Diese Methode gibt die Referenz des gegebenen Schlüssels zurück.
+ * @param _key Schlüssel.
+ * @return Referenz. */
+inline INT32 _bexRef_(UINT32 _key) {
+	return _key >> 3;
 }
 
-inline UINT32 _bexKey_(UINT8 type, UINT32 ref) {
-	return type | (ref << 3);
+/** Diese Methode gibt einen Schlüssel mit den gegebenen Eigenschaften zurück.
+ * @param type Typkennung (0..7).
+ * @param ref Referenz als Zeilennummer des Datensatzes.
+ * @return Schlüssel. */
+inline UINT32 _bexKey_(UINT8 _type, UINT32 _ref) {
+	return (_ref << 3) | _type;
 }
 
-inline UINT8 _bexType_(UINT32 key) {
-	return key & 7;
+/** Diese Methode gibt die Typkennung des gegebenen Schlüssels zurück.
+ * @param key Schlüssel.
+ * @return Typkennung. */
+inline UINT8 _bexType_(UINT32 _key) {
+	return _key & 7;
 }
 
-inline string _bexString_(IAMArray const& array) {
-	string result((PCCHAR) array.data());
+/** Diese Methode gibt die gegebenen Zahlenfolge als Zeichenkette zurück.
+ * @param _array Zahlenfolge.
+ * @return Zeichenkette. */
+inline string _bexString_(IAMArray const& _array) {
+	string result((PCCHAR) _array.data());
 	return result;
 }
 
-inline IAMArray _bexArray_(string const& string) {
-	IAMArray result((INT8 const*) string.data(), string.length() + 1);
+/** Diese Methode gibt die gegebenen Zeichenkette als Zahlenfolge zurück.
+ * @param _string Zeichenkette.
+ * @return Zahlenfolge. */
+inline IAMArray _bexArray_(string const& _string) {
+	IAMArray result((INT8 const*) _string.data(), _string.length() + 1);
 	return result;
 }
 
