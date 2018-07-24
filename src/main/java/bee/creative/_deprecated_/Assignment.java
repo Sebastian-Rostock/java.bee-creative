@@ -1,8 +1,8 @@
-package bee.creative.util;
+package bee.creative._deprecated_;
 
 /** Diese Schnittstelle definiert Methoden zur Bereitstellung und Zuweisung von Informationen eines Quellobjekts auf ein Zielobket, welche von einem
  * {@link Assigner} bzw. {@link Assignable} genutzt werden können.<br>
- * Im Kontext eines {@link Assignable}s kann einem Quellobjekt ein Zielobjekt zugeordnet werden, wodurch das Übertragen von Informationen in komplexern
+ * Im Kontext eines {@link Assignable} kann einem Quellobjekt ein Zielobjekt zugeordnet werden, wodurch das Übertragen von Informationen in komplexern
  * Objektgraphen erleichtert werden kann.
  *
  * @see Assigner
@@ -80,7 +80,7 @@ public interface Assignment<GSource> {
 
 	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt.<br>
 	 * Hierbei wird dem Quellobjekt zuerst über {@link #set(Object, Object)} das Zielobjekt zugeordnet. Anschließend erfolgt die Zuweisung über die Methode
-	 * {@link Assigner#assign(Object, Assignment)} des gegebenen {@link Assigner}s entweder sofort ({@code commit = true}) oder später ({@code commit = false}) im
+	 * {@link Assigner#assign(Object, Assignment)} des gegebenen {@link Assigner} entweder sofort ({@code commit = true}) oder später ({@code commit = false}) im
 	 * Rahmen der Methode {@link #commit()}.
 	 *
 	 * @param <GObject> Typ des Quellobjekts sowie des Zielobjekts.
@@ -101,7 +101,7 @@ public interface Assignment<GSource> {
 	public void commit() throws IllegalArgumentException;
 
 	/** Diese Methode erzeugt eine {@link Assignment}-Sicht mit den gegebenen Quellobjekt. Der über {@link #set(Object, Object)},
-	 * {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} erzeugte Zustand dieses {@link Assignment}s gilt auch
+	 * {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} erzeugte Zustand dieses {@link Assignment} gilt auch
 	 * im erzeugten {@link Assignment} und kann ebenfalls über dieses modifiziert werden.
 	 *
 	 * @param <GObject> Typ der Quell- und Zielobjekte.

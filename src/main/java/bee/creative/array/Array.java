@@ -44,7 +44,7 @@ public interface Array<GArray, GValue> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
 	public void get(int index, ArraySection<? super GArray> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** Diese Methode kopiert die Werte des gegebenen {@link Array}s an die gegebene Position.
+	/** Diese Methode kopiert die Werte des gegebenen {@link Array} an die gegebene Position.
 	 *
 	 * @param index Position.
 	 * @param values {@link Array}.
@@ -60,7 +60,7 @@ public interface Array<GArray, GValue> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
 	public void set(int index, ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** Diese Methode fügt die Werte des gegebenen {@link Array}s am Ende ein.
+	/** Diese Methode fügt die Werte des gegebenen {@link Array} am Ende ein.
 	 *
 	 * @see Array#add(int, Array)
 	 * @param values {@link Array}.
@@ -74,7 +74,7 @@ public interface Array<GArray, GValue> {
 	 * @throws NullPointerException Wenn die gegebene {@link ArraySection} {@code null} ist. */
 	public void add(ArraySection<? extends GArray> values) throws NullPointerException;
 
-	/** Diese Methode fügt die Werte des gegebenen {@link Array}s an der gegebenen Position ein.
+	/** Diese Methode fügt die Werte des gegebenen {@link Array} an der gegebenen Position ein.
 	 *
 	 * @see Array#insert(int, int)
 	 * @see Array#set(int, Array)
@@ -120,13 +120,13 @@ public interface Array<GArray, GValue> {
 	 * @return mit Werten belegter Abschnitt des intern verwalteten Arrays. */
 	public ArraySection<GArray> section();
 
-	/** Diese Methode gibt ein neues Array mit allen Werten dieses {@link Array}s zurück.
+	/** Diese Methode gibt ein neues Array mit allen Werten dieses {@link Array} zurück.
 	 *
 	 * @see List#toArray()
 	 * @return neues Array. */
 	public GArray toArray();
 
-	/** Diese Methode gibt ein {@link Array} als modifizierbare Sicht auf einen Teil diese {@link Array}s zurück.
+	/** Diese Methode gibt ein {@link Array} als modifizierbare Sicht auf einen Teil diese {@link Array} zurück.
 	 *
 	 * @see List#subList(int, int)
 	 * @param startIndex Index des ersten Werts im Teil-{@link Array}.

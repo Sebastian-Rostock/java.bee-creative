@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactLongArray extends CompactArray<long[], Long> implements LongArray {
 
-	/** Diese Klasse implementiert ein {@link LongArray} als modifizierbare Sicht auf einen Teil eines {@link CompactLongArray}s.
+	/** Diese Klasse implementiert ein {@link LongArray} als modifizierbare Sicht auf einen Teil eines {@link CompactLongArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactLongSubArray extends CompactSubArray<CompactLongArray, long[], Long> implements LongArray {
@@ -90,7 +90,7 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 	}
 
-	/** Diese Klasse implementiert die live {@link LongArraySection} eines {@link CompactLongArray}s.
+	/** Diese Klasse implementiert die live {@link LongArraySection} eines {@link CompactLongArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactLongArraySection extends LongArraySection {
@@ -135,7 +135,7 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 	}
 
-	/** Diese Klasse implementiert die live {@link LongArraySection} eines {@link CompactLongSubArray}s.
+	/** Diese Klasse implementiert die live {@link LongArraySection} eines {@link CompactLongSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactLongSubArraySection extends LongArraySection {

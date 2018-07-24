@@ -7,13 +7,13 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert ein {@link ObjectArray} als {@link CompactArray}.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ der {@link Object}s. */
+ * @param <GValue> Typ der Elemente. */
 public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> implements ObjectArray<GValue>, Comparator<GValue> {
 
-	/** Diese Klasse implementiert ein {@link ObjectArray} als modifizierbare Sicht auf einen Teil eines {@link CompactObjectArray}s.
+	/** Diese Klasse implementiert ein {@link ObjectArray} als modifizierbare Sicht auf einen Teil eines {@link CompactObjectArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der {@link Object}s. */
+ * @param <GValue> Typ der Elemente. */
 	protected static class CompactObjectSubArray<GValue> extends CompactSubArray<CompactObjectArray<GValue>, GValue[], GValue> implements ObjectArray<GValue> {
 
 		/** Dieser Konstruktor initialisiert Besitzer und Indices.
@@ -94,10 +94,10 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	}
 
-	/** Diese Klasse implementiert die live {@link ObjectArraySection} eines {@link CompactObjectArray}s.
+	/** Diese Klasse implementiert die live {@link ObjectArraySection} eines {@link CompactObjectArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der {@link Object}s. */
+ * @param <GValue> Typ der Elemente. */
 	protected static class CompactObjectArraySection<GValue> extends ObjectArraySection<GValue> {
 
 		/** Dieses Feld speichert den Besitzer. */
@@ -146,10 +146,10 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	}
 
-	/** Diese Klasse implementiert die live {@link ObjectArraySection} eines {@link CompactObjectArray.CompactObjectSubArray}s.
+	/** Diese Klasse implementiert die live {@link ObjectArraySection} eines {@link CompactObjectArray.CompactObjectSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der {@link Object}s. */
+ * @param <GValue> Typ der Elemente. */
 	protected static class CompactObjectSubArraySection<GValue> extends ObjectArraySection<GValue> {
 
 		/** Dieses Feld speichert den Besitzer. */

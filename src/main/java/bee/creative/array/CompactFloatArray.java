@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactFloatArray extends CompactArray<float[], Float> implements FloatArray {
 
-	/** Diese Klasse implementiert ein {@link FloatArray} als modifizierbare Sicht auf einen Teil eines {@link CompactFloatArray}s.
+	/** Diese Klasse implementiert ein {@link FloatArray} als modifizierbare Sicht auf einen Teil eines {@link CompactFloatArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactFloatSubArray extends CompactSubArray<CompactFloatArray, float[], Float> implements FloatArray {
@@ -90,7 +90,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	}
 
-	/** Diese Klasse implementiert die live {@link FloatArraySection} eines {@link CompactFloatArray}s.
+	/** Diese Klasse implementiert die live {@link FloatArraySection} eines {@link CompactFloatArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactFloatArraySection extends FloatArraySection {
@@ -135,7 +135,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	}
 
-	/** Diese Klasse implementiert die live {@link FloatArraySection} eines {@link CompactFloatSubArray}s.
+	/** Diese Klasse implementiert die live {@link FloatArraySection} eines {@link CompactFloatSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactFloatSubArraySection extends FloatArraySection {

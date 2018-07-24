@@ -137,7 +137,7 @@ BEXFile::OBJECT::OBJECT(IAMIndex const& _fileData)
 	INT32 _chldCount = _chldNameRef.length();
 
 	if (false || //
-		(headVal != 0xBE10BA5E) || //
+		(_headVal != (INT32)0xBE10BA5E) || //
 	    (_rootRef < 0) || //
 	    (_chldCount <= _rootRef) || //
 	    ((_attrUriRef.length() != _attrCount) && (_attrUriRef.length() != 0)) || //

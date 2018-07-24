@@ -5,7 +5,7 @@ import java.util.List;
 /** Diese Schnittstelle definiert ein modifizierbares {@code GValue}-{@link Array}.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ der {@link Object}s. */
+ * @param <GValue> Typ der Elemente. */
 public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** {@inheritDoc} */

@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactDoubleArray extends CompactArray<double[], Double> implements DoubleArray {
 
-	/** Diese Klasse implementiert ein {@link DoubleArray} als modifizierbare Sicht auf einen Teil eines {@link CompactDoubleArray}s.
+	/** Diese Klasse implementiert ein {@link DoubleArray} als modifizierbare Sicht auf einen Teil eines {@link CompactDoubleArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactDoubleSubArray extends CompactSubArray<CompactDoubleArray, double[], Double> implements DoubleArray {
@@ -90,7 +90,7 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	}
 
-	/** Diese Klasse implementiert die live {@link DoubleArraySection} eines {@link CompactDoubleArray}s.
+	/** Diese Klasse implementiert die live {@link DoubleArraySection} eines {@link CompactDoubleArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactDoubleArraySection extends DoubleArraySection {
@@ -135,7 +135,7 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	}
 
-	/** Diese Klasse implementiert die live {@link DoubleArraySection} eines {@link CompactDoubleSubArray}s.
+	/** Diese Klasse implementiert die live {@link DoubleArraySection} eines {@link CompactDoubleSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactDoubleSubArraySection extends DoubleArraySection {

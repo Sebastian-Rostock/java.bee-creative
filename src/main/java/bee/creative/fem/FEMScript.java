@@ -35,7 +35,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		 * @see Comparables
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
-		 * @return {@link Comparable} für das Ende von {@link Token}s. */
+		 * @return {@link Comparable} für das Ende von {@link Token}. */
 		public static Comparable<Token> endingAt(final int index) {
 			return new Comparable<Token>() {
 

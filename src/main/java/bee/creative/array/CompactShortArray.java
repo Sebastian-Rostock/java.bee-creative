@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactShortArray extends CompactArray<short[], Short> implements ShortArray {
 
-	/** Diese Klasse implementiert ein {@link ShortArray} als modifizierbare Sicht auf einen Teil eines {@link CompactShortArray}s.
+	/** Diese Klasse implementiert ein {@link ShortArray} als modifizierbare Sicht auf einen Teil eines {@link CompactShortArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactShortSubArray extends CompactSubArray<CompactShortArray, short[], Short> implements ShortArray {
@@ -90,7 +90,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	}
 
-	/** Diese Klasse implementiert die live {@link ShortArraySection} eines {@link CompactShortArray}s.
+	/** Diese Klasse implementiert die live {@link ShortArraySection} eines {@link CompactShortArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactShortArraySection extends ShortArraySection {
@@ -135,7 +135,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	}
 
-	/** Diese Klasse implementiert die live {@link ShortArraySection} eines {@link CompactShortSubArray}s.
+	/** Diese Klasse implementiert die live {@link ShortArraySection} eines {@link CompactShortSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactShortSubArraySection extends ShortArraySection {

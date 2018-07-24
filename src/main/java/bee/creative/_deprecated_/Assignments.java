@@ -1,10 +1,12 @@
-package bee.creative.util;
+package bee.creative._deprecated_;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import bee.creative.util.HashMap2;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Assignment} und {@link Assignable}.
  *
@@ -104,7 +106,7 @@ public class Assignments {
 	}
 
 	/** Diese Klasse implementiert ein {@link Assignment}, der zur Abbildung der Quellobjekte auf die Zielobjekte eine {@link Map} verwendet. Das Quellobjekt
-	 * dieses {@link Assignment}s ist {@code null}.
+	 * dieses {@link Assignment} ist {@code null}.
 	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class ParentAssignment implements Assignment<Object> {
@@ -113,7 +115,7 @@ public class Assignments {
 		final HashMap2<Object, Object> map = new HashMap2<>();
 
 		/** Dieses Feld speichert die in {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} gesammelten
-		 * {@link Entry}s. */
+		 * {@link Entry}. */
 		final List<Assignable<Object>> assignables = new LinkedList<>();
 
 		{}

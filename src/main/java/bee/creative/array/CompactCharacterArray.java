@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactCharacterArray extends CompactArray<char[], Character> implements CharacterArray {
 
-	/** Diese Klasse implementiert ein {@link CharacterArray} als modifizierbare Sicht auf einen Teil eines {@link CompactCharacterArray}s.
+	/** Diese Klasse implementiert ein {@link CharacterArray} als modifizierbare Sicht auf einen Teil eines {@link CompactCharacterArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterSubArray extends CompactSubArray<CompactCharacterArray, char[], Character> implements CharacterArray {
@@ -90,7 +90,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	}
 
-	/** Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterArray}s.
+	/** Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterArraySection extends CharacterArraySection {
@@ -135,7 +135,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	}
 
-	/** Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterSubArray}s.
+	/** Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterSubArraySection extends CharacterArraySection {

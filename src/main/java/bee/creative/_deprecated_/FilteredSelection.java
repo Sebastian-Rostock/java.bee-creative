@@ -1,4 +1,4 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 import java.util.Iterator;
 import bee.creative.util.Field;
@@ -17,7 +17,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 
 	/** Dieser Konstruktor initialisiert das {@link Iterable}.
 	 *
-	 * @param items {@link Iterable} der {@link Item}s.
+	 * @param items {@link Iterable} der {@link Item}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public FilteredSelection(final Iterable<? extends GItem> items) throws NullPointerException {
 		this.items = Objects.assertNotNull(items);

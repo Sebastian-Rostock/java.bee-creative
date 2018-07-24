@@ -1,4 +1,4 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 import bee.creative.util.Field;
 
@@ -14,7 +14,7 @@ public interface Part extends Owned, Labeled {
 
 	/** Diese Methode gibt das {@link Field} zurück, über welches dieser {@link Part} von seinem {@link #owner()} aus erreichbar ist.
 	 *
-	 * @return {@link Field} des {@link Part}s in seinem {@link #owner()}. */
+	 * @return {@link Field} des {@link Part} in seinem {@link #owner()}. */
 	public Field<?, ?> field();
 
 }

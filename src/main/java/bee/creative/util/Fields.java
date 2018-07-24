@@ -11,9 +11,6 @@ import java.util.Set;
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Field}s.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-/** Diese Klasse implementiert . Diese Schnittstelle definiert .
- *
- * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
 
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation eines {@link Set}, welches über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
@@ -41,20 +38,20 @@ public final class Fields {
 		 * @param input Eingabe.
 		 * @param index Index.
 		 * @param item Element. */
-		public void append(final GInput input, final int index, final GItem item);
+		public void put(final GInput input, final int index, final GItem item);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link List#addAll(int, Collection)}.
 		 *
 		 * @param input Eingabe.
 		 * @param index Index.
 		 * @param items Elemente. */
-		public void appendAll(final GInput input, final int index, final Iterable<? extends GItem> items);
+		public void putAll(final GInput input, final int index, final Iterable<? extends GItem> items);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link List#remove(int)}.
 		 *
 		 * @param input Eingabe.
 		 * @param index Index. */
-		public void remove(final GInput input, final int index);
+		public void pop(final GInput input, final int index);
 
 	}
 
@@ -79,34 +76,34 @@ public final class Fields {
 	 * @param <GItem> Typ der Elemente. */
 	public static interface ItemsField<GInput, GItem> {
 
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#clear()}.
-		 *
-		 * @param input Eingabe. */
-		public void clear(final GInput input);
-
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#add(Object)}.
 		 *
 		 * @param input Eingabe.
 		 * @param item Element. */
-		public void append(final GInput input, final GItem item);
+		public void put(final GInput input, final GItem item);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#addAll(Collection)}.
 		 *
 		 * @param input Eingabe.
 		 * @param items Elemente. */
-		public void appendAll(final GInput input, final Iterable<? extends GItem> items);
+		public void putAll(final GInput input, final Iterable<? extends GItem> items);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#remove(Object)}.
 		 *
 		 * @param input Eingabe.
 		 * @param item Element. */
-		public void remove(final GInput input, final Object item);
+		public void pop(final GInput input, final Object item);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#removeAll(Collection)}.
 		 *
 		 * @param input Eingabe.
 		 * @param items Elemente. */
-		public void removeAll(final GInput input, final Iterable<?> items);
+		public void popAll(final GInput input, final Iterable<?> items);
+
+		/** Diese Methode verändert die Sammlung analog zu {@link Collection#clear()}.
+		 *
+		 * @param input Eingabe. */
+		public void clear(final GInput input);
 
 	}
 
@@ -120,35 +117,35 @@ public final class Fields {
 	 * @param <GValue> Typ der Werte. */
 	public static interface EntriesField<GInput, GKey, GValue> {
 
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#clear()}.
-		 *
-		 * @param input Eingabe. */
-		public void clear(final GInput input);
-
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#put(Object, Object)}.
 		 *
 		 * @param input Eingabe.
 		 * @param key Schlüssel.
 		 * @param value Wert. */
-		public void append(final GInput input, final GKey key, GValue value);
+		public void put(final GInput input, final GKey key, GValue value);
 
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#putAll(Map)}.
 		 *
 		 * @param input Eingabe.
 		 * @param entries Elemente. */
-		public void appendAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries);
+		public void putAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries);
 
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#remove(Object)}.
 		 *
 		 * @param input Eingabe.
 		 * @param key Schlüssel. */
-		public void remove(final GInput input, final Object key);
+		public void pop(final GInput input, final Object key);
 
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#keySet()} mit {@link Set#removeAll(Collection)}.
 		 *
 		 * @param input Eingabe.
 		 * @param keys Schlüssel. */
-		public void removeAll(final GInput input, final Iterable<?> keys);
+		public void popAll(final GInput input, final Iterable<?> keys);
+
+		/** Diese Methode verändert die {@link Map} analog zu {@link Map#clear()}.
+		 *
+		 * @param input Eingabe. */
+		public void clear(final GInput input);
 
 	}
 
@@ -207,7 +204,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void append(final GInput input, final GItem item) {
+		public void put(final GInput input, final GItem item) {
 			Set<GItem> value = this.get(input);
 			if (value.contains(item)) return;
 			value = this.customCopy(this.get(input));
@@ -217,7 +214,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void appendAll(final GInput input, final Iterable<? extends GItem> items) {
+		public void putAll(final GInput input, final Iterable<? extends GItem> items) {
 			final Set<GItem> value = this.customCopy(this.get(input));
 			if (!Iterables.addAll(value, items)) return;
 			this.set(input, value);
@@ -225,7 +222,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void remove(final GInput input, final Object item) {
+		public void pop(final GInput input, final Object item) {
 			Set<GItem> value = this.get(input);
 			if (!value.contains(item)) return;
 			value = this.customCopy(this.get(input));
@@ -235,7 +232,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void removeAll(final GInput input, final Iterable<?> items) {
+		public void popAll(final GInput input, final Iterable<?> items) {
 			final Set<GItem> value = this.customCopy(this.get(input));
 			if (!Iterables.removeAll(value, items)) return;
 			this.set(input, value);
@@ -298,7 +295,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void append(final GInput input, final GEntry item) {
+		public void put(final GInput input, final GEntry item) {
 			final List<GEntry> value = this.customCopy(this.get(input));
 			value.add(item);
 			this.set(input, value);
@@ -306,7 +303,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void appendAll(final GInput input, final Iterable<? extends GEntry> items) {
+		public void putAll(final GInput input, final Iterable<? extends GEntry> items) {
 			final List<GEntry> value = this.customCopy(this.get(input));
 			if (!Iterables.addAll(value, items)) return;
 			this.set(input, value);
@@ -314,7 +311,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void append(final GInput input, final int index, final GEntry item) {
+		public void put(final GInput input, final int index, final GEntry item) {
 			final List<GEntry> value = this.customCopy(this.get(input));
 			value.add(index, item);
 			this.set(input, value);
@@ -322,7 +319,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void appendAll(final GInput input, final int index, final Iterable<? extends GEntry> items) {
+		public void putAll(final GInput input, final int index, final Iterable<? extends GEntry> items) {
 			final List<GEntry> value = this.customCopy(this.get(input));
 			if (!Iterables.addAll(value.subList(index, index), items)) return;
 			this.set(input, value);
@@ -330,7 +327,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void remove(final GInput input, final int index) {
+		public void pop(final GInput input, final int index) {
 			final List<GEntry> value = this.customCopy(this.get(input));
 			value.remove(index);
 			this.set(input, value);
@@ -338,16 +335,16 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void remove(final GInput input, final Object item) {
+		public void pop(final GInput input, final Object item) {
 			final List<GEntry> value = this.get(input);
 			final int index = value.indexOf(item);
 			if (index < 0) return;
-			this.remove(input, index);
+			this.pop(input, index);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void removeAll(final GInput input, final Iterable<?> items) {
+		public void popAll(final GInput input, final Iterable<?> items) {
 			final List<GEntry> value = this.customCopy(this.get(input));
 			if (!Iterables.removeAll(value, items)) return;
 			this.set(input, value);
@@ -413,7 +410,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void append(final GInput input, final GKey key, final GValue value) {
+		public void put(final GInput input, final GKey key, final GValue value) {
 			Map<GKey, GValue> map = this.get(input);
 			if (Objects.equals(map.get(key), value) && ((value != null) || map.containsKey(key))) return;
 			map = this.customCopy(this.get(input));
@@ -423,7 +420,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void appendAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
+		public void putAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
 			final Map<GKey, GValue> map = this.customCopy(this.get(input));
 			boolean modified = false;
 			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
@@ -435,7 +432,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void remove(final GInput input, final Object key) {
+		public void pop(final GInput input, final Object key) {
 			Map<GKey, GValue> map = this.get(input);
 			if (!map.containsKey(key)) return;
 			map = this.customCopy(map);
@@ -445,7 +442,7 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void removeAll(final GInput input, final Iterable<?> keys) {
+		public void popAll(final GInput input, final Iterable<?> keys) {
 			final Map<GKey, GValue> map = this.customCopy(this.get(input));
 			if (!Iterables.removeAll(map.keySet(), keys)) return;
 			this.set(input, map);

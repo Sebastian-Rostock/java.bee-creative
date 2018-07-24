@@ -1,4 +1,4 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 /** Diese Schnittstelle definiert ein Objekt mit Beschriftung, die das Objekt dem Nutzer gegenüber erkennbar macht.
  *

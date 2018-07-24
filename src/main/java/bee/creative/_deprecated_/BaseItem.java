@@ -1,7 +1,5 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
-import bee.creative.util.Assigner;
-import bee.creative.util.Assignment;
 import bee.creative.util.Field;
 import bee.creative.util.Filters;
 import bee.creative.util.Getter;
@@ -32,16 +30,16 @@ public abstract class BaseItem implements Item {
 
 	{}
 
-	/** Diese Methode gibt die {@link Assigner} zurück, die in {@link #assign(Assignment)} zur Übertragung der Informatioenen des gegebenen {@link Item}s auf
+	/** Diese Methode gibt die {@link Assigner} zurück, die in {@link #assign(Assignment)} zur Übertragung der Informatioenen des gegebenen {@link Item} auf
 	 * dieses {@link Item} verwendet werden.
 	 * <p>
-	 * Die Implementation in {@link BaseItem} verwndet hierfür die am {@link #type()} dieses bzw. des gegebenen {@link Item}s definierten {@link Field}s, die die
-	 * {@link Assigner}-Schnittstelle implementieren. Die genutzten {@link Field}s ergeben sich aus:
+	 * Die Implementation in {@link BaseItem} verwndet hierfür die am {@link #type()} dieses bzw. des gegebenen {@link Item} definierten {@link Field}, die die
+	 * {@link Assigner}-Schnittstelle implementieren. Die genutzten {@link Field} ergeben sich aus:
 	 * {@code this.type().is(value.type()) ? value.type().fields() : value.type().is(this.type()) ? this.type().fields() : Iterables.voidIterable())}.
 	 *
 	 * @see #FIELD_AS_ASSIGNER
-	 * @param assignment {@link Item} als Quellobjekt des in {@link #assign(Assignment)} gegebenen {@link Assignment}s.
-	 * @return {@link Assigner}s. */
+	 * @param assignment {@link Item} als Quellobjekt des in {@link #assign(Assignment)} gegebenen {@link Assignment}.
+	 * @return {@link Assigner}. */
 	protected Iterable<? extends Assigner<? super Item, ? super Item>> assigners(final Assignment<? extends Item> assignment) {
 		final Type<?> thisType = this.type(), thatType = assignment.value().type();
 		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.navigatedIterable(BaseItem.FIELD_AS_ASSIGNER, //
@@ -67,7 +65,7 @@ public abstract class BaseItem implements Item {
 	}
 
 	/** {@inheritDoc} Hierbei werden die {@link Assigner} verwendet, die über die Methode {@link #assigners(Assignment)} aus dem {@link Item} des gegebenen
-	 * {@link Assignment}s ({@link Assignment#value() Quellobjekt}) ermittelt werden.
+	 * {@link Assignment} ({@link Assignment#value() Quellobjekt}) ermittelt werden.
 	 *
 	 * @see #assigners(Assignment)
 	 * @see Assignment#assign(Object, Object, Assigner) */

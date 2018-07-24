@@ -1,4 +1,4 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -13,7 +13,7 @@ import bee.creative.util.Objects;
 public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 
 	/** Diese Methode implementiert {@link BaseItem#delete()}. Sie sollte vom {@link Iterator} ({@link #iterator()}) bzw. der {@link Collection} (
-	 * {@link #items(int)}) zum Entfernen eines {@link Item}s verwendet werden.
+	 * {@link #items(int)}) zum Entfernen eines {@link Item} verwendet werden.
 	 *
 	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
@@ -161,7 +161,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 		return new FilteredSelection<GItem>(this.items(states)).findAll(field, value);
 	}
 
-	/** {@inheritDoc} Diese entspricht der des {@link #type()}s. */
+	/** {@inheritDoc} Diese entspricht der des {@link #type()}. */
 	@Override
 	public String label() {
 		return this.type().label();

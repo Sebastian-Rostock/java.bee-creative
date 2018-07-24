@@ -139,13 +139,15 @@ public abstract class AbstractHashData<GKey, GValue> {
 		protected final AbstractHashData<GKey, GValue> entryData;
 
 		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link AbstractHashData#keys}. */
-		protected int nextIndex;
+		protected int nextEntry;
 
 		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#table}. */
-		protected int tableIndex = -1;
+		protected int nextTable = -1;
 
 		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#keys}. */
-		protected int entryIndex = -1;
+		protected int prevEntry = -1;
+
+		protected int prevTable;
 
 		public HashIterator(final AbstractHashData<GKey, GValue> entryData) {
 			this.entryData = entryData;
@@ -169,44 +171,45 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 		/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
 		protected final int nextIndex() {
-			final int prevIndex = this.nextIndex;
-			this.entryIndex = prevIndex;
-			if (prevIndex < 0) throw new NoSuchElementException();
-			final int nextIndex = this.entryData.nexts[prevIndex];
-			if (nextIndex >= 0) {
-				this.nextIndex = nextIndex;
+			int nextEntry = this.nextEntry;
+			if (nextEntry < 0) throw new NoSuchElementException();
+			this.prevEntry = nextEntry;
+			nextEntry = this.entryData.nexts[nextEntry];
+			if (nextEntry >= 0) {
+				this.nextEntry = nextEntry;
 			} else {
 				this.nextIndex2();
 			}
-			return prevIndex;
+			return nextEntry;
 		}
 
 		/** Diese Methode sucht den Index des nächsten Eintrags. */
 		final void nextIndex2() {
 			final int[] table = this.entryData.table;
 			final int length = table.length;
-			for (int tableIndex = this.tableIndex + 1; tableIndex < length; ++tableIndex) {
-				final int nextIndex = table[tableIndex];
-				if (nextIndex >= 0) {
-					this.nextIndex = nextIndex;
-					this.tableIndex = tableIndex;
+			for (int nextTable = (this.prevTable = this.nextTable) + 1; nextTable < length; ++nextTable) {
+				final int nextEntry = table[nextTable];
+				if (nextEntry >= 0) {
+					this.nextEntry = nextEntry;
+					this.nextTable = nextTable;
 					return;
 				}
 			}
-			this.nextIndex = -1;
-			this.tableIndex = -1;
+			this.nextEntry = -1;
+			this.nextTable = -1;
 		}
 
 		{}
 
 		@Override
 		public boolean hasNext() {
-			return this.nextIndex >= 0;
+			return this.nextEntry >= 0;
 		}
 
 		@Override
 		public void remove() {
-			if (this.entryData.popEntryImpl(this.tableIndex, this.entryIndex)) return;
+			if (this.entryData.popEntryImpl(this.prevTable, this.prevEntry)) return;
+			this.prevEntry = -1;
 			throw new IllegalStateException();
 		}
 
@@ -255,12 +258,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 				this.remove(item);
 			}
 			return size != this.size();
-		}
-
-		@Override
-		public boolean retainAll(final Collection<?> items) {
-			// TODO
-			return super.retainAll(items);
 		}
 
 		@Override
@@ -345,12 +342,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 			return size != this.size();
 		}
 
-		@Override
-		public boolean retainAll(final Collection<?> items) {
-			// TODO
-			return super.retainAll(items);
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -409,12 +400,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 				this.remove(item);
 			}
 			return size != this.size();
-		}
-
-		@Override
-		public boolean retainAll(final Collection<?> items) {
-			// TODO
-			return super.retainAll(items);
 		}
 
 		@Override

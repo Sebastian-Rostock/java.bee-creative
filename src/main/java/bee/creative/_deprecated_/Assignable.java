@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative._deprecated_;
 
 /** Diese Schnittstelle definiert ein Objekt, auf das die Informationen eines {@link Assignment#value() gegebenen Quellobjekts} übertragen werden können.
  *

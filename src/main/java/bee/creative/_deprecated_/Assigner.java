@@ -1,6 +1,6 @@
-package bee.creative.util;
+package bee.creative._deprecated_;
 
-/** Diese Schnittstelle definiert eine Methode, mit der die Informationen des Quellobjekts eines gegebenen {@link Assignment}s auf ein gegebenes Zielobjekt
+/** Diese Schnittstelle definiert eine Methode, mit der die Informationen des Quellobjekts eines gegebenen {@link Assignment} auf ein gegebenes Zielobjekt
  * übertragen werden können.
  *
  * @see Assignment
@@ -9,7 +9,7 @@ package bee.creative.util;
  * @param <GSource> Typ des Quellobjekts, dessen Informationen übertragen werden. */
 public interface Assigner<GTarget, GSource> {
 
-	/** Diese Methode überträgt die Informationen des Quellobjekts des gegebenen {@link Assignment}s auf das gegebene Zielobjekt.
+	/** Diese Methode überträgt die Informationen des Quellobjekts des gegebenen {@link Assignment} auf das gegebene Zielobjekt.
 	 *
 	 * @see Assignment#value()
 	 * @param target Zielobjekt.

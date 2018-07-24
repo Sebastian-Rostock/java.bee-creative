@@ -70,7 +70,7 @@ public class Iterables {
 		return -Iterators.skip(iterable.iterator(), -1) - 1;
 	}
 
-	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterable}s in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
+	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterable} in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
 	 * {@link Collection} {@code true} zurück.
 	 *
 	 * @see Iterators#addAll(Collection, Iterator)
@@ -83,8 +83,8 @@ public class Iterables {
 		return Iterators.addAll(collection, iterable.iterator());
 	}
 
-	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei
-	 * Veränderung des {@link Iterable}s {@code true} zurück.
+	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung
+	 * des {@link Iterable} {@code true} zurück.
 	 *
 	 * @see Iterators#retainAll(Iterator, Collection)
 	 * @param iterable {@link Iterable}.
@@ -107,7 +107,7 @@ public class Iterables {
 		return Iterators.retainAll(collection, iterable.iterator());
 	}
 
-	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s und gibt nur bei Veränderung des {@link Iterable}s {@code true} zurück.
+	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable} und gibt nur bei Veränderung des {@link Iterable} {@code true} zurück.
 	 *
 	 * @see Iterators#removeAll(Iterator)
 	 * @param iterable {@link Iterable}.
@@ -117,8 +117,8 @@ public class Iterables {
 		return Iterators.removeAll(iterable.iterator());
 	}
 
-	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des
-	 * {@link Iterable}s {@code true} zurück.
+	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des
+	 * {@link Iterable} {@code true} zurück.
 	 *
 	 * @see Iterators#removeAll(Iterator, Collection)
 	 * @param iterable {@link Iterable}.
@@ -129,7 +129,7 @@ public class Iterables {
 		return Iterators.removeAll(iterable.iterator(), collection);
 	}
 
-	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s aus der gegebenen {@link Collection} und gibt nur bei Veränderungen an der
+	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable} aus der gegebenen {@link Collection} und gibt nur bei Veränderungen an der
 	 * {@link Collection} {@code true} zurück.
 	 *
 	 * @see Iterators#removeAll(Collection, Iterator)
@@ -141,7 +141,7 @@ public class Iterables {
 		return Iterators.removeAll(collection, iterable.iterator());
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterable}s in der gegebenen {@link Collection} enthalten sind.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterable} in der gegebenen {@link Collection} enthalten sind.
 	 *
 	 * @see Iterators#containsAll(Collection, Iterator)
 	 * @param collection {@link Collection}.

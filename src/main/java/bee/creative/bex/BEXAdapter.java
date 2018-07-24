@@ -1269,7 +1269,7 @@ public class BEXAdapter {
 	}
 
 	/** Diese Klasse implementiert erweitert den {@link BEXNodeAdapter} und die Methoden {@link #getParentNode()}, {@link #getNextSibling()} und
-	 * {@link #getPreviousSibling()} als Basis des {@link BEXTextAdapter}s sowie des {@link BEXElemAdapter}s.
+	 * {@link #getPreviousSibling()} als Basis des {@link BEXTextAdapter} sowie des {@link BEXElemAdapter}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class BEXChldAdapter extends BEXNodeAdapter {
@@ -1543,7 +1543,7 @@ public class BEXAdapter {
 		/** Dieses Feld speichert die Anzahl der gesammelten Elementknoten. */
 		protected final int size;
 
-		/** Dieser Konstruktor initialisiert die Parameter zur Zusammenstellung der {@link BEXNodeAdapter}s.
+		/** Dieser Konstruktor initialisiert die Parameter zur Zusammenstellung der {@link BEXNodeAdapter}.
 		 *
 		 * @param node Elementknoten, dessen Kindknoten rekursiv analysiert werden.
 		 * @param uri Uri oder {@code "*"}.

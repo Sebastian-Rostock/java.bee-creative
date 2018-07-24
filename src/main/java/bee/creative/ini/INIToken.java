@@ -6,101 +6,7 @@ import bee.creative.util.Objects;
  * Abschnitt, eine Eigenschaft oder einen Kommentar stehen kann.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class INIToken {
-
-	@SuppressWarnings ("javadoc")
-	static final class SectionToken extends INIToken {
-
-		final String section;
-
-		SectionToken(final String section) {
-			this.section = section;
-		}
-
-		{}
-
-		@Override
-		public final int type() {
-			return INIToken.SECTION;
-		}
-
-		@Override
-		public final String section() {
-			return this.section;
-		}
-
-		@Override
-		public final boolean isSection() {
-			return true;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final class PropertyToken extends INIToken {
-
-		final String key;
-
-		final String value;
-
-		PropertyToken(final String key, final String value) {
-			this.key = key;
-			this.value = value;
-		}
-
-		{}
-
-		@Override
-		public final int type() {
-			return INIToken.PROPERTY;
-		}
-
-		@Override
-		public final String key() {
-			return this.key;
-		}
-
-		@Override
-		public final String value() {
-			return this.value;
-		}
-
-		@Override
-		public final boolean isProperty() {
-			return true;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final class CommentToken extends INIToken {
-
-		final String comment;
-
-		CommentToken(final String comment) {
-			this.comment = comment;
-		}
-
-		{}
-
-		@Override
-		public final int type() {
-			return INIToken.COMMENT;
-		}
-
-		@Override
-		public final String comment() {
-			return this.comment;
-		}
-
-		@Override
-		public final boolean isComment() {
-			return true;
-		}
-
-	}
-
-	{}
+public final class INIToken {
 
 	/** Dieses Feld speichert die Typkennung eines Abschnitts.
 	 *
@@ -130,7 +36,7 @@ public abstract class INIToken {
 	 * @return Abschnitt.
 	 * @throws NullPointerException Wenn {@code section} {@code null} ist. */
 	public static INIToken fromSection(final String section) throws NullPointerException {
-		return new SectionToken(section.intern());
+		return new INIToken(section.toString(), null);
 	}
 
 	/** Diese Methode gibt einen Kommentar mit dem gegebenen Schlüssel und dem gegebenen Wert als {@link INIToken} zurück.
@@ -142,7 +48,7 @@ public abstract class INIToken {
 	 * @return Eigenschaft
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
 	public static INIToken fromProperty(final String key, final String value) throws NullPointerException {
-		return new PropertyToken(key.intern(), value.intern());
+		return new INIToken(key.toString(), value.toString());
 	}
 
 	/** Diese Methode gibt einen Kommentar mit dem gegebenen Text als {@link INIToken} zurück.
@@ -152,13 +58,21 @@ public abstract class INIToken {
 	 * @return Kommentar.
 	 * @throws NullPointerException Wenn {@code comment} {@code null} ist. */
 	public static INIToken fromComment(final String comment) throws NullPointerException {
-		return new CommentToken(comment.intern());
+		return new INIToken(null, comment.toString());
 	}
 
 	{}
 
+	/** Dieses Feld speichert das {@link #key()}, die {@link #section()} oder {@code null}. */
+	final String string1;
+
+	/** Dieses Feld speichert den {@link #value()}. den {@link #comment()} oder {@code null}. */
+	final String string2;
+
 	@SuppressWarnings ("javadoc")
-	INIToken() {
+	INIToken(final String string1, final String string2) {
+		this.string1 = string1;
+		this.string2 = string2;
 	}
 
 	{}
@@ -169,59 +83,63 @@ public abstract class INIToken {
 	 * @see #PROPERTY
 	 * @see #COMMENT
 	 * @return Typkennung. */
-	public abstract int type();
+	public final int type() {
+		if (this.string1 == null) return INIToken.COMMENT;
+		if (this.string2 == null) return INIToken.SECTION;
+		return INIToken.PROPERTY;
+	}
 
 	/** Diese Methode gibt den Schlüssel der Eigenschaft zurück, wenn dieses Element ein {@link #PROPERTY} ist. Andernfalls wird {@code null} geliefert.
 	 *
 	 * @see #fromProperty(String, String)
 	 * @return Schlüssel der Eigenschaft oder {@code null}. */
-	public String key() {
-		return null;
+	public final String key() {
+		return this.string2 != null ? this.string1 : null;
 	}
 
 	/** Diese Methode gibt den Wert der Eigenschaft zurück, wenn dieses Element ein {@link #PROPERTY} ist. Andernfalls wird {@code null} geliefert.
 	 *
 	 * @see #fromProperty(String, String)
 	 * @return Wert der Eigenschaft oder {@code null}. */
-	public String value() {
-		return null;
+	public final String value() {
+		return this.string1 != null ? this.string2 : null;
 	}
 
 	/** Diese Methode gibt den Namen des Abschnitts zurück, wenn dieses Element eine {@link #SECTION} ist. Andernfalls wird {@code null} geliefert.
 	 *
 	 * @see #fromSection(String)
 	 * @return Namen des Abschnitts oder {@code null}. */
-	public String section() {
-		return null;
+	public final String section() {
+		return this.string2 == null ? this.string1 : null;
 	}
 
 	/** Diese Methode gibt den Text des Kommentars zurück, wenn dieses Element ein {@link #COMMENT} ist. Andernfalls wird {@code null} geliefert.
 	 *
 	 * @see #fromComment(String)
 	 * @return Text des Kommentars oder {@code null}. */
-	public String comment() {
-		return null;
+	public final String comment() {
+		return this.string1 == null ? this.string2 : null;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element ein {@link #SECTION Anschnitt} {@link #type() ist}.
 	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #SECTION}. */
-	public boolean isSection() {
-		return false;
+	public final boolean isSection() {
+		return this.string2 == null;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element eine {@link #PROPERTY Eigenschaft} {@link #type() ist}.
 	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #PROPERTY}. */
-	public boolean isProperty() {
-		return false;
+	public final boolean isProperty() {
+		return (this.string1 != null) && (this.string2 != null);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element ein {@link #COMMENT Kommentar} {@link #type() ist}.
 	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #COMMENT}. */
-	public boolean isComment() {
-		return false;
+	public final boolean isComment() {
+		return this.string1 == null;
 	}
 
 	{}
@@ -229,7 +147,7 @@ public abstract class INIToken {
 	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
-		return Objects.hash(this.key(), this.value(), this.section(), this.comment());
+		return Objects.hash(this.string1, this.string2);
 	}
 
 	/** {@inheritDoc} */
@@ -238,23 +156,15 @@ public abstract class INIToken {
 		if (object == this) return true;
 		if (!(object instanceof INIToken)) return false;
 		final INIToken that = (INIToken)object;
-		return Objects.equals(this.key(), that.key()) && Objects.equals(this.value(), that.value()) && //
-			Objects.equals(this.section(), that.section()) && Objects.equals(this.comment(), that.comment());
+		return Objects.equals(this.string1, that.string1) && Objects.equals(this.string2, that.string2);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		switch (this.type()) {
-			case SECTION:
-				return "[" + Objects.toString(this.section()) + "]";
-			case PROPERTY:
-				return Objects.toString(this.key()) + "=" + Objects.toString(this.value());
-			case COMMENT:
-				return ";" + Objects.toString(this.comment());
-			default:
-				throw new IllegalStateException();
-		}
+		if (this.string1 == null) return ";" + Objects.toString(this.string2);
+		if (this.string2 == null) return "[" + Objects.toString(this.string1) + "]";
+		return Objects.toString(this.string1) + "=" + Objects.toString(this.string2);
 	}
 
 }

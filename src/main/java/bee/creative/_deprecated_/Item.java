@@ -1,13 +1,11 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 import java.util.Iterator;
-import bee.creative.util.Assignable;
-import bee.creative.util.Assignment;
 
 /** Diese Schnittstelle definiert ein von einem {@link Pool} verwalteten Datensatz, welcher als Abstraktion eiens Eintrags einer Tabelle einer Datenbank
  * verstanden werden kann. Ein solcher Datensatz hat einen {@link #type() Datentyp} und besitzt zur Identifikation einen {@link #key() Schlüssel}. Der Schlüssel
  * entspricht dem Identifikator, den auch die Datenbank verwendet.<br>
- * {@link Item}s werden von {@link Pool}s verwaltet und sind {@link Assignable}.
+ * {@link Item} werden von {@link Pool} verwaltet und sind {@link Assignable}.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface Item extends Part, Assignable<Item> {
@@ -35,7 +33,7 @@ public interface Item extends Part, Assignable<Item> {
 	@Override
 	public Object owner();
 
-	/** Diese Methode gibt den Datentyp dieses {@link Item}s zurück. Dieser wird über den {@link #pool()} ermittelt.
+	/** Diese Methode gibt den Datentyp dieses {@link Item} zurück. Dieser wird über den {@link #pool()} ermittelt.
 	 *
 	 * @see #pool()
 	 * @see Pool#type()
@@ -68,7 +66,7 @@ public interface Item extends Part, Assignable<Item> {
 	 * @return Assoziationen, die dieses {@link Item} verwenden. */
 	public Iterable<?> links();
 
-	/** Diese Methode überträgt die Informationen des im gegebenen {@link Assignment} gehaltenen {@link Item}s auf dieses {@link Item}. */
+	/** Diese Methode überträgt die Informationen des im gegebenen {@link Assignment} gehaltenen {@link Item} auf dieses {@link Item}. */
 	@Override
 	public void assign(Assignment<? extends Item> assignment) throws NullPointerException, IllegalArgumentException;
 

@@ -1,4 +1,4 @@
-/* [cc-by] 2013..2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+/* [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 
 #include "bee_creative_mmf.hpp"
 

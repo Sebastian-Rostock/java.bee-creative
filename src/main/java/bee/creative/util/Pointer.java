@@ -19,7 +19,7 @@ public interface Pointer<GData> {
 	public int hashCode();
 
 	/** Diese Methode gibt die via {@link Objects#equals(Object, Object)} berechnete {@link Object#equals(Object) Äquivalenz} der Datensätze dieses und des
-	 * gegebenenen {@link Pointer}s zurück.
+	 * gegebenenen {@link Pointer} zurück.
 	 *
 	 * @param object {@link Pointer}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der Datensätze. */

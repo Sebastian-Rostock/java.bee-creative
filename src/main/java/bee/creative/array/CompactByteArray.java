@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactByteArray extends CompactArray<byte[], Byte> implements ByteArray {
 
-	/** Diese Klasse implementiert ein {@link ByteArray} als modifizierbare Sicht auf einen Teil eines {@link CompactByteArray}s.
+	/** Diese Klasse implementiert ein {@link ByteArray} als modifizierbare Sicht auf einen Teil eines {@link CompactByteArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactByteSubArray extends CompactSubArray<CompactByteArray, byte[], Byte> implements ByteArray {
@@ -90,7 +90,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	}
 
-	/** Diese Klasse implementiert die live {@link ByteArraySection} eines {@link CompactByteArray}s.
+	/** Diese Klasse implementiert die live {@link ByteArraySection} eines {@link CompactByteArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactByteArraySection extends ByteArraySection {
@@ -135,7 +135,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	}
 
-	/** Diese Klasse implementiert die live {@link ByteArraySection} eines {@link CompactByteSubArray}s.
+	/** Diese Klasse implementiert die live {@link ByteArraySection} eines {@link CompactByteSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactByteSubArraySection extends ByteArraySection {

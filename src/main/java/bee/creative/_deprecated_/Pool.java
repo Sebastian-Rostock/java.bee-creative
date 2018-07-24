@@ -1,10 +1,10 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.util.Field;
 
-/** Diese Schnittstelle definiert einen Sammlung von {@link Item}s und kann als Abstraktion einer Tabelle einer Datenbank verstenden werden. Die {@link Item}s
+/** Diese Schnittstelle definiert einen Sammlung von {@link Item} und kann als Abstraktion einer Tabelle einer Datenbank verstenden werden. Die {@link Item}
  * können über ihren Schlüssel {@link #get(long) identifiziert} werden. Ein {@link Pool} hat darüber hinaus einen Besitzer.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -17,13 +17,13 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 
 	/** Diese Methode gibt das {@link Field} zurück, über welches dieser {@link Pool} von seinem {@link #owner()} aus erreichbar ist.
 	 *
-	 * @return {@link Field} des {@link Pool}s in seinem {@link #owner()}. */
+	 * @return {@link Field} des {@link Pool} in seinem {@link #owner()}. */
 	@Override
 	public Field<?, ? extends Pool<GItem>> field();
 
-	/** Diese Methode gibt den {@link Type} der {@link Item}s zurück.
+	/** Diese Methode gibt den {@link Type} der {@link Item} zurück.
 	 *
-	 * @return {@link Type} der {@link Item}s. */
+	 * @return {@link Type} der {@link Item}. */
 	@Override
 	public Type<GItem> type();
 
@@ -50,12 +50,12 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public <GValue> GItem find(Field<? super GItem, ? extends GValue> field, GValue value, int states) throws NullPointerException;
 
-	/** Diese Methode gibt die {@link Selection} der {@link Item}s im {@link Item#APPEND_STATE} zurück, die für die als {@link Field} gegebene Eigenschaft den
+	/** Diese Methode gibt die {@link Selection} der {@link Item} im {@link Item#APPEND_STATE} zurück, die für die als {@link Field} gegebene Eigenschaft den
 	 * gegebenen Wert besitzen. */
 	@Override
 	public <GValue> Selection<GItem> findAll(Field<? super GItem, ? extends GValue> field, GValue value) throws NullPointerException;
 
-	/** Diese Methode gibt die {@link Selection} der {@link Item}s im gegebenen Status zurück, die für die als {@link Field} gegebene Eigenschaft den gegebenen
+	/** Diese Methode gibt die {@link Selection} der {@link Item} im gegebenen Status zurück, die für die als {@link Field} gegebene Eigenschaft den gegebenen
 	 * Wert besitzen.
 	 *
 	 * @param <GValue> Typ des Werts.
@@ -71,22 +71,22 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 	 * @return Datensatzanzahl. */
 	public int size();
 
-	/** Diese Methode gibt eine {@link Collection}-Sicht auf die {@link Item}s im {@link Item#APPEND_STATE} zurück. Das einfügen von Elementen ist unzulässig.<br>
+	/** Diese Methode gibt eine {@link Collection}-Sicht auf die {@link Item} im {@link Item#APPEND_STATE} zurück. Das einfügen von Elementen ist unzulässig.<br>
 	 * <em>Achtung:</em> Beim Entfernen von Datensätzen werden diese in den {@link Item#CREATE_STATE} überführt.
 	 *
 	 * @see Item#state()
 	 * @see Pool#items(int)
 	 * @see Pool#iterator()
-	 * @return {@link Collection} über die {@link Item}s im {@link Item#APPEND_STATE}. */
+	 * @return {@link Collection} über die {@link Item} im {@link Item#APPEND_STATE}. */
 	public Collection<? extends GItem> items();
 
-	/** Diese Methode gibt eine {@link Collection}-Sicht auf die {@link Item}s im gegebenen Status zurück. Das einfügen von Elementen ist unzulässig.<br>
+	/** Diese Methode gibt eine {@link Collection}-Sicht auf die {@link Item} im gegebenen Status zurück. Das einfügen von Elementen ist unzulässig.<br>
 	 * <em>Achtung:</em> Beim Entfernen von Datensätzen werden diese in den {@link Item#CREATE_STATE} überführt.
 	 *
 	 * @see Item#state()
 	 * @see Pool#items()
 	 * @param states Status-Bitmaske ({@link Item#APPEND_STATE}, {@link Item#REMOVE_STATE}, {@link Item#UPDATE_STATE}).
-	 * @return {@link Item}s im gegebenen Status. */
+	 * @return {@link Item} im gegebenen Status. */
 	public Collection<? extends GItem> items(int states);
 
 	/** Diese Methode erstellt ein neues {@link Item} im {@link Item#CREATE_STATE} und gibt dieses zurück.
@@ -95,7 +95,7 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 	 * @return neues {@link Item}. */
 	public GItem create();
 
-	/** Diese Methode gibt den {@link Iterator} über die {@link Item}s im {@link Item#APPEND_STATE} zurück.
+	/** Diese Methode gibt den {@link Iterator} über die {@link Item} im {@link Item#APPEND_STATE} zurück.
 	 *
 	 * @see Pool#items() */
 	@Override

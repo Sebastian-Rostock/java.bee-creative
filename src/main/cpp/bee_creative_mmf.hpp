@@ -1,4 +1,4 @@
-/* [cc-by] 2013..2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+/* [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 
 #ifndef BEE_CREATIVE_MMF_HPP
 #define BEE_CREATIVE_MMF_HPP
@@ -10,7 +10,7 @@ namespace bee {
 namespace creative {
 
 /** Dieser Namensraum definiert Klassen und Methoden zu Bereitstellung der Daten einer Datei als <i>memory-mapped-file</i> sowie zur Interpretation von Speicherbereichen in als Zahlen in <i>big-endian</i> und <i>little-endian</i> Kodierung.
- * @author [cc-by] 2014..2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 namespace mmf {
 
 using namespace bee::creative;

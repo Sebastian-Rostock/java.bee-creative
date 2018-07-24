@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactIntegerArray extends CompactArray<int[], Integer> implements IntegerArray {
 
-	/** Diese Klasse implementiert ein {@link IntegerArray} als modifizierbare Sicht auf einen Teil eines {@link CompactIntegerArray}s.
+	/** Diese Klasse implementiert ein {@link IntegerArray} als modifizierbare Sicht auf einen Teil eines {@link CompactIntegerArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactIntegerSubArray extends CompactSubArray<CompactIntegerArray, int[], Integer> implements IntegerArray {
@@ -90,7 +90,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	}
 
-	/** Diese Klasse implementiert die live {@link IntegerArraySection} eines {@link CompactIntegerArray}s.
+	/** Diese Klasse implementiert die live {@link IntegerArraySection} eines {@link CompactIntegerArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactIntegerArraySection extends IntegerArraySection {
@@ -135,7 +135,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	}
 
-	/** Diese Klasse implementiert die live {@link IntegerArraySection} eines {@link CompactIntegerSubArray}s.
+	/** Diese Klasse implementiert die live {@link IntegerArraySection} eines {@link CompactIntegerSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactIntegerSubArraySection extends IntegerArraySection {
