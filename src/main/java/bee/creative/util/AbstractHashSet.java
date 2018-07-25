@@ -79,7 +79,11 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	/** {@inheritDoc} */
 	@Override
 	public boolean addAll(final Collection<? extends GItem> items) {
-		return this.newKeysImpl().addAll(items);
+		final int count = this.countImpl();
+		for (final GItem item: items) {
+			this.putKeyImpl(item);
+		}
+		return count != this.countImpl();
 	}
 
 	/** {@inheritDoc} */

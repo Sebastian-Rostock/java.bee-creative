@@ -171,16 +171,16 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 		/** Diese Methode ermitteln den Index des nächsten Eintrags und gibt den des aktuellen zurück. */
 		protected final int nextIndex() {
-			int nextEntry = this.nextEntry;
-			if (nextEntry < 0) throw new NoSuchElementException();
-			this.prevEntry = nextEntry;
-			nextEntry = this.entryData.nexts[nextEntry];
+			final int result = this.nextEntry;
+			this.prevEntry = result;
+			if (result < 0) throw new NoSuchElementException();
+			final int nextEntry = this.entryData.nexts[result];
 			if (nextEntry >= 0) {
 				this.nextEntry = nextEntry;
 			} else {
 				this.nextIndex2();
 			}
-			return nextEntry;
+			return result;
 		}
 
 		/** Diese Methode sucht den Index des nächsten Eintrags. */
