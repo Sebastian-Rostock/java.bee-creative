@@ -56,6 +56,21 @@ public class Objects {
 
 	};
 
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link System#identityHashCode(Object)} und die Objekte über ihre Referenz vergleicht. */
+	public static final Hasher IDENTITY_HASHER = new Hasher() {
+
+		@Override
+		public int hash(final Object input) {
+			return System.identityHashCode(input);
+		}
+
+		@Override
+		public boolean equals(final Object input1, final Object input2) {
+			return input1 == input2;
+		}
+
+	};
+
 	{}
 
 	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
