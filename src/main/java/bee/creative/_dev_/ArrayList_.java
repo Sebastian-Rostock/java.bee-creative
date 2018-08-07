@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
- class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Serializable {
+class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Serializable {
 
 	@SuppressWarnings ("javadoc")
 	protected static class Sub<GItem> implements List<GItem> {
@@ -208,8 +208,6 @@ import bee.creative.util.Objects;
 			this.count = count;
 		}
 
-		{}
-
 		/** Diese Methode überspringt die gegebene Anzahl an Elementen. Eine negative Anzahl navigiert rückwärts.
 		 *
 		 * @param count Anzahl an Elementen.
@@ -302,8 +300,6 @@ import bee.creative.util.Objects;
 			super(array, offset, length);
 		}
 
-		{}
-
 		@Override
 		public boolean hasNext() {
 			return this.hasNextImpl();
@@ -358,8 +354,6 @@ import bee.creative.util.Objects;
 			super(array);
 		}
 
-		{}
-
 		@Override
 		public boolean hasNext() {
 			return this.hasPrevImpl();
@@ -377,8 +371,6 @@ import bee.creative.util.Objects;
 
 	}
 
-	{}
-
 	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = 1727164646735088421L;
 
@@ -388,8 +380,6 @@ import bee.creative.util.Objects;
 	/** Dieses Feld speichert die maximale Kapazität. */
 	static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
 
-	{}
-
 	/** Diese Methode setzt alle Elemente im gegebenen zyklischen Abschnitt auf {@code null}.
 	 *
 	 * @param array Array.
@@ -398,8 +388,6 @@ import bee.creative.util.Objects;
 	private static void nullImpl(final Object[] array, final int offset, final int length) {
 		for (int i = offset, size = offset + length; i < size; array[i++] = null) {}
 	}
-
-	{}
 
 	/** Dieses Feld speichert die Elemente. */
 	transient Object[] array;
@@ -422,15 +410,14 @@ import bee.creative.util.Objects;
 		this.array = capacity != 0 ? new Object[capacity] : ArrayList_.EMPTY_OBJECTS;
 	}
 
-	{}
-
 	@SuppressWarnings ("javadoc")
 	private final void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		final int length = stream.readInt();
 		if (length == 0) return;
 		final Object[] array = new Object[length];
-		for (int i = 0; i < length; array[i++] = stream.readObject()) {}
-		this.array = array;
+		for (int i = 0; i < length; array[i++] = stream.readObject()) {
+			this.array = array;
+		}
 		this.length = length;
 	}
 
@@ -775,8 +762,6 @@ import bee.creative.util.Objects;
 		this.allocateImpl(this.length);
 		return this;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

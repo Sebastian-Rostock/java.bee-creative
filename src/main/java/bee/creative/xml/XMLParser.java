@@ -26,8 +26,6 @@ public final class XMLParser {
 			return XMLParser.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final SourceData customThis() {
@@ -48,8 +46,6 @@ public final class XMLParser {
 			return XMLParser.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final BuilderData customThis() {
@@ -58,15 +54,11 @@ public final class XMLParser {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
 	final SourceData sourceData = new SourceData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openBuilderData()}. */
 	final BuilderData builderData = new BuilderData();
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -117,8 +109,6 @@ public final class XMLParser {
 	public final BuilderData openBuilderData() {
 		return this.builderData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

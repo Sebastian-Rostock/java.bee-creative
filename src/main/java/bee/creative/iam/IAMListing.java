@@ -73,8 +73,6 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 			this.itemCount = itemCount;
 		}
 
-		{}
-
 		@Override
 		public final IAMArray item(final int itemIndex) {
 			if ((itemIndex < 0) || (itemIndex >= this.itemCount)) return IAMArray.EMPTY;
@@ -128,8 +126,6 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 			this.owner = owner;
 		}
 
-		{}
-
 		@Override
 		public final IAMArray get(final int index) {
 			if ((index < 0) || (index >= this.owner.itemCount())) throw new IndexOutOfBoundsException();
@@ -143,12 +139,8 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert das leere {@link IAMListing}. */
 	public static final IAMListing EMPTY = new EmptyListing();
-
-	{}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMListing} und gibt dieses zurück.<br>
 	 * Wenn das Objekt ein {@link IAMListing} ist, wird dieses geliefert. Andernfalls wird {@code new IAMListingLoader(MMFArray.from(object).withOrder(...))}
@@ -165,8 +157,6 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 		final MMFArray array = MMFArray.from(object);
 		return new IAMListingLoader(array.withOrder(IAMListingLoader.HEADER.orderOf(array)));
 	}
-
-	{}
 
 	/** Diese Methode gibt das {@code itemIndex}-te Element als Zahlenfolge zurück. Bei einem ungültigen {@code itemIndex} wird eine leere Zahlenfolge geliefert.
 	 *
@@ -280,8 +270,6 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 		if (this.itemCount() == 0) return this;
 		return new CompactListing(this);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

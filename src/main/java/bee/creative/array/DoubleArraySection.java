@@ -64,8 +64,6 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final double[] array) {

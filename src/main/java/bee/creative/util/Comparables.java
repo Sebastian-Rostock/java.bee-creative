@@ -50,8 +50,6 @@ public class Comparables {
 
 	}
 
-	{}
-
 	@SuppressWarnings ("javadoc")
 	static void check(final int fromIndex, final int toIndex) throws IllegalArgumentException {
 		if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");

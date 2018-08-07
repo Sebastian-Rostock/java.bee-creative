@@ -9,8 +9,6 @@ class MMFArrayUR1 extends MMFArraySR1 {
 		super(length, buffer, offset);
 	}
 
-	{}
-
 	@Override
 	public MMFArray toINT8() {
 		return new MMFArraySR1(this.length, this.buffer, this.offset);

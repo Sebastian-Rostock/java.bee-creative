@@ -26,8 +26,6 @@ public final class FEMFuture extends FEMValue {
 		return new FEMFuture(Objects.assertNotNull(frame), Objects.assertNotNull(function));
 	}
 
-	{}
-
 	/** Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
 	 *
 	 * @see FEMFunction#invoke(FEMFrame) */
@@ -52,8 +50,6 @@ public final class FEMFuture extends FEMValue {
 		this.function = function;
 	}
 
-	{}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #result() Ergebniswert} noch nicht ausgewertet wurde.
 	 *
 	 * @return Auswertungsstatus. */
@@ -76,8 +72,6 @@ public final class FEMFuture extends FEMValue {
 	public final synchronized FEMFunction function() {
 		return this.function;
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this.result().data()} zurück. */
 	@Override

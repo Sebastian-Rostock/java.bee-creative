@@ -41,8 +41,6 @@ public class FileDataSource extends BaseDataSource {
 		this.data = Objects.assertNotNull(file);
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public final RandomAccessFile data() {

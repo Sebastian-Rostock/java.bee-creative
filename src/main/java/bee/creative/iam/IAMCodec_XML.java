@@ -98,8 +98,6 @@ final class IAMCodec_XML {
 
 	}
 
-	{}
-
 	public final IAMIndexBuilder decode(final IAMCodec codec) throws IOException, IllegalArgumentException {
 		final IAMINDEXTYPE xmlIndex = JAXB.unmarshal(IO.inputReaderFrom(codec.getSourceData()), IAMINDEXTYPE.class);
 

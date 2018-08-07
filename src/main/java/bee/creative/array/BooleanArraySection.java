@@ -64,8 +64,6 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final boolean[] array) {

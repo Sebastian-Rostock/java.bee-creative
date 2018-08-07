@@ -11,7 +11,7 @@ import bee.creative.util.Objects;
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
- abstract class CompactSet<GItem> extends CompactCollection<GItem> implements Set<GItem> {
+abstract class CompactSet<GItem> extends CompactCollection<GItem> implements Set<GItem> {
 
 	/** Diese Klasse implementiert das {@link AbstractSet} eines {@link Set}s.
 	 *
@@ -30,8 +30,6 @@ import bee.creative.util.Objects;
 			this.set = Objects.assertNotNull(set);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -45,8 +43,6 @@ import bee.creative.util.Objects;
 		}
 
 	}
-
-	{}
 
 	/** Dieser Konstruktor initialisiert das {@link Set}. */
 	public CompactSet() {
@@ -71,8 +67,6 @@ import bee.creative.util.Objects;
 		this.addAll(collection);
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public final boolean add(final GItem item) {
@@ -93,7 +87,7 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
-		return new CompactSetItems<GItem>(this).hashCode();
+		return new CompactSetItems<>(this).hashCode();
 	}
 
 	/** {@inheritDoc} */
@@ -101,7 +95,7 @@ import bee.creative.util.Objects;
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof Set)) return false;
-		return new CompactSetItems<GItem>(this).equals(object);
+		return new CompactSetItems<>(this).equals(object);
 	}
 
 }

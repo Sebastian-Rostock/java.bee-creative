@@ -12,8 +12,6 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -8419791227943208230L;
 
-	{}
-
 	/** Diese Methode gibt eine neue {@link HashMap2} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
@@ -45,8 +43,6 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		};
 	}
 
-	{}
-
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
 	transient int[] hashes = AbstractHashData.EMPTY_INTEGERS;
 
@@ -61,15 +57,13 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMap} mit dem Inhalt der gegebenen {@link Map}.
+	/** Dieser Konstruktor initialisiert die {@link HashMap2} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
 	public HashMap2(final Map<? extends GKey, ? extends GValue> source) {
 		this.allocateImpl(source.size());
 		this.putAll(source);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

@@ -81,8 +81,6 @@ public final class FEMTracer {
 	 * angepasst werden. */
 	RuntimeException exception;
 
-	{}
-
 	/** Diese Methode gibt die Überwachungsmethoden zurück.
 	 *
 	 * @return Überwachungsmethoden. */
@@ -187,8 +185,6 @@ public final class FEMTracer {
 		this.exception = null;
 		return this;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

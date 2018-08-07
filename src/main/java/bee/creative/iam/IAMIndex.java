@@ -72,8 +72,6 @@ public abstract class IAMIndex {
 			return 3;
 		}
 
-		{}
-
 		/** Dieses Feld speichert den Größentyp.<br>
 		 * Der Wert {@code 0} legt fest, dass alle Zahlenfolgen die gleiche Länge {@link #dataLength} besitzen.<br>
 		 * Die Werte {@code 1}, {@code 2} und {@code 2} legen fest, dass die kummulierten Längen der Zahlenlisten als {@code UINT8}, {@code UINT16} bzw.
@@ -121,8 +119,6 @@ public abstract class IAMIndex {
 			}
 
 		}
-
-		{}
 
 		/** Diese Methode schreibt die {@link #dataLength} bzw. das {@link #dataOffset} gemäß {@link #type} in den gegebenen Puffer.
 		 *
@@ -194,8 +190,6 @@ public abstract class IAMIndex {
 			return 3;
 		}
 
-		{}
-
 		/** Dieses Feld speichert den Datentyp.<br>
 		 * Die Werte {@code 1}, {@code 2} und {@code 2} legen fest, dass die Werte der Zahlenlisten als {@code INT8}, {@code INT16} bzw. {@code INT32} in
 		 * {@link #dataValue} gespeichert sind.
@@ -238,8 +232,6 @@ public abstract class IAMIndex {
 			this.bytes = (dataValueBytes + 3) & -4;
 		}
 
-		{}
-
 		/** Diese Methode schreibt die {@link #dataValue} gemäß {@link #type} in den gegebenen Puffer.
 		 *
 		 * @param buffer Puffer. */
@@ -257,8 +249,6 @@ public abstract class IAMIndex {
 		Listingss(final IAMIndex owner) {
 			this.owner = owner;
 		}
-
-		{}
 
 		@Override
 		public IAMListing get(final int index) {
@@ -282,8 +272,6 @@ public abstract class IAMIndex {
 			this.owner = owner;
 		}
 
-		{}
-
 		@Override
 		public IAMMapping get(final int index) {
 			if ((index < 0) || (index >= this.owner.mappingCount())) throw new IndexOutOfBoundsException();
@@ -297,12 +285,8 @@ public abstract class IAMIndex {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den leeren {@link IAMIndex}. */
 	public static final IAMIndex EMPTY = new EmptyIndex();
-
-	{}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMIndex} und gibt diesen zurück.<br>
 	 * Wenn das Objekt ein {@link IAMIndex} ist, wird dieser geliefert. Andernfalls wird {@code new IAMIndexLoader(MMFArray.from(object).withOrder(...))}
@@ -319,8 +303,6 @@ public abstract class IAMIndex {
 		final MMFArray array = MMFArray.from(object);
 		return new IAMIndexLoader(array.withOrder(IAMIndexLoader.HEADER.orderOf(array)));
 	}
-
-	{}
 
 	/** Diese Methode gibt die {@code index}-te Abbildung zurück. Bei einem ungültigen {@code index} wird eine leere Abbildung geliefert.
 	 *
@@ -412,8 +394,6 @@ public abstract class IAMIndex {
 
 		return result;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

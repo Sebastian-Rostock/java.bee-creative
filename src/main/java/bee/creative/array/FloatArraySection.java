@@ -64,8 +64,6 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final float[] array) {

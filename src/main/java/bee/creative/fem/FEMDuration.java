@@ -164,8 +164,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		64, 16, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16, 18,
 		33, 18, 33, 33, 33, 48, 33, 48, 33, 48};
 
-	{}
-
 	/** Diese Methode gibt eine neue Zeitspanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
 	 *
@@ -596,8 +594,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return (years * 12) + months;
 	}
 
-	{}
-
 	/** Dieses Feld speichert die 32 LSB der internen 64 Bit Darstellung dieser Zeitspanne.
 	 * <p>
 	 * Die 32 Bit von MBS zum LSB sind:
@@ -644,8 +640,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		this.valueH = valueH;
 		this.valueL = valueL;
 	}
-
-	{}
 
 	/** Diese Methode gibt die interne Darstellung der Zeitspanne zurück.
 	 * <p>
@@ -902,8 +896,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		if (result < 0) return -1;
 		return undefined;
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

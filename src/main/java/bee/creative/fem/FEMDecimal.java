@@ -15,8 +15,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	/** Dieses Feld speichert den Dezimalbruch {@code NaN}. */
 	public static final FEMDecimal EMPTY = new FEMDecimal(Double.NaN);
 
-	{}
-
 	/** Diese Methode gibt einen neuen Dezimalbruch mit dem gegebenen Wert zurück.
 	 *
 	 * @param value Wert.
@@ -61,8 +59,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		return context.dataFrom(value, FEMDecimal.TYPE);
 	}
 
-	{}
-
 	/** Dieses Feld speichert die interne Darstellung des Dezimalbruchs. */
 	final double value;
 
@@ -72,8 +68,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	public FEMDecimal(final double value) {
 		this.value = value;
 	}
-
-	{}
 
 	/** Diese Methode gibt die interne Darstellung des Dezimalbruchs zurück.
 	 *
@@ -119,8 +113,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	public final Double toNumber() {
 		return new Double(this.value);
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

@@ -33,8 +33,6 @@ public final class INIReader implements Closeable {
 		return new INIReader(IO.inputReaderFrom(data));
 	}
 
-	{}
-
 	/** Dieses Feld speichert den {@link Reader}. */
 	final Reader reader;
 
@@ -49,8 +47,6 @@ public final class INIReader implements Closeable {
 		this.reader = Objects.assertNotNull(reader);
 		this.builder = new StringBuilder();
 	}
-
-	{}
 
 	/** Diese Methode ließt das nächste Element der {@code INI}-Datenstruktur und gibt es zurück. Wenn kein weiteres Element mehr existiert, wird {@code null}
 	 * geliefert.
@@ -207,8 +203,6 @@ public final class INIReader implements Closeable {
 			result.append((char)symbol);
 		}
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

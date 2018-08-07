@@ -16,8 +16,6 @@ public class Strings {
 	 * {@link #Strings()} genutzt, die einen regulärer Ausdruck kompilieren müssen. */
 	public static final Getter<String, Pattern> PATTERN_COMPILER = Getters.synchronizedGetter(Getters.bufferedGetter(Strings.patternCompiler(0)));
 
-	{}
-
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden
 	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette
 	 * in diese Liste eingetragen werden sollen.

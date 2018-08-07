@@ -39,8 +39,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			this.that = that;
 		}
 
-		{}
-
 		@Override
 		public final boolean push(final FEMValue value) {
 			if (value.equals(this.that)) return false;
@@ -54,8 +52,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	static final class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
-
-		{}
 
 		@Override
 		public final boolean push(final FEMValue value) {
@@ -77,8 +73,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			this.index = index;
 		}
 
-		{}
-
 		@Override
 		public final boolean push(final FEMValue value) {
 			this.array[this.index++] = value;
@@ -93,8 +87,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		EmptyArray() throws IllegalArgumentException {
 			super(0);
 		}
-
-		{}
 
 		@Override
 		public final FEMArray reverse() {
@@ -120,8 +112,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			this.array1 = array1;
 			this.array2 = array2;
 		}
-
-		{}
 
 		@Override
 		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
@@ -166,8 +156,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			this.offset = offset;
 		}
 
-		{}
-
 		@Override
 		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			return this.array.customGet(index + this.offset);
@@ -194,8 +182,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			super(array.length);
 			this.array = array;
 		}
-
-		{}
 
 		@Override
 		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
@@ -233,8 +219,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			super(length);
 			this.item = item;
 		}
-
-		{}
 
 		@Override
 		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
@@ -275,8 +259,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			super(length, item);
 		}
 
-		{}
-
 		@Override
 		public final FEMArray result(final boolean recursive) {
 			return this;
@@ -298,8 +280,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 				if (items[i] == null) throw new NullPointerException();
 			}
 		}
-
-		{}
 
 		@Override
 		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
@@ -332,8 +312,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 1;
 
@@ -342,8 +320,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Dieses Feld speichert die leere Wertliste. */
 	public static final FEMArray EMPTY = new EmptyArray();
-
-	{}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
 	 * Das gegebene Array wird kopiert.
@@ -452,8 +428,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return FEMArray.concatAll(values, min, mid).concat(FEMArray.concatAll(values, mid + 1, max));
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Streuwert. */
 	int hash;
 
@@ -468,8 +442,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		if (length < 0) throw new IllegalArgumentException("length < 0");
 		this.length = length;
 	}
-
-	{}
 
 	/** Diese Methode gibt den {@code index}-ten Wert zurück.
 	 *
@@ -700,8 +672,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		};
 	}
-
-	{}
 
 	/** Diese Methode gibt den {@code index}-ten Wert zurück. */
 	@Override

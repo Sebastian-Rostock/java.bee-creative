@@ -48,8 +48,6 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 			}
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final AttrData<GOwner> customThis() {
@@ -119,8 +117,6 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 			}
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final ChldData<GOwner> customThis() {
@@ -128,8 +124,6 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert die leere Attributknotenliste. */
 	public static final NamedNodeMap EMPTY_ATTR_MAP = new NamedNodeMap() {
@@ -191,12 +185,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	};
 
-	{}
-
 	/** Dieses Feld speichert den aktuellen Knoten. */
 	Node node;
-
-	{}
 
 	/** Diese Methode gibt einen neuen Konfigurator für einen Attributknoten zurück.
 	 *
@@ -600,8 +590,6 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		}
 		return this.newChldData();
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

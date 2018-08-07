@@ -27,8 +27,6 @@ public class Getters {
 
 	};
 
-	{}
-
 	/** Diese Methode ist eine Abkürzung für {@code Fields.emptyField()}. */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Getter<Object, GValue> emptyGetter() {

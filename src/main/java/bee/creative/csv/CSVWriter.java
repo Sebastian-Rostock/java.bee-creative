@@ -29,8 +29,6 @@ public final class CSVWriter implements Closeable, Flushable {
 		return new CSVWriter(IO.outputWriterFrom(data));
 	}
 
-	{}
-
 	/** Dieses Feld speichert die Zieldaten. */
 	final Writer writer;
 
@@ -60,8 +58,6 @@ public final class CSVWriter implements Closeable, Flushable {
 		writer.flush();
 		this.writer = writer;
 	}
-
-	{}
 
 	/** Diese Methode gibt den Maskierungszwang zurück.<br>
 	 * Wenn dieser {@code true} ist, gelten alle {@link #writeValue(String) Werte} als zu maskieren. Andernfalls gelten nur die {@link #writeValue(String) Werte}
@@ -255,8 +251,6 @@ public final class CSVWriter implements Closeable, Flushable {
 			target.write(value);
 		}
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

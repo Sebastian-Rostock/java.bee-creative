@@ -15,8 +15,6 @@ public final class FEMHandler extends FEMValue {
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
 	public static final FEMType<FEMHandler> TYPE = FEMType.from(FEMHandler.ID);
 
-	{}
-
 	/** Diese Methode gibt die gegebene Funktion als Funktionszeiger zurück.
 	 *
 	 * @see FEMFunction#toValue()
@@ -37,8 +35,6 @@ public final class FEMHandler extends FEMValue {
 		return context.dataFrom(value, FEMHandler.TYPE);
 	}
 
-	{}
-
 	/** Dieses Feld speichert die Nutzdaten. */
 	final FEMFunction value;
 
@@ -46,8 +42,6 @@ public final class FEMHandler extends FEMValue {
 	FEMHandler(final FEMFunction value) throws NullPointerException {
 		this.value = value;
 	}
-
-	{}
 
 	/** Diese Methode gibt die Funktion zurück.
 	 *
@@ -71,8 +65,6 @@ public final class FEMHandler extends FEMValue {
 	public final boolean equals(final FEMHandler that) throws NullPointerException {
 		return this.value.equals(that.value);
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

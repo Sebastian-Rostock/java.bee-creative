@@ -22,7 +22,7 @@ import bee.creative.util.Objects;
  * Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des Arrays führ in jedem Fall zu einer erneuten Ausrichtung.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
- abstract class CompactData {
+abstract class CompactData {
 
 	/** Diese Klasse implementiert das {@link CompactObjectArray} der {@link CompactData}.
 	 *
@@ -31,8 +31,6 @@ import bee.creative.util.Objects;
 
 		/** Dieses Feld speichert das leere Array. */
 		static final Object[] empty = new Object[0];
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -95,8 +93,6 @@ import bee.creative.util.Objects;
 			this.last = last;
 		}
 
-		{}
-
 		/** Diese Methode gibt das {@code index}-te Element zurück.
 		 *
 		 * @param index Index.
@@ -136,8 +132,6 @@ import bee.creative.util.Objects;
 			super(data, from - 1, last - 1);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public GItem next() {
@@ -170,8 +164,6 @@ import bee.creative.util.Objects;
 			super(array, from, last);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public GItem next() {
@@ -189,8 +181,6 @@ import bee.creative.util.Objects;
 
 		/** Dieses Feld speichert das Objekt zur offenen Begrenzung von Teilmengen. */
 		protected static final Object open = new Object();
-
-		{}
 
 		/** Dieses Feld speichert das erste Element oder {@link CompactSubData#open}. */
 		protected final Object fromItem;
@@ -229,8 +219,6 @@ import bee.creative.util.Objects;
 			this.lastItem = lastItem;
 			this.lastInclusive = lastInclusive;
 		}
-
-		{}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Index zu groß ist oder der Index gültig und das {@code index}-te Element zu klein
 		 * sind.
@@ -435,8 +423,6 @@ import bee.creative.util.Objects;
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert das {@link Array} der Elemente. */
 	protected final CompactDataArray items;
 
@@ -444,8 +430,6 @@ import bee.creative.util.Objects;
 	public CompactData() {
 		this.items = new CompactDataArray();
 	}
-
-	{}
 
 	/** Diese Methode fügt die gegebene Anzahl an Einträgen ab dem gegebenen Index in das Array ein.
 	 *

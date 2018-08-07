@@ -9,8 +9,6 @@ class MMFArraySR4 extends MMFArraySR1 {
 		super(length, buffer, offset);
 	}
 
-	{}
-
 	@Override
 	public int mode() {
 		return 4;

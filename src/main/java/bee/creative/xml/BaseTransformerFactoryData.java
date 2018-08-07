@@ -34,8 +34,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FeatureData<GOwner> customThis() {
@@ -55,8 +53,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeAttributeData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -78,8 +74,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		 * @return Besitzer. */
 		public abstract GOwner closeListenerData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final ListenerData<GOwner> customThis() {
@@ -100,8 +94,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		 * @return Besitzer. */
 		public abstract GOwner closeResolverData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final ResolverData<GOwner> customThis() {
@@ -109,8 +101,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert die {@link TransformerFactory}. */
 	TransformerFactory factory;
@@ -154,8 +144,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -259,8 +247,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	public final ResolverData<GThis> openResolverData() {
 		return this.resolverData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

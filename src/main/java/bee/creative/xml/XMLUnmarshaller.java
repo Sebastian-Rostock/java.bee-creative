@@ -29,8 +29,6 @@ public final class XMLUnmarshaller {
 			return XMLUnmarshaller.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final SourceData customThis() {
@@ -51,8 +49,6 @@ public final class XMLUnmarshaller {
 			return XMLUnmarshaller.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final UnmarshallerData customThis() {
@@ -60,8 +56,6 @@ public final class XMLUnmarshaller {
 		}
 
 	}
-
-	{}
 
 	/** Diese Methode gibt einen neuen {@link XMLUnmarshaller} zurück, dessen {@link JAXBContext} die gegebenen Klassen nutzt.
 	 *
@@ -90,15 +84,11 @@ public final class XMLUnmarshaller {
 		return XMLUnmarshaller.from(classes).unmarshalString(source);
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
 	final SourceData sourceData = new SourceData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openUnmarshallerData()}. */
 	final UnmarshallerData unmarshallerData = new UnmarshallerData();
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -168,8 +158,6 @@ public final class XMLUnmarshaller {
 		this.openSourceData().resetSource();
 		return result;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

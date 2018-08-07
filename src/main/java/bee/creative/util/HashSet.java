@@ -14,12 +14,10 @@ import java.util.Set;
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializable {
+public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializable, Cloneable {
 
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = 1947961515821394540L;
-
-	{}
 
 	/** Diese Methode gibt ein neues {@link HashSet} zurück, welche Streuwert und Äquivalenz der Elemente über den gegebenen {@link Hasher} ermittelt.
 	 *
@@ -51,8 +49,6 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		};
 	}
 
-	{}
-
 	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] items = AbstractHashData.EMPTY_OBJECTS;
 
@@ -82,8 +78,6 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		this.addAll(source);
 	}
 
-	{}
-
 	@SuppressWarnings ({"javadoc", "unchecked"})
 	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		final int count = stream.readInt();
@@ -100,8 +94,6 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 			stream.writeObject(item);
 		}
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

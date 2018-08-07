@@ -32,8 +32,6 @@ public class BufferDataSource extends BaseDataSource {
 		this.data = data.slice().order(ByteOrder.BIG_ENDIAN);
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public final ByteBuffer data() {

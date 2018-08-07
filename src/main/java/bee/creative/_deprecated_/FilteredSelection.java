@@ -23,8 +23,6 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 		this.items = Objects.assertNotNull(items);
 	}
 
-	{}
-
 	/** {@inheritDoc}
 	 * <p>
 	 * Diese Implementation gibt das erste {@link Item} der {@link Selection} zurück, die von {@link #findAll(Field, Object)} für die gegebenen Parameter
@@ -39,7 +37,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	/** {@inheritDoc} */
 	@Override
 	public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
-		return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.navigatedFilter(field, Filters.containsFilter(value)), this.items));
+		return new FilteredSelection<>(Iterables.filteredIterable(Filters.navigatedFilter(field, Filters.containsFilter(value)), this.items));
 	}
 
 	/** {@inheritDoc} */

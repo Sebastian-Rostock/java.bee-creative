@@ -108,8 +108,6 @@ public final class IAMCodec {
 
 		};
 
-		{}
-
 		/** Diese Methode liest die {@link IAMCodec#getSourceData() Eingabedaten} des gegebenen {@link IAMCodec} ein und gibt den daraus erstellten {@link IAMIndex}
 		 * zurück.
 		 *
@@ -172,8 +170,6 @@ public final class IAMCodec {
 			.put(IAMMapping.MODE_SORTED, SORTED).put("S", SORTED).put("SORTED", SORTED) //
 			.build();
 
-		{}
-
 		/** Diese Methode gibt den {@link IAMFindMode} zum gegebenen Objekt zurück.<br>
 		 * Hierbei werden folgende Eingaben unterstützt:
 		 * <dl>
@@ -194,8 +190,6 @@ public final class IAMCodec {
 			if (result == null) throw new IllegalArgumentException("illegal find-mode: " + object);
 			return result;
 		}
-
-		{}
 
 		/** Diese Methode gibt den {@link IAMMapping#mode() Suchmodus} dieses {@link IAMFindMode} zurück.
 		 *
@@ -252,8 +246,6 @@ public final class IAMCodec {
 			.put("L", LITTLEENDIAN).put("LITTLEENDIAN", LITTLEENDIAN).put(LITTLEENDIAN.toOrder(), LITTLEENDIAN) //
 			.build();
 
-		{}
-
 		/** Diese Methode gibt die {@link IAMByteOrder} zum gegebenen Objekt zurück.<br>
 		 * Hierbei werden folgende Eingaben unterstützt:
 		 * <dl>
@@ -274,8 +266,6 @@ public final class IAMCodec {
 			if (result == null) throw new IllegalArgumentException("illegal byte-order: " + object);
 			return result;
 		}
-
-		{}
 
 		/** Diese Methode gibt die Bytereihenfolge dieser {@link IAMByteOrder} zurück.
 		 *
@@ -533,8 +523,6 @@ public final class IAMCodec {
 			.put(STRING_FEM_8, "FEM-8").put(STRING_FEM_16, "FEM-16").put(STRING_FEM_32, "FEM-32") //
 			.build();
 
-		{}
-
 		/** Diese Methode gibt das {@link IAMArrayFormat} zum gegebenen Objekt zurück.<br>
 		 * Hierbei werden folgende Eingaben unterstützt:
 		 * <dl>
@@ -572,8 +560,6 @@ public final class IAMCodec {
 			return result;
 		}
 
-		{}
-
 		/** Diese Methode parst die gegebene Zeichenkette in eine Zahlenfolge und gibt diese zurück.
 		 *
 		 * @param source Zeichenkette.
@@ -590,8 +576,6 @@ public final class IAMCodec {
 		 * @throws IllegalArgumentException Wenn die Zahlenfolge ungültig ist. */
 		public abstract String format(final int[] source) throws NullPointerException, IllegalArgumentException;
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public String toString() {
@@ -599,8 +583,6 @@ public final class IAMCodec {
 		}
 
 	}
-
-	{}
 
 	@SuppressWarnings ("javadoc")
 	static int checkRange(final int value, final int length) throws IllegalArgumentException {
@@ -648,8 +630,6 @@ public final class IAMCodec {
 		return result;
 	}
 
-	{}
-
 	/** Dieses Feld speichert die Bytereihenfolge. */
 	IAMByteOrder byteOrder = IAMByteOrder.AUTO;
 
@@ -668,8 +648,6 @@ public final class IAMCodec {
 	/** Dieser Konstruktor initialisiert einen neuen {@link IAMCodec} mit Bytereihenfolge {@link IAMByteOrder#AUTO}) */
 	public IAMCodec() {
 	}
-
-	{}
 
 	/** Diese Methode gibt die Bytereihenfolge zurück.
 	 *

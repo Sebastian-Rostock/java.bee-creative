@@ -19,8 +19,6 @@ final class IAMCodec_INI {
 
 	INIWriter writer;
 
-	{}
-
 	INIToken readContent() throws IOException {
 		while (true) {
 			final INIToken result = this.reader.read();

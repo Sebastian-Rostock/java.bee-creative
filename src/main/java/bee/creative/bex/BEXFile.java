@@ -16,8 +16,6 @@ public class BEXFile {
 	/** Dieses Feld speichert das leere {@link BEXFile}. */
 	public static final BEXFile EMPTY = new BEXFile();
 
-	{}
-
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link BEXFile} und gibt dieses zurück.<br>
 	 * Wenn das Objekt ein {@link BEXFile} ist, wird dieses geliefert. Andernfalls wird {@code new BEXFileLoader(IAMIndex.from(object))} geliefert.
 	 *
@@ -69,8 +67,6 @@ public class BEXFile {
 		return new String(IAMArray.toChars(array.section(0, length)));
 	}
 
-	{}
-
 	/** Diese Methode gibt das Wurzelelement des Dokuments zurück.
 	 *
 	 * @return Wurzelelement. */
@@ -97,8 +93,6 @@ public class BEXFile {
 	public BEXNode node(final int key) {
 		return BEXNode.EMPTY;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

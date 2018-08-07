@@ -25,8 +25,6 @@ public final class INIWriter implements Closeable {
 		return new INIWriter(IO.outputWriterFrom(object));
 	}
 
-	{}
-
 	/** Dieses Feld speichert den {@link Writer}. */
 	final Writer writer;
 
@@ -37,8 +35,6 @@ public final class INIWriter implements Closeable {
 	public INIWriter(final Writer writer) throws NullPointerException {
 		this.writer = Objects.assertNotNull(writer);
 	}
-
-	{}
 
 	/** Diese Methode schreibt die gegebene Zeichenkette mit Maskierung.
 	 *
@@ -131,8 +127,6 @@ public final class INIWriter implements Closeable {
 		this.write(comment);
 		target.write("\r\n");
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

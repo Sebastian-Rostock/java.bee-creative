@@ -31,8 +31,6 @@ public class ArrayCodecSource<GContext> extends ArrayDataSource implements Codec
 		this.context = context;
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public final GContext context() {

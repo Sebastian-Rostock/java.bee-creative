@@ -57,8 +57,6 @@ public class Filters {
 
 	};
 
-	{}
-
 	/** Diese Methode gibt einen {@link Getter} als Adapter zu einem {@link Filter} zurück.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code Boolean.valueOf(filter.accept(input))}.
 	 *

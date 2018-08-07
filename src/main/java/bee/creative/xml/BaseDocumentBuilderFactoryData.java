@@ -27,8 +27,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FeatureData<GOwner> customThis() {
@@ -48,8 +46,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeSchemaData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -137,7 +133,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode ist eine Abkürzung für {@code this.useValue(Boolean.TRUE)} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> useTRUE() {
 			return this.useValue(Boolean.TRUE);
@@ -147,8 +143,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -170,8 +164,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @return Besitzer. */
 		public abstract GOwner closeAttributeData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final AttributeData<GOwner> customThis() {
@@ -179,8 +171,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert die {@link DocumentBuilderFactory}. */
 	DocumentBuilderFactory factory;
@@ -224,8 +214,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -340,8 +328,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	public final AttributeData<GThis> openAttributeData() {
 		return this.attributeData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

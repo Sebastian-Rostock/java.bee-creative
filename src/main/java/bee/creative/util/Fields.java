@@ -185,8 +185,6 @@ public final class Fields {
 			};
 		}
 
-		{}
-
 		/** Diese Methode gibt eine Bearbeitungskopie des gegebenen {@link Set} zurück.
 		 *
 		 * @param value {@link Set}.
@@ -275,8 +273,6 @@ public final class Fields {
 
 			};
 		}
-
-		{}
 
 		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link List} zurück.
 		 *
@@ -391,8 +387,6 @@ public final class Fields {
 			};
 		}
 
-		{}
-
 		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link Map} zurück.
 		 *
 		 * @param value {@link Map}.
@@ -450,8 +444,6 @@ public final class Fields {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert das leere {@link Field}, welches stets {@code null} liefert und das Schreiben ignoriert. */
 	public static final Field<?, ?> EMPTY_FIELD = new Field<Object, Object>() {
 
@@ -470,8 +462,6 @@ public final class Fields {
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode gibt das leere {@link Field} zurück, das stets {@code null} liefert und das Schreiben ignoriert.
 	 *

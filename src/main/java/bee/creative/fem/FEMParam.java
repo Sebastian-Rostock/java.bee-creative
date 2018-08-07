@@ -69,8 +69,6 @@ public final class FEMParam extends FEMFunction {
 
 	};
 
-	{}
-
 	/** Diese Methode gibt eine Funktion zurück, welche den {@code index}-ten Parameterwert des Stapelrahmens als Ergebniswert liefert.
 	 *
 	 * @param index Index des Parameterwerts.
@@ -82,8 +80,6 @@ public final class FEMParam extends FEMFunction {
 		return new FEMParam(index);
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Index des Parameterwerts. */
 	final int index;
 
@@ -92,8 +88,6 @@ public final class FEMParam extends FEMFunction {
 		this.index = index;
 	}
 
-	{}
-
 	/** Diese Methode gibt den Index des Parameterwerts zurück.
 	 *
 	 * @return Index des Parameterwerts.
@@ -101,8 +95,6 @@ public final class FEMParam extends FEMFunction {
 	public final int index() {
 		return this.index;
 	}
-
-	{}
 
 	/** {@inheritDoc}
 	 * <p>

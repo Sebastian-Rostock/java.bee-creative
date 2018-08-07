@@ -102,8 +102,6 @@ public class FEMDomain {
 	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Wertliste ({@code Map<String, FEMProxy>}). */
 	public static final int PARSE_PROXY_MAP = 6;
 
-	{}
-
 	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer mit Semikolon separierten Auflistung von über den gegebenen {@code itemParser} erkannten
 	 * Elementen und gibt nur dann {@code true} zurück, wenn diese Auflistung am ersten Element erkannt wurden. Das Symbol {@code ';'} wird direkt als Typ des
 	 * erfassten Bereichs eingesetzt. Zwischen all diesen Komponenten können beliebig viele {@link #parseComments(FEMParser) Kommentare/Leerraum} stehen.
@@ -441,8 +439,8 @@ public class FEMDomain {
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseIndex(final FEMParser target) throws NullPointerException {
 		final int offset = target.index();
-		for (int symbol = target.symbol(); ('0' <= symbol) && (symbol <= '9'); symbol = target.skip()) {}
-		if (target.index() == offset) return false;
+		for (int symbol = target.symbol(); ('0' <= symbol) && (symbol <= '9'); symbol = target.skip())
+			if (target.index() == offset) return false;
 		target.putToken('#', offset);
 		return true;
 	}
@@ -601,8 +599,6 @@ public class FEMDomain {
 		final String result = Strings.parseSequence(string, '<', '/', '>');
 		return result != null ? result : string;
 	}
-
-	{}
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes.
 	 *
@@ -1175,8 +1171,6 @@ public class FEMDomain {
 		this.formatFunction(target, source);
 		return target.format();
 	}
-
-	{}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.compileScript(this.parseScript(source, scriptMode))}.
 	 *

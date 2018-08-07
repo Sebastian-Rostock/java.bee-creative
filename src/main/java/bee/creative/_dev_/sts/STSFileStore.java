@@ -153,10 +153,10 @@ public class STSFileStore {
 
 		} else {
 			final int used = (listSize - 6) & 7; // in letzter liste benutzte einträge, 0 bei voller liste
-			if(used == 0){
+			if (used == 0) {
 				// neue liste reservieren und zwei elemente eintragen
-				
-			}else{
+
+			} else {
 				// auffüllen
 			}
 		}

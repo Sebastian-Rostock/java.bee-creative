@@ -18,8 +18,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	/** Dieses Feld speichert den Wahrheitswert {@code false}. */
 	public static final FEMBoolean FALSE = new FEMBoolean(false);
 
-	{}
-
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem gegebenen Wert zurück.
 	 *
 	 * @param data Wert.
@@ -61,8 +59,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		return context.dataFrom(value, FEMBoolean.TYPE);
 	}
 
-	{}
-
 	/** Dieses Feld speichert die interne Darstellung des Wahrheitswerts. */
 	final boolean value;
 
@@ -72,8 +68,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	FEMBoolean(final boolean value) {
 		this.value = value;
 	}
-
-	{}
 
 	/** Diese Methode gibt die interne Darstellung des Wahrheitswerts zurück. Diese ist ein {@code boolean}.
 	 *
@@ -113,8 +107,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	public final Boolean toBoolean() {
 		return Boolean.valueOf(this.value);
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

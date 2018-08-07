@@ -215,8 +215,6 @@ public final class FEMCompiler extends Parser {
 		return this.token().extract(this.script.source());
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {

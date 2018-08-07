@@ -7,7 +7,7 @@ import bee.creative.fem.FEMBinary;
  * <p>
  * Die korrekte Ermittlung von {@link #equals(Object) Äquivalenz} und {@link #compareTo(STSNode) Ordnung} zweier Knoten setzt deren Verwaltung im gleichen
  * Graphspeicher voraus.
- * 
+ *
  * @see STSStore
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class STSNode extends STSItem implements Comparable<STSNode> {
@@ -17,8 +17,6 @@ public final class STSNode extends STSItem implements Comparable<STSNode> {
 		super(store, index);
 	}
 
-	{}
-
 	/** Diese Methode gibt den Wert dieses Knoten zurück. Dieser kennzeichnet den Knoten im Kontext seines {@link #store() Graphspeichers} eineindeutig und
 	 * verbindet ihn inhaltlich mit einem Element eines externen Wissensspeichers. Der Knotenwert könnte bspw. der Binärkodierung der Verkettung von
 	 * Namensraum(-prefix) und Lakolnamen entsprechen.
@@ -27,8 +25,6 @@ public final class STSNode extends STSItem implements Comparable<STSNode> {
 	public FEMBinary value() {
 		return this.store.customGetNodeValue(this.index);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

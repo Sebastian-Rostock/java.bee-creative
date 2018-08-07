@@ -55,8 +55,6 @@ public class Conversions {
 
 	};
 
-	{}
-
 	/** Diese Methode gibt eine statische {@link Conversion} zurück, deren Eingabe und Ausgabe konstant sind.
 	 *
 	 * @param <GInput> Typ des Eingabe.

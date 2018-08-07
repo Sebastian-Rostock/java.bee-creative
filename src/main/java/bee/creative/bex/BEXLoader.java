@@ -24,8 +24,6 @@ public final class BEXLoader {
 		/** Dieses Feld speichert den leeren {@link BEXFileLoader}. */
 		public static final BEXFileLoader EMPTY = new BEXFileLoader();
 
-		{}
-
 		/** Dieses Feld speichert die Referenz des Wurzelelements. */
 		final int rootRef;
 
@@ -207,8 +205,6 @@ public final class BEXLoader {
 
 		}
 
-		{}
-
 		/** Diese Methode gibt die Verwaltung der URI der Attributknoten zurück.
 		 *
 		 * @return Verwaltung der URI der Attributknoten. */
@@ -250,8 +246,6 @@ public final class BEXLoader {
 		public final BEXStringLoader chldValueCache() {
 			return this.chldValueText;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -312,8 +306,6 @@ public final class BEXLoader {
 		/** Dieses Feld speichert den leeren {@link BEXListLoader}. */
 		public static final BEXListLoader EMPTY = new BEXListLoader(BEXFileLoader.EMPTY);
 
-		{}
-
 		/** Dieses Feld speichert den Schlüssel. */
 		final int key;
 
@@ -343,8 +335,6 @@ public final class BEXLoader {
 			this.ref = ref;
 			this.owner = owner;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -518,8 +508,6 @@ public final class BEXLoader {
 		/** Dieses Feld speichert den leeren {@link BEXNodeLoader}. */
 		public static final BEXNodeLoader EMPTY = new BEXNodeLoader(BEXFileLoader.EMPTY);
 
-		{}
-
 		/** Dieses Feld speichert den Schlüssel. */
 		final int key;
 
@@ -541,8 +529,6 @@ public final class BEXLoader {
 			this.key = key;
 			this.owner = owner;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -749,8 +735,6 @@ public final class BEXLoader {
 		/** Dieses Feld speichert den leeren {@link BEXStringLoader}. */
 		public static final BEXStringLoader EMPTY = new BEXStringLoader(IAMListing.EMPTY);
 
-		{}
-
 		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */
 		final IAMListing items;
 
@@ -763,8 +747,6 @@ public final class BEXLoader {
 		BEXStringLoader(final IAMListing items) {
 			this.items = items;
 		}
-
-		{}
 
 		/** Diese Methode gibt das {@code index}-te Element zurück.
 		 *
@@ -798,8 +780,6 @@ public final class BEXLoader {
 			}
 		}
 
-		{}
-
 		/** Diese Methode gibt die Zeichenkette zum {@code index}-ten Element zurück. Wenn der Index ungültig ist, wird {@code ""} geliefert.
 		 *
 		 * @param index Index.
@@ -827,8 +807,6 @@ public final class BEXLoader {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert die Typkennung für den undefinierten Knoten bzw. die undefinierte Knotenliste. */
 	static final int BEX_VOID_TYPE = 0;
 
@@ -852,8 +830,6 @@ public final class BEXLoader {
 
 	/** Dieses Feld speichert die Typkennung für die Kindknotenliste dem Textknoten eines Elementknoten. */
 	static final int BEX_CHTX_LIST = 7;
-
-	{}
 
 	/** Diese Methode gibt die Referenz des gegebenen Schlüssels zurück.
 	 *

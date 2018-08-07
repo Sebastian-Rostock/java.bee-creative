@@ -104,8 +104,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	/** Dieses Feld speichert die späteste darstellbare Zeitangabe. */
 	public static final FEMDatetime MAXIMUM = new FEMDatetime(-1673592829, -1953505280);
 
-	{}
-
 	/** Diese Methode gibt den aktuellen Zeitpunkt zurück.
 	 *
 	 * @return aktueller Zeitpunkt.
@@ -595,8 +593,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return ((((year * 365) + year2) - year3) + (year3 >> 2) + month3 + date) - 578130;
 	}
 
-	{}
-
 	/** Dieses Feld speichert die 32 LSB der internen 64 Bit Darstellung dieser Zeitangabe.
 	 * <p>
 	 * Die 32 Bit von MBS zum LSB sind:
@@ -655,8 +651,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		this.valueH = valueH;
 		this.valueL = valueL;
 	}
-
-	{}
 
 	/** Diese Methode gibt die interne Darstellung der Zeitangabe zurück.
 	 * <p>
@@ -1406,8 +1400,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		}
 		return result;
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

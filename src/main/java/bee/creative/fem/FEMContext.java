@@ -34,8 +34,6 @@ public class FEMContext {
 	 * Nutzdatensatz}. */
 	public static final FEMContext EMPTY = new FEMContext();
 
-	{}
-
 	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
 	 * Ausgabe überführt.
 	 *
@@ -250,8 +248,6 @@ public class FEMContext {
 		}
 		return result;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

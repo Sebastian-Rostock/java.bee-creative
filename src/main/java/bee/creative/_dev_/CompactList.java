@@ -18,7 +18,7 @@ import bee.creative.util.Objects;
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
- class CompactList<GItem> extends CompactCollection<GItem> implements List<GItem>, RandomAccess {
+class CompactList<GItem> extends CompactCollection<GItem> implements List<GItem>, RandomAccess {
 
 	/** Diese Klasse implementiert eine {@link List} als modifizierbare Sicht auf die Werte.
 	 *
@@ -38,8 +38,6 @@ import bee.creative.util.Objects;
 		public CompactListItems(final CompactList<GItem> owner) throws NullPointerException {
 			this.owner = Objects.assertNotNull(owner);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -79,8 +77,6 @@ import bee.creative.util.Objects;
 
 	}
 
-	{}
-
 	/** Dieser Konstruktor initialisiert die {@link List}. */
 	public CompactList() {
 		super();
@@ -104,8 +100,6 @@ import bee.creative.util.Objects;
 		super(collection);
 	}
 
-	{}
-
 	/** Diese Methode gibt die relative Ausrichtungsposition der Elemente im Array zurück. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am
 	 * Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition
 	 * {@code 1} gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays
@@ -128,8 +122,6 @@ import bee.creative.util.Objects;
 	public final void setAlignment(final float alignment) throws IllegalArgumentException {
 		this.items.setAlignment(alignment);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override
@@ -218,31 +210,31 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public final ListIterator<GItem> listIterator() {
-		return new CompactListItems<GItem>(this).listIterator();
+		return new CompactListItems<>(this).listIterator();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final ListIterator<GItem> listIterator(final int index) {
-		return new CompactListItems<GItem>(this).listIterator(index);
+		return new CompactListItems<>(this).listIterator(index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final List<GItem> subList(final int fromIndex, final int toIndex) {
-		return new CompactListItems<GItem>(this).subList(fromIndex, toIndex);
+		return new CompactListItems<>(this).subList(fromIndex, toIndex);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
-		return new CompactListItems<GItem>(this).hashCode();
+		return new CompactListItems<>(this).hashCode();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
-		return new CompactListItems<GItem>(this).equals(object);
+		return new CompactListItems<>(this).equals(object);
 	}
 
 }

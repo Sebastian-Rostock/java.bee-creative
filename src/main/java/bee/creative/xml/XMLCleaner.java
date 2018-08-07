@@ -36,8 +36,6 @@ public final class XMLCleaner {
 			return XMLCleaner.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FileData customThis() {
@@ -58,8 +56,6 @@ public final class XMLCleaner {
 			return XMLCleaner.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final CharsetData customThis() {
@@ -67,8 +63,6 @@ public final class XMLCleaner {
 		}
 
 	}
-
-	{}
 
 	@SuppressWarnings ("javadoc")
 	static final Pattern listFieldPattern = Pattern.compile("^(\\s+)protected (List<\\S+)( [^;]+);");
@@ -91,15 +85,11 @@ public final class XMLCleaner {
 	@SuppressWarnings ("javadoc")
 	static final Pattern commentPattern = Pattern.compile("^\\s*[*/]");
 
-	{}
-
 	/** Dieses Feld speichert den Konfigurator für {@link #openFileData()}. */
 	final FileData fileData = new FileData();
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openCharsetData()}. */
 	final CharsetData charsetData = new CharsetData();
-
-	{}
 
 	/** Diese Methode bereinigt die gewählten Quelltextdateien und gibt {@code this} zurück.
 	 *

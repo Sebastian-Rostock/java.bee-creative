@@ -28,8 +28,6 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		 * @return Besitzer. */
 		public abstract GOwner closeFacroryData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FactoryData<GOwner> customThis() {
@@ -49,8 +47,6 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeContextData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -72,8 +68,6 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		 * @return Besitzer. */
 		public abstract GOwner closeVariableData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final VariableData<GOwner> customThis() {
@@ -94,8 +88,6 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		 * @return Besitzer. */
 		public abstract GOwner closeFunctionData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FunctionData<GOwner> customThis() {
@@ -103,8 +95,6 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert die {@link XPath}. */
 	XPath xpath;
@@ -148,8 +138,6 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -251,8 +239,6 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	public final FunctionData<GThis> openFunctionData() {
 		return this.functionData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

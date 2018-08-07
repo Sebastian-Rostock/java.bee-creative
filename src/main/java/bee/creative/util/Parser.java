@@ -46,8 +46,6 @@ public class Parser {
 		this.source(source);
 	}
 
-	{}
-
 	/** Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück.
 	 *
 	 * @see #index()
@@ -204,8 +202,6 @@ public class Parser {
 		this.target.append(value);
 	}
 
-	{}
-
 	/** Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
 	 *
 	 * @see #seek(int)
@@ -244,8 +240,6 @@ public class Parser {
 		this.source = new String(source);
 		this.reset();
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

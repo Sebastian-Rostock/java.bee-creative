@@ -17,14 +17,10 @@ public class CountingInputStream extends FilterInputStream {
 		super(inputStream);
 	}
 
-	{}
-
 	/** Diese Methode gibt die Anzahl der gelesenen bzw. ausgelassenen Bytes zurück. */
 	public long readCount() {
 		return this.readCount;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

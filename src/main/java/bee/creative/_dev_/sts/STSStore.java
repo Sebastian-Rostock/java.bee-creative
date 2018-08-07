@@ -58,17 +58,11 @@ public abstract class STSStore {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Generator für {@link #hash}. */
 	protected static AtomicInteger hashGen = new AtomicInteger(1);
 
-	{}
-
 	/** Dieses Feld speichert den Streuwert als Identifikator des Graphspeichers. */
 	protected final int hash = STSStore.hashGen.getAndIncrement();
-
-	{}
 
 	/** Diese Methode überführt die gegebenen Datensätze in die duplikatfrei aufsteigend geordnete Liste ihrer {@link STSItem#index Positionen} und gibt diese
 	 * zurück.
@@ -759,8 +753,6 @@ public abstract class STSStore {
 	public final boolean contains(final STSItemSet<?> items) {
 		return (items != null) && (items.store == this);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

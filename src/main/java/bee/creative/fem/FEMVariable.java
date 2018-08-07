@@ -13,8 +13,6 @@ public final class FEMVariable extends FEMValue {
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
 	public static final FEMType<FEMVariable> TYPE = FEMType.from(FEMVariable.ID);
 
-	{}
-
 	/** Diese Methode gibt eine neue Variable mit dem gegebenen Initialwert zurück.
 	 *
 	 * @param value Initialwert.
@@ -34,8 +32,6 @@ public final class FEMVariable extends FEMValue {
 		return context.dataFrom(value, FEMVariable.TYPE);
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Wert. */
 	FEMValue value;
 
@@ -46,8 +42,6 @@ public final class FEMVariable extends FEMValue {
 	public FEMVariable(final FEMValue value) throws NullPointerException {
 		this.update(value);
 	}
-
-	{}
 
 	/** Diese Methode gibt den aktuellen Wert der Variable zurück, der über {@link #update(FEMValue)} geändert werden kann.
 	 *
@@ -64,8 +58,6 @@ public final class FEMVariable extends FEMValue {
 	public final synchronized void update(final FEMValue value) throws NullPointerException {
 		this.value = Objects.assertNotNull(value);
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

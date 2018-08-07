@@ -36,8 +36,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.that = that;
 		}
 
-		{}
-
 		@Override
 		public final boolean push(final int value) {
 			if (value == this.that) return false;
@@ -51,8 +49,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	static final class StringHasher implements Collector {
 
 		public int hash = Objects.hashInit();
-
-		{}
 
 		@Override
 		public final boolean push(final int value) {
@@ -96,8 +92,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.index = index;
 		}
 
-		{}
-
 		@Override
 		public final boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
@@ -128,8 +122,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 		public int count;
 
-		{}
-
 		@Override
 		public final boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
@@ -154,8 +146,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.array = array;
 			this.index = index;
 		}
-
-		{}
 
 		@Override
 		public final boolean push(final int value) {
@@ -186,8 +176,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.index = index;
 		}
 
-		{}
-
 		@Override
 		public final boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
@@ -207,8 +195,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			if (length > array.length()) throw new IllegalStateException();
 			this.array = array;
 		}
-
-		{}
 
 		@Override
 		protected final int customGet(int index) throws IndexOutOfBoundsException {
@@ -241,8 +227,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 					index += FEMString.utf8Size(this.array.get(index));
 				}
 				while (length > 0) {
-					while (!FEMString.utf8Header(this.array.get(--index))) {}
-					if (!target.push(FEMString.utf8Codepoint(this.array, index))) return false;
+					while (!FEMString.utf8Header(this.array.get(--index)))
+						if (!target.push(FEMString.utf8Codepoint(this.array, index))) return false;
 					length--;
 				}
 			}
@@ -266,8 +252,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			if (length > array.length()) throw new IllegalStateException();
 			this.array = array;
 		}
-
-		{}
 
 		@Override
 		protected final int customGet(int index) throws IndexOutOfBoundsException {
@@ -300,8 +284,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 					index += FEMString.utf16Size(this.array.get(index));
 				}
 				while (length > 0) {
-					while (!FEMString.utf16Header(this.array.get(--index))) {}
-					if (!target.push(FEMString.utf16Codepoint(this.array, index))) return false;
+					while (!FEMString.utf16Header(this.array.get(--index)))
+						if (!target.push(FEMString.utf16Codepoint(this.array, index))) return false;
 					length--;
 				}
 			}
@@ -321,8 +305,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.array = array;
 		}
 
-		{}
-
 		@Override
 		protected final int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.array.get(index);
@@ -340,8 +322,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			super(FEMString.utf8Length(items));
 			this.items = items;
 		}
-
-		{}
 
 		@Override
 		protected final int customGet(int index) throws IndexOutOfBoundsException {
@@ -374,8 +354,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 					index += FEMString.utf8Size(this.items[index]);
 				}
 				while (length > 0) {
-					while (!FEMString.utf8Header(this.items[--index])) {}
-					if (!target.push(FEMString.utf8Codepoint(this.items, index))) return false;
+					while (!FEMString.utf8Header(this.items[--index]))
+						if (!target.push(FEMString.utf8Codepoint(this.items, index))) return false;
 					length--;
 				}
 			}
@@ -399,8 +379,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			super(FEMString.utf16Length(items));
 			this.items = items;
 		}
-
-		{}
 
 		@Override
 		protected final int customGet(int index) throws IndexOutOfBoundsException {
@@ -433,8 +411,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 					index += FEMString.utf16Size(this.items[index]);
 				}
 				while (length > 0) {
-					while (!FEMString.utf16Header(this.items[--index])) {}
-					if (!target.push(FEMString.utf16Codepoint(this.items, index))) return false;
+					while (!FEMString.utf16Header(this.items[--index]))
+						if (!target.push(FEMString.utf16Codepoint(this.items, index))) return false;
 					length--;
 				}
 			}
@@ -459,8 +437,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.items = items;
 		}
 
-		{}
-
 		@Override
 		protected final int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
@@ -479,8 +455,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		EmptyString() {
 			super(0);
 		}
-
-		{}
 
 		@Override
 		public final FEMString reverse() {
@@ -506,8 +480,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.string1 = string1;
 			this.string2 = string2;
 		}
-
-		{}
 
 		@Override
 		protected final int customGet(final int index) throws IndexOutOfBoundsException {
@@ -552,8 +524,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.offset = offset;
 		}
 
-		{}
-
 		@Override
 		protected final int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.string.customGet(index + this.offset);
@@ -580,8 +550,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			super(string.length);
 			this.string = string;
 		}
-
-		{}
 
 		@Override
 		protected final int customGet(final int index) throws IndexOutOfBoundsException {
@@ -620,8 +588,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			this.item = item;
 		}
 
-		{}
-
 		@Override
 		protected final int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.item;
@@ -648,8 +614,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 4;
 
@@ -658,8 +622,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	/** Dieses Feld speichert die leere Zeichenkette. */
 	public static final FEMString EMPTY = new EmptyString();
-
-	{}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF32-kodierten Codepoints zurück.<br>
 	 * Das gegebene Array wird kopiert.
@@ -1128,8 +1090,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		throw new IllegalArgumentException();
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Streuwert. */
 	int hash;
 
@@ -1144,8 +1104,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		if (length < 0) throw new IllegalArgumentException("length < 0");
 		this.length = length;
 	}
-
-	{}
 
 	/** Diese Methode gibt den {@code index}-ten Codepoint zurück.
 	 *
@@ -1465,8 +1423,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 		throw new IllegalArgumentException();
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

@@ -17,23 +17,19 @@ public class CountingOutputStream extends FilterOutputStream {
 		super(outputStream);
 	}
 
-	{}
-
 	/** Diese Methode gibt die Anzahl der geschriebenen Bytes zurück. */
 	public long writeCount() {
 		return this.writeCount;
 	}
 
-	{}
-
 	@Override
-	public void write(int c) throws IOException {
+	public void write(final int c) throws IOException {
 		super.write(c);
 		this.writeCount++;
 	}
 
 	@Override
-	public void write(byte[] chars, int offset, int length) throws IOException {
+	public void write(final byte[] chars, final int offset, final int length) throws IOException {
 		super.write(chars, offset, length);
 		this.writeCount += length;
 	}

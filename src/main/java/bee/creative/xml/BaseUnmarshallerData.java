@@ -35,8 +35,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		 * @return Besitzer. */
 		public abstract GOwner closeContextData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected ContextData<GOwner> customThis() {
@@ -56,8 +54,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeShemaData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -79,8 +75,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		 * @return Besitzer. */
 		public abstract GOwner closeAdapterData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected AdapterData<GOwner> customThis() {
@@ -100,8 +94,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeListenerData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -123,8 +115,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected PropertyData<GOwner> customThis() {
@@ -145,8 +135,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		 * @return Besitzer. */
 		public abstract GOwner closeValidationData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected ValidationData<GOwner> customThis() {
@@ -154,8 +142,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert den {@link Unmarshaller}. */
 	Unmarshaller marshaller;
@@ -219,8 +205,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -344,8 +328,6 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	public final ContextData<GThis> openContextData() {
 		return this.contextData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

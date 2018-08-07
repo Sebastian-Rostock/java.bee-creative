@@ -29,8 +29,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FeatureData<GOwner> customThis() {
@@ -50,8 +48,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -73,8 +69,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 * @return Besitzer. */
 		public abstract GOwner closeHandlerData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final HandlerData<GOwner> customThis() {
@@ -94,8 +88,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeResolverData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -118,8 +110,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 			this.useW3C_XML_SCHEMA_NS_URI();
 		}
 
-		{}
-
 		/** Diese Methode setzt den Wert auf {@link XMLConstants#RELAXNG_NS_URI} und gibt {@code this} zurück.
 		 *
 		 * @see #use(Object)
@@ -141,8 +131,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 * @return Besitzer. */
 		public abstract GOwner closeLanguageData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final LanguageData<GOwner> customThis() {
@@ -150,8 +138,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert die {@link SchemaFactory}. */
 	SchemaFactory factory;
@@ -205,8 +191,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -321,8 +305,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	public final LanguageData<GThis> openLanguageData() {
 		return this.languageData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

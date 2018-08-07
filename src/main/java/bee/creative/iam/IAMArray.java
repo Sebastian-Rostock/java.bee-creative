@@ -23,8 +23,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			this.offset = offset;
 		}
 
-		{}
-
 		@Override
 		protected final int customGet(final int index) {
 			return this.array[this.offset + index];
@@ -86,8 +84,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			this.array = array;
 			this.offset = offset;
 		}
-
-		{}
 
 		@Override
 		protected final int customGet(final int index) {
@@ -151,8 +147,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			this.offset = offset;
 		}
 
-		{}
-
 		@Override
 		protected final int customGet(final int index) {
 			return this.array[this.offset + index];
@@ -214,8 +208,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			this.array = array;
 			this.offset = offset;
 		}
-
-		{}
 
 		@Override
 		protected final int customGet(final int index) {
@@ -288,8 +280,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			this.offset = offset;
 		}
 
-		{}
-
 		@Override
 		protected final int customGet(final int index) {
 			return this.array.customGet(this.offset + index);
@@ -339,12 +329,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert das leere {@link IAMArray}. */
 	public static final IAMArray EMPTY = new EmptyArray();
-
-	{}
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
 	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
@@ -1062,8 +1048,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	{}
-
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;
 
@@ -1073,8 +1057,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	protected IAMArray(final int length) {
 		this.length = length;
 	}
-
-	{}
 
 	/** Diese Methode implementiert {@link #get(int)} ohne Parameterprüfung.
 	 *
@@ -1196,8 +1178,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			result[i + offset] = this.customGet(i);
 		}
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

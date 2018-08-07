@@ -12,8 +12,6 @@ public abstract class BaseDataTarget implements DataTarget {
 	/** Dieses Feld speichert den Schreibpuffer. */
 	protected final byte[] array = new byte[8];
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public void write(final int b) throws IOException {

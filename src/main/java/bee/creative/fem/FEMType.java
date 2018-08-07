@@ -30,8 +30,6 @@ public class FEMType<GData> {
 		this.id = id;
 	}
 
-	{}
-
 	/** Diese Methode gibt den Identifikator dieses Datentyps zurück. Dieser sollte über eine statische Konstante definiert werden, um Fallunterscheidungen mit
 	 * einem {@code switch}-Statement umsetzen zu können.
 	 *
@@ -63,8 +61,6 @@ public class FEMType<GData> {
 	public final GData dataFrom(final FEMValue value, final FEMContext context) throws NullPointerException, ClassCastException, IllegalArgumentException {
 		return context.dataFrom(value, this);
 	}
-
-	{}
 
 	/** {@inheritDoc}
 	 *

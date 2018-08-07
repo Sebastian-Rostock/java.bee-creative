@@ -39,8 +39,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			this.that = that;
 		}
 
-		{}
-
 		@Override
 		public final boolean push(final byte value) {
 			if (value == this.that) return false;
@@ -54,8 +52,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	static final class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
-
-		{}
 
 		@Override
 		public final boolean push(final byte value) {
@@ -83,8 +79,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			}
 		}
 
-		{}
-
 		@Override
 		public final boolean push(final byte value) {
 			int index = this.index;
@@ -110,8 +104,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			this.index = index;
 		}
 
-		{}
-
 		@Override
 		public final boolean push(final byte value) {
 			this.array[this.index++] = value;
@@ -129,8 +121,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			super(array.length());
 			this.array = array;
 		}
-
-		{}
 
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
@@ -154,8 +144,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			this.buffer = buffer;
 		}
 
-		{}
-
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.buffer.get(index);
@@ -169,8 +157,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		EmptyBinary() {
 			super(0);
 		}
-
-		{}
 
 		@Override
 		public final FEMBinary reverse() {
@@ -193,8 +179,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			super(length);
 			this.value = value;
 		}
-
-		{}
 
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
@@ -222,8 +206,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			super(length);
 			this.value = value;
 		}
-
-		{}
 
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
@@ -254,8 +236,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			this.binary1 = binary1;
 			this.binary2 = binary2;
 		}
-
-		{}
 
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
@@ -300,8 +280,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			this.offset = offset;
 		}
 
-		{}
-
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.binary.customGet(index + this.offset);
@@ -328,8 +306,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			super(binary.length);
 			this.binary = binary;
 		}
-
-		{}
 
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
@@ -367,8 +343,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			super(length);
 			this.item = item;
 		}
-
-		{}
 
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
@@ -415,8 +389,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			this.items = items;
 		}
 
-		{}
-
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
@@ -434,8 +406,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 5;
 
@@ -444,8 +414,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	/** Dieses Feld speichert die leere Bytefolge. */
 	public static final FEMBinary EMPTY = new EmptyBinary();
-
-	{}
 
 	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.<br>
 	 * Das gegebene Array wird kopiert.
@@ -695,8 +663,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return (a << 24) | (FEMBinary.toInteger(b) << 16) | (FEMBinary.toInteger(c) << 8) | FEMBinary.toInteger(d);
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Streuwert. */
 	int hash;
 
@@ -711,8 +677,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		if (length < 0) throw new IllegalArgumentException("length < 0");
 		this.length = length;
 	}
-
-	{}
 
 	/** Diese Methode gibt das {@code index}-te Byte zurück.
 	 *
@@ -1024,8 +988,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 		throw new IllegalStateException();
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

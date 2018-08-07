@@ -38,8 +38,6 @@ public class ArrayDataTarget extends BaseDataTarget {
 		this.data = Objects.assertNotNull(data);
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public CompactByteArray data() {

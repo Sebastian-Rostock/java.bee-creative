@@ -10,8 +10,6 @@ class MMFArraySR1 extends MMFArraySN1 {
 		super(length, buffer, offset);
 	}
 
-	{}
-
 	@Override
 	public ByteOrder order() {
 		return MMFArray.REVERSE_ORDER;

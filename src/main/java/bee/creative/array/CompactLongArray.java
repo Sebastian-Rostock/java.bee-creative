@@ -25,8 +25,6 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 			super(owner, startIndex, finalIndex);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public LongArraySection section() {
@@ -106,8 +104,6 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -151,8 +147,6 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -178,8 +172,6 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert das {@code long}-Array. */
 	protected long[] array;
@@ -210,8 +202,6 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 	public CompactLongArray(final ArraySection<long[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

@@ -37,8 +37,6 @@ public abstract class IAMEntry {
 			this.value = value;
 		}
 
-		{}
-
 		@Override
 		public final IAMArray key() {
 			return this.key;
@@ -51,12 +49,8 @@ public abstract class IAMEntry {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert das leere {@link IAMEntry}. */
 	public static final IAMEntry EMPTY = new EmptyEntry();
-
-	{}
 
 	/** Diese Methode ein neues {@link IAMEntry} als Sicht auf den gegebenen Schlüssel sowie dem gegebenen Wert zurück.
 	 *
@@ -68,8 +62,6 @@ public abstract class IAMEntry {
 		if ((key.length() == 0) && (value.length() == 0)) return IAMEntry.EMPTY;
 		return new SimpleEntry(key, value);
 	}
-
-	{}
 
 	/** Diese Methode gibt den Schlüssel als Zahlenfolge zurück.
 	 *
@@ -116,8 +108,6 @@ public abstract class IAMEntry {
 	public final int valueLength() {
 		return this.value().length();
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

@@ -272,8 +272,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			this.owner = owner;
 		}
 
-		{}
-
 		@Override
 		public final IAMEntry get(final int index) {
 			if ((index < 0) || (index >= this.owner.entryCount())) throw new IndexOutOfBoundsException();
@@ -287,8 +285,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert die leere {@link IAMMapping}. */
 	public static final IAMMapping EMPTY = new EmptyMapping();
 
@@ -301,8 +297,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 *
 	 * @see #mode() */
 	public static final boolean MODE_SORTED = false;
-
-	{}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMMapping} und gibt dieses zurück.<br>
 	 * Wenn das Objekt ein {@link IAMMapping} ist, wird dieses geliefert. Andernfalls wird {@code new IAMMappingLoader(MMFArray.from(object).withOrder(...))}
@@ -339,8 +333,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		entryCount |= (entryCount >> 16);
 		return entryCount & 536870911;
 	}
-
-	{}
 
 	/** Diese Methode gibt nur dann {@link #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden.<br>
 	 * Wenn sie {@link #MODE_SORTED} liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
@@ -570,8 +562,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		if (this.entryCount() == 0) return IAMMapping.EMPTY;
 		return new CompactMapping(this);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

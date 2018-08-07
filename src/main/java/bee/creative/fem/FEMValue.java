@@ -84,8 +84,6 @@ public abstract class FEMValue extends FEMFunction {
 		return this;
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public final FEMValue invoke(final FEMFrame frame) {

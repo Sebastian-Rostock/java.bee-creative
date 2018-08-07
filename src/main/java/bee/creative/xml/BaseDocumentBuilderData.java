@@ -28,8 +28,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		 * @return Besitzer. */
 		public abstract GOwner closeFactoryData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FactoryData<GOwner> customThis() {
@@ -49,8 +47,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeHandlerData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -72,8 +68,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		 * @return Besitzer. */
 		public abstract GOwner closeResolverData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final ResolverData<GOwner> customThis() {
@@ -81,8 +75,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert den {@link DocumentBuilder}. */
 	DocumentBuilder builder;
@@ -116,8 +108,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -209,8 +199,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 	public final ResolverData<GThis> openResolverData() {
 		return this.resolverData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

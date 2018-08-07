@@ -41,8 +41,6 @@ public class FileDataTarget extends BaseDataTarget {
 		this.data = Objects.assertNotNull(file);
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public final RandomAccessFile data() {

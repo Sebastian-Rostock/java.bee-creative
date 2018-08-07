@@ -27,8 +27,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		 * @return Besitzer. */
 		public abstract GOwner closeSourceData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final SourceData<GOwner> customThis() {
@@ -48,8 +46,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		 * @return Besitzer. */
 		public abstract GOwner closeFactoryData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FactoryData<GOwner> customThis() {
@@ -57,8 +53,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert die {@link Templates}. */
 	Templates templates;
@@ -82,8 +76,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -148,8 +140,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	public final FactoryData<GThis> openFactoryData() {
 		return this.factoryData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

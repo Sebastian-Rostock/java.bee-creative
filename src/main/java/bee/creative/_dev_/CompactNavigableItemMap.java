@@ -12,7 +12,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
- abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavigableMap<GKey, GValue> {
+abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavigableMap<GKey, GValue> {
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
 	 *
@@ -43,8 +43,6 @@ import bee.creative.util.Objects;
 	public CompactNavigableItemMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator) throws NullPointerException {
 		super(map, comparator);
 	}
-
-	{}
 
 	/** Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
 	 *

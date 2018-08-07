@@ -27,8 +27,6 @@ public final class INIToken {
 	 * @see #fromComment(String) */
 	public static final int COMMENT = 4;
 
-	{}
-
 	/** Diese Methode gibt einen Abschnitt mit dem gegebenen Namen als {@link INIToken} zurück.
 	 *
 	 * @see #section()
@@ -61,8 +59,6 @@ public final class INIToken {
 		return new INIToken(null, comment.toString());
 	}
 
-	{}
-
 	/** Dieses Feld speichert das {@link #key()}, die {@link #section()} oder {@code null}. */
 	final String string1;
 
@@ -74,8 +70,6 @@ public final class INIToken {
 		this.string1 = string1;
 		this.string2 = string2;
 	}
-
-	{}
 
 	/** Diese Methode gibt die Typkennung des Elements zurück.
 	 *
@@ -141,8 +135,6 @@ public final class INIToken {
 	public final boolean isComment() {
 		return this.string1 == null;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

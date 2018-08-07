@@ -45,8 +45,6 @@ public class _STSBufferIntSet {
 		if (this.isNodeTypwOuter(rootHead)) {
 			if (rootLength == _STSBufferIntSet.OUTER_NODE_CAPACITY) {
 
-				
-				
 				// Wurlen muss wachsen
 				// Wurzel hatte nur werte -> 2 mal terminale mit je 50% der elemente erzeugen
 				// mittleres element in den rootnode mittig eintragen, dessen heder neu setzen
@@ -76,22 +74,22 @@ public class _STSBufferIntSet {
 			}
 		} else {
 			if (rootLength == _STSBufferIntSet.INNER_NODE_CAPACITY) {
-				 // mittig Vm behalten, Pm-1 und Pm überschreiben  
+				// mittig Vm behalten, Pm-1 und Pm überschreiben
 			}
 		}
-//		if (isInner(rootHead)) {
-//			if (isFullInner(rootHead)) {
-//				splitInnerRoot();
-//			}
-//			putInner(this.rootNode, value);
-//		} else {
-//			if (isFullOuter(this.rootNode)) {
-//				splitOuterRoot();
-//				putInner(this.rootNode, value);
-//			} else {
-//				this.putOuter(this.rootNode, value);
-//			}
-//		}
+		// if (isInner(rootHead)) {
+		// if (isFullInner(rootHead)) {
+		// splitInnerRoot();
+		// }
+		// putInner(this.rootNode, value);
+		// } else {
+		// if (isFullOuter(this.rootNode)) {
+		// splitOuterRoot();
+		// putInner(this.rootNode, value);
+		// } else {
+		// this.putOuter(this.rootNode, value);
+		// }
+		// }
 	}
 
 	final void copyList(final int sourceId, int sourceOffset, final int targetId, int targetOffset, int length) {
@@ -108,7 +106,7 @@ public class _STSBufferIntSet {
 	}
 
 	final void setNodeHead(final int nodeId, final int nodeType, final int nodeOffset, final int nodeLength) {
-		buffer.putInt(nodeId, (nodeType << 24) | (nodeOffset << 8) | (nodeLength << 0));
+		this.buffer.putInt(nodeId, (nodeType << 24) | (nodeOffset << 8) | (nodeLength << 0));
 	}
 
 	/** Diese Methode reserviert speicher für einen neuen Knoten und gibt dessen Kennung zurück. */
@@ -140,42 +138,42 @@ public class _STSBufferIntSet {
 	}
 
 	private void putOuter(final int outerNode, final int value) {
-//		// outerNode hat platz
-//		final int s = valueStart(outerNode);
-//		final int c = valueCount(outerNode);
-//
-//		int l = s;
-//		int r = l + c;
-//		final int m = (l + r) >> 2;
-//
-//		boolean insl;
-//
-//		final int v = valueAt(outerNode, m);
-//
-//		if (value == v) return; // bereits enthalten
-//
-//		if (value < v) {
-//			insl = l != 0;
-//			r = m;
-//		} else {
-//			insl = r != _STSBufferIntSet.NODE_SIZE;
-//			l = m + 1;
-//		}
-//
-//		while (l < r) {
-//			// binär suchen
-//
-//		}
-//
-//		if (insl) {
-//			// linls einfügen
-//			moveL(outerNode, s, l - s);
-//			valueSet(outerNode, l - 1, value);
-//		} else {
-//			// rechts einfügen
-//			moveR(outerNode, l, (s + c) - l);
-//			valueSet(outerNode, l, value);
-//		}
+		// // outerNode hat platz
+		// final int s = valueStart(outerNode);
+		// final int c = valueCount(outerNode);
+		//
+		// int l = s;
+		// int r = l + c;
+		// final int m = (l + r) >> 2;
+		//
+		// boolean insl;
+		//
+		// final int v = valueAt(outerNode, m);
+		//
+		// if (value == v) return; // bereits enthalten
+		//
+		// if (value < v) {
+		// insl = l != 0;
+		// r = m;
+		// } else {
+		// insl = r != _STSBufferIntSet.NODE_SIZE;
+		// l = m + 1;
+		// }
+		//
+		// while (l < r) {
+		// // binär suchen
+		//
+		// }
+		//
+		// if (insl) {
+		// // linls einfügen
+		// moveL(outerNode, s, l - s);
+		// valueSet(outerNode, l - 1, value);
+		// } else {
+		// // rechts einfügen
+		// moveR(outerNode, l, (s + c) - l);
+		// valueSet(outerNode, l, value);
+		// }
 
 	}
 

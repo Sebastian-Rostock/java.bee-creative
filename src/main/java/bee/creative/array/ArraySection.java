@@ -31,8 +31,6 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		return section;
 	}
 
-	{}
-
 	/** Diese Methode implementiert {@link #equals(Object)} ohne {@code null}-Prüfung. Sie sollte von Nachfahren in {@link #equals(Object)} aufgerufen werden.
 	 *
 	 * @param data Abschnitt.
@@ -127,8 +125,6 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 *
 	 * @return Index des ersten Elements nach dem Abschnitt. */
 	public abstract int finalIndex();
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

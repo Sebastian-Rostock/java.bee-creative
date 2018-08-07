@@ -19,8 +19,6 @@ public final class FEMProxy extends FEMFunction {
 		return new FEMProxy(name);
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Namen. */
 	final String name;
 
@@ -34,8 +32,6 @@ public final class FEMProxy extends FEMFunction {
 	public FEMProxy(final String name) throws NullPointerException {
 		this.name = Objects.assertNotNull(name);
 	}
-
-	{}
 
 	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird.<br>
 	 * Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch nicht aufgerufen wurde.
@@ -58,8 +54,6 @@ public final class FEMProxy extends FEMFunction {
 	public final String name() {
 		return this.name;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

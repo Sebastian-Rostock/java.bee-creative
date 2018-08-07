@@ -27,7 +27,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
 @SuppressWarnings ("javadoc")
- class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableSet<GItem> {
+class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableSet<GItem> {
 
 	/** Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactNavigableSet}s.
 	 *
@@ -47,8 +47,6 @@ import bee.creative.util.Objects;
 			final boolean lastInclusive) throws IllegalArgumentException {
 			super(set, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -133,19 +131,19 @@ import bee.creative.util.Objects;
 		/** {@inheritDoc} */
 		@Override
 		public Object[] toArray() {
-			return new CompactSetItems<GItem>(this).toArray();
+			return new CompactSetItems<>(this).toArray();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public <T> T[] toArray(final T[] a) {
-			return new CompactSetItems<GItem>(this).toArray(a);
+			return new CompactSetItems<>(this).toArray(a);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
-			return new CompactSetItems<GItem>(this).hashCode();
+			return new CompactSetItems<>(this).hashCode();
 		}
 
 		/** {@inheritDoc} */
@@ -153,13 +151,13 @@ import bee.creative.util.Objects;
 		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof Set<?>)) return false;
-			return new CompactSetItems<GItem>(this).equals(object);
+			return new CompactSetItems<>(this).equals(object);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public String toString() {
-			return new CompactSetItems<GItem>(this).toString();
+			return new CompactSetItems<>(this).toString();
 		}
 
 	}
@@ -183,12 +181,10 @@ import bee.creative.util.Objects;
 			super(array, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GItem> iterator() {
-			return new CompactCollectionAscendingIterator<GItem>(this.data, this.defaultFirstIndex(), this.defaultLastIndex() + 1);
+			return new CompactCollectionAscendingIterator<>(this.data, this.defaultFirstIndex(), this.defaultLastIndex() + 1);
 		}
 
 		/** {@inheritDoc} */
@@ -248,13 +244,13 @@ import bee.creative.util.Objects;
 		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GItem> descendingSet() {
-			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
+			return new CompactNavigableSet.CompactDescendingSubSet<>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GItem> descendingIterator() {
-			return new CompactCollectionDescendingIterator<GItem>(this.data, this.defaultFirstIndex(), this.defaultLastIndex() + 1);
+			return new CompactCollectionDescendingIterator<>(this.data, this.defaultFirstIndex(), this.defaultLastIndex() + 1);
 		}
 
 		/** {@inheritDoc} */
@@ -262,21 +258,21 @@ import bee.creative.util.Objects;
 		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement, final boolean toInclusive) {
 			if (!this.defaultIsInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
 			if (!this.defaultIsInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, fromElement, fromInclusive, toElement, toInclusive);
+			return new CompactNavigableSet.CompactAscendingSubSet<>(this.data, fromElement, fromInclusive, toElement, toInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
 			if (!this.defaultIsInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, toElement, inclusive);
+			return new CompactNavigableSet.CompactAscendingSubSet<>(this.data, this.fromItem, this.fromInclusive, toElement, inclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
 			if (!this.defaultIsInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
-			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, fromElement, inclusive, this.lastItem, this.lastInclusive);
+			return new CompactNavigableSet.CompactAscendingSubSet<>(this.data, fromElement, inclusive, this.lastItem, this.lastInclusive);
 		}
 
 	}
@@ -300,12 +296,10 @@ import bee.creative.util.Objects;
 			super(array, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GItem> iterator() {
-			return new CompactCollectionDescendingIterator<GItem>(this.data, this.defaultFirstIndex(), this.defaultLastIndex() + 1);
+			return new CompactCollectionDescendingIterator<>(this.data, this.defaultFirstIndex(), this.defaultLastIndex() + 1);
 		}
 
 		/** {@inheritDoc} */
@@ -365,13 +359,13 @@ import bee.creative.util.Objects;
 		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GItem> descendingSet() {
-			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
+			return new CompactNavigableSet.CompactAscendingSubSet<>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GItem> descendingIterator() {
-			return new CompactCollectionAscendingIterator<GItem>(this.data, this.defaultFirstIndex(), this.defaultLastIndex() + 1);
+			return new CompactCollectionAscendingIterator<>(this.data, this.defaultFirstIndex(), this.defaultLastIndex() + 1);
 		}
 
 		/** {@inheritDoc} */
@@ -379,26 +373,24 @@ import bee.creative.util.Objects;
 		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement, final boolean toInclusive) {
 			if (!this.defaultIsInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
 			if (!this.defaultIsInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, toElement, toInclusive, fromElement, fromInclusive);
+			return new CompactNavigableSet.CompactDescendingSubSet<>(this.data, toElement, toInclusive, fromElement, fromInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
 			if (!this.defaultIsInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, toElement, inclusive, this.lastItem, this.lastInclusive);
+			return new CompactNavigableSet.CompactDescendingSubSet<>(this.data, toElement, inclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
 			if (!this.defaultIsInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
-			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, fromElement, inclusive);
+			return new CompactNavigableSet.CompactDescendingSubSet<>(this.data, this.fromItem, this.fromInclusive, fromElement, inclusive);
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert den {@link Comparator}. */
 	protected final Comparator<? super GItem> comparator;
@@ -435,8 +427,6 @@ import bee.creative.util.Objects;
 		this.addAll(collection);
 	}
 
-	{}
-
 	/** Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
 	 *
 	 * @param index Index.
@@ -466,8 +456,6 @@ import bee.creative.util.Objects;
 		if ((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getItem(index);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override
@@ -551,7 +539,7 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement, final boolean toInclusive) {
-		return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this, fromElement, fromInclusive, toElement, toInclusive);
+		return new CompactNavigableSet.CompactAscendingSubSet<>(this, fromElement, fromInclusive, toElement, toInclusive);
 	}
 
 	/** {@inheritDoc} */
@@ -563,7 +551,7 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
-		return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this, CompactSubData.open, true, toElement, inclusive);
+		return new CompactNavigableSet.CompactAscendingSubSet<>(this, CompactSubData.open, true, toElement, inclusive);
 	}
 
 	/** {@inheritDoc} */
@@ -575,19 +563,19 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
-		return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this, fromElement, inclusive, CompactSubData.open, true);
+		return new CompactNavigableSet.CompactAscendingSubSet<>(this, fromElement, inclusive, CompactSubData.open, true);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public NavigableSet<GItem> descendingSet() {
-		return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this, CompactSubData.open, true, CompactSubData.open, true);
+		return new CompactNavigableSet.CompactDescendingSubSet<>(this, CompactSubData.open, true, CompactSubData.open, true);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public Iterator<GItem> descendingIterator() {
-		return new CompactCollectionDescendingIterator<GItem>(this, 0, this.size());
+		return new CompactCollectionDescendingIterator<>(this, 0, this.size());
 	}
 
 }

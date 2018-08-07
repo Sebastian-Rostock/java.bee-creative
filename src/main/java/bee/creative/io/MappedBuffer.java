@@ -44,8 +44,6 @@ public class MappedBuffer {
 	/** Dieses Feld speichert die Anzahl an Elementen eines nicht {@code byte}-Arrays, ab welcher das Array nicht mehr elementweise verarbeitet werden soll. */
 	private static final int BUFFER_OTHER_THRESHOLD = 27;
 
-	{}
-
 	/** Diese Methode gibt den Index eines Werts innerhalb eins {@link MappedByteBuffer} zur gegebenen Adresse zurück.
 	 *
 	 * @param address Adresse.
@@ -61,8 +59,6 @@ public class MappedBuffer {
 	private static int bufferIndex(final long address) {
 		return (int)(address >> MappedBuffer.INDEX_SIZE);
 	}
-
-	{}
 
 	/** Dieses Feld speichert die gebundene Datei. */
 	private final File file;
@@ -122,8 +118,6 @@ public class MappedBuffer {
 		this.readonly = readonly;
 		this.resize(size);
 	}
-
-	{}
 
 	/** Diese Methode gibt die Größe des Puffers zurück.
 	 *

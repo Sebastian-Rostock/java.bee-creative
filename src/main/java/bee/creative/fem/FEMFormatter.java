@@ -29,8 +29,6 @@ public final class FEMFormatter {
 			this.data = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
 		}
 
-		{}
-
 		/** Diese Methode gibt die Tiefe der Einrückung zurück.
 		 *
 		 * @return Tiefe der Einrückung. */
@@ -64,8 +62,6 @@ public final class FEMFormatter {
 			return (this.data & 2) != 0;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
@@ -73,8 +69,6 @@ public final class FEMFormatter {
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert die bisher gesammelten Zeichenketten und Markierungen. */
 	final List<Object> items = new ArrayList<>();
@@ -89,8 +83,6 @@ public final class FEMFormatter {
 	public FEMFormatter() {
 		this.reset();
 	}
-
-	{}
 
 	/** Diese Methode setzt den Formatieren zurück und gibt {@code this} zurück.
 	 *
@@ -177,7 +169,7 @@ public final class FEMFormatter {
 			final Object item = items.get(i);
 			if (item instanceof Token) {
 				final Token token = (Token)item;
-				int level = token.level();
+				final int level = token.level();
 				if (level <= value) { // ALTERNATIV: else if (token.level() < value) return this;
 					if (token.isEnabled()) return this;
 					token.enable();
@@ -233,8 +225,6 @@ public final class FEMFormatter {
 		}
 		return result.toString();
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

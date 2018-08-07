@@ -25,8 +25,6 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 			super(owner, startIndex, finalIndex);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public BooleanArraySection section() {
@@ -106,8 +104,6 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -151,8 +147,6 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -178,8 +172,6 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert das {@code boolean}-Array. */
 	protected boolean[] array;
@@ -210,8 +202,6 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	public CompactBooleanArray(final ArraySection<boolean[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

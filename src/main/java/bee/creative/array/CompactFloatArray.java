@@ -25,8 +25,6 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 			super(owner, startIndex, finalIndex);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public FloatArraySection section() {
@@ -106,8 +104,6 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -151,8 +147,6 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -178,8 +172,6 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert das {@code float}-Array. */
 	protected float[] array;
@@ -210,8 +202,6 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	public CompactFloatArray(final ArraySection<float[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

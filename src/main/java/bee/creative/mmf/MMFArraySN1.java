@@ -18,8 +18,6 @@ class MMFArraySN1 extends MMFArray {
 		this.offset = offset;
 	}
 
-	{}
-
 	@Override
 	public int mode() {
 		return 1;

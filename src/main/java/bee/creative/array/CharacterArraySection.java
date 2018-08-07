@@ -64,8 +64,6 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final char[] array) {

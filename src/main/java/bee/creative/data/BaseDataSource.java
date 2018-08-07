@@ -13,8 +13,6 @@ public abstract class BaseDataSource implements DataSource {
 	/** Dieses Feld speichert den Lesepuffer. */
 	protected final byte[] array = new byte[8];
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public int skipBytes(final int n) throws IOException {

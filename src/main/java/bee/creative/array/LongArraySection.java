@@ -64,8 +64,6 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final long[] array) {

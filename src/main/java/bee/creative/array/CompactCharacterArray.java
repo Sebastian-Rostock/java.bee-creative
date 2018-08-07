@@ -25,8 +25,6 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 			super(owner, startIndex, finalIndex);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public CharacterArraySection section() {
@@ -106,8 +104,6 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -151,8 +147,6 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -178,8 +172,6 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert das {@code char}-Array. */
 	protected char[] array;
@@ -210,8 +202,6 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	public CompactCharacterArray(final ArraySection<char[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

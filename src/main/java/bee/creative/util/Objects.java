@@ -24,8 +24,6 @@ public class Objects {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#hash(Object)} und {@link Objects#equals(Object, Object)} delegiert. */
 	public static final Hasher HASHER = new Hasher() {
 
@@ -70,8 +68,6 @@ public class Objects {
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
 	 *
@@ -135,7 +131,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}. */
 	public static String formatMap(final boolean format, final Map<?, ?> object) {
 		if (object == null) return "null";
-		if (object.isEmpty()) return "{}";
+		if (object.isEmpty()) return "";
 		String space = (format ? "{\n  " : "{");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();

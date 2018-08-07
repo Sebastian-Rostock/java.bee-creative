@@ -41,8 +41,6 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		{}
-
 		public final FEMTracer tracer() {
 			return this.tracer;
 		}
@@ -50,8 +48,6 @@ public abstract class FEMFunction {
 		public final FEMFunction function() {
 			return this.function;
 		}
-
-		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
@@ -108,8 +104,6 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		{}
-
 		public final FEMFrame frame() {
 			return this.frame;
 		}
@@ -117,8 +111,6 @@ public abstract class FEMFunction {
 		public final FEMFunction function() {
 			return this.function;
 		}
-
-		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
@@ -164,13 +156,9 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		{}
-
 		public final FEMFunction function() {
 			return this.function;
 		}
-
-		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
@@ -229,8 +217,6 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		{}
-
 		public final FEMFunction[] params() {
 			return this.params.clone();
 		}
@@ -238,8 +224,6 @@ public abstract class FEMFunction {
 		public final FEMFunction function() {
 			return this.function;
 		}
-
-		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
@@ -288,8 +272,6 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		{}
-
 		public final FEMFunction function() {
 			return this.function;
 		}
@@ -337,8 +319,6 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		{}
-
 		public final FEMFunction[] params() {
 			return this.params.clone();
 		}
@@ -346,8 +326,6 @@ public abstract class FEMFunction {
 		public final FEMFunction function() {
 			return this.function;
 		}
-
-		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
@@ -386,8 +364,6 @@ public abstract class FEMFunction {
 		}
 
 	}
-
-	{}
 
 	/** Diese Methode führt Berechnungen mit dem gegebenen Stapelrahmen durch und gibt den ermittelten Ergebniswert zurück.
 	 *
@@ -545,8 +521,6 @@ public abstract class FEMFunction {
 	public FEMFunction toClosure(final FEMFrame params) throws NullPointerException {
 		return new FrameFunction(params, this);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

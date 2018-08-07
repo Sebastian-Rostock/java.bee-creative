@@ -29,8 +29,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 			this.params = params;
 		}
 
-		{}
-
 		@Override
 		public final FEMValue get(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.params.length;
@@ -101,8 +99,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 				this.values = new FEMValue[params.length];
 			}
 
-			{}
-
 			final FEMValue frameGet(final int index) {
 				final int index2 = index - this.length;
 				if (index2 >= 0) return this.frame.get(index2);
@@ -117,8 +113,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 					return result;
 				}
 			}
-
-			{}
 
 			@Override
 			protected final FEMValue customGet(final int index) {
@@ -135,8 +129,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		}
 
-		{}
-
 		public final Params params;
 
 		InvokeFrame(final FEMFrame parent, final Params params, final FEMContext context) {
@@ -148,8 +140,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 			super(parent, context);
 			this.params = new Params(parent, params);
 		}
-
-		{}
 
 		@Override
 		public final FEMValue get(final int index) throws IndexOutOfBoundsException {
@@ -175,13 +165,9 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den leeren Stapelrahmen, der keine Parameterwerte bereitstellt, das Kontextobjekt {@link FEMContext#EMPTY} verwendet und sich selbst
 	 * als {@link #parent()} nutzt. */
 	public static final FEMFrame EMPTY = new EmptyFrame();
-
-	{}
 
 	/** Diese Methode gibt einen Stapelrahmen mit dem gegebenen {@link #context() Kontextobjekt} zurück.<br>
 	 * Sie ist eine Abkürzung für {@code EMPTY.withContext(context)}.
@@ -192,8 +178,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	public static FEMFrame from(final FEMContext context) throws NullPointerException {
 		return FEMFrame.EMPTY.withContext(context);
 	}
-
-	{}
 
 	/** Dieses Feld speichert die übergeordneten Parameterdaten. */
 	protected final FEMFrame parent;
@@ -212,8 +196,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		this.parent = parent;
 		this.context = context;
 	}
-
-	{}
 
 	/** Diese Methode gibt die Anzahl der Parameterwerte zurück, die zur Verwendung durch eine aufgerufene Funktion bestimmt sind.<br>
 	 * Über die Methode {@link #get(int)} werden mindestens so viele Parameterwerte bereitgestellt.
@@ -374,8 +356,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code context} {@code null} ist. */
 	public abstract FEMFrame withContext(final FEMContext context) throws NullPointerException;
-
-	{}
 
 	/** Diese Methode gibt den Wert des {@code index}-ten Parameters zurück.<br>
 	 * Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus, können auch zusätzliche Parameterwerte des {@link #parent() übergeordneten

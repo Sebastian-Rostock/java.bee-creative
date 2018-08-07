@@ -12,8 +12,6 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -6978391927144580624L;
 
-	{}
-
 	/** Diese Methode gibt ein neues {@link HashSet2} zurück, welche Streuwert und Äquivalenz der Elemente über den gegebenen {@link Hasher} ermittelt.
 	 *
 	 * @param <GItem> Typ der Elemente.
@@ -44,8 +42,6 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		};
 	}
 
-	{}
-
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
 	transient int[] hashes = AbstractHashData.EMPTY_INTEGERS;
 
@@ -60,7 +56,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashSet} mit dem Inhalt der gegebenen {@link Set}.
+	/** Dieser Konstruktor initialisiert das {@link HashSet2} mit dem Inhalt der gegebenen {@link Set}.
 	 *
 	 * @param source gegebene Einträge. */
 	public HashSet2(final Set<? extends GItem> source) {
@@ -68,14 +64,12 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		this.addAll(source);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashSet} mit dem Inhalt der gegebenen {@link Collection}.
+	/** Dieser Konstruktor initialisiert das {@link HashSet2} mit dem Inhalt der gegebenen {@link Collection}.
 	 *
 	 * @param source gegebene Einträge. */
 	public HashSet2(final Collection<? extends GItem> source) {
 		this.addAll(source);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

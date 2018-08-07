@@ -30,14 +30,10 @@ public final class CSVReader implements Closeable {
 		return new CSVReader(IO.inputReaderFrom(data));
 	}
 
-	{}
-
 	@SuppressWarnings ("javadoc")
 	static void check(final char symbol) throws IllegalArgumentException {
 		if ((symbol == '\r') || (symbol == '\n')) throw new IllegalArgumentException();
 	}
-
-	{}
 
 	/** Dieses Feld speichert die Quelldaten. */
 	final Reader reader;
@@ -71,8 +67,6 @@ public final class CSVReader implements Closeable {
 		this.value = new StringBuilder();
 		this.entry = new ArrayList<>();
 	}
-
-	{}
 
 	/** Diese Methode gibt das Maskierungszeichen zurück.<br>
 	 * Maskierte {@link #readValue() Werte} werden in diese Zeichen eingeschlossen und enthalten dieses Zeichen nur gedoppelt.
@@ -234,8 +228,6 @@ public final class CSVReader implements Closeable {
 			result.setLength(0);
 		}
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

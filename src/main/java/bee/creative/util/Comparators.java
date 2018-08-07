@@ -265,8 +265,6 @@ public class Comparators {
 
 	};
 
-	{}
-
 	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der kleinsten Ordnung zurück. Dieses ergibt sich aus
 	 * {@code Comparators.compare(item1, item2) <= 0 ? item1 : item2}.
 	 *

@@ -25,8 +25,6 @@ public class Iterables {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert das leere {@link Iterable}. */
 	public static final Iterable<?> EMPTY_ITERABLE = new Iterable<Object>() {
 
@@ -56,8 +54,6 @@ public class Iterables {
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück.
 	 *

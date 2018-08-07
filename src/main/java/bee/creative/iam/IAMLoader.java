@@ -32,8 +32,6 @@ public class IAMLoader {
 			this.value = value;
 		}
 
-		{}
-
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Kopfdaten eine gültige Datenstrukturkennung enthalten.
 		 *
 		 * @param header Kopfdaten.
@@ -70,8 +68,6 @@ public class IAMLoader {
 			return this.orderOf(bytes);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
@@ -90,8 +86,6 @@ public class IAMLoader {
 
 		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_INDEX} Datenstruktur. */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFFF, 0xF00DBA5E);
-
-		{}
 
 		/** Dieses Feld speichert die Abbildungen. */
 		final IAMMappingLoader[] mappings;
@@ -165,8 +159,6 @@ public class IAMLoader {
 
 		}
 
-		{}
-
 		/** Diese Methode prüft die Kodierung der Längen der Zahlenfolgen in den Abbildungen und Auflistungen.
 		 *
 		 * @see IAMListingLoader#check()
@@ -180,8 +172,6 @@ public class IAMLoader {
 				mapping.check();
 			}
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -221,8 +211,6 @@ public class IAMLoader {
 
 		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_LIST} Datenstruktur. */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFF0, 0xF00D2000);
-
-		{}
 
 		/** Dieses Feld speichert die Zahlen der Elemente. */
 		final MMFArray itemData;
@@ -304,8 +292,6 @@ public class IAMLoader {
 
 		}
 
-		{}
-
 		/** Diese Methode prüft die Kodierung der {@link #itemLength(int) Längen der Zahlenfolgen}.
 		 *
 		 * @see IAMLoader#checkArray(IAMArray)
@@ -313,8 +299,6 @@ public class IAMLoader {
 		public final void check() throws IAMException {
 			IAMLoader.checkArray(this.itemOffset);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -350,8 +334,6 @@ public class IAMLoader {
 
 		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_MAP} Datenstruktur. */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFC00, 0xF00D1000);
-
-		{}
 
 		/** Dieses Feld speichert die Zahlen der Schlüssel. */
 		final MMFArray keyData;
@@ -523,8 +505,6 @@ public class IAMLoader {
 
 		}
 
-		{}
-
 		/** Diese Methode prüft die Kodierung der {@link #keyLength(int) Längen der Schlüssel} und {@link #valueLength(int) Werte}.
 		 *
 		 * @see IAMLoader#checkArray(IAMArray)
@@ -534,8 +514,6 @@ public class IAMLoader {
 			IAMLoader.checkArray(this.keyOffset);
 			IAMLoader.checkArray(this.valueOffset);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -608,8 +586,6 @@ public class IAMLoader {
 		}
 
 	}
-
-	{}
 
 	/** Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen zurück.
 	 *

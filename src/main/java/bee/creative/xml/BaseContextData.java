@@ -28,8 +28,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		 * @return Besitzer. */
 		public abstract GOwner closeClassesData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected ClassData<GOwner> customThis() {
@@ -50,8 +48,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected PropertyData<GOwner> customThis() {
@@ -59,8 +55,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert den {@link JAXBContext}. */
 	JAXBContext context;
@@ -84,8 +78,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -148,8 +140,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	public final PropertyData<GThis> openPropertyData() {
 		return this.propertyData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

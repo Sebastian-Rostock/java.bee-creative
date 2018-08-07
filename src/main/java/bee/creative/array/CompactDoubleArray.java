@@ -25,8 +25,6 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 			super(owner, startIndex, finalIndex);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public DoubleArraySection section() {
@@ -106,8 +104,6 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -151,8 +147,6 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -178,8 +172,6 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert das {@code double}-Array. */
 	protected double[] array;
@@ -210,8 +202,6 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 	public CompactDoubleArray(final ArraySection<double[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

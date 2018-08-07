@@ -28,8 +28,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 			this.useDEFAULT_OBJECT_MODEL_URI();
 		}
 
-		{}
-
 		/** Diese Methode setzt den Wert auf {@link XPathFactory#DEFAULT_OBJECT_MODEL_URI} und gibt {@code this} zurück.
 		 *
 		 * @see #use(BaseValueBuilder)
@@ -42,8 +40,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeModelData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -65,8 +61,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FeatureData<GOwner> customThis() {
@@ -86,8 +80,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeVariableData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -109,8 +101,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		 * @return Besitzer. */
 		public abstract GOwner closeFunctionData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final FunctionData<GOwner> customThis() {
@@ -118,8 +108,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert die {@link XPathFactory}. */
 	XPathFactory factory;
@@ -163,8 +151,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -267,8 +253,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	public final FunctionData<GThis> openFunctionData() {
 		return this.functionData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

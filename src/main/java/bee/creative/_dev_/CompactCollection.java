@@ -8,7 +8,7 @@ import bee.creative.util.Iterables;
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
- abstract class CompactCollection<GItem> extends CompactData implements Collection<GItem> {
+abstract class CompactCollection<GItem> extends CompactData implements Collection<GItem> {
 
 	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} für {@link CompactCollection}s.
 	 *
@@ -24,8 +24,6 @@ import bee.creative.util.Iterables;
 		public CompactCollectionAscendingIterator(final CompactCollection<GItem> data, final int from, final int last) {
 			super(data, from, last);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -50,8 +48,6 @@ import bee.creative.util.Iterables;
 			super(data, from, last);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected GItem customNext(final int index) {
@@ -59,8 +55,6 @@ import bee.creative.util.Iterables;
 		}
 
 	}
-
-	{}
 
 	/** Dieser Konstruktor initialisiert die {@link Collection}. */
 	public CompactCollection() {
@@ -88,8 +82,6 @@ import bee.creative.util.Iterables;
 		this.addAll(collection);
 	}
 
-	{}
-
 	/** Diese Methode gibt das {@code index}-te Element zurück.
 	 *
 	 * @param index Index.
@@ -115,8 +107,6 @@ import bee.creative.util.Iterables;
 		this.items.set(index, items);
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public final int size() {
@@ -138,7 +128,7 @@ import bee.creative.util.Iterables;
 	/** {@inheritDoc} */
 	@Override
 	public final Iterator<GItem> iterator() {
-		return new CompactCollectionAscendingIterator<GItem>(this, 0, this.size());
+		return new CompactCollectionAscendingIterator<>(this, 0, this.size());
 	}
 
 	/** {@inheritDoc} */

@@ -41,16 +41,12 @@ public final class BEXBuilder {
 		/** Dieses Feld speichert den Schlüssel zur Referenzierung. */
 		public int key;
 
-		{}
-
 		/** Diese Methode gibt den Schlüssel zur Referenzierung zurück.
 		 *
 		 * @return Schlüssel. */
 		public int key() {
 			return this.key;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -78,8 +74,6 @@ public final class BEXBuilder {
 
 		};
 
-		{}
-
 		/** Dieses Feld speichert die Zeichenkette. */
 		public String text;
 
@@ -89,8 +83,6 @@ public final class BEXBuilder {
 		public BEXTextItem(final String text) {
 			this.text = text;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -118,8 +110,6 @@ public final class BEXBuilder {
 
 		};
 
-		{}
-
 		/** Dieses Feld speichert die Zeilennummer in der Kind- bzw. Attributknotentabelle, ab der die Kind- bzw. Attributknotenliste abgelegt ist. */
 		public int offset;
 
@@ -139,8 +129,6 @@ public final class BEXBuilder {
 			this.items = items;
 		}
 
-		{}
-
 		/** Diese Methode fügt den gegebenen Datensatz an {@link #items} an und gibt {@code this} zurück.
 		 *
 		 * @param item Datensatz oder {@code null}.
@@ -149,8 +137,6 @@ public final class BEXBuilder {
 			this.items.add(item);
 			return this;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -182,8 +168,6 @@ public final class BEXBuilder {
 			this.index = index;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final int key() {
@@ -202,8 +186,6 @@ public final class BEXBuilder {
 		/** Dieses Feld speichert die Liste aller einzigartigen Datensätze. */
 		public final List<GItem> items = new ArrayList<>();
 
-		{}
-
 		/** Diese Methode fügt den gegebenen Datensatz an {@link #items} an und gibt {@code this} zurück.
 		 *
 		 * @param item Datensatz.
@@ -219,15 +201,11 @@ public final class BEXBuilder {
 			this.items.clear();
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final void customReuse(final GData input, final GItem output) {
 			output.key--;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -271,8 +249,6 @@ public final class BEXBuilder {
 		/** Dieses Feld speichert die Anzahl der Zeilen der Tabelle, die durch die Datensätze in {@link #items} beschrieben wird. */
 		public int length;
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final BEXGroupItem customBuild(final List<BEXItem> input) {
@@ -313,8 +289,6 @@ public final class BEXBuilder {
 
 		/** Dieses Feld speichert den Datentyp des Dokumentknoten mit Wurzelelement. */
 		public static final int ROOT = 4;
-
-		{}
 
 		/** Dieses Feld speichert die Zustandsdaten des Elternknoten. */
 		public BEXStack parent;
@@ -393,8 +367,6 @@ public final class BEXBuilder {
 		public BEXFileBuilder() {
 			this.clear();
 		}
-
-		{}
 
 		/** Diese Methode beendet die Bestückung des aktuellen Attributknoten und gibt {@code this} zurück.<br>
 		 * Anschließend wird die Bestückung des Elternknoten (Elementknoten) fortgesetzt.
@@ -916,8 +888,6 @@ public final class BEXBuilder {
 			header.put(new int[]{0xBE10BA5E, this.stack.children.offset});
 			return header;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override

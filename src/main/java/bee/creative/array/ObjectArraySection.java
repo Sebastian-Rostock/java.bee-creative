@@ -158,8 +158,6 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final GValue[] array) {

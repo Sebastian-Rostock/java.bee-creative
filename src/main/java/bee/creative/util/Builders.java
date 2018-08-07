@@ -93,8 +93,6 @@ public class Builders {
 			return this.customThis();
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<GResult> iterator() {
@@ -119,8 +117,6 @@ public class Builders {
 		protected BaseSetBuilder(final GResult result) throws NullPointerException {
 			this.result = Objects.assertNotNull(result);
 		}
-
-		{}
 
 		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 		 *
@@ -216,8 +212,6 @@ public class Builders {
 			return this.customThis();
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<GItem> iterator() {
@@ -245,8 +239,6 @@ public class Builders {
 		protected BaseMapBuilder(final GResult result) throws NullPointerException {
 			this.result = Objects.assertNotNull(result);
 		}
-
-		{}
 
 		@SuppressWarnings ("javadoc")
 		void putImpl(final Entry<? extends GKey, ? extends GValue> entry) {
@@ -551,8 +543,6 @@ public class Builders {
 			return this.customThis();
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final Iterator<Entry<GKey, GValue>> iterator() {
@@ -645,8 +635,6 @@ public class Builders {
 			return MapBuilder.from(withHashCache ? new HashMap2<GKey, GValue>() : new HashMap<GKey, GValue>());
 		}
 
-		{}
-
 		/** Dieser Konstruktor initialisiert die interne {@link Map}.
 		 *
 		 * @param result interne {@link Map}.
@@ -654,8 +642,6 @@ public class Builders {
 		public MapBuilder(final GResult result) throws NullPointerException {
 			super(result);
 		}
-
-		{}
 
 		/** Diese Methode gibt einen neuen {@link MapBuilder} zur datentypsicheren {@link #build() Abbildung} zurück.
 		 *
@@ -695,8 +681,6 @@ public class Builders {
 		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toUnmodifiable() {
 			return MapBuilder.from(Collections.unmodifiableMap(this.result));
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -757,8 +741,6 @@ public class Builders {
 			return SetBuilder.from(withHashCache ? new HashSet2<GItem>() : new HashSet<GItem>());
 		}
 
-		{}
-
 		/** Dieser Konstruktor initialisiert das {@link Set}.
 		 *
 		 * @param result {@link Set}.
@@ -766,8 +748,6 @@ public class Builders {
 		public SetBuilder(final GResult result) throws NullPointerException {
 			super(result);
 		}
-
-		{}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Vereinigungsmenge dieser {@link #build() Menge} und der gegebenen Menge zurück.
 		 *
@@ -832,8 +812,6 @@ public class Builders {
 			return SetBuilder.from(Collections.unmodifiableSet(this.result));
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final SetBuilder<GItem, GResult> customThis() {
@@ -875,8 +853,6 @@ public class Builders {
 			return ListBuilder.from(new LinkedList<GItem>());
 		}
 
-		{}
-
 		/** Dieser Konstruktor initialisiert das {@link List}.
 		 *
 		 * @param result {@link List}.
@@ -884,8 +860,6 @@ public class Builders {
 		public ListBuilder(final GResult result) throws NullPointerException {
 			super(result);
 		}
-
-		{}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die rückwärts geordnete {@link #build() Liste} zurück.
 		 *
@@ -949,8 +923,6 @@ public class Builders {
 			return ListBuilder.from(Collections.unmodifiableList(this.result));
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final ListBuilder<GItem, GResult> customThis() {
@@ -984,8 +956,6 @@ public class Builders {
 			return ComparatorBuilder.from(Comparators.<GItem>naturalComparator());
 		}
 
-		{}
-
 		/** Dieser Konstruktor initialisiert den internen {@link Comparator}.
 		 *
 		 * @param result interner {@link Comparator}.
@@ -993,8 +963,6 @@ public class Builders {
 		public ComparatorBuilder(final GResult result) throws NullPointerException {
 			this.result = Objects.assertNotNull(result);
 		}
-
-		{}
 
 		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum {@code null} vergleichenden {@link #build() Comparator} zurück.
 		 *
@@ -1048,8 +1016,6 @@ public class Builders {
 			return ComparableBuilder.from(Comparables.itemComparable(item, this.result));
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected ComparatorBuilder<GItem, GResult> customThis() {
@@ -1075,8 +1041,6 @@ public class Builders {
 			return new ComparableBuilder<>(result);
 		}
 
-		{}
-
 		/** Dieser Konstruktor initialisiert das interne {@link Comparable}.
 		 *
 		 * @param result internes {@link Comparable}.
@@ -1084,8 +1048,6 @@ public class Builders {
 		protected ComparableBuilder(final GResult result) throws NullPointerException {
 			this.result = Objects.assertNotNull(result);
 		}
-
-		{}
 
 		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum {@code null} vergleichenden {@link #build() Comparable} zurück.
 		 *
@@ -1130,8 +1092,6 @@ public class Builders {
 			return ComparableBuilder.from(Comparables.navigatedComparable(navigator, this.result));
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected ComparableBuilder<GItem, GResult> customThis() {
@@ -1158,8 +1118,6 @@ public class Builders {
 		// toUnmodifiable
 
 	}
-
-	{}
 
 	/** Diese Methode gibt einen {@link Builder} zurück, der den gegebenen Datensatz bereitstellt.
 	 *

@@ -19,7 +19,7 @@ import bee.creative.array.Array;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
- class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<GKey, GValue> {
+class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<GKey, GValue> {
 
 	/** Dieses Feld speichert das {@link Array} der Werte. */
 	protected final CompactDataArray values;
@@ -57,8 +57,6 @@ import bee.creative.array.Array;
 		this.allocate(map.size());
 		this.putAll(map);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@SuppressWarnings ("unchecked")

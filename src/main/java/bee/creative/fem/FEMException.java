@@ -22,8 +22,6 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -2654985371977072939L;
 
-	{}
-
 	/** Diese Methode gibt die gegebene Ausnahme als {@link FEMException} zurück.<br>
 	 * Wenn {@code cause} eine {@link FEMException} ist, wird diese unverändert geliefert.<br>
 	 * Andernfalls wird eine neue {@link FEMException} mit der gegebenen Ausnahme als {@link #useCause(Throwable) Ursache} erzeugt und geliefert.
@@ -34,8 +32,6 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 		if (cause instanceof FEMException) return (FEMException)cause;
 		return new FEMException().useCause(cause);
 	}
-
-	{}
 
 	/** Dieses Feld speichert den Wert. */
 	FEMValue value;
@@ -54,8 +50,6 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	public FEMException() {
 		this.messages = Collections.synchronizedList(new ArrayList<String>());
 	}
-
-	{}
 
 	/** Diese Methode setzt den {@link #getValue() Wert} und gibt {@code this} zurück.
 	 *
@@ -173,8 +167,6 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 		Iterables.addAll(this.messages, Iterables.filteredIterable(Filters.nullFilter(), messages));
 		return this;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

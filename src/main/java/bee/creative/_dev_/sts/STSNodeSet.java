@@ -11,15 +11,13 @@ import bee.creative.array.IntegerArraySection;
 public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	/** Diese Klasse implementiert die Menge aller Knoten eines Graphspeichers.
-	 * 
+	 *
 	 * @see STSStore#getNodeSet() */
 	protected static class StoreNodeSet extends STSNodeSet {
 
 		public StoreNodeSet(final STSStore store) {
 			super(store);
 		}
-
-		{}
 
 		@Override
 		protected ItemIndex customIndex() {
@@ -42,13 +40,13 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 		}
 
 		@Override
-		public STSNodeSet toUnion(STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+		public STSNodeSet toUnion(final STSNodeSet that) throws NullPointerException, IllegalArgumentException {
 			if (!this.store.contains(that)) throw new IllegalArgumentException();
 			return this;
 		}
 
 		@Override
-		public STSNodeSet toIntersection(STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+		public STSNodeSet toIntersection(final STSNodeSet that) throws NullPointerException, IllegalArgumentException {
 			if (!this.store.contains(that)) throw new IllegalArgumentException();
 			return that;
 		}
@@ -64,8 +62,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 			super(node.store);
 			this.node = node;
 		}
-
-		{}
 
 		@Override
 		protected ItemIndex customIndex() {
@@ -96,8 +92,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 			super(store);
 		}
 
-		{}
-
 		@Override
 		protected ItemIndex customIndex() {
 			return new EmptyIndex();
@@ -119,13 +113,13 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 		}
 
 		@Override
-		public STSNodeSet toUnion(STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+		public STSNodeSet toUnion(final STSNodeSet that) throws NullPointerException, IllegalArgumentException {
 			if (!this.store.contains(that)) throw new IllegalArgumentException();
 			return that;
 		}
 
 		@Override
-		public STSNodeSet toIntersection(STSNodeSet that) throws NullPointerException, IllegalArgumentException {
+		public STSNodeSet toIntersection(final STSNodeSet that) throws NullPointerException, IllegalArgumentException {
 			if (!this.store.contains(that)) throw new IllegalArgumentException();
 			return this;
 		}
@@ -142,8 +136,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 			super(store);
 			this.items = items;
 		}
-
-		{}
 
 		@Override
 		protected ItemIndex customIndex() {
@@ -180,8 +172,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 			this.items2 = items2;
 		}
 
-		{}
-
 		@Override
 		protected ItemIndex customIndex() {
 			return new UnionIndex(this.items1.customIndex(), this.items2.customIndex());
@@ -217,8 +207,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 			this.items2 = items2;
 		}
 
-		{}
-
 		@Override
 		protected ItemIndex customIndex() {
 			return new IntersectionIndex(this.items1.customIndex(), this.items2.customIndex());
@@ -241,13 +229,9 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	}
 
-	{}
-
 	protected STSNodeSet(final STSStore store) {
 		super(store);
 	}
-
-	{}
 
 	/** Diese Methode gibt die Vereinigungsmenge dieser und der gegebenen Menge zurück.
 	 *
@@ -274,8 +258,6 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 		if (that instanceof StoreNodeSet) return this;
 		return new IntersectionNodeSet(this, that);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

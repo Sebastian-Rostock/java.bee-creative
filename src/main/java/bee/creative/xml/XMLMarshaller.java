@@ -32,8 +32,6 @@ public final class XMLMarshaller {
 			return XMLMarshaller.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final SourceData customThis() {
@@ -55,8 +53,6 @@ public final class XMLMarshaller {
 			return XMLMarshaller.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final ResultData customThis() {
@@ -77,8 +73,6 @@ public final class XMLMarshaller {
 			return XMLMarshaller.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final MarshallerData customThis() {
@@ -86,8 +80,6 @@ public final class XMLMarshaller {
 		}
 
 	}
-
-	{}
 
 	/** Diese Methode gibt einen neuen {@link XMLMarshaller} zurück, dessen {@link JAXBContext} die gegebenen Klassen nutzt.
 	 *
@@ -99,7 +91,7 @@ public final class XMLMarshaller {
 	}
 
 	/** Diese Methode ist eine Abkürtung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode()}.
-	 * 
+	 *
 	 * @see #from(Class...)
 	 * @see #marshalString() */
 	@SuppressWarnings ("javadoc")
@@ -108,15 +100,13 @@ public final class XMLMarshaller {
 	}
 
 	/** Diese Methode ist eine Abkürtung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString()}.
-	 * 
+	 *
 	 * @see #from(Class...)
 	 * @see #marshalString() */
 	@SuppressWarnings ("javadoc")
 	public static String marshalString(final Object object) throws SAXException, JAXBException {
 		return XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString();
 	}
-
-	{}
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
 	final SourceData sourceData = new SourceData();
@@ -126,8 +116,6 @@ public final class XMLMarshaller {
 
 	/** Dieses Feld speichert den Konfigurator {@link #openMarshallerData()}. */
 	final MarshallerData marshallerData = new MarshallerData();
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -210,8 +198,6 @@ public final class XMLMarshaller {
 	public final MarshallerData openMarshallerData() {
 		return this.marshallerData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

@@ -21,7 +21,7 @@ import bee.creative.util.Objects;
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
 @SuppressWarnings ("javadoc")
- abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue> implements NavigableMap<GKey, GValue> {
+abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue> implements NavigableMap<GKey, GValue> {
 
 	/** Diese Klasse implementiert die anstrakte Menge der Schlüssel einer {@link NavigableMap}.
 	 *
@@ -41,8 +41,6 @@ import bee.creative.util.Objects;
 			this.data = Objects.assertNotNull(data);
 		}
 
-		{}
-
 		/** Diese Methode gibt den Schlüssel des gegebenen {@link ItemEntry}s oder {@code null} zurück.
 		 *
 		 * @param entry {@link ItemEntry}.
@@ -51,8 +49,6 @@ import bee.creative.util.Objects;
 			if (entry == null) return null;
 			return entry.getKey();
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -204,12 +200,10 @@ import bee.creative.util.Objects;
 			super(data);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GKey> iterator() {
-			return new CompactMapKeyAscendingIterator<GKey>(this.data, this.data.defaultFirstIndex(), this.data.defaultIastIndex() + 1);
+			return new CompactMapKeyAscendingIterator<>(this.data, this.data.defaultFirstIndex(), this.data.defaultIastIndex() + 1);
 		}
 
 	}
@@ -229,12 +223,10 @@ import bee.creative.util.Objects;
 			super(data);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GKey> iterator() {
-			return new CompactMapKeyAscendingIterator<GKey>(this.data.data, this.data.defaultFirstIndex(), this.data.defaultLastIndex() + 1);
+			return new CompactMapKeyAscendingIterator<>(this.data.data, this.data.defaultFirstIndex(), this.data.defaultLastIndex() + 1);
 		}
 
 	}
@@ -254,12 +246,10 @@ import bee.creative.util.Objects;
 			super(data);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GKey> iterator() {
-			return new CompactMapKeyDescendingIterator<GKey>(this.data.data, this.data.defaultFirstIndex(), this.data.defaultLastIndex() + 1);
+			return new CompactMapKeyDescendingIterator<>(this.data.data, this.data.defaultFirstIndex(), this.data.defaultLastIndex() + 1);
 		}
 
 	}
@@ -289,8 +279,6 @@ import bee.creative.util.Objects;
 				this.data = data;
 			}
 
-			{}
-
 			/** {@inheritDoc} */
 			@Override
 			public int size() {
@@ -306,7 +294,7 @@ import bee.creative.util.Objects;
 			/** {@inheritDoc} */
 			@Override
 			public Iterator<Entry<GKey, GValue>> iterator() {
-				return new CompactMapEntryIterator<GKey, GValue>(this.data.data, this.data.defaultFirstIndex(), this.data.defaultLastIndex() - 1);
+				return new CompactMapEntryIterator<>(this.data.data, this.data.defaultFirstIndex(), this.data.defaultLastIndex() - 1);
 			}
 		}
 
@@ -326,8 +314,6 @@ import bee.creative.util.Objects;
 				this.data = data;
 			}
 
-			{}
-
 			/** {@inheritDoc} */
 			@Override
 			public int size() {
@@ -343,12 +329,10 @@ import bee.creative.util.Objects;
 			/** {@inheritDoc} */
 			@Override
 			public Iterator<GValue> iterator() {
-				return new CompactMapValueIterator<GValue>(this.data.data, this.data.defaultFirstIndex(), this.data.defaultLastIndex() + 1);
+				return new CompactMapValueIterator<>(this.data.data, this.data.defaultFirstIndex(), this.data.defaultLastIndex() + 1);
 			}
 
 		}
-
-		{}
 
 		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
 		 *
@@ -362,8 +346,6 @@ import bee.creative.util.Objects;
 			final boolean lastInclusive) {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -451,7 +433,7 @@ import bee.creative.util.Objects;
 		/** {@inheritDoc} */
 		@Override
 		public Set<Entry<GKey, GValue>> entrySet() {
-			return new CompactNavigableSubMap.EntrySet<GKey, GValue>(this);
+			return new CompactNavigableSubMap.EntrySet<>(this);
 		}
 
 		/** {@inheritDoc} */
@@ -463,13 +445,13 @@ import bee.creative.util.Objects;
 		/** {@inheritDoc} */
 		@Override
 		public Collection<GValue> values() {
-			return new CompactNavigableSubMap.ValueCollection<GValue>(this);
+			return new CompactNavigableSubMap.ValueCollection<>(this);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
-			return new CompactMapItems<GKey, GValue>(this).hashCode();
+			return new CompactMapItems<>(this).hashCode();
 		}
 
 		/** {@inheritDoc} */
@@ -477,13 +459,13 @@ import bee.creative.util.Objects;
 		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof Map<?, ?>)) return false;
-			return new CompactMapItems<GKey, GValue>(this).equals(object);
+			return new CompactMapItems<>(this).equals(object);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public String toString() {
-			return new CompactMapItems<GKey, GValue>(this).toString();
+			return new CompactMapItems<>(this).toString();
 		}
 
 	}
@@ -507,8 +489,6 @@ import bee.creative.util.Objects;
 			final boolean lastInclusive) throws IllegalArgumentException {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -603,13 +583,13 @@ import bee.creative.util.Objects;
 		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> descendingMap() {
-			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
+			return new CompactNavigableMap.CompactDescendingSubMap<>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> navigableKeySet() {
-			return new CompactNavigableMap.CompactAscendingKeySet<GKey>(this);
+			return new CompactNavigableMap.CompactAscendingKeySet<>(this);
 		}
 
 		/** {@inheritDoc} */
@@ -617,21 +597,21 @@ import bee.creative.util.Objects;
 		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
 			if (!this.defaultIsInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromKey out of range");
 			if (!this.defaultIsInRange(toKey, toInclusive)) throw new IllegalArgumentException("toKey out of range");
-			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, fromInclusive, toKey, toInclusive);
+			return new CompactNavigableMap.CompactAscendingSubMap<>(this.data, fromKey, fromInclusive, toKey, toInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
 			if (!this.defaultIsInRange(toKey, inclusive)) throw new IllegalArgumentException("toKey out of range");
-			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive, toKey, inclusive);
+			return new CompactNavigableMap.CompactAscendingSubMap<>(this.data, this.fromItem, this.fromInclusive, toKey, inclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
 			if (!this.defaultIsInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromKey out of range");
-			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, inclusive, this.lastItem, this.lastInclusive);
+			return new CompactNavigableMap.CompactAscendingSubMap<>(this.data, fromKey, inclusive, this.lastItem, this.lastInclusive);
 		}
 
 	}
@@ -657,8 +637,6 @@ import bee.creative.util.Objects;
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -753,13 +731,13 @@ import bee.creative.util.Objects;
 		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> descendingMap() {
-			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
+			return new CompactNavigableMap.CompactAscendingSubMap<>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> navigableKeySet() {
-			return new CompactNavigableMap.CompactDescendingKeySet<GKey>(this);
+			return new CompactNavigableMap.CompactDescendingKeySet<>(this);
 		}
 
 		/** {@inheritDoc} */
@@ -767,26 +745,24 @@ import bee.creative.util.Objects;
 		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
 			if (!this.defaultIsInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromKey out of range");
 			if (!this.defaultIsInRange(toKey, toInclusive)) throw new IllegalArgumentException("toKey out of range");
-			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, toKey, toInclusive, fromKey, fromInclusive);
+			return new CompactNavigableMap.CompactDescendingSubMap<>(this.data, toKey, toInclusive, fromKey, fromInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
 			if (!this.defaultIsInRange(toKey, inclusive)) throw new IllegalArgumentException("toKey out of range");
-			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, toKey, inclusive, this.fromItem, this.fromInclusive);
+			return new CompactNavigableMap.CompactDescendingSubMap<>(this.data, toKey, inclusive, this.fromItem, this.fromInclusive);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
 			if (!this.defaultIsInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromKey out of range");
-			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, this.lastItem, this.lastInclusive, fromKey, inclusive);
+			return new CompactNavigableMap.CompactDescendingSubMap<>(this.data, this.lastItem, this.lastInclusive, fromKey, inclusive);
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert den {@link Comparator}. */
 	protected final Comparator<? super GKey> comparator;
@@ -823,8 +799,6 @@ import bee.creative.util.Objects;
 		this.allocate(map.size());
 		this.putAll(map);
 	}
-
-	{}
 
 	/** Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
 	 *
@@ -874,8 +848,6 @@ import bee.creative.util.Objects;
 		if ((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.defaultGetEntry(index);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override
@@ -988,13 +960,13 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public NavigableMap<GKey, GValue> descendingMap() {
-		return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this, CompactSubData.open, true, CompactSubData.open, true);
+		return new CompactNavigableMap.CompactDescendingSubMap<>(this, CompactSubData.open, true, CompactSubData.open, true);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public NavigableSet<GKey> navigableKeySet() {
-		return new CompactNavigableMap.CompactNavigableKeySet<GKey>(this);
+		return new CompactNavigableMap.CompactNavigableKeySet<>(this);
 	}
 
 	/** {@inheritDoc} */
@@ -1012,7 +984,7 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
-		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, fromKey, fromInclusive, toKey, toInclusive);
+		return new CompactNavigableMap.CompactAscendingSubMap<>(this, fromKey, fromInclusive, toKey, toInclusive);
 	}
 
 	/** {@inheritDoc} */
@@ -1024,7 +996,7 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
-		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, CompactSubData.open, true, toKey, inclusive);
+		return new CompactNavigableMap.CompactAscendingSubMap<>(this, CompactSubData.open, true, toKey, inclusive);
 	}
 
 	/** {@inheritDoc} */
@@ -1036,7 +1008,7 @@ import bee.creative.util.Objects;
 	/** {@inheritDoc} */
 	@Override
 	public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
-		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, fromKey, inclusive, CompactSubData.open, true);
+		return new CompactNavigableMap.CompactAscendingSubMap<>(this, fromKey, inclusive, CompactSubData.open, true);
 	}
 
 }

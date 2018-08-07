@@ -17,29 +17,25 @@ public class CountingWriter extends FilterWriter {
 		super(writer);
 	}
 
-	{}
-
 	/** Diese Methode gibt die Anzahl der geschriebenen Zeichen zurück. */
 	public long writeCount() {
 		return this.writeCount;
 	}
 
-	{}
-
 	@Override
-	public void write(int c) throws IOException {
+	public void write(final int c) throws IOException {
 		super.write(c);
 		this.writeCount++;
 	}
 
 	@Override
-	public void write(String string, int offset, int length) throws IOException {
+	public void write(final String string, final int offset, final int length) throws IOException {
 		super.write(string, offset, length);
 		this.writeCount += length;
 	}
 
 	@Override
-	public void write(char[] chars, int offset, int length) throws IOException {
+	public void write(final char[] chars, final int offset, final int length) throws IOException {
 		super.write(chars, offset, length);
 		this.writeCount += length;
 	}

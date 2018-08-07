@@ -13,7 +13,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/** Diese Klasse implementiert ein {@link ObjectArray} als modifizierbare Sicht auf einen Teil eines {@link CompactObjectArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ der Elemente. */
+	 * @param <GValue> Typ der Elemente. */
 	protected static class CompactObjectSubArray<GValue> extends CompactSubArray<CompactObjectArray<GValue>, GValue[], GValue> implements ObjectArray<GValue> {
 
 		/** Dieser Konstruktor initialisiert Besitzer und Indices.
@@ -28,8 +28,6 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 			throws NullPointerException, IndexOutOfBoundsException {
 			super(owner, startIndex, finalIndex);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -97,7 +95,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/** Diese Klasse implementiert die live {@link ObjectArraySection} eines {@link CompactObjectArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ der Elemente. */
+	 * @param <GValue> Typ der Elemente. */
 	protected static class CompactObjectArraySection<GValue> extends ObjectArraySection<GValue> {
 
 		/** Dieses Feld speichert den Besitzer. */
@@ -110,8 +108,6 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		public CompactObjectArraySection(final CompactObjectArray<GValue> owner) throws NullPointerException {
 			this.owner = Objects.assertNotNull(owner);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -149,7 +145,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/** Diese Klasse implementiert die live {@link ObjectArraySection} eines {@link CompactObjectArray.CompactObjectSubArray}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ der Elemente. */
+	 * @param <GValue> Typ der Elemente. */
 	protected static class CompactObjectSubArraySection<GValue> extends ObjectArraySection<GValue> {
 
 		/** Dieses Feld speichert den Besitzer. */
@@ -162,8 +158,6 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		public CompactObjectSubArraySection(final CompactObjectSubArray<GValue> owner) throws NullPointerException {
 			this.owner = Objects.assertNotNull(owner);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -197,8 +191,6 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert das {@code GValue}-Array. */
 	protected GValue[] array;
 
@@ -228,8 +220,6 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	public CompactObjectArray(final ArraySection<? extends GValue[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

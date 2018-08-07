@@ -25,8 +25,6 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 			super(owner, startIndex, finalIndex);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public IntegerArraySection section() {
@@ -106,8 +104,6 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -151,8 +147,6 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -178,8 +172,6 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert das {@code int}-Array. */
 	protected int[] array;
@@ -210,8 +202,6 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	public CompactIntegerArray(final ArraySection<int[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

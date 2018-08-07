@@ -65,8 +65,6 @@ public abstract class BEXNode {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den leeren {@link BEXNode} als undefinierten Knoten im {@link BEXFile#EMPTY}. */
 	public static final BEXNode EMPTY = new EmptyNode();
 
@@ -81,8 +79,6 @@ public abstract class BEXNode {
 
 	/** Dieses Feld speichert die Typkennung eines Textknoten. */
 	public static final int TEXT_NODE = 3;
-
-	{}
 
 	/** Diese Methode gibt den Identifikator dieses Knoten zurück.
 	 *
@@ -140,8 +136,6 @@ public abstract class BEXNode {
 	 *
 	 * @return Attributknotenliste. */
 	public abstract BEXList attributes();
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

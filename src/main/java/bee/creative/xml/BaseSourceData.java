@@ -40,8 +40,6 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	/** Dieses Feld speichert den System-Identifikator. */
 	String systemId;
 
-	{}
-
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
 	 * @param data Konfigurator oder {@code null}.
@@ -221,8 +219,6 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 		this.useSystemID(null);
 		return this.useSource(null);
 	}
-
-	{}
 
 	/** {@inheritDoc}
 	 *

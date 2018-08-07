@@ -17,8 +17,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	/** Dieses Feld speichert die Dezimalzahl {@code 0}. */
 	public static final FEMInteger EMPTY = new FEMInteger(0);
 
-	{}
-
 	/** Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
 	 *
 	 * @param value Wert.
@@ -63,8 +61,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		return context.dataFrom(value, FEMInteger.TYPE);
 	}
 
-	{}
-
 	/** Dieses Feld speichert die interne Darstellung der Dezimalzahl. */
 	final long value;
 
@@ -74,8 +70,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	public FEMInteger(final long value) {
 		this.value = value;
 	}
-
-	{}
 
 	/** Diese Methode gibt die interne Darstellung der Dezimalzahl zurück.
 	 *
@@ -116,8 +110,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	public final Long toNumber() {
 		return new Long(this.value);
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

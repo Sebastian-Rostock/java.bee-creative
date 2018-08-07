@@ -16,7 +16,7 @@ import bee.creative.fem.FEMArray;
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
 @SuppressWarnings ("javadoc")
- abstract class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
+abstract class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
 
 	/** Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Schlüssel einer {@link CompactMap} delegiert.
 	 *
@@ -34,8 +34,6 @@ import bee.creative.fem.FEMArray;
 			this.data = data;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -51,7 +49,7 @@ import bee.creative.fem.FEMArray;
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GKey> iterator() {
-			return new CompactMapKeyAscendingIterator<GKey>(this.data, 0, this.data.size());
+			return new CompactMapKeyAscendingIterator<>(this.data, 0, this.data.size());
 		}
 
 	}
@@ -70,8 +68,6 @@ import bee.creative.fem.FEMArray;
 		public CompactMapKeyAscendingIterator(final CompactMap<GKey, ?> map, final int from, final int last) {
 			super(map, from, last);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -95,8 +91,6 @@ import bee.creative.fem.FEMArray;
 		public CompactMapKeyDescendingIterator(final CompactMap<GKey, ?> map, final int from, final int last) {
 			super(map, from, last);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -123,8 +117,6 @@ import bee.creative.fem.FEMArray;
 			this.map = data;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Set<Entry<GKey, GValue>> entrySet() {
@@ -149,8 +141,6 @@ import bee.creative.fem.FEMArray;
 			this.data = data;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -166,7 +156,7 @@ import bee.creative.fem.FEMArray;
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GValue> iterator() {
-			return new CompactMapValueIterator<GValue>(this.data, 0, this.data.size());
+			return new CompactMapValueIterator<>(this.data, 0, this.data.size());
 		}
 
 	}
@@ -186,8 +176,6 @@ import bee.creative.fem.FEMArray;
 			super(map, from, last);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected V customNext(final int index) {
@@ -206,8 +194,6 @@ import bee.creative.fem.FEMArray;
 		/** Dieses Feld speichert die {@code SerialVersionUID}. */
 		private static final long serialVersionUID = -543360027933297926L;
 
-		{}
-
 		/** Dieses Feld speichert die {@link CompactMap}. */
 		protected final CompactMap<GKey, GValue> data;
 
@@ -219,8 +205,6 @@ import bee.creative.fem.FEMArray;
 			super(data.customGetKey(index), data.customGetValue(index));
 			this.data = data;
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -252,8 +236,6 @@ import bee.creative.fem.FEMArray;
 			this.data = data;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -269,7 +251,7 @@ import bee.creative.fem.FEMArray;
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<Entry<GKey, GValue>> iterator() {
-			return new CompactMapEntryIterator<GKey, GValue>(this.data, 0, this.data.size());
+			return new CompactMapEntryIterator<>(this.data, 0, this.data.size());
 		}
 
 	}
@@ -290,8 +272,6 @@ import bee.creative.fem.FEMArray;
 			super(map, from, last);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected Entry<GKey, V> customNext(final int index) {
@@ -299,8 +279,6 @@ import bee.creative.fem.FEMArray;
 		}
 
 	}
-
-	{}
 
 	/** Dieser Konstruktor initialisiert die {@link Map}. */
 	public CompactMap() {
@@ -329,8 +307,6 @@ import bee.creative.fem.FEMArray;
 		this.putAll(map);
 	}
 
-	{}
-
 	/** Diese Methode gibt den Schlüssel des {@code index}-ten Elements zurück.
 	 *
 	 * @param index Index.
@@ -355,10 +331,8 @@ import bee.creative.fem.FEMArray;
 	 * @param index Index.
 	 * @return {@code index}-tes Element */
 	protected final Entry<GKey, GValue> defaultGetEntry(final int index) {
-		return new CompactMapEntry<GKey, GValue>(this, index);
+		return new CompactMapEntry<>(this, index);
 	}
-
-	{}
 
 	/** Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses Elements oder
 	 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden müsste.
@@ -391,19 +365,19 @@ import bee.creative.fem.FEMArray;
 	/** {@inheritDoc} */
 	@Override
 	public final Collection<GValue> values() {
-		return new CompactMapValues<GValue>(this);
+		return new CompactMapValues<>(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final Set<GKey> keySet() {
-		return new CompactMapKeys<GKey>(this);
+		return new CompactMapKeys<>(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final Set<Entry<GKey, GValue>> entrySet() {
-		return new CompactMapEntries<GKey, GValue>(this);
+		return new CompactMapEntries<>(this);
 	}
 
 	/** {@inheritDoc} */
@@ -456,7 +430,7 @@ import bee.creative.fem.FEMArray;
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		return new CompactMapItems<GKey, GValue>(this).hashCode();
+		return new CompactMapItems<>(this).hashCode();
 	}
 
 	/** {@inheritDoc} */
@@ -464,13 +438,13 @@ import bee.creative.fem.FEMArray;
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof Map<?, ?>)) return false;
-		return new CompactMapItems<GKey, GValue>(this).equals(object);
+		return new CompactMapItems<>(this).equals(object);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return new CompactMapItems<GKey, GValue>(this).toString();
+		return new CompactMapItems<>(this).toString();
 	}
 
 }

@@ -28,8 +28,6 @@ public final class XMLEvaluator {
 			return XMLEvaluator.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final XPathData customThis() {
@@ -57,8 +55,6 @@ public final class XMLEvaluator {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert des Basisknoten. */
 	Node base;
 
@@ -70,8 +66,6 @@ public final class XMLEvaluator {
 
 	/** Dieses Feld speichert den Cache für {@link #compile(String)}. */
 	final CacheData cacheData = new CacheData();
-
-	{}
 
 	/** Diese Methode gibt den Basisknoten zurück, auf den sich die Pfadangaben beziehen.
 	 *
@@ -236,8 +230,6 @@ public final class XMLEvaluator {
 	public final XPathData openXpathData() {
 		return this.xpathData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

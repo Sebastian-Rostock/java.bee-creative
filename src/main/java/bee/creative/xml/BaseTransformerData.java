@@ -94,8 +94,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final PropertyData<GOwner> customThis() {
@@ -115,8 +113,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeParameterData();
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -138,8 +134,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		 * @return Besitzer. */
 		public abstract GOwner closeTemplatesData();
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final TemplatesData<GOwner> customThis() {
@@ -147,8 +141,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert den {@link Transformer}. */
 	Transformer transformer;
@@ -182,8 +174,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -277,8 +267,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	public final TemplatesData<GThis> openTemplatesData() {
 		return this.templatesData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

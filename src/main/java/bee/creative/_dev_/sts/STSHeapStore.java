@@ -8,17 +8,17 @@ import bee.creative.iam.IAMMapping;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen {@link STSStore Graphspeicher}, der seine Daten im Arbeitsspeicher verwaltet.
- * 
+ *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class STSHeapStore extends STSStore {
 
-	public static void main(String[] args) throws Exception {
-		STSHeapStore store = new STSHeapStore();
+	public static void main(final String[] args) throws Exception {
+		final STSHeapStore store = new STSHeapStore();
 
-		STSNode p = store.putNode(FEMBinary.from("0x4657"));
-		STSNode s = store.putNode(FEMBinary.from("0x1234"));
-		STSNode o = store.putNode(FEMBinary.from("0x89AB"));
-		STSNode x = store.putNode(FEMBinary.from("0xCDEF"));
+		final STSNode p = store.putNode(FEMBinary.from("0x4657"));
+		final STSNode s = store.putNode(FEMBinary.from("0x1234"));
+		final STSNode o = store.putNode(FEMBinary.from("0x89AB"));
+		final STSNode x = store.putNode(FEMBinary.from("0xCDEF"));
 		store.putEdge(s, p, o);
 		store.putEdge(s, p, x);
 
@@ -29,8 +29,6 @@ public final class STSHeapStore extends STSStore {
 	}
 
 	static int[] emptyEdges = {0};
-
-	{}
 
 	int edgeCount = 0;
 
@@ -57,8 +55,6 @@ public final class STSHeapStore extends STSStore {
 	int[][] nodeSubjectEdges = new int[8][];
 
 	int[][] nodePredicateEdges = new int[8][];
-
-	{}
 
 	/** Diese Methode reserviert Speicher für die gegebene Anzahl an Kanten.
 	 *
@@ -184,8 +180,6 @@ public final class STSHeapStore extends STSStore {
 		edges[0] = count;
 		edges[count] = edgeIndex;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

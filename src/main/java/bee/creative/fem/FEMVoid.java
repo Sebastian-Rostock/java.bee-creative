@@ -14,8 +14,6 @@ public final class FEMVoid extends FEMValue {
 	/** Dieses Feld speichert den Leerwert. */
 	public static final FEMVoid INSTANCE = new FEMVoid();
 
-	{}
-
 	/** Diese Methode gibt den Leerwert nur dann zurück, wenn die gegebenen Zeichenkette gleich {@code "void"} ist.
 	 *
 	 * @param value Zeichenkette.
@@ -37,13 +35,9 @@ public final class FEMVoid extends FEMValue {
 		return context.dataFrom(value, FEMVoid.TYPE);
 	}
 
-	{}
-
 	@SuppressWarnings ("javadoc")
 	FEMVoid() {
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

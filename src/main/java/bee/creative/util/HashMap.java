@@ -14,12 +14,10 @@ import java.util.Map;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
-public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> implements Serializable {
+public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> implements Serializable, Cloneable {
 
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -8792297171308603896L;
-
-	{}
 
 	/** Diese Methode gibt eine neue {@link HashMap} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
 	 *
@@ -57,8 +55,6 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		};
 	}
 
-	{}
-
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
 
@@ -84,8 +80,6 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		this.putAll(source);
 	}
 
-	{}
-
 	@SuppressWarnings ({"javadoc", "unchecked"})
 	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		final int count = stream.readInt();
@@ -105,8 +99,6 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 			stream.writeObject(entry.getValue());
 		}
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

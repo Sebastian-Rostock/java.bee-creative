@@ -29,8 +29,6 @@ public final class XMLFormatter {
 			return XMLFormatter.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final SourceData customThis() {
@@ -52,8 +50,6 @@ public final class XMLFormatter {
 			return XMLFormatter.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final ResultData customThis() {
@@ -74,8 +70,6 @@ public final class XMLFormatter {
 			return XMLFormatter.this;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected final TransformerData customThis() {
@@ -83,8 +77,6 @@ public final class XMLFormatter {
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
 	final SourceData sourceData = new SourceData();
@@ -94,8 +86,6 @@ public final class XMLFormatter {
 
 	/** Dieses Feld speichert den Konfigurator {@link #openTransformerData()}. */
 	final TransformerData transformerData = new TransformerData();
-
-	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -175,8 +165,6 @@ public final class XMLFormatter {
 	public final TransformerData openTransformerData() {
 		return this.transformerData;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

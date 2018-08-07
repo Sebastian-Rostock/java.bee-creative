@@ -60,8 +60,6 @@ public class Tester {
 			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
 		}
 
-		{}
-
 		/** Diese Methode aktiviert die periodische Messung.
 		 *
 		 * @see #start() */
@@ -78,8 +76,6 @@ public class Tester {
 				this.join();
 			} catch (final InterruptedException e) {}
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -105,8 +101,6 @@ public class Tester {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
 	public static final Comparator<Tester> USED_TIME_ORDER = new Comparator<Tester>() {
 
@@ -126,8 +120,6 @@ public class Tester {
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode ist eine Abkürzung für liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen
 	 * Tester.
@@ -177,8 +169,6 @@ public class Tester {
 		}
 		return new Tester(usedTime, usedMemory);
 	}
-
-	{}
 
 	/** Dieses Feld speichert die Rechenzeit in Nanosekunden, die von der Testmethode benötigt wurde.
 	 *
@@ -293,8 +283,6 @@ public class Tester {
 		this.leaveMemory = leaveMemory;
 		this.cause = cause;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

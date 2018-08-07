@@ -38,8 +38,6 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 		return this;
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected GItem customGetValue(final int entryIndex) {

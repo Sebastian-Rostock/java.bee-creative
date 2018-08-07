@@ -9,8 +9,6 @@ class MMFArrayUN2 extends MMFArraySN2 {
 		super(length, buffer, offset);
 	}
 
-	{}
-
 	@Override
 	public MMFArray toINT16() {
 		return new MMFArraySN2(this.length, this.buffer, this.offset);

@@ -19,8 +19,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 			super(store);
 		}
 
-		{}
-
 		@Override
 		protected ItemIndex customIndex() {
 			return new SequenceIndex(this.store.customGetEdgeIndex(), this.store.customGetEdgeCount());
@@ -65,8 +63,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 			this.edge = node;
 		}
 
-		{}
-
 		@Override
 		protected ItemIndex customIndex() {
 			return new SequenceIndex(this.edge.index, 1);
@@ -95,8 +91,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 		public EmptyEdgeSet(final STSStore store) {
 			super(store);
 		}
-
-		{}
 
 		@Override
 		protected ItemIndex customIndex() {
@@ -143,8 +137,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 			this.items = items;
 		}
 
-		{}
-
 		@Override
 		protected ItemIndex customIndex() {
 			return new ArrayIndex(this.items);
@@ -179,8 +171,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 			this.items1 = items1;
 			this.items2 = items2;
 		}
-
-		{}
 
 		@Override
 		protected ItemIndex customIndex() {
@@ -217,8 +207,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 			this.items2 = items2;
 		}
 
-		{}
-
 		@Override
 		protected ItemIndex customIndex() {
 			return new IntersectionIndex(this.items1.customIndex(), this.items2.customIndex());
@@ -241,13 +229,9 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
 	}
 
-	{}
-
 	protected STSEdgeSet(final STSStore store) {
 		super(store);
 	}
-
-	{}
 
 	/** Diese Methode gibt die Vereinigungsmenge dieser und der gegebenen Menge zurück.
 	 *
@@ -270,8 +254,6 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 		if (this.store == that.store) return new IntersectionEdgeSet(this, that);
 		throw new IllegalArgumentException();
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

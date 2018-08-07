@@ -23,8 +23,6 @@ public abstract class MMFArray extends IAMArray {
 	/** Dieses Feld speichert die zur nativen umgekehrte Bytereihenfolge. */
 	protected static final ByteOrder REVERSE_ORDER = MMFArray.NATIVE_ORDER == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
 
-	{}
-
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link MMFArray} und gibt dieses zurück.<br>
 	 * Wenn das Objekt ein {@link MMFArray} ist, wird dieses geliefert. Wenn es ein {@link ByteBuffer} ist, wird dazu eine {@link #toINT8() INT8}-Sicht erzeugt.
 	 * Andernfalls wird das Objekt in einen {@link ByteBuffer} {@link IO#inputBufferFrom(Object) überführt}.
@@ -39,14 +37,10 @@ public abstract class MMFArray extends IAMArray {
 		return new MMFArraySN1(Math.min(buffer.limit(), 1073741823), buffer, 0);
 	}
 
-	{}
-
 	@SuppressWarnings ("javadoc")
 	protected MMFArray(final int length) {
 		super(length);
 	}
-
-	{}
 
 	/** Diese Methode gibt die Bytereihenfolge zur Interpretation des internen {@link ByteBuffer} bzw. {@link MappedBuffer} zurück.
 	 *
@@ -95,8 +89,6 @@ public abstract class MMFArray extends IAMArray {
 	 * @see #withOrder(ByteOrder)
 	 * @return {@link MMFArray}. */
 	public abstract MMFArray withReverseOrder();
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

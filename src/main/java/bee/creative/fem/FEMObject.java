@@ -22,8 +22,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	/** Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind. */
 	public static final FEMObject EMPTY = new FEMObject(0, (short)0, (short)0);
 
-	{}
-
 	/** Diese Methode gibt eine neue Referenz mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
 	 *
@@ -83,8 +81,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		if (value > 65535) throw new IllegalArgumentException();
 	}
 
-	{}
-
 	@SuppressWarnings ("javadoc")
 	final int refValue;
 
@@ -109,8 +105,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		this.typeValue = typeValue;
 		this.ownerValue = ownerValue;
 	}
-
-	{}
 
 	/** Diese Methode gibt die interne Darstellung der Referenz zurück.
 	 * <p>
@@ -211,8 +205,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		if (result != 0) return result;
 		return Comparators.compare(this.typeValue(), that.typeValue());
 	}
-
-	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override

@@ -38,8 +38,6 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 		this.context = context;
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public final GContext context() {

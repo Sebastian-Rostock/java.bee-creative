@@ -25,8 +25,6 @@ public class Iterators {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den leeren {@link Iterator}. */
 	public static final Iterator<?> EMPTY_ITERATOR = new BaseIterator<Object>() {
 
@@ -51,8 +49,6 @@ public class Iterators {
 		}
 
 	};
-
-	{}
 
 	/** Diese Methode gibt das {@code index}-te Elemente des gegebenen {@link Iterator} zurück.
 	 *

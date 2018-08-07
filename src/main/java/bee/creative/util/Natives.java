@@ -33,8 +33,6 @@ public class Natives {
 
 	};
 
-	{}
-
 	/** Diese Methode gibt das native Objekt zur gegebenen Pfadangabe zurück.<br>
 	 * Die Pfadangabe kodiert hierbei eine Klasse, eine Methode, einen Konstruktor oder ein Datenfeld. Die folgenden Pfadangaben werden unterstützt:
 	 * <dl>

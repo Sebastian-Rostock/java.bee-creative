@@ -25,8 +25,6 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 			super(owner, startIndex, finalIndex);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public ByteArraySection section() {
@@ -106,8 +104,6 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -151,8 +147,6 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int size() {
@@ -178,8 +172,6 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		}
 
 	}
-
-	{}
 
 	/** Dieses Feld speichert das {@code byte}-Array. */
 	protected byte[] array;
@@ -210,8 +202,6 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	public CompactByteArray(final ArraySection<byte[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

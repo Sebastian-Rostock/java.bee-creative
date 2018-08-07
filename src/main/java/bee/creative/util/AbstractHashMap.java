@@ -8,7 +8,6 @@ import java.util.Set;
  * <p>
  * <b>Achtung:</b> Die Ermittlung von {@link Object#hashCode() Streuwerte} und {@link Object#equals(Object) Äquivalenz} der Schlüssel erfolgt nicht wie in
  * {@link Map} beschrieben über die Methoden der Schlüssel, sondern über die Methoden {@link #customHash(Object)} bzw. {@link #customEqualsKey(int, Object)}.
- * 
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://cureativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
@@ -39,8 +38,6 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 		this.allocateImpl(this.countImpl());
 		return this;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

@@ -29,8 +29,6 @@ import bee.creative.util.Objects;
 
 class ListData<GKey, GValue> {
 
-	{}
-
 	private static final int[] EMPTY_PAGES = {2, 2, -1, -1};
 
 	/** Dieses Feld speichert den initialwert für {@link #keys} und {@link #values}. */
@@ -46,8 +44,6 @@ class ListData<GKey, GValue> {
 	private static final Object HI_OBJECT = new Object();
 
 	private static final Object LO_OBJECT = new Object();
-
-	{}
 
 	@SuppressWarnings ("javadoc")
 	private static void clearObjects(final Object[] array) {
@@ -119,8 +115,6 @@ class ListData<GKey, GValue> {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert eine Auflistung von Bereichen, welche die mit Nutzdaten belegten Abschnitte von {@link #pages} und {@link #keys} kennzeichnen. Jeder
 	 * Bereich besteht aus zwei Positionswerten. Der erste Bereichen nennt den Abschnitt von {@link #pages}, der die nicht leere Bereiche in {@link #keys}
 	 * verwaltet. Diesem folgt ein stets leerer Bereich. */
@@ -138,8 +132,6 @@ class ListData<GKey, GValue> {
 	public ListData(final boolean withValues) {
 		this.values = withValues ? ListData.EMPTY_OBJECTS : null;
 	}
-
-	{}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
 	 *
@@ -699,10 +691,6 @@ class ListData<GKey, GValue> {
 		return Comparators.compare((Comparable)thisKey, (Comparable)thatKey);
 	}
 
-	{}
-	{}
-	{}
-
 	@SuppressWarnings ("javadoc")
 	protected static class TreeEntry<GKey, GValue> implements Entry<GKey, GValue> {
 
@@ -714,8 +702,6 @@ class ListData<GKey, GValue> {
 			this.entryData = entryData;
 			this.entryIndex = entryIndex;
 		}
-
-		{}
 
 		@Override
 		public GKey getKey() {
@@ -826,8 +812,6 @@ class ListData<GKey, GValue> {
 			throw new UnsupportedOperationException();
 		}
 
-		{}
-
 		@Override
 		public boolean hasNext() {
 			return this.nodeIndex >= 0;
@@ -843,8 +827,6 @@ class ListData<GKey, GValue> {
 		public Keys(final ListData<GKey, ?> entryData) {
 			this.entryData = entryData;
 		}
-
-		{}
 
 		@Override
 		public int size() {
@@ -981,8 +963,6 @@ class ListData<GKey, GValue> {
 			super(entryData);
 		}
 
-		{}
-
 		@Override
 		public GKey next() {
 			return this.nextKey();
@@ -1001,8 +981,6 @@ class ListData<GKey, GValue> {
 		public KeysIteratorD(final ListData<GKey, GValue> entryData) {
 			super(entryData);
 		}
-
-		{}
 
 		@Override
 		public GKey next() {
@@ -1024,8 +1002,6 @@ class ListData<GKey, GValue> {
 		public Values(final ListData<?, GValue> entryData) {
 			this.entryData = entryData;
 		}
-
-		{}
 
 		@Override
 		public int size() {
@@ -1061,8 +1037,6 @@ class ListData<GKey, GValue> {
 			super(entryData);
 		}
 
-		{}
-
 		@Override
 		public GValue next() {
 			return this.nextValue();
@@ -1083,8 +1057,6 @@ class ListData<GKey, GValue> {
 		public Entries(final ListData<GKey, GValue> entryData) {
 			this.entryData = entryData;
 		}
-
-		{}
 
 		@Override
 		public int size() {
@@ -1124,8 +1096,6 @@ class ListData<GKey, GValue> {
 			super(entryData);
 		}
 
-		{}
-
 		@Override
 		public Entry<GKey, GValue> next() {
 			return this.nextEntry();
@@ -1146,8 +1116,6 @@ class ListData<GKey, GValue> {
 		public Mapping(final ListData<GKey, GValue> entryData) {
 			this.entryData = entryData;
 		}
-
-		{}
 
 		@Override
 		public int size() {
@@ -1325,8 +1293,6 @@ class ListData<GKey, GValue> {
 		}
 
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

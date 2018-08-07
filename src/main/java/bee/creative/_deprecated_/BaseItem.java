@@ -28,8 +28,6 @@ public abstract class BaseItem implements Item {
 
 		};
 
-	{}
-
 	/** Diese Methode gibt die {@link Assigner} zurück, die in {@link #assign(Assignment)} zur Übertragung der Informatioenen des gegebenen {@link Item} auf
 	 * dieses {@link Item} verwendet werden.
 	 * <p>
@@ -45,8 +43,6 @@ public abstract class BaseItem implements Item {
 		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.navigatedIterable(BaseItem.FIELD_AS_ASSIGNER, //
 			thisType.is(thatType) ? thatType.fields() : thatType.is(thisType) ? thisType.fields() : Iterables.<Field<?, ?>>emptyIterable()));
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

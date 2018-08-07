@@ -64,8 +64,6 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final short[] array) {

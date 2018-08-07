@@ -54,8 +54,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 			this.array = indexArray.array();
 		}
 
-		{}
-
 		@Override
 		public int next() {
 			final int next = this.index;
@@ -78,8 +76,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 			this.next1 = index1.next();
 			this.next2 = index2.next();
 		}
-
-		{}
 
 		@Override
 		public int next() {
@@ -111,8 +107,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 			this.limit = index + count;
 		}
 
-		{}
-
 		@Override
 		public int next() {
 			final int next = this.index;
@@ -135,8 +129,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 			this.index2 = index2;
 		}
 
-		{}
-
 		@Override
 		public int next() {
 			int next1 = this.index1.next(), next2 = this.index2.next();
@@ -152,8 +144,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 		}
 
 	}
-
-	{}
 
 	/** Diese Methode gibt {@link #minSize()} der Vereinigungsmenge der gegebenen Mengen zurück. */
 	protected static int unionMinSizeImpl(final STSItemSet<?> items1, final STSItemSet<?> items2) {
@@ -175,16 +165,12 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 		return Math.min(items1.maxSize(), items2.maxSize());
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Graphspeicher, der die Elemente dieser Menge verwaltet. */
 	protected final STSStore store;
 
 	protected STSItemSet(final STSStore store) {
 		this.store = store;
 	}
-
-	{}
 
 	protected final boolean containsImpl(final IntegerArraySection items, final STSItem item) {
 		if (!this.store.contains(item)) return false;
@@ -229,8 +215,6 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	 *
 	 * @return maximale Datensatzanzahl. */
 	public abstract int maxSize();
-
-	{}
 
 	/** Diese Methode gibt die Anzahl der Datensätze in dieser Menge zurück. Wenn sich deren {@link #maxSize() Obergrenze} und {@link #minSize() Untergrenze}
 	 * unterscheiden, musss zu deren Ermittlung über die Datensätze dieser Menge {@link #iterator() iteriert} werden.

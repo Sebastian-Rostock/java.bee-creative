@@ -53,8 +53,6 @@ public class IAMBuilder {
 		/** Dieses Feld speichert die gesammelten Nutzdaten. */
 		public final List<GData> datas = new ArrayList<>();
 
-		{}
-
 		/** Diese Methode nimmt einen neuen Nutzdatensatz mit der gegebenen Zahlenliste in die Verwaltung auf und gibt den Index zurück, unter dem diese in
 		 * {@link #datas} verwaltet werden.
 		 *
@@ -79,8 +77,6 @@ public class IAMBuilder {
 		 * @param array Zahlenliste.
 		 * @return Nutzdatensatz. */
 		protected abstract GData customBuild(int index, int[] array);
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -150,8 +146,6 @@ public class IAMBuilder {
 		public IAMIndexBuilder() {
 		}
 
-		{}
-
 		/** Diese Methode fügt das gegebene {@link IAMMapping} hinzu und gibt den Index zurück, unter dem dieses verwaltet wird.
 		 *
 		 * @param mapping {@link IAMMapping}.
@@ -179,8 +173,6 @@ public class IAMBuilder {
 			this.mappings.clear();
 			this.listings.clear();
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -221,8 +213,6 @@ public class IAMBuilder {
 		/** Dieser Konstruktor initialisiert einen leeren {@link IAMListingBuilder}. */
 		public IAMListingBuilder() {
 		}
-
-		{}
 
 		/** Diese Methode gibt das modifizierbare {@code int}-Array des {@code itemIndex}-te Elements zurück.<br>
 		 * Dieses Array sollte nur dann verändert werden, wenn es über {@link #put(int[], boolean)} ohne Wiederverwendung hunzugefügt wurde.
@@ -268,8 +258,6 @@ public class IAMBuilder {
 			this.items.clear();
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final IAMArray item(final int itemIndex) {
@@ -300,8 +288,6 @@ public class IAMBuilder {
 		/** Dieser Konstruktor initialisiert einen leeren {@link IAMMappingBuilder}. */
 		public IAMMappingBuilder() {
 		}
-
-		{}
 
 		/** Diese Methode gibt das modifizierbare {@code int}-Array des Werts des {@code entryIndex}-ten Eintrags zurück.
 		 *
@@ -345,8 +331,6 @@ public class IAMBuilder {
 			this.entries.clear();
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final IAMArray key(final int entryIndex) {
@@ -377,8 +361,6 @@ public class IAMBuilder {
 		}
 
 	}
-
-	{}
 
 	/** Diese Methode gibt den Streuwert der gegebenen Zahlenfolge zurück.
 	 *

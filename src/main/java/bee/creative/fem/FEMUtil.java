@@ -141,8 +141,6 @@ public abstract class FEMUtil {
 
 	}, "repeat", "REPEAT");
 
-	{}
-
 	/** Diese Methode gibt die via {@link #put(FEMFunction, String...)} unter dem gegebenen Namen registrierte Funktion bzw. {@code null} zurück.<br>
 	 * Sie ist eine Abkürzung für {@code INSTANCES.get(name)}.
 	 *

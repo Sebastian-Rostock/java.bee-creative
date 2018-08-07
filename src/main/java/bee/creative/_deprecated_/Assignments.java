@@ -38,8 +38,6 @@ public class Assignments {
 			this.source = source;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final GSource value() {
@@ -117,8 +115,6 @@ public class Assignments {
 		/** Dieses Feld speichert die in {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} gesammelten
 		 * {@link Entry}. */
 		final List<Assignable<Object>> assignables = new LinkedList<>();
-
-		{}
 
 		/** Diese Methode gibt {@code null} zurück. */
 		@Override
@@ -210,8 +206,6 @@ public class Assignments {
 		}
 
 	}
-
-	{}
 
 	@SuppressWarnings ("javadoc")
 	static <GObject> Assignable<Object> assignable(final GObject source, final Assignable<? super GObject> target) {

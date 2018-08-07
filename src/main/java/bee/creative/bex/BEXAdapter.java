@@ -50,8 +50,6 @@ public class BEXAdapter {
 			this.parent = Objects.assertNotNull(parent);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public String getNamespaceURI() {
@@ -148,8 +146,6 @@ public class BEXAdapter {
 			return this.equals(object);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
@@ -186,8 +182,6 @@ public class BEXAdapter {
 		public BEXTextAdapter(final BEXNode node, final Node parent) throws NullPointerException {
 			super(node, parent);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -307,8 +301,6 @@ public class BEXAdapter {
 			return true;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
@@ -352,8 +344,6 @@ public class BEXAdapter {
 			}
 		}
 
-		{}
-
 		/** Dieser Konstruktor initialisiert {@link BEXNode} und Elternknoten.
 		 *
 		 * @param node {@link BEXNode}.
@@ -362,8 +352,6 @@ public class BEXAdapter {
 		public BEXElemAdapter(final BEXNode node, final Node parent) throws NullPointerException {
 			super(node, parent);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -581,8 +569,6 @@ public class BEXAdapter {
 			return this.equals(object);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
@@ -734,8 +720,6 @@ public class BEXAdapter {
 		static final List<String> defaultParameterListFalse = Collections.unmodifiableList(Arrays.asList("cdata-sections", "entities", "split-cdata-sections",
 			"validate", "infoset", "normalize-characters", "canonical-form", "validate-if-schema", "check-character-normalization"));
 
-		{}
-
 		/** Dieser Konstruktor initialisiert das {@link BEXFile}.
 		 *
 		 * @param file {@link BEXFile}.
@@ -743,8 +727,6 @@ public class BEXAdapter {
 		public BEXDocuAdapter(final BEXFile file) throws NullPointerException {
 			super(file.root());
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -1044,8 +1026,6 @@ public class BEXAdapter {
 			return null;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
@@ -1084,8 +1064,6 @@ public class BEXAdapter {
 		public BEXNodeAdapter(final BEXNode node) throws NullPointerException {
 			this.node = Objects.assertNotNull(node);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -1287,8 +1265,6 @@ public class BEXAdapter {
 			this.parent = parent;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Node getParentNode() {
@@ -1337,8 +1313,6 @@ public class BEXAdapter {
 			this.list = Objects.assertNotNull(list);
 			this.parent = Objects.assertNotNull(parent);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -1392,8 +1366,6 @@ public class BEXAdapter {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public String toString() {
@@ -1427,8 +1399,6 @@ public class BEXAdapter {
 			this.parent = Objects.assertNotNull(parent);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Node item(final int index) {
@@ -1443,8 +1413,6 @@ public class BEXAdapter {
 		public int getLength() {
 			return this.list.length();
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -1529,8 +1497,6 @@ public class BEXAdapter {
 			}
 		}
 
-		{}
-
 		/** Dieses Feld speichert die gesuchte {@link BEXNode#uri()} oder {@code "*"}. */
 		protected final String uri;
 
@@ -1553,7 +1519,7 @@ public class BEXAdapter {
 		public BEXElemCollector(final BEXNodeAdapter node, final String uri, final String name, final boolean self) throws NullPointerException {
 			this.uri = Objects.assertNotNull(uri);
 			this.name = Objects.assertNotNull(name);
-			this.list = new ArrayList<Node>();
+			this.list = new ArrayList<>();
 			if ("*".equals(uri)) {
 				if ("*".equals(name)) {
 					this.collectElements(node, self);
@@ -1570,8 +1536,6 @@ public class BEXAdapter {
 			this.size = this.list.size();
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public Node item(final int index) {
@@ -1586,8 +1550,6 @@ public class BEXAdapter {
 		}
 
 	}
-
-	{}
 
 	/** Diese Methode gibt das gegebene {@link BEXFile} als {@link Document} zurück.
 	 *

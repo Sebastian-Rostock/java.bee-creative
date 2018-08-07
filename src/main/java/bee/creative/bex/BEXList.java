@@ -46,8 +46,6 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert die leere {@link BEXList} als undefinierte Knotenliste im {@link BEXFile#EMPTY}. */
 	public static final BEXList EMPTY = new EmptyList();
 
@@ -59,8 +57,6 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 
 	/** Dieses Feld speichert die Typkennung einer Attributknotenliste. */
 	public static final int ATTR_LIST = 2;
-
-	{}
 
 	/** Diese Methode gibt den Identifikator dieser Knotenliste zurück.
 	 *
@@ -118,8 +114,6 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 	 *
 	 * @return Elternknoten. */
 	public abstract BEXNode parent();
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

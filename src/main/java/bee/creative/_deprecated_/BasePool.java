@@ -124,8 +124,6 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	 * @param item {@link Item}. */
 	protected abstract void doUpdate(final GItem item);
 
-	{}
-
 	/** {@inheritDoc}
 	 *
 	 * @see #find(Field, Object, int) */
@@ -140,7 +138,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	 * @see FilteredSelection */
 	@Override
 	public <GValue> GItem find(final Field<? super GItem, ? extends GValue> field, final GValue value, final int states) throws NullPointerException {
-		return new FilteredSelection<GItem>(this.items(states)).find(field, value);
+		return new FilteredSelection<>(this.items(states)).find(field, value);
 	}
 
 	/** {@inheritDoc}
@@ -158,7 +156,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	@Override
 	public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value, final int states)
 		throws NullPointerException {
-		return new FilteredSelection<GItem>(this.items(states)).findAll(field, value);
+		return new FilteredSelection<>(this.items(states)).findAll(field, value);
 	}
 
 	/** {@inheritDoc} Diese entspricht der des {@link #type()}. */

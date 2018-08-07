@@ -20,8 +20,6 @@ public final class IAMException extends RuntimeException {
 	/** Dieses Feld identifiziert die Ausnahme bei der Erkennugn einer unbekannten Datentypkennung oder Datenstruktur. */
 	public static final int INVALID_HEADER = 8;
 
-	{}
-
 	/** Dieses Feld speichert die Kennungen der Fehlerursache. */
 	final int code;
 
@@ -35,8 +33,6 @@ public final class IAMException extends RuntimeException {
 	public IAMException(final int code) {
 		this.code = code;
 	}
-
-	{}
 
 	/** Diese Methode gibt die Kennungen der Fehlerursachen zurück.
 	 *

@@ -25,8 +25,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		/** Dieses Feld speichert den leeren Bereich, dessen Komponenten alle {@code 0} sind. */
 		public static final Token EMPTY = new Token((char)0, 0, 0);
 
-		{}
-
 		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Token#end() Endposition}en mit der gegebenen Position vergleicht.
 		 * Der Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position
 		 * kleiner, gleich bzw. größer der {@link Token#end() Endposition} eines gegebenen Bereichs ist.
@@ -89,8 +87,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 			};
 		}
 
-		{}
-
 		/** Dieses Feld speichert den Typ des Bereichs. */
 		final char type;
 
@@ -112,8 +108,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 			this.offset = offset;
 			this.length = length;
 		}
-
-		{}
 
 		/** Diese Methode gibt den Typ des Bereichs zurück.
 		 *
@@ -197,8 +191,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 			return new Token(type, this.offset, this.length);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public final int compareTo(final Token value) {
@@ -228,12 +220,8 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den leeren Quelltext ohne Bereiche. */
 	public static final FEMScript EMPTY = new FEMScript(0, "", new Token[0]);
-
-	{}
 
 	/** Diese Methode gibt einen aufbereiteten Quelltext mit den gegebenen Eigenschaften zurück.
 	 *
@@ -281,8 +269,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		FEMScript.checkSource(source, tokens);
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Quelltextmodus. */
 	final int mode;
 
@@ -298,8 +284,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		this.source = source;
 		this.tokens = tokens;
 	}
-
-	{}
 
 	/** Diese Methode gibt die Verkettung der {@link Token#type() Typen} der {@link #tokens() Bereiche} als Zeichenkette zurück.
 	 *
@@ -420,8 +404,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	public final FEMScript withTokens(final List<Token> tokens) throws NullPointerException, IllegalArgumentException {
 		return this.withTokens(tokens.toArray(new Token[tokens.size()]));
 	}
-
-	{}
 
 	/** Diese Methode gibt den {@code index}-ten Bereich zurück. */
 	@Override

@@ -22,8 +22,6 @@ public final class FEMNative extends FEMValue {
 	/** Dieses Feld speichert den Wert zu {@code false}. */
 	public static final FEMNative FALSE = new FEMNative(Boolean.FALSE);
 
-	{}
-
 	/** Diese Methode gibt das native Objekt als Wert zurück.<br>
 	 * Wenn das Objekt bereits ein {@link FEMNative} ist, wird dieses geliefert.
 	 *
@@ -36,8 +34,6 @@ public final class FEMNative extends FEMValue {
 		if (data instanceof FEMNative) return (FEMNative)data;
 		return new FEMNative(data);
 	}
-
-	{}
 
 	/** Dieses Feld speichert das native Objekt. */
 	final Object data;
@@ -66,8 +62,6 @@ public final class FEMNative extends FEMValue {
 		if (this == that) return true;
 		return Objects.equals(this.data, that.data);
 	}
-
-	{}
 
 	/** Diese Methode gibt das native Objekt zurück. */
 	@Override

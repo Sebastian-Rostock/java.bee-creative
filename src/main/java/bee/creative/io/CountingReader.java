@@ -17,14 +17,10 @@ public class CountingReader extends FilterReader {
 		super(reader);
 	}
 
-	{}
-
 	/** Diese Methode gibt die Anzahl der gelesenen bzw. ausgelassenen Zeichen zurück. */
 	public long readCount() {
 		return this.readCount;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

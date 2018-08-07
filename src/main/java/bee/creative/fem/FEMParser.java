@@ -14,8 +14,6 @@ public final class FEMParser extends Parser {
 	/** Dieses Feld speichert die bisher ermittelten Bereiche. */
 	final List<Token> tokens = new ArrayList<>();
 
-	{}
-
 	/** Diese Methode gibt die Auflistung aller {@link #putToken(Token) erfassten Bereiche} zurück.
 	 *
 	 * @return Bereichsliste. */

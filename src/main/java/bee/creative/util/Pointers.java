@@ -52,8 +52,6 @@ public class Pointers {
 			this.data = data;
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public GData data() {
@@ -76,8 +74,6 @@ public class Pointers {
 		public WeakPointer(final GData data) {
 			super(data);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -121,8 +117,6 @@ public class Pointers {
 			super(data);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		public GData data() {
@@ -149,8 +143,6 @@ public class Pointers {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link HardPointer}. Die Referenz auf den Datensatz
 	 * eines solcher {@link Pointer} wird nicht automatisch aufgelöst. */
 	public static final int HARD = 0;
@@ -166,8 +158,6 @@ public class Pointers {
 
 	/** Dieses Feld speichert den {@link Pointer} auf {@code null}. */
 	static final Pointer<?> NULL = new HardPointer<>(null);
-
-	{}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link Pointer} zurück.
 	 *

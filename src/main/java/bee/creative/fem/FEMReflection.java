@@ -45,8 +45,6 @@ public abstract class FEMReflection extends FEMFunction {
 			this.field = field;
 		}
 
-		{}
-
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
 			try {
@@ -86,8 +84,6 @@ public abstract class FEMReflection extends FEMFunction {
 			this.method = method;
 		}
 
-		{}
-
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
 			try {
@@ -120,8 +116,6 @@ public abstract class FEMReflection extends FEMFunction {
 			this.constructor = constructor;
 		}
 
-		{}
-
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
 			try {
@@ -153,8 +147,6 @@ public abstract class FEMReflection extends FEMFunction {
 		InstanceField(final Field field) {
 			this.field = field;
 		}
-
-		{}
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
@@ -197,8 +189,6 @@ public abstract class FEMReflection extends FEMFunction {
 			this.method = method;
 		}
 
-		{}
-
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
 			try {
@@ -222,8 +212,6 @@ public abstract class FEMReflection extends FEMFunction {
 		}
 
 	}
-
-	{}
 
 	/** Diese Methode gibt die native Funktion zur gegebenen Pfadangabe zurück.<br>
 	 * Die Pfadangabe kodiert hierbei eine Funktion, die eine Klasse liefert, an eine Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw.
@@ -282,8 +270,6 @@ public abstract class FEMReflection extends FEMFunction {
 		return result;
 	}
 
-	{}
-
 	/** Diese Methode gibt den {@link Member} zurück, auf den sich die Methode {@link #invoke(FEMFrame)} bezieht.
 	 *
 	 * @return {@link Member}. */
@@ -316,8 +302,6 @@ public abstract class FEMReflection extends FEMFunction {
 	public final boolean isConstructor() {
 		return this.member() instanceof Constructor<?>;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

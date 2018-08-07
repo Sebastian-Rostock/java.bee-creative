@@ -142,8 +142,6 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 		};
 	}
 
-	{}
-
 	/** Dieses Feld bildet von Ein- auf Ausgabeobjekte ab. */
 	protected final Map<GInput, GOutput> mapping;
 
@@ -166,8 +164,6 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	public Unique(final Map<GInput, GOutput> mapping) throws NullPointerException {
 		this.mapping = Objects.assertNotNull(mapping);
 	}
-
-	{}
 
 	/** Diese Methode gibt die mit der gegebenen Eingabe in der {@link #mapping() angebundenen Abbildung} assoziierte Ausgabe zurück.<br>
 	 * Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet {@link Map#get(Object) ist}, wird deren Wiederverwendung via
@@ -221,8 +217,6 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	 * @param output Ausgabe oder {@code null}. */
 	protected void customReuse(final GInput input, final GOutput output) {
 	}
-
-	{}
 
 	/** {@inheritDoc} **/
 	@Override

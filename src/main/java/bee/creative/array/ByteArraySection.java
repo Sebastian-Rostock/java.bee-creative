@@ -64,8 +64,6 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final byte[] array) {

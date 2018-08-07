@@ -19,8 +19,6 @@ public abstract class STSItem {
 		this.index = index;
 	}
 
-	{}
-
 	/** Diese Methode gibt den dieses Objekt verwaltenden Graphspeicher zurück.
 	 *
 	 * @return Graphspeicher. */

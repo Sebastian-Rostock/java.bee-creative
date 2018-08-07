@@ -101,8 +101,8 @@ public interface Assignment<GSource> {
 	public void commit() throws IllegalArgumentException;
 
 	/** Diese Methode erzeugt eine {@link Assignment}-Sicht mit den gegebenen Quellobjekt. Der über {@link #set(Object, Object)},
-	 * {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} erzeugte Zustand dieses {@link Assignment} gilt auch
-	 * im erzeugten {@link Assignment} und kann ebenfalls über dieses modifiziert werden.
+	 * {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} erzeugte Zustand dieses {@link Assignment} gilt auch im
+	 * erzeugten {@link Assignment} und kann ebenfalls über dieses modifiziert werden.
 	 *
 	 * @param <GObject> Typ der Quell- und Zielobjekte.
 	 * @param source Quellobjekt.

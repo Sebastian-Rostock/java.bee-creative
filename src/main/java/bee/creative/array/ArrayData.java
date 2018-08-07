@@ -23,8 +23,6 @@ public abstract class ArrayData<GArray> {
 	/** Dieses Feld speichert die Anzahl der Elemente. */
 	protected int size;
 
-	{}
-
 	/** Diese Methode gibt die Position zurück, an der die Elemente des internen Arrays ausgerichtet werden sollen. Bei der Ausrichtung {@code 0} werden die
 	 * Elemente am Anfang des internen Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des internen Arrays beschleunigt wird. Für die
 	 * relative Ausrichtung {@code space} gilt das gegenteil, da hier die Elemente am Ende des internen Arrays ausgerichtet werden, wodurch das häufige Einfügen

@@ -36,8 +36,6 @@ public class ArrayDataSource extends BaseDataSource {
 		this.data = Objects.assertNotNull(data);
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	public ByteArraySection data() {

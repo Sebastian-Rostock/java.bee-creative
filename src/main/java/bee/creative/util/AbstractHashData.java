@@ -97,8 +97,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 			this.entryIndex = entryIndex;
 		}
 
-		{}
-
 		@Override
 		public GKey getKey() {
 			return this.entryData.customGetKey(this.entryIndex);
@@ -199,8 +197,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 			this.nextTable = -1;
 		}
 
-		{}
-
 		@Override
 		public boolean hasNext() {
 			return this.nextEntry >= 0;
@@ -223,8 +219,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 		public Keys(final AbstractHashData<GKey, ?> entryData) {
 			this.entryData = entryData;
 		}
-
-		{}
 
 		@Override
 		public int size() {
@@ -288,8 +282,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 			super(entryData);
 		}
 
-		{}
-
 		@Override
 		public GKey next() {
 			return this.nextKey();
@@ -305,8 +297,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 		public Values(final AbstractHashData<?, GValue> entryData) {
 			this.entryData = entryData;
 		}
-
-		{}
 
 		@Override
 		public int size() {
@@ -351,8 +341,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 			super(entryData);
 		}
 
-		{}
-
 		@Override
 		public GValue next() {
 			return this.nextValue();
@@ -368,8 +356,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 		public Entries(final AbstractHashData<GKey, GValue> entryData) {
 			this.entryData = entryData;
 		}
-
-		{}
 
 		@Override
 		public int size() {
@@ -418,8 +404,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 			super(entryData);
 		}
 
-		{}
-
 		@Override
 		public Entry<GKey, GValue> next() {
 			return this.nextEntry();
@@ -435,8 +419,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 		public Mapping(final AbstractHashData<GKey, GValue> entryData) {
 			this.entryData = entryData;
 		}
-
-		{}
 
 		@Override
 		public int size() {
@@ -512,8 +494,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert die maximale Kapazität. */
 	private static final int MAX_CAPACITY = Integer.MAX_VALUE - 8;
 
@@ -526,8 +506,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
 	protected static final int[] EMPTY_INTEGERS = {};
 
-	{}
-
 	@SuppressWarnings ("javadoc")
 	private static void setupNextsImpl(final int[] array) {
 		for (int i = 0, size = array.length; i < size; array[i] = ++i) {}
@@ -537,8 +515,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 	private static void setupTableImpl(final int[] array) {
 		Arrays.fill(array, -1);
 	}
-
-	{}
 
 	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
 	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. */
@@ -561,8 +537,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 		this.nexts = AbstractHashData.EMPTY_INTEGERS;
 		this.customAllocator(0).apply();
 	}
-
-	{}
 
 	/** Diese Methode wird in {@link HashEntry#getKey()} sowie {@link HashIterator#nextKey()} genutzt und gibt den Schlüssel des gegebenen Eintrags zurück.
 	 *
@@ -679,7 +653,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
 	 *
 	 * @return Anzahl der Einträge. */
-	protected final int countImpl() {
+	protected int countImpl() {
 		return this.count;
 	}
 
@@ -1049,8 +1023,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 		this.customClear();
 		this.count = 0;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override

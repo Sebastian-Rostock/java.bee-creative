@@ -10,7 +10,7 @@ import bee.creative.util.Objects;
 // TODO
 class TreeMap<GKey, GValue> extends TreeData<GKey, GValue> implements Map<GKey, GValue> {
 
-	  static void main(final String[] args) throws Exception {
+	static void main(final String[] args) throws Exception {
 
 		final Map map1 = new java.util.TreeMap();
 		final TreeMap map2 = new TreeMap(5);
@@ -76,7 +76,7 @@ class TreeMap<GKey, GValue> extends TreeData<GKey, GValue> implements Map<GKey, 
 	/** {@inheritDoc} */
 	@Override
 	public GValue remove(final Object key) {
-		return popImpl(key);
+		return this.popImpl(key);
 	}
 
 	@Override

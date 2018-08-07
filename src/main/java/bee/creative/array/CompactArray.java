@@ -32,8 +32,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 			super(owner);
 		}
 
-		{}
-
 		/** {@inheritDoc} */
 		@Override
 		protected void removeRange(final int fromIndex, final int toIndex) {
@@ -91,8 +89,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 			this.owner = Objects.assertNotNull(owner);
 		}
 
-		{}
-
 		/** Diese Methode gibt ein neues Array mit allen Werten des intern genutzten {@link CompactArray} zurück.
 		 *
 		 * @see List#toArray()
@@ -100,8 +96,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		public GArray array() {
 			return this.owner.toArray();
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -181,8 +175,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 			this.owner = owner;
 		}
 
-		{}
-
 		/** Diese Methode gibt den gegebenen Index als Index des internen Arrays des Besitzers zurück.
 		 *
 		 * @param index Index.
@@ -211,8 +203,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 			if (ownerFinalIndex > this.finalIndex) throw new IndexOutOfBoundsException("finalIndex > size()");
 			return this.owner.subArray(delta + startIndex, ownerFinalIndex);
 		}
-
-		{}
 
 		/** {@inheritDoc} */
 		@Override
@@ -353,8 +343,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 
 	}
 
-	{}
-
 	/** Dieses Feld speichert die relative Ausrichtungsposition. */
 	private float align = 0.5f;
 
@@ -389,8 +377,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		this.from = section.startIndex();
 		this.size = section.size();
 	}
-
-	{}
 
 	/** Diese Methode gibt den {@code index}-ten Wert als Objekt zurück.
 	 *
@@ -474,8 +460,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		if (!(alignment <= 1f)) throw new IllegalArgumentException("alignment > 1");
 		this.align = alignment;
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override
@@ -575,7 +559,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	/** {@inheritDoc} */
 	@Override
 	public Values<GArray, GValue> values() {
-		return new Values<GArray, GValue>(this);
+		return new Values<>(this);
 	}
 
 	/** {@inheritDoc} */

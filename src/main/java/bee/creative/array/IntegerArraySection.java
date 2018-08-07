@@ -64,8 +64,6 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 		});
 	}
 
-	{}
-
 	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final int[] array) {

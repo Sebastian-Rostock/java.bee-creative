@@ -13,8 +13,6 @@ public final class STSEdge extends STSItem implements Comparable<STSEdge> {
 		super(store, index);
 	}
 
-	{}
-
 	/** Diese Methode gibt {@link STSNode Knoten} zurück, der für das Objekt bzw. das Ziel der Kante steht.
 	 *
 	 * @return Objekt. */
@@ -35,8 +33,6 @@ public final class STSEdge extends STSItem implements Comparable<STSEdge> {
 	public STSNode predicate() {
 		return this.store.customGetEdgePredicateNode(this.index);
 	}
-
-	{}
 
 	/** {@inheritDoc} */
 	@Override
