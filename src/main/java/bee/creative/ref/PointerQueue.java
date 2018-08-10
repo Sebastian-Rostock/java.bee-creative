@@ -15,14 +15,23 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 	@SuppressWarnings ("javadoc")
 	private static final class QueueNode extends WeakReference<Object> {
 
-		public static final QueueNode head = new QueueNode(null);
+		public static final QueueNode head = new QueueNode();
 
 		public QueueNode prev;
 
 		public QueueNode next;
 
+		private QueueNode() {
+			super(null);
+			this.prev = (this.next = this);
+		}
+
 		public QueueNode(final Object referent) {
 			super(referent);
+			final QueueNode head = QueueNode.head;
+			synchronized (head) {
+				head.prev = ((this.prev = (this.next = head).prev).next = this);
+			}
 		}
 
 	}
@@ -72,10 +81,7 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 	}
 
 	{
-		final QueueNode head = QueueNode.head, node = new QueueNode(this);
-		synchronized (head) {
-			head.prev = ((node.prev = (node.next = head).prev).next = node);
-		}
+		new QueueNode(this);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -88,7 +94,7 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 	/** Diese Methode wird beim Entfernen einer {@link Reference} über {@link #poll()}, {@link #remove()} bzw. {@link #remove(long)} mit der entfernten
 	 * {@link Reference} aufgerufen, sofern diese nicht {@code null} ist. Die Reaktion auf das Entfernen sollte so schnell es geht behandelt werden. Der aktuelle
 	 * {@link Thread} sollte hierfür keinesfalls längere Zeit warten müssen.
-	 * 
+	 *
 	 * @param reference {@link Reference}. */
 	protected void customRemove(final Reference<? extends GObject> reference) {
 	}

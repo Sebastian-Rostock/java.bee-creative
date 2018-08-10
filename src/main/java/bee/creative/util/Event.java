@@ -6,9 +6,9 @@ import java.lang.ref.WeakReference;
  * {@link #fire(Object) benachrichtigt} werden können.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GListener> Typ der Empfänger. Dieser darf kein {@code Object[]} sein.
- * @param <GMessage> Typ der Nachricht. */
-public interface Event<GListener, GMessage> {
+ * @param <GMessage> Typ der Nachricht.
+ * @param <GListener> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
+public interface Event<GMessage, GListener> {
 
 	/** Diese Methode meldet den gegebenen Ereignisempfänger für dieses Ereignis an und gibt ihn zurück.<br>
 	 * Wenn der Empfänger {@code null} ist, wird er ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object) Auslösen} dieses Ereignisses informiert.

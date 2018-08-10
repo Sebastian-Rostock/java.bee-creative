@@ -7,22 +7,42 @@ import bee.creative.ref.PointerQueue;
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
  * {@link #pop(Object, Object) abgemeldet} bzw. {@link #fire(Object, Object) benachrichtigt} werden können und bezüglich eines {@link WeakReference schwach}
- * referenzierten Ereignissenders gespeichert werden. Wenn der Speicher des Senders frei gegeben wird, werden die für diesen angemeldeten Empfänger automatisch
- * abgemeldet.
+ * referenzierten Ereignissenders gespeichert werden.
  * <p>
- * Die Empfänger können direkt oder {@link WeakReference schwach} referenziert werden, sodass für jeden angemeldeten Empfänger 4 bzw. 24 Byte Verwaltungsdaten
- * anfallen. Die Verwaltungsdaten je Sender betragen dagegen 32 oder 44 Byte, wenn dafür ein bzw. mehrere Empfänger angemeldet sind.
+ * Die Empfänger können direkt oder {@link WeakReference schwach} referenziert werden, sodass für jeden angemeldeten Empfänger {@code 4} bzw. {@code 36} Byte
+ * Verwaltungsdaten anfallen. Die Verwaltungsdaten je Sender betragen dagegen {@code 0}, {@code 48} oder {@code 60} Byte, wenn dafür keine, ein bzw. mehrere
+ * Empfänger angemeldet sind.
  * <p>
  * Beim {@link #fire(Object, Object) Auslösen} eines Ereignisses wird eine gegebene Nachricht an alle zu diesem Zeitpunkt für einen gegebenen Sender
  * {@link #put(Object, Object) angemeldeten} Empfänger {@link #customFire(Object, Object, Object) gesendet}. Die Reihenfolge der Benachrichtigung der Empfänger
  * entsprichtz der Reihenfolge ihrer Anmeldung.
  * <p>
- * TODO nutzungsbeispiel
+ * <pre>
+ *
+ * public interface MyListener {
+ * 	public static class MyMessage { ... }
+ * 	public void handleMyEvent(MyMessage message);
+ * }
+ *
+ * public class MySender {
+ *
+ * 	public static final Listeners &lt;MyMessage, MyListener> MyCustomEventListeners = new Listeners<>(){
+ * 		protected void customFire(Object sender, MyMessage message, MyListener listener) {
+ * 			listener.handleMyEvent(message);
+ *		}
+ * 	};
+ *
+ * 	public Event&lt;MyMessage, MyListener> getMyCustomEventListeners() {
+ * 		return MyCustomEventListeners.toEvent(this);
+ * 	}
+ *
+ * }
+ * </pre>
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GListener> Typ der Empfänger. Dieser darf kein {@code Object[]} sein.
- * @param <GMessage> Typ der Nachricht. */
-public abstract class Listeners<GListener, GMessage> implements Consumer<GMessage>, Iterable<GListener> {
+ * @param <GMessage> Typ der Nachricht.
+ * @param <GListener> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
+public abstract class Listeners<GMessage, GListener> {
 
 	/** Diese Klasse implementiert die Verwaltungsdaten eines Ereignissenders. Jede Instanz benötigt mindestens 24 Byte. */
 	private static final class EventItem extends WeakReference<Object> {
@@ -135,9 +155,11 @@ public abstract class Listeners<GListener, GMessage> implements Consumer<GMessag
 					final EventListener eventListener = (EventListener)reference;
 					final EventStore eventStore = eventListener.eventStore;
 					synchronized (eventStore) {
-						synchronized (eventListener.eventItem) {
-
-							eventListener.eventItem.pop(eventListener);
+						final EventItem eventItem = eventListener.eventItem;
+						synchronized (eventItem) {
+							eventItem.pop(eventListener);
+							if (eventItem.listener != null) return;
+							eventStore.pop(eventStore);
 						}
 					}
 				}
@@ -237,6 +259,23 @@ public abstract class Listeners<GListener, GMessage> implements Consumer<GMessag
 
 	}
 
+	public static interface EventConsumer<GMessage, GListener> {
+
+		public void fire(final Object sender, final GMessage message, final GListener listener);
+
+	}
+
+	public static <GMessage, GListener> Listeners<GMessage, GListener> from(final EventConsumer<? super GMessage, ? super GListener> consumer) {
+		return new Listeners<GMessage, GListener>() {
+
+			@Override
+			protected void customFire(final Object sender, final GMessage message, final GListener listener) {
+				consumer.fire(sender, message, listener);
+			}
+
+		};
+	}
+
 	/** Dieses Feld speichert die {@link EventItem}. */
 	private final EventStore eventStore = new EventStore();
 
@@ -302,7 +341,14 @@ public abstract class Listeners<GListener, GMessage> implements Consumer<GMessag
 		}
 	}
 
-	public final GMessage fire(final Object sender, final GMessage message) {
+	/** Diese Methode löst ein Ereignis aus, benachrichtigt alle zu diesem Zeitpunkt für den gegebenen Ereignissender angemeldeten Ereignisempfänger mit der
+	 * gegebenen Ereignisnachricht und gibt letztere zurück. Sofern die Empfänger es zulassen, kann die Nachricht {@code null} sein.
+	 *
+	 * @param sender Ereignissender oder {@code null}.
+	 * @param message Ereignisnachricht oder {@code null}.
+	 * @return Ereignisnachricht.
+	 * @throws NullPointerException Wenn {@code message} {@code null} ist und die Empfänger dies nicht unterstützten. */
+	public final GMessage fire(final Object sender, final GMessage message) throws NullPointerException {
 		final Object listener;
 		final EventStore eventStore = this.eventStore;
 		synchronized (eventStore) {
@@ -320,19 +366,20 @@ public abstract class Listeners<GListener, GMessage> implements Consumer<GMessag
 		return message;
 	}
 
+	@SuppressWarnings ("javadoc")
 	private final void fireImpl(final Object sender, final Object listener, final GMessage message) {
 		@SuppressWarnings ("unchecked")
 		final GListener listener2 = (GListener)EventListener.get(listener);
 		if (listener2 == null) return;
-		this.customFire(sender, listener2, message);
+		this.customFire(sender, message, listener2);
 	}
 
 	/** Diese Methode gibt das an den gegebenen Sender gebundene Ereignis zurück.
 	 *
 	 * @param sender Ereignissender.
 	 * @return Ereignis. */
-	public final Event<GListener, GMessage> toEvent(final Object sender) {
-		return new Event<GListener, GMessage>() {
+	public final Event<GMessage, GListener> toEvent(final Object sender) {
+		return new Event<GMessage, GListener>() {
 
 			@Override
 			public GListener put(final GListener listener) {
@@ -360,8 +407,8 @@ public abstract class Listeners<GListener, GMessage> implements Consumer<GMessag
 	/** Diese Methode wird durch {@link #fire(Object, Object)} aufgerufen und soll dem gegebenen Empfänger die gegebene Nachricht senden.
 	 *
 	 * @param sender Sender oder {@code null}.
-	 * @param handler Empfänger.
-	 * @param message Nachricht oder {@code null}. */
-	protected abstract void customFire(Object sender, GListener handler, GMessage message);
+	 * @param message Nachricht oder {@code null}.
+	 * @param listener Empfänger. */
+	protected abstract void customFire(Object sender, GMessage message, GListener listener);
 
 }
