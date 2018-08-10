@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import bee.creative.util.Pointers.SoftPointer;
+import bee.creative.ref.Pointer;
+import bee.creative.ref.Pointers;
+import bee.creative.ref.SoftPointer;
 
 /** Diese Klasse implementiert grundlegende {@link Filter}.
  *

@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import bee.creative.ref.Pointer;
+import bee.creative.ref.Pointers;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Getter}-Konstruktion und -Verarbeitung.
  *
@@ -271,7 +273,7 @@ public class Getters {
 			public GValue get(final GInput input) {
 				final Pointer<GValue> pointer = this.map.get(Pointers.hardPointer(input));
 				if (pointer != null) {
-					final GValue output = pointer.data();
+					final GValue output = pointer.get();
 					if (output != null) return output;
 					if (Pointers.isValid(pointer)) return null;
 					int valid = limit - 1;

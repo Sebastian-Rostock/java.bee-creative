@@ -12,10 +12,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import bee.creative.ref.Pointer;
+import bee.creative.ref.Pointers;
+import bee.creative.ref.SoftPointer;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import bee.creative.util.Pointers.SoftPointer;
 
 /** Diese Klasse implementiert grundlegende {@link Builder}.
  *
@@ -1253,7 +1255,7 @@ public class Builders {
 			public final GValue build() throws IllegalStateException {
 				final Pointer<GValue> pointer = this.pointer;
 				if (pointer != null) {
-					final GValue data = pointer.data();
+					final GValue data = pointer.get();
 					if (data != null) return data;
 					if (pointer == Pointers.NULL) return null;
 				}
