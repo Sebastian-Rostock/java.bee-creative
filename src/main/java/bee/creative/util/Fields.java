@@ -673,7 +673,7 @@ public final class Fields {
 	 *
 	 * @see #compositeField(Getter, Setter)
 	 * @see Getters#navigatedGetter(Getter, Getter)
-	 * @see Setters#navigatedField(Getter, Setter) */
+	 * @see Setters#navigatedSetter(Getter, Setter) */
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GInput2, GValue> Field<GInput, GValue> navigatedField(final Getter<? super GInput, ? extends GInput2> navigator,
 		final Field<? super GInput2, GValue> field) throws NullPointerException {

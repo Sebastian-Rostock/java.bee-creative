@@ -230,7 +230,7 @@ public class Getters {
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.mappingField(mapping)}. */
 	@SuppressWarnings ({"javadoc", "unchecked"})
-	public static <GValue> Getter<Object, GValue> mappedGetter(final Map<?, ? extends GValue> mapping) {
+	public static <GValue> Getter<Object, GValue> mappingGetter(final Map<?, ? extends GValue> mapping) {
 		return (Getter<Object, GValue>)Fields.mappingField(mapping);
 	}
 
