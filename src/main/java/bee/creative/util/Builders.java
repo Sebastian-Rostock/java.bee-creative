@@ -12,12 +12,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import bee.creative.ref.Pointer;
-import bee.creative.ref.Pointers;
-import bee.creative.ref.SoftPointer;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import bee.creative.ref.Pointer;
+import bee.creative.ref.Pointers;
+import bee.creative.ref.SoftPointer;
 
 /** Diese Klasse implementiert grundlegende {@link Builder}.
  *
@@ -514,7 +514,7 @@ public class Builders {
 		}
 
 		/** Diese Methode wählt den gegebenen Schlüssel und gibt {@code this} zurück. Dieser Schlüssel wird in den nachfolgenden Aufrufen von {@link #getValue()}
-		 * und {@link #useValue(Object)} verwendet.
+		 * und {@link #useValue(Object)} verwendet und dort wieder zurück gesetzt.
 		 *
 		 * @see #getValue()
 		 * @see #useValue(Object)
@@ -525,23 +525,31 @@ public class Builders {
 			return this.customThis();
 		}
 
-		/** Diese Methode gibt den Wert zum {@link #forKey(Object) gewählten Schlüssel} zurück.
+		/** Diese Methode gibt den Wert zum {@link #forKey(Object) gewählten Schlüssel} zurück und setzt diesen Schlüssel auf {@code null}.
 		 *
 		 * @see #forKey(Object)
 		 * @see #useValue(Object)
 		 * @return Wert zum gewählten Schlüssel. */
 		public GValue getValue() {
-			return this.result.get(this.key);
+			try {
+				return this.result.get(this.key);
+			} finally {
+				this.forKey(null);
+			}
 		}
 
-		/** Diese Methode setzt den Wert zum {@link #forKey(Object) gewählten Schlüssel} und gibt {@code this} zurück.
+		/** Diese Methode setzt den Wert zum {@link #forKey(Object) gewählten Schlüssel}, setzt diesen Schlüssel auf {@code null} und gibt {@code this} zurück.
 		 *
 		 * @see #forKey(Object)
 		 * @see #getValue()
 		 * @param value Wert.
 		 * @return {@code this}. */
 		public GThis useValue(final GValue value) {
-			this.put(this.key, value);
+			try {
+				this.put(this.key, value);
+			} finally {
+				this.forKey(null);
+			}
 			return this.customThis();
 		}
 

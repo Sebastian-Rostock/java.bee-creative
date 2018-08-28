@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
+import bee.creative.util.emu.EMU;
+import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert eine abstrakte Funktion, deren {@link #invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen
  * werden kann, um einen Ergebniswert zu ermitteln.<br>
@@ -206,7 +208,7 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatFunction extends BaseFunction {
+	public static final class ConcatFunction extends BaseFunction implements Emuable {
 
 		final FEMFunction[] params;
 
@@ -221,8 +223,17 @@ public abstract class FEMFunction {
 			return this.params.clone();
 		}
 
+		public final int paramCount() {
+			return this.params.length;
+		}
+
 		public final FEMFunction function() {
 			return this.function;
+		}
+
+		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.fromArray(this.params);
 		}
 
 		@Override
@@ -308,7 +319,7 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompositeFunction extends BaseFunction {
+	public static final class CompositeFunction extends BaseFunction implements Emuable {
 
 		final FEMFunction[] params;
 
@@ -323,8 +334,17 @@ public abstract class FEMFunction {
 			return this.params.clone();
 		}
 
+		public final int paramCount() {
+			return this.params.length;
+		}
+
 		public final FEMFunction function() {
 			return this.function;
+		}
+
+		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.fromArray(this.params);
 		}
 
 		@Override

@@ -8,6 +8,8 @@ import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
+import bee.creative.util.emu.EMU;
+import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert eine unveränderliche Zeichenkette sowie Methoden zur Erzeugung solcher Zeichenketten aus nativen Arrays.
  *
@@ -313,7 +315,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF8CompactString extends FEMString {
+	static final class UTF8CompactString extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der UTF-8-Token, das nicht verändert werden darf. */
 		public final byte[] items;
@@ -363,6 +365,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.fromArray(this.items);
+		}
+
+		@Override
 		public final FEMString compact() {
 			return this;
 		}
@@ -370,7 +377,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF16CompactString extends FEMString {
+	static final class UTF16CompactString extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der UTF-16-Token, das nicht verändert werden darf. */
 		public final char[] items;
@@ -420,6 +427,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.fromArray(this.items);
+		}
+
+		@Override
 		public final FEMString compact() {
 			return this;
 		}
@@ -427,7 +439,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class UTF32CompactString extends FEMString {
+	static final class UTF32CompactString extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der UTF-32-Token, das nicht verändert werden darf. */
 		public final int[] items;
@@ -440,6 +452,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		@Override
 		protected final int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
+		}
+
+		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.fromArray(this.items);
 		}
 
 		@Override

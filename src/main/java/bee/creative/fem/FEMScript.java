@@ -9,11 +9,13 @@ import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
+import bee.creative.util.emu.EMU;
+import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMScript implements Items<Token>, Iterable<Token> {
+public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 
 	/** Diese Klasse implementiert ein Objekt, das einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Token)}
 	 * erfolgt gemäß ihrer Startposition.
@@ -409,6 +411,12 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 	@Override
 	public final Token get(final int index) throws IndexOutOfBoundsException {
 		return this.tokens[index];
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long emu() {
+		return EMU.fromObject(this) + EMU.fromArray(this.tokens) + EMU.fromAll((Object[])this.tokens);
 	}
 
 	/** {@inheritDoc} */

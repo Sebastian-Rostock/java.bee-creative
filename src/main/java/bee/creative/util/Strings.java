@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -167,7 +168,7 @@ public class Strings {
 	 * @param items Objekte.
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static String join(final Iterable<?> items) {
+	public static String join(final Iterable<?> items) throws NullPointerException {
 		return Strings.join("", items);
 	}
 
@@ -178,20 +179,26 @@ public class Strings {
 	 * @param items Objekte.
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code space} bzw. {@code items} {@code null} ist. */
-	public static String join(final String space, final Iterable<?> items) {
-		final StringBuilder builder = new StringBuilder();
-		if (!space.isEmpty()) {
-			String join = "";
-			for (final Object item: items) {
-				builder.append(join).append(item);
-				join = space;
-			}
-		} else {
-			for (final Object item: items) {
-				builder.append(item);
-			}
+	public static String join(final String space, final Iterable<?> items) throws NullPointerException {
+		final StringBuilder result = new StringBuilder();
+		Strings.join(result, space, items);
+		return result.toString();
+	}
+
+	/** Diese Methode fügt die Verkettung der {@link Object#toString() Textdarstelungen} der gegebenen Objekte mit dem gegebenen Trennzeichen an den gegebenen
+	 * {@link StringBuilder} an. Das Trennzeichen wird hierbei zwischen die {@link Object#toString() Textdarstelungen} aufeinanderfolgender Objekte platziert.
+	 *
+	 * @param result Verkettungstext.
+	 * @param space Trennzeichen.
+	 * @param items Objekte.
+	 * @throws NullPointerException Wenn {@code result}, {@code space} bzw. {@code items} {@code null} ist. */
+	public static void join(final StringBuilder result, final String space, final Iterable<?> items) throws NullPointerException {
+		final Iterator<?> iter = items.iterator();
+		if (!iter.hasNext()) return;
+		result.append(iter.next());
+		while (iter.hasNext()) {
+			result.append(space).append(iter.next());
 		}
-		return builder.toString();
 	}
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die vom regulären

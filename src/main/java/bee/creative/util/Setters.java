@@ -10,6 +10,8 @@ import java.util.Map;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
+	/** Diese Klasse implementiert {@link Setters#defaultSetter(Setter)} */
+	@SuppressWarnings ("javadoc")
 	public static final class DefaultSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
 		public final Setter<? super GInput, GValue> setter;
@@ -26,11 +28,13 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("defaultSetter", this.setter);
+			return Objects.toInvokeString(this, this.setter);
 		}
 
 	}
 
+	/** Diese Klasse implementiert {@link Setters#navigatedSetter(Getter, Setter)} */
+	@SuppressWarnings ("javadoc")
 	public static final class NavigatedSetter<GInput, GInput2, GValue> implements Setter<GInput, GValue> {
 
 		public final Getter<? super GInput, ? extends GInput2> navigator;
@@ -49,42 +53,46 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("navigatedSetter", this.navigator, this.setter);
+			return Objects.toInvokeString(this, this.navigator, this.setter);
 		}
 
 	}
 
+	/** Diese Klasse implementiert {@link Setters#conditionalSetter(Filter, Setter, Setter)} */
+	@SuppressWarnings ("javadoc")
 	public static final class ConditionalSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
 		public final Filter<? super GInput> condition;
 
-		public final Setter<? super GInput, ? super GValue> acceptSetter;
+		public final Setter<? super GInput, ? super GValue> accept;
 
-		public final Setter<? super GInput, ? super GValue> rejectSetter;
+		public final Setter<? super GInput, ? super GValue> reject;
 
 		public ConditionalSetter(final Filter<? super GInput> condition, final Setter<? super GInput, ? super GValue> acceptSetter,
 			final Setter<? super GInput, ? super GValue> rejectSetter) {
 			this.condition = Objects.assertNotNull(condition);
-			this.acceptSetter = Objects.assertNotNull(acceptSetter);
-			this.rejectSetter = Objects.assertNotNull(rejectSetter);
+			this.accept = Objects.assertNotNull(acceptSetter);
+			this.reject = Objects.assertNotNull(rejectSetter);
 		}
 
 		@Override
 		public void set(final GInput input, final GValue value) {
 			if (this.condition.accept(input)) {
-				this.acceptSetter.set(input, value);
+				this.accept.set(input, value);
 			} else {
-				this.rejectSetter.set(input, value);
+				this.reject.set(input, value);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("conditionalSetter", this.condition, this.acceptSetter, this.rejectSetter);
+			return Objects.toInvokeString(this, this.condition, this.accept, this.reject);
 		}
 
 	}
 
+	/** Diese Klasse implementiert {@link Setters#aggregatedSetter(Setter, Getter)} */
+	@SuppressWarnings ("javadoc")
 	public static final class AggregatedSetter<GItem, GValue, GValue2> implements Setter<Iterable<? extends GItem>, GValue> {
 
 		public final Setter<? super GItem, GValue2> setter;
@@ -104,19 +112,20 @@ public class Setters {
 			final Iterator<? extends GItem> iterator = input.iterator();
 			if (!iterator.hasNext()) return;
 			final GValue2 value2 = this.format.get(value);
-			this.setter.set(iterator.next(), value2);
-			while (iterator.hasNext()) {
+			do {
 				this.setter.set(iterator.next(), value2);
-			}
+			} while (iterator.hasNext());
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("aggregatedSetter", this.setter, this.format);
+			return Objects.toInvokeString(this, this.setter, this.format);
 		}
 
 	}
 
+	/** Diese Klasse implementiert {@link Setters#synchronizedSetter(Setter, Object)} */
+	@SuppressWarnings ("javadoc")
 	public static final class SynchronizedSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
 		public final Object mutex;
@@ -137,7 +146,7 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("synchronizedSetter", this.setter, this.mutex);
+			return Objects.toInvokeString(this, this.setter, this.mutex);
 		}
 
 	}
@@ -165,12 +174,10 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("nativeSetter", Natives.formatMethod(this.method));
+			return Objects.toInvokeString(this, Natives.formatMethod(this.method));
 		}
 
 	}
-	
-	
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.emptyField()}. */
 	@SuppressWarnings ("javadoc")

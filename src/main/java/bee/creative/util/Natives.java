@@ -258,7 +258,9 @@ public class Natives {
 	 * @return Parametertypentext.
 	 * @throws NullPointerException Wenn {@code types} {@code null} ist oder enthält. */
 	public static String formatParams(final Class<?>... types) throws NullPointerException {
-		return "(" + Strings.join(",", Iterables.navigatedIterable(Natives.formatClass, Arrays.asList(types))) + ")";
+		final StringBuilder result = new StringBuilder().append('(');
+		Strings.join(result, ",", Iterables.navigatedIterable(Natives.formatClass, Arrays.asList(types)));
+		return result.append(')').toString();
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Method Methode} zurück.<br>

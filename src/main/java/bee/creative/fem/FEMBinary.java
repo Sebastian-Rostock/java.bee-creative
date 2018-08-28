@@ -11,6 +11,8 @@ import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
+import bee.creative.util.emu.EMU;
+import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
@@ -379,7 +381,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactBinary extends FEMBinary {
+	public static final class CompactBinary extends FEMBinary implements Emuable {
 
 		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden darf. */
 		public final byte[] items;
@@ -392,6 +394,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		@Override
 		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
+		}
+
+		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.fromArray(this.items);
 		}
 
 		@Override

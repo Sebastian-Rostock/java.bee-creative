@@ -1,6 +1,8 @@
 package bee.creative.fem;
 
 import bee.creative.util.Objects;
+import bee.creative.util.emu.EMU;
+import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert.
@@ -8,7 +10,7 @@ import bee.creative.util.Objects;
  * @see FEMCompiler#proxy(String)
  * @see FEMCompiler#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMProxy extends FEMFunction {
+public final class FEMProxy extends FEMFunction implements Emuable {
 
 	/** Diese Methode gibt eine neue {@link FEMProxy} mit dem gegebenen Namen zurück.
 	 *
@@ -53,6 +55,12 @@ public final class FEMProxy extends FEMFunction {
 	 * @return Name. */
 	public final String name() {
 		return this.name;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long emu() {
+		return EMU.fromObject(this) + EMU.from(this.name);
 	}
 
 	/** {@inheritDoc} */

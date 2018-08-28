@@ -1,6 +1,7 @@
 package bee.creative.util.emu;
 
-/** Diese Schnittstelle definiert eine Methode zur Ermittlung des geschätzten Speicherverbrauchs eines gegebenen Objekts.
+/** Diese Schnittstelle definiert eine Methode zur Ermittlung des geschätzten Speicherverbrauchs eines gegebenen Objekts. Dieser Speicherverbrauch sollte den
+ * der ausschließlich intern verwalteten Objekte mit einschließen.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ des gegebenen Objekts. */
