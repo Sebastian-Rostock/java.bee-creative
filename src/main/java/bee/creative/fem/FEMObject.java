@@ -1,6 +1,7 @@
 package bee.creative.fem;
 
 import bee.creative.util.Comparators;
+import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine unveränderliche Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue()
  * Objektschlüssel} identifiziert wird.<br>
@@ -117,7 +118,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 *
 	 * @return interne Darstellung der Referenz. */
 	public final long value() {
-		return (((long)this.refValue) << 32) | (this.ownerValue << 16) | (this.typeValue << 0);
+		return Integers.toLong(this.refValue, Integers.toInt(this.ownerValue, this.typeValue));
 	}
 
 	/** Diese Methode gibt den Objektschlüssel zurück.

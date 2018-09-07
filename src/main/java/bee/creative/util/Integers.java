@@ -234,4 +234,31 @@ public class Integers {
 		return length;
 	}
 
+	/** Diese Methode gibt die gegebennen 16-Bit-Werte als 32-Bit-Wert zurück.
+	 *
+	 * @param hi msb 16-Bit-Wert.
+	 * @param lo lsb 16-Bit-Wert.
+	 * @return 32-Bit-Wert */
+	public static int toInt(final int hi, final int lo) {
+		return (hi << 16) | (lo & 0xFFFF);
+	}
+
+	/** Diese Methode gibt die gegebennen 8-Bit-Werte als 16-Bit-Wert zurück.
+	 *
+	 * @param hi msb 8-Bit-Wert.
+	 * @param lo lsb 8-Bit-Wert.
+	 * @return 16-Bit-Wert */
+	public static int toShort(final int hi, final int lo) {
+		return (hi << 8) | (lo & 0xFF);
+	}
+
+	/** Diese Methode gibt die gegebennen 32-Bit-Werte als 64-Bit-Wert zurück.
+	 *
+	 * @param hi msb 32-Bit-Wert.
+	 * @param lo lsb 32-Bit-Wert.
+	 * @return 64-Bit-Wert */
+	public static long toLong(final int hi, final int lo) {
+		return ((long)hi << 32) | (lo & 0xFFFFFFFFL);
+	}
+
 }

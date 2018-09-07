@@ -84,25 +84,21 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 		new QueueNode(this);
 	}
 
-	@SuppressWarnings ("javadoc")
-	private final Reference<? extends GObject> remove(final Reference<? extends GObject> reference) {
-		if (reference == null) return null;
-		this.customRemove(reference);
-		return reference;
-	}
-
 	/** Diese Methode wird beim Entfernen einer {@link Reference} über {@link #poll()}, {@link #remove()} bzw. {@link #remove(long)} mit der entfernten
 	 * {@link Reference} aufgerufen, sofern diese nicht {@code null} ist. Die Reaktion auf das Entfernen sollte so schnell es geht behandelt werden. Der aktuelle
 	 * {@link Thread} sollte hierfür keinesfalls längere Zeit warten müssen.
 	 *
 	 * @param reference {@link Reference}. */
-	protected void customRemove(final Reference<? extends GObject> reference) {
+	protected void customRemove(final Reference<?> reference) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final Reference<? extends GObject> poll() {
-		return this.remove(super.poll());
+		final Reference<? extends GObject> result = super.poll();
+		if (result == null) return null;
+		this.customRemove(result);
+		return result;
 	}
 
 	/** {@inheritDoc} */
@@ -114,7 +110,10 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 	/** {@inheritDoc} */
 	@Override
 	public final Reference<? extends GObject> remove(final long timeout) throws IllegalArgumentException, InterruptedException {
-		return this.remove(super.remove(timeout));
+		final Reference<? extends GObject> result = super.remove(timeout);
+		if (result == null) return null;
+		this.customRemove(result);
+		return result;
 	}
 
 }

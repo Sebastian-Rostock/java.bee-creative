@@ -8,17 +8,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import bee.creative.util.Builders.MapBuilder;
 
-// Estimated Memory Usage
+/** Diese Klasse implementiert Methoden zur Schätzung des Speicherverbrauchs von Objekten (<i>Estimated Memory Usage</i>).
+ * 
+ * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("rawtypes")
 public class EMU {
 
 	/** Dieses Feld speichert die in {@link #use(Class, Emuator)} registrierten {@link Emuator}. */
 	private static final Map<Class<?>, Emuator<?>> emuators = new bee.creative.util.HashMap<>();
 
+	/** Dieses Feld speichert die in {@link #from(Object)} gepufferten {@link Emuator}. */
 	private static final Map<Class<?>, Emuator<?>> emuatorsCache = new bee.creative.util.HashMap<>();
 
+	/** Dieses Feld speichert den {@link Emuator} zu {@link #fromClass(Class)}. */
 	private static final Emuator<?> defaultEmuator = new Emuator<Object>() {
 
 		@Override
@@ -61,15 +64,14 @@ public class EMU {
 			}
 
 		});
-	}
+		EMU.use(HashMap.class, new Emuator<HashMap>() {
 
-	public static void main(final String[] args) throws Exception {
-		final Map m = MapBuilder.forHashMap().put(123, 456).put(789, 147).put("hallo", "welt").build();
+			@Override
+			public long emu(final HashMap input) throws NullPointerException {
+				return EMU.fromClass(HashMap.class) + (36 * input.size());
+			}
 
-		final String[] z = {"Hallo", "Welt", "!"};
-		System.out.println(EMU.fromAll(z) + EMU.from(z));
-
-		System.out.println(EMU.fromAll(m) + EMU.fromAll(m.keySet()) + EMU.fromAll(m.values()));
+		});
 	}
 
 	/** Diese Methode registriert den gegebenen {@link Emuator} zur Schätzung des Speicherverbrauchs der Instanzen der gegebenen Klasse in {@link #from(Object)}.

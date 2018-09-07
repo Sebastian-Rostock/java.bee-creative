@@ -19,8 +19,9 @@ function FEMValue(Data) {
 	FEMValue.FALSE = new FEMValue('F');
 
 	FEMValue.from = function(Source) {
-		if (Source == null || Source == undefined) return FEMValue.VOID;
-		var Class = Data.constructor
+		if (Source == undefined) return undefined;
+		if (Source == null) return FEMValue.VOID;
+		var Class = Source.constructor;
 		if (Class == Array) return FEMValue.fromArray(Source);
 		if (Class == Number) return FEMValue.fromNumber(Source);
 		if (Class == String) return FEMValue.fromString(Source);
@@ -32,15 +33,15 @@ function FEMValue(Data) {
 	FEMValue.fromArray = function(Source) {
 		var items = [], length = Source.length;
 		for (var i = 0; i < length; i++) {
-			items.push(FEMValue.from(Source[i]));
+			items.push(FEMValue.from(Source[i])._data);
 		}
 		return new FEMValue([ items ]);
 	};
 	FEMValue.fromObject = function(Source) {
 		var keys = [], values = [], key;
 		for (key in Source) {
-			keys.push(FEMValue.fromString(key));
-			values.push(FEMValue.from(Source[key]));
+			keys.push(FEMValue.fromString(key)._data);
+			values.push(FEMValue.from(Source[key])._data);
 		}
 		return new FEMValue([ keys, values ]);
 	};
@@ -48,17 +49,17 @@ function FEMValue(Data) {
 		// TODO Uint8Array
 		return FEMValue.VOID;
 	};
+	FEMValue.fromNumber = function(Source) {
+		return parseInt(Source) == Source ? FEMValue.fromInteger(Source) : FEMValue.fromDecimal(Source);
+	};
 	FEMValue.fromString = function(Source) {
 		return new FEMValue('S' + String(Source));
 	};
-	FEMValue.fromNumber = function(Source) {
-		return Source == parseInt(Source) ? FEMValue.fromInteger(Source) : FEMValue.fromDecimal(Source);
-	};
 	FEMValue.fromDecimal = function(Source) {
-		return new FEMValue('I' + parseInt(Source));
+		return new FEMValue('D' + parseFloat(Source));
 	};
 	FEMValue.fromInteger = function(Source) {
-		return new FEMValue('D' + parseFloat(Source));
+		return new FEMValue('I' + parseInt(Source));
 	};
 	FEMValue.fromBoolean = function(Source) {
 		return Source ? FEMValue.TRUE : FEMValue.FALSE;
@@ -72,6 +73,9 @@ function FEMValue(Data) {
 		return FEMValue.VOID;
 	};
 
+	FEMValue.prototype.data = function() {
+		return this._data;
+	};
 	FEMValue.prototype.isVoid = function() {
 		return this._data === 'V';
 	};
@@ -113,15 +117,15 @@ function FEMValue(Data) {
 		if (!this.isArray()) return undefined;
 		var result = [], items = this._data[0], length = items.length;
 		for (var i = 0; i < length; i++) {
-			result.push(items[i].asNative());
+			result.push(new FEMValue(items[i]).asNative());
 		}
 		return result;
 	};
 	FEMValue.prototype.asObject = function() {
-		if (!this.isArray()) return undefined;
+		if (!this.isObject()) return undefined;
 		var result = {}, keys = this._data[0], values = this._data[1], length = keys.length;
 		for (var i = 0; i < length; i++) {
-			result[keys[i].asString()] = values[i].asNative();
+			result[new FEMValue(keys[i]).asString()] = new FEMValue(values[i]).asNative();
 		}
 		return result;
 	};
@@ -129,12 +133,21 @@ function FEMValue(Data) {
 		// TODO
 		return undefined;
 	};
-	FEMValue.prototype.asString = function() {
-		// TODO
+	FEMValue.prototype.asNumber = function() {
+		if (this.isDecimal()) return this.asDecimal();
+		if (this.isInteger()) return this.asInteger();
 		return undefined;
 	};
-	FEMValue.prototype.asNumber = function() {
-		// TODO
+	FEMValue.prototype.asString = function() {
+		if (this.isString()) return this._data.slice(1);
+		return undefined;
+	};
+	FEMValue.prototype.asDecimal = function() {
+		if (this.isDecimal()) return parseFloat(this._data.slice(1));
+		return undefined;
+	};
+	FEMValue.prototype.asInteger = function() {
+		if (this.isInteger()) return parseInt(this._data.slice(1));
 		return undefined;
 	};
 	FEMValue.prototype.asBoolean = function() {
@@ -150,32 +163,22 @@ function FEMValue(Data) {
 		// TODO
 		return undefined;
 	};
+	FEMValue.prototype.asNative = function() {
+		if (this.isVoid()) return null;
+		if (this.isTrue()) return true;
+		if (this.isFalse()) return false;
+		if (this.isArray()) return this.asArray();
+		if (this.isObject()) return this.asObject();
+		if (this.isString()) return this.asString();
+		if (this.isBinary()) return this.asBinary();
+		if (this.isDecimal()) return this.asDecimal();
+		if (this.isInteger()) return this.asInteger();
+		if (this.isDatetime()) return this.asDatetime();
+		if (this.isDuration()) return this.asDuration();
+		return undefined;
+	};
+	FEMValue.prototype.toString = function() {
+		return JSON.stringify(this._data);
+	};
 
-})()
-
-alert(typeof 'as')
-alert(new String('as').constructor === String)
-
-alert(new FEMValue().isBinary)
-//
-//transport
-//
-//V void undefined
-//T true Boolean
-//F false Boolean
-//B Binary [bytes...]
-//S String 
-//D Decimal Number
-//I Integer Number
-//W Datetime [days, millis]
-//H Duration [months, millis]
-//[] Array 
-//
-//
-//json
-//
-//X[] -> X[][1]
-//
-//{X:Y} -> [X[], Y[]]
-//
-//
+})();

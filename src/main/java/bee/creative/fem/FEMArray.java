@@ -11,6 +11,8 @@ import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
+import bee.creative.util.emu.EMU;
+import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
  *
@@ -101,7 +103,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatArray extends FEMArray {
+	public static final class ConcatArray extends FEMArray implements Emuable {
 
 		public final FEMArray array1;
 
@@ -134,6 +136,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.array1) + EMU.from(this.array2);
+		}
+
+		@Override
 		public final FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.array2.section(offset2, length);
@@ -144,7 +151,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class SectionArray extends FEMArray {
+	public static final class SectionArray extends FEMArray implements Emuable {
 
 		public final FEMArray array;
 
@@ -167,6 +174,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.array);
+		}
+
+		@Override
 		public final FEMArray section(final int offset2, final int length2) throws IllegalArgumentException {
 			return this.array.section(this.offset + offset2, length2);
 		}
@@ -174,7 +186,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ReverseArray extends FEMArray {
+	public static final class ReverseArray extends FEMArray implements Emuable {
 
 		public final FEMArray array;
 
@@ -191,6 +203,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		@Override
 		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.array.customExtract(target, this.length - offset - length, length, !foreward);
+		}
+
+		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.array);
 		}
 
 		@Override
@@ -267,7 +284,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactArray extends FEMArray {
+	public static class CompactArray extends FEMArray implements Emuable {
 
 		/** Dieses Feld speichert das Array der Werte, das nicht verändert werden darf. */
 		public final FEMValue[] items;
@@ -284,6 +301,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		@Override
 		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
+		}
+
+		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.items);
 		}
 
 		@Override
@@ -451,13 +473,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return null;
 	}
 
-	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
+	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 *
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
-	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
+	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {

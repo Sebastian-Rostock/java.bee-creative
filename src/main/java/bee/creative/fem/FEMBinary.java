@@ -8,6 +8,7 @@ import java.util.List;
 import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
+import bee.creative.util.Integers;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
@@ -227,7 +228,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatBinary extends FEMBinary {
+	public static final class ConcatBinary extends FEMBinary implements Emuable {
 
 		public final FEMBinary binary1;
 
@@ -260,6 +261,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.binary1) + EMU.from(this.binary2);
+		}
+
+		@Override
 		public final FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this.binary1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.binary2.section(offset2, length);
@@ -270,7 +276,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class SectionBinary extends FEMBinary {
+	public static final class SectionBinary extends FEMBinary implements Emuable {
 
 		public final FEMBinary binary;
 
@@ -293,6 +299,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.binary);
+		}
+
+		@Override
 		public final FEMBinary section(final int offset2, final int length2) throws IllegalArgumentException {
 			return this.binary.section(this.offset + offset2, length2);
 		}
@@ -300,7 +311,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ReverseBinary extends FEMBinary {
+	public static final class ReverseBinary extends FEMBinary implements Emuable {
 
 		public final FEMBinary binary;
 
@@ -317,6 +328,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		@Override
 		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.binary.customExtract(target, this.length - offset - length, length, !foreward);
+		}
+
+		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.binary);
 		}
 
 		@Override
@@ -398,7 +414,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 		@Override
 		public final long emu() {
-			return EMU.fromObject(this) + EMU.fromArray(this.items);
+			return EMU.fromObject(this) + EMU.from(this.items);
 		}
 
 		@Override
@@ -646,28 +662,13 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static int toInteger(final byte a) {
-		return a & 255;
-	}
-
-	@SuppressWarnings ("javadoc")
-	private static long toInteger(final int a, final int b) {
-		return ((long)a << 32) | b;
-	}
-
-	@SuppressWarnings ("javadoc")
-	private static int toInteger(final byte a, final byte b) {
-		return (FEMBinary.toInteger(a) << 8) | FEMBinary.toInteger(b);
-	}
-
-	@SuppressWarnings ("javadoc")
 	private static int toInteger(final byte a, final byte b, final byte c) {
-		return (FEMBinary.toInteger(a) << 16) | (FEMBinary.toInteger(b) << 8) | FEMBinary.toInteger(c);
+		return Integers.toInt(a, Integers.toShort(b, c));
 	}
 
 	@SuppressWarnings ("javadoc")
 	private static int toInteger(final byte a, final byte b, final byte c, final byte d) {
-		return (a << 24) | (FEMBinary.toInteger(b) << 16) | (FEMBinary.toInteger(c) << 8) | FEMBinary.toInteger(d);
+		return Integers.toInt(Integers.toShort(a, b), Integers.toShort(c, d));
 	}
 
 	/** Dieses Feld speichert den Streuwert. */
@@ -693,13 +694,13 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return 0;
 	}
 
-	/** Diese Methode fügt alle Bytes im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
+	/** Diese Methode fügt alle Bytes im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(byte)} {@code false} liefert.
 	 *
 	 * @param target {@link Collector}, an den die Bytes geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
-	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
+	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
@@ -947,24 +948,23 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 				case 0:
 					return 0;
 				case 1:
-					return FEMBinary.toInteger(this.customGet(0));
+					return this.customGet(0);
 				case 2:
-					return FEMBinary.toInteger(this.customGet(0), this.customGet(1));
+					return Integers.toShort(this.customGet(0), this.customGet(1));
 				case 3:
 					return FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2));
 				case 4:
 					return FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3));
 				case 5:
-					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(0)),
-						FEMBinary.toInteger(this.customGet(1), this.customGet(2), this.customGet(3), this.customGet(4)));
+					return Integers.toLong(this.customGet(0), FEMBinary.toInteger(this.customGet(1), this.customGet(2), this.customGet(3), this.customGet(4)));
 				case 6:
-					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(0), this.customGet(1)),
+					return Integers.toLong(Integers.toShort(this.customGet(0), this.customGet(1)),
 						FEMBinary.toInteger(this.customGet(2), this.customGet(3), this.customGet(4), this.customGet(5)));
 				case 7:
-					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2)),
+					return Integers.toLong(FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2)),
 						FEMBinary.toInteger(this.customGet(3), this.customGet(4), this.customGet(5), this.customGet(6)));
 				case 8:
-					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3)),
+					return Integers.toLong(FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3)),
 						FEMBinary.toInteger(this.customGet(4), this.customGet(5), this.customGet(6), this.customGet(7)));
 			}
 		} else {
@@ -972,24 +972,23 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 				case 0:
 					return 0;
 				case 1:
-					return FEMBinary.toInteger(this.customGet(0));
+					return this.customGet(0);
 				case 2:
-					return FEMBinary.toInteger(this.customGet(1), this.customGet(0));
+					return Integers.toShort(this.customGet(1), this.customGet(0));
 				case 3:
 					return FEMBinary.toInteger(this.customGet(2), this.customGet(1), this.customGet(0));
 				case 4:
 					return FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0));
 				case 5:
-					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(4)),
-						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+					return Integers.toLong(this.customGet(4), FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
 				case 6:
-					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(5), this.customGet(4)),
+					return Integers.toLong(Integers.toShort(this.customGet(5), this.customGet(4)),
 						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
 				case 7:
-					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(6), this.customGet(5), this.customGet(4)),
+					return Integers.toLong(FEMBinary.toInteger(this.customGet(6), this.customGet(5), this.customGet(4)),
 						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
 				case 8:
-					return FEMBinary.toInteger(FEMBinary.toInteger(this.customGet(7), this.customGet(6), this.customGet(5), this.customGet(4)),
+					return Integers.toLong(FEMBinary.toInteger(this.customGet(7), this.customGet(6), this.customGet(5), this.customGet(4)),
 						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
 			}
 		}

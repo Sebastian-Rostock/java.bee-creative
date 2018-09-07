@@ -28,13 +28,13 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ValueFinder implements Collector {
+	static final class ItemFinder implements Collector {
 
 		public final int that;
 
 		public int index;
 
-		ValueFinder(final int that) {
+		ItemFinder(final int that) {
 			this.that = that;
 		}
 
@@ -42,6 +42,47 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		public final boolean push(final int value) {
 			if (value == this.that) return false;
 			this.index++;
+			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class ValueFinder implements Collector {
+
+		public final int[] that;
+
+		public int index;
+
+		public int offset;
+
+		ValueFinder(final int[] that) {
+			this.that = that;
+			this.index = 1 - that.length;
+		}
+
+		@Override
+		public final boolean push(final int value) {
+			int offset = this.offset;
+			final int[] array = this.that;
+			if (array[offset] == value) {
+				++offset;
+				if (offset == array.length) return false;
+			} else {
+				LOOP: for (int delta = 1; offset > 0; ++delta) {
+					--offset;
+					if (array[offset] == value) {
+						for (int i = 0; i < offset; i++) {
+							if (array[i] != array[i + delta]) {
+								continue LOOP;
+							}
+						}
+						break LOOP;
+					}
+				}
+			}
+			this.index++;
+			this.offset = offset;
 			return true;
 		}
 
@@ -301,9 +342,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 		public final IAMArray array;
 
-		UTF32ArrayString(final int length, final IAMArray array) {
-			super(length);
-			if (length > array.length()) throw new IllegalStateException();
+		UTF32ArrayString(final IAMArray array) {
+			super(array.length());
 			this.array = array;
 		}
 
@@ -320,8 +360,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		/** Dieses Feld speichert das Array der UTF-8-Token, das nicht verändert werden darf. */
 		public final byte[] items;
 
-		UTF8CompactString(final byte[] items) throws IllegalArgumentException {
-			super(FEMString.utf8Length(items));
+		UTF8CompactString(final int length, final byte[] items) throws IllegalArgumentException {
+			super(length);
+			if (length > items.length) throw new IllegalStateException();
 			this.items = items;
 		}
 
@@ -374,6 +415,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			return this;
 		}
 
+		@Override
+		public final FEMString toUTF8() {
+			return this;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -382,8 +428,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		/** Dieses Feld speichert das Array der UTF-16-Token, das nicht verändert werden darf. */
 		public final char[] items;
 
-		UTF16CompactString(final char[] items) throws IllegalArgumentException {
-			super(FEMString.utf16Length(items));
+		UTF16CompactString(final int length, final char[] items) throws IllegalArgumentException {
+			super(length);
+			if (length > items.length) throw new IllegalStateException();
 			this.items = items;
 		}
 
@@ -436,6 +483,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			return this;
 		}
 
+		@Override
+		public final FEMString toUTF16() {
+			return this;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -464,6 +516,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			return this;
 		}
 
+		@Override
+		public final FEMString toUTF32() {
+			return this;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -486,7 +543,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatString extends FEMString {
+	public static final class ConcatString extends FEMString implements Emuable {
 
 		public final FEMString string1;
 
@@ -519,6 +576,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.string1) + EMU.from(this.string2);
+		}
+
+		@Override
 		public final FEMString section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this.string1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.string2.section(offset2, length);
@@ -529,7 +591,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class SectionString extends FEMString {
+	public static final class SectionString extends FEMString implements Emuable {
 
 		public final FEMString string;
 
@@ -552,6 +614,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.string);
+		}
+
+		@Override
 		public final FEMString section(final int offset2, final int length2) throws IllegalArgumentException {
 			return this.string.section(this.offset + offset2, length2);
 		}
@@ -559,7 +626,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ReverseString extends FEMString {
+	public static final class ReverseString extends FEMString implements Emuable {
 
 		public final FEMString string;
 
@@ -576,6 +643,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		@Override
 		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.string.customExtract(target, offset, length, !foreward);
+		}
+
+		@Override
+		public final long emu() {
+			return EMU.fromObject(this) + EMU.from(this.string);
 		}
 
 		@Override
@@ -647,9 +719,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMString from(final int[] items) throws NullPointerException {
-		if (items.length == 0) return FEMString.EMPTY;
-		if (items.length == 1) return new UniformString(1, items[0]);
-		return new UTF32CompactString(items.clone());
+		return FEMString.from(false, items);
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF32-kodierten Codepoints zurück.
@@ -659,8 +729,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMString from(final boolean copy, final int[] items) throws NullPointerException {
-		if (copy) return FEMString.from(items);
-		return new UTF32CompactString(items);
+		if (items.length == 0) return FEMString.EMPTY;
+		if (items.length == 1) return new UniformString(1, items[0]);
+		return new UTF32CompactString(copy ? items.clone() : items);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den UTF32-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
@@ -678,7 +749,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		if (length == 1) return new UniformString(1, items[offset]);
 		final int[] result = new int[length];
 		System.arraycopy(items, offset, result, 0, length);
-		return new UTF32CompactString(result);
+		return FEMString.from(false, result);
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück.<br>
@@ -689,8 +760,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final byte[] items) throws NullPointerException, IllegalArgumentException {
-		if (items.length == 0) return FEMString.EMPTY;
-		return new UTF8CompactString(items.clone());
+		return FEMString.from(true, items);
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück.
@@ -701,8 +771,10 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final boolean copy, final byte[] items) throws NullPointerException, IllegalArgumentException {
-		if (copy) return FEMString.from(items);
-		return new UTF8CompactString(items);
+		if (items.length == 0) return FEMString.EMPTY;
+		final int length = FEMString.utf8Length(items);
+		if (length == 1) return new UniformString(1, FEMString.utf8Codepoint(items, 0));
+		return new UTF8CompactString(length, copy ? items.clone() : items);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den UTF8-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
@@ -719,7 +791,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		if (length == 0) return FEMString.EMPTY;
 		final byte[] result = new byte[length];
 		System.arraycopy(items, offset, result, 0, length);
-		return new UTF8CompactString(result);
+		return FEMString.from(false, result);
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück.<br>
@@ -730,8 +802,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final char[] items) throws NullPointerException, IllegalArgumentException {
-		if (items.length == 0) return FEMString.EMPTY;
-		return new UTF16CompactString(items.clone());
+		return FEMString.from(true, items);
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück.
@@ -742,8 +813,10 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final boolean copy, final char[] items) throws NullPointerException, IllegalArgumentException {
-		if (copy) return FEMString.from(items);
-		return new UTF16CompactString(items);
+		if (items.length == 0) return FEMString.EMPTY;
+		final int length = FEMString.utf16Length(items);
+		if (length == 1) return new UniformString(1, FEMString.utf16Codepoint(items, 0));
+		return new UTF16CompactString(length, copy ? items.clone() : items);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den UTF16-kodierte Codepoints im gegebenen Abschnitt zurück.<br>
@@ -760,7 +833,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		if (length == 0) return FEMString.EMPTY;
 		final char[] result = new char[length];
 		System.arraycopy(items, offset, result, 0, length);
-		return new UTF16CompactString(result);
+		return FEMString.from(false, result);
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen Codepoints zurück.
@@ -770,7 +843,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
 	public static FEMString from(final String string) throws NullPointerException {
 		if (string.length() == 0) return FEMString.EMPTY;
-		return new UTF16CompactString(string.toCharArray());
+		return FEMString.from(false, string.toCharArray());
 	}
 
 	/** Diese Methode gibt eine uniforme Zeichenkette mit der gegebenen Länge zurück, deren Codepoints alle gleich dem gegebenen sind.
@@ -794,7 +867,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	public static FEMString from(final List<? extends Number> items) throws NullPointerException {
 		final int length = items.size();
 		if (length == 0) return FEMString.EMPTY;
-		if (length == 1) return FEMString.from(items.get(0).intValue(), 1);
+		if (length == 1) return new UniformString(1, items.get(0).intValue());
 		final int[] result = new int[length];
 		for (int i = 0; i < length; i++) {
 			result[i] = items.get(i).intValue();
@@ -821,16 +894,20 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-		final int length = array.length();
+		int length = array.length();
 		if (length == 0) return FEMString.EMPTY;
-		if (length == 1) return FEMString.from(array.get(0), 1);
 		switch (array.mode()) {
 			case 1:
-				return new UTF8ArrayString(FEMString.utf8Length(array), array);
+				length = FEMString.utf8Length(array);
+				if (length == 1) return new UniformString(1, FEMString.utf8Codepoint(array, 0));
+				return new UTF8ArrayString(length, array);
 			case 2:
-				return new UTF16ArrayString(FEMString.utf16Length(array), array);
+				length = FEMString.utf16Length(array);
+				if (length == 1) return new UniformString(1, FEMString.utf16Codepoint(array, 0));
+				return new UTF16ArrayString(length, array);
 			case 4:
-				return new UTF32ArrayString(length, array);
+				if (length == 1) return new UniformString(1, array.get(0));
+				return new UTF32ArrayString(array);
 		}
 		throw new IllegalArgumentException();
 	}
@@ -857,21 +934,21 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 				length = (array.get(0) << 0) | (array.get(1) << 8) | (array.get(2) << 16) | (array.get(3) << 24);
 				if (length < 0) throw new IllegalArgumentException();
 				if (length == 0) return FEMString.EMPTY;
-				if (length == 1) return FEMString.from(FEMString.utf8Codepoint(array, 4), 1);
+				if (length == 1) return new UniformString(1, FEMString.utf8Codepoint(array, 4));
 				return new UTF8ArrayString(length, array.section(4, count - 5));
 			case 2:
 				if (count < 3) throw new IllegalArgumentException();
 				length = (array.get(0) << 0) | (array.get(1) << 16);
 				if (length == 0) return FEMString.EMPTY;
-				if (length == 1) return FEMString.from(FEMString.utf16Codepoint(array, 2), 1);
+				if (length == 1) return new UniformString(1, FEMString.utf16Codepoint(array, 2));
 				return new UTF16ArrayString(length, array.section(2, count - 3));
 			case 4:
 				if (count < 2) throw new IllegalArgumentException();
 				length = array.get(0);
 				if (length < 0) throw new IllegalArgumentException();
 				if (length == 0) return FEMString.EMPTY;
-				if (length == 1) return FEMString.from(array.get(0), 1);
-				return new UTF32ArrayString(length, array.section(1, count - 2));
+				if (length == 1) return new UniformString(1, array.get(0));
+				return new UTF32ArrayString(array.section(1, count - 2));
 		}
 		throw new IllegalArgumentException();
 	}
@@ -1130,13 +1207,37 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return 0;
 	}
 
-	/** Diese Methode fügt alle Codepoints im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück.<br>
+	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
+	 *
+	 * @param that gesuchtes Zeichen.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens des gegebenen Zeichens ({@code offset..this.length()-1}) oder {@code -1}. */
+	protected int customFind(final int that, final int offset) {
+		final ItemFinder finder = new ItemFinder(that);
+		if (this.customExtract(finder, offset, this.length - offset, true)) return -1;
+		return finder.index + offset;
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück.<br>
+	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
+	 *
+	 * @param that gesuchte Zeichenkette.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens der gegebene Zeichenkette ({@code offset..this.length()-that.length()}) oder {@code -1}. */
+	protected int customFind(final FEMString that, final int offset) {
+		final ValueFinder finder = new ValueFinder(that.value());
+		if (this.customExtract(finder, offset, this.length - offset, true)) return -1;
+		return finder.index + offset;
+	}
+
+	/** Diese Methode fügt alle Codepoints im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(int)} {@code false} liefert.
 	 *
 	 * @param target {@link Collector}, an den die Codepoints geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
-	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
+	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
@@ -1223,9 +1324,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @see #value()
 	 * @return performanteren Zeichenkette oder {@code this}. */
 	public FEMString compact() {
-		final FEMString result = this.length == 1 ? new UniformString(1, this.customGet(0)) : new UTF8CompactString(this.toBytes());
-		result.hash = this.hash;
-		return result;
+		return this.toUTF32();
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück.<br>
@@ -1236,12 +1335,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @return Position des ersten Vorkommens des gegebenen Zeichens ({@code offset..this.length()-1}) oder {@code -1}.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final int that, final int offset) throws IllegalArgumentException {
-		final int length = this.length - offset;
-		if (length == 0) return -1;
-		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
-		final ValueFinder finder = new ValueFinder(that);
-		if (this.customExtract(finder, offset, length, true)) return -1;
-		return finder.index + offset;
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
+		if (offset == this.length) return -1;
+		return this.customFind(that, offset);
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück.<br>
@@ -1253,23 +1349,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMString that, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int count = that.length;
-		if (count == 1) return this.find(that.customGet(0), offset);
 		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
-		if (count == 0) return offset;
-		final int value = that.customGet(0);
-		final int length = (this.length - count) + 1;
-		FIND: for (int i = offset; i < length; i++) {
-			if (value == this.customGet(i)) {
-				for (int i2 = 1; i2 < count; i2++) {
-					if (this.customGet(i + i2) != that.customGet(i2)) {
-						continue FIND;
-					}
-				}
-				return i;
-			}
-		}
-		return -1;
+		if (that.length == 0) return offset;
+		if (that.length == 1) return this.customFind(that.customGet(0), offset);
+		if (that.length > (this.length - offset)) return -1;
+		return this.customFind(that, offset);
 	}
 
 	/** Diese Methode fügt alle Codepoints dieser Zeichenkette vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
@@ -1317,6 +1401,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		final int length = this.length;
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;
+		// TODO schneller
 		for (int i = 0; i < length; i++) {
 			if (this.customGet(i) != that.customGet(i)) return false;
 		}
@@ -1331,6 +1416,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMString that) throws NullPointerException {
 		final int length = Math.min(this.length, that.length);
+		// TODO schneller
 		for (int i = 0; i < length; i++) {
 			final int result = Comparators.compare(this.customGet(i), that.customGet(i));
 			if (result != 0) return result;
@@ -1357,6 +1443,30 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			}
 
 		};
+	}
+
+	/** Diese Methode gibt diese Zeichenkette in UTF8-Kodierung zurück.
+	 *
+	 * @see #toBytes()
+	 * @return Zeichenkette in UTF8-Kodierung zurück. */
+	public FEMString toUTF8() {
+		return FEMString.from(false, this.toBytes());
+	}
+
+	/** Diese Methode gibt diese Zeichenkette in UTF16-Kodierung zurück.
+	 *
+	 * @see #toChars()
+	 * @return Zeichenkette in UTF16-Kodierung zurück. */
+	public FEMString toUTF16() {
+		return FEMString.from(false, this.toChars());
+	}
+
+	/** Diese Methode gibt diese Zeichenkette in UTF32-Kodierung zurück.
+	 *
+	 * @see #value()
+	 * @return Zeichenkette in UTF32-Kodierung zurück. */
+	public FEMString toUTF32() {
+		return FEMString.from(false, this.value());
 	}
 
 	/** Diese Methode gibt die Codepoint in UTF8-Kodierung zurück.

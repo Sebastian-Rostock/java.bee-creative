@@ -72,7 +72,7 @@ public abstract class FEMUtil {
 	}, "var", "VAR");
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (param1; ...; paramN; result: FEMValue): FEMValue}, welche die gegebenen Parameter in der
-	 * gegebenen Reigenfolge {@link FEMValue#result(boolean) rekursiv auswertet} und den letzten als Ergebniswert liefert. */
+	 * gegebenen Reihenfolge {@link FEMValue#result(boolean) rekursiv auswertet} und den letzten als Ergebniswert liefert. */
 	public static final FEMFunction EVAL = FEMUtil.put(new FEMFunction() {
 
 		@Override
