@@ -286,8 +286,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	@SuppressWarnings ("javadoc")
 	public static class CompactArray extends FEMArray implements Emuable {
 
-		/** Dieses Feld speichert das Array der Werte, das nicht verändert werden darf. */
-		public final FEMValue[] items;
+		/** Dieses Feld speichert das Array der Werte, das nicht verändert werden sollte. */
+		final FEMValue[] items;
 
 		CompactArray(final FEMValue[] items) throws IllegalArgumentException {
 			super(items.length);
@@ -461,7 +461,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMArray(final int length) throws IllegalArgumentException {
-		if (length < 0) throw new IllegalArgumentException("length < 0");
+		if (length < 0) throw new IllegalArgumentException();
 		this.length = length;
 	}
 

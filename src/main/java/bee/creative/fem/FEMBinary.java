@@ -65,6 +65,26 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
+	static final class ValueCollector implements Collector {
+	
+		public final byte[] array;
+	
+		public int index;
+	
+		public ValueCollector(final byte[] array, final int index) {
+			this.array = array;
+			this.index = index;
+		}
+	
+		@Override
+		public final boolean push(final byte value) {
+			this.array[this.index++] = value;
+			return true;
+		}
+	
+	}
+
+	@SuppressWarnings ("javadoc")
 	static final class StringCollector implements Collector {
 
 		public final char[] array;
@@ -90,26 +110,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			this.array[index] = FEMBinary.toChar((value >> 0) & 0xF);
 			++index;
 			this.index = index;
-			return true;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final class ValueCollector implements Collector {
-
-		public final byte[] array;
-
-		public int index;
-
-		public ValueCollector(final byte[] array, final int index) {
-			this.array = array;
-			this.index = index;
-		}
-
-		@Override
-		public final boolean push(final byte value) {
-			this.array[this.index++] = value;
 			return true;
 		}
 
@@ -399,8 +399,8 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	@SuppressWarnings ("javadoc")
 	public static final class CompactBinary extends FEMBinary implements Emuable {
 
-		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden darf. */
-		public final byte[] items;
+		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden sollte. */
+		final byte[] items;
 
 		CompactBinary(final byte[] items) throws IllegalArgumentException {
 			super(items.length);
@@ -682,7 +682,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMBinary(final int length) throws IllegalArgumentException {
-		if (length < 0) throw new IllegalArgumentException("length < 0");
+		if (length < 0) throw new IllegalArgumentException();
 		this.length = length;
 	}
 
