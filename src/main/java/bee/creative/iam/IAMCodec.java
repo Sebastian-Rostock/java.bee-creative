@@ -455,73 +455,101 @@ public final class IAMCodec {
 
 		},
 
-//		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-//		 * 8-Bit-Kodierung} eines {@link FEMString} stehen. */
-//		STRING_FEM_8 { TODO
-//
-//			@Override
-//			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
-//				return FEMString.from(source).toArray(1, true).toArray();
-//			}
-//
-//			@Override
-//			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
-//				return FEMString.from(IAMArray.from(IAMArray.toBytes(IAMArray.from(source))), true).toString();
-//			}
-//
-//		},
-//
-//		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-//		 * 16-Bit-Kodierung} eines {@link FEMString} stehen. */
-//		STRING_FEM_16 {
-//
-//			@Override
-//			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
-//				return FEMString.from(source).toArray(2, true).toArray();
-//			}
-//
-//			@Override
-//			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
-//				return FEMString.from(IAMArray.from(IAMArray.toChars(IAMArray.from(source))), true).toString();
-//			}
-//
-//		},
-//
-//		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-//		 * 32-Bit-Kodierung} eines {@link FEMString} stehen. */
-//		STRING_FEM_32 {
-//
-//			@Override
-//			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
-//				return FEMString.from(source).toArray(4, true).toArray();
-//			}
-//
-//			@Override
-//			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
-//				return FEMString.from(IAMArray.from(source), true).toString();
-//			}
-//
-//		}
-		;
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 32-Bit-Einzelwertkodierung} eines {@link FEMString} stehen. */
+		STRING_FEM {
+
+			@Override
+			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(4, true).toArray();
+			}
+
+			@Override
+			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(source), false).toString();
+			}
+
+		},
+
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 8-Bit-Einzelwertkodierung} eines {@link FEMString} stehen. */
+		STRING_FEM_INT8 {
+
+			@Override
+			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(4, true).toArray();
+			}
+
+			@Override
+			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(IAMArray.toBytes(IAMArray.from(source))), false).toString();
+			}
+
+		},
+
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 16-Bit-Einzelwertkodierung} eines {@link FEMString} stehen. */
+		STRING_FEM_INT16 {
+
+			@Override
+			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(2, false).toArray();
+			}
+
+			@Override
+			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(IAMArray.toChars(IAMArray.from(source))), false).toString();
+			}
+
+		},
+
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 8-Bit-Mehrwertkodierung} eines {@link FEMString} stehen. */
+		STRING_FEM_UTF8 {
+
+			@Override
+			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(1, true).toArray();
+			}
+
+			@Override
+			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(IAMArray.toBytes(IAMArray.from(source))), true).toString();
+			}
+
+		},
+
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 16-Bit-Mehrwertkodierung} eines {@link FEMString} stehen. */
+		STRING_FEM_UTF16 {
+
+			@Override
+			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(2, true).toArray();
+			}
+
+			@Override
+			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(IAMArray.toChars(IAMArray.from(source))), true).toString();
+			}
+
+		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMArrayFormat> values = MapBuilder.<Object, IAMArrayFormat>forHashMap() //
-			.put(null, ARRAY).put("", ARRAY).put("A", ARRAY).put("ARRAY", ARRAY) //
-			.put("B", BINARY).put("BINARY", BINARY) //
-			.put("UTF-8", STRING_UTF_8).put("UTF-16", STRING_UTF_16).put("UTF-32", STRING_UTF_32) //
-			.put("CP-1252", STRING_CP_1252) //
-			.put("ISO-8859-1", STRING_ISO_8859_1).put("ISO-8859-15", STRING_ISO_8859_15)//
-//			.put("FEM-8", STRING_FEM_8).put("FEM-16", STRING_FEM_16).put("FEM-32", STRING_FEM_32) //
-			.build();
-
-		@SuppressWarnings ("javadoc")
-		static final Map<?, String> strings = MapBuilder.<Object, String>forHashMap() //
+		static final Map<IAMArrayFormat, String> strings = MapBuilder.<IAMArrayFormat, String>forHashMap() //
 			.put(ARRAY, "ARRAY") //
 			.put(BINARY, "BINARY") //
 			.put(STRING_UTF_8, "UTF-8").put(STRING_UTF_16, "UTF-16").put(STRING_UTF_32, "UTF-32") //
 			.put(STRING_CP_1252, "CP-1252") //
 			.put(STRING_ISO_8859_1, "ISO-8859-1").put(STRING_ISO_8859_15, "ISO-8859-15") //
-//			.put(STRING_FEM_8, "FEM-8").put(STRING_FEM_16, "FEM-16").put(STRING_FEM_32, "FEM-32") //
+			.put(STRING_FEM, "FEM-32") //
+			.put(STRING_FEM_INT8, "FEM-UTF8").put(STRING_FEM_UTF16, "FEM-UTF16") //
+			.put(STRING_FEM_UTF8, "FEM-UTF8").put(STRING_FEM_UTF16, "FEM-UTF16") //
+			.build();
+
+		@SuppressWarnings ("javadoc")
+		static final Map<?, IAMArrayFormat> values = MapBuilder.<Object, IAMArrayFormat>forHashMap() //
+			.putAllInverse(IAMArrayFormat.strings).put(null, ARRAY).put("", ARRAY).put("A", ARRAY).put("B", BINARY) //
 			.build();
 
 		/** Diese Methode gibt das {@link IAMArrayFormat} zum gegebenen Objekt zurück.<br>
@@ -543,12 +571,12 @@ public final class IAMCodec {
 		 * <dd>{@link #STRING_ISO_8859_1}</dd>
 		 * <dt>{@code "ISO-8859-15"}</dt>
 		 * <dd>{@link #STRING_ISO_8859_15}</dd>
-		 * <dt>{@code "FEM-8"}</dt>
-		 * <dd>{@link #STRING_FEM_8}</dd>
-		 * <dt>{@code "FEM-16"}</dt>
-		 * <dd>{@link #STRING_FEM_16}</dd>
+		 * <dt>{@code "FEM-UTF8"}</dt>
+		 * <dd>{@link #STRING_FEM_UTF8}</dd>
+		 * <dt>{@code "FEM-UTF16"}</dt>
+		 * <dd>{@link #STRING_FEM_UTF16}</dd>
 		 * <dt>{@code "FEM-32"}</dt>
-		 * <dd>{@link #STRING_FEM_32}</dd>
+		 * <dd>{@link #STRING_FEM}</dd>
 		 * </dl>
 		 *
 		 * @param object {@link Object} oder {@code null}.

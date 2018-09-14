@@ -14,7 +14,7 @@ import bee.creative.util.Objects.UseToString;
 import bee.creative.util.emu.EMU;
 import bee.creative.util.emu.Emuable;
 
-/** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
+/** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iterable<FEMValue>, UseToString {
