@@ -16,7 +16,7 @@ import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
 import bee.creative.iam.IAMCodec.IAMArrayFormat;
 import bee.creative.iam.IAMCodec.IAMByteOrder;
 import bee.creative.iam.IAMCodec.IAMFindMode;
-import bee.creative.util.IO;
+import bee.creative.io.IO;
 
 /** @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")

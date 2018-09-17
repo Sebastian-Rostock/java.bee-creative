@@ -9,8 +9,8 @@ import bee.creative.fem.FEMBinary;
 import bee.creative.fem.FEMString;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
+import bee.creative.io.IO;
 import bee.creative.util.Builders.MapBuilder;
-import bee.creative.util.IO;
 
 /** Diese Klasse implementiert den Konfigurator, mit welchem ein {@link IAMIndex} aus bzw. in unterschiedliche Datenformate gelesen bzw. geschieben werden kann.
  * Dabei können {@link #getSourceData() Eingabedaten} unterschiedlicher {@link #getSourceFormat() Eingabeformate} direkt in {@link #getTargetData()

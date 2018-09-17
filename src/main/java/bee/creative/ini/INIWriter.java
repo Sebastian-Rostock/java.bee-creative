@@ -3,7 +3,7 @@ package bee.creative.ini;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
-import bee.creative.util.IO;
+import bee.creative.io.IO;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein Objekt zum Schreiben einer {@code INI}-Datenstruktur über einen {@link Writer}, analog zu einem {@link INIReader}.

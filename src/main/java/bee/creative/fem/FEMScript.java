@@ -3,14 +3,14 @@ package bee.creative.fem;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMScript.Token;
 import bee.creative.util.Comparables;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
-import bee.creative.util.emu.EMU;
-import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  *

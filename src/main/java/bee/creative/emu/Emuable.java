@@ -1,4 +1,4 @@
-package bee.creative.util.emu;
+package bee.creative.emu;
 
 /** Diese Schnittstelle definiert eine Methode zur Ermittlung des geschätzten Speicherverbrauchs des Objekts. Dieser Speicherverbrauch sollte den der
  * ausschließlich intern verwalteten Objekte mit einschließen.

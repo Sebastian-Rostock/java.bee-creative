@@ -1,4 +1,4 @@
-package bee.creative.util.emu;
+package bee.creative.emu;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -108,7 +108,7 @@ public class EMU {
 		return (size + 7) & -8L;
 	}
 
-	/** Diese Methode gibt den gegebenen Speicherverbrauch des gegebenen Objekts zurück. Wenn es {@code null} ist, wird {@code 0} geliefert. Wenn es ein
+	/** Diese Methode gibt den geschätztern Speicherverbrauch des gegebenen Objekts zurück. Wenn es {@code null} ist, wird {@code 0} geliefert. Wenn es ein
 	 * {@link Emuable} ist, wird der Speicherverbrauch über {@link Emuable#emu()} geschätzt. Wenn es ein Array ist, wird er über {@link #fromArray(Object)}
 	 * geschätzt. Wenn für seine Klasse ein {@link Emuator} {@link #use(Class, Emuator) registiriert wurde}, wird er über {@link Emuator#emu(Object)} geschätzt.
 	 * Andernfalls wird er über {@link #fromClass(Class)} bezüglich seiner Klasse geschätzt.

@@ -22,7 +22,9 @@ import bee.creative.ref.SoftPointer;
 /** Diese Klasse implementiert grundlegende {@link Builder}.
  *
  * @see Builder
- * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+ * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @deprecated {@link Producers} */
+@Deprecated
 public class Builders {
 
 	/** Diese Klasse implementiert einen abstrakten Konfigurator zur Erzeugung eines Datensatzes.

@@ -2,10 +2,10 @@ package bee.creative.fem;
 
 import java.util.Collection;
 import java.util.List;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
-import bee.creative.util.emu.EMU;
-import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert eine abstrakte Funktion, deren {@link #invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen
  * werden kann, um einen Ergebniswert zu ermitteln.<br>

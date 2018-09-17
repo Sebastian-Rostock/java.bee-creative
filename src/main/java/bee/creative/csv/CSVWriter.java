@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
-import bee.creative.util.IO;
+import bee.creative.io.IO;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Formatter für Daten im {@code CSV}-Format.<br>

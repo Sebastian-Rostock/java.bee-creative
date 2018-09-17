@@ -5,6 +5,8 @@ import java.nio.ByteOrder;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
@@ -12,8 +14,6 @@ import bee.creative.util.Integers;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
-import bee.creative.util.emu.EMU;
-import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
@@ -752,7 +752,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return new ConcatBinary(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length - offset)}.
+	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length() - offset)}.
 	 *
 	 * @see #length()
 	 * @see #section(int, int) */

@@ -3,14 +3,14 @@ package bee.creative.fem;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
-import bee.creative.util.emu.EMU;
-import bee.creative.util.emu.Emuable;
 
 /** Diese Klasse implementiert eine unveränderliche Zeichenkette sowie Methoden zur Erzeugung solcher Zeichenketten.
  * <p>
@@ -25,9 +25,8 @@ import bee.creative.util.emu.Emuable;
  * </p>
  * <h5>UTF - Mehrwertkodierungen</h5>
  * <p>
- * Mehrwertkodierungen speichern einen Codepoint in mindestens einem {@code byte}- bzw. {@code char}-Wert. Wie die {@link #compactINT32() 32-Bit}
- * Einzelwertkodierung schränken sie den Wertebereich der Codepoints nicht ein, erlauben jedoch einen geringeren Speicherverbrauch bei gleichzeitig langsamerem
- * {@link #get(int) Zugriff}.
+ * Mehrwertkodierungen speichern einen Codepoint in mindestens einem {@code byte}- bzw. {@code char}-Wert. Sie schränken den Wertebereich der Codepoints bei
+ * geringerem Speicherverbrauch nicht ein, erlauben wegen dieser Kompression jedoch nur einen langsamen {@link #get(int) Zugriff} auf die Codepoints.
  * </p>
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -419,11 +418,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			return true;
 		}
 
-		@Override
-		public final FEMString compactUTF8() {
-			return this;
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -685,13 +679,13 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public int[] toInts() {
-			return this.items.clone();
+		public final FEMString compactINT32() {
+			return this;
 		}
 
 		@Override
-		public final FEMString compactINT32() {
-			return this;
+		public int[] toInts() {
+			return this.items.clone();
 		}
 
 	}
@@ -719,6 +713,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 		@Override
 		public final FEMString compact() {
+			return this;
+		}
+
+		@Override
+		public FEMString compactINT8() {
 			return this;
 		}
 
@@ -753,6 +752,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 		@Override
 		public final FEMString compact() {
+			return this;
+		}
+
+		@Override
+		public FEMString compactINT16() {
 			return this;
 		}
 
@@ -825,11 +829,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			return this.items.clone();
 		}
 
-		@Override
-		public final FEMString compactUTF8() {
-			return this;
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -891,11 +890,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		@Override
 		public char[] toChars() {
 			return this.items.clone();
-		}
-
-		@Override
-		public final FEMString compactUTF16() {
-			return this;
 		}
 
 	}
@@ -981,8 +975,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @see #toBytes(boolean)
 	 * @param items 8-Bit-kodierte Codepoints.
 	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
-	 * @param asUTF8 {@code true}, wenn die Codepoints Mehrwertkodiert sind.<br>
-	 *        {@code false}, wenn die Codepoints Einzelwertkodiert sind.
+	 * @param asUTF8 {@code true}, wenn die Codepoints mehrwertkodiert sind.<br>
+	 *        {@code false}, wenn die Codepoints einzelwertkodiert sind.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -1019,8 +1013,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param items 8-Bit-kodierte Codepoints.
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
-	 * @param asUTF8 {@code true}, wenn die Codepoints Mehrwertkodiert sind.<br>
-	 *        {@code false}, wenn die Codepoints Einzelwertkodiert sind.
+	 * @param asUTF8 {@code true}, wenn die Codepoints mehrwertkodiert sind.<br>
+	 *        {@code false}, wenn die Codepoints einzelwertkodiert sind.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -1055,6 +1049,16 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return FEMString.from(items, copy, true);
 	}
 
+	/** Diese Methode gibt eine Zeichenkette mit den gegebenen 16-Bit-kodierten Codepoints zurück.
+	 *
+	 * @see #toChars(boolean)
+	 * @param items 16-Bit-kodierte Codepoints.
+	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
+	 * @param asUTF16 {@code true}, wenn die Codepoints mehrwertkodiert sind.<br>
+	 *        {@code false}, wenn die Codepoints einzelwertkodiert sind.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final char[] items, final boolean copy, final boolean asUTF16) throws NullPointerException, IllegalArgumentException {
 		if (items.length == 0) return FEMString.EMPTY;
 		if (asUTF16) {
@@ -1080,6 +1084,18 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return FEMString.from(items, offset, length, true);
 	}
 
+	/** Diese Methode gibt eine Zeichenkette mit den gegebenen 16-Bit-kodierten Codepoints im gegebenen Abschnitt zurück.<br>
+	 * Der gegebene Abschnitt wird kopiert.
+	 *
+	 * @see #toChars(boolean)
+	 * @param items 16-Bit-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @param asUTF16 {@code true}, wenn die Codepoints mehrwertkodiert sind.<br>
+	 *        {@code false}, wenn die Codepoints einzelwertkodiert sind.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final char[] items, final int offset, final int length, final boolean asUTF16)
 		throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
@@ -1150,31 +1166,19 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return FEMString.from(array, false);
 	}
 
-	// /** Diese Methode gibt eine Zeichenkette mit den gegebenen Zahlen zurück. Sie ist die Umkehroperation zu {@link #toArray(int, boolean)}.<br>
-	// * Wenn die gegebene Zahlenliste aus {@link IAMArray#mode() 1}, {@link IAMArray#mode() 2} oder {@link IAMArray#mode() 4} Byte großen Zahlen besteht, werden
-	// * diese als UTF8-, UTF16- bzw. UTF32-kodierte Codepoints interpretiert.
-	// * <p>
-	// * Bei einer strukturierten Zahlenfolge geben die Zahlen in den ersten vier Byte der Zahlenfolge die Länge der Zeichenkette an. Diese Zahlen werden gemäß
-	// * <em>little-endian</em> Semantik zusammengeführt. Die letzte Zahl einer solchen Zahlenfolge ist stets {@code 0}. Die Zahlen zwischen Längenangabe und
-	// * Nullterminierung enthalten dann die Codepoints. Eine unstrukturierte Zahlenfolge ehthält dagegen nur die Codepoints.
-	// *
-	// * @param array Zahlenfolge.
-	// * @param structured {@code true}, wenn die Zahlenfolge strukturiert ist.
-	// * @return {@link FEMString}-Sicht auf die gegebene Zahlenfolge.
-	// * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	// * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	//
-	/** int: hash, content, null
-	 * <p>
-	 * utf: hash, length, content, null
-	 * <p>
-	 * Diese Methode gibt das zurück.
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeichenkette und gibt diese zurück. <br>
+	 * Bei der Kodierung mit Einzelwerten werden die ersten vier Byte der Zahlenfolge als {@link #hash() Streuwert}, die darauf folgenden Zahlenwerte als
+	 * Auflistung der einzelwertkodierten Codepoints und der letzte Zahlenwert als abschließende {@code 0} interpretiert. Bei der Mehrwertkodierung werden dagegen
+	 * die ersten vier Byte der Zahlenfolge als {@link #hash() Streuwert}, die nächsten die darauf folgenden Zahlenwerte als Auflistung der mehrwertkodierten
+	 * Codepoints und der letzte Zahlenwert als abschließende {@code 0} interpretiert. Ob eine 8-, 16- oder 32-Bit-Kodierung eingesetzt wird, hängt von der
+	 * {@link IAMArray#mode() Größe der Zahlenwerte} ab.
 	 *
-	 * @param array
-	 * @param asUTFx
-	 * @return
-	 * @throws NullPointerException
-	 * @throws IllegalArgumentException */
+	 * @param array Zahlenfolge.
+	 * @param asUTFx {@code true}, wenn die Codepoints mehrwertkodiert sind.<br>
+	 *        {@code false}, wenn die Codepoints einzelwertkodiert sind.
+	 * @return {@link FEMString}-Sicht auf die gegebene Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final IAMArray array, final boolean asUTFx) throws NullPointerException, IllegalArgumentException {
 		switch (array.mode()) {
 			case 1:
@@ -1524,7 +1528,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return new ConcatString(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length - offset)}.
+	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length() - offset)}.
 	 *
 	 * @see #length()
 	 * @see #section(int, int) */
@@ -1553,11 +1557,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return new ReverseString(this);
 	}
 
-	/** Diese Methode gibt die {@link #value() Codepoints dieser Zeichenkette} in einer performanteren oder zumindest gleichwertigen Zeichenkette zurück.
+	/** Diese Methode gibt die {@link #value() Codepoints dieser Zeichenkette} in einer performanteren oder zumindest gleichwertigen Zeichenkette mit möglichst
+	 * geringerem Speicherverbrauch zurück.<br>
+	 * Abhängig vom Wertebereich der Codepoints kann hierfür eine {@link #compactINT8() 8-Bit-}, {@link #compactINT16() 16-Bit-} oder {@link #compactINT32()
+	 * 32-Bit-}Einzelwertkodierung zum Einsatz kommen.
 	 *
-	 * @see #compactINT8()
-	 * @see #compactINT16()
-	 * @see #compactINT32()
 	 * @return performanteren Zeichenkette oder {@code this}. */
 	public FEMString compact() {
 		final RangeCollector finder = new RangeCollector();
@@ -1568,7 +1572,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	/** Diese Methode gibt diese Zeichenkette mit 8-Bit Einzelwertkodierung zurück.<br>
-	 * Codepoints größer als {@code 255} werden hierbei mit {@code 0} kodiert.
+	 * Codepoints größer als {@code 255} werden bei dieser Kodierung zu {@code 0}.
 	 *
 	 * @see #from(byte[], int, int)
 	 * @see #toBytes(boolean)
@@ -1578,37 +1582,22 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	/** Diese Methode gibt diese Zeichenkette mit 16-Bit Einzelwertkodierung zurück.<br>
-	 * Codepoints größer als {@code 65535} werden hierbei mit {@code 0} kodiert.
+	 * Codepoints größer als {@code 65535} werden bei dieser Kodierung zu {@code 0}.
 	 *
 	 * @see #from(char[], boolean, boolean)
 	 * @see #toChars(boolean)
-	 * @return Zeichenkette in 8-Bit-Einzelwertkodierung. */
+	 * @return Zeichenkette in 16-Bit-Einzelwertkodierung. */
 	public FEMString compactINT16() {
 		return FEMString.from(this.toChars(false), false, false);
 	}
 
-	/** Diese Methode gibt diese Zeichenkette in UTF32-Kodierung zurück.
+	/** Diese Methode gibt diese Zeichenkette mit 32-Bit Einzelwertkodierung zurück.
 	 *
-	 * @see #value()
-	 * @return Zeichenkette in UTF32-Kodierung zurück. */
+	 * @see #from(int[], boolean)
+	 * @see #toInts()
+	 * @return Zeichenkette in 32-Bit-Einzelwertkodierung. */
 	public FEMString compactINT32() {
 		return FEMString.from(this.toInts(), false);
-	}
-
-	/** Diese Methode gibt diese Zeichenkette in UTF8-Kodierung zurück.
-	 *
-	 * @see #toBytes()
-	 * @return Zeichenkette in UTF8-Kodierung zurück. */
-	public FEMString compactUTF8() {
-		return FEMString.from(this.toBytes(), false, true);
-	}
-
-	/** Diese Methode gibt diese Zeichenkette in UTF16-Kodierung zurück.
-	 *
-	 * @see #toChars()
-	 * @return Zeichenkette in UTF16-Kodierung zurück. */
-	public FEMString compactUTF16() {
-		return FEMString.from(this.toChars(), false, true);
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück.<br>
@@ -1793,19 +1782,14 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return this.toArray(mode, false);
 	}
 
-	// /** Diese Methode gibt eine Zahlenfolge zurück, welche die kodierten Codepoints dieser Zeichenkette enthält. Sie ist die Umkehroperation zu
-	// * {@link #from(IAMArray, boolean)}.
-	// *
-	// * @see #value()
-	// * @see #toBytes()
-	// * @see #toChars()
-	// * @param mode Kodierungskennung mit {@code 1} für {@code 8-Bit}, {@code 2} für {@code 16-Bit} und {@code 4} für {@code 32-Bit}.
-	// * @param structured {@code true}, wenn die Zahlenfolge strukturiert sein soll.
-	// * @return Zahlenfolge mit der entsprechend kodierten Zeichenkette.
-	// * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-
-	// int: hash, content, null
-	// utf: hash, length, content, null
+	/** Diese Methode gibt eine Zahlenfolge zurück, welche die einzel- oder mehrwertkodierten Codepoints dieser Zeichenkette enthält. Sie ist die Umkehroperation
+	 * zu {@link #from(IAMArray, boolean)}.
+	 *
+	 * @param mode Größe der Zahlen der Zahlenfolge: {@code 1} für {@code 8-Bit}, {@code 2} für {@code 16-Bit} und {@code 4} für {@code 32-Bit}.
+	 * @param asUTFx {@code true}, wenn die Codepoints mehrwertkodiert werden sollen.<br>
+	 *        {@code false}, wenn die Codepoints einzelwertkodiert werden sollen.
+	 * @return Zahlenfolge mit den entsprechend kodierten Codepoints.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public final IAMArray toArray(final int mode, final boolean asUTFx) throws IllegalArgumentException {
 		final int hash = this.hash(), length = this.length();
 		switch (mode) {
@@ -1855,7 +1839,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			}
 			case 4: {
 				final int[] array = new int[length + 2];
-				array[0] = this.hash();
+				array[0] = hash;
 				this.extract(new UTF32Encoder(array, 1));
 				return IAMArray.from(array);
 			}

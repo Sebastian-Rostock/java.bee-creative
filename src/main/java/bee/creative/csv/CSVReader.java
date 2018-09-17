@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import bee.creative.util.IO;
+import bee.creative.io.IO;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Parser für Daten im {@code CSV}-Format.<br>
