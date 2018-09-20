@@ -27,118 +27,35 @@ import bee.creative.ref.SoftPointer;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Producers {
 
-	private static final class NavigatedProducer<GInput, GOutput> implements Producer<GOutput> {
+	/** Diese Klasse implementiert {@link Producers#itemProducer(Object)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ItemProducer<GItem> implements Producer<GItem> {
 
-		private final Getter<? super GInput, ? extends GOutput> navigator;
+		public final GItem item;
 
-		private final Producer<? extends GInput> producer;
-
-		NavigatedProducer(final Getter<? super GInput, ? extends GOutput> navigator, final Producer<? extends GInput> producer) {
-			this.navigator = Objects.assertNotNull(navigator);
-			this.producer = Objects.assertNotNull(producer);
+		public ItemProducer(final GItem item) {
+			this.item = item;
 		}
 
 		@Override
-		public final GOutput get() {
-			return this.navigator.get(this.producer.get());
-		}
-
-		@Override
-		public final String toString() {
-			return Objects.toInvokeString(this, this.navigator, this.producer);
-		}
-
-	}
-
-	private static final class NativeConstructorProducer<GItem> implements Producer<GItem> {
-
-		private final Constructor<?> constructor;
-
-		NativeConstructorProducer(final Constructor<?> constructor) {
-			this.constructor = Objects.assertNotNull(constructor);
-		}
-
-		@Override
-		@SuppressWarnings ("unchecked")
 		public GItem get() {
-			try {
-				return (GItem)this.constructor.newInstance();
-			} catch (IllegalAccessException | InstantiationException | InvocationTargetException cause) {
-				throw new IllegalArgumentException(cause);
-			}
+			return this.item;
 		}
 
 		@Override
-		public final String toString() {
-			return Objects.toInvokeString(this, Natives.formatConstructor(this.constructor));
+		public String toString() {
+			return Objects.toInvokeString(this, this.item);
 		}
 
 	}
 
-	private static final class BufferedProducer<GItem> implements Producer<GItem> {
+	/** Diese Klasse implementiert {@link Producers#nativeProducer(Method)}. */
+	@SuppressWarnings ("javadoc")
+	public static class MethodProducer<GItem> implements Producer<GItem> {
 
-		private final Producer<? extends GItem> producer;
+		public final Method method;
 
-		private final int mode;
-
-		Pointer<GItem> pointer;
-
-		BufferedProducer(final int mode, final Producer<? extends GItem> producer) {
-			Pointers.pointer(mode, null);
-			this.mode = mode;
-			this.producer = Objects.assertNotNull(producer);
-		}
-
-		@Override
-		public final GItem get() {
-			final Pointer<GItem> pointer = this.pointer;
-			if (pointer != null) {
-				final GItem data = pointer.get();
-				if (data != null) return data;
-				if (pointer == Pointers.NULL) return null;
-			}
-			final GItem data = this.producer.get();
-			this.pointer = Pointers.pointer(this.mode, data);
-			return data;
-		}
-
-		@Override
-		public final String toString() {
-			return Objects.toInvokeString(this, this.mode, this.producer);
-		}
-
-	}
-
-	private static final class SynchronizedProducer<GItem> implements Producer<GItem> {
-
-		private final Object mutex;
-
-		private final Producer<? extends GItem> producer;
-
-		SynchronizedProducer(final Object mutex, final Producer<? extends GItem> producer) {
-			this.mutex = Objects.assertNotNull(mutex);
-			this.producer = Objects.assertNotNull(producer);
-		}
-
-		@Override
-		public final GItem get() {
-			synchronized (this.mutex) {
-				return this.producer.get();
-			}
-		}
-
-		@Override
-		public final String toString() {
-			return Objects.toInvokeString(this, this.producer, this.mutex);
-		}
-
-	}
-
-	private static final class NativeMethodProducer<GItem> implements Producer<GItem> {
-
-		private final Method method;
-
-		NativeMethodProducer(final Method method) {
+		public MethodProducer(final Method method) {
 			if (!Modifier.isStatic(method.getModifiers()) || (method.getParameterTypes().length != 0)) throw new IllegalArgumentException();
 			this.method = method;
 		}
@@ -154,28 +71,123 @@ public class Producers {
 		}
 
 		@Override
-		public final String toString() {
+		public String toString() {
 			return Objects.toInvokeString(this, Natives.formatMethod(this.method));
 		}
 
 	}
 
-	private static final class ItemProducer<GItem> implements Producer<GItem> {
+	/** Diese Klasse implementiert {@link Producers#nativeProducer(Constructor)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ConstructorProducer<GItem> implements Producer<GItem> {
 
-		private final GItem item;
+		public final Constructor<?> constructor;
 
-		ItemProducer(final GItem item) {
-			this.item = item;
+		public ConstructorProducer(final Constructor<?> constructor) {
+			this.constructor = Objects.assertNotNull(constructor);
 		}
 
 		@Override
-		public final GItem get() {
-			return this.item;
+		@SuppressWarnings ("unchecked")
+		public GItem get() {
+			try {
+				return (GItem)this.constructor.newInstance();
+			} catch (IllegalAccessException | InstantiationException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
 		}
 
 		@Override
-		public final String toString() {
-			return Objects.toInvokeString(this, this.item);
+		public String toString() {
+			return Objects.toInvokeString(this, Natives.formatConstructor(this.constructor));
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Producers#bufferedProducer(int, Producer)}. */
+	@SuppressWarnings ("javadoc")
+	public static class BufferedProducer<GItem> implements Producer<GItem> {
+
+		public final Producer<? extends GItem> producer;
+
+		public final int mode;
+
+		protected Pointer<GItem> pointer;
+
+		public BufferedProducer(final int mode, final Producer<? extends GItem> producer) {
+			Pointers.pointer(mode, null);
+			this.mode = mode;
+			this.producer = Objects.assertNotNull(producer);
+		}
+
+		@Override
+		public GItem get() {
+			final Pointer<GItem> pointer = this.pointer;
+			if (pointer != null) {
+				final GItem data = pointer.get();
+				if (data != null) return data;
+				if (pointer == Pointers.NULL) return null;
+			}
+			final GItem data = this.producer.get();
+			this.pointer = Pointers.pointer(this.mode, data);
+			return data;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.mode, this.producer);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Producers#navigatedBuilder(Getter, Producer)}. */
+	@SuppressWarnings ("javadoc")
+	public static class NavigatedProducer<GInput, GOutput> implements Producer<GOutput> {
+
+		public final Getter<? super GInput, ? extends GOutput> navigator;
+
+		public final Producer<? extends GInput> producer;
+
+		public NavigatedProducer(final Getter<? super GInput, ? extends GOutput> navigator, final Producer<? extends GInput> producer) {
+			this.navigator = Objects.assertNotNull(navigator);
+			this.producer = Objects.assertNotNull(producer);
+		}
+
+		@Override
+		public GOutput get() {
+			return this.navigator.get(this.producer.get());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.navigator, this.producer);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Producers#synchronizedProducer(Object, Producer)}. */
+	@SuppressWarnings ("javadoc")
+	public static class SynchronizedProducer<GItem> implements Producer<GItem> {
+
+		public final Object mutex;
+
+		public final Producer<? extends GItem> producer;
+
+		public SynchronizedProducer(final Object mutex, final Producer<? extends GItem> producer) throws NullPointerException {
+			this.mutex = mutex != null ? mutex : this;
+			this.producer = Objects.assertNotNull(producer);
+		}
+
+		@Override
+		public GItem get() {
+			synchronized (this.mutex) {
+				return this.producer.get();
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.producer);
 		}
 
 	}
@@ -204,7 +216,7 @@ public class Producers {
 
 		/** {@inheritDoc} */
 		@Override
-		public final GResult get() {
+		public GResult get() {
 			return this.result;
 		}
 
@@ -252,7 +264,7 @@ public class Producers {
 
 		/** {@inheritDoc} */
 		@Override
-		public final Iterator<GResult> iterator() {
+		public Iterator<GResult> iterator() {
 			final GResult result = this.result;
 			if (result == null) return Iterators.emptyIterator();
 			return Iterators.itemIterator(result);
@@ -371,7 +383,7 @@ public class Producers {
 
 		/** {@inheritDoc} */
 		@Override
-		public final Iterator<GItem> iterator() {
+		public Iterator<GItem> iterator() {
 			return this.result.iterator();
 		}
 
@@ -398,22 +410,22 @@ public class Producers {
 		}
 
 		@SuppressWarnings ("javadoc")
-		void putImpl(final Entry<? extends GKey, ? extends GItem> entry) {
+		protected void putImpl(final Entry<? extends GKey, ? extends GItem> entry) {
 			this.result.put(entry.getKey(), entry.getValue());
 		}
 
 		@SuppressWarnings ("javadoc")
-		void putKeyFromImpl(final Getter<? super GItem, ? extends GKey> key, final GItem value) {
+		protected void putKeyFromImpl(final Getter<? super GItem, ? extends GKey> key, final GItem value) {
 			this.result.put(key.get(value), value);
 		}
 
 		@SuppressWarnings ("javadoc")
-		void putValueFromImpl(final Getter<? super GKey, ? extends GItem> value, final GKey key) {
+		protected void putValueFromImpl(final Getter<? super GKey, ? extends GItem> value, final GKey key) {
 			this.result.put(key, value.get(key));
 		}
 
 		@SuppressWarnings ("javadoc")
-		void putInverseImpl(final Entry<? extends GItem, ? extends GKey> entry) {
+		protected void putInverseImpl(final Entry<? extends GItem, ? extends GKey> entry) {
 			this.result.put(entry.getValue(), entry.getKey());
 		}
 
@@ -710,7 +722,7 @@ public class Producers {
 
 		/** {@inheritDoc} */
 		@Override
-		public final Iterator<Entry<GKey, GItem>> iterator() {
+		public Iterator<Entry<GKey, GItem>> iterator() {
 			return this.result.entrySet().iterator();
 		}
 
@@ -803,8 +815,14 @@ public class Producers {
 		 *
 		 * @param result interne {@link Map}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public MapBuilder(final GResult result) throws NullPointerException {
+		protected MapBuilder(final GResult result) throws NullPointerException {
 			super(result);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected MapBuilder<GKey, GItem, GResult> customThis() {
+			return this;
 		}
 
 		/** Diese Methode gibt einen neuen {@link MapBuilder} zur datentypsicheren {@link #get() Abbildung} zurück.
@@ -844,12 +862,6 @@ public class Producers {
 		 * @return neuer {@link MapBuilder} zur {@code unmodifiableMap}. */
 		public MapBuilder<GKey, GItem, Map<GKey, GItem>> toUnmodifiable() {
 			return MapBuilder.from(Collections.unmodifiableMap(this.result));
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected MapBuilder<GKey, GItem, GResult> customThis() {
-			return this;
 		}
 
 	}
@@ -909,8 +921,14 @@ public class Producers {
 		 *
 		 * @param result {@link Set}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public SetBuilder(final GResult result) throws NullPointerException {
+		protected SetBuilder(final GResult result) throws NullPointerException {
 			super(result);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected SetBuilder<GItem, GResult> customThis() {
+			return this;
 		}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Vereinigungsmenge dieser {@link #get() Menge} und der gegebenen Menge zurück.
@@ -976,12 +994,6 @@ public class Producers {
 			return SetBuilder.from(Collections.unmodifiableSet(this.result));
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		protected final SetBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
 	}
 
 	/** Diese Klasse implementiert einen Konfigurator für eine {@link List}.
@@ -1021,8 +1033,14 @@ public class Producers {
 		 *
 		 * @param result {@link List}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public ListBuilder(final GResult result) throws NullPointerException {
+		protected ListBuilder(final GResult result) throws NullPointerException {
 			super(result);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected ListBuilder<GItem, GResult> customThis() {
+			return this;
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die rückwärts geordnete {@link #get() Liste} zurück.
@@ -1087,10 +1105,94 @@ public class Producers {
 			return ListBuilder.from(Collections.unmodifiableList(this.result));
 		}
 
-		/** {@inheritDoc} */
+	}
+
+	public static class IteratorBuilder<GItem, GResult extends Iterator<GItem>> extends BaseBuilder2<GResult, IteratorBuilder<GItem, GResult>> {
+
+		public static <GItem, GResult extends Iterator<GItem>> IteratorBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+			return new IteratorBuilder<>(result);
+		}
+
+		protected IteratorBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.assertNotNull(result);
+		}
+
 		@Override
-		protected final ListBuilder<GItem, GResult> customThis() {
+		protected IteratorBuilder<GItem, GResult> customThis() {
 			return this;
+		}
+
+		public IteratorBuilder<GItem, Iterator<GItem>> toUnique() {
+			return IteratorBuilder.from(Iterators.uniqueIterator(this.get()));
+		}
+
+		public IteratorBuilder<GItem, Iterator<GItem>> toChained(final Iterator<? extends GItem> i) {
+			return IteratorBuilder.from(Iterators.chainedIterator(this.get(), i));
+		}
+
+		public IteratorBuilder<GItem, Iterator<GItem>> toLimited(final int count) {
+			return IteratorBuilder.from(Iterators.limitedIterator(count, this.get()));
+		}
+
+		public IteratorBuilder<GItem, Iterator<GItem>> toFiltered(final Filter<? super GItem> filter) {
+			return IteratorBuilder.from(Iterators.filteredIterator(filter, this.get()));
+		}
+
+		public <GItem2> IteratorBuilder<GItem2, Iterator<GItem2>> toNavigated(final Getter<? super GItem, ? extends GItem2> getter) {
+			return IteratorBuilder.from(Iterators.navigatedIterator(getter, this.get()));
+		}
+
+		public IteratorBuilder<GItem, Iterator<GItem>> toUnmodifiable() {
+			return IteratorBuilder.from(Iterators.unmodifiableIterator(this.get()));
+		}
+
+	}
+
+	public static class IterableBuilder<GItem, GResult extends Iterable<GItem>> extends BaseBuilder2<GResult, IterableBuilder<GItem, GResult>> {
+
+		public static <GItem, GResult extends Iterable<GItem>> IterableBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+			return new IterableBuilder<>(result);
+		}
+
+		protected IterableBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.assertNotNull(result);
+		}
+
+		@Override
+		protected IterableBuilder<GItem, GResult> customThis() {
+			return this;
+		}
+
+		public SetBuilder<GItem, Set<GItem>> toSet() {
+			return SetBuilder.from(Iterables.toSet(this.get()));
+		}
+
+		public ListBuilder<GItem, List<GItem>> toList() {
+			return ListBuilder.from(Iterables.toList(this.get()));
+		}
+
+		public IterableBuilder<GItem, Iterable<GItem>> toUnique() {
+			return IterableBuilder.from(Iterables.uniqueIterable(this.get()));
+		}
+
+		public IterableBuilder<GItem, Iterable<GItem>> toChained(final Iterable<? extends GItem> i) {
+			return IterableBuilder.from(Iterables.chainedIterable(this.get(), i));
+		}
+
+		public IterableBuilder<GItem, Iterable<GItem>> toLimited(final int count) {
+			return IterableBuilder.from(Iterables.limitedIterable(count, this.get()));
+		}
+
+		public IterableBuilder<GItem, Iterable<GItem>> toFiltered(final Filter<? super GItem> filter) {
+			return IterableBuilder.from(Iterables.filteredIterable(filter, this.get()));
+		}
+
+		public <GItem2> IterableBuilder<GItem2, Iterable<GItem2>> toNavigated(final Getter<? super GItem, ? extends GItem2> getter) {
+			return IterableBuilder.from(Iterables.navigatedIterable(getter, this.get()));
+		}
+
+		public IterableBuilder<GItem, Iterable<GItem>> toUnmodifiable() {
+			return IterableBuilder.from(Iterables.unmodifiableIterable(this.get()));
 		}
 
 	}
@@ -1108,7 +1210,7 @@ public class Producers {
 		 * @param result {@link Comparator}.
 		 * @return {@link ComparatorBuilder}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static final <GItem, GResult extends Comparator<GItem>> ComparatorBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+		public static <GItem, GResult extends Comparator<GItem>> ComparatorBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
 			return new ComparatorBuilder<>(result);
 		}
 
@@ -1116,7 +1218,7 @@ public class Producers {
 		 *
 		 * @param <GItem> Typ der {@link Comparable} Elemente.
 		 * @return {@link ComparatorBuilder}. */
-		public static final <GItem extends Comparable<? super GItem>> ComparatorBuilder<GItem, Comparator<GItem>> fromNatural() {
+		public static <GItem extends Comparable<? super GItem>> ComparatorBuilder<GItem, Comparator<GItem>> fromNatural() {
 			return ComparatorBuilder.from(Comparators.<GItem>naturalComparator());
 		}
 
@@ -1124,8 +1226,14 @@ public class Producers {
 		 *
 		 * @param result interner {@link Comparator}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public ComparatorBuilder(final GResult result) throws NullPointerException {
+		protected ComparatorBuilder(final GResult result) throws NullPointerException {
 			this.result = Objects.assertNotNull(result);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected ComparatorBuilder<GItem, GResult> customThis() {
+			return this;
 		}
 
 		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum {@code null} vergleichenden {@link #get() Comparator} zurück.
@@ -1180,12 +1288,6 @@ public class Producers {
 			return ComparableBuilder.from(Comparables.itemComparable(item, this.result));
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		protected ComparatorBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
 	}
 
 	/** Diese Klasse implementiert einen Konfigurator für einen {@link Comparable}.
@@ -1201,7 +1303,7 @@ public class Producers {
 		 * @param result {@link Comparable}.
 		 * @return {@link ComparableBuilder}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static final <GItem, GResult extends Comparable<GItem>> ComparableBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+		public static <GItem, GResult extends Comparable<GItem>> ComparableBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
 			return new ComparableBuilder<>(result);
 		}
 
@@ -1211,6 +1313,12 @@ public class Producers {
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
 		protected ComparableBuilder(final GResult result) throws NullPointerException {
 			this.result = Objects.assertNotNull(result);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected ComparableBuilder<GItem, GResult> customThis() {
+			return this;
 		}
 
 		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum {@code null} vergleichenden {@link #get() Comparable} zurück.
@@ -1256,62 +1364,6 @@ public class Producers {
 			return ComparableBuilder.from(Comparables.navigatedComparable(navigator, this.result));
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		protected ComparableBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	static class IterableBuilder<GItem, GResult extends Iterable<GItem>> extends BaseBuilder2<GResult, IterableBuilder<GItem, GResult>> {
-
-		public static final <GItem, GResult extends Iterable<GItem>> IterableBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new IterableBuilder<>(result);
-		}
-
-		public IterableBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.assertNotNull(result);
-		}
-
-		@Override
-		protected IterableBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
-		public SetBuilder<GItem, Set<GItem>> toSet() {
-			return SetBuilder.from(Iterables.toSet(get()));
-		}
-
-		public ListBuilder<GItem, List<GItem>> toList() {
-			return ListBuilder.from(Iterables.toList(get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toUnique() {
-			return from(Iterables.uniqueIterable(get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toChained(Iterable<? extends GItem> i) {
-			return from(Iterables.chainedIterable(get(), i));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toLimited(int count) {
-			return from(Iterables.limitedIterable(count, get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toFiltered(Filter<? super GItem> filter) {
-			return from(Iterables.filteredIterable(filter, get()));
-		}
-
-		public <GItem2> IterableBuilder<GItem2, Iterable<GItem2>> toNavigated(Getter<? super GItem, ? extends GItem2> getter) {
-			return from(Iterables.navigatedIterable(getter, get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toUnmodifiable() {
-			return from(Iterables.unmodifiableIterable(get()));
-		}
-
 	}
 
 	/** Diese Methode gibt einen {@link Producer} zurück, der den gegebenen Datensatz bereitstellt.
@@ -1352,7 +1404,7 @@ public class Producers {
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die gegebene Methode nicht statisch oder nicht parameterlos ist. */
 	public static <GItem> Producer<GItem> nativeProducer(final java.lang.reflect.Method method) throws NullPointerException, IllegalArgumentException {
-		return new NativeMethodProducer<>(method);
+		return new MethodProducer<>(method);
 	}
 
 	/** Diese Methode gibt einen {@link Producer} zum gegebenen {@link java.lang.reflect.Constructor nativen Kontruktor} zurück.<br>
@@ -1364,7 +1416,7 @@ public class Producers {
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
 	public static <GItem> Producer<GItem> nativeProducer(final java.lang.reflect.Constructor<?> constructor) throws NullPointerException {
-		return new NativeConstructorProducer<>(constructor);
+		return new ConstructorProducer<>(constructor);
 	}
 
 	/** Diese Methode gibt einen gepufferten {@link Producer} zurück, der den vonm gegebenen {@link Producer} erzeugten Datensatz mit Hilfe eines
@@ -1390,7 +1442,6 @@ public class Producers {
 	 * @throws IllegalArgumentException Wenn {@code mode} ungültig ist. */
 	public static <GItem> Producer<GItem> bufferedProducer(final int mode, final Producer<? extends GItem> producer)
 		throws NullPointerException, IllegalArgumentException {
-
 		return new BufferedProducer<>(mode, producer);
 	}
 
@@ -1423,7 +1474,7 @@ public class Producers {
 	 * @param mutex Synchronisationsobjekt.
 	 * @return {@code synchronized}-{@link Producer}.
 	 * @throws NullPointerException Wenn der {@code producer} bzw. {@code mutex} {@code null} ist. */
-	public static <GItem> Producer<GItem> synchronizedProducer(final Object mutex,final Producer<? extends GItem> producer) throws NullPointerException {
+	public static <GItem> Producer<GItem> synchronizedProducer(final Object mutex, final Producer<? extends GItem> producer) throws NullPointerException {
 		return new SynchronizedProducer<>(mutex, producer);
 	}
 

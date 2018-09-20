@@ -470,11 +470,6 @@ public class Strings {
 				return Pattern.compile(input, flags);
 			}
 
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("patternCompiler", flags);
-			}
-
 		};
 	}
 

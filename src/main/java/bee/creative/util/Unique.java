@@ -229,7 +229,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	/** Diese Methode gibt die interne {@link Map} zurück.
 	 *
 	 * @return {@link Map} der Einträge. */
-	public final Map<GInput, GOutput> mapping() {
+	public   Map<GInput, GOutput> mapping() {
 		return this.mapping;
 	}
 

@@ -19,7 +19,7 @@ public final class Fields {
 
 		private final Field<? super GTarget, GValue> field;
 
-		private NavigatedField(Getter<? super GSource, ? extends GTarget> navigator, Field<? super GTarget, GValue> field) {
+		private NavigatedField(final Getter<? super GSource, ? extends GTarget> navigator, final Field<? super GTarget, GValue> field) {
 			Objects.assertNotNull(navigator);
 			Objects.assertNotNull(field);
 			this.navigator = navigator;
@@ -28,17 +28,17 @@ public final class Fields {
 
 		@Override
 		public GValue get(final GSource input) {
-			return field.get(navigator.get(input));
+			return this.field.get(this.navigator.get(input));
 		}
 
 		@Override
 		public void set(final GSource input, final GValue value) {
-			field.set(navigator.get(input), value);
+			this.field.set(this.navigator.get(input), value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("navigatedField", navigator, field);
+			return Objects.toInvokeString("navigatedField", this.navigator, this.field);
 		}
 	}
 
@@ -48,7 +48,7 @@ public final class Fields {
 
 		private final Getter<? super GInput, GValue> setupGetter;
 
-		SetupField(Field<? super GInput, GValue> field, Getter<? super GInput, GValue> setupGetter) {
+		SetupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> setupGetter) {
 			Objects.assertNotNull(field);
 			Objects.assertNotNull(setupGetter);
 			this.setupGetter = setupGetter;
@@ -57,21 +57,21 @@ public final class Fields {
 
 		@Override
 		public GValue get(final GInput input) {
-			GValue result = field.get(input);
+			GValue result = this.field.get(input);
 			if (result != null) return result;
-			result = setupGetter.get(input);
-			field.set(input, result);
+			result = this.setupGetter.get(input);
+			this.field.set(input, result);
 			return result;
 		}
 
 		@Override
 		public void set(final GInput input, final GValue value) {
-			field.set(input, value);
+			this.field.set(input, value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("setupField", field, setupGetter);
+			return Objects.toInvokeString("setupField", this.field, this.setupGetter);
 		}
 	}
 
@@ -79,17 +79,17 @@ public final class Fields {
 
 		private final GValue value;
 
-		private ValueField(GValue value) {
+		private ValueField(final GValue value) {
 			this.value = value;
 		}
 
 		@Override
-		public GValue get(Object input) {
-			return value;
+		public GValue get(final Object input) {
+			return this.value;
 		}
 
 		@Override
-		public void set(Object input, GValue value) {
+		public void set(final Object input, final GValue value) {
 		}
 	}
 
@@ -101,8 +101,8 @@ public final class Fields {
 
 		private final Field<? super GInput, GValue2> field;
 
-		TranslatedField2(Field<? super GInput, GValue2> field, Getter<? super GValue, ? extends GValue2> setFormat,
-			Getter<? super GValue2, ? extends GValue> getFormat) {
+		TranslatedField2(final Field<? super GInput, GValue2> field, final Getter<? super GValue, ? extends GValue2> setFormat,
+			final Getter<? super GValue2, ? extends GValue> getFormat) {
 			Objects.assertNotNull(field);
 			Objects.assertNotNull(getFormat);
 			Objects.assertNotNull(setFormat);
@@ -113,17 +113,17 @@ public final class Fields {
 
 		@Override
 		public GValue get(final GInput input) {
-			return getFormat.get(field.get(input));
+			return this.getFormat.get(this.field.get(input));
 		}
 
 		@Override
 		public void set(final GInput input, final GValue value) {
-			field.set(input, setFormat.get(value));
+			this.field.set(input, this.setFormat.get(value));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("translatedField", field, getFormat, setFormat);
+			return Objects.toInvokeString("translatedField", this.field, this.getFormat, this.setFormat);
 		}
 	}
 
@@ -135,7 +135,7 @@ public final class Fields {
 
 		private final Field<? super GInput, GValue> rejectField;
 
-		ConditionalField(Filter<? super GInput> condition, Field<? super GInput, GValue> acceptField, Field<? super GInput, GValue> rejectField) {
+		ConditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> acceptField, final Field<? super GInput, GValue> rejectField) {
 			this.condition = Objects.assertNotNull(condition);
 			this.acceptField = Objects.assertNotNull(acceptField);
 			this.rejectField = Objects.assertNotNull(rejectField);
@@ -143,22 +143,22 @@ public final class Fields {
 
 		@Override
 		public GValue get(final GInput input) {
-			if (condition.accept(input)) return acceptField.get(input);
-			return rejectField.get(input);
+			if (this.condition.accept(input)) return this.acceptField.get(input);
+			return this.rejectField.get(input);
 		}
 
 		@Override
 		public void set(final GInput input, final GValue value) {
-			if (condition.accept(input)) {
-				acceptField.set(input, value);
+			if (this.condition.accept(input)) {
+				this.acceptField.set(input, value);
 			} else {
-				rejectField.set(input, value);
+				this.rejectField.set(input, value);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("conditionalField", condition, acceptField, rejectField);
+			return Objects.toInvokeString("conditionalField", this.condition, this.acceptField, this.rejectField);
 		}
 	}
 
@@ -757,7 +757,7 @@ public final class Fields {
 	 * @see Setters#emptySetter() */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
-		if (value == null) return emptyField();
+		if (value == null) return Fields.emptyField();
 		return new ValueField<>(value);
 	}
 
@@ -1015,7 +1015,7 @@ public final class Fields {
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GInput, GValue, GValue2> Field<GInput, GValue> translatedField(final Field<? super GInput, GValue2> field,
 		final Getter<? super GValue2, ? extends GValue> getFormat, final Getter<? super GValue, ? extends GValue2> setFormat) throws NullPointerException {
-		return new TranslatedField2<GInput, GValue, GValue2>(field, setFormat, getFormat);
+		return new TranslatedField2<>(field, setFormat, getFormat);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(field, Getters.neutralGetter(), Getters.neutralGetter(), null, null)}. <br>
@@ -1068,7 +1068,7 @@ public final class Fields {
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> acceptField,
 		final Field<? super GInput, GValue> rejectField) throws NullPointerException {
-		return new ConditionalField<GInput, GValue>(condition, acceptField, rejectField);
+		return new ConditionalField<>(condition, acceptField, rejectField);
 	}
 
 	/** Diese Methode gibt ein {@link Field} zurück, welches das gegebene {@link Field} via {@code synchronized(field)} synchronisiert.

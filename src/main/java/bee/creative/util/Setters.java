@@ -10,9 +10,37 @@ import java.util.Map;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
+	/** Diese Klasse implementiert {@link Setters#nativeSetter(Method)} */
+	@SuppressWarnings ("javadoc")
+	public static class NativeSetter<GInput, GValue> implements Setter<GInput, GValue> {
+
+		public final Method method;
+
+		public NativeSetter(final Method method) {
+			if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
+			method.setAccessible(true);
+			this.method = method;
+		}
+
+		@Override
+		public void set(final GInput input, final GValue value) {
+			try {
+				this.method.invoke(input, value);
+			} catch (IllegalAccessException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, Natives.formatMethod(this.method));
+		}
+
+	}
+
 	/** Diese Klasse implementiert {@link Setters#defaultSetter(Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static final class DefaultSetter<GInput, GValue> implements Setter<GInput, GValue> {
+	public static class DefaultSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
 		public final Setter<? super GInput, GValue> setter;
 
@@ -35,7 +63,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#navigatedSetter(Getter, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static final class NavigatedSetter<GInput, GInput2, GValue> implements Setter<GInput, GValue> {
+	public static class NavigatedSetter<GInput, GInput2, GValue> implements Setter<GInput, GValue> {
 
 		public final Getter<? super GInput, ? extends GInput2> navigator;
 
@@ -60,7 +88,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#conditionalSetter(Filter, Setter, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static final class ConditionalSetter<GInput, GValue> implements Setter<GInput, GValue> {
+	public static class ConditionalSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
 		public final Filter<? super GInput> condition;
 
@@ -93,7 +121,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#aggregatedSetter(Setter, Getter)} */
 	@SuppressWarnings ("javadoc")
-	public static final class AggregatedSetter<GItem, GValue, GValue2> implements Setter<Iterable<? extends GItem>, GValue> {
+	public static class AggregatedSetter<GItem, GValue, GValue2> implements Setter<Iterable<? extends GItem>, GValue> {
 
 		public final Setter<? super GItem, GValue2> setter;
 
@@ -126,7 +154,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#synchronizedSetter(Setter, Object)} */
 	@SuppressWarnings ("javadoc")
-	public static final class SynchronizedSetter<GInput, GValue> implements Setter<GInput, GValue> {
+	public static class SynchronizedSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
 		public final Object mutex;
 
@@ -147,34 +175,6 @@ public class Setters {
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.setter, this.mutex);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Setters#nativeSetter(Method)} */
-	@SuppressWarnings ("javadoc")
-	public static final class NativeSetter<GInput, GValue> implements Setter<GInput, GValue> {
-
-		public final Method method;
-
-		public NativeSetter(final Method method) {
-			if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
-			method.setAccessible(true);
-			this.method = method;
-		}
-
-		@Override
-		public void set(final GInput input, final GValue value) {
-			try {
-				this.method.invoke(input, value);
-			} catch (IllegalAccessException | InvocationTargetException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, Natives.formatMethod(this.method));
 		}
 
 	}
@@ -299,7 +299,7 @@ public class Setters {
 		return new AggregatedSetter<>(setter, format);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Setters.synchronizedSetter(setter, setter)}.
+	/** Diese Methode ist eine Abkürzung für {@code synchronizedSetter(setter, setter)}.
 	 *
 	 * @see #synchronizedSetter(Setter, Object) */
 	@SuppressWarnings ("javadoc")
