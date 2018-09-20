@@ -4,8 +4,8 @@ import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.xml.sax.SAXException;
-import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link Schema}.
  *
@@ -148,7 +148,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 	 *
 	 * @see #getSchema() */
 	@Override
-	public final Schema build() throws IllegalStateException {
+	public final Schema get() throws IllegalStateException {
 		try {
 			return this.getSchema();
 		} catch (final SAXException cause) {

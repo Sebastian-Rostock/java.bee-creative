@@ -4,10 +4,10 @@ import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapData;
-import bee.creative.util.Builders.BaseSetData;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
+import bee.creative.util.Producers.BaseMapData;
+import bee.creative.util.Producers.BaseSetData;
 
 /** Diese Klasse implementiert den Konfigurator für einen {@link JAXBContext}.
  *
@@ -102,8 +102,8 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	public final JAXBContext getContext() throws JAXBException {
 		JAXBContext result = this.context;
 		if (result != null) return result;
-		final Set<Class<?>> classes = this.classData.build();
-		result = JAXBContext.newInstance(classes.toArray(new Class<?>[classes.size()]), this.propertyData.build());
+		final Set<Class<?>> classes = this.classData.get();
+		result = JAXBContext.newInstance(classes.toArray(new Class<?>[classes.size()]), this.propertyData.get());
 		this.useContext(result);
 		return result;
 	}
@@ -149,7 +149,7 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 	 *
 	 * @see #getContext() */
 	@Override
-	public final JAXBContext build() throws IllegalStateException {
+	public final JAXBContext get() throws IllegalStateException {
 		try {
 			return this.getContext();
 		} catch (final JAXBException cause) {

@@ -5,8 +5,8 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
-import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
 
 /** Diese Klasse implementiert den Konfigurator für die {@link Templates} zur Erzeugung eines {@link Transformer}.
  *
@@ -149,7 +149,7 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	 *
 	 * @see #getTemplates() */
 	@Override
-	public final Templates build() throws IllegalStateException {
+	public final Templates get() throws IllegalStateException {
 		try {
 			return this.getTemplates();
 		} catch (final TransformerConfigurationException cause) {

@@ -41,20 +41,7 @@ public class Getters {
 	 * @param value Ausgabe.
 	 * @return {@code value}-{@link Getter}. */
 	public static <GValue> Getter<Object, GValue> valueGetter(final GValue value) {
-		if (value == null) return Getters.emptyGetter();
-		return new Getter<Object, GValue>() {
-
-			@Override
-			public GValue get(final Object input) {
-				return value;
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("valueGetter", value);
-			}
-
-		};
+		return Fields.valueField(value);
 	}
 
 	/** Diese Methode ist effektiv eine Abkürzung für {@code Fields.nativeField(Natives.parse(memberText))}, wobei eine {@link Class} zu einer Ausnahme führt.

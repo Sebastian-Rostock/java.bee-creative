@@ -174,6 +174,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 			if (result < 0) throw new NoSuchElementException();
 			final int nextEntry = this.entryData.nexts[result];
 			if (nextEntry >= 0) {
+				this.prevTable = this.nextTable;
 				this.nextEntry = nextEntry;
 			} else {
 				this.nextIndex2();

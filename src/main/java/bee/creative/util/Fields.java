@@ -13,6 +13,187 @@ import java.util.Set;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
 
+	private static final class NavigatedField<GSource, GTarget, GValue> implements Field<GSource, GValue> {
+
+		private final Getter<? super GSource, ? extends GTarget> navigator;
+
+		private final Field<? super GTarget, GValue> field;
+
+		private NavigatedField(Getter<? super GSource, ? extends GTarget> navigator, Field<? super GTarget, GValue> field) {
+			Objects.assertNotNull(navigator);
+			Objects.assertNotNull(field);
+			this.navigator = navigator;
+			this.field = field;
+		}
+
+		@Override
+		public GValue get(final GSource input) {
+			return field.get(navigator.get(input));
+		}
+
+		@Override
+		public void set(final GSource input, final GValue value) {
+			field.set(navigator.get(input), value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString("navigatedField", navigator, field);
+		}
+	}
+
+	private static final class SetupField<GInput, GValue> implements Field<GInput, GValue> {
+
+		private final Field<? super GInput, GValue> field;
+
+		private final Getter<? super GInput, GValue> setupGetter;
+
+		SetupField(Field<? super GInput, GValue> field, Getter<? super GInput, GValue> setupGetter) {
+			Objects.assertNotNull(field);
+			Objects.assertNotNull(setupGetter);
+			this.setupGetter = setupGetter;
+			this.field = field;
+		}
+
+		@Override
+		public GValue get(final GInput input) {
+			GValue result = field.get(input);
+			if (result != null) return result;
+			result = setupGetter.get(input);
+			field.set(input, result);
+			return result;
+		}
+
+		@Override
+		public void set(final GInput input, final GValue value) {
+			field.set(input, value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString("setupField", field, setupGetter);
+		}
+	}
+
+	private static final class ValueField<GValue> implements Field<Object, GValue> {
+
+		private final GValue value;
+
+		private ValueField(GValue value) {
+			this.value = value;
+		}
+
+		@Override
+		public GValue get(Object input) {
+			return value;
+		}
+
+		@Override
+		public void set(Object input, GValue value) {
+		}
+	}
+
+	private static final class TranslatedField2<GInput, GValue, GValue2> implements Field<GInput, GValue> {
+
+		private final Getter<? super GValue, ? extends GValue2> setFormat;
+
+		private final Getter<? super GValue2, ? extends GValue> getFormat;
+
+		private final Field<? super GInput, GValue2> field;
+
+		TranslatedField2(Field<? super GInput, GValue2> field, Getter<? super GValue, ? extends GValue2> setFormat,
+			Getter<? super GValue2, ? extends GValue> getFormat) {
+			Objects.assertNotNull(field);
+			Objects.assertNotNull(getFormat);
+			Objects.assertNotNull(setFormat);
+			this.setFormat = setFormat;
+			this.getFormat = getFormat;
+			this.field = field;
+		}
+
+		@Override
+		public GValue get(final GInput input) {
+			return getFormat.get(field.get(input));
+		}
+
+		@Override
+		public void set(final GInput input, final GValue value) {
+			field.set(input, setFormat.get(value));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString("translatedField", field, getFormat, setFormat);
+		}
+	}
+
+	private static final class ConditionalField<GInput, GValue> implements Field<GInput, GValue> {
+
+		private final Field<? super GInput, GValue> acceptField;
+
+		private final Filter<? super GInput> condition;
+
+		private final Field<? super GInput, GValue> rejectField;
+
+		ConditionalField(Filter<? super GInput> condition, Field<? super GInput, GValue> acceptField, Field<? super GInput, GValue> rejectField) {
+			this.condition = Objects.assertNotNull(condition);
+			this.acceptField = Objects.assertNotNull(acceptField);
+			this.rejectField = Objects.assertNotNull(rejectField);
+		}
+
+		@Override
+		public GValue get(final GInput input) {
+			if (condition.accept(input)) return acceptField.get(input);
+			return rejectField.get(input);
+		}
+
+		@Override
+		public void set(final GInput input, final GValue value) {
+			if (condition.accept(input)) {
+				acceptField.set(input, value);
+			} else {
+				rejectField.set(input, value);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString("conditionalField", condition, acceptField, rejectField);
+		}
+	}
+
+	public static final class SynchronizedField<GInput, GValue> implements Field<GInput, GValue> {
+
+		public final Field<? super GInput, GValue> field;
+
+		public final Object mutex;
+
+		SynchronizedField(final Object mutex, final Field<? super GInput, GValue> field) {
+			this.field = Objects.assertNotNull(field);
+			this.mutex = mutex != null ? mutex : this;
+		}
+
+		@Override
+		public GValue get(final GInput input) {
+			synchronized (this.mutex) {
+				return this.field.get(input);
+			}
+		}
+
+		@Override
+		public void set(final GInput input, final GValue value) {
+			synchronized (this.mutex) {
+				this.field.set(input, value);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.field);
+		}
+
+	}
+
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation eines {@link Set}, welches über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
 	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie des {@link Set}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
 	 * wird.
@@ -444,24 +625,121 @@ public final class Fields {
 
 	}
 
-	/** Dieses Feld speichert das leere {@link Field}, welches stets {@code null} liefert und das Schreiben ignoriert. */
-	public static final Field<?, ?> EMPTY_FIELD = new Field<Object, Object>() {
+	/** Diese Klasse implementiert ein überwachbares {@link Field Datenfeld}.
+	 *
+	 * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft. */
+	public static class ObservableField<GInput, GValue>
+		implements Field<GInput, GValue>, Listenable<ObservableField.ChangeFieldEvent, ObservableField.ChangeFieldListener> {
 
-		@Override
-		public Object get(final Object input) {
-			return null;
+		public static class ChangeFieldEvent {
+
+			public final ObservableField<?, ?> sender;
+
+			public final Field<?, ?> field;
+
+			public final Object input;
+
+			public final Object oldValue;
+
+			public final Object newValue;
+
+			public ChangeFieldEvent(final ObservableField<?, ?> sender, final Field<?, ?> field, final Object input, final Object oldValue, final Object newValue) {
+				this.sender = sender;
+				this.field = field;
+				this.input = input;
+				this.oldValue = oldValue;
+				this.newValue = newValue;
+			}
+
 		}
 
-		@Override
-		public void set(final Object input, final Object value) {
+		public static interface ChangeFieldListener {
+
+			public void onChangeField(ChangeFieldEvent event);
+
 		}
 
+		public static final Listenables<ChangeFieldEvent, ChangeFieldListener> OnChangeField = new Listenables<ChangeFieldEvent, ChangeFieldListener>() {
+
+			@Override
+			protected void customFire(final Object sender, final ChangeFieldEvent event, final ChangeFieldListener listener) {
+				listener.onChangeField(event);
+			}
+
+		};
+
+		/** Dieses Feld speichert das Datenfel, an das in {@link #get(Object)} und {@link #set(Object, Object)} delegiert wird. */
+		public final Field<? super GInput, GValue> field;
+
+		/** Dieser Konstruktor initialisiert das überwachte Datenfeld.
+		 *
+		 * @param field überwachtes Datenfeld. */
+		public ObservableField(final Field<? super GInput, GValue> field) {
+			this.field = Objects.assertNotNull(field);
+		}
+
+		protected GValue customClone(final GValue value) {
+			return value;
+		}
+
+		protected boolean customEquals(final GValue value1, final GValue value2) {
+			return Objects.equals(value1, value2);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public GValue get(final GInput input) {
+			return this.field.get(input);
+		}
+
+		/** {@inheritDoc}
+		 *
+		 * @throws IllegalStateException Wenn der Wert während */
+		@Override
+		public void set(final GInput input, final GValue newValue) throws IllegalStateException {
+			GValue oldValue = this.field.get(input);
+			if (this.customEquals(oldValue, newValue)) return;
+			oldValue = this.customClone(oldValue);
+			this.field.set(input, newValue);
+			this.fire(new ChangeFieldEvent(this, this.field, input, oldValue, newValue));
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public ChangeFieldListener put(final ChangeFieldListener listener) throws IllegalArgumentException {
+			return ObservableField.OnChangeField.put(this, listener);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public ChangeFieldListener putWeak(final ChangeFieldListener listener) throws IllegalArgumentException {
+			return ObservableField.OnChangeField.putWeak(this, listener);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void pop(final ChangeFieldListener listener) throws IllegalArgumentException {
+			ObservableField.OnChangeField.pop(this, listener);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public ChangeFieldEvent fire(final ChangeFieldEvent event) throws NullPointerException {
+			return ObservableField.OnChangeField.fire(this, event);
+		}
+
+		/** {@inheritDoc} */
 		@Override
 		public String toString() {
-			return "EMPTY_FIELD";
+			return this.field.toString();
 		}
 
-	};
+	}
+
+	/** Dieses Feld speichert das leere {@link Field}, welches stets {@code null} liefert und das Schreiben ignoriert. */
+	public static final Field<?, ?> EMPTY_FIELD = new ValueField(null);
 
 	/** Diese Methode gibt das leere {@link Field} zurück, das stets {@code null} liefert und das Schreiben ignoriert.
 	 *
@@ -479,7 +757,8 @@ public final class Fields {
 	 * @see Setters#emptySetter() */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
-		return Fields.compositeField(Getters.valueGetter(value), Setters.emptySetter());
+		if (value == null) return emptyField();
+		return new ValueField<>(value);
 	}
 
 	/** Diese Methode gibt ein initialisierendes {@link Field} zurück.<br>
@@ -495,30 +774,7 @@ public final class Fields {
 	 * @throws NullPointerException Wenn {@code field} bzw. {@code setupGetter} {@code null} ist. */
 	public static <GInput, GValue> Field<GInput, GValue> setupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> setupGetter)
 		throws NullPointerException {
-		Objects.assertNotNull(field);
-		Objects.assertNotNull(setupGetter);
-		return new Field<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				GValue result = field.get(input);
-				if (result != null) return result;
-				result = setupGetter.get(input);
-				field.set(input, result);
-				return result;
-			}
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				field.set(input, value);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("setupField", field, setupGetter);
-			}
-
-		};
+		return new SetupField<>(field, setupGetter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldText))}.
@@ -675,28 +931,9 @@ public final class Fields {
 	 * @see Getters#navigatedGetter(Getter, Getter)
 	 * @see Setters#navigatedSetter(Getter, Setter) */
 	@SuppressWarnings ("javadoc")
-	public static <GInput, GInput2, GValue> Field<GInput, GValue> navigatedField(final Getter<? super GInput, ? extends GInput2> navigator,
-		final Field<? super GInput2, GValue> field) throws NullPointerException {
-		Objects.assertNotNull(navigator);
-		Objects.assertNotNull(field);
-		return new Field<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				return field.get(navigator.get(input));
-			}
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				field.set(navigator.get(input), value);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("navigatedField", navigator, field);
-			}
-
-		};
+	public static <GSource, GTarget, GValue> Field<GSource, GValue> navigatedField(final Getter<? super GSource, ? extends GTarget> navigator,
+		final Field<? super GTarget, GValue> field) throws NullPointerException {
+		return new NavigatedField<>(navigator, field);
 	}
 
 	/** Diese Methode gibt ein zusammengesetztes {@link Field} zurück, dessen Methoden an die des gegebenen {@link Getter} und {@link Setter} delegieren.
@@ -737,19 +974,19 @@ public final class Fields {
 	 * @see Translators#toTargetGetter(Translator)
 	 * @see Translators#toSourceGetter(Translator) */
 	@SuppressWarnings ("javadoc")
-	public static <GInput, GValue, GValue2> Field<GInput, GValue> translatedField(final Field<? super GInput, GValue2> field,
-		final Translator<? extends GValue2, ? extends GValue> translator) throws NullPointerException {
+	public static <GInput, GSource, GTarget> Field<GInput, GTarget> translatedField(final Field<? super GInput, GSource> field,
+		final Translator<GSource, GTarget> translator) throws NullPointerException {
 		Objects.assertNotNull(field);
 		Objects.assertNotNull(translator);
-		return new Field<GInput, GValue>() {
+		return new Field<GInput, GTarget>() {
 
 			@Override
-			public GValue get(final GInput input) {
+			public GTarget get(final GInput input) {
 				return translator.toTarget(field.get(input));
 			}
 
 			@Override
-			public void set(final GInput input, final GValue value) {
+			public void set(final GInput input, final GTarget value) {
 				field.set(input, translator.toSource(value));
 			}
 
@@ -778,27 +1015,7 @@ public final class Fields {
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GInput, GValue, GValue2> Field<GInput, GValue> translatedField(final Field<? super GInput, GValue2> field,
 		final Getter<? super GValue2, ? extends GValue> getFormat, final Getter<? super GValue, ? extends GValue2> setFormat) throws NullPointerException {
-		Objects.assertNotNull(field);
-		Objects.assertNotNull(getFormat);
-		Objects.assertNotNull(setFormat);
-		return new Field<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				return getFormat.get(field.get(input));
-			}
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				field.set(input, setFormat.get(value));
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("translatedField", field, getFormat, setFormat);
-			}
-
-		};
+		return new TranslatedField2<GInput, GValue, GValue2>(field, setFormat, getFormat);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(field, Getters.neutralGetter(), Getters.neutralGetter(), null, null)}. <br>
@@ -851,32 +1068,7 @@ public final class Fields {
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> acceptField,
 		final Field<? super GInput, GValue> rejectField) throws NullPointerException {
-		Objects.assertNotNull(condition);
-		Objects.assertNotNull(acceptField);
-		Objects.assertNotNull(rejectField);
-		return new Field<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				if (condition.accept(input)) return acceptField.get(input);
-				return rejectField.get(input);
-			}
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				if (condition.accept(input)) {
-					acceptField.set(input, value);
-				} else {
-					rejectField.set(input, value);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("conditionalField", condition, acceptField, rejectField);
-			}
-
-		};
+		return new ConditionalField<GInput, GValue>(condition, acceptField, rejectField);
 	}
 
 	/** Diese Methode gibt ein {@link Field} zurück, welches das gegebene {@link Field} via {@code synchronized(field)} synchronisiert.
@@ -887,29 +1079,12 @@ public final class Fields {
 	 * @return {@code synchronized}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GInput, GValue> Field<GInput, GValue> synchronizedField(final Field<? super GInput, GValue> field) throws NullPointerException {
-		Objects.assertNotNull(field);
-		return new Field<GInput, GValue>() {
+		return Fields.synchronizedField(field, field);
+	}
 
-			@Override
-			public GValue get(final GInput input) {
-				synchronized (field) {
-					return field.get(input);
-				}
-			}
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				synchronized (field) {
-					field.set(input, value);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("synchronizedField", field);
-			}
-
-		};
+	public static <GInput, GValue> Field<GInput, GValue> synchronizedField(final Object mutex, final Field<? super GInput, GValue> field)
+		throws NullPointerException {
+		return new SynchronizedField<>(mutex, field);
 	}
 
 }

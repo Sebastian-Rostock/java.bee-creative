@@ -9,6 +9,35 @@ import java.util.Map;
  * @param <GValue> Typ der Werte. */
 public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 
+	/** Diese Klasse implementiert {@link HashMap2#from(Hasher)} */
+	@SuppressWarnings ("javadoc")
+	public static class HasherHashMap2<GKey, GValue> extends HashMap2<GKey, GValue> {
+
+		private static final long serialVersionUID = -1399170754272459026L;
+
+		public final Hasher hasher;
+
+		public HasherHashMap2(final Hasher hasher) {
+			this.hasher = Objects.assertNotNull(hasher);
+		}
+
+		@Override
+		protected int customHash(final Object key) {
+			return this.hasher.hash(key);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object key) {
+			return this.hasher.equals(this.keys[entryIndex], key);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
+			return (this.hashes[entryIndex] == keyHash) && this.hasher.equals(this.keys[entryIndex], key);
+		}
+
+	}
+
 	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -8419791227943208230L;
 
@@ -20,27 +49,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	 * @return An {@link Hasher} gebundene {@link HashMap2}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
 	public static <GKey, GValue> HashMap2<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
-		Objects.assertNotNull(hasher);
-		return new HashMap2<GKey, GValue>() {
-
-			private static final long serialVersionUID = -1399170754272459026L;
-
-			@Override
-			protected int customHash(final Object key) {
-				return hasher.hash(key);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object key) {
-				return hasher.equals(this.keys[entryIndex], key);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-				return (this.hashes[entryIndex] == keyHash) && hasher.equals(this.keys[entryIndex], key);
-			}
-
-		};
+		return new HasherHashMap2<>(hasher);
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */

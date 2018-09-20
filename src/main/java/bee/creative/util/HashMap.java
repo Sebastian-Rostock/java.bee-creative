@@ -16,6 +16,40 @@ import java.util.Map;
  * @param <GValue> Typ der Werte. */
 public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> implements Serializable, Cloneable {
 
+	/** Diese Klasse implementiert {@link HashMap#from(Hasher)} */
+	@SuppressWarnings ("javadoc")
+	public static final class HasherHashMap<GKey, GValue> extends HashMap<GKey, GValue> {
+
+		private static final long serialVersionUID = -4549473363883050977L;
+
+		public final Hasher hasher;
+
+		public HasherHashMap(final Hasher hasher) {
+			this.hasher = Objects.assertNotNull(hasher);
+		}
+
+		@Override
+		protected int customHash(final Object key) {
+			return this.hasher.hash(key);
+		}
+
+		@Override
+		protected int customHashKey(final int entryIndex) {
+			return this.hasher.hash(this.keys[entryIndex]);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object key) {
+			return this.hasher.equals(this.keys[entryIndex], key);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
+			return this.hasher.equals(this.keys[entryIndex], key);
+		}
+
+	}
+
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -8792297171308603896L;
 
@@ -27,32 +61,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	 * @return An {@link Hasher} gebundene {@link HashMap}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
 	public static <GKey, GValue> AbstractHashData<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
-		Objects.assertNotNull(hasher);
-		return new HashMap<GKey, GValue>() {
-
-			private static final long serialVersionUID = -4549473363883050977L;
-
-			@Override
-			protected int customHash(final Object key) {
-				return hasher.hash(key);
-			}
-
-			@Override
-			protected int customHashKey(final int entryIndex) {
-				return hasher.hash(this.keys[entryIndex]);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object key) {
-				return hasher.equals(this.keys[entryIndex], key);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-				return hasher.equals(this.keys[entryIndex], key);
-			}
-
-		};
+		return new HasherHashMap<>(hasher);
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */

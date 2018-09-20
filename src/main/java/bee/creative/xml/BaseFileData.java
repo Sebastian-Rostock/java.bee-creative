@@ -2,7 +2,7 @@ package bee.creative.xml;
 
 import java.io.File;
 import java.net.URI;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Producers.BaseValueBuilder;
 
 /** Diese Klasse implementiert den Konfigurator eines {@link File}.
  *

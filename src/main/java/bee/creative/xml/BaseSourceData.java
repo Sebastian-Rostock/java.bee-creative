@@ -20,8 +20,8 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
-import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source} oder {@link InputSource}, die für die Eingabedaten eines {@link Schema},
  * {@link Validator}, {@link DocumentBuilder} bzw. {@link Transformer} genutzt wird.
@@ -224,7 +224,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	 *
 	 * @see #getSource() */
 	@Override
-	public final Source build() throws IllegalStateException {
+	public final Source get() throws IllegalStateException {
 		return this.getSource();
 	}
 

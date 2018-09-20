@@ -6,9 +6,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
+import bee.creative.util.Producers.BaseValueBuilder;
 
 /** Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder}.
  *
@@ -208,7 +208,7 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 	 *
 	 * @see #getBuilder() */
 	@Override
-	public final DocumentBuilder build() throws IllegalStateException {
+	public final DocumentBuilder get() throws IllegalStateException {
 		try {
 			return this.getBuilder();
 		} catch (final SAXException | ParserConfigurationException cause) {

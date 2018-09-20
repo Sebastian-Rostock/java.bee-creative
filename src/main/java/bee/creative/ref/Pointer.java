@@ -1,10 +1,11 @@
 package bee.creative.ref;
 
+import java.lang.ref.Reference;
 import bee.creative.util.Objects;
 import bee.creative.util.Producer;
 
-/** Diese Schnittstelle definiert einen Zeiger bzw. Verweis auf einen Datensatz. Sie wird zur verbindung von
- *
+/** Diese Schnittstelle definiert einen Zeiger bzw. Verweis auf einen Datensatz. Sie wird zur verbindung von {@link Reference} mit {@link Producer} verwendet.
+ * 
  * @see Pointers
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ des Datensatzes. */

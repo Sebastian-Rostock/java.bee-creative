@@ -5,9 +5,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import org.xml.sax.SAXException;
-import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapData;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
+import bee.creative.util.Producers.BaseMapData;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory}.
  *
@@ -337,7 +337,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 *
 	 * @see #getFactory() */
 	@Override
-	public final DocumentBuilderFactory build() throws IllegalStateException {
+	public final DocumentBuilderFactory get() throws IllegalStateException {
 		try {
 			return this.getFactory();
 		} catch (final SAXException | ParserConfigurationException cause) {

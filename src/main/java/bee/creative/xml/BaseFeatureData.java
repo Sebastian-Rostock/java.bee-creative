@@ -4,7 +4,7 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.xpath.XPathFactory;
-import bee.creative.util.Builders.BaseMapData;
+import bee.creative.util.Producers.BaseMapData;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für die Fähigkeiten einer {@link XPathFactory}, {@link TransformerFactory} bzw.
  * {@link DocumentBuilderFactory}.

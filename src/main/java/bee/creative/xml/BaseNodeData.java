@@ -8,8 +8,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Node}.
  *
@@ -599,7 +599,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 *
 	 * @see #getNode() */
 	@Override
-	public final Node build() throws IllegalStateException {
+	public final Node get() throws IllegalStateException {
 		return this.getNode();
 	}
 

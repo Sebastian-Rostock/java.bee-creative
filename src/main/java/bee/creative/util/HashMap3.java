@@ -3,8 +3,7 @@ package bee.creative.util;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-/** Diese Klasse implementiert eine {@link HashMap} mit {@code ==} zum Referenzvergleich und {@link System#identityHashCode(Object)} zur Streuwertberechnung von
- * Schlüsseln.
+/** Diese Klasse implementiert eine {@link HashMap}, deren Schlüssel über Reverenzvergleich und {@link System#identityHashCode(Object)} abgeglichen werden.
  *
  * @see IdentityHashMap
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

@@ -5,7 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import bee.creative.util.Builders.MapBuilder;
+import bee.creative.util.Producers.MapBuilder;
 
 /** Diese Klasse implementiert Methoden zum Parsen von {@link Class Klassen}, {@link Field Datenfeldern}, {@link Method Methoden} und {@link Constructor
  * Konstruktoren} aus deren Textdarstellung sowie zur Erzeugung dieser Textdarstellungen.
@@ -21,7 +21,7 @@ public class Natives {
 			return input.getName();
 		}
 
-	}, byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class).build();
+	}, byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class).get();
 
 	/** Dieses Feld speichert den {@link Getter} zu {@link #formatClass(Class)}. */
 	static final Getter<Class<?>, Object> formatClass = new Getter<Class<?>, Object>() {

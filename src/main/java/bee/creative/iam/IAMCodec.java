@@ -10,7 +10,7 @@ import bee.creative.fem.FEMString;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
 import bee.creative.io.IO;
-import bee.creative.util.Builders.MapBuilder;
+import bee.creative.util.Producers.MapBuilder;
 
 /** Diese Klasse implementiert den Konfigurator, mit welchem ein {@link IAMIndex} aus bzw. in unterschiedliche Datenformate gelesen bzw. geschieben werden kann.
  * Dabei können {@link #getSourceData() Eingabedaten} unterschiedlicher {@link #getSourceFormat() Eingabeformate} direkt in {@link #getTargetData()
@@ -168,7 +168,7 @@ public final class IAMCodec {
 			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
 			.put(IAMMapping.MODE_HASHED, SORTED).put("H", HASHED).put("HASHED", HASHED) //
 			.put(IAMMapping.MODE_SORTED, SORTED).put("S", SORTED).put("SORTED", SORTED) //
-			.build();
+			.get();
 
 		/** Diese Methode gibt den {@link IAMFindMode} zum gegebenen Objekt zurück.<br>
 		 * Hierbei werden folgende Eingaben unterstützt:
@@ -244,7 +244,7 @@ public final class IAMCodec {
 			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
 			.put("B", BIGENDIAN).put("BIGENDIAN", BIGENDIAN).put(BIGENDIAN.toOrder(), BIGENDIAN) //
 			.put("L", LITTLEENDIAN).put("LITTLEENDIAN", LITTLEENDIAN).put(LITTLEENDIAN.toOrder(), LITTLEENDIAN) //
-			.build();
+			.get();
 
 		/** Diese Methode gibt die {@link IAMByteOrder} zum gegebenen Objekt zurück.<br>
 		 * Hierbei werden folgende Eingaben unterstützt:
@@ -545,12 +545,12 @@ public final class IAMCodec {
 			.put(STRING_FEM, "FEM-32") //
 			.put(STRING_FEM_INT8, "FEM-UTF8").put(STRING_FEM_UTF16, "FEM-UTF16") //
 			.put(STRING_FEM_UTF8, "FEM-UTF8").put(STRING_FEM_UTF16, "FEM-UTF16") //
-			.build();
+			.get();
 
 		@SuppressWarnings ("javadoc")
 		static final Map<?, IAMArrayFormat> values = MapBuilder.<Object, IAMArrayFormat>forHashMap() //
 			.putAllInverse(IAMArrayFormat.strings).put(null, ARRAY).put("", ARRAY).put("A", ARRAY).put("B", BINARY) //
-			.build();
+			.get();
 
 		/** Diese Methode gibt das {@link IAMArrayFormat} zum gegebenen Objekt zurück.<br>
 		 * Hierbei werden folgende Eingaben unterstützt:

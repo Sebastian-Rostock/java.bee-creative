@@ -2,7 +2,7 @@ package bee.creative.fem;
 
 import java.util.Arrays;
 import java.util.Map;
-import bee.creative.util.Builders.MapBuilder;
+import bee.creative.util.Producers.MapBuilder;
 
 /** Diese Klasse implementiert mit {@link #INSTANCES} eine statische Abbildung zur Verwaltung benannter Funktionen sowie einige generische Funktionen zur
  * Steuerung von Kontrollfluss und Variablen.
@@ -13,7 +13,7 @@ public abstract class FEMUtil {
 
 	/** Dieses Feld bildet von Namen auf Funktionen ab, die auch bequem über {@link #put(FEMFunction, String...)} modifiziert und über {@link #get(String)}
 	 * gelesen werden können. */
-	public static final Map<String, FEMFunction> INSTANCES = MapBuilder.<String, FEMFunction>forHashMap().toSynchronized().build();
+	public static final Map<String, FEMFunction> INSTANCES = MapBuilder.<String, FEMFunction>forHashMap().toSynchronized().get();
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (condition: FEMBoolean; trueResult: FEMValue; falseResult: FEMValue): FEMValue}, deren
 	 * Ergebniswert via {@code (condition ? trueResult : falseResult)} ermittelt wird. */

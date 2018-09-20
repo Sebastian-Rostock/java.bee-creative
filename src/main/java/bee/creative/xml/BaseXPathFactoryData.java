@@ -5,9 +5,9 @@ import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
-import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
+import bee.creative.util.Producers.BaseValueBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link XPathFactory}.
  *
@@ -178,7 +178,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	public final XPathFactory getFactory() throws XPathFactoryConfigurationException {
 		XPathFactory result = this.factory;
 		if (result != null) return result;
-		result = XPathFactory.newInstance(this.modelData.build());
+		result = XPathFactory.newInstance(this.modelData.get());
 		this.useFactory(result);
 		this.updateFactory();
 		return result;
@@ -262,7 +262,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 *
 	 * @see #getFactory() */
 	@Override
-	public final XPathFactory build() throws IllegalStateException {
+	public final XPathFactory get() throws IllegalStateException {
 		try {
 			return this.getFactory();
 		} catch (final XPathFactoryConfigurationException cause) {

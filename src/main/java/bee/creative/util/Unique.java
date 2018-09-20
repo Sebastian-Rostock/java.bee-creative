@@ -15,6 +15,118 @@ import java.util.TreeMap;
  * @param <GOutput> Typ der Ausgabe. */
 public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>, Hasher, Comparator<GInput>, Iterable<GOutput> {
 
+	/** Diese Klasse implementiert {@link Unique#fromTreeMap(Comparator, Getter, Setter)} */
+	@SuppressWarnings ("javadoc")
+	public static class TreeMapUnique<GInput, GOutput> extends Unique<GInput, GOutput> {
+
+		public final Comparator<? super GInput> sorter;
+
+		public final Setter<? super GInput, ? super GOutput> reuser;
+
+		public final Getter<? super GInput, ? extends GOutput> compiler;
+
+		public TreeMapUnique(final Comparator<? super GInput> sorter, final Setter<? super GInput, ? super GOutput> reuser,
+			final Getter<? super GInput, ? extends GOutput> compiler) throws NullPointerException {
+			super(new TreeMap<GInput, GOutput>(sorter));
+			this.sorter = Objects.assertNotNull(sorter);
+			this.reuser = Objects.assertNotNull(reuser);
+			this.compiler = Objects.assertNotNull(compiler);
+		}
+
+		@Override
+		public int compare(final GInput input1, final GInput input2) throws NullPointerException {
+			return this.sorter.compare(input1, input2);
+		}
+
+		@Override
+		public GOutput customBuild(final GInput input) {
+			return this.compiler.get(input);
+		}
+
+		@Override
+		public void customReuse(final GInput input, final GOutput output) {
+			this.reuser.set(input, output);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Unique#fromHashMap(Hasher, Getter, Setter)} */
+	@SuppressWarnings ("javadoc")
+	public static class HashMapUnique<GInput, GOutput> extends Unique<GInput, GOutput> {
+
+		public final Hasher hasher;
+
+		public final Setter<? super GInput, ? super GOutput> reuser;
+
+		public final Getter<? super GInput, ? extends GOutput> compiler;
+
+		public HashMapUnique(final Hasher hasher, final Setter<? super GInput, ? super GOutput> reuser, final Getter<? super GInput, ? extends GOutput> compiler)
+			throws NullPointerException {
+			super(HashMap2.<GInput, GOutput>from(hasher));
+			this.hasher = hasher;
+			this.reuser = Objects.assertNotNull(reuser);
+			this.compiler = Objects.assertNotNull(compiler);
+		}
+
+		@Override
+		public int hash(final Object input) throws NullPointerException {
+			return this.hasher.hash(input);
+		}
+
+		@Override
+		public boolean equals(final Object input1, final Object input2) throws NullPointerException {
+			return this.hasher.equals(input1, input2);
+		}
+
+		@Override
+		public void customReuse(final GInput input, final GOutput output) {
+			this.reuser.set(input, output);
+		}
+
+		@Override
+		public GOutput customBuild(final GInput input) {
+			return this.compiler.get(input);
+		}
+
+	}
+
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
+	 * fromTreeMap(Comparators.naturalComparator(), Getters.neutralGetter(), Setters.emptySetter())}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput extends Comparable<? super GInput>> Unique<GInput, GInput> fromTreeMap() throws NullPointerException {
+		return Unique.fromTreeMap(Comparators.<GInput>naturalComparator(), Getters.<GInput>neutralGetter(), Setters.emptySetter());
+	}
+
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
+	 * fromTreeMap(comparator, Getters.neutralGetter(), Setters.emptySetter())}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput> Unique<GInput, GInput> fromTreeMap(final Comparator<? super GInput> comparator) throws NullPointerException {
+		return Unique.fromTreeMap(comparator, Getters.<GInput>neutralGetter(), Setters.emptySetter());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter) fromTreeMap(Comparators.naturalComparator(), compiler,
+	 * Setters.emptySetter())}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput extends Comparable<? super GInput>, GOutput> Unique<GInput, GOutput> fromTreeMap(
+		final Getter<? super GInput, ? extends GOutput> compiler) throws NullPointerException {
+		return Unique.fromTreeMap(Comparators.<GInput>naturalComparator(), compiler, Setters.emptySetter());
+	}
+
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Comparator} miteinander verglichen und
+	 * über den gegebenen {@link Getter} in die Ausgaben überführt werden. Die Wiederverwendung einer Ausgabe wird dem gegebenen {@link Setter} signalisiert.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param sorter {@link Comparator} zur Ermittlung des Vergleichswerts der Eingaben in {@link #compare(Object, Object)}.
+	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
+	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
+	 * @return streuwertbasiertes {@link Unique}.
+	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
+	public static <GInput, GOutput> Unique<GInput, GOutput> fromTreeMap(final Comparator<? super GInput> sorter,
+		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) throws NullPointerException {
+		return new TreeMapUnique<>(sorter, reuser, compiler);
+	}
+
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
 	 * fromHashMap(Objects.OBJECT_HASHER, Getters.neutralGetter(), Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
@@ -57,89 +169,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
 	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Hasher hasher, final Getter<? super GInput, ? extends GOutput> compiler,
 		final Setter<? super GInput, ? super GOutput> reuser) throws NullPointerException {
-		Objects.assertNotNull(hasher);
-		Objects.assertNotNull(compiler);
-		Objects.assertNotNull(reuser);
-		return new Unique<GInput, GOutput>(HashMap2.<GInput, GOutput>from(hasher)) {
-
-			@Override
-			public int hash(final Object input) throws NullPointerException {
-				return hasher.hash(input);
-			}
-
-			@Override
-			public boolean equals(final Object input1, final Object input2) throws NullPointerException {
-				return hasher.equals(input1, input2);
-			}
-
-			@Override
-			public void customReuse(final GInput input, final GOutput output) {
-				reuser.set(input, output);
-			}
-
-			@Override
-			public GOutput customBuild(final GInput input) {
-				return compiler.get(input);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
-	 * fromTreeMap(Comparators.naturalComparator(), Getters.neutralGetter(), Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
-	public static <GInput extends Comparable<? super GInput>> Unique<GInput, GInput> fromTreeMap() throws NullPointerException {
-		return Unique.fromTreeMap(Comparators.<GInput>naturalComparator(), Getters.<GInput>neutralGetter(), Setters.emptySetter());
-	}
-
-	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
-	 * fromTreeMap(comparator, Getters.neutralGetter(), Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
-	public static <GInput> Unique<GInput, GInput> fromTreeMap(final Comparator<? super GInput> comparator) throws NullPointerException {
-		return Unique.fromTreeMap(comparator, Getters.<GInput>neutralGetter(), Setters.emptySetter());
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter) fromTreeMap(Comparators.naturalComparator(), compiler,
-	 * Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
-	public static <GInput extends Comparable<? super GInput>, GOutput> Unique<GInput, GOutput> fromTreeMap(
-		final Getter<? super GInput, ? extends GOutput> compiler) throws NullPointerException {
-		return Unique.fromTreeMap(Comparators.<GInput>naturalComparator(), compiler, Setters.emptySetter());
-	}
-
-	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Comparator} miteinander verglichen und
-	 * über den gegebenen {@link Getter} in die Ausgaben überführt werden. Die Wiederverwendung einer Ausgabe wird dem gegebenen {@link Setter} signalisiert.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param comparator {@link Comparator} zur Ermittlung des Vergleichswerts der Eingaben in {@link #compare(Object, Object)}.
-	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
-	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
-	 * @return streuwertbasiertes {@link Unique}.
-	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
-	public static <GInput, GOutput> Unique<GInput, GOutput> fromTreeMap(final Comparator<? super GInput> comparator,
-		final Getter<? super GInput, ? extends GOutput> compiler, final Setter<? super GInput, ? super GOutput> reuser) throws NullPointerException {
-		Objects.assertNotNull(comparator);
-		Objects.assertNotNull(compiler);
-		Objects.assertNotNull(reuser);
-		return new Unique<GInput, GOutput>(new TreeMap<GInput, GOutput>(comparator)) {
-
-			@Override
-			public int compare(final GInput input1, final GInput input2) throws NullPointerException {
-				return comparator.compare(input1, input2);
-			}
-
-			@Override
-			public GOutput customBuild(final GInput input) {
-				return compiler.get(input);
-			}
-
-			@Override
-			public void customReuse(final GInput input, final GOutput output) {
-				reuser.set(input, output);
-			}
-
-		};
+		return new HashMapUnique<>(hasher, reuser, compiler);
 	}
 
 	/** Dieses Feld bildet von Ein- auf Ausgabeobjekte ab. */

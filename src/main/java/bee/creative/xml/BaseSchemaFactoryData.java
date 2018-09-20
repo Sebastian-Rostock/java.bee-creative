@@ -6,10 +6,10 @@ import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapData;
-import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseBuilder;
+import bee.creative.util.Producers.BaseMapData;
+import bee.creative.util.Producers.BaseValueBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link SchemaFactory}.
  *
@@ -219,7 +219,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	public final SchemaFactory getFactory() throws SAXException {
 		SchemaFactory result = this.factory;
 		if (result != null) return result;
-		result = SchemaFactory.newInstance(this.languageData.build());
+		result = SchemaFactory.newInstance(this.languageData.get());
 		this.useFactory(result);
 		this.updateFactory();
 		return result;
@@ -312,7 +312,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 	/** {@inheritDoc} */
 	@Override
-	public final SchemaFactory build() throws IllegalStateException {
+	public final SchemaFactory get() throws IllegalStateException {
 		try {
 			return this.getFactory();
 		} catch (final SAXException cause) {

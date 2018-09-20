@@ -11,8 +11,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMResult;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
+import bee.creative.util.Producers.BaseValueBuilder;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #marshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Marshaller}.
  *
@@ -140,7 +140,7 @@ public final class XMLMarshaller {
 	public final XMLMarshaller marshal() throws SAXException, JAXBException {
 		final Marshaller marshaller = this.marshallerData.getMarshaller();
 		synchronized (marshaller) {
-			final Object source = this.sourceData.build();
+			final Object source = this.sourceData.get();
 			final Result result = this.resultData.getResult();
 			marshaller.marshal(source, result);
 		}

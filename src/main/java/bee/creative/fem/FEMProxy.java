@@ -5,21 +5,13 @@ import bee.creative.emu.Emuable;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
- * Funktion} delegiert.
+ * Funktion} delegiert.<br>
+ * {@link #hashCode() Streuwert} und {@link #equals(Object) Äquivalenz} beziehen sich auf den {@link #name() Namen} des Platzhalters.
  *
  * @see FEMCompiler#proxy(String)
  * @see FEMCompiler#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMProxy extends FEMFunction implements Emuable {
-
-	/** Diese Methode gibt eine neue {@link FEMProxy} mit dem gegebenen Namen zurück.
-	 *
-	 * @param name Name.
-	 * @return {@link FEMProxy}.
-	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-	public static FEMProxy from(final String name) throws NullPointerException {
-		return new FEMProxy(name);
-	}
 
 	/** Dieses Feld speichert den Namen. */
 	final String name;
@@ -35,25 +27,36 @@ public final class FEMProxy extends FEMFunction implements Emuable {
 		this.name = Objects.assertNotNull(name);
 	}
 
+	/** Dieser Konstruktor initialisiert Namen und Funktion.
+	 *
+	 * @see #set(FEMFunction)
+	 * @param name Name.
+	 * @param function Funktion.
+	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
+	public FEMProxy(final String name, final FEMFunction function) throws NullPointerException {
+		this(name);
+		this.set(function);
+	}
+
 	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird.<br>
 	 * Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch nicht aufgerufen wurde.
 	 *
 	 * @return Funktion oder {@code null}. */
-	public final FEMFunction get() {
+	public FEMFunction get() {
 		return this.function;
 	}
 
 	/** Diese Methode setzt die in {@link #invoke(FEMFrame)} aufzurufende Funktion.
 	 *
 	 * @param function Funktion oder {@code null}. */
-	public final void set(final FEMFunction function) {
+	public void set(final FEMFunction function) {
 		this.function = function;
 	}
 
 	/** Diese Methode gibt den Namen des Platzhalters zurück.
 	 *
 	 * @return Name. */
-	public final String name() {
+	public String name() {
 		return this.name;
 	}
 
@@ -65,8 +68,23 @@ public final class FEMProxy extends FEMFunction implements Emuable {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMValue invoke(final FEMFrame frame) {
+	public FEMValue invoke(final FEMFrame frame) {
 		return this.function.invoke(frame);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public int hashCode() {
+		return this.name.hashCode();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean equals(final Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMProxy)) return false;
+		final FEMProxy that = (FEMProxy)object;
+		return this.name.equals(that.name);
 	}
 
 	/** {@inheritDoc} */

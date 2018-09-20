@@ -9,6 +9,35 @@ import java.util.Set;
  * @param <GItem> Typ der Elemente. */
 public class HashSet2<GItem> extends HashSet<GItem> {
 
+	/** Diese Klasse implementiert {@link HashSet2#from(Hasher)} */
+	@SuppressWarnings ("javadoc")
+	public static final class HasherHashSet2<GItem> extends HashSet2<GItem> {
+
+		public static final long serialVersionUID = 5185785086449129611L;
+
+		public final Hasher hasher;
+
+		public HasherHashSet2(final Hasher hasher) {
+			this.hasher = Objects.assertNotNull(hasher);
+		}
+
+		@Override
+		protected int customHash(final Object item) {
+			return this.hasher.hash(item);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object item) {
+			return this.hasher.equals(this.items[entryIndex], item);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
+			return (this.hashes[entryIndex] == itemHash) && this.hasher.equals(this.items[entryIndex], item);
+		}
+
+	}
+
 	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -6978391927144580624L;
 
@@ -19,27 +48,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	 * @return An {@link Hasher} gebundenes {@link HashSet2}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
 	public static <GItem> HashSet2<GItem> from(final Hasher hasher) throws NullPointerException {
-		Objects.assertNotNull(hasher);
-		return new HashSet2<GItem>() {
-
-			private static final long serialVersionUID = 5185785086449129611L;
-
-			@Override
-			protected int customHash(final Object item) {
-				return hasher.hash(item);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object item) {
-				return hasher.equals(this.items[entryIndex], item);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
-				return (this.hashes[entryIndex] == itemHash) && hasher.equals(this.items[entryIndex], item);
-			}
-
-		};
+		return new HasherHashSet2<>(hasher);
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Streuwert seines Schlüssels ab. */
