@@ -24,8 +24,21 @@ public class Objects {
 
 	}
 
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#hash(Object)} und {@link Objects#equals(Object, Object)} delegiert. */
-	public static final Hasher HASHER = new Hasher() {
+	/** Diese Klasse implementiert ein Objekt, dessen {@link #toString() Textdarsellung} über {@link Objects#toInvokeString(Object, Object...)
+	 * Objects.toInvokeString(this)} ermittelt wird. Sie kann als Basis von Klassen mit nur einer Instanz eingesetzt werden. */
+	@SuppressWarnings ("javadoc")
+	public static class BaseObject {
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Objects#HASHER}. */
+	@SuppressWarnings ("javadoc")
+	public static class BaseHasher extends BaseObject implements Hasher {
 
 		@Override
 		public int hash(final Object input) {
@@ -37,10 +50,11 @@ public class Objects {
 			return Objects.equals(input1, input2);
 		}
 
-	};
+	}
 
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#deepHash(Object)} und {@link Objects#deepEquals(Object, Object)} delegiert. */
-	public static final Hasher DEEP_HASHER = new Hasher() {
+	/** Diese Klasse implementiert {@link Objects#DEEP_HASHER}. */
+	@SuppressWarnings ("javadoc")
+	public static class DeepHasher extends BaseHasher {
 
 		@Override
 		public int hash(final Object input) {
@@ -52,10 +66,11 @@ public class Objects {
 			return Objects.deepEquals(input1, input2);
 		}
 
-	};
+	}
 
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link System#identityHashCode(Object)} und die Objekte über ihre Referenz vergleicht. */
-	public static final Hasher IDENTITY_HASHER = new Hasher() {
+	/** Diese Klasse implementiert {@link Objects#IDENTITY_HASHER}. */
+	@SuppressWarnings ("javadoc")
+	public static class IdentityHasher extends BaseHasher {
 
 		@Override
 		public int hash(final Object input) {
@@ -67,7 +82,83 @@ public class Objects {
 			return input1 == input2;
 		}
 
-	};
+	}
+
+	/** Diese Klasse implementiert {@link Objects#navigatedHasher(Getter, Hasher)}. */
+	@SuppressWarnings ("javadoc")
+	public static class NavigatedHasher implements Hasher {
+
+		public final Hasher hasher;
+
+		public final Getter<? super Object, ? extends Object> navigator;
+
+		public NavigatedHasher(final Hasher hasher, final Getter<? super Object, ? extends Object> navigator) {
+			this.hasher = Objects.assertNotNull(hasher);
+			this.navigator = Objects.assertNotNull(navigator);
+		}
+
+		@Override
+		public int hash(final Object input) {
+			return this.hasher.hash(this.navigator.get(input));
+		}
+
+		@Override
+		public boolean equals(final Object input1, final Object input2) {
+			return this.hasher.equals(this.navigator.get(input1), this.navigator.get(input2));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.navigator, this.hasher);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Objects#toStringObject(String)}. */
+	@SuppressWarnings ("javadoc")
+	public static class StringObject {
+
+		public final String string;
+
+		public StringObject(final String string) {
+			this.string = Objects.assertNotNull(string);
+		}
+
+		@Override
+		public String toString() {
+			return this.string;
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Objects#toStringObject(boolean, Object)}. */
+	@SuppressWarnings ("javadoc")
+	public static class FormatObject {
+
+		public final boolean format;
+
+		public final Object object;
+
+		public FormatObject(final boolean format, final Object object) {
+			this.format = format;
+			this.object = object;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toString(this.format, this.object);
+		}
+
+	}
+
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#hash(Object)} und {@link Objects#equals(Object, Object)} delegiert. */
+	public static final Hasher HASHER = new BaseHasher();
+
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#deepHash(Object)} und {@link Objects#deepEquals(Object, Object)} delegiert. */
+	public static final Hasher DEEP_HASHER = new DeepHasher();
+
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link System#identityHashCode(Object)} und die Objekte über ihre Referenz vergleicht. */
+	public static final Hasher IDENTITY_HASHER = new IdentityHasher();
 
 	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
 	 *
@@ -519,18 +610,11 @@ public class Objects {
 
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der gegebene Zeichenkette entspricht.
 	 *
-	 * @param string Textdarstelung oder {@code null}.
+	 * @param string Textdarstelung .
 	 * @return Textdarstelung-Objekt. */
 	public static Object toStringObject(final String string) {
 		if (string == null) return "null";
-		return new Object() {
-
-			@Override
-			public String toString() {
-				return string;
-			}
-
-		};
+		return new StringObject(string);
 	}
 
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten
@@ -541,15 +625,7 @@ public class Objects {
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Objects#toString(boolean, Object)}-Objekt. */
 	public static Object toStringObject(final boolean format, final Object object) {
-		if (object == null) return "null";
-		return new Object() {
-
-			@Override
-			public String toString() {
-				return Objects.toString(format, object);
-			}
-
-		};
+		return new FormatObject(format, object);
 	}
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
@@ -644,26 +720,7 @@ public class Objects {
 	 * @return {@code navigated}-{@link Hasher}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code hasher} {@code null} ist. */
 	public static Hasher navigatedHasher(final Getter<? super Object, ? extends Object> navigator, final Hasher hasher) throws NullPointerException {
-		Objects.assertNotNull(navigator);
-		Objects.assertNotNull(hasher);
-		return new Hasher() {
-
-			@Override
-			public int hash(final Object input) {
-				return hasher.hash(navigator.get(input));
-			}
-
-			@Override
-			public boolean equals(final Object input1, final Object input2) {
-				return hasher.equals(navigator.get(input1), navigator.get(input2));
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("navigatedHasher", navigator, hasher);
-			}
-
-		};
+		return new NavigatedHasher(hasher, navigator);
 	}
 
 }

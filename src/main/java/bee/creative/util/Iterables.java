@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import bee.creative.array.Array;
+import bee.creative.util.Objects.BaseObject;
 import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert grundlegende {@link Iterable}.
@@ -17,43 +18,229 @@ import bee.creative.util.Objects.UseToString;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Iterables {
 
-	/** Diese Klasse implementiert ein abstraktes {@link Iterable}.
-	 *
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente. */
-	public static abstract class BaseIterable<GItem> implements Iterable<GItem>, UseToString {
-
+	/** Diese Klasse implementiert ein abstraktes {@link Iterable} mit {@link UseToString}-Merkierung. */
+	@SuppressWarnings ("javadoc")
+	public static abstract class BaseIterable<GItem> extends BaseObject implements Iterable<GItem>, UseToString {
 	}
 
-	/** Dieses Feld speichert das leere {@link Iterable}. */
-	public static final Iterable<?> EMPTY_ITERABLE = new Iterable<Object>() {
+	/** Diese Klasse implementiert {@link Iterables#emptyIterable()}. */
+	@SuppressWarnings ("javadoc")
+	public static class EmptaIterable extends BaseIterable<Object> {
 
 		@Override
 		public Iterator<Object> iterator() {
 			return Iterators.emptyIterator();
 		}
 
-		@Override
-		public String toString() {
-			return "EMPTY_ITERABLE";
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#itemIterable(Object, int)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ItemIterable<GItem> extends BaseIterable<GItem> {
+
+		public final GItem item;
+
+		public final int count;
+
+		public ItemIterable(final GItem item, final int count) {
+			if (count < 0) throw new IllegalArgumentException();
+			this.count = count;
+			this.item = item;
 		}
 
-	};
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.itemIterator(this.item, this.count);
+		}
 
-	/** Dieses Feld speichert den {@link Getter}, der den {@link Iterator} eines {@link Iterable} ermittelt. */
-	public static final Getter<?, ?> ITERABLE_ITERATOR = new Getter<Iterable<?>, Iterator<?>>() {
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.item, this.count);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#integerIterable(int)}. */
+	@SuppressWarnings ("javadoc")
+	public static class IntegerIterable extends BaseIterable<Integer> {
+
+		public final int count;
+
+		public IntegerIterable(final int count) {
+			if (count < 0) throw new IllegalArgumentException();
+			this.count = count;
+		}
+
+		@Override
+		public Iterator<Integer> iterator() {
+			return Iterators.integerIterator(this.count);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.count);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#limitedIterable(int, Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class LimitedIterable<GItem> extends BaseIterable<GItem> {
+
+		public final int count;
+
+		public final Iterable<? extends GItem> iterable;
+
+		public LimitedIterable(final int count, final Iterable<? extends GItem> iterable) {
+			if (count < 0) throw new IllegalArgumentException();
+			this.count = count;
+			this.iterable = Objects.assertNotNull(iterable);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.limitedIterator(this.count, this.iterable.iterator());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.count, this.iterable);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#filteredIterable(Filter, Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class FilteredIterable<GItem> extends BaseIterable<GItem> {
+
+		public final Filter<? super GItem> filter;
+
+		public final Iterable<? extends GItem> iterable;
+
+		public FilteredIterable(final Filter<? super GItem> filter, final Iterable<? extends GItem> iterable) {
+			this.filter = Objects.assertNotNull(filter);
+			this.iterable = Objects.assertNotNull(iterable);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.filteredIterator(this.filter, this.iterable.iterator());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.filter, this.iterable);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#uniqueIterable(Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class UniqueIterable<GItem> extends BaseIterable<GItem> {
+
+		public final Iterable<? extends GItem> iterable;
+
+		public UniqueIterable(final Iterable<? extends GItem> iterable) {
+			this.iterable = Objects.assertNotNull(iterable);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.uniqueIterator(this.iterable.iterator());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterable);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#chainedIterable(Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ChainedIterable<GItem> extends BaseIterable<GItem> {
+
+		public final Iterable<? extends Iterable<? extends GItem>> iterables;
+
+		public ChainedIterable(final Iterable<? extends Iterable<? extends GItem>> iterables) {
+			this.iterables = Objects.assertNotNull(iterables);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterables.iterator()));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterables);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#navigatedIterable(Getter, Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class NavigatedIterable<GInput, GOutput> extends BaseIterable<GOutput> {
+
+		public final Getter<? super GInput, ? extends GOutput> navigator;
+
+		public final Iterable<? extends GInput> iterable;
+
+		public NavigatedIterable(final Getter<? super GInput, ? extends GOutput> navigator, final Iterable<? extends GInput> iterable) {
+			this.navigator = Objects.assertNotNull(navigator);
+			this.iterable = Objects.assertNotNull(iterable);
+		}
+
+		@Override
+		public Iterator<GOutput> iterator() {
+			return Iterators.navigatedIterator(this.navigator, this.iterable.iterator());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.navigator, this.iterable);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#unmodifiableIterable(Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class UnmodifiableIterable<GItem> extends BaseIterable<GItem> {
+
+		public final Iterable<? extends GItem> iterable;
+
+		public UnmodifiableIterable(final Iterable<? extends GItem> iterable) {
+			this.iterable = Objects.assertNotNull(iterable);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.unmodifiableIterator(this.iterable.iterator());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterable);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#ITERABLE_ITERATOR}. */
+	@SuppressWarnings ("javadoc")
+	static class IteratorGetter extends BaseObject implements Getter<Iterable<?>, Iterator<?>> {
 
 		@Override
 		public Iterator<?> get(final Iterable<?> input) {
 			return input.iterator();
 		}
 
-		@Override
-		public String toString() {
-			return "ITERABLE_ITERATOR";
-		}
+	}
 
-	};
+	/** Dieses Feld speichert das leere {@link Iterable}. */
+	public static final Iterable<?> EMPTY_ITERABLE = new EmptaIterable();
+
+	/** Dieses Feld speichert den {@link Getter}, der den {@link Iterator} eines {@link Iterable} ermittelt. */
+	public static final Getter<Iterable<?>, Iterator<?>> ITERABLE_ITERATOR = new IteratorGetter();
 
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück.
 	 *
@@ -180,20 +367,7 @@ public class Iterables {
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static <GItem> Iterable<GItem> itemIterable(final GItem item, final int count) throws IllegalArgumentException {
 		if (count == 0) return Iterables.emptyIterable();
-		if (count < 0) throw new IllegalArgumentException("count < 0");
-		return new BaseIterable<GItem>() {
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.itemIterator(item, count);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("itemIterable", item, count);
-			}
-
-		};
+		return new ItemIterable<>(item, count);
 	}
 
 	/** Diese Methode gibt das leere {@link Iterable} zurück.
@@ -214,30 +388,7 @@ public class Iterables {
 	 * @return {@link Integer}-{@link Iterable}.
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static Iterable<Integer> integerIterable(final int count) throws IllegalArgumentException {
-		if (count < 0) throw new IllegalArgumentException("count < 0");
-		return new BaseIterable<Integer>() {
-
-			@Override
-			public Iterator<Integer> iterator() {
-				return Iterators.integerIterator(count);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("integerIterable", count);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt den {@link Getter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.
-	 *
-	 * @see Iterable#iterator()
-	 * @param <GItem> Typ der Elemente.
-	 * @return {@link #ITERABLE_ITERATOR}. */
-	@SuppressWarnings ("unchecked")
-	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> iterableIterator() {
-		return (Getter<Iterable<? extends GItem>, Iterator<GItem>>)Iterables.ITERABLE_ITERATOR;
+		return new IntegerIterable(count);
 	}
 
 	/** Diese Methode gibt ein {@link Iterable} zurück, das die gegebene maximale Anzahl an Elementen des gegebenen {@link Iterable} liefert.
@@ -251,22 +402,8 @@ public class Iterables {
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static <GItem> Iterable<GItem> limitedIterable(final int count, final Iterable<? extends GItem> iterable)
 		throws NullPointerException, IllegalArgumentException {
-		Objects.assertNotNull(iterable);
-		if (count < 0) throw new IllegalArgumentException("count < 0");
 		if (count == 0) return Iterables.emptyIterable();
-		return new BaseIterable<GItem>() {
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.limitedIterator(count, iterable.iterator());
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("limitedIterable", count, iterable);
-			}
-
-		};
+		return new LimitedIterable<>(count, iterable);
 	}
 
 	/** Diese Methode gibt ein filterndes {@link Iterable} zurück, das nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterable}
@@ -280,21 +417,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code filter} bzw. {@code iterable} {@code null} ist. */
 	public static <GItem> Iterable<GItem> filteredIterable(final Filter<? super GItem> filter, final Iterable<? extends GItem> iterable)
 		throws NullPointerException {
-		Objects.assertNotNull(filter);
-		Objects.assertNotNull(iterable);
-		return new BaseIterable<GItem>() {
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.filteredIterator(filter, iterable.iterator());
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("filteredIterable", filter, iterable);
-			}
-
-		};
+		return new FilteredIterable<>(filter, iterable);
 	}
 
 	/** Diese Methode gibt ein {@link Iterable} zurück, das kein Element des gegebenen {@link Iterable} mehrfach liefert.
@@ -305,20 +428,7 @@ public class Iterables {
 	 * @return {@code unique}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
 	public static <GItem> Iterable<GItem> uniqueIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
-		Objects.assertNotNull(iterable);
-		return new BaseIterable<GItem>() {
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.uniqueIterator(iterable.iterator());
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("uniqueIterable", iterable);
-			}
-
-		};
+		return new UniqueIterable<>(iterable);
 	}
 
 	/** Diese Methode gibt ein verkettetes {@link Iterable} zurück, das alle Elemente der gegebenen {@link Iterable} in der gegebenen Reihenfolge liefert.
@@ -329,20 +439,7 @@ public class Iterables {
 	 * @return {@code chained}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist. */
 	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends Iterable<? extends GItem>> iterables) throws NullPointerException {
-		Objects.assertNotNull(iterables);
-		return new BaseIterable<GItem>() {
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>iterableIterator(), iterables.iterator()));
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("chainedIterable", iterables);
-			}
-
-		};
+		return new ChainedIterable<>(iterables);
 	}
 
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
@@ -355,7 +452,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem>... iterables) throws NullPointerException {
-		return Iterables.chainedIterable(Arrays.asList(Objects.assertNotNull(iterables)));
+		return Iterables.chainedIterable(Arrays.asList(iterables));
 	}
 
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
@@ -363,13 +460,13 @@ public class Iterables {
 	 *
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
-	 * @param iterable1 erstes {@link Iterable}.
-	 * @param iterable2 zweites {@link Iterable}.
+	 * @param iterable1 erstes {@link Iterable} oder {@code null}.
+	 * @param iterable2 zweites {@link Iterable} oder {@code null}.
 	 * @return {@code chained}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable1} bzw. {@code iterable2} {@code null} ist. */
 	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2)
 		throws NullPointerException {
-		return Iterables.chainedIterable(Arrays.asList(Objects.assertNotNull(iterable1), Objects.assertNotNull(iterable2)));
+		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
 	}
 
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
@@ -384,21 +481,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static <GInput, GOutput> Iterable<GOutput> navigatedIterable(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Iterable<? extends GInput> iterable) throws NullPointerException {
-		Objects.assertNotNull(navigator);
-		Objects.assertNotNull(iterable);
-		return new BaseIterable<GOutput>() {
-
-			@Override
-			public Iterator<GOutput> iterator() {
-				return Iterators.navigatedIterator(navigator, iterable.iterator());
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("navigatedIterable", navigator, iterable);
-			}
-
-		};
+		return new NavigatedIterable<>(navigator, iterable);
 	}
 
 	/** Diese Methode gibt eun unveränderliches {@link Iterable} zurück, das die Elemente des gegebenen {@link Iterable} liefert.
@@ -409,20 +492,7 @@ public class Iterables {
 	 * @return {@code unmodifiable}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
 	public static <GItem> Iterable<GItem> unmodifiableIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
-		Objects.assertNotNull(iterable);
-		return new BaseIterable<GItem>() {
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.unmodifiableIterator(iterable.iterator());
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("unmodifiableIterator", iterable);
-			}
-
-		};
+		return new UnmodifiableIterable<>(iterable);
 	}
 
 	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück.<br>
@@ -454,6 +524,16 @@ public class Iterables {
 		Iterables.addAll(result, iterable);
 		result.trimToSize();
 		return result;
+	}
+
+	/** Diese Methode gibt den {@link Getter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.
+	 *
+	 * @see Iterable#iterator()
+	 * @param <GItem> Typ der Elemente.
+	 * @return {@link #ITERABLE_ITERATOR}. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> toIteratorGetter() {
+		return (Getter<Iterable<? extends GItem>, Iterator<GItem>>)(Object)Iterables.ITERABLE_ITERATOR;
 	}
 
 }

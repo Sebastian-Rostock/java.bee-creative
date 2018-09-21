@@ -189,7 +189,6 @@ public class Filters {
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code collection} {@code null} ist. */
 	public static <GInput> Filter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
-		if (collection.isEmpty()) return Filters.rejectFilter();
 		return new Filter<GInput>() {
 
 			@Override

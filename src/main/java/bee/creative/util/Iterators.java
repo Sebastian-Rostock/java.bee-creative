@@ -17,16 +17,101 @@ import bee.creative.util.Objects.UseToString;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Iterators {
 
-	/** Diese Klasse implementiert einen abstrakten {@link Iterator}.
+	/** Diese Klasse implementiert einen abstrakten {@link Iterator} mit {@link UseToString}.
 	 *
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des Elementes. */
 	public static abstract class BaseIterator<GItem> implements Iterator<GItem>, UseToString {
 
 	}
 
-	/** Dieses Feld speichert den leeren {@link Iterator}. */
-	public static final Iterator<?> EMPTY_ITERATOR = new BaseIterator<Object>() {
+	/** Diese Klasse implementiert {@link Iterators#itemIterator(Object, int)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ItemIterator<GItem> extends BaseIterator<GItem> {
+
+		public final GItem item;
+
+		public final int count;
+
+		protected int index = 0;
+
+		public ItemIterator(final int count, final GItem item) {
+			if (count < 0) throw new IllegalArgumentException();
+			this.item = item;
+			this.count = count;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.index < this.count;
+		}
+
+		@Override
+		public GItem next() {
+			if (!this.hasNext()) throw new NoSuchElementException();
+			this.index++;
+			return this.item;
+		}
+
+		@Override
+		public void remove() {
+			throw (this.hasNext() ? new IllegalStateException() : new UnsupportedOperationException());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.item, this.count);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#itemsIterator(Items, int, int)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ItemsIterator<GItem> extends BaseIterator<GItem> {
+
+		public final int fromIndex;
+
+		public final int toIndex;
+
+		public final Items<? extends GItem> items;
+
+		int index;
+
+		public ItemsIterator(final int fromIndex, final int toIndex, final Items<? extends GItem> items) {
+			Comparables.check(fromIndex, toIndex);
+
+			this.items = Objects.assertNotNull(items);
+			this.fromIndex = fromIndex;
+			this.toIndex = toIndex;
+			this.index = fromIndex;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.index < this.toIndex;
+		}
+
+		@Override
+		public GItem next() {
+			if (this.index == this.toIndex) throw new NoSuchElementException();
+			return this.items.get(this.index++);
+		}
+
+		@Override
+		public void remove() {
+			if (this.index == this.fromIndex) throw new IllegalStateException();
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.items, this.fromIndex, this.toIndex);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#emptyIterator()}. */
+	@SuppressWarnings ("javadoc")
+	public static class EmptyIterator extends BaseIterator<Object> {
 
 		@Override
 		public boolean hasNext() {
@@ -45,10 +130,285 @@ public class Iterators {
 
 		@Override
 		public String toString() {
-			return "EMPTY_ITERATOR";
+			return Objects.toInvokeString(this);
 		}
 
-	};
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#integerIterator(int)}. */
+	@SuppressWarnings ("javadoc")
+	public static class IntegerIterator implements Iterator<Integer> {
+
+		public final int count;
+
+		int value = 0;
+
+		public IntegerIterator(final int count) {
+			if (count < 0) throw new IllegalArgumentException();
+			this.count = count;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.value < this.count;
+		}
+
+		@Override
+		public Integer next() {
+			return Integer.valueOf(this.value++);
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.count);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#limitedIterator(int, Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class LimitedIterator<GItem> extends BaseIterator<GItem> {
+
+		public final int count;
+
+		public final Iterator<? extends GItem> iterator;
+
+		protected int index = 0;
+
+		public LimitedIterator(final int count, final Iterator<? extends GItem> iterator) {
+			if (count < 0) throw new IllegalArgumentException();
+			this.iterator = Objects.assertNotNull(iterator);
+			this.count = count;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return (this.index < this.count) && this.iterator.hasNext();
+		}
+
+		@Override
+		public GItem next() {
+			if (this.index == this.count) throw new NoSuchElementException();
+			this.index++;
+			return this.iterator.next();
+		}
+
+		@Override
+		public void remove() {
+			this.iterator.remove();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.count, this.iterator);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#uniqueIterator(Collection, Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class UniqueIterator<GItem> extends BaseIterator<GItem> {
+
+		public final Collection<GItem> collection;
+
+		public final Iterator<GItem> iterator;
+
+		public UniqueIterator(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) {
+			this.collection = collection;
+			this.iterator = Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(collection)), iterator);
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.iterator.hasNext();
+		}
+
+		@Override
+		public GItem next() {
+			final GItem item = this.iterator.next();
+			this.collection.add(item);
+			return item;
+		}
+
+		@Override
+		public void remove() {
+			this.iterator.remove();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterator);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#filteredIterator(Filter, Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class FilteredIterator<GItem> extends BaseIterator<GItem> {
+
+		public final Filter<? super GItem> filter;
+
+		public final Iterator<? extends GItem> iterator;
+
+		protected Boolean has;
+
+		protected GItem item;
+
+		public FilteredIterator(final Filter<? super GItem> filter, final Iterator<? extends GItem> iterator) {
+			this.filter = Objects.assertNotNull(filter);
+			this.iterator = Objects.assertNotNull(iterator);
+		}
+
+		@Override
+		public boolean hasNext() {
+			if (this.has != null) return this.has.booleanValue();
+			while (this.iterator.hasNext()) {
+				if (this.filter.accept(this.item = this.iterator.next())) {
+					this.has = Boolean.TRUE;
+					return true;
+				}
+			}
+			this.has = Boolean.FALSE;
+			return false;
+		}
+
+		@Override
+		public GItem next() {
+			if (!this.hasNext()) throw new NoSuchElementException();
+			this.has = null;
+			return this.item;
+		}
+
+		@Override
+		public void remove() {
+			if (this.has != null) throw new IllegalStateException();
+			this.iterator.remove();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.filter, this.iterator);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#chainedIterator(Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ChainedIterator<GItem> extends BaseIterator<GItem> {
+
+		public final Iterator<? extends Iterator<? extends GItem>> iterators;
+
+		protected Iterator<? extends GItem> iterator;
+
+		public ChainedIterator(final Iterator<? extends Iterator<? extends GItem>> iterators) {
+			this.iterators = Objects.assertNotNull(iterators);
+		}
+
+		@Override
+		public boolean hasNext() {
+			while (true) {
+				while (this.iterator == null) {
+					if (!this.iterators.hasNext()) return false;
+					this.iterator = this.iterators.next();
+				}
+				if (this.iterator.hasNext()) return true;
+				this.iterator = null;
+			}
+		}
+
+		@Override
+		public GItem next() {
+			if (this.iterator == null) throw new NoSuchElementException();
+			return this.iterator.next();
+		}
+
+		@Override
+		public void remove() {
+			if (this.iterator == null) throw new IllegalStateException();
+			this.iterator.remove();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterators);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#navigatedIterator(Getter, Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class NavigatedIterator<GInput, GOutput> extends BaseIterator<GOutput> {
+
+		public final Getter<? super GInput, ? extends GOutput> navigator;
+
+		public final Iterator<? extends GInput> iterator;
+
+		public NavigatedIterator(final Getter<? super GInput, ? extends GOutput> navigator, final Iterator<? extends GInput> iterator) {
+			this.navigator = Objects.assertNotNull(navigator);
+			this.iterator = Objects.assertNotNull(iterator);
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.iterator.hasNext();
+		}
+
+		@Override
+		public GOutput next() {
+			return this.navigator.get(this.iterator.next());
+		}
+
+		@Override
+		public void remove() {
+			this.iterator.remove();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.navigator, this.iterator);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#unmodifiableIterator(Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class UnmodifiableIterator<GItem> extends BaseIterator<GItem> {
+
+		public final Iterator<? extends GItem> iterator;
+
+		public UnmodifiableIterator(final Iterator<? extends GItem> iterator) {
+			this.iterator = Objects.assertNotNull(iterator);
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.iterator.hasNext();
+		}
+
+		@Override
+		public GItem next() {
+			return this.iterator.next();
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterator);
+		}
+
+	}
+
+	/** Dieses Feld speichert den leeren {@link Iterator}. */
+	public static final Iterator<?> EMPTY_ITERATOR = new EmptyIterator();
 
 	/** Diese Methode gibt das {@code index}-te Elemente des gegebenen {@link Iterator} zurück.
 	 *
@@ -202,8 +562,9 @@ public class Iterators {
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean containsAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
 		Objects.assertNotNull(collection);
-		while (iterator.hasNext())
+		while (iterator.hasNext()) {
 			if (!collection.contains(iterator.next())) return false;
+		}
 		return true;
 	}
 
@@ -250,34 +611,7 @@ public class Iterators {
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static <GItem> Iterator<GItem> itemIterator(final GItem item, final int count) throws IllegalArgumentException {
 		if (count == 0) return Iterators.emptyIterator();
-		if (count < 0) throw new IllegalArgumentException("count < 0");
-		return new BaseIterator<GItem>() {
-
-			int index = 0;
-
-			@Override
-			public boolean hasNext() {
-				return this.index < count;
-			}
-
-			@Override
-			public GItem next() {
-				if (!this.hasNext()) throw new NoSuchElementException();
-				this.index++;
-				return item;
-			}
-
-			@Override
-			public void remove() {
-				throw (this.hasNext() ? new IllegalStateException() : new UnsupportedOperationException());
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("itemIterator", item, count);
-			}
-
-		};
+		return new ItemIterator<>(count, item);
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} über die Elemente eines Abschnitts der gegebenen {@link Items} zurück.
@@ -291,35 +625,7 @@ public class Iterators {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
 	public static <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
-		Objects.assertNotNull(items);
-		Comparables.check(fromIndex, toIndex);
-		return new BaseIterator<GItem>() {
-
-			int index = fromIndex;
-
-			@Override
-			public boolean hasNext() {
-				return this.index < toIndex;
-			}
-
-			@Override
-			public GItem next() {
-				if (this.index == toIndex) throw new NoSuchElementException();
-				return items.get(this.index++);
-			}
-
-			@Override
-			public void remove() {
-				if (this.index == fromIndex) throw new IllegalStateException();
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("itemsIterator", items, fromIndex, toIndex);
-			}
-
-		};
+		return new ItemsIterator<>(fromIndex, toIndex, items);
 	}
 
 	/** Diese Methode gibt den leeren {@link Iterator} zurück.
@@ -338,32 +644,7 @@ public class Iterators {
 	 * @return {@link Integer}-{@link Iterator}.
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static Iterator<Integer> integerIterator(final int count) throws IllegalArgumentException {
-		if (count < 0) throw new IllegalArgumentException("count < 0");
-		return new Iterator<Integer>() {
-
-			int value = 0;
-
-			@Override
-			public boolean hasNext() {
-				return this.value < count;
-			}
-
-			@Override
-			public Integer next() {
-				return Integer.valueOf(this.value++);
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("integerIterator", count);
-			}
-
-		};
+		return new IntegerIterator(count);
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der die gegebene maximale Anzahl an Elementen des gegebenen {@link Iterator} liefert.
@@ -376,37 +657,8 @@ public class Iterators {
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static <GItem> Iterator<GItem> limitedIterator(final int count, final Iterator<? extends GItem> iterator)
 		throws NullPointerException, IllegalArgumentException {
-		Objects.assertNotNull(iterator);
-		if (count < 0) throw new IllegalArgumentException("count < 0");
 		if (count == 0) return Iterators.emptyIterator();
-		return new BaseIterator<GItem>() {
-
-			int index = 0;
-
-			@Override
-			public boolean hasNext() {
-				return (this.index < count) && iterator.hasNext();
-			}
-
-			@Override
-			public GItem next() {
-				if (this.index == count) throw new NoSuchElementException();
-				this.index++;
-				return iterator.next();
-			}
-
-			@Override
-			public void remove() {
-				iterator.remove();
-			}
-
-			/** {@inheritDoc} */
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("limitedIterator", count, iterator);
-			}
-
-		};
+		return new LimitedIterator<>(count, iterator);
 	}
 
 	/** Diese Methode gibt einen filternden {@link Iterator} zurück, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterator}
@@ -420,46 +672,7 @@ public class Iterators {
 	 * @throws NullPointerException Wenn {@code filter} bzw. {@code iterator} {@code null} ist. */
 	public static <GItem> Iterator<GItem> filteredIterator(final Filter<? super GItem> filter, final Iterator<? extends GItem> iterator)
 		throws NullPointerException {
-		Objects.assertNotNull(filter);
-		Objects.assertNotNull(iterator);
-		return new BaseIterator<GItem>() {
-
-			Boolean has;
-
-			GItem item;
-
-			@Override
-			public boolean hasNext() {
-				if (this.has != null) return this.has.booleanValue();
-				while (iterator.hasNext()) {
-					if (filter.accept(this.item = iterator.next())) {
-						this.has = Boolean.TRUE;
-						return true;
-					}
-				}
-				this.has = Boolean.FALSE;
-				return false;
-			}
-
-			@Override
-			public GItem next() {
-				if (!this.hasNext()) throw new NoSuchElementException();
-				this.has = null;
-				return this.item;
-			}
-
-			@Override
-			public void remove() {
-				if (this.has != null) throw new IllegalStateException();
-				iterator.remove();
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("filteredIterator", filter, iterator);
-			}
-
-		};
+		return new FilteredIterator<>(filter, iterator);
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}
@@ -484,32 +697,7 @@ public class Iterators {
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static <GItem> Iterator<GItem> uniqueIterator(final Collection<GItem> collection, final Iterator<? extends GItem> iterator)
 		throws NullPointerException {
-		final Iterator<GItem> iterator2 = Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(collection)), iterator);
-		return new BaseIterator<GItem>() {
-
-			@Override
-			public boolean hasNext() {
-				return iterator2.hasNext();
-			}
-
-			@Override
-			public GItem next() {
-				final GItem item = iterator2.next();
-				collection.add(item);
-				return item;
-			}
-
-			@Override
-			public void remove() {
-				iterator2.remove();
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("uniqueIterator", collection, iterator);
-			}
-
-		};
+		return new UniqueIterator<>(collection, iterator);
 	}
 
 	/** Diese Methode gibt einen verketteten {@link Iterator} zurück, der alle Elemente der gegebenen {@link Iterator} in der gegebenen Reihenfolge liefert.
@@ -543,41 +731,7 @@ public class Iterators {
 	 * @return {@code chained}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterators} {@code null} ist. */
 	public static <GItem> Iterator<GItem> chainedIterator(final Iterator<? extends Iterator<? extends GItem>> iterators) throws NullPointerException {
-		Objects.assertNotNull(iterators);
-		return new BaseIterator<GItem>() {
-
-			Iterator<? extends GItem> iterator;
-
-			@Override
-			public boolean hasNext() {
-				while (true) {
-					while (this.iterator == null) {
-						if (!iterators.hasNext()) return false;
-						this.iterator = iterators.next();
-					}
-					if (this.iterator.hasNext()) return true;
-					this.iterator = null;
-				}
-			}
-
-			@Override
-			public GItem next() {
-				if (this.iterator == null) throw new NoSuchElementException();
-				return this.iterator.next();
-			}
-
-			@Override
-			public void remove() {
-				if (this.iterator == null) throw new IllegalStateException();
-				this.iterator.remove();
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("chainedIterator", iterators);
-			}
-
-		};
+		return new ChainedIterator<>(iterators);
 	}
 
 	/** Diese Methode gibt einen umwandelnden {@link Iterator} zurück, der die vom gegebenen {@link Getter} konvertierten Elemente des gegebenen {@link Iterator}
@@ -592,31 +746,7 @@ public class Iterators {
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code navigator} {@code null} ist. */
 	public static <GInput, GOutput> Iterator<GOutput> navigatedIterator(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Iterator<? extends GInput> iterator) throws NullPointerException {
-		Objects.assertNotNull(navigator);
-		Objects.assertNotNull(iterator);
-		return new BaseIterator<GOutput>() {
-
-			@Override
-			public boolean hasNext() {
-				return iterator.hasNext();
-			}
-
-			@Override
-			public GOutput next() {
-				return navigator.get(iterator.next());
-			}
-
-			@Override
-			public void remove() {
-				iterator.remove();
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("navigatedIterator", navigator, iterator);
-			}
-
-		};
+		return new NavigatedIterator<>(navigator, iterator);
 	}
 
 	/** Diese Methode gibt einen unveränderlichen {@link Iterator} zurück, der die Elemente des gegebenen {@link Iterator} liefert und dessen
@@ -627,30 +757,7 @@ public class Iterators {
 	 * @return {@code unmodifiable}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static <GItem> Iterator<GItem> unmodifiableIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-		Objects.assertNotNull(iterator);
-		return new BaseIterator<GItem>() {
-
-			@Override
-			public boolean hasNext() {
-				return iterator.hasNext();
-			}
-
-			@Override
-			public GItem next() {
-				return iterator.next();
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("unmodifiableIterator", iterator);
-			}
-
-		};
+		return new UnmodifiableIterator<>(iterator);
 	}
 
 }

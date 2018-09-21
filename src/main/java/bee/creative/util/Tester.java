@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import bee.creative.util.Comparators.BaseComparator;
 
 /** Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Method Testmethode} benötigt werden.
  * <p>
@@ -101,25 +102,33 @@ public class Tester {
 
 	}
 
-	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
-	public static final Comparator<Tester> USED_TIME_ORDER = new Comparator<Tester>() {
+	/** Diese Klasse implementiert {@link Tester#USED_TIME_ORDER}. */
+	@SuppressWarnings ("javadoc")
+	static class UsedTimeComparator extends BaseComparator<Tester> {
 
 		@Override
-		public int compare(final Tester o1, final Tester o2) {
-			return Comparators.compare(o1.usedTime, o2.usedTime);
+		public int compare(final Tester tester1, final Tester tester2) {
+			return Comparators.compare(tester1.usedTime, tester2.usedTime);
 		}
 
-	};
+	}
+
+	/** Diese Klasse implementiert {@link Tester#USED_MEMORY_ORDER}. */
+	@SuppressWarnings ("javadoc")
+	static class UsedMemoryComparator extends BaseComparator<Tester> {
+
+		@Override
+		public int compare(final Tester tester1, final Tester tester2) {
+			return Comparators.compare(tester1.usedMemory, tester2.usedMemory);
+		}
+
+	}
+
+	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedTime}. */
+	public static final Comparator<Tester> USED_TIME_ORDER = new UsedTimeComparator();
 
 	/** Dieses Feld speichert den {@link Comparator} zu {@link #usedMemory}. */
-	public static final Comparator<Tester> USED_MEMORY_ORDER = new Comparator<Tester>() {
-
-		@Override
-		public int compare(final Tester o1, final Tester o2) {
-			return Comparators.compare(o1.usedMemory, o2.usedMemory);
-		}
-
-	};
+	public static final Comparator<Tester> USED_MEMORY_ORDER = new UsedMemoryComparator();
 
 	/** Diese Methode ist eine Abkürzung für liefert den {@link Tester} zum arithmetischen Mittel ({@link #usedTime} und {@link #usedMemory}) der gegebenen
 	 * Tester.

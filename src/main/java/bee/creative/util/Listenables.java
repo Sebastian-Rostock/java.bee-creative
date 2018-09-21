@@ -148,7 +148,7 @@ public abstract class Listenables<GEvent, GListener> {
 		public EventStore() {
 		}
 
-		private final Object toKey(final Object sender) {
+		private Object toKey(final Object sender) {
 			return sender != null ? sender : EventStore.NULL;
 		}
 

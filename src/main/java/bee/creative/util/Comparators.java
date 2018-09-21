@@ -2,12 +2,17 @@ package bee.creative.util;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert grundlegende {@link Comparator}.
  *
  * @see Comparator
  * @author Sebastian Rostock 2011. */
 public class Comparators {
+
+	public static abstract class BaseComparator<GItem> extends BaseObject implements Comparator<GItem> {
+
+	}
 
 	/** Dieses Feld speichert den {@link Comparator} für die {@link Comparable#compareTo(Object) natürliche Ordnung}. */
 	public static final Comparator<?> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {

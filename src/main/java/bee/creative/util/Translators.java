@@ -6,6 +6,94 @@ package bee.creative.util;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Translators {
 
+	/** Diese Klasse implementiert {@link Translators#toSourceFilter(Translator)}. */
+	@SuppressWarnings ("javadoc")
+	static class SourceFilter implements Filter<Object> {
+	
+		public final Translator<?, ?> translator;
+	
+		public SourceFilter(final Translator<?, ?> translator) throws NullPointerException {
+			this.translator = Objects.assertNotNull(translator);
+		}
+	
+		@Override
+		public boolean accept(final Object input) {
+			return this.translator.isSource(input);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator);
+		}
+	
+	}
+
+	/** Diese Klasse implementiert {@link Translators#toSourceGetter(Translator)}. */
+	@SuppressWarnings ("javadoc")
+	static class SourceGetter<GSource> implements Getter<Object, GSource> {
+	
+		public final Translator<GSource, ?> translator;
+	
+		public SourceGetter(final Translator<GSource, ?> translator) throws NullPointerException {
+			this.translator = Objects.assertNotNull(translator);
+		}
+	
+		@Override
+		public GSource get(final Object input) {
+			return this.translator.toSource(input);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator);
+		}
+	
+	}
+
+	/** Diese Klasse implementiert {@link Translators#toTargetFilter(Translator)}. */
+	@SuppressWarnings ("javadoc")
+	static class TargetFilter implements Filter<Object> {
+	
+		public final Translator<?, ?> translator;
+	
+		public TargetFilter(final Translator<?, ?> translator) throws NullPointerException {
+			this.translator = Objects.assertNotNull(translator);
+		}
+	
+		@Override
+		public boolean accept(final Object input) {
+			return this.translator.isTarget(input);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator);
+		}
+	
+	}
+
+	/** Diese Klasse implementiert {@link Translators#toTargetGetter(Translator)}. */
+	@SuppressWarnings ("javadoc")
+	static class TargetGetter<GTarget> implements Getter<Object, GTarget> {
+	
+		public final Translator<?, GTarget> translator;
+	
+		public TargetGetter(final Translator<?, GTarget> translator) {
+			this.translator = Objects.assertNotNull(translator);
+		}
+	
+		@Override
+		public GTarget get(final Object input) {
+			return this.translator.toTarget(input);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator);
+		}
+	
+	}
+
 	/** Diese Klasse implementiert {@link Translators#neutralTranslator(Class)}. */
 	@SuppressWarnings ("javadoc")
 	public static class NeutralTranslator<GValue> implements Translator<GValue, GValue> {
@@ -206,94 +294,6 @@ public class Translators {
 			synchronized (this.mutex) {
 				return this.translator.toSource(object);
 			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#toSourceFilter(Translator)}. */
-	@SuppressWarnings ("javadoc")
-	public static class SourceFilter implements Filter<Object> {
-
-		public final Translator<?, ?> translator;
-
-		public SourceFilter(final Translator<?, ?> translator) throws NullPointerException {
-			this.translator = Objects.assertNotNull(translator);
-		}
-
-		@Override
-		public boolean accept(final Object input) {
-			return this.translator.isSource(input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#toSourceGetter(Translator)}. */
-	@SuppressWarnings ("javadoc")
-	public static class SourceGetter<GSource> implements Getter<Object, GSource> {
-
-		public final Translator<GSource, ?> translator;
-
-		public SourceGetter(final Translator<GSource, ?> translator) throws NullPointerException {
-			this.translator = Objects.assertNotNull(translator);
-		}
-
-		@Override
-		public GSource get(final Object input) {
-			return this.translator.toSource(input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#toTargetFilter(Translator)}. */
-	@SuppressWarnings ("javadoc")
-	public static class TargetFilter implements Filter<Object> {
-
-		public final Translator<?, ?> translator;
-
-		public TargetFilter(final Translator<?, ?> translator) throws NullPointerException {
-			this.translator = Objects.assertNotNull(translator);
-		}
-
-		@Override
-		public boolean accept(final Object input) {
-			return this.translator.isTarget(input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#toTargetGetter(Translator)}. */
-	@SuppressWarnings ("javadoc")
-	public static class TargetGetter<GTarget> implements Getter<Object, GTarget> {
-
-		public final Translator<?, GTarget> translator;
-
-		public TargetGetter(final Translator<?, GTarget> translator) {
-			this.translator = Objects.assertNotNull(translator);
-		}
-
-		@Override
-		public GTarget get(final Object input) {
-			return this.translator.toTarget(input);
 		}
 
 		@Override

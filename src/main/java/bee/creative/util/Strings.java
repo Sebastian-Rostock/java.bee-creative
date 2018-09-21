@@ -13,6 +13,28 @@ import java.util.regex.Pattern;
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Strings {
 
+	/** Diese Klasse implementiert {@link Strings#patternCompiler(int)}. */
+	@SuppressWarnings ("javadoc")
+	public static class PatternCompiler implements Getter<String, Pattern> {
+
+		public final int flags;
+
+		public PatternCompiler(final int flags) {
+			this.flags = flags;
+		}
+
+		@Override
+		public Pattern get(final String input) {
+			return Pattern.compile(input, this.flags);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.flags);
+		}
+
+	}
+
 	/** Dieses Feld speichert einen synchronisierten, gepufferten {@link #patternCompiler(int)} mit Flag {@code 0}. Dieser wird von den Methoden in
 	 * {@link #Strings()} genutzt, die einen regulärer Ausdruck kompilieren müssen. */
 	public static final Getter<String, Pattern> PATTERN_COMPILER = Getters.synchronizedGetter(Getters.bufferedGetter(Strings.patternCompiler(0)));
@@ -463,14 +485,7 @@ public class Strings {
 	 *        {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})
 	 * @return {@link Pattern}-Compiler. */
 	public static Getter<String, Pattern> patternCompiler(final int flags) {
-		return new Getter<String, Pattern>() {
-
-			@Override
-			public Pattern get(final String input) {
-				return Pattern.compile(input, flags);
-			}
-
-		};
+		return new PatternCompiler(flags);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code parseSequence(string, maskSymbol, maskSymbol, maskSymbol)}.
