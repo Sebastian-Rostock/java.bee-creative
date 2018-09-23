@@ -24,9 +24,24 @@ public class Iterables {
 	public static abstract class BaseIterable<GItem> extends BaseObject implements Iterable<GItem>, UseToString {
 	}
 
+	/** Diese Klasse implementiert {@link Iterables#iteratorGetter()}. */
+	@SuppressWarnings ("javadoc")
+	static class IteratorGetter extends BaseGetter<Iterable<?>, Iterator<?>> {
+
+		public static final Getter<?, ?> INSTANCE = new IteratorGetter();
+
+		@Override
+		public Iterator<?> get(final Iterable<?> input) {
+			return input.iterator();
+		}
+
+	}
+
 	/** Diese Klasse implementiert {@link Iterables#emptyIterable()}. */
 	@SuppressWarnings ("javadoc")
-	public static class EmptaIterable extends BaseIterable<Object> {
+	public static class EmptyIterable extends BaseIterable<Object> {
+
+		static final Iterable<?> INSTANCE = new EmptyIterable();
 
 		@Override
 		public Iterator<Object> iterator() {
@@ -226,23 +241,6 @@ public class Iterables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Iterables#ITERABLE_ITERATOR}. */
-	@SuppressWarnings ("javadoc")
-	static class IteratorGetter extends BaseGetter<Iterable<?>, Iterator<?>> {
-
-		@Override
-		public Iterator<?> get(final Iterable<?> input) {
-			return input.iterator();
-		}
-
-	}
-
-	/** Dieses Feld speichert das leere {@link Iterable}. */
-	static final Iterable<?> EMPTY_ITERABLE = new EmptaIterable();
-
-	/** Dieses Feld speichert den {@link Getter}, der den {@link Iterator} eines {@link Iterable} ermittelt. */
-	static final Getter<Iterable<?>, Iterator<?>> ITERABLE_ITERATOR = new IteratorGetter();
-
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück.
 	 *
 	 * @param iterable {@link Iterable}.
@@ -336,12 +334,11 @@ public class Iterables {
 		return Iterators.containsAll(collection, iterable.iterator());
 	}
 
-	/** Diese Methode gibt den gegebenen {@link Iterable} oder {@link #EMPTY_ITERABLE} zurück. Wenn {@code iterable} {@code null} ist, wird
-	 * {@link #EMPTY_ITERABLE} geliefert.
+	/** Diese Methode gibt den gegebenen {@link Iterable} zurück, sofern dieser nicht {@code null} ist. Andernfalls wird {@link #emptyIterable()} geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable} oder {@code null}.
-	 * @return {@link Iterable} oder {@link #EMPTY_ITERABLE}. */
+	 * @return {@link Iterable} oder {@link #emptyIterable()}. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterable<GItem> iterable(final Iterable<? extends GItem> iterable) {
 		if (iterable == null) return Iterables.emptyIterable();
@@ -375,10 +372,10 @@ public class Iterables {
 	 *
 	 * @see Iterators#emptyIterator()
 	 * @param <GItem> Typ der Elemente.
-	 * @return {@link #EMPTY_ITERABLE}. */
+	 * @return {@link EmptyIterable}. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterable<GItem> emptyIterable() {
-		return (Iterable<GItem>)Iterables.EMPTY_ITERABLE;
+		return (Iterable<GItem>)EmptyIterable.INSTANCE;
 	}
 
 	/** Diese Methode gibt ein {@link Iterable} zurück, das die gegebene Anzahl an {@link Integer} ab dem Wert {@code 0} liefert, d.h {@code 0}, {@code 1}, ...,
@@ -531,10 +528,10 @@ public class Iterables {
 	 *
 	 * @see Iterable#iterator()
 	 * @param <GItem> Typ der Elemente.
-	 * @return {@link #ITERABLE_ITERATOR}. */
+	 * @return {@code iterator}-{@link Getter}. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> iteratorGetter() {
-		return (Getter<Iterable<? extends GItem>, Iterator<GItem>>)(Object)Iterables.ITERABLE_ITERATOR;
+		return (Getter<Iterable<? extends GItem>, Iterator<GItem>>)IteratorGetter.INSTANCE;
 	}
 
 }

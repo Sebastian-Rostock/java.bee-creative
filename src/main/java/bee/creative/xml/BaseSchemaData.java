@@ -4,8 +4,8 @@ import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.xml.sax.SAXException;
+import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
-import bee.creative.util.Producers.BaseBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link Schema}.
  *

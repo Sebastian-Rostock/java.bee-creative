@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
-import bee.creative.util.Producers.BaseValueBuilder;
+import bee.creative.util.Builders.BaseValueBuilder;
 
 /** Diese Klasse implementiert den Konfigurator eines {@link Charset}.<br>
  * Initialisiert wird dieses {@link Charset} via {@link #useDEFAULT()}.

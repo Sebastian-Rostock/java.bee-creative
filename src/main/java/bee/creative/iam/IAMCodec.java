@@ -10,7 +10,8 @@ import bee.creative.fem.FEMString;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
 import bee.creative.io.IO;
-import bee.creative.util.Producers.MapBuilder;
+import bee.creative.util.Builders;
+import bee.creative.util.Builders.MapBuilder;
 
 /** Diese Klasse implementiert den Konfigurator, mit welchem ein {@link IAMIndex} aus bzw. in unterschiedliche Datenformate gelesen bzw. geschieben werden kann.
  * Dabei können {@link #getSourceData() Eingabedaten} unterschiedlicher {@link #getSourceFormat() Eingabeformate} direkt in {@link #getTargetData()
@@ -164,7 +165,7 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMFindMode> values = MapBuilder.<Object, IAMFindMode>forHashMap() //
+		static final Map<?, IAMFindMode> values = Builders.MapBuilder.<Object, IAMFindMode>forHashMap() //
 			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
 			.put(IAMMapping.MODE_HASHED, SORTED).put("H", HASHED).put("HASHED", HASHED) //
 			.put(IAMMapping.MODE_SORTED, SORTED).put("S", SORTED).put("SORTED", SORTED) //
@@ -240,7 +241,7 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMByteOrder> values = MapBuilder.<Object, IAMByteOrder>forHashMap() //
+		static final Map<?, IAMByteOrder> values = Builders.MapBuilder.<Object, IAMByteOrder>forHashMap() //
 			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
 			.put("B", BIGENDIAN).put("BIGENDIAN", BIGENDIAN).put(BIGENDIAN.toOrder(), BIGENDIAN) //
 			.put("L", LITTLEENDIAN).put("LITTLEENDIAN", LITTLEENDIAN).put(LITTLEENDIAN.toOrder(), LITTLEENDIAN) //
@@ -536,7 +537,7 @@ public final class IAMCodec {
 		};
 
 		@SuppressWarnings ("javadoc")
-		static final Map<IAMArrayFormat, String> strings = MapBuilder.<IAMArrayFormat, String>forHashMap() //
+		static final Map<IAMArrayFormat, String> strings = Builders.MapBuilder.<IAMArrayFormat, String>forHashMap() //
 			.put(ARRAY, "ARRAY") //
 			.put(BINARY, "BINARY") //
 			.put(STRING_UTF_8, "UTF-8").put(STRING_UTF_16, "UTF-16").put(STRING_UTF_32, "UTF-32") //
@@ -548,7 +549,7 @@ public final class IAMCodec {
 			.get();
 
 		@SuppressWarnings ("javadoc")
-		static final Map<?, IAMArrayFormat> values = MapBuilder.<Object, IAMArrayFormat>forHashMap() //
+		static final Map<?, IAMArrayFormat> values = Builders.MapBuilder.<Object, IAMArrayFormat>forHashMap() //
 			.putAllInverse(IAMArrayFormat.strings).put(null, ARRAY).put("", ARRAY).put("A", ARRAY).put("B", BINARY) //
 			.get();
 

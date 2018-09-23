@@ -1,19 +1,19 @@
 package bee.creative.util;
 
-import java.util.Iterator;
 import bee.creative.util.Getters.BaseGetter;
 import bee.creative.util.Objects.BaseObject;
-import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert grundlegende {@link Conversion}.
  *
- * @see Getter
- * @see Getters
  * @see Conversion
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Conversions {
 
-	static class InpitGetter extends BaseGetter<Conversion<?, ?>, Object> {
+	/** Diese Klasse implementiert {@link Conversions#inputGetter()} */
+	@SuppressWarnings ("javadoc")
+	static class InputGetter extends BaseGetter<Conversion<?, ?>, Object> {
+
+		static final Getter<?, ?> INSTANCE = new InputGetter();
 
 		@Override
 		public Object get(final Conversion<?, ?> input) {
@@ -22,60 +22,15 @@ public class Conversions {
 
 	}
 
+	/** Diese Klasse implementiert {@link Conversions#outputGetter()} */
+	@SuppressWarnings ("javadoc")
 	static class OutputGetter extends BaseGetter<Conversion<?, ?>, Object> {
+
+		static final Getter<?, ?> INSTANCE = new OutputGetter();
 
 		@Override
 		public Object get(final Conversion<?, ?> input) {
 			return input.output();
-		}
-
-	}
-
-	static class VirtualGetter<GInput, GOutput> extends BaseGetter<GInput, Conversion<GInput, GOutput>> {
-
-		public final Getter<? super GInput, ? extends GOutput> converter;
-
-		public VirtualGetter(final Getter<? super GInput, ? extends GOutput> converter) {
-			this.converter = Objects.assertNotNull(converter);
-		}
-
-		@Override
-		public Conversion<GInput, GOutput> get(final GInput input) {
-			return Conversions.<GInput, GOutput>virtualConversion(input, this.converter);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.converter);
-		}
-
-	}
-
-	static class ReverseGetter extends BaseGetter<Conversion<?, ?>, Object> {
-
-		@Override
-		public Object get(final Conversion<?, ?> input) {
-			return Conversions.reverseConversion(input);
-		}
-
-	}
-
-	static class CompositeGetter<GInput, GOutput> extends BaseGetter<GInput, Conversion<GInput, GOutput>> {
-
-		public final Getter<? super GInput, ? extends GOutput> converter;
-
-		public CompositeGetter(final Getter<? super GInput, ? extends GOutput> converter) {
-			this.converter = Objects.assertNotNull(converter);
-		}
-
-		@Override
-		public Conversion<GInput, GOutput> get(final GInput input) {
-			return Conversions.<GInput, GOutput>compositeConversion(input, this.converter.get(input));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.converter);
 		}
 
 	}
@@ -98,6 +53,8 @@ public class Conversions {
 
 	}
 
+	/** Diese Klasse implementiert {@link Conversions#virtualConversion(Object, Getter)} */
+	@SuppressWarnings ("javadoc")
 	public static class VirtualConversion<GInput, GOutput> extends BaseConversion<GInput, GOutput> {
 
 		public final GInput input;
@@ -126,6 +83,8 @@ public class Conversions {
 
 	}
 
+	/** Diese Klasse implementiert {@link Conversions#reverseConversion(Conversion)} */
+	@SuppressWarnings ("javadoc")
 	public static class ReverseConversion<GInput, GOutput> extends BaseConversion<GInput, GOutput> {
 
 		public final Conversion<? extends GOutput, ? extends GInput> conversion;
@@ -151,6 +110,8 @@ public class Conversions {
 
 	}
 
+	/** Diese Klasse implementiert {@link Conversions#compositeConversion(Object, Object)} */
+	@SuppressWarnings ("javadoc")
 	public static class CompositeConversion<GInput, GOutput> extends BaseConversion<GInput, GOutput> {
 
 		public GInput input;
@@ -178,15 +139,6 @@ public class Conversions {
 		}
 
 	}
-
-	/** Dieses Feld speichert den {@link Getter} für {@link Conversions#inputGetter()} */
-	static final Getter<?, ?> INPUT_GETTER = new InpitGetter();
-
-	/** Dieses Feld speichert den {@link Getter} für {@link Conversions#outputGetter()} */
-	static final Getter<?, ?> OUTPUT_GETTER = new OutputGetter();
-
-	/** Dieses Feld speichert den {@link Getter} für {@link Conversions#reverseGetter()} */
-	static final Getter<?, ?> REVERSE_GETTER = new ReverseGetter();
 
 	/** Diese Methode gibt eine dynamische {@link Conversion} zurück, deren Ausgabe stats mit Hilfe des gegebenen {@link Getter} aus der gegebenen Eingabe
 	 * ermittelt wird.
@@ -232,7 +184,7 @@ public class Conversions {
 	 * @return {@link Getter} zu {@link Conversion#input()}. */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Getter<Conversion<? extends GInput, ?>, GInput> inputGetter() {
-		return (Getter<Conversion<? extends GInput, ?>, GInput>)Conversions.INPUT_GETTER;
+		return (Getter<Conversion<? extends GInput, ?>, GInput>)InputGetter.INSTANCE;
 	}
 
 	/** Diese Methode gibt den {@link Getter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
@@ -242,45 +194,7 @@ public class Conversions {
 	 * @return {@link Getter} zu {@link Conversion#output()}. */
 	@SuppressWarnings ("unchecked")
 	public static <GOutput> Getter<Conversion<?, ? extends GOutput>, GOutput> outputGetter() {
-		return (Getter<Conversion<?, ? extends GOutput>, GOutput>)Conversions.OUTPUT_GETTER;
-	}
-
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe mit dem gegebenen {@link Getter} via {@link #virtualConversion(Object, Getter)} in seine
-	 * Ausgabe überführt.
-	 *
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param converter {@link Getter}.
-	 * @return {@link Getter} zu {@link #virtualConversion(Object, Getter)}.
-	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Getter<GInput, Conversion<GInput, GOutput>> virtualGetter(final Getter<? super GInput, ? extends GOutput> converter)
-		throws NullPointerException {
-		return new VirtualGetter<>(converter);
-	}
-
-	/** Diese Methode gibt einen {@link Getter} zurück, der eine gegebene {@link Conversion} umkehrt.
-	 *
-	 * @see #reverseConversion(Conversion)
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @return {@link Getter} zu {@link #reverseConversion(Conversion)}. */
-	@SuppressWarnings ("unchecked")
-	public static <GInput, GOutput> Getter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>> reverseGetter() {
-		return (Getter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>>)Conversions.REVERSE_GETTER;
-	}
-
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe in mit dem gegebenen {@link Getter} umwandelt und das Paar dieser beiden Objekte als
-	 * {@link Conversion} liefert.
-	 *
-	 * @see #compositeConversion(Object, Object)
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param converter {@link Getter}.
-	 * @return {@link Getter} zu {@link #compositeConversion(Object, Object)}.
-	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Getter<GInput, Conversion<GInput, GOutput>> compositeGetter(final Getter<? super GInput, ? extends GOutput> converter)
-		throws NullPointerException {
-		return new CompositeGetter<>(converter);
+		return (Getter<Conversion<?, ? extends GOutput>, GOutput>)OutputGetter.INSTANCE;
 	}
 
 }

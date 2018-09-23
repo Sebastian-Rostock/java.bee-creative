@@ -4,10 +4,10 @@ import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import bee.creative.util.Builders.BaseBuilder;
+import bee.creative.util.Builders.BaseMapData;
+import bee.creative.util.Builders.BaseSetData;
 import bee.creative.util.Objects;
-import bee.creative.util.Producers.BaseBuilder;
-import bee.creative.util.Producers.BaseMapData;
-import bee.creative.util.Producers.BaseSetData;
 
 /** Diese Klasse implementiert den Konfigurator für einen {@link JAXBContext}.
  *

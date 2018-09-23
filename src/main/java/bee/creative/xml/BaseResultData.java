@@ -10,8 +10,8 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Validator;
 import org.w3c.dom.Node;
+import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
-import bee.creative.util.Producers.BaseBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Result}, das für die Ausgabedaten eines {@link Transformer} oder {@link Validator}
  * genutzt wird.

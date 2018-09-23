@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
+import bee.creative.util.Consumers.BaseConsumer;
 import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Setter}-Konstruktion und -Verarbeitung.
@@ -180,7 +181,30 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.setter, this.mutex);
+			return Objects.toInvokeString(this, this.setter);
+		}
+
+	}
+
+	public static class SetterConsumer<GValue, GInput> extends BaseConsumer<GValue> {
+
+		public final Setter<? super GInput, ? super GValue> setter;
+
+		public final GInput input;
+
+		public SetterConsumer(final GInput input, final Setter<? super GInput, ? super GValue> setter) {
+			this.input = input;
+			this.setter = Objects.assertNotNull(setter);
+		}
+
+		@Override
+		public void set(final GValue value) {
+			this.setter.set(this.input, value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.input, this.setter);
 		}
 
 	}
@@ -212,6 +236,7 @@ public class Setters {
 		return Fields.nativeField(field);
 	}
 
+	// TODO satic mit (null, inp, val)
 	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
 	 * Für eine Eingabe {@code input} erfolgt das Schreiben des Werts {@code value} über {@code method.invoke(input, value)}.
 	 *
@@ -324,6 +349,14 @@ public class Setters {
 	public static <GInput, GValue> Setter<GInput, GValue> synchronizedSetter(final Setter<? super GInput, ? super GValue> setter, final Object mutex)
 		throws NullPointerException {
 		return new SynchronizedSetter<>(mutex, setter);
+	}
+
+	public static <GInput, GValue> Consumer<GValue> toConsumer(final Setter<? super GInput, ? super GValue> setter) {
+		return Setters.toConsumer(setter, null);
+	}
+
+	public static <GInput, GValue> Consumer<GValue> toConsumer(final Setter<? super GInput, ? super GValue> setter, final GInput input) {
+		return new SetterConsumer<>(input, setter);
 	}
 
 }

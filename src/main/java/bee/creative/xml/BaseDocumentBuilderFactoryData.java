@@ -5,9 +5,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import org.xml.sax.SAXException;
+import bee.creative.util.Builders.BaseBuilder;
+import bee.creative.util.Builders.BaseMapData;
 import bee.creative.util.Objects;
-import bee.creative.util.Producers.BaseBuilder;
-import bee.creative.util.Producers.BaseMapData;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory}.
  *
@@ -320,7 +320,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	public final PropertyData<GThis> openPropertyData() {
 		return this.propertyData;
 	}
-
+	
 	/** Diese Methode öffnet den Konfigurator für die Attribute und gibt ihn zurück.
 	 *
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
