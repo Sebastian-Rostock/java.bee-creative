@@ -13,7 +13,7 @@ import bee.creative.util.Objects;
  *
  * @see CSVReader
  * @author Sebastian Rostock 2014. */
-public final class CSVWriter implements Closeable, Flushable {
+public class CSVWriter implements Closeable, Flushable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVWriter} und gibt diesen zurück.<br>
 	 * Wenn das Objekt ein {@link CSVWriter} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object)
@@ -30,7 +30,7 @@ public final class CSVWriter implements Closeable, Flushable {
 	}
 
 	/** Dieses Feld speichert die Zieldaten. */
-	final Writer writer;
+	protected final Writer writer;
 
 	/** Dieses Feld speichert den Maskierungszwang. */
 	boolean force = true;
@@ -41,15 +41,15 @@ public final class CSVWriter implements Closeable, Flushable {
 	/** Dieses Feld speichert das Trennzeichen. */
 	char comma = ';';
 
-	/** Dieses Feld speichert nur dann {@code true}, wenn das {@link #getComma() Trennzeichen} vor dem {@link #writeValue(String) nächsten geschriebenen Wert}
+	/** Dieses Feld speichert nur dann {@code true}, wenn das {@link #getComma() Trennzeichen} vor dem {@link #writeValue(Object) nächsten geschriebenen Wert}
 	 * ignoriert werden soll (Zeilenanfang). */
 	boolean ignore = true;
 
 	/** Dieser Konstruktor initialisiert die Ausgabe.<br>
 	 * Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird {@code '"'} genutzt. Der {@link #getForce()
 	 * Maskierungszwang} ist aktiviert.<br>
-	 * Die Methoden {@link #useForce(boolean)}, {@link #useQuote(char)}, {@link #useComma(char)}, {@link #writeValue(String)}, {@link #writeEntry(String...)} und
-	 * {@link #writeTable(String[][])} synchronisieren auf den gegebenen {@link Writer}.
+	 * Die Methoden {@link #useForce(boolean)}, {@link #useQuote(char)}, {@link #useComma(char)}, {@link #writeValue(Object)}, {@link #writeEntry(String...)} und
+	 * {@link #writeTable(Object[][])} synchronisieren auf den gegebenen {@link Writer}.
 	 *
 	 * @param writer Ausgabe.
 	 * @throws IOException Wenn {@link Writer#flush()} eine entsprechende Ausnahme auslöst.
@@ -60,34 +60,34 @@ public final class CSVWriter implements Closeable, Flushable {
 	}
 
 	/** Diese Methode gibt den Maskierungszwang zurück.<br>
-	 * Wenn dieser {@code true} ist, gelten alle {@link #writeValue(String) Werte} als zu maskieren. Andernfalls gelten nur die {@link #writeValue(String) Werte}
+	 * Wenn dieser {@code true} ist, gelten alle {@link #writeValue(Object) Werte} als zu maskieren. Andernfalls gelten nur die {@link #writeValue(Object) Werte}
 	 * als zu maskieren, in denen ein {@link #getComma() Trennzeichen}, ein {@link #getQuote() Maskierungszeichen} oder ein Zeilenumbruch vorkommt.
 	 *
 	 * @return Maskierungszwang. */
-	public final boolean getForce() {
+	public boolean getForce() {
 		synchronized (this.writer) {
 			return this.force;
 		}
 	}
 
 	/** Diese Methode gibt das Maskierungszeichen zurück.<br>
-	 * Maskierte {@link #writeValue(String) Werte} werden in diese Zeichen eingeschlossen und enthalten dieses Zeichen nur gedoppelt.<br>
-	 * Wenn das Zeichen {@code '\0'} ist, werden die {@link #writeValue(String) Werte} nicht maskiert. Diese Einstellung aht Vorrang gegebnüber dem
+	 * Maskierte {@link #writeValue(Object) Werte} werden in diese Zeichen eingeschlossen und enthalten dieses Zeichen nur gedoppelt.<br>
+	 * Wenn das Zeichen {@code '\0'} ist, werden die {@link #writeValue(Object) Werte} nicht maskiert. Diese Einstellung aht Vorrang gegebnüber dem
 	 * {@link #getForce() Maskierungszwang}.
 	 *
 	 * @see #getForce()
 	 * @return Maskierungszeichen. */
-	public final char getQuote() {
+	public char getQuote() {
 		synchronized (this.writer) {
 			return this.quote;
 		}
 	}
 
 	/** Diese Methode gibt das Trennzeichen zurück.<br>
-	 * Dieses Zeichen steht zwischen den {@link #writeValue(String) Werten} eines {@link #writeEntry(String...) Eintrags}.
+	 * Dieses Zeichen steht zwischen den {@link #writeValue(Object) Werten} eines {@link #writeEntry(String...) Eintrags}.
 	 *
 	 * @return Trennzeichen. */
-	public final char getComma() {
+	public char getComma() {
 		synchronized (this.writer) {
 			return this.comma;
 		}
@@ -97,7 +97,7 @@ public final class CSVWriter implements Closeable, Flushable {
 	 *
 	 * @param force Maskierungszwang.
 	 * @return {@code this}. */
-	public final CSVWriter useForce(final boolean force) {
+	public CSVWriter useForce(final boolean force) {
 		synchronized (this.writer) {
 			this.force = force;
 		}
@@ -109,7 +109,7 @@ public final class CSVWriter implements Closeable, Flushable {
 	 * @param quote Maskierungszeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Maskierungszeichen einem Zeilenumbruch gleicht. */
-	public final CSVWriter useQuote(final char quote) throws IllegalArgumentException {
+	public CSVWriter useQuote(final char quote) throws IllegalArgumentException {
 		CSVReader.check(quote);
 		synchronized (this.writer) {
 			this.quote = quote;
@@ -122,7 +122,7 @@ public final class CSVWriter implements Closeable, Flushable {
 	 * @param comma Trennzeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Trennzeichen einem Zeilenumbruch gleicht. */
-	public final CSVWriter useComma(final char comma) throws IllegalArgumentException {
+	public CSVWriter useComma(final char comma) throws IllegalArgumentException {
 		CSVReader.check(comma);
 		synchronized (this.writer) {
 			this.comma = comma;
@@ -138,7 +138,7 @@ public final class CSVWriter implements Closeable, Flushable {
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link #writeEntry(String...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code entries} {@code null} ist oder enthält. */
-	public final CSVWriter writeTable(final String[][] entries) throws IOException {
+	public CSVWriter writeTable(final Object[][] entries) throws IOException {
 		synchronized (this.writer) {
 			this.writeTableImpl(entries);
 		}
@@ -146,22 +146,38 @@ public final class CSVWriter implements Closeable, Flushable {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void writeTableImpl(final String[][] values) throws IOException {
-		for (final String[] value: values) {
+	final void writeTableImpl(final Object[][] values) throws IOException {
+		for (final Object[] value: values) {
 			this.writeEntryImpl(value);
 		}
 	}
 
-	/** Diese Methode schreibt den gegebenen Eintrag und gibt this zurück.<br>
-	 * Dabei werden zuerst die gegebenen {@link #writeValue(String) Werte} in der gegebenen Reihenfolge und anschließend ein Zeilenumbruch ({@code "\r\n"})
-	 * ausgegeben.
+	/** Diese Methode schreibt den abschließenden Zeilenumbruch ({@code "\r\n"}) des aktuellen Eintrags und gibt {@code this} zurück.
 	 *
-	 * @see #writeValue(String)
-	 * @param values Eintrag (Liste von Werten).
 	 * @return {@code this}.
-	 * @throws IOException Wenn {@link #writeValue(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält. */
-	public final CSVWriter writeEntry(final String... values) throws IOException, NullPointerException {
+	 * @throws IOException Wenn {@link Writer#write(String)} eine entsprechende Ausnahme auslöst. */
+	public CSVWriter writeEntry() throws IOException {
+		synchronized (this.writer) {
+			this.writeEntryImpl();
+		}
+		return this;
+	}
+
+	@SuppressWarnings ("javadoc")
+	final void writeEntryImpl() throws IOException {
+		this.writer.write("\r\n");
+		this.ignore = true;
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values).writeEntry()}.
+	 *
+	 * @sell #writeValue(String...)
+	 * @sell #writeEntry()
+	 * @param values Werte.
+	 * @return {@code this}.
+	 * @throws IOException Wenn {@link #writeValue(String...)} bzw. {@link #writeEntry()} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
+	public CSVWriter writeEntry(final Object... values) throws IOException, NullPointerException {
 		synchronized (this.writer) {
 			this.writeEntryImpl(values);
 		}
@@ -169,12 +185,9 @@ public final class CSVWriter implements Closeable, Flushable {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void writeEntryImpl(final String[] values) throws IOException {
-		for (final String value: values) {
-			this.writeValueImpl(value);
-		}
-		this.writer.write("\r\n");
-		this.ignore = true;
+	final void writeEntryImpl(final Object[] values) throws IOException {
+		this.writeValueImpl(values);
+		this.writeEntryImpl();
 	}
 
 	/** Diese Methode schreibt den gegebenen Wert und gibt {@code this} zurück.<br>
@@ -185,29 +198,13 @@ public final class CSVWriter implements Closeable, Flushable {
 	 * @see #getForce()
 	 * @see #getQuote()
 	 * @see #getComma()
-	 * @param value Wert.
+	 * @param value Wert, der über {@link Object#toString()} in seine Textdarstellung überführt wird.
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final CSVWriter writeValue(final String value) throws IOException, NullPointerException {
+	public CSVWriter writeValue(final Object value) throws IOException, NullPointerException {
 		synchronized (this.writer) {
-			this.writeValueImpl(value);
-		}
-		return this;
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values[0]).writeValue(values[1])...}.
-	 *
-	 * @sell #writeValue(String)
-	 * @param values Werte.
-	 * @return {@code this}.
-	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
-	public final CSVWriter writeValue(final String... values) throws IOException, NullPointerException {
-		synchronized (this.writer) {
-			for (final String value: values) {
-				this.writeValueImpl(value);
-			}
+			this.writeValueImpl(value.toString());
 		}
 		return this;
 	}
@@ -252,9 +249,30 @@ public final class CSVWriter implements Closeable, Flushable {
 		}
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values[0]).writeValue(values[1])...}.
+	 *
+	 * @sell #writeValue(String)
+	 * @param values Werte.
+	 * @return {@code this}.
+	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
+	public CSVWriter writeValue(final Object... values) throws IOException, NullPointerException {
+		synchronized (this.writer) {
+			this.writeValueImpl(values);
+		}
+		return this;
+	}
+
+	@SuppressWarnings ("javadoc")
+	final void writeValueImpl(final Object... values) throws IOException, NullPointerException {
+		for (final Object value: values) {
+			this.writeValueImpl(value.toString());
+		}
+	}
+
 	/** {@inheritDoc} */
 	@Override
-	public final void close() throws IOException {
+	public void close() throws IOException {
 		synchronized (this.writer) {
 			this.writer.close();
 		}

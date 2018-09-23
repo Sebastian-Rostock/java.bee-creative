@@ -8,26 +8,29 @@ import java.util.Map;
 import java.util.Map.Entry;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Getter}-Konstruktion und -Verarbeitung.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
 
-	/** Dieses Feld speichert den neutralen {@link Getter}, dessen Ausgabe gleich seiner Eingabe ist. */
-	public static final Getter<?, ?> NEUTRAL_GETTER = new Getter<Object, Object>() {
+	static class NeutralGetter extends BaseGetter<Object, Object> {
 
 		@Override
 		public Object get(final Object input) {
 			return input;
 		}
+		
+	}
 
-		@Override
-		public String toString() {
-			return "NEUTRAL_GETTER";
-		}
+	/** Diese Klasse implementiert einen {@link Setter} als {@link BaseObject}. */
+	@SuppressWarnings ("javadoc")
+	public static abstract class BaseGetter<GInput, GValue> extends BaseObject implements Getter<GInput, GValue> {
+	}
 
-	};
+	/** Dieses Feld speichert den neutralen {@link Getter}, dessen Ausgabe gleich seiner Eingabe ist. */
+	public static final Getter<?, ?> NEUTRAL_GETTER = new NeutralGetter();
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.emptyField()}. */
 	@SuppressWarnings ("javadoc")
@@ -131,6 +134,7 @@ public class Getters {
 				}
 
 			};
+
 		}
 	}
 

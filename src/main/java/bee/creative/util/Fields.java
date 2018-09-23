@@ -75,11 +75,11 @@ public final class Fields {
 		}
 	}
 
-	private static final class ValueField<GValue> implements Field<Object, GValue> {
+	public static class ValueField<GValue> implements Field<Object, GValue> {
 
-		private final GValue value;
+		public final GValue value;
 
-		private ValueField(final GValue value) {
+		public ValueField(final GValue value) {
 			this.value = value;
 		}
 
@@ -91,6 +91,12 @@ public final class Fields {
 		@Override
 		public void set(final Object input, final GValue value) {
 		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.value);
+		}
+
 	}
 
 	private static final class TranslatedField2<GInput, GValue, GValue2> implements Field<GInput, GValue> {

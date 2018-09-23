@@ -17,7 +17,7 @@ import bee.creative.util.Objects;
  * Voranstellen des Zeichens {@code '\\'}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class INIReader implements Closeable {
+public class INIReader implements Closeable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIReader} und gibt diesen zurück.<br>
 	 * Wenn das Objekt ein {@link INIReader} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object)
@@ -34,7 +34,7 @@ public final class INIReader implements Closeable {
 	}
 
 	/** Dieses Feld speichert den {@link Reader}. */
-	final Reader reader;
+	protected final Reader reader;
 
 	/** Dieses Feld speichert den Puffer für die maskierten Texte. */
 	final StringBuilder builder;
@@ -53,24 +53,31 @@ public final class INIReader implements Closeable {
 	 *
 	 * @return nächstes Element oder {@code null}.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst. */
-	public final INIToken read() throws IOException {
+	public INIToken read() throws IOException {
+		synchronized (this.reader) {
+			return this.readImpl();
+		}
+	}
+
+	@SuppressWarnings ("javadoc")
+	final INIToken readImpl() throws IOException {
 		while (true) {
 			final int symbol = this.reader.read();
 			switch (symbol) {
 				case -1:
 					return null;
 				case '[':
-					final String section = this.readSection();
+					final String section = this.readSectionImpl();
 					return INIToken.fromSection(section);
 				case ';':
-					final String comment = this.readComment();
+					final String comment = this.readCommentImpl();
 					return INIToken.fromComment(comment);
 				default:
-					final String key = this.readKey(symbol);
-					final String value = this.readValue();
+					final String key = this.readKeyImpl(symbol);
+					final String value = this.readValueImpl();
 					return INIToken.fromProperty(key, value);
 				case '\r':
-				case '\n': // skip
+				case '\n':
 			}
 		}
 	}
@@ -82,7 +89,7 @@ public final class INIReader implements Closeable {
 	 * @return Schlüssel einer Eigenschaft.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	final String readKey(int symbol) throws IOException, IllegalArgumentException {
+	final String readKeyImpl(int symbol) throws IOException, IllegalArgumentException {
 		final Reader source = this.reader;
 		final StringBuilder result = this.builder;
 		result.setLength(0);
@@ -95,7 +102,7 @@ public final class INIReader implements Closeable {
 				case '=':
 					return result.toString();
 				case '\\':
-					symbol = this.readSymbol(source.read());
+					symbol = this.readSymbolImpl(source.read());
 			}
 			result.append((char)symbol);
 			symbol = source.read();
@@ -107,7 +114,7 @@ public final class INIReader implements Closeable {
 	 * @return Wert einer Eigenschaft.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	final String readValue() throws IOException, IllegalArgumentException {
+	final String readValueImpl() throws IOException, IllegalArgumentException {
 		final Reader source = this.reader;
 		final StringBuilder result = this.builder;
 		result.setLength(0);
@@ -119,7 +126,7 @@ public final class INIReader implements Closeable {
 				case '\n':
 					return result.toString();
 				case '\\':
-					symbol = this.readSymbol(source.read());
+					symbol = this.readSymbolImpl(source.read());
 			}
 			result.append((char)symbol);
 		}
@@ -130,7 +137,7 @@ public final class INIReader implements Closeable {
 	 * @return Name eines Abschnitts.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	final String readSection() throws IOException, IllegalArgumentException {
+	final String readSectionImpl() throws IOException, IllegalArgumentException {
 		final Reader source = this.reader;
 		final StringBuilder result = this.builder;
 		result.setLength(0);
@@ -152,7 +159,7 @@ public final class INIReader implements Closeable {
 					}
 					throw new IllegalArgumentException();
 				case '\\':
-					symbol = this.readSymbol(source.read());
+					symbol = this.readSymbolImpl(source.read());
 			}
 			result.append((char)symbol);
 		}
@@ -163,7 +170,7 @@ public final class INIReader implements Closeable {
 	 * @param symbol Zeichen nach dem {@code '\'}.
 	 * @return unmaskiertes Zeichen.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	final int readSymbol(final int symbol) throws IllegalArgumentException {
+	final int readSymbolImpl(final int symbol) throws IllegalArgumentException {
 		switch (symbol) {
 			case '\\':
 			case '=':
@@ -186,7 +193,7 @@ public final class INIReader implements Closeable {
 	 * @return Text eines Kommentars.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	final String readComment() throws IOException {
+	final String readCommentImpl() throws IOException {
 		final Reader source = this.reader;
 		final StringBuilder result = this.builder;
 		result.setLength(0);
@@ -198,7 +205,7 @@ public final class INIReader implements Closeable {
 				case '\n':
 					return result.toString();
 				case '\\':
-					symbol = this.readSymbol(source.read());
+					symbol = this.readSymbolImpl(source.read());
 			}
 			result.append((char)symbol);
 		}
@@ -206,14 +213,18 @@ public final class INIReader implements Closeable {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void close() throws IOException {
-		this.reader.close();
+	public void close() throws IOException {
+		synchronized (this.reader) {
+			this.reader.close();
+		}
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final String toString() {
-		return Objects.toInvokeString(this, this.reader);
+	public String toString() {
+		synchronized (this.reader) {
+			return Objects.toInvokeString(this, this.reader);
+		}
 	}
 
 }

@@ -9,7 +9,7 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert ein Objekt zum Schreiben einer {@code INI}-Datenstruktur über einen {@link Writer}, analog zu einem {@link INIReader}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class INIWriter implements Closeable {
+public class INIWriter implements Closeable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIWriter} und gibt diesen zurück.<br>
 	 * Wenn das Objekt ein {@link INIWriter} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object)
@@ -26,7 +26,7 @@ public final class INIWriter implements Closeable {
 	}
 
 	/** Dieses Feld speichert den {@link Writer}. */
-	final Writer writer;
+	protected final Writer writer;
 
 	/** Dieser Konstruktor initialisiert den {@link Writer} für die {@code INI}-Datenstruktur.
 	 *
@@ -36,11 +36,41 @@ public final class INIWriter implements Closeable {
 		this.writer = Objects.assertNotNull(writer);
 	}
 
+	/** Diese Methode schreibt das gegebene Element und gibt {@code this} zurück.
+	 *
+	 * @param token Abschnitt, Eigenschaft oder Kommentar.
+	 * @return {@code this}.
+	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@code token} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Typkennung des Elements ungültig ist. */
+	public INIWriter write(final INIToken token) throws IOException, NullPointerException, IllegalArgumentException {
+		synchronized (this.writer) {
+			this.writeImpl(token);
+		}
+		return this;
+	}
+
+	@SuppressWarnings ("javadoc")
+	final void writeImpl(final INIToken token) throws IOException, NullPointerException, IllegalArgumentException {
+		switch (token.type()) {
+			case INIToken.SECTION:
+				this.writeSectionImpl(token.section());
+			break;
+			case INIToken.PROPERTY:
+				this.writePropertyImpl(token.key(), token.value());
+			break;
+			case INIToken.COMMENT:
+				this.writeCommentImpl(token.comment());
+			break;
+		}
+		throw new IllegalArgumentException();
+	}
+
 	/** Diese Methode schreibt die gegebene Zeichenkette mit Maskierung.
 	 *
 	 * @param string Zeichenkette.
 	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst. */
-	final void write(final String string) throws IOException {
+	final void writeStringImpl(final String string) throws IOException {
 		final Writer target = this.writer;
 		for (int i = 0, length = string.length(); i < length; i++) {
 			final char symbol = string.charAt(i);
@@ -68,76 +98,77 @@ public final class INIWriter implements Closeable {
 		}
 	}
 
-	/** Diese Methode schreibt das gegebene Element.
-	 *
-	 * @param token Abschnitt, Eigenschaft oder Kommentar.
-	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code token} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Typkennung des Elements ungültig ist. */
-	public final void write(final INIToken token) throws IOException, NullPointerException, IllegalArgumentException {
-		switch (token.type()) {
-			case INIToken.SECTION:
-				this.writeSection(token.section());
-			break;
-			case INIToken.PROPERTY:
-				this.writeProperty(token.key(), token.value());
-			break;
-			case INIToken.COMMENT:
-				this.writeComment(token.comment());
-			break;
-		}
-		throw new IllegalArgumentException();
-	}
-
 	/** Diese Methode schreibt einen Abschnitt mit dem gegebenen Namen.
 	 *
 	 * @param section Name eines Abschnitts.
+	 * @return {@code this}.
 	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst. */
-	public final void writeSection(final String section) throws IOException {
-		Objects.assertNotNull(section);
-		final Writer target = this.writer;
-		target.write('[');
-		this.write(section);
-		target.write("]\r\n");
+	public INIWriter writeSection(final Object section) throws IOException {
+		synchronized (this.writer) {
+			this.writeSectionImpl(section.toString());
+		}
+		return this;
 	}
 
-	/** Diese Methode gibt das zurück.
+	@SuppressWarnings ("javadoc")
+	final void writeSectionImpl(final String section) throws IOException {
+		this.writer.write('[');
+		this.writeStringImpl(section);
+		this.writer.write("]\r\n");
+	}
+
+	/** Diese Methode schreibt eine Eigenschaft und gibt {@code this} zurück.
 	 *
 	 * @param key Schlüssel der Eigenschaft.
 	 * @param value Wert der Eigenschaft.
+	 * @return {@code this}.
 	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst. */
-	public final void writeProperty(final String key, final String value) throws IOException {
-		Objects.assertNotNull(key);
-		Objects.assertNotNull(value);
-		final Writer target = this.writer;
-		this.write(key);
-		target.write('=');
-		this.write(value);
-		target.write("\r\n");
+	public INIWriter writeProperty(final Object key, final Object value) throws IOException {
+		synchronized (this.writer) {
+			this.writePropertyImpl(key.toString(), value.toString());
+		}
+		return this;
 	}
 
-	/** Diese Methode gibt das zurück.
+	@SuppressWarnings ("javadoc")
+	final void writePropertyImpl(final String key, final String value) throws IOException {
+		this.writeStringImpl(key);
+		this.writer.write('=');
+		this.writeStringImpl(value);
+		this.writer.write("\r\n");
+	}
+
+	/** Diese Methode schreibt einen Kommentar und gibt {@code this} zurück.
 	 *
-	 * @param comment Text des Kommentar.
+	 * @param comment Kommentar.
 	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst. */
-	public final void writeComment(final String comment) throws IOException {
-		Objects.assertNotNull(comment);
-		final Writer target = this.writer;
-		target.write(';');
-		this.write(comment);
-		target.write("\r\n");
+	public void writeComment(final Object comment) throws IOException {
+		synchronized (this.writer) {
+			this.writeCommentImpl(comment.toString());
+		}
+	}
+
+	@SuppressWarnings ("javadoc")
+	final void writeCommentImpl(final String comment) throws IOException {
+		this.writer.write(';');
+		this.writeStringImpl(comment);
+		this.writer.write("\r\n");
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final void close() throws IOException {
-		this.writer.close();
+	public void close() throws IOException {
+		synchronized (this.writer) {
+			this.writer.close();
+		}
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final String toString() {
-		return Objects.toInvokeString(this, this.writer);
+	public String toString() {
+		synchronized (this.writer) {
+			return Objects.toInvokeString(this, this.writer);
+		}
 	}
 
 }

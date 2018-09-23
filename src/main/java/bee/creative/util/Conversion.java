@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 
 /** Diese Schnittstelle definiert das Paar aus Ein- und Ausgabe eines {@link Getter}.
  * <p>

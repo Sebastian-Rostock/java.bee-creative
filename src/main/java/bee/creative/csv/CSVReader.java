@@ -14,7 +14,7 @@ import bee.creative.util.Objects;
  *
  * @see CSVWriter
  * @author Sebastian Rostock 2014. */
-public final class CSVReader implements Closeable {
+public class CSVReader implements Closeable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVReader} und gibt diesen zurück.<br>
 	 * Wenn das Objekt ein {@link CSVReader} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object)
@@ -36,7 +36,7 @@ public final class CSVReader implements Closeable {
 	}
 
 	/** Dieses Feld speichert die Quelldaten. */
-	final Reader reader;
+	protected final Reader reader;
 
 	/** Dieses Feld speichert den Puffer für die Werte. */
 	final StringBuilder value;
@@ -73,7 +73,7 @@ public final class CSVReader implements Closeable {
 	 *
 	 * @see #readValue()
 	 * @return Maskierungszeichen. */
-	public final char getQuote() {
+	public char getQuote() {
 		synchronized (this.reader) {
 			return this.quote;
 		}
@@ -84,7 +84,7 @@ public final class CSVReader implements Closeable {
 	 *
 	 * @see #readValue()
 	 * @return Trennzeichen. */
-	public final char getComma() {
+	public char getComma() {
 		synchronized (this.reader) {
 			return this.comma;
 		}
@@ -96,7 +96,7 @@ public final class CSVReader implements Closeable {
 	 * @param quote Maskierungszeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Maskierungszeichen einem Zeilenumbruch gleicht. */
-	public final CSVReader useQuote(final char quote) throws IllegalArgumentException {
+	public CSVReader useQuote(final char quote) throws IllegalArgumentException {
 		CSVReader.check(quote);
 		synchronized (this.reader) {
 			this.quote = quote;
@@ -110,7 +110,7 @@ public final class CSVReader implements Closeable {
 	 * @param comma Trennzeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Trennzeichen einem Zeilenumbruch gleicht. */
-	public final CSVReader useComma(final char comma) throws IllegalArgumentException {
+	public CSVReader useComma(final char comma) throws IllegalArgumentException {
 		CSVReader.check(comma);
 		synchronized (this.reader) {
 			this.comma = comma;
@@ -126,7 +126,7 @@ public final class CSVReader implements Closeable {
 	 * @return Tabelle (Liste von Einträgen).
 	 * @throws IOException Wenn {@link #readValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #readValue()} eine entsprechende Ausnahme auslöst. */
-	public final String[][] readTable() throws IOException, IllegalArgumentException {
+	public String[][] readTable() throws IOException, IllegalArgumentException {
 		synchronized (this.reader) {
 			return this.readTableImpl();
 		}
@@ -150,7 +150,7 @@ public final class CSVReader implements Closeable {
 	 * @return Eintrag (Liste von Werten).
 	 * @throws IOException Wenn {@link #readValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #readValue()} eine entsprechende Ausnahme auslöst. */
-	public final String[] readEntry() throws IOException, IllegalArgumentException {
+	public String[] readEntry() throws IOException, IllegalArgumentException {
 		synchronized (this.reader) {
 			return this.readEntryImpl();
 		}
@@ -191,7 +191,7 @@ public final class CSVReader implements Closeable {
 	 * @return Wert oder {@code null}.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Maskierung des Werts nicth vor der Eingabe endet. */
-	public final String readValue() throws IOException, IllegalArgumentException {
+	public String readValue() throws IOException, IllegalArgumentException {
 		synchronized (this.reader) {
 			return this.readValueImpl();
 		}
@@ -231,7 +231,7 @@ public final class CSVReader implements Closeable {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void close() throws IOException {
+	public void close() throws IOException {
 		synchronized (this.reader) {
 			this.reader.close();
 		}

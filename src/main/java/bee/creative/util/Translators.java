@@ -1,5 +1,7 @@
 package bee.creative.util;
 
+import bee.creative.util.Getters.BaseGetter;
+
 /** Diese Klasse implementiert grundlegende {@link Translator}.
  *
  * @see Translator
@@ -30,7 +32,7 @@ public class Translators {
 
 	/** Diese Klasse implementiert {@link Translators#toSourceGetter(Translator)}. */
 	@SuppressWarnings ("javadoc")
-	static class SourceGetter<GSource> implements Getter<Object, GSource> {
+	static class SourceGetter<GSource> extends BaseGetter<Object, GSource> {
 	
 		public final Translator<GSource, ?> translator;
 	
@@ -74,7 +76,7 @@ public class Translators {
 
 	/** Diese Klasse implementiert {@link Translators#toTargetGetter(Translator)}. */
 	@SuppressWarnings ("javadoc")
-	static class TargetGetter<GTarget> implements Getter<Object, GTarget> {
+	static class TargetGetter<GTarget> extends BaseGetter<Object, GTarget> {
 	
 		public final Translator<?, GTarget> translator;
 	

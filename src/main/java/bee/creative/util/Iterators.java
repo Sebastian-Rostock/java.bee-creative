@@ -17,11 +17,9 @@ import bee.creative.util.Objects.UseToString;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Iterators {
 
-	/** Diese Klasse implementiert einen abstrakten {@link Iterator} mit {@link UseToString}.
-	 *
-	 * @param <GItem> Typ des Elementes. */
+	/** Diese Klasse implementiert einen abstrakten {@link Iterator} mit {@link UseToString}. */
+	@SuppressWarnings ("javadoc")
 	public static abstract class BaseIterator<GItem> implements Iterator<GItem>, UseToString {
-
 	}
 
 	/** Diese Klasse implementiert {@link Iterators#itemIterator(Object, int)}. */

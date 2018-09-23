@@ -4,11 +4,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Setter}-Konstruktion und -Verarbeitung.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
+
+	/** Diese Klasse implementiert einen {@link Setter} als {@link BaseObject}. */
+	@SuppressWarnings ("javadoc")
+	public static abstract class BaseSetter<GInput, GValue> extends BaseObject implements Setter<GInput, GValue> {
+	}
 
 	/** Diese Klasse implementiert {@link Setters#nativeSetter(Method)} */
 	@SuppressWarnings ("javadoc")

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import bee.creative.array.Array;
+import bee.creative.util.Getters.BaseGetter;
 import bee.creative.util.Objects.BaseObject;
 import bee.creative.util.Objects.UseToString;
 
@@ -168,7 +169,7 @@ public class Iterables {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterables.iterator()));
+			return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>iteratorGetter(), this.iterables.iterator()));
 		}
 
 		@Override
@@ -227,7 +228,7 @@ public class Iterables {
 
 	/** Diese Klasse implementiert {@link Iterables#ITERABLE_ITERATOR}. */
 	@SuppressWarnings ("javadoc")
-	static class IteratorGetter extends BaseObject implements Getter<Iterable<?>, Iterator<?>> {
+	static class IteratorGetter extends BaseGetter<Iterable<?>, Iterator<?>> {
 
 		@Override
 		public Iterator<?> get(final Iterable<?> input) {
@@ -237,10 +238,10 @@ public class Iterables {
 	}
 
 	/** Dieses Feld speichert das leere {@link Iterable}. */
-	public static final Iterable<?> EMPTY_ITERABLE = new EmptaIterable();
+	static final Iterable<?> EMPTY_ITERABLE = new EmptaIterable();
 
 	/** Dieses Feld speichert den {@link Getter}, der den {@link Iterator} eines {@link Iterable} ermittelt. */
-	public static final Getter<Iterable<?>, Iterator<?>> ITERABLE_ITERATOR = new IteratorGetter();
+	static final Getter<Iterable<?>, Iterator<?>> ITERABLE_ITERATOR = new IteratorGetter();
 
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück.
 	 *
@@ -532,7 +533,7 @@ public class Iterables {
 	 * @param <GItem> Typ der Elemente.
 	 * @return {@link #ITERABLE_ITERATOR}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> toIteratorGetter() {
+	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> iteratorGetter() {
 		return (Getter<Iterable<? extends GItem>, Iterator<GItem>>)(Object)Iterables.ITERABLE_ITERATOR;
 	}
 

@@ -16,6 +16,33 @@ import java.util.Set;
  * @param <GItem> Typ der Elemente. */
 public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializable, Cloneable {
 
+	public static class HasherHashSet<GItem> extends HashSet<GItem> {
+
+		public static final long serialVersionUID = -1097708178888446196L;
+
+		public final Hasher hasher;
+
+		public HasherHashSet(Hasher hasher) throws NullPointerException {
+			this.hasher = Objects.assertNotNull(hasher);
+		}
+
+		@Override
+		protected int customHash(final Object item) {
+			return hasher.hash(item);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object item) {
+			return hasher.equals(this.items[entryIndex], item);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
+			return hasher.equals(this.items[entryIndex], item);
+		}
+
+	}
+
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = 1947961515821394540L;
 
@@ -26,27 +53,7 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 	 * @return An {@link Hasher} gebundenes {@link HashSet}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
 	public static <GItem> HashSet<GItem> from(final Hasher hasher) throws NullPointerException {
-		Objects.assertNotNull(hasher);
-		return new HashSet<GItem>() {
-
-			private static final long serialVersionUID = -1097708178888446196L;
-
-			@Override
-			protected int customHash(final Object item) {
-				return hasher.hash(item);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object item) {
-				return hasher.equals(this.items[entryIndex], item);
-			}
-
-			@Override
-			protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
-				return hasher.equals(this.items[entryIndex], item);
-			}
-
-		};
+		return new HasherHashSet<>(hasher);
 	}
 
 	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
