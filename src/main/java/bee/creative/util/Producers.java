@@ -14,18 +14,18 @@ import bee.creative.ref.SoftPointer;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Producers {
 
-	/** Diese Klasse implementiert {@link Producers#itemProducer(Object)}. */
+	/** Diese Klasse implementiert {@link Producers#valueProducer(Object)}. */
 	@SuppressWarnings ("javadoc")
-	public static class ItemProducer<GItem> implements Producer<GItem> {
+	public static class ValueProducer<GValue> implements Producer<GValue> {
 
-		public final GItem item;
+		public final GValue item;
 
-		public ItemProducer(final GItem item) {
+		public ValueProducer(final GValue item) {
 			this.item = item;
 		}
 
 		@Override
-		public GItem get() {
+		public GValue get() {
 			return this.item;
 		}
 
@@ -38,7 +38,7 @@ public class Producers {
 
 	/** Diese Klasse implementiert {@link Producers#nativeProducer(Method)}. */
 	@SuppressWarnings ("javadoc")
-	public static class MethodProducer<GItem> implements Producer<GItem> {
+	public static class MethodProducer<GValue> implements Producer<GValue> {
 
 		public final Method method;
 
@@ -49,9 +49,9 @@ public class Producers {
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public GItem get() {
+		public GValue get() {
 			try {
-				return (GItem)this.method.invoke(null);
+				return (GValue)this.method.invoke(null);
 			} catch (IllegalAccessException | InvocationTargetException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -66,7 +66,7 @@ public class Producers {
 
 	/** Diese Klasse implementiert {@link Producers#nativeProducer(Constructor)}. */
 	@SuppressWarnings ("javadoc")
-	public static class ConstructorProducer<GItem> implements Producer<GItem> {
+	public static class ConstructorProducer<GValue> implements Producer<GValue> {
 
 		public final Constructor<?> constructor;
 
@@ -76,9 +76,9 @@ public class Producers {
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public GItem get() {
+		public GValue get() {
 			try {
-				return (GItem)this.constructor.newInstance();
+				return (GValue)this.constructor.newInstance();
 			} catch (IllegalAccessException | InstantiationException | InvocationTargetException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -93,29 +93,29 @@ public class Producers {
 
 	/** Diese Klasse implementiert {@link Producers#bufferedProducer(int, Producer)}. */
 	@SuppressWarnings ("javadoc")
-	public static class BufferedProducer<GItem> implements Producer<GItem> {
+	public static class BufferedProducer<GValue> implements Producer<GValue> {
 
-		public final Producer<? extends GItem> producer;
+		public final Producer<? extends GValue> producer;
 
 		public final int mode;
 
-		protected Pointer<GItem> pointer;
+		protected Pointer<GValue> pointer;
 
-		public BufferedProducer(final int mode, final Producer<? extends GItem> producer) {
+		public BufferedProducer(final int mode, final Producer<? extends GValue> producer) {
 			Pointers.pointer(mode, null);
 			this.mode = mode;
 			this.producer = Objects.assertNotNull(producer);
 		}
 
 		@Override
-		public GItem get() {
-			final Pointer<GItem> pointer = this.pointer;
+		public GValue get() {
+			final Pointer<GValue> pointer = this.pointer;
 			if (pointer != null) {
-				final GItem data = pointer.get();
+				final GValue data = pointer.get();
 				if (data != null) return data;
 				if (pointer == Pointers.NULL) return null;
 			}
-			final GItem data = this.producer.get();
+			final GValue data = this.producer.get();
 			this.pointer = Pointers.pointer(this.mode, data);
 			return data;
 		}
@@ -154,19 +154,19 @@ public class Producers {
 
 	/** Diese Klasse implementiert {@link Producers#synchronizedProducer(Object, Producer)}. */
 	@SuppressWarnings ("javadoc")
-	public static class SynchronizedProducer<GItem> implements Producer<GItem> {
+	public static class SynchronizedProducer<GValue> implements Producer<GValue> {
 
 		public final Object mutex;
 
-		public final Producer<? extends GItem> producer;
+		public final Producer<? extends GValue> producer;
 
-		public SynchronizedProducer(final Object mutex, final Producer<? extends GItem> producer) throws NullPointerException {
+		public SynchronizedProducer(final Object mutex, final Producer<? extends GValue> producer) throws NullPointerException {
 			this.mutex = mutex != null ? mutex : this;
 			this.producer = Objects.assertNotNull(producer);
 		}
 
 		@Override
-		public GItem get() {
+		public GValue get() {
 			synchronized (this.mutex) {
 				return this.producer.get();
 			}
@@ -181,11 +181,11 @@ public class Producers {
 
 	/** Diese Methode gibt einen {@link Producer} zurück, der den gegebenen Datensatz bereitstellt.
 	 *
-	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param item Datensatz.
 	 * @return {@code value}-{@link Producer}. */
-	public static <GItem> Producer<GItem> itemProducer(final GItem item) {
-		return new ItemProducer<>(item);
+	public static <GValue> Producer<GValue> valueProducer(final GValue item) {
+		return new ValueProducer<>(item);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code nativeProducer(Natives.parse(memberText))}.
@@ -193,13 +193,13 @@ public class Producers {
 	 * @see Natives#parse(String)
 	 * @see #nativeProducer(java.lang.reflect.Method)
 	 * @see #nativeProducer(java.lang.reflect.Constructor)
-	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param memberText Methoden- oder Konstruktortext.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws ReflectiveOperationException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
-	public static <GItem> Producer<GItem> nativeProducer(final String memberText)
+	public static <GValue> Producer<GValue> nativeProducer(final String memberText)
 		throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
 		final Object object = Natives.parse(memberText);
 		if (object instanceof java.lang.reflect.Method) return Producers.nativeProducer((java.lang.reflect.Method)object);
@@ -211,12 +211,12 @@ public class Producers {
 	 * Der vom gelieferten {@link Producer} erzeugte Datensatz entspricht {@code method.invoke(null)}.
 	 *
 	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param method Native statische Methode.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die gegebene Methode nicht statisch oder nicht parameterlos ist. */
-	public static <GItem> Producer<GItem> nativeProducer(final java.lang.reflect.Method method) throws NullPointerException, IllegalArgumentException {
+	public static <GValue> Producer<GValue> nativeProducer(final java.lang.reflect.Method method) throws NullPointerException, IllegalArgumentException {
 		return new MethodProducer<>(method);
 	}
 
@@ -224,11 +224,11 @@ public class Producers {
 	 * Der vom gelieferten {@link Producer} erzeugte Datensatz entspricht {@code constructor.newInstance()}.
 	 *
 	 * @see java.lang.reflect.Constructor#newInstance(Object...)
-	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param constructor Nativer Kontruktor.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
-	public static <GItem> Producer<GItem> nativeProducer(final java.lang.reflect.Constructor<?> constructor) throws NullPointerException {
+	public static <GValue> Producer<GValue> nativeProducer(final java.lang.reflect.Constructor<?> constructor) throws NullPointerException {
 		return new ConstructorProducer<>(constructor);
 	}
 
@@ -236,24 +236,24 @@ public class Producers {
 	 * {@link SoftPointer} verwaltet.
 	 *
 	 * @see #bufferedProducer(int, Producer)
-	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param producer {@link Producer}.
 	 * @return {@code buffered}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code producer} {@code null} ist. */
-	public static <GItem> Producer<GItem> bufferedProducer(final Producer<? extends GItem> producer) throws NullPointerException {
+	public static <GValue> Producer<GValue> bufferedProducer(final Producer<? extends GValue> producer) throws NullPointerException {
 		return Producers.bufferedProducer(Pointers.SOFT, producer);
 	}
 
 	/** Diese Methode gibt einen gepufferten {@link Producer} zurück, der den vonm gegebenen {@link Producer} erzeugten Datensatz mit Hilfe eines {@link Pointer}
 	 * im gegebenenen Modus verwaltet.
 	 *
-	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
 	 * @param producer {@link Producer}.
 	 * @return {@code buffered}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code producer} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code mode} ungültig ist. */
-	public static <GItem> Producer<GItem> bufferedProducer(final int mode, final Producer<? extends GItem> producer)
+	public static <GValue> Producer<GValue> bufferedProducer(final int mode, final Producer<? extends GValue> producer)
 		throws NullPointerException, IllegalArgumentException {
 		return new BufferedProducer<>(mode, producer);
 	}
@@ -276,19 +276,23 @@ public class Producers {
 	 *
 	 * @see #synchronizedProducer(Producer, Object) */
 	@SuppressWarnings ("javadoc")
-	public static <GItem> Producer<GItem> synchronizedProducer(final Producer<? extends GItem> producer) throws NullPointerException {
+	public static <GValue> Producer<GValue> synchronizedProducer(final Producer<? extends GValue> producer) throws NullPointerException {
 		return Producers.synchronizedProducer(producer, producer);
 	}
 
 	/** Diese Methode gibt einen synchronisierten {@link Producer} zurück, der den gegebenen {@link Producer} via {@code synchronized(mutex)} synchronisiert.
 	 *
-	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param producer {@link Producer}.
 	 * @param mutex Synchronisationsobjekt.
 	 * @return {@code synchronized}-{@link Producer}.
 	 * @throws NullPointerException Wenn der {@code producer} bzw. {@code mutex} {@code null} ist. */
-	public static <GItem> Producer<GItem> synchronizedProducer(final Object mutex, final Producer<? extends GItem> producer) throws NullPointerException {
+	public static <GValue> Producer<GValue> synchronizedProducer( final Object mutex,final Producer<? extends GValue> producer) throws NullPointerException {
 		return new SynchronizedProducer<>(mutex, producer);
+	}
+
+	public static <GValue> Getter<Object, GValue> toGetter(final Producer<? extends GValue> producer) throws NullPointerException {
+		return null;
 	}
 
 }

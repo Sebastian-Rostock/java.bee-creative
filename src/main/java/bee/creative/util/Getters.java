@@ -1,6 +1,8 @@
 package bee.creative.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -15,22 +17,360 @@ import bee.creative.util.Objects.BaseObject;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
 
-	static class NeutralGetter extends BaseGetter<Object, Object> {
-
-		@Override
-		public Object get(final Object input) {
-			return input;
-		}
-		
-	}
-
 	/** Diese Klasse implementiert einen {@link Setter} als {@link BaseObject}. */
 	@SuppressWarnings ("javadoc")
 	public static abstract class BaseGetter<GInput, GValue> extends BaseObject implements Getter<GInput, GValue> {
 	}
 
-	/** Dieses Feld speichert den neutralen {@link Getter}, dessen Ausgabe gleich seiner Eingabe ist. */
-	public static final Getter<?, ?> NEUTRAL_GETTER = new NeutralGetter();
+	static class NeutralGetter extends BaseGetter<Object, Object> {
+
+		public static final Getter<?, ?> INSTANCE = new NeutralGetter();
+
+		@Override
+		public Object get(final Object input) {
+			return input;
+		}
+
+	}
+
+	public static class MethodGetter<GInput, GOutput> implements Getter<GInput, GOutput> {
+
+		public final Method method;
+
+		public MethodGetter(final Method method) {
+			try {
+				method.setAccessible(true);
+			} catch (final SecurityException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+			if (Modifier.isStatic(method.getModifiers())) {
+				if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
+			} else {
+				if (method.getParameterTypes().length != 0) throw new IllegalArgumentException();
+			}
+			this.method = method;
+		}
+
+		@Override
+		public GOutput get(final GInput input) {
+			try {
+				@SuppressWarnings ("unchecked")
+				final GOutput result = Modifier.isStatic(this.method.getModifiers()) //
+					? (GOutput)this.method.invoke(null, input) //
+					: (GOutput)this.method.invoke(input);
+				return result;
+			} catch (final IllegalAccessException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, Natives.formatMethod(this.method));
+		}
+
+	}
+
+	public static class ConstructorGetter<GInput, GOutput> implements Getter<GInput, GOutput> {
+
+		public final Constructor<?> constructor;
+
+		public ConstructorGetter(final Constructor<?> constructor) {
+			try {
+				constructor.setAccessible(true);
+			} catch (final SecurityException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 1)) throw new IllegalArgumentException();
+			this.constructor = constructor;
+		}
+
+		@Override
+		public GOutput get(final GInput input) {
+			try {
+				@SuppressWarnings ("unchecked")
+				final GOutput result = (GOutput)this.constructor.newInstance(input);
+				return result;
+			} catch (final IllegalAccessException | InstantiationException | InvocationTargetException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, Natives.formatConstructor(this.constructor));
+		}
+
+	}
+
+	public static class DefaultGetter<GInput, GValue> implements Getter<GInput, GValue> {
+
+		public final GValue value;
+
+		public final Getter<? super GInput, GValue> getter;
+
+		public DefaultGetter(final GValue value, final Getter<? super GInput, GValue> getter) {
+			this.value = value;
+			this.getter = Objects.assertNotNull(getter);
+		}
+
+		@Override
+		public GValue get(final GInput input) {
+			if (input == null) return this.value;
+			return this.getter.get(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.getter, this.value);
+		}
+
+	}
+
+	public static class BufferedGetter<GInput, GValue> implements Getter<GInput, GValue> {
+
+		public final int limit;
+
+		public final byte inputMode;
+
+		public final byte outputMode;
+
+		public final Getter<? super GInput, ? extends GValue> getter;
+
+		Map<Pointer<GInput>, Pointer<GValue>> map = new LinkedHashMap<>(0, 0.75f, true);
+
+		int capacity = 0;
+
+		public BufferedGetter(final int limit, final int inputMode, final int outputMode, final Getter<? super GInput, ? extends GValue> getter) {
+			Pointers.pointer(inputMode, null);
+			Pointers.pointer(outputMode, null);
+			this.limit = limit;
+			this.inputMode = (byte)inputMode;
+			this.outputMode = (byte)outputMode;
+			this.getter = Objects.assertNotNull(getter);
+		}
+
+		@Override
+		public GValue get(final GInput input) {
+			final Pointer<GValue> pointer = this.map.get(Pointers.hardPointer(input));
+			if (pointer != null) {
+				final GValue output = pointer.get();
+				if (output != null) return output;
+				if (Pointers.isValid(pointer)) return null;
+				int valid = this.limit - 1;
+				for (final Iterator<Entry<Pointer<GInput>, Pointer<GValue>>> iterator = this.map.entrySet().iterator(); iterator.hasNext();) {
+					final Entry<Pointer<GInput>, Pointer<GValue>> entry = iterator.next();
+					final Pointer<?> key = entry.getKey(), value = entry.getValue();
+					if (valid != 0) {
+						if (!Pointers.isValid(key) || !Pointers.isValid(value)) {
+							iterator.remove();
+						} else {
+							valid--;
+						}
+					} else {
+						iterator.remove();
+					}
+				}
+			}
+			final GValue output = this.getter.get(input);
+			this.map.put(Pointers.pointer(this.inputMode, input), Pointers.pointer(this.outputMode, output));
+			final int size = this.map.size(), capacity = this.capacity;
+			if (size >= capacity) {
+				this.capacity = size;
+			} else if ((size << 2) <= capacity) {
+				(this.map = new LinkedHashMap<>(0, 0.75f, true)).putAll(this.map);
+				this.capacity = size;
+			}
+			return output;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.limit, this.inputMode, this.outputMode, this.getter);
+		}
+
+	}
+
+	public static class NavigatedGetter<GInput, GValue, GOutput> implements Getter<GInput, GOutput> {
+
+		public final Getter<? super GInput, ? extends GValue> navigator;
+
+		public final Getter<? super GValue, ? extends GOutput> getter;
+
+		public NavigatedGetter(final Getter<? super GValue, ? extends GOutput> getter, final Getter<? super GInput, ? extends GValue> navigator) {
+			this.navigator = Objects.assertNotNull(navigator);
+			this.getter = Objects.assertNotNull(getter);
+		}
+
+		@Override
+		public GOutput get(final GInput input) {
+			return this.getter.get(this.navigator.get(input));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.navigator, this.getter);
+		}
+
+	}
+
+	public static class AggregatedGetter<GItem, GValue, GValue2> implements Getter<Iterable<? extends GItem>, GValue> {
+
+		public final Getter<? super GItem, GValue2> getter;
+
+		public final Getter<? super GValue2, ? extends GValue> format;
+
+		public final GValue emptyValue;
+
+		public final GValue mixedValue;
+
+		public AggregatedGetter(final Getter<? super GItem, GValue2> getter, final Getter<? super GValue2, ? extends GValue> format, final GValue emptyValue,
+			final GValue mixedValue) {
+			this.getter = Objects.assertNotNull(getter);
+			this.format = Objects.assertNotNull(format);
+			this.emptyValue = emptyValue;
+			this.mixedValue = mixedValue;
+		}
+
+		@Override
+		public GValue get(final Iterable<? extends GItem> input) {
+			if (input == null) return this.emptyValue;
+			final Iterator<? extends GItem> iterator = input.iterator();
+			if (!iterator.hasNext()) return this.emptyValue;
+			final GItem item = iterator.next();
+			final GValue2 value = this.getter.get(item);
+			while (iterator.hasNext()) {
+				final GItem item2 = iterator.next();
+				final GValue2 value2 = this.getter.get(item2);
+				if (!Objects.equals(value, value2)) return this.mixedValue;
+			}
+			return this.format.get(value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.getter, this.format, this.emptyValue, this.mixedValue);
+		}
+
+	}
+
+	public static class ConditionalGetter<GInput, GOutput> implements Getter<GInput, GOutput> {
+
+		public final Filter<? super GInput> condition;
+
+		public final Getter<? super GInput, ? extends GOutput> acceptGetter;
+
+		public final Getter<? super GInput, ? extends GOutput> rejectGetter;
+
+		public ConditionalGetter(final Filter<? super GInput> condition, final Getter<? super GInput, ? extends GOutput> acceptGetter,
+			final Getter<? super GInput, ? extends GOutput> rejectGetter) {
+			this.acceptGetter = acceptGetter;
+			this.rejectGetter = rejectGetter;
+			this.condition = condition;
+		}
+
+		@Override
+		public GOutput get(final GInput input) {
+			if (this.condition.accept(input)) return this.acceptGetter.get(input);
+			return this.rejectGetter.get(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.condition, this.acceptGetter, this.rejectGetter);
+		}
+
+	}
+
+	public static class SynchronizedGetter<GInput, GValue> implements Getter<GInput, GValue> {
+
+		public final Object mutex;
+
+		public final Getter<? super GInput, ? extends GValue> getter;
+
+		public SynchronizedGetter(final Getter<? super GInput, ? extends GValue> getter, final Object mutex) {
+			this.mutex = mutex != null ? mutex : null;
+			this.getter = Objects.assertNotNull(getter);
+		}
+
+		@Override
+		public GValue get(final GInput input) {
+			synchronized (this.mutex) {
+				return this.getter.get(input);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.getter);
+		}
+
+	}
+
+	static class GetterFilter<GInput> implements Filter<GInput> {
+
+		public final Getter<? super GInput, Boolean> getter;
+
+		public GetterFilter(final Getter<? super GInput, Boolean> getter) {
+			this.getter = Objects.assertNotNull(getter);
+		}
+
+		@Override
+		public boolean accept(final GInput input) {
+			final Boolean result = this.getter.get(input);
+			return (result != null) && result.booleanValue();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.getter);
+		}
+
+	}
+
+	static class GetterProducer<GInput, GValue> implements Producer<GValue> {
+
+		public final Getter<? super GInput, ? extends GValue> getter;
+
+		public final GInput input;
+
+		public GetterProducer(final Getter<? super GInput, ? extends GValue> getter, final GInput input) {
+			this.getter = getter;
+			this.input = input;
+		}
+
+		@Override
+		public GValue get() {
+			return this.getter.get(this.input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.getter);
+		}
+
+	}
+
+	static class GetterComparable<GInput> implements Comparable<GInput> {
+
+		public final Getter<? super GInput, ? extends Number> getter;
+
+		public GetterComparable(final Getter<? super GInput, ? extends Number> getter) {
+			this.getter = Objects.assertNotNull(getter);
+		}
+
+		@Override
+		public int compareTo(final GInput input) {
+			final Number result = this.getter.get(input);
+			return result != null ? result.intValue() : 0;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.getter);
+		}
+
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.emptyField()}. */
 	@SuppressWarnings ("javadoc")
@@ -87,55 +427,7 @@ public class Getters {
 	 * @throws IllegalArgumentException Wenn die Parameteranzahl der nativen Methode ungültig oder die Methode nicht zugreifbar ist. */
 	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final java.lang.reflect.Method method)
 		throws NullPointerException, IllegalArgumentException {
-		try {
-			method.setAccessible(true);
-		} catch (final SecurityException cause) {
-			throw new IllegalArgumentException(cause);
-		}
-		if (Modifier.isStatic(method.getModifiers())) {
-			if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
-			return new Getter<GInput, GOutput>() {
-
-				@Override
-				public GOutput get(final GInput input) {
-					try {
-						@SuppressWarnings ("unchecked")
-						final GOutput result = (GOutput)method.invoke(null, input);
-						return result;
-					} catch (final IllegalAccessException | InvocationTargetException cause) {
-						throw new IllegalArgumentException(cause);
-					}
-				}
-
-				@Override
-				public String toString() {
-					return Objects.toInvokeString("nativeGetter", Natives.formatMethod(method));
-				}
-
-			};
-		} else {
-			if (method.getParameterTypes().length != 0) throw new IllegalArgumentException();
-			return new Getter<GInput, GOutput>() {
-
-				@Override
-				public GOutput get(final GInput input) {
-					try {
-						@SuppressWarnings ("unchecked")
-						final GOutput result = (GOutput)method.invoke(input);
-						return result;
-					} catch (final IllegalAccessException | InvocationTargetException cause) {
-						throw new IllegalArgumentException(cause);
-					}
-				}
-
-				@Override
-				public String toString() {
-					return Objects.toInvokeString("nativeGetter", Natives.formatMethod(method));
-				}
-
-			};
-
-		}
+		return new MethodGetter<>(method);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zum gegebenen {@link java.lang.reflect.Constructor nativen Kontruktor} zurück.<br>
@@ -150,31 +442,7 @@ public class Getters {
 	 * @throws IllegalArgumentException Wenn die Parameteranzahl des nativen Konstruktor ungültig, er nicht zugreifbar oder er nicht statisch ist. */
 	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final java.lang.reflect.Constructor<?> constructor)
 		throws NullPointerException, IllegalArgumentException {
-		try {
-			constructor.setAccessible(true);
-		} catch (final SecurityException cause) {
-			throw new IllegalArgumentException(cause);
-		}
-		if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 1)) throw new IllegalArgumentException();
-		return new Getter<GInput, GOutput>() {
-
-			@Override
-			public GOutput get(final GInput input) {
-				try {
-					@SuppressWarnings ("unchecked")
-					final GOutput result = (GOutput)constructor.newInstance(input);
-					return result;
-				} catch (final IllegalAccessException | InstantiationException | InvocationTargetException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nativeGetter", Natives.formatConstructor(constructor));
-			}
-
-		};
+		return new ConstructorGetter<>(constructor);
 	}
 
 	/** Diese Methode gibt den neutralen {@link Getter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
@@ -183,7 +451,7 @@ public class Getters {
 	 * @return {@link #NEUTRAL_GETTER}. */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Getter<GInput, GInput> neutralGetter() {
-		return (Getter<GInput, GInput>)Getters.NEUTRAL_GETTER;
+		return (Getter<GInput, GInput>)NeutralGetter.INSTANCE;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Getters.defaultGetter(getter, null)}.
@@ -202,27 +470,7 @@ public class Getters {
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Getter<GInput, GValue> defaultGetter(final Getter<? super GInput, GValue> getter, final GValue value)
 		throws NullPointerException {
-		Objects.assertNotNull(getter);
-		return new Getter<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				if (input == null) return value;
-				return getter.get(input);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("defaultGetter", getter, value);
-			}
-
-		};
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.mappingField(mapping)}. */
-	@SuppressWarnings ({"javadoc", "unchecked"})
-	public static <GValue> Getter<Object, GValue> mappingGetter(final Map<?, ? extends GValue> mapping) {
-		return (Getter<Object, GValue>)Fields.mappingField(mapping);
+		return new DefaultGetter<>(value, getter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Getters.bufferedGetter(-1, Pointers.SOFT, Pointers.SOFT, getter)}.
@@ -251,55 +499,13 @@ public class Getters {
 	 * @throws IllegalArgumentException Wenn {@link Pointers#pointer(int, Object)} eine entsprechende Ausnahme auslöst. */
 	public static <GInput, GValue> Getter<GInput, GValue> bufferedGetter(final int limit, final int inputMode, final int outputMode,
 		final Getter<? super GInput, ? extends GValue> getter) throws NullPointerException, IllegalArgumentException {
-		Objects.assertNotNull(getter);
-		Pointers.pointer(inputMode, null);
-		Pointers.pointer(outputMode, null);
-		return new Getter<GInput, GValue>() {
+		return new BufferedGetter<>(limit, inputMode, outputMode, getter);
+	}
 
-			Map<Pointer<GInput>, Pointer<GValue>> map = new LinkedHashMap<>(0, 0.75f, true);
-
-			int capacity = 0;
-
-			@Override
-			public GValue get(final GInput input) {
-				final Pointer<GValue> pointer = this.map.get(Pointers.hardPointer(input));
-				if (pointer != null) {
-					final GValue output = pointer.get();
-					if (output != null) return output;
-					if (Pointers.isValid(pointer)) return null;
-					int valid = limit - 1;
-					for (final Iterator<Entry<Pointer<GInput>, Pointer<GValue>>> iterator = this.map.entrySet().iterator(); iterator.hasNext();) {
-						final Entry<Pointer<GInput>, Pointer<GValue>> entry = iterator.next();
-						final Pointer<?> key = entry.getKey(), value = entry.getValue();
-						if (valid != 0) {
-							if (!Pointers.isValid(key) || !Pointers.isValid(value)) {
-								iterator.remove();
-							} else {
-								valid--;
-							}
-						} else {
-							iterator.remove();
-						}
-					}
-				}
-				final GValue output = getter.get(input);
-				this.map.put(Pointers.pointer(inputMode, input), Pointers.pointer(outputMode, output));
-				final int size = this.map.size(), capacity = this.capacity;
-				if (size >= capacity) {
-					this.capacity = size;
-				} else if ((size << 2) <= capacity) {
-					(this.map = new LinkedHashMap<>(0, 0.75f, true)).putAll(this.map);
-					this.capacity = size;
-				}
-				return output;
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("bufferedGetter", limit, inputMode, outputMode, getter);
-			}
-
-		};
+	/** Diese Methode ist eine Abkürzung für {@code Fields.mappingField(mapping)}. */
+	@SuppressWarnings ({"javadoc", "unchecked"})
+	public static <GValue> Getter<Object, GValue> mappingGetter(final Map<?, ? extends GValue> mapping) {
+		return (Getter<Object, GValue>)Fields.mappingField(mapping);
 	}
 
 	/** Diese Methode gibt einen navigierten bzw. verketteten {@link Getter} zurück.<br>
@@ -314,21 +520,7 @@ public class Getters {
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code getter} {@code null} ist. */
 	public static <GInput, GValue, GOutput> Getter<GInput, GOutput> navigatedGetter(final Getter<? super GInput, ? extends GValue> navigator,
 		final Getter<? super GValue, ? extends GOutput> getter) throws NullPointerException {
-		Objects.assertNotNull(navigator);
-		Objects.assertNotNull(getter);
-		return new Getter<GInput, GOutput>() {
-
-			@Override
-			public GOutput get(final GInput input) {
-				return getter.get(navigator.get(input));
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("navigatedGetter", navigator, getter);
-			}
-
-		};
+		return new NavigatedGetter<>(getter, navigator);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Getters.aggregatedGetter(getter, null, null)}.
@@ -378,31 +570,7 @@ public class Getters {
 	 * @throws NullPointerException Wenn {@code property} bzw. {@code getFormat} {@code null} ist. */
 	public static <GItem, GValue, GValue2> Getter<Iterable<? extends GItem>, GValue> aggregatedGetter(final Getter<? super GItem, GValue2> getter,
 		final Getter<? super GValue2, ? extends GValue> format, final GValue emptyValue, final GValue mixedValue) throws NullPointerException {
-		Objects.assertNotNull(getter);
-		Objects.assertNotNull(format);
-		return new Getter<Iterable<? extends GItem>, GValue>() {
-
-			@Override
-			public GValue get(final Iterable<? extends GItem> input) {
-				if (input == null) return emptyValue;
-				final Iterator<? extends GItem> iterator = input.iterator();
-				if (!iterator.hasNext()) return emptyValue;
-				final GItem item = iterator.next();
-				final GValue2 value = getter.get(item);
-				while (iterator.hasNext()) {
-					final GItem item2 = iterator.next();
-					final GValue2 value2 = getter.get(item2);
-					if (!Objects.equals(value, value2)) return mixedValue;
-				}
-				return format.get(value);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("aggregatedGetter", getter, format, emptyValue, mixedValue);
-			}
-
-		};
+		return new AggregatedGetter<>(getter, format, emptyValue, mixedValue);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zurück, der über die Weiterleitug der Eingabe an einen der gegebenen {@link Getter Eigenschaften} mit Hilfe des
@@ -420,20 +588,7 @@ public class Getters {
 	 * @throws NullPointerException Wenn {@code condition}, {@code acceptGetter} bzw. {@code rejectGetter} {@code null} ist. */
 	public static <GInput, GOutput> Getter<GInput, GOutput> conditionalGetter(final Filter<? super GInput> condition,
 		final Getter<? super GInput, ? extends GOutput> acceptGetter, final Getter<? super GInput, ? extends GOutput> rejectGetter) throws NullPointerException {
-		return new Getter<GInput, GOutput>() {
-
-			@Override
-			public GOutput get(final GInput input) {
-				if (condition.accept(input)) return acceptGetter.get(input);
-				return rejectGetter.get(input);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("conditionalGetter", condition, acceptGetter, rejectGetter);
-			}
-
-		};
+		return new ConditionalGetter<>(condition, acceptGetter, rejectGetter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Getters.synchronizedGetter(getter, getter)}.
@@ -452,25 +607,9 @@ public class Getters {
 	 * @param mutex Synchronisationsobjekt.
 	 * @return {@code synchronized}-{@link Getter}.
 	 * @throws NullPointerException Wenn der {@code getter} bzw. {@code mutex} {@code null} ist. */
-	public static <GInput, GValue> Getter<GInput, GValue> synchronizedGetter(final Getter<? super GInput, ? extends GValue> getter, final Object mutex)
+	public static <GInput, GValue> Getter<GInput, GValue> synchronizedGetter(final Object mutex, final Getter<? super GInput, ? extends GValue> getter)
 		throws NullPointerException {
-		Objects.assertNotNull(getter);
-		Objects.assertNotNull(mutex);
-		return new Getter<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				synchronized (mutex) {
-					return getter.get(input);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("synchronizedGetter", getter);
-			}
-
-		};
+		return new SynchronizedGetter<>(getter, mutex);
 	}
 
 	/** Diese Methode gibt einen {@link Filter} als Adapter zu einer {@code boolean}-{@link Getter Eigenschaft} zurück.<br>
@@ -481,21 +620,7 @@ public class Getters {
 	 * @return {@link Filter} als {@link Getter}-Adapter.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GInput> Filter<GInput> toFilter(final Getter<? super GInput, Boolean> getter) throws NullPointerException {
-		Objects.assertNotNull(getter);
-		return new Filter<GInput>() {
-
-			@Override
-			public boolean accept(final GInput input) {
-				final Boolean result = getter.get(input);
-				return (result != null) && result.booleanValue();
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("toFilter", getter);
-			}
-
-		};
+		return new GetterFilter<>(getter);
 	}
 
 	/** Diese Methode gibt ein {@link Comparable} als Adapter zu einer {@link Number}-{@link Getter Eigenschaft} zurück.<br>
@@ -507,21 +632,16 @@ public class Getters {
 	 * @return {@link Comparable} als {@link Getter}-Adapter.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GInput> Comparable<GInput> toComparable(final Getter<? super GInput, ? extends Number> getter) throws NullPointerException {
-		Objects.assertNotNull(getter);
-		return new Comparable<GInput>() {
+		return new GetterComparable<>(getter);
+	}
 
-			@Override
-			public int compareTo(final GInput input) {
-				final Number result = getter.get(input);
-				return result != null ? result.intValue() : 0;
-			}
+	public static <GValue> Producer<GValue> toProducer(final Getter<Object, ? extends GValue> getter) throws NullPointerException {
+		return Getters.toProducer(getter, null);
+	}
 
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("toFilter", getter);
-			}
-
-		};
+	public static <GInput, GValue> Producer<GValue> toProducer(final Getter<? super GInput, ? extends GValue> getter, final GInput input)
+		throws NullPointerException {
+		return new GetterProducer<>(getter, input);
 	}
 
 }

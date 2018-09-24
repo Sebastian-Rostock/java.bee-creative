@@ -8,6 +8,215 @@ import bee.creative.util.Getters.BaseGetter;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Translators {
 
+	/** Diese Klasse implementiert {@link Translators#neutralTranslator(Class)}. */
+	@SuppressWarnings ("javadoc")
+	public static class NeutralTranslator<GValue> implements Translator<GValue, GValue> {
+
+		public final Class<GValue> valueClass;
+
+		public NeutralTranslator(final Class<GValue> valueClass) throws NullPointerException {
+			this.valueClass = Objects.assertNotNull(valueClass);
+		}
+
+		@Override
+		public boolean isTarget(final Object object) {
+			return this.valueClass.isInstance(object);
+		}
+
+		@Override
+		public boolean isSource(final Object object) {
+			return this.valueClass.isInstance(object);
+		}
+
+		@Override
+		public GValue toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+			return this.valueClass.cast(object);
+		}
+
+		@Override
+		public GValue toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+			return this.valueClass.cast(object);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.valueClass);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Translators#reverseTranslator(Translator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ReverseTranslator<GSource, GTarget> implements Translator<GSource, GTarget> {
+	
+		public final Translator<GTarget, GSource> translator;
+	
+		public ReverseTranslator(final Translator<GTarget, GSource> translator) throws NullPointerException {
+			this.translator = Objects.assertNotNull(translator);
+		}
+	
+		@Override
+		public boolean isTarget(final Object object) {
+			return this.translator.isSource(object);
+		}
+	
+		@Override
+		public boolean isSource(final Object object) {
+			return this.translator.isTarget(object);
+		}
+	
+		@Override
+		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+			return this.translator.toSource(object);
+		}
+	
+		@Override
+		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+			return this.translator.toTarget(object);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator);
+		}
+	
+	}
+
+	/** Diese Klasse implementiert {@link Translators#chainedTranslator(Translator, Translator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ChainedTranslator<GSource, GTarget, GCenter> implements Translator<GSource, GTarget> {
+	
+		public final Translator<GSource, GCenter> translator1;
+	
+		public final Translator<GCenter, GTarget> translator2;
+	
+		public ChainedTranslator(final Translator<GSource, GCenter> translator1, final Translator<GCenter, GTarget> translator2) throws NullPointerException {
+			this.translator1 = Objects.assertNotNull(translator1);
+			this.translator2 = Objects.assertNotNull(translator2);
+		}
+	
+		@Override
+		public boolean isTarget(final Object object) {
+			return this.translator2.isTarget(object);
+		}
+	
+		@Override
+		public boolean isSource(final Object object) {
+			return this.translator1.isSource(object);
+		}
+	
+		@Override
+		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+			return this.translator2.toTarget(this.translator1.toTarget(object));
+		}
+	
+		@Override
+		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+			return this.translator1.toSource(this.translator2.toSource(object));
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator1, this.translator2);
+		}
+	
+	}
+
+	/** Diese Klasse implementiert {@link Translators#compositeTranslator(Class, Class, Getter, Getter)}. */
+	@SuppressWarnings ("javadoc")
+	public static class CompositeTranslator<GSource, GTarget> implements Translator<GSource, GTarget> {
+	
+		public final Class<GSource> sourceClass;
+	
+		public final Class<GTarget> targetClass;
+	
+		public final Getter<GSource, GTarget> sourceGetter;
+	
+		public final Getter<GTarget, GSource> targetGetter;
+	
+		public CompositeTranslator(final Class<GSource> sourceClass, final Class<GTarget> targetClass, final Getter<GSource, GTarget> sourceGetter,
+			final Getter<GTarget, GSource> targetGetter) throws NullPointerException {
+			this.sourceClass = Objects.assertNotNull(sourceClass);
+			this.targetClass = Objects.assertNotNull(targetClass);
+			this.sourceGetter = Objects.assertNotNull(sourceGetter);
+			this.targetGetter = Objects.assertNotNull(targetGetter);
+		}
+	
+		@Override
+		public boolean isTarget(final Object object) {
+			return this.targetClass.isInstance(object);
+		}
+	
+		@Override
+		public boolean isSource(final Object object) {
+			return this.sourceClass.isInstance(object);
+		}
+	
+		@Override
+		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+			return this.sourceGetter.get(this.sourceClass.cast(object));
+		}
+	
+		@Override
+		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+			return this.targetGetter.get(this.targetClass.cast(object));
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.sourceClass, this.targetClass, this.sourceGetter, this.targetGetter);
+		}
+	
+	}
+
+	/** Diese Klasse implementiert {@link Translators#synchronizedTranslator(Object, Translator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class SynchronizedTranslator<GSource, GTarget> implements Translator<GSource, GTarget> {
+	
+		public final Object mutex;
+	
+		public final Translator<GSource, GTarget> translator;
+	
+		public SynchronizedTranslator(final Object mutex, final Translator<GSource, GTarget> translator) throws NullPointerException {
+			this.mutex = mutex != null ? mutex : this;
+			this.translator = Objects.assertNotNull(translator);
+		}
+	
+		@Override
+		public boolean isTarget(final Object object) {
+			synchronized (this.mutex) {
+				return this.translator.isSource(object);
+			}
+		}
+	
+		@Override
+		public boolean isSource(final Object object) {
+			synchronized (this.mutex) {
+				return this.translator.isTarget(object);
+			}
+		}
+	
+		@Override
+		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+			synchronized (this.mutex) {
+				return this.translator.toTarget(object);
+			}
+		}
+	
+		@Override
+		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+			synchronized (this.mutex) {
+				return this.translator.toSource(object);
+			}
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator);
+		}
+	
+	}
+
 	/** Diese Klasse implementiert {@link Translators#toSourceFilter(Translator)}. */
 	@SuppressWarnings ("javadoc")
 	static class SourceFilter implements Filter<Object> {
@@ -94,215 +303,6 @@ public class Translators {
 			return Objects.toInvokeString(this, this.translator);
 		}
 	
-	}
-
-	/** Diese Klasse implementiert {@link Translators#neutralTranslator(Class)}. */
-	@SuppressWarnings ("javadoc")
-	public static class NeutralTranslator<GValue> implements Translator<GValue, GValue> {
-
-		public final Class<GValue> valueClass;
-
-		public NeutralTranslator(final Class<GValue> valueClass) throws NullPointerException {
-			this.valueClass = Objects.assertNotNull(valueClass);
-		}
-
-		@Override
-		public boolean isTarget(final Object object) {
-			return this.valueClass.isInstance(object);
-		}
-
-		@Override
-		public boolean isSource(final Object object) {
-			return this.valueClass.isInstance(object);
-		}
-
-		@Override
-		public GValue toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.valueClass.cast(object);
-		}
-
-		@Override
-		public GValue toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.valueClass.cast(object);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.valueClass);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#reverseTranslator(Translator)}. */
-	@SuppressWarnings ("javadoc")
-	public static class ReverseTranslator<GSource, GTarget> implements Translator<GSource, GTarget> {
-
-		public final Translator<GTarget, GSource> translator;
-
-		public ReverseTranslator(final Translator<GTarget, GSource> translator) throws NullPointerException {
-			this.translator = Objects.assertNotNull(translator);
-		}
-
-		@Override
-		public boolean isTarget(final Object object) {
-			return this.translator.isSource(object);
-		}
-
-		@Override
-		public boolean isSource(final Object object) {
-			return this.translator.isTarget(object);
-		}
-
-		@Override
-		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.translator.toSource(object);
-		}
-
-		@Override
-		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.translator.toTarget(object);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#chainedTranslator(Translator, Translator)}. */
-	@SuppressWarnings ("javadoc")
-	public static class ChainedTranslator<GSource, GTarget, GCenter> implements Translator<GSource, GTarget> {
-
-		public final Translator<GSource, GCenter> translator1;
-
-		public final Translator<GCenter, GTarget> translator2;
-
-		public ChainedTranslator(final Translator<GSource, GCenter> translator1, final Translator<GCenter, GTarget> translator2) throws NullPointerException {
-			this.translator1 = Objects.assertNotNull(translator1);
-			this.translator2 = Objects.assertNotNull(translator2);
-		}
-
-		@Override
-		public boolean isTarget(final Object object) {
-			return this.translator2.isTarget(object);
-		}
-
-		@Override
-		public boolean isSource(final Object object) {
-			return this.translator1.isSource(object);
-		}
-
-		@Override
-		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.translator2.toTarget(this.translator1.toTarget(object));
-		}
-
-		@Override
-		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.translator1.toSource(this.translator2.toSource(object));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator1, this.translator2);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#compositeTranslator(Class, Class, Getter, Getter)}. */
-	@SuppressWarnings ("javadoc")
-	public static class CompositeTranslator<GSource, GTarget> implements Translator<GSource, GTarget> {
-
-		public final Class<GSource> sourceClass;
-
-		public final Class<GTarget> targetClass;
-
-		public final Getter<GSource, GTarget> sourceGetter;
-
-		public final Getter<GTarget, GSource> targetGetter;
-
-		public CompositeTranslator(final Class<GSource> sourceClass, final Class<GTarget> targetClass, final Getter<GSource, GTarget> sourceGetter,
-			final Getter<GTarget, GSource> targetGetter) throws NullPointerException {
-			this.sourceClass = Objects.assertNotNull(sourceClass);
-			this.targetClass = Objects.assertNotNull(targetClass);
-			this.sourceGetter = Objects.assertNotNull(sourceGetter);
-			this.targetGetter = Objects.assertNotNull(targetGetter);
-		}
-
-		@Override
-		public boolean isTarget(final Object object) {
-			return this.targetClass.isInstance(object);
-		}
-
-		@Override
-		public boolean isSource(final Object object) {
-			return this.sourceClass.isInstance(object);
-		}
-
-		@Override
-		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.sourceGetter.get(this.sourceClass.cast(object));
-		}
-
-		@Override
-		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.targetGetter.get(this.targetClass.cast(object));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.sourceClass, this.targetClass, this.sourceGetter, this.targetGetter);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#synchronizedTranslator(Object, Translator)}. */
-	@SuppressWarnings ("javadoc")
-	public static class SynchronizedTranslator<GSource, GTarget> implements Translator<GSource, GTarget> {
-
-		public final Object mutex;
-
-		public final Translator<GSource, GTarget> translator;
-
-		public SynchronizedTranslator(final Object mutex, final Translator<GSource, GTarget> translator) throws NullPointerException {
-			this.mutex = mutex != null ? mutex : this;
-			this.translator = Objects.assertNotNull(translator);
-		}
-
-		@Override
-		public boolean isTarget(final Object object) {
-			synchronized (this.mutex) {
-				return this.translator.isSource(object);
-			}
-		}
-
-		@Override
-		public boolean isSource(final Object object) {
-			synchronized (this.mutex) {
-				return this.translator.isTarget(object);
-			}
-		}
-
-		@Override
-		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			synchronized (this.mutex) {
-				return this.translator.toTarget(object);
-			}
-		}
-
-		@Override
-		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			synchronized (this.mutex) {
-				return this.translator.toSource(object);
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator);
-		}
-
 	}
 
 	/** Diese Methode gibt einen neutralen {@link Translator} zurück, dessen Quellobjekte gleich seinen Zielobjekten sind.<br>

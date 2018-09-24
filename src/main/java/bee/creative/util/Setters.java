@@ -186,11 +186,13 @@ public class Setters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Setters#toConsumer(Setter, Object)} */
+	@SuppressWarnings ("javadoc")
 	public static class SetterConsumer<GValue, GInput> extends BaseConsumer<GValue> {
 
-		public final Setter<? super GInput, ? super GValue> setter;
-
 		public final GInput input;
+
+		public final Setter<? super GInput, ? super GValue> setter;
 
 		public SetterConsumer(final GInput input, final Setter<? super GInput, ? super GValue> setter) {
 			this.input = input;
@@ -346,12 +348,16 @@ public class Setters {
 	 * @param mutex Synchronisationsobjekt.
 	 * @return {@code synchronized}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code setter} bzw. {@code mutex} {@code null} ist. */
-	public static <GInput, GValue> Setter<GInput, GValue> synchronizedSetter(final Setter<? super GInput, ? super GValue> setter, final Object mutex)
+	public static <GInput, GValue> Setter<GInput, GValue> synchronizedSetter(final Object mutex, final Setter<? super GInput, ? super GValue> setter)
 		throws NullPointerException {
 		return new SynchronizedSetter<>(mutex, setter);
 	}
 
-	public static <GInput, GValue> Consumer<GValue> toConsumer(final Setter<? super GInput, ? super GValue> setter) {
+	/** Diese Methode ist eine Abkürzung für {@code toConsumer(setter, null)}.
+	 *
+	 * @see #toConsumer(Setter, Object) */
+	@SuppressWarnings ("javadoc")
+	public static <GValue> Consumer<GValue> toConsumer(final Setter<Object, ? super GValue> setter) {
 		return Setters.toConsumer(setter, null);
 	}
 

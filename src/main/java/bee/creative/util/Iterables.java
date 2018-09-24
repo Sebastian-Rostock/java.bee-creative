@@ -24,19 +24,6 @@ public class Iterables {
 	public static abstract class BaseIterable<GItem> extends BaseObject implements Iterable<GItem>, UseToString {
 	}
 
-	/** Diese Klasse implementiert {@link Iterables#iteratorGetter()}. */
-	@SuppressWarnings ("javadoc")
-	static class IteratorGetter extends BaseGetter<Iterable<?>, Iterator<?>> {
-
-		public static final Getter<?, ?> INSTANCE = new IteratorGetter();
-
-		@Override
-		public Iterator<?> get(final Iterable<?> input) {
-			return input.iterator();
-		}
-
-	}
-
 	/** Diese Klasse implementiert {@link Iterables#emptyIterable()}. */
 	@SuppressWarnings ("javadoc")
 	public static class EmptyIterable extends BaseIterable<Object> {
@@ -184,7 +171,7 @@ public class Iterables {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>iteratorGetter(), this.iterables.iterator()));
+			return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterables.iterator()));
 		}
 
 		@Override
@@ -239,6 +226,19 @@ public class Iterables {
 			return Objects.toInvokeString(this, this.iterable);
 		}
 
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#toIteratorGetter()}. */
+	@SuppressWarnings ("javadoc")
+	static class IteratorGetter extends BaseGetter<Iterable<?>, Iterator<?>> {
+	
+		public static final Getter<?, ?> INSTANCE = new IteratorGetter();
+	
+		@Override
+		public Iterator<?> get(final Iterable<?> input) {
+			return input.iterator();
+		}
+	
 	}
 
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück.
@@ -467,6 +467,10 @@ public class Iterables {
 		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
 	}
 
+	public static <GItem> Iterable<GItem> repeatedIterable(int count, final Iterable<? extends GItem> iterable) throws NullPointerException {
+		return Iterables.chainedIterable(Iterables.itemIterable(iterable, count));
+	}
+
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
 	 * liefert.
 	 *
@@ -530,7 +534,7 @@ public class Iterables {
 	 * @param <GItem> Typ der Elemente.
 	 * @return {@code iterator}-{@link Getter}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> iteratorGetter() {
+	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> toIteratorGetter() {
 		return (Getter<Iterable<? extends GItem>, Iterator<GItem>>)IteratorGetter.INSTANCE;
 	}
 
