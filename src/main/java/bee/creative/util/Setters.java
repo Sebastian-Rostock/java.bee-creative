@@ -188,7 +188,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#toConsumer(Setter, Object)} */
 	@SuppressWarnings ("javadoc")
-	public static class SetterConsumer<GValue, GInput> extends BaseConsumer<GValue> {
+	static class SetterConsumer<GValue, GInput> extends BaseConsumer<GValue> {
 
 		public final GInput input;
 
@@ -340,14 +340,15 @@ public class Setters {
 		return Setters.synchronizedSetter(setter, setter);
 	}
 
-	/** Diese Methode gibt einen {@link Setter} zurück, welcher den gegebenen {@link Setter} via {@code synchronized(mutex)} synchronisiert.
-	 *
+	/** Diese Methode gibt einen {@link Setter} zurück, welcher den gegebenen {@link Setter} via {@code synchronized(mutex)} synchronisiert. Wenn das
+	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Setter} als Synchronisationsobjekt verwendet.
+	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param setter {@link Setter}.
-	 * @param mutex Synchronisationsobjekt.
+	 * @param mutex Synchronisationsobjekt oder {@code null}.
 	 * @return {@code synchronized}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@code setter} bzw. {@code mutex} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
 	public static <GInput, GValue> Setter<GInput, GValue> synchronizedSetter(final Object mutex, final Setter<? super GInput, ? super GValue> setter)
 		throws NullPointerException {
 		return new SynchronizedSetter<>(mutex, setter);
@@ -361,6 +362,13 @@ public class Setters {
 		return Setters.toConsumer(setter, null);
 	}
 
+	/** Diese Methode gibt einen {@link Consumer} zurück, der mit der gegebenen Eingabe an den gegebenen {@link Setter} delegiert.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 * @param setter {@link Setter}.
+	 * @param input Eingabe.
+	 * @return {@link Setter}-{@link Consumer}. */
 	public static <GInput, GValue> Consumer<GValue> toConsumer(final Setter<? super GInput, ? super GValue> setter, final GInput input) {
 		return new SetterConsumer<>(input, setter);
 	}

@@ -4,6 +4,7 @@ import java.util.AbstractCollection;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -11,11 +12,31 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import bee.creative.util.Collections.FilterImplementation2;
 
 /** Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}, {@link Map}, {@link List} und {@link Collection}.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Collections {
+
+	static final class FilterImplementation2<GInput> implements Filter<GInput> {
+	
+		private final Collection<?> collection;
+	
+		private FilterImplementation2(final Collection<?> collection) {
+			this.collection = collection;
+		}
+	
+		@Override
+		public boolean accept(final GInput input) {
+			return this.collection.contains(input);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString("containsFilter", this.collection);
+		}
+	}
 
 	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Vereinigungsmenge der gegebenen {@link Set} zurück.
 	 *
@@ -55,8 +76,8 @@ public class Collections {
 			@Override
 			public Iterator<GItem> iterator() {
 				return Iterators.unmodifiableIterator(items1.size() < items2.size() //
-					? Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(items2)), items1.iterator()), items2.iterator()) //
-					: Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(items1)), items2.iterator()), items1.iterator()) //
+					? Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Collections.containsFilter(items2)), items1.iterator()), items2.iterator()) //
+					: Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Collections.containsFilter(items1)), items2.iterator()), items1.iterator()) //
 				);
 			}
 
@@ -174,8 +195,8 @@ public class Collections {
 			@Override
 			public Iterator<GItem> iterator() {
 				return Iterators.unmodifiableIterator(items1.size() < items2.size() //
-					? Iterators.filteredIterator(Filters.containsFilter(items2), items1.iterator()) //
-					: Iterators.filteredIterator(Filters.containsFilter(items1), items2.iterator()) //
+					? Iterators.filteredIterator(Collections.containsFilter(items2), items1.iterator()) //
+					: Iterators.filteredIterator(Collections.containsFilter(items1), items2.iterator()) //
 				);
 			}
 
@@ -1020,6 +1041,30 @@ public class Collections {
 			}
 
 		};
+	}
+
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
+	 *
+	 * @see #containsFilter(Collection)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param items akzeptierte Eingaben.
+	 * @return {@code contains}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static <GInput> Filter<GInput> containsFilter(final Object... items) throws NullPointerException {
+		if (items.length == 0) return Filters.valueFilter(false);
+		if (items.length == 1) return bee.creative.util.Collections.containsFilter(java.util.Collections.singleton(items[0]));
+		return bee.creative.util.Collections.containsFilter(new HashSet2<>(Arrays.asList(items)));
+	}
+
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code collection.contains(input)}.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param collection {@link Collection} der akzeptierten Eingaben.
+	 * @return {@code contains}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code collection} {@code null} ist. */
+	public static <GInput> Filter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
+		return new Collections.FilterImplementation2<>(collection);
 	}
 
 }

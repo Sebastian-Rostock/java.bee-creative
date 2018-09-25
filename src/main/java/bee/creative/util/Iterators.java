@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import bee.creative.util.Comparables.Items;
+import bee.creative.util.Objects.BaseObject;
 import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert grundlegende {@link Iterator}.
@@ -19,7 +20,13 @@ public class Iterators {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Iterator} mit {@link UseToString}. */
 	@SuppressWarnings ("javadoc")
-	public static abstract class BaseIterator<GItem> implements Iterator<GItem>, UseToString {
+	public static abstract class BaseIterator<GItem> extends BaseObject implements Iterator<GItem>, UseToString {
+
+		@Override
+		public void remove() {
+			throw new IllegalStateException();
+		}
+
 	}
 
 	/** Diese Klasse implementiert {@link Iterators#itemIterator(Object, int)}. */
@@ -111,6 +118,8 @@ public class Iterators {
 	@SuppressWarnings ("javadoc")
 	public static class EmptyIterator extends BaseIterator<Object> {
 
+		public static final Iterator<?> INSTANCE = new EmptyIterator();
+
 		@Override
 		public boolean hasNext() {
 			return false;
@@ -121,21 +130,11 @@ public class Iterators {
 			throw new NoSuchElementException();
 		}
 
-		@Override
-		public void remove() {
-			throw new IllegalStateException();
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this);
-		}
-
 	}
 
 	/** Diese Klasse implementiert {@link Iterators#integerIterator(int)}. */
 	@SuppressWarnings ("javadoc")
-	public static class IntegerIterator implements Iterator<Integer> {
+	public static class IntegerIterator extends BaseIterator<Integer> {
 
 		public final int count;
 
@@ -154,11 +153,6 @@ public class Iterators {
 		@Override
 		public Integer next() {
 			return Integer.valueOf(this.value++);
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -218,7 +212,7 @@ public class Iterators {
 
 		public UniqueIterator(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) {
 			this.collection = collection;
-			this.iterator = Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(collection)), iterator);
+			this.iterator = Iterators.filteredIterator(Filters.negationFilter(Collections.containsFilter(collection)), iterator);
 		}
 
 		@Override
@@ -405,9 +399,6 @@ public class Iterators {
 
 	}
 
-	/** Dieses Feld speichert den leeren {@link Iterator}. */
-	public static final Iterator<?> EMPTY_ITERATOR = new EmptyIterator();
-
 	/** Diese Methode gibt das {@code index}-te Elemente des gegebenen {@link Iterator} zurück.
 	 *
 	 * @param <GItem> Typ des Elements.
@@ -566,25 +557,24 @@ public class Iterators {
 		return true;
 	}
 
-	/** Diese Methode gibt den gegebenen {@link Iterator} oder {@link #EMPTY_ITERATOR} zurück. Wenn {@code iterator} {@code null} ist, wird
-	 * {@link #EMPTY_ITERATOR} geliefert.
+	/** Diese Methode gibt den gegebenen {@link Iterator} zurück. Wenn {@code iterator} {@code null} ist, wird {@link #emptyIterator()} geliefert.
 	 *
 	 * @see Iterators#emptyIterator()
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterator {@link Iterator} oder {@code null}.
-	 * @return {@link Iterator} oder {@link #EMPTY_ITERATOR}. */
+	 * @return {@link Iterator} oder {@link #emptyIterator()}. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterator<GItem> iterator(final Iterator<? extends GItem> iterator) {
 		if (iterator == null) return Iterators.emptyIterator();
 		return (Iterator<GItem>)iterator;
 	}
 
-	/** Diese Methode gibt den {@link Iterator} des gegebenen {@link Iterable} oder {@link #EMPTY_ITERATOR} zurück. Wenn {@code iterable} {@code null} ist, wird
-	 * {@link #EMPTY_ITERATOR} geliefert.
+	/** Diese Methode gibt den {@link Iterator} des gegebenen {@link Iterable} zurück. Wenn {@code iterable} {@code null} ist, wird {@link #emptyIterator()}
+	 * geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable} oder {@code null}.
-	 * @return {@link Iterable#iterator()} oder {@link #EMPTY_ITERATOR}. */
+	 * @return {@link Iterable#iterator()} oder {@link #emptyIterator()}. */
 	public static <GItem> Iterator<GItem> iterator(final Iterable<? extends GItem> iterable) {
 		if (iterable == null) return Iterators.emptyIterator();
 		return Iterators.iterator(iterable.iterator());
@@ -629,10 +619,10 @@ public class Iterators {
 	/** Diese Methode gibt den leeren {@link Iterator} zurück.
 	 *
 	 * @param <GItem> Typ der Elemente.
-	 * @return {@link #EMPTY_ITERATOR}. */
+	 * @return {@code empty}-{@link Iterator}. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterator<GItem> emptyIterator() {
-		return (Iterator<GItem>)Iterators.EMPTY_ITERATOR;
+		return (Iterator<GItem>)EmptyIterator.INSTANCE;
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der die gegebene Anzahl an {@link Integer} ab dem Wert {@code 0} liefert, d.h {@code 0}, {@code 1}, ...,

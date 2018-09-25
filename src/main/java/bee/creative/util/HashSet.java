@@ -16,29 +16,31 @@ import java.util.Set;
  * @param <GItem> Typ der Elemente. */
 public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializable, Cloneable {
 
+	/** Diese Klasse implementiert {@link HashSet#from(Hasher)} */
+	@SuppressWarnings ("javadoc")
 	public static class HasherHashSet<GItem> extends HashSet<GItem> {
 
 		public static final long serialVersionUID = -1097708178888446196L;
 
 		public final Hasher hasher;
 
-		public HasherHashSet(Hasher hasher) throws NullPointerException {
+		public HasherHashSet(final Hasher hasher) throws NullPointerException {
 			this.hasher = Objects.assertNotNull(hasher);
 		}
 
 		@Override
 		protected int customHash(final Object item) {
-			return hasher.hash(item);
+			return this.hasher.hash(item);
 		}
 
 		@Override
 		protected boolean customEqualsKey(final int entryIndex, final Object item) {
-			return hasher.equals(this.items[entryIndex], item);
+			return this.hasher.equals(this.items[entryIndex], item);
 		}
 
 		@Override
 		protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
-			return hasher.equals(this.items[entryIndex], item);
+			return this.hasher.equals(this.items[entryIndex], item);
 		}
 
 	}

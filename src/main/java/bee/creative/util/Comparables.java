@@ -35,6 +35,30 @@ import java.util.List;
  * @author Sebastian Rostock 2011. */
 public class Comparables {
 
+	private static final class NavigatedComparable<GItem, GItem2> implements Comparable<GItem> {
+
+		private final Comparable<? super GItem2> comparable;
+
+		private final Getter<? super GItem, ? extends GItem2> navigator;
+
+		private NavigatedComparable( Getter<? super GItem, ? extends GItem2> navigator, Comparable<? super GItem2> comparable) {
+			Objects.assertNotNull(navigator);
+			Objects.assertNotNull(comparable);
+			this.comparable = comparable;
+			this.navigator = navigator;
+		}
+
+		@Override
+		public int compareTo(final GItem item) {
+			return comparable.compareTo(navigator.get(item));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, navigator, comparable);
+		}
+	}
+
 	/** Diese Schnittstelle definiert eine Methode zum Lesen eines Element zu einem gegebenen Index.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -48,6 +72,64 @@ public class Comparables {
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist. */
 		public GItem get(int index) throws IndexOutOfBoundsException;
 
+	}
+
+	static final class FilterImplementation4<GInput> implements Filter<GInput> {
+	
+		private final Comparable<? super GInput> comparable;
+	
+		private FilterImplementation4(final Comparable<? super GInput> comparable) {
+			this.comparable = comparable;
+		}
+	
+		@Override
+		public boolean accept(final GInput input) {
+			return this.comparable.compareTo(input) >= 0;
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString("lowerFilter", this.comparable);
+		}
+	}
+
+	private static final class HigherFilter<GInput> implements Filter<GInput> {
+	
+		private final Comparable<? super GInput> comparable;
+	
+		private HigherFilter(final Comparable<? super GInput> comparable) {
+			this.comparable = 		Objects.assertNotNull(comparable);
+		}
+	
+		@Override
+		public boolean accept(final GInput input) {
+			return this.comparable.compareTo(input) <= 0;
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString("higherFilter", this.comparable);
+		}
+		
+	}
+
+	private static final class FilterImplementation3<GInput> implements Filter<GInput> {
+	
+		private final Comparable<? super GInput> comparable;
+	
+		private FilterImplementation3(final Comparable<? super GInput> comparable) {
+			this.comparable = comparable;
+		}
+	
+		@Override
+		public boolean accept(final GInput input) {
+			return this.comparable.compareTo(input) == 0;
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString("equalFilter", this.comparable);
+		}
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -104,7 +186,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("itemsSection", items, indices);
+				return Objects.toInvokeString(this, items, indices);
 			}
 
 		};
@@ -136,7 +218,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("itemsSection", items, fromIndex, toIndex);
+				return Objects.toInvokeString(this, items, fromIndex, toIndex);
 			}
 
 		};
@@ -162,7 +244,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("itemComparable", input, comparator);
+				return Objects.toInvokeString(this, input, comparator);
 			}
 
 		};
@@ -186,7 +268,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("defaultComparable", comparable);
+				return Objects.toInvokeString(this, comparable);
 			}
 
 		};
@@ -210,7 +292,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("reverseComparable", comparable);
+				return Objects.toInvokeString(this, comparable);
 			}
 
 		};
@@ -238,7 +320,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("iterableComparable", comparable);
+				return Objects.toInvokeString(this, comparable);
 			}
 
 		};
@@ -268,7 +350,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("chainedComparable", comparable1, comparable2);
+				return Objects.toInvokeString(this, comparable1, comparable2);
 			}
 
 		};
@@ -286,21 +368,7 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparable} {@code null} ist. */
 	public static <GItem, GItem2> Comparable<GItem> navigatedComparable(final Getter<? super GItem, ? extends GItem2> navigator,
 		final Comparable<? super GItem2> comparable) throws NullPointerException {
-		Objects.assertNotNull(navigator);
-		Objects.assertNotNull(comparable);
-		return new Comparable<GItem>() {
-
-			@Override
-			public int compareTo(final GItem item) {
-				return comparable.compareTo(navigator.get(item));
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("navigatedComparable", navigator, comparable);
-			}
-
-		};
+		return new NavigatedComparable<>(navigator,comparable);
 	}
 
 	/** Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten
@@ -664,6 +732,41 @@ public class Comparables {
 		from--;
 		if ((fromIndex <= from) && (from < toIndex) && (comparable.compareTo(items.get(from)) == 0)) return from;
 		return -from - 2;
+	}
+
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) == 0}.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
+	 * @return {@code equal}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
+	public static <GInput> Filter<GInput> toEqualFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+		Objects.assertNotNull(comparable);
+		return new FilterImplementation3<>(comparable);
+	}
+
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) >= 0}.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
+	 * @return {@code lower}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
+	public static <GInput> Filter<GInput> toLowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+		Objects.assertNotNull(comparable);
+		return new FilterImplementation4<>(comparable);
+	}
+
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) <= 0}.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
+	 * @return {@code higher}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
+	public static <GInput> Filter<GInput> toHigherFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+		return new HigherFilter<>(comparable);
 	}
 
 }

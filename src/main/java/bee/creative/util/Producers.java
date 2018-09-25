@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
 import bee.creative.ref.SoftPointer;
+import bee.creative.util.Getters.BaseGetter;
 
 /** Diese Klasse implementiert grundlegende {@link Producer}.
  *
@@ -179,6 +180,28 @@ public class Producers {
 
 	}
 
+	/** Diese Klasse implementiert {@link Producers#toGetter(Producer)}. */
+	@SuppressWarnings ("javadoc")
+	static class ProducerGetter<GValue> extends BaseGetter<Object, GValue> {
+
+		public final Producer<? extends GValue> producer;
+
+		public ProducerGetter(final Producer<? extends GValue> producer) {
+			this.producer = Objects.assertNotNull(producer);
+		}
+
+		@Override
+		public GValue get(final Object input) {
+			return this.producer.get();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.producer);
+		}
+
+	}
+
 	/** Diese Methode gibt einen {@link Producer} zurück, der den gegebenen Datensatz bereitstellt.
 	 *
 	 * @param <GValue> Typ des Datensatzes.
@@ -287,12 +310,18 @@ public class Producers {
 	 * @param mutex Synchronisationsobjekt.
 	 * @return {@code synchronized}-{@link Producer}.
 	 * @throws NullPointerException Wenn der {@code producer} bzw. {@code mutex} {@code null} ist. */
-	public static <GValue> Producer<GValue> synchronizedProducer( final Object mutex,final Producer<? extends GValue> producer) throws NullPointerException {
+	public static <GValue> Producer<GValue> synchronizedProducer(final Object mutex, final Producer<? extends GValue> producer) throws NullPointerException {
 		return new SynchronizedProducer<>(mutex, producer);
 	}
 
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe ignoriert und den Wert des gegebenen {@link Producer} liefert.
+	 * 
+	 * @param <GValue> Typ des Werts.
+	 * @param producer {@link Producer}.
+	 * @return {@link Producer}-{@link Getter}.
+	 * @throws NullPointerException Wenn {@code producer} {@code null} ist. */
 	public static <GValue> Getter<Object, GValue> toGetter(final Producer<? extends GValue> producer) throws NullPointerException {
-		return null;
+		return new ProducerGetter<>(producer);
 	}
 
 }

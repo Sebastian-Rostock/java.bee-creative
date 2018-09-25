@@ -231,14 +231,14 @@ public class Iterables {
 	/** Diese Klasse implementiert {@link Iterables#toIteratorGetter()}. */
 	@SuppressWarnings ("javadoc")
 	static class IteratorGetter extends BaseGetter<Iterable<?>, Iterator<?>> {
-	
+
 		public static final Getter<?, ?> INSTANCE = new IteratorGetter();
-	
+
 		@Override
 		public Iterator<?> get(final Iterable<?> input) {
 			return input.iterator();
 		}
-	
+
 	}
 
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück.
@@ -467,8 +467,18 @@ public class Iterables {
 		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
 	}
 
-	public static <GItem> Iterable<GItem> repeatedIterable(int count, final Iterable<? extends GItem> iterable) throws NullPointerException {
-		return Iterables.chainedIterable(Iterables.itemIterable(iterable, count));
+	/** Diese Methode ist eine Abkürzung für {@code Iterables.chainedIterable(Iterables.itemIterable(iterable, count))} und liefert ein {@link Iterable}, welches
+	 * die gegebene Anzahl Mal über die Elemente des gegebenen {@link Iterable} iteriert.
+	 * 
+	 * @param <GItem> Typ der Elemente.
+	 * @param count Anzahl der Wiederholungen.
+	 * @param iterable {@link Iterable}.
+	 * @return {@code repeated}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
+	public static <GItem> Iterable<GItem> repeatedIterable(int count, final Iterable<? extends GItem> iterable)
+		throws NullPointerException, IllegalArgumentException {
+		return Iterables.chainedIterable(Iterables.itemIterable(Objects.assertNotNull(iterable), count));
 	}
 
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}

@@ -1,12 +1,11 @@
 package bee.creative.util;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
 import bee.creative.ref.SoftPointer;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert grundlegende {@link Filter}.
  *
@@ -14,298 +13,217 @@ import bee.creative.ref.SoftPointer;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Filters {
 
-	private static final class FilterImplementation14 implements Filter<Object> {
+	public static class NullFilter extends BaseObject implements Filter<Object> {
+
+		public static final Filter<?> INSTANCE = new NullFilter();
 
 		@Override
 		public boolean accept(final Object input) {
 			return input != null;
 		}
 
-		@Override
-		public String toString() {
-			return "NULL_FILTER";
-		}
 	}
 
-	private static final class FilterImplementation13 implements Filter<Object> {
+	public static class ValueFilter implements Filter<Object> {
+
+		public static final Filter<?> TRUE = new ValueFilter(true);
+
+		public static final Filter<?> FALSE = new ValueFilter(false);
+
+		public final boolean value;
+
+		public ValueFilter(final boolean value) {
+			this.value = value;
+		}
 
 		@Override
 		public boolean accept(final Object input) {
-			return false;
+			return this.value;
 		}
 
 		@Override
 		public String toString() {
-			return "REJECT_FILTER";
+			return Objects.toInvokeString(this, this.value);
 		}
+
 	}
 
-	private static final class FilterImplementation12 implements Filter<Object> {
+	public static class ClassFilter<GInput> implements Filter<GInput> {
 
-		@Override
-		public boolean accept(final Object input) {
-			return true;
-		}
+		public final Class<?> inputClass;
 
-		@Override
-		public String toString() {
-			return "ACCEPT_FILTER";
-		}
-	}
-
-	private static final class GetterImplementation<GInput> implements Getter<GInput, Boolean> {
-
-		private final Filter<? super GInput> filter;
-
-		private GetterImplementation(Filter<? super GInput> filter) {
-			this.filter = filter;
-		}
-
-		@Override
-		public Boolean get(final GInput input) {
-			return Boolean.valueOf(filter.accept(input));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString("toGetter", filter);
-		}
-	}
-
-	private static final class FilterImplementation11<GInput> implements Filter<GInput> {
-
-		private final Class<?> inputType;
-
-		private FilterImplementation11(Class<?> inputType) {
-			this.inputType = inputType;
+		public ClassFilter(final Class<?> inputClass) {
+			this.inputClass = Objects.assertNotNull(inputClass);
 		}
 
 		@Override
 		public boolean accept(final GInput input) {
-			return inputType.isInstance(input);
+			return this.inputClass.isInstance(input);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("typeFilter", inputType);
+			return Objects.toInvokeString(this, this.inputClass);
 		}
+
 	}
 
-	private static final class FilterImplementation10<GInput> implements Filter<GInput> {
+	public static class NegationFilter<GInput> implements Filter<GInput> {
 
-		private final Filter<? super GInput> filter2;
+		public final Filter<? super GInput> filter;
 
-		private final Filter<? super GInput> filter1;
-
-		private FilterImplementation10(Filter<? super GInput> filter2, Filter<? super GInput> filter1) {
-			this.filter2 = filter2;
-			this.filter1 = filter1;
+		public NegationFilter(final Filter<? super GInput> filter) {
+			this.filter = Objects.assertNotNull(filter);
 		}
 
 		@Override
 		public boolean accept(final GInput input) {
-			return filter1.accept(input) == filter2.accept(input);
+			return !this.filter.accept(input);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("equivalenceFilter", filter1, filter2);
+			return Objects.toInvokeString(this, this.filter);
 		}
+
 	}
 
-	private static final class FilterImplementation9<GInput> implements Filter<GInput> {
+	public static class NavigatedFilter<GInput, GOutput> implements Filter<GInput> {
 
-		private final Filter<? super GInput> filter1;
+		public final Getter<? super GInput, ? extends GOutput> navigator;
 
-		private final Filter<? super GInput> filter2;
+		public final Filter<? super GOutput> filter;
 
-		private FilterImplementation9(Filter<? super GInput> filter1, Filter<? super GInput> filter2) {
-			this.filter1 = filter1;
-			this.filter2 = filter2;
+		public NavigatedFilter(final Getter<? super GInput, ? extends GOutput> navigator, final Filter<? super GOutput> filter) {
+			this.navigator = Objects.assertNotNull(navigator);
+			this.filter = Objects.assertNotNull(filter);
 		}
 
 		@Override
 		public boolean accept(final GInput input) {
-			return filter1.accept(input) && filter2.accept(input);
+			return this.filter.accept(this.navigator.get(input));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("conjunctionFilter", filter1, filter2);
+			return Objects.toInvokeString(this, this.navigator, this.filter);
 		}
+
 	}
 
-	private static final class FilterImplementation8<GInput> implements Filter<GInput> {
+	public static class DisjunctionFilter<GInput> implements Filter<GInput> {
 
-		private final Filter<? super GInput> filter2;
+		public final Filter<? super GInput> filter2;
 
-		private final Filter<? super GInput> filter1;
+		public final Filter<? super GInput> filter1;
 
-		private FilterImplementation8(Filter<? super GInput> filter2, Filter<? super GInput> filter1) {
-			this.filter2 = filter2;
-			this.filter1 = filter1;
+		public DisjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
+			this.filter1 = Objects.assertNotNull(filter1);
+			this.filter2 = Objects.assertNotNull(filter2);
 		}
 
 		@Override
 		public boolean accept(final GInput input) {
-			return filter1.accept(input) || filter2.accept(input);
+			return this.filter1.accept(input) || this.filter2.accept(input);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("disjunctionFilter", filter1, filter2);
+			return Objects.toInvokeString(this, this.filter1, this.filter2);
 		}
+
 	}
 
-	private static final class FilterImplementation7<GInput> implements Filter<GInput> {
+	public static class ConjunctionFilter<GInput> implements Filter<GInput> {
 
-		private final Filter<? super GInput> filter;
+		public final Filter<? super GInput> filter1;
 
-		private FilterImplementation7(Filter<? super GInput> filter) {
-			this.filter = filter;
+		public final Filter<? super GInput> filter2;
+
+		public ConjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
+			this.filter1 = Objects.assertNotNull(filter1);
+			this.filter2 = Objects.assertNotNull(filter2);
 		}
 
 		@Override
 		public boolean accept(final GInput input) {
-			return !filter.accept(input);
+			return this.filter1.accept(input) && this.filter2.accept(input);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("negationFilter", filter);
+			return Objects.toInvokeString(this, this.filter1, this.filter2);
 		}
+
 	}
 
-	private static final class FilterImplementation6<GInput,GOutput> implements Filter<GInput> {
+	public static class EquivalenceFilter<GInput> implements Filter<GInput> {
 
-		private final Getter<? super GInput, ? extends GOutput> navigator;
+		public final Filter<? super GInput> filter1;
 
-		private final Filter<? super GOutput> filter;
+		public final Filter<? super GInput> filter2;
 
-		private FilterImplementation6(Getter<? super GInput, ? extends GOutput> navigator, Filter<? super GOutput> filter) {
-			this.navigator = navigator;
-			this.filter = filter;
+		public EquivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
+			this.filter1 = Objects.assertNotNull(filter1);
+			this.filter2 = Objects.assertNotNull(filter2);
 		}
 
 		@Override
 		public boolean accept(final GInput input) {
-			return filter.accept(navigator.get(input));
+			return this.filter1.accept(input) == this.filter2.accept(input);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("navigatedFilter", navigator, filter);
+			return Objects.toInvokeString(this, this.filter1, this.filter2);
 		}
+
 	}
 
-	private static final class FilterImplementation5<GInput> implements Filter<GInput> {
+	public static class SynchronizedFilter<GInput> implements Filter<GInput> {
 
-		private final Comparable<? super GInput> comparable;
+		public final Object mutex;
 
-		private FilterImplementation5(Comparable<? super GInput> comparable) {
-			this.comparable = comparable;
+		public final Filter<? super GInput> filter;
+
+		public SynchronizedFilter(final Object mutex, final Filter<? super GInput> filter) {
+			this.mutex = mutex != null ? mutex : this;
+			this.filter = Objects.assertNotNull(filter);
 		}
 
 		@Override
 		public boolean accept(final GInput input) {
-			return comparable.compareTo(input) <= 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString("higherFilter", comparable);
-		}
-	}
-
-	private static final class FilterImplementation4<GInput> implements Filter<GInput> {
-
-		private final Comparable<? super GInput> comparable;
-
-		private FilterImplementation4(Comparable<? super GInput> comparable) {
-			this.comparable = comparable;
-		}
-
-		@Override
-		public boolean accept(final GInput input) {
-			return comparable.compareTo(input) >= 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString("lowerFilter", comparable);
-		}
-	}
-
-	private static final class FilterImplementation3<GInput> implements Filter<GInput> {
-
-		private final Comparable<? super GInput> comparable;
-
-		private FilterImplementation3(Comparable<? super GInput> comparable) {
-			this.comparable = comparable;
-		}
-
-		@Override
-		public boolean accept(final GInput input) {
-			return comparable.compareTo(input) == 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString("equalFilter", comparable);
-		}
-	}
-
-	private static final class FilterImplementation2<GInput> implements Filter<GInput> {
-
-		private final Collection<?> collection;
-
-		private FilterImplementation2(Collection<?> collection) {
-			this.collection = collection;
-		}
-
-		@Override
-		public boolean accept(final GInput input) {
-			return collection.contains(input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString("containsFilter", collection);
-		}
-	}
-
-	private static final class FilterImplementation<GInput> implements Filter<GInput> {
-
-		private final Filter<? super GInput> filter;
-
-		private final Object mutex;
-
-		private FilterImplementation(Filter<? super GInput> filter, Object mutex) {
-			this.mutex = mutex!=null ? mutex : this;
-			this.filter = 		Objects.assertNotNull(filter);
-		}
-
-		@Override
-		public boolean accept(final GInput input) {
-			synchronized (mutex) {
-				return filter.accept(input);
+			synchronized (this.mutex) {
+				return this.filter.accept(input);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("synchronizedFilter", filter);
+			return Objects.toInvokeString(this, this.filter);
 		}
+
 	}
 
-	/** Dieses Feld speichert den {@link Filter}, der außer {@code null} alle Eingaben akzeptiert. */
-	public static final Filter<?> NULL_FILTER = new FilterImplementation14();
+	static class FilterGetter<GInput> implements Getter<GInput, Boolean> {
 
-	/** Dieses Feld speichert den {@link Filter}, der jede Eingabe ablehnt. */
-	public static final Filter<Object> REJECT_FILTER = new FilterImplementation13();
+		public final Filter<? super GInput> filter;
 
-	/** Dieses Feld speichert den {@link Filter}, der jede Eingabe akzeptiert. */
-	public static final Filter<Object> ACCEPT_FILTER = new FilterImplementation12();
+		public FilterGetter(final Filter<? super GInput> filter) {
+			this.filter = filter;
+		}
+
+		@Override
+		public Boolean get(final GInput input) {
+			return Boolean.valueOf(this.filter.accept(input));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.filter);
+		}
+
+	}
 
 	/** Diese Methode gibt den {@link Filter} zurück, der alle Eingaben akzeptiert, die nicht {@code null} sind.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code input != null}.
@@ -314,39 +232,28 @@ public class Filters {
 	 * @return {@link #NULL_FILTER}. */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Filter<GInput> nullFilter() {
-		return (Filter<GInput>)Filters.NULL_FILTER;
+		return (Filter<GInput>)NullFilter.INSTANCE;
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, der nur die Eingaben akzeptiert, die Instanzen der gegebenen {@link Class} oder ihrer Nachfahren sind.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code inputType.isInstance(input)}.
 	 *
 	 * @param <GInput> Typ der Eingabe.
-	 * @param inputType {@link Class} der akzeptierten Eingaben.
+	 * @param inputClass {@link Class} der akzeptierten Eingaben.
 	 * @return {@code type}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code inputType} {@code null} ist. */
-	public static <GInput> Filter<GInput> classFilter(final Class<?> inputType) throws NullPointerException {
-		Objects.assertNotNull(inputType);
-		return new FilterImplementation11<GInput>(inputType);
+	public static <GInput> Filter<GInput> classFilter(final Class<?> inputClass) throws NullPointerException {
+		return new ClassFilter<>(inputClass);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, der jede Eingabe ablehnt.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code false}.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @return {@link #REJECT_FILTER}. */
+	/** Diese Methode gibt einen {@link Filter} zurück, der stets die gegebene Akzeptanz liefert.
+	 * 
+	 * @param <GInput> Typ der ignorierten Eingabe.
+	 * @param value Akzeptanz.
+	 * @return {@code value}-{@link Filter}. */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Filter<GInput> rejectFilter() {
-		return (Filter<GInput>)Filters.REJECT_FILTER;
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, der jede Eingabe akzeptiert.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code true}.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @return {@link #ACCEPT_FILTER}. */
-	@SuppressWarnings ("unchecked")
-	public static <GInput> Filter<GInput> acceptFilter() {
-		return (Filter<GInput>)Filters.ACCEPT_FILTER;
+	public static <GInput> Filter<GInput> valueFilter(final boolean value) {
+		return (Filter<GInput>)(value ? ValueFilter.TRUE : ValueFilter.FALSE);
 	}
 
 	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
@@ -380,66 +287,6 @@ public class Filters {
 		return Getters.toFilter(Getters.bufferedGetter(limit, mode, Pointers.HARD, Filters.toGetter(filter)));
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
-	 *
-	 * @see #containsFilter(Collection)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param items akzeptierte Eingaben.
-	 * @return {@code contains}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static <GInput> Filter<GInput> containsFilter(final Object... items) throws NullPointerException {
-		if (items.length == 0) return Filters.rejectFilter();
-		if (items.length == 1) return Filters.containsFilter(Collections.singleton(items[0]));
-		return Filters.containsFilter(new HashSet2<>(Arrays.asList(items)));
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code collection.contains(input)}.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param collection {@link Collection} der akzeptierten Eingaben.
-	 * @return {@code contains}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code collection} {@code null} ist. */
-	public static <GInput> Filter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
-		return new FilterImplementation2<GInput>(collection);
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) == 0}.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code equal}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GInput> Filter<GInput> equalFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		Objects.assertNotNull(comparable);
-		return new FilterImplementation3<GInput>(comparable);
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) >= 0}.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code lower}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GInput> Filter<GInput> lowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		Objects.assertNotNull(comparable);
-		return new FilterImplementation4<GInput>(comparable);
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) <= 0}.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code higher}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GInput> Filter<GInput> higherFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		Objects.assertNotNull(comparable);
-		return new FilterImplementation5<GInput>(comparable);
-	}
-
 	/** Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Getter} zur Eingabe des gegebenen
 	 * {@link Filter} navigiert.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(navigator.get(input))}.
@@ -452,9 +299,7 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code filter} {@code null} ist. */
 	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Getter<? super GInput, ? extends GOutput> navigator,
 		final Filter<? super GOutput> filter) throws NullPointerException {
-		Objects.assertNotNull(navigator);
-		Objects.assertNotNull(filter);
-		return new FilterImplementation6< >(navigator, filter);
+		return new NavigatedFilter<>(navigator, filter);
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden.<br>
@@ -465,8 +310,7 @@ public class Filters {
 	 * @return {@code negation}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
 	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		Objects.assertNotNull(filter);
-		return new FilterImplementation7<GInput>(filter);
+		return new NegationFilter<>(filter);
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von einem der gegebenen {@link Filter} akzeptiert werden <br>
@@ -479,9 +323,7 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist. */
 	public static <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		Objects.assertNotNull(filter1);
-		Objects.assertNotNull(filter2);
-		return new FilterImplementation8<GInput>(filter2, filter1);
+		return new DisjunctionFilter<>(filter1, filter2);
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert werden <br>
@@ -494,9 +336,7 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist. */
 	public static <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		Objects.assertNotNull(filter1);
-		Objects.assertNotNull(filter2);
-		return new FilterImplementation9<GInput>(filter1, filter2);
+		return new ConjunctionFilter<>(filter1, filter2);
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert bzw. abgelehnt
@@ -510,9 +350,7 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist. */
 	public static <GInput> Filter<GInput> equivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		Objects.assertNotNull(filter1);
-		Objects.assertNotNull(filter2);
-		return new FilterImplementation10<GInput>(filter2, filter1);
+		return new EquivalenceFilter<>(filter1, filter2);
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, der den gegebenen {@link Filter} über {@code synchronized(filter)} synchronisiert.
@@ -521,8 +359,8 @@ public class Filters {
 	 * @param filter {@link Filter}.
 	 * @return {@code synchronized}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
-	public static <GInput> Filter<GInput> synchronizedFilter( final Object mutex,final Filter<? super GInput> filter) throws NullPointerException {
-		return new FilterImplementation<>(filter, mutex);
+	public static <GInput> Filter<GInput> synchronizedFilter(final Object mutex, final Filter<? super GInput> filter) throws NullPointerException {
+		return new SynchronizedFilter<>(mutex, filter);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} als Adapter zu einem {@link Filter} zurück.<br>
@@ -533,8 +371,7 @@ public class Filters {
 	 * @return {@link Filter}-Adapter.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
 	public static <GInput> Getter<GInput, Boolean> toGetter(final Filter<? super GInput> filter) throws NullPointerException {
-		filter.getClass();
-		return new GetterImplementation<GInput>(filter);
+		return new FilterGetter<>(filter);
 	}
 
 }
