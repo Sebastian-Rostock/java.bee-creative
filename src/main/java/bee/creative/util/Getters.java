@@ -22,7 +22,9 @@ public class Getters {
 	public static abstract class BaseGetter<GInput, GValue> extends BaseObject implements Getter<GInput, GValue> {
 	}
 
-	static class NeutralGetter extends BaseGetter<Object, Object> {
+	/** Diese Klasse implementiert {@link Getters#neutralGetter()}. */
+	@SuppressWarnings ("javadoc")
+	public static class NeutralGetter extends BaseGetter<Object, Object> {
 
 		public static final Getter<?, ?> INSTANCE = new NeutralGetter();
 
@@ -33,6 +35,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#nativeGetter(Method)}. */
+	@SuppressWarnings ("javadoc")
 	public static class MethodGetter<GInput, GOutput> implements Getter<GInput, GOutput> {
 
 		public final Method method;
@@ -52,12 +56,15 @@ public class Getters {
 		}
 
 		@Override
+		@SuppressWarnings ("unchecked")
 		public GOutput get(final GInput input) {
 			try {
-				@SuppressWarnings ("unchecked")
-				final GOutput result = Modifier.isStatic(this.method.getModifiers()) //
-					? (GOutput)this.method.invoke(null, input) //
-					: (GOutput)this.method.invoke(input);
+				final GOutput result;
+				if (Modifier.isStatic(this.method.getModifiers())) {
+					result = (GOutput)this.method.invoke(null, input);
+				} else {
+					result = (GOutput)this.method.invoke(input);
+				}
 				return result;
 			} catch (final IllegalAccessException | InvocationTargetException cause) {
 				throw new IllegalArgumentException(cause);
@@ -71,6 +78,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#nativeGetter(Constructor)}. */
+	@SuppressWarnings ("javadoc")
 	public static class ConstructorGetter<GInput, GOutput> implements Getter<GInput, GOutput> {
 
 		public final Constructor<?> constructor;
@@ -103,6 +112,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#defaultGetter(Getter, Object)}. */
+	@SuppressWarnings ("javadoc")
 	public static class DefaultGetter<GInput, GValue> implements Getter<GInput, GValue> {
 
 		public final GValue value;
@@ -127,6 +138,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#bufferedGetter(int, int, int, Getter)}. */
+	@SuppressWarnings ("javadoc")
 	public static class BufferedGetter<GInput, GValue> implements Getter<GInput, GValue> {
 
 		public final int limit;
@@ -191,6 +204,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#navigatedGetter(Getter, Getter)}. */
+	@SuppressWarnings ("javadoc")
 	public static class NavigatedGetter<GInput, GValue, GOutput> implements Getter<GInput, GOutput> {
 
 		public final Getter<? super GInput, ? extends GValue> navigator;
@@ -214,6 +229,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#aggregatedGetter(Getter, Getter, Object, Object)}. */
+	@SuppressWarnings ("javadoc")
 	public static class AggregatedGetter<GItem, GValue, GValue2> implements Getter<Iterable<? extends GItem>, GValue> {
 
 		public final Getter<? super GItem, GValue2> getter;
@@ -254,6 +271,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#conditionalGetter(Filter, Getter, Getter)}. */
+	@SuppressWarnings ("javadoc")
 	public static class ConditionalGetter<GInput, GOutput> implements Getter<GInput, GOutput> {
 
 		public final Filter<? super GInput> condition;
@@ -282,6 +301,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#synchronizedGetter(Object, Getter)}. */
+	@SuppressWarnings ("javadoc")
 	public static class SynchronizedGetter<GInput, GValue> implements Getter<GInput, GValue> {
 
 		public final Object mutex;
@@ -289,7 +310,7 @@ public class Getters {
 		public final Getter<? super GInput, ? extends GValue> getter;
 
 		public SynchronizedGetter(final Getter<? super GInput, ? extends GValue> getter, final Object mutex) {
-			this.mutex = mutex != null ? mutex : null;
+			this.mutex = mutex != null ? mutex : this;
 			this.getter = Objects.assertNotNull(getter);
 		}
 
@@ -307,6 +328,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#toFilter(Getter)}. */
+	@SuppressWarnings ("javadoc")
 	static class GetterFilter<GInput> implements Filter<GInput> {
 
 		public final Getter<? super GInput, Boolean> getter;
@@ -328,15 +351,17 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#toProducer(Getter, Object)}. */
+	@SuppressWarnings ("javadoc")
 	static class GetterProducer<GInput, GValue> implements Producer<GValue> {
-
-		public final Getter<? super GInput, ? extends GValue> getter;
 
 		public final GInput input;
 
+		public final Getter<? super GInput, ? extends GValue> getter;
+
 		public GetterProducer(final Getter<? super GInput, ? extends GValue> getter, final GInput input) {
-			this.getter = getter;
 			this.input = input;
+			this.getter = Objects.assertNotNull(getter);
 		}
 
 		@Override
@@ -351,6 +376,8 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#toComparable(Getter)}. */
+	@SuppressWarnings ("javadoc")
 	static class GetterComparable<GInput> implements Comparable<GInput> {
 
 		public final Getter<? super GInput, ? extends Number> getter;
@@ -414,6 +441,7 @@ public class Getters {
 		return Fields.nativeField(field);
 	}
 
+	// TODO doku
 	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
 	 * Bei einer Klassenmethode liefert der erzeugte {@link Getter} für eine Eingabe {@code input} {@code method.invoke(null, input)}, bei einer Objektmethode
 	 * liefert er dagegen {@code method.invoke(input)}.
@@ -448,7 +476,7 @@ public class Getters {
 	/** Diese Methode gibt den neutralen {@link Getter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
 	 *
 	 * @param <GInput> Typ der Ein-/Ausgabe.
-	 * @return {@link #NEUTRAL_GETTER}. */
+	 * @return {@code neutral}-{@link Getter}. */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Getter<GInput, GInput> neutralGetter() {
 		return (Getter<GInput, GInput>)NeutralGetter.INSTANCE;
@@ -635,10 +663,22 @@ public class Getters {
 		return new GetterComparable<>(getter);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code Getters.toProducer(getter, null)}.
+	 *
+	 * @see #toProducer(Getter, Object) */
+	@SuppressWarnings ("javadoc")
 	public static <GValue> Producer<GValue> toProducer(final Getter<Object, ? extends GValue> getter) throws NullPointerException {
 		return Getters.toProducer(getter, null);
 	}
 
+	/** Diese Methode gibt einen {@link Producer} zurück, der mit der gegebenen Eingabe an den gegebenen {@link Getter} delegiert.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 * @param getter {@link Getter}.
+	 * @param input Eingabe.
+	 * @return {@link Getter}-{@link Producer}.
+	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GInput, GValue> Producer<GValue> toProducer(final Getter<? super GInput, ? extends GValue> getter, final GInput input)
 		throws NullPointerException {
 		return new GetterProducer<>(getter, input);

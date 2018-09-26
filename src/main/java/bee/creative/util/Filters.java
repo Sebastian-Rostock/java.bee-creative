@@ -229,7 +229,7 @@ public class Filters {
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code input != null}.
 	 *
 	 * @param <GInput> Typ der Eingabe.
-	 * @return {@link #NULL_FILTER}. */
+	 * @return {@code null}-{@link Filter}. */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Filter<GInput> nullFilter() {
 		return (Filter<GInput>)NullFilter.INSTANCE;

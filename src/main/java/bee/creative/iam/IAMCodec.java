@@ -11,7 +11,6 @@ import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
 import bee.creative.io.IO;
 import bee.creative.util.Builders;
-import bee.creative.util.Builders.MapBuilder;
 
 /** Diese Klasse implementiert den Konfigurator, mit welchem ein {@link IAMIndex} aus bzw. in unterschiedliche Datenformate gelesen bzw. geschieben werden kann.
  * Dabei können {@link #getSourceData() Eingabedaten} unterschiedlicher {@link #getSourceFormat() Eingabeformate} direkt in {@link #getTargetData()
@@ -167,7 +166,7 @@ public final class IAMCodec {
 		@SuppressWarnings ("javadoc")
 		static final Map<?, IAMFindMode> values = Builders.MapBuilder.<Object, IAMFindMode>forHashMap() //
 			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
-			.put(IAMMapping.MODE_HASHED, SORTED).put("H", HASHED).put("HASHED", HASHED) //
+			.put(IAMMapping.MODE_HASHED, HASHED).put("H", HASHED).put("HASHED", HASHED) //
 			.put(IAMMapping.MODE_SORTED, SORTED).put("S", SORTED).put("SORTED", SORTED) //
 			.get();
 

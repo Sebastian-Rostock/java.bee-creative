@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.Map;
 import bee.creative.util.Consumers.BaseConsumer;
@@ -19,20 +20,32 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#nativeSetter(Method)} */
 	@SuppressWarnings ("javadoc")
-	public static class NativeSetter<GInput, GValue> implements Setter<GInput, GValue> {
+	public static class MethodSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
 		public final Method method;
 
-		public NativeSetter(final Method method) {
-			if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
-			method.setAccessible(true);
+		public MethodSetter(final Method method) {
+			try {
+				method.setAccessible(true);
+			} catch (final SecurityException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+			if (Modifier.isStatic(method.getModifiers())) {
+				if (method.getParameterTypes().length != 2) throw new IllegalArgumentException();
+			} else {
+				if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
+			}
 			this.method = method;
 		}
 
 		@Override
 		public void set(final GInput input, final GValue value) {
 			try {
-				this.method.invoke(input, value);
+				if (Modifier.isStatic(this.method.getModifiers())) {
+					this.method.invoke(null, input, value);
+				} else {
+					this.method.invoke(input, value);
+				}
 			} catch (IllegalAccessException | InvocationTargetException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -251,7 +264,7 @@ public class Setters {
 	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
 	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final java.lang.reflect.Method method)
 		throws NullPointerException, IllegalArgumentException {
-		return new NativeSetter<>(method);
+		return new MethodSetter<>(method);
 	}
 
 	/** Diese Methode einen {@link Setter} zurück, der seine Eingabe nur dann an den gegebenen {@link Setter} delegiert, wenn diese nicht {@code null} ist.
@@ -342,7 +355,7 @@ public class Setters {
 
 	/** Diese Methode gibt einen {@link Setter} zurück, welcher den gegebenen {@link Setter} via {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Setter} als Synchronisationsobjekt verwendet.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param setter {@link Setter}.
@@ -363,12 +376,13 @@ public class Setters {
 	}
 
 	/** Diese Methode gibt einen {@link Consumer} zurück, der mit der gegebenen Eingabe an den gegebenen {@link Setter} delegiert.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts.
 	 * @param setter {@link Setter}.
 	 * @param input Eingabe.
-	 * @return {@link Setter}-{@link Consumer}. */
+	 * @return {@link Setter}-{@link Consumer}.
+	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
 	public static <GInput, GValue> Consumer<GValue> toConsumer(final Setter<? super GInput, ? super GValue> setter, final GInput input) {
 		return new SetterConsumer<>(input, setter);
 	}
