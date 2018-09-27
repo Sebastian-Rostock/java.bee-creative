@@ -62,10 +62,10 @@ public class Setters {
 	@SuppressWarnings ("javadoc")
 	public static class DefaultSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
-		public final Setter<? super GInput, GValue> setter;
+		public final Setter<? super GInput, ? super GValue> setter;
 
-		public DefaultSetter(final Setter<? super GInput, GValue> setter) {
-			this.setter = Objects.assertNotNull(setter);
+		public DefaultSetter(final Setter<? super GInput, ? super GValue> setter) {
+			this.setter = Objects.notNull(setter);
 		}
 
 		@Override
@@ -87,11 +87,11 @@ public class Setters {
 
 		public final Getter<? super GInput, ? extends GInput2> navigator;
 
-		public final Setter<? super GInput2, GValue> setter;
+		public final Setter<? super GInput2, ? super GValue> setter;
 
-		public NavigatedSetter(final Getter<? super GInput, ? extends GInput2> navigator, final Setter<? super GInput2, GValue> setter) {
-			this.navigator = Objects.assertNotNull(navigator);
-			this.setter = Objects.assertNotNull(setter);
+		public NavigatedSetter(final Getter<? super GInput, ? extends GInput2> navigator, final Setter<? super GInput2, ? super GValue> setter) {
+			this.navigator = Objects.notNull(navigator);
+			this.setter = Objects.notNull(setter);
 		}
 
 		@Override
@@ -102,6 +102,31 @@ public class Setters {
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.navigator, this.setter);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Setters#translatedSetter(Getter, Setter)} */
+	@SuppressWarnings ("javadoc")
+	public static class TranslatedSetter<GInput, GSource, GTarget> implements Setter<GInput, GTarget> {
+
+		public final Setter<? super GInput, ? super GSource> setter;
+
+		public final Getter<? super GTarget, ? extends GSource> toSource;
+
+		public TranslatedSetter(final Setter<? super GInput, ? super GSource> setter, final Getter<? super GTarget, ? extends GSource> toSource) {
+			this.setter = Objects.notNull(setter);
+			this.toSource = Objects.notNull(toSource);
+		}
+
+		@Override
+		public void set(final GInput input, final GTarget value) {
+			this.setter.set(input, this.toSource.get(value));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.setter, this.toSource);
 		}
 
 	}
@@ -118,9 +143,9 @@ public class Setters {
 
 		public ConditionalSetter(final Filter<? super GInput> condition, final Setter<? super GInput, ? super GValue> acceptSetter,
 			final Setter<? super GInput, ? super GValue> rejectSetter) {
-			this.condition = Objects.assertNotNull(condition);
-			this.accept = Objects.assertNotNull(acceptSetter);
-			this.reject = Objects.assertNotNull(rejectSetter);
+			this.condition = Objects.notNull(condition);
+			this.accept = Objects.notNull(acceptSetter);
+			this.reject = Objects.notNull(rejectSetter);
 		}
 
 		@Override
@@ -148,8 +173,8 @@ public class Setters {
 		public final Getter<? super GValue, ? extends GValue2> format;
 
 		public AggregatedSetter(final Setter<? super GItem, GValue2> setter, final Getter<? super GValue, ? extends GValue2> format) {
-			Objects.assertNotNull(setter);
-			Objects.assertNotNull(format);
+			Objects.notNull(setter);
+			Objects.notNull(format);
 			this.setter = setter;
 			this.format = format;
 		}
@@ -181,8 +206,8 @@ public class Setters {
 		public final Setter<? super GInput, ? super GValue> setter;
 
 		public SynchronizedSetter(final Object mutex, final Setter<? super GInput, ? super GValue> setter) {
-			this.mutex = Objects.assertNotNull(mutex);
-			this.setter = Objects.assertNotNull(setter);
+			this.mutex = Objects.notNull(mutex, this);
+			this.setter = Objects.notNull(setter);
 		}
 
 		@Override
@@ -209,7 +234,7 @@ public class Setters {
 
 		public SetterConsumer(final GInput input, final Setter<? super GInput, ? super GValue> setter) {
 			this.input = input;
-			this.setter = Objects.assertNotNull(setter);
+			this.setter = Objects.notNull(setter);
 		}
 
 		@Override
@@ -251,9 +276,9 @@ public class Setters {
 		return Fields.nativeField(field);
 	}
 
-	// TODO satic mit (null, inp, val)
 	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
-	 * Für eine Eingabe {@code input} erfolgt das Schreiben des Werts {@code value} über {@code method.invoke(input, value)}.
+	 * Bei einer Klassenmethode erfolgt das Schreiben des Werts {@code value} für eine Eingabe {@code input} über {@code method.invoke(null, input, value)}, bei
+	 * einer Objektmethode hingegen über {@code method.invoke(input, value)}.
 	 *
 	 * @see java.lang.reflect.Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
@@ -295,8 +320,13 @@ public class Setters {
 	 * @return {@code navigated}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code setter} {@code null} ist. */
 	public static <GInput, GInput2, GValue> Setter<GInput, GValue> navigatedSetter(final Getter<? super GInput, ? extends GInput2> navigator,
-		final Setter<? super GInput2, GValue> setter) throws NullPointerException {
+		final Setter<? super GInput2, ? super GValue> setter) throws NullPointerException {
 		return new NavigatedSetter<>(navigator, setter);
+	}
+
+	public static <GInput, GSource, GTarget> Setter<GInput, GTarget> translatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
+		final Setter<? super GInput, ? super GSource> setter) throws NullPointerException {
+		return new TranslatedSetter<>(setter, toSource);
 	}
 
 	/** Diese Methode gibt einen {@link Setter} zurück, der über die Weiterleitug der Eingabe an einen der gegebenen {@link Setter Eigenschaften} mit Hilfe des
@@ -367,23 +397,23 @@ public class Setters {
 		return new SynchronizedSetter<>(mutex, setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code toConsumer(setter, null)}.
+	/** Diese Methode ist eine Abkürzung für {@code Setters.toConsumer(null, setter)}.
 	 *
-	 * @see #toConsumer(Setter, Object) */
+	 * @see #toConsumer(Object, Setter) */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Consumer<GValue> toConsumer(final Setter<Object, ? super GValue> setter) {
-		return Setters.toConsumer(setter, null);
+		return Setters.toConsumer(null, setter);
 	}
 
 	/** Diese Methode gibt einen {@link Consumer} zurück, der mit der gegebenen Eingabe an den gegebenen {@link Setter} delegiert.
 	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts.
-	 * @param setter {@link Setter}.
 	 * @param input Eingabe.
+	 * @param setter {@link Setter}.
 	 * @return {@link Setter}-{@link Consumer}.
 	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
-	public static <GInput, GValue> Consumer<GValue> toConsumer(final Setter<? super GInput, ? super GValue> setter, final GInput input) {
+	public static <GInput, GValue> Consumer<GValue> toConsumer(final GInput input, final Setter<? super GInput, ? super GValue> setter) {
 		return new SetterConsumer<>(input, setter);
 	}
 

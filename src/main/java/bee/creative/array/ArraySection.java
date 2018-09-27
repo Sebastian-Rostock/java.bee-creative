@@ -24,7 +24,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
 	public static <GSection extends ArraySection<?>> GSection validate(final GSection section)
 		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		Objects.assertNotNull(section.array());
+		Objects.notNull(section.array());
 		if (section.startIndex() < 0) throw new IndexOutOfBoundsException("startIndex < 0");
 		if (section.finalIndex() < section.startIndex()) throw new IllegalArgumentException("finalIndex < startIndex");
 		if (section.finalIndex() > section.arrayLength()) throw new IndexOutOfBoundsException("finalIndex > arrayLength");

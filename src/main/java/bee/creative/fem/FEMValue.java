@@ -105,7 +105,7 @@ public abstract class FEMValue extends FEMFunction {
 	/** {@inheritDoc} */
 	@Override
 	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
-		Objects.assertNotNull(frame);
+		Objects.notNull(frame);
 		return this;
 	}
 

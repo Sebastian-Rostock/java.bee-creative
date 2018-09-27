@@ -39,7 +39,7 @@ public abstract class FEMFunction {
 		final FEMFunction function;
 
 		TraceFunction(final FEMTracer tracer, final FEMFunction function) throws NullPointerException {
-			this.tracer = Objects.assertNotNull(tracer);
+			this.tracer = Objects.notNull(tracer);
 			this.function = function;
 		}
 
@@ -102,7 +102,7 @@ public abstract class FEMFunction {
 		final FEMFunction function;
 
 		FrameFunction(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
-			this.frame = Objects.assertNotNull(frame);
+			this.frame = Objects.notNull(frame);
 			this.function = function;
 		}
 
@@ -515,7 +515,7 @@ public abstract class FEMFunction {
 	 * @return Ergebniswert ggf. als {@link FEMFuture}.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
 	public FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
-		return new FEMFuture(Objects.assertNotNull(frame), this);
+		return new FEMFuture(Objects.notNull(frame), this);
 	}
 
 	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapelrahmen}

@@ -108,7 +108,7 @@ public class Builders {
 		 * @param result Sammlung.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
 		protected BaseSetBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.assertNotNull(result);
+			this.result = Objects.notNull(result);
 		}
 
 		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
@@ -119,7 +119,7 @@ public class Builders {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 		public GThis use(final BaseSetBuilder<? extends GItem, ?, ?> source) throws NullPointerException {
-			Objects.assertNotNull(source);
+			Objects.notNull(source);
 			this.clear();
 			return this.putAll(source.result);
 		}
@@ -230,7 +230,7 @@ public class Builders {
 		 * @param result interne {@link Map}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
 		protected BaseMapBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.assertNotNull(result);
+			this.result = Objects.notNull(result);
 		}
 
 		@SuppressWarnings ("javadoc")
@@ -261,7 +261,7 @@ public class Builders {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 		public GThis use(final BaseMapBuilder<? extends GKey, ? extends GItem, ?, ?> source) throws NullPointerException {
-			Objects.assertNotNull(source);
+			Objects.notNull(source);
 			return this.putAll(source.result);
 		}
 
@@ -942,7 +942,7 @@ public class Builders {
 		}
 
 		protected IteratorBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.assertNotNull(result);
+			this.result = Objects.notNull(result);
 		}
 
 		@Override
@@ -987,7 +987,7 @@ public class Builders {
 		}
 
 		protected IterableBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.assertNotNull(result);
+			this.result = Objects.notNull(result);
 		}
 
 		@Override
@@ -1063,7 +1063,7 @@ public class Builders {
 		 * @param result interner {@link Comparator}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
 		protected ComparatorBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.assertNotNull(result);
+			this.result = Objects.notNull(result);
 		}
 
 		/** {@inheritDoc} */
@@ -1148,7 +1148,7 @@ public class Builders {
 		 * @param result internes {@link Comparable}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
 		protected ComparableBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.assertNotNull(result);
+			this.result = Objects.notNull(result);
 		}
 
 		/** {@inheritDoc} */

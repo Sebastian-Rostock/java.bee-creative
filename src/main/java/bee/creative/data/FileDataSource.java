@@ -38,7 +38,7 @@ public class FileDataSource extends BaseDataSource {
 	 * @param file {@link RandomAccessFile}.
 	 * @throws NullPointerException Wenn das {@link RandomAccessFile} {@code null} ist. */
 	public FileDataSource(final RandomAccessFile file) throws NullPointerException {
-		this.data = Objects.assertNotNull(file);
+		this.data = Objects.notNull(file);
 	}
 
 	/** {@inheritDoc} */

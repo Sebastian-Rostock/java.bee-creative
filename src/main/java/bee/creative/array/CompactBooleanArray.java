@@ -101,7 +101,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactBooleanArraySection(final CompactBooleanArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */
@@ -144,7 +144,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactBooleanSubArraySection(final CompactBooleanSubArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */

@@ -63,7 +63,7 @@ public class Conversions {
 
 		public VirtualConversion(final GInput input, final Getter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 			this.input = input;
-			this.converter = Objects.assertNotNull(converter);
+			this.converter = Objects.notNull(converter);
 		}
 
 		@Override
@@ -90,7 +90,7 @@ public class Conversions {
 		public final Conversion<? extends GOutput, ? extends GInput> conversion;
 
 		public ReverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) throws NullPointerException {
-			this.conversion = Objects.assertNotNull(conversion);
+			this.conversion = Objects.notNull(conversion);
 		}
 
 		@Override

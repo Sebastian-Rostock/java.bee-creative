@@ -1599,7 +1599,7 @@ public class FEMDomain {
 	protected FEMFunction compileComposite(final FEMCompiler source, FEMFunction result, final boolean concat)
 		throws NullPointerException, IllegalArgumentException {
 		List<FEMFunction> params = this.compileParams(source);
-		if (params == null) return Objects.assertNotNull(result);
+		if (params == null) return Objects.notNull(result);
 		result = concat ? result.concat(params) : result.compose(params);
 		while (true) {
 			params = this.compileParams(source);

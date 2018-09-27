@@ -34,7 +34,7 @@ public class Assignments {
 		 * @param source Quellobjekt.
 		 * @throws NullPointerException Wenn {@code parent} {@code null} ist. */
 		public ChildAssignment(final Assignment<?> parent, final GSource source) throws NullPointerException {
-			this.parent = Objects.assertNotNull(parent);
+			this.parent = Objects.notNull(parent);
 			this.source = source;
 		}
 
@@ -134,7 +134,7 @@ public class Assignments {
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void set(final GObject source, final GObject target) throws NullPointerException {
-			Objects.assertNotNull(source);
+			Objects.notNull(source);
 			if (target == null) {
 				this.map.remove(source);
 			} else {
@@ -152,8 +152,8 @@ public class Assignments {
 		@Override
 		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit)
 			throws NullPointerException, IllegalArgumentException {
-			Objects.assertNotNull(source);
-			Objects.assertNotNull(target);
+			Objects.notNull(source);
+			Objects.notNull(target);
 			this.set(source, target);
 			if (commit) {
 				target.assign(this.assignment(source));
@@ -174,9 +174,9 @@ public class Assignments {
 		@Override
 		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner,
 			final boolean commit) throws NullPointerException, IllegalArgumentException {
-			Objects.assertNotNull(source);
-			Objects.assertNotNull(target);
-			Objects.assertNotNull(assigner);
+			Objects.notNull(source);
+			Objects.notNull(target);
+			Objects.notNull(assigner);
 			this.set(source, target);
 			if (commit) {
 				assigner.assign(target, this.assignment(source));
@@ -256,7 +256,7 @@ public class Assignments {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static <GInput, GKey, GValue> void assignEntries(final Assignment<?> assignment, final Map<GKey, GValue> source, final Map<GKey, GValue> target)
 		throws NullPointerException {
-		Objects.assertNotNull(assignment);
+		Objects.notNull(assignment);
 		target.clear();
 		for (final Entry<GKey, GValue> entry: source.entrySet()) {
 			target.put(assignment.get(entry.getKey()), assignment.get(entry.getValue()));
@@ -278,7 +278,7 @@ public class Assignments {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static <GValue> void assignValues(final Assignment<?> assignment, final Collection<GValue> source, final Collection<GValue> target)
 		throws NullPointerException {
-		Objects.assertNotNull(assignment);
+		Objects.notNull(assignment);
 		target.clear();
 		for (final GValue value: source) {
 			target.add(assignment.get(value));

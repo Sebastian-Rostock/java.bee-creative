@@ -23,7 +23,7 @@ public final class FEMFuture extends FEMValue {
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist. */
 	public static FEMFuture from(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
-		return new FEMFuture(Objects.assertNotNull(frame), Objects.assertNotNull(function));
+		return new FEMFuture(Objects.notNull(frame), Objects.notNull(function));
 	}
 
 	/** Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.

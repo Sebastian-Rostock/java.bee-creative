@@ -49,7 +49,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		@Override
 		public final FEMFrame withContext(final FEMContext context) throws NullPointerException {
-			return new ArrayFrame(this.parent, this.params, Objects.assertNotNull(context));
+			return new ArrayFrame(this.parent, this.params, Objects.notNull(context));
 		}
 
 	}
@@ -74,7 +74,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		@Override
 		public final FEMFrame withContext(final FEMContext context) throws NullPointerException {
-			return new ArrayFrame(this, FEMArray.EMPTY, Objects.assertNotNull(context));
+			return new ArrayFrame(this, FEMArray.EMPTY, Objects.notNull(context));
 		}
 
 	}
@@ -160,7 +160,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 		@Override
 		public final FEMFrame withContext(final FEMContext context) throws NullPointerException {
-			return new InvokeFrame(this.parent, this.params, Objects.assertNotNull(context));
+			return new InvokeFrame(this.parent, this.params, Objects.notNull(context));
 		}
 
 	}

@@ -35,7 +35,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die Nutzdaten {@code null} sind. */
 	public ArrayDataTarget(final CompactByteArray data) throws NullPointerException {
-		this.data = Objects.assertNotNull(data);
+		this.data = Objects.notNull(data);
 	}
 
 	/** {@inheritDoc} */

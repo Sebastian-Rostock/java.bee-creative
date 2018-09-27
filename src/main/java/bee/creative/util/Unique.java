@@ -28,9 +28,9 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 		public TreeMapUnique(final Comparator<? super GInput> sorter, final Setter<? super GInput, ? super GOutput> reuser,
 			final Getter<? super GInput, ? extends GOutput> compiler) throws NullPointerException {
 			super(new TreeMap<GInput, GOutput>(sorter));
-			this.sorter = Objects.assertNotNull(sorter);
-			this.reuser = Objects.assertNotNull(reuser);
-			this.compiler = Objects.assertNotNull(compiler);
+			this.sorter = Objects.notNull(sorter);
+			this.reuser = Objects.notNull(reuser);
+			this.compiler = Objects.notNull(compiler);
 		}
 
 		@Override
@@ -64,8 +64,8 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 			throws NullPointerException {
 			super(HashMap2.<GInput, GOutput>from(hasher));
 			this.hasher = hasher;
-			this.reuser = Objects.assertNotNull(reuser);
-			this.compiler = Objects.assertNotNull(compiler);
+			this.reuser = Objects.notNull(reuser);
+			this.compiler = Objects.notNull(compiler);
 		}
 	
 		@Override
@@ -192,7 +192,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	 * @param mapping Abbildung.
 	 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
 	public Unique(final Map<GInput, GOutput> mapping) throws NullPointerException {
-		this.mapping = Objects.assertNotNull(mapping);
+		this.mapping = Objects.notNull(mapping);
 	}
 
 	/** Diese Methode gibt die mit der gegebenen Eingabe in der {@link #mapping() angebundenen Abbildung} assoziierte Ausgabe zurück.<br>

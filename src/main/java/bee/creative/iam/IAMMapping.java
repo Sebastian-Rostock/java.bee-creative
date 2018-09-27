@@ -48,7 +48,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
-			Objects.assertNotNull(key);
+			Objects.notNull(key);
 			return -1;
 		}
 
@@ -164,7 +164,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
-			Objects.assertNotNull(key);
+			Objects.notNull(key);
 			int i = this.rangeMask;
 			if (i != 0) {
 				final int[] range = this.rangeOffset;

@@ -18,7 +18,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		public final Hasher hasher;
 
 		public HasherHashSet2(final Hasher hasher) {
-			this.hasher = Objects.assertNotNull(hasher);
+			this.hasher = Objects.notNull(hasher);
 		}
 
 		@Override

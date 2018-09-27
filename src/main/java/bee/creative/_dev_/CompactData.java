@@ -60,7 +60,7 @@ abstract class CompactData {
 		 *
 		 * @param data {@link CompactData}. */
 		public CompactDataOwner(final GData data) {
-			this.data = Objects.assertNotNull(data);
+			this.data = Objects.notNull(data);
 		}
 
 	}

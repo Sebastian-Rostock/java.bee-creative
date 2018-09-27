@@ -18,7 +18,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		public final Hasher hasher;
 
 		public HasherHashMap2(final Hasher hasher) {
-			this.hasher = Objects.assertNotNull(hasher);
+			this.hasher = Objects.notNull(hasher);
 		}
 
 		@Override

@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import java.util.Collections;
 import java.util.Map;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
@@ -13,6 +12,8 @@ import bee.creative.util.Objects.BaseObject;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Filters {
 
+	/** Diese Klasse implementiert {@link Filters#nullFilter()} */
+	@SuppressWarnings ("javadoc")
 	public static class NullFilter extends BaseObject implements Filter<Object> {
 
 		public static final Filter<?> INSTANCE = new NullFilter();
@@ -24,6 +25,8 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#valueFilter(boolean)} */
+	@SuppressWarnings ("javadoc")
 	public static class ValueFilter implements Filter<Object> {
 
 		public static final Filter<?> TRUE = new ValueFilter(true);
@@ -48,12 +51,14 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#classFilter(Class)} */
+	@SuppressWarnings ("javadoc")
 	public static class ClassFilter<GInput> implements Filter<GInput> {
 
 		public final Class<?> inputClass;
 
 		public ClassFilter(final Class<?> inputClass) {
-			this.inputClass = Objects.assertNotNull(inputClass);
+			this.inputClass = Objects.notNull(inputClass);
 		}
 
 		@Override
@@ -68,12 +73,14 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#negationFilter(Filter)} */
+	@SuppressWarnings ("javadoc")
 	public static class NegationFilter<GInput> implements Filter<GInput> {
 
 		public final Filter<? super GInput> filter;
 
 		public NegationFilter(final Filter<? super GInput> filter) {
-			this.filter = Objects.assertNotNull(filter);
+			this.filter = Objects.notNull(filter);
 		}
 
 		@Override
@@ -88,6 +95,8 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#navigatedFilter(Getter, Filter)} */
+	@SuppressWarnings ("javadoc")
 	public static class NavigatedFilter<GInput, GOutput> implements Filter<GInput> {
 
 		public final Getter<? super GInput, ? extends GOutput> navigator;
@@ -95,8 +104,8 @@ public class Filters {
 		public final Filter<? super GOutput> filter;
 
 		public NavigatedFilter(final Getter<? super GInput, ? extends GOutput> navigator, final Filter<? super GOutput> filter) {
-			this.navigator = Objects.assertNotNull(navigator);
-			this.filter = Objects.assertNotNull(filter);
+			this.navigator = Objects.notNull(navigator);
+			this.filter = Objects.notNull(filter);
 		}
 
 		@Override
@@ -111,6 +120,8 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#disjunctionFilter(Filter, Filter)} */
+	@SuppressWarnings ("javadoc")
 	public static class DisjunctionFilter<GInput> implements Filter<GInput> {
 
 		public final Filter<? super GInput> filter2;
@@ -118,8 +129,8 @@ public class Filters {
 		public final Filter<? super GInput> filter1;
 
 		public DisjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			this.filter1 = Objects.assertNotNull(filter1);
-			this.filter2 = Objects.assertNotNull(filter2);
+			this.filter1 = Objects.notNull(filter1);
+			this.filter2 = Objects.notNull(filter2);
 		}
 
 		@Override
@@ -134,6 +145,8 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#conjunctionFilter(Filter, Filter)} */
+	@SuppressWarnings ("javadoc")
 	public static class ConjunctionFilter<GInput> implements Filter<GInput> {
 
 		public final Filter<? super GInput> filter1;
@@ -141,8 +154,8 @@ public class Filters {
 		public final Filter<? super GInput> filter2;
 
 		public ConjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			this.filter1 = Objects.assertNotNull(filter1);
-			this.filter2 = Objects.assertNotNull(filter2);
+			this.filter1 = Objects.notNull(filter1);
+			this.filter2 = Objects.notNull(filter2);
 		}
 
 		@Override
@@ -157,6 +170,8 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#equivalenceFilter(Filter, Filter)} */
+	@SuppressWarnings ("javadoc")
 	public static class EquivalenceFilter<GInput> implements Filter<GInput> {
 
 		public final Filter<? super GInput> filter1;
@@ -164,8 +179,8 @@ public class Filters {
 		public final Filter<? super GInput> filter2;
 
 		public EquivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			this.filter1 = Objects.assertNotNull(filter1);
-			this.filter2 = Objects.assertNotNull(filter2);
+			this.filter1 = Objects.notNull(filter1);
+			this.filter2 = Objects.notNull(filter2);
 		}
 
 		@Override
@@ -180,6 +195,8 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#synchronizedFilter(Object, Filter)} */
+	@SuppressWarnings ("javadoc")
 	public static class SynchronizedFilter<GInput> implements Filter<GInput> {
 
 		public final Object mutex;
@@ -187,8 +204,8 @@ public class Filters {
 		public final Filter<? super GInput> filter;
 
 		public SynchronizedFilter(final Object mutex, final Filter<? super GInput> filter) {
-			this.mutex = mutex != null ? mutex : this;
-			this.filter = Objects.assertNotNull(filter);
+			this.mutex = Objects.notNull(mutex, this);
+			this.filter = Objects.notNull(filter);
 		}
 
 		@Override
@@ -205,6 +222,8 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#toGetter(Filter)} */
+	@SuppressWarnings ("javadoc")
 	static class FilterGetter<GInput> implements Getter<GInput, Boolean> {
 
 		public final Filter<? super GInput> filter;
@@ -247,7 +266,7 @@ public class Filters {
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, der stets die gegebene Akzeptanz liefert.
-	 * 
+	 *
 	 * @param <GInput> Typ der ignorierten Eingabe.
 	 * @param value Akzeptanz.
 	 * @return {@code value}-{@link Filter}. */
@@ -353,9 +372,11 @@ public class Filters {
 		return new EquivalenceFilter<>(filter1, filter2);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, der den gegebenen {@link Filter} über {@code synchronized(filter)} synchronisiert.
+	/** Diese Methode gibt einen {@link Filter} zurück, der den gegebenen {@link Filter} über {@code synchronized(filter)} synchronisiert. Wenn das
+	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Filter} als Synchronisationsobjekt verwendet.
 	 *
 	 * @param <GInput> Typ der Eingabe.
+	 * @param mutex Synchronisationsobjekt oder {@code null}.
 	 * @param filter {@link Filter}.
 	 * @return {@code synchronized}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */

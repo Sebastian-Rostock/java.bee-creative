@@ -21,7 +21,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	 * @param items {@link Iterable} der {@link Item}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public FilteredSelection(final Iterable<? extends GItem> items) throws NullPointerException {
-		this.items = Objects.assertNotNull(items);
+		this.items = Objects.notNull(items);
 	}
 
 	/** {@inheritDoc}

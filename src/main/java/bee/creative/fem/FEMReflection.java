@@ -257,7 +257,7 @@ public abstract class FEMReflection extends FEMFunction {
 	 * @return Funktion zum gegebenen Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
 	public static FEMReflection from(final Constructor<?> constructor) throws NullPointerException {
-		return new StaticConstructor(Objects.assertNotNull(constructor));
+		return new StaticConstructor(Objects.notNull(constructor));
 	}
 
 	@SuppressWarnings ("javadoc")

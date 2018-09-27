@@ -84,7 +84,7 @@ public class Iterators {
 		public ItemsIterator(final int fromIndex, final int toIndex, final Items<? extends GItem> items) {
 			Comparables.check(fromIndex, toIndex);
 
-			this.items = Objects.assertNotNull(items);
+			this.items = Objects.notNull(items);
 			this.fromIndex = fromIndex;
 			this.toIndex = toIndex;
 			this.index = fromIndex;
@@ -174,7 +174,7 @@ public class Iterators {
 
 		public LimitedIterator(final int count, final Iterator<? extends GItem> iterator) {
 			if (count < 0) throw new IllegalArgumentException();
-			this.iterator = Objects.assertNotNull(iterator);
+			this.iterator = Objects.notNull(iterator);
 			this.count = count;
 		}
 
@@ -252,8 +252,8 @@ public class Iterators {
 		protected GItem item;
 
 		public FilteredIterator(final Filter<? super GItem> filter, final Iterator<? extends GItem> iterator) {
-			this.filter = Objects.assertNotNull(filter);
-			this.iterator = Objects.assertNotNull(iterator);
+			this.filter = Objects.notNull(filter);
+			this.iterator = Objects.notNull(iterator);
 		}
 
 		@Override
@@ -298,7 +298,7 @@ public class Iterators {
 		protected Iterator<? extends GItem> iterator;
 
 		public ChainedIterator(final Iterator<? extends Iterator<? extends GItem>> iterators) {
-			this.iterators = Objects.assertNotNull(iterators);
+			this.iterators = Objects.notNull(iterators);
 		}
 
 		@Override
@@ -341,8 +341,8 @@ public class Iterators {
 		public final Iterator<? extends GInput> iterator;
 
 		public NavigatedIterator(final Getter<? super GInput, ? extends GOutput> navigator, final Iterator<? extends GInput> iterator) {
-			this.navigator = Objects.assertNotNull(navigator);
-			this.iterator = Objects.assertNotNull(iterator);
+			this.navigator = Objects.notNull(navigator);
+			this.iterator = Objects.notNull(iterator);
 		}
 
 		@Override
@@ -374,7 +374,7 @@ public class Iterators {
 		public final Iterator<? extends GItem> iterator;
 
 		public UnmodifiableIterator(final Iterator<? extends GItem> iterator) {
-			this.iterator = Objects.assertNotNull(iterator);
+			this.iterator = Objects.notNull(iterator);
 		}
 
 		@Override
@@ -424,7 +424,7 @@ public class Iterators {
 	 * @return Anzahl der noch zu überspringenden Elemente.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static int skip(final Iterator<?> iterator, int count) throws NullPointerException {
-		Objects.assertNotNull(iterator);
+		Objects.notNull(iterator);
 		while ((count != 0) && iterator.hasNext()) {
 			count--;
 			iterator.next();
@@ -442,7 +442,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static <GItem> boolean addAll(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) throws NullPointerException {
-		Objects.assertNotNull(collection);
+		Objects.notNull(collection);
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.add(iterator.next())) {
@@ -461,7 +461,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean retainAll(final Iterator<?> iterator, final Collection<?> collection) throws NullPointerException {
-		Objects.assertNotNull(collection);
+		Objects.notNull(collection);
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (!collection.contains(iterator.next())) {
@@ -481,7 +481,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean retainAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		Objects.assertNotNull(collection);
+		Objects.notNull(collection);
 		final List<Object> list = new ArrayList<>();
 		Iterators.addAll(list, iterator);
 		return collection.retainAll(list);
@@ -512,7 +512,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean removeAll(final Iterator<?> iterator, final Collection<?> collection) throws NullPointerException {
-		Objects.assertNotNull(collection);
+		Objects.notNull(collection);
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.contains(iterator.next())) {
@@ -532,7 +532,7 @@ public class Iterators {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean removeAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		Objects.assertNotNull(collection);
+		Objects.notNull(collection);
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.remove(iterator.next())) {
@@ -550,7 +550,7 @@ public class Iterators {
 	 * @return {@code true} bei vollständiger Inklusion.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist. */
 	public static boolean containsAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		Objects.assertNotNull(collection);
+		Objects.notNull(collection);
 		while (iterator.hasNext()) {
 			if (!collection.contains(iterator.next())) return false;
 		}
@@ -672,7 +672,7 @@ public class Iterators {
 	 * @return {@code unique}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static <GItem> Iterator<GItem> uniqueIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-		return Iterators.uniqueIterator(new HashSet2<GItem>(), Objects.assertNotNull(iterator));
+		return Iterators.uniqueIterator(new HashSet2<GItem>(), Objects.notNull(iterator));
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}

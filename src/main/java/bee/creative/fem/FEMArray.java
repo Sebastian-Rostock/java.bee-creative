@@ -378,7 +378,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static FEMArray from(final FEMValue[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMArray.EMPTY;
-		if (length == 1) return new UniformArray(1, Objects.assertNotNull(items[offset]));
+		if (length == 1) return new UniformArray(1, Objects.notNull(items[offset]));
 		final FEMValue[] result = new FEMValue[length];
 		System.arraycopy(items, offset, result, 0, length);
 		return new CompactArray(result);
@@ -392,7 +392,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	public static FEMArray from(final FEMValue item, final int length) throws NullPointerException, IllegalArgumentException {
-		Objects.assertNotNull(item);
+		Objects.notNull(item);
 		if (length == 0) return FEMArray.EMPTY;
 		return new UniformArray(length, item);
 	}
@@ -612,7 +612,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean extract(final Collector target) throws NullPointerException {
-		Objects.assertNotNull(target);
+		Objects.notNull(target);
 		if (this.length == 0) return true;
 		return this.customExtract(target, 0, this.length, true);
 	}

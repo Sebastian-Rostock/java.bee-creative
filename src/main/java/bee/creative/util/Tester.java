@@ -243,7 +243,7 @@ public class Tester {
 	 * @param method Testmethode.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
 	public Tester(final int mode, final Method method) throws NullPointerException {
-		Objects.assertNotNull(method);
+		Objects.notNull(method);
 		final Runtime runtime = Runtime.getRuntime();
 		Throwable cause = null;
 		final long enterMemory, enterTime, leaveMemory, leaveTime;

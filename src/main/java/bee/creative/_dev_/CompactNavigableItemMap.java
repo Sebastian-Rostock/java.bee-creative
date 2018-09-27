@@ -72,7 +72,7 @@ abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavigableMap
 	/** {@inheritDoc} */
 	@Override
 	protected final void customSetEntry(final int index, final GKey key, final GValue value) {
-		Objects.assertNotNull(value);
+		Objects.notNull(value);
 		this.items.set(index, value);
 		this.customSetKey(key, value);
 	}
@@ -87,7 +87,7 @@ abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavigableMap
 	/** {@inheritDoc} */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		Objects.assertNotNull(value);
+		Objects.notNull(value);
 		return super.put(key, value);
 	}
 

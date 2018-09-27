@@ -22,7 +22,7 @@ public final class FEMHandler extends FEMValue {
 	 * @return Funktionszeiger.
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
 	public static FEMHandler from(final FEMFunction function) throws NullPointerException {
-		return new FEMHandler(Objects.assertNotNull(function));
+		return new FEMHandler(Objects.notNull(function));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMMethod.TYPE)}.

@@ -33,7 +33,7 @@ public class INIWriter implements Closeable {
 	 * @param writer {@link Writer}.
 	 * @throws NullPointerException Wenn {@code writer} {@code null} ist. */
 	public INIWriter(final Writer writer) throws NullPointerException {
-		this.writer = Objects.assertNotNull(writer);
+		this.writer = Objects.notNull(writer);
 	}
 
 	/** Diese Methode schreibt das gegebene Element und gibt {@code this} zurück.

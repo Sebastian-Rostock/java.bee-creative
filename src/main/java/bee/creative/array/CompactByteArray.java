@@ -101,7 +101,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactByteArraySection(final CompactByteArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */
@@ -144,7 +144,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactByteSubArraySection(final CompactByteSubArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */

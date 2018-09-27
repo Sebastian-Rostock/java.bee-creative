@@ -213,7 +213,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	 * @return Index des Elements.
 	 * @throws NullPointerException Wenn {@code item} {@code null} ist. */
 	public int find(final IAMArray item) throws NullPointerException {
-		Objects.assertNotNull(item);
+		Objects.notNull(item);
 		for (int i = 0, count = this.itemCount(); i < count; i++) {
 			if (item.equals(this.item(i))) return i;
 		}

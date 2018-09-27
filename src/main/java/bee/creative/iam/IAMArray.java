@@ -1126,7 +1126,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final IAMArray that) throws NullPointerException {
-		return this.equals(Objects.<Object>assertNotNull(that));
+		return this.equals(Objects.<Object>notNull(that));
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung dieser Zahlenfolge lexikografisch kleiner, gleich bzw.

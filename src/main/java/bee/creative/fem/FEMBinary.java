@@ -843,7 +843,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean extract(final Collector target) throws NullPointerException {
-		Objects.assertNotNull(target);
+		Objects.notNull(target);
 		if (this.length == 0) return true;
 		return this.customExtract(target, 0, this.length, true);
 	}

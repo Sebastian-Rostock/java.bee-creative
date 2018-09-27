@@ -101,7 +101,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactIntegerArraySection(final CompactIntegerArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */
@@ -144,7 +144,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactIntegerSubArraySection(final CompactIntegerSubArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */

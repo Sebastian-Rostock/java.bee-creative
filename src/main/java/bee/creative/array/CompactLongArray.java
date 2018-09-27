@@ -101,7 +101,7 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactLongArraySection(final CompactLongArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */
@@ -144,7 +144,7 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactLongSubArraySection(final CompactLongSubArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */

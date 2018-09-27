@@ -93,8 +93,8 @@ public class Objects {
 		public final Getter<? super Object, ? extends Object> navigator;
 
 		public NavigatedHasher(final Hasher hasher, final Getter<? super Object, ? extends Object> navigator) {
-			this.hasher = Objects.assertNotNull(hasher);
-			this.navigator = Objects.assertNotNull(navigator);
+			this.hasher = Objects.notNull(hasher);
+			this.navigator = Objects.notNull(navigator);
 		}
 
 		@Override
@@ -121,7 +121,7 @@ public class Objects {
 		public final String string;
 
 		public StringObject(final String string) {
-			this.string = Objects.assertNotNull(string);
+			this.string = Objects.notNull(string);
 		}
 
 		@Override
@@ -703,13 +703,17 @@ public class Objects {
 
 	/** Diese Methode gibt das gegebene Objekt zurück, wenn dieses nicht {@code null} ist.
 	 *
-	 * @param <GObject> Typ des Objekts.
-	 * @param object Objekt oder {@code null}.
+	 * @param <GResult> Typ des Objekts.
+	 * @param result Objekt oder {@code null}.
 	 * @return Objekt.
 	 * @throws NullPointerException Wenn {@code object} {@code null} ist. */
-	public static <GObject> GObject assertNotNull(final GObject object) throws NullPointerException {
-		if (object == null) throw new NullPointerException("object = null");
-		return object;
+	public static <GResult> GResult notNull(final GResult result) throws NullPointerException {
+		if (result == null) throw new NullPointerException();
+		return result;
+	}
+
+	public static <GObject> GObject notNull(final GObject result, final GObject result2) {
+		return result != null ? result : result2;
 	}
 
 	/** Diese Methode gibt einen navigierten {@link Hasher} zurück.<br>

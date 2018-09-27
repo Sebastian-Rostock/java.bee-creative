@@ -72,7 +72,7 @@ public class Producers {
 		public final Constructor<?> constructor;
 
 		public ConstructorProducer(final Constructor<?> constructor) {
-			this.constructor = Objects.assertNotNull(constructor);
+			this.constructor = Objects.notNull(constructor);
 		}
 
 		@Override
@@ -105,7 +105,7 @@ public class Producers {
 		public BufferedProducer(final int mode, final Producer<? extends GValue> producer) {
 			Pointers.pointer(mode, null);
 			this.mode = mode;
-			this.producer = Objects.assertNotNull(producer);
+			this.producer = Objects.notNull(producer);
 		}
 
 		@Override
@@ -137,8 +137,8 @@ public class Producers {
 		public final Producer<? extends GInput> producer;
 
 		public NavigatedProducer(final Getter<? super GInput, ? extends GOutput> navigator, final Producer<? extends GInput> producer) {
-			this.navigator = Objects.assertNotNull(navigator);
-			this.producer = Objects.assertNotNull(producer);
+			this.navigator = Objects.notNull(navigator);
+			this.producer = Objects.notNull(producer);
 		}
 
 		@Override
@@ -162,8 +162,8 @@ public class Producers {
 		public final Producer<? extends GValue> producer;
 
 		public SynchronizedProducer(final Object mutex, final Producer<? extends GValue> producer) throws NullPointerException {
-			this.mutex = mutex != null ? mutex : this;
-			this.producer = Objects.assertNotNull(producer);
+			this.mutex = Objects.notNull(mutex, this);
+			this.producer = Objects.notNull(producer);
 		}
 
 		@Override
@@ -187,7 +187,7 @@ public class Producers {
 		public final Producer<? extends GValue> producer;
 
 		public ProducerGetter(final Producer<? extends GValue> producer) {
-			this.producer = Objects.assertNotNull(producer);
+			this.producer = Objects.notNull(producer);
 		}
 
 		@Override

@@ -47,7 +47,7 @@ public class BEXAdapter {
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
 		public BEXAttrAdapter(final BEXNode node, final Element parent) throws NullPointerException {
 			super(node);
-			this.parent = Objects.assertNotNull(parent);
+			this.parent = Objects.notNull(parent);
 		}
 
 		/** {@inheritDoc} */
@@ -1062,7 +1062,7 @@ public class BEXAdapter {
 		 * @param node {@link BEXNode}.
 		 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
 		public BEXNodeAdapter(final BEXNode node) throws NullPointerException {
-			this.node = Objects.assertNotNull(node);
+			this.node = Objects.notNull(node);
 		}
 
 		/** {@inheritDoc} */
@@ -1310,8 +1310,8 @@ public class BEXAdapter {
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
 		public BEXAttrListAdapter(final BEXList list, final Element parent) throws NullPointerException {
-			this.list = Objects.assertNotNull(list);
-			this.parent = Objects.assertNotNull(parent);
+			this.list = Objects.notNull(list);
+			this.parent = Objects.notNull(parent);
 		}
 
 		/** {@inheritDoc} */
@@ -1395,8 +1395,8 @@ public class BEXAdapter {
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
 		public BEXChldListAdapter(final BEXList list, final Node parent) throws NullPointerException {
-			this.list = Objects.assertNotNull(list);
-			this.parent = Objects.assertNotNull(parent);
+			this.list = Objects.notNull(list);
+			this.parent = Objects.notNull(parent);
 		}
 
 		/** {@inheritDoc} */
@@ -1517,8 +1517,8 @@ public class BEXAdapter {
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst auch analysiert werden soll.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 		public BEXElemCollector(final BEXNodeAdapter node, final String uri, final String name, final boolean self) throws NullPointerException {
-			this.uri = Objects.assertNotNull(uri);
-			this.name = Objects.assertNotNull(name);
+			this.uri = Objects.notNull(uri);
+			this.name = Objects.notNull(name);
 			this.list = new ArrayList<>();
 			if ("*".equals(uri)) {
 				if ("*".equals(name)) {

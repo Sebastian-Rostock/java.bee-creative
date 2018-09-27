@@ -187,7 +187,7 @@ public class Parser {
 	 * @param value Ausgabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void target(final char[] value) throws NullPointerException {
-		Objects.assertNotNull(value);
+		Objects.notNull(value);
 		this.clear();
 		this.target.append(value);
 	}
@@ -197,7 +197,7 @@ public class Parser {
 	 * @param value Ausgabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void target(final String value) throws NullPointerException {
-		Objects.assertNotNull(value);
+		Objects.notNull(value);
 		this.clear();
 		this.target.append(value);
 	}

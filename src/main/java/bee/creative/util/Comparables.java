@@ -42,8 +42,8 @@ public class Comparables {
 		private final Getter<? super GItem, ? extends GItem2> navigator;
 
 		private NavigatedComparable( Getter<? super GItem, ? extends GItem2> navigator, Comparable<? super GItem2> comparable) {
-			Objects.assertNotNull(navigator);
-			Objects.assertNotNull(comparable);
+			Objects.notNull(navigator);
+			Objects.notNull(comparable);
 			this.comparable = comparable;
 			this.navigator = navigator;
 		}
@@ -98,7 +98,7 @@ public class Comparables {
 		private final Comparable<? super GInput> comparable;
 	
 		private HigherFilter(final Comparable<? super GInput> comparable) {
-			this.comparable = 		Objects.assertNotNull(comparable);
+			this.comparable = 		Objects.notNull(comparable);
 		}
 	
 		@Override
@@ -147,22 +147,22 @@ public class Comparables {
 	@SuppressWarnings ("javadoc")
 	static void check(final Items<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
-		Objects.assertNotNull(items);
-		Objects.assertNotNull(comparable);
+		Objects.notNull(items);
+		Objects.notNull(comparable);
 		Comparables.check(fromIndex, toIndex);
 	}
 
 	@SuppressWarnings ("javadoc")
 	static void check(final List<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
-		Objects.assertNotNull(comparable);
+		Objects.notNull(comparable);
 		Comparables.check(items.size(), fromIndex, toIndex);
 	}
 
 	@SuppressWarnings ("javadoc")
 	static void check(final Object[] items, final Comparable<?> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
-		Objects.assertNotNull(comparable);
+		Objects.notNull(comparable);
 		Comparables.check(items.length, fromIndex, toIndex);
 	}
 
@@ -175,8 +175,8 @@ public class Comparables {
 	 * @return Auswahl der Elemente.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code indices} {@code null} ist. */
 	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int[] indices) throws NullPointerException {
-		Objects.assertNotNull(items);
-		Objects.assertNotNull(indices);
+		Objects.notNull(items);
+		Objects.notNull(indices);
 		return new Items<GItem>() {
 
 			@Override
@@ -204,7 +204,7 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
 	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
-		Objects.assertNotNull(items);
+		Objects.notNull(items);
 		Comparables.check(fromIndex, toIndex);
 		return new Items<GItem>() {
 
@@ -234,7 +234,7 @@ public class Comparables {
 	 * @return {@code entry}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
 	public static <GItem> Comparable<GItem> itemComparable(final GItem input, final Comparator<? super GItem> comparator) throws NullPointerException {
-		Objects.assertNotNull(comparator);
+		Objects.notNull(comparator);
 		return new Comparable<GItem>() {
 
 			@Override
@@ -258,7 +258,7 @@ public class Comparables {
 	 * @return {@code default}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GItem> Comparable<GItem> defaultComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
-		Objects.assertNotNull(comparable);
+		Objects.notNull(comparable);
 		return new Comparable<GItem>() {
 
 			@Override
@@ -282,7 +282,7 @@ public class Comparables {
 	 * @return {@code reverse}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GItem> Comparable<GItem> reverseComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
-		Objects.assertNotNull(comparable);
+		Objects.notNull(comparable);
 		return new Comparable<GItem>() {
 
 			@Override
@@ -306,7 +306,7 @@ public class Comparables {
 	 * @return {@code iterable}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GItem> Comparable<Iterable<? extends GItem>> iterableComparable(final Comparable<? super GItem> comparable) {
-		Objects.assertNotNull(comparable);
+		Objects.notNull(comparable);
 		return new Comparable<Iterable<? extends GItem>>() {
 
 			@Override
@@ -337,8 +337,8 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code comparable1} bzw. {@code comparable2} {@code null} ist. */
 	public static <GItem> Comparable<GItem> chainedComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2)
 		throws NullPointerException {
-		Objects.assertNotNull(comparable1);
-		Objects.assertNotNull(comparable2);
+		Objects.notNull(comparable1);
+		Objects.notNull(comparable2);
 		return new Comparable<GItem>() {
 
 			@Override
@@ -742,7 +742,7 @@ public class Comparables {
 	 * @return {@code equal}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GInput> Filter<GInput> toEqualFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		Objects.assertNotNull(comparable);
+		Objects.notNull(comparable);
 		return new FilterImplementation3<>(comparable);
 	}
 
@@ -754,7 +754,7 @@ public class Comparables {
 	 * @return {@code lower}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GInput> Filter<GInput> toLowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		Objects.assertNotNull(comparable);
+		Objects.notNull(comparable);
 		return new FilterImplementation4<>(comparable);
 	}
 

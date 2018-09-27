@@ -153,7 +153,7 @@ public class IAMBuilder {
 		 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
 		public final int putMapping(final IAMMapping mapping) throws NullPointerException {
 			final int result = this.mappings.size();
-			this.mappings.add(result, Objects.assertNotNull(mapping));
+			this.mappings.add(result, Objects.notNull(mapping));
 			return result;
 		}
 
@@ -164,7 +164,7 @@ public class IAMBuilder {
 		 * @throws NullPointerException Wenn {@code listing} {@code null} ist. */
 		public final int putListing(final IAMListing listing) throws NullPointerException {
 			final int result = this.listings.size();
-			this.listings.add(result, Objects.assertNotNull(listing));
+			this.listings.add(result, Objects.notNull(listing));
 			return result;
 		}
 
@@ -306,8 +306,8 @@ public class IAMBuilder {
 		 * @param value Wert.
 		 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
 		public final void put(final int[] key, final int[] value) throws NullPointerException {
-			Objects.assertNotNull(key);
-			Objects.assertNotNull(value);
+			Objects.notNull(key);
+			Objects.notNull(value);
 			this.entries.get(key).value = value;
 		}
 

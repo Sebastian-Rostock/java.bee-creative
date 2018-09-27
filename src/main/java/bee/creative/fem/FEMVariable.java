@@ -56,7 +56,7 @@ public final class FEMVariable extends FEMValue {
 	 * @param value aktuellen Wert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final synchronized void update(final FEMValue value) throws NullPointerException {
-		this.value = Objects.assertNotNull(value);
+		this.value = Objects.notNull(value);
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */

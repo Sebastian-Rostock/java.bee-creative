@@ -24,7 +24,7 @@ public final class FEMProxy extends FEMFunction implements Emuable {
 	 * @param name Name.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
 	public FEMProxy(final String name) throws NullPointerException {
-		this.name = Objects.assertNotNull(name);
+		this.name = Objects.notNull(name);
 	}
 
 	/** Dieser Konstruktor initialisiert Namen und Funktion.

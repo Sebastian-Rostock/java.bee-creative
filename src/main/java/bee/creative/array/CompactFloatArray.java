@@ -101,7 +101,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactFloatArraySection(final CompactFloatArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */
@@ -144,7 +144,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactFloatSubArraySection(final CompactFloatSubArray owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */

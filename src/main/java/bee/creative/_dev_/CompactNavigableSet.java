@@ -401,7 +401,7 @@ class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableS
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableSet(final Comparator<? super GItem> comparator) throws NullPointerException {
 		super();
-		this.comparator = Objects.assertNotNull(comparator);
+		this.comparator = Objects.notNull(comparator);
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.

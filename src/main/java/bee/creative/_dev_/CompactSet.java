@@ -27,7 +27,7 @@ abstract class CompactSet<GItem> extends CompactCollection<GItem> implements Set
 		 * @param set {@link Set}.
 		 * @throws NullPointerException Wennd as gegebene {@link Set} {@code null} ist. */
 		public CompactSetItems(final Set<GItem> set) throws NullPointerException {
-			this.set = Objects.assertNotNull(set);
+			this.set = Objects.notNull(set);
 		}
 
 		/** {@inheritDoc} */

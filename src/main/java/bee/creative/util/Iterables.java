@@ -97,7 +97,7 @@ public class Iterables {
 		public LimitedIterable(final int count, final Iterable<? extends GItem> iterable) {
 			if (count < 0) throw new IllegalArgumentException();
 			this.count = count;
-			this.iterable = Objects.assertNotNull(iterable);
+			this.iterable = Objects.notNull(iterable);
 		}
 
 		@Override
@@ -121,8 +121,8 @@ public class Iterables {
 		public final Iterable<? extends GItem> iterable;
 
 		public FilteredIterable(final Filter<? super GItem> filter, final Iterable<? extends GItem> iterable) {
-			this.filter = Objects.assertNotNull(filter);
-			this.iterable = Objects.assertNotNull(iterable);
+			this.filter = Objects.notNull(filter);
+			this.iterable = Objects.notNull(iterable);
 		}
 
 		@Override
@@ -144,7 +144,7 @@ public class Iterables {
 		public final Iterable<? extends GItem> iterable;
 
 		public UniqueIterable(final Iterable<? extends GItem> iterable) {
-			this.iterable = Objects.assertNotNull(iterable);
+			this.iterable = Objects.notNull(iterable);
 		}
 
 		@Override
@@ -166,7 +166,7 @@ public class Iterables {
 		public final Iterable<? extends Iterable<? extends GItem>> iterables;
 
 		public ChainedIterable(final Iterable<? extends Iterable<? extends GItem>> iterables) {
-			this.iterables = Objects.assertNotNull(iterables);
+			this.iterables = Objects.notNull(iterables);
 		}
 
 		@Override
@@ -190,8 +190,8 @@ public class Iterables {
 		public final Iterable<? extends GInput> iterable;
 
 		public NavigatedIterable(final Getter<? super GInput, ? extends GOutput> navigator, final Iterable<? extends GInput> iterable) {
-			this.navigator = Objects.assertNotNull(navigator);
-			this.iterable = Objects.assertNotNull(iterable);
+			this.navigator = Objects.notNull(navigator);
+			this.iterable = Objects.notNull(iterable);
 		}
 
 		@Override
@@ -213,7 +213,7 @@ public class Iterables {
 		public final Iterable<? extends GItem> iterable;
 
 		public UnmodifiableIterable(final Iterable<? extends GItem> iterable) {
-			this.iterable = Objects.assertNotNull(iterable);
+			this.iterable = Objects.notNull(iterable);
 		}
 
 		@Override
@@ -274,7 +274,7 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen am {@link Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist. */
 	public static boolean retainAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
-		return Iterators.retainAll(iterable.iterator(), Objects.assertNotNull(collection));
+		return Iterators.retainAll(iterable.iterator(), Objects.notNull(collection));
 	}
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, und gibt nur bei Veränderung der
@@ -478,7 +478,7 @@ public class Iterables {
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static <GItem> Iterable<GItem> repeatedIterable(int count, final Iterable<? extends GItem> iterable)
 		throws NullPointerException, IllegalArgumentException {
-		return Iterables.chainedIterable(Iterables.itemIterable(Objects.assertNotNull(iterable), count));
+		return Iterables.chainedIterable(Iterables.itemIterable(Objects.notNull(iterable), count));
 	}
 
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}

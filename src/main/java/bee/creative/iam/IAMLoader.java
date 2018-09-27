@@ -562,7 +562,7 @@ public class IAMLoader {
 		/** {@inheritDoc} */
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
-			Objects.assertNotNull(key);
+			Objects.notNull(key);
 			int i = this.rangeMask;
 			if (i != 0) {
 				final IAMArray range = this.rangeOffset;

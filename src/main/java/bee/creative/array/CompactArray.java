@@ -41,7 +41,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		/** {@inheritDoc} */
 		@Override
 		public GValue set(final int index, final GValue value) {
-			Objects.assertNotNull(value);
+			Objects.notNull(value);
 			final CompactArray<?, GValue> owner = this.owner;
 			final GValue entry = owner.customGet(index);
 			owner.customSet(index, value);
@@ -51,7 +51,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final GValue value) {
-			Objects.assertNotNull(value);
+			Objects.notNull(value);
 			final CompactArray<?, GValue> owner = this.owner;
 			owner.insert(index, 1);
 			owner.customSet(index, value);
@@ -86,7 +86,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public UnmodifiableValues(final CompactArray<GArray, GValue> owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** Diese Methode gibt ein neues Array mit allen Werten des intern genutzten {@link CompactArray} zurück.

@@ -33,7 +33,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public ArrayDataSource(final ByteArraySection data) throws NullPointerException {
-		this.data = Objects.assertNotNull(data);
+		this.data = Objects.notNull(data);
 	}
 
 	/** {@inheritDoc} */

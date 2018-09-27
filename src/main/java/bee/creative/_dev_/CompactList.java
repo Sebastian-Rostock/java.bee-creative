@@ -36,7 +36,7 @@ class CompactList<GItem> extends CompactCollection<GItem> implements List<GItem>
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactListItems(final CompactList<GItem> owner) throws NullPointerException {
-			this.owner = Objects.assertNotNull(owner);
+			this.owner = Objects.notNull(owner);
 		}
 
 		/** {@inheritDoc} */

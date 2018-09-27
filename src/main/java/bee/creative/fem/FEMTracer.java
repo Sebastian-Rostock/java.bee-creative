@@ -122,7 +122,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useListener(final Listener value) throws NullPointerException {
-		this.listener = Objects.assertNotNull(value);
+		this.listener = Objects.notNull(value);
 		return this;
 	}
 
@@ -133,7 +133,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useResult(final FEMValue value) throws NullPointerException {
-		this.result = Objects.assertNotNull(value);
+		this.result = Objects.notNull(value);
 		this.exception = null;
 		return this;
 	}
@@ -145,7 +145,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useFrame(final FEMFrame value) throws NullPointerException {
-		this.frame = Objects.assertNotNull(value);
+		this.frame = Objects.notNull(value);
 		return this;
 	}
 
@@ -155,7 +155,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useFunction(final FEMFunction value) throws NullPointerException {
-		this.function = Objects.assertNotNull(value);
+		this.function = Objects.notNull(value);
 		return this;
 	}
 
@@ -166,7 +166,7 @@ public final class FEMTracer {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final FEMTracer useException(final RuntimeException value) throws NullPointerException {
-		this.exception = Objects.assertNotNull(value);
+		this.exception = Objects.notNull(value);
 		this.result = null;
 		return this;
 	}

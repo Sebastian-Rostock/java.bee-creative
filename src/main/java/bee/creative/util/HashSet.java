@@ -25,7 +25,7 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		public final Hasher hasher;
 
 		public HasherHashSet(final Hasher hasher) throws NullPointerException {
-			this.hasher = Objects.assertNotNull(hasher);
+			this.hasher = Objects.notNull(hasher);
 		}
 
 		@Override

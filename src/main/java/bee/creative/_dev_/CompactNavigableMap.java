@@ -38,7 +38,7 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 		 * @param data {@link NavigableMap}.
 		 * @throws NullPointerException Wenn die gegebene {@link NavigableMap} {@code null} ist. */
 		public AbstractNavigableKeySet(final GData data) throws NullPointerException {
-			this.data = Objects.assertNotNull(data);
+			this.data = Objects.notNull(data);
 		}
 
 		/** Diese Methode gibt den Schlüssel des gegebenen {@link ItemEntry}s oder {@code null} zurück.
@@ -772,7 +772,7 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableMap(final Comparator<? super GKey> comparator) throws NullPointerException {
-		this.comparator = Objects.assertNotNull(comparator);
+		this.comparator = Objects.notNull(comparator);
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.

@@ -25,7 +25,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		public final Hasher hasher;
 
 		public HasherHashMap(final Hasher hasher) {
-			this.hasher = Objects.assertNotNull(hasher);
+			this.hasher = Objects.notNull(hasher);
 		}
 
 		@Override

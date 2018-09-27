@@ -116,13 +116,13 @@ public class Getters {
 	@SuppressWarnings ("javadoc")
 	public static class DefaultGetter<GInput, GValue> implements Getter<GInput, GValue> {
 
-		public final GValue value;
-
 		public final Getter<? super GInput, GValue> getter;
 
-		public DefaultGetter(final GValue value, final Getter<? super GInput, GValue> getter) {
+		public final GValue value;
+
+		public DefaultGetter(final Getter<? super GInput, GValue> getter, final GValue value) {
+			this.getter = Objects.notNull(getter);
 			this.value = value;
-			this.getter = Objects.assertNotNull(getter);
 		}
 
 		@Override
@@ -160,7 +160,7 @@ public class Getters {
 			this.limit = limit;
 			this.inputMode = (byte)inputMode;
 			this.outputMode = (byte)outputMode;
-			this.getter = Objects.assertNotNull(getter);
+			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
@@ -213,8 +213,8 @@ public class Getters {
 		public final Getter<? super GValue, ? extends GOutput> getter;
 
 		public NavigatedGetter(final Getter<? super GValue, ? extends GOutput> getter, final Getter<? super GInput, ? extends GValue> navigator) {
-			this.navigator = Objects.assertNotNull(navigator);
-			this.getter = Objects.assertNotNull(getter);
+			this.navigator = Objects.notNull(navigator);
+			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
@@ -243,8 +243,8 @@ public class Getters {
 
 		public AggregatedGetter(final Getter<? super GItem, GValue2> getter, final Getter<? super GValue2, ? extends GValue> format, final GValue emptyValue,
 			final GValue mixedValue) {
-			this.getter = Objects.assertNotNull(getter);
-			this.format = Objects.assertNotNull(format);
+			this.getter = Objects.notNull(getter);
+			this.format = Objects.notNull(format);
 			this.emptyValue = emptyValue;
 			this.mixedValue = mixedValue;
 		}
@@ -310,8 +310,8 @@ public class Getters {
 		public final Getter<? super GInput, ? extends GValue> getter;
 
 		public SynchronizedGetter(final Getter<? super GInput, ? extends GValue> getter, final Object mutex) {
-			this.mutex = mutex != null ? mutex : this;
-			this.getter = Objects.assertNotNull(getter);
+			this.mutex = Objects.notNull(mutex, this);
+			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
@@ -335,7 +335,7 @@ public class Getters {
 		public final Getter<? super GInput, Boolean> getter;
 
 		public GetterFilter(final Getter<? super GInput, Boolean> getter) {
-			this.getter = Objects.assertNotNull(getter);
+			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
@@ -361,7 +361,7 @@ public class Getters {
 
 		public GetterProducer(final Getter<? super GInput, ? extends GValue> getter, final GInput input) {
 			this.input = input;
-			this.getter = Objects.assertNotNull(getter);
+			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
@@ -383,7 +383,7 @@ public class Getters {
 		public final Getter<? super GInput, ? extends Number> getter;
 
 		public GetterComparable(final Getter<? super GInput, ? extends Number> getter) {
-			this.getter = Objects.assertNotNull(getter);
+			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
@@ -498,7 +498,7 @@ public class Getters {
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Getter<GInput, GValue> defaultGetter(final Getter<? super GInput, GValue> getter, final GValue value)
 		throws NullPointerException {
-		return new DefaultGetter<>(value, getter);
+		return new DefaultGetter<>(getter, value);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Getters.bufferedGetter(-1, Pointers.SOFT, Pointers.SOFT, getter)}.
@@ -627,12 +627,13 @@ public class Getters {
 		return Getters.synchronizedGetter(getter, getter);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der den gegebenen {@link Getter} via {@code synchronized(mutex)} synchronisiert.
-	 *
+	/** Diese Methode gibt einen {@link Getter} zurück, der den gegebenen {@link Getter} via {@code synchronized(mutex)} synchronisiert. Wenn das
+	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Getter} als Synchronisationsobjekt verwendet.
+	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GValue> Typ des Werts.
+	 * @param mutex Synchronisationsobjekt oder {@code null}.
 	 * @param getter {@link Getter}.
-	 * @param mutex Synchronisationsobjekt.
 	 * @return {@code synchronized}-{@link Getter}.
 	 * @throws NullPointerException Wenn der {@code getter} bzw. {@code mutex} {@code null} ist. */
 	public static <GInput, GValue> Getter<GInput, GValue> synchronizedGetter(final Object mutex, final Getter<? super GInput, ? extends GValue> getter)
