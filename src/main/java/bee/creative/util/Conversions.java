@@ -9,32 +9,6 @@ import bee.creative.util.Objects.BaseObject;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Conversions {
 
-	/** Diese Klasse implementiert {@link Conversions#inputGetter()} */
-	@SuppressWarnings ("javadoc")
-	static class InputGetter extends BaseGetter<Conversion<?, ?>, Object> {
-
-		static final Getter<?, ?> INSTANCE = new InputGetter();
-
-		@Override
-		public Object get(final Conversion<?, ?> input) {
-			return input.input();
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Conversions#outputGetter()} */
-	@SuppressWarnings ("javadoc")
-	static class OutputGetter extends BaseGetter<Conversion<?, ?>, Object> {
-
-		static final Getter<?, ?> INSTANCE = new OutputGetter();
-
-		@Override
-		public Object get(final Conversion<?, ?> input) {
-			return input.output();
-		}
-
-	}
-
 	/** Diese Klasse implementiert eine abstrakte {@link Conversion} als {@link BaseObject}. */
 	@SuppressWarnings ("javadoc")
 	public static abstract class BaseConversion<GInput, GValue> extends BaseObject implements Conversion<GInput, GValue> {
@@ -138,6 +112,32 @@ public class Conversions {
 			return Objects.toInvokeString(this, this.input, this.output);
 		}
 
+	}
+
+	/** Diese Klasse implementiert {@link Conversions#inputGetter()} */
+	@SuppressWarnings ("javadoc")
+	static class InputGetter extends BaseGetter<Conversion<?, ?>, Object> {
+	
+		static final Getter<?, ?> INSTANCE = new InputGetter();
+	
+		@Override
+		public Object get(final Conversion<?, ?> input) {
+			return input.input();
+		}
+	
+	}
+
+	/** Diese Klasse implementiert {@link Conversions#outputGetter()} */
+	@SuppressWarnings ("javadoc")
+	static class OutputGetter extends BaseGetter<Conversion<?, ?>, Object> {
+	
+		static final Getter<?, ?> INSTANCE = new OutputGetter();
+	
+		@Override
+		public Object get(final Conversion<?, ?> input) {
+			return input.output();
+		}
+	
 	}
 
 	/** Diese Methode gibt eine dynamische {@link Conversion} zurück, deren Ausgabe stats mit Hilfe des gegebenen {@link Getter} aus der gegebenen Eingabe

@@ -13,6 +13,8 @@ import java.util.Set;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
 
+	/** Diese Klasse implementiert {@link Fields#valueField(Object)}. */
+	@SuppressWarnings ("javadoc")
 	public static class ValueField<GValue> implements Field<Object, GValue> {
 
 		public static final Field<?, ?> EMPTY = new ValueField<>(null);
@@ -39,11 +41,13 @@ public final class Fields {
 
 	}
 
-	private static final class NativeField<GInput, GValue> implements Field<GInput, GValue> {
+	/** Diese Klasse implementiert {@link Fields#nativeField(java.lang.reflect.Field)}. */
+	@SuppressWarnings ("javadoc")
+	public static class NativeField<GInput, GValue> implements Field<GInput, GValue> {
 
-		private final java.lang.reflect.Field field;
+		public final java.lang.reflect.Field field;
 
-		private NativeField(final java.lang.reflect.Field field) {
+		public NativeField(final java.lang.reflect.Field field) {
 			try {
 				field.setAccessible(true);
 			} catch (final SecurityException cause) {
@@ -78,24 +82,24 @@ public final class Fields {
 
 	}
 
-	private static final class SetupField<GInput, GValue> implements Field<GInput, GValue> {
+	/** Diese Klasse implementiert {@link Fields#setupField(Field, Getter)}. */
+	@SuppressWarnings ("javadoc")
+	public static class SetupField<GInput, GValue> implements Field<GInput, GValue> {
 
-		private final Field<? super GInput, GValue> field;
+		public final Field<? super GInput, GValue> field;
 
-		private final Getter<? super GInput, GValue> setupGetter;
+		public final Getter<? super GInput, GValue> setup;
 
-		SetupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> setupGetter) {
-			Objects.notNull(field);
-			Objects.notNull(setupGetter);
-			this.setupGetter = setupGetter;
-			this.field = field;
+		public SetupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> setup) {
+			this.field = Objects.notNull(field);
+			this.setup = Objects.notNull(setup);
 		}
 
 		@Override
 		public GValue get(final GInput input) {
 			GValue result = this.field.get(input);
 			if (result != null) return result;
-			result = this.setupGetter.get(input);
+			result = this.setup.get(input);
 			this.field.set(input, result);
 			return result;
 		}
@@ -107,10 +111,13 @@ public final class Fields {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("setupField", this.field, this.setupGetter);
+			return Objects.toInvokeString(this, this.field, this.setup);
 		}
+
 	}
 
+	/** Diese Klasse implementiert {@link Fields#defaultField(Field, Object)}. */
+	@SuppressWarnings ("javadoc")
 	public static class DefaultField<GInput, GValue> implements Field<GInput, GValue> {
 
 		public final Field<? super GInput, GValue> field;
@@ -141,6 +148,8 @@ public final class Fields {
 
 	}
 
+	/** Diese Klasse implementiert {@link Fields#mappingField(Map)}. */
+	@SuppressWarnings ("javadoc")
 	public static class MappingField<GInput, GValue> implements Field<GInput, GValue> {
 
 		public final Map<GInput, GValue> mapping;
@@ -166,6 +175,8 @@ public final class Fields {
 
 	}
 
+	/** Diese Klasse implementiert {@link Fields#navigatedField(Getter, Field)}. */
+	@SuppressWarnings ("javadoc")
 	public static class NavigatedField<GSource, GTarget, GValue> implements Field<GSource, GValue> {
 
 		public final Getter<? super GSource, ? extends GTarget> navigator;
@@ -194,6 +205,8 @@ public final class Fields {
 
 	}
 
+	/** Diese Klasse implementiert {@link Fields#compositeField(Getter, Setter)}. */
+	@SuppressWarnings ("javadoc")
 	public static class CompositeField<GInput, GValue> implements Field<GInput, GValue> {
 
 		public final Getter<? super GInput, ? extends GValue> getter;
@@ -222,6 +235,8 @@ public final class Fields {
 
 	}
 
+	/** Diese Klasse implementiert {@link Fields#translatedField(Field, Translator)}. */
+	@SuppressWarnings ("javadoc")
 	public static class TranslatedField<GInput, GTarget, GSource> implements Field<GInput, GTarget> {
 
 		public final Field<? super GInput, GSource> field;
@@ -250,6 +265,8 @@ public final class Fields {
 
 	}
 
+	/** Diese Klasse implementiert {@link Fields#translatedField(Field, Getter, Getter)}. */
+	@SuppressWarnings ("javadoc")
 	public static class TranslatedField2<GInput, GSource, GTarget> implements Field<GInput, GTarget> {
 
 		public final Field<? super GInput, GSource> field;
@@ -282,15 +299,18 @@ public final class Fields {
 
 	}
 
-	private static final class ConditionalField<GInput, GValue> implements Field<GInput, GValue> {
+	/** Diese Klasse implementiert {@link Fields#conditionalField(Filter, Field, Field)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ConditionalField<GInput, GValue> implements Field<GInput, GValue> {
 
-		private final Field<? super GInput, GValue> acceptField;
+		public final Filter<? super GInput> condition;
 
-		private final Filter<? super GInput> condition;
+		public final Field<? super GInput, GValue> acceptField;
 
-		private final Field<? super GInput, GValue> rejectField;
+		public final Field<? super GInput, GValue> rejectField;
 
-		ConditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> acceptField, final Field<? super GInput, GValue> rejectField) {
+		public ConditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> acceptField,
+			final Field<? super GInput, GValue> rejectField) {
 			this.condition = Objects.notNull(condition);
 			this.acceptField = Objects.notNull(acceptField);
 			this.rejectField = Objects.notNull(rejectField);
@@ -313,10 +333,13 @@ public final class Fields {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("conditionalField", this.condition, this.acceptField, this.rejectField);
+			return Objects.toInvokeString(this, this.condition, this.acceptField, this.rejectField);
 		}
+
 	}
 
+	/** Diese Klasse implementiert {@link Fields#synchronizedField(Object, Field)}. */
+	@SuppressWarnings ("javadoc")
 	public static class SynchronizedField<GInput, GValue> implements Field<GInput, GValue> {
 
 		public final Object mutex;
@@ -349,30 +372,6 @@ public final class Fields {
 
 	}
 
-	public static class UnmodifiableField<GInput, GValue> implements Field<GInput, GValue> {
-
-		public final Field<? super GInput, ? extends GValue> field;
-
-		public UnmodifiableField(final Field<? super GInput, ? extends GValue> field) {
-			this.field = Objects.notNull(field);
-		}
-
-		@Override
-		public GValue get(final GInput input) {
-			return this.field.get(input);
-		}
-
-		@Override
-		public void set(final GInput input, final GValue value) {
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.field);
-		}
-
-	}
-
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation eines {@link Set}, welches über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
 	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie des {@link Set}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
 	 * wird.
@@ -381,7 +380,6 @@ public final class Fields {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GItem> Typ der Elemente. */
 	public static interface SetField<GInput, GItem> extends ItemsField<GInput, GItem>, Field<GInput, Set<GItem>> {
-
 	}
 
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link List}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
@@ -424,7 +422,6 @@ public final class Fields {
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
 	public static interface MapField<GInput, GKey, GValue> extends EntriesField<GInput, GKey, GValue>, Field<GInput, Map<GKey, GValue>> {
-
 	}
 
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Collection}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
@@ -539,7 +536,7 @@ public final class Fields {
 
 				@Override
 				public String toString() {
-					return Objects.toInvokeString("setField", field);
+					return field.toString();
 				}
 
 			};
@@ -628,7 +625,7 @@ public final class Fields {
 
 				@Override
 				public String toString() {
-					return Objects.toInvokeString("listField", field);
+					return field.toString();
 				}
 
 			};
@@ -741,7 +738,7 @@ public final class Fields {
 
 				@Override
 				public String toString() {
-					return Objects.toInvokeString("mapField", field);
+					return field.toString();
 				}
 
 			};
@@ -812,21 +809,25 @@ public final class Fields {
 	public static class ObservableField<GInput, GValue>
 		implements Field<GInput, GValue>, Listenable<ObservableField.ChangeFieldEvent, ObservableField.ChangeFieldListener> {
 
+		/** Diese Klasse implementiert das Ereignis, dass bei de Änderung des Werts eines {@link ObservableField} ausgelöst werden kann. */
 		public static class ChangeFieldEvent {
 
+			/** Dieses Feld speichert den Sender des Ereignisses. */
 			public final ObservableField<?, ?> sender;
 
-			public final Field<?, ?> field;
-
+			/** Dieses Feld speichert die Eingabe, dessen Eigenschaft geändert wurde. */
 			public final Object input;
 
+			/** Dieses Feld speichert den alten Wert der Eigenschaft. */
 			public final Object oldValue;
 
+			/** Dieses Feld speichert den neuen Wert der Eigenschaft. */
 			public final Object newValue;
 
-			public ChangeFieldEvent(final ObservableField<?, ?> sender, final Field<?, ?> field, final Object input, final Object oldValue, final Object newValue) {
+			/** Dieser Konstruktor initialisiert die Merkmale des Ereignisses. */
+			@SuppressWarnings ("javadoc")
+			public ChangeFieldEvent(final ObservableField<?, ?> sender, final Object input, final Object oldValue, final Object newValue) {
 				this.sender = sender;
-				this.field = field;
 				this.input = input;
 				this.oldValue = oldValue;
 				this.newValue = newValue;
@@ -882,7 +883,7 @@ public final class Fields {
 			if (this.customEquals(oldValue, newValue)) return;
 			oldValue = this.customClone(oldValue);
 			this.field.set(input, newValue);
-			this.fire(new ChangeFieldEvent(this, this.field, input, oldValue, newValue));
+			this.fire(input, oldValue, newValue);
 		}
 
 		/** {@inheritDoc} */
@@ -909,6 +910,15 @@ public final class Fields {
 			return ObservableField.OnChangeField.fire(this, event);
 		}
 
+		public void fire(final GInput input) {
+			final GValue value = this.get(input);
+			this.fire(input, value, value);
+		}
+
+		public void fire(final GInput input, final GValue oldValue, final GValue newValue) {
+			this.fire(new ChangeFieldEvent(this, input, oldValue, newValue));
+		}
+
 		/** {@inheritDoc} */
 		@Override
 		public String toString() {
@@ -920,7 +930,7 @@ public final class Fields {
 	/** Diese Methode gibt das leere {@link Field} zurück, das stets {@code null} liefert und das Schreiben ignoriert.
 	 *
 	 * @param <GValue> Typ des Werts.
-	 * @return {@link #EMPTY_FIELD}. */
+	 * @return {@code empty}-{@link Field}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Field<Object, GValue> emptyField() {
 		return (Field<Object, GValue>)ValueField.EMPTY;
@@ -1034,7 +1044,7 @@ public final class Fields {
 	 * {@code Fields.compositeField(Getters.navigatedGetter(navigator, field), Setters.navigatedField(navigator, field))}.
 	 *
 	 * @see #compositeField(Getter, Setter)
-	 * @see Getters#navigatedGetter(Getter, Getter)
+	 * @see Getters#translatedGetter(Getter, Getter)
 	 * @see Setters#navigatedSetter(Getter, Setter) */
 	@SuppressWarnings ("javadoc")
 	public static <GSource, GTarget, GValue> Field<GSource, GValue> navigatedField(final Getter<? super GSource, ? extends GTarget> navigator,
@@ -1146,10 +1156,6 @@ public final class Fields {
 	public static <GInput, GValue> Field<GInput, GValue> synchronizedField(final Object mutex, final Field<? super GInput, GValue> field)
 		throws NullPointerException {
 		return new SynchronizedField<>(mutex, field);
-	}
-
-	public static <GInput, GValue> Field<GInput, GValue> unmodifiableField(final Field<? super GInput, ? extends GValue> field) throws NullPointerException {
-		return new UnmodifiableField<>(field);
 	}
 
 }

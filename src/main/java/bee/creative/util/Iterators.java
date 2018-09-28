@@ -332,17 +332,17 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert {@link Iterators#navigatedIterator(Getter, Iterator)}. */
+	/** Diese Klasse implementiert {@link Iterators#translatedIterator(Getter, Iterator)}. */
 	@SuppressWarnings ("javadoc")
-	public static class NavigatedIterator<GInput, GOutput> extends BaseIterator<GOutput> {
+	public static class TranslatedIterator<GSource, GTarget> extends BaseIterator<GTarget> {
 
-		public final Getter<? super GInput, ? extends GOutput> navigator;
+		public final Iterator<? extends GSource> iterator;
+		
+		public final Getter<? super GSource, ? extends GTarget> toTarget;
 
-		public final Iterator<? extends GInput> iterator;
-
-		public NavigatedIterator(final Getter<? super GInput, ? extends GOutput> navigator, final Iterator<? extends GInput> iterator) {
-			this.navigator = Objects.notNull(navigator);
+		public TranslatedIterator(final Getter<? super GSource, ? extends GTarget> navigator, final Iterator<? extends GSource> iterator) {
 			this.iterator = Objects.notNull(iterator);
+			this.toTarget = Objects.notNull(navigator);
 		}
 
 		@Override
@@ -351,8 +351,8 @@ public class Iterators {
 		}
 
 		@Override
-		public GOutput next() {
-			return this.navigator.get(this.iterator.next());
+		public GTarget next() {
+			return this.toTarget.get(this.iterator.next());
 		}
 
 		@Override
@@ -362,7 +362,7 @@ public class Iterators {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.navigator, this.iterator);
+			return Objects.toInvokeString(this, this.toTarget, this.iterator);
 		}
 
 	}
@@ -726,15 +726,15 @@ public class Iterators {
 	 * liefert.
 	 *
 	 * @see Getter#get(Object)
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterator}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterator}.
+	 * @param <GSource> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterator}.
+	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterator}.
 	 * @param iterator {@link Iterator}.
-	 * @param navigator {@link Getter} nur Navigation.
+	 * @param toTarget {@link Getter} nur Navigation.
 	 * @return {@code navigated}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code navigator} {@code null} ist. */
-	public static <GInput, GOutput> Iterator<GOutput> navigatedIterator(final Getter<? super GInput, ? extends GOutput> navigator,
-		final Iterator<? extends GInput> iterator) throws NullPointerException {
-		return new NavigatedIterator<>(navigator, iterator);
+	public static <GSource, GTarget> Iterator<GTarget> translatedIterator(final Getter<? super GSource, ? extends GTarget> toTarget,
+		final Iterator<? extends GSource> iterator) throws NullPointerException {
+		return new TranslatedIterator<>(toTarget, iterator);
 	}
 
 	/** Diese Methode gibt einen unveränderlichen {@link Iterator} zurück, der die Elemente des gegebenen {@link Iterator} liefert und dessen

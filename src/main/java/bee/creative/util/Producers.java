@@ -128,27 +128,27 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Producers#navigatedBuilder(Getter, Producer)}. */
+	/** Diese Klasse implementiert {@link Producers#translatedProducer(Getter, Producer)}. */
 	@SuppressWarnings ("javadoc")
-	public static class NavigatedProducer<GInput, GOutput> implements Producer<GOutput> {
+	public static class TranslatedProducer<GSource, GTarget> implements Producer<GTarget> {
 
-		public final Getter<? super GInput, ? extends GOutput> navigator;
+		public final Producer<? extends GSource> producer;
 
-		public final Producer<? extends GInput> producer;
+		public final Getter<? super GSource, ? extends GTarget> toTarget;
 
-		public NavigatedProducer(final Getter<? super GInput, ? extends GOutput> navigator, final Producer<? extends GInput> producer) {
-			this.navigator = Objects.notNull(navigator);
+		public TranslatedProducer(final Getter<? super GSource, ? extends GTarget> toTarget, final Producer<? extends GSource> producer) {
 			this.producer = Objects.notNull(producer);
+			this.toTarget = Objects.notNull(toTarget);
 		}
 
 		@Override
-		public GOutput get() {
-			return this.navigator.get(this.producer.get());
+		public GTarget get() {
+			return this.toTarget.get(this.producer.get());
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.navigator, this.producer);
+			return Objects.toInvokeString(this, this.toTarget, this.producer);
 		}
 
 	}
@@ -285,14 +285,14 @@ public class Producers {
 	 * {@link Producer} ermittelt wird.
 	 *
 	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Producer} sowie der Eingabe des gegebenen {@link Getter}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
-	 * @param navigator {@link Getter}.
+	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
+	 * @param toTarget {@link Getter}.
 	 * @param producer {@link Producer}.
 	 * @return {@code navigated}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code producer} {@code null} ist. */
-	public static <GInput, GOutput> Producer<GOutput> navigatedBuilder(final Getter<? super GInput, ? extends GOutput> navigator,
+	public static <GInput, GTarget> Producer<GTarget> translatedProducer(final Getter<? super GInput, ? extends GTarget> toTarget,
 		final Producer<? extends GInput> producer) throws NullPointerException {
-		return new NavigatedProducer<>(navigator, producer);
+		return new TranslatedProducer<>(toTarget, producer);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code synchronizedProducer(producer, producer)}.
@@ -315,7 +315,7 @@ public class Producers {
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe ignoriert und den Wert des gegebenen {@link Producer} liefert.
-	 * 
+	 *
 	 * @param <GValue> Typ des Werts.
 	 * @param producer {@link Producer}.
 	 * @return {@link Producer}-{@link Getter}.

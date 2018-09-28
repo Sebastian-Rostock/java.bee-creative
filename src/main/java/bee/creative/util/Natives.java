@@ -258,7 +258,7 @@ public class Natives {
 	 * @throws NullPointerException Wenn {@code types} {@code null} ist oder enthält. */
 	public static String formatParams(final Class<?>... types) throws NullPointerException {
 		final StringBuilder result = new StringBuilder().append('(');
-		Strings.join(result, ",", Iterables.navigatedIterable(Natives.formatClass, Arrays.asList(types)));
+		Strings.join(result, ",", Iterables.translatedIterable(Natives.formatClass, Arrays.asList(types)));
 		return result.append(')').toString();
 	}
 

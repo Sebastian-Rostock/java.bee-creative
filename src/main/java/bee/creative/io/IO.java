@@ -772,7 +772,7 @@ public class IO {
 	public static Iterable<File> listFiles(final int maxDepth, final Iterable<File> files) {
 		if (files == null) return Iterables.emptyIterable();
 		if (maxDepth == 0) return files;
-		return Iterables.chainedIterable(Iterables.navigatedIterable(new Getter<File, Iterable<File>>() {
+		return Iterables.chainedIterable(Iterables.translatedIterable(new Getter<File, Iterable<File>>() {
 
 			@Override
 			public Iterable<File> get(final File file) {

@@ -171,7 +171,7 @@ public class Iterables {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterables.iterator()));
+			return Iterators.chainedIterator(Iterators.translatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterables.iterator()));
 		}
 
 		@Override
@@ -181,27 +181,27 @@ public class Iterables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Iterables#navigatedIterable(Getter, Iterable)}. */
+	/** Diese Klasse implementiert {@link Iterables#translatedIterable(Getter, Iterable)}. */
 	@SuppressWarnings ("javadoc")
-	public static class NavigatedIterable<GInput, GOutput> extends BaseIterable<GOutput> {
+	public static class TranslatedIterable<GSource, GTarget> extends BaseIterable<GTarget> {
 
-		public final Getter<? super GInput, ? extends GOutput> navigator;
+		public final Iterable<? extends GSource> iterable;
 
-		public final Iterable<? extends GInput> iterable;
+		public final Getter<? super GSource, ? extends GTarget> toTarget;
 
-		public NavigatedIterable(final Getter<? super GInput, ? extends GOutput> navigator, final Iterable<? extends GInput> iterable) {
-			this.navigator = Objects.notNull(navigator);
+		public TranslatedIterable(final Getter<? super GSource, ? extends GTarget> navigator, final Iterable<? extends GSource> iterable) {
 			this.iterable = Objects.notNull(iterable);
+			this.toTarget = Objects.notNull(navigator);
 		}
 
 		@Override
-		public Iterator<GOutput> iterator() {
-			return Iterators.navigatedIterator(this.navigator, this.iterable.iterator());
+		public Iterator<GTarget> iterator() {
+			return Iterators.translatedIterator(this.toTarget, this.iterable.iterator());
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.navigator, this.iterable);
+			return Objects.toInvokeString(this, this.toTarget, this.iterable);
 		}
 
 	}
@@ -469,14 +469,14 @@ public class Iterables {
 
 	/** Diese Methode ist eine Abkürzung für {@code Iterables.chainedIterable(Iterables.itemIterable(iterable, count))} und liefert ein {@link Iterable}, welches
 	 * die gegebene Anzahl Mal über die Elemente des gegebenen {@link Iterable} iteriert.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param count Anzahl der Wiederholungen.
 	 * @param iterable {@link Iterable}.
 	 * @return {@code repeated}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
-	public static <GItem> Iterable<GItem> repeatedIterable(int count, final Iterable<? extends GItem> iterable)
+	public static <GItem> Iterable<GItem> repeatedIterable(final int count, final Iterable<? extends GItem> iterable)
 		throws NullPointerException, IllegalArgumentException {
 		return Iterables.chainedIterable(Iterables.itemIterable(Objects.notNull(iterable), count));
 	}
@@ -484,16 +484,16 @@ public class Iterables {
 	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
 	 * liefert.
 	 *
-	 * @see Iterators#navigatedIterator(Getter, Iterator)
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterable}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterable}.
-	 * @param navigator {@link Getter} zur Navigation.
+	 * @see Iterators#translatedIterator(Getter, Iterator)
+	 * @param <GSource> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterable}.
+	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterable}.
+	 * @param toTarget {@link Getter} zur Navigation.
 	 * @param iterable {@link Iterable}.
 	 * @return {@code navigated}-{@link Iterable}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static <GInput, GOutput> Iterable<GOutput> navigatedIterable(final Getter<? super GInput, ? extends GOutput> navigator,
-		final Iterable<? extends GInput> iterable) throws NullPointerException {
-		return new NavigatedIterable<>(navigator, iterable);
+	public static <GSource, GTarget> Iterable<GTarget> translatedIterable(final Getter<? super GSource, ? extends GTarget> toTarget,
+		final Iterable<? extends GSource> iterable) throws NullPointerException {
+		return new TranslatedIterable<>(toTarget, iterable);
 	}
 
 	/** Diese Methode gibt eun unveränderliches {@link Iterable} zurück, das die Elemente des gegebenen {@link Iterable} liefert.

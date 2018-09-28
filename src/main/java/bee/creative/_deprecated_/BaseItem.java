@@ -40,7 +40,7 @@ public abstract class BaseItem implements Item {
 	 * @return {@link Assigner}. */
 	protected Iterable<? extends Assigner<? super Item, ? super Item>> assigners(final Assignment<? extends Item> assignment) {
 		final Type<?> thisType = this.type(), thatType = assignment.value().type();
-		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.navigatedIterable(BaseItem.FIELD_AS_ASSIGNER, //
+		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.translatedIterable(BaseItem.FIELD_AS_ASSIGNER, //
 			thisType.is(thatType) ? thatType.fields() : thatType.is(thisType) ? thisType.fields() : Iterables.<Field<?, ?>>emptyIterable()));
 	}
 

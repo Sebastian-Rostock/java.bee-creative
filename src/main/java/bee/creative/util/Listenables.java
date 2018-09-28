@@ -319,7 +319,7 @@ public abstract class Listenables<GEvent, GListener> {
 	 * @param listener Ereignisempfänger oder {@code null}.
 	 * @return {@code listener}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
-	public final GListener put(final Object sender, final GListener listener) throws IllegalArgumentException {
+	public GListener put(final Object sender, final GListener listener) throws IllegalArgumentException {
 		if (listener == null) return null;
 		if (listener instanceof Object[]) throw new IllegalArgumentException();
 		final EventStore eventStore = this.eventStore;
@@ -340,7 +340,7 @@ public abstract class Listenables<GEvent, GListener> {
 	 * @param listener Ereignisempfänger oder {@code null}.
 	 * @return {@code listener}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
-	public final GListener putWeak(final Object sender, final GListener listener) throws IllegalArgumentException {
+	public GListener putWeak(final Object sender, final GListener listener) throws IllegalArgumentException {
 		if (listener == null) return null;
 		if (listener instanceof Object[]) throw new IllegalArgumentException();
 		final EventStore eventStore = this.eventStore;
@@ -359,7 +359,7 @@ public abstract class Listenables<GEvent, GListener> {
 	 * @param sender Ereignissender oder {@code null}.
 	 * @param listener Empfänger oder {@code null}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
-	public final void pop(final Object sender, final GListener listener) throws IllegalArgumentException {
+	public void pop(final Object sender, final GListener listener) throws IllegalArgumentException {
 		if (listener == null) return;
 		if (listener instanceof Object[]) throw new IllegalArgumentException();
 		final EventStore eventStore = this.eventStore;
@@ -379,7 +379,7 @@ public abstract class Listenables<GEvent, GListener> {
 	 * @param event Ereignisnachricht oder {@code null}.
 	 * @return Ereignisnachricht.
 	 * @throws NullPointerException Wenn {@code event} {@code null} ist und die Empfänger dies nicht unterstützten. */
-	public final GEvent fire(final Object sender, final GEvent event) throws NullPointerException {
+	public GEvent fire(final Object sender, final GEvent event) throws NullPointerException {
 		final Object listener;
 		final EventStore eventStore = this.eventStore;
 		synchronized (eventStore) {
@@ -398,7 +398,7 @@ public abstract class Listenables<GEvent, GListener> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final void fireImpl(final Object sender, final Object listener, final GEvent event) {
+	private void fireImpl(final Object sender, final Object listener, final GEvent event) {
 		@SuppressWarnings ("unchecked")
 		final GListener listener2 = (GListener)EventListener.get(listener);
 		if (listener2 == null) return;
@@ -409,7 +409,7 @@ public abstract class Listenables<GEvent, GListener> {
 	 *
 	 * @param sender Ereignissender.
 	 * @return Ereignis. */
-	public final Listenable<GEvent, GListener> toListenable(final Object sender) {
+	public Listenable<GEvent, GListener> toListenable(final Object sender) {
 		return new EventListenable(sender);
 	}
 

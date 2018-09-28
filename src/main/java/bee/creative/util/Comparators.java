@@ -11,7 +11,6 @@ import bee.creative.util.Objects.BaseObject;
 public class Comparators {
 
 	public static abstract class BaseComparator<GItem> extends BaseObject implements Comparator<GItem> {
-
 	}
 
 	/** Dieses Feld speichert den {@link Comparator} für die {@link Comparable#compareTo(Object) natürliche Ordnung}. */
@@ -37,10 +36,7 @@ public class Comparators {
 			final int s1 = item1.length(), s2 = item2.length();
 			int a1 = 0, a2 = 0;
 			boolean n1 = false, n2 = false;
-			{ // Vorzeichen
-				// ermitteln
-				// und
-				// überspringen
+			{ // Vorzeichen ermitteln und überspringen
 				if (a1 < s1) {
 					final int c1 = item1.charAt(a1);
 					if (c1 == '-') {
@@ -60,8 +56,7 @@ public class Comparators {
 					}
 				}
 			}
-			{ // '0'
-				// überspringen
+			{ // '0' überspringen
 				while ((a1 < s1) && (item1.charAt(a1) == '0')) {
 					a1++;
 				}

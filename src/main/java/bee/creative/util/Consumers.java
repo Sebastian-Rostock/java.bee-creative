@@ -1,8 +1,6 @@
 package bee.creative.util;
 
 import bee.creative.util.Objects.BaseObject;
-import bee.creative.util.Setters.AggregatedSetter;
-import bee.creative.util.Setters.ConditionalSetter;
 
 public class Consumers {
 
@@ -15,31 +13,40 @@ public class Consumers {
 		return null;
 	}
 
-	public static <GValue> Consumer<GValue> nativeConsumer(String memberText) {
+	public static <GValue> Consumer<GValue> nativeConsumer(final String memberText) {
 		return null;
 	}
 
-	public static <GValue> Consumer<GValue> nativeConsumer(java.lang.reflect.Field field) {
+	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Field field) {
 		return null;
 	}
 
-	public static <GValue> Consumer<GValue> nativeConsumer(java.lang.reflect.Method method) {
+	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Method method) {
 		return null;
 	}
 
-	public static <GValue, GValue2> Consumer<GValue> navigatedConsumer(Getter<? super GValue, ? extends GValue2> navigator, Consumer<? super GValue2> consumer) {
+	public static <GTarget, GSource> Consumer<GTarget> translatedConsumer(final Getter<? super GTarget, ? extends GSource> toSource,
+		final Consumer<? super GSource> consumer) {
 		return null;
 	}
 
-	public static <GValue> Consumer<GValue> synchronizedConsumer(Consumer<? super GValue> consumer) {
-		return synchronizedConsumer(consumer, consumer);
+	public static <GValue> Consumer<GValue> synchronizedConsumer(final Consumer<? super GValue> consumer) {
+		return Consumers.synchronizedConsumer(consumer, consumer);
 	}
 
-	public static <GValue> Consumer<GValue> synchronizedConsumer(final Object mutex, Consumer<? super GValue> consumer) {
+	public static <GValue> Consumer<GValue> synchronizedConsumer(final Object mutex, final Consumer<? super GValue> consumer) {
 		return null;
 	}
 
-	public static <GValue> Setter<Object, GValue> toSetter(Consumer<? super GValue> consumer) {
+	public static <GValue> Field<Object, GValue> toField(final Consumer<? super GValue> consumer) {
+		return Setters.toField(Consumers.toSetter(consumer));
+	}
+
+	public static <GValue> Setter<Object, GValue> toSetter(final Consumer<? super GValue> consumer) {
+		return null;
+	}
+
+	public static <GValue> Property<GValue> toProperty(final Consumer<? super GValue> consumer) {
 		return null;
 	}
 

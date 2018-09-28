@@ -204,27 +204,27 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert {@link Getters#navigatedGetter(Getter, Getter)}. */
+	/** Diese Klasse implementiert {@link Getters#translatedGetter(Getter, Getter)}. */
 	@SuppressWarnings ("javadoc")
-	public static class NavigatedGetter<GInput, GValue, GOutput> implements Getter<GInput, GOutput> {
+	public static class TranslatedGetter<GInput, GSource, GTarget> implements Getter<GInput, GTarget> {
 
-		public final Getter<? super GInput, ? extends GValue> navigator;
+		public final Getter<? super GInput, ? extends GSource> getter;
 
-		public final Getter<? super GValue, ? extends GOutput> getter;
+		public final Getter<? super GSource, ? extends GTarget> toTarget;
 
-		public NavigatedGetter(final Getter<? super GValue, ? extends GOutput> getter, final Getter<? super GInput, ? extends GValue> navigator) {
-			this.navigator = Objects.notNull(navigator);
+		public TranslatedGetter(final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GInput, ? extends GSource> getter) {
 			this.getter = Objects.notNull(getter);
+			this.toTarget = Objects.notNull(toTarget);
 		}
 
 		@Override
-		public GOutput get(final GInput input) {
-			return this.getter.get(this.navigator.get(input));
+		public GTarget get(final GInput input) {
+			return this.toTarget.get(this.getter.get(input));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.navigator, this.getter);
+			return Objects.toInvokeString(this, this.getter, this.toTarget);
 		}
 
 	}
@@ -540,15 +540,15 @@ public class Getters {
 	 * Der erzeugte {@link Getter} liefert für eine Eingabe {@code input} den Wert {@code getter.get(navigator.get(input))}.
 	 *
 	 * @param <GInput> Typ der Eingabe des erzeugten sowie der Eingabe des ersten {@link Getter}.
-	 * @param <GValue> Typ der Ausgabe des ersten sowie der Eingabe des zweiten {@link Getter}.
-	 * @param <GOutput> Typ der Ausgabe des zweiten sowie der Ausgabe des erzeugten {@link Getter}.
-	 * @param navigator {@link Getter} zur Navigation.
+	 * @param <GSource> Typ der Ausgabe des ersten sowie der Eingabe des zweiten {@link Getter}.
+	 * @param <GTarget> Typ der Ausgabe des zweiten sowie der Ausgabe des erzeugten {@link Getter}.
+	 * @param toTarget {@link Getter} zur Navigation.
 	 * @param getter {@link Getter} zum Lesen.
 	 * @return {@code navigated}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code getter} {@code null} ist. */
-	public static <GInput, GValue, GOutput> Getter<GInput, GOutput> navigatedGetter(final Getter<? super GInput, ? extends GValue> navigator,
-		final Getter<? super GValue, ? extends GOutput> getter) throws NullPointerException {
-		return new NavigatedGetter<>(getter, navigator);
+	public static <GInput, GSource, GTarget> Getter<GInput, GTarget> translatedGetter(final Getter<? super GSource, ? extends GTarget> toTarget,
+		final Getter<? super GInput, ? extends GSource> getter) throws NullPointerException {
+		return new TranslatedGetter<>(toTarget, getter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Getters.aggregatedGetter(getter, null, null)}.
@@ -629,7 +629,7 @@ public class Getters {
 
 	/** Diese Methode gibt einen {@link Getter} zurück, der den gegebenen {@link Getter} via {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Getter} als Synchronisationsobjekt verwendet.
-	 * 
+	 *
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GValue> Typ des Werts.
 	 * @param mutex Synchronisationsobjekt oder {@code null}.
@@ -639,6 +639,14 @@ public class Getters {
 	public static <GInput, GValue> Getter<GInput, GValue> synchronizedGetter(final Object mutex, final Getter<? super GInput, ? extends GValue> getter)
 		throws NullPointerException {
 		return new SynchronizedGetter<>(getter, mutex);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(getter, Fields.emptyField())}.
+	 *
+	 * @see Fields#compositeField(Getter, Setter) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> toField(final Getter<? super GInput, ? extends GValue> getter) throws NullPointerException {
+		return Fields.compositeField(getter, Fields.emptyField());
 	}
 
 	/** Diese Methode gibt einen {@link Filter} als Adapter zu einer {@code boolean}-{@link Getter Eigenschaft} zurück.<br>

@@ -966,8 +966,8 @@ public class Builders {
 			return IteratorBuilder.from(Iterators.filteredIterator(filter, this.get()));
 		}
 
-		public <GItem2> IteratorBuilder<GItem2, Iterator<GItem2>> toNavigated(final Getter<? super GItem, ? extends GItem2> getter) {
-			return IteratorBuilder.from(Iterators.navigatedIterator(getter, this.get()));
+		public <GItem2> IteratorBuilder<GItem2, Iterator<GItem2>> toTranslated(final Getter<? super GItem, ? extends GItem2> getter) {
+			return IteratorBuilder.from(Iterators.translatedIterator(getter, this.get()));
 		}
 
 		public IteratorBuilder<GItem, Iterator<GItem>> toUnmodifiable() {
@@ -1024,7 +1024,7 @@ public class Builders {
 		}
 
 		public <GItem2> IterableBuilder<GItem2, Iterable<GItem2>> toNavigated(final Getter<? super GItem, ? extends GItem2> getter) {
-			return IterableBuilder.from(Iterables.navigatedIterable(getter, this.get()));
+			return IterableBuilder.from(Iterables.translatedIterable(getter, this.get()));
 		}
 
 		public IterableBuilder<GItem, Iterable<GItem>> toUnmodifiable() {

@@ -83,25 +83,25 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#navigatedSetter(Getter, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static class NavigatedSetter<GInput, GInput2, GValue> implements Setter<GInput, GValue> {
+	public static class NavigatedSetter<GTarget, GSource, GValue> implements Setter<GTarget, GValue> {
 
-		public final Getter<? super GInput, ? extends GInput2> navigator;
+		public final Setter<? super GSource, ? super GValue> setter;
 
-		public final Setter<? super GInput2, ? super GValue> setter;
+		public final Getter<? super GTarget, ? extends GSource> toSource;
 
-		public NavigatedSetter(final Getter<? super GInput, ? extends GInput2> navigator, final Setter<? super GInput2, ? super GValue> setter) {
-			this.navigator = Objects.notNull(navigator);
+		public NavigatedSetter(final Getter<? super GTarget, ? extends GSource> toSource, final Setter<? super GSource, ? super GValue> setter) {
 			this.setter = Objects.notNull(setter);
+			this.toSource = Objects.notNull(toSource);
 		}
 
 		@Override
-		public void set(final GInput input, final GValue value) {
-			this.setter.set(this.navigator.get(input), value);
+		public void set(final GTarget input, final GValue value) {
+			this.setter.set(this.toSource.get(input), value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.navigator, this.setter);
+			return Objects.toInvokeString(this, this.toSource, this.setter);
 		}
 
 	}
@@ -114,9 +114,9 @@ public class Setters {
 
 		public final Getter<? super GTarget, ? extends GSource> toSource;
 
-		public TranslatedSetter(final Setter<? super GInput, ? super GSource> setter, final Getter<? super GTarget, ? extends GSource> toSource) {
-			this.setter = Objects.notNull(setter);
+		public TranslatedSetter(final Getter<? super GTarget, ? extends GSource> toSource, final Setter<? super GInput, ? super GSource> setter) {
 			this.toSource = Objects.notNull(toSource);
+			this.setter = Objects.notNull(setter);
 		}
 
 		@Override
@@ -126,7 +126,7 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.setter, this.toSource);
+			return Objects.toInvokeString(this, this.toSource, this.setter);
 		}
 
 	}
@@ -310,23 +310,33 @@ public class Setters {
 	}
 
 	/** Diese Methode gibt einen navigierten {@link Setter} zurück.<br>
-	 * Der erzeugte {@link Setter} setzt den Wert {@code value} einer Eingabe {@code input} über {@code setter.set(navigator.get(input), value)}.
+	 * Der erzeugte {@link Setter} setzt den Wert {@code value} einer Eingabe {@code input} über {@code setter.set(toSource.get(input), value)}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GInput2> Typ des Werts des Navigators sowie der Eingabe der Eigenschaft.
+	 * @param <GTarget> Typ der Eingabe.
+	 * @param <GSource> Typ der Eingabe des Übersetzers sowie der Eingabe der Eigenschaft.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param navigator {@link Getter} zur Navigation.
+	 * @param toSource {@link Getter} zur Übersetzung der Eingabe.
 	 * @param setter {@link Setter} zur Manipulation.
 	 * @return {@code navigated}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code setter} {@code null} ist. */
-	public static <GInput, GInput2, GValue> Setter<GInput, GValue> navigatedSetter(final Getter<? super GInput, ? extends GInput2> navigator,
-		final Setter<? super GInput2, ? super GValue> setter) throws NullPointerException {
-		return new NavigatedSetter<>(navigator, setter);
+	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code setter} {@code null} ist. */
+	public static <GTarget, GSource, GValue> Setter<GTarget, GValue> navigatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
+		final Setter<? super GSource, ? super GValue> setter) throws NullPointerException {
+		return new NavigatedSetter<>(toSource, setter);
 	}
 
+	/** Diese Methode gibt einen übersetzenden {@link Setter} zurück.<br>
+	 * Der erzeugte {@link Setter} setzt den Wert {@code value} einer Eingabe {@code input} über {@code setter.set(input, toSource.get(value))}.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GSource> Typ der Eingabe des Übersetzers sowie des Werts der Eigenschaft.
+	 * @param <GTarget> Typ des Werts der Eigenschaft.
+	 * @param toSource zur Übersetzung des Werts.
+	 * @param setter {@link Setter} zur Manipulation.
+	 * @return {@code translated}-{@link Setter}.
+	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code setter} {@code null} ist. */
 	public static <GInput, GSource, GTarget> Setter<GInput, GTarget> translatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Setter<? super GInput, ? super GSource> setter) throws NullPointerException {
-		return new TranslatedSetter<>(setter, toSource);
+		return new TranslatedSetter<>(toSource, setter);
 	}
 
 	/** Diese Methode gibt einen {@link Setter} zurück, der über die Weiterleitug der Eingabe an einen der gegebenen {@link Setter Eigenschaften} mit Hilfe des
@@ -395,6 +405,14 @@ public class Setters {
 	public static <GInput, GValue> Setter<GInput, GValue> synchronizedSetter(final Object mutex, final Setter<? super GInput, ? super GValue> setter)
 		throws NullPointerException {
 		return new SynchronizedSetter<>(mutex, setter);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Fields.emptyField(), setter)}.
+	 *
+	 * @see Fields#compositeField(Getter, Setter) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> toField(final Setter<? super GInput, ? super GValue> setter) throws NullPointerException {
+		return Fields.compositeField(Fields.<GValue>emptyField(), setter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Setters.toConsumer(null, setter)}.

@@ -712,7 +712,13 @@ public class Objects {
 		return result;
 	}
 
-	public static <GObject> GObject notNull(final GObject result, final GObject result2) {
+	/** Diese Methode gibt das erste gegebene Objekt zurück, wenn dieses nicht {@code null} ist. Andernfalls wird das zweite geliefert.
+	 *
+	 * @param <GResult> Typ der Objekte.
+	 * @param result Objekt oder {@code null}.
+	 * @param result2 Objekt oder {@code null}.
+	 * @return Objekt. */
+	public static <GResult> GResult notNull(final GResult result, final GResult result2) {
 		return result != null ? result : result2;
 	}
 
