@@ -7,11 +7,441 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Field}-Instanzen.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
+
+	/** Diese Schnittstelle definiert einen Adapter zur Modifikation eines {@link Set}, welches über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
+	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie des {@link Set}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
+	 * wird.
+	 *
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GItem> Typ der Elemente. */
+	public static interface SetField<GInput, GItem> extends ItemsField<GInput, GItem>, Field<GInput, Set<GItem>> {
+	}
+
+	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link List}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
+	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link List}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
+	 * wird.
+	 *
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GItem> Typ der Elemente. */
+	public static interface ListField<GInput, GItem> extends ItemsField<GInput, GItem>, Field<GInput, List<GItem>> {
+
+		/** Diese Methode verändert die Sammlung analog zu {@link List#add(int, Object)}.
+		 *
+		 * @param input Eingabe.
+		 * @param index Index.
+		 * @param item Element. */
+		public void put(final GInput input, final int index, final GItem item);
+
+		/** Diese Methode verändert die Sammlung analog zu {@link List#addAll(int, Collection)}.
+		 *
+		 * @param input Eingabe.
+		 * @param index Index.
+		 * @param items Elemente. */
+		public void putAll(final GInput input, final int index, final Iterable<? extends GItem> items);
+
+		/** Diese Methode verändert die Sammlung analog zu {@link List#remove(int)}.
+		 *
+		 * @param input Eingabe.
+		 * @param index Index. */
+		public void pop(final GInput input, final int index);
+
+	}
+
+	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
+	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
+	 * wird.
+	 *
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte. */
+	public static interface MapField<GInput, GKey, GValue> extends EntriesField<GInput, GKey, GValue>, Field<GInput, Map<GKey, GValue>> {
+	}
+
+	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Collection}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
+	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der Objektsammlung, welche nach ihrer Modifikation über {@link Field#set(Object, Object)}
+	 * zugewiesen wird.
+	 *
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GItem> Typ der Elemente. */
+	public static interface ItemsField<GInput, GItem> {
+
+		/** Diese Methode verändert die Sammlung analog zu {@link Collection#add(Object)}.
+		 *
+		 * @param input Eingabe.
+		 * @param item Element. */
+		public void put(final GInput input, final GItem item);
+
+		/** Diese Methode verändert die Sammlung analog zu {@link Collection#addAll(Collection)}.
+		 *
+		 * @param input Eingabe.
+		 * @param items Elemente. */
+		public void putAll(final GInput input, final Iterable<? extends GItem> items);
+
+		/** Diese Methode verändert die Sammlung analog zu {@link Collection#remove(Object)}.
+		 *
+		 * @param input Eingabe.
+		 * @param item Element. */
+		public void pop(final GInput input, final Object item);
+
+		/** Diese Methode verändert die Sammlung analog zu {@link Collection#removeAll(Collection)}.
+		 *
+		 * @param input Eingabe.
+		 * @param items Elemente. */
+		public void popAll(final GInput input, final Iterable<?> items);
+
+		/** Diese Methode verändert die Sammlung analog zu {@link Collection#clear()}.
+		 *
+		 * @param input Eingabe. */
+		public void clear(final GInput input);
+
+	}
+
+	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
+	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link Field#set(Object, Object)} zugewiesen
+	 * wird.
+	 *
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte. */
+	public static interface EntriesField<GInput, GKey, GValue> {
+
+		/** Diese Methode verändert die {@link Map} analog zu {@link Map#put(Object, Object)}.
+		 *
+		 * @param input Eingabe.
+		 * @param key Schlüssel.
+		 * @param value Wert. */
+		public void put(final GInput input, final GKey key, GValue value);
+
+		/** Diese Methode verändert die {@link Map} analog zu {@link Map#putAll(Map)}.
+		 *
+		 * @param input Eingabe.
+		 * @param entries Elemente. */
+		public void putAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries);
+
+		/** Diese Methode verändert die {@link Map} analog zu {@link Map#remove(Object)}.
+		 *
+		 * @param input Eingabe.
+		 * @param key Schlüssel. */
+		public void pop(final GInput input, final Object key);
+
+		/** Diese Methode verändert die {@link Map} analog zu {@link Map#keySet()} mit {@link Set#removeAll(Collection)}.
+		 *
+		 * @param input Eingabe.
+		 * @param keys Schlüssel. */
+		public void popAll(final GInput input, final Iterable<?> keys);
+
+		/** Diese Methode verändert die {@link Map} analog zu {@link Map#clear()}.
+		 *
+		 * @param input Eingabe. */
+		public void clear(final GInput input);
+
+	}
+
+	/** Diese Klasse implementiert ein abstraktes {@link SetField}.
+	 *
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GItem> Typ der Elemente. */
+	public static abstract class BaseSetField<GInput, GItem> extends BaseObject implements SetField<GInput, GItem> {
+
+		/** Diese Methode gibt ein {@link SetField} zurück, welches das {@link Set} über das gegebene {@link Field} liest und schreibt.
+		 *
+		 * @param <GInput> Typ der Eingabe.
+		 * @param <GItem> Typ der Elemente.
+		 * @param field {@link Field} zum Lesen und Schreiben des {@link Set}.
+		 * @return {@link SetField}.
+		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+		public static <GInput, GItem> BaseSetField<GInput, GItem> from(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
+			Objects.notNull(field);
+			return new BaseSetField<GInput, GItem>() {
+
+				@Override
+				public Set<GItem> get(final GInput input) {
+					return field.get(input);
+				}
+
+				@Override
+				public void set(final GInput input, final Set<GItem> value) {
+					field.set(input, value);
+				}
+
+				@Override
+				public String toString() {
+					return field.toString();
+				}
+
+			};
+		}
+
+		/** Diese Methode gibt eine Bearbeitungskopie des gegebenen {@link Set} zurück.
+		 *
+		 * @param value {@link Set}.
+		 * @return Bearbeitungskopie. */
+		protected Set<GItem> customCopy(final Set<GItem> value) {
+			return new HashSet2<>(value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void clear(final GInput input) {
+			if (this.get(input).isEmpty()) return;
+			this.set(input, Collections.<GItem>emptySet());
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void put(final GInput input, final GItem item) {
+			Set<GItem> value = this.get(input);
+			if (value.contains(item)) return;
+			value = this.customCopy(this.get(input));
+			value.add(item);
+			this.set(input, value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void putAll(final GInput input, final Iterable<? extends GItem> items) {
+			final Set<GItem> value = this.customCopy(this.get(input));
+			if (!Iterables.addAll(value, items)) return;
+			this.set(input, value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void pop(final GInput input, final Object item) {
+			Set<GItem> value = this.get(input);
+			if (!value.contains(item)) return;
+			value = this.customCopy(this.get(input));
+			value.remove(item);
+			this.set(input, value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void popAll(final GInput input, final Iterable<?> items) {
+			final Set<GItem> value = this.customCopy(this.get(input));
+			if (!Iterables.removeAll(value, items)) return;
+			this.set(input, value);
+		}
+
+	}
+
+	/** Diese Klasse implementiert ein abstraktes {@link ListField}.
+	 *
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GEntry> Typ der Elemente. */
+	public static abstract class BaseListField<GInput, GEntry> extends BaseObject implements ListField<GInput, GEntry> {
+
+		/** Diese Methode gibt ein {@link ListField} zurück, welches das {@link List} über das gegebene {@link Field} liest und schreibt.
+		 *
+		 * @param <GInput> Typ der Eingabe.
+		 * @param <GItem> Typ der Elemente.
+		 * @param field {@link Field} zum Lesen und Schreiben einer {@link List}.
+		 * @return {@link ListField}.
+		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+		public static <GInput, GItem> BaseListField<GInput, GItem> from(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
+			Objects.notNull(field);
+			return new BaseListField<GInput, GItem>() {
+
+				@Override
+				public List<GItem> get(final GInput input) {
+					return field.get(input);
+				}
+
+				@Override
+				public void set(final GInput input, final List<GItem> value) {
+					field.set(input, value);
+				}
+
+				@Override
+				public String toString() {
+					return field.toString();
+				}
+
+			};
+		}
+
+		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link List} zurück.
+		 *
+		 * @param value {@link List}.
+		 * @return Bearbeitungskopie. */
+		protected List<GEntry> customCopy(final List<GEntry> value) {
+			return new ArrayList<>(value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void clear(final GInput input) {
+			if (this.get(input).isEmpty()) return;
+			this.set(input, Collections.<GEntry>emptyList());
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void put(final GInput input, final GEntry item) {
+			final List<GEntry> value = this.customCopy(this.get(input));
+			value.add(item);
+			this.set(input, value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void putAll(final GInput input, final Iterable<? extends GEntry> items) {
+			final List<GEntry> value = this.customCopy(this.get(input));
+			if (!Iterables.addAll(value, items)) return;
+			this.set(input, value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void put(final GInput input, final int index, final GEntry item) {
+			final List<GEntry> value = this.customCopy(this.get(input));
+			value.add(index, item);
+			this.set(input, value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void putAll(final GInput input, final int index, final Iterable<? extends GEntry> items) {
+			final List<GEntry> value = this.customCopy(this.get(input));
+			if (!Iterables.addAll(value.subList(index, index), items)) return;
+			this.set(input, value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void pop(final GInput input, final int index) {
+			final List<GEntry> value = this.customCopy(this.get(input));
+			value.remove(index);
+			this.set(input, value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void pop(final GInput input, final Object item) {
+			final List<GEntry> value = this.get(input);
+			final int index = value.indexOf(item);
+			if (index < 0) return;
+			this.pop(input, index);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void popAll(final GInput input, final Iterable<?> items) {
+			final List<GEntry> value = this.customCopy(this.get(input));
+			if (!Iterables.removeAll(value, items)) return;
+			this.set(input, value);
+		}
+
+	}
+
+	/** Diese Klasse implementiert ein abstraktes {@link MapField}.
+	 *
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte. */
+	public static abstract class BaseMapField<GInput, GKey, GValue> extends BaseObject implements MapField<GInput, GKey, GValue> {
+
+		/** Diese Methode gibt ein {@link MapField} zurück, welches die {@link Map} über das gegebene {@link Field} liest und schreibt.
+		 *
+		 * @param <GInput> Typ der Eingabe.
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 * @param field {@link Field} zum Lesen und Schreiben einer {@link Map}.
+		 * @return {@link MapField}.
+		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+		public static <GInput, GKey, GValue> BaseMapField<GInput, GKey, GValue> from(final Field<? super GInput, Map<GKey, GValue>> field)
+			throws NullPointerException {
+			Objects.notNull(field);
+			return new BaseMapField<GInput, GKey, GValue>() {
+
+				@Override
+				public Map<GKey, GValue> get(final GInput input) {
+					return field.get(input);
+				}
+
+				@Override
+				public void set(final GInput input, final Map<GKey, GValue> value) {
+					field.set(input, value);
+				}
+
+				@Override
+				public String toString() {
+					return field.toString();
+				}
+
+			};
+		}
+
+		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link Map} zurück.
+		 *
+		 * @param value {@link Map}.
+		 * @return Bearbeitungskopie. */
+		protected Map<GKey, GValue> customCopy(final Map<GKey, GValue> value) {
+			return new HashMap2<>(value);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void clear(final GInput input) {
+			if (this.get(input).isEmpty()) return;
+			this.set(input, Collections.<GKey, GValue>emptyMap());
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void put(final GInput input, final GKey key, final GValue value) {
+			Map<GKey, GValue> map = this.get(input);
+			if (Objects.equals(map.get(key), value) && ((value != null) || map.containsKey(key))) return;
+			map = this.customCopy(this.get(input));
+			map.put(key, value);
+			this.set(input, map);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void putAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
+			final Map<GKey, GValue> map = this.customCopy(this.get(input));
+			boolean modified = false;
+			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
+				modified = !Objects.equals(map.put(entry.getKey(), entry.getValue()), entry.getValue()) || modified;
+			}
+			if (!modified) return;
+			this.set(input, map);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void pop(final GInput input, final Object key) {
+			Map<GKey, GValue> map = this.get(input);
+			if (!map.containsKey(key)) return;
+			map = this.customCopy(map);
+			map.remove(key);
+			this.set(input, map);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void popAll(final GInput input, final Iterable<?> keys) {
+			final Map<GKey, GValue> map = this.customCopy(this.get(input));
+			if (!Iterables.removeAll(map.keySet(), keys)) return;
+			this.set(input, map);
+		}
+
+	}
 
 	/** Diese Klasse implementiert {@link Fields#valueField(Object)}. */
 	@SuppressWarnings ("javadoc")
@@ -372,557 +802,32 @@ public final class Fields {
 
 	}
 
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation eines {@link Set}, welches über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie des {@link Set}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
-	 * wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GItem> Typ der Elemente. */
-	public static interface SetField<GInput, GItem> extends ItemsField<GInput, GItem>, Field<GInput, Set<GItem>> {
-	}
+	/** Diese Klasse implementiert {@link Fields#toProperty(Object, Field)}. */
+	@SuppressWarnings ("javadoc")
+	static class FieldProperty<GValue, GInput> implements Property<GValue> {
 
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link List}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link List}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
-	 * wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GItem> Typ der Elemente. */
-	public static interface ListField<GInput, GItem> extends ItemsField<GInput, GItem>, Field<GInput, List<GItem>> {
+		public final GInput input;
 
-		/** Diese Methode verändert die Sammlung analog zu {@link List#add(int, Object)}.
-		 *
-		 * @param input Eingabe.
-		 * @param index Index.
-		 * @param item Element. */
-		public void put(final GInput input, final int index, final GItem item);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link List#addAll(int, Collection)}.
-		 *
-		 * @param input Eingabe.
-		 * @param index Index.
-		 * @param items Elemente. */
-		public void putAll(final GInput input, final int index, final Iterable<? extends GItem> items);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link List#remove(int)}.
-		 *
-		 * @param input Eingabe.
-		 * @param index Index. */
-		public void pop(final GInput input, final int index);
-
-	}
-
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
-	 * wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte. */
-	public static interface MapField<GInput, GKey, GValue> extends EntriesField<GInput, GKey, GValue>, Field<GInput, Map<GKey, GValue>> {
-	}
-
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Collection}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der Objektsammlung, welche nach ihrer Modifikation über {@link Field#set(Object, Object)}
-	 * zugewiesen wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GItem> Typ der Elemente. */
-	public static interface ItemsField<GInput, GItem> {
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#add(Object)}.
-		 *
-		 * @param input Eingabe.
-		 * @param item Element. */
-		public void put(final GInput input, final GItem item);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#addAll(Collection)}.
-		 *
-		 * @param input Eingabe.
-		 * @param items Elemente. */
-		public void putAll(final GInput input, final Iterable<? extends GItem> items);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#remove(Object)}.
-		 *
-		 * @param input Eingabe.
-		 * @param item Element. */
-		public void pop(final GInput input, final Object item);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#removeAll(Collection)}.
-		 *
-		 * @param input Eingabe.
-		 * @param items Elemente. */
-		public void popAll(final GInput input, final Iterable<?> items);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#clear()}.
-		 *
-		 * @param input Eingabe. */
-		public void clear(final GInput input);
-
-	}
-
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link Field#set(Object, Object)} zugewiesen
-	 * wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte. */
-	public static interface EntriesField<GInput, GKey, GValue> {
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#put(Object, Object)}.
-		 *
-		 * @param input Eingabe.
-		 * @param key Schlüssel.
-		 * @param value Wert. */
-		public void put(final GInput input, final GKey key, GValue value);
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#putAll(Map)}.
-		 *
-		 * @param input Eingabe.
-		 * @param entries Elemente. */
-		public void putAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries);
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#remove(Object)}.
-		 *
-		 * @param input Eingabe.
-		 * @param key Schlüssel. */
-		public void pop(final GInput input, final Object key);
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#keySet()} mit {@link Set#removeAll(Collection)}.
-		 *
-		 * @param input Eingabe.
-		 * @param keys Schlüssel. */
-		public void popAll(final GInput input, final Iterable<?> keys);
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#clear()}.
-		 *
-		 * @param input Eingabe. */
-		public void clear(final GInput input);
-
-	}
-
-	/** Diese Klasse implementiert ein abstraktes {@link SetField}.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GItem> Typ der Elemente. */
-	public static abstract class BaseSetField<GInput, GItem> implements SetField<GInput, GItem> {
-
-		/** Diese Methode gibt ein {@link SetField} zurück, welches das {@link Set} über das gegebene {@link Field} liest und schreibt.
-		 *
-		 * @param <GInput> Typ der Eingabe.
-		 * @param <GItem> Typ der Elemente.
-		 * @param field {@link Field} zum Lesen und Schreiben des {@link Set}.
-		 * @return {@link SetField}.
-		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static <GInput, GItem> BaseSetField<GInput, GItem> from(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
-			Objects.notNull(field);
-			return new BaseSetField<GInput, GItem>() {
-
-				@Override
-				public Set<GItem> get(final GInput input) {
-					return field.get(input);
-				}
-
-				@Override
-				public void set(final GInput input, final Set<GItem> value) {
-					field.set(input, value);
-				}
-
-				@Override
-				public String toString() {
-					return field.toString();
-				}
-
-			};
-		}
-
-		/** Diese Methode gibt eine Bearbeitungskopie des gegebenen {@link Set} zurück.
-		 *
-		 * @param value {@link Set}.
-		 * @return Bearbeitungskopie. */
-		protected Set<GItem> customCopy(final Set<GItem> value) {
-			return new HashSet2<>(value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void clear(final GInput input) {
-			if (this.get(input).isEmpty()) return;
-			this.set(input, Collections.<GItem>emptySet());
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void put(final GInput input, final GItem item) {
-			Set<GItem> value = this.get(input);
-			if (value.contains(item)) return;
-			value = this.customCopy(this.get(input));
-			value.add(item);
-			this.set(input, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void putAll(final GInput input, final Iterable<? extends GItem> items) {
-			final Set<GItem> value = this.customCopy(this.get(input));
-			if (!Iterables.addAll(value, items)) return;
-			this.set(input, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void pop(final GInput input, final Object item) {
-			Set<GItem> value = this.get(input);
-			if (!value.contains(item)) return;
-			value = this.customCopy(this.get(input));
-			value.remove(item);
-			this.set(input, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void popAll(final GInput input, final Iterable<?> items) {
-			final Set<GItem> value = this.customCopy(this.get(input));
-			if (!Iterables.removeAll(value, items)) return;
-			this.set(input, value);
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein abstraktes {@link ListField}.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GEntry> Typ der Elemente. */
-	public static abstract class BaseListField<GInput, GEntry> implements ListField<GInput, GEntry> {
-
-		/** Diese Methode gibt ein {@link ListField} zurück, welches das {@link List} über das gegebene {@link Field} liest und schreibt.
-		 *
-		 * @param <GInput> Typ der Eingabe.
-		 * @param <GItem> Typ der Elemente.
-		 * @param field {@link Field} zum Lesen und Schreiben einer {@link List}.
-		 * @return {@link ListField}.
-		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static <GInput, GItem> BaseListField<GInput, GItem> from(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
-			Objects.notNull(field);
-			return new BaseListField<GInput, GItem>() {
-
-				@Override
-				public List<GItem> get(final GInput input) {
-					return field.get(input);
-				}
-
-				@Override
-				public void set(final GInput input, final List<GItem> value) {
-					field.set(input, value);
-				}
-
-				@Override
-				public String toString() {
-					return field.toString();
-				}
-
-			};
-		}
-
-		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link List} zurück.
-		 *
-		 * @param value {@link List}.
-		 * @return Bearbeitungskopie. */
-		protected List<GEntry> customCopy(final List<GEntry> value) {
-			return new ArrayList<>(value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void clear(final GInput input) {
-			if (this.get(input).isEmpty()) return;
-			this.set(input, Collections.<GEntry>emptyList());
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void put(final GInput input, final GEntry item) {
-			final List<GEntry> value = this.customCopy(this.get(input));
-			value.add(item);
-			this.set(input, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void putAll(final GInput input, final Iterable<? extends GEntry> items) {
-			final List<GEntry> value = this.customCopy(this.get(input));
-			if (!Iterables.addAll(value, items)) return;
-			this.set(input, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void put(final GInput input, final int index, final GEntry item) {
-			final List<GEntry> value = this.customCopy(this.get(input));
-			value.add(index, item);
-			this.set(input, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void putAll(final GInput input, final int index, final Iterable<? extends GEntry> items) {
-			final List<GEntry> value = this.customCopy(this.get(input));
-			if (!Iterables.addAll(value.subList(index, index), items)) return;
-			this.set(input, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void pop(final GInput input, final int index) {
-			final List<GEntry> value = this.customCopy(this.get(input));
-			value.remove(index);
-			this.set(input, value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void pop(final GInput input, final Object item) {
-			final List<GEntry> value = this.get(input);
-			final int index = value.indexOf(item);
-			if (index < 0) return;
-			this.pop(input, index);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void popAll(final GInput input, final Iterable<?> items) {
-			final List<GEntry> value = this.customCopy(this.get(input));
-			if (!Iterables.removeAll(value, items)) return;
-			this.set(input, value);
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein abstraktes {@link MapField}.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte. */
-	public static abstract class BaseMapField<GInput, GKey, GValue> implements MapField<GInput, GKey, GValue> {
-
-		/** Diese Methode gibt ein {@link MapField} zurück, welches die {@link Map} über das gegebene {@link Field} liest und schreibt.
-		 *
-		 * @param <GInput> Typ der Eingabe.
-		 * @param <GKey> Typ der Schlüssel.
-		 * @param <GValue> Typ der Werte.
-		 * @param field {@link Field} zum Lesen und Schreiben einer {@link Map}.
-		 * @return {@link MapField}.
-		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static <GInput, GKey, GValue> BaseMapField<GInput, GKey, GValue> from(final Field<? super GInput, Map<GKey, GValue>> field)
-			throws NullPointerException {
-			Objects.notNull(field);
-			return new BaseMapField<GInput, GKey, GValue>() {
-
-				@Override
-				public Map<GKey, GValue> get(final GInput input) {
-					return field.get(input);
-				}
-
-				@Override
-				public void set(final GInput input, final Map<GKey, GValue> value) {
-					field.set(input, value);
-				}
-
-				@Override
-				public String toString() {
-					return field.toString();
-				}
-
-			};
-		}
-
-		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link Map} zurück.
-		 *
-		 * @param value {@link Map}.
-		 * @return Bearbeitungskopie. */
-		protected Map<GKey, GValue> customCopy(final Map<GKey, GValue> value) {
-			return new HashMap2<>(value);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void clear(final GInput input) {
-			if (this.get(input).isEmpty()) return;
-			this.set(input, Collections.<GKey, GValue>emptyMap());
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void put(final GInput input, final GKey key, final GValue value) {
-			Map<GKey, GValue> map = this.get(input);
-			if (Objects.equals(map.get(key), value) && ((value != null) || map.containsKey(key))) return;
-			map = this.customCopy(this.get(input));
-			map.put(key, value);
-			this.set(input, map);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void putAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-			final Map<GKey, GValue> map = this.customCopy(this.get(input));
-			boolean modified = false;
-			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
-				modified = !Objects.equals(map.put(entry.getKey(), entry.getValue()), entry.getValue()) || modified;
-			}
-			if (!modified) return;
-			this.set(input, map);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void pop(final GInput input, final Object key) {
-			Map<GKey, GValue> map = this.get(input);
-			if (!map.containsKey(key)) return;
-			map = this.customCopy(map);
-			map.remove(key);
-			this.set(input, map);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void popAll(final GInput input, final Iterable<?> keys) {
-			final Map<GKey, GValue> map = this.customCopy(this.get(input));
-			if (!Iterables.removeAll(map.keySet(), keys)) return;
-			this.set(input, map);
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein überwachbares {@link Field Datenfeld}.
-	 *
-	 * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	public static class ObservableField<GInput, GValue>
-		implements Field<GInput, GValue>, Listenable<ObservableField.ChangeFieldEvent, ObservableField.ChangeFieldListener> {
-
-		/** Diese Klasse implementiert das Ereignis, dass bei de Änderung des Werts eines {@link ObservableField} ausgelöst werden kann. */
-		public static class ChangeFieldEvent {
-
-			/** Dieses Feld speichert den Sender des Ereignisses. */
-			public final ObservableField<?, ?> sender;
-
-			/** Dieses Feld speichert die Eingabe, dessen Eigenschaft geändert wurde. */
-			public final Object input;
-
-			/** Dieses Feld speichert den alten Wert der Eigenschaft. */
-			public final Object oldValue;
-
-			/** Dieses Feld speichert den neuen Wert der Eigenschaft. */
-			public final Object newValue;
-
-			/** Dieser Konstruktor initialisiert die Merkmale des Ereignisses. */
-			@SuppressWarnings ("javadoc")
-			public ChangeFieldEvent(final ObservableField<?, ?> sender, final Object input, final Object oldValue, final Object newValue) {
-				this.sender = sender;
-				this.input = input;
-				this.oldValue = oldValue;
-				this.newValue = newValue;
-			}
-
-		}
-
-		public static interface ChangeFieldListener {
-
-			public void onChangeField(ChangeFieldEvent event);
-
-		}
-
-		public static final Listenables<ChangeFieldEvent, ChangeFieldListener> OnChangeField = new Listenables<ChangeFieldEvent, ChangeFieldListener>() {
-
-			@Override
-			protected void customFire(final Object sender, final ChangeFieldEvent event, final ChangeFieldListener listener) {
-				listener.onChangeField(event);
-			}
-
-		};
-
-		/** Dieses Feld speichert das Datenfel, an das in {@link #get(Object)} und {@link #set(Object, Object)} delegiert wird. */
 		public final Field<? super GInput, GValue> field;
 
-		/** Dieser Konstruktor initialisiert das überwachte Datenfeld.
-		 *
-		 * @param field überwachtes Datenfeld. */
-		public ObservableField(final Field<? super GInput, GValue> field) {
+		public FieldProperty(final GInput input, final Field<? super GInput, GValue> field) {
+			this.input = input;
 			this.field = Objects.notNull(field);
 		}
 
-		protected GValue customClone(final GValue value) {
-			return value;
-		}
-
-		protected boolean customEquals(final GValue value1, final GValue value2) {
-			return Objects.equals(value1, value2);
-		}
-
-		/** {@inheritDoc} */
 		@Override
-		public GValue get(final GInput input) {
-			return this.field.get(input);
+		public GValue get() {
+			return this.field.get(this.input);
 		}
 
-		/** {@inheritDoc}
-		 *
-		 * @throws IllegalStateException Wenn der Wert während */
 		@Override
-		public void set(final GInput input, final GValue newValue) throws IllegalStateException {
-			GValue oldValue = this.field.get(input);
-			if (this.customEquals(oldValue, newValue)) return;
-			oldValue = this.customClone(oldValue);
-			this.field.set(input, newValue);
-			this.fire(input, oldValue, newValue);
+		public void set(final GValue value) {
+			this.field.set(this.input, value);
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		public ChangeFieldListener put(final ChangeFieldListener listener) throws IllegalArgumentException {
-			return ObservableField.OnChangeField.put(this, listener);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public ChangeFieldListener putWeak(final ChangeFieldListener listener) throws IllegalArgumentException {
-			return ObservableField.OnChangeField.putWeak(this, listener);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void pop(final ChangeFieldListener listener) throws IllegalArgumentException {
-			ObservableField.OnChangeField.pop(this, listener);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public ChangeFieldEvent fire(final ChangeFieldEvent event) throws NullPointerException {
-			return ObservableField.OnChangeField.fire(this, event);
-		}
-
-		public void fire(final GInput input) {
-			final GValue value = this.get(input);
-			this.fire(input, value, value);
-		}
-
-		public void fire(final GInput input, final GValue oldValue, final GValue newValue) {
-			this.fire(new ChangeFieldEvent(this, input, oldValue, newValue));
-		}
-
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
-			return this.field.toString();
+			return Objects.toInvokeString(this, this.input, this.field);
 		}
 
 	}
@@ -1156,6 +1061,14 @@ public final class Fields {
 	public static <GInput, GValue> Field<GInput, GValue> synchronizedField(final Object mutex, final Field<? super GInput, GValue> field)
 		throws NullPointerException {
 		return new SynchronizedField<>(mutex, field);
+	}
+
+	public static <GValue> Property<GValue> toProperty(final Field<Object, GValue> field) throws NullPointerException {
+		return Fields.toProperty(null, field);
+	}
+
+	public static <GInput, GValue> Property<GValue> toProperty(final GInput input, final Field<? super GInput, GValue> field) throws NullPointerException {
+		return new FieldProperty<>(input, field);
 	}
 
 }

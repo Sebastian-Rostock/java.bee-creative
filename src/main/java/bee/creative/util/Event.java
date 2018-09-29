@@ -19,30 +19,30 @@ import bee.creative.ref.PointerQueue;
  * <p>
  * <pre>
  *
- * public interface MyListener {
- * 	public static class MyMessage { ... }
- * 	public void handleMyEvent(MyMessage event);
+ * public class MyMessage { ... }
+ * public interface MyObserver {
+ * 	public void onMyEvent(MyMessage message);
  * }
  *
  * public class MySender {
  *
- * 	public static final Listeners &lt;MyMessage, MyListener> MyCustomEventListeners = new Listeners<>(){
- * 		protected void customFire(Object sender, MyMessage event, MyListener listener) {
- * 			listener.handleMyEvent(event);
+ * 	public static final Event&lt;MyMessage, MyObserver> MyEvent = new Event&lt;>(){
+ * 		protected void customFire(Object sender, MyMessage message, MyListener observer) {
+ * 			observer.onMyEvent(message);
  *		}
  * 	};
  *
- * 	public Event&lt;MyMessage, MyListener> getMyCustomEventListeners() {
- * 		return MyCustomEventListeners.toEvent(this);
+ * 	public Observable&lt;MyMessage, MyObserver> getMyEvent() {
+ * 		return MyEvent.toObservable(this);
  * 	}
  *
  * }
  * </pre>
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GEvent> Typ der Nachricht.
- * @param <GListener> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
-public abstract class Listenables<GEvent, GListener> {
+ * @param <GMessage> Typ der Nachricht.
+ * @param <GObserver> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
+public abstract class Event<GMessage, GObserver> {
 
 	/** Diese Klasse implementiert die Verwaltungsdaten eines Ereignissenders. Jede Instanz benötigt mindestens 24 Byte. */
 	private static final class EventItem extends WeakReference<Object> {
@@ -50,8 +50,8 @@ public abstract class Listenables<GEvent, GListener> {
 		/** Dieses Feld speichert den Streuwert des Senders. */
 		public final int hash;
 
-		/** Dieses Feld speichert die angemeldeten Empfänger als {@link EventListener}, {@code GListener} oder {@code Object[]} solcher Empfänger sein. */
-		public volatile Object listener;
+		/** Dieses Feld speichert die angemeldeten Empfänger als {@link EventObserver}, {@code GListener} oder {@code Object[]} solcher Empfänger sein. */
+		public volatile Object observer;
 
 		@SuppressWarnings ("javadoc")
 		public EventItem(final Object sender, final ReferenceQueue<? super Object> queue) {
@@ -61,51 +61,51 @@ public abstract class Listenables<GEvent, GListener> {
 
 		/** Diese Methode meldet den gegebenen Empfänger an.
 		 *
-		 * @param listener Empfänger. */
-		public void put(final Object listener) {
-			final Object listener2 = this.listener;
-			if (listener2 instanceof Object[]) {
-				final Object[] array = (Object[])listener2;
+		 * @param observer Empfänger. */
+		public void put(final Object observer) {
+			final Object observer2 = this.observer;
+			if (observer2 instanceof Object[]) {
+				final Object[] array = (Object[])observer2;
 				final int length = array.length;
 				final Object[] array2 = new Object[length + 1];
 				System.arraycopy(array, 0, array2, 0, length);
-				array2[length] = listener;
-				this.listener = array2;
-			} else if (EventListener.get(listener2) != null) {
-				this.listener = new Object[]{listener2, listener};
+				array2[length] = observer;
+				this.observer = array2;
+			} else if (EventObserver.get(observer2) != null) {
+				this.observer = new Object[]{observer2, observer};
 			} else {
-				this.listener = listener;
+				this.observer = observer;
 			}
 		}
 
 		/** Diese Methode meldet den gegebenen Empfänger ab.
 		 *
-		 * @param listener Empfänger. */
-		public void pop(final Object listener) {
-			final Object listener2 = this.listener;
-			if (listener2 instanceof Object[]) {
-				final Object[] array = (Object[])listener2;
+		 * @param observer Empfänger. */
+		public void pop(final Object observer) {
+			final Object observer2 = this.observer;
+			if (observer2 instanceof Object[]) {
+				final Object[] array = (Object[])observer2;
 				final int length = array.length;
 				int length2 = 0;
 				for (int i = 0; i < length; i++) {
-					final Object item = EventListener.get(array[i]);
-					if ((item == null) || (item == listener)) {
+					final Object item = EventObserver.get(array[i]);
+					if ((item == null) || (item == observer)) {
 						array[i] = null;
 					} else {
 						length2++;
 					}
 				}
 				if (length2 == 0) {
-					this.listener = null;
+					this.observer = null;
 				} else if (length2 == 1) {
 					for (int i = 0; i < length; i++) {
 						final Object item = array[i];
 						if (item != null) {
-							this.listener = item;
+							this.observer = item;
 							return;
 						}
 					}
-					this.listener = null;
+					this.observer = null;
 				} else {
 					final Object[] array2 = new Object[length2];
 					for (int i = 0, i2 = 0; i < length; i++) {
@@ -114,12 +114,12 @@ public abstract class Listenables<GEvent, GListener> {
 							array2[i2++] = item;
 						}
 					}
-					this.listener = array2;
+					this.observer = array2;
 				}
 			} else {
-				final Object item = EventListener.get(listener2);
-				if ((item == null) || (item == listener)) {
-					this.listener = null;
+				final Object item = EventObserver.get(observer2);
+				if ((item == null) || (item == observer)) {
+					this.observer = null;
 				}
 			}
 		}
@@ -127,7 +127,7 @@ public abstract class Listenables<GEvent, GListener> {
 		/** {@inheritDoc} */
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.get(), this.listener);
+			return Objects.toInvokeString(this, this.get(), this.observer);
 		}
 
 	}
@@ -171,7 +171,7 @@ public abstract class Listenables<GEvent, GListener> {
 
 		/** Diese Methode entfernt die Verwaltungsdaten zum gegebenen Ereignissender.
 		 *
-		 * @param sender Ereignissender, {@link EventItem} oder {@code null}. */
+		 * @param sender Ereignissender, {@link EventItem Verwaltungsdaten} oder {@code null}. */
 		public void pop(final Object sender) {
 			this.popIndexImpl(this.toKey(sender));
 		}
@@ -226,14 +226,14 @@ public abstract class Listenables<GEvent, GListener> {
 				synchronized (eventStore) {
 					eventStore.pop(reference);
 				}
-			} else if (reference instanceof EventListener) {
-				final EventListener eventListener = (EventListener)reference;
+			} else if (reference instanceof EventObserver) {
+				final EventObserver eventListener = (EventObserver)reference;
 				final EventStore eventStore = eventListener.eventStore;
 				synchronized (eventStore) {
 					final EventItem eventItem = eventListener.eventItem;
 					synchronized (eventItem) {
 						eventItem.pop(eventListener);
-						if (eventItem.listener != null) return;
+						if (eventItem.observer != null) return;
 						eventStore.pop(eventStore);
 					}
 				}
@@ -248,17 +248,17 @@ public abstract class Listenables<GEvent, GListener> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final class EventListener extends WeakReference<Object> {
+	private static final class EventObserver extends WeakReference<Object> {
 
 		public static Object get(final Object object) {
-			return object instanceof EventListener ? ((EventListener)object).get() : object;
+			return object instanceof EventObserver ? ((EventObserver)object).get() : object;
 		}
 
 		public EventItem eventItem;
 
 		public EventStore eventStore;
 
-		public EventListener(final Object referent, final EventItem eventItem, final EventStore eventStore) {
+		public EventObserver(final Object referent, final EventItem eventItem, final EventStore eventStore) {
 			super(referent, eventStore.eventQueue);
 			this.eventItem = eventItem;
 			this.eventStore = eventStore;
@@ -272,32 +272,32 @@ public abstract class Listenables<GEvent, GListener> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final class EventListenable implements Listenable<GEvent, GListener> {
+	private final class EventObservable implements Observable<GMessage, GObserver> {
 
 		public final Object sender;
 
-		public EventListenable(final Object sender) {
+		public EventObservable(final Object sender) {
 			this.sender = sender;
 		}
 
 		@Override
-		public GListener put(final GListener listener) {
-			return Listenables.this.put(this.sender, listener);
+		public GObserver put(final GObserver observer) {
+			return Event.this.put(this.sender, observer);
 		}
 
 		@Override
-		public GListener putWeak(final GListener listener) throws IllegalArgumentException {
-			return Listenables.this.putWeak(this.sender, listener);
+		public GObserver putWeak(final GObserver observer) throws IllegalArgumentException {
+			return Event.this.putWeak(this.sender, observer);
 		}
 
 		@Override
-		public void pop(final GListener listener) {
-			Listenables.this.pop(this.sender, listener);
+		public void pop(final GObserver observer) {
+			Event.this.pop(this.sender, observer);
 		}
 
 		@Override
-		public GEvent fire(final GEvent event) {
-			return Listenables.this.fire(this.sender, event);
+		public GMessage fire(final GMessage message) {
+			return Event.this.fire(this.sender, message);
 		}
 
 		@Override
@@ -314,22 +314,22 @@ public abstract class Listenables<GEvent, GListener> {
 	 * Wenn der Empfänger {@code null} ist, wird er ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object, Object) Auslösen} von Ereignissen
 	 * informiert. Das mehrfache Anmelden des gleichen Empfängers sollte vermieden werden.
 	 *
-	 * @see Listenables#putWeak(Object, Object)
+	 * @see Event#putWeak(Object, Object)
 	 * @param sender Ereignissender oder {@code null}.
-	 * @param listener Ereignisempfänger oder {@code null}.
-	 * @return {@code listener}.
+	 * @param observer Ereignisempfänger oder {@code null}.
+	 * @return {@code observer}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
-	public GListener put(final Object sender, final GListener listener) throws IllegalArgumentException {
-		if (listener == null) return null;
-		if (listener instanceof Object[]) throw new IllegalArgumentException();
+	public GObserver put(final Object sender, final GObserver observer) throws IllegalArgumentException {
+		if (observer == null) return null;
+		if (observer instanceof Object[]) throw new IllegalArgumentException();
 		final EventStore eventStore = this.eventStore;
 		synchronized (eventStore) {
 			final EventItem eventItem = eventStore.put(sender);
 			synchronized (eventItem) {
-				eventItem.put(listener);
+				eventItem.put(observer);
 			}
 		}
-		return listener;
+		return observer;
 	}
 
 	/** Diese Methode meldet den gegebenen Ereignisempfänger für den gegebenen Ereignissender an und gibt ihn zurück.<br>
@@ -337,37 +337,37 @@ public abstract class Listenables<GEvent, GListener> {
 	 * informiert. Das mehrfache Anmelden des gleichen Empfängers sollte vermieden werden. Der Empfänger wird über eine {@link WeakReference} referenziert.
 	 *
 	 * @param sender Ereignissender oder {@code null}.
-	 * @param listener Ereignisempfänger oder {@code null}.
-	 * @return {@code listener}.
+	 * @param observer Ereignisempfänger oder {@code null}.
+	 * @return {@code observer}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
-	public GListener putWeak(final Object sender, final GListener listener) throws IllegalArgumentException {
-		if (listener == null) return null;
-		if (listener instanceof Object[]) throw new IllegalArgumentException();
+	public GObserver putWeak(final Object sender, final GObserver observer) throws IllegalArgumentException {
+		if (observer == null) return null;
+		if (observer instanceof Object[]) throw new IllegalArgumentException();
 		final EventStore eventStore = this.eventStore;
 		synchronized (eventStore) {
 			final EventItem eventItem = eventStore.put(sender);
 			synchronized (eventItem) {
-				eventItem.put(new EventListener(listener, eventItem, eventStore));
+				eventItem.put(new EventObserver(observer, eventItem, eventStore));
 			}
 		}
-		return listener;
+		return observer;
 	}
 
 	/** Diese Methode meldet den gegebenen Empfänger ab. Wenn der Empfänger {@code null} ist, wird er nicht abgemeldet. Andernfalls wird er beim zukünftigen
 	 * {@link #fire(Object, Object) Auslösen} von Ereignissen nicht mehr informiert.
 	 *
 	 * @param sender Ereignissender oder {@code null}.
-	 * @param listener Empfänger oder {@code null}.
+	 * @param observer Empfänger oder {@code null}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
-	public void pop(final Object sender, final GListener listener) throws IllegalArgumentException {
-		if (listener == null) return;
-		if (listener instanceof Object[]) throw new IllegalArgumentException();
+	public void pop(final Object sender, final GObserver observer) throws IllegalArgumentException {
+		if (observer == null) return;
+		if (observer instanceof Object[]) throw new IllegalArgumentException();
 		final EventStore eventStore = this.eventStore;
 		synchronized (eventStore) {
 			final EventItem eventItem = eventStore.get(sender);
 			if (eventItem == null) return;
 			synchronized (eventItem) {
-				eventItem.pop(listener);
+				eventItem.pop(observer);
 			}
 		}
 	}
@@ -376,48 +376,48 @@ public abstract class Listenables<GEvent, GListener> {
 	 * gegebenen Ereignisnachricht und gibt letztere zurück. Sofern die Empfänger es zulassen, kann die Nachricht {@code null} sein.
 	 *
 	 * @param sender Ereignissender oder {@code null}.
-	 * @param event Ereignisnachricht oder {@code null}.
+	 * @param message Ereignisnachricht oder {@code null}.
 	 * @return Ereignisnachricht.
 	 * @throws NullPointerException Wenn {@code event} {@code null} ist und die Empfänger dies nicht unterstützten. */
-	public GEvent fire(final Object sender, final GEvent event) throws NullPointerException {
-		final Object listener;
+	public GMessage fire(final Object sender, final GMessage message) throws NullPointerException {
+		final Object observer;
 		final EventStore eventStore = this.eventStore;
 		synchronized (eventStore) {
 			final EventItem eventItem = eventStore.get(sender);
-			if (eventItem == null) return event;
-			listener = eventItem.listener;
+			if (eventItem == null) return message;
+			observer = eventItem.observer;
 		}
-		if (listener instanceof Object[]) {
-			for (final Object item: (Object[])listener) {
-				this.fireImpl(sender, item, event);
+		if (observer instanceof Object[]) {
+			for (final Object item: (Object[])observer) {
+				this.fireImpl(sender, item, message);
 			}
 		} else {
-			this.fireImpl(sender, listener, event);
+			this.fireImpl(sender, observer, message);
 		}
-		return event;
+		return message;
 	}
 
 	@SuppressWarnings ("javadoc")
-	private void fireImpl(final Object sender, final Object listener, final GEvent event) {
+	private void fireImpl(final Object sender, final Object observer, final GMessage message) {
 		@SuppressWarnings ("unchecked")
-		final GListener listener2 = (GListener)EventListener.get(listener);
-		if (listener2 == null) return;
-		this.customFire(sender, event, listener2);
+		final GObserver observer2 = (GObserver)EventObserver.get(observer);
+		if (observer2 == null) return;
+		this.customFire(sender, message, observer2);
 	}
 
 	/** Diese Methode gibt das an den gegebenen Sender gebundene Ereignis zurück.
 	 *
 	 * @param sender Ereignissender.
 	 * @return Ereignis. */
-	public Listenable<GEvent, GListener> toListenable(final Object sender) {
-		return new EventListenable(sender);
+	public Observable<GMessage, GObserver> toObservable(final Object sender) {
+		return new EventObservable(sender);
 	}
 
 	/** Diese Methode wird durch {@link #fire(Object, Object)} aufgerufen und soll dem gegebenen Empfänger die gegebene Nachricht senden.
 	 *
 	 * @param sender Sender oder {@code null}.
-	 * @param event Nachricht oder {@code null}.
-	 * @param listener Empfänger. */
-	protected abstract void customFire(Object sender, GEvent event, GListener listener);
+	 * @param message Nachricht oder {@code null}.
+	 * @param observer Empfänger. */
+	protected abstract void customFire(Object sender, GMessage message, GObserver observer);
 
 }
