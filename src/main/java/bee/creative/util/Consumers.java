@@ -4,7 +4,7 @@ import bee.creative.util.Objects.BaseObject;
 
 public class Consumers {
 
-	/** Diese Klasse implementiert einen {@link Consumer} als {@link BaseObject}. */
+	/** Diese Klasse implementiert einen abstrakten {@link Consumer} als {@link BaseObject}. */
 	@SuppressWarnings ("javadoc")
 	public static abstract class BaseConsumer<GValue> extends BaseObject implements Consumer<GValue> {
 	}

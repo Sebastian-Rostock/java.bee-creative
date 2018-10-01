@@ -38,7 +38,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	/** {@inheritDoc} */
 	@Override
 	public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
-		return new FilteredSelection<>(Iterables.filteredIterable(Filters.navigatedFilter(field, Collections.containsFilter(value)), this.items));
+		return new FilteredSelection<>(Iterables.filteredIterable(Filters.translatedFilter(field, Collections.containsFilter(value)), this.items));
 	}
 
 	/** {@inheritDoc} */

@@ -1107,21 +1107,21 @@ public class Builders {
 
 		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum navigierenden {@link #get() Comparator} zurück.
 		 *
-		 * @see Comparators#navigatedComparator(Getter, Comparator)
+		 * @see Comparators#translatedComparator(Getter, Comparator)
 		 * @param <GItem2> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparator}.
 		 * @param navigator {@link Getter} zur Navigation.
 		 * @return neuer {@link ComparatorBuilder} zu {@code navigatedComparator}. */
 		public <GItem2> ComparatorBuilder<GItem2, Comparator<GItem2>> toNavigated(final Getter<? super GItem2, ? extends GItem> navigator) {
-			return ComparatorBuilder.from(Comparators.navigatedComparator(navigator, this.result));
+			return ComparatorBuilder.from(Comparators.translatedComparator(navigator, this.result));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum gegebenen Element sowie dem {@link #get() aktuell konfigurierten Comparator} zurück.
 		 *
-		 * @see Comparables#itemComparable(Getter, Comparator)
+		 * @see Comparators#itemComparable(Getter, Comparator)
 		 * @param item Element, welches über den {@link #get() aktuellen Comparator} mit den Eingabe des erzeugten {@link Comparable} vergleichen wird.
 		 * @return neuer {@link ComparableBuilder} zu {@code itemComparable}. */
 		public ComparableBuilder<GItem, Comparable<GItem>> toComparable(final GItem item) {
-			return ComparableBuilder.from(Comparables.itemComparable(item, this.result));
+			return ComparableBuilder.from(Comparators.itemComparable(item, this.result));
 		}
 
 	}
@@ -1192,12 +1192,12 @@ public class Builders {
 
 		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum navigierenden {@link #get() Comparable} zurück.
 		 *
-		 * @see Comparables#navigatedComparable(Getter, Comparable)
+		 * @see Comparables#translatedComparable(Getter, Comparable)
 		 * @param <GItem2> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparable}.
 		 * @param navigator {@link Getter} zur Navigation.
 		 * @return neuer {@link ComparableBuilder} zu {@code iterableComparable}. */
 		public <GItem2> ComparableBuilder<GItem2, Comparable<GItem2>> toNavigated(final Getter<? super GItem2, ? extends GItem> navigator) {
-			return ComparableBuilder.from(Comparables.navigatedComparable(navigator, this.result));
+			return ComparableBuilder.from(Comparables.translatedComparable(navigator, this.result));
 		}
 
 	}

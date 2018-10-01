@@ -212,8 +212,8 @@ public class FEMDomain {
 				itemParser = new Filter<FEMParser>() {
 
 					@Override
-					public boolean accept(final FEMParser input) {
-						return FEMDomain.this.parseValue(input);
+					public boolean accept(final FEMParser item) {
+						return FEMDomain.this.parseValue(item);
 					}
 
 				};
@@ -223,8 +223,8 @@ public class FEMDomain {
 				itemParser = new Filter<FEMParser>() {
 
 					@Override
-					public boolean accept(final FEMParser input) {
-						return FEMDomain.this.parseProxy(input);
+					public boolean accept(final FEMParser item) {
+						return FEMDomain.this.parseProxy(item);
 					}
 
 				};
@@ -235,8 +235,8 @@ public class FEMDomain {
 				itemParser = new Filter<FEMParser>() {
 
 					@Override
-					public boolean accept(final FEMParser input) {
-						return FEMDomain.this.parseFunction(input);
+					public boolean accept(final FEMParser item) {
+						return FEMDomain.this.parseFunction(item);
 					}
 
 				};

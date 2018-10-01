@@ -228,8 +228,8 @@ public class Translators {
 		}
 
 		@Override
-		public boolean accept(final Object input) {
-			return this.translator.isSource(input);
+		public boolean accept(final Object item) {
+			return this.translator.isSource(item);
 		}
 
 		@Override
@@ -272,8 +272,8 @@ public class Translators {
 		}
 
 		@Override
-		public boolean accept(final Object input) {
-			return this.translator.isTarget(input);
+		public boolean accept(final Object item) {
+			return this.translator.isTarget(item);
 		}
 
 		@Override

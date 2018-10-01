@@ -17,7 +17,7 @@ import bee.creative.util.Objects.BaseObject;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
 
-	/** Diese Klasse implementiert einen {@link Setter} als {@link BaseObject}. */
+	/** Diese Klasse implementiert einen abstrakten {@link Getter} als {@link BaseObject}. */
 	@SuppressWarnings ("javadoc")
 	public static abstract class BaseGetter<GInput, GValue> extends BaseObject implements Getter<GInput, GValue> {
 	}
@@ -330,17 +330,17 @@ public class Getters {
 
 	/** Diese Klasse implementiert {@link Getters#toFilter(Getter)}. */
 	@SuppressWarnings ("javadoc")
-	static class GetterFilter<GInput> implements Filter<GInput> {
+	static class GetterFilter<GItem> implements Filter<GItem> {
 
-		public final Getter<? super GInput, Boolean> getter;
+		public final Getter<? super GItem, Boolean> getter;
 
-		public GetterFilter(final Getter<? super GInput, Boolean> getter) {
+		public GetterFilter(final Getter<? super GItem, Boolean> getter) {
 			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
-		public boolean accept(final GInput input) {
-			final Boolean result = this.getter.get(input);
+		public boolean accept(final GItem item) {
+			final Boolean result = this.getter.get(item);
 			return (result != null) && result.booleanValue();
 		}
 

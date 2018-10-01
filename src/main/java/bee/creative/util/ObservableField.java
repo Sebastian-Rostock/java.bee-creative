@@ -9,7 +9,7 @@ public class ObservableField<GInput, GValue>
 	implements Field<GInput, GValue>, Observable<ObservableField.ChangeFieldMessage, ObservableField.ChangeFieldObserver> {
 
 	/** Diese Klasse implementiert das Ereignis, dass bei Änderung des Werts eines {@link ObservableField} ausgelöst werden kann. */
-	public static class ChangeFieldEvent extends Event<ChangeFieldMessage, ChangeFieldObserver> {
+	protected static class ChangeFieldEvent extends Event<ChangeFieldMessage, ChangeFieldObserver> {
 
 		/** Dieses Feld speichert das {@link ChangeFieldEvent}. */
 		public static final ChangeFieldEvent INSTANCE = new ChangeFieldEvent();

@@ -13,7 +13,7 @@ import bee.creative.util.Objects.BaseObject;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
-	/** Diese Klasse implementiert einen {@link Setter} als {@link BaseObject}. */
+	/** Diese Klasse implementiert einen abstrakten {@link Setter} als {@link BaseObject}. */
 	@SuppressWarnings ("javadoc")
 	public static abstract class BaseSetter<GInput, GValue> extends BaseObject implements Setter<GInput, GValue> {
 	}

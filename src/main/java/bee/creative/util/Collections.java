@@ -19,7 +19,7 @@ import bee.creative.util.Collections.FilterImplementation2;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Collections {
 
-	static final class FilterImplementation2<GInput> implements Filter<GInput> {
+	static final class FilterImplementation2<GItem> implements Filter<GItem> {
 	
 		private final Collection<?> collection;
 	
@@ -28,8 +28,8 @@ public class Collections {
 		}
 	
 		@Override
-		public boolean accept(final GInput input) {
-			return this.collection.contains(input);
+		public boolean accept(final GItem item) {
+			return this.collection.contains(item);
 		}
 	
 		@Override

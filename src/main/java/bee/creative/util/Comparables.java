@@ -35,30 +35,6 @@ import java.util.List;
  * @author Sebastian Rostock 2011. */
 public class Comparables {
 
-	private static final class NavigatedComparable<GItem, GItem2> implements Comparable<GItem> {
-
-		private final Comparable<? super GItem2> comparable;
-
-		private final Getter<? super GItem, ? extends GItem2> navigator;
-
-		private NavigatedComparable( Getter<? super GItem, ? extends GItem2> navigator, Comparable<? super GItem2> comparable) {
-			Objects.notNull(navigator);
-			Objects.notNull(comparable);
-			this.comparable = comparable;
-			this.navigator = navigator;
-		}
-
-		@Override
-		public int compareTo(final GItem item) {
-			return comparable.compareTo(navigator.get(item));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, navigator, comparable);
-		}
-	}
-
 	/** Diese Schnittstelle definiert eine Methode zum Lesen eines Element zu einem gegebenen Index.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -74,62 +50,176 @@ public class Comparables {
 
 	}
 
-	static final class FilterImplementation4<GInput> implements Filter<GInput> {
+	public static class DefaultComparable<GItem> implements Comparable<GItem> {
 	
-		private final Comparable<? super GInput> comparable;
+		public final Comparable<? super GItem> comparable;
 	
-		private FilterImplementation4(final Comparable<? super GInput> comparable) {
-			this.comparable = comparable;
+		public DefaultComparable(Comparable<? super GItem> comparable) {
+			this.comparable = Objects.notNull(comparable);
 		}
 	
 		@Override
-		public boolean accept(final GInput input) {
-			return this.comparable.compareTo(input) >= 0;
+		public int compareTo(final GItem item) {
+			return item == null ? 1 : comparable.compareTo(item);
 		}
 	
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("lowerFilter", this.comparable);
+			return Objects.toInvokeString(this, comparable);
 		}
+	
 	}
 
-	private static final class HigherFilter<GInput> implements Filter<GInput> {
-	
-		private final Comparable<? super GInput> comparable;
-	
-		private HigherFilter(final Comparable<? super GInput> comparable) {
-			this.comparable = 		Objects.notNull(comparable);
+	public static class ReverseComparable<GItem> implements Comparable<GItem> {
+
+		public final Comparable<? super GItem> comparable;
+
+		public ReverseComparable(Comparable<? super GItem> comparable) {
+			this.comparable = Objects.notNull(comparable);
 		}
-	
+
 		@Override
-		public boolean accept(final GInput input) {
-			return this.comparable.compareTo(input) <= 0;
+		public int compareTo(final GItem item) {
+			return -comparable.compareTo(item);
 		}
-	
+
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("higherFilter", this.comparable);
+			return Objects.toInvokeString(this, comparable);
 		}
-		
+
 	}
 
-	private static final class FilterImplementation3<GInput> implements Filter<GInput> {
-	
-		private final Comparable<? super GInput> comparable;
-	
-		private FilterImplementation3(final Comparable<? super GInput> comparable) {
-			this.comparable = comparable;
+	public static class IterableComparable<GItem> implements Comparable<Iterable<? extends GItem>> {
+
+		public final Comparable<? super GItem> comparable;
+
+		public IterableComparable(Comparable<? super GItem> comparable) {
+			this.comparable = Objects.notNull(comparable);
 		}
-	
+
 		@Override
-		public boolean accept(final GInput input) {
-			return this.comparable.compareTo(input) == 0;
+		public int compareTo(final Iterable<? extends GItem> that) {
+			for (final GItem item: that) {
+				final int result = comparable.compareTo(item);
+				if (result != 0) return result;
+			}
+			return 0;
 		}
-	
+
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("equalFilter", this.comparable);
+			return Objects.toInvokeString(this, comparable);
 		}
+
+	}
+
+	public static class ChainedComparable<GItem> implements Comparable<GItem> {
+
+		public final Comparable<? super GItem> comparable1;
+
+		public final Comparable<? super GItem> comparable2;
+
+		public ChainedComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2) {
+			this.comparable1 = Objects.notNull(comparable1);
+			this.comparable2 = Objects.notNull(comparable2);
+		}
+
+		@Override
+		public int compareTo(final GItem item) {
+			final int result = this.comparable1.compareTo(item);
+			if (result != 0) return result;
+			return this.comparable2.compareTo(item);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.comparable1, this.comparable2);
+		}
+
+	}
+
+	public static class TranslatedComparable<GSource, GTarget> implements Comparable<GSource> {
+
+		public final Getter<? super GSource, ? extends GTarget> toSource;
+
+		public final Comparable<? super GTarget> comparable;
+
+		public TranslatedComparable(final Getter<? super GSource, ? extends GTarget> toSource, final Comparable<? super GTarget> comparable) {
+			this.toSource = Objects.notNull(toSource);
+			this.comparable = Objects.notNull(comparable);
+		}
+
+		@Override
+		public int compareTo(final GSource item) {
+			return this.comparable.compareTo(this.toSource.get(item));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.toSource, this.comparable);
+		}
+
+	}
+
+	static class LowerFilter<GItem> implements Filter<GItem> {
+
+		public final Comparable<? super GItem> comparable;
+
+		public LowerFilter(final Comparable<? super GItem> comparable) {
+			this.comparable = Objects.notNull(comparable);
+		}
+
+		@Override
+		public boolean accept(final GItem item) {
+			return this.comparable.compareTo(item) >= 0;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.comparable);
+		}
+
+	}
+
+	static class HigherFilter<GItem> implements Filter<GItem> {
+
+		public final Comparable<? super GItem> comparable;
+
+		public HigherFilter(final Comparable<? super GItem> comparable) {
+			this.comparable = Objects.notNull(comparable);
+		}
+
+		@Override
+		public boolean accept(final GItem item) {
+			return this.comparable.compareTo(item) <= 0;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.comparable);
+		}
+
+	}
+
+	static class EqualFilter<GItem> implements Filter<GItem> {
+
+		public final Comparable<? super GItem> comparable;
+
+		public EqualFilter(final Comparable<? super GItem> comparable) {
+			this.comparable = Objects.notNull(comparable);
+		}
+
+		@Override
+		public boolean accept(final GItem item) {
+			return this.comparable.compareTo(item) == 0;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.comparable);
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -164,211 +254,6 @@ public class Comparables {
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
 		Objects.notNull(comparable);
 		Comparables.check(items.length, fromIndex, toIndex);
-	}
-
-	/** Diese Methode gibt eine beliebig sortierte Sicht auf die Elemente des gegebenen {@link Items}. Die Methode {@link Items#get(int)} liefert hierbei
-	 * {@code items.get(indices[index])}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param items Elemente.
-	 * @param indices Indices.
-	 * @return Auswahl der Elemente.
-	 * @throws NullPointerException Wenn {@code items} bzw. {@code indices} {@code null} ist. */
-	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int[] indices) throws NullPointerException {
-		Objects.notNull(items);
-		Objects.notNull(indices);
-		return new Items<GItem>() {
-
-			@Override
-			public GItem get(final int index) throws IndexOutOfBoundsException {
-				return items.get(indices[index]);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, items, indices);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen Abschnitt der gegebenen Elemente zurück. Die Methode {@link Items#get(int)} liefert hierbei {@code items.get(index + fromIndex)}
-	 * für alle gültigen Indizes.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param items Elemente.
-	 * @param fromIndex Index des ersten aus {@code items} gelieferten Elements, d.h für {@code get(0)} des erzeigten Abschnitts.
-	 * @param toIndex Index nach dem letzten aus {@code items} gelieferten Elements.
-	 * @return Auswahl der Elemente.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
-	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
-		throws NullPointerException, IllegalArgumentException {
-		Objects.notNull(items);
-		Comparables.check(fromIndex, toIndex);
-		return new Items<GItem>() {
-
-			@Override
-			public GItem get(int index) throws IndexOutOfBoundsException {
-				if (index < 0) throw new IndexOutOfBoundsException();
-				index += fromIndex;
-				if (index >= toIndex) throw new IndexOutOfBoundsException();
-				return items.get(index);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, items, fromIndex, toIndex);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie die gegebene Eingabe zur Berechnung des Navigationswert
-	 * verwendet. Die gegebene Eingabe wird als erstes Argument des {@link Comparator} verwendet. Der Navigationswert für ein Element {@code item} ist
-	 * {@code comparator.compare(input, item)}.
-	 *
-	 * @param <GItem> Typ der Eingabe.
-	 * @param input erstes Argument des {@link Comparator}.
-	 * @param comparator {@link Comparator}.
-	 * @return {@code entry}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparable<GItem> itemComparable(final GItem input, final Comparator<? super GItem> comparator) throws NullPointerException {
-		Objects.notNull(comparator);
-		return new Comparable<GItem>() {
-
-			@Override
-			public int compareTo(final GItem item2) {
-				return comparator.compare(input, item2);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, input, comparator);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Eingaben als minimal betrachtet und alle anderen Eingaben an das gegebene
-	 * {@link Comparable} delegiert. Der Navigationswert für eine Eingaben {@code item} ist {@code ((item == null) ? 1 : comparable.compareTo(item))}.
-	 *
-	 * @param <GItem> Typ der Eingabe.
-	 * @param comparable {@link Comparable}.
-	 * @return {@code default}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<GItem> defaultComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
-		Objects.notNull(comparable);
-		return new Comparable<GItem>() {
-
-			@Override
-			public int compareTo(final GItem item) {
-				return item == null ? 1 : comparable.compareTo(item);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, comparable);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen {@link Comparable} zurück, der den Navigationswert des gegebenen {@link Comparable} umkehrt. Der Navigationswert für eine Eingabe
-	 * {@code item} ist {@code -comparable.compareTo(item)}.
-	 *
-	 * @param <GItem> Typ der Eingabe.
-	 * @param comparable {@link Comparable}.
-	 * @return {@code reverse}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<GItem> reverseComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
-		Objects.notNull(comparable);
-		return new Comparable<GItem>() {
-
-			@Override
-			public int compareTo(final GItem item) {
-				return -comparable.compareTo(item);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, comparable);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen {@link Comparable} zurück, der das gegebenen {@link Comparable} auf jedes Element der iterierbaren Eingabe anwendet und den
-	 * ersten Navigationswert ungleich {@code 0} liefert und welcher bei erfolgloser Suche {@code 0} liefert.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param comparable {@link Comparable}.
-	 * @return {@code iterable}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<Iterable<? extends GItem>> iterableComparable(final Comparable<? super GItem> comparable) {
-		Objects.notNull(comparable);
-		return new Comparable<Iterable<? extends GItem>>() {
-
-			@Override
-			public int compareTo(final Iterable<? extends GItem> that) {
-				for (final GItem item: that) {
-					final int result = comparable.compareTo(item);
-					if (result != 0) return result;
-				}
-				return 0;
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, comparable);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert einer Eingabe zuerst über den ersten {@link Comparable} berechnet
-	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste den Navigationswert {@code 0} ermittelt hat. Der Navigationswert für eine Eingabe
-	 * {@code item} ist {@code (comparable1.compareTo(item) != 0 ? comparable1 : comparable2).compareTo(item)}.
-	 *
-	 * @param <GItem> Typ der Eingabe.
-	 * @param comparable1 erster {@link Comparable}.
-	 * @param comparable2 zweiter {@link Comparable}.
-	 * @return {@code chained}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code comparable1} bzw. {@code comparable2} {@code null} ist. */
-	public static <GItem> Comparable<GItem> chainedComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2)
-		throws NullPointerException {
-		Objects.notNull(comparable1);
-		Objects.notNull(comparable2);
-		return new Comparable<GItem>() {
-
-			@Override
-			public int compareTo(final GItem item) {
-				final int result = comparable1.compareTo(item);
-				if (result != 0) return result;
-				return comparable2.compareTo(item);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, comparable1, comparable2);
-			}
-
-		};
-	}
-
-	/** Diese Methode gint einen navigierten {@link Comparable} zurück, der von seiner Eingabe mit dem gegebenen {@link Getter} zur Eingabe des gegebenen
-	 * {@link Comparable} navigiert. Der Navigationswert für eine Eingabe {@code item} ist {@code comparable.compareTo(navigator.get(item))}.
-	 *
-	 * @see Getter
-	 * @param <GItem> Typ der Eingabe des {@link Getter}.
-	 * @param <GItem2> Typ der Ausgabe des {@link Getter} sowie der Eingabe des gegebenen {@link Comparable}.
-	 * @param navigator {@link Getter}.
-	 * @param comparable {@link Comparable}.
-	 * @return {@code navigated}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparable} {@code null} ist. */
-	public static <GItem, GItem2> Comparable<GItem> navigatedComparable(final Getter<? super GItem, ? extends GItem2> navigator,
-		final Comparable<? super GItem2> comparable) throws NullPointerException {
-		return new NavigatedComparable<>(navigator,comparable);
 	}
 
 	/** Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten
@@ -734,34 +619,152 @@ public class Comparables {
 		return -from - 2;
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) == 0}.
+	/** Diese Methode gibt einen Abschnitt der gegebenen Elemente zurück. Die Methode {@link Items#get(int)} liefert hierbei {@code items.get(index + fromIndex)}
+	 * für alle gültigen Indizes.
 	 *
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GItem> Typ der Elemente.
+	 * @param items Elemente.
+	 * @param fromIndex Index des ersten aus {@code items} gelieferten Elements, d.h für {@code get(0)} des erzeigten Abschnitts.
+	 * @param toIndex Index nach dem letzten aus {@code items} gelieferten Elements.
+	 * @return Auswahl der Elemente.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
+	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException {
+		Objects.notNull(items);
+		Comparables.check(fromIndex, toIndex);
+		return new Items<GItem>() {
+	
+			@Override
+			public GItem get(int index) throws IndexOutOfBoundsException {
+				if (index < 0) throw new IndexOutOfBoundsException();
+				index += fromIndex;
+				if (index >= toIndex) throw new IndexOutOfBoundsException();
+				return items.get(index);
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toInvokeString(this, items, fromIndex, toIndex);
+			}
+	
+		};
+	}
+
+	/** Diese Methode gibt eine beliebig sortierte Sicht auf die Elemente des gegebenen {@link Items}. Die Methode {@link Items#get(int)} liefert hierbei
+	 * {@code items.get(indices[index])}.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param items Elemente.
+	 * @param indices Indices.
+	 * @return Auswahl der Elemente.
+	 * @throws NullPointerException Wenn {@code items} bzw. {@code indices} {@code null} ist. */
+	public static <GItem> Items<GItem> itemsSelection(final Items<? extends GItem> items, final int[] indices) throws NullPointerException {
+		Objects.notNull(items);
+		Objects.notNull(indices);
+		return new Items<GItem>() {
+	
+			@Override
+			public GItem get(final int index) throws IndexOutOfBoundsException {
+				return items.get(indices[index]);
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toInvokeString(this, items, indices);
+			}
+	
+		};
+	}
+
+	/** Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Eingaben als minimal betrachtet und alle anderen Eingaben an das gegebene
+	 * {@link Comparable} delegiert. Der Navigationswert für eine Eingaben {@code item} ist {@code ((item == null) ? 1 : comparable.compareTo(item))}.
+	 *
+	 * @param <GItem> Typ der Eingabe.
+	 * @param comparable {@link Comparable}.
+	 * @return {@code default}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
+	public static <GItem> Comparable<GItem> defaultComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
+		return new DefaultComparable<>(comparable);
+	}
+
+	/** Diese Methode gibt einen {@link Comparable} zurück, der den Navigationswert des gegebenen {@link Comparable} umkehrt. Der Navigationswert für eine Eingabe
+	 * {@code item} ist {@code -comparable.compareTo(item)}.
+	 *
+	 * @param <GItem> Typ der Eingabe.
+	 * @param comparable {@link Comparable}.
+	 * @return {@code reverse}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
+	public static <GItem> Comparable<GItem> reverseComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
+		return new ReverseComparable<>(comparable);
+	}
+
+	/** Diese Methode gibt einen {@link Comparable} zurück, der das gegebenen {@link Comparable} auf jedes Element der iterierbaren Eingabe anwendet und den
+	 * ersten Navigationswert ungleich {@code 0} liefert und welcher bei erfolgloser Suche {@code 0} liefert.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param comparable {@link Comparable}.
+	 * @return {@code iterable}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
+	public static <GItem> Comparable<Iterable<? extends GItem>> iterableComparable(final Comparable<? super GItem> comparable) {
+		return new IterableComparable<>(comparable);
+	}
+
+	/** Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert einer Eingabe zuerst über den ersten {@link Comparable} berechnet
+	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste den Navigationswert {@code 0} ermittelt hat. Der Navigationswert für eine Eingabe
+	 * {@code item} ist {@code (comparable1.compareTo(item) != 0 ? comparable1 : comparable2).compareTo(item)}.
+	 *
+	 * @param <GItem> Typ der Eingabe.
+	 * @param comparable1 erster {@link Comparable}.
+	 * @param comparable2 zweiter {@link Comparable}.
+	 * @return {@code chained}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable1} bzw. {@code comparable2} {@code null} ist. */
+	public static <GItem> Comparable<GItem> chainedComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2)
+		throws NullPointerException {
+		return new ChainedComparable<>(comparable1, comparable2);
+	}
+
+	/** Diese Methode gint einen navigierten {@link Comparable} zurück, der von seiner Eingabe mit dem gegebenen {@link Getter} zur Eingabe des gegebenen
+	 * {@link Comparable} navigiert. Der Navigationswert für eine Eingabe {@code item} ist {@code comparable.compareTo(navigator.get(item))}.
+	 *
+	 * @see Getter
+	 * @param <GSource> Typ der Ausgabe des {@link Getter} sowie der Eingabe des gegebenen {@link Comparable}.
+	 * @param <GTarget> Typ der Eingabe des {@link Getter}.
+	 * @param toSource {@link Getter}.
+	 * @param comparable {@link Comparable}.
+	 * @return {@code navigated}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparable} {@code null} ist. */
+	public static <GSource, GTarget> Comparable<GTarget> translatedComparable(final Getter<? super GTarget, ? extends GSource> toSource,
+		final Comparable<? super GSource> comparable) throws NullPointerException {
+		return new TranslatedComparable<>(toSource, comparable);
+	}
+
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) == 0}.
+	 *
+	 * @param <GItem> Typ der Elemente.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
 	 * @return {@code equal}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GInput> Filter<GInput> toEqualFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		Objects.notNull(comparable);
-		return new FilterImplementation3<>(comparable);
+	public static <GItem> Filter<GItem> toEqualFilter(final Comparable<? super GItem> comparable) throws NullPointerException {
+		return new EqualFilter<>(comparable);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) >= 0}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) >= 0}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ der Elemente.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
 	 * @return {@code lower}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GInput> Filter<GInput> toLowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		Objects.notNull(comparable);
-		return new FilterImplementation4<>(comparable);
+		return new LowerFilter<>(comparable);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) <= 0}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) <= 0}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ der Elemente.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
 	 * @return {@code higher}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
