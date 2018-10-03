@@ -52,50 +52,6 @@ public class Builders {
 
 	}
 
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für einen Wert. Der {@link #iterator()} liefert diesen, sofern er nicht {@code null} ist.
-	 *
-	 * @param <GResult> Typ des Werts.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseValueBuilder<GResult, GThis> extends BaseBuilder2<GResult, GThis> implements Iterable<GResult> {
-
-		/** Diese Methode setzt den Wert und gibt {@code this} zurück.
-		 *
-		 * @see #get()
-		 * @param value Wert.
-		 * @return {@code this}. */
-		public GThis use(final GResult value) {
-			this.result = value;
-			return this.customThis();
-		}
-
-		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-		 *
-		 * @see #use(Object)
-		 * @param source Konfigurator.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-		public GThis use(final BaseValueBuilder<? extends GResult, ?> source) throws NullPointerException {
-			return this.use(source.result);
-		}
-
-		/** Diese Methode setzt den Wert auf {@code null} und gibt {@code this} zurück.
-		 *
-		 * @return {@code this}. */
-		public GThis clear() {
-			this.result = null;
-			return this.customThis();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public Iterator<GResult> iterator() {
-			final GResult result = this.result;
-			if (result == null) return Iterators.emptyIterator();
-			return Iterators.itemIterator(result);
-		}
-
-	}
-
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link Collection}.
 	 *
 	 * @param <GItem> Typ der Elemente.
@@ -209,6 +165,19 @@ public class Builders {
 		@Override
 		public Iterator<GItem> iterator() {
 			return this.result.iterator();
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link HashSet}.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
+	public static abstract class BaseSetBuilder2<GItem, GThis> extends BaseSetBuilder<GItem, HashSet<GItem>, GThis> {
+
+		/** Dieser Konstruktor initialisiert das interne {@link HashSet}. */
+		public BaseSetBuilder2() {
+			super(new HashSet<GItem>());
 		}
 
 	}
@@ -552,31 +521,62 @@ public class Builders {
 
 	}
 
-	/** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link HashSet}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseSetData<GItem, GThis> extends BaseSetBuilder<GItem, HashSet<GItem>, GThis> {
-
-		/** Dieser Konstruktor initialisiert das interne {@link HashSet}. */
-		public BaseSetData() {
-			super(new HashSet<GItem>());
-		}
-
-	}
-
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link HashMap}.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GItem> Typ der Werte.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseMapData<GKey, GItem, GThis> extends BaseMapBuilder<GKey, GItem, HashMap<GKey, GItem>, GThis> {
+	public static abstract class BaseMapBuilder2<GKey, GItem, GThis> extends BaseMapBuilder<GKey, GItem, HashMap<GKey, GItem>, GThis> {
 
 		/** Dieser Konstruktor initialisiert die interne {@link HashMap}. */
-		public BaseMapData() {
+		public BaseMapBuilder2() {
 			super(new HashMap<GKey, GItem>());
 		}
 
+	}
+
+	/** Diese Klasse implementiert einen abstrakten Konfigurator für einen Wert. Der {@link #iterator()} liefert diesen, sofern er nicht {@code null} ist.
+	 *
+	 * @param <GResult> Typ des Werts.
+	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
+	public static abstract class BaseValueBuilder<GResult, GThis> extends BaseBuilder2<GResult, GThis> implements Iterable<GResult> {
+	
+		/** Diese Methode setzt den Wert und gibt {@code this} zurück.
+		 *
+		 * @see #get()
+		 * @param value Wert.
+		 * @return {@code this}. */
+		public GThis use(final GResult value) {
+			this.result = value;
+			return this.customThis();
+		}
+	
+		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
+		 *
+		 * @see #use(Object)
+		 * @param source Konfigurator.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+		public GThis use(final BaseValueBuilder<? extends GResult, ?> source) throws NullPointerException {
+			return this.use(source.result);
+		}
+	
+		/** Diese Methode setzt den Wert auf {@code null} und gibt {@code this} zurück.
+		 *
+		 * @return {@code this}. */
+		public GThis clear() {
+			this.result = null;
+			return this.customThis();
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public Iterator<GResult> iterator() {
+			final GResult result = this.result;
+			if (result == null) return Iterators.emptyIterator();
+			return Iterators.itemIterator(result);
+		}
+	
 	}
 
 	/** Diese Klasse implementiert einen Konfigurator für eine {@link Map}.
@@ -900,7 +900,7 @@ public class Builders {
 		 * @param itemClazz Klasse der Elemente.
 		 * @return neuer {@link ListBuilder} zur {@code checkedList}. */
 		public ListBuilder<GItem, List<GItem>> toChecked(final Class<GItem> itemClazz) {
-			return ListBuilder.from(Collections.checkedList(this.result, itemClazz));
+			return ListBuilder.from(java.util.Collections.checkedList(this.result, itemClazz));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #get() Liste} zurück.
@@ -918,7 +918,7 @@ public class Builders {
 		 * @see java.util.Collections#synchronizedList(List)
 		 * @return neuer {@link ListBuilder} zur {@code synchronizedList}. */
 		public ListBuilder<GItem, List<GItem>> toSynchronized() {
-			return ListBuilder.from(Collections.synchronizedList(this.result));
+			return ListBuilder.from(java.util.Collections.synchronizedList(this.result));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die unveränderliche {@link #get() Liste} zurück.
@@ -926,353 +926,7 @@ public class Builders {
 		 * @see java.util.Collections#unmodifiableList(List)
 		 * @return neuer {@link ListBuilder} zur {@code unmodifiableList}. */
 		public ListBuilder<GItem, List<GItem>> toUnmodifiable() {
-			return ListBuilder.from(Collections.unmodifiableList(this.result));
-		}
-
-	}
-
-	public static class IteratorBuilder<GItem, GResult extends Iterator<GItem>> extends BaseBuilder2<GResult, IteratorBuilder<GItem, GResult>> {
-
-		public static <GItem, GResult extends Iterator<GItem>> IteratorBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new IteratorBuilder<>(result);
-		}
-
-		public static <GItem> IteratorBuilder<GItem, Iterator<GItem>> fromItem(final GItem item) throws NullPointerException {
-			return IteratorBuilder.from(Iterators.itemIterator(item));
-		}
-
-		protected IteratorBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.notNull(result);
-		}
-
-		@Override
-		protected IteratorBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
-		public IteratorBuilder<GItem, Iterator<GItem>> toUnique() {
-			return IteratorBuilder.from(Iterators.uniqueIterator(this.get()));
-		}
-
-		public IteratorBuilder<GItem, Iterator<GItem>> toChained(final Iterator<? extends GItem> i) {
-			return IteratorBuilder.from(Iterators.chainedIterator(this.get(), i));
-		}
-
-		public IteratorBuilder<GItem, Iterator<GItem>> toLimited(final int count) {
-			return IteratorBuilder.from(Iterators.limitedIterator(count, this.get()));
-		}
-
-		public IteratorBuilder<GItem, Iterator<GItem>> toFiltered(final Filter<? super GItem> filter) {
-			return IteratorBuilder.from(Iterators.filteredIterator(filter, this.get()));
-		}
-
-		public <GItem2> IteratorBuilder<GItem2, Iterator<GItem2>> toTranslated(final Getter<? super GItem, ? extends GItem2> getter) {
-			return IteratorBuilder.from(Iterators.translatedIterator(getter, this.get()));
-		}
-
-		public IteratorBuilder<GItem, Iterator<GItem>> toUnmodifiable() {
-			return IteratorBuilder.from(Iterators.unmodifiableIterator(this.get()));
-		}
-
-	}
-
-	public static class IterableBuilder<GItem, GResult extends Iterable<GItem>> extends BaseBuilder2<GResult, IterableBuilder<GItem, GResult>> {
-
-		public static <GItem, GResult extends Iterable<GItem>> IterableBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new IterableBuilder<>(result);
-		}
-
-		public static <GItem> IterableBuilder<GItem, Iterable<GItem>> fromItem(final GItem item) throws NullPointerException {
-			return IterableBuilder.from(Iterables.itemIterable(item));
-		}
-
-		protected IterableBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.notNull(result);
-		}
-
-		@Override
-		protected IterableBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
-		public SetBuilder<GItem, Set<GItem>> toSet() {
-			return SetBuilder.from(Iterables.toSet(this.get()));
-		}
-
-		public ListBuilder<GItem, List<GItem>> toList() {
-			return ListBuilder.from(Iterables.toList(this.get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toUnique() {
-			return IterableBuilder.from(Iterables.uniqueIterable(this.get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toChained(final Iterable<? extends GItem> iterable) {
-			return IterableBuilder.from(Iterables.chainedIterable(this.get(), iterable));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toLimited(final int count) {
-			return IterableBuilder.from(Iterables.limitedIterable(count, this.get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toFiltered(final Filter<? super GItem> filter) {
-			return IterableBuilder.from(Iterables.filteredIterable(filter, this.get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toRepeated(final int count) {
-			return IterableBuilder.from(Iterables.repeatedIterable(count, this.get()));
-		}
-
-		public <GItem2> IterableBuilder<GItem2, Iterable<GItem2>> toNavigated(final Getter<? super GItem, ? extends GItem2> getter) {
-			return IterableBuilder.from(Iterables.translatedIterable(getter, this.get()));
-		}
-
-		public IterableBuilder<GItem, Iterable<GItem>> toUnmodifiable() {
-			return IterableBuilder.from(Iterables.unmodifiableIterable(this.get()));
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen Konfigurator für einen {@link Comparator}.
-	 *
-	 * @param <GItem> Typ der verglichenen Elemente.
-	 * @param <GResult> Typ des {@link Comparator}. */
-	public static class ComparatorBuilder<GItem, GResult extends Comparator<GItem>> extends BaseBuilder2<GResult, ComparatorBuilder<GItem, GResult>> {
-
-		/** Diese Methode gibt einen {@link ComparatorBuilder} zum gegebenen {@link Comparator} zurück.
-		 *
-		 * @param <GItem> Typ der verglichenen Elemente.
-		 * @param <GResult> Typ des {@link Comparator}.
-		 * @param result {@link Comparator}.
-		 * @return {@link ComparatorBuilder}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static <GItem, GResult extends Comparator<GItem>> ComparatorBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new ComparatorBuilder<>(result);
-		}
-
-		/** Diese Methode gibt einen {@link ComparatorBuilder} zur {@link Comparators#naturalComparator() natürlichen Ordnung} zurück.
-		 *
-		 * @param <GItem> Typ der {@link Comparable} Elemente.
-		 * @return {@link ComparatorBuilder}. */
-		public static <GItem extends Comparable<? super GItem>> ComparatorBuilder<GItem, Comparator<GItem>> fromNatural() {
-			return ComparatorBuilder.from(Comparators.<GItem>naturalComparator());
-		}
-
-		/** Dieser Konstruktor initialisiert den internen {@link Comparator}.
-		 *
-		 * @param result interner {@link Comparator}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		protected ComparatorBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.notNull(result);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected ComparatorBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum {@code null} vergleichenden {@link #get() Comparator} zurück.
-		 *
-		 * @see Comparators#defaultComparator(Comparator)
-		 * @return neuer {@link ComparatorBuilder} zu {@code defaultComparator}. */
-		public ComparatorBuilder<GItem, Comparator<GItem>> toDefault() {
-			return ComparatorBuilder.from(Comparators.defaultComparator(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum umkehrenden {@link #get() Comparator} zurück.
-		 *
-		 * @see Comparators#reverseComparator(Comparator)
-		 * @return neuer {@link ComparatorBuilder} zu {@code reverseComparator}. */
-		public ComparatorBuilder<GItem, Comparator<GItem>> toReverse() {
-			return ComparatorBuilder.from(Comparators.reverseComparator(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum iterierenden {@link #get() Comparator} zurück.
-		 *
-		 * @see Comparators#iterableComparator(Comparator)
-		 * @return neuer {@link ComparatorBuilder} zu {@code iterableComparator}. */
-		public ComparatorBuilder<Iterable<? extends GItem>, Comparator<Iterable<? extends GItem>>> toIterable() {
-			return ComparatorBuilder.from(Comparators.iterableComparator(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum verkettenden {@link #get() Comparator} zurück.
-		 *
-		 * @see Comparators#chainedComparator(Comparator, Comparator)
-		 * @param comparator zweiter {@link Comparator}, das nach dem {@link #get() aktuell konfigurierten} angewandt wird.
-		 * @return neuer {@link ComparatorBuilder} zu {@code chainedComparator}. */
-		public ComparatorBuilder<GItem, Comparator<GItem>> toChained(final Comparator<? super GItem> comparator) {
-			return ComparatorBuilder.from(Comparators.chainedComparator(this.result, comparator));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparatorBuilder} zum navigierenden {@link #get() Comparator} zurück.
-		 *
-		 * @see Comparators#translatedComparator(Getter, Comparator)
-		 * @param <GItem2> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparator}.
-		 * @param navigator {@link Getter} zur Navigation.
-		 * @return neuer {@link ComparatorBuilder} zu {@code navigatedComparator}. */
-		public <GItem2> ComparatorBuilder<GItem2, Comparator<GItem2>> toNavigated(final Getter<? super GItem2, ? extends GItem> navigator) {
-			return ComparatorBuilder.from(Comparators.translatedComparator(navigator, this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum gegebenen Element sowie dem {@link #get() aktuell konfigurierten Comparator} zurück.
-		 *
-		 * @see Comparators#itemComparable(Getter, Comparator)
-		 * @param item Element, welches über den {@link #get() aktuellen Comparator} mit den Eingabe des erzeugten {@link Comparable} vergleichen wird.
-		 * @return neuer {@link ComparableBuilder} zu {@code itemComparable}. */
-		public ComparableBuilder<GItem, Comparable<GItem>> toComparable(final GItem item) {
-			return ComparableBuilder.from(Comparators.itemComparable(item, this.result));
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen Konfigurator für einen {@link Comparable}.
-	 *
-	 * @param <GItem> Typ der verglichenen Elemente.
-	 * @param <GResult> Typ des {@link Comparable}. */
-	public static class ComparableBuilder<GItem, GResult extends Comparable<GItem>> extends BaseBuilder2<GResult, ComparableBuilder<GItem, GResult>> {
-
-		/** Diese Methode gibt einen {@link ComparableBuilder} zum gegebenen {@link Comparable} zurück.
-		 *
-		 * @param <GItem> Typ der verglichenen Elemente.
-		 * @param <GResult> Typ des {@link Comparable}.
-		 * @param result {@link Comparable}.
-		 * @return {@link ComparableBuilder}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static <GItem, GResult extends Comparable<GItem>> ComparableBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new ComparableBuilder<>(result);
-		}
-
-		/** Dieser Konstruktor initialisiert das interne {@link Comparable}.
-		 *
-		 * @param result internes {@link Comparable}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		protected ComparableBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.notNull(result);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected ComparableBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum {@code null} vergleichenden {@link #get() Comparable} zurück.
-		 *
-		 * @see Comparables#defaultComparable(Comparable)
-		 * @return neuer {@link ComparableBuilder} zu {@code defaultComparable}. */
-		public ComparableBuilder<GItem, Comparable<GItem>> toDefault() {
-			return ComparableBuilder.from(Comparables.defaultComparable(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum umkehrenden {@link #get() Comparable} zurück.
-		 *
-		 * @see Comparables#reverseComparable(Comparable)
-		 * @return neuer {@link ComparableBuilder} zu {@code reverseComparable}. */
-		public ComparableBuilder<GItem, Comparable<GItem>> toReverse() {
-			return ComparableBuilder.from(Comparables.reverseComparable(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum iterierenden {@link #get() Comparable} zurück.
-		 *
-		 * @see Comparables#iterableComparable(Comparable)
-		 * @return neuer {@link ComparableBuilder} zu {@code iterableComparable}. */
-		public ComparableBuilder<Iterable<? extends GItem>, Comparable<Iterable<? extends GItem>>> toIterable() {
-			return ComparableBuilder.from(Comparables.iterableComparable(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum verkettenden {@link #get() Comparable} zurück.
-		 *
-		 * @see Comparables#chainedComparable(Comparable, Comparable)
-		 * @param comparable zweites {@link Comparable}, das nach dem {@link #get() aktuell konfigurierten} angewandt wird.
-		 * @return neuer {@link ComparableBuilder} zu {@code chainedComparable}. */
-		public ComparableBuilder<GItem, Comparable<GItem>> toChained(final Comparable<? super GItem> comparable) {
-			return ComparableBuilder.from(Comparables.chainedComparable(this.result, comparable));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ComparableBuilder} zum navigierenden {@link #get() Comparable} zurück.
-		 *
-		 * @see Comparables#translatedComparable(Getter, Comparable)
-		 * @param <GItem2> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparable}.
-		 * @param navigator {@link Getter} zur Navigation.
-		 * @return neuer {@link ComparableBuilder} zu {@code iterableComparable}. */
-		public <GItem2> ComparableBuilder<GItem2, Comparable<GItem2>> toNavigated(final Getter<? super GItem2, ? extends GItem> navigator) {
-			return ComparableBuilder.from(Comparables.translatedComparable(navigator, this.result));
-		}
-
-	}
-
-	public static class FilterBuilder<GInput, GResult extends Filter<GInput>> extends BaseBuilder2<GResult, FilterBuilder<GInput, GResult>> {
-
-		@Override
-		protected FilterBuilder<GInput, GResult> customThis() {
-			return this;
-		}
-
-	}
-
-	public static class PropertyBuilder<GValue, GResult extends Property<GValue>> extends BaseBuilder2<GResult, PropertyBuilder<GValue, GResult>> {
-
-		@Override
-		protected PropertyBuilder<GValue, GResult> customThis() {
-			return this;
-		}
-
-	}
-
-	public static class ProducerBuilder<GValue, GResult extends Producer<GValue>> extends BaseBuilder2<GResult, ProducerBuilder<GValue, GResult>> {
-
-		@Override
-		protected ProducerBuilder<GValue, GResult> customThis() {
-			return this;
-		}
-
-	}
-
-	public static class ConsumerBuilder<GValue, GResult extends Consumer<GValue>> extends BaseBuilder2<GResult, ConsumerBuilder<GValue, GResult>> {
-
-		@Override
-		protected ConsumerBuilder<GValue, GResult> customThis() {
-			return this;
-		}
-
-	}
-
-	public static class FieldBuilder<GInput, GValue, GResult extends Field<GInput, GValue>> extends BaseBuilder2<GResult, FieldBuilder<GInput, GValue, GResult>> {
-
-		@Override
-		protected FieldBuilder<GInput, GValue, GResult> customThis() {
-			return this;
-		}
-
-	}
-
-	public static class SetterBuilder<GInput, GValue, GResult extends Setter<GInput, GValue>>
-		extends BaseBuilder2<GResult, SetterBuilder<GInput, GValue, GResult>> {
-
-		@Override
-		protected SetterBuilder<GInput, GValue, GResult> customThis() {
-			return this;
-		}
-
-	}
-
-	public static class GetterBuilder<GInput, GValue, GResult extends Getter<GInput, GValue>>
-		extends BaseBuilder2<GResult, GetterBuilder<GInput, GValue, GResult>> {
-
-		@Override
-		protected GetterBuilder<GInput, GValue, GResult> customThis() {
-			return this;
-		}
-
-	}
-
-	public static class TranslatorBuilder<GSource, GTarget, GResult extends Translator<GSource, GTarget>>
-		extends BaseBuilder2<GResult, TranslatorBuilder<GSource, GTarget, GResult>> {
-
-		@Override
-		protected TranslatorBuilder<GSource, GTarget, GResult> customThis() {
-			return this;
+			return ListBuilder.from(java.util.Collections.unmodifiableList(this.result));
 		}
 
 	}

@@ -8,7 +8,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapData;
+import bee.creative.util.Builders.BaseMapBuilder2;
 import bee.creative.util.Objects;
 import bee.creative.xml.BaseTemplatesData.FactoryData;
 
@@ -23,7 +23,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @see Transformer#setOutputProperty(String, String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertyData<GOwner> extends BaseMapData<String, String, PropertyData<GOwner>> {
+	public static abstract class PropertyData<GOwner> extends BaseMapBuilder2<String, String, PropertyData<GOwner>> {
 
 		/** Diese Methode wählt {@link OutputKeys#INDENT} und gibt {@code this} zurück.
 		 *
@@ -107,7 +107,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @see Transformer#setParameter(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ParameterData<GOwner> extends BaseMapData<String, Object, ParameterData<GOwner>> {
+	public static abstract class ParameterData<GOwner> extends BaseMapBuilder2<String, Object, ParameterData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

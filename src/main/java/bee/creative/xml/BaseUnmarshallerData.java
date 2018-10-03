@@ -10,8 +10,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.validation.Schema;
 import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapData;
-import bee.creative.util.Builders.BaseSetData;
+import bee.creative.util.Builders.BaseMapBuilder2;
+import bee.creative.util.Builders.BaseSetBuilder2;
 import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 import bee.creative.xml.BaseDocumentBuilderFactoryData.SchemaData;
@@ -68,7 +68,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @see Unmarshaller#setAdapter(XmlAdapter)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class AdapterData<GOwner> extends BaseSetData<XmlAdapter<?, ?>, AdapterData<GOwner>> {
+	public static abstract class AdapterData<GOwner> extends BaseSetBuilder2<XmlAdapter<?, ?>, AdapterData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -108,7 +108,7 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 	 * @see Unmarshaller#setProperty(String, Object)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertyData<GOwner> extends BaseMapData<String, Object, PropertyData<GOwner>> {
+	public static abstract class PropertyData<GOwner> extends BaseMapBuilder2<String, Object, PropertyData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
