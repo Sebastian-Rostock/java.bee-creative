@@ -266,7 +266,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	/** Diese Methode ist eine Abkürzung für {@code this.newFrame(FEMArray.from(params))}.
 	 *
 	 * @see #newFrame(FEMArray)
-	 * @see FEMArray#from(Collection) */
+	 * @see FEMArray#from(Iterable) */
 	@SuppressWarnings ("javadoc")
 	public final FEMFrame newFrame(final Collection<? extends FEMValue> params) throws NullPointerException {
 		return this.newFrame(FEMArray.from(params));
@@ -322,7 +322,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	/** Diese Methode ist eine Abkürzung für {@code this.withParams(FEMArray.from(params))}.
 	 *
 	 * @see #withParams(FEMArray)
-	 * @see FEMArray#from(Collection) */
+	 * @see FEMArray#from(Iterable) */
 	@SuppressWarnings ("javadoc")
 	public final FEMFrame withParams(final Collection<? extends FEMValue> params) throws NullPointerException {
 		return this.withParams(FEMArray.from(params));

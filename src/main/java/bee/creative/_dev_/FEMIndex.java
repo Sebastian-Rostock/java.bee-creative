@@ -1,6 +1,5 @@
 package bee.creative._dev_;
 
-import bee.creative.bex.BEXFile;
 import bee.creative.fem.FEMArray;
 import bee.creative.fem.FEMBinary;
 import bee.creative.fem.FEMBoolean;
@@ -32,55 +31,53 @@ public abstract class FEMIndex {
 	public static class FEM_JSON implements Producer<Object> {
 
 		// hashmap mit int value
-		
-		
-		
+
 		// werte als string kodieren und häufigkeit der referenzen zählen
 		// häufigste an den listenbeginn sortieren
 		// 1-malige inline kodieren, übrige per referenz auf häufigen eintrag in pool
 		//
 
-		public int put(FEMValue value) {
-// todo switch
+		public int put(final FEMValue value) {
+			// todo switch
 			return 0;
 		}
-		
+
 		protected int customPutVoid() {
 			return 0;
 		}
 
-		protected int customPutArray(FEMArray value) {
-			return 0;
-		}
-		
-		protected int customPutString(FEMString value) {
-			return 0;
-		}
-		
-		protected int customPutBinary(FEMBinary value) {
+		protected int customPutArray(final FEMArray value) {
 			return 0;
 		}
 
-		protected int customPutInteger(FEMInteger value) {
+		protected int customPutString(final FEMString value) {
 			return 0;
 		}
 
-		protected int customPutDecimal(FEMDecimal value) {
+		protected int customPutBinary(final FEMBinary value) {
 			return 0;
 		}
 
-		protected int customPutBoolean(FEMBoolean value) {
+		protected int customPutInteger(final FEMInteger value) {
 			return 0;
 		}
 
-		protected int customPutDuration(FEMDuration value) {
+		protected int customPutDecimal(final FEMDecimal value) {
 			return 0;
 		}
 
-		protected int customPutDatetime(FEMDatetime value) {
+		protected int customPutBoolean(final FEMBoolean value) {
 			return 0;
 		}
-		
+
+		protected int customPutDuration(final FEMDuration value) {
+			return 0;
+		}
+
+		protected int customPutDatetime(final FEMDatetime value) {
+			return 0;
+		}
+
 		/** Diese Methode leert den konfigurator */
 		public void cleaar() {
 
@@ -93,10 +90,8 @@ public abstract class FEMIndex {
 
 	}
 
-	
 	public abstract FEMValue value(int ref);
-	
+
 	public abstract FEMFunction function(int ref);
-	
-	
+
 }

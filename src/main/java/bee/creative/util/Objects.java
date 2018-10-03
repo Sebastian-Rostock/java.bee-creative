@@ -26,7 +26,6 @@ public class Objects {
 
 	/** Diese Klasse implementiert ein Objekt, dessen {@link #toString() Textdarsellung} über {@link Objects#toInvokeString(Object, Object...)
 	 * Objects.toInvokeString(this)} ermittelt wird. Sie kann als Basis von Klassen mit nur einer Instanz eingesetzt werden. */
-	@SuppressWarnings ("javadoc")
 	public static class BaseObject {
 
 		@Override
@@ -37,7 +36,6 @@ public class Objects {
 	}
 
 	/** Diese Klasse implementiert {@link Objects#HASHER}. */
-	@SuppressWarnings ("javadoc")
 	public static class BaseHasher extends BaseObject implements Hasher {
 
 		@Override
@@ -53,7 +51,6 @@ public class Objects {
 	}
 
 	/** Diese Klasse implementiert {@link Objects#DEEP_HASHER}. */
-	@SuppressWarnings ("javadoc")
 	public static class DeepHasher extends BaseHasher {
 
 		@Override
@@ -69,7 +66,6 @@ public class Objects {
 	}
 
 	/** Diese Klasse implementiert {@link Objects#IDENTITY_HASHER}. */
-	@SuppressWarnings ("javadoc")
 	public static class IdentityHasher extends BaseHasher {
 
 		@Override

@@ -66,22 +66,22 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	@SuppressWarnings ("javadoc")
 	static final class ValueCollector implements Collector {
-	
+
 		public final byte[] array;
-	
+
 		public int index;
-	
+
 		public ValueCollector(final byte[] array, final int index) {
 			this.array = array;
 			this.index = index;
 		}
-	
+
 		@Override
 		public final boolean push(final byte value) {
 			this.array[this.index++] = value;
 			return true;
 		}
-	
+
 	}
 
 	@SuppressWarnings ("javadoc")

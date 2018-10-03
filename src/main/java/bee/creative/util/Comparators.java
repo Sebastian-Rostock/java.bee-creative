@@ -667,17 +667,17 @@ public class Comparators {
 	public static <GItem> Comparable<GItem> itemComparable(final GItem input, final Comparator<? super GItem> comparator) throws NullPointerException {
 		Objects.notNull(comparator);
 		return new Comparable<GItem>() {
-	
+
 			@Override
 			public int compareTo(final GItem item2) {
 				return comparator.compare(input, item2);
 			}
-	
+
 			@Override
 			public String toString() {
 				return Objects.toInvokeString(this, input, comparator);
 			}
-	
+
 		};
 	}
 

@@ -75,10 +75,8 @@ class TreeData<GKey, GValue> {
 
 		protected final TreeData<GKey, GValue> entryData;
 
-		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link XX_HashData#keys}. */
 		protected int nodeIndex;
 
-		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link XX_HashData#keys}. */
 		protected int entryIndex = -1;
 
 		public TreeIterator(final TreeData<GKey, GValue> entryData) {

@@ -1001,45 +1001,46 @@ public final class Fields {
 		return new CompositeField<>(getter, setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(field, Getters.neutralGetter(), Getters.neutralGetter(), null, null)}. <br>
+	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(Getters.neutralGetter(), Getters.neutralGetter(), null, null,field)}. <br>
 	 *
-	 * @see #aggregatedField(Field, Getter, Getter, Object, Object) */
+	 * @see #aggregatedField(Getter, Getter, Object, Object, Field) */
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Field<Iterable<? extends GInput>, GValue> aggregatedField(final Field<? super GInput, GValue> field)
 		throws NullPointerException {
-		return Fields.aggregatedField(field, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter(), null, null);
+		return Fields.aggregatedField(Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter(), null, null, field);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(field, Getters.neutralGetter(), Getters.neutralGetter(), emptyValue, mixedValue)}. <br>
+	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(Getters.neutralGetter(), Getters.neutralGetter(), emptyTarget, mixedTarget, field)}.
+	 * <br>
 	 *
-	 * @see #aggregatedField(Field, Getter, Getter, Object, Object) */
+	 * @see #aggregatedField(Getter, Getter, Object, Object, Field) */
 	@SuppressWarnings ("javadoc")
-	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field, final GValue emptyValue,
-		final GValue mixedValue) throws NullPointerException {
-		return Fields.aggregatedField(field, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter(), emptyValue, mixedValue);
+	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field, final GValue emptyTarget,
+		final GValue mixedTarget) throws NullPointerException {
+		return Fields.aggregatedField(Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter(), emptyTarget, mixedTarget, field);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(field, getFormat, setFormat, null, null)}. <br>
+	/** Diese Methode ist eine Abkürzung für {@code Fields.aggregatedField(toTarget, toSource, null, null, field)}. <br>
 	 *
-	 * @see #aggregatedField(Field, Getter, Getter, Object, Object) */
+	 * @see #aggregatedField(Getter, Getter, Object, Object, Field) */
 	@SuppressWarnings ("javadoc")
-	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
-		final Getter<? super GValue2, ? extends GValue> getFormat, final Getter<? super GValue, ? extends GValue2> setFormat) throws NullPointerException {
-		return Fields.aggregatedField(field, getFormat, setFormat, null, null);
+	public static <GItem, GSource, GTarget> Field<Iterable<? extends GItem>, GTarget> aggregatedField(final Field<? super GItem, GSource> field,
+		final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
+		return Fields.aggregatedField(toTarget, toSource, null, null, field);
 	}
 
 	/** Diese Methode ist eine Abkürzung für
-	 * {@code Fields.compositeField(Getters.aggregatedGetter(field, formatter, emptyValue, mixedValue), Setters.aggregatedSetter(field, parser))}. <br>
+	 * {@code Fields.compositeField(Getters.aggregatedGetter(toTarget, emptyTarget, mixedTarget, field), Setters.aggregatedSetter(toSource, field))}.<br>
 	 * Mit einem aggregierten {@link Field} können die Elemente der iterierbaren Eingabe parallel modifiziert werden.
 	 *
 	 * @see #compositeField(Getter, Setter)
-	 * @see Getters#aggregatedGetter(Getter, Getter, Object, Object)
-	 * @see Setters#aggregatedSetter(Setter, Getter) */
+	 * @see Getters#aggregatedGetter(Getter, Object, Object, Getter)
+	 * @see Setters#aggregatedSetter(Getter, Setter) */
 	@SuppressWarnings ("javadoc")
-	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
-		final Getter<? super GValue2, ? extends GValue> getFormat, final Getter<? super GValue, ? extends GValue2> setFormat, final GValue emptyValue,
-		final GValue mixedValue) throws NullPointerException {
-		return Fields.compositeField(Getters.aggregatedGetter(field, getFormat, emptyValue, mixedValue), Setters.aggregatedSetter(field, setFormat));
+	public static <GItem, GSource, GTarget> Field<Iterable<? extends GItem>, GTarget> aggregatedField(final Getter<? super GSource, ? extends GTarget> toTarget,
+		final Getter<? super GTarget, ? extends GSource> toSource, final GTarget emptyTarget, final GTarget mixedTarget, final Field<? super GItem, GSource> field)
+		throws NullPointerException {
+		return Fields.compositeField(Getters.aggregatedGetter(toTarget, emptyTarget, mixedTarget, field), Setters.aggregatedSetter(toSource, field));
 	}
 
 	/** Diese Methode ist eine effiziente Alternative zu

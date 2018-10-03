@@ -14,7 +14,6 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import bee.creative.array.ArrayData;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 
@@ -476,10 +475,8 @@ class ListData<GKey, GValue> {
 	 * werden muss, wird versucht, die wenigen Elemente vor bzw. nach dem gegebenen Index um die gegebene Anzahl zu verschieben. Reicht der verfügbare Platz zum
 	 * Verschieben dieser wenigen Elemente nicht aus, so werden alle Elemente verschoben und der Ausrichtung entsprechend im internen Array ausgerichtet. Wenn die
 	 * Größe des internen Arrays dagegen angepasst werden muss, werden ein neues Array mit passender Größe erzeugt und die Elemente des internen Arrays der
-	 * Ausrichtung entsprechend in das neue Array kopiert. Die benötigte Größe wird via {@link ArrayData#customNewCapacity(int)} ermittelt.
+	 * Ausrichtung entsprechend in das neue Array kopiert. Die benötigte Größe wird via ArrayData#customNewCapacity(int) ermittelt.
 	 *
-	 * @see ArrayData#customNewFrom(int)
-	 * @see ArrayData#customNewCapacity(int)
 	 * @param index Index des ersten neuen Elements.
 	 * @param count Anzahl der neuen Elemente.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
@@ -540,7 +537,6 @@ class ListData<GKey, GValue> {
 	/** Diese Methode entfernt die gegebene Anzahl an Elementen ab der gegebenen Position im internen Array. Es wird versucht, die wenigen Elemente vor bzw. nach
 	 * dem zu entfernenden Bereich um die gegebene Anzahl zu verschieben.
 	 *
-	 * @see ArrayData#customNewFrom(int)
 	 * @param index Index des ersten entfallenden Elements.
 	 * @param count Anzahl der entfallende Elemente.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
@@ -742,10 +738,10 @@ class ListData<GKey, GValue> {
 
 		protected final ListData<GKey, GValue> entryData;
 
-		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link XX_HashData#keys}. */
+		/** Dieses Feld speichert den Index des nächsten Eintrags */
 		protected int nodeIndex;
 
-		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link XX_HashData#keys}. */
+		/** Dieses Feld speichert den Index des aktuellen Eintrags */
 		protected int entryIndex = -1;
 
 		public TreeIterator(final ListData<GKey, GValue> entryData) {

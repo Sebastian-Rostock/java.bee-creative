@@ -38,9 +38,9 @@ class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableS
 		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 		 *
 		 * @param set {@link CompactNavigableSet}.
-		 * @param fromItem erstes Element oder {@link CompactSubData#open}.
+		 * @param fromItem erstes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
-		 * @param lastItem letztes Element oder {@link CompactSubData#open}.
+		 * @param lastItem letztes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 		public CompactNavigableSubSet(final CompactNavigableSet<GItem> set, final Object fromItem, final boolean fromInclusive, final Object lastItem,
@@ -171,9 +171,9 @@ class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableS
 		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 		 *
 		 * @param array {@link CompactNavigableSet}.
-		 * @param fromItem erstes Element oder {@link CompactSubData#open}.
+		 * @param fromItem erstes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
-		 * @param lastItem letztes Element oder {@link CompactSubData#open}.
+		 * @param lastItem letztes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 		public CompactAscendingSubSet(final CompactNavigableSet<GItem> array, final Object fromItem, final boolean fromInclusive, final Object lastItem,
@@ -286,9 +286,9 @@ class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableS
 		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 		 *
 		 * @param array {@link CompactNavigableSet}.
-		 * @param fromItem erstes Element oder {@link CompactSubData#open}.
+		 * @param fromItem erstes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
-		 * @param lastItem letztes Element oder {@link CompactSubData#open}.
+		 * @param lastItem letztes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 		public CompactDescendingSubSet(final CompactNavigableSet<GItem> array, final Object fromItem, final boolean fromInclusive, final Object lastItem,

@@ -8,6 +8,9 @@ import bee.creative.fem.FEMDecimal;
 import bee.creative.fem.FEMDuration;
 import bee.creative.fem.FEMException;
 import bee.creative.fem.FEMFunction;
+import bee.creative.fem.FEMFunction.ClosureFunction;
+import bee.creative.fem.FEMFunction.CompositeFunction;
+import bee.creative.fem.FEMFunction.ConcatFunction;
 import bee.creative.fem.FEMHandler;
 import bee.creative.fem.FEMInteger;
 import bee.creative.fem.FEMNative;
@@ -17,9 +20,6 @@ import bee.creative.fem.FEMProxy;
 import bee.creative.fem.FEMString;
 import bee.creative.fem.FEMValue;
 import bee.creative.fem.FEMVoid;
-import bee.creative.fem.FEMFunction.ClosureFunction;
-import bee.creative.fem.FEMFunction.CompositeFunction;
-import bee.creative.fem.FEMFunction.ConcatFunction;
 
 public abstract class FEMIndexBuilder extends FEMIndex {
 

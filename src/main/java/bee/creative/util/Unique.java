@@ -53,13 +53,13 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	/** Diese Klasse implementiert {@link Unique#fromHashMap(Hasher, Getter, Setter)} */
 	@SuppressWarnings ("javadoc")
 	public static class HashMapUnique<GInput, GOutput> extends Unique<GInput, GOutput> {
-	
+
 		public final Hasher hasher;
-	
+
 		public final Setter<? super GInput, ? super GOutput> reuser;
-	
+
 		public final Getter<? super GInput, ? extends GOutput> compiler;
-	
+
 		public HashMapUnique(final Hasher hasher, final Setter<? super GInput, ? super GOutput> reuser, final Getter<? super GInput, ? extends GOutput> compiler)
 			throws NullPointerException {
 			super(HashMap2.<GInput, GOutput>from(hasher));
@@ -67,27 +67,27 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 			this.reuser = Objects.notNull(reuser);
 			this.compiler = Objects.notNull(compiler);
 		}
-	
+
 		@Override
 		public int hash(final Object input) throws NullPointerException {
 			return this.hasher.hash(input);
 		}
-	
+
 		@Override
 		public boolean equals(final Object input1, final Object input2) throws NullPointerException {
 			return this.hasher.equals(input1, input2);
 		}
-	
+
 		@Override
 		public void customReuse(final GInput input, final GOutput output) {
 			this.reuser.set(input, output);
 		}
-	
+
 		@Override
 		public GOutput customBuild(final GInput input) {
 			return this.compiler.get(input);
 		}
-	
+
 	}
 
 	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
@@ -148,7 +148,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 		return Unique.fromHashMap(Objects.HASHER, compiler, Setters.emptySetter());
 	}
 
-	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMapImpl(Hasher, Getter, Setter)
+	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
 	 * fromHashMap(hasher, compiler, Setters.emptySetter())}. */
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GOutput> Unique<GInput, GOutput> fromHashMap(final Hasher hasher, final Getter<? super GInput, ? extends GOutput> compiler)
@@ -229,7 +229,7 @@ public abstract class Unique<GInput, GOutput> implements Field<GInput, GOutput>,
 	/** Diese Methode gibt die interne {@link Map} zurück.
 	 *
 	 * @return {@link Map} der Einträge. */
-	public   Map<GInput, GOutput> mapping() {
+	public Map<GInput, GOutput> mapping() {
 		return this.mapping;
 	}
 

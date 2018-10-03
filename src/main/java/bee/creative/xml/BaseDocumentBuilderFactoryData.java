@@ -320,7 +320,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	public final PropertyData<GThis> openPropertyData() {
 		return this.propertyData;
 	}
-	
+
 	/** Diese Methode öffnet den Konfigurator für die Attribute und gibt ihn zurück.
 	 *
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)

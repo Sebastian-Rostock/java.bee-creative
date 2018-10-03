@@ -32,12 +32,11 @@ import java.util.List;
  * @see Collections#binarySearch(List, Object)
  * @see Collections#binarySearch(List, Object, Comparator)
  * @see Comparable
- * @author Sebastian Rostock 2011. */
+ * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Comparables {
 
 	/** Diese Schnittstelle definiert eine Methode zum Lesen eines Element zu einem gegebenen Index.
 	 *
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente. */
 	public static interface Items<GItem> {
 
@@ -50,58 +49,121 @@ public class Comparables {
 
 	}
 
-	public static class DefaultComparable<GItem> implements Comparable<GItem> {
-	
-		public final Comparable<? super GItem> comparable;
-	
-		public DefaultComparable(Comparable<? super GItem> comparable) {
-			this.comparable = Objects.notNull(comparable);
+	/** Diese Klasse implementiert {@link Comparables#itemsSection(Items, int, int)} */
+	@SuppressWarnings ("javadoc")
+	public static class ItemsSection<GItem> implements Items<GItem> {
+
+		public final Items<? extends GItem> items;
+
+		public final int fromIndex;
+
+		public final int toIndex;
+
+		public ItemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex) {
+			Comparables.check(fromIndex, toIndex);
+			this.items = Objects.notNull(items);
+			this.fromIndex = fromIndex;
+			this.toIndex = toIndex;
 		}
-	
+
 		@Override
-		public int compareTo(final GItem item) {
-			return item == null ? 1 : comparable.compareTo(item);
+		public GItem get(int index) throws IndexOutOfBoundsException {
+			if (index < 0) throw new IndexOutOfBoundsException();
+			index += this.fromIndex;
+			if (index >= this.toIndex) throw new IndexOutOfBoundsException();
+			return this.items.get(index);
 		}
-	
+
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, comparable);
+			return Objects.toInvokeString(this, this.items, this.fromIndex, this.toIndex);
 		}
-	
+
 	}
 
+	/** Diese Klasse implementiert {@link Comparables#itemsSelection(Items, int[])} */
+	@SuppressWarnings ("javadoc")
+	public static class ItemsSelection<GItem> implements Items<GItem> {
+
+		public final Items<? extends GItem> items;
+
+		public final int[] indices;
+
+		public ItemsSelection(final Items<? extends GItem> items, final int[] indices) {
+			this.items = Objects.notNull(items);
+			this.indices = Objects.notNull(indices);
+		}
+
+		@Override
+		public GItem get(final int index) throws IndexOutOfBoundsException {
+			return this.items.get(this.indices[index]);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.items, this.indices);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Comparables#defaultComparable(Comparable)} */
+	@SuppressWarnings ("javadoc")
+	public static class DefaultComparable<GItem> implements Comparable<GItem> {
+
+		public final Comparable<? super GItem> comparable;
+
+		public DefaultComparable(final Comparable<? super GItem> comparable) {
+			this.comparable = Objects.notNull(comparable);
+		}
+
+		@Override
+		public int compareTo(final GItem item) {
+			return item == null ? 1 : this.comparable.compareTo(item);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.comparable);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Comparables#reverseComparable(Comparable)} */
+	@SuppressWarnings ("javadoc")
 	public static class ReverseComparable<GItem> implements Comparable<GItem> {
 
 		public final Comparable<? super GItem> comparable;
 
-		public ReverseComparable(Comparable<? super GItem> comparable) {
+		public ReverseComparable(final Comparable<? super GItem> comparable) {
 			this.comparable = Objects.notNull(comparable);
 		}
 
 		@Override
 		public int compareTo(final GItem item) {
-			return -comparable.compareTo(item);
+			return -this.comparable.compareTo(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, comparable);
+			return Objects.toInvokeString(this, this.comparable);
 		}
 
 	}
 
+	/** Diese Klasse implementiert {@link Comparables#iterableComparable(Comparable)} */
+	@SuppressWarnings ("javadoc")
 	public static class IterableComparable<GItem> implements Comparable<Iterable<? extends GItem>> {
 
 		public final Comparable<? super GItem> comparable;
 
-		public IterableComparable(Comparable<? super GItem> comparable) {
+		public IterableComparable(final Comparable<? super GItem> comparable) {
 			this.comparable = Objects.notNull(comparable);
 		}
 
 		@Override
 		public int compareTo(final Iterable<? extends GItem> that) {
 			for (final GItem item: that) {
-				final int result = comparable.compareTo(item);
+				final int result = this.comparable.compareTo(item);
 				if (result != 0) return result;
 			}
 			return 0;
@@ -109,11 +171,13 @@ public class Comparables {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, comparable);
+			return Objects.toInvokeString(this, this.comparable);
 		}
 
 	}
 
+	/** Diese Klasse implementiert {@link Comparables#chainedComparable(Comparable, Comparable)} */
+	@SuppressWarnings ("javadoc")
 	public static class ChainedComparable<GItem> implements Comparable<GItem> {
 
 		public final Comparable<? super GItem> comparable1;
@@ -139,6 +203,8 @@ public class Comparables {
 
 	}
 
+	/** Diese Klasse implementiert {@link Comparables#translatedComparable(Getter, Comparable)} */
+	@SuppressWarnings ("javadoc")
 	public static class TranslatedComparable<GSource, GTarget> implements Comparable<GSource> {
 
 		public final Getter<? super GSource, ? extends GTarget> toSource;
@@ -162,6 +228,8 @@ public class Comparables {
 
 	}
 
+	/** Diese Klasse implementiert {@link Comparables#toLowerFilter(Comparable)} */
+	@SuppressWarnings ("javadoc")
 	static class LowerFilter<GItem> implements Filter<GItem> {
 
 		public final Comparable<? super GItem> comparable;
@@ -182,6 +250,8 @@ public class Comparables {
 
 	}
 
+	/** Diese Klasse implementiert {@link Comparables#toHigherFilter(Comparable)} */
+	@SuppressWarnings ("javadoc")
 	static class HigherFilter<GItem> implements Filter<GItem> {
 
 		public final Comparable<? super GItem> comparable;
@@ -202,6 +272,8 @@ public class Comparables {
 
 	}
 
+	/** Diese Klasse implementiert {@link Comparables#toEqualFilter(Comparable)} */
+	@SuppressWarnings ("javadoc")
 	static class EqualFilter<GItem> implements Filter<GItem> {
 
 		public final Comparable<? super GItem> comparable;
@@ -631,24 +703,7 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
 	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
-		Objects.notNull(items);
-		Comparables.check(fromIndex, toIndex);
-		return new Items<GItem>() {
-	
-			@Override
-			public GItem get(int index) throws IndexOutOfBoundsException {
-				if (index < 0) throw new IndexOutOfBoundsException();
-				index += fromIndex;
-				if (index >= toIndex) throw new IndexOutOfBoundsException();
-				return items.get(index);
-			}
-	
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, items, fromIndex, toIndex);
-			}
-	
-		};
+		return new ItemsSection<>(items, fromIndex, toIndex);
 	}
 
 	/** Diese Methode gibt eine beliebig sortierte Sicht auf die Elemente des gegebenen {@link Items}. Die Methode {@link Items#get(int)} liefert hierbei
@@ -660,21 +715,7 @@ public class Comparables {
 	 * @return Auswahl der Elemente.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code indices} {@code null} ist. */
 	public static <GItem> Items<GItem> itemsSelection(final Items<? extends GItem> items, final int[] indices) throws NullPointerException {
-		Objects.notNull(items);
-		Objects.notNull(indices);
-		return new Items<GItem>() {
-	
-			@Override
-			public GItem get(final int index) throws IndexOutOfBoundsException {
-				return items.get(indices[index]);
-			}
-	
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, items, indices);
-			}
-	
-		};
+		return new ItemsSelection<>(items, indices);
 	}
 
 	/** Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Eingaben als minimal betrachtet und alle anderen Eingaben an das gegebene

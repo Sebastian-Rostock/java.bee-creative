@@ -364,7 +364,7 @@ public class Translators {
 
 	/** Diese Methode ist eine Abkürzung für {@code synchronizedTranslator(translator, translator)}.
 	 *
-	 * @see #synchronizedTranslator(Translator, Object) */
+	 * @see #synchronizedTranslator(Object, Translator) */
 	@SuppressWarnings ("javadoc")
 	public static <GSource, GTarget> Translator<GSource, GTarget> synchronizedTranslator(final Translator<GSource, GTarget> translator)
 		throws NullPointerException {

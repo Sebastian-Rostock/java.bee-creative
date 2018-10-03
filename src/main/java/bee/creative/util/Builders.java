@@ -938,7 +938,7 @@ public class Builders {
 		}
 
 		public static <GItem> IteratorBuilder<GItem, Iterator<GItem>> fromItem(final GItem item) throws NullPointerException {
-			return from(Iterators.itemIterator(item));
+			return IteratorBuilder.from(Iterators.itemIterator(item));
 		}
 
 		protected IteratorBuilder(final GResult result) throws NullPointerException {
@@ -983,7 +983,7 @@ public class Builders {
 		}
 
 		public static <GItem> IterableBuilder<GItem, Iterable<GItem>> fromItem(final GItem item) throws NullPointerException {
-			return from(Iterables.itemIterable(item));
+			return IterableBuilder.from(Iterables.itemIterable(item));
 		}
 
 		protected IterableBuilder(final GResult result) throws NullPointerException {
@@ -1212,21 +1212,21 @@ public class Builders {
 	}
 
 	public static class PropertyBuilder<GValue, GResult extends Property<GValue>> extends BaseBuilder2<GResult, PropertyBuilder<GValue, GResult>> {
-	
+
 		@Override
 		protected PropertyBuilder<GValue, GResult> customThis() {
 			return this;
 		}
-	
+
 	}
 
 	public static class ProducerBuilder<GValue, GResult extends Producer<GValue>> extends BaseBuilder2<GResult, ProducerBuilder<GValue, GResult>> {
-	
+
 		@Override
 		protected ProducerBuilder<GValue, GResult> customThis() {
 			return this;
 		}
-	
+
 	}
 
 	public static class ConsumerBuilder<GValue, GResult extends Consumer<GValue>> extends BaseBuilder2<GResult, ConsumerBuilder<GValue, GResult>> {
@@ -1239,22 +1239,22 @@ public class Builders {
 	}
 
 	public static class FieldBuilder<GInput, GValue, GResult extends Field<GInput, GValue>> extends BaseBuilder2<GResult, FieldBuilder<GInput, GValue, GResult>> {
-	
+
 		@Override
 		protected FieldBuilder<GInput, GValue, GResult> customThis() {
 			return this;
 		}
-	
+
 	}
 
 	public static class SetterBuilder<GInput, GValue, GResult extends Setter<GInput, GValue>>
 		extends BaseBuilder2<GResult, SetterBuilder<GInput, GValue, GResult>> {
-	
+
 		@Override
 		protected SetterBuilder<GInput, GValue, GResult> customThis() {
 			return this;
 		}
-	
+
 	}
 
 	public static class GetterBuilder<GInput, GValue, GResult extends Getter<GInput, GValue>>

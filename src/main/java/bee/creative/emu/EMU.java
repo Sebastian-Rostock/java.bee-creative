@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /** Diese Klasse implementiert Methoden zur Schätzung des Speicherverbrauchs von Objekten (<i>Estimated Memory Usage</i>).
- * 
+ *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("rawtypes")
 public class EMU {

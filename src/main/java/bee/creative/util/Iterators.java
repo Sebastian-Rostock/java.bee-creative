@@ -212,7 +212,7 @@ public class Iterators {
 
 		public UniqueIterator(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) {
 			this.collection = collection;
-			this.iterator = Iterators.filteredIterator(Filters.negationFilter(Collections.containsFilter(collection)), iterator);
+			this.iterator = Iterators.filteredIterator(Filters.negationFilter(Collections.toContainsFilter(collection)), iterator);
 		}
 
 		@Override
@@ -337,7 +337,7 @@ public class Iterators {
 	public static class TranslatedIterator<GSource, GTarget> extends BaseIterator<GTarget> {
 
 		public final Iterator<? extends GSource> iterator;
-		
+
 		public final Getter<? super GSource, ? extends GTarget> toTarget;
 
 		public TranslatedIterator(final Getter<? super GSource, ? extends GTarget> navigator, final Iterator<? extends GSource> iterator) {

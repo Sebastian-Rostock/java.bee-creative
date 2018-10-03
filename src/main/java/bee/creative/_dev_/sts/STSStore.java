@@ -426,7 +426,7 @@ public abstract class STSStore {
 		return this.customGetNodeSetByFields(values.iterator());
 	}
 
-	/** Diese Methode implementiert {@link #getNodeSet(List)}. */
+	/** Diese Methode implementiert {@link #getNodeSet(Iterable)}. */
 	@SuppressWarnings ("javadoc")
 	protected STSNodeSet customGetNodeSetByFields(final Iterator<? extends FEMBinary> values) throws NullPointerException {
 		return this.toNodeSetImpl(new ItemIterator() {
@@ -609,7 +609,7 @@ public abstract class STSStore {
 		return this.customPutNodeSetByFields(values.iterator());
 	}
 
-	/** Diese Methode implementiert {@link #putNodeSet(List)}. */
+	/** Diese Methode implementiert {@link #putNodeSet(Iterable)}. */
 	@SuppressWarnings ("javadoc")
 	protected STSNodeSet customPutNodeSetByFields(final Iterator<? extends FEMBinary> values) throws NullPointerException {
 		return this.toNodeSetImpl(new ItemIterator() {

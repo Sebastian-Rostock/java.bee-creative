@@ -41,10 +41,6 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 			this.data = Objects.notNull(data);
 		}
 
-		/** Diese Methode gibt den Schlüssel des gegebenen {@link ItemEntry}s oder {@code null} zurück.
-		 *
-		 * @param entry {@link ItemEntry}.
-		 * @return Schlüssel oder {@code null}. */
 		protected final GKey defaultPeekKey(final Entry<GKey, ?> entry) {
 			if (entry == null) return null;
 			return entry.getKey();
@@ -208,17 +204,17 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 
 	}
 
-	/** Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactAscendingSubMap}.
+	/** Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link bee.creative._dev_.CompactNavigableMap.CompactAscendingSubMap}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactAscendingKeySet<GKey>
 		extends CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap.CompactAscendingSubMap<GKey, ?>> {
 
-		/** Dieser Konstruktor initialisiert die {@link CompactAscendingSubMap}.
+		/** Dieser Konstruktor initialisiert die {@link bee.creative._dev_.CompactNavigableMap.CompactAscendingSubMap}.
 		 *
-		 * @param data {@link CompactAscendingSubMap}.
-		 * @throws NullPointerException Wenn die gegebene {@link CompactAscendingSubMap} {@code null} ist. */
+		 * @param data {@link bee.creative._dev_.CompactNavigableMap.CompactAscendingSubMap}.
+		 * @throws NullPointerException Wenn die gegebene {@link bee.creative._dev_.CompactNavigableMap.CompactAscendingSubMap} {@code null} ist. */
 		public CompactAscendingKeySet(final CompactNavigableMap.CompactAscendingSubMap<GKey, ?> data) throws NullPointerException {
 			super(data);
 		}
@@ -231,17 +227,17 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 
 	}
 
-	/** Diese Klasse implementiert die abfsteigende Menge der Schlüssel einer {@link CompactDescendingSubMap}.
+	/** Diese Klasse implementiert die abfsteigende Menge der Schlüssel einer {@link bee.creative._dev_.CompactNavigableMap.CompactDescendingSubMap}.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactDescendingKeySet<GKey>
 		extends CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap.CompactDescendingSubMap<GKey, ?>> {
 
-		/** Dieser Konstruktor initialisiert die {@link CompactDescendingSubMap}.
+		/** Dieser Konstruktor initialisiert die {@link bee.creative._dev_.CompactNavigableMap.CompactDescendingSubMap}.
 		 *
-		 * @param data {@link CompactDescendingSubMap}.
-		 * @throws NullPointerException Wenn die gegebene {@link CompactDescendingSubMap} {@code null} ist. */
+		 * @param data {@link bee.creative._dev_.CompactNavigableMap.CompactDescendingSubMap}.
+		 * @throws NullPointerException Wenn die gegebene {@link bee.creative._dev_.CompactNavigableMap.CompactDescendingSubMap} {@code null} ist. */
 		public CompactDescendingKeySet(final CompactNavigableMap.CompactDescendingSubMap<GKey, ?> data) throws NullPointerException {
 			super(data);
 		}
@@ -262,19 +258,16 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 	protected static abstract class CompactNavigableSubMap<GKey, GValue> extends CompactSubData<CompactNavigableMap<GKey, GValue>>
 		implements NavigableMap<GKey, GValue> {
 
-		/** Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer {@link CompactNavigableSubMap} delegiert.
+		/** Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer
+		 * {@link bee.creative._dev_.CompactNavigableMap.CompactNavigableSubMap} delegiert.
 		 *
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte. */
 		protected static final class EntrySet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
 
-			/** Dieses Feld speichert die {@link CompactNavigableSubMap}. */
 			protected final CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> data;
 
-			/** Dieser Konstruktor initialisiert die {@link CompactNavigableSubMap}.
-			 *
-			 * @param data {@link CompactNavigableSubMap}. */
 			public EntrySet(final CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> data) {
 				this.data = data;
 			}
@@ -298,18 +291,10 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 			}
 		}
 
-		/** Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer {@link CompactNavigableSubMap} delegiert.
-		 *
-		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <GValue> Typ der Werte. */
 		protected static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
 
-			/** Dieses Feld speichert die {@link CompactNavigableSubMap}. */
 			protected final CompactNavigableMap.CompactNavigableSubMap<?, GValue> data;
 
-			/** Dieser Konstruktor initialisiert die {@link CompactNavigableSubMap}.
-			 *
-			 * @param data {@link CompactNavigableSubMap}. */
 			public ValueCollection(final CompactNavigableMap.CompactNavigableSubMap<?, GValue> data) {
 				this.data = data;
 			}
@@ -337,9 +322,9 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
 		 *
 		 * @param map {@link CompactNavigableMap}.
-		 * @param fromItem erstes Element oder {@link CompactSubData#open}.
+		 * @param fromItem erstes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
-		 * @param lastItem letztes Element oder {@link CompactSubData#open}.
+		 * @param lastItem letztes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 		public CompactNavigableSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem, final boolean fromInclusive, final Object lastItem,
@@ -480,9 +465,9 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
 		 *
 		 * @param map {@link CompactNavigableMap}.
-		 * @param fromItem erstes Element oder {@link CompactSubData#open}.
+		 * @param fromItem erstes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
-		 * @param lastItem letztes Element oder {@link CompactSubData#open}.
+		 * @param lastItem letztes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 		public CompactAscendingSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem, final boolean fromInclusive, final Object lastItem,
@@ -626,9 +611,9 @@ abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue
 		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 		 *
 		 * @param map {@link CompactNavigableSet}.
-		 * @param fromItem erstes Element oder {@link CompactSubData#open}.
+		 * @param fromItem erstes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
-		 * @param lastItem letztes Element oder {@link CompactSubData#open}.
+		 * @param lastItem letztes Element oder {@link bee.creative._dev_.CompactData.CompactSubData#open}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 

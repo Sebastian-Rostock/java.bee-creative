@@ -26,7 +26,7 @@ public class ObservableField<GInput, GValue>
 	public static class ChangeFieldMessage {
 
 		/** Dieses Feld speichert den Sender des Änderungsereignisses.
-		 * 
+		 *
 		 * @see ObservableField#field */
 		public final ObservableField<?, ?> sender;
 
@@ -54,7 +54,7 @@ public class ObservableField<GInput, GValue>
 	public static interface ChangeFieldObserver {
 
 		/** Diese Methode wird bei Änderung des Werts eiens {@link ObservableField#field Datenfeldes} aufgerufen.
-		 * 
+		 *
 		 * @param message Nachricht des Änderungsereignisses. */
 		public void onChangeField(ChangeFieldMessage message);
 

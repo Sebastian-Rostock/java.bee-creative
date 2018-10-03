@@ -164,27 +164,25 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert {@link Setters#aggregatedSetter(Setter, Getter)} */
+	/** Diese Klasse implementiert {@link Setters#aggregatedSetter(Getter, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static class AggregatedSetter<GItem, GValue, GValue2> implements Setter<Iterable<? extends GItem>, GValue> {
+	public static class AggregatedSetter<GItem, GSource, GTarget> implements Setter<Iterable<? extends GItem>, GTarget> {
 
-		public final Setter<? super GItem, GValue2> setter;
+		public final Getter<? super GTarget, ? extends GSource> toSource;
 
-		public final Getter<? super GValue, ? extends GValue2> format;
+		public final Setter<? super GItem, GSource> setter;
 
-		public AggregatedSetter(final Setter<? super GItem, GValue2> setter, final Getter<? super GValue, ? extends GValue2> format) {
-			Objects.notNull(setter);
-			Objects.notNull(format);
-			this.setter = setter;
-			this.format = format;
+		public AggregatedSetter(final Getter<? super GTarget, ? extends GSource> toSource, final Setter<? super GItem, GSource> setter) {
+			this.toSource = Objects.notNull(toSource);
+			this.setter = Objects.notNull(setter);
 		}
 
 		@Override
-		public void set(final Iterable<? extends GItem> input, final GValue value) {
+		public void set(final Iterable<? extends GItem> input, final GTarget value) {
 			if (input == null) return;
 			final Iterator<? extends GItem> iterator = input.iterator();
 			if (!iterator.hasNext()) return;
-			final GValue2 value2 = this.format.get(value);
+			final GSource value2 = this.toSource.get(value);
 			do {
 				this.setter.set(iterator.next(), value2);
 			} while (iterator.hasNext());
@@ -192,12 +190,12 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.setter, this.format);
+			return Objects.toInvokeString(this, this.toSource, this.setter);
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Setters#synchronizedSetter(Setter, Object)} */
+	/** Diese Klasse implementiert {@link Setters#synchronizedSetter(Object, Setter)} */
 	@SuppressWarnings ("javadoc")
 	public static class SynchronizedSetter<GInput, GValue> implements Setter<GInput, GValue> {
 
@@ -224,7 +222,7 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert {@link Setters#toConsumer(Setter, Object)} */
+	/** Diese Klasse implementiert {@link Setters#toConsumer(Object, Setter)} */
 	@SuppressWarnings ("javadoc")
 	static class SetterConsumer<GValue, GInput> extends BaseConsumer<GValue> {
 
@@ -357,14 +355,14 @@ public class Setters {
 		return new ConditionalSetter<>(condition, acceptSetter, rejectSetter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Setters.aggregatedSetter(setter, Getters.neutralGetter())}.
+	/** Diese Methode ist eine Abkürzung für {@code Setters.aggregatedSetter(Getters.neutralGetter(), setter)}.
 	 *
 	 * @see #emptySetter()
-	 * @see #aggregatedSetter(Setter, Setter, Object, Object) */
+	 * @see #aggregatedSetter(Getter, Setter) */
 	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<Iterable<? extends GItem>, GValue> aggregatedSetter(final Setter<? super GItem, GValue> setter)
 		throws NullPointerException {
-		return Setters.aggregatedSetter(setter, Getters.<GValue>neutralGetter());
+		return Setters.aggregatedSetter(Getters.<GValue>neutralGetter(), setter);
 	}
 
 	/** Diese Methode gibt einen aggregierten {@link Setter} zurück, welcher den formatierten Wert der {@link Setter Eigenschaften} der Elemente seiner
@@ -374,20 +372,20 @@ public class Setters {
 	 * gesetzt.
 	 *
 	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts des gelieferten {@link Setter}.
-	 * @param <GValue2> Typ des Werts der Eigenschaft der Elemente in der iterierbaren Eingabe.
+	 * @param <GSource> Typ des Werts der Eigenschaft der Elemente in der iterierbaren Eingabe.
+	 * @param <GTarget> Typ des Werts des gelieferten {@link Setter}.
+	 * @param toSource Leseformat zur Umwandlung des Werts der Eigenschaft der Elemente in den Wert des gelieferten {@link Setter}.
 	 * @param setter Eigenschaft der Elemente in der iterierbaren Eingabe.
-	 * @param format Leseformat zur Umwandlung des Werts der Eigenschaft der Elemente in den Wert des gelieferten {@link Setter}.
 	 * @return {@code aggregated}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code property} bzw. {@code getFormat} {@code null} ist. */
-	public static <GItem, GValue, GValue2> Setter<Iterable<? extends GItem>, GValue> aggregatedSetter(final Setter<? super GItem, GValue2> setter,
-		final Getter<? super GValue, ? extends GValue2> format) throws NullPointerException {
-		return new AggregatedSetter<>(setter, format);
+	public static <GItem, GSource, GTarget> Setter<Iterable<? extends GItem>, GTarget> aggregatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
+		final Setter<? super GItem, GSource> setter) throws NullPointerException {
+		return new AggregatedSetter<>(toSource, setter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code synchronizedSetter(setter, setter)}.
 	 *
-	 * @see #synchronizedSetter(Setter, Object) */
+	 * @see #synchronizedSetter(Object, Setter) */
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Setter<GInput, GValue> synchronizedSetter(final Setter<? super GInput, ? super GValue> setter) throws NullPointerException {
 		return Setters.synchronizedSetter(setter, setter);

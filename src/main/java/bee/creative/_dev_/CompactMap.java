@@ -256,7 +256,7 @@ abstract class CompactMap<GKey, GValue> extends CompactData implements Map<GKey,
 
 	}
 
-	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} der {@link CompactMapEntry}s.
+	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} der {@link bee.creative._dev_.CompactMap.CompactMapEntry}s.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.

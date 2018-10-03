@@ -136,13 +136,13 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 		protected final AbstractHashData<GKey, GValue> entryData;
 
-		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link AbstractHashData#keys}. */
+		/** Dieses Feld speichert den Index des nächsten Eintrags in {@link AbstractHashData#customGetKey(int)}. */
 		protected int nextEntry;
 
 		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#table}. */
 		protected int nextTable = -1;
 
-		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#keys}. */
+		/** Dieses Feld speichert den Index des aktuellen Eintrags in {@link AbstractHashData#customGetKey(int)}. */
 		protected int prevEntry = -1;
 
 		protected int prevTable;

@@ -12,30 +12,1020 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import bee.creative.util.Collections.FilterImplementation2;
 
 /** Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}, {@link Map}, {@link List} und {@link Collection}.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Collections {
 
-	static final class FilterImplementation2<GItem> implements Filter<GItem> {
-	
-		private final Collection<?> collection;
-	
-		private FilterImplementation2(final Collection<?> collection) {
-			this.collection = collection;
+	/** Diese Klasse implementiert {@link Collections#unionSet(Set, Set)} */
+	@SuppressWarnings ("javadoc")
+	public static class UnionSet<GItem> extends AbstractSet<GItem> {
+
+		public final Set<? extends GItem> items1;
+
+		public final Set<? extends GItem> items2;
+
+		public UnionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) {
+			this.items1 = Objects.notNull(items1);
+			this.items2 = Objects.notNull(items2);
 		}
-	
+
 		@Override
-		public boolean accept(final GItem item) {
+		public int size() {
+			final int size1 = this.items1.size(), size2 = this.items2.size();
+			int result = size1 + size2;
+			if (size1 < size2) {
+				for (final Object item: this.items1)
+					if (this.items2.contains(item)) {
+						result--;
+					}
+			} else {
+				for (final Object item: this.items2)
+					if (this.items1.contains(item)) {
+						result--;
+					}
+			}
+			return result;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.items1.isEmpty() && this.items2.isEmpty();
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.unmodifiableIterator(this.items1.size() < this.items2.size()
+				? Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Collections.toContainsFilter(this.items2)), this.items1.iterator()),
+					this.items2.iterator())
+				: Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Collections.toContainsFilter(this.items1)), this.items2.iterator()),
+					this.items1.iterator()));
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.items1.contains(item) || this.items2.contains(item);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Collections#cartesianSet(Set, Set)} */
+	@SuppressWarnings ("javadoc")
+	public static class CartesianSet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
+
+		public class EntryIterator implements Iterator<Entry<GKey, GValue>> {
+
+			protected GKey nextKey;
+
+			protected Iterator<? extends GKey> keyIter = CartesianSet.this.keys.iterator();
+
+			protected Iterator<? extends GValue> valueIter = Iterators.emptyIterator();
+
+			@Override
+			public boolean hasNext() {
+				if (this.valueIter.hasNext()) return true;
+				if (!this.keyIter.hasNext()) return false;
+				this.nextKey = this.keyIter.next();
+				this.valueIter = CartesianSet.this.values.iterator();
+				return this.valueIter.hasNext();
+			}
+
+			@Override
+			public Entry<GKey, GValue> next() {
+				final GValue nextValue = this.valueIter.next();
+				return new AbstractMap.SimpleImmutableEntry<>(this.nextKey, nextValue);
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+
+		}
+
+		public final Set<? extends GKey> keys;
+
+		public final Set<? extends GValue> values;
+
+		public CartesianSet(final Set<? extends GKey> keys, final Set<? extends GValue> values) {
+			this.keys = Objects.notNull(keys);
+			this.values = Objects.notNull(values);
+		}
+
+		@Override
+		public int size() {
+			return this.keys.size() * this.values.size();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.keys.isEmpty() || this.values.isEmpty();
+		}
+
+		@Override
+		public Iterator<Entry<GKey, GValue>> iterator() {
+			if (this.keys.isEmpty() || this.values.isEmpty()) return Iterators.emptyIterator();
+			return new EntryIterator();
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			if (!(item instanceof Entry<?, ?>)) return false;
+			final Entry<?, ?> entry = (Entry<?, ?>)item;
+			return this.keys.contains(entry.getKey()) && this.values.contains(entry.getValue());
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Collections#intersectionSet(Set, Set)} */
+	@SuppressWarnings ("javadoc")
+	public static final class IntersectionSet<GItem> extends AbstractSet<GItem> {
+
+		public final Set<? extends GItem> items1;
+
+		public final Set<? extends GItem> items2;
+
+		public IntersectionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) {
+			this.items1 = Objects.notNull(items1);
+			this.items2 = Objects.notNull(items2);
+		}
+
+		@Override
+		public int size() {
+			final int size1 = this.items1.size(), size2 = this.items2.size();
+			int result = 0;
+			if (size1 < size2) {
+				for (final Object item: this.items1)
+					if (this.items2.contains(item)) {
+						result++;
+					}
+			} else {
+				for (final Object item: this.items2)
+					if (this.items1.contains(item)) {
+						result++;
+					}
+			}
+			return result;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.items1.isEmpty() || this.items2.isEmpty() || !this.iterator().hasNext();
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.unmodifiableIterator(this.items1.size() < this.items2.size() //
+				? Iterators.filteredIterator(Collections.toContainsFilter(this.items2), this.items1.iterator()) //
+				: Iterators.filteredIterator(Collections.toContainsFilter(this.items1), this.items2.iterator()) //
+			);
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.items1.contains(item) && this.items2.contains(item);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Collections#reverseList(List)} */
+	@SuppressWarnings ("javadoc")
+	public static class ReverseList<GItem> extends AbstractList<GItem> {
+
+		public class ReverseIterator implements ListIterator<GItem> {
+
+			public final ListIterator<GItem> iterator;
+
+			public ReverseIterator(final int index) {
+				this.iterator = ReverseList.this.items.listIterator(ReverseList.this.items.size() - index);
+			}
+
+			@Override
+			public boolean hasNext() {
+				return this.iterator.hasPrevious();
+			}
+
+			@Override
+			public boolean hasPrevious() {
+				return this.iterator.hasNext();
+			}
+
+			@Override
+			public void set(final GItem item2) {
+				this.iterator.set(item2);
+			}
+
+			@Override
+			public void add(final GItem item2) {
+				this.iterator.add(item2);
+				this.iterator.hasPrevious();
+				this.iterator.previous();
+			}
+
+			@Override
+			public GItem next() {
+				return this.iterator.previous();
+			}
+
+			@Override
+			public int nextIndex() {
+				return ReverseList.this.items.size() - this.iterator.previousIndex() - 1;
+			}
+
+			@Override
+			public GItem previous() {
+				return this.iterator.next();
+			}
+
+			@Override
+			public int previousIndex() {
+				return ReverseList.this.items.size() - this.iterator.nextIndex() - 1;
+			}
+
+			@Override
+			public void remove() {
+				this.iterator.remove();
+			}
+
+		}
+
+		public final List<GItem> items;
+
+		public ReverseList(final List<GItem> items) {
+			this.items = Objects.notNull(items);
+		}
+
+		@Override
+		protected void removeRange(final int fromIndex, final int toIndex) {
+			final int size = this.items.size();
+			this.items.subList(size - toIndex, size - fromIndex).clear();
+		}
+
+		@Override
+		public GItem get(final int index) {
+			return this.items.get(this.items.size() - index - 1);
+		}
+
+		@Override
+		public GItem set(final int index, final GItem item2) {
+			return this.items.set(this.items.size() - index - 1, item2);
+		}
+
+		@Override
+		public void add(final int index, final GItem item2) {
+			this.items.add(this.items.size() - index, item2);
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> items2) {
+			return this.items.retainAll(items2);
+		}
+
+		@Override
+		public GItem remove(final int index) {
+			return this.items.remove(this.items.size() - index - 1);
+		}
+
+		@Override
+		public boolean removeAll(final Collection<?> items2) {
+			return this.items.removeAll(items2);
+		}
+
+		@Override
+		public int size() {
+			return this.items.size();
+		}
+
+		@Override
+		public void clear() {
+			this.items.clear();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.items.isEmpty();
+		}
+
+		@Override
+		public int indexOf(final Object item2) {
+			final int index = this.items.lastIndexOf(item2);
+			return index < 0 ? -1 : this.items.size() - index - 1;
+		}
+
+		@Override
+		public int lastIndexOf(final Object item2) {
+			final int index = this.items.indexOf(item2);
+			return index < 0 ? -1 : this.items.size() - index - 1;
+		}
+
+		@Override
+		public boolean contains(final Object item2) {
+			return this.items.contains(item2);
+		}
+
+		@Override
+		public boolean containsAll(final Collection<?> items2) {
+			return this.items.containsAll(items2);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return this.listIterator(0);
+		}
+
+		@Override
+		public ListIterator<GItem> listIterator(final int index) {
+			return new ReverseIterator(index);
+		}
+
+		@Override
+		public List<GItem> subList(final int fromIndex, final int toIndex) {
+			return Collections.reverseList(this.items.subList(this.items.size() - toIndex - 2, this.items.size() - fromIndex - 2));
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Collections#chainedList(List, List, boolean)} */
+	@SuppressWarnings ("javadoc")
+	public static class ChainedList<GItem> extends AbstractList<GItem> {
+
+		public final List<GItem> items1;
+
+		public final List<GItem> items2;
+
+		public final boolean extendMode;
+
+		public ChainedList(final List<GItem> items1, final List<GItem> items2, final boolean extendMode) {
+			this.items1 = Objects.notNull(items1);
+			this.items2 = Objects.notNull(items2);
+			this.extendMode = extendMode;
+		}
+
+		@Override
+		public GItem get(final int index) {
+			final int size = this.items1.size();
+			return index < size ? this.items1.get(index) : this.items2.get(index - size);
+		}
+
+		@Override
+		public GItem set(final int index, final GItem item) {
+			final int size = this.items1.size();
+			return index < size ? this.items1.set(index, item) : this.items2.set(index - size, item);
+		}
+
+		@Override
+		public void add(final int index, final GItem item) {
+			final int size = this.items1.size();
+			if ((index < size) || ((index == size) && this.extendMode)) {
+				this.items1.add(index, item);
+			} else {
+				this.items2.add(index - size, item);
+			}
+		}
+
+		@Override
+		public boolean addAll(final int index, final Collection<? extends GItem> items) {
+			final int size = this.items1.size();
+			if ((index < size) || ((index == size) && this.extendMode)) return this.items1.addAll(index, items);
+			return this.items2.addAll(index - size, items);
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> items) {
+			if (!this.items1.retainAll(items)) return this.items2.retainAll(items);
+			this.items2.retainAll(items);
+			return true;
+		}
+
+		@Override
+		public GItem remove(final int index) {
+			final int size = this.items1.size();
+			return index < size ? this.items1.remove(index) : this.items2.remove(index - size);
+		}
+
+		@Override
+		public boolean remove(final Object item) {
+			return this.items1.remove(item) || this.items2.remove(item);
+		}
+
+		@Override
+		public boolean removeAll(final Collection<?> item) {
+			if (!this.items1.removeAll(item)) return this.items2.removeAll(item);
+			this.items2.removeAll(item);
+			return true;
+		}
+
+		@Override
+		public int size() {
+			return this.items1.size() + this.items2.size();
+		}
+
+		@Override
+		public void clear() {
+			this.items1.clear();
+			this.items2.clear();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.items1.isEmpty() && this.items2.isEmpty();
+		}
+
+		@Override
+		public int indexOf(final Object item) {
+			int index = this.items1.indexOf(item);
+			if (index >= 0) return index;
+			index = this.items2.indexOf(item);
+			return index < 0 ? -1 : index + this.items1.size();
+		}
+
+		@Override
+		public int lastIndexOf(final Object item) {
+			final int index = this.items2.lastIndexOf(item);
+			if (index >= 0) return index + this.items1.size();
+			return this.items1.lastIndexOf(item);
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.items1.contains(item) || this.items2.contains(item);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.chainedIterator(this.items1.iterator(), this.items2.iterator());
+		}
+
+		@Override
+		public ListIterator<GItem> listIterator(final int index) {
+			final ListIterator<GItem> iterator1, iterator2;
+			int size = this.items1.size();
+			if (index < size) {
+				iterator1 = this.items1.listIterator(index);
+				iterator2 = this.items2.listIterator(0);
+			} else {
+				iterator1 = this.items1.listIterator(size);
+				iterator2 = this.items2.listIterator(index - size);
+			}
+			size = 0;
+			return new ListIterator<GItem>() {
+
+				int size = ChainedList.this.items1.size();
+
+				ListIterator<GItem> iterator = index < this.size ? iterator1 : iterator2;
+
+				@Override
+				public boolean hasNext() {
+					return this.iterator.hasNext() || (this.iterator = iterator2).hasNext();
+				}
+
+				@Override
+				public boolean hasPrevious() {
+					return this.iterator.hasPrevious() || (this.iterator = iterator1).hasPrevious();
+				}
+
+				@Override
+				public void set(final GItem item) {
+					this.iterator.set(item);
+				}
+
+				@Override
+				public void add(final GItem item) {
+					if ((iterator2.nextIndex() != 0) || (iterator1.nextIndex() != this.size)) {
+						this.iterator.add(item);
+					} else if (ChainedList.this.extendMode) {
+						iterator1.add(item);
+					} else {
+						iterator2.add(item);
+					}
+					this.size = ChainedList.this.items1.size();
+				}
+
+				@Override
+				public GItem next() {
+					return this.iterator.next();
+				}
+
+				@Override
+				public int nextIndex() {
+					return this.iterator == iterator2 ? iterator2.nextIndex() + this.size : iterator1.nextIndex();
+				}
+
+				@Override
+				public GItem previous() {
+					return this.iterator.previous();
+				}
+
+				@Override
+				public int previousIndex() {
+					return this.iterator == iterator2 ? iterator2.previousIndex() + this.size : iterator1.previousIndex();
+				}
+
+				@Override
+				public void remove() {
+					this.iterator.remove();
+					if (this.iterator == iterator2) return;
+					this.size = ChainedList.this.items1.size();
+				}
+
+			};
+		}
+	}
+
+	/** Diese Klasse implementiert {@link Collections#chainedCollection(Collection, Collection, boolean)} */
+	@SuppressWarnings ("javadoc")
+	public static class ChainedCollection<GItem> extends AbstractCollection<GItem> {
+
+		public final Collection<GItem> items1;
+
+		public final Collection<GItem> items2;
+
+		public final boolean extendMode;
+
+		public ChainedCollection(final Collection<GItem> items1, final Collection<GItem> items2, final boolean extendMode) {
+			this.items1 = Objects.notNull(items1);
+			this.items2 = Objects.notNull(items2);
+			this.extendMode = extendMode;
+		}
+
+		@Override
+		public boolean add(final GItem item) {
+			return (this.extendMode ? this.items1 : this.items2).add(item);
+		}
+
+		@Override
+		public boolean addAll(final Collection<? extends GItem> items) {
+			return (this.extendMode ? this.items1 : this.items2).addAll(items);
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> items) {
+			if (!this.items1.retainAll(items)) return this.items2.retainAll(items);
+			this.items2.retainAll(items);
+			return true;
+		}
+
+		@Override
+		public boolean remove(final Object item) {
+			return this.items1.remove(item) || this.items2.remove(item);
+		}
+
+		@Override
+		public boolean removeAll(final Collection<?> items) {
+			if (!this.items1.removeAll(items)) return this.items2.removeAll(items);
+			this.items2.removeAll(items);
+			return true;
+		}
+
+		@Override
+		public int size() {
+			return this.items1.size() + this.items2.size();
+		}
+
+		@Override
+		public void clear() {
+			this.items1.clear();
+			this.items2.clear();
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.items1.contains(item) || this.items2.contains(item);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.chainedIterator(this.items1.iterator(), this.items2.iterator());
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Collections#translatedMap(Map, Translator, Translator)} */
+	@SuppressWarnings ("javadoc")
+	public static class TranslatedMap<GTargetKey, GTargetValue, GSourceKey, GSourceValue> extends AbstractMap<GTargetKey, GTargetValue> {
+
+		public class SourceEntry extends SimpleEntry<GSourceKey, GSourceValue> {
+
+			private static final long serialVersionUID = -1304243507468561381L;
+
+			public final Entry<GTargetKey, GTargetValue> entry;
+
+			public SourceEntry(final Entry<GTargetKey, GTargetValue> entry) {
+				super(TranslatedMap.this.keyTranslator.toSource(entry.getKey()), TranslatedMap.this.valueTranslator.toSource(entry.getValue()));
+				this.entry = entry;
+			}
+
+			@Override
+			public GSourceValue setValue(final GSourceValue value2) {
+				super.setValue(value2);
+				return TranslatedMap.this.valueTranslator.toSource(this.entry.setValue(TranslatedMap.this.valueTranslator.toTarget(value2)));
+			}
+
+		}
+
+		public class TargetEntry extends SimpleEntry<GTargetKey, GTargetValue> {
+
+			private static final long serialVersionUID = 3378767550974847519L;
+
+			public final Entry<GSourceKey, GSourceValue> entry;
+
+			public TargetEntry(final Entry<GSourceKey, GSourceValue> entry) {
+				super(TranslatedMap.this.keyTranslator.toTarget(entry.getKey()), TranslatedMap.this.valueTranslator.toTarget(entry.getValue()));
+				this.entry = entry;
+			}
+
+			@Override
+			public GTargetValue setValue(final GTargetValue value) {
+				super.setValue(value);
+				return TranslatedMap.this.valueTranslator.toTarget(this.entry.setValue(TranslatedMap.this.valueTranslator.toSource(value)));
+			}
+
+		}
+
+		public class EntryTranslator implements Translator<Entry<GSourceKey, GSourceValue>, Entry<GTargetKey, GTargetValue>> {
+
+			@Override
+			public boolean isSource(final Object object) {
+				if (!(object instanceof Entry)) return false;
+				final Entry<?, ?> entry = (Entry<?, ?>)object;
+				return TranslatedMap.this.keyTranslator.isSource(entry.getKey()) && TranslatedMap.this.valueTranslator.isSource(entry.getValue());
+			}
+
+			@Override
+			public boolean isTarget(final Object object) {
+				if (!(object instanceof Entry)) return false;
+				final Entry<?, ?> entry = (Entry<?, ?>)object;
+				return TranslatedMap.this.keyTranslator.isTarget(entry.getKey()) && TranslatedMap.this.valueTranslator.isTarget(entry.getValue());
+			}
+
+			@Override
+			@SuppressWarnings ("unchecked")
+			public Entry<GSourceKey, GSourceValue> toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+				return new SourceEntry((Entry<GTargetKey, GTargetValue>)object);
+			}
+
+			@Override
+			@SuppressWarnings ("unchecked")
+			public Entry<GTargetKey, GTargetValue> toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+				return new TargetEntry((Entry<GSourceKey, GSourceValue>)object);
+			}
+
+		}
+
+		public final Map<GSourceKey, GSourceValue> entries;
+
+		public final Translator<GSourceKey, GTargetKey> keyTranslator;
+
+		public final Translator<GSourceValue, GTargetValue> valueTranslator;
+
+		public TranslatedMap(final Map<GSourceKey, GSourceValue> entries, final Translator<GSourceKey, GTargetKey> keyTranslator,
+			final Translator<GSourceValue, GTargetValue> valueTranslator) {
+			this.entries = Objects.notNull(entries);
+			this.keyTranslator = Objects.notNull(keyTranslator);
+			this.valueTranslator = Objects.notNull(valueTranslator);
+		}
+
+		@Override
+		public void clear() {
+			this.entries.clear();
+		}
+
+		@Override
+		public boolean containsKey(final Object key2) {
+			if (!this.keyTranslator.isTarget(key2)) return false;
+			return this.entries.containsKey(this.keyTranslator.toSource(key2));
+		}
+
+		@Override
+		public boolean containsValue(final Object value2) {
+			if (!this.valueTranslator.isTarget(value2)) return false;
+			return this.entries.containsKey(this.valueTranslator.toSource(value2));
+		}
+
+		@Override
+		public GTargetValue get(final Object key2) {
+			if (!this.keyTranslator.isTarget(key2)) return null;
+			return this.valueTranslator.toTarget(this.entries.get(this.keyTranslator.toSource(key2)));
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.entries.isEmpty();
+		}
+
+		@Override
+		public Set<GTargetKey> keySet() {
+			return Collections.translatedSet(this.entries.keySet(), this.keyTranslator);
+		}
+
+		@Override
+		public GTargetValue put(final GTargetKey key2, final GTargetValue value2) {
+			return this.valueTranslator.toTarget(this.entries.put(this.keyTranslator.toSource(key2), this.valueTranslator.toSource(value2)));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public void putAll(final Map<? extends GTargetKey, ? extends GTargetValue> entries2) {
+			this.entries.putAll(Collections.translatedMap((Map<GTargetKey, GTargetValue>)entries2, Translators.reverseTranslator(this.keyTranslator),
+				Translators.reverseTranslator(this.valueTranslator)));
+		}
+
+		@Override
+		public GTargetValue remove(final Object key2) {
+			if (!this.keyTranslator.isTarget(key2)) return null;
+			return this.valueTranslator.toTarget(this.entries.remove(this.keyTranslator.toSource(key2)));
+		}
+
+		@Override
+		public int size() {
+			return this.entries.size();
+		}
+
+		@Override
+		public Collection<GTargetValue> values() {
+			return Collections.translatedCollection(this.entries.values(), this.valueTranslator);
+		}
+
+		@Override
+		public Set<Entry<GTargetKey, GTargetValue>> entrySet() {
+			return Collections.translatedSet(this.entries.entrySet(), new EntryTranslator());
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Collections#translatedList(List, Translator)} */
+	@SuppressWarnings ("javadoc")
+	public static class TranslatedList<GSource, GTarget> extends AbstractList<GTarget> {
+
+		public final List<GSource> items;
+
+		public final Translator<GSource, GTarget> translator;
+
+		public TranslatedList(final List<GSource> items, final Translator<GSource, GTarget> translator) {
+			this.items = Objects.notNull(items);
+			this.translator = Objects.notNull(translator);
+		}
+
+		@Override
+		protected void removeRange(final int fromIndex, final int toIndex) {
+			this.items.subList(fromIndex, toIndex).clear();
+		}
+
+		@Override
+		public GTarget get(final int index) {
+			return this.translator.toTarget(this.items.get(index));
+		}
+
+		@Override
+		public GTarget set(final int index, final GTarget item2) {
+			return this.translator.toTarget(this.items.set(index, this.translator.toSource(item2)));
+		}
+
+		@Override
+		public boolean add(final GTarget item2) {
+			return this.items.add(this.translator.toSource(item2));
+		}
+
+		@Override
+		public void add(final int index, final GTarget item2) {
+			this.items.add(index, this.translator.toSource(item2));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean addAll(final Collection<? extends GTarget> items2) {
+			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean addAll(final int index, final Collection<? extends GTarget> items2) {
+			return this.items.addAll(index, Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		public GTarget remove(final int index) {
+			return this.translator.toTarget(this.items.remove(index));
+		}
+
+		@Override
+		public boolean remove(final Object item2) {
+			if (!this.translator.isTarget(item2)) return false;
+			return this.items.remove(this.translator.toSource(item2));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean removeAll(final Collection<?> items2) {
+			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean retainAll(final Collection<?> items2) {
+			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		public int size() {
+			return this.items.size();
+		}
+
+		@Override
+		public void clear() {
+			this.items.clear();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.items.isEmpty();
+		}
+
+		@Override
+		public boolean contains(final Object item2) {
+			if (!this.translator.isTarget(item2)) return false;
+			return this.items.contains(this.translator.toSource(item2));
+		}
+
+		@Override
+		public Iterator<GTarget> iterator() {
+			return Iterators.translatedIterator(Translators.toTargetGetter(this.translator), this.items.iterator());
+		}
+
+		@Override
+		public int indexOf(final Object item2) {
+			if (!this.translator.isTarget(item2)) return -1;
+			return this.items.indexOf(this.translator.toSource(item2));
+		}
+
+		@Override
+		public int lastIndexOf(final Object item2) {
+			if (!this.translator.isTarget(item2)) return -1;
+			return this.items.lastIndexOf(this.translator.toSource(item2));
+		}
+	}
+
+	/** Diese Klasse implementiert {@link Collections#translatedSet(Set, Translator)} */
+	@SuppressWarnings ("javadoc")
+	public static class TranslatedSet<GSource, GTarget> extends AbstractSet<GTarget> {
+
+		public final Translator<GSource, GTarget> translator;
+
+		public final Set<GSource> items;
+
+		public TranslatedSet(final Translator<GSource, GTarget> translator, final Set<GSource> items) {
+			this.items = Objects.notNull(items);
+			this.translator = Objects.notNull(translator);
+		}
+
+		@Override
+		public boolean add(final GTarget item2) {
+			return this.items.add(this.translator.toSource(item2));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean addAll(final Collection<? extends GTarget> items2) {
+			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		public boolean remove(final Object item2) {
+			if (!this.translator.isTarget(item2)) return false;
+			return this.items.remove(this.translator.toSource(item2));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean removeAll(final Collection<?> items2) {
+			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean retainAll(final Collection<?> items2) {
+			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		public int size() {
+			return this.items.size();
+		}
+
+		@Override
+		public void clear() {
+			this.items.clear();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.items.isEmpty();
+		}
+
+		@Override
+		public boolean contains(final Object item2) {
+			if (!this.translator.isTarget(item2)) return false;
+			return this.items.contains(this.translator.toSource(item2));
+		}
+
+		@Override
+		public Iterator<GTarget> iterator() {
+			return Iterators.translatedIterator(Translators.toTargetGetter(this.translator), this.items.iterator());
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Collections#translatedCollection(Collection, Translator)} */
+	@SuppressWarnings ("javadoc")
+	public static class TranslatedCollection<GSource, GTarget> extends AbstractCollection<GTarget> {
+
+		public final Collection<GSource> items;
+
+		public final Translator<GSource, GTarget> translator;
+
+		public TranslatedCollection(final Collection<GSource> items, final Translator<GSource, GTarget> translator) {
+			this.items = Objects.notNull(items);
+			this.translator = Objects.notNull(translator);
+		}
+
+		@Override
+		public boolean add(final GTarget item2) {
+			return this.items.add(this.translator.toSource(item2));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean addAll(final Collection<? extends GTarget> items2) {
+			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		public boolean remove(final Object item2) {
+			if (!this.translator.isTarget(item2)) return false;
+			return this.items.remove(this.translator.toSource(item2));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean removeAll(final Collection<?> items2) {
+			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public boolean retainAll(final Collection<?> items2) {
+			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(this.translator)));
+		}
+
+		@Override
+		public int size() {
+			return this.items.size();
+		}
+
+		@Override
+		public void clear() {
+			this.items.clear();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.items.isEmpty();
+		}
+
+		@Override
+		public boolean contains(final Object item2) {
+			if (!this.translator.isTarget(item2)) return false;
+			return this.items.contains(this.translator.toSource(item2));
+		}
+
+		@Override
+		public Iterator<GTarget> iterator() {
+			return Iterators.translatedIterator(Translators.toTargetGetter(this.translator), this.items.iterator());
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Collections#toContainsFilter(Collection)} */
+	@SuppressWarnings ("javadoc")
+	static class ContainsFilter implements Filter<Object> {
+
+		public final Collection<?> collection;
+
+		public ContainsFilter(final Collection<?> collection) {
+			this.collection = Objects.notNull(collection);
+		}
+
+		@Override
+		public boolean accept(final Object item) {
 			return this.collection.contains(item);
 		}
-	
+
 		@Override
 		public String toString() {
-			return Objects.toInvokeString("containsFilter", this.collection);
+			return Objects.toInvokeString(this, this.collection);
 		}
+
 	}
 
 	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Vereinigungsmenge der gegebenen {@link Set} zurück.
@@ -46,47 +1036,7 @@ public class Collections {
 	 * @return {@code union}-{@link Set}.
 	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static <GItem> Set<GItem> unionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
-		Objects.notNull(items1);
-		Objects.notNull(items2);
-		return new AbstractSet<GItem>() {
-
-			@Override
-			public int size() {
-				final int size1 = items1.size(), size2 = items2.size();
-				int result = size1 + size2;
-				if (size1 < size2) {
-					for (final Object item: items1)
-						if (items2.contains(item)) {
-							result--;
-						}
-				} else {
-					for (final Object item: items2)
-						if (items1.contains(item)) {
-							result--;
-						}
-				}
-				return result;
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return items1.isEmpty() && items2.isEmpty();
-			}
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.unmodifiableIterator(items1.size() < items2.size() //
-					? Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Collections.containsFilter(items2)), items1.iterator()), items2.iterator()) //
-					: Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Collections.containsFilter(items1)), items2.iterator()), items1.iterator()) //
-				);
-			}
-
-			@Override
-			public boolean contains(final Object item) {
-				return items1.contains(item) || items2.contains(item);
-			}
-
-		};
+		return new UnionSet<>(items1, items2);
 	}
 
 	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf das Kartesische Produkt der gegebenen {@link Set} zurück.
@@ -99,62 +1049,7 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code keys} bzw. {@code values} {@code null} ist. */
 	public static <GKey, GValue> Set<Entry<GKey, GValue>> cartesianSet(final Set<? extends GKey> keys, final Set<? extends GValue> values)
 		throws NullPointerException {
-		Objects.notNull(keys);
-		Objects.notNull(values);
-		return new AbstractSet<Entry<GKey, GValue>>() {
-
-			@Override
-			public int size() {
-				return keys.size() * values.size();
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return keys.isEmpty() || values.isEmpty();
-			}
-
-			@Override
-			public Iterator<Entry<GKey, GValue>> iterator() {
-				if (keys.isEmpty() || values.isEmpty()) return Iterators.emptyIterator();
-				return new Iterator<Entry<GKey, GValue>>() {
-
-					GKey nextKey;
-
-					Iterator<? extends GKey> keyIter = keys.iterator();
-
-					Iterator<? extends GValue> valueIter = Iterators.emptyIterator();
-
-					@Override
-					public boolean hasNext() {
-						if (this.valueIter.hasNext()) return true;
-						if (!this.keyIter.hasNext()) return false;
-						this.nextKey = this.keyIter.next();
-						this.valueIter = values.iterator();
-						return this.valueIter.hasNext();
-					}
-
-					@Override
-					public Entry<GKey, GValue> next() {
-						final GValue nextValue = this.valueIter.next();
-						return new AbstractMap.SimpleImmutableEntry<>(this.nextKey, nextValue);
-					}
-
-					@Override
-					public void remove() {
-						throw new UnsupportedOperationException();
-					}
-
-				};
-			}
-
-			@Override
-			public boolean contains(final Object item) {
-				if (!(item instanceof Entry<?, ?>)) return false;
-				final Entry<?, ?> entry = (Entry<?, ?>)item;
-				return keys.contains(entry.getKey()) && values.contains(entry.getValue());
-			}
-
-		};
+		return new CartesianSet<>(keys, values);
 	}
 
 	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Schnittmenge der gegebenen {@link Set} zurück.
@@ -165,47 +1060,7 @@ public class Collections {
 	 * @return {@code intersection}-{@link Set}.
 	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static <GItem> Set<GItem> intersectionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
-		Objects.notNull(items1);
-		Objects.notNull(items2);
-		return new AbstractSet<GItem>() {
-
-			@Override
-			public int size() {
-				final int size1 = items1.size(), size2 = items2.size();
-				int result = 0;
-				if (size1 < size2) {
-					for (final Object item: items1)
-						if (items2.contains(item)) {
-							result++;
-						}
-				} else {
-					for (final Object item: items2)
-						if (items1.contains(item)) {
-							result++;
-						}
-				}
-				return result;
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return items1.isEmpty() || items2.isEmpty() || !this.iterator().hasNext();
-			}
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.unmodifiableIterator(items1.size() < items2.size() //
-					? Iterators.filteredIterator(Collections.containsFilter(items2), items1.iterator()) //
-					: Iterators.filteredIterator(Collections.containsFilter(items1), items2.iterator()) //
-				);
-			}
-
-			@Override
-			public boolean contains(final Object item) {
-				return items1.contains(item) && items2.contains(item);
-			}
-
-		};
+		return new IntersectionSet<>(items1, items2);
 	}
 
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf die gegebene {@link List} zurück.
@@ -215,149 +1070,7 @@ public class Collections {
 	 * @return {@code reverse}-{@link List}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static <GItem> List<GItem> reverseList(final List<GItem> items) throws NullPointerException {
-		Objects.notNull(items);
-		return new AbstractList<GItem>() {
-
-			@Override
-			protected void removeRange(final int fromIndex, final int toIndex) {
-				final int size = items.size();
-				items.subList(size - toIndex, size - fromIndex).clear();
-			}
-
-			@Override
-			public GItem get(final int index) {
-				return items.get(items.size() - index - 1);
-			}
-
-			@Override
-			public GItem set(final int index, final GItem item2) {
-				return items.set(items.size() - index - 1, item2);
-			}
-
-			@Override
-			public void add(final int index, final GItem item2) {
-				items.add(items.size() - index, item2);
-			}
-
-			@Override
-			public boolean retainAll(final Collection<?> items2) {
-				return items.retainAll(items2);
-			}
-
-			@Override
-			public GItem remove(final int index) {
-				return items.remove(items.size() - index - 1);
-			}
-
-			@Override
-			public boolean removeAll(final Collection<?> items2) {
-				return items.removeAll(items2);
-			}
-
-			@Override
-			public int size() {
-				return items.size();
-			}
-
-			@Override
-			public void clear() {
-				items.clear();
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return items.isEmpty();
-			}
-
-			@Override
-			public int indexOf(final Object item2) {
-				final int index = items.lastIndexOf(item2);
-				return index < 0 ? -1 : items.size() - index - 1;
-			}
-
-			@Override
-			public int lastIndexOf(final Object item2) {
-				final int index = items.indexOf(item2);
-				return index < 0 ? -1 : items.size() - index - 1;
-			}
-
-			@Override
-			public boolean contains(final Object item2) {
-				return items.contains(item2);
-			}
-
-			@Override
-			public boolean containsAll(final Collection<?> items2) {
-				return items.containsAll(items2);
-			}
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return this.listIterator(0);
-			}
-
-			@Override
-			public ListIterator<GItem> listIterator(int index) {
-				final ListIterator<GItem> iterator = items.listIterator(items.size() - index);
-				index = 0;
-				return new ListIterator<GItem>() {
-
-					@Override
-					public boolean hasNext() {
-						return iterator.hasPrevious();
-					}
-
-					@Override
-					public boolean hasPrevious() {
-						return iterator.hasNext();
-					}
-
-					@Override
-					public void set(final GItem item2) {
-						iterator.set(item2);
-					}
-
-					@Override
-					public void add(final GItem item2) {
-						iterator.add(item2);
-						iterator.hasPrevious();
-						iterator.previous();
-					}
-
-					@Override
-					public GItem next() {
-						return iterator.previous();
-					}
-
-					@Override
-					public int nextIndex() {
-						return items.size() - iterator.previousIndex() - 1;
-					}
-
-					@Override
-					public GItem previous() {
-						return iterator.next();
-					}
-
-					@Override
-					public int previousIndex() {
-						return items.size() - iterator.nextIndex() - 1;
-					}
-
-					@Override
-					public void remove() {
-						iterator.remove();
-					}
-
-				};
-			}
-
-			@Override
-			public List<GItem> subList(final int fromIndex, final int toIndex) {
-				return Collections.reverseList(items.subList(items.size() - toIndex - 2, items.size() - fromIndex - 2));
-			}
-
-		};
+		return new ReverseList<>(items);
 	}
 
 	/** Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List} und gibt diese zurück. Wenn ein Elemente zwischen beiden
@@ -385,181 +1098,7 @@ public class Collections {
 	 * @return verkettete {@link List}-Sicht.
 	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static <GItem> List<GItem> chainedList(final List<GItem> items1, final List<GItem> items2, final boolean extendMode) throws NullPointerException {
-		Objects.notNull(items1);
-		Objects.notNull(items2);
-		return new AbstractList<GItem>() {
-
-			@Override
-			public GItem get(final int index) {
-				final int size = items1.size();
-				return index < size ? items1.get(index) : items2.get(index - size);
-			}
-
-			@Override
-			public GItem set(final int index, final GItem item) {
-				final int size = items1.size();
-				return index < size ? items1.set(index, item) : items2.set(index - size, item);
-			}
-
-			@Override
-			public void add(final int index, final GItem item) {
-				final int size = items1.size();
-				if ((index < size) || ((index == size) && extendMode)) {
-					items1.add(index, item);
-				} else {
-					items2.add(index - size, item);
-				}
-			}
-
-			@Override
-			public boolean addAll(final int index, final Collection<? extends GItem> items) {
-				final int size = items1.size();
-				if ((index < size) || ((index == size) && extendMode)) return items1.addAll(index, items);
-				return items2.addAll(index - size, items);
-			}
-
-			@Override
-			public boolean retainAll(final Collection<?> items) {
-				if (!items1.retainAll(items)) return items2.retainAll(items);
-				items2.retainAll(items);
-				return true;
-			}
-
-			@Override
-			public GItem remove(final int index) {
-				final int size = items1.size();
-				return index < size ? items1.remove(index) : items2.remove(index - size);
-			}
-
-			@Override
-			public boolean remove(final Object item) {
-				return items1.remove(item) || items2.remove(item);
-			}
-
-			@Override
-			public boolean removeAll(final Collection<?> item) {
-				if (!items1.removeAll(item)) return items2.removeAll(item);
-				items2.removeAll(item);
-				return true;
-			}
-
-			@Override
-			public int size() {
-				return items1.size() + items2.size();
-			}
-
-			@Override
-			public void clear() {
-				items1.clear();
-				items2.clear();
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return items1.isEmpty() && items2.isEmpty();
-			}
-
-			@Override
-			public int indexOf(final Object item) {
-				int index = items1.indexOf(item);
-				if (index >= 0) return index;
-				index = items2.indexOf(item);
-				return index < 0 ? -1 : index + items1.size();
-			}
-
-			@Override
-			public int lastIndexOf(final Object item) {
-				final int index = items2.lastIndexOf(item);
-				if (index >= 0) return index + items1.size();
-				return items1.lastIndexOf(item);
-			}
-
-			@Override
-			public boolean contains(final Object item) {
-				return items1.contains(item) || items2.contains(item);
-			}
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.chainedIterator(items1.iterator(), items2.iterator());
-			}
-
-			@Override
-			public ListIterator<GItem> listIterator(final int index) {
-				final ListIterator<GItem> iterator1, iterator2;
-				int size = items1.size();
-				if (index < size) {
-					iterator1 = items1.listIterator(index);
-					iterator2 = items2.listIterator(0);
-				} else {
-					iterator1 = items1.listIterator(size);
-					iterator2 = items2.listIterator(index - size);
-				}
-				size = 0;
-				return new ListIterator<GItem>() {
-
-					int size = items1.size();
-
-					ListIterator<GItem> iterator = index < this.size ? iterator1 : iterator2;
-
-					@Override
-					public boolean hasNext() {
-						return this.iterator.hasNext() || (this.iterator = iterator2).hasNext();
-					}
-
-					@Override
-					public boolean hasPrevious() {
-						return this.iterator.hasPrevious() || (this.iterator = iterator1).hasPrevious();
-					}
-
-					@Override
-					public void set(final GItem item) {
-						this.iterator.set(item);
-					}
-
-					@Override
-					public void add(final GItem item) {
-						if ((iterator2.nextIndex() != 0) || (iterator1.nextIndex() != this.size)) {
-							this.iterator.add(item);
-						} else if (extendMode) {
-							iterator1.add(item);
-						} else {
-							iterator2.add(item);
-						}
-						this.size = items1.size();
-					}
-
-					@Override
-					public GItem next() {
-						return this.iterator.next();
-					}
-
-					@Override
-					public int nextIndex() {
-						return this.iterator == iterator2 ? iterator2.nextIndex() + this.size : iterator1.nextIndex();
-					}
-
-					@Override
-					public GItem previous() {
-						return this.iterator.previous();
-					}
-
-					@Override
-					public int previousIndex() {
-						return this.iterator == iterator2 ? iterator2.previousIndex() + this.size : iterator1.previousIndex();
-					}
-
-					@Override
-					public void remove() {
-						this.iterator.remove();
-						if (this.iterator == iterator2) return;
-						this.size = items1.size();
-					}
-
-				};
-			}
-
-		};
+		return new ChainedList<>(items1, items2, extendMode);
 	}
 
 	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
@@ -588,61 +1127,7 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static <GItem> Collection<GItem> chainedCollection(final Collection<GItem> items1, final Collection<GItem> items2, final boolean extendMode)
 		throws NullPointerException {
-		Objects.notNull(items1);
-		Objects.notNull(items2);
-		return new AbstractCollection<GItem>() {
-
-			@Override
-			public boolean add(final GItem item) {
-				return (extendMode ? items1 : items2).add(item);
-			}
-
-			@Override
-			public boolean addAll(final Collection<? extends GItem> items) {
-				return (extendMode ? items1 : items2).addAll(items);
-			}
-
-			@Override
-			public boolean retainAll(final Collection<?> items) {
-				if (!items1.retainAll(items)) return items2.retainAll(items);
-				items2.retainAll(items);
-				return true;
-			}
-
-			@Override
-			public boolean remove(final Object item) {
-				return items1.remove(item) || items2.remove(item);
-			}
-
-			@Override
-			public boolean removeAll(final Collection<?> items) {
-				if (!items1.removeAll(items)) return items2.removeAll(items);
-				items2.removeAll(items);
-				return true;
-			}
-
-			@Override
-			public int size() {
-				return items1.size() + items2.size();
-			}
-
-			@Override
-			public void clear() {
-				items1.clear();
-				items2.clear();
-			}
-
-			@Override
-			public boolean contains(final Object item) {
-				return items1.contains(item) || items2.contains(item);
-			}
-
-			@Override
-			public Iterator<GItem> iterator() {
-				return Iterators.chainedIterator(items1.iterator(), items2.iterator());
-			}
-
-		};
+		return new ChainedCollection<>(items1, items2, extendMode);
 	}
 
 	/** Diese Methode gibt eine {@link Map} als übersetzte Sicht auf die gegebene {@link Map} zurück.
@@ -658,130 +1143,7 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code entries}, {@code keyTranslator} bzw. {@code valueTranslator} {@code null} ist. */
 	public static <GSourceKey, GSourceValue, GTargetKey, GTargetValue> Map<GTargetKey, GTargetValue> translatedMap(final Map<GSourceKey, GSourceValue> entries,
 		final Translator<GSourceKey, GTargetKey> keyTranslator, final Translator<GSourceValue, GTargetValue> valueTranslator) throws NullPointerException {
-		Objects.notNull(entries);
-		Objects.notNull(keyTranslator);
-		Objects.notNull(valueTranslator);
-		return new AbstractMap<GTargetKey, GTargetValue>() {
-
-			@Override
-			public void clear() {
-				entries.clear();
-			}
-
-			@Override
-			public boolean containsKey(final Object key2) {
-				if (!keyTranslator.isTarget(key2)) return false;
-				return entries.containsKey(keyTranslator.toSource(key2));
-			}
-
-			@Override
-			public boolean containsValue(final Object value2) {
-				if (!valueTranslator.isTarget(value2)) return false;
-				return entries.containsKey(valueTranslator.toSource(value2));
-			}
-
-			@Override
-			public GTargetValue get(final Object key2) {
-				if (!keyTranslator.isTarget(key2)) return null;
-				return valueTranslator.toTarget(entries.get(keyTranslator.toSource(key2)));
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return entries.isEmpty();
-			}
-
-			@Override
-			public Set<GTargetKey> keySet() {
-				return Collections.translatedSet(entries.keySet(), keyTranslator);
-			}
-
-			@Override
-			public GTargetValue put(final GTargetKey key2, final GTargetValue value2) {
-				return valueTranslator.toTarget(entries.put(keyTranslator.toSource(key2), valueTranslator.toSource(value2)));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public void putAll(final Map<? extends GTargetKey, ? extends GTargetValue> entries2) {
-				entries.putAll(Collections.translatedMap((Map<GTargetKey, GTargetValue>)entries2, Translators.reverseTranslator(keyTranslator),
-					Translators.reverseTranslator(valueTranslator)));
-			}
-
-			@Override
-			public GTargetValue remove(final Object key2) {
-				if (!keyTranslator.isTarget(key2)) return null;
-				return valueTranslator.toTarget(entries.remove(keyTranslator.toSource(key2)));
-			}
-
-			@Override
-			public int size() {
-				return entries.size();
-			}
-
-			@Override
-			public Collection<GTargetValue> values() {
-				return Collections.translatedCollection(entries.values(), valueTranslator);
-			}
-
-			@Override
-			public Set<Entry<GTargetKey, GTargetValue>> entrySet() {
-				return Collections.translatedSet(entries.entrySet(), new Translator<Entry<GSourceKey, GSourceValue>, Entry<GTargetKey, GTargetValue>>() {
-
-					@Override
-					public boolean isTarget(final Object object) {
-						if (!(object instanceof Entry)) return false;
-						final Entry<?, ?> entry = (Entry<?, ?>)object;
-						return keyTranslator.isTarget(entry.getKey()) && valueTranslator.isTarget(entry.getValue());
-					}
-
-					@Override
-					public boolean isSource(final Object object) {
-						if (!(object instanceof Entry)) return false;
-						final Entry<?, ?> entry = (Entry<?, ?>)object;
-						return keyTranslator.isSource(entry.getKey()) && valueTranslator.isSource(entry.getValue());
-					}
-
-					@Override
-					@SuppressWarnings ("unchecked")
-					public Entry<GTargetKey, GTargetValue> toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-						final Entry<?, GSourceValue> entry = (Entry<?, GSourceValue>)object;
-						object = null;
-						return new SimpleEntry<GTargetKey, GTargetValue>(keyTranslator.toTarget(entry.getKey()), valueTranslator.toTarget(entry.getValue())) {
-
-							private static final long serialVersionUID = 9189869604170030443L;
-
-							@Override
-							public GTargetValue setValue(final GTargetValue value2) {
-								super.setValue(value2);
-								return valueTranslator.toTarget(entry.setValue(valueTranslator.toSource(value2)));
-							}
-
-						};
-					}
-
-					@Override
-					@SuppressWarnings ("unchecked")
-					public Entry<GSourceKey, GSourceValue> toSource(Object object) throws ClassCastException, IllegalArgumentException {
-						final Entry<?, GSourceValue> entry = (Entry<?, GSourceValue>)object;
-						object = null;
-						return new SimpleEntry<GSourceKey, GSourceValue>(keyTranslator.toSource(entry.getKey()), valueTranslator.toSource(entry.getValue())) {
-
-							private static final long serialVersionUID = 6699416526369328676L;
-
-							@Override
-							public GSourceValue setValue(final GSourceValue value2) {
-								super.setValue(value2);
-								return valueTranslator.toSource(entry.setValue(valueTranslator.toSource(value2)));
-							}
-
-						};
-					}
-
-				});
-			}
-
-		};
+		return new TranslatedMap<>(entries, keyTranslator, valueTranslator);
 	}
 
 	/** Diese Methode gibt eine {@link List} als übersetzte Sicht auf die gegebene {@link List} zurück.
@@ -794,109 +1156,7 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static <GSource, GTarget> List<GTarget> translatedList(final List<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
-		Objects.notNull(items);
-		Objects.notNull(translator);
-		return new AbstractList<GTarget>() {
-
-			@Override
-			protected void removeRange(final int fromIndex, final int toIndex) {
-				items.subList(fromIndex, toIndex).clear();
-			}
-
-			@Override
-			public GTarget get(final int index) {
-				return translator.toTarget(items.get(index));
-			}
-
-			@Override
-			public GTarget set(final int index, final GTarget item2) {
-				return translator.toTarget(items.set(index, translator.toSource(item2)));
-			}
-
-			@Override
-			public boolean add(final GTarget item2) {
-				return items.add(translator.toSource(item2));
-			}
-
-			@Override
-			public void add(final int index, final GTarget item2) {
-				items.add(index, translator.toSource(item2));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean addAll(final Collection<? extends GTarget> items2) {
-				return items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean addAll(final int index, final Collection<? extends GTarget> items2) {
-				return items.addAll(index, Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			public GTarget remove(final int index) {
-				return translator.toTarget(items.remove(index));
-			}
-
-			@Override
-			public boolean remove(final Object item2) {
-				if (!translator.isTarget(item2)) return false;
-				return items.remove(translator.toSource(item2));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean removeAll(final Collection<?> items2) {
-				return items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean retainAll(final Collection<?> items2) {
-				return items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			public int size() {
-				return items.size();
-			}
-
-			@Override
-			public void clear() {
-				items.clear();
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return items.isEmpty();
-			}
-
-			@Override
-			public boolean contains(final Object item2) {
-				if (!translator.isTarget(item2)) return false;
-				return items.contains(translator.toSource(item2));
-			}
-
-			@Override
-			public Iterator<GTarget> iterator() {
-				return Iterators.translatedIterator(Translators.toTargetGetter(translator), items.iterator());
-			}
-
-			@Override
-			public int indexOf(final Object item2) {
-				if (!translator.isTarget(item2)) return -1;
-				return items.indexOf(translator.toSource(item2));
-			}
-
-			@Override
-			public int lastIndexOf(final Object item2) {
-				if (!translator.isTarget(item2)) return -1;
-				return items.lastIndexOf(translator.toSource(item2));
-			}
-
-		};
+		return new TranslatedList<>(items, translator);
 	}
 
 	/** Diese Methode gibt ein {@link Set} als übersetzte Sicht auf das gegebene {@link Set} zurück.
@@ -909,66 +1169,7 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static <GSource, GTarget> Set<GTarget> translatedSet(final Set<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
-		Objects.notNull(items);
-		Objects.notNull(translator);
-		return new AbstractSet<GTarget>() {
-
-			@Override
-			public boolean add(final GTarget item2) {
-				return items.add(translator.toSource(item2));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean addAll(final Collection<? extends GTarget> items2) {
-				return items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			public boolean remove(final Object item2) {
-				if (!translator.isTarget(item2)) return false;
-				return items.remove(translator.toSource(item2));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean removeAll(final Collection<?> items2) {
-				return items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean retainAll(final Collection<?> items2) {
-				return items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			public int size() {
-				return items.size();
-			}
-
-			@Override
-			public void clear() {
-				items.clear();
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return items.isEmpty();
-			}
-
-			@Override
-			public boolean contains(final Object item2) {
-				if (!translator.isTarget(item2)) return false;
-				return items.contains(translator.toSource(item2));
-			}
-
-			@Override
-			public Iterator<GTarget> iterator() {
-				return Iterators.translatedIterator(Translators.toTargetGetter(translator), items.iterator());
-			}
-
-		};
+		return new TranslatedSet<>(translator, items);
 	}
 
 	/** Diese Methode gibt eine {@link Collection} als übersetzte Sicht auf die gegebene {@link Collection} zurück.
@@ -981,90 +1182,29 @@ public class Collections {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static <GSource, GTarget> Collection<GTarget> translatedCollection(final Collection<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
-		Objects.notNull(items);
-		Objects.notNull(translator);
-		return new AbstractCollection<GTarget>() {
-
-			@Override
-			public boolean add(final GTarget item2) {
-				return items.add(translator.toSource(item2));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean addAll(final Collection<? extends GTarget> items2) {
-				return items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			public boolean remove(final Object item2) {
-				if (!translator.isTarget(item2)) return false;
-				return items.remove(translator.toSource(item2));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean removeAll(final Collection<?> items2) {
-				return items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			@SuppressWarnings ("unchecked")
-			public boolean retainAll(final Collection<?> items2) {
-				return items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverseTranslator(translator)));
-			}
-
-			@Override
-			public int size() {
-				return items.size();
-			}
-
-			@Override
-			public void clear() {
-				items.clear();
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return items.isEmpty();
-			}
-
-			@Override
-			public boolean contains(final Object item2) {
-				if (!translator.isTarget(item2)) return false;
-				return items.contains(translator.toSource(item2));
-			}
-
-			@Override
-			public Iterator<GTarget> iterator() {
-				return Iterators.translatedIterator(Translators.toTargetGetter(translator), items.iterator());
-			}
-
-		};
+		return new TranslatedCollection<>(items, translator);
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
 	 *
-	 * @see #containsFilter(Collection)
-	 * @param <GInput> Typ der Eingabe.
+	 * @see #toContainsFilter(Collection)
 	 * @param items akzeptierte Eingaben.
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static <GInput> Filter<GInput> containsFilter(final Object... items) throws NullPointerException {
+	public static Filter<Object> toContainsFilter(final Object... items) throws NullPointerException {
 		if (items.length == 0) return Filters.valueFilter(false);
-		if (items.length == 1) return bee.creative.util.Collections.containsFilter(java.util.Collections.singleton(items[0]));
-		return bee.creative.util.Collections.containsFilter(new HashSet2<>(Arrays.asList(items)));
+		if (items.length == 1) return Collections.toContainsFilter(java.util.Collections.singleton(items[0]));
+		return Collections.toContainsFilter(new HashSet2<>(Arrays.asList(items)));
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code collection.contains(input)}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
 	 * @param collection {@link Collection} der akzeptierten Eingaben.
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code collection} {@code null} ist. */
-	public static <GInput> Filter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
-		return new Collections.FilterImplementation2<>(collection);
+	public static Filter<Object> toContainsFilter(final Collection<?> collection) throws NullPointerException {
+		return new ContainsFilter(collection);
 	}
 
 }

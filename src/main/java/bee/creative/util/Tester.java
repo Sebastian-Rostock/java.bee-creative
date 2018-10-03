@@ -103,7 +103,6 @@ public class Tester {
 	}
 
 	/** Diese Klasse implementiert {@link Tester#USED_TIME_ORDER}. */
-	@SuppressWarnings ("javadoc")
 	static class UsedTimeComparator extends BaseComparator<Tester> {
 
 		@Override
@@ -114,7 +113,6 @@ public class Tester {
 	}
 
 	/** Diese Klasse implementiert {@link Tester#USED_MEMORY_ORDER}. */
-	@SuppressWarnings ("javadoc")
 	static class UsedMemoryComparator extends BaseComparator<Tester> {
 
 		@Override

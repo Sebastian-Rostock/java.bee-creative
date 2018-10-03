@@ -297,7 +297,7 @@ public class Producers {
 
 	/** Diese Methode ist eine Abkürzung für {@code synchronizedProducer(producer, producer)}.
 	 *
-	 * @see #synchronizedProducer(Producer, Object) */
+	 * @see #synchronizedProducer(Object, Producer) */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Producer<GValue> synchronizedProducer(final Producer<? extends GValue> producer) throws NullPointerException {
 		return Producers.synchronizedProducer(producer, producer);
