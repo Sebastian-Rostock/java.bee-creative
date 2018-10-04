@@ -516,13 +516,13 @@ public final class Fields {
 	@SuppressWarnings ("javadoc")
 	public static class SetupField<GInput, GValue> implements Field<GInput, GValue> {
 
+		public final Getter<? super GInput, ? extends GValue> setup;
+
 		public final Field<? super GInput, GValue> field;
 
-		public final Getter<? super GInput, GValue> setup;
-
-		public SetupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> setup) {
-			this.field = Objects.notNull(field);
+		public SetupField(final Getter<? super GInput, ? extends GValue> setup, final Field<? super GInput, GValue> field) {
 			this.setup = Objects.notNull(setup);
+			this.field = Objects.notNull(field);
 		}
 
 		@Override
@@ -541,7 +541,7 @@ public final class Fields {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.field, this.setup);
+			return Objects.toInvokeString(this, this.setup, this.field);
 		}
 
 	}
@@ -695,40 +695,6 @@ public final class Fields {
 
 	}
 
-	/** Diese Klasse implementiert {@link Fields#translatedField(Field, Getter, Getter)}. */
-	@SuppressWarnings ("javadoc")
-	public static class TranslatedField2<GInput, GSource, GTarget> implements Field<GInput, GTarget> {
-
-		public final Field<? super GInput, GSource> field;
-
-		public final Getter<? super GTarget, ? extends GSource> toSource;
-
-		public final Getter<? super GSource, ? extends GTarget> toTarget;
-
-		public TranslatedField2(final Field<? super GInput, GSource> field, final Getter<? super GSource, ? extends GTarget> toTarget,
-			final Getter<? super GTarget, ? extends GSource> toSource) {
-			this.field = Objects.notNull(field);
-			this.toSource = Objects.notNull(toSource);
-			this.toTarget = Objects.notNull(toTarget);
-		}
-
-		@Override
-		public GTarget get(final GInput input) {
-			return this.toTarget.get(this.field.get(input));
-		}
-
-		@Override
-		public void set(final GInput input, final GTarget value) {
-			this.field.set(input, this.toSource.get(value));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.field, this.toSource, this.toTarget);
-		}
-
-	}
-
 	/** Diese Klasse implementiert {@link Fields#conditionalField(Filter, Field, Field)}. */
 	@SuppressWarnings ("javadoc")
 	public static class ConditionalField<GInput, GValue> implements Field<GInput, GValue> {
@@ -841,7 +807,7 @@ public final class Fields {
 		return (Field<Object, GValue>)ValueField.EMPTY;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.valueGetter(value), Setters.neutralSetter())}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.valueGetter(value), Setters.emptySetter())}.
 	 *
 	 * @see #compositeField(Getter, Setter)
 	 * @see Getters#valueGetter(Object)
@@ -854,27 +820,18 @@ public final class Fields {
 
 	/** Diese Methode gibt ein initialisierendes {@link Field} zurück.<br>
 	 * Das Schreiben wird direkt an das gegebene {@link Field Datenfeld} {@code field} delegiert. Beim Lesen wird der Wert zuerst über das gegebene {@link Field
-	 * Datenfeld} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. gemäß der gegebenen {@link Getter Initialisierung} {@code setupGetter}
+	 * Datenfeld} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. gemäß der gegebenen {@link Getter Initialisierung} {@code setup}
 	 * ermittelt, über das {@link Field Datenfeld} {@code field} geschrieben und zurückgegeben. Andernfalls wird der Wertt er direkt zurückgegeben.
 	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts.
 	 * @param field Datenfeld zur Manipulation.
-	 * @param setupGetter Methode zur Initialisierung.
+	 * @param setup Methode zur Initialisierung.
 	 * @return {@code setup}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} bzw. {@code setupGetter} {@code null} ist. */
-	public static <GInput, GValue> Field<GInput, GValue> setupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> setupGetter)
-		throws NullPointerException {
-		return new SetupField<>(field, setupGetter);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldText))}.
-	 *
-	 * @see #nativeField(java.lang.reflect.Field)
-	 * @see Natives#parseField(String) */
-	@SuppressWarnings ("javadoc")
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String fieldText) throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(Natives.parseField(fieldText));
+	 * @throws NullPointerException Wenn {@code field} bzw. {@code setup} {@code null} ist. */
+	public static <GInput, GValue> Field<GInput, GValue> setupField(final Field<? super GInput, GValue> field,
+		final Getter<? super GInput, ? extends GValue> setup) throws NullPointerException {
+		return new SetupField<>(setup, field);
 	}
 
 	/** Diese Methode gibt ein {@link Field} zum gegebenen {@link java.lang.reflect.Field nativen Datenfeld} zurück.<br>
@@ -893,15 +850,14 @@ public final class Fields {
 		return new NativeField<>(field);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.nativeGetter(getMemberText), Setters.nativeSetter(setMemberText))}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldOwner, fieldName))}.
 	 *
-	 * @see #compositeField(Getter, Setter)
-	 * @see Getters#nativeGetter(String)
-	 * @see Setters#nativeSetter(String) */
+	 * @see #nativeField(java.lang.reflect.Field)
+	 * @see Natives#parseField(Class, String) */
 	@SuppressWarnings ("javadoc")
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String getMemberText, final String setMemberText)
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<? extends GInput> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.compositeField(Getters.<GInput, GValue>nativeGetter(getMemberText), Setters.<GInput, GValue>nativeSetter(setMemberText));
+		return Fields.nativeField(Natives.parseField(fieldOwner, fieldName));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.nativeGetter(getMethod), Setters.nativeSetter(setMethod))}.
@@ -913,6 +869,17 @@ public final class Fields {
 	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
 		throws NullPointerException, IllegalArgumentException {
 		return Fields.compositeField(Getters.<GInput, GValue>nativeGetter(getMethod), Setters.<GInput, GValue>nativeSetter(setMethod));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.nativeGetter(getMemberText), Setters.nativeSetter(setMemberText))}.
+	 *
+	 * @see #compositeField(Getter, Setter)
+	 * @see Getters#nativeGetter(String)
+	 * @see Setters#nativeSetter(String) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String getMemberText, final String setMemberText)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.compositeField(Getters.<GInput, GValue>nativeGetter(getMemberText), Setters.<GInput, GValue>nativeSetter(setMemberText));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.defaultField(field, null)}.
@@ -969,11 +936,11 @@ public final class Fields {
 		return new TranslatedField<>(field, translator);
 	}
 
-	/** Diese Methode gibt ein übersetztes {@link Field} zurück, welches die gegebenen {@link Getter} zum Parsen und Formatieren nutzt.
+	/** Diese Methode gibt ein übersetztes {@link Field} zurück.
 	 * <p>
-	 * Das erzeugte {@link Field} liefert beim Lesen den (externen) Wert, der gemäß dem gegebenen {@link Getter Leseformat} {@code getFormat} aus dem über das
+	 * Das erzeugte {@link Field} liefert beim Lesen den (externen) Wert, der gemäß dem gegebenen {@link Getter Leseformat} {@code toTarget} aus dem über das
 	 * gegebene {@link Field Datenfeld} ermittelten (internen) Wert berechnet wird. Beim Schreiben eines (externen) Werts wird dieser gemäß dem gegebenen
-	 * {@link Getter Schreibformat} {@code setFormat} in einen (internen) Wert überfüght, welcher anschließend an das gegebene {@link Field Datenfeld} delegiert
+	 * {@link Getter Schreibformat} {@code toSource} in einen (internen) Wert überfüght, welcher anschließend an das gegebene {@link Field Datenfeld} delegiert
 	 * wird.
 	 *
 	 * @param <GInput> Typ der Eingabe.
@@ -983,10 +950,10 @@ public final class Fields {
 	 * @param toTarget {@link Getter} zum Umwandeln des internen in den externen Wert zum Lesen.
 	 * @param toSource {@link Getter} zum Umwandeln des externen in den internen Wert zum Schreiben.
 	 * @return {@code translated}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code field}, {@code toTarget} bzw. {@code toSource} {@code null} ist. */
 	public static <GInput, GSource, GTarget> Field<GInput, GTarget> translatedField(final Field<? super GInput, GSource> field,
 		final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
-		return new TranslatedField2<>(field, toTarget, toSource);
+		return Fields.compositeField(Getters.translatedGetter(toTarget, field), Setters.translatedSetter(toSource, field));
 	}
 
 	/** Diese Methode gibt ein zusammengesetztes {@link Field} zurück, dessen Methoden an die des gegebenen {@link Getter} und {@link Setter} delegieren.

@@ -18,10 +18,12 @@ public class Consumers {
 	}
 
 	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Field field) {
+		// static field
 		return null;
 	}
 
 	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Method method) {
+		// static method
 		return null;
 	}
 

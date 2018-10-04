@@ -274,6 +274,13 @@ public class Setters {
 		return Fields.nativeField(field);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(fieldOwner, fieldName)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final Class<? extends GInput> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(fieldOwner, fieldName);
+	}
+
 	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
 	 * Bei einer Klassenmethode erfolgt das Schreiben des Werts {@code value} für eine Eingabe {@code input} über {@code method.invoke(null, input, value)}, bei
 	 * einer Objektmethode hingegen über {@code method.invoke(input, value)}.

@@ -220,14 +220,19 @@ public class Producers {
 	 * @param memberText Methoden- oder Konstruktortext.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws ReflectiveOperationException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
-	public static <GValue> Producer<GValue> nativeProducer(final String memberText)
-		throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
+	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	public static <GValue> Producer<GValue> nativeProducer(final String memberText) throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberText);
+		if (object instanceof java.lang.reflect.Field) return Producers.nativeProducer((java.lang.reflect.Field)object);
 		if (object instanceof java.lang.reflect.Method) return Producers.nativeProducer((java.lang.reflect.Method)object);
 		if (object instanceof java.lang.reflect.Constructor<?>) return Producers.nativeProducer((java.lang.reflect.Constructor<?>)object);
 		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Properties.nativeProperty(field)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GValue> Producer<GValue> nativeProducer(final java.lang.reflect.Field field) throws NullPointerException {
+		return Properties.nativeProperty(field);
 	}
 
 	/** Diese Methode gibt einen {@link Producer} zur gegebenen {@link java.lang.reflect.Method nativen statischen Methode} zurück.<br>
@@ -284,14 +289,14 @@ public class Producers {
 	/** Diese Methode gibt einen umgewandelten {@link Producer} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Getter} aus dem Datensatz des gegebenen
 	 * {@link Producer} ermittelt wird.
 	 *
-	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Producer} sowie der Eingabe des gegebenen {@link Getter}.
+	 * @param <GSource> Typ des Datensatzes des gegebenen {@link Producer} sowie der Eingabe des gegebenen {@link Getter}.
 	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
 	 * @param toTarget {@link Getter}.
 	 * @param producer {@link Producer}.
 	 * @return {@code navigated}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code producer} {@code null} ist. */
-	public static <GInput, GTarget> Producer<GTarget> translatedProducer(final Getter<? super GInput, ? extends GTarget> toTarget,
-		final Producer<? extends GInput> producer) throws NullPointerException {
+	public static <GSource, GTarget> Producer<GTarget> translatedProducer(final Getter<? super GSource, ? extends GTarget> toTarget,
+		final Producer<? extends GSource> producer) throws NullPointerException {
 		return new TranslatedProducer<>(toTarget, producer);
 	}
 

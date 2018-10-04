@@ -441,6 +441,13 @@ public class Getters {
 		return Fields.nativeField(field);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(fieldOwner, fieldName)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final Class<? extends GInput> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(fieldOwner, fieldName);
+	}
+
 	// TODO doku
 	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
 	 * Bei einer Klassenmethode liefert der erzeugte {@link Getter} für eine Eingabe {@code input} {@code method.invoke(null, input)}, bei einer Objektmethode
