@@ -264,7 +264,8 @@ public class Setters {
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param memberText Feld- oder Methodentext.
 	 * @return {@code native}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@link Natives#parse(String)}, {@link #nativeSetter(java.lang.reflect.Field)} bzw.
+	 *         {@link #nativeSetter(java.lang.reflect.Method)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
 	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final String memberText) throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberText);
@@ -273,13 +274,13 @@ public class Setters {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(field)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(java.lang.reflect.Field) Fields.nativeField(field)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
 		return Fields.nativeField(field);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(fieldOwner, fieldName)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String) Fields.nativeField(fieldOwner, fieldName)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Class<? extends GItem> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
@@ -313,7 +314,7 @@ public class Setters {
 		return new DefaultSetter<>(setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.mappingField(mapping)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#mappingField(Map) Fields.mappingField(mapping)}. */
 	@SuppressWarnings ({"javadoc", "unchecked"})
 	public static <GItem, GValue> Setter<GItem, GValue> mappingSetter(final Map<? super GItem, ? super GValue> mapping) {
 		return (Setter<GItem, GValue>)Fields.mappingField(mapping);
@@ -367,10 +368,7 @@ public class Setters {
 		return new ConditionalSetter<>(condition, acceptSetter, rejectSetter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Setters.aggregatedSetter(Getters.neutralGetter(), setter)}.
-	 *
-	 * @see #emptySetter()
-	 * @see #aggregatedSetter(Getter, Setter) */
+	/** Diese Methode ist eine Abkürzung für {@link #aggregatedSetter(Getter, Setter) Setters.aggregatedSetter(Getters.neutralGetter(), setter)}. **/
 	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<Iterable<? extends GItem>, GValue> aggregatedSetter(final Setter<? super GItem, GValue> setter)
 		throws NullPointerException {
@@ -394,9 +392,7 @@ public class Setters {
 		return new AggregatedSetter<>(toSource, setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Setters.synchronizedSetter(setter, setter)}.
-	 *
-	 * @see #synchronizedSetter(Object, Setter) */
+	/** Diese Methode ist eine Abkürzung für {@link #synchronizedSetter(Object, Setter) Setters.synchronizedSetter(setter, setter)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<GItem, GValue> synchronizedSetter(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
 		return Setters.synchronizedSetter(setter, setter);
@@ -416,17 +412,13 @@ public class Setters {
 		return new SynchronizedSetter<>(mutex, setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Fields.emptyField(), setter)}.
-	 *
-	 * @see Fields#compositeField(Getter, Setter) */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#compositeField(Getter, Setter) Fields.compositeField(Fields.emptyField(), setter)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Field<GItem, GValue> toField(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
 		return Fields.compositeField(Fields.<GValue>emptyField(), setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Setters.toConsumer(null, setter)}.
-	 *
-	 * @see #toConsumer(Object, Setter) */
+	/** Diese Methode ist eine Abkürzung für {@link #toConsumer(Object, Setter) Setters.toConsumer(null, setter)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Consumer<GValue> toConsumer(final Setter<Object, ? super GValue> setter) {
 		return Setters.toConsumer(null, setter);

@@ -310,7 +310,7 @@ public class Translators {
 	 * @param <GValue> Typ der Quell- und Zielobjekte.
 	 * @param valueClass {@link Class} der Quell- und Zielobjekte.
 	 * @return {@code neutral}-{@link Translator}.
-	 * @throws NullPointerException Wenn {@code itemClass} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code valueClass} {@code null} ist. */
 	public static <GValue> Translator<GValue, GValue> neutralTranslator(final Class<GValue> valueClass) throws NullPointerException {
 		return new NeutralTranslator<>(valueClass);
 	}
@@ -354,15 +354,13 @@ public class Translators {
 	 * @param toTarget {@link Getter} zur Übersetzung von Quellobjekten in Zielobjekte.
 	 * @param toSource {@link Getter} zur Übersetzung von Zielobjekten in Quellobjekte.
 	 * @return {@code composite}-{@link Translator}.
-	 * @throws NullPointerException Wenn {@code sourceClass}, {@code targetClass}, {@code sourceGetter} bzw. {@code targetGetter} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code isSource}, {@code isTarget}, {@code toTarget} bzw. {@code toSource} {@code null} ist. */
 	public static <GSource, GTarget> Translator<GSource, GTarget> compositeTranslator(final Class<GSource> isSource, final Class<GTarget> isTarget,
 		final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
 		return new CompositeTranslator<>(isSource, isTarget, toTarget, toSource);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Translators.synchronizedTranslator(translator, translator)}.
-	 *
-	 * @see #synchronizedTranslator(Object, Translator) */
+	/** Diese Methode ist eine Abkürzung für {@link #synchronizedTranslator(Object, Translator) Translators.synchronizedTranslator(translator, translator)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GSource, GTarget> Translator<GSource, GTarget> synchronizedTranslator(final Translator<GSource, GTarget> translator)
 		throws NullPointerException {

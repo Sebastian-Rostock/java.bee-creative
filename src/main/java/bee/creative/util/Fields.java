@@ -909,12 +909,12 @@ public final class Fields {
 	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen am {@link Map#get(Object)} sowie beim Schreiben an {@link Map#put(Object, Object)}
 	 * delegiert.
 	 *
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GItem> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts.
 	 * @param mapping {@link Map} zur Abbildung von einer Eingabe auf einen Wert.
 	 * @return {@code mapping}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
-	public static <GInput, GValue> Field<GInput, GValue> mappingField(final Map<GInput, GValue> mapping) throws NullPointerException {
+	public static <GItem, GValue> Field<GItem, GValue> mappingField(final Map<GItem, GValue> mapping) throws NullPointerException {
 		return new MappingField<>(mapping);
 	}
 
