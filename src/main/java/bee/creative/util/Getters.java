@@ -422,7 +422,7 @@ public class Getters {
 	 * @see Natives#parse(String)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
-	 * @param memberText Methoden- oder Konstruktortext.
+	 * @param memberText Feld-, Methoden- oder Konstruktortext.
 	 * @return {@code native}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst oder eine {@link Class} bzw. ein nicht zugrifbares
@@ -543,6 +543,11 @@ public class Getters {
 		return (Getter<Object, GValue>)Fields.mappingField(mapping);
 	}
 
+	public static <GSource, GTarget, GValue> Getter<GTarget, GValue> navigatedGetter(final Getter<? super GTarget, ? extends GSource> toSource,
+		final Getter<? super GSource, ? extends GValue> getter) throws NullPointerException {
+		return Getters.translatedGetter(getter, toSource);
+	}
+
 	/** Diese Methode gibt einen navigierten bzw. verketteten {@link Getter} zurück.<br>
 	 * Der erzeugte {@link Getter} liefert für eine Eingabe {@code input} den Wert {@code getter.get(navigator.get(input))}.
 	 *
@@ -551,7 +556,7 @@ public class Getters {
 	 * @param <GTarget> Typ der Ausgabe des zweiten sowie der Ausgabe des erzeugten {@link Getter}.
 	 * @param toTarget {@link Getter} zur Navigation.
 	 * @param getter {@link Getter} zum Lesen.
-	 * @return {@code navigated}-{@link Getter}.
+	 * @return {@code translated}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code getter} {@code null} ist. */
 	public static <GInput, GSource, GTarget> Getter<GInput, GTarget> translatedGetter(final Getter<? super GSource, ? extends GTarget> toTarget,
 		final Getter<? super GInput, ? extends GSource> getter) throws NullPointerException {

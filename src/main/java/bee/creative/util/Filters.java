@@ -12,9 +12,14 @@ import bee.creative.util.Objects.BaseObject;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Filters {
 
+	/** Diese Klasse implementiert einen abstrakten {@link Filter} als {@link BaseObject}. */
+	@SuppressWarnings ("javadoc")
+	public static abstract class BaseFilter<GItem> extends BaseObject implements Filter<GItem> {
+	}
+
 	/** Diese Klasse implementiert {@link Filters#nullFilter()} */
 	@SuppressWarnings ("javadoc")
-	public static class NullFilter extends BaseObject implements Filter<Object> {
+	public static class NullFilter extends BaseFilter<Object> {
 
 		public static final Filter<?> INSTANCE = new NullFilter();
 

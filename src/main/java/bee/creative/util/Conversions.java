@@ -11,42 +11,43 @@ public class Conversions {
 
 	/** Diese Klasse implementiert eine abstrakte {@link Conversion} als {@link BaseObject}. */
 	@SuppressWarnings ("javadoc")
-	public static abstract class BaseConversion<GInput, GValue> extends BaseObject implements Conversion<GInput, GValue> {
+	public static abstract class BaseConversion<GSource, GTarget> extends BaseObject implements Conversion<GSource, GTarget> {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.output());
+			return Objects.hash(this.target());
 		}
 
 		@Override
 		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof Conversion<?, ?>)) return false;
-			return Objects.equals(this.output(), ((Conversion<?, ?>)object).output());
+			Conversion<?, ?> that = (Conversion<?, ?>)object;
+			return Objects.equals(this.target(), that.target());
 		}
 
 	}
 
 	/** Diese Klasse implementiert {@link Conversions#virtualConversion(Object, Getter)} */
 	@SuppressWarnings ("javadoc")
-	public static class VirtualConversion<GInput, GOutput> extends BaseConversion<GInput, GOutput> {
+	public static class VirtualConversion<GSource, GTarget> extends BaseConversion<GSource, GTarget> {
 
-		public final GInput input;
+		public final GSource input;
 
-		public final Getter<? super GInput, ? extends GOutput> converter;
+		public final Getter<? super GSource, ? extends GTarget> converter;
 
-		public VirtualConversion(final GInput input, final Getter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+		public VirtualConversion(final GSource input, final Getter<? super GSource, ? extends GTarget> converter) throws NullPointerException {
 			this.input = input;
 			this.converter = Objects.notNull(converter);
 		}
 
 		@Override
-		public GInput input() {
+		public GSource source() {
 			return this.input;
 		}
 
 		@Override
-		public GOutput output() {
+		public GTarget target() {
 			return this.converter.get(this.input);
 		}
 
@@ -59,22 +60,22 @@ public class Conversions {
 
 	/** Diese Klasse implementiert {@link Conversions#reverseConversion(Conversion)} */
 	@SuppressWarnings ("javadoc")
-	public static class ReverseConversion<GInput, GOutput> extends BaseConversion<GInput, GOutput> {
+	public static class ReverseConversion<GSource, GTarget> extends BaseConversion<GSource, GTarget> {
 
-		public final Conversion<? extends GOutput, ? extends GInput> conversion;
+		public final Conversion<? extends GTarget, ? extends GSource> conversion;
 
-		public ReverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) throws NullPointerException {
+		public ReverseConversion(final Conversion<? extends GTarget, ? extends GSource> conversion) throws NullPointerException {
 			this.conversion = Objects.notNull(conversion);
 		}
 
 		@Override
-		public GInput input() {
-			return this.conversion.output();
+		public GSource source() {
+			return this.conversion.target();
 		}
 
 		@Override
-		public GOutput output() {
-			return this.conversion.input();
+		public GTarget target() {
+			return this.conversion.source();
 		}
 
 		@Override
@@ -86,24 +87,24 @@ public class Conversions {
 
 	/** Diese Klasse implementiert {@link Conversions#compositeConversion(Object, Object)} */
 	@SuppressWarnings ("javadoc")
-	public static class CompositeConversion<GInput, GOutput> extends BaseConversion<GInput, GOutput> {
+	public static class CompositeConversion<GSource, GTarget> extends BaseConversion<GSource, GTarget> {
 
-		public GInput input;
+		public GSource input;
 
-		public GOutput output;
+		public GTarget output;
 
-		public CompositeConversion(final GInput input, final GOutput output) {
+		public CompositeConversion(final GSource input, final GTarget output) {
 			this.input = input;
 			this.output = output;
 		}
 
 		@Override
-		public GInput input() {
+		public GSource source() {
 			return this.input;
 		}
 
 		@Override
-		public GOutput output() {
+		public GTarget target() {
 			return this.output;
 		}
 
@@ -122,7 +123,7 @@ public class Conversions {
 
 		@Override
 		public Object get(final Conversion<?, ?> input) {
-			return input.input();
+			return input.source();
 		}
 
 	}
@@ -135,7 +136,7 @@ public class Conversions {
 
 		@Override
 		public Object get(final Conversion<?, ?> input) {
-			return input.output();
+			return input.target();
 		}
 
 	}
@@ -143,58 +144,58 @@ public class Conversions {
 	/** Diese Methode gibt eine dynamische {@link Conversion} zurück, deren Ausgabe stats mit Hilfe des gegebenen {@link Getter} aus der gegebenen Eingabe
 	 * ermittelt wird.
 	 *
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
+	 * @param <GSource> Typ des Eingabe.
+	 * @param <GTarget> Typ der Ausgabe.
 	 * @param input Eingabe.
 	 * @param converter {@link Getter}.
 	 * @return {@code dynamic}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Conversion<GInput, GOutput> virtualConversion(final GInput input, final Getter<? super GInput, ? extends GOutput> converter)
-		throws NullPointerException {
+	public static <GSource, GTarget> Conversion<GSource, GTarget> virtualConversion(final GSource input,
+		final Getter<? super GSource, ? extends GTarget> converter) throws NullPointerException {
 		return new VirtualConversion<>(input, converter);
 	}
 
 	/** Diese Methode gibt eine inverse {@link Conversion} zurück, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe der gegebenen {@link Conversion} ermittelt
 	 * werden.
 	 *
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
+	 * @param <GSource> Typ des Eingabe.
+	 * @param <GTarget> Typ der Ausgabe.
 	 * @param conversion {@link Conversion}.
 	 * @return {@code inverse}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code conversion} {@code null} ist. */
-	public static <GInput, GOutput> Conversion<GInput, GOutput> reverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) {
+	public static <GSource, GTarget> Conversion<GSource, GTarget> reverseConversion(final Conversion<? extends GTarget, ? extends GSource> conversion) {
 		return new ReverseConversion<>(conversion);
 	}
 
 	/** Diese Methode gibt eine statische {@link Conversion} zurück, deren Eingabe und Ausgabe konstant sind.
 	 *
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
+	 * @param <GSource> Typ des Eingabe.
+	 * @param <GTarget> Typ der Ausgabe.
 	 * @param input Eingabe.
 	 * @param output Ausgabe.
 	 * @return {@code static}-{@link Conversion}. */
-	public static <GInput, GOutput> Conversion<GInput, GOutput> compositeConversion(final GInput input, final GOutput output) {
+	public static <GSource, GTarget> Conversion<GSource, GTarget> compositeConversion(final GSource input, final GTarget output) {
 		return new CompositeConversion<>(input, output);
 	}
 
 	/** Diese Methode gibt den {@link Getter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
 	 *
-	 * @see Conversion#input()
-	 * @param <GInput> Typ des Eingabe.
-	 * @return {@link Getter} zu {@link Conversion#input()}. */
+	 * @see Conversion#source()
+	 * @param <GSource> Typ des Eingabe.
+	 * @return {@link Getter} zu {@link Conversion#source()}. */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Getter<Conversion<? extends GInput, ?>, GInput> inputGetter() {
-		return (Getter<Conversion<? extends GInput, ?>, GInput>)InputGetter.INSTANCE;
+	public static <GSource> Getter<Conversion<? extends GSource, ?>, GSource> inputGetter() {
+		return (Getter<Conversion<? extends GSource, ?>, GSource>)InputGetter.INSTANCE;
 	}
 
 	/** Diese Methode gibt den {@link Getter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
 	 *
-	 * @see Conversion#output()
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @return {@link Getter} zu {@link Conversion#output()}. */
+	 * @see Conversion#target()
+	 * @param <GTarget> Typ der Ausgabe.
+	 * @return {@link Getter} zu {@link Conversion#target()}. */
 	@SuppressWarnings ("unchecked")
-	public static <GOutput> Getter<Conversion<?, ? extends GOutput>, GOutput> outputGetter() {
-		return (Getter<Conversion<?, ? extends GOutput>, GOutput>)OutputGetter.INSTANCE;
+	public static <GTarget> Getter<Conversion<?, ? extends GTarget>, GTarget> outputGetter() {
+		return (Getter<Conversion<?, ? extends GTarget>, GTarget>)OutputGetter.INSTANCE;
 	}
 
 }

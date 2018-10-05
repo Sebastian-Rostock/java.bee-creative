@@ -1,7 +1,5 @@
 package bee.creative.util;
 
-import bee.creative.util.Getters.BaseGetter;
-
 /** Diese Klasse implementiert grundlegende {@link Translator}.
  *
  * @see Translator
@@ -241,7 +239,7 @@ public class Translators {
 
 	/** Diese Klasse implementiert {@link Translators#toSourceGetter(Translator)}. */
 	@SuppressWarnings ("javadoc")
-	static class SourceGetter<GSource, GTarget> extends BaseGetter<GTarget, GSource> {
+	static class SourceGetter<GSource, GTarget> implements Getter<GTarget, GSource> {
 
 		public final Translator<? extends GSource, ? super GTarget> translator;
 
@@ -285,7 +283,7 @@ public class Translators {
 
 	/** Diese Klasse implementiert {@link Translators#toTargetGetter(Translator)}. */
 	@SuppressWarnings ("javadoc")
-	static class TargetGetter<GSource, GTarget> extends BaseGetter<GSource, GTarget> {
+	static class TargetGetter<GSource, GTarget> implements Getter<GSource, GTarget> {
 
 		public final Translator<? super GSource, ? extends GTarget> translator;
 
@@ -362,7 +360,7 @@ public class Translators {
 		return new CompositeTranslator<>(sourceClass, targetClass, sourceGetter, targetGetter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code synchronizedTranslator(translator, translator)}.
+	/** Diese Methode ist eine Abkürzung für {@code Translators.synchronizedTranslator(translator, translator)}.
 	 *
 	 * @see #synchronizedTranslator(Object, Translator) */
 	@SuppressWarnings ("javadoc")

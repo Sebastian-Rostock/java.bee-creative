@@ -730,7 +730,7 @@ public class Iterators {
 	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterator}.
 	 * @param iterator {@link Iterator}.
 	 * @param toTarget {@link Getter} nur Navigation.
-	 * @return {@code navigated}-{@link Iterator}.
+	 * @return {@code translated}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code navigator} {@code null} ist. */
 	public static <GSource, GTarget> Iterator<GTarget> translatedIterator(final Getter<? super GSource, ? extends GTarget> toTarget,
 		final Iterator<? extends GSource> iterator) throws NullPointerException {

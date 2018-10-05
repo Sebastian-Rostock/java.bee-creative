@@ -7,34 +7,17 @@ import java.lang.reflect.Modifier;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
 import bee.creative.ref.SoftPointer;
-import bee.creative.util.Getters.BaseGetter;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert grundlegende {@link Producer}.
  *
  * @see Producer
- * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+ * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Producers {
 
-	/** Diese Klasse implementiert {@link Producers#valueProducer(Object)}. */
+	/** Diese Klasse implementiert einen abstrakten {@link Producer} als {@link BaseObject}. */
 	@SuppressWarnings ("javadoc")
-	public static class ValueProducer<GValue> implements Producer<GValue> {
-
-		public final GValue item;
-
-		public ValueProducer(final GValue item) {
-			this.item = item;
-		}
-
-		@Override
-		public GValue get() {
-			return this.item;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.item);
-		}
-
+	public static abstract class BaseProducer<GValue> extends BaseObject implements Producer<GValue> {
 	}
 
 	/** Diese Klasse implementiert {@link Producers#nativeProducer(Method)}. */
@@ -182,7 +165,7 @@ public class Producers {
 
 	/** Diese Klasse implementiert {@link Producers#toGetter(Producer)}. */
 	@SuppressWarnings ("javadoc")
-	static class ProducerGetter<GValue> extends BaseGetter<Object, GValue> {
+	static class ProducerGetter<GValue> implements Getter<Object, GValue> {
 
 		public final Producer<? extends GValue> producer;
 
@@ -202,18 +185,25 @@ public class Producers {
 
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code Properties.emptyProperty()}. */
+	@SuppressWarnings ("javadoc")
+	public static <GValue> Producer<GValue> emptyProducer() {
+		return Properties.emptyProperty();
+	}
+
 	/** Diese Methode gibt einen {@link Producer} zurück, der den gegebenen Datensatz bereitstellt.
 	 *
 	 * @param <GValue> Typ des Datensatzes.
-	 * @param item Datensatz.
+	 * @param value Datensatz.
 	 * @return {@code value}-{@link Producer}. */
-	public static <GValue> Producer<GValue> valueProducer(final GValue item) {
-		return new ValueProducer<>(item);
+	public static <GValue> Producer<GValue> valueProducer(final GValue value) {
+		return Properties.valueProperty(value);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code nativeProducer(Natives.parse(memberText))}.
+	/** Diese Methode ist eine Abkürzung für {@code nativeProducer(Natives.parse(memberText))}, wobei eine {@link Class} zu einer Ausnahme führt.
 	 *
 	 * @see Natives#parse(String)
+	 * @see #nativeProducer(java.lang.reflect.Field)
 	 * @see #nativeProducer(java.lang.reflect.Method)
 	 * @see #nativeProducer(java.lang.reflect.Constructor)
 	 * @param <GValue> Typ des Datensatzes.
@@ -272,7 +262,7 @@ public class Producers {
 		return Producers.bufferedProducer(Pointers.SOFT, producer);
 	}
 
-	/** Diese Methode gibt einen gepufferten {@link Producer} zurück, der den vonm gegebenen {@link Producer} erzeugten Datensatz mit Hilfe eines {@link Pointer}
+	/** Diese Methode gibt einen gepufferten {@link Producer} zurück, der den vom gegebenen {@link Producer} erzeugten Datensatz mit Hilfe eines {@link Pointer}
 	 * im gegebenenen Modus verwaltet.
 	 *
 	 * @param <GValue> Typ des Datensatzes.
@@ -293,14 +283,14 @@ public class Producers {
 	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
 	 * @param toTarget {@link Getter}.
 	 * @param producer {@link Producer}.
-	 * @return {@code navigated}-{@link Producer}.
+	 * @return {@code translated}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code producer} {@code null} ist. */
 	public static <GSource, GTarget> Producer<GTarget> translatedProducer(final Getter<? super GSource, ? extends GTarget> toTarget,
 		final Producer<? extends GSource> producer) throws NullPointerException {
 		return new TranslatedProducer<>(toTarget, producer);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code synchronizedProducer(producer, producer)}.
+	/** Diese Methode ist eine Abkürzung für {@code Producers.synchronizedProducer(producer, producer)}.
 	 *
 	 * @see #synchronizedProducer(Object, Producer) */
 	@SuppressWarnings ("javadoc")
@@ -311,8 +301,8 @@ public class Producers {
 	/** Diese Methode gibt einen synchronisierten {@link Producer} zurück, der den gegebenen {@link Producer} via {@code synchronized(mutex)} synchronisiert.
 	 *
 	 * @param <GValue> Typ des Datensatzes.
-	 * @param producer {@link Producer}.
 	 * @param mutex Synchronisationsobjekt.
+	 * @param producer {@link Producer}.
 	 * @return {@code synchronized}-{@link Producer}.
 	 * @throws NullPointerException Wenn der {@code producer} bzw. {@code mutex} {@code null} ist. */
 	public static <GValue> Producer<GValue> synchronizedProducer(final Object mutex, final Producer<? extends GValue> producer) throws NullPointerException {
@@ -327,6 +317,14 @@ public class Producers {
 	 * @throws NullPointerException Wenn {@code producer} {@code null} ist. */
 	public static <GValue> Getter<Object, GValue> toGetter(final Producer<? extends GValue> producer) throws NullPointerException {
 		return new ProducerGetter<>(producer);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Properties.compositeProperty(Properties.emptyProperty(), consumer)}.
+	 *
+	 * @see Properties#compositeProperty(Producer, Consumer) */
+	@SuppressWarnings ("javadoc")
+	public static <GValue> Property<GValue> toProperty(final Consumer<? super GValue> consumer) {
+		return Properties.compositeProperty(Properties.<GValue>emptyProperty(), consumer);
 	}
 
 }

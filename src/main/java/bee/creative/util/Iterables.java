@@ -489,7 +489,7 @@ public class Iterables {
 	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterable}.
 	 * @param toTarget {@link Getter} zur Navigation.
 	 * @param iterable {@link Iterable}.
-	 * @return {@code navigated}-{@link Iterable}.
+	 * @return {@code translated}-{@link Iterable}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static <GSource, GTarget> Iterable<GTarget> translatedIterable(final Getter<? super GSource, ? extends GTarget> toTarget,
 		final Iterable<? extends GSource> iterable) throws NullPointerException {

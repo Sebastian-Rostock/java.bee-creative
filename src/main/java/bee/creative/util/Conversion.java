@@ -3,44 +3,45 @@ package bee.creative.util;
 import java.util.Comparator;
 import java.util.List;
 
-/** Diese Schnittstelle definiert das Paar aus Ein- und Ausgabe eines {@link Getter}.
+/** Diese Schnittstelle definiert das Paar aus Ein- und Ausgabedaten.
  * <p>
  * Im nachfolgenden Beispiel wird aus den gegebenen Elementen {@code entries} mit Hilfe des {@link Getter} {@code converter} eine {@link List} aus
- * {@link Conversion} {@link Iterables#addAll(java.util.Collection, Iterable) erzeugt}. Diese {@link Conversion} werden anschließend bezüglich ihrer
- * {@link Conversion#output() Ausgabe} gemäß dem {@link Comparator} {@code comparator} geordnet. Abschließend werden je ein {@link Iterable} für die
- * {@link Conversion#input() Eingabe} und die {@link Conversion#output() Ausgabe} der {@link Conversion} erzeugt. Wenn die Berechnung der Eigenschaft (Ausgabe),
- * auf der die Ordnung erfolgt, sehr Aufwändig ist, kann diese Form des Pufferns zu einer verringerung der Rechenzeit führen. <pre>{@literal
+ * {@link Conversion} {@link Iterables#addAll(java.util.Collection, Iterable) erzeugt}. Diese werden anschließend bezüglich ihrer
+ * {@link Conversion#target() Ausgabe} gemäß dem {@link Comparator} {@code comparator} geordnet. Abschließend werden je ein {@link Iterable} für die
+ * so geordneten 
+ * {@link Conversion#source() Eingaben} und die {@link Conversion#target() Ausgaben} erzeugt.
+ * <pre>{@literal
  * Iterable<I> entries = // ...
  * Getter<I, O> converter = // ...
  * Comparator<O> comparator = // ...
  * List<Conversion<I, O>> conversions = new ArrayList<>();
- * Iterables.addAll(conversions, Iterables.navigatedIterable((i) -> Conversions.compositeConversion(i, converter.get(i)), entries));
- * Collections.sort(conversions, Comparators.navigatedComparator(Conversions.<O>outputGetter(), comparator));
- * Iterable<I> inputs = Iterables.navigatedIterable(Conversions.<I>inputGetter(), conversions);
- * Iterable<O> outputs = Iterables.navigatedIterable(Conversions.<O>outputGetter(), conversions);}
+ * Iterables.addAll(conversions, Iterables.translatedIterable((i) -> Conversions.compositeConversion(i, converter.get(i)), entries));
+ * Collections.sort(conversions, Comparators.translatedComparator(Conversions.targetGetter(), comparator));
+ * Iterable<I> inputs = Iterables.translatedIterable(Conversions.sourceGetter(), conversions);
+ * Iterable<O> outputs = Iterables.translatedIterable(Conversions.targetGetter(), conversions);}
  * </pre>
  *
  * @see Conversions
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GInput> Typ des Eingabe.
- * @param <GOutput> Typ der Ausgabe. */
-public interface Conversion<GInput, GOutput> {
+ * @param <GSource> Typ des Eingabe.
+ * @param <GTarget> Typ der Ausgabe. */
+public interface Conversion<GSource, GTarget> {
 
-	/** Diese Methode gibt die Eingabe eines {@link Getter} zurück.
+	/** Diese Methode gibt die Eingabe zurück.
 	 *
 	 * @return Eingabe. */
-	public GInput input();
+	public GSource source();
 
-	/** Diese Methode gibt die Ausgabe eines {@link Getter} zurück.
+	/** Diese Methode gibt die Ausgabe  zurück.
 	 *
 	 * @return Ausgabe. */
-	public GOutput output();
+	public GTarget target();
 
-	/** Der Streuwert entspricht dem der {@link #output() Ausgabe}. {@inheritDoc} */
+	/** Der Streuwert entspricht dem der {@link #target() Ausgabe}. {@inheritDoc} */
 	@Override
 	public int hashCode();
 
-	/** Die Äquivalenz dieses und der gegebenen {@link Conversion} basiert auf der Äquivalenz ihrer {@link #output() Ausgaben}. {@inheritDoc} */
+	/** Die Äquivalenz dieses und der gegebenen {@link Conversion} basiert auf der Äquivalenz ihrer {@link #target() Ausgaben}. {@inheritDoc} */
 	@Override
 	public boolean equals(Object object);
 

@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,7 +21,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#nativeSetter(Method)} */
 	@SuppressWarnings ("javadoc")
-	public static class MethodSetter<GInput, GValue> implements Setter<GInput, GValue> {
+	public static class MethodSetter<GInput, GValue> extends BaseSetter<GInput, GValue> {
 
 		public final Method method;
 
@@ -60,7 +61,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#defaultSetter(Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static class DefaultSetter<GInput, GValue> implements Setter<GInput, GValue> {
+	public static class DefaultSetter<GInput, GValue> extends BaseSetter<GInput, GValue> {
 
 		public final Setter<? super GInput, ? super GValue> setter;
 
@@ -83,7 +84,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#navigatedSetter(Getter, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static class NavigatedSetter<GTarget, GSource, GValue> implements Setter<GTarget, GValue> {
+	public static class NavigatedSetter<GTarget, GSource, GValue> extends BaseSetter<GTarget, GValue> {
 
 		public final Setter<? super GSource, ? super GValue> setter;
 
@@ -108,7 +109,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#translatedSetter(Getter, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static class TranslatedSetter<GInput, GSource, GTarget> implements Setter<GInput, GTarget> {
+	public static class TranslatedSetter<GInput, GSource, GTarget> extends BaseSetter<GInput, GTarget> {
 
 		public final Setter<? super GInput, ? super GSource> setter;
 
@@ -133,7 +134,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#conditionalSetter(Filter, Setter, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static class ConditionalSetter<GInput, GValue> implements Setter<GInput, GValue> {
+	public static class ConditionalSetter<GInput, GValue> extends BaseSetter<GInput, GValue> {
 
 		public final Filter<? super GInput> condition;
 
@@ -166,7 +167,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#aggregatedSetter(Getter, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static class AggregatedSetter<GItem, GSource, GTarget> implements Setter<Iterable<? extends GItem>, GTarget> {
+	public static class AggregatedSetter<GItem, GSource, GTarget> extends BaseSetter<Iterable<? extends GItem>, GTarget> {
 
 		public final Getter<? super GTarget, ? extends GSource> toSource;
 
@@ -197,7 +198,7 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#synchronizedSetter(Object, Setter)} */
 	@SuppressWarnings ("javadoc")
-	public static class SynchronizedSetter<GInput, GValue> implements Setter<GInput, GValue> {
+	public static class SynchronizedSetter<GInput, GValue> extends BaseSetter<GInput, GValue> {
 
 		public final Object mutex;
 
@@ -253,18 +254,23 @@ public class Setters {
 		return Fields.emptyField();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(Natives.parseMethod(methodText))}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(Natives.parse(methodText))}, wobei eine {@link Class} bzw. ein {@link Constructor} zu
+	 * einer Ausnahme führt.
 	 *
+	 * @see #nativeSetter(java.lang.reflect.Field)
 	 * @see #nativeSetter(java.lang.reflect.Method)
 	 * @see Natives#parseMethod(String)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param methodText Methodentext der Methode zum Schreiben der Eigenschaft.
+	 * @param memberText Feld- oder Methodentext.
 	 * @return {@code native}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst. */
-	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final String methodText) throws NullPointerException, IllegalArgumentException {
-		return Setters.nativeSetter(Natives.parseMethod(methodText));
+	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final String memberText) throws NullPointerException, IllegalArgumentException {
+		final Object object = Natives.parse(memberText);
+		if (object instanceof java.lang.reflect.Field) return Setters.nativeSetter((java.lang.reflect.Field)object);
+		if (object instanceof java.lang.reflect.Method) return Setters.nativeSetter((java.lang.reflect.Method)object);
+		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(field)}. */
@@ -390,7 +396,7 @@ public class Setters {
 		return new AggregatedSetter<>(toSource, setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code synchronizedSetter(setter, setter)}.
+	/** Diese Methode ist eine Abkürzung für {@code Setters.synchronizedSetter(setter, setter)}.
 	 *
 	 * @see #synchronizedSetter(Object, Setter) */
 	@SuppressWarnings ("javadoc")
@@ -403,8 +409,8 @@ public class Setters {
 	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param setter {@link Setter}.
 	 * @param mutex Synchronisationsobjekt oder {@code null}.
+	 * @param setter {@link Setter}.
 	 * @return {@code synchronized}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
 	public static <GInput, GValue> Setter<GInput, GValue> synchronizedSetter(final Object mutex, final Setter<? super GInput, ? super GValue> setter)

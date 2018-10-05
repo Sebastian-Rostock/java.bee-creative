@@ -12,7 +12,7 @@ public class Comparators {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Comparator} als {@link BaseObject}. */
 	@SuppressWarnings ("javadoc")
-	public static abstract class BaseComparator<GInput> extends BaseObject implements Comparator<GInput> {
+	public static abstract class BaseComparator<GItem> extends BaseObject implements Comparator<GItem> {
 	}
 
 	/** Diese Klasse implementiert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#intValue()} vergleicht.
@@ -24,8 +24,8 @@ public class Comparators {
 		public static final IntComparator INSTANCE = new IntComparator();
 
 		@Override
-		public int compare(final Number input1, final Number input2) {
-			return Comparators.compare(input1.intValue(), input2.intValue());
+		public int compare(final Number item1, final Number item2) {
+			return Comparators.compare(item1.intValue(), item2.intValue());
 		}
 
 	}
@@ -39,8 +39,8 @@ public class Comparators {
 		public static final LongComparator INSTANCE = new LongComparator();
 
 		@Override
-		public int compare(final Number input1, final Number input2) {
-			return Comparators.compare(input1.longValue(), input2.longValue());
+		public int compare(final Number item1, final Number item2) {
+			return Comparators.compare(item1.longValue(), item2.longValue());
 		}
 
 	}
@@ -54,8 +54,8 @@ public class Comparators {
 		public static final FloatComparator INSTANCE = new FloatComparator();
 
 		@Override
-		public int compare(final Number input1, final Number input2) {
-			return Comparators.compare(input1.floatValue(), input2.floatValue());
+		public int compare(final Number item1, final Number item2) {
+			return Comparators.compare(item1.floatValue(), item2.floatValue());
 		}
 
 	}
@@ -69,8 +69,8 @@ public class Comparators {
 		public static final DoubleComparator INSTANCE = new DoubleComparator();
 
 		@Override
-		public int compare(final Number input1, final Number input2) {
-			return Comparators.compare(input1.doubleValue(), input2.doubleValue());
+		public int compare(final Number item1, final Number item2) {
+			return Comparators.compare(item1.doubleValue(), item2.doubleValue());
 		}
 
 	}
@@ -82,13 +82,13 @@ public class Comparators {
 		public static final Comparator<String> INSTANCE = new NumericalComparator();
 
 		@Override
-		public int compare(final String input1, final String input2) {
-			final int s1 = input1.length(), s2 = input2.length();
+		public int compare(final String item1, final String item2) {
+			final int s1 = item1.length(), s2 = item2.length();
 			int a1 = 0, a2 = 0;
 			boolean n1 = false, n2 = false;
 			{ /** Vorzeichen ermitteln und überspringen */
 				if (a1 < s1) {
-					final int c1 = input1.charAt(a1);
+					final int c1 = item1.charAt(a1);
 					if (c1 == '-') {
 						n1 = true;
 						a1++;
@@ -97,7 +97,7 @@ public class Comparators {
 					}
 				}
 				if (a2 < s2) {
-					final int c2 = input2.charAt(a2);
+					final int c2 = item2.charAt(a2);
 					if (c2 == '-') {
 						n2 = true;
 						a2++;
@@ -107,10 +107,10 @@ public class Comparators {
 				}
 			}
 			{ /** '0' überspringen */
-				while ((a1 < s1) && (input1.charAt(a1) == '0')) {
+				while ((a1 < s1) && (item1.charAt(a1) == '0')) {
 					a1++;
 				}
-				while ((a2 < s2) && (input2.charAt(a2) == '0')) {
+				while ((a2 < s2) && (item2.charAt(a2) == '0')) {
 					a2++;
 				}
 			}
@@ -125,7 +125,7 @@ public class Comparators {
 				if (n1 != n2) return n1 ? -1 : +1;
 				final int comp = (s1 - a1) - (s2 - a2);
 				if (comp != 0) return comp;
-				return input1.substring(a1, s1).compareTo(input2.substring(a2, s2));
+				return item1.substring(a1, s1).compareTo(item2.substring(a2, s2));
 			}
 		}
 
@@ -138,8 +138,8 @@ public class Comparators {
 		public static final AlphabeticalComparator INSTANCE = new AlphabeticalComparator();
 
 		@Override
-		public int compare(final String input1, final String input2) {
-			return input1.compareToIgnoreCase(input2);
+		public int compare(final String item1, final String item2) {
+			return item1.compareToIgnoreCase(item2);
 		}
 
 	}
@@ -229,25 +229,25 @@ public class Comparators {
 		public static final Comparator<?> INSTANCE = new NaturalComparator();
 
 		@Override
-		public int compare(final Comparable<Object> input1, final Comparable<Object> input2) {
-			return input1.compareTo(input2);
+		public int compare(final Comparable<Object> item1, final Comparable<Object> item2) {
+			return item1.compareTo(item2);
 		}
 
 	}
 
 	/** Diese Klasse implementiert {@link Comparators#reverseComparator(Comparator)} */
 	@SuppressWarnings ("javadoc")
-	public static class ReverseComparator<GInput> implements Comparator<GInput> {
+	public static class ReverseComparator<GItem> implements Comparator<GItem> {
 
-		public final Comparator<? super GInput> comparator;
+		public final Comparator<? super GItem> comparator;
 
-		public ReverseComparator(final Comparator<? super GInput> comparator) {
+		public ReverseComparator(final Comparator<? super GItem> comparator) {
 			this.comparator = Objects.notNull(comparator);
 		}
 
 		@Override
-		public int compare(final GInput input1, final GInput input2) {
-			return this.comparator.compare(input2, input1);
+		public int compare(final GItem item1, final GItem item2) {
+			return this.comparator.compare(item2, item1);
 		}
 
 		@Override
@@ -259,17 +259,17 @@ public class Comparators {
 
 	/** Diese Klasse implementiert {@link Comparators#defaultComparator(Comparator)} */
 	@SuppressWarnings ("javadoc")
-	public static class DefaultComparator<GInput> implements Comparator<GInput> {
+	public static class DefaultComparator<GItem> implements Comparator<GItem> {
 
-		public final Comparator<? super GInput> comparator;
+		public final Comparator<? super GItem> comparator;
 
-		public DefaultComparator(final Comparator<? super GInput> comparator) {
+		public DefaultComparator(final Comparator<? super GItem> comparator) {
 			this.comparator = Objects.notNull(comparator);
 		}
 
 		@Override
-		public int compare(final GInput input1, final GInput input2) {
-			return Comparators.compare(input1, input2, this.comparator);
+		public int compare(final GItem item1, final GItem item2) {
+			return Comparators.compare(item1, item2, this.comparator);
 		}
 
 		@Override
@@ -281,17 +281,17 @@ public class Comparators {
 
 	/** Diese Klasse implementiert {@link Comparators#iterableComparator(Comparator)} */
 	@SuppressWarnings ("javadoc")
-	public static class IterableComparator<GInput> implements Comparator<Iterable<? extends GInput>> {
+	public static class IterableComparator<GItem> implements Comparator<Iterable<? extends GItem>> {
 
-		public final Comparator<? super GInput> comparator;
+		public final Comparator<? super GItem> comparator;
 
-		public IterableComparator(final Comparator<? super GInput> comparator) {
+		public IterableComparator(final Comparator<? super GItem> comparator) {
 			this.comparator = Objects.notNull(comparator);
 		}
 
 		@Override
-		public int compare(final Iterable<? extends GInput> input1, final Iterable<? extends GInput> input2) {
-			return Comparators.compare(input1, input2, this.comparator);
+		public int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2) {
+			return Comparators.compare(item1, item2, this.comparator);
 		}
 
 		@Override
@@ -303,22 +303,22 @@ public class Comparators {
 
 	/** Diese Klasse implementiert {@link Comparators#chainedComparator(Comparator, Comparator)} */
 	@SuppressWarnings ("javadoc")
-	public static class ChainedComparator<GInput> implements Comparator<GInput> {
+	public static class ChainedComparator<GItem> implements Comparator<GItem> {
 
-		public final Comparator<? super GInput> comparator1;
+		public final Comparator<? super GItem> comparator1;
 
-		public final Comparator<? super GInput> comparator2;
+		public final Comparator<? super GItem> comparator2;
 
-		public ChainedComparator(final Comparator<? super GInput> comparator1, final Comparator<? super GInput> comparator2) {
+		public ChainedComparator(final Comparator<? super GItem> comparator1, final Comparator<? super GItem> comparator2) {
 			this.comparator1 = Objects.notNull(comparator1);
 			this.comparator2 = Objects.notNull(comparator2);
 		}
 
 		@Override
-		public int compare(final GInput input1, final GInput input2) {
-			final int result = this.comparator1.compare(input1, input2);
+		public int compare(final GItem item1, final GItem item2) {
+			final int result = this.comparator1.compare(item1, item2);
 			if (result != 0) return result;
-			return this.comparator2.compare(input1, input2);
+			return this.comparator2.compare(item1, item2);
 		}
 
 		@Override
@@ -342,8 +342,8 @@ public class Comparators {
 		}
 
 		@Override
-		public int compare(final GTarget input1, final GTarget input2) {
-			return this.comparator.compare(this.toSource.get(input1), this.toSource.get(input2));
+		public int compare(final GTarget item1, final GTarget item2) {
+			return this.comparator.compare(this.toSource.get(item1), this.toSource.get(item2));
 		}
 
 		@Override
@@ -357,11 +357,11 @@ public class Comparators {
 	 * {@code Comparators.compare(item1, item2) <= 0 ? item1 : item2}.
 	 *
 	 * @see #compare(Comparable, Comparable)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param item1 erstes Objekt oder {@code null}.
 	 * @param item2 zweites Objekt oder {@code null}.
 	 * @return Objekt mit der kleinsten ordnung oder {@code null}. */
-	public static <GInput extends Comparable<? super GInput>> GInput min(final GInput item1, final GInput item2) {
+	public static <GItem extends Comparable<? super GItem>> GItem min(final GItem item1, final GItem item2) {
 		return Comparators.compare(item1, item2) <= 0 ? item1 : item2;
 	}
 
@@ -369,13 +369,13 @@ public class Comparators {
 	 * {@code Comparators.compare(item1, item2, comparator) <= 0 ? item1 : item2}.
 	 *
 	 * @see #compare(Object, Object, Comparator)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param item1 erstes Objekt oder {@code null}.
 	 * @param item2 zweites Objekt oder {@code null}.
 	 * @param comparator {@link Comparator}.
 	 * @return Objekt mit der kleinsten ordnung oder {@code null}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> GInput min(final GInput item1, final GInput item2, final Comparator<? super GInput> comparator) throws NullPointerException {
+	public static <GItem> GItem min(final GItem item1, final GItem item2, final Comparator<? super GItem> comparator) throws NullPointerException {
 		return Comparators.compare(item1, item2, comparator) <= 0 ? item1 : item2;
 	}
 
@@ -383,13 +383,13 @@ public class Comparators {
 	 *
 	 * @see #min(Comparable, Comparable)
 	 * @see Iterators#iterator(Iterator)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte oder {@code null}.
 	 * @return Objekt mit der kleinsten Ordnung oder {@code null}. */
-	public static <GInput extends Comparable<? super GInput>> GInput min(final Iterable<? extends GInput> items) {
-		final Iterator<? extends GInput> iterator = Iterators.iterator(items);
+	public static <GItem extends Comparable<? super GItem>> GItem min(final Iterable<? extends GItem> items) {
+		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
 		if (!iterator.hasNext()) return null;
-		GInput result = iterator.next();
+		GItem result = iterator.next();
 		while (iterator.hasNext()) {
 			result = Comparators.min(iterator.next(), result);
 		}
@@ -400,15 +400,15 @@ public class Comparators {
 	 *
 	 * @see #min(Object, Object, Comparator)
 	 * @see Iterators#iterator(Iterator)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte oder {@code null}.
 	 * @param comparator {@link Comparator}.
 	 * @return Objekt mit der kleinsten Ordnung oder {@code null}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> GInput min(final Iterable<? extends GInput> items, final Comparator<? super GInput> comparator) {
-		final Iterator<? extends GInput> iterator = Iterators.iterator(items);
+	public static <GItem> GItem min(final Iterable<? extends GItem> items, final Comparator<? super GItem> comparator) {
+		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
 		if (!iterator.hasNext()) return null;
-		GInput result = iterator.next();
+		GItem result = iterator.next();
 		while (iterator.hasNext()) {
 			result = Comparators.min(iterator.next(), result, comparator);
 		}
@@ -419,11 +419,11 @@ public class Comparators {
 	 * {@code Comparators.compare(item1, item2) >= 0 ? item1 : item2}.
 	 *
 	 * @see #compare(Comparable, Comparable)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param item1 erstes Objekt oder {@code null}.
 	 * @param item2 zweites Objekt oder {@code null}.
 	 * @return Objekt mit der kleinsten ordnung oder {@code null}. */
-	public static <GInput extends Comparable<? super GInput>> GInput max(final GInput item1, final GInput item2) {
+	public static <GItem extends Comparable<? super GItem>> GItem max(final GItem item1, final GItem item2) {
 		return Comparators.compare(item1, item2) >= 0 ? item1 : item2;
 	}
 
@@ -431,13 +431,13 @@ public class Comparators {
 	 * {@code Comparators.compare(item1, item2, comparator) >= 0 ? item1 : item2}.
 	 *
 	 * @see #compare(Object, Object, Comparator)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param item1 erstes Objekt oder {@code null}.
 	 * @param item2 zweites Objekt oder {@code null}.
 	 * @param comparator {@link Comparator}.
 	 * @return Objekt mit der kleinsten ordnung oder {@code null}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> GInput max(final GInput item1, final GInput item2, final Comparator<? super GInput> comparator) throws NullPointerException {
+	public static <GItem> GItem max(final GItem item1, final GItem item2, final Comparator<? super GItem> comparator) throws NullPointerException {
 		return Comparators.compare(item1, item2, comparator) >= 0 ? item1 : item2;
 	}
 
@@ -445,13 +445,13 @@ public class Comparators {
 	 *
 	 * @see #max(Comparable, Comparable)
 	 * @see Iterators#iterator(Iterator)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte oder {@code null}.
 	 * @return Objekt mit der größten Ordnung oder {@code null}. */
-	public static <GInput extends Comparable<? super GInput>> GInput max(final Iterable<? extends GInput> items) {
-		final Iterator<? extends GInput> iterator = Iterators.iterator(items);
+	public static <GItem extends Comparable<? super GItem>> GItem max(final Iterable<? extends GItem> items) {
+		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
 		if (!iterator.hasNext()) return null;
-		GInput result = iterator.next();
+		GItem result = iterator.next();
 		while (iterator.hasNext()) {
 			result = Comparators.max(iterator.next(), result);
 		}
@@ -462,15 +462,15 @@ public class Comparators {
 	 *
 	 * @see #max(Object, Object, Comparator)
 	 * @see Iterators#iterator(Iterator)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte oder {@code null}.
 	 * @param comparator {@link Comparator}.
 	 * @return Objekt mit der größten Ordnung oder {@code null}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> GInput max(final Iterable<? extends GInput> items, final Comparator<? super GInput> comparator) {
-		final Iterator<? extends GInput> iterator = Iterators.iterator(items);
+	public static <GItem> GItem max(final Iterable<? extends GItem> items, final Comparator<? super GItem> comparator) {
+		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
 		if (!iterator.hasNext()) return null;
-		GInput result = iterator.next();
+		GItem result = iterator.next();
 		while (iterator.hasNext()) {
 			result = Comparators.max(iterator.next(), result, comparator);
 		}
@@ -522,11 +522,11 @@ public class Comparators {
 	 * {@code item1 == null ? (item2 == null ? 0 : -1) : (item2 == null ? 1 : item1.compareTo(item2))}.
 	 *
 	 * @see #compare(Object, Object, Comparator)
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param item1 erstes Objekt oder {@code null}.
 	 * @param item2 zweites Objekt oder {@code null}.
 	 * @return Vergleichswert. */
-	public static <GInput extends Comparable<? super GInput>> int compare(final GInput item1, final GInput item2) {
+	public static <GItem extends Comparable<? super GItem>> int compare(final GItem item1, final GItem item2) {
 		return item1 == null ? (item2 == null ? 0 : -1) : (item2 == null ? 1 : item1.compareTo(item2));
 	}
 
@@ -534,13 +534,13 @@ public class Comparators {
 	 * Objekt ist. Wenn nur eines der Objekte {@code null} ist, wird dieses als das kleiner angesehen. Der berechnete Vergleichswert entspricht:
 	 * {@code item1 == null ? (item2 == null ? 0 : -1) : (item2 == null ? 1 : comparator.compare(item1, item2))}.
 	 *
-	 * @param <GInput> Typ der Objekte.
+	 * @param <GItem> Typ der Objekte.
 	 * @param item1 erstes Objekt oder {@code null}.
 	 * @param item2 zweites Objekt oder {@code null}.
 	 * @param comparator {@link Comparator}.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> int compare(final GInput item1, final GInput item2, final Comparator<? super GInput> comparator) throws NullPointerException {
+	public static <GItem> int compare(final GItem item1, final GItem item2, final Comparator<? super GItem> comparator) throws NullPointerException {
 		return item1 == null ? (item2 == null ? 0 : -1) : (item2 == null ? 1 : Objects.notNull(comparator).compare(item1, item2));
 	}
 
@@ -549,12 +549,12 @@ public class Comparators {
 	 *
 	 * @see #compare(Iterable, Iterable, Comparator)
 	 * @see #naturalComparator()
-	 * @param <GInput> Typ der Elemente der {@link Iterable}.
+	 * @param <GItem> Typ der Elemente der {@link Iterable}.
 	 * @param item1 erster {@link Iterable}.
 	 * @param item2 zweiter {@link Iterable}.
 	 * @return Vergleichswert. */
-	public static <GInput extends Comparable<? super GInput>> int compare(final Iterable<? extends GInput> item1, final Iterable<? extends GInput> item2) {
-		return Comparators.compare(item1, item2, Comparators.<GInput>naturalComparator());
+	public static <GItem extends Comparable<? super GItem>> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2) {
+		return Comparators.compare(item1, item2, Comparators.<GItem>naturalComparator());
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste {@link Iterable} kleienr als, gleich bzw. größer als das
@@ -564,16 +564,16 @@ public class Comparators {
 	 * wird er zurück gegeben. Anderenfalls läuft die Iteration weiter. Wenn der erste {@link Iterator} ein nächstes Element besitzt, der zweite {@link Iterator}
 	 * jedoch kein nächstes Element liefern kann, wird {@code 1} zurück gegeben.
 	 *
-	 * @param <GInput> Typ der Elemente der {@link Iterable}.
+	 * @param <GItem> Typ der Elemente der {@link Iterable}.
 	 * @param item1 erster {@link Iterable}.
 	 * @param item2 zweiter {@link Iterable}.
 	 * @param comparator {@link Comparator} für die Elemente der {@link Iterable}.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> int compare(final Iterable<? extends GInput> item1, final Iterable<? extends GInput> item2,
-		final Comparator<? super GInput> comparator) throws NullPointerException {
+	public static <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2,
+		final Comparator<? super GItem> comparator) throws NullPointerException {
 		Objects.notNull(comparator);
-		final Iterator<? extends GInput> iter1 = Iterators.iterator(item1), iter2 = Iterators.iterator(item2);
+		final Iterator<? extends GItem> iter1 = Iterators.iterator(item1), iter2 = Iterators.iterator(item2);
 		while (true) {
 			if (!iter1.hasNext()) return (iter2.hasNext() ? -1 : 0);
 			if (!iter2.hasNext()) return 1;
@@ -596,21 +596,21 @@ public class Comparators {
 	 * alle anderen Eingaben an den gegebenen {@link Comparator} weiterleitet.
 	 *
 	 * @see #compare(Object, Object, Comparator)
-	 * @param <GInput> Typ der Elemente.
+	 * @param <GItem> Typ der Elemente.
 	 * @param comparator {@link Comparator}.
 	 * @return {@code default}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> Comparator<GInput> defaultComparator(final Comparator<? super GInput> comparator) throws NullPointerException {
+	public static <GItem> Comparator<GItem> defaultComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
 		return new DefaultComparator<>(comparator);
 	}
 
 	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der den Vergleichswert des gegebenen {@link Comparator} umkehrt.
 	 *
-	 * @param <GInput> Typ der Elemente.
+	 * @param <GItem> Typ der Elemente.
 	 * @param comparator {@link Comparator}.
 	 * @return {@code reverse}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> Comparator<GInput> reverseComparator(final Comparator<? super GInput> comparator) throws NullPointerException {
+	public static <GItem> Comparator<GItem> reverseComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
 		return new ReverseComparator<>(comparator);
 	}
 
@@ -618,23 +618,23 @@ public class Comparators {
 	 * (d.h. lexikographisch) vergleicht.
 	 *
 	 * @see #compare(Iterable, Iterable, Comparator)
-	 * @param <GInput> Typ der in den {@link Iterable} enthaltenen sowie vom gegebenen {@link Comparator} zu vergleichenden Elemente.
+	 * @param <GItem> Typ der in den {@link Iterable} enthaltenen sowie vom gegebenen {@link Comparator} zu vergleichenden Elemente.
 	 * @param comparator {@link Comparator}.
 	 * @return {@link Iterable}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GInput> Comparator<Iterable<? extends GInput>> iterableComparator(final Comparator<? super GInput> comparator) throws NullPointerException {
+	public static <GItem> Comparator<Iterable<? extends GItem>> iterableComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
 		return new IterableComparator<>(comparator);
 	}
 
 	/** Diese Methode gibt einen verketteten {@link Comparator} zurück, der seine Eingaben zuerst über den ersten {@link Comparator} vergleich und den zweiten
 	 * {@link Comparator} nur dann verwenet, wenn der erste {@link Comparator} mit dem Vergleichswert {@code 0} die Gleichheit der Eingaben anzeigt.
 	 *
-	 * @param <GInput> Typ der Elemente.
+	 * @param <GItem> Typ der Elemente.
 	 * @param comparator1 erster {@link Comparator}.
 	 * @param comparator2 zweiter {@link Comparator}.
 	 * @return {@code chained}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator1} bzw. {@code comparator2} {@code null} ist. */
-	public static <GInput> Comparator<GInput> chainedComparator(final Comparator<? super GInput> comparator1, final Comparator<? super GInput> comparator2)
+	public static <GItem> Comparator<GItem> chainedComparator(final Comparator<? super GItem> comparator1, final Comparator<? super GItem> comparator2)
 		throws NullPointerException {
 		return new ChainedComparator<>(comparator1, comparator2);
 	}
@@ -648,7 +648,7 @@ public class Comparators {
 	 * @param <GSource> Typ der Ausgabe des {@link Getter} sowie der Elemente des gegebenen {@link Comparator}.
 	 * @param toSource {@link Getter} zur Navigation.
 	 * @param comparator {@link Comparator}.
-	 * @return {@code navigated}-{@link Comparator}.
+	 * @return {@code translated}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparator} {@code null} ist. */
 	public static <GTarget, GSource> Comparator<GTarget> translatedComparator(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Comparator<? super GSource> comparator) throws NullPointerException {

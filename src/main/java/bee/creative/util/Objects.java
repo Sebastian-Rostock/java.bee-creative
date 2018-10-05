@@ -80,15 +80,15 @@ public class Objects {
 
 	}
 
-	/** Diese Klasse implementiert {@link Objects#navigatedHasher(Getter, Hasher)}. */
+	/** Diese Klasse implementiert {@link Objects#translatedHasher(Getter, Hasher)}. */
 	@SuppressWarnings ("javadoc")
-	public static class NavigatedHasher implements Hasher {
+	public static class TranslatedHasher implements Hasher {
 
 		public final Hasher hasher;
 
 		public final Getter<? super Object, ? extends Object> navigator;
 
-		public NavigatedHasher(final Hasher hasher, final Getter<? super Object, ? extends Object> navigator) {
+		public TranslatedHasher(final Hasher hasher, final Getter<? super Object, ? extends Object> navigator) {
 			this.hasher = Objects.notNull(hasher);
 			this.navigator = Objects.notNull(navigator);
 		}
@@ -704,8 +704,8 @@ public class Objects {
 	 * @return Objekt.
 	 * @throws NullPointerException Wenn {@code object} {@code null} ist. */
 	public static <GResult> GResult notNull(final GResult result) throws NullPointerException {
-		if (result == null) throw new NullPointerException();
-		return result;
+		if (result != null) return result;
+		throw new NullPointerException();
 	}
 
 	/** Diese Methode gibt das erste gegebene Objekt zurück, wenn dieses nicht {@code null} ist. Andernfalls wird das zweite geliefert.
@@ -715,7 +715,8 @@ public class Objects {
 	 * @param result2 Objekt oder {@code null}.
 	 * @return Objekt. */
 	public static <GResult> GResult notNull(final GResult result, final GResult result2) {
-		return result != null ? result : result2;
+		if (result != null) return result;
+		return result2;
 	}
 
 	/** Diese Methode gibt einen navigierten {@link Hasher} zurück.<br>
@@ -723,10 +724,10 @@ public class Objects {
 	 *
 	 * @param navigator {@link Getter} zur Navigation.
 	 * @param hasher {@link Hasher} zur Abgleich.
-	 * @return {@code navigated}-{@link Hasher}.
+	 * @return {@code translated}-{@link Hasher}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code hasher} {@code null} ist. */
-	public static Hasher navigatedHasher(final Getter<? super Object, ? extends Object> navigator, final Hasher hasher) throws NullPointerException {
-		return new NavigatedHasher(hasher, navigator);
+	public static Hasher translatedHasher(final Getter<? super Object, ? extends Object> navigator, final Hasher hasher) throws NullPointerException {
+		return new TranslatedHasher(hasher, navigator);
 	}
 
 }

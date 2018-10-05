@@ -1,15 +1,21 @@
 package bee.creative.util;
 
 import java.lang.reflect.Modifier;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Property}-Instanzen.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Properties {
 
+	/** Diese Klasse implementiert ein abstraktes {@link Property} als {@link BaseObject}. */
+	@SuppressWarnings ("javadoc")
+	public static abstract class BaseProperty<GValue> extends BaseObject implements Property<GValue> {
+	}
+
 	/** Diese Klasse implementiert {@link Properties#valueProperty(Object)}. */
 	@SuppressWarnings ("javadoc")
-	public static class ValueProperty<GValue> implements Property<GValue> {
+	public static class ValueProperty<GValue> extends BaseProperty<GValue> {
 
 		public static final Property<?> EMPTY = new ValueProperty<>(null);
 
@@ -37,7 +43,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#nativeProperty(java.lang.reflect.Field)}. */
 	@SuppressWarnings ("javadoc")
-	public static class NativeProperty<GValue> implements Property<GValue> {
+	public static class NativeProperty<GValue> extends BaseProperty<GValue> {
 
 		public final java.lang.reflect.Field field;
 
@@ -79,7 +85,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#setupProperty(Property, Producer)}. */
 	@SuppressWarnings ("javadoc")
-	public static class SetupProperty<GValue> implements Property<GValue> {
+	public static class SetupProperty<GValue> extends BaseProperty<GValue> {
 
 		public final Producer<? extends GValue> setup;
 
@@ -113,7 +119,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#compositeProperty(Producer, Consumer)}. */
 	@SuppressWarnings ("javadoc")
-	public static class CompositeProperty<GValue> implements Property<GValue> {
+	public static class CompositeProperty<GValue> extends BaseProperty<GValue> {
 
 		public final Producer<? extends GValue> producer;
 
@@ -143,7 +149,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#translatedProperty(Property, Translator)}. */
 	@SuppressWarnings ("javadoc")
-	public static class TranslatedProperty<GTarget, GSource> implements Property<GTarget> {
+	public static class TranslatedProperty<GTarget, GSource> extends BaseProperty<GTarget> {
 
 		public final Property<GSource> property;
 
@@ -173,7 +179,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#synchronizedProperty(Object, Property)}. */
 	@SuppressWarnings ("javadoc")
-	public static class SynchronizedProperty<GValue> implements Property<GValue> {
+	public static class SynchronizedProperty<GValue> extends BaseProperty<GValue> {
 
 		public final Object mutex;
 
@@ -196,6 +202,33 @@ public class Properties {
 			synchronized (this.mutex) {
 				this.property.set(value);
 			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.property);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Properties#toField(Property)}. */
+	@SuppressWarnings ("javadoc")
+	static class PropertyField<GValue> implements Field<Object, GValue> {
+
+		public final Property<GValue> property;
+
+		public PropertyField(final Property<GValue> property) {
+			this.property = Objects.notNull(property);
+		}
+
+		@Override
+		public GValue get(final Object input) {
+			return this.property.get();
+		}
+
+		@Override
+		public void set(final Object input, final GValue value) {
+			this.property.set(value);
 		}
 
 		@Override
@@ -253,7 +286,8 @@ public class Properties {
 	 * @see #nativeProperty(java.lang.reflect.Field)
 	 * @see Natives#parseField(Class, String) */
 	@SuppressWarnings ("javadoc")
-	public static <GValue> Property<GValue> nativeField(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
+	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
 		return Properties.nativeProperty(Natives.parseField(fieldOwner, fieldName));
 	}
 
@@ -336,7 +370,7 @@ public class Properties {
 		return new CompositeProperty<>(producer, consumer);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code synchronizedProperty(property, property)}.
+	/** Diese Methode ist eine Abkürzung für {@code Properties.synchronizedProperty(property, property)}.
 	 *
 	 * @see #synchronizedProperty(Object, Property) */
 	@SuppressWarnings ("javadoc")
@@ -348,12 +382,16 @@ public class Properties {
 	 * Synchronisationsobjekt {@code null} ist, wird das erzeugte {@link Property} als Synchronisationsobjekt verwendet.
 	 *
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param property {@link Property}.
 	 * @param mutex Synchronisationsobjekt oder {@code null}.
+	 * @param property {@link Property}.
 	 * @return {@code synchronized}-{@link Property}.
 	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
 	public static <GValue> Property<GValue> synchronizedProperty(final Object mutex, final Property<GValue> property) throws NullPointerException {
 		return new SynchronizedProperty<>(mutex, property);
+	}
+
+	public static <GValue> Field<Object, GValue> toField(final Property<GValue> property) {
+		return new PropertyField<>(property);
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import bee.creative.util.Objects.BaseObject;
+import bee.creative.util.Properties.BaseProperty;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Field}-Instanzen.
  *
@@ -148,12 +149,17 @@ public final class Fields {
 
 	}
 
+	/** Diese Klasse implementiert ein abstraktes {@link Field} als {@link BaseObject}. */
+	@SuppressWarnings ("javadoc")
+	public static abstract class BaseField<GInput, GValue> extends BaseObject implements Field<GInput, GValue> {
+	}
+
 	/** Diese Klasse implementiert ein abstraktes {@link SetField}.
 	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GItem> Typ der Elemente. */
-	public static abstract class BaseSetField<GInput, GItem> extends BaseObject implements SetField<GInput, GItem> {
+	public static abstract class BaseSetField<GInput, GItem> extends BaseField<GInput, Set<GItem>> implements SetField<GInput, GItem> {
 
 		/** Diese Methode gibt ein {@link SetField} zurück, welches das {@link Set} über das gegebene {@link Field} liest und schreibt.
 		 *
@@ -242,7 +248,7 @@ public final class Fields {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GEntry> Typ der Elemente. */
-	public static abstract class BaseListField<GInput, GEntry> extends BaseObject implements ListField<GInput, GEntry> {
+	public static abstract class BaseListField<GInput, GEntry> extends BaseField<GInput, List<GEntry>> implements ListField<GInput, GEntry> {
 
 		/** Diese Methode gibt ein {@link ListField} zurück, welches das {@link List} über das gegebene {@link Field} liest und schreibt.
 		 *
@@ -353,7 +359,7 @@ public final class Fields {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
-	public static abstract class BaseMapField<GInput, GKey, GValue> extends BaseObject implements MapField<GInput, GKey, GValue> {
+	public static abstract class BaseMapField<GInput, GKey, GValue> extends BaseField<GInput, Map<GKey, GValue>> implements MapField<GInput, GKey, GValue> {
 
 		/** Diese Methode gibt ein {@link MapField} zurück, welches die {@link Map} über das gegebene {@link Field} liest und schreibt.
 		 *
@@ -609,28 +615,28 @@ public final class Fields {
 	@SuppressWarnings ("javadoc")
 	public static class NavigatedField<GSource, GTarget, GValue> implements Field<GSource, GValue> {
 
-		public final Getter<? super GSource, ? extends GTarget> navigator;
+		public final Getter<? super GSource, ? extends GTarget> toTarget;
 
 		public final Field<? super GTarget, GValue> field;
 
-		public NavigatedField(final Getter<? super GSource, ? extends GTarget> navigator, final Field<? super GTarget, GValue> field) {
-			this.navigator = Objects.notNull(navigator);
+		public NavigatedField(final Getter<? super GSource, ? extends GTarget> toTarget, final Field<? super GTarget, GValue> field) {
+			this.toTarget = Objects.notNull(toTarget);
 			this.field = Objects.notNull(field);
 		}
 
 		@Override
 		public GValue get(final GSource input) {
-			return this.field.get(this.navigator.get(input));
+			return this.field.get(this.toTarget.get(input));
 		}
 
 		@Override
 		public void set(final GSource input, final GValue value) {
-			this.field.set(this.navigator.get(input), value);
+			this.field.set(this.toTarget.get(input), value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.navigator, this.field);
+			return Objects.toInvokeString(this, this.toTarget, this.field);
 		}
 
 	}
@@ -770,7 +776,7 @@ public final class Fields {
 
 	/** Diese Klasse implementiert {@link Fields#toProperty(Object, Field)}. */
 	@SuppressWarnings ("javadoc")
-	static class FieldProperty<GValue, GInput> implements Property<GValue> {
+	static class FieldProperty<GValue, GInput> extends BaseProperty<GValue> {
 
 		public final GInput input;
 
@@ -913,15 +919,15 @@ public final class Fields {
 	}
 
 	/** Diese Methode ist eine effiziente Alternative zu
-	 * {@code Fields.compositeField(Getters.navigatedGetter(navigator, field), Setters.navigatedField(navigator, field))}.
+	 * {@code Fields.compositeField(Getters.navigatedGetter(toTarget, field), Setters.navigatedSetter(toTarget, field))}.
 	 *
 	 * @see #compositeField(Getter, Setter)
-	 * @see Getters#translatedGetter(Getter, Getter)
+	 * @see Getters#navigatedGetter(Getter, Getter)
 	 * @see Setters#navigatedSetter(Getter, Setter) */
 	@SuppressWarnings ("javadoc")
-	public static <GSource, GTarget, GValue> Field<GSource, GValue> navigatedField(final Getter<? super GSource, ? extends GTarget> navigator,
+	public static <GSource, GTarget, GValue> Field<GSource, GValue> navigatedField(final Getter<? super GSource, ? extends GTarget> toTarget,
 		final Field<? super GTarget, GValue> field) throws NullPointerException {
-		return new NavigatedField<>(navigator, field);
+		return new NavigatedField<>(toTarget, field);
 	}
 
 	/** Diese Methode ist eine effiziente Alternative zu
@@ -1022,7 +1028,7 @@ public final class Fields {
 		return new ConditionalField<>(condition, acceptField, rejectField);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code synchronizedField(field, field)}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.synchronizedField(field, field)}.
 	 *
 	 * @see #synchronizedField(Object, Field) */
 	@SuppressWarnings ("javadoc")

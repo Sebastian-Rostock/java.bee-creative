@@ -6,5 +6,4 @@ package bee.creative.util;
  * @param <GInput> Typ der Eingabe.
  * @param <GValue> Typ des Werts der Eigenschaft. */
 public interface Field<GInput, GValue> extends Getter<GInput, GValue>, Setter<GInput, GValue> {
-
 }

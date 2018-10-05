@@ -773,7 +773,7 @@ public class Comparables {
 	 * @param <GTarget> Typ der Eingabe des {@link Getter}.
 	 * @param toSource {@link Getter}.
 	 * @param comparable {@link Comparable}.
-	 * @return {@code navigated}-{@link Comparable}.
+	 * @return {@code translated}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparable} {@code null} ist. */
 	public static <GSource, GTarget> Comparable<GTarget> translatedComparable(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Comparable<? super GSource> comparable) throws NullPointerException {

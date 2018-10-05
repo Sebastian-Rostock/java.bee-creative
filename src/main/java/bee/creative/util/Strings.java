@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import bee.creative.util.Getters.BaseGetter;
 
 /** Diese Klasse stellt einige statische Methoden bzur Verarbeitung von regulären Ausdrücken und Zeichenketten zur Verfügung.
  *
@@ -16,7 +15,7 @@ public class Strings {
 
 	/** Diese Klasse implementiert {@link Strings#patternCompiler(int)}. */
 	@SuppressWarnings ("javadoc")
-	public static class PatternCompiler extends BaseGetter<String, Pattern> {
+	public static class PatternCompiler implements Getter<String, Pattern> {
 
 		public final int flags;
 

@@ -1,31 +1,31 @@
 package bee.creative.util;
 
-/** Diese Klasse implementiert ein überwachbares {@link Field Datenfeld}.
+/** Diese Klasse implementiert ein {@link Observable überwachbares} {@link Field Datenfeld}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ der Eingabe.
  * @param <GValue> Typ des Werts der Eigenschaft. */
-public class ObservableField<GInput, GValue>
-	implements Field<GInput, GValue>, Observable<ObservableField.ChangeFieldMessage, ObservableField.ChangeFieldObserver> {
+public class ObservableField<GInput, GValue> extends ObservableValue<GValue, ObservableField.UpdateFieldMessage, ObservableField.UpdateFieldObserver>
+	implements Field<GInput, GValue> {
 
-	/** Diese Klasse implementiert das Ereignis, dass bei Änderung des Werts eines {@link ObservableField} ausgelöst werden kann. */
-	protected static class ChangeFieldEvent extends Event<ChangeFieldMessage, ChangeFieldObserver> {
+	/** Diese Klasse implementiert das Ereignis, dass bei Aktualisierung des Werts eines {@link ObservableField} ausgelöst werden kann. */
+	protected static class UpdateFieldEvent extends Event<UpdateFieldMessage, UpdateFieldObserver> {
 
-		/** Dieses Feld speichert das {@link ChangeFieldEvent}. */
-		public static final ChangeFieldEvent INSTANCE = new ChangeFieldEvent();
+		/** Dieses Feld speichert das {@link UpdateFieldEvent}. */
+		public static final UpdateFieldEvent INSTANCE = new UpdateFieldEvent();
 
 		/** {@inheritDoc} */
 		@Override
-		protected void customFire(final Object sender, final ChangeFieldMessage message, final ChangeFieldObserver observer) {
-			observer.onChangeField(message);
+		protected void customFire(final Object sender, final UpdateFieldMessage message, final UpdateFieldObserver observer) {
+			observer.onUpdateField(message);
 		}
 
 	}
 
-	/** Diese Klasse implementiert die Nachricht des {@link ChangeFieldEvent} */
-	public static class ChangeFieldMessage {
+	/** Diese Klasse implementiert die Nachricht des {@link UpdateFieldEvent} */
+	public static class UpdateFieldMessage {
 
-		/** Dieses Feld speichert den Sender des Änderungsereignisses.
+		/** Dieses Feld speichert den Sender des Ereignisses.
 		 *
 		 * @see ObservableField#field */
 		public final ObservableField<?, ?> sender;
@@ -39,9 +39,9 @@ public class ObservableField<GInput, GValue>
 		/** Dieses Feld speichert den neuen Wert des {@link ObservableField#field Datenfelds}. */
 		public final Object newValue;
 
-		/** Dieser Konstruktor initialisiert die Merkmale des Änderungsereignisses. */
+		/** Dieser Konstruktor initialisiert die Merkmale des Ereignisses. */
 		@SuppressWarnings ("javadoc")
-		public ChangeFieldMessage(final ObservableField<?, ?> sender, final Object input, final Object oldValue, final Object newValue) {
+		public UpdateFieldMessage(final ObservableField<?, ?> sender, final Object input, final Object oldValue, final Object newValue) {
 			this.sender = sender;
 			this.input = input;
 			this.oldValue = oldValue;
@@ -50,13 +50,13 @@ public class ObservableField<GInput, GValue>
 
 	}
 
-	/** Diese Schnittstelle definiert den Empfänger des {@link ChangeFieldEvent}. */
-	public static interface ChangeFieldObserver {
+	/** Diese Schnittstelle definiert den Empfänger des {@link UpdateFieldEvent}. */
+	public static interface UpdateFieldObserver {
 
-		/** Diese Methode wird bei Änderung des Werts eiens {@link ObservableField#field Datenfeldes} aufgerufen.
+		/** Diese Methode wird bei Aktualisierung des Werts eiens {@link ObservableField#field Datenfeldes} aufgerufen.
 		 *
-		 * @param message Nachricht des Änderungsereignisses. */
-		public void onChangeField(ChangeFieldMessage message);
+		 * @param message Nachricht des Ereignisses. */
+		public void onUpdateField(UpdateFieldMessage message);
 
 	}
 
@@ -68,26 +68,6 @@ public class ObservableField<GInput, GValue>
 	 * @param field überwachtes Datenfeld. */
 	public ObservableField(final Field<? super GInput, GValue> field) {
 		this.field = Objects.notNull(field);
-	}
-
-	/** Diese Methode gibt eine Kopie des gegebenen Werts oder diesen unverändert zurück. Vor dem {@link #set(Object, Object) Schreiben} des neuen Werts des
-	 * {@link #field Datenfeldes} wird vom alten Wert eine Kopie erzeugt, welche nach dem Schreiben beim {@link #fire(ChangeFieldMessage) auslösen des
-	 * Änderungsereignisses} eingesetzt wird. Eine Kopie ist nur dann nötig, wenn der alte Wert sich durch das Schreiben ändert.
-	 *
-	 * @param value alter Wert.
-	 * @return kopierter Wert. */
-	protected GValue customClone(final GValue value) {
-		return value;
-	}
-
-	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück. Sie wird beim {@link #set(Object, Object) Setzen} des Werts
-	 * des {@link #field Datenfeldes} eingesetzt zur Erkennung einer Änderung des Werts zu erkennen. des
-	 *
-	 * @param value1 alter Wert.
-	 * @param value2 neuer Wert.
-	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
-	protected boolean customEquals(final GValue value1, final GValue value2) {
-		return Objects.equals(value1, value2);
 	}
 
 	/** {@inheritDoc} */
@@ -103,31 +83,31 @@ public class ObservableField<GInput, GValue>
 		if (this.customEquals(oldValue, newValue)) return;
 		oldValue = this.customClone(oldValue);
 		this.field.set(input, newValue);
-		this.fire(new ChangeFieldMessage(this, input, oldValue, newValue));
+		this.fire(new UpdateFieldMessage(this, input, oldValue, newValue));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public ObservableField.ChangeFieldObserver put(final ChangeFieldObserver listener) throws IllegalArgumentException {
-		return ChangeFieldEvent.INSTANCE.put(this, listener);
+	public ObservableField.UpdateFieldObserver put(final UpdateFieldObserver listener) throws IllegalArgumentException {
+		return UpdateFieldEvent.INSTANCE.put(this, listener);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public ObservableField.ChangeFieldObserver putWeak(final ChangeFieldObserver listener) throws IllegalArgumentException {
-		return ChangeFieldEvent.INSTANCE.putWeak(this, listener);
+	public ObservableField.UpdateFieldObserver putWeak(final UpdateFieldObserver listener) throws IllegalArgumentException {
+		return UpdateFieldEvent.INSTANCE.putWeak(this, listener);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void pop(final ChangeFieldObserver listener) throws IllegalArgumentException {
-		ChangeFieldEvent.INSTANCE.pop(this, listener);
+	public void pop(final UpdateFieldObserver listener) throws IllegalArgumentException {
+		UpdateFieldEvent.INSTANCE.pop(this, listener);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public ChangeFieldMessage fire(final ChangeFieldMessage event) throws NullPointerException {
-		return ChangeFieldEvent.INSTANCE.fire(this, event);
+	public UpdateFieldMessage fire(final UpdateFieldMessage event) throws NullPointerException {
+		return UpdateFieldEvent.INSTANCE.fire(this, event);
 	}
 
 	/** {@inheritDoc} */
