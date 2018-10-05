@@ -420,7 +420,7 @@ public class Getters {
 	 * @see #nativeGetter(java.lang.reflect.Method)
 	 * @see #nativeGetter(java.lang.reflect.Constructor)
 	 * @see Natives#parse(String)
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ des Datensatzes.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param memberText Feld-, Methoden- oder Konstruktortext.
 	 * @return {@code native}-{@link Getter}.
@@ -454,7 +454,7 @@ public class Getters {
 	 * liefert er dagegen {@code method.invoke(input)}.
 	 *
 	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ des Datensatzes.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param method Native Methode.
 	 * @return {@code native}-{@link Getter}.
@@ -469,7 +469,7 @@ public class Getters {
 	 * Der erzeugte {@link Getter} liefert für eine Eingabe {@code input} {@code constructor.newInstance(input)}.
 	 *
 	 * @see java.lang.reflect.Constructor#newInstance(Object...)
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ des Datensatzes.
 	 * @param <GOutput> Typ des Werts.
 	 * @param constructor Nativer Kontruktor.
 	 * @return {@code native}-{@link Getter}.
@@ -521,7 +521,7 @@ public class Getters {
 	 * und die Werte als {@link Pointer} auf die Werte bestückt.
 	 *
 	 * @see Pointers#pointer(int, Object)
-	 * @param <GInput> Typ der Eingabe sowie der Datensätze in den Schlüsseln der internen {@link LinkedHashMap}.
+	 * @param <GInput> Typ des Datensatzes sowie der Datensätze in den Schlüsseln der internen {@link LinkedHashMap}.
 	 * @param <GValue> Typ der Werte sowie der Datensätze in den Werten der internen {@link LinkedHashMap}.
 	 * @param limit Maximum für die Anzahl der Einträge in der internen {@link LinkedHashMap}.
 	 * @param inputMode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link LinkedHashMap} erzeugt werden
@@ -551,7 +551,7 @@ public class Getters {
 	/** Diese Methode gibt einen navigierten bzw. verketteten {@link Getter} zurück.<br>
 	 * Der erzeugte {@link Getter} liefert für eine Eingabe {@code input} den Wert {@code getter.get(navigator.get(input))}.
 	 *
-	 * @param <GInput> Typ der Eingabe des erzeugten sowie der Eingabe des ersten {@link Getter}.
+	 * @param <GInput> Typ des Datensatzes des erzeugten sowie der Eingabe des ersten {@link Getter}.
 	 * @param <GSource> Typ der Ausgabe des ersten sowie der Eingabe des zweiten {@link Getter}.
 	 * @param <GTarget> Typ der Ausgabe des zweiten sowie der Ausgabe des erzeugten {@link Getter}.
 	 * @param toTarget {@link Getter} zur Navigation.
@@ -619,7 +619,7 @@ public class Getters {
 	 * Andernfalls liefert er den Wert der {@link Getter Eigenschaft} {@code rejectGetter}. Der erzeugte {@link Getter} liefert für eine Eingabe {@code input}
 	 * damit {@code (condition.accept(input) ? acceptGetter : rejectGetter).get(input)}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ des Datensatzes.
 	 * @param <GOutput> Typ des Werts.
 	 * @param condition Bedingung.
 	 * @param acceptGetter Eigenschaft zum Lesen des Werts akzeptierter Eingaben.
@@ -664,7 +664,7 @@ public class Getters {
 	/** Diese Methode gibt einen {@link Filter} als Adapter zu einer {@code boolean}-{@link Getter Eigenschaft} zurück.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} entspricht {@code Boolean.TRUE.equals(getter.get(input))}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ des Datensatzes.
 	 * @param getter Eigenschaft mit {@code boolean}-Wert.
 	 * @return {@link Filter} als {@link Getter}-Adapter.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
@@ -676,7 +676,7 @@ public class Getters {
 	 * Der Vergleichswert einer Eingabe {@code input} entspricht {@code getter.get(input).intValue()}, wenn diese nicht {@code null} ist. Andernfalls ist der
 	 * Vergleichswert {@code 0}.
 	 *
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ des Datensatzes.
 	 * @param getter Eigenschaft mit {@link Number}-Wert.
 	 * @return {@link Comparable} als {@link Getter}-Adapter.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
@@ -694,7 +694,7 @@ public class Getters {
 
 	/** Diese Methode gibt einen {@link Producer} zurück, der mit der gegebenen Eingabe an den gegebenen {@link Getter} delegiert.
 	 *
-	 * @param <GInput> Typ der Eingabe.
+	 * @param <GInput> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts.
 	 * @param getter {@link Getter}.
 	 * @param input Eingabe.

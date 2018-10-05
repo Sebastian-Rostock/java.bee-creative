@@ -124,45 +124,45 @@ public class Translators {
 	@SuppressWarnings ("javadoc")
 	public static class CompositeTranslator<GSource, GTarget> implements Translator<GSource, GTarget> {
 
-		public final Class<GSource> sourceClass;
+		public final Class<GSource> isSource;
 
-		public final Class<GTarget> targetClass;
+		public final Class<GTarget> isTarget;
 
-		public final Getter<GSource, GTarget> sourceGetter;
+		public final Getter<? super GSource, ? extends GTarget> toTarget;
 
-		public final Getter<GTarget, GSource> targetGetter;
+		public final Getter<? super GTarget, ? extends GSource> toSource;
 
-		public CompositeTranslator(final Class<GSource> sourceClass, final Class<GTarget> targetClass, final Getter<GSource, GTarget> sourceGetter,
-			final Getter<GTarget, GSource> targetGetter) throws NullPointerException {
-			this.sourceClass = Objects.notNull(sourceClass);
-			this.targetClass = Objects.notNull(targetClass);
-			this.sourceGetter = Objects.notNull(sourceGetter);
-			this.targetGetter = Objects.notNull(targetGetter);
+		public CompositeTranslator(final Class<GSource> isSource, final Class<GTarget> isTarget, final Getter<? super GSource, ? extends GTarget> toTarget,
+			final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
+			this.isSource = Objects.notNull(isSource);
+			this.isTarget = Objects.notNull(isTarget);
+			this.toTarget = Objects.notNull(toTarget);
+			this.toSource = Objects.notNull(toSource);
 		}
 
 		@Override
 		public boolean isTarget(final Object object) {
-			return this.targetClass.isInstance(object);
+			return this.isTarget.isInstance(object);
 		}
 
 		@Override
 		public boolean isSource(final Object object) {
-			return this.sourceClass.isInstance(object);
+			return this.isSource.isInstance(object);
 		}
 
 		@Override
 		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.sourceGetter.get(this.sourceClass.cast(object));
+			return this.toTarget.get(this.isSource.cast(object));
 		}
 
 		@Override
 		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.targetGetter.get(this.targetClass.cast(object));
+			return this.toSource.get(this.isTarget.cast(object));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.sourceClass, this.targetClass, this.sourceGetter, this.targetGetter);
+			return Objects.toInvokeString(this, this.isSource, this.isTarget, this.toTarget, this.toSource);
 		}
 
 	}
@@ -349,15 +349,15 @@ public class Translators {
 	 *
 	 * @param <GSource> Typ der Quellobjekte.
 	 * @param <GTarget> Typ der Zielobjekte.
-	 * @param sourceClass {@link Class} der Quellobjekte.
-	 * @param targetClass {@link Class} der Zielobjekte.
-	 * @param sourceGetter {@link Getter} zur Übersetzung von Quellobjekten in Zielobjekte.
-	 * @param targetGetter {@link Getter} zur Übersetzung von Zielobjekten in Quellobjekte.
+	 * @param isSource {@link Class} der Quellobjekte.
+	 * @param isTarget {@link Class} der Zielobjekte.
+	 * @param toTarget {@link Getter} zur Übersetzung von Quellobjekten in Zielobjekte.
+	 * @param toSource {@link Getter} zur Übersetzung von Zielobjekten in Quellobjekte.
 	 * @return {@code composite}-{@link Translator}.
 	 * @throws NullPointerException Wenn {@code sourceClass}, {@code targetClass}, {@code sourceGetter} bzw. {@code targetGetter} {@code null} ist. */
-	public static <GSource, GTarget> Translator<GSource, GTarget> compositeTranslator(final Class<GSource> sourceClass, final Class<GTarget> targetClass,
-		final Getter<GSource, GTarget> sourceGetter, final Getter<GTarget, GSource> targetGetter) throws NullPointerException {
-		return new CompositeTranslator<>(sourceClass, targetClass, sourceGetter, targetGetter);
+	public static <GSource, GTarget> Translator<GSource, GTarget> compositeTranslator(final Class<GSource> isSource, final Class<GTarget> isTarget,
+		final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
+		return new CompositeTranslator<>(isSource, isTarget, toTarget, toSource);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Translators.synchronizedTranslator(translator, translator)}.

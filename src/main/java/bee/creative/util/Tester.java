@@ -34,7 +34,7 @@ public class Tester {
 	/** Diese Klasse implementiert den {@link Thread} zur parallelen Messung der maximale Speicherbelegung in Byte.
 	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class Sampler extends Thread {
+	static final class Sampler extends Thread {
 
 		/** Dieses Feld speichert das Interval in Millisekunden, in dem die Messung erfolgt. Es ist {@code 0}, wenn die Messung beendet werden soll. */
 		int millis;
@@ -55,7 +55,7 @@ public class Tester {
 		 * @param millis Interval der Messung in Millisekunden.
 		 * @throws IllegalArgumentException Wenn {@code millis <= 0} ist. */
 		public Sampler(final int millis) throws IllegalArgumentException {
-			super(Sampler.class.getSimpleName());
+			super("Tester-Thread");
 			if (millis <= 0) throw new IllegalArgumentException();
 			this.millis = millis;
 			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
