@@ -28,6 +28,11 @@ public class Producers {
 
 		public MethodProducer(final Method method) {
 			if (!Modifier.isStatic(method.getModifiers()) || (method.getParameterTypes().length != 0)) throw new IllegalArgumentException();
+			try {
+				method.setAccessible(true);
+			} catch (final SecurityException cause) {
+				throw new IllegalArgumentException(cause);
+			}
 			this.method = method;
 		}
 
@@ -55,7 +60,13 @@ public class Producers {
 		public final Constructor<?> constructor;
 
 		public ConstructorProducer(final Constructor<?> constructor) {
-			this.constructor = Objects.notNull(constructor);
+			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 0)) throw new IllegalArgumentException();
+			try {
+				constructor.setAccessible(true);
+			} catch (final SecurityException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+			this.constructor = constructor;
 		}
 
 		@Override
@@ -185,32 +196,30 @@ public class Producers {
 
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.emptyProperty()}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#emptyProperty() Properties.emptyProperty()}. */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Producer<GValue> emptyProducer() {
 		return Properties.emptyProperty();
 	}
 
-	/** Diese Methode gibt einen {@link Producer} zurück, der den gegebenen Datensatz bereitstellt.
-	 *
-	 * @param <GValue> Typ des Datensatzes.
-	 * @param value Datensatz.
-	 * @return {@code value}-{@link Producer}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#valueProperty(Object) Properties.valueProperty(value)}. */
+	@SuppressWarnings ("javadoc")
 	public static <GValue> Producer<GValue> valueProducer(final GValue value) {
 		return Properties.valueProperty(value);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code nativeProducer(Natives.parse(memberText))}, wobei eine {@link Class} zu einer Ausnahme führt.
+	/** Diese Methode ist eine Abkürzung für {@code Producers.nativeProducer(Natives.parse(memberText))}, wobei eine {@link Class} zu einer Ausnahme führt.
 	 *
 	 * @see Natives#parse(String)
 	 * @see #nativeProducer(java.lang.reflect.Field)
 	 * @see #nativeProducer(java.lang.reflect.Method)
 	 * @see #nativeProducer(java.lang.reflect.Constructor)
-	 * @param <GValue> Typ des Datensatzes.
+	 * @param <GValue> Typ des Werts.
 	 * @param memberText Methoden- oder Konstruktortext.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)}, {@link Producers#nativeProducer(java.lang.reflect.Field)},
+	 *         {@link Producers#nativeProducer(Method)} bzw. {@link Producers#nativeProducer(Constructor)} eine entsprechende Ausnahme auslöst. */
 	public static <GValue> Producer<GValue> nativeProducer(final String memberText) throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberText);
 		if (object instanceof java.lang.reflect.Field) return Producers.nativeProducer((java.lang.reflect.Field)object);
@@ -219,7 +228,7 @@ public class Producers {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.nativeProperty(field)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(field)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Producer<GValue> nativeProducer(final java.lang.reflect.Field field) throws NullPointerException {
 		return Properties.nativeProperty(field);
@@ -246,7 +255,8 @@ public class Producers {
 	 * @param constructor Nativer Kontruktor.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
-	public static <GValue> Producer<GValue> nativeProducer(final java.lang.reflect.Constructor<?> constructor) throws NullPointerException {
+	public static <GValue> Producer<GValue> nativeProducer(final java.lang.reflect.Constructor<?> constructor)
+		throws NullPointerException, IllegalArgumentException {
 		return new ConstructorProducer<>(constructor);
 	}
 

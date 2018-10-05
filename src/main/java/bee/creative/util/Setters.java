@@ -26,15 +26,15 @@ public class Setters {
 		public final Method method;
 
 		public MethodSetter(final Method method) {
-			try {
-				method.setAccessible(true);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
 			if (Modifier.isStatic(method.getModifiers())) {
 				if (method.getParameterTypes().length != 2) throw new IllegalArgumentException();
 			} else {
 				if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
+			}
+			try {
+				method.setAccessible(true);
+			} catch (final SecurityException cause) {
+				throw new IllegalArgumentException(cause);
 			}
 			this.method = method;
 		}
@@ -248,7 +248,7 @@ public class Setters {
 
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.emptyField()}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#emptyField() Fields.emptyField()}. */
 	@SuppressWarnings ("javadoc")
 	public static Setter<Object, Object> emptySetter() {
 		return Fields.emptyField();
@@ -424,7 +424,7 @@ public class Setters {
 		return Setters.toConsumer(null, setter);
 	}
 
-	/** Diese Methode gibt einen {@link Consumer} zurück, der mit der gegebenen Eingabe an den gegebenen {@link Setter} delegiert.
+	/** Diese Methode gibt einen {@link Consumer} zurück, der mit dem gegebenen Datensatz an den gegebenen {@link Setter} delegiert.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts.

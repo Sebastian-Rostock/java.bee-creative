@@ -247,9 +247,9 @@ public class Properties {
 		return (Property<GValue>)ValueProperty.EMPTY;
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@code Properties.compositeProperty(Producers.valueProducer(value), Consumers.emptyConsumer())}.
+	/** Diese Methode ist eine effiziente Alternative zu {@link #compositeProperty(Producer, Consumer)
+	 * Properties.compositeProperty(Producers.valueProducer(value), Consumers.emptyConsumer())}.
 	 *
-	 * @see #compositeProperty(Producer, Consumer)
 	 * @see Producers#valueProducer(Object)
 	 * @see Consumers#emptyConsumer() */
 	@SuppressWarnings ("javadoc")
@@ -267,23 +267,22 @@ public class Properties {
 	 * @param property Eigenschaft zur Manipulation.
 	 * @param setup Methode zur Initialisierung.
 	 * @return {@code setup}-{@link Property}.
-	 * @throws NullPointerException Wenn {@code field} bzw. {@code setup} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code setup} bzw. {@code property} {@code null} ist. */
 	public static <GValue> Property<GValue> setupProperty(final Property<GValue> property, final Producer<? extends GValue> setup) throws NullPointerException {
 		return new SetupProperty<>(setup, property);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.nativeProperty(Natives.parseProperty(fieldText))}.
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(Natives.parseField(fieldText))}.
 	 *
-	 * @see #nativeProperty(java.lang.reflect.Field)
 	 * @see Natives#parseField(String) */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Property<GValue> nativeProperty(final String fieldText) throws NullPointerException, IllegalArgumentException {
 		return Properties.nativeProperty(Natives.parseField(fieldText));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.nativeProperty(Natives.parseField(fieldOwner, fieldName))}.
+	/** Diese Methode ist eine Abkürzung für {@link #nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(Natives.parseField(fieldOwner,
+	 * fieldName))}.
 	 *
-	 * @see #nativeProperty(java.lang.reflect.Field)
 	 * @see Natives#parseField(Class, String) */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName)
@@ -329,10 +328,9 @@ public class Properties {
 		return Properties.compositeProperty(Producers.<GValue>nativeProducer(getMethod), Consumers.<GValue>nativeConsumer(setMethod));
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu
-	 * {@code Properties.translatedProperty(property, Translators.toTargetGetter(translator), Translators.toSourceGetter(translator))}.
+	/** Diese Methode ist eine effiziente Alternative zu {@link #translatedProperty(Property, Getter, Getter) Properties.translatedProperty(property,
+	 * Translators.toTargetGetter(translator), Translators.toSourceGetter(translator))}.
 	 *
-	 * @see #translatedProperty(Property, Getter, Getter)
 	 * @see Translators#toTargetGetter(Translator)
 	 * @see Translators#toSourceGetter(Translator) */
 	@SuppressWarnings ("javadoc")
@@ -348,6 +346,8 @@ public class Properties {
 	 * {@link Getter Schreibformat} {@code setFormat} in einen (internen) Wert überfüght, welcher anschließend an das gegebene {@link Property Datenfeld}
 	 * delegiert wird.
 	 *
+	 * @see Producers#translatedProducer(Getter, Producer)
+	 * @see Consumers#translatedConsumer(Getter, Consumer)
 	 * @param <GTarget> Typ des Werts der erzeugten Eigenschaft.
 	 * @param <GSource> Typ des Werts der gegebenen Eigenschaft.
 	 * @param property Eigenschaft.
@@ -365,14 +365,14 @@ public class Properties {
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param producer {@link Producer} für {@link Property#get()}.
 	 * @param consumer {@link Consumer} für {@link Property#set( Object)}.
-	 * @return {@code composite}-{@link Property}. */
-	public static <GValue> Property<GValue> compositeProperty(final Producer<? extends GValue> producer, final Consumer<? super GValue> consumer) {
+	 * @return {@code composite}-{@link Property}.
+	 * @throws NullPointerException Wenn {@code property} bzw. {@code consumer} {@code null} ist. */
+	public static <GValue> Property<GValue> compositeProperty(final Producer<? extends GValue> producer, final Consumer<? super GValue> consumer)
+		throws NullPointerException {
 		return new CompositeProperty<>(producer, consumer);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.synchronizedProperty(property, property)}.
-	 *
-	 * @see #synchronizedProperty(Object, Property) */
+	/** Diese Methode ist eine Abkürzung für {@link #synchronizedProperty(Object, Property) Properties.synchronizedProperty(property, property)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Property<GValue> synchronizedProperty(final Property<GValue> property) throws NullPointerException {
 		return Properties.synchronizedProperty(property, property);
@@ -390,6 +390,12 @@ public class Properties {
 		return new SynchronizedProperty<>(mutex, property);
 	}
 
+	/** Diese Methode gibt ein {@link Field} zurück, das seinen Datensatz ignoriert und den Wert des gegebenen {@link Property} manipuliert.
+	 *
+	 * @param <GValue> Typ des Werts.
+	 * @param property {@link Property}.
+	 * @return {@link Property}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
 	public static <GValue> Field<Object, GValue> toField(final Property<GValue> property) {
 		return new PropertyField<>(property);
 	}

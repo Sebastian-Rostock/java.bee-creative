@@ -399,17 +399,14 @@ public class Getters {
 
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.emptyField()}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#emptyField() Fields.emptyField()}. */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Getter<Object, GValue> emptyGetter() {
 		return Fields.emptyField();
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, welcher stets die gegebene Ausgabe liefert.
-	 *
-	 * @param <GValue> Typ der Ausgabe.
-	 * @param value Ausgabe.
-	 * @return {@code value}-{@link Getter}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#valueField(Object) Fields.valueField(value)}. */
+	@SuppressWarnings ("javadoc")
 	public static <GValue> Getter<Object, GValue> valueGetter(final GValue value) {
 		return Fields.valueField(value);
 	}
