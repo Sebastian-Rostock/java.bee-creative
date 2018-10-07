@@ -245,29 +245,23 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return new ArrayFrame(this, params.length == 0 ? FEMArray.EMPTY : params, this.context);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.newFrame(FEMArray.from(params))}.
+	/** Diese Methode ist eine Abkürzung für {@link #newFrame(FEMArray) this.newFrame(FEMArray.from(params))}.
 	 *
-	 * @see #newFrame(FEMArray)
 	 * @see FEMArray#from(FEMValue...) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFrame newFrame(final FEMValue... params) throws NullPointerException {
 		return this.newFrame(FEMArray.from(params));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.newFrame(FEMArray.from(params))}.
+	/** Diese Methode ist eine Abkürzung für {@link #newFrame(FEMArray) this.newFrame(FEMArray.from(params))}.
 	 *
-	 * @see #newFrame(FEMArray)
 	 * @see FEMArray#from(Iterable) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFrame newFrame(final Iterable<? extends FEMValue> params) throws NullPointerException {
 		return this.newFrame(FEMArray.from(params));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.newFrame(FEMArray.from(params))}.
+	/** Diese Methode ist eine Abkürzung für {@link #newFrame(FEMArray) this.newFrame(FEMArray.from(params))}.
 	 *
-	 * @see #newFrame(FEMArray)
 	 * @see FEMArray#from(Iterable) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFrame newFrame(final Collection<? extends FEMValue> params) throws NullPointerException {
 		return this.newFrame(FEMArray.from(params));
 	}
@@ -301,29 +295,23 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return new ArrayFrame(this.parent, params.length == 0 ? FEMArray.EMPTY : params, this.context);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.withParams(FEMArray.from(params))}.
+	/** Diese Methode ist eine Abkürzung für {@link #withParams(FEMArray) this.withParams(FEMArray.from(params))}.
 	 *
-	 * @see #withParams(FEMArray)
 	 * @see FEMArray#from(FEMValue...) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFrame withParams(final FEMValue... params) throws NullPointerException {
 		return this.withParams(FEMArray.from(params));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.withParams(FEMArray.from(params))}.
+	/** Diese Methode ist eine Abkürzung für {@link #withParams(FEMArray) this.withParams(FEMArray.from(params))}.
 	 *
-	 * @see #withParams(FEMArray)
 	 * @see FEMArray#from(Iterable) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFrame withParams(final Iterable<? extends FEMValue> params) throws NullPointerException {
 		return this.withParams(FEMArray.from(params));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.withParams(FEMArray.from(params))}.
+	/** Diese Methode ist eine Abkürzung für {@link #withParams(FEMArray) this.withParams(FEMArray.from(params))}.
 	 *
-	 * @see #withParams(FEMArray)
 	 * @see FEMArray#from(Iterable) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFrame withParams(final Collection<? extends FEMValue> params) throws NullPointerException {
 		return this.withParams(FEMArray.from(params));
 	}

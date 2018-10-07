@@ -422,9 +422,8 @@ public final class Fields {
 		public void putAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
 			final Map<GKey, GValue> map = this.customCopy(this.get(input));
 			boolean modified = false;
-			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
+			for (final Entry<? extends GKey, ? extends GValue> entry: entries)
 				modified = !Objects.equals(map.put(entry.getKey(), entry.getValue()), entry.getValue()) || modified;
-			}
 			if (!modified) return;
 			this.set(input, map);
 		}
@@ -483,13 +482,13 @@ public final class Fields {
 
 		public final java.lang.reflect.Field field;
 
-		public NativeField(final java.lang.reflect.Field field) {
-			try {
+		public NativeField(final java.lang.reflect.Field field, final boolean forceAccessible) {
+			if (forceAccessible) try {
 				field.setAccessible(true);
 			} catch (final SecurityException cause) {
 				throw new IllegalArgumentException(cause);
 			}
-			this.field = field;
+			this.field = Objects.notNull(field);
 		}
 
 		@Override
@@ -513,7 +512,7 @@ public final class Fields {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, Natives.formatField(this.field));
+			return Objects.toInvokeString(this, this.field);
 		}
 
 	}
@@ -726,11 +725,8 @@ public final class Fields {
 
 		@Override
 		public void set(final GInput input, final GValue value) {
-			if (this.condition.accept(input)) {
-				this.acceptField.set(input, value);
-			} else {
-				this.rejectField.set(input, value);
-			}
+			if (this.condition.accept(input)) this.acceptField.set(input, value);
+			else this.rejectField.set(input, value);
 		}
 
 		@Override
@@ -813,12 +809,11 @@ public final class Fields {
 		return (Field<Object, GValue>)ValueField.EMPTY;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.valueGetter(value), Setters.emptySetter())}.
+	/** Diese Methode gibt ein {@link Field} zurück, das stets den gegebenen Wert liefert und das Schreiben ignoriert.
 	 *
-	 * @see #compositeField(Getter, Setter)
-	 * @see Getters#valueGetter(Object)
-	 * @see Setters#emptySetter() */
-	@SuppressWarnings ("javadoc")
+	 * @param <GValue> Typ des Werts.
+	 * @param value Wert.
+	 * @return {@code value}-{@link Field}. */
 	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
 		if (value == null) return Fields.emptyField();
 		return new ValueField<>(value);
@@ -840,6 +835,10 @@ public final class Fields {
 		return new SetupField<>(setup, field);
 	}
 
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+		return nativeField(field, true);
+	}
+
 	/** Diese Methode gibt ein {@link Field} zum gegebenen {@link java.lang.reflect.Field nativen Datenfeld} zurück.<br>
 	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Field} über {@code field.get(input)}. Das Schreiben eines Werts {@code value}
 	 * erfolgt hierbei über {@code field.set(input, value)}. Bei Klassenfeldern wird die Eingabe ignoriert.
@@ -849,11 +848,13 @@ public final class Fields {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param field Datenfeld.
+	 * @param forceAccessible
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das native Datenfeld nicht zugrifbar ist. */
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
-		return new NativeField<>(field);
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return new NativeField<>(field, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldOwner, fieldName))}.
@@ -866,9 +867,19 @@ public final class Fields {
 		return Fields.nativeField(Natives.parseField(fieldOwner, fieldName));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.nativeGetter(getMethod), Setters.nativeSetter(setMethod))}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldOwner, fieldName), forceAccessible)}.
 	 *
-	 * @see #compositeField(Getter, Setter)
+	 * @see #nativeField(java.lang.reflect.Field)
+	 * @see Natives#parseField(Class, String) */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<? extends GInput> fieldOwner, final String fieldName,
+		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(Natives.parseField(fieldOwner, fieldName), forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #compositeField(Getter, Setter) Fields.compositeField(Getters.nativeGetter(getMethod),
+	 * Setters.nativeSetter(setMethod))}.
+	 *
 	 * @see Getters#nativeGetter(java.lang.reflect.Method)
 	 * @see Setters#nativeSetter(java.lang.reflect.Method) */
 	@SuppressWarnings ("javadoc")
@@ -1036,7 +1047,7 @@ public final class Fields {
 		return Fields.synchronizedField(field, field);
 	}
 
-	/** Diese Methode gibt einen {@link Field} zurück, welcher das gegebenen {@link Field} via {@code synchronized(mutex)} synchronisiert. Wenn das
+	/** Diese Methode gibt einen {@link Field} zurück, welcher das gegebenen {@link Field} über {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird das erzeugte {@link Field} als Synchronisationsobjekt verwendet.
 	 *
 	 * @param <GInput> Typ der Eingabe.

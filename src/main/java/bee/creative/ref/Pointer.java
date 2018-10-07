@@ -17,13 +17,13 @@ public interface Pointer<GValue> extends Producer<GValue> {
 	@Override
 	public GValue get();
 
-	/** Diese Methode gibt den via {@link Objects#deepHash(Object)} berechneten {@link Object#hashCode() Streuwert} des Datensatzes zurück.
+	/** Diese Methode gibt den über {@link Objects#deepHash(Object)} berechneten {@link Object#hashCode() Streuwert} des Datensatzes zurück.
 	 *
 	 * @return {@link Object#hashCode() Streuwert} des Datensatzes. */
 	@Override
 	public int hashCode();
 
-	/** Diese Methode gibt die via {@link Objects#deepEquals(Object, Object)} berechnete {@link Object#equals(Object) Äquivalenz} der Datensätze dieses und des
+	/** Diese Methode gibt die über {@link Objects#deepEquals(Object, Object)} berechnete {@link Object#equals(Object) Äquivalenz} der Datensätze dieses und des
 	 * gegebenenen {@link Pointer} zurück.
 	 *
 	 * @param object {@link Pointer}.

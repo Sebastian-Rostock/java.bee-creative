@@ -42,15 +42,15 @@ public class Getters {
 		public final Method method;
 
 		public MethodGetter(final Method method) {
-			try {
-				method.setAccessible(true);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
 			if (Modifier.isStatic(method.getModifiers())) {
 				if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
 			} else {
 				if (method.getParameterTypes().length != 0) throw new IllegalArgumentException();
+			}
+			try {
+				method.setAccessible(true);
+			} catch (final SecurityException cause) {
+				throw new IllegalArgumentException(cause);
 			}
 			this.method = method;
 		}
@@ -73,7 +73,7 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, Natives.formatMethod(this.method));
+			return Objects.toInvokeString(this, this.method);
 		}
 
 	}
@@ -85,12 +85,12 @@ public class Getters {
 		public final Constructor<?> constructor;
 
 		public ConstructorGetter(final Constructor<?> constructor) {
+			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			try {
 				constructor.setAccessible(true);
 			} catch (final SecurityException cause) {
 				throw new IllegalArgumentException(cause);
 			}
-			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			this.constructor = constructor;
 		}
 
@@ -107,7 +107,7 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, Natives.formatConstructor(this.constructor));
+			return Objects.toInvokeString(this, this.constructor);
 		}
 
 	}
@@ -444,6 +444,8 @@ public class Getters {
 		throws NullPointerException, IllegalArgumentException {
 		return Fields.nativeField(fieldOwner, fieldName);
 	}
+	
+ 
 
 	// TODO doku
 	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
@@ -636,7 +638,7 @@ public class Getters {
 		return Getters.synchronizedGetter(getter, getter);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der den gegebenen {@link Getter} via {@code synchronized(mutex)} synchronisiert. Wenn das
+	/** Diese Methode gibt einen {@link Getter} zurück, der den gegebenen {@link Getter} über {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Getter} als Synchronisationsobjekt verwendet.
 	 *
 	 * @param <GInput> Typ des Eingabe.

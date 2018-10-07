@@ -17,7 +17,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 
-	/** Diese Klasse implementiert ein Objekt, das einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Token)}
+	/** Diese Klasse implementiert ein Objekt, das einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen über {@link #compareTo(Token)}
 	 * erfolgt gemäß ihrer Startposition.
 	 *
 	 * @see FEMScript

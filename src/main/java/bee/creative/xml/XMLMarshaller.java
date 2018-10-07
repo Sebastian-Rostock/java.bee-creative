@@ -94,7 +94,6 @@ public final class XMLMarshaller {
 	 *
 	 * @see #from(Class...)
 	 * @see #marshalString() */
-	@SuppressWarnings ("javadoc")
 	public static Node marshalNode(final Object object) throws SAXException, JAXBException {
 		return XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode();
 	}
@@ -103,7 +102,6 @@ public final class XMLMarshaller {
 	 *
 	 * @see #from(Class...)
 	 * @see #marshalString() */
-	@SuppressWarnings ("javadoc")
 	public static String marshalString(final Object object) throws SAXException, JAXBException {
 		return XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString();
 	}

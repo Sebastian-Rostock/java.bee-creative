@@ -1,15 +1,16 @@
 package bee.creative.util;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import bee.creative.util.Objects.BaseObject;
 
-/** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Property}-Instanzen.
+/** Diese Klasse implementiert gundlegende {@link Property}.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Properties {
 
 	/** Diese Klasse implementiert ein abstraktes {@link Property} als {@link BaseObject}. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseProperty<GValue> extends BaseObject implements Property<GValue> {
 	}
 
@@ -37,48 +38,6 @@ public class Properties {
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.value);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Properties#nativeProperty(java.lang.reflect.Field)}. */
-	@SuppressWarnings ("javadoc")
-	public static class NativeProperty<GValue> extends BaseProperty<GValue> {
-
-		public final java.lang.reflect.Field field;
-
-		public NativeProperty(final java.lang.reflect.Field field) {
-			if (!Modifier.isStatic(field.getModifiers())) throw new IllegalArgumentException();
-			try {
-				field.setAccessible(true);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-			this.field = field;
-		}
-
-		@Override
-		@SuppressWarnings ("unchecked")
-		public GValue get() {
-			try {
-				return (GValue)this.field.get(null);
-			} catch (final IllegalAccessException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-		}
-
-		@Override
-		public void set(final GValue value) {
-			try {
-				this.field.set(null, value);
-			} catch (final IllegalAccessException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, Natives.formatField(this.field));
 		}
 
 	}
@@ -113,6 +72,48 @@ public class Properties {
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.setup, this.property);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Properties#nativeProperty(java.lang.reflect.Field, boolean)}. */
+	@SuppressWarnings ("javadoc")
+	public static class NativeProperty<GValue> extends BaseProperty<GValue> {
+
+		public final java.lang.reflect.Field field;
+
+		public NativeProperty(final java.lang.reflect.Field field, final boolean forceAccessible) {
+			if (!Modifier.isStatic(field.getModifiers())) throw new IllegalArgumentException();
+			try {
+				field.setAccessible(forceAccessible);
+			} catch (final SecurityException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+			this.field = field;
+		}
+
+		@Override
+		@SuppressWarnings ("unchecked")
+		public GValue get() {
+			try {
+				return (GValue)this.field.get(null);
+			} catch (final IllegalAccessException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public void set(final GValue value) {
+			try {
+				this.field.set(null, value);
+			} catch (final IllegalAccessException cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.field, this.field.isAccessible());
 		}
 
 	}
@@ -238,30 +239,24 @@ public class Properties {
 
 	}
 
-	/** Diese Methode gibt das leere {@link Property} zurück, das stets {@code null} liefert und das Schreiben ignoriert.
-	 *
-	 * @param <GValue> Typ des Werts.
-	 * @return {@code empty}-{@link Property}. */
-	@SuppressWarnings ("unchecked")
+	/** Diese Methode ist eine Abkürzung für {@link Properties#valueProperty(Object) Properties.valueProperty(null)}. */
 	public static <GValue> Property<GValue> emptyProperty() {
-		return (Property<GValue>)ValueProperty.EMPTY;
+		return Properties.valueProperty(null);
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@link #compositeProperty(Producer, Consumer)
-	 * Properties.compositeProperty(Producers.valueProducer(value), Consumers.emptyConsumer())}.
+	/** Diese Methode gibt ein {@link Property} zurück, das stets den gegebenen Wert liefert und das Schreiben ignoriert.
 	 *
-	 * @see Producers#valueProducer(Object)
-	 * @see Consumers#emptyConsumer() */
-	@SuppressWarnings ("javadoc")
+	 * @param value Wert.
+	 * @return {@code value}-{@link Property}. */
+	@SuppressWarnings ("unchecked")
 	public static <GValue> Property<GValue> valueProperty(final GValue value) {
-		if (value == null) return Properties.emptyProperty();
+		if (value == null) return (Property<GValue>)ValueProperty.EMPTY;
 		return new ValueProperty<>(value);
 	}
 
-	/** Diese Methode gibt ein initialisierendes {@link Property} zurück.<br>
-	 * Das Schreiben wird direkt an das gegebene {@link Property} {@code property} delegiert. Beim Lesen wird der Wert zuerst über das gegebene {@link Property}
-	 * ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. gemäß der gegebenen {@link Producer Initialisierung} {@code setup} ermittelt,
-	 * über das {@link Property} {@code property} geschrieben und zurückgegeben. Andernfalls wird der Wertt er direkt zurückgegeben.
+	/** Diese Methode gibt ein initialisierendes {@link Property} zurück. Das Schreiben wird direkt an das gegebene {@link Property} delegiert. Beim Lesen wird
+	 * der Wert zuerst über das gegebene {@link Property} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. mit Hilfe des gegebenen
+	 * {@link Producer} ermittelt und über das {@link Property} geschrieben.
 	 *
 	 * @param <GValue> Typ des Werts.
 	 * @param property Eigenschaft zur Manipulation.
@@ -272,22 +267,23 @@ public class Properties {
 		return new SetupProperty<>(setup, property);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(Natives.parseField(fieldText))}.
-	 *
-	 * @see Natives#parseField(String) */
-	@SuppressWarnings ("javadoc")
-	public static <GValue> Property<GValue> nativeProperty(final String fieldText) throws NullPointerException, IllegalArgumentException {
-		return Properties.nativeProperty(Natives.parseField(fieldText));
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(String, boolean) Properties.nativeProperty(fieldPath, true)}. */
+	public static <GValue> Property<GValue> nativeProperty(final String fieldPath) throws NullPointerException, IllegalArgumentException {
+		return Properties.nativeProperty(fieldPath, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(Natives.parseField(fieldOwner,
-	 * fieldName))}.
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(Natives.parseField(fieldPath),
+	 * forceAccessible)}.
 	 *
-	 * @see Natives#parseField(Class, String) */
-	@SuppressWarnings ("javadoc")
-	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName)
+	 * @see Natives#parseField(String) */
+	public static <GValue> Property<GValue> nativeProperty(final String fieldPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Properties.nativeProperty(Natives.parseField(fieldOwner, fieldName));
+		return Properties.nativeProperty(Natives.parseField(fieldPath), forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(java.lang.reflect.Field, boolean) Properties.nativeProperty(field, true)}. */
+	public static <GValue> Property<GValue> nativeProperty(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+		return Properties.nativeProperty(field, true);
 	}
 
 	/** Diese Methode gibt ein {@link Property} zum gegebenen {@link java.lang.reflect.Field nativen statischen Datenfeld} zurück.<br>
@@ -297,62 +293,70 @@ public class Properties {
 	 * @see java.lang.reflect.Field#get(Object)
 	 * @see java.lang.reflect.Field#set(Object, Object)
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param field Eigenschaft.
+	 * @param field Datenfeld.
+	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Property}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das native Datenfeld nicht zugrifbar oder nicht statisch ist. */
-	public static <GValue> Property<GValue> nativeProperty(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
-		return new NativeProperty<>(field);
-	}
-
-	/** Diese Methode ist eine Abkürzung für
-	 * {@code Properties.compositeProperty(Producers.nativeProducer(getMemberText), Consumers.nativeConsumer(setMemberText))}.
-	 *
-	 * @see #compositeProperty(Producer, Consumer)
-	 * @see Getters#nativeGetter(String)
-	 * @see Setters#nativeSetter(String) */
-	@SuppressWarnings ("javadoc")
-	public static <GValue> Property<GValue> nativeProperty(final String getMemberText, final String setMemberText)
+	public static <GValue> Property<GValue> nativeProperty(final java.lang.reflect.Field field, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Properties.compositeProperty(Producers.<GValue>nativeProducer(getMemberText), Consumers.<GValue>nativeConsumer(setMemberText));
+		return new NativeProperty<>(field, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.compositeProperty(Producers.nativeProducer(getMethod), Consumers.nativeConsumer(setMethod))}.
-	 *
-	 * @see #compositeProperty(Producer, Consumer)
-	 * @see Producers#nativeProducer(java.lang.reflect.Method)
-	 * @see Consumers#nativeConsumer(java.lang.reflect.Method) */
-	@SuppressWarnings ("javadoc")
-	public static <GValue> Property<GValue> nativeProperty(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(Class, String, boolean) Properties.nativeProperty(fieldOwner, fieldName, true)}. */
+	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
-		return Properties.compositeProperty(Producers.<GValue>nativeProducer(getMethod), Consumers.<GValue>nativeConsumer(setMethod));
+		return Properties.nativeProperty(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@link #translatedProperty(Property, Getter, Getter) Properties.translatedProperty(property,
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(Natives.parseField(fieldOwner,
+	 * fieldName), forceAccessible)}.
+	 *
+	 * @see Natives#parseField(Class, String) */
+	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Properties.nativeProperty(Natives.parseField(fieldOwner, fieldName), forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(Method, Method, boolean) Properties.compositeProperty(getMethod, setMethod,
+	 * true)}. **/
+	public static <GValue> Property<GValue> nativeProperty(final Method getMethod, final Method setMethod) throws NullPointerException, IllegalArgumentException {
+		return Properties.nativeProperty(getMethod, setMethod, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#compositeProperty(Producer, Consumer)
+	 * Properties.compositeProperty(Producers.nativeProducer(getMethod, forceAccessible), Consumers.nativeConsumer(setMethod, forceAccessible))}.
+	 *
+	 * @see Producers#nativeProducer(Method, boolean)
+	 * @see Consumers#nativeConsumer(Method, boolean) */
+	public static <GValue> Property<GValue> nativeProperty(final Method getMethod, final Method setMethod, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Properties.compositeProperty(Producers.<GValue>nativeProducer(getMethod, forceAccessible),
+			Consumers.<GValue>nativeConsumer(setMethod, forceAccessible));
+	}
+
+	/** Diese Methode ist eine effiziente Alternative zu {@link Properties#translatedProperty(Property, Getter, Getter) Properties.translatedProperty(property,
 	 * Translators.toTargetGetter(translator), Translators.toSourceGetter(translator))}.
 	 *
 	 * @see Translators#toTargetGetter(Translator)
 	 * @see Translators#toSourceGetter(Translator) */
-	@SuppressWarnings ("javadoc")
 	public static <GSource, GTarget> Property<GTarget> translatedProperty(final Property<GSource> property, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
 		return new TranslatedProperty<>(property, translator);
 	}
 
-	/** Diese Methode gibt ein übersetztes {@link Property} zurück, welches die gegebenen {@link Getter} zum Parsen und Formatieren nutzt.
-	 * <p>
-	 * Das erzeugte {@link Property} liefert beim Lesen den (externen) Wert, der gemäß dem gegebenen {@link Getter Leseformat} {@code getFormat} aus dem über das
-	 * gegebene {@link Property Datenfeld} ermittelten (internen) Wert berechnet wird. Beim Schreiben eines (externen) Werts wird dieser gemäß dem gegebenen
-	 * {@link Getter Schreibformat} {@code setFormat} in einen (internen) Wert überfüght, welcher anschließend an das gegebene {@link Property Datenfeld}
-	 * delegiert wird.
+	/** Diese Methode gibt ein übersetztes {@link Property} zurück, welches die gegebenen {@link Getter} zum Parsen und Formatieren nutzt. Das erzeugte
+	 * {@link Property} liefert beim Lesen den Wert, der mit Hilfe des gegebenen {@link Getter} {@code toTarget} aus dem über das gegebene {@link Property}
+	 * ermittelten Wert berechnet wird. Beim Schreiben eines Werts wird dieser über den gegebenen {@link Getter} {@code toSource} in einen Wert überfüght, welcher
+	 * anschließend an das gegebene {@link Property} delegiert wird.
 	 *
 	 * @see Producers#translatedProducer(Getter, Producer)
 	 * @see Consumers#translatedConsumer(Getter, Consumer)
 	 * @param <GTarget> Typ des Werts der erzeugten Eigenschaft.
 	 * @param <GSource> Typ des Werts der gegebenen Eigenschaft.
 	 * @param property Eigenschaft.
-	 * @param toTarget {@link Getter} zum Umwandeln des internen in den externen Wert zum Lesen.
-	 * @param toSource {@link Getter} zum Umwandeln des externen in den internen Wert zum Schreiben.
+	 * @param toTarget {@link Getter} zum Übersetzen des Wert beim Lesen.
+	 * @param toSource {@link Getter} zum Übersetzen des Wert beim Schreiben.
 	 * @return {@code translated}-{@link Property}.
 	 * @throws NullPointerException Wenn {@code property}, {@code toTarget} bzw. {@code toSource} {@code null} ist. */
 	public static <GSource, GTarget> Property<GTarget> translatedProperty(final Property<GSource> property,
@@ -372,13 +376,12 @@ public class Properties {
 		return new CompositeProperty<>(producer, consumer);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizedProperty(Object, Property) Properties.synchronizedProperty(property, property)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode ist eine Abkürzung für {@link Properties#synchronizedProperty(Object, Property) Properties.synchronizedProperty(property, property)}. */
 	public static <GValue> Property<GValue> synchronizedProperty(final Property<GValue> property) throws NullPointerException {
 		return Properties.synchronizedProperty(property, property);
 	}
 
-	/** Diese Methode gibt ein {@link Property} zurück, welches das gegebene {@link Property} via {@code synchronized(mutex)} synchronisiert. Wenn das
+	/** Diese Methode gibt ein {@link Property} zurück, welches das gegebene {@link Property} über {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird das erzeugte {@link Property} als Synchronisationsobjekt verwendet.
 	 *
 	 * @param <GValue> Typ des Werts der Eigenschaft.

@@ -7,7 +7,7 @@ import bee.creative.array.ByteArraySection;
 import bee.creative.util.Bytes;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einer {@link ByteArraySection}. Die Dekidierung der Zahlen erfolgt via {@link Bytes} und
+/** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einer {@link ByteArraySection}. Die Dekidierung der Zahlen erfolgt über {@link Bytes} und
  * damit in {@link ByteOrder#BIG_ENDIAN}.
  *
  * @see ByteArraySection

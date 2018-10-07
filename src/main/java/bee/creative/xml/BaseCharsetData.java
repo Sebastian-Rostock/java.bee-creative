@@ -7,7 +7,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import bee.creative.util.Builders.BaseValueBuilder;
 
 /** Diese Klasse implementiert den Konfigurator eines {@link Charset}.<br>
- * Initialisiert wird dieses {@link Charset} via {@link #useDEFAULT()}.
+ * Initialisiert wird dieses {@link Charset} über {@link #useDEFAULT()}.
  *
  * @see Charset#forName(String)
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

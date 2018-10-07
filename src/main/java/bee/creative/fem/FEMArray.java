@@ -521,11 +521,9 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return new ConcatArray(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length() - offset)}.
+	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.
 	 *
-	 * @see #length()
-	 * @see #section(int, int) */
-	@SuppressWarnings ("javadoc")
+	 * @see #length() */
 	public FEMArray section(final int offset) throws IllegalArgumentException {
 		return this.section(offset, this.length - offset);
 	}

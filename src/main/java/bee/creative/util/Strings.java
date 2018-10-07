@@ -477,7 +477,7 @@ public class Strings {
 		return Strings.applyAll(pattern, string, true, true);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe via {@link Pattern#compile(String, int)} in einen kompilierten regulären Ausdruck
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe über {@link Pattern#compile(String, int)} in einen kompilierten regulären Ausdruck
 	 * umwandelt.
 	 *
 	 * @see Pattern#compile(String, int)

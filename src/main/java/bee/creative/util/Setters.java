@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,24 +16,19 @@ import bee.creative.util.Objects.BaseObject;
 public class Setters {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Setter} als {@link BaseObject}. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseSetter<GItem, GValue> extends BaseObject implements Setter<GItem, GValue> {
 	}
 
 	/** Diese Klasse implementiert {@link Setters#nativeSetter(Method)} */
 	@SuppressWarnings ("javadoc")
-	public static class MethodSetter<GItem, GValue> extends BaseSetter<GItem, GValue> {
+	public static class NativeSetter<GItem, GValue> extends BaseSetter<GItem, GValue> {
 
 		public final Method method;
 
-		public MethodSetter(final Method method) {
-			if (Modifier.isStatic(method.getModifiers())) {
-				if (method.getParameterTypes().length != 2) throw new IllegalArgumentException();
-			} else {
-				if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
-			}
+		public NativeSetter(final Method method, final boolean forceAccessible) {
+			if (method.getParameterTypes().length != (Modifier.isStatic(method.getModifiers()) ? 2 : 1)) throw new IllegalArgumentException();
 			try {
-				method.setAccessible(true);
+				method.setAccessible(forceAccessible);
 			} catch (final SecurityException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -54,7 +50,7 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, Natives.formatMethod(this.method));
+			return Objects.toInvokeString(this, this.method, this.method.isAccessible());
 		}
 
 	}
@@ -249,61 +245,84 @@ public class Setters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#emptyField() Fields.emptyField()}. */
-	@SuppressWarnings ("javadoc")
 	public static Setter<Object, Object> emptySetter() {
 		return Fields.emptyField();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(Natives.parse(methodText))}, wobei eine {@link Class} bzw. ein {@link Constructor} zu
+	/** Diese Methode ist eine Abkürzung für {@link Setters#nativeSetter(String, boolean) Setters.nativeSetter(memberPath, true)}. */
+	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final String memberPath) throws NullPointerException, IllegalArgumentException {
+		return Setters.nativeSetter(memberPath, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(Natives.parse(methodPath))}, wobei eine {@link Class} bzw. ein {@link Constructor} zu
 	 * einer Ausnahme führt.
 	 *
-	 * @see #nativeSetter(java.lang.reflect.Field)
-	 * @see #nativeSetter(java.lang.reflect.Method)
 	 * @see Natives#parseMethod(String)
+	 * @see Setters#nativeSetter(java.lang.reflect.Field, boolean)
+	 * @see Setters#nativeSetter(Method, boolean)
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param memberText Feld- oder Methodentext.
+	 * @param memberPath Pfad einer Methode oder eines Datenfelds.
+	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@link Natives#parse(String)}, {@link #nativeSetter(java.lang.reflect.Field)} bzw.
-	 *         {@link #nativeSetter(java.lang.reflect.Method)} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@link Natives#parse(String)}, {@link #nativeSetter(java.lang.reflect.Field, boolean)} bzw.
+	 *         {@link #nativeSetter(Method, boolean)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
-	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final String memberText) throws NullPointerException, IllegalArgumentException {
-		final Object object = Natives.parse(memberText);
-		if (object instanceof java.lang.reflect.Field) return Setters.nativeSetter((java.lang.reflect.Field)object);
-		if (object instanceof java.lang.reflect.Method) return Setters.nativeSetter((java.lang.reflect.Method)object);
+	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final String memberPath, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		final Object object = Natives.parse(memberPath);
+		if (object instanceof java.lang.reflect.Field) return Setters.nativeSetter((java.lang.reflect.Field)object, forceAccessible);
+		if (object instanceof Method) return Setters.nativeSetter((Method)object, forceAccessible);
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(java.lang.reflect.Field) Fields.nativeField(field)}. */
-	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
 		return Fields.nativeField(field);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(java.lang.reflect.Field, boolean) Fields.nativeField(field, forceAccessible)}. */
+	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final java.lang.reflect.Field field, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(field, forceAccessible);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String) Fields.nativeField(fieldOwner, fieldName)}. */
-	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Class<? extends GItem> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
 		return Fields.nativeField(fieldOwner, fieldName);
 	}
 
-	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, forceAccessible)}. */
+	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Class<? extends GItem> fieldOwner, final String fieldName,
+		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(fieldOwner, fieldName, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Setters#nativeSetter(Method, boolean) Setters.nativeSetter(method, true)}. */
+	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Method method) throws NullPointerException, IllegalArgumentException {
+		return Setters.nativeSetter(method, true);
+	}
+
+	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link Method nativen Methode} zurück.<br>
 	 * Bei einer Klassenmethode erfolgt das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item} über
 	 * {@code method.invoke(null, item, value)}, bei einer Objektmethode hingegen über {@code method.invoke(item, value)}.
 	 *
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @see Method#invoke(Object, Object...)
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param method Methode zum Schreiben der Eigenschaft.
+	 * @param method Methode zum Schreiben des Werts der Eigenschaft.
+	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
-	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final java.lang.reflect.Method method)
+	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Method method, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return new MethodSetter<>(method);
+		return new NativeSetter<>(method, forceAccessible);
 	}
 
-	/** Diese Methode einen {@link Setter} zurück, der den Datensatz nur dann an den gegebenen {@link Setter} delegiert, wenn diese nicht {@code null} ist.
+	/** Diese Methode einen {@link Setter} zurück, der Datensatz und Wert nur dann dann an den gegebenen {@link Setter} delegiert, wenn der Datensatz nicht
+	 * {@code null} ist.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
@@ -315,7 +334,7 @@ public class Setters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#mappingField(Map) Fields.mappingField(mapping)}. */
-	@SuppressWarnings ({"javadoc", "unchecked"})
+	@SuppressWarnings ("unchecked")
 	public static <GItem, GValue> Setter<GItem, GValue> mappingSetter(final Map<? super GItem, ? super GValue> mapping) {
 		return (Setter<GItem, GValue>)Fields.mappingField(mapping);
 	}
@@ -369,7 +388,6 @@ public class Setters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #aggregatedSetter(Getter, Setter) Setters.aggregatedSetter(Getters.neutralGetter(), setter)}. **/
-	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<Iterable<? extends GItem>, GValue> aggregatedSetter(final Setter<? super GItem, GValue> setter)
 		throws NullPointerException {
 		return Setters.aggregatedSetter(Getters.<GValue>neutralGetter(), setter);
@@ -393,12 +411,11 @@ public class Setters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronizedSetter(Object, Setter) Setters.synchronizedSetter(setter, setter)}. */
-	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Setter<GItem, GValue> synchronizedSetter(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
 		return Setters.synchronizedSetter(setter, setter);
 	}
 
-	/** Diese Methode gibt einen {@link Setter} zurück, welcher den gegebenen {@link Setter} via {@code synchronized(mutex)} synchronisiert. Wenn das
+	/** Diese Methode gibt einen {@link Setter} zurück, welcher den gegebenen {@link Setter} über {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Setter} als Synchronisationsobjekt verwendet.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
@@ -412,15 +429,13 @@ public class Setters {
 		return new SynchronizedSetter<>(mutex, setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#compositeField(Getter, Setter) Fields.compositeField(Fields.emptyField(), setter)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode ist eine Abkürzung für {@link Fields#compositeField(Getter, Setter) Fields.compositeField(Getters.emptyGetter(), setter)}. */
 	public static <GItem, GValue> Field<GItem, GValue> toField(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
-		return Fields.compositeField(Fields.<GValue>emptyField(), setter);
+		return Fields.compositeField(Getters.<GValue>emptyGetter(), setter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toConsumer(Object, Setter) Setters.toConsumer(null, setter)}. */
-	@SuppressWarnings ("javadoc")
-	public static <GValue> Consumer<GValue> toConsumer(final Setter<Object, ? super GValue> setter) {
+	public static <GItem, GValue> Consumer<GValue> toConsumer(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
 		return Setters.toConsumer(null, setter);
 	}
 
@@ -428,11 +443,11 @@ public class Setters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts.
-	 * @param item Eingabe.
+	 * @param item Datensatz.
 	 * @param setter {@link Setter}.
 	 * @return {@link Setter}-{@link Consumer}.
 	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
-	public static <GItem, GValue> Consumer<GValue> toConsumer(final GItem item, final Setter<? super GItem, ? super GValue> setter) {
+	public static <GItem, GValue> Consumer<GValue> toConsumer(final GItem item, final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
 		return new SetterConsumer<>(item, setter);
 	}
 

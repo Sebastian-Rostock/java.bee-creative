@@ -405,20 +405,16 @@ public abstract class FEMFunction {
 		return new ConcatFunction(this, params.clone());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.concat(params.toArray(new FEMFunction[params.size()]))}.
+	/** Diese Methode ist eine Abkürzung für {@link #concat(FEMFunction...) this.concat(params.toArray(new FEMFunction[params.size()]))}.
 	 *
-	 * @see #concat(FEMFunction...)
 	 * @see Collection#toArray(Object[]) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFunction concat(final List<? extends FEMFunction> params) throws NullPointerException {
 		return this.concat(params.toArray(new FEMFunction[params.size()]));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.concat(Iterables.toList(params))}.
+	/** Diese Methode ist eine Abkürzung für {@link #concat(List) this.concat(Iterables.toList(params))}.
 	 *
-	 * @see #concat(List)
 	 * @see Iterables#toList(Iterable) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFunction concat(final Iterable<? extends FEMFunction> params) throws NullPointerException {
 		return this.concat(Iterables.toList(params));
 	}
@@ -435,20 +431,16 @@ public abstract class FEMFunction {
 		return new CompositeFunction(this, params.clone());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.compose(params.toArray(new FEMFunction[params.size()]))}.
+	/** Diese Methode ist eine Abkürzung für {@link #compose(FEMFunction...) this.compose(params.toArray(new FEMFunction[params.size()]))}.
 	 *
-	 * @see #compose(FEMFunction...)
 	 * @see Collection#toArray(Object[]) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFunction compose(final List<? extends FEMFunction> params) throws NullPointerException {
 		return this.compose(params.toArray(new FEMFunction[params.size()]));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.compose(Iterables.toList(params))}.
+	/** Diese Methode ist eine Abkürzung für {@link #compose(List) this.compose(Iterables.toList(params))}.
 	 *
-	 * @see #compose(List)
 	 * @see Iterables#toList(Iterable) */
-	@SuppressWarnings ("javadoc")
 	public final FEMFunction compose(final Iterable<? extends FEMFunction> params) throws NullPointerException {
 		return this.compose(Iterables.toList(params));
 	}

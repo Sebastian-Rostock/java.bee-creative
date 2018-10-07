@@ -475,7 +475,7 @@ class ListData<GKey, GValue> {
 	 * werden muss, wird versucht, die wenigen Elemente vor bzw. nach dem gegebenen Index um die gegebene Anzahl zu verschieben. Reicht der verfügbare Platz zum
 	 * Verschieben dieser wenigen Elemente nicht aus, so werden alle Elemente verschoben und der Ausrichtung entsprechend im internen Array ausgerichtet. Wenn die
 	 * Größe des internen Arrays dagegen angepasst werden muss, werden ein neues Array mit passender Größe erzeugt und die Elemente des internen Arrays der
-	 * Ausrichtung entsprechend in das neue Array kopiert. Die benötigte Größe wird via ArrayData#customNewCapacity(int) ermittelt.
+	 * Ausrichtung entsprechend in das neue Array kopiert. Die benötigte Größe wird über ArrayData#customNewCapacity(int) ermittelt.
 	 *
 	 * @param index Index des ersten neuen Elements.
 	 * @param count Anzahl der neuen Elemente.

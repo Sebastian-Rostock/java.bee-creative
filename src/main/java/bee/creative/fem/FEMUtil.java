@@ -16,7 +16,7 @@ public abstract class FEMUtil {
 	public static final Map<String, FEMFunction> INSTANCES = Builders.MapBuilder.<String, FEMFunction>forHashMap().toSynchronized().get();
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (condition: FEMBoolean; trueResult: FEMValue; falseResult: FEMValue): FEMValue}, deren
-	 * Ergebniswert via {@code (condition ? trueResult : falseResult)} ermittelt wird. */
+	 * Ergebniswert über {@code (condition ? trueResult : falseResult)} ermittelt wird. */
 	public static final FEMFunction IF = FEMUtil.put(new FEMFunction() {
 
 		@Override
@@ -57,7 +57,7 @@ public abstract class FEMUtil {
 
 	}, "get", "GET");
 
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (value: FEMValue): FEMVariable}, deren Ergebniswert via {@code FEMVariable.from(value)}
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (value: FEMValue): FEMVariable}, deren Ergebniswert über {@code FEMVariable.from(value)}
 	 * ermittelt wird. */
 	public static final FEMFunction VAR = FEMUtil.put(new FEMFunction() {
 
@@ -141,7 +141,7 @@ public abstract class FEMUtil {
 
 	}, "repeat", "REPEAT");
 
-	/** Diese Methode gibt die via {@link #put(FEMFunction, String...)} unter dem gegebenen Namen registrierte Funktion bzw. {@code null} zurück.<br>
+	/** Diese Methode gibt die über {@link #put(FEMFunction, String...)} unter dem gegebenen Namen registrierte Funktion bzw. {@code null} zurück.<br>
 	 * Sie ist eine Abkürzung für {@code INSTANCES.get(name)}.
 	 *
 	 * @param name Name.

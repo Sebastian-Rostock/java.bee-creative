@@ -22,10 +22,10 @@ public class Consumers {
 
 		public final Method method;
 
-		public NativeConsumer(final java.lang.reflect.Method method) {
+		public NativeConsumer(final Method method, final boolean forceAccessible) {
 			if (!Modifier.isStatic(method.getModifiers()) || (method.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			try {
-				method.setAccessible(true);
+				method.setAccessible(forceAccessible);
 			} catch (final SecurityException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -128,45 +128,67 @@ public class Consumers {
 		return Properties.emptyProperty();
 	}
 
+	public static <GValue> Consumer<GValue> nativeConsumer(final String memberText) throws NullPointerException, IllegalArgumentException {
+		return Consumers.nativeConsumer(memberText, true);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@code nativeProducer(Natives.parse(memberText))}, wobei eine {@link Class} bzw. ein {@link Constructor} zu einer
 	 * Ausnahme führt.
 	 *
 	 * @see Natives#parse(String)
 	 * @see #nativeConsumer(java.lang.reflect.Field)
-	 * @see #nativeConsumer(java.lang.reflect.Method)
+	 * @see #nativeConsumer(Method)
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param memberText Methoden- oder Konstruktortext.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
-	public static <GValue> Consumer<GValue> nativeConsumer(final String memberText) throws NullPointerException, IllegalArgumentException {
+	public static <GValue> Consumer<GValue> nativeConsumer(final String memberText, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberText);
-		if (object instanceof java.lang.reflect.Field) return Consumers.nativeConsumer((java.lang.reflect.Field)object);
-		if (object instanceof java.lang.reflect.Method) return Consumers.nativeConsumer((java.lang.reflect.Method)object);
+		if (object instanceof java.lang.reflect.Field) return Consumers.nativeConsumer((java.lang.reflect.Field)object, forceAccessible);
+		if (object instanceof Method) return Consumers.nativeConsumer((Method)object, forceAccessible);
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code Properties.nativeProperty(field)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Field field) {
+		return Consumers.nativeConsumer(field, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Properties.nativeProperty(field)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Field field, final boolean forceAccessible) {
 		return Properties.nativeProperty(field);
 	}
 
-	/** Diese Methode gibt einen {@link Consumer} zur gegebenen {@link java.lang.reflect.Method nativen statischen Methode} zurück.<br>
+	/** Diese Methode gibt einen {@link Consumer} zur gegebenen {@link Method nativen statischen Methode} zurück.<br>
 	 * Das Schreiben des Werts {@code value} erfolgt über {@code method.invoke(null, value)}.
 	 *
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @see Method#invoke(Object, Object...)
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param method Methode zum Schreiben der Eigenschaft.
 	 * @return {@code native}-{@link Consumer}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
-	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Method method) {
+	public static <GValue> Consumer<GValue> nativeConsumer(final Method method) {
 		return new NativeConsumer<>(method);
 	}
-	
-	
-	
+
+	/** Diese Methode gibt einen {@link Consumer} zur gegebenen {@link Method nativen statischen Methode} zurück.<br>
+	 * Das Schreiben des Werts {@code value} erfolgt über {@code method.invoke(null, value)}.
+	 *
+	 * @see Method#invoke(Object, Object...)
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param method Methode zum Schreiben der Eigenschaft.
+	 * @return {@code native}-{@link Consumer}.
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
+	public static <GValue> Consumer<GValue> nativeConsumer(final Method method, final boolean forceAccessible) {
+		return new NativeConsumer<>(method, forceAccessible);
+	}
+
 	/** Diese Methode gibt einen umgewandelten {@link Consumer} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Getter} in dem Datensatz des gegebenen
 	 * {@link Consumer} überführt wird.
 	 *
@@ -176,7 +198,6 @@ public class Consumers {
 	 * @param consumer {@link Consumer}.
 	 * @return {@code translated}-{@link Consumer}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code producer} {@code null} ist. */
-
 
 	public static <GTarget, GSource> Consumer<GTarget> translatedConsumer(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Consumer<? super GSource> consumer) {
@@ -191,7 +212,7 @@ public class Consumers {
 		return Consumers.synchronizedConsumer(consumer, consumer);
 	}
 
-	/** Diese Methode gibt einen {@link Consumer} zurück, welcher den gegebenen {@link Consumer} via {@code synchronized(mutex)} synchronisiert. Wenn das
+	/** Diese Methode gibt einen {@link Consumer} zurück, welcher den gegebenen {@link Consumer} über {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Consumer} als Synchronisationsobjekt verwendet.
 	 *
 	 * @param <GValue> Typ des Werts der Eigenschaft.

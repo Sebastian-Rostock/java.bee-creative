@@ -197,11 +197,9 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	 * @return Anzahl der Elemente. */
 	public abstract int itemCount();
 
-	/** Diese Methode ist eine Abkürzung für {@code this.find(IAMArray.from(item))}.
+	/** Diese Methode ist eine Abkürzung für {@link #find(IAMArray) this.find(IAMArray.from(item))}.
 	 *
-	 * @see #find(IAMArray)
 	 * @see IAMArray#from(int...) */
-	@SuppressWarnings ("javadoc")
 	public final int find(final int... item) throws NullPointerException {
 		return this.find(IAMArray.from(item));
 	}

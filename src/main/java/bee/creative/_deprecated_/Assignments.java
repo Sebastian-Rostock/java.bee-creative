@@ -239,7 +239,7 @@ public class Assignments {
 		return new ParentAssignment();
 	}
 
-	/** Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Schlüsseln und Werten der Einträge
+	/** Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle über {@link Assignment#get(Object)} zu den Schlüsseln und Werten der Einträge
 	 * der gegebenen Quellabbildung ermittelten Schlüssel-Wert-Paare in die Zielabbildung ein. Die Implementation entspricht: <pre>
 	 * target.clear();
 	 * for(Entry<GKey, GValue> entry: source.entrySet())target.put(assigner.get(entry.getKey()), assigner.get(entry.getValue()));
@@ -263,7 +263,7 @@ public class Assignments {
 		}
 	}
 
-	/** Diese Methode leert die gegebenen Zielsammlung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Elemente der gegebenen Quellsammlung
+	/** Diese Methode leert die gegebenen Zielsammlung und fügt anschließend alle über {@link Assignment#get(Object)} zu den Elemente der gegebenen Quellsammlung
 	 * ermittelten Zielobjekte in die Zielsammlung ein. Die Implementation entspricht: <pre>
 	 * target.clear();
 	 * for(GValue value: source)target.add(assigner.get(value));

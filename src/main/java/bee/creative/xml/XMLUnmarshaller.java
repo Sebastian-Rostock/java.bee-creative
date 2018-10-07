@@ -70,7 +70,6 @@ public final class XMLUnmarshaller {
 	 *
 	 * @see #from(Class...)
 	 * @see #unmarshalNode(Node) */
-	@SuppressWarnings ("javadoc")
 	public static Object unmarshalNode(final Node source, final Class<?>... classes) throws SAXException, JAXBException {
 		return XMLUnmarshaller.from(classes).unmarshalNode(source);
 	}
@@ -79,7 +78,6 @@ public final class XMLUnmarshaller {
 	 *
 	 * @see #from(Class...)
 	 * @see #unmarshalString(String) */
-	@SuppressWarnings ("javadoc")
 	public static Object unmarshalString(final String source, final Class<?>... classes) throws SAXException, JAXBException {
 		return XMLUnmarshaller.from(classes).unmarshalString(source);
 	}

@@ -2,46 +2,8 @@ package bee.creative.util;
 
 /** Diese Klasse implementiert grundlegende {@link Translator}.
  *
- * @see Translator
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Translators {
-
-	/** Diese Klasse implementiert {@link Translators#neutralTranslator(Class)}. */
-	@SuppressWarnings ("javadoc")
-	public static class NeutralTranslator<GValue> implements Translator<GValue, GValue> {
-
-		public final Class<GValue> valueClass;
-
-		public NeutralTranslator(final Class<GValue> valueClass) throws NullPointerException {
-			this.valueClass = Objects.notNull(valueClass);
-		}
-
-		@Override
-		public boolean isTarget(final Object object) {
-			return this.valueClass.isInstance(object);
-		}
-
-		@Override
-		public boolean isSource(final Object object) {
-			return this.valueClass.isInstance(object);
-		}
-
-		@Override
-		public GValue toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.valueClass.cast(object);
-		}
-
-		@Override
-		public GValue toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.valueClass.cast(object);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.valueClass);
-		}
-
-	}
 
 	/** Diese Klasse implementiert {@link Translators#reverseTranslator(Translator)}. */
 	@SuppressWarnings ("javadoc")
@@ -303,16 +265,13 @@ public class Translators {
 
 	}
 
-	/** Diese Methode gibt einen neutralen {@link Translator} zurück, dessen Quellobjekte gleich seinen Zielobjekten sind.<br>
-	 * Die Methoden {@link Translator#isSource(Object)} und {@link Translator#isTarget(Object)} delegieren an {@link Class#isInstance(Object)}. Die Methoden
-	 * {@link Translator#toSource(Object)} und {@link Translator#toTarget(Object)} delegieren an {@link Class#cast(Object)}.
+	/** Diese Methode gibt einen neutralen {@link Translator} zurück und ist eine Abkürzung für
+	 * {@link Translators#compositeTranslator(Class, Class, Getter, Getter) Translators.compositeTranslator(valueClass, valueClass,
+	 * Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter())}.
 	 *
-	 * @param <GValue> Typ der Quell- und Zielobjekte.
-	 * @param valueClass {@link Class} der Quell- und Zielobjekte.
-	 * @return {@code neutral}-{@link Translator}.
-	 * @throws NullPointerException Wenn {@code valueClass} {@code null} ist. */
+	 * @see Getters#neutralGetter() */
 	public static <GValue> Translator<GValue, GValue> neutralTranslator(final Class<GValue> valueClass) throws NullPointerException {
-		return new NeutralTranslator<>(valueClass);
+		return Translators.compositeTranslator(valueClass, valueClass, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter());
 	}
 
 	/** Diese Methode gibt einen {@link Translator} zurück, der die Übersetzung des gegebenen {@link Translator} umkehrt, d.h. dessen Quellobjekte gleich den
@@ -328,7 +287,7 @@ public class Translators {
 	}
 
 	/** Diese Methode gibt einen verkettenden {@link Translator} zurück, welcher Quellobjekte über {@code translator2.toTarget(translator1.toTarget(object))} in
-	 * Zielobjekte bzw. Zielobjekte über {@code translator1.toSource(translator2.toSource(object))} in Quellobjekte überführt.
+	 * Zielobjekte sowei Zielobjekte über {@code translator1.toSource(translator2.toSource(object))} in Quellobjekte überführt.
 	 *
 	 * @param <GSource> Typ der Quellobjekte des erzeugten sowie des ersten {@link Translator}.
 	 * @param <GCenter> Typ der Zielobjekte des ersten sowie der Quellobjekte zweiten {@link Translator}.
@@ -342,7 +301,7 @@ public class Translators {
 		return new ChainedTranslator<>(translator1, translator2);
 	}
 
-	/** Diese Methode gibt einen zusammengesetzten {@link Translator} zurück, dessen Metoden an die gegebenen Objekte delegieren.<br>
+	/** Diese Methode gibt einen zusammengesetzten {@link Translator} zurück, dessen Metoden an die entsprechenden der gegebenen Objekte delegieren.<br>
 	 * Die Methoden {@link Translator#isSource(Object)} und {@link Translator#isTarget(Object)} delegieren an {@link Class#isInstance(Object)} der gegebenen
 	 * Klassen. Die Methoden {@link Translator#toSource(Object)} und {@link Translator#toTarget(Object)} delegieren an {@link Class#cast(Object)} der gegebenen
 	 * Klassen sowie {@link Getter#get(Object)} der gegebenen Konvertierungsmethode.
@@ -361,7 +320,6 @@ public class Translators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronizedTranslator(Object, Translator) Translators.synchronizedTranslator(translator, translator)}. */
-	@SuppressWarnings ("javadoc")
 	public static <GSource, GTarget> Translator<GSource, GTarget> synchronizedTranslator(final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
 		return Translators.synchronizedTranslator(translator, translator);
@@ -376,27 +334,27 @@ public class Translators {
 	 * @param mutex Synchronisationsobjekt oder {@code null}.
 	 * @param translator {@link Translator}.
 	 * @return {@code synchronized}-{@link Translator}.
-	 * @throws NullPointerException Wenn der {@code translator} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
 	public static <GSource, GTarget> Translator<GSource, GTarget> synchronizedTranslator(final Object mutex, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
 		return new SynchronizedTranslator<>(mutex, translator);
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isSource(Object)} des gegebenen {@link Translator} zurück.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code translator.isSource(input)}.
+	 * Die Akzeptanz eines Datensatzes {@code item} ist {@code translator.isSource(item)}.
 	 *
 	 * @param translator {@link Translator}.
-	 * @return {@link Filter}, der nur Quellobjekte von {@code translator} akzeptiert.
+	 * @return {@link Filter}, der nur Quellobjekte des {@code translator} akzeptiert.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
 	public static Filter<Object> toSourceFilter(final Translator<?, ?> translator) throws NullPointerException {
 		return new SourceFilter(translator);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück.<br>
-	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code translator.toSource(input)}.
+	 * Für einen Datensatz {@code item} liefert er den Wert {@code translator.toSource(item)}.
 	 *
-	 * @param <GSource> Typ der Quellobjekte des {@link Translator}.
-	 * @param <GTarget> Typ der Zielobjekte des {@link Translator}.
+	 * @param <GSource> Typ der Quellobjekte des {@link Translator} sowie des Werts des erzeugten {@link Getter}.
+	 * @param <GTarget> Typ der Zielobjekte des {@link Translator} sowie des Datensatzes des erzeugten {@link Getter}.
 	 * @param translator {@link Translator}.
 	 * @return {@link Getter}, der Zielobjekte in Quellobjekte des {@code translator} umwandelt.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
@@ -406,20 +364,20 @@ public class Translators {
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isTarget(Object)} des gegebenen {@link Translator} zurück.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code translator.isTarget(input)}.
+	 * Die Akzeptanz eines Datensatzes {@code item} ist {@code translator.isTarget(item)}.
 	 *
 	 * @param translator {@link Translator}.
-	 * @return {@link Filter}, der nur Zielobjekte von {@code translator} akzeptiert.
+	 * @return {@link Filter}, der nur Zielobjekte des {@code translator} akzeptiert.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
 	public static Filter<Object> toTargetFilter(final Translator<?, ?> translator) throws NullPointerException {
 		return new TargetFilter(translator);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toTarget(Object)} des gegebenen {@link Translator} zurück.<br>
-	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code translator.toTarget(input)}.
+	 * Für einen Datensatz {@code item} liefert er den Wert {@code translator.toTarget(item)}.
 	 *
-	 * @param <GSource> Typ der Quellobjekte des {@link Translator}.
-	 * @param <GTarget> Typ der Zielobjekte des {@link Translator}.
+	 * @param <GSource> Typ der Quellobjekte des {@link Translator} sowie des Datensatzes des erzeugten {@link Getter}.
+	 * @param <GTarget> Typ der Zielobjekte des {@link Translator} sowie des Werts des erzeugten {@link Getter}.
 	 * @param translator {@link Translator}.
 	 * @return {@link Getter}, der Quellobjekte in Zielobjekte des {@code translator} umwandelt.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */

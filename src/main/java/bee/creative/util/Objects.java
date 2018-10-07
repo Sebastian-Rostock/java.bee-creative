@@ -423,7 +423,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
-	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via {@link Objects#equals(Object, Object)} ermittelt.
+	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird über {@link Objects#equals(Object, Object)} ermittelt.
 	 *
 	 * @see Objects#equals(Object, Object)
 	 * @param objects1 Array 1 oder {@code null}.
@@ -562,7 +562,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
-	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via {@link Objects#deepEquals(Object, Object)} ermittelt. Für Arrays
+	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird über {@link Objects#deepEquals(Object, Object)} ermittelt. Für Arrays
 	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 *
 	 * @see Objects#deepEquals(Object, Object)
@@ -613,7 +613,7 @@ public class Objects {
 		return new StringObject(string);
 	}
 
-	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten
+	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der über {@link Objects#toString(boolean, Object)} ermittelten
 	 * Textdarstelung des gegebenen Objekts entspricht.
 	 *
 	 * @see Objects#toString(boolean, Object)

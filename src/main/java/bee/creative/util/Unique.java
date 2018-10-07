@@ -7,8 +7,8 @@ import java.util.TreeMap;
 
 /** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten.<br>
  * Dazu werden gegebene Eingabeobjekte mit daraus {@link #customBuild(Object) berechneten} Ausgabeobjekten über in einer {@link Map Abbildung} verwaltet. Wenn
- * via {@link #get(Object)} das mit einem gegebenen Eingabeobjekten assoziierte Ausgabeobjekt ermittelt werden soll und dieses zuvor bereits
- * {@link #customBuild(Object) erzeugt} wurde, wird dessen Wiederverwendung via {@link #customReuse(Object, Object)} signalisiert.
+ * über {@link #get(Object)} das mit einem gegebenen Eingabeobjekten assoziierte Ausgabeobjekt ermittelt werden soll und dieses zuvor bereits
+ * {@link #customBuild(Object) erzeugt} wurde, wird dessen Wiederverwendung über {@link #customReuse(Object, Object)} signalisiert.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GSource> Typ der Eingabe.
@@ -23,14 +23,14 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 
 		public final Setter<? super GSource, ? super GTarget> reuser;
 
-		public final Getter<? super GSource, ? extends GTarget> compiler;
+		public final Getter<? super GSource, ? extends GTarget> builder;
 
 		public TreeMapUnique(final Comparator<? super GSource> sorter, final Setter<? super GSource, ? super GTarget> reuser,
-			final Getter<? super GSource, ? extends GTarget> compiler) throws NullPointerException {
+			final Getter<? super GSource, ? extends GTarget> builder) throws NullPointerException {
 			super(new TreeMap<GSource, GTarget>(sorter));
 			this.sorter = Objects.notNull(sorter);
 			this.reuser = Objects.notNull(reuser);
-			this.compiler = Objects.notNull(compiler);
+			this.builder = Objects.notNull(builder);
 		}
 
 		@Override
@@ -40,7 +40,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 
 		@Override
 		public GTarget customBuild(final GSource source) {
-			return this.compiler.get(source);
+			return this.builder.get(source);
 		}
 
 		@Override
@@ -58,14 +58,14 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 
 		public final Setter<? super GSource, ? super GTarget> reuser;
 
-		public final Getter<? super GSource, ? extends GTarget> compiler;
+		public final Getter<? super GSource, ? extends GTarget> builder;
 
-		public HashMapUnique(final Hasher hasher, final Setter<? super GSource, ? super GTarget> reuser, final Getter<? super GSource, ? extends GTarget> compiler)
+		public HashMapUnique(final Hasher hasher, final Setter<? super GSource, ? super GTarget> reuser, final Getter<? super GSource, ? extends GTarget> builder)
 			throws NullPointerException {
 			super(HashMap2.<GSource, GTarget>from(hasher));
 			this.hasher = hasher;
 			this.reuser = Objects.notNull(reuser);
-			this.compiler = Objects.notNull(compiler);
+			this.builder = Objects.notNull(builder);
 		}
 
 		@Override
@@ -85,31 +85,35 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 
 		@Override
 		public GTarget customBuild(final GSource source) {
-			return this.compiler.get(source);
+			return this.builder.get(source);
 		}
 
 	}
 
 	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
 	 * fromTreeMap(Comparators.naturalComparator(), Getters.neutralGetter(), Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
-	public static <GSource extends Comparable<? super GSource>> Unique<GSource, GSource> fromTreeMap() throws NullPointerException {
+	public static <GSource extends Comparable<? super GSource>> Unique<GSource, GSource> fromTreeMap() {
 		return Unique.fromTreeMap(Comparators.<GSource>naturalComparator(), Getters.<GSource>neutralGetter(), Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
-	 * fromTreeMap(comparator, Getters.neutralGetter(), Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
-	public static <GSource> Unique<GSource, GSource> fromTreeMap(final Comparator<? super GSource> comparator) throws NullPointerException {
-		return Unique.fromTreeMap(comparator, Getters.<GSource>neutralGetter(), Setters.emptySetter());
+	 * fromTreeMap(sorter, Getters.neutralGetter(), Setters.emptySetter())}. */
+	public static <GSource> Unique<GSource, GSource> fromTreeMap(final Comparator<? super GSource> sorter) throws NullPointerException {
+		return Unique.fromTreeMap(sorter, Getters.<GSource>neutralGetter(), Setters.emptySetter());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter) fromTreeMap(Comparators.naturalComparator(), compiler,
-	 * Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
+	 * fromTreeMap(Comparators.naturalComparator(), builder, Setters.emptySetter())}. */
 	public static <GSource extends Comparable<? super GSource>, GTarget> Unique<GSource, GTarget> fromTreeMap(
-		final Getter<? super GSource, ? extends GTarget> compiler) throws NullPointerException {
-		return Unique.fromTreeMap(Comparators.<GSource>naturalComparator(), compiler, Setters.emptySetter());
+		final Getter<? super GSource, ? extends GTarget> builder) throws NullPointerException {
+		return Unique.fromTreeMap(Comparators.<GSource>naturalComparator(), builder, Setters.emptySetter());
+	}
+
+	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
+	 * fromTreeMap(sorter, builder, Setters.emptySetter())}. */
+	public static <GSource extends Comparable<? super GSource>, GTarget> Unique<GSource, GTarget> fromTreeMap(final Comparator<? super GSource> sorter,
+		final Getter<? super GSource, ? extends GTarget> builder) throws NullPointerException {
+		return Unique.fromTreeMap(sorter, builder, Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Comparator} miteinander verglichen und
@@ -117,62 +121,57 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	 *
 	 * @param <GSource> Typ der Eingabe.
 	 * @param <GTarget> Typ der Ausgabe.
-	 * @param sorter {@link Comparator} zur Ermittlung des Vergleichswerts der Eingaben in {@link #compare(Object, Object)}.
-	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
+	 * @param sorter {@link Comparator} zur Ermittlung der Ordnung der Eingaben in {@link #compare(Object, Object)}.
+	 * @param builder {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
 	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
-	 * @return streuwertbasiertes {@link Unique}.
+	 * @return ordnungsbasiertes {@link Unique}.
 	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
 	public static <GSource, GTarget> Unique<GSource, GTarget> fromTreeMap(final Comparator<? super GSource> sorter,
-		final Getter<? super GSource, ? extends GTarget> compiler, final Setter<? super GSource, ? super GTarget> reuser) throws NullPointerException {
-		return new TreeMapUnique<>(sorter, reuser, compiler);
+		final Getter<? super GSource, ? extends GTarget> builder, final Setter<? super GSource, ? super GTarget> reuser) throws NullPointerException {
+		return new TreeMapUnique<>(sorter, reuser, builder);
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
-	 * fromHashMap(Objects.OBJECT_HASHER, Getters.neutralGetter(), Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
+	 * fromHashMap(Objects.HASHER, Getters.neutralGetter(), Setters.emptySetter())}. */
 	public static <GSource> Unique<GSource, GSource> fromHashMap() {
 		return Unique.fromHashMap(Objects.HASHER, Getters.<GSource>neutralGetter(), Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
 	 * fromHashMap(hasher, Getters.neutralGetter(), Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
 	public static <GSource> Unique<GSource, GSource> fromHashMap(final Hasher hasher) throws NullPointerException {
 		return Unique.fromHashMap(hasher, Getters.<GSource>neutralGetter(), Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
-	 * fromHashMap(Objects.OBJECT_HASHER, compiler, Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
-	public static <GSource, GTarget> Unique<GSource, GTarget> fromHashMap(final Getter<? super GSource, ? extends GTarget> compiler) throws NullPointerException {
-		return Unique.fromHashMap(Objects.HASHER, compiler, Setters.emptySetter());
+	 * fromHashMap(Objects.HASHER, builder, Setters.emptySetter())}. */
+	public static <GSource, GTarget> Unique<GSource, GTarget> fromHashMap(final Getter<? super GSource, ? extends GTarget> builder) throws NullPointerException {
+		return Unique.fromHashMap(Objects.HASHER, builder, Setters.emptySetter());
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
-	 * fromHashMap(hasher, compiler, Setters.emptySetter())}. */
-	@SuppressWarnings ("javadoc")
-	public static <GSource, GTarget> Unique<GSource, GTarget> fromHashMap(final Hasher hasher, final Getter<? super GSource, ? extends GTarget> compiler)
+	 * fromHashMap(hasher, builder, Setters.emptySetter())}. */
+	public static <GSource, GTarget> Unique<GSource, GTarget> fromHashMap(final Hasher hasher, final Getter<? super GSource, ? extends GTarget> builder)
 		throws NullPointerException {
-		return Unique.fromHashMap(hasher, compiler, Setters.emptySetter());
+		return Unique.fromHashMap(hasher, builder, Setters.emptySetter());
 	}
 
-	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Filter} geprüft, über den gegebenen
-	 * {@link Hasher} miteinander verglichen und über den gegebenen {@link Getter} in die Ausgaben überführt werden. Die Wiederverwendung einer Ausgabe wird dem
-	 * gegebenen {@link Setter} signalisiert.
+	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück, dessen Eingaben über den gegebenen {@link Hasher} miteinander verglichen und über
+	 * den gegebenen {@link Getter} in die Ausgaben überführt werden. Die Wiederverwendung einer Ausgabe wird dem gegebenen {@link Setter} signalisiert.
 	 *
 	 * @param <GSource> Typ der Eingabe.
 	 * @param <GTarget> Typ der Ausgabe.
 	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}.
-	 * @param compiler {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
+	 * @param builder {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
 	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
 	 * @return streuwertbasiertes {@link Unique}.
 	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
-	public static <GSource, GTarget> Unique<GSource, GTarget> fromHashMap(final Hasher hasher, final Getter<? super GSource, ? extends GTarget> compiler,
+	public static <GSource, GTarget> Unique<GSource, GTarget> fromHashMap(final Hasher hasher, final Getter<? super GSource, ? extends GTarget> builder,
 		final Setter<? super GSource, ? super GTarget> reuser) throws NullPointerException {
-		return new HashMapUnique<>(hasher, reuser, compiler);
+		return new HashMapUnique<>(hasher, reuser, builder);
 	}
 
-	/** Dieses Feld bildet von Ein- auf Ausgabeobjekte ab. */
+	/** Dieses Feld bildet von Ein- auf Ausgaben ab. */
 	protected final Map<GSource, GTarget> mapping;
 
 	/** Dieser Konstruktor initialisiert die {@link #mapping() Abbildung} mit einer {@link HashMap2}. */
@@ -196,9 +195,8 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	}
 
 	/** Diese Methode gibt die mit der gegebenen Eingabe in der {@link #mapping() angebundenen Abbildung} assoziierte Ausgabe zurück.<br>
-	 * Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet {@link Map#get(Object) ist}, wird deren Wiederverwendung via
-	 * {@link Unique#customReuse(Object, Object)} signalisiert.<br>
-	 * Sollte der Eingabe noch keine Ausgabe zugeordnet sein, wird diese via {@link Unique#customBuild(Object)} erzeugt und mit der Eingabe
+	 * Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet {@link Map#get(Object) ist}, wird deren Wiederverwendung {@link #customReuse(Object, Object)
+	 * signalisiert}. Sollte der Eingabe noch keine Ausgabe zugeordnet sein, wird diese {@link #customBuild(Object) erzeugt} und mit der Eingabe
 	 * {@link Map#put(Object, Object) assoziiert}.
 	 *
 	 * @see Map#get(Object)
@@ -226,14 +224,14 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		this.mapping.put(source, target);
 	}
 
-	/** Diese Methode gibt die interne {@link Map} zurück.
+	/** Diese Methode gibt die angebundenen Abbildung zurück.
 	 *
-	 * @return {@link Map} der Einträge. */
+	 * @return Abbildung von Ein- auf Ausgaben. */
 	public Map<GSource, GTarget> mapping() {
 		return this.mapping;
 	}
 
-	/** Diese Methode kompiliert die gegebene Eingabe in die zugeordnete Ausgabe und gibt diese zurück.
+	/** Diese Methode überführt die gegebene Eingabe in die zugeordnete Ausgabe und gibt diese zurück.
 	 *
 	 * @see Unique#get(Object)
 	 * @param source Eingabe oder {@code null}.

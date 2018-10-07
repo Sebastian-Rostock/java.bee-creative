@@ -3,7 +3,7 @@ package bee.creative.xml.bind;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import bee.creative.fem.FEMInteger;
 
-/** Diese Klasse implementiert den {@link XmlAdapter} für {@link FEMInteger}, welcher einem Datenfeld via {@code @XmlJavaTypeAdapter(FEMIntegerAdapter.class)}
+/** Diese Klasse implementiert den {@link XmlAdapter} für {@link FEMInteger}, welcher einem Datenfeld über {@code @XmlJavaTypeAdapter(FEMIntegerAdapter.class)}
  * zugeordnet werden kann.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

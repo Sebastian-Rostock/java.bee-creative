@@ -752,11 +752,9 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return new ConcatBinary(this, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.section(offset, this.length() - offset)}.
+	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.
 	 *
-	 * @see #length()
-	 * @see #section(int, int) */
-	@SuppressWarnings ("javadoc")
+	 * @see #length() */
 	public FEMBinary section(final int offset) throws IllegalArgumentException {
 		return this.section(offset, this.length - offset);
 	}

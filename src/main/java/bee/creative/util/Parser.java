@@ -169,7 +169,7 @@ public class Parser {
 		this.target.setLength(0);
 	}
 
-	/** Diese Methode gibt die via {@link #take()}, {@link #take(int)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
+	/** Diese Methode gibt die über {@link #take()}, {@link #take(int)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
 	 *
 	 * @see #skip()
 	 * @see #take()

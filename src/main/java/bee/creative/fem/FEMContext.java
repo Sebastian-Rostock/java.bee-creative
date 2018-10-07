@@ -25,7 +25,7 @@ public class FEMContext {
 	 * Die {@link #valueFrom(Object)}-Methode dieses Kontextobjekts gibt einen gegebenen {@link FEMValue} unverändert zurück und konvertiert {@code null} zu
 	 * {@link FEMVoid}, {@code char[]} und {@link String} zu {@link FEMString}, {@code byte[]} zu {@link FEMBinary}, {@link Float}, {@link Double} und
 	 * {@link BigDecimal} zu {@link FEMDecimal}, alle anderen {@link Number} zu {@link FEMInteger}, {@link Boolean} zu {@link FEMBoolean}, {@link Calendar} zu
-	 * {@link FEMDatetime}, {@link FEMFunction} zu {@link FEMHandler} und alle anderen Eingaben via {@link #arrayFrom(Object)} in ein {@link FEMArray}. Im
+	 * {@link FEMDatetime}, {@link FEMFunction} zu {@link FEMHandler} und alle anderen Eingaben über {@link #arrayFrom(Object)} in ein {@link FEMArray}. Im
 	 * Fehlerfall löst sie eine {@link IllegalArgumentException} aus.
 	 * <p>
 	 * Die {@link #objectFrom(FEMValue)}-Methode dieses Kontextobjekts konvertiert {@link FEMVoid} zu {@code null}, {@link FEMArray} und die darin enthaltenen
@@ -34,7 +34,7 @@ public class FEMContext {
 	 * Nutzdatensatz}. */
 	public static final FEMContext EMPTY = new FEMContext();
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} über {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
 	 * Ausgabe überführt.
 	 *
 	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Getter}.
@@ -75,7 +75,7 @@ public class FEMContext {
 		return result;
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #arrayFrom(Object) valueFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} über {@link #arrayFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
 	 * @return {@code arrayFrom}-{@link Getter}. */
@@ -98,7 +98,7 @@ public class FEMContext {
 	/** Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.<br>
 	 * <ol>
 	 * <li>Wenn das Objekt ein {@link FEMArray} ist, wird es unverändert zurück gegeben.</li>
-	 * <li>Wenn es ein natives Array ist, wird jedes seiner Elemente via {@link #valueFrom(Object)} in einen Wert überführt und die so entstandene Wertliste
+	 * <li>Wenn es ein natives Array ist, wird jedes seiner Elemente über {@link #valueFrom(Object)} in einen Wert überführt und die so entstandene Wertliste
 	 * geliefert.</li>
 	 * <li>Wenn es eine {@link Collection} ist, wird diese in ein natives Array überführt, welches anschließend in eine Wertliste umgewandelt wird.</li>
 	 * <li>Wenn es ein {@link Iterable} ist, wird dieses in eine {@link Collection} überführt, welche anschließend in eine Wertliste umgewandelt wird.</li>
@@ -147,7 +147,7 @@ public class FEMContext {
 		return this.arrayFromImpl(data.toArray());
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} über {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
 	 * @return {@code valueFrom}-{@link Getter}. */
@@ -189,7 +189,7 @@ public class FEMContext {
 		return this.arrayFrom(object);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
+	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe {@code input} über {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
 	 * überführt.
 	 *
 	 * @return {@code objectFrom}-{@link Getter}. */
@@ -209,7 +209,7 @@ public class FEMContext {
 		};
 	}
 
-	/** Diese Methode gibt ein {@link Object} zurück, welches via {@link #valueFrom(Object)} in einen Wert überführt werden kann, der zum gegebenen Wert
+	/** Diese Methode gibt ein {@link Object} zurück, welches über {@link #valueFrom(Object)} in einen Wert überführt werden kann, der zum gegebenen Wert
 	 * äquivalenten ist.
 	 *
 	 * @see #valueFrom(Object)

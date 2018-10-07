@@ -52,7 +52,8 @@ public class Natives {
 	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktors oder eines Datenfelds.
 	 * @return Objekt zur Pfadangabe.
 	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link #parseMethod(String)} bzw. {@link #parseConstructor(String)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IllegalArgumentException Wenn {@link #parseClass}, {@link #parseField(String)}, {@link #parseMethod(String)} bzw. {@link #parseConstructor(String)}
+	 *         eine entsprechende Ausnahme auslöst. */
 	public static Object parse(final String memberPath) throws NullPointerException, IllegalArgumentException {
 		if (memberPath.endsWith(".class")) return Natives.parseClass(memberPath.substring(0, memberPath.length() - 6));
 		if (memberPath.contains(".new(")) return Natives.parseConstructor(memberPath);
@@ -237,7 +238,7 @@ public class Natives {
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Klasse} zurück.<br>
-	 * Diese wird via {@link Class#getCanonicalName()} ermittelt. Die Klassen {@code Object.class} und {@code int[].class} liefert beispielsweise
+	 * Diese wird über {@link Class#getCanonicalName()} ermittelt. Die Klassen {@code Object.class} und {@code int[].class} liefert beispielsweise
 	 * {@code "java.lang.Object"} bzw. {@code "int[]"}.
 	 *
 	 * @see Class#getCanonicalName()

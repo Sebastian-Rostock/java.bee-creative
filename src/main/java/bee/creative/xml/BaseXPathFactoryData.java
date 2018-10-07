@@ -16,14 +16,14 @@ import bee.creative.util.Objects;
 public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFactory, GThis> {
 
 	/** Diese Klasse implementiert den Konfigurator für das Objektmodel einer {@link XPathFactory}.<br>
-	 * Initialisiert wird dieses via {@link #useDEFAULT_OBJECT_MODEL_URI()}.
+	 * Initialisiert wird dieses über {@link #useDEFAULT_OBJECT_MODEL_URI()}.
 	 *
 	 * @see XPathFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ModelData<GOwner> extends BaseValueBuilder<String, ModelData<GOwner>> {
 
-		/** Dieser Konstruktor initialisiert den Wert via {@link #useDEFAULT_OBJECT_MODEL_URI()}. */
+		/** Dieser Konstruktor initialisiert den Wert über {@link #useDEFAULT_OBJECT_MODEL_URI()}. */
 		public ModelData() {
 			this.useDEFAULT_OBJECT_MODEL_URI();
 		}

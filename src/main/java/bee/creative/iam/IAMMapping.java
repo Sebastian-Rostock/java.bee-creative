@@ -424,11 +424,9 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		return new Entries(this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.find(IAMArray.from(key))}.
+	/** Diese Methode ist eine Abkürzung für {@link #find(IAMArray) this.find(IAMArray.from(key))}.
 	 *
-	 * @see #find(IAMArray)
 	 * @see IAMArray#from(int...) */
-	@SuppressWarnings ("javadoc")
 	public final int find(final int... key) throws NullPointerException {
 		return this.find(IAMArray.from(key));
 	}

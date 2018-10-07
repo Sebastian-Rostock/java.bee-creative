@@ -1070,7 +1070,7 @@ public class FEMDomain {
 
 	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit Maskierung als formatierte Zeichenkette zurück. Die
 	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder die Zeichenkette ein Leerzeichen, Semikolon, Schrägstrich bzw. eine runde, eckige oder
-	 * geschweifte Klammer enthält. Die Maskierung erfolgt via {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<',
+	 * geschweifte Klammer enthält. Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<',
 	 * '/', '>')}. Wenn die Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
 	 *
 	 * @param string Zeichenkette.

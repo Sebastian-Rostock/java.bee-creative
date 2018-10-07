@@ -40,7 +40,7 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 	private static final class QueueThread extends Thread {
 
 		public QueueThread() {
-			super("PointerQueueThread");
+			super("QueueThread");
 			this.setPriority(Thread.MAX_PRIORITY);
 			this.setDaemon(true);
 			this.start();

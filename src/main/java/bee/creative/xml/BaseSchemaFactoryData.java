@@ -98,14 +98,14 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für die Sprache einer {@link SchemaFactory}.<br>
-	 * Initialisiert wird diese Sprache via {@link #useW3C_XML_SCHEMA_NS_URI()}.
+	 * Initialisiert wird diese Sprache über {@link #useW3C_XML_SCHEMA_NS_URI()}.
 	 *
 	 * @see SchemaFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class LanguageData<GOwner> extends BaseValueBuilder<String, LanguageData<GOwner>> {
 
-		/** Dieser Konstruktor initialisiert den Wert via {@link #useW3C_XML_SCHEMA_NS_URI()}. */
+		/** Dieser Konstruktor initialisiert den Wert über {@link #useW3C_XML_SCHEMA_NS_URI()}. */
 		public LanguageData() {
 			this.useW3C_XML_SCHEMA_NS_URI();
 		}
