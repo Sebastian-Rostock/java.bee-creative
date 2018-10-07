@@ -414,7 +414,7 @@ public class Getters {
 	/** Diese Methode ist effektiv eine Abkürzung für {@code Fields.nativeField(Natives.parse(memberText))}, wobei eine {@link Class} zu einer Ausnahme führt.
 	 *
 	 * @see #nativeGetter(java.lang.reflect.Field)
-	 * @see #nativeGetter(java.lang.reflect.Method)
+	 * @see #nativeGetter(Method)
 	 * @see #nativeGetter(java.lang.reflect.Constructor)
 	 * @see Natives#parse(String)
 	 * @param <GInput> Typ des Datensatzes.
@@ -427,7 +427,7 @@ public class Getters {
 	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final String memberText) throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberText);
 		if (object instanceof java.lang.reflect.Field) return Getters.nativeGetter((java.lang.reflect.Field)object);
-		if (object instanceof java.lang.reflect.Method) return Getters.nativeGetter((java.lang.reflect.Method)object);
+		if (object instanceof Method) return Getters.nativeGetter((Method)object);
 		if (object instanceof java.lang.reflect.Constructor<?>) return Getters.nativeGetter((java.lang.reflect.Constructor<?>)object);
 		throw new IllegalArgumentException();
 	}
@@ -438,30 +438,43 @@ public class Getters {
 		return Fields.nativeField(field);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(field)}. */
+	@SuppressWarnings ("javadoc")
+	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final java.lang.reflect.Field field, boolean forceAccessible) throws NullPointerException {
+		return Fields.nativeField(field);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(fieldOwner, fieldName)}. */
 	@SuppressWarnings ("javadoc")
 	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final Class<? extends GInput> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(fieldOwner, fieldName);
+		return nativeGetter(fieldOwner, fieldName, true);
 	}
-	
- 
+
+	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final Class<? extends GInput> fieldOwner, final String fieldName, boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(fieldOwner, fieldName, forceAccessible);
+	}
 
 	// TODO doku
-	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
+	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link Method nativen Methode} zurück.<br>
 	 * Bei einer Klassenmethode liefert der erzeugte {@link Getter} für eine Eingabe {@code input} {@code method.invoke(null, input)}, bei einer Objektmethode
 	 * liefert er dagegen {@code method.invoke(input)}.
 	 *
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @see Method#invoke(Object, Object...)
 	 * @param <GInput> Typ des Datensatzes.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param method Native Methode.
 	 * @return {@code native}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Parameteranzahl der nativen Methode ungültig oder die Methode nicht zugreifbar ist. */
-	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final java.lang.reflect.Method method)
-		throws NullPointerException, IllegalArgumentException {
+	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final Method method) throws NullPointerException, IllegalArgumentException {
 		return new MethodGetter<>(method);
+	}
+
+	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final Method method, boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return new MethodGetter<>(method, forceAccessible);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zum gegebenen {@link java.lang.reflect.Constructor nativen Kontruktor} zurück.<br>
@@ -475,6 +488,11 @@ public class Getters {
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Parameteranzahl des nativen Konstruktor ungültig, er nicht zugreifbar oder er nicht statisch ist. */
 	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final java.lang.reflect.Constructor<?> constructor)
+		throws NullPointerException, IllegalArgumentException {
+		return new ConstructorGetter<>(constructor);
+	}
+
+	public static <GInput, GOutput> Getter<GInput, GOutput> nativeGetter(final java.lang.reflect.Constructor<?> constructor, boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new ConstructorGetter<>(constructor);
 	}

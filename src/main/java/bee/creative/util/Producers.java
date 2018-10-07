@@ -232,20 +232,6 @@ public class Producers {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#nativeProducer(Class, boolean) Producers.nativeProducer(valueClass, true)}. */
-	public static <GValue> Producer<GValue> nativeProducer(final Class<? extends GValue> valueClass) throws NullPointerException, IllegalArgumentException {
-		return Producers.nativeProducer(valueClass, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Producers#nativeProducer(Constructor, boolean) Producers.nativeProducer(Natives.parseConstructor(valueClass),
-	 * forceAccessible)}.
-	 *
-	 * @see Natives#parseConstructor(Class, Class...) */
-	public static <GValue> Producer<GValue> nativeProducer(final Class<? extends GValue> valueClass, final boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return Producers.nativeProducer(Natives.parseConstructor(valueClass), forceAccessible);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link Producers#nativeProducer(java.lang.reflect.Field, boolean) Producers.nativeProducer(field, true)}. */
 	public static <GValue> Producer<GValue> nativeProducer(final java.lang.reflect.Field field) throws NullPointerException {
 		return Producers.nativeProducer(field, true);
@@ -277,6 +263,20 @@ public class Producers {
 		return new MethodProducer<>(method, forceAccessible);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Producers#nativeProducer(Class, boolean) Producers.nativeProducer(valueClass, true)}. */
+	public static <GValue> Producer<GValue> nativeProducer(final Class<? extends GValue> valueClass) throws NullPointerException, IllegalArgumentException {
+		return Producers.nativeProducer(valueClass, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Producers#nativeProducer(Constructor, boolean) Producers.nativeProducer(Natives.parseConstructor(valueClass),
+	 * forceAccessible)}.
+	 *
+	 * @see Natives#parseConstructor(Class, Class...) */
+	public static <GValue> Producer<GValue> nativeProducer(final Class<? extends GValue> valueClass, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Producers.nativeProducer(Natives.parseConstructor(valueClass), forceAccessible);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Producers#nativeProducer(Constructor, boolean) Producers.nativeProducer(constructor, true)}. */
 	public static <GValue> Producer<GValue> nativeProducer(final Constructor<?> constructor) throws NullPointerException, IllegalArgumentException {
 		return Producers.nativeProducer(constructor, true);
@@ -294,6 +294,19 @@ public class Producers {
 	public static <GValue> Producer<GValue> nativeProducer(final Constructor<?> constructor, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new ConstructorProducer<>(constructor, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Producers#nativeProducer(Class, String, boolean) Producers.nativeProducer(fieldOwner, fieldName, true)}. */
+	public static <GValue> Producer<GValue> nativeProducer(final Class<?> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Producers.nativeProducer(fieldOwner, fieldName, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(Class, String, boolean) Properties.nativeProperty(fieldOwner, fieldName,
+	 * forceAccessible)}. */
+	public static <GValue> Producer<GValue> nativeProducer(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Properties.nativeProperty(fieldOwner, fieldName, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#bufferedProducer(int, Producer) Producers.bufferedProducer(Pointers.SOFT, producer)}. */

@@ -303,21 +303,6 @@ public class Properties {
 		return new NativeProperty<>(field, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(Class, String, boolean) Properties.nativeProperty(fieldOwner, fieldName, true)}. */
-	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName)
-		throws NullPointerException, IllegalArgumentException {
-		return Properties.nativeProperty(fieldOwner, fieldName, true);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(Natives.parseField(fieldOwner,
-	 * fieldName), forceAccessible)}.
-	 *
-	 * @see Natives#parseField(Class, String) */
-	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return Properties.nativeProperty(Natives.parseField(fieldOwner, fieldName), forceAccessible);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(Method, Method, boolean) Properties.compositeProperty(getMethod, setMethod,
 	 * true)}. **/
 	public static <GValue> Property<GValue> nativeProperty(final Method getMethod, final Method setMethod) throws NullPointerException, IllegalArgumentException {
@@ -333,6 +318,21 @@ public class Properties {
 		throws NullPointerException, IllegalArgumentException {
 		return Properties.compositeProperty(Producers.<GValue>nativeProducer(getMethod, forceAccessible),
 			Consumers.<GValue>nativeConsumer(setMethod, forceAccessible));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(Class, String, boolean) Properties.nativeProperty(fieldOwner, fieldName, true)}. */
+	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Properties.nativeProperty(fieldOwner, fieldName, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(java.lang.reflect.Field) Properties.nativeProperty(Natives.parseField(fieldOwner,
+	 * fieldName), forceAccessible)}.
+	 *
+	 * @see Natives#parseField(Class, String) */
+	public static <GValue> Property<GValue> nativeProperty(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Properties.nativeProperty(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
 	/** Diese Methode ist eine effiziente Alternative zu {@link Properties#translatedProperty(Property, Getter, Getter) Properties.translatedProperty(property,

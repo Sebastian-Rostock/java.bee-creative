@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -863,6 +864,22 @@ public final class Fields {
 		return new NativeField<>(field, forceAccessible);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #compositeField(Getter, Setter) Fields.compositeField(Getters.nativeGetter(getMethod),
+	 * Setters.nativeSetter(setMethod))}.
+	 *
+	 * @see Getters#nativeGetter(Method)
+	 * @see Setters#nativeSetter(Method) */
+	public static <GItem, GValue> Field<GItem, GValue> nativeField(final Method getMethod, final Method setMethod)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.compositeField(Getters.<GItem, GValue>nativeGetter(getMethod), Setters.<GItem, GValue>nativeSetter(setMethod));
+	}
+
+	public static <GItem, GValue> Field<GItem, GValue> nativeField(final Method getMethod, final Method setMethod, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.compositeField(Getters.<GItem, GValue>nativeGetter(getMethod, forceAccessible),
+			Setters.<GItem, GValue>nativeSetter(setMethod, forceAccessible));
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldOwner, fieldName))}.
 	 *
 	 * @see #nativeField(java.lang.reflect.Field)
@@ -883,42 +900,16 @@ public final class Fields {
 		return Fields.nativeField(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #compositeField(Getter, Setter) Fields.compositeField(Getters.nativeGetter(getMethod),
-	 * Setters.nativeSetter(setMethod))}.
-	 *
-	 * @see Getters#nativeGetter(java.lang.reflect.Method)
-	 * @see Setters#nativeSetter(java.lang.reflect.Method) */
-	@SuppressWarnings ("javadoc")
-	public static <GItem, GValue> Field<GItem, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
-		throws NullPointerException, IllegalArgumentException {
-		return Fields.compositeField(Getters.<GItem, GValue>nativeGetter(getMethod), Setters.<GItem, GValue>nativeSetter(setMethod));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Getters.nativeGetter(getMemberText), Setters.nativeSetter(setMemberText))}.
-	 *
-	 * @see #compositeField(Getter, Setter)
-	 * @see Getters#nativeGetter(String)
-	 * @see Setters#nativeSetter(String) */
-	@SuppressWarnings ("javadoc")
-	public static <GItem, GValue> Field<GItem, GValue> nativeField(final String getMemberText, final String setMemberText)
-		throws NullPointerException, IllegalArgumentException {
-		return Fields.compositeField(Getters.<GItem, GValue>nativeGetter(getMemberText), Setters.<GItem, GValue>nativeSetter(setMemberText));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code Fields.defaultField(field, null)}.
-	 *
-	 * @see #defaultField(Field, Object) */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode ist eine Abkürzung für {@link #defaultField(Field, Object) Fields.defaultField(field, null)}. */
 	public static <GItem, GValue> Field<GItem, GValue> defaultField(final Field<? super GItem, GValue> field) throws NullPointerException {
 		return Fields.defaultField(field, null);
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@code Fields.compositeField(Fields.defaultGetter(field, value), Fields.defaultSetter(field))}.
+	/** Diese Methode ist eine effiziente Alternative zu {@link #compositeField(Getter, Setter) Fields.compositeField(Fields.defaultGetter(field, value),
+	 * Fields.defaultSetter(field))}.
 	 *
-	 * @see #compositeField(Getter, Setter)
 	 * @see Getters#defaultGetter(Getter, Object)
 	 * @see Setters#defaultSetter(Setter) */
-	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Field<GItem, GValue> defaultField(final Field<? super GItem, GValue> field, final GValue value) throws NullPointerException {
 		return new DefaultField<>(field, value);
 	}

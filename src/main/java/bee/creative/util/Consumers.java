@@ -181,6 +181,19 @@ public class Consumers {
 		return new NativeConsumer<>(method, forceAccessible);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#nativeConsumer(Class, String, boolean) Consumers.NativeConsumer(fieldOwner, fieldName, true)}. */
+	public static <GValue> Consumer<GValue> nativeConsumer(final Class<?> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Consumers.nativeConsumer(fieldOwner, fieldName, true);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(Class, String, boolean) Properties.nativeProperty(fieldOwner, fieldName,
+	 * forceAccessible)}. */
+	public static <GValue> Consumer<GValue> nativeConsumer(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
+		return Properties.nativeProperty(fieldOwner, fieldName, forceAccessible);
+	}
+
 	/** Diese Methode gibt einen übersetzten {@link Consumer} zurück, dessen Wert mit Hilfe des gegebenen {@link Getter} in den Wert des gegebenen
 	 * {@link Consumer} überführt wird.
 	 *
