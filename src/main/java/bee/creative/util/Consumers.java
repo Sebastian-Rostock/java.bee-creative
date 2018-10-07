@@ -14,10 +14,11 @@ import bee.creative.util.Setters.BaseSetter;
 public class Consumers {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Consumer} als {@link BaseObject}. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseConsumer<GValue> extends BaseObject implements Consumer<GValue> {
 	}
 
+	/** Diese Klasse implementiert {@link Consumers#nativeConsumer(Method, boolean)} */
+	@SuppressWarnings ("javadoc")
 	public static class NativeConsumer<GValue> extends BaseConsumer<GValue> {
 
 		public final Method method;
@@ -43,7 +44,7 @@ public class Consumers {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.method);
+			return Objects.toInvokeString(this, this.method, this.method.isAccessible());
 		}
 
 	}

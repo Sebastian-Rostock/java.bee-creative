@@ -46,7 +46,7 @@ public class Producers {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, Natives.formatMethod(this.method));
+			return Objects.toInvokeString(this, this.method, this.method.isAccessible());
 		}
 
 	}
@@ -79,7 +79,7 @@ public class Producers {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, Natives.formatConstructor(this.constructor));
+			return Objects.toInvokeString(this, this.constructor, this.constructor.isAccessible());
 		}
 
 	}
