@@ -880,21 +880,16 @@ public final class Fields {
 			Setters.<GItem, GValue>nativeSetter(setMethod, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldOwner, fieldName))}.
-	 *
-	 * @see #nativeField(java.lang.reflect.Field)
-	 * @see Natives#parseField(Class, String) */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, true)}. */
 	public static <GItem, GValue> Field<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(Natives.parseField(fieldOwner, fieldName));
+		return Fields.nativeField(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldOwner, fieldName), forceAccessible)}.
+	/** Diese Methode ist eine Abkürzung für {@link #nativeField(java.lang.reflect.Field, boolean) Fields.nativeField(Natives.parseField(fieldOwner, fieldName),
+	 * forceAccessible)}.
 	 *
-	 * @see #nativeField(java.lang.reflect.Field)
 	 * @see Natives#parseField(Class, String) */
-	@SuppressWarnings ("javadoc")
 	public static <GItem, GValue> Field<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Fields.nativeField(Natives.parseField(fieldOwner, fieldName), forceAccessible);

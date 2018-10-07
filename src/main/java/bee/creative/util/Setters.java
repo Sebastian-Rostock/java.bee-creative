@@ -21,11 +21,11 @@ public class Setters {
 
 	/** Diese Klasse implementiert {@link Setters#nativeSetter(Method)} */
 	@SuppressWarnings ("javadoc")
-	public static class NativeSetter<GItem, GValue> extends BaseSetter<GItem, GValue> {
+	public static class MethodSetter<GItem, GValue> extends BaseSetter<GItem, GValue> {
 
 		public final Method method;
 
-		public NativeSetter(final Method method, final boolean forceAccessible) {
+		public MethodSetter(final Method method, final boolean forceAccessible) {
 			if (method.getParameterTypes().length != (Modifier.isStatic(method.getModifiers()) ? 2 : 1)) throw new IllegalArgumentException();
 			try {
 				method.setAccessible(forceAccessible);
@@ -286,18 +286,6 @@ public class Setters {
 		return Fields.nativeField(field, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String) Fields.nativeField(fieldOwner, fieldName)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Class<? extends GItem> fieldOwner, final String fieldName)
-		throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(fieldOwner, fieldName);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, forceAccessible)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Class<? extends GItem> fieldOwner, final String fieldName,
-		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(fieldOwner, fieldName, forceAccessible);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link Setters#nativeSetter(Method, boolean) Setters.nativeSetter(method, true)}. */
 	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Method method) throws NullPointerException, IllegalArgumentException {
 		return Setters.nativeSetter(method, true);
@@ -317,7 +305,19 @@ public class Setters {
 	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
 	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Method method, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return new NativeSetter<>(method, forceAccessible);
+		return new MethodSetter<>(method, forceAccessible);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String) Fields.nativeField(fieldOwner, fieldName)}. */
+	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Class<? extends GItem> fieldOwner, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(fieldOwner, fieldName);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, forceAccessible)}. */
+	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final Class<? extends GItem> fieldOwner, final String fieldName,
+		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(fieldOwner, fieldName, forceAccessible);
 	}
 
 	/** Diese Methode einen {@link Setter} zurück, der Datensatz und Wert nur dann dann an den gegebenen {@link Setter} delegiert, wenn der Datensatz nicht
@@ -368,17 +368,16 @@ public class Setters {
 		return new TranslatedSetter<>(toSource, setter);
 	}
 
-	/** Diese Methode gibt einen {@link Setter} zurück, der über die Weiterleitug der Eingabe an einen der gegebenen {@link Setter} mit Hilfe des gegebenen
-	 * {@link Filter} entscheiden.<br>
-	 * Wenn der {@link Filter} einen Datensatz akzeptiert, setzt der erzeugte {@link Setter} den Wert der Eigenschaft dieses Datensatzes über
-	 * {@code acceptSetter}. Andernfalls setzt er ihn über {@code rejectSetter}. Der erzeugte {@link Setter} setzt den Wert {@code value} für einen Datensatz
-	 * {@code item} damit über {@code (condition.accept(item) ? acceptSetter : rejectSetter).set(item, value)}.
+	/** Diese Methode gibt einen {@link Setter} zurück, der über die Weiterleitug eines Datensatzes an einen der gegebenen {@link Setter} mit Hilfe des gegebenen
+	 * {@link Filter} entscheiden. Wenn der {@link Filter} einen Datensatz akzeptiert, setzt der erzeugte {@link Setter} den Wert der Eigenschaft dieses
+	 * Datensatzes über {@code acceptSetter}. Andernfalls setzt er ihn über {@code rejectSetter}. Der erzeugte {@link Setter} setzt den Wert {@code value} für
+	 * einen Datensatz {@code item} damit über {@code (condition.accept(item) ? acceptSetter : rejectSetter).set(item, value)}.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts.
 	 * @param condition Bedingung.
-	 * @param acceptSetter Eigenschaft zum Setzen des Werts akzeptierter Eingaben.
-	 * @param rejectSetter Eigenschaft zum Setzen des Werts abgelehntenr Eingaben.
+	 * @param acceptSetter Eigenschaft zum Setzen des Werts akzeptierter Datensätze.
+	 * @param rejectSetter Eigenschaft zum Setzen des Werts abgelehnter Datensätze.
 	 * @return {@code conditional}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code condition}, {@code acceptSetter} bzw. {@code rejectSetter} {@code null} ist. */
 	public static <GItem, GValue> Setter<GItem, GValue> conditionalSetter(final Filter<? super GItem> condition,
