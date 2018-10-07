@@ -1,6 +1,6 @@
 package bee.creative.util;
 
-import java.lang.reflect.Constructor;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -122,27 +122,27 @@ public class Consumers {
 
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.emptyProperty()}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode ist eine Abkürzung für {@link Properties#emptyProperty() Properties.emptyProperty()}. */
 	public static <GValue> Consumer<GValue> emptyConsumer() {
 		return Properties.emptyProperty();
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#nativeConsumer(String, boolean) Consumers.nativeConsumer(memberText, true)}. */
 	public static <GValue> Consumer<GValue> nativeConsumer(final String memberText) throws NullPointerException, IllegalArgumentException {
 		return Consumers.nativeConsumer(memberText, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code nativeProducer(Natives.parse(memberText))}, wobei eine {@link Class} bzw. ein {@link Constructor} zu einer
-	 * Ausnahme führt.
+	/** Diese Methode ist eine Abkürzung für {@code nativeProducer(Natives.parse(memberText))}.
 	 *
 	 * @see Natives#parse(String)
-	 * @see #nativeConsumer(java.lang.reflect.Field)
-	 * @see #nativeConsumer(Method)
-	 * @param <GValue> Typ des Datensatzes.
-	 * @param memberText Methoden- oder Konstruktortext.
+	 * @see #nativeConsumer(java.lang.reflect.Field, boolean)
+	 * @see #nativeConsumer(Method, boolean)
+	 * @param <GValue> Typ des Werts.
+	 * @param memberText Pfad einer Methode oder eines Datenfelds.
+	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	 * @throws NullPointerException Wenn {@code memberText} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Pfad ungültig bzw. sein Ziel nicht zugreifbar ist. */
 	public static <GValue> Consumer<GValue> nativeConsumer(final String memberText, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberText);
@@ -151,63 +151,50 @@ public class Consumers {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.nativeProperty(field)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#nativeConsumer(java.lang.reflect.Field, boolean) Consumers.nativeConsumer(field, true)}. */
 	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Field field) {
 		return Consumers.nativeConsumer(field, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.nativeProperty(field)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode ist eine Abkürzung für {@link Properties#nativeProperty(java.lang.reflect.Field, boolean) Properties.nativeProperty(field,
+	 * forceAccessible)}. */
 	public static <GValue> Consumer<GValue> nativeConsumer(final java.lang.reflect.Field field, final boolean forceAccessible) {
 		return Properties.nativeProperty(field);
 	}
 
-	/** Diese Methode gibt einen {@link Consumer} zur gegebenen {@link Method nativen statischen Methode} zurück.<br>
-	 * Das Schreiben des Werts {@code value} erfolgt über {@code method.invoke(null, value)}.
-	 *
-	 * @see Method#invoke(Object, Object...)
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param method Methode zum Schreiben der Eigenschaft.
-	 * @return {@code native}-{@link Consumer}.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#nativeConsumer(Method, boolean) Consumers.nativeConsumer(method, true)}. */
 	public static <GValue> Consumer<GValue> nativeConsumer(final Method method) {
-		return new NativeConsumer<>(method);
+		return Consumers.nativeConsumer(method, true);
 	}
 
-	/** Diese Methode gibt einen {@link Consumer} zur gegebenen {@link Method nativen statischen Methode} zurück.<br>
-	 * Das Schreiben des Werts {@code value} erfolgt über {@code method.invoke(null, value)}.
+	/** Diese Methode gibt einen {@link Consumer} zur gegebenen {@link Method nativen statischen Methode} zurück. Das Schreiben des Werts {@code value} erfolgt
+	 * über {@code method.invoke(null, value)}.
 	 *
 	 * @see Method#invoke(Object, Object...)
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param method Methode zum Schreiben der Eigenschaft.
+	 * @param <GValue> Typ des Werts.
+	 * @param method Methode zum Schreiben.
 	 * @return {@code native}-{@link Consumer}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
+	 * @throws IllegalArgumentException Wenn die Methode nicht zugreifbar ist oder keine passende Parameteranzahl besitzt. */
 	public static <GValue> Consumer<GValue> nativeConsumer(final Method method, final boolean forceAccessible) {
 		return new NativeConsumer<>(method, forceAccessible);
 	}
 
-	/** Diese Methode gibt einen umgewandelten {@link Consumer} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Getter} in dem Datensatz des gegebenen
+	/** Diese Methode gibt einen übersetzten {@link Consumer} zurück, dessen Wert mit Hilfe des gegebenen {@link Getter} in den Wert des gegebenen
 	 * {@link Consumer} überführt wird.
 	 *
-	 * @param <GSource> Typ des Datensatzes des gegebenen {@link Producer} sowie der Eingabe des gegebenen {@link Getter}.
-	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie des Datensatzes.
+	 * @param <GSource> Typ des Werts des gegebenen {@link Consumer} sowie des Werts gegebenen {@link Getter}.
+	 * @param <GTarget> Typ des Datensatzes des gegebenen {@link Getter} sowie des Werts des gelieferten {@link Consumer}.
 	 * @param toSource {@link Getter}.
 	 * @param consumer {@link Consumer}.
 	 * @return {@code translated}-{@link Consumer}.
-	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code producer} {@code null} ist. */
-
+	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code consumer} {@code null} ist. */
 	public static <GTarget, GSource> Consumer<GTarget> translatedConsumer(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Consumer<? super GSource> consumer) {
 		return new TranslatedConsumer<>(toSource, consumer);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Consumers.synchronizedConsumer(consumer, consumer)}.
-	 *
-	 * @see #synchronizedConsumer(Object, Consumer) */
-	@SuppressWarnings ("javadoc")
+	/** Diese Methode ist eine Abkürzung für {@link #synchronizedConsumer(Object, Consumer) Consumers.synchronizedConsumer(consumer, consumer)}. */
 	public static <GValue> Consumer<GValue> synchronizedConsumer(final Consumer<? super GValue> consumer) {
 		return Consumers.synchronizedConsumer(consumer, consumer);
 	}
@@ -224,7 +211,7 @@ public class Consumers {
 		return new SynchronizedConsumer<>(mutex, consumer);
 	}
 
-	/** Diese Methode gibt einen {@link Setter} zurück, der seine Eingabe ignoriert und den Wert des gegebenen {@link Consumer} setzt.
+	/** Diese Methode gibt einen {@link Setter} zurück, der seinen Datensatz ignoriert und den Wert des gegebenen {@link Consumer} setzt.
 	 *
 	 * @param <GValue> Typ des Werts.
 	 * @param consumer {@link Consumer}.
@@ -234,12 +221,12 @@ public class Consumers {
 		return new ConsumerSetter<>(consumer);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Properties.compositeProperty(Properties.emptyProperty(), consumer)}.
+	/** Diese Methode ist eine Abkürzung für {@link Properties#compositeProperty(Producer, Consumer) Properties.compositeProperty(Producers.emptyProducer(),
+	 * consumer)}.
 	 *
-	 * @see Properties#compositeProperty(Producer, Consumer) */
-	@SuppressWarnings ("javadoc")
+	 * @see Producers#emptyProducer() */
 	public static <GValue> Property<GValue> toProperty(final Consumer<? super GValue> consumer) {
-		return Properties.compositeProperty(Properties.<GValue>emptyProperty(), consumer);
+		return Properties.compositeProperty(Producers.<GValue>emptyProducer(), consumer);
 	}
 
 }

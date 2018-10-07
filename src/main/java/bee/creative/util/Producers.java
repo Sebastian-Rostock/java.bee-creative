@@ -221,9 +221,7 @@ public class Producers {
 	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)}, {@link Producers#nativeProducer(Class, boolean)},
-	 *         {@link Producers#nativeProducer(java.lang.reflect.Field, boolean)}, {@link Producers#nativeProducer(Method, boolean)} bzw.
-	 *         {@link Producers#nativeProducer(Constructor, boolean)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IllegalArgumentException Wenn der Pfad ungültig bzw. sein Ziel nicht zugreifbar ist. */
 	public static <GValue> Producer<GValue> nativeProducer(final String memberPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberPath);
@@ -241,7 +239,7 @@ public class Producers {
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#nativeProducer(Constructor, boolean) Producers.nativeProducer(Natives.parseConstructor(valueClass),
 	 * forceAccessible)}.
-	 * 
+	 *
 	 * @see Natives#parseConstructor(Class, Class...) */
 	public static <GValue> Producer<GValue> nativeProducer(final Class<? extends GValue> valueClass, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
@@ -358,12 +356,12 @@ public class Producers {
 		return new ProducerGetter<>(producer);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#compositeProperty(Producer, Consumer) Properties.compositeProperty(Producers.emptyProducer(),
-	 * consumer)}.
+	/** Diese Methode ist eine Abkürzung für {@link Properties#compositeProperty(Producer, Consumer) Properties.compositeProperty(producer,
+	 * Consumers.emptyConsumer())}.
 	 *
-	 * @see Producers#emptyProducer() */
-	public static <GValue> Property<GValue> toProperty(final Consumer<? super GValue> consumer) {
-		return Properties.compositeProperty(Producers.<GValue>emptyProducer(), consumer);
+	 * @see Consumers#emptyConsumer() */
+	public static <GValue> Property<GValue> toProperty(final Producer<? extends GValue> producer) {
+		return Properties.compositeProperty(producer, Consumers.<GValue>emptyConsumer());
 	}
 
 }

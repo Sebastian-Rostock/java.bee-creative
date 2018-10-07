@@ -265,9 +265,8 @@ public class Setters {
 	 * @param memberPath Pfad einer Methode oder eines Datenfelds.
 	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@link Natives#parse(String)}, {@link #nativeSetter(java.lang.reflect.Field, boolean)} bzw.
-	 *         {@link #nativeSetter(Method, boolean)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Pfad ungültig bzw. sein Ziel nicht zugreifbar ist. */
 	public static <GItem, GValue> Setter<GItem, GValue> nativeSetter(final String memberPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberPath);
