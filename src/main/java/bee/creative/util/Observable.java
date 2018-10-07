@@ -10,9 +10,9 @@ import java.lang.ref.WeakReference;
  * @param <GObserver> Typ der Ereignisempfänger. Dieser darf kein {@code Object[]} sein. */
 public interface Observable<GMessage, GObserver> {
 
-	/** Diese Methode meldet den gegebenen Ereignisempfänger für das Ereignis an und gibt ihn zurück.<br>
-	 * Wenn der Ereignisempfänger {@code null} ist, wird er ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object) Auslösen} des Ereignisses
-	 * informiert. Das mehrfache Anmelden des gleichen Empfängers sollte vermieden werden.
+	/** Diese Methode meldet den gegebenen Ereignisempfänger für das Ereignis an und gibt ihn zurück. Wenn der Ereignisempfänger {@code null} ist, wird er
+	 * ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object) Auslösen} des Ereignisses informiert. Das mehrfache Anmelden des gleichen Empfängers
+	 * sollte vermieden werden.
 	 *
 	 * @see Event#put(Object, Object)
 	 * @param listener Ereignisempfänger oder {@code null}.
@@ -20,10 +20,9 @@ public interface Observable<GMessage, GObserver> {
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
 	public GObserver put(GObserver listener) throws IllegalArgumentException;
 
-	/** Diese Methode meldet den gegebenen Ereignisempfänger für das Ereignis an und gibt ihn zurück.<br>
-	 * Wenn der Ereignisempfänger {@code null} ist, wird er ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object) Auslösen} des Ereignisses
-	 * informiert. Das mehrfache Anmelden des gleichen Ereignisempfängers sollte vermieden werden. Der Ereignisempfänger wird über eine {@link WeakReference}
-	 * referenziert.
+	/** Diese Methode meldet den gegebenen Ereignisempfänger für das Ereignis an und gibt ihn zurück. Wenn der Ereignisempfänger {@code null} ist, wird er
+	 * ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object) Auslösen} des Ereignisses informiert. Das mehrfache Anmelden des gleichen
+	 * Ereignisempfängers sollte vermieden werden. Der Ereignisempfänger wird über eine {@link WeakReference} referenziert.
 	 *
 	 * @see Event#putWeak(Object, Object)
 	 * @param listener Ereignisempfänger oder {@code null}.

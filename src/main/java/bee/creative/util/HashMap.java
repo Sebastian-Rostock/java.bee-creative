@@ -7,9 +7,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 
-/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüssel- und Wertobjekten.<br>
- * Das {@link #get(Object) Finden} sowie {@link #put(Object, Object) Einfügen} von Einträgen benötigt ca. 50 % der Rechenzeit, die eine
- * {@link java.util.HashMap} benötigen würde. Das {@link #remove(Object) Entfernen} von Einträge liegt dazu bei ca. 80 % der Rechenzeit.
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüssel- und Wertobjekten. Das {@link #get(Object)
+ * Finden} sowie {@link #put(Object, Object) Einfügen} von Einträgen benötigt ca. 50 % der Rechenzeit, die eine {@link java.util.HashMap} benötigen würde. Das
+ * {@link #remove(Object) Entfernen} von Einträge liegt dazu bei ca. 80 % der Rechenzeit.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.

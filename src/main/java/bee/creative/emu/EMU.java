@@ -162,9 +162,9 @@ public class EMU {
 		return result;
 	}
 
-	/** Diese Methode gibt den geschätzten Speicherverbrauch eines Datenfeldes mit dem gegebenen Datentyp zurück.<br>
-	 * Für {@link Byte#TYPE} sowie {@link Boolean#TYPE} liefert sie {@code 1}, für {@link Short#TYPE} sowie {@link Character#TYPE} liefert sie {@code 2}, für
-	 * {@link Long#TYPE} sowie {@link Double#TYPE} liefert sie {@code 8} und für alle anderen Datentyp liefert sie {@code 4}.
+	/** Diese Methode gibt den geschätzten Speicherverbrauch eines Datenfeldes mit dem gegebenen Datentyp zurück. Für {@link Byte#TYPE} sowie {@link Boolean#TYPE}
+	 * liefert sie {@code 1}, für {@link Short#TYPE} sowie {@link Character#TYPE} liefert sie {@code 2}, für {@link Long#TYPE} sowie {@link Double#TYPE} liefert
+	 * sie {@code 8} und für alle anderen Datentyp liefert sie {@code 4}.
 	 *
 	 * @param type Datentyp oder {@code null}.
 	 * @return geschätzter Speicherverbrauch. */

@@ -113,7 +113,7 @@ public final class BEXBuilder {
 		/** Dieses Feld speichert die Zeilennummer in der Kind- bzw. Attributknotentabelle, ab der die Kind- bzw. Attributknotenliste abgelegt ist. */
 		public int offset;
 
-		/** Dieses Feld speichert die Kind- bzw. Attributknotenliste. Ein Knoten besteht hierbei immer aus fünf aufeinander folgenden Datensätzen:<br>
+		/** Dieses Feld speichert die Kind- bzw. Attributknotenliste. Ein Knoten besteht hierbei immer aus fünf aufeinander folgenden Datensätzen:
 		 * {@code 0=uri/null}, {@code 1=name/null}, {@code 2=value/children}, {@code 3=attributes/null} , {@code 4=parent/null}. */
 		public List<BEXItem> items;
 
@@ -368,8 +368,8 @@ public final class BEXBuilder {
 			this.clear();
 		}
 
-		/** Diese Methode beendet die Bestückung des aktuellen Attributknoten und gibt {@code this} zurück.<br>
-		 * Anschließend wird die Bestückung des Elternknoten (Elementknoten) fortgesetzt.
+		/** Diese Methode beendet die Bestückung des aktuellen Attributknoten und gibt {@code this} zurück. Anschließend wird die Bestückung des Elternknoten
+		 * (Elementknoten) fortgesetzt.
 		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Attributknoten bestückt wird oder dessen Name unbestimmt ist. */
@@ -385,10 +385,9 @@ public final class BEXBuilder {
 			return this;
 		}
 
-		/** Diese Methode beginnt die Bestückung eines neuen Attributknoten und gibt {@code this} zurück.<br>
-		 * Die Bestückung des neuen, aktuellen Attributknoten kann anschließend über {@link #useUri(String)}, {@link #useName(String)} und {@link #useValue(String)}
-		 * erfolgen und muss mit {@link #putAttr()} abgeschlossen werden. Die Bestückung des Elternknoten (Elementknoten) kann erst nach dem Aufruf von
-		 * {@link #putAttr()} fortgesetzt werden.
+		/** Diese Methode beginnt die Bestückung eines neuen Attributknoten und gibt {@code this} zurück. Die Bestückung des neuen, aktuellen Attributknoten kann
+		 * anschließend über {@link #useUri(String)}, {@link #useName(String)} und {@link #useValue(String)} erfolgen und muss mit {@link #putAttr()} abgeschlossen
+		 * werden. Die Bestückung des Elternknoten (Elementknoten) kann erst nach dem Aufruf von {@link #putAttr()} fortgesetzt werden.
 		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Elementknoten bestückt wird. */
@@ -402,8 +401,8 @@ public final class BEXBuilder {
 			return this;
 		}
 
-		/** Diese Methode beendet die Bestückung des aktuellen Textknoten und gibt {@code this} zurück.<br>
-		 * Anschließend wird die Bestückung des Elternknoten (Elementknoten) fortgesetzt.
+		/** Diese Methode beendet die Bestückung des aktuellen Textknoten und gibt {@code this} zurück. Anschließend wird die Bestückung des Elternknoten
+		 * (Elementknoten) fortgesetzt.
 		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird. */
@@ -417,9 +416,9 @@ public final class BEXBuilder {
 			return this;
 		}
 
-		/** Diese Methode beginnt die Bestückung eines neuen Textknoten und gibt {@code this} zurück.<br>
-		 * Die Bestückung des neuen, aktuellen Textknoten kann anschließend über {@link #useValue(String)} erfolgen und muss mit {@link #putText()} abgeschlossen
-		 * werden. Die Bestückung des Elternknoten (Elementknoten) kann erst nach dem Aufruf von {@link #putText()} fortgesetzt werden.
+		/** Diese Methode beginnt die Bestückung eines neuen Textknoten und gibt {@code this} zurück. Die Bestückung des neuen, aktuellen Textknoten kann
+		 * anschließend über {@link #useValue(String)} erfolgen und muss mit {@link #putText()} abgeschlossen werden. Die Bestückung des Elternknoten
+		 * (Elementknoten) kann erst nach dem Aufruf von {@link #putText()} fortgesetzt werden.
 		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Elementknoten bestückt wird. */
@@ -431,8 +430,8 @@ public final class BEXBuilder {
 			return this;
 		}
 
-		/** Diese Methode beendet die Bestückung des aktuellen Elementknoten und gibt {@code this} zurück.<br>
-		 * Anschließend wird die Bestückung des Elternknoten (Elementknoten) fortgesetzt.
+		/** Diese Methode beendet die Bestückung des aktuellen Elementknoten und gibt {@code this} zurück. Anschließend wird die Bestückung des Elternknoten
+		 * (Elementknoten) fortgesetzt.
 		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird. */
@@ -460,10 +459,10 @@ public final class BEXBuilder {
 			return this;
 		}
 
-		/** Diese Methode beginnt die Bestückung eines neuen Elementknoten und gibt {@code this} zurück.<br>
-		 * Die Bestückung des neuen, aktuellen Elementknoten kann anschließend über {@link #useUri(String)}, {@link #useName(String)}, {@link #newAttr()},
-		 * {@link #newText()} und {@link #newElem()} erfolgen und muss mit {@link #putElem()} abgeschlossen werden. Die Bestückung des Elternknoten (Elementknoten)
-		 * kann erst nach dem Aufruf von {@link #putElem()} fortgesetzt werden.
+		/** Diese Methode beginnt die Bestückung eines neuen Elementknoten und gibt {@code this} zurück. Die Bestückung des neuen, aktuellen Elementknoten kann
+		 * anschließend über {@link #useUri(String)}, {@link #useName(String)}, {@link #newAttr()}, {@link #newText()} und {@link #newElem()} erfolgen und muss mit
+		 * {@link #putElem()} abgeschlossen werden. Die Bestückung des Elternknoten (Elementknoten) kann erst nach dem Aufruf von {@link #putElem()} fortgesetzt
+		 * werden.
 		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
@@ -711,8 +710,8 @@ public final class BEXBuilder {
 			return this;
 		}
 
-		/** Diese Methode setzt die Aktivierung der Elternknoten an Attributknoten und gibt {@code this} zurück.<br>
-		 * Wenn die Elternknoten an Attributknoten erfasst werden, werden auch die der Kindknoten erfasst.
+		/** Diese Methode setzt die Aktivierung der Elternknoten an Attributknoten und gibt {@code this} zurück. Wenn die Elternknoten an Attributknoten erfasst
+		 * werden, werden auch die der Kindknoten erfasst.
 		 *
 		 * @see #isAttrParentEnabled()
 		 * @param value {@code true}, wenn die Elternknoten von Attributknoten erfasst werden.
@@ -742,8 +741,8 @@ public final class BEXBuilder {
 			return this;
 		}
 
-		/** Diese Methode setzt die Aktivierung der Elternknoten an Kindknoten und gibt {@code this} zurück.<br>
-		 * Wenn die Elternknoten an Kindknoten ignoriert werden, werden auch die der Attributknoten ignoriert.
+		/** Diese Methode setzt die Aktivierung der Elternknoten an Kindknoten und gibt {@code this} zurück. Wenn die Elternknoten an Kindknoten ignoriert werden,
+		 * werden auch die der Attributknoten ignoriert.
 		 *
 		 * @see #isAttrParentEnabled()
 		 * @param value {@code true}, wenn die Elternknoten von Kindknoten erfasst werden.

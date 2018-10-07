@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-/** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit beliebigen Elementen.<br>
- * Das {@link #contains(Object) Finden} sowie {@link #add(Object) Einfügen} von Elementen benötigt ca. 60 % der Rechenzeit, die ein {@link java.util.HashSet}
- * benötigen würde. Das {@link #remove(Object) Entfernen} von Elementen liegt dazu bei ca. 80 % der Rechenzeit.
+/** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit beliebigen Elementen. Das {@link #contains(Object) Finden} sowie
+ * {@link #add(Object) Einfügen} von Elementen benötigt ca. 60 % der Rechenzeit, die ein {@link java.util.HashSet} benötigen würde. Das {@link #remove(Object)
+ * Entfernen} von Elementen liegt dazu bei ca. 80 % der Rechenzeit.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */

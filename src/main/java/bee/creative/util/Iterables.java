@@ -507,9 +507,8 @@ public class Iterables {
 		return new UnmodifiableIterable<>(iterable);
 	}
 
-	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück.<br>
-	 * Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses geliefert. Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes
-	 * {@link HashSet2} geliefert.
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück. Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses
+	 * geliefert. Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes {@link HashSet2} geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable}.
@@ -522,9 +521,8 @@ public class Iterables {
 		return result;
 	}
 
-	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link List} zurück.<br>
-	 * Wenn das gegebene {@link Iterable} eine {@link List} ist, wird diese geliefert. Andernfalls wird eine über {@link #addAll(Collection, Iterable)} befüllte
-	 * {@link ArrayList} geliefert.
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link List} zurück. Wenn das gegebene {@link Iterable} eine {@link List} ist, wird
+	 * diese geliefert. Andernfalls wird eine über {@link #addAll(Collection, Iterable)} befüllte {@link ArrayList} geliefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable}.

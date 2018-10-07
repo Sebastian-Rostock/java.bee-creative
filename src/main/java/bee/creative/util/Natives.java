@@ -32,8 +32,8 @@ public class Natives {
 
 	};
 
-	/** Diese Methode gibt das native Objekt zur gegebenen Pfadangabe zurück.<br>
-	 * Die Pfadangabe kodiert hierbei eine Klasse, eine Methode, einen Konstruktor oder ein Datenfeld. Die folgenden Pfadangaben werden unterstützt:
+	/** Diese Methode gibt das native Objekt zur gegebenen Pfadangabe zurück. Die Pfadangabe kodiert hierbei eine Klasse, eine Methode, einen Konstruktor oder ein
+	 * Datenfeld. Die folgenden Pfadangaben werden unterstützt:
 	 * <dl>
 	 * <dt>{@code "CLASS_PATH.class"}</dt>
 	 * <dd>Dieser Pfad wird über {@link #parseClass(String)} aufgelöst.</dd>
@@ -61,8 +61,8 @@ public class Natives {
 		return Natives.parseField(memberPath);
 	}
 
-	/** Diese Methode gibt das {@link Field Datenfeld} mit der gegebenen {@link #formatField(Field) Textdarstellung} zurück.<br>
-	 * Das gelieferte Datenfeld entspricht {@code parseField(parseClass("CLASS_PATH"), "FIELD_NAME")}.
+	/** Diese Methode gibt das {@link Field Datenfeld} mit der gegebenen {@link #formatField(Field) Textdarstellung} zurück. Das gelieferte Datenfeld entspricht
+	 * {@code parseField(parseClass("CLASS_PATH"), "FIELD_NAME")}.
 	 *
 	 * @see #parseClass(String)
 	 * @see #formatField(Field)
@@ -100,8 +100,8 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt die {@link Class Klasse} mit der gegebenen {@link #formatClass(Class) Textdarstellung} zurück.<br>
-	 * Die Klassentexte {@code "java.lang.Object"} und {@code "int[]"} liefert beispielsweise die Klassen {@code Object.class} bzw. {@code int[].class}.
+	/** Diese Methode gibt die {@link Class Klasse} mit der gegebenen {@link #formatClass(Class) Textdarstellung} zurück. Die Klassentexte
+	 * {@code "java.lang.Object"} und {@code "int[]"} liefert beispielsweise die Klassen {@code Object.class} bzw. {@code int[].class}.
 	 *
 	 * @see #formatClass(Class)
 	 * @param classText Klassentext.
@@ -148,8 +148,8 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt die {@link Method Methode} mit der gegebenen {@link #formatMethod(Method) Textdarstellung} zurück.<br>
-	 * Das gelieferte Datenfeld entspricht {@code parseMethod(parseClass(CLASS_PATH), "METHOD_NAME", parseParams("PARAM_TYPE_1,...,PARAM_TYPE_N"))}.
+	/** Diese Methode gibt die {@link Method Methode} mit der gegebenen {@link #formatMethod(Method) Textdarstellung} zurück. Das gelieferte Datenfeld entspricht
+	 * {@code parseMethod(parseClass(CLASS_PATH), "METHOD_NAME", parseParams("PARAM_TYPE_1,...,PARAM_TYPE_N"))}.
 	 *
 	 * @see #formatMethod(Method)
 	 * @param methodText Methodentext.
@@ -187,8 +187,8 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt den {@link Constructor Konstruktor} mit der gegebenen {@link #formatConstructor(Constructor) Textdarstellung} zurück.<br>
-	 * Das gelieferte Datenfeld entspricht {@code parseConstructor(parseClass(CLASS_PATH), parseParams("PARAM_TYPE_1,...,PARAM_TYPE_N"))}.
+	/** Diese Methode gibt den {@link Constructor Konstruktor} mit der gegebenen {@link #formatConstructor(Constructor) Textdarstellung} zurück. Das gelieferte
+	 * Datenfeld entspricht {@code parseConstructor(parseClass(CLASS_PATH), parseParams("PARAM_TYPE_1,...,PARAM_TYPE_N"))}.
 	 *
 	 * @see #formatConstructor(Constructor)
 	 * @param constructorText Konstruktortext.
@@ -225,8 +225,8 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Field Datenfelds} zurück.<br>
-	 * Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .}{@link Field#getName() FIELD_NAME}{@code "}.
+	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Field Datenfelds} zurück. Das Format der Textdarstellung ist
+	 * {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .}{@link Field#getName() FIELD_NAME}{@code "}.
 	 *
 	 * @see Field#getName()
 	 * @see #formatClass(Class)
@@ -237,9 +237,8 @@ public class Natives {
 		return Natives.formatClass(field.getDeclaringClass()) + "." + field.getName();
 	}
 
-	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Klasse} zurück.<br>
-	 * Diese wird über {@link Class#getCanonicalName()} ermittelt. Die Klassen {@code Object.class} und {@code int[].class} liefert beispielsweise
-	 * {@code "java.lang.Object"} bzw. {@code "int[]"}.
+	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Klasse} zurück. Diese wird über {@link Class#getCanonicalName()} ermittelt. Die Klassen
+	 * {@code Object.class} und {@code int[].class} liefert beispielsweise {@code "java.lang.Object"} bzw. {@code "int[]"}.
 	 *
 	 * @see Class#getCanonicalName()
 	 * @param clazz Klasse.
@@ -249,8 +248,8 @@ public class Natives {
 		return clazz.getCanonicalName();
 	}
 
-	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Parametertypen} zurück.<br>
-	 * Das Format der Textdarstellung ist {@code "(}{@link #formatClass(Class) PARAM_TYPE_1}{@code ,...,}{@link #formatClass(Class) PARAM_TYPE_N}{@code )"}.
+	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Parametertypen} zurück. Das Format der Textdarstellung ist
+	 * {@code "(}{@link #formatClass(Class) PARAM_TYPE_1}{@code ,...,}{@link #formatClass(Class) PARAM_TYPE_N}{@code )"}.
 	 *
 	 * @see Method#getParameterTypes()
 	 * @see Constructor#getParameterTypes()
@@ -263,9 +262,8 @@ public class Natives {
 		return result.append(')').toString();
 	}
 
-	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Method Methode} zurück.<br>
-	 * Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .}{@link Method#getName() METHOD_NAME}
-	 * {@link #formatParams(Class...) (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
+	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Method Methode} zurück. Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class)
+	 * CLASS_PATH}{@code .}{@link Method#getName() METHOD_NAME} {@link #formatParams(Class...) (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
 	 *
 	 * @see Method#getName()
 	 * @see #formatClass(Class)
@@ -277,9 +275,8 @@ public class Natives {
 		return Natives.formatMethod(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
 	}
 
-	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Constructor Konstruktors} zurück.<br>
-	 * Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .new}{@link #formatParams(Class...)
-	 * (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
+	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Constructor Konstruktors} zurück. Das Format der Textdarstellung ist
+	 * {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .new}{@link #formatParams(Class...) (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
 	 *
 	 * @param constructor Konstruktor.
 	 * @return Konstruktortext.

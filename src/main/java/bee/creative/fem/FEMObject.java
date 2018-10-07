@@ -4,12 +4,11 @@ import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine unveränderliche Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue()
- * Objektschlüssel} identifiziert wird.<br>
- * Datentyp und Besitzer des Objekts werden über eine {@link #typeValue() Typkennung} bzw. {@link #ownerValue() Besitzerkennung} angegeben. Die Besitzerkennung
- * kann beispielsweise eine über den {@link FEMContext} erreichbare Objektliste identifizieren, deren Elemente die referenzierten Objekte darstellen. Der
- * Objektschlüssel könnte hierbei der Position eines Objekts in solch einer Liste entsprechen. Alternativ zur Besitzerkennung könnte hierbei auch die Typkennung
- * genutzt werden.<br>
- * Die Wertebereiche für Objektschlüssel, Typkennungen und Besitzerkennungen sind {@code 0..2147483647}, {@code 0..65535} bzw. {@code 0..65535}.
+ * Objektschlüssel} identifiziert wird. Datentyp und Besitzer des Objekts werden über eine {@link #typeValue() Typkennung} bzw. {@link #ownerValue()
+ * Besitzerkennung} angegeben. Die Besitzerkennung kann beispielsweise eine über den {@link FEMContext} erreichbare Objektliste identifizieren, deren Elemente
+ * die referenzierten Objekte darstellen. Der Objektschlüssel könnte hierbei der Position eines Objekts in solch einer Liste entsprechen. Alternativ zur
+ * Besitzerkennung könnte hierbei auch die Typkennung genutzt werden. Die Wertebereiche für Objektschlüssel, Typkennungen und Besitzerkennungen sind
+ * {@code 0..2147483647}, {@code 0..65535} bzw. {@code 0..65535}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
@@ -23,8 +22,8 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	/** Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind. */
 	public static final FEMObject EMPTY = new FEMObject(0, (short)0, (short)0);
 
-	/** Diese Methode gibt eine neue Referenz mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
-	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	/** Diese Methode gibt eine neue Referenz mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
+	 * {@link #toString() Textdarstellung}.
 	 *
 	 * @see #toString()
 	 * @param string Zeichenkette.
@@ -255,8 +254,8 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return this.compare(that);
 	}
 
-	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück.<br>
-	 * Das Format der Textdarstellung ist {@code @}{@link #refValue() REF}{@code .}{@link #ownerValue() OWNER}{@code :}{@link #typeValue() TYPE}.
+	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück. Das Format der Textdarstellung ist {@code @}{@link #refValue()
+	 * REF}{@code .}{@link #ownerValue() OWNER}{@code :}{@link #typeValue() TYPE}.
 	 *
 	 * @return Textdarstellung. */
 	@Override

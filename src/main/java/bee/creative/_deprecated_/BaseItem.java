@@ -6,11 +6,10 @@ import bee.creative.util.Getter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert ein abstraktes {@link Item}, dass seinen {@link BasePool} kennt und einen Teil seiner Schnittstelle an diesen Delegiert. <br>
- * Die Methoden {@link #append()}, {@link #remove()} und {@link #update()} delegieren an {@link BasePool#append(BaseItem)}, {@link BasePool#remove(BaseItem)}
- * bzw. {@link BasePool#update(BaseItem)}. <br>
- * Der {@link #hashCode() Streuwert} basiert auf dem {@link #key() Schlüssel}, die {@link #equals(Object) Äquivalenz} basiert auf der von {@link #key()
- * Schlüssel} und {@link #pool() Pool}.
+/** Diese Klasse implementiert ein abstraktes {@link Item}, dass seinen {@link BasePool} kennt und einen Teil seiner Schnittstelle an diesen Delegiert. Die
+ * Methoden {@link #append()}, {@link #remove()} und {@link #update()} delegieren an {@link BasePool#append(BaseItem)}, {@link BasePool#remove(BaseItem)} bzw.
+ * {@link BasePool#update(BaseItem)}. Der {@link #hashCode() Streuwert} basiert auf dem {@link #key() Schlüssel}, die {@link #equals(Object) Äquivalenz} basiert
+ * auf der von {@link #key() Schlüssel} und {@link #pool() Pool}.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class BaseItem implements Item {

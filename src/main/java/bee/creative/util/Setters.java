@@ -254,8 +254,8 @@ public class Setters {
 		return Setters.nativeSetter(memberPath, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(Natives.parse(methodPath))}, wobei eine {@link Class} bzw. ein {@link Constructor} zu
-	 * einer Ausnahme führt.
+	/** Diese Methode ist effektiv eine Abkürzung für {@code Fields.nativeSetter(Natives.parse(methodPath))}, wobei eine {@link Class} bzw. ein
+	 * {@link Constructor} zu einer Ausnahme führt.
 	 *
 	 * @see Natives#parseMethod(String)
 	 * @see Setters#nativeSetter(java.lang.reflect.Field, boolean)
@@ -291,9 +291,9 @@ public class Setters {
 		return Setters.nativeSetter(method, true);
 	}
 
-	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link Method nativen Methode} zurück.<br>
-	 * Bei einer Klassenmethode erfolgt das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item} über
-	 * {@code method.invoke(null, item, value)}, bei einer Objektmethode hingegen über {@code method.invoke(item, value)}.
+	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link Method nativen Methode} zurück. Bei einer Klassenmethode erfolgt das Schreiben des Werts
+	 * {@code value} der Eigenschaft eines Datensatzes {@code item} über {@code method.invoke(null, item, value)}, bei einer Objektmethode hingegen über
+	 * {@code method.invoke(item, value)}.
 	 *
 	 * @see Method#invoke(Object, Object...)
 	 * @param <GItem> Typ des Datensatzes.
@@ -338,13 +338,13 @@ public class Setters {
 		return (Setter<GItem, GValue>)Fields.mappingField(mapping);
 	}
 
-	/** Diese Methode gibt einen navigierten {@link Setter} zurück.<br>
-	 * Der erzeugte {@link Setter} setzt den Wert {@code value} der Eigenschaft eines Datensatzes {@code item} über {@code setter.set(toSource.get(item), value)}.
+	/** Diese Methode gibt einen navigierten {@link Setter} zurück. Der erzeugte {@link Setter} setzt den Wert {@code value} der Eigenschaft eines Datensatzes
+	 * {@code item} über {@code setter.set(toSource.get(item), value)}.
 	 *
 	 * @param <GTarget> Typ des Datensatzes.
-	 * @param <GSource> Typ des Datensatzes des Übersetzers sowie der Eingabe der Eigenschaft.
+	 * @param <GSource> Typ des Datensatzes des gegebenen {@link Setter}.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param toSource {@link Getter} zur Übersetzung der Eingabe.
+	 * @param toSource {@link Getter} zur Übersetzung des Datensatzes.
 	 * @param setter {@link Setter} zur Manipulation.
 	 * @return {@code navigated}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code setter} {@code null} ist. */
@@ -353,8 +353,8 @@ public class Setters {
 		return new NavigatedSetter<>(toSource, setter);
 	}
 
-	/** Diese Methode gibt einen übersetzenden {@link Setter} zurück.<br>
-	 * Der erzeugte {@link Setter} setzt den Wert {@code value} der Eigenschaft eines Datensatzes {@code item} über {@code setter.set(item, toSource.get(value))}.
+	/** Diese Methode gibt einen übersetzten {@link Setter} zurück. Der erzeugte {@link Setter} setzt den Wert {@code value} der Eigenschaft eines Datensatzes
+	 * {@code item} über {@code setter.set(item, toSource.get(value))}.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GSource> Typ des Datensatzes des Übersetzers sowie des Werts der Eigenschaft.
@@ -392,9 +392,8 @@ public class Setters {
 	}
 
 	/** Diese Methode gibt einen aggregierten {@link Setter} zurück, welcher den formatierten Wert der Eigenschaften der Elemente des iterierbaren Datensatzes
-	 * setzt.<br>
-	 * Wenn der iterierbare Datensatz des erzeugten {@link Setter} {@code null} oder leer ist, wird das Setzen ignoriert. Andernfalls wird der gemäß dem gegebenen
-	 * {@link Getter} {@code toSource} umgewandelte Wert über die gegebene {@link Setter} an jedem Element des iterierbaren Datensatzes gesetzt.
+	 * setzt. Wenn der iterierbare Datensatz des erzeugten {@link Setter} {@code null} oder leer ist, wird das Setzen ignoriert. Andernfalls wird der gemäß dem
+	 * gegebenen {@link Getter} {@code toSource} umgewandelte Wert über die gegebene {@link Setter} an jedem Element des iterierbaren Datensatzes gesetzt.
 	 *
 	 * @param <GItem> Typ der Elemente des iterierbaren Datensatzes.
 	 * @param <GSource> Typ des Werts der Eigenschaft der Elemente.

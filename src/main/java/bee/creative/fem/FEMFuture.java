@@ -3,20 +3,17 @@ package bee.creative.fem;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
- * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann.<br>
- * Der Wert kapselt dazu eine gegebene {@link #function() Funktion} sowie einen gegebenen {@link #frame() Stapelrahmen} und wertet diese Funktion erst dann mit
- * diesem Stapelrahmen einmalig aus, wenn auf {@link #type() Datentyp} oder {@link #data() Nutzdaten} {@link #result(boolean) zugegriffen} wird, d.h. bei einem
- * Aufruf von {@link #result(boolean)}.<br>
- * Der von der Funktion berechnete Ergebniswert wird zur Wiederverwendung zwischengespeichert.<br>
- * Nach der einmaligen Auswertung der Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
+ * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann. Der Wert kapselt dazu eine gegebene {@link #function() Funktion} sowie einen gegebenen
+ * {@link #frame() Stapelrahmen} und wertet diese Funktion erst dann mit diesem Stapelrahmen einmalig aus, wenn auf {@link #type() Datentyp} oder {@link #data()
+ * Nutzdaten} {@link #result(boolean) zugegriffen} wird, d.h. bei einem Aufruf von {@link #result(boolean)}. Der von der Funktion berechnete Ergebniswert wird
+ * zur Wiederverwendung zwischengespeichert. Nach der einmaligen Auswertung der Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFuture extends FEMValue {
 
 	/** Diese Methode gibt den Ergebniswert des {@link FEMFunction#invoke(FEMFrame) Aufrufs} der gegebenen Funktion mit dem gegebenen Stapelrahmen als Wert mit
-	 * <em>call-by-reference</em>-Semantik zurück.<br>
-	 * Der gelieferte Ergebniswert verzögert die Auswertung der Funktion bis zum ersten {@link #result(boolean) Zugriff} auf seinen {@link #type() Datentyp} bzw.
-	 * seine {@link #data() Nutzdaten}.
+	 * <em>call-by-reference</em>-Semantik zurück. Der gelieferte Ergebniswert verzögert die Auswertung der Funktion bis zum ersten {@link #result(boolean)
+	 * Zugriff} auf seinen {@link #type() Datentyp} bzw. seine {@link #data() Nutzdaten}.
 	 *
 	 * @param frame Stapelrahmen.
 	 * @param function Funktion.
@@ -57,16 +54,14 @@ public final class FEMFuture extends FEMValue {
 		return this.result != null;
 	}
 
-	/** Diese Methode gibt die Stapelrahmen oder {@code null} zurück.<br>
-	 * Der erste Aufruf von {@link #result(boolean)} setzt die Stapelrahmen auf {@code null}.
+	/** Diese Methode gibt die Stapelrahmen oder {@code null} zurück. Der erste Aufruf von {@link #result(boolean)} setzt die Stapelrahmen auf {@code null}.
 	 *
 	 * @return Stapelrahmen oder {@code null}. */
 	public final synchronized FEMFrame frame() {
 		return this.frame;
 	}
 
-	/** Diese Methode gibt die Funktion oder {@code null} zurück.<br>
-	 * Der erste Aufruf von {@link #result(boolean)} setzt die Funktion auf {@code null}.
+	/** Diese Methode gibt die Funktion oder {@code null} zurück. Der erste Aufruf von {@link #result(boolean)} setzt die Funktion auf {@code null}.
 	 *
 	 * @return Funktion oder {@code null}. */
 	public final synchronized FEMFunction function() {
@@ -86,9 +81,8 @@ public final class FEMFuture extends FEMValue {
 	}
 
 	/** Diese Methode gibt das Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} der {@link #function() Funktion} mit den {@link #frame() Stapelrahmen}
-	 * zurück.<br>
-	 * Dieser Ergebniswert wird nur beim ersten Aufruf dieser Methode ermittelt und zur Wiederverwendung zwischengespeichert. Dabei werden die Verweise auf
-	 * Stapelrahmen und Funktion aufgelöst.
+	 * zurück. Dieser Ergebniswert wird nur beim ersten Aufruf dieser Methode ermittelt und zur Wiederverwendung zwischengespeichert. Dabei werden die Verweise
+	 * auf Stapelrahmen und Funktion aufgelöst.
 	 *
 	 * @see FEMFuture
 	 * @see #frame()

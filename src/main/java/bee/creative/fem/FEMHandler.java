@@ -2,8 +2,7 @@ package bee.creative.fem;
 
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. ein als {@link FEMValue} verpackter Verweis auf eine {@link FEMFunction
- * Funktion}.<br>
+/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. ein als {@link FEMValue} verpackter Verweis auf eine {@link FEMFunction Funktion}.
  * Intern wird der Funktionszeiger als {@link FEMFunction} dargestellt.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

@@ -273,8 +273,8 @@ public class Builders {
 			return this.customThis();
 		}
 
-		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag invertiert ein} und gibt {@code this} zurück.<br>
-		 * Schlüssel und Wert des Eintrags werden dazu als Wert bzw. Schlüssel verwendet.
+		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag invertiert ein} und gibt {@code this} zurück. Schlüssel und Wert des Eintrags
+		 * werden dazu als Wert bzw. Schlüssel verwendet.
 		 *
 		 * @param entry Eintrag.
 		 * @return {@code this}. */
@@ -540,7 +540,7 @@ public class Builders {
 	 * @param <GResult> Typ des Werts.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 	public static abstract class BaseValueBuilder<GResult, GThis> extends BaseBuilder2<GResult, GThis> implements Iterable<GResult> {
-	
+
 		/** Diese Methode setzt den Wert und gibt {@code this} zurück.
 		 *
 		 * @see #get()
@@ -550,7 +550,7 @@ public class Builders {
 			this.result = value;
 			return this.customThis();
 		}
-	
+
 		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 		 *
 		 * @see #use(Object)
@@ -560,7 +560,7 @@ public class Builders {
 		public GThis use(final BaseValueBuilder<? extends GResult, ?> source) throws NullPointerException {
 			return this.use(source.result);
 		}
-	
+
 		/** Diese Methode setzt den Wert auf {@code null} und gibt {@code this} zurück.
 		 *
 		 * @return {@code this}. */
@@ -568,7 +568,7 @@ public class Builders {
 			this.result = null;
 			return this.customThis();
 		}
-	
+
 		/** {@inheritDoc} */
 		@Override
 		public Iterator<GResult> iterator() {
@@ -576,7 +576,7 @@ public class Builders {
 			if (result == null) return Iterators.emptyIterator();
 			return Iterators.itemIterator(result);
 		}
-	
+
 	}
 
 	/** Diese Klasse implementiert einen Konfigurator für eine {@link Map}.

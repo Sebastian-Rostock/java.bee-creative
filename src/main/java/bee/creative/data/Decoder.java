@@ -2,8 +2,8 @@ package bee.creative.data;
 
 import java.io.IOException;
 
-/** Diese Schnittstelle definiert eine Methode, die einen Wert aus einer {@link CodecSource} ausliest und ihn zurück gibt.<br>
- * Die {@link CodecSource} kann dazu ein Kontextobjekt mit zusätzlichen Informationen bereitstellen.
+/** Diese Schnittstelle definiert eine Methode, die einen Wert aus einer {@link CodecSource} ausliest und ihn zurück gibt. Die {@link CodecSource} kann dazu ein
+ * Kontextobjekt mit zusätzlichen Informationen bereitstellen.
  *
  * @see CodecSource#context()
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

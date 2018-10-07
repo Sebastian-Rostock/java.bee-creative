@@ -719,8 +719,8 @@ public class Objects {
 		return result2;
 	}
 
-	/** Diese Methode gibt einen navigierten {@link Hasher} zurück.<br>
-	 * Der erzeugte {@link Hasher} liefert für eine Eingabe {@code input} den Streuwert {@code hasher.hash(navigator.get(input))}.
+	/** Diese Methode gibt einen navigierten {@link Hasher} zurück. Der erzeugte {@link Hasher} liefert für eine Eingabe {@code input} den Streuwert
+	 * {@code hasher.hash(navigator.get(input))}.
 	 *
 	 * @param navigator {@link Getter} zur Navigation.
 	 * @param hasher {@link Hasher} zur Abgleich.

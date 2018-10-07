@@ -126,8 +126,8 @@ public abstract class STSEdgeSet extends STSItemSet<STSEdge> {
 
 	}
 
-	/** Diese Klasse implementiert die Menge der Kanten zu einer gegebenen {@link IntegerArraySection Positionsliste}.<br>
-	 * <b>Die Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b> */
+	/** Diese Klasse implementiert die Menge der Kanten zu einer gegebenen {@link IntegerArraySection Positionsliste}. <b>Die Positionsliste muss aufsteigend
+	 * geordnet und Duplikatfrei sein!</b> */
 	protected static class ArrayEdgeSet extends STSEdgeSet {
 
 		final IntegerArraySection items;

@@ -170,8 +170,7 @@ public final class IAMCodec {
 			.put(IAMMapping.MODE_SORTED, SORTED).put("S", SORTED).put("SORTED", SORTED) //
 			.get();
 
-		/** Diese Methode gibt den {@link IAMFindMode} zum gegebenen Objekt zurück.<br>
-		 * Hierbei werden folgende Eingaben unterstützt:
+		/** Diese Methode gibt den {@link IAMFindMode} zum gegebenen Objekt zurück. Hierbei werden folgende Eingaben unterstützt:
 		 * <dl>
 		 * <dt>{@code null}, {@code ""}, {@code "A"}, {@code "AUTO"}</dt>
 		 * <dd>{@link #AUTO}</dd>
@@ -246,8 +245,7 @@ public final class IAMCodec {
 			.put("L", LITTLEENDIAN).put("LITTLEENDIAN", LITTLEENDIAN).put(LITTLEENDIAN.toOrder(), LITTLEENDIAN) //
 			.get();
 
-		/** Diese Methode gibt die {@link IAMByteOrder} zum gegebenen Objekt zurück.<br>
-		 * Hierbei werden folgende Eingaben unterstützt:
+		/** Diese Methode gibt die {@link IAMByteOrder} zum gegebenen Objekt zurück. Hierbei werden folgende Eingaben unterstützt:
 		 * <dl>
 		 * <dt>{@code null}, {@code ""}, {@code "A"}, {@code "AUTO"}</dt>
 		 * <dd>{@link #AUTO}</dd>
@@ -552,8 +550,7 @@ public final class IAMCodec {
 			.putAllInverse(IAMArrayFormat.strings).put(null, ARRAY).put("", ARRAY).put("A", ARRAY).put("B", BINARY) //
 			.get();
 
-		/** Diese Methode gibt das {@link IAMArrayFormat} zum gegebenen Objekt zurück.<br>
-		 * Hierbei werden folgende Eingaben unterstützt:
+		/** Diese Methode gibt das {@link IAMArrayFormat} zum gegebenen Objekt zurück. Hierbei werden folgende Eingaben unterstützt:
 		 * <dl>
 		 * <dt>{@code null}, {@code ""}, {@code "A"}, {@code "ARRAY"}</dt>
 		 * <dd>{@link #ARRAY}</dd>

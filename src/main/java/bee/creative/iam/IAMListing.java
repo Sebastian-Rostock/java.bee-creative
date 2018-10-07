@@ -13,8 +13,8 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte geordnete Auflistung von Elementen, welche selbst Zahlenfolgen ({@link IAMArray}) sind.
  * <p>
- * Die von {@link #items()} gelieferte {@link List} delegiert an {@link #item(int)} und {@link #itemCount()}.<br>
- * Die Methoden {@link #item(int, int)} und {@link #itemLength(int)} delegieren an {@link #item(int)}.
+ * Die von {@link #items()} gelieferte {@link List} delegiert an {@link #item(int)} und {@link #itemCount()}. Die Methoden {@link #item(int, int)} und
+ * {@link #itemLength(int)} delegieren an {@link #item(int)}.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMListing implements Iterable<IAMArray> {
@@ -142,9 +142,9 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	/** Dieses Feld speichert das leere {@link IAMListing}. */
 	public static final IAMListing EMPTY = new EmptyListing();
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMListing} und gibt dieses zurück.<br>
-	 * Wenn das Objekt ein {@link IAMListing} ist, wird dieses geliefert. Andernfalls wird {@code new IAMListingLoader(MMFArray.from(object).withOrder(...))}
-	 * geliefert, wobei die Bytereihenfolge über {@link IAMListingLoader#HEADER} ermittelt wird.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMListing} und gibt dieses zurück. Wenn das Objekt ein {@link IAMListing} ist, wird dieses
+	 * geliefert. Andernfalls wird {@code new IAMListingLoader(MMFArray.from(object).withOrder(...))} geliefert, wobei die Bytereihenfolge über
+	 * {@link IAMListingLoader#HEADER} ermittelt wird.
 	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMListingLoader#IAMListingLoader(MMFArray)

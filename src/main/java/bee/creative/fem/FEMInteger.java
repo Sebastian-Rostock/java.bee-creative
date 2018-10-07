@@ -2,8 +2,7 @@ package bee.creative.fem;
 
 import bee.creative.util.Comparators;
 
-/** Diese Klasse implementiert eine unveränderliche Dezimalzahl.<br>
- * Intern wird die Dezimalzahl als {@code long} dargestellt.
+/** Diese Klasse implementiert eine unveränderliche Dezimalzahl. Intern wird die Dezimalzahl als {@code long} dargestellt.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMInteger extends FEMValue implements Comparable<FEMInteger> {
@@ -34,8 +33,8 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		return new FEMInteger(value.longValue());
 	}
 
-	/** Diese Methode gibt eine neue Dezimalzahl mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
-	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	/** Diese Methode gibt eine neue Dezimalzahl mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
+	 * {@link #toString() Textdarstellung}.
 	 *
 	 * @see #toString()
 	 * @see Long#parseLong(String)

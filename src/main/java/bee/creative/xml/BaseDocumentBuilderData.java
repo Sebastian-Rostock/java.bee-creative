@@ -122,10 +122,10 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt den {@link DocumentBuilder} zurück.<br>
-	 * Wenn über {@link #useBuilder(DocumentBuilder)} noch kein {@link DocumentBuilder} gesetzt wurde, wird über
-	 * {@link DocumentBuilderFactory#newDocumentBuilder()} ein neuer erstellt, über {@link #useBuilder(DocumentBuilder)} gesetzt und über {@link #updateBuilder()}
-	 * aktualisiert. Für die Erstellung wird die {@link DocumentBuilderFactory} genutzt, die in {@link #openFactoryData()} konfiguriert ist.
+	/** Diese Methode gibt den {@link DocumentBuilder} zurück. Wenn über {@link #useBuilder(DocumentBuilder)} noch kein {@link DocumentBuilder} gesetzt wurde,
+	 * wird über {@link DocumentBuilderFactory#newDocumentBuilder()} ein neuer erstellt, über {@link #useBuilder(DocumentBuilder)} gesetzt und über
+	 * {@link #updateBuilder()} aktualisiert. Für die Erstellung wird die {@link DocumentBuilderFactory} genutzt, die in {@link #openFactoryData()} konfiguriert
+	 * ist.
 	 *
 	 * @see #useBuilder(DocumentBuilder)
 	 * @see #updateBuilder()
@@ -158,9 +158,9 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		return this.useBuilder(null);
 	}
 
-	/** Diese Methode aktualisiert die Einstellungen des {@link DocumentBuilder} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf den über {@link #getBuilder()} ermittelten {@link DocumentBuilder} die Einstellungen übertragen, die in
-	 * {@link #openHandlerData()} und {@link #openResolverData()} konfiguriert sind.
+	/** Diese Methode aktualisiert die Einstellungen des {@link DocumentBuilder} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
+	 * {@link #getBuilder()} ermittelten {@link DocumentBuilder} die Einstellungen übertragen, die in {@link #openHandlerData()} und {@link #openResolverData()}
+	 * konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.

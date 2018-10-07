@@ -189,11 +189,11 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode implementiert {@link #parseScript(String, int)} und ist eine Abkürzung für {@code this.parseItems(target, itemLimit, itemParser)}, wobei
-	 * {@code itemLimit} und {@code itemParser} abhängig vom gegebenen {@link FEMScript#mode() Skriptmodus} bestückt werden.<br>
-	 * Die Implementation in {@link FEMDomain} erfasst für alle nicht unterstützten Skriptmodus einen {@link #parseError(FEMParser) Fehlerbereich}. Die maximale
-	 * Elementanzahl {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der {@code itemParser}
-	 * delegiert für {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #parseValue(FEMParser)}, für {@link #PARSE_PROXY_MAP} an
-	 * {@link #parseProxy(FEMParser)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #parseFunction(FEMParser)}.
+	 * {@code itemLimit} und {@code itemParser} abhängig vom gegebenen {@link FEMScript#mode() Skriptmodus} bestückt werden. Die Implementation in
+	 * {@link FEMDomain} erfasst für alle nicht unterstützten Skriptmodus einen {@link #parseError(FEMParser) Fehlerbereich}. Die maximale Elementanzahl
+	 * {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der {@code itemParser} delegiert für
+	 * {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #parseValue(FEMParser)}, für {@link #PARSE_PROXY_MAP} an {@link #parseProxy(FEMParser)} sowie
+	 * für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #parseFunction(FEMParser)}.
 	 *
 	 * @see #parseItems(FEMParser, int, Filter)
 	 * @param target Parser.
@@ -311,12 +311,11 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Funktionszeigers und gibt nur dann {@code true} zurück, wenn dieser an der öffnenden
-	 * geschweiften Klammer erkannt wurde.<br>
-	 * Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #parseName(FEMParser) Parameternamen}. Auf diese folgen dann ein Doppelpunkt, die
-	 * {@link #parseFunction(FEMParser) Funktion} sowie die schließenden geschweifte Klammer. Die Symbole <code>'{'</code>, {@code ';'}, {@code ':'} und
-	 * <code>'}'</code> werden direkt als Typ der erfassten Bereiche eingesetzt. Wenn de Funktionszeiger fehlerhaft ist, wird für die öffnende geschweifte Klammer
-	 * sowie den Doppelpunkt der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können beliebig viele {@link #parseComments(FEMParser)
-	 * Kommentare/Leerraum} stehen.
+	 * geschweiften Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #parseName(FEMParser) Parameternamen}. Auf
+	 * diese folgen dann ein Doppelpunkt, die {@link #parseFunction(FEMParser) Funktion} sowie die schließenden geschweifte Klammer. Die Symbole <code>'{'</code>,
+	 * {@code ';'}, {@code ':'} und <code>'}'</code> werden direkt als Typ der erfassten Bereiche eingesetzt. Wenn de Funktionszeiger fehlerhaft ist, wird für die
+	 * öffnende geschweifte Klammer sowie den Doppelpunkt der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können beliebig viele
+	 * {@link #parseComments(FEMParser) Kommentare/Leerraum} stehen.
 	 *
 	 * @param target Parser.
 	 * @return {@code true}, wenn der Funktionszeiger erkannt wurde.
@@ -370,10 +369,10 @@ public class FEMDomain {
 		return true;
 	}
 
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Funktion und gibt nur dann {@code true} zurück, wenn diese erkannt wurde.<br>
-	 * Sie probiert hierfür {@link #parseArray(FEMParser) Wertlisten}, {@link #parseString(FEMParser) Zeichenketten}, {@link #parseLocale(FEMParser)
-	 * Parameterverweise}, {@link #parseHandler(FEMParser) Funktionszeiger} und {@link #parseConst(FEMParser) Konstanten} durch, wobei die letzten drei noch von
-	 * beliebig viel {@link #parseComments(FEMParser) Leerraum/Kommentaren} und {@link #parseParams(FEMParser) Parameterlisten} gefolgt werden können.
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Funktion und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert
+	 * hierfür {@link #parseArray(FEMParser) Wertlisten}, {@link #parseString(FEMParser) Zeichenketten}, {@link #parseLocale(FEMParser) Parameterverweise},
+	 * {@link #parseHandler(FEMParser) Funktionszeiger} und {@link #parseConst(FEMParser) Konstanten} durch, wobei die letzten drei noch von beliebig viel
+	 * {@link #parseComments(FEMParser) Leerraum/Kommentaren} und {@link #parseParams(FEMParser) Parameterlisten} gefolgt werden können.
 	 *
 	 * @param target Parser.
 	 * @return {@code true}, wenn die Funktion erkannt wurde.
@@ -431,8 +430,8 @@ public class FEMDomain {
 		}
 	}
 
-	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameterindexes und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde.<br>
-	 * Sie sucht dazu eine nicht leere Zeichenkette aus dezimalen Ziffern und nutzt das Symbole {@code '#'} als Typ des erfassten Bereichs.
+	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameterindexes und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie
+	 * sucht dazu eine nicht leere Zeichenkette aus dezimalen Ziffern und nutzt das Symbole {@code '#'} als Typ des erfassten Bereichs.
 	 *
 	 * @param target Parser.
 	 * @return {@code true}, wenn der Parameterindex erkannt wurde.
@@ -445,9 +444,9 @@ public class FEMDomain {
 		return true;
 	}
 
-	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameternamen und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde.<br>
-	 * Sie sucht dazu eine nicht leere Zeichenkette ohne Leerraum, Schrägstrich, Doppelpunkt, Semikolon sowie ohne Klammer. Das Symbol {@code '~'} wird als Typ
-	 * des erfassten Bereichs eingesetzt.
+	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameternamen und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie sucht
+	 * dazu eine nicht leere Zeichenkette ohne Leerraum, Schrägstrich, Doppelpunkt, Semikolon sowie ohne Klammer. Das Symbol {@code '~'} wird als Typ des
+	 * erfassten Bereichs eingesetzt.
 	 *
 	 * @param target Parser.
 	 * @return {@code true}, wenn der Parametername erkannt wurde.
@@ -481,9 +480,8 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Parameterverweises und gibt nur dann {@code true} zurück, wenn dieser am Dollarzeichen
-	 * erkannt wurde.<br>
-	 * Diesem Zeichen kann ein {@link #parseIndex(FEMParser) Parameterindex} oder ein {@link #parseName(FEMParser) Parametername} folgen. Das Symbol {@code '$'}
-	 * wird direkt als Typ des erfassten Bereichs eingesetzt.
+	 * erkannt wurde. Diesem Zeichen kann ein {@link #parseIndex(FEMParser) Parameterindex} oder ein {@link #parseName(FEMParser) Parametername} folgen. Das
+	 * Symbol {@code '$'} wird direkt als Typ des erfassten Bereichs eingesetzt.
 	 *
 	 * @param source Parser.
 	 * @return {@code true}, wenn der Parameterverweis erkannt wurde.
@@ -497,8 +495,7 @@ public class FEMDomain {
 		return true;
 	}
 
-	/** Diese Methode parst den {@link Token Bereich} von Leerraum, erfasst diese jedoch nicht.<br>
-	 * Zum Leerraum zählen alle Symbole kleiner oder gleich {@code ' '}.
+	/** Diese Methode parst den {@link Token Bereich} von Leerraum, erfasst diese jedoch nicht. Zum Leerraum zählen alle Symbole kleiner oder gleich {@code ' '}.
 	 *
 	 * @param source Parser.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
@@ -506,9 +503,9 @@ public class FEMDomain {
 		for (int symbol = source.symbol(); (symbol >= 0) && (symbol <= ' '); symbol = source.skip()) {}
 	}
 
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} von Kommentaren.<br>
-	 * Ein Kommentar wird als mit Schrägstrich {@link #parseSequence(FEMParser, char)} maskierte} Zeichenkette erkannt und erfasst. Vor und nach einem Kommentar
-	 * kann beliebig viel {@link #parseSpace(FEMParser) Leerraum} stehen.
+	/** Diese Methode parst und erfasst die {@link Token Bereiche} von Kommentaren. Ein Kommentar wird als mit Schrägstrich
+	 * {@link #parseSequence(FEMParser, char)} maskierte} Zeichenkette erkannt und erfasst. Vor und nach einem Kommentar kann beliebig viel
+	 * {@link #parseSpace(FEMParser) Leerraum} stehen.
 	 *
 	 * @param source Parser.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
@@ -530,9 +527,8 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Zeichenkette analog zu {@link Strings#parseSequence(CharSequence, char, char, char)} und
-	 * gibt nur dann {@code true} zurück, wenn diese am {@code openSymbol} erkannt wurde.<br>
-	 * Für eine fehlerfreie Sequenz wird {@code openSymbol} als Typ des Bereichs eingesetzt. Eine fehlerhafte Sequenz geht dagegen bis zum Ende der Eingabe und
-	 * wird mit dem Bereichstyp {@code '!'} erfasst.
+	 * gibt nur dann {@code true} zurück, wenn diese am {@code openSymbol} erkannt wurde. Für eine fehlerfreie Sequenz wird {@code openSymbol} als Typ des
+	 * Bereichs eingesetzt. Eine fehlerhafte Sequenz geht dagegen bis zum Ende der Eingabe und wird mit dem Bereichstyp {@code '!'} erfasst.
 	 *
 	 * @param target Parser.
 	 * @param openSymbol Erstes Symbol der Zeichenkette.
@@ -681,8 +677,8 @@ public class FEMDomain {
 		}
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der Konstanten mit der gegebenen Bezeichnung.<br>
-	 * Die Formatierung der Bezeichnung erfolgt dazu über {@link #formatConst(String)}.
+	/** Diese Methode formateirt und erfasst die Textdarstellung der Konstanten mit der gegebenen Bezeichnung. Die Formatierung der Bezeichnung erfolgt dazu über
+	 * {@link #formatConst(String)}.
 	 *
 	 * @param target Formatierer.
 	 * @param source Bezeichnung.
@@ -691,12 +687,11 @@ public class FEMDomain {
 		target.putToken(this.formatConst(source));
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der Liste der gegebenen Elemente.<br>
-	 * Die Elemente werden über den gegebenen {@link Setter} {@link Setter#set(Object, Object) formatiert} und mit {@code commaSymbol} separiert sowie in
-	 * {@code openSymbol} und {@code closeSymbol} eingeschlossen. Bei einer licht leeren Liste {@link FEMFormatter#putBreakInc() beginnt} nach {@code openSymbol}
-	 * eine neue Hierarchieebene, die vor {@code closeSymbol} {@link FEMFormatter#putBreakDec() endet}. Nach jedem {@code commaSymbol} wird ein
-	 * {@link FEMFormatter#putBreakSpace() bedingtes Leerzeichen} eingefügt. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent()
-	 * markiert}, wenn die Liste mehr als ein Element enthält.
+	/** Diese Methode formateirt und erfasst die Textdarstellung der Liste der gegebenen Elemente. Die Elemente werden über den gegebenen {@link Setter}
+	 * {@link Setter#set(Object, Object) formatiert} und mit {@code commaSymbol} separiert sowie in {@code openSymbol} und {@code closeSymbol} eingeschlossen. Bei
+	 * einer licht leeren Liste {@link FEMFormatter#putBreakInc() beginnt} nach {@code openSymbol} eine neue Hierarchieebene, die vor {@code closeSymbol}
+	 * {@link FEMFormatter#putBreakDec() endet}. Nach jedem {@code commaSymbol} wird ein {@link FEMFormatter#putBreakSpace() bedingtes Leerzeichen} eingefügt. Die
+	 * aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Liste mehr als ein Element enthält.
 	 *
 	 * @see FEMFormatter#putBreakInc()
 	 * @see FEMFormatter#putBreakDec()
@@ -735,10 +730,10 @@ public class FEMDomain {
 		}
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Parameterfunktionsliste.<br>
-	 * Hierbei werden die {@link #formatFunction(FEMFormatter, FEMFunction) formatierten} Parameterfunktionen mit {@code ";"} separiert sowie in {@code "("} und
-	 * {@code ")"} eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die
-	 * Funktionsliste mehr als ein Element enthält.
+	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Parameterfunktionsliste. Hierbei werden die
+	 * {@link #formatFunction(FEMFormatter, FEMFunction) formatierten} Parameterfunktionen mit {@code ";"} separiert sowie in {@code "("} und {@code ")"}
+	 * eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Funktionsliste mehr
+	 * als ein Element enthält.
 	 *
 	 * @see #formatItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
 	 * @see #formatFunction(FEMFormatter, FEMFunction)
@@ -757,10 +752,10 @@ public class FEMDomain {
 		});
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Stapelrahmen.<br>
-	 * Hierbei werden die nummerierten und {@link #formatFunction(FEMFormatter, FEMFunction) formatierten} Parameterwerte mit {@code ";"} separiert sowie in
-	 * {@code "("} und {@code ")"} eingeschlossen erfasst. Die Nummerierung wird vor jedem Parameterwert als Ordnungsposition {@code i} im Format {@code "$i: "}
-	 * angefügt. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
+	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Stapelrahmen. Hierbei werden die nummerierten und
+	 * {@link #formatFunction(FEMFormatter, FEMFunction) formatierten} Parameterwerte mit {@code ";"} separiert sowie in {@code "("} und {@code ")"}
+	 * eingeschlossen erfasst. Die Nummerierung wird vor jedem Parameterwert als Ordnungsposition {@code i} im Format {@code "$i: "} angefügt. Die aktuelle
+	 * Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
 	 *
 	 * @see #formatItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
 	 * @see #formatFunction(FEMFormatter, FEMFunction)
@@ -783,13 +778,13 @@ public class FEMDomain {
 		});
 	}
 
-	/** Diese Methode formatiert und erfasst die Textdarstellung der gegebene Funktion.<br>
-	 * Für eine {@link TraceFunction}, eine {@link FrameFunction}, eine {@link FutureFunction} oder eine {@link ClosureFunction} wird die Textdarstellung ihrer
-	 * referenzierten Funktion mit dieser Methode erfasst. Bei einer {@link ConcatFunction} oder einer {@link CompositeFunction} werden die Textdarstellungen der
-	 * aufzurufenden Funktion mit dieser Methode sowie die der Parameterliste mit {@link #formatParams(FEMFormatter, Iterable)} erfasst. Bei einem
-	 * {@link FEMProxy} wird dessen {@link FEMProxy#name() Name} über {@link #formatConst(FEMFormatter, String)} erfasst. Jeder andere {@link FEMValue} würd über
-	 * {@link #formatValue(FEMFormatter, FEMValue)} erfasst. Jede andere {@link FEMFunction} wird über {@link FEMFunction#toString()} in eine Zeichenkette
-	 * überführt, welche anschließend über {@link #formatConst(FEMFormatter, String)} erfasst wird.
+	/** Diese Methode formatiert und erfasst die Textdarstellung der gegebene Funktion. Für eine {@link TraceFunction}, eine {@link FrameFunction}, eine
+	 * {@link FutureFunction} oder eine {@link ClosureFunction} wird die Textdarstellung ihrer referenzierten Funktion mit dieser Methode erfasst. Bei einer
+	 * {@link ConcatFunction} oder einer {@link CompositeFunction} werden die Textdarstellungen der aufzurufenden Funktion mit dieser Methode sowie die der
+	 * Parameterliste mit {@link #formatParams(FEMFormatter, Iterable)} erfasst. Bei einem {@link FEMProxy} wird dessen {@link FEMProxy#name() Name} über
+	 * {@link #formatConst(FEMFormatter, String)} erfasst. Jeder andere {@link FEMValue} würd über {@link #formatValue(FEMFormatter, FEMValue)} erfasst. Jede
+	 * andere {@link FEMFunction} wird über {@link FEMFunction#toString()} in eine Zeichenkette überführt, welche anschließend über
+	 * {@link #formatConst(FEMFormatter, String)} erfasst wird.
 	 *
 	 * @param target Formatierer.
 	 * @param source Funktion.
@@ -827,9 +822,9 @@ public class FEMDomain {
 		}
 	}
 
-	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Werts.<br>
-	 * Dazu delegiert sie den gegebenen Wert an die spezifischen Formatierungsmethoden. Werte unbekannter Datentypen werden über {@link FEMValue#toString()} in
-	 * eine Zeichenkette überführt, welche anschließend über {@link #formatConst(FEMFormatter, String)} erfasst wird.
+	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Werts. Dazu delegiert sie den gegebenen Wert an die spezifischen
+	 * Formatierungsmethoden. Werte unbekannter Datentypen werden über {@link FEMValue#toString()} in eine Zeichenkette überführt, welche anschließend über
+	 * {@link #formatConst(FEMFormatter, String)} erfasst wird.
 	 *
 	 * @see #formatFuture(FEMFormatter, FEMFuture)
 	 * @see #formatNative(FEMFormatter, FEMNative)
@@ -897,11 +892,10 @@ public class FEMDomain {
 		}
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Ergebniswerts.<br>
-	 * Die Formatierung erfolgt dazu für eine bereits ausgewertete {@link FEMFuture} mit deren {@link FEMFuture#result(boolean) Ergebniswert} über
-	 * {@link #formatValue(FEMFormatter, FEMValue)}. Andernfalls werden deren {@link FEMFuture#function() Funktion} über
-	 * {@link #formatFunction(FEMFormatter, FEMFunction)} und deren {@link FEMFuture#frame() Stapelrahmen} über {@link #formatFrame(FEMFormatter, FEMFrame)}
-	 * erfasst.
+	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Ergebniswerts. Die Formatierung erfolgt dazu für eine bereits ausgewertete
+	 * {@link FEMFuture} mit deren {@link FEMFuture#result(boolean) Ergebniswert} über {@link #formatValue(FEMFormatter, FEMValue)}. Andernfalls werden deren
+	 * {@link FEMFuture#function() Funktion} über {@link #formatFunction(FEMFormatter, FEMFunction)} und deren {@link FEMFuture#frame() Stapelrahmen} über
+	 * {@link #formatFrame(FEMFormatter, FEMFrame)} erfasst.
 	 *
 	 * @param target Formatierer.
 	 * @param source Ergebniswert.
@@ -918,9 +912,9 @@ public class FEMDomain {
 		}
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen nativen Objekts.<br>
-	 * Die Formatierung erfolgt dazu für Nutzdaten vom Typ {@link String} und {@link Character} {@link Strings#formatSequence(CharSequence, char) maskiert} mit
-	 * doppelten bzw. einfachen Anführungszeichen. Alle anderen Nutzdaten werden als Konstante {@link #formatConst(FEMFormatter, String) maskiert}.
+	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen nativen Objekts. Die Formatierung erfolgt dazu für Nutzdaten vom Typ {@link String}
+	 * und {@link Character} {@link Strings#formatSequence(CharSequence, char) maskiert} mit doppelten bzw. einfachen Anführungszeichen. Alle anderen Nutzdaten
+	 * werden als Konstante {@link #formatConst(FEMFormatter, String) maskiert}.
 	 *
 	 * @param target Formatierer.
 	 * @param source natives Objekt.
@@ -946,10 +940,9 @@ public class FEMDomain {
 		target.putToken(source.toString());
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Wertliste.<br>
-	 * Hierbei werden die {@link #formatValue(FEMFormatter, FEMValue) formatierten} Werte mit {@code ";"} separiert sowie in {@code "["} und {@code "]"}
-	 * eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Wertliste mehr als
-	 * ein Element enthält.
+	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Wertliste. Hierbei werden die {@link #formatValue(FEMFormatter, FEMValue)
+	 * formatierten} Werte mit {@code ";"} separiert sowie in {@code "["} und {@code "]"} eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als
+	 * einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Wertliste mehr als ein Element enthält.
 	 *
 	 * @see #formatItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
 	 * @see #formatValue(FEMFormatter, FEMValue)
@@ -968,8 +961,8 @@ public class FEMDomain {
 		});
 	}
 
-	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Funktionszeigers.<br>
-	 * Die {@link #formatFunction(FEMFormatter, FEMFunction) formatierte} Funktion wird dabei in <code>"{:"</code> und <code>"}"</code> eingeschlossen.
+	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Funktionszeigers. Die {@link #formatFunction(FEMFormatter, FEMFunction)
+	 * formatierte} Funktion wird dabei in <code>"{:"</code> und <code>"}"</code> eingeschlossen.
 	 *
 	 * @see #formatFunction(FEMFormatter, FEMFunction)
 	 * @param target Formatierer.
@@ -991,8 +984,8 @@ public class FEMDomain {
 		target.putToken(source.toString());
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Zeichenkette.<br>
-	 * Die Formatierung erfolgt dazu über {@link Strings#formatSequence(CharSequence, char)} mit dem einfachen Anführungszeichen zur Maskierung.
+	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Zeichenkette. Die Formatierung erfolgt dazu über
+	 * {@link Strings#formatSequence(CharSequence, char)} mit dem einfachen Anführungszeichen zur Maskierung.
 	 *
 	 * @param target Formatierer.
 	 * @param source Zeichenkette.
@@ -1204,10 +1197,10 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode implementiert {@link #compileScript(FEMScript)} und ist eine Abkürzung für {@code this.compileAsItems(source, itemLimit, itemCompiler)},
-	 * wobei {@code itemLimit} und {@code itemCompiler} abhängig vom {@link FEMScript#mode() Skriptmodus} bestückt werden.<br>
-	 * Die maximale Elementanzahl {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der
-	 * {@code itemCompiler} delegiert für {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #compileValue(FEMCompiler)}, für {@link #PARSE_PROXY_MAP}
-	 * an {@link #compileProxy(FEMCompiler)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #compileFunction(FEMCompiler)}.
+	 * wobei {@code itemLimit} und {@code itemCompiler} abhängig vom {@link FEMScript#mode() Skriptmodus} bestückt werden. Die maximale Elementanzahl
+	 * {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der {@code itemCompiler} delegiert für
+	 * {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #compileValue(FEMCompiler)}, für {@link #PARSE_PROXY_MAP} an
+	 * {@link #compileProxy(FEMCompiler)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #compileFunction(FEMCompiler)}.
 	 *
 	 * @see #parseScript(FEMParser, int)
 	 * @param source Kompiler.
@@ -1591,8 +1584,8 @@ public class FEMDomain {
 	 *
 	 * @param source Kompiler.
 	 * @param result aufzurufende Funktion.
-	 * @param concat {@code true}, wenn die erste Parameterliste über {@link FEMFunction#concat(List)} angebunden werden soll.<br>
-	 *        {@code false}, wenn sie über {@link FEMFunction#compose(List)} angebunden werden soll.
+	 * @param concat {@code true}, wenn die erste Parameterliste über {@link FEMFunction#concat(List)} angebunden werden soll. {@code false}, wenn sie über
+	 *        {@link FEMFunction#compose(List)} angebunden werden soll.
 	 * @return Funktionsaufruf oder {@code result}.
 	 * @throws NullPointerException Wenn {@code source} bzw. {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */

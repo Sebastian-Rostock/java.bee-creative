@@ -88,10 +88,9 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt das {@link Schema} zurück.<br>
-	 * Wenn über {@link #useSchema(Schema)} noch kein {@link Schema} gesetzt wurden, werden über {@link SchemaFactory#newSchema(Source)} ein neues erstellt und
-	 * über {@link #useSchema(Schema)} gesetzt. Die zur Erstellung verwendeten Quelldaten können über {@link #openSourceData()} konfiguriert werden. Wenn diese
-	 * {@code null} sind, wird {@code null} geliefert.
+	/** Diese Methode gibt das {@link Schema} zurück. Wenn über {@link #useSchema(Schema)} noch kein {@link Schema} gesetzt wurden, werden über
+	 * {@link SchemaFactory#newSchema(Source)} ein neues erstellt und über {@link #useSchema(Schema)} gesetzt. Die zur Erstellung verwendeten Quelldaten können
+	 * über {@link #openSourceData()} konfiguriert werden. Wenn diese {@code null} sind, wird {@code null} geliefert.
 	 *
 	 * @see #useSchema(Schema)
 	 * @return {@link Schema} oder {@code null}.

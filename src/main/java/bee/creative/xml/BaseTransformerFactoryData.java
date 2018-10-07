@@ -159,9 +159,9 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt die {@link TransformerFactory} zurück.<br>
-	 * Wenn über {@link #useFactory(TransformerFactory)} noch keine {@link TransformerFactory} gesetzt wurde, wird über {@link TransformerFactory#newInstance()}
-	 * eine neue erstellt, über {@link #useFactory(TransformerFactory)} gesetzt und über {@link #updateFactory()} aktualisiert.
+	/** Diese Methode gibt die {@link TransformerFactory} zurück. Wenn über {@link #useFactory(TransformerFactory)} noch keine {@link TransformerFactory} gesetzt
+	 * wurde, wird über {@link TransformerFactory#newInstance()} eine neue erstellt, über {@link #useFactory(TransformerFactory)} gesetzt und über
+	 * {@link #updateFactory()} aktualisiert.
 	 *
 	 * @see #useFactory(TransformerFactory)
 	 * @see #updateFactory()
@@ -193,9 +193,9 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		return this.useFactory(null);
 	}
 
-	/** Diese Methode aktualisiert die Einstellungen der {@link TransformerFactory} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf die über {@link #getFactory()} ermittelte {@link TransformerFactory} die Einstellungen übertragen, die in
-	 * {@link #openListenerData()}, {@link #openResolverData()}, {@link #openFeatureData()} und {@link #openAttributeData()} konfiguriert sind.
+	/** Diese Methode aktualisiert die Einstellungen der {@link TransformerFactory} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf die über
+	 * {@link #getFactory()} ermittelte {@link TransformerFactory} die Einstellungen übertragen, die in {@link #openListenerData()}, {@link #openResolverData()},
+	 * {@link #openFeatureData()} und {@link #openAttributeData()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws TransformerConfigurationException Wenn {@link TransformerFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst. */

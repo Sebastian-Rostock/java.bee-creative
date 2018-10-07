@@ -657,8 +657,8 @@ class TreeData<GKey, GValue> {
 		return nodeValue & 3;
 	}
 
-	/** Diese Methode gibt die inversen Balanz zur gegebenen zurück.<br>
-	 * Diese sollte vor seiner Verwendung noch maskiert werden, bspw. mit {@code & 1} oder {@code & 2}.
+	/** Diese Methode gibt die inversen Balanz zur gegebenen zurück. Diese sollte vor seiner Verwendung noch maskiert werden, bspw. mit {@code & 1} oder
+	 * {@code & 2}.
 	 *
 	 * @param nodeBalance Knotenwert als Element aus {@link #prevs} oder {@link #nexts}.
 	 * @return inverse Knotenbalanz mit {@code 0} und {@code 4} für gleichgewicht, {@code 2} für rechtslastig und {@code 1} für linkslastig. */
@@ -761,8 +761,8 @@ class TreeData<GKey, GValue> {
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	Object[] values;
 
-	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
-	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
+	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}. Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine
+	 * einfach verkettete Liste. */
 	int entry = 0;
 
 	/** Dieses Feld speichert die Anzahl der Einträge. */
@@ -895,8 +895,7 @@ class TreeData<GKey, GValue> {
 		return (index >= 0) && Objects.equals(this.values[index], value);
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Wert zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Wert zurück. Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
 	 *
 	 * @see Map#get(Object)
 	 * @param key Schlüssel des Eintrags.
@@ -926,8 +925,8 @@ class TreeData<GKey, GValue> {
 		return (GValue)this.values[entryIndex];
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird {@code -1}
+	 * geliefert.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen Eintrags oder {@code -1}. */
@@ -950,8 +949,8 @@ class TreeData<GKey, GValue> {
 		return -1;
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück.<br>
-	 * Wenn kein solcher Eintrag existierte, wird {@code null} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück. Wenn kein solcher Eintrag
+	 * existierte, wird {@code null} geliefert.
 	 *
 	 * @see Map#put(Object, Object)
 	 * @param key Schlüssel des Eintrags.
@@ -987,8 +986,7 @@ class TreeData<GKey, GValue> {
 		return (GValue)result;
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird er erzeugt.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird er erzeugt.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
@@ -1065,8 +1063,8 @@ class TreeData<GKey, GValue> {
 		return nodeIndex; // positiv, da Teilbaum unverändert
 	}
 
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
+	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück. Wenn kein solcher Eintrag existiert, wird
+	 * {@code null} geliefert.
 	 *
 	 * @see Map#remove(Object)
 	 * @param key Schlüssel.

@@ -1,8 +1,7 @@
 package bee.creative._dev_.sts;
 
-/** Diese Klasse implementiert eine gerichtete Kante eines Graphen, der in einem {@link #store() Graphspeicher} verwaltet wird.<br>
- * Die korrekte Ermittlung von {@link #equals(Object) Äquivalenz} und {@link #compareTo(STSEdge) Ordnung} zweier Kanten setzt deren Verwaltung im gleichen
- * Graphspeicher voraus.
+/** Diese Klasse implementiert eine gerichtete Kante eines Graphen, der in einem {@link #store() Graphspeicher} verwaltet wird. Die korrekte Ermittlung von
+ * {@link #equals(Object) Äquivalenz} und {@link #compareTo(STSEdge) Ordnung} zweier Kanten setzt deren Verwaltung im gleichen Graphspeicher voraus.
  *
  * @see STSStore
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

@@ -8,9 +8,8 @@ import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte Funktion, deren {@link #invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen
- * werden kann, um einen Ergebniswert zu ermitteln.<br>
- * Aus den {@link FEMFrame#params() Parameterwerten} sowie dem {@link FEMFrame#context() Kontextobjekt} der Stapelrahmens können hierbei Informationen für die
- * Berechnungen extrahiert werden. Der Zustand des Kontextobjekts kann auch modifiziert werden.
+ * werden kann, um einen Ergebniswert zu ermitteln. Aus den {@link FEMFrame#params() Parameterwerten} sowie dem {@link FEMFrame#context() Kontextobjekt} der
+ * Stapelrahmens können hierbei Informationen für die Berechnungen extrahiert werden. Der Zustand des Kontextobjekts kann auch modifiziert werden.
  * <p>
  * Als {@link #toString() Textdarstellung} wird der {@link Class#getSimpleName() Klassenname} verwendet.
  *
@@ -451,18 +450,16 @@ public abstract class FEMFunction {
 	 * {@link FEMTracer#getFunction() aktuellen Funktion} des {@link FEMTracer Überwachungsobjekts} verwendet werden. Wenn diese Funktion ein Wert ist, sollte
 	 * dieser sich unverändert liefern.
 	 * <p>
-	 * Der {@link #invoke(FEMFrame) Aufruf} der gelieferten Funktion startet folgenden Ablauf:<br>
-	 * Zuerst werden dem Überwachungsobjekt der gegebene Stapelrahmen sowie die {@link FEMTracer#getFunction() aufzurufenden Funktion} bekannt gegeben und die
-	 * Methode {@link FEMTracer.Listener#onExecute(FEMTracer) tracer.getListener().onExecute(tracer)} aufgerufen.<br>
-	 * Anschließend wird die {@link FEMTracer#getFunction() aktuelle Funktion} des Überwachungsobjekts mit seinem {@link FEMTracer#getFrame() aktuellen
-	 * Stapelrahmen} ausgewertet und das Ergebnis im Überwachungsobjekt {@link FEMTracer#useResult(FEMValue) gespeichert}.<br>
-	 * Abschließend wird {@link FEMTracer.Listener#onReturn(FEMTracer) tracer.getListener().onReturn(tracer)} aufgerufen und der {@link FEMTracer#getResult()
-	 * aktuelle Ergebniswert} geliefert.<br>
-	 * Wenn eine {@link RuntimeException} auftritt, wird diese im Überwachungsobjekt {@link FEMTracer#useException(RuntimeException) gespeichert},
-	 * {@link FEMTracer.Listener#onThrow(FEMTracer) tracer.getListener().onThrow(tracer)} aufgerufen und die {@link FEMTracer#getException() aktuelle Ausnahme}
-	 * des Überwachungsobjekts ausgelöst.<br>
-	 * In jedem Fall wird der Zustand des Überwachungsobjekts beim Verlassen dieser Methode {@link FEMTracer#clear() bereinigt}.<br>
-	 * Der verwendete {@link FEMTracer.Listener} wird nur einmalig zu Beginn der Auswertung ermittelt.
+	 * Der {@link #invoke(FEMFrame) Aufruf} der gelieferten Funktion startet folgenden Ablauf: Zuerst werden dem Überwachungsobjekt der gegebene Stapelrahmen
+	 * sowie die {@link FEMTracer#getFunction() aufzurufenden Funktion} bekannt gegeben und die Methode {@link FEMTracer.Listener#onExecute(FEMTracer)
+	 * tracer.getListener().onExecute(tracer)} aufgerufen. Anschließend wird die {@link FEMTracer#getFunction() aktuelle Funktion} des Überwachungsobjekts mit
+	 * seinem {@link FEMTracer#getFrame() aktuellen Stapelrahmen} ausgewertet und das Ergebnis im Überwachungsobjekt {@link FEMTracer#useResult(FEMValue)
+	 * gespeichert}. Abschließend wird {@link FEMTracer.Listener#onReturn(FEMTracer) tracer.getListener().onReturn(tracer)} aufgerufen und der
+	 * {@link FEMTracer#getResult() aktuelle Ergebniswert} geliefert. Wenn eine {@link RuntimeException} auftritt, wird diese im Überwachungsobjekt
+	 * {@link FEMTracer#useException(RuntimeException) gespeichert}, {@link FEMTracer.Listener#onThrow(FEMTracer) tracer.getListener().onThrow(tracer)} aufgerufen
+	 * und die {@link FEMTracer#getException() aktuelle Ausnahme} des Überwachungsobjekts ausgelöst. In jedem Fall wird der Zustand des Überwachungsobjekts beim
+	 * Verlassen dieser Methode {@link FEMTracer#clear() bereinigt}. Der verwendete {@link FEMTracer.Listener} wird nur einmalig zu Beginn der Auswertung
+	 * ermittelt.
 	 *
 	 * @see TraceFunction
 	 * @see #withoutTracer()
@@ -481,9 +478,8 @@ public abstract class FEMFunction {
 		return this;
 	}
 
-	/** Diese Methode gibt eine diese Funktion repräsentierenden {@link FEMValue Wert} zurück.<br>
-	 * Ein Wert liefert hierbei sich selbst. Jede andere Funktion liefert einen {@link FEMHandler}, sodass die über {@code this.toValue().toFunction()} ermittelte
-	 * Funktion gleich zu dieser ist.
+	/** Diese Methode gibt eine diese Funktion repräsentierenden {@link FEMValue Wert} zurück. Ein Wert liefert hierbei sich selbst. Jede andere Funktion liefert
+	 * einen {@link FEMHandler}, sodass die über {@code this.toValue().toFunction()} ermittelte Funktion gleich zu dieser ist.
 	 *
 	 * @see FEMHandler
 	 * @return Funktionszeiger. */

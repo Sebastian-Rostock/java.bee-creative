@@ -1,9 +1,8 @@
 package bee.creative._deprecated_;
 
 /** Diese Schnittstelle definiert Methoden zur Bereitstellung und Zuweisung von Informationen eines Quellobjekts auf ein Zielobket, welche von einem
- * {@link Assigner} bzw. {@link Assignable} genutzt werden können.<br>
- * Im Kontext eines {@link Assignable} kann einem Quellobjekt ein Zielobjekt zugeordnet werden, wodurch das Übertragen von Informationen in komplexern
- * Objektgraphen erleichtert werden kann.
+ * {@link Assigner} bzw. {@link Assignable} genutzt werden können. Im Kontext eines {@link Assignable} kann einem Quellobjekt ein Zielobjekt zugeordnet werden,
+ * wodurch das Übertragen von Informationen in komplexern Objektgraphen erleichtert werden kann.
  *
  * @see Assigner
  * @see Assignable
@@ -34,8 +33,7 @@ public interface Assignment<GSource> {
 	 * @throws NullPointerException Wenn das gegebene Quellobjekt {@code null} ist. */
 	public <GObject> void set(GObject source, GObject target) throws NullPointerException;
 
-	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt.<br>
-	 * Die Implementation entspricht <pre>
+	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt. Die Implementation entspricht <pre>
 	 * this.assign(source, target, true);</pre> und damit <pre>
 	 * this.set(source, target);
 	 * target.assign(this.assignment(source));</pre>
@@ -48,10 +46,9 @@ public interface Assignment<GSource> {
 	 * @throws IllegalArgumentException Wenn das Quellobjekt ungültig ist. */
 	public <GObject> void assign(GObject source, Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt.<br>
-	 * Hierbei wird dem Quellobjekt zuerst über {@link #set(Object, Object)} das Zielobjekt zugeordnet. Anschließend erfolgt die Zuweisung über die Methode
-	 * {@link Assignable#assign(Assignment)} des gegebenen Zielobjekt entweder sofort ({@code commit = true}) oder später ({@code commit = false}) im Rahmen der
-	 * Methode {@link #commit()}.
+	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt. Hierbei wird dem Quellobjekt zuerst über
+	 * {@link #set(Object, Object)} das Zielobjekt zugeordnet. Anschließend erfolgt die Zuweisung über die Methode {@link Assignable#assign(Assignment)} des
+	 * gegebenen Zielobjekt entweder sofort ({@code commit = true}) oder später ({@code commit = false}) im Rahmen der Methode {@link #commit()}.
 	 *
 	 * @param <GObject> Typ der Quell- und Zielobjekte.
 	 * @param source Quellobjekt.
@@ -62,8 +59,7 @@ public interface Assignment<GSource> {
 	 * @throws IllegalArgumentException Wenn das Quellobjekt ungültig ist. */
 	public <GObject> void assign(GObject source, Assignable<? super GObject> target, boolean commit) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt.<br>
-	 * Die Implementation entspricht <pre>
+	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt. Die Implementation entspricht <pre>
 	 * this.assign(source, target, assigner, true);</pre> und damit <pre>
 	 * this.set(source, target);
 	 * assigner.assign(target, this.assignment(source));</pre>
@@ -78,10 +74,9 @@ public interface Assignment<GSource> {
 	public <GObject> void assign(GObject source, GObject target, Assigner<? super GObject, ? super GObject> assigner)
 		throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt.<br>
-	 * Hierbei wird dem Quellobjekt zuerst über {@link #set(Object, Object)} das Zielobjekt zugeordnet. Anschließend erfolgt die Zuweisung über die Methode
-	 * {@link Assigner#assign(Object, Assignment)} des gegebenen {@link Assigner} entweder sofort ({@code commit = true}) oder später ({@code commit = false}) im
-	 * Rahmen der Methode {@link #commit()}.
+	/** Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt. Hierbei wird dem Quellobjekt zuerst über
+	 * {@link #set(Object, Object)} das Zielobjekt zugeordnet. Anschließend erfolgt die Zuweisung über die Methode {@link Assigner#assign(Object, Assignment)} des
+	 * gegebenen {@link Assigner} entweder sofort ({@code commit = true}) oder später ({@code commit = false}) im Rahmen der Methode {@link #commit()}.
 	 *
 	 * @param <GObject> Typ des Quellobjekts sowie des Zielobjekts.
 	 * @param source Quellobjekt.

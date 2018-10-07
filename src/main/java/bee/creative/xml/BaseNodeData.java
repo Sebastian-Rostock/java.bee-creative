@@ -28,8 +28,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		 * @return Besitzer. */
 		public abstract GOwner closeAttr();
 
-		/** Diese Methode entfernt den {@link #getNode() aktuelen Attributknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück.<br>
-		 * Wenn der aktuelle Knoten {@code null} ist, erfolgt keine Änderung.
+		/** Diese Methode entfernt den {@link #getNode() aktuelen Attributknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück. Wenn der
+		 * aktuelle Knoten {@code null} ist, erfolgt keine Änderung.
 		 *
 		 * @see #closeAttr()
 		 * @see Element#removeAttributeNode(Attr)
@@ -68,9 +68,9 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		public abstract GOwner closeChld();
 
 		/** Diese Methode fügt den {@link #getNode() aktuellen Kindknoten} an der gegebenen Position im Elementknoten des Besitzers ein und gibt den Besitzer
-		 * zurück.<br>
-		 * Negative Positionen zählen vom Ende der Kindknotenliste, sodass der Kindknoten für die Positionen {@code -1}, {@code -2} usw. zum letzten, vorletzten
-		 * usw. Kindknoten wird. Wenn die effektive Position außerhalb der Kindknotenliste liegt, wird der Kindknoten am Beginn bzw. am Ende der Liste eingefügt.
+		 * zurück. Negative Positionen zählen vom Ende der Kindknotenliste, sodass der Kindknoten für die Positionen {@code -1}, {@code -2} usw. zum letzten,
+		 * vorletzten usw. Kindknoten wird. Wenn die effektive Position außerhalb der Kindknotenliste liegt, wird der Kindknoten am Beginn bzw. am Ende der Liste
+		 * eingefügt.
 		 *
 		 * @see #closeChld()
 		 * @see Node#insertBefore(Node, Node)
@@ -98,8 +98,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 			}
 		}
 
-		/** Diese Methode entfernt den {@link #getNode() aktuelen Kindknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück.<br>
-		 * Wenn der aktuelle Knoten {@code null} ist, erfolgt keine Änderung.
+		/** Diese Methode entfernt den {@link #getNode() aktuelen Kindknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück. Wenn der aktuelle
+		 * Knoten {@code null} ist, erfolgt keine Änderung.
 		 *
 		 * @see #closeChld()
 		 * @see Element#removeAttributeNode(Attr)
@@ -267,8 +267,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.hasType(Node.DOCUMENT_NODE);
 	}
 
-	/** Diese Methode gibt den Knotentyp des {@link #getNode() aktuellen Knote} zurück.<br>
-	 * Wenn es {@link #hasNode() keinen solchen Knoten gibt}, wird {@code 0} geliefert.
+	/** Diese Methode gibt den Knotentyp des {@link #getNode() aktuellen Knote} zurück. Wenn es {@link #hasNode() keinen solchen Knoten gibt}, wird {@code 0}
+	 * geliefert.
 	 *
 	 * @return Knotentyp oder {@code 0}. */
 	public final int getType() {
@@ -302,9 +302,9 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.getValue(null);
 	}
 
-	/** Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück.<br>
-	 * Wenn der Knoten ein {@link #hasType_ELEM() Elementknoten} ist, wird dessen {@link Node#getTextContent() Inhalt} geliefert. Wenn es {@link #hasNode() keinen
-	 * aktuellen Knoten gibt}, wird der gegebene Vorgabewert geliefert. Andernfalls wird der {@link Node#getNodeValue() Wert} des Knoten geliefert.
+	/** Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück. Wenn der Knoten ein {@link #hasType_ELEM() Elementknoten} ist,
+	 * wird dessen {@link Node#getTextContent() Inhalt} geliefert. Wenn es {@link #hasNode() keinen aktuellen Knoten gibt}, wird der gegebene Vorgabewert
+	 * geliefert. Andernfalls wird der {@link Node#getNodeValue() Wert} des Knoten geliefert.
 	 *
 	 * @see #hasType_ELEM()
 	 * @see Node#getNodeValue()
@@ -337,8 +337,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt den Elternknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
-	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keinen Elternknoten hat, wird {@code null} geliefert.
+	/** Diese Methode gibt den Elternknoten des {@link #getNode() aktuellen Knoten} zurück. Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser
+	 * keinen Elternknoten hat, wird {@code null} geliefert.
 	 *
 	 * @see Attr#getOwnerElement()
 	 * @see Node#getParentNode()
@@ -350,8 +350,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return node.getParentNode();
 	}
 
-	/** Diese Methode gibt das {@link Document} zum {@link #getNode() aktuellen Knoten} zurück.<br>
-	 * Wenn der der aktuelle Knoten {@code null} ist, wird {@code null} geliefert.
+	/** Diese Methode gibt das {@link Document} zum {@link #getNode() aktuellen Knoten} zurück. Wenn der der aktuelle Knoten {@code null} ist, wird {@code null}
+	 * geliefert.
 	 *
 	 * @see Node#getOwnerDocument()
 	 * @return {@link Document} oder {@code null}. */
@@ -362,8 +362,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return node.getOwnerDocument();
 	}
 
-	/** Diese Methode gibt die Attributknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
-	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keine Attribute hat, wird {@link #EMPTY_ATTR_MAP} geliefert.
+	/** Diese Methode gibt die Attributknoten des {@link #getNode() aktuellen Knoten} zurück. Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser
+	 * keine Attribute hat, wird {@link #EMPTY_ATTR_MAP} geliefert.
 	 *
 	 * @see Node#getAttributes()
 	 * @return Attributknoten oder {@link #EMPTY_ATTR_MAP}. */
@@ -383,8 +383,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.getAttrMap().getLength();
 	}
 
-	/** Diese Methode gibt die Kindknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
-	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keine Kindknoten hat, wird {@link #EMPTY_CHLD_LIST} geliefert.
+	/** Diese Methode gibt die Kindknoten des {@link #getNode() aktuellen Knoten} zurück. Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser
+	 * keine Kindknoten hat, wird {@link #EMPTY_CHLD_LIST} geliefert.
 	 *
 	 * @see Node#getChildNodes()
 	 * @return Kindknoten oder {@link #EMPTY_CHLD_LIST}. */
@@ -508,8 +508,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newChldData().useNode(elem);
 	}
 
-	/** Diese Methode gibt den Konfigurator für den Attributknoten mit der gegebenen Position zurück.<br>
-	 * Negative Positionen zählen vom Ende der Attributknotenliste.
+	/** Diese Methode gibt den Konfigurator für den Attributknoten mit der gegebenen Position zurück. Negative Positionen zählen vom Ende der Attributknotenliste.
 	 *
 	 * @see #getAttrMap()
 	 * @param index Position.
@@ -543,8 +542,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newAttrData().useNode(item);
 	}
 
-	/** Diese Methode gibt den Konfigurator für den Elementknoten mit der gegebenen Position zurück.<br>
-	 * Negative Positionen zählen vom Ende der Kindknotenliste.
+	/** Diese Methode gibt den Konfigurator für den Elementknoten mit der gegebenen Position zurück. Negative Positionen zählen vom Ende der Kindknotenliste.
 	 *
 	 * @see #getChldList()
 	 * @param index Position.

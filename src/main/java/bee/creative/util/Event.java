@@ -310,9 +310,9 @@ public abstract class Event<GMessage, GObserver> {
 	/** Dieses Feld speichert die {@link EventItem}. */
 	private final EventStore eventStore = new EventStore();
 
-	/** Diese Methode meldet den gegebenen Ereignisempfänger für den gegebenen Ereignissender an und gibt ihn zurück.<br>
-	 * Wenn der Empfänger {@code null} ist, wird er ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object, Object) Auslösen} von Ereignissen
-	 * informiert. Das mehrfache Anmelden des gleichen Empfängers sollte vermieden werden.
+	/** Diese Methode meldet den gegebenen Ereignisempfänger für den gegebenen Ereignissender an und gibt ihn zurück. Wenn der Empfänger {@code null} ist, wird er
+	 * ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object, Object) Auslösen} von Ereignissen informiert. Das mehrfache Anmelden des gleichen
+	 * Empfängers sollte vermieden werden.
 	 *
 	 * @see Event#putWeak(Object, Object)
 	 * @param sender Ereignissender oder {@code null}.
@@ -332,9 +332,9 @@ public abstract class Event<GMessage, GObserver> {
 		return observer;
 	}
 
-	/** Diese Methode meldet den gegebenen Ereignisempfänger für den gegebenen Ereignissender an und gibt ihn zurück.<br>
-	 * Wenn der Empfänger {@code null} ist, wird er ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object, Object) Auslösen} von Ereignissen
-	 * informiert. Das mehrfache Anmelden des gleichen Empfängers sollte vermieden werden. Der Empfänger wird über eine {@link WeakReference} referenziert.
+	/** Diese Methode meldet den gegebenen Ereignisempfänger für den gegebenen Ereignissender an und gibt ihn zurück. Wenn der Empfänger {@code null} ist, wird er
+	 * ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object, Object) Auslösen} von Ereignissen informiert. Das mehrfache Anmelden des gleichen
+	 * Empfängers sollte vermieden werden. Der Empfänger wird über eine {@link WeakReference} referenziert.
 	 *
 	 * @param sender Ereignissender oder {@code null}.
 	 * @param observer Ereignisempfänger oder {@code null}.

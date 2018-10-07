@@ -10,7 +10,7 @@ import bee.creative.util.Objects;
 
 /** Diese Funktion kann zum Lesen und Schreiben von {@link Field nativen Datenfeldern} sowie zum Aufrufen von {@link Method nativen Methoden} und
  * {@link Constructor nativen Konstruktoren} eingesetzt werden. Der dieser Funktion zugrundeliegende {@link Member} kann hierbei als {@link Field},
- * {@link Method} oder {@link Constructor} gegeben sein.<br>
+ * {@link Method} oder {@link Constructor} gegeben sein.
  * <h4>Datenfelder</h4>
  * <p>
  * Native Funktionen zu klassengebundenen Datenfeldern nutzen zum Lesen die Signatur {@code (): FEMNative} und liefern den Ergebniswert
@@ -213,9 +213,9 @@ public abstract class FEMReflection extends FEMFunction {
 
 	}
 
-	/** Diese Methode gibt die native Funktion zur gegebenen Pfadangabe zurück.<br>
-	 * Die Pfadangabe kodiert hierbei eine Funktion, die eine Klasse liefert, an eine Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw.
-	 * schreibt. Die unterstützten Pfadangaben sind bei {@link Natives#parse(String)} beschrieben.
+	/** Diese Methode gibt die native Funktion zur gegebenen Pfadangabe zurück. Die Pfadangabe kodiert hierbei eine Funktion, die eine Klasse liefert, an eine
+	 * Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw. schreibt. Die unterstützten Pfadangaben sind bei {@link Natives#parse(String)}
+	 * beschrieben.
 	 *
 	 * @see Natives#parse(String)
 	 * @see #from(Field)

@@ -2,8 +2,8 @@ package bee.creative.fem;
 
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert den abstrakten Datentyp eines Werts, analog zur {@link Class} eines {@link Object}.<br>
- * Ein solcher Datentyp besitzt Methoden zum Konvertieren der Nutzdaten eines gegebenen Werts sowie zur Prüfung der Kompatibilität zu anderen Datentypen.
+/** Diese Klasse implementiert den abstrakten Datentyp eines Werts, analog zur {@link Class} eines {@link Object}. Ein solcher Datentyp besitzt Methoden zum
+ * Konvertieren der Nutzdaten eines gegebenen Werts sowie zur Prüfung der Kompatibilität zu anderen Datentypen.
  *
  * @see FEMValue#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -48,8 +48,8 @@ public class FEMType<GData> {
 		return (type == this) || ((type != null) && (type.id == this.id));
 	}
 
-	/** Diese Methode gibt die in den Datentyp {@code GData} kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
-	 * Der Rückgabewert entspricht {@code context.dataFrom(value, this)}.
+	/** Diese Methode gibt die in den Datentyp {@code GData} kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück. Der Rückgabewert entspricht
+	 * {@code context.dataFrom(value, this)}.
 	 *
 	 * @see FEMContext#dataFrom(FEMValue, FEMType)
 	 * @param value gegebener Wert.

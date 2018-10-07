@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-/** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten.<br>
- * Dazu werden gegebene Eingabeobjekte mit daraus {@link #customBuild(Object) berechneten} Ausgabeobjekten über in einer {@link Map Abbildung} verwaltet. Wenn
- * über {@link #get(Object)} das mit einem gegebenen Eingabeobjekten assoziierte Ausgabeobjekt ermittelt werden soll und dieses zuvor bereits
+/** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten. Dazu werden
+ * gegebene Eingabeobjekte mit daraus {@link #customBuild(Object) berechneten} Ausgabeobjekten über in einer {@link Map Abbildung} verwaltet. Wenn über
+ * {@link #get(Object)} das mit einem gegebenen Eingabeobjekten assoziierte Ausgabeobjekt ermittelt werden soll und dieses zuvor bereits
  * {@link #customBuild(Object) erzeugt} wurde, wird dessen Wiederverwendung über {@link #customReuse(Object, Object)} signalisiert.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -194,10 +194,9 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		this.mapping = Objects.notNull(mapping);
 	}
 
-	/** Diese Methode gibt die mit der gegebenen Eingabe in der {@link #mapping() angebundenen Abbildung} assoziierte Ausgabe zurück.<br>
-	 * Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet {@link Map#get(Object) ist}, wird deren Wiederverwendung {@link #customReuse(Object, Object)
-	 * signalisiert}. Sollte der Eingabe noch keine Ausgabe zugeordnet sein, wird diese {@link #customBuild(Object) erzeugt} und mit der Eingabe
-	 * {@link Map#put(Object, Object) assoziiert}.
+	/** Diese Methode gibt die mit der gegebenen Eingabe in der {@link #mapping() angebundenen Abbildung} assoziierte Ausgabe zurück. Wenn der gegebenen Eingabe
+	 * bereits eine Ausgabe zugeordnet {@link Map#get(Object) ist}, wird deren Wiederverwendung {@link #customReuse(Object, Object) signalisiert}. Sollte der
+	 * Eingabe noch keine Ausgabe zugeordnet sein, wird diese {@link #customBuild(Object) erzeugt} und mit der Eingabe {@link Map#put(Object, Object) assoziiert}.
 	 *
 	 * @see Map#get(Object)
 	 * @see Map#containsKey(Object)
@@ -217,8 +216,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		return target;
 	}
 
-	/** {@inheritDoc}<br>
-	 * Dazu ruft sie {@link Map#put(Object, Object)} der {@link #mapping() angebundenen Abbildung} auf. */
+	/** {@inheritDoc} Dazu ruft sie {@link Map#put(Object, Object)} der {@link #mapping() angebundenen Abbildung} auf. */
 	@Override
 	public void set(final GSource source, final GTarget target) {
 		this.mapping.put(source, target);

@@ -228,10 +228,9 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt die {@link DocumentBuilderFactory} zurück.<br>
-	 * Wenn über {@link #useFactory(DocumentBuilderFactory)} noch keine {@link DocumentBuilderFactory} gesetzt wurde, wird über
-	 * {@link DocumentBuilderFactory#newInstance()} eine neue erstellt, über {@link #useFactory(DocumentBuilderFactory)} gesetzt und über {@link #updateFactory()}
-	 * aktualisiert.
+	/** Diese Methode gibt die {@link DocumentBuilderFactory} zurück. Wenn über {@link #useFactory(DocumentBuilderFactory)} noch keine
+	 * {@link DocumentBuilderFactory} gesetzt wurde, wird über {@link DocumentBuilderFactory#newInstance()} eine neue erstellt, über
+	 * {@link #useFactory(DocumentBuilderFactory)} gesetzt und über {@link #updateFactory()} aktualisiert.
 	 *
 	 * @see #useFactory(DocumentBuilderFactory)
 	 * @see #updateFactory()
@@ -264,9 +263,9 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		return this.useFactory(null);
 	}
 
-	/** Diese Methode aktualisiert die Einstellungen der {@link DocumentBuilderFactory} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf die über {@link #getFactory()} ermittelte {@link DocumentBuilderFactory} die Einstellungen übertragen, die in
-	 * {@link #openSchemaData()}, {@link #openFeatureData()}, {@link #openPropertyData()} und {@link #openAttributeData()} konfiguriert sind.
+	/** Diese Methode aktualisiert die Einstellungen der {@link DocumentBuilderFactory} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf die
+	 * über {@link #getFactory()} ermittelte {@link DocumentBuilderFactory} die Einstellungen übertragen, die in {@link #openSchemaData()},
+	 * {@link #openFeatureData()}, {@link #openPropertyData()} und {@link #openAttributeData()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link SchemaData#getSchema()} eine entsprechende Ausnahme auslöst.

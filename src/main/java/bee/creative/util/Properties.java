@@ -148,7 +148,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert {@link Properties#translatedProperty(Property, Translator)}. */
+	/** Diese Klasse implementiert {@link Properties#translatedProperty(Translator, Property)}. */
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedProperty<GTarget, GSource> extends BaseProperty<GTarget> {
 
@@ -286,9 +286,8 @@ public class Properties {
 		return Properties.nativeProperty(field, true);
 	}
 
-	/** Diese Methode gibt ein {@link Property} zum gegebenen {@link java.lang.reflect.Field nativen statischen Datenfeld} zurück.<br>
-	 * Das Lesen des gelieferten {@link Property} erfolgt über {@code field.get(null)}. Das Schreiben eines Werts {@code value} erfolgt dazu über
-	 * {@code field.set(null, value)}.
+	/** Diese Methode gibt ein {@link Property} zum gegebenen {@link java.lang.reflect.Field nativen statischen Datenfeld} zurück. Das Lesen des gelieferten
+	 * {@link Property} erfolgt über {@code field.get(null)}. Das Schreiben eines Werts {@code value} erfolgt dazu über {@code field.set(null, value)}.
 	 *
 	 * @see java.lang.reflect.Field#get(Object)
 	 * @see java.lang.reflect.Field#set(Object, Object)
@@ -335,12 +334,12 @@ public class Properties {
 		return Properties.nativeProperty(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@link Properties#translatedProperty(Property, Getter, Getter) Properties.translatedProperty(property,
-	 * Translators.toTargetGetter(translator), Translators.toSourceGetter(translator))}.
+	/** Diese Methode ist eine effiziente Alternative zu {@link Properties#translatedProperty(Getter, Getter, Property)
+	 * Properties.translatedProperty(Translators.toTargetGetter(translator), Translators.toSourceGetter(translator), property)}.
 	 *
 	 * @see Translators#toTargetGetter(Translator)
 	 * @see Translators#toSourceGetter(Translator) */
-	public static <GSource, GTarget> Property<GTarget> translatedProperty(final Property<GSource> property, final Translator<GSource, GTarget> translator)
+	public static <GSource, GTarget> Property<GTarget> translatedProperty(final Translator<GSource, GTarget> translator, final Property<GSource> property)
 		throws NullPointerException {
 		return new TranslatedProperty<>(property, translator);
 	}
@@ -354,13 +353,13 @@ public class Properties {
 	 * @see Consumers#translatedConsumer(Getter, Consumer)
 	 * @param <GTarget> Typ des Werts der erzeugten Eigenschaft.
 	 * @param <GSource> Typ des Werts der gegebenen Eigenschaft.
-	 * @param property Eigenschaft.
 	 * @param toTarget {@link Getter} zum Übersetzen des Wert beim Lesen.
 	 * @param toSource {@link Getter} zum Übersetzen des Wert beim Schreiben.
+	 * @param property Eigenschaft.
 	 * @return {@code translated}-{@link Property}.
 	 * @throws NullPointerException Wenn {@code property}, {@code toTarget} bzw. {@code toSource} {@code null} ist. */
-	public static <GSource, GTarget> Property<GTarget> translatedProperty(final Property<GSource> property,
-		final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
+	public static <GSource, GTarget> Property<GTarget> translatedProperty(final Getter<? super GSource, ? extends GTarget> toTarget,
+		final Getter<? super GTarget, ? extends GSource> toSource, final Property<GSource> property) throws NullPointerException {
 		return Properties.compositeProperty(Producers.translatedProducer(toTarget, property), Consumers.translatedConsumer(toSource, property));
 	}
 

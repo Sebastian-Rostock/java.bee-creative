@@ -98,8 +98,8 @@ public class STSFileStore {
 	/** Dieses Feld speichert den Puffer, in den {@link #liststoreNewList() neue Listen} eingefügt werden. */
 	ByteBuffer listStoreNewBuffer;
 
-	/** Diese Methode gibt den Index einer neuen Knotenliste zurück.<br>
-	 * Dabei wird die {@link #listStoreNewBuffer aktuelle Datei} bei Bedarf vergrößert bzw. wird eine {@link #liststoreBuffers weitere Datei} erzeugt.
+	/** Diese Methode gibt den Index einer neuen Knotenliste zurück. Dabei wird die {@link #listStoreNewBuffer aktuelle Datei} bei Bedarf vergrößert bzw. wird
+	 * eine {@link #liststoreBuffers weitere Datei} erzeugt.
 	 *
 	 * @return Index einer neuen Kantenliste. */
 	protected final int liststoreNewList() { // erzeugt neue leere liste

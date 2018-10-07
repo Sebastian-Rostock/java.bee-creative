@@ -25,7 +25,7 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 	public static class UpdatePropertyMessage {
 
 		/** Dieses Feld speichert den Sender des Ereignisses.
-		 * 
+		 *
 		 * @see ObservableProperty#property */
 		public final ObservableProperty<?> sender;
 

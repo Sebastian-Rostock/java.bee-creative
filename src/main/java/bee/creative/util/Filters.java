@@ -249,8 +249,8 @@ public class Filters {
 
 	}
 
-	/** Diese Methode gibt den {@link Filter} zurück, der alle Elemente akzeptiert, die nicht {@code null} sind.<br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code item != null}.
+	/** Diese Methode gibt den {@link Filter} zurück, der alle Elemente akzeptiert, die nicht {@code null} sind. Die Akzeptanz eines Elements {@code item} ist
+	 * {@code item != null}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @return {@code null}-{@link Filter}. */
@@ -259,8 +259,8 @@ public class Filters {
 		return (Filter<GItem>)NullFilter.INSTANCE;
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, der nur die Eingaben akzeptiert, die Instanzen der gegebenen {@link Class} oder ihrer Nachfahren sind.<br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code itemType.isInstance(item)}.
+	/** Diese Methode gibt einen {@link Filter} zurück, der nur die Eingaben akzeptiert, die Instanzen der gegebenen {@link Class} oder ihrer Nachfahren sind. Die
+	 * Akzeptanz eines Elements {@code item} ist {@code itemType.isInstance(item)}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param itemClass {@link Class} der akzeptierten Eingaben.
@@ -309,8 +309,8 @@ public class Filters {
 		return Getters.toFilter(Getters.bufferedGetter(limit, mode, Pointers.HARD, Filters.toGetter(filter)));
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden.<br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code !filter.accept(item)}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden. Die Akzeptanz eines
+	 * Elements {@code item} ist {@code !filter.accept(item)}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param filter {@link Filter}.
@@ -321,8 +321,7 @@ public class Filters {
 	}
 
 	/** Diese Methode gibt einen übersetzten {@link Filter} zurück, welcher von seinen Elementen mit dem gegebenen {@link Getter} zu den Elementen des gegebenen
-	 * {@link Filter} navigiert.<br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code filter.accept(toSource.get(item))}.
+	 * {@link Filter} navigiert. Die Akzeptanz eines Elements {@code item} ist {@code filter.accept(toSource.get(item))}.
 	 *
 	 * @param <GSource> Typ der Elemente des gegebenen {@link Filter} sowie der Ausgabe des {@link Getter}.
 	 * @param <GTarget> Typ der Elemente des gelieferten {@link Filter} sowie der Eingabe des {@link Getter}.
@@ -335,8 +334,8 @@ public class Filters {
 		return new TranslatedFilter<>(toSource, filter);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von einem der gegebenen {@link Filter} akzeptiert werden <br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code filter1.accept(item) || filter2.accept(item)}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von einem der gegebenen {@link Filter} akzeptiert werden Die
+	 * Akzeptanz eines Elements {@code item} ist {@code filter1.accept(item) || filter2.accept(item)}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param filter1 erster {@link Filter}.
@@ -347,8 +346,8 @@ public class Filters {
 		return new DisjunctionFilter<>(filter1, filter2);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert werden <br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code filter1.accept(item) && filter2.accept(item)}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert werden Die
+	 * Akzeptanz eines Elements {@code item} ist {@code filter1.accept(item) && filter2.accept(item)}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param filter1 erster {@link Filter}.
@@ -360,8 +359,7 @@ public class Filters {
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert bzw. abgelehnt
-	 * werden <br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code filter1.accept(item) == filter2.accept(item)}.
+	 * werden Die Akzeptanz eines Elements {@code item} ist {@code filter1.accept(item) == filter2.accept(item)}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param filter1 erster {@link Filter}.
@@ -384,8 +382,8 @@ public class Filters {
 		return new SynchronizedFilter<>(mutex, filter);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} als Adapter zu einem {@link Filter} zurück.<br>
-	 * Für eine Eingabe {@code item} liefert er die Ausgabe {@code Boolean.valueOf(filter.accept(item))}.
+	/** Diese Methode gibt einen {@link Getter} als Adapter zu einem {@link Filter} zurück. Für eine Eingabe {@code item} liefert er die Ausgabe
+	 * {@code Boolean.valueOf(filter.accept(item))}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param filter {@link Filter}.

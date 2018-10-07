@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert einen Formatierer, der Daten, Werten und Funktionen in eine Zeichenkette überführen kann.<br>
- * Er realisiert damit die entgegengesetzte Operation zur Kombination von {@link FEMParser} und {@link FEMCompiler}.
+/** Diese Klasse implementiert einen Formatierer, der Daten, Werten und Funktionen in eine Zeichenkette überführen kann. Er realisiert damit die
+ * entgegengesetzte Operation zur Kombination von {@link FEMParser} und {@link FEMCompiler}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFormatter {
@@ -94,8 +94,7 @@ public final class FEMFormatter {
 		return this;
 	}
 
-	/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
-	 * Wenn das Objekt {@code null} ist, wird es ignoriert.
+	/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück. Wenn das Objekt {@code null} ist, wird es ignoriert.
 	 *
 	 * @see Object#toString()
 	 * @param token Objekt oder {@code null}.
@@ -188,8 +187,8 @@ public final class FEMFormatter {
 		return this.indent;
 	}
 
-	/** Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.<br>
-	 * Wenn diese {@code null} ist, wird nicht eingerückt.
+	/** Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück. Wenn diese {@code null} ist, wird nicht
+	 * eingerückt.
 	 *
 	 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
 	 * @return {@code this}. */

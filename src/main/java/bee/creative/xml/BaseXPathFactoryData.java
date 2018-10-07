@@ -15,8 +15,8 @@ import bee.creative.util.Objects;
  * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFactory, GThis> {
 
-	/** Diese Klasse implementiert den Konfigurator für das Objektmodel einer {@link XPathFactory}.<br>
-	 * Initialisiert wird dieses über {@link #useDEFAULT_OBJECT_MODEL_URI()}.
+	/** Diese Klasse implementiert den Konfigurator für das Objektmodel einer {@link XPathFactory}. Initialisiert wird dieses über
+	 * {@link #useDEFAULT_OBJECT_MODEL_URI()}.
 	 *
 	 * @see XPathFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -166,10 +166,9 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt das {@link XPathFactory} zurück.<br>
-	 * Wenn über {@link #useFactory(XPathFactory)} noch keine {@link XPathFactory} gesetzt wurde, wird über {@link XPathFactory#newInstance(String)} eine neue
-	 * erstellt, über {@link #useFactory(XPathFactory)} gesetzt und über {@link #updateFactory()} aktualisiert. Das zur Erstellung verwendete Objektmodell kann
-	 * über {@link #openModelData()} konfiguriert werden.
+	/** Diese Methode gibt das {@link XPathFactory} zurück. Wenn über {@link #useFactory(XPathFactory)} noch keine {@link XPathFactory} gesetzt wurde, wird über
+	 * {@link XPathFactory#newInstance(String)} eine neue erstellt, über {@link #useFactory(XPathFactory)} gesetzt und über {@link #updateFactory()} aktualisiert.
+	 * Das zur Erstellung verwendete Objektmodell kann über {@link #openModelData()} konfiguriert werden.
 	 *
 	 * @see #useFactory(XPathFactory)
 	 * @return {@link XPathFactory}.
@@ -201,9 +200,9 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		return this.useFactory(null);
 	}
 
-	/** Diese Methode aktualisiert die Einstellungen der {@link XPathFactory} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf die über {@link #getFactory()} ermittelte {@link XPathFactory} die Einstellungen übertragen, die in
-	 * {@link #openVariableData()}, {@link #openFunctionData()} und {@link #openFeatureData()} konfiguriert sind.
+	/** Diese Methode aktualisiert die Einstellungen der {@link XPathFactory} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf die über
+	 * {@link #getFactory()} ermittelte {@link XPathFactory} die Einstellungen übertragen, die in {@link #openVariableData()}, {@link #openFunctionData()} und
+	 * {@link #openFeatureData()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactory#setFeature(String, boolean)} bzw. {@link #getFactory()} eine entsprechende Ausnahme

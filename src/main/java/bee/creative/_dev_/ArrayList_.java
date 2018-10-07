@@ -428,8 +428,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		for (int i = minOffset; i < maxOffset; stream.writeObject(array[i++])) {}
 	}
 
-	/** Diese Methode gibt das Element an der gegebenen Position zurück.<br>
-	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
+	/** Diese Methode gibt das Element an der gegebenen Position zurück. <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
 	 *
 	 * @param index Position.
 	 * @return Element. */
@@ -441,8 +440,7 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return result;
 	}
 
-	/** Diese Methode ersetzt das Element an der gegebenen Position und gibt alten Wert zurück.<br>
-	 * <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
+	/** Diese Methode ersetzt das Element an der gegebenen Position und gibt alten Wert zurück. <b>Achtung:</b> Es erfolgt keine Bereichsprüfung!
 	 *
 	 * @param index Position.
 	 * @param item neses Element.
@@ -497,8 +495,8 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return true;
 	}
 
-	/** Diese Methode gibt die größte Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück.<br>
-	 * <b>Achtung:</b> Es erfolgt keine Prüfung von {@code offset} und {@code length}.
+	/** Diese Methode gibt die größte Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück. <b>Achtung:</b> Es erfolgt keine Prüfung von
+	 * {@code offset} und {@code length}.
 	 *
 	 * @param item gesuchtes Element.
 	 * @param index Beginn des Abschnitts.
@@ -514,8 +512,8 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return -1;
 	}
 
-	/** Diese Methode gibt die kleinste Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück.<br>
-	 * <b>Achtung:</b> Es erfolgt keine Prüfung von {@code offset} und {@code length}.
+	/** Diese Methode gibt die kleinste Position des gegebenen Elements innerhalb des gegebenen Abschnitts zurück. <b>Achtung:</b> Es erfolgt keine Prüfung von
+	 * {@code offset} und {@code length}.
 	 *
 	 * @param object gesuchtes Element.
 	 * @param index Beginn des Abschnitts.
@@ -585,9 +583,8 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return !iter.hasNext();
 	}
 
-	/** Diese Methode kopiert alle Elemente des gegebenen Abschnitts in das gegebene Array und gibt dieses zurück.<br>
-	 * Wenn die Kapazität des gegebenen Arrays hierfür nicht ausreicht, wird ein neues mit passender Größe erzeugt. Überflüssige Bereiche werden mit {@code null}
-	 * gefüllt.
+	/** Diese Methode kopiert alle Elemente des gegebenen Abschnitts in das gegebene Array und gibt dieses zurück. Wenn die Kapazität des gegebenen Arrays hierfür
+	 * nicht ausreicht, wird ein neues mit passender Größe erzeugt. Überflüssige Bereiche werden mit {@code null} gefüllt.
 	 *
 	 * @param <T> Typ der Elemente im gegebenen Array.
 	 * @param result gegebene Array.
@@ -619,8 +616,8 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		return result.append(']').toString();
 	}
 
-	/** Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position ein und gibt nur dann {@code true} zurück, wenn dies erfolgreich war.<br>
-	 * Die Ausrichtung erfolgt mittig und es wird bei erreichen einer grenze neu alokoert und ausgerichtet.
+	/** Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position ein und gibt nur dann {@code true} zurück, wenn dies erfolgreich war. Die
+	 * Ausrichtung erfolgt mittig und es wird bei erreichen einer grenze neu alokoert und ausgerichtet.
 	 *
 	 * @param index Position, ab der die Elemente eingefügt werden sollen.
 	 * @param count Anzahl der einzufügenden Elemente.
@@ -713,8 +710,8 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		this.length = newLength;
 	}
 
-	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.<br>
-	 * In neu reservierten Speicherbereichen werden die verwalteten Elemente mitig ausgerichtet.
+	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann. In neu reservierten Speicherbereichen werden die
+	 * verwalteten Elemente mitig ausgerichtet.
 	 *
 	 * @param newCapacity Anzahl der verwaltbaren Einträge.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Elementen ist. */

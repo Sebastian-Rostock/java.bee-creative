@@ -343,8 +343,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	/** Dieses Feld speichert die leere Wertliste. */
 	public static final FEMArray EMPTY = new EmptyArray();
 
-	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
-	 * Das gegebene Array wird kopiert.
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück. Das gegebene Array wird kopiert.
 	 *
 	 * @param items Werte.
 	 * @return Wertliste.
@@ -366,8 +365,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return new CompactArray(items);
 	}
 
-	/** Diese Methode gibt eine Wertliste mit den Werten im gegebenen Abschnitt zurück.<br>
-	 * Der gegebene Abschnitt wird kopiert.
+	/** Diese Methode gibt eine Wertliste mit den Werten im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
 	 *
 	 * @param items Werte.
 	 * @param offset Beginn des Abschnitts.
@@ -473,8 +471,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return null;
 	}
 
-	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an.<br>
-	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
+	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an. Das Anfügen wird
+	 * vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 *
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
@@ -559,8 +557,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return result;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück.<br>
-	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück. Die Suche beginnt an der gegebenen Position.
+	 * Bei einer erfolglosen Suche wird {@code -1} geliefert.
 	 *
 	 * @param that gesuchter Wert.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
@@ -575,8 +573,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return finder.index + offset;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück.<br>
-	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück. Die Suche beginnt an der gegebenen
+	 * Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
 	 *
 	 * @param that gesuchte Wertliste.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
@@ -603,8 +601,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return -1;
 	}
 
-	/** Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
-	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
+	/** Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig
+	 * abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 *
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.

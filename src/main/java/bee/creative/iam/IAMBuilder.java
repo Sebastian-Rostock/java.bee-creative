@@ -214,8 +214,8 @@ public class IAMBuilder {
 		public IAMListingBuilder() {
 		}
 
-		/** Diese Methode gibt das modifizierbare {@code int}-Array des {@code itemIndex}-te Elements zurück.<br>
-		 * Dieses Array sollte nur dann verändert werden, wenn es über {@link #put(int[], boolean)} ohne Wiederverwendung hunzugefügt wurde.
+		/** Diese Methode gibt das modifizierbare {@code int}-Array des {@code itemIndex}-te Elements zurück. Dieses Array sollte nur dann verändert werden, wenn es
+		 * über {@link #put(int[], boolean)} ohne Wiederverwendung hunzugefügt wurde.
 		 *
 		 * @see #put(int[], boolean)
 		 * @see #itemCount()

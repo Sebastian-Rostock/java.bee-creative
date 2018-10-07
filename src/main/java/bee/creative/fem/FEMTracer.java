@@ -46,8 +46,8 @@ public final class FEMTracer {
 		 * @param tracer {@link FEMTracer}. */
 		public void onThrow(FEMTracer tracer);
 
-		/** Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion über {@code return} aufgerufen. Das Feld
-		 * {@link FEMTracer#getResult()} kann hierbei angepasst werden.
+		/** Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion über {@code return} aufgerufen. Das
+		 * Feld {@link FEMTracer#getResult()} kann hierbei angepasst werden.
 		 *
 		 * @see FEMTracer#useResult(FEMValue)
 		 * @param tracer {@link FEMTracer}. */

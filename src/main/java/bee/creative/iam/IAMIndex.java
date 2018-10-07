@@ -47,8 +47,8 @@ public abstract class IAMIndex {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class SizeStats {
 
-		/** Diese Methode füht die Startpositionen der gegebenen Zahlenfolgen an den gegebenen {@link ByteBuffer} an.<br>
-		 * Die Zahlenfolgen repräsentieren die von {@link IAMListing#toBytes(ByteOrder)} bzw. {@link IAMMapping#toBytes(ByteOrder)} kodierten Datenstrukturen.
+		/** Diese Methode füht die Startpositionen der gegebenen Zahlenfolgen an den gegebenen {@link ByteBuffer} an. Die Zahlenfolgen repräsentieren die von
+		 * {@link IAMListing#toBytes(ByteOrder)} bzw. {@link IAMMapping#toBytes(ByteOrder)} kodierten Datenstrukturen.
 		 *
 		 * @param buffer {@link ByteBuffer}.
 		 * @param source Zahlenfolgen. */
@@ -61,8 +61,8 @@ public abstract class IAMIndex {
 			}
 		}
 
-		/** Diese Methode gibt den Datentyp für die gegebene Größe zurück.<br>
-		 * Die Datentypen {@code 1}, {@code 2} und {@code 3} stehen für {@code UINT8}, {@code UINT16} und {@code UINT32}.
+		/** Diese Methode gibt den Datentyp für die gegebene Größe zurück. Die Datentypen {@code 1}, {@code 2} und {@code 3} stehen für {@code UINT8},
+		 * {@code UINT16} und {@code UINT32}.
 		 *
 		 * @param value Größe.
 		 * @return Datentyp ({@code 1..3}). */
@@ -72,10 +72,9 @@ public abstract class IAMIndex {
 			return 3;
 		}
 
-		/** Dieses Feld speichert den Größentyp.<br>
-		 * Der Wert {@code 0} legt fest, dass alle Zahlenfolgen die gleiche Länge {@link #dataLength} besitzen.<br>
-		 * Die Werte {@code 1}, {@code 2} und {@code 2} legen fest, dass die kummulierten Längen der Zahlenlisten als {@code UINT8}, {@code UINT16} bzw.
-		 * {@code UINT32} in {@link #dataOffset} gespeichert sind.
+		/** Dieses Feld speichert den Größentyp. Der Wert {@code 0} legt fest, dass alle Zahlenfolgen die gleiche Länge {@link #dataLength} besitzen. Die Werte
+		 * {@code 1}, {@code 2} und {@code 2} legen fest, dass die kummulierten Längen der Zahlenlisten als {@code UINT8}, {@code UINT16} bzw. {@code UINT32} in
+		 * {@link #dataOffset} gespeichert sind.
 		 *
 		 * @see SizeStats#computeSizeType(int) */
 		public final int type;
@@ -138,8 +137,8 @@ public abstract class IAMIndex {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class DataStats {
 
-		/** Diese Methode speichert die gegebene Zahlenfolge an den gegebenen {@link ByteBuffer} an.<br>
-		 * Der geschriebene Speicherbereich wird mit Nullwerten ergänzt, um eine restlos durch vier teilbare Größe zu erreichen.
+		/** Diese Methode speichert die gegebene Zahlenfolge an den gegebenen {@link ByteBuffer} an. Der geschriebene Speicherbereich wird mit Nullwerten ergänzt,
+		 * um eine restlos durch vier teilbare Größe zu erreichen.
 		 *
 		 * @see ByteBuffer#put(byte)
 		 * @see ByteBuffer#putInt(int)
@@ -179,8 +178,8 @@ public abstract class IAMIndex {
 			}
 		}
 
-		/** Diese Methode gibt den Datentyp für den gegebenen Wert zurück.<br>
-		 * Die Datentypen {@code 1}, {@code 2} und {@code 3} stehen für {@code INT8}, {@code INT16} und {@code INT32}.
+		/** Diese Methode gibt den Datentyp für den gegebenen Wert zurück. Die Datentypen {@code 1}, {@code 2} und {@code 3} stehen für {@code INT8}, {@code INT16}
+		 * und {@code INT32}.
 		 *
 		 * @param value Wert.
 		 * @return Datengrößentyps ({@code 1..3}). */
@@ -190,9 +189,8 @@ public abstract class IAMIndex {
 			return 3;
 		}
 
-		/** Dieses Feld speichert den Datentyp.<br>
-		 * Die Werte {@code 1}, {@code 2} und {@code 2} legen fest, dass die Werte der Zahlenlisten als {@code INT8}, {@code INT16} bzw. {@code INT32} in
-		 * {@link #dataValue} gespeichert sind.
+		/** Dieses Feld speichert den Datentyp. Die Werte {@code 1}, {@code 2} und {@code 2} legen fest, dass die Werte der Zahlenlisten als {@code INT8},
+		 * {@code INT16} bzw. {@code INT32} in {@link #dataValue} gespeichert sind.
 		 *
 		 * @see DataStats#computeDataType(int) */
 		public final int type;
@@ -288,9 +286,9 @@ public abstract class IAMIndex {
 	/** Dieses Feld speichert den leeren {@link IAMIndex}. */
 	public static final IAMIndex EMPTY = new EmptyIndex();
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMIndex} und gibt diesen zurück.<br>
-	 * Wenn das Objekt ein {@link IAMIndex} ist, wird dieser geliefert. Andernfalls wird {@code new IAMIndexLoader(MMFArray.from(object).withOrder(...))}
-	 * geliefert, wobei die Bytereihenfolge über {@link IAMIndexLoader#HEADER} ermittelt wird.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMIndex} und gibt diesen zurück. Wenn das Objekt ein {@link IAMIndex} ist, wird dieser
+	 * geliefert. Andernfalls wird {@code new IAMIndexLoader(MMFArray.from(object).withOrder(...))} geliefert, wobei die Bytereihenfolge über
+	 * {@link IAMIndexLoader#HEADER} ermittelt wird.
 	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMIndexLoader#IAMIndexLoader(MMFArray)

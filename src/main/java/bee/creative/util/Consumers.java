@@ -133,7 +133,7 @@ public class Consumers {
 		return Consumers.nativeConsumer(memberText, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code nativeProducer(Natives.parse(memberText))}.
+	/** Diese Methode ist effektiv eine Abkürzung für {@code nativeProducer(Natives.parse(memberText), forceAccessible)}.
 	 *
 	 * @see Natives#parse(String)
 	 * @see #nativeConsumer(java.lang.reflect.Field, boolean)

@@ -1101,9 +1101,8 @@ public class Collections {
 		return new ChainedList<>(items1, items2, extendMode);
 	}
 
-	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
-	 * Wenn Elemente angefügt werden sollen, wird die erste {@link Collection} erweitert. Der Rückgabewert entspricht
-	 * {@code Collections.chainedCollection(items1, items2, true)}.
+	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück. Wenn Elemente angefügt werden sollen, wird
+	 * die erste {@link Collection} erweitert. Der Rückgabewert entspricht {@code Collections.chainedCollection(items1, items2, true)}.
 	 *
 	 * @see #chainedCollection(Collection, Collection, boolean)
 	 * @param <GItem> Typ der Elemente.
@@ -1115,9 +1114,9 @@ public class Collections {
 		return Collections.chainedCollection(items1, items2, true);
 	}
 
-	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
-	 * Wenn Elemente angefügt werden sollen, entscheidet der Erweiterungsmodus, in welche {@link Collection} diese Elemente angefügt werden. Ist der
-	 * Erweiterungsmodus {@code true}, wird die erste {@link Collection} erweitert, bei {@code false} wird die zweite {@link Collection} erweitert.
+	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück. Wenn Elemente angefügt werden sollen,
+	 * entscheidet der Erweiterungsmodus, in welche {@link Collection} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste
+	 * {@link Collection} erweitert, bei {@code false} wird die zweite {@link Collection} erweitert.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param items1 {@link Collection} der ersten Elemente.
@@ -1197,8 +1196,8 @@ public class Collections {
 		return Collections.toContainsFilter(new HashSet2<>(Arrays.asList(items)));
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code collection.contains(input)}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind. Die Akzeptanz
+	 * einer Eingabe {@code input} ist {@code collection.contains(input)}.
 	 *
 	 * @param collection {@link Collection} der akzeptierten Eingaben.
 	 * @return {@code contains}-{@link Filter}.

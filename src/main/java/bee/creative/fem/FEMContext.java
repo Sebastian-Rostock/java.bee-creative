@@ -58,8 +58,8 @@ public class FEMContext {
 		};
 	}
 
-	/** Diese Methode gibt die in {@link FEMValue#data() Nutzdaten} des gegebenen Werts im gegebenen Datentyp ({@code GData}) zurück.<br>
-	 * Hierbei werden die Nutzdaten {@link FEMValue#data() value.data()} in den geforderten Datentyp konvertiert.
+	/** Diese Methode gibt die in {@link FEMValue#data() Nutzdaten} des gegebenen Werts im gegebenen Datentyp ({@code GData}) zurück. Hierbei werden die Nutzdaten
+	 * {@link FEMValue#data() value.data()} in den geforderten Datentyp konvertiert.
 	 *
 	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten des gegebenen Werts konvertiert werden.
 	 * @param value gegebener Wert.
@@ -95,7 +95,7 @@ public class FEMContext {
 		};
 	}
 
-	/** Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.<br>
+	/** Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.
 	 * <ol>
 	 * <li>Wenn das Objekt ein {@link FEMArray} ist, wird es unverändert zurück gegeben.</li>
 	 * <li>Wenn es ein natives Array ist, wird jedes seiner Elemente über {@link #valueFrom(Object)} in einen Wert überführt und die so entstandene Wertliste
@@ -167,8 +167,8 @@ public class FEMContext {
 		};
 	}
 
-	/** Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück.<br>
-	 * Welcher Wert- und Datentyp hierfür verwendet wird, ist der Implementation überlassen.
+	/** Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück. Welcher Wert- und Datentyp hierfür verwendet
+	 * wird, ist der Implementation überlassen.
 	 *
 	 * @param object Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.

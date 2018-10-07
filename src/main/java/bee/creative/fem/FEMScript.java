@@ -156,8 +156,8 @@ public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 			return new Token(this.type, this.offset - count, this.length + (count << 1));
 		}
 
-		/** Diese Methode gibt den durch diesen Bereich beschriebenen Abschnitt der gegebenen Zeichenkette zurück.<br>
-		 * Der Bereich wird dazu auf die gegebene Zeichenkette eingegrenzt.
+		/** Diese Methode gibt den durch diesen Bereich beschriebenen Abschnitt der gegebenen Zeichenkette zurück. Der Bereich wird dazu auf die gegebene
+		 * Zeichenkette eingegrenzt.
 		 *
 		 * @param source Zeichenkette.
 		 * @return Abschnitt der Zeichenkette.

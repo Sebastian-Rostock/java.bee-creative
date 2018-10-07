@@ -17,8 +17,7 @@ public abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GIte
 	 * Konstanten {@link Integer#MAX_VALUE} das Ende der Iteration anzeigt. */
 	protected static interface ItemIndex {
 
-		/** Diese Methode gibt die Position des nächsten Datensatzes zurück.<br>
-		 * Wenn keine weitere Position existiert, wird {@link Integer#MAX_VALUE} geliefert.
+		/** Diese Methode gibt die Position des nächsten Datensatzes zurück. Wenn keine weitere Position existiert, wird {@link Integer#MAX_VALUE} geliefert.
 		 *
 		 * @return nächste Position. */
 		public int next();

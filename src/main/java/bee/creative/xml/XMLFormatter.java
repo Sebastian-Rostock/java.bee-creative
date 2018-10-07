@@ -116,8 +116,8 @@ public final class XMLFormatter {
 		return this;
 	}
 
-	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück.<br>
-	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein neues {@link DOMResult} eingesetzt.
+	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück. Dazu wird als
+	 * {@link #openResultData() Ausgabedaten} ein neues {@link DOMResult} eingesetzt.
 	 *
 	 * @see ResultData#useNode()
 	 * @see #openResultData()
@@ -129,8 +129,8 @@ public final class XMLFormatter {
 		return result.getNode();
 	}
 
-	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück.<br>
-	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein neuer {@link StringWriter} eingesetzt.
+	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück. Dazu wird als {@link #openResultData()
+	 * Ausgabedaten} ein neuer {@link StringWriter} eingesetzt.
 	 *
 	 * @see StringWriter
 	 * @see ResultData#useWriter(Writer)

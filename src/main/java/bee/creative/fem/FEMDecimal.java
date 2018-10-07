@@ -1,7 +1,6 @@
 package bee.creative.fem;
 
-/** Diese Klasse implementiert einen unveränderlichen Dezimalbruch.<br>
- * Intern wird der Dezimalbruch als {@code double} dargestellt.
+/** Diese Klasse implementiert einen unveränderlichen Dezimalbruch. Intern wird der Dezimalbruch als {@code double} dargestellt.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal> {
@@ -32,8 +31,8 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		return FEMDecimal.from(value.doubleValue());
 	}
 
-	/** Diese Methode gibt einen neuen Dezimalbruch mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
-	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	/** Diese Methode gibt einen neuen Dezimalbruch mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
+	 * {@link #toString() Textdarstellung}.
 	 *
 	 * @see #toString()
 	 * @see Double#parseDouble(String)

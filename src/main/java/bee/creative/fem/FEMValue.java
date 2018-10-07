@@ -14,8 +14,8 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMValue extends FEMFunction {
 
-	/** Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextsensitiv konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
-	 * Der Rückgabewert entspricht {@code context.dataFrom(this, type)}.
+	/** Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextsensitiv konvertierten {@link #data() Nutzdaten} dieses Werts zurück. Der
+	 * Rückgabewert entspricht {@code context.dataFrom(this, type)}.
 	 *
 	 * @see FEMContext#dataFrom(FEMValue, FEMType)
 	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
@@ -53,8 +53,8 @@ public abstract class FEMValue extends FEMFunction {
 	 *
 	 * @see FEMArray#result(boolean)
 	 * @see FEMFuture#result(boolean)
-	 * @param recursive {@code true}, wenn die in diesem Wert enthaltenen Werte ebenfalls ausgewertet werden sollen, z.B. bei {@link FEMArray}.<br>
-	 *        {@code false}, wenn nur dieser Wert ausgewertet werden soll, z.B. bei {@link FEMFuture}.
+	 * @param recursive {@code true}, wenn die in diesem Wert enthaltenen Werte ebenfalls ausgewertet werden sollen, z.B. bei {@link FEMArray}. {@code false},
+	 *        wenn nur dieser Wert ausgewertet werden soll, z.B. bei {@link FEMFuture}.
 	 * @see FEMFrame#get(int)
 	 * @see FEMFunction#invoke(FEMFrame)
 	 * @return ausgewerteter Ergebniswert. */
@@ -75,8 +75,8 @@ public abstract class FEMValue extends FEMFunction {
 		return Objects.equals(this.type(), that.type()) && Objects.equals(this.data(), that.data());
 	}
 
-	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück.<br>
-	 * Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen {@link FEMHandler#value() referenzierte Funktion}. Jeder andere Wert liefert sich selbst.
+	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück. Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen
+	 * {@link FEMHandler#value() referenzierte Funktion}. Jeder andere Wert liefert sich selbst.
 	 *
 	 * @see FEMHandler
 	 * @return Funktion des Werts. */

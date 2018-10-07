@@ -97,8 +97,8 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 	}
 
-	/** Diese Klasse implementiert den Konfigurator für die Sprache einer {@link SchemaFactory}.<br>
-	 * Initialisiert wird diese Sprache über {@link #useW3C_XML_SCHEMA_NS_URI()}.
+	/** Diese Klasse implementiert den Konfigurator für die Sprache einer {@link SchemaFactory}. Initialisiert wird diese Sprache über
+	 * {@link #useW3C_XML_SCHEMA_NS_URI()}.
 	 *
 	 * @see SchemaFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -207,10 +207,9 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt das {@link SchemaFactory} zurück.<br>
-	 * Wenn über {@link #useFactory(SchemaFactory)} noch keine {@link SchemaFactory} gesetzt wurde, wird über {@link SchemaFactory#newInstance(String)} eine neue
-	 * erstellt, über {@link #useFactory(SchemaFactory)} gesetzt und über {@link #updateFactory()} aktualisiert. Die zur Erstellung verwendete Sprache kann über
-	 * {@link #openLanguageData()} konfiguriert werden.
+	/** Diese Methode gibt das {@link SchemaFactory} zurück. Wenn über {@link #useFactory(SchemaFactory)} noch keine {@link SchemaFactory} gesetzt wurde, wird
+	 * über {@link SchemaFactory#newInstance(String)} eine neue erstellt, über {@link #useFactory(SchemaFactory)} gesetzt und über {@link #updateFactory()}
+	 * aktualisiert. Die zur Erstellung verwendete Sprache kann über {@link #openLanguageData()} konfiguriert werden.
 	 *
 	 * @see #useFactory(SchemaFactory)
 	 * @see #updateFactory()
@@ -242,9 +241,9 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		return this.useFactory(null);
 	}
 
-	/** Diese Methode aktualisiert die Einstellungen der {@link SchemaFactory} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf die über {@link #getFactory()} ermittelte {@link SchemaFactory} die Einstellungen übertragen, die in
-	 * {@link #openHandlerData()}, {@link #openResolverData()}, {@link #openFeatureData()} und {@link #openPropertyData()} konfiguriert sind.
+	/** Diese Methode aktualisiert die Einstellungen der {@link SchemaFactory} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf die über
+	 * {@link #getFactory()} ermittelte {@link SchemaFactory} die Einstellungen übertragen, die in {@link #openHandlerData()}, {@link #openResolverData()},
+	 * {@link #openFeatureData()} und {@link #openPropertyData()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link #getFactory()}, {@link SchemaFactory#setFeature(String, boolean)} bzw. {@link SchemaFactory#setProperty(String, Object)}

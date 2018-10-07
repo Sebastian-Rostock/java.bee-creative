@@ -16,11 +16,10 @@ import bee.creative.iam.IAMMapping;
  * {@link Set}.
  * <p>
  * Um die Verwaltungsdaten je Eintrag zu minimieren, werden die Tabelle mit den Eigenschaften der Einträge spaltenweise in mehreren Arrays
- * {@link #allocateImpl(int) reserviert} und die Verweise auf die nächsten Einträge in den verketteten Listen über Indexpositionen abgebildet. <br>
- * Nachfahren müssen die Spalten zur verwaltung der Schlüssel und Werte ergänzen. Über die Methoden {@link #customHash(Object)} und
- * {@link #customEqualsKey(int, Object)} kann die Berechnung von {@link Object#hashCode() Streuwert} und {@link Object#equals(Object) Äquivalenz} der Schlüssel
- * angepasst werden. <br>
- * Die nachfolgende Tabelle zeigt den Vergleich der genäherten Speicherbelegung (32 Bit).
+ * {@link #allocateImpl(int) reserviert} und die Verweise auf die nächsten Einträge in den verketteten Listen über Indexpositionen abgebildet. Nachfahren müssen
+ * die Spalten zur verwaltung der Schlüssel und Werte ergänzen. Über die Methoden {@link #customHash(Object)} und {@link #customEqualsKey(int, Object)} kann die
+ * Berechnung von {@link Object#hashCode() Streuwert} und {@link Object#equals(Object) Äquivalenz} der Schlüssel angepasst werden. Die nachfolgende Tabelle
+ * zeigt den Vergleich der genäherten Speicherbelegung (32 Bit).
  * <p>
  * <table border="1" cellpadding="2" cellspacing="0">
  * <tr>
@@ -528,8 +527,8 @@ public abstract class AbstractHashData<GKey, GValue> {
 	/** Dieses Feld speichert die Anzahl der Einträge. */
 	transient int count;
 
-	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}.<br>
-	 * Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine einfach verkettete Liste. */
+	/** Dieses Feld speichert den Index des nächsten freien Speicherbereiches in {@link #nexts}. Die ungenutzten Speicherbereiche bilden über {@link #nexts} eine
+	 * einfach verkettete Liste. */
 	transient int empty;
 
 	/** Dieser Konstruktor initialisiert das die {@link #capacityImpl() Kapazität} mit {@code 0}. */
@@ -738,8 +737,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 		return (entryIndex >= 0) && this.customEqualsValue(entryIndex, value);
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Wert zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Wert zurück. Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
 	 *
 	 * @see Map#get(Object)
 	 * @param key Schlüssel des Eintrags.
@@ -749,8 +747,8 @@ public abstract class AbstractHashData<GKey, GValue> {
 		return entryIndex < 0 ? null : this.customGetValue(entryIndex);
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird {@code -1}
+	 * geliefert.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen Eintrags oder {@code -1}. */
@@ -768,8 +766,8 @@ public abstract class AbstractHashData<GKey, GValue> {
 		return -1;
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück.<br>
-	 * Wenn kein solcher Eintrag existierte, wird {@code null} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück. Wenn kein solcher Eintrag
+	 * existierte, wird {@code null} geliefert.
 	 *
 	 * @see Map#put(Object, Object)
 	 * @param key Schlüssel des Eintrags.
@@ -792,8 +790,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 		return count != this.count;
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird er erzeugt.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird er erzeugt.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
@@ -820,8 +817,8 @@ public abstract class AbstractHashData<GKey, GValue> {
 		return result;
 	}
 
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
+	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück. Wenn kein solcher Eintrag existiert, wird
+	 * {@code null} geliefert.
 	 *
 	 * @see Map#remove(Object)
 	 * @param key Schlüssel.
@@ -929,8 +926,8 @@ public abstract class AbstractHashData<GKey, GValue> {
 		return false;
 	}
 
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird {@code -1}
+	 * geliefert.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des entfernten Eintrags oder {@code -1}. */

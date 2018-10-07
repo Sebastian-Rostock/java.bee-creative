@@ -11,9 +11,8 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class INIWriter implements Closeable {
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIWriter} und gibt diesen zurück.<br>
-	 * Wenn das Objekt ein {@link INIWriter} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object)
-	 * überführt}.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIWriter} und gibt diesen zurück. Wenn das Objekt ein {@link INIWriter} ist, wird dieser
+	 * geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object) überführt}.
 	 *
 	 * @see IO#outputWriterFrom(Object)
 	 * @see INIWriter#INIWriter(Writer)

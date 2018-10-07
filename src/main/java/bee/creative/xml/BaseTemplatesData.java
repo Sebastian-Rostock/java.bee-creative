@@ -89,10 +89,9 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt die {@link Templates} zurück.<br>
-	 * Wenn über {@link #useTemplates(Templates)} noch keine {@link Templates} gesetzt wurden, werden über {@link TransformerFactory#newTemplates(Source)} neue
-	 * erstellt und über {@link #useTemplates(Templates)} gesetzt. Die zur Erstellung verwendeten Quelldaten können über {@link #openScriptData()} konfiguriert
-	 * werden. Wenn diese {@code null} sind, wird {@code null} geliefert.
+	/** Diese Methode gibt die {@link Templates} zurück. Wenn über {@link #useTemplates(Templates)} noch keine {@link Templates} gesetzt wurden, werden über
+	 * {@link TransformerFactory#newTemplates(Source)} neue erstellt und über {@link #useTemplates(Templates)} gesetzt. Die zur Erstellung verwendeten Quelldaten
+	 * können über {@link #openScriptData()} konfiguriert werden. Wenn diese {@code null} sind, wird {@code null} geliefert.
 	 *
 	 * @see #useTemplates(Templates)
 	 * @return {@link Templates} oder {@code null}.

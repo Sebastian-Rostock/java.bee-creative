@@ -5,8 +5,7 @@ import bee.creative.emu.Emuable;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
- * Funktion} delegiert.<br>
- * {@link #hashCode() Streuwert} und {@link #equals(Object) Äquivalenz} beziehen sich auf den {@link #name() Namen} des Platzhalters.
+ * Funktion} delegiert. {@link #hashCode() Streuwert} und {@link #equals(Object) Äquivalenz} beziehen sich auf den {@link #name() Namen} des Platzhalters.
  *
  * @see FEMCompiler#proxy(String)
  * @see FEMCompiler#proxies()
@@ -38,8 +37,8 @@ public final class FEMProxy extends FEMFunction implements Emuable {
 		this.set(function);
 	}
 
-	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird.<br>
-	 * Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch nicht aufgerufen wurde.
+	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird. Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch
+	 * nicht aufgerufen wurde.
 	 *
 	 * @return Funktion oder {@code null}. */
 	public FEMFunction get() {

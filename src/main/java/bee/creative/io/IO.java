@@ -127,8 +127,8 @@ public class IO {
 		}
 	}
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt eine {@link DataSource} und gibt diese zurück.<br>
-	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	/** Diese Methode erzeugt aus dem gegebenen Objekt eine {@link DataSource} und gibt diese zurück. Hierbei werden folgende Datentypen für {@code object}
+	 * unterstützt:
 	 * <dl>
 	 * <dt>{@link DataSource}</dt>
 	 * <dd>Die gegebene {@link DataSource} wird geliefert.</dd>
@@ -269,8 +269,8 @@ public class IO {
 		};
 	}
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link ByteBuffer} zum Lesen und gibt diesen zurück.<br>
-	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link ByteBuffer} zum Lesen und gibt diesen zurück. Hierbei werden folgende Datentypen für
+	 * {@code object} unterstützt:
 	 * <dl>
 	 * <dt>{@link ByteBuffer}</dt>
 	 * <dd>Der gegebene {@link ByteBuffer} wird geliefert.</dd>
@@ -326,8 +326,8 @@ public class IO {
 		return IO.inputBufferFrom(object.getChannel());
 	}
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link InputStream} und gibt diesen zurück.<br>
-	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link InputStream} und gibt diesen zurück. Hierbei werden folgende Datentypen für {@code object}
+	 * unterstützt:
 	 * <dl>
 	 * <dt>{@link InputStream}</dt>
 	 * <dd>Der gegebene {@link InputStream} wird geliefert.</dd>
@@ -369,8 +369,8 @@ public class IO {
 		return new ByteArrayInputStream(object.array(), object.startIndex(), object.size());
 	}
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link Reader} und gibt diesen zurück.<br>
-	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link Reader} und gibt diesen zurück. Hierbei werden folgende Datentypen für {@code object}
+	 * unterstützt:
 	 * <dl>
 	 * <dt>{@link Reader}</dt>
 	 * <dd>Der gegebene {@link Reader} wird geliefert.</dd>
@@ -428,8 +428,8 @@ public class IO {
 		return new CharArrayReader(object.array(), object.startIndex(), object.size());
 	}
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link DataTarget} und gibt dieses zurück.<br>
-	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link DataTarget} und gibt dieses zurück. Hierbei werden folgende Datentypen für {@code object}
+	 * unterstützt:
 	 * <dl>
 	 * <dt>{@link DataTarget}</dt>
 	 * <dd>Das gegebene {@link DataTarget} wird geliefert.</dd>
@@ -571,8 +571,8 @@ public class IO {
 		};
 	}
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link ByteBuffer} zum Schreiben und gibt diesen zurück.<br>
-	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link ByteBuffer} zum Schreiben und gibt diesen zurück. Hierbei werden folgende Datentypen für
+	 * {@code object} unterstützt:
 	 * <dl>
 	 * <dt>{@link ByteBuffer}</dt>
 	 * <dd>Der gegebene {@link ByteBuffer} wird geliefert.</dd>
@@ -628,8 +628,8 @@ public class IO {
 		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size());
 	}
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link OutputStream} und gibt diesen zurück.<br>
-	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link OutputStream} und gibt diesen zurück. Hierbei werden folgende Datentypen für {@code object}
+	 * unterstützt:
 	 * <dl>
 	 * <dt>{@link OutputStream}</dt>
 	 * <dd>Der gegebene {@link OutputStream} wird geliefert.</dd>
@@ -671,8 +671,8 @@ public class IO {
 		};
 	}
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link Writer} und gibt diesen zurück.<br>
-	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link Writer} und gibt diesen zurück. Hierbei werden folgende Datentypen für {@code object}
+	 * unterstützt:
 	 * <dl>
 	 * <dt>{@link Writer}</dt>
 	 * <dd>Der gegebene {@link Writer} wird geliefert.</dd>
@@ -752,9 +752,9 @@ public class IO {
 	 * zurück.
 	 *
 	 * @see File#listFiles()
-	 * @param maxDepth Maximale Tiefe für die rekursive Iteration über {@link File#listFiles() Unterverzeichnisse}.<br>
-	 *        Wenn diese {@code 0} ist, wird nur über die gegebenen Dateien und Verzeichnise iteriert. Andernfalls wird in den gegebenen Verzeichnissen rekursiv
-	 *        mit maximaler Tiefe {@code maxDepth-1} rekursiv weiter iteriert.
+	 * @param maxDepth Maximale Tiefe für die rekursive Iteration über {@link File#listFiles() Unterverzeichnisse}. Wenn diese {@code 0} ist, wird nur über die
+	 *        gegebenen Dateien und Verzeichnise iteriert. Andernfalls wird in den gegebenen Verzeichnissen rekursiv mit maximaler Tiefe {@code maxDepth-1}
+	 *        rekursiv weiter iteriert.
 	 * @param files Dateien und Verzeichnisse oder {@code null}.
 	 * @return {@link Iterable} über {@link File}. */
 	public static Iterable<File> listFiles(final int maxDepth, final File... files) {

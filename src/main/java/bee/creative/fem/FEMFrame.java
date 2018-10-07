@@ -8,11 +8,9 @@ import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert einen Stapelrahmen ({@code stack-frame}), über welchen einer Funktion eine Liste von Parameterwerten sowie ein Kontextobjekt zur
- * Verfügung gestellt werden.<br>
- * Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus können von der Methode {@link #get(int)} auch zusätzliche Parameterwerte aus dem
- * {@link #parent() übergeordneten Stapelrahmen} bereitgestellt werden.<br>
- * Die Methode {@link #get(int)} liefert für einen gegebenen Index immer den gleichen Wert bzw. löst immer die gleiche Ausnahme aus. Analoges gilt für die
- * Methoden {@link #size()}, {@link #params()} und {@link #context()}.
+ * Verfügung gestellt werden. Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus können von der Methode {@link #get(int)} auch zusätzliche
+ * Parameterwerte aus dem {@link #parent() übergeordneten Stapelrahmen} bereitgestellt werden. Die Methode {@link #get(int)} liefert für einen gegebenen Index
+ * immer den gleichen Wert bzw. löst immer die gleiche Ausnahme aus. Analoges gilt für die Methoden {@link #size()}, {@link #params()} und {@link #context()}.
  *
  * @see FEMValue
  * @see FEMFunction
@@ -169,8 +167,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * als {@link #parent()} nutzt. */
 	public static final FEMFrame EMPTY = new EmptyFrame();
 
-	/** Diese Methode gibt einen Stapelrahmen mit dem gegebenen {@link #context() Kontextobjekt} zurück.<br>
-	 * Sie ist eine Abkürzung für {@code EMPTY.withContext(context)}.
+	/** Diese Methode gibt einen Stapelrahmen mit dem gegebenen {@link #context() Kontextobjekt} zurück. Sie ist eine Abkürzung für
+	 * {@code EMPTY.withContext(context)}.
 	 *
 	 * @param context Kontextobjekt.
 	 * @return neue Stapelrahmen.
@@ -197,8 +195,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		this.context = context;
 	}
 
-	/** Diese Methode gibt die Anzahl der Parameterwerte zurück, die zur Verwendung durch eine aufgerufene Funktion bestimmt sind.<br>
-	 * Über die Methode {@link #get(int)} werden mindestens so viele Parameterwerte bereitgestellt.
+	/** Diese Methode gibt die Anzahl der Parameterwerte zurück, die zur Verwendung durch eine aufgerufene Funktion bestimmt sind. Über die Methode
+	 * {@link #get(int)} werden mindestens so viele Parameterwerte bereitgestellt.
 	 *
 	 * @return Anzahl der zugesicherten Parameterwert. */
 	public abstract int size();
@@ -210,17 +208,16 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return this.parent;
 	}
 
-	/** Diese Methode gibt eine Wertliste als Sicht auf die zugesicherten Parameterwerte zurück.<br>
-	 * Die Elemente dieser Wertliste können der {@link FEMFuture <em>return-by-reference</em>}-Semantik angehören.
+	/** Diese Methode gibt eine Wertliste als Sicht auf die zugesicherten Parameterwerte zurück. Die Elemente dieser Wertliste können der {@link FEMFuture
+	 * <em>return-by-reference</em>}-Semantik angehören.
 	 *
 	 * @see #get(int)
 	 * @see #size()
 	 * @return {@link FEMArray} der Parameterwerte. */
 	public abstract FEMArray params();
 
-	/** Diese Methode gibt das Kontextobjekt zurück.<<br>
-	 * Funktionen können aus diesem Objekt Informationen für ihre Berechnungen extrahieren oder auch den Zustand dieses Objekts modifizieren.<br>
-	 * Das Kontextobjekt entspricht dem Kontext {@code this} in {@code Java}-Methoden.
+	/** Diese Methode gibt das Kontextobjekt zurück.< Funktionen können aus diesem Objekt Informationen für ihre Berechnungen extrahieren oder auch den Zustand
+	 * dieses Objekts modifizieren. Das Kontextobjekt entspricht dem Kontext {@code this} in {@code Java}-Methoden.
 	 *
 	 * @return Kontextobjekt. */
 	public final FEMContext context() {
@@ -272,8 +269,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * <p>
 	 * Die zugesicherten Parameterwerte werden mit Hilfe dieses Stapelrahmens und der gegebener Parameterfunktionen ermittelt. Eine Parameterfunktion wird zur
 	 * Ermittlung eines Parameterwerts einmalig mit diesem Stapelrahmen {@link FEMFunction#invoke(FEMFrame) ausgewertet}. Genauer entspricht der {@code index}-te
-	 * zugesicherte Parameterwert dem Ergebnis von {@code params[index].invoke(this)}. Der Ergebniswert wird zur Wiederverwendung zwischengespeichert.<br>
-	 * Die über {@link #params()} bereitgestellte Liste der Parameterwerte des erzeugten Stapelrahmen liefert die noch nicht über {@link #get(int)} ermittelten
+	 * zugesicherte Parameterwert dem Ergebnis von {@code params[index].invoke(this)}. Der Ergebniswert wird zur Wiederverwendung zwischengespeichert. Die über
+	 * {@link #params()} bereitgestellte Liste der Parameterwerte des erzeugten Stapelrahmen liefert die noch nicht über {@link #get(int)} ermittelten
 	 * Parameterwerte als {@link FEMFuture}.
 	 *
 	 * @param params Parameterfunktionen zur Berechnung der zugesicherten Parameterwerte.
@@ -283,8 +280,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return new InvokeFrame(this, params, this.context);
 	}
 
-	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen {@link #params() zugesicherten Parameterwerten} zurück.<br>
-	 * Sie ist eine Abkürzung für {@code this.parent().newFrame(params).withContext(this.context())}.
+	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen {@link #params() zugesicherten Parameterwerten} zurück. Sie ist eine Abkürzung für
+	 * {@code this.parent().newFrame(params).withContext(this.context())}.
 	 *
 	 * @see #newFrame(FEMArray)
 	 * @see #withContext(FEMContext)
@@ -316,8 +313,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return this.withParams(FEMArray.from(params));
 	}
 
-	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten Parameterwerte} zurück.<br>
-	 * Sie ist eine Abkürzung für {@code this.parent().newFrame(params).withContext(this.context())}.
+	/** Diese Methode gibt diesen Stapelrahmen mit den gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten Parameterwerte} zurück. Sie
+	 * ist eine Abkürzung für {@code this.parent().newFrame(params).withContext(this.context())}.
 	 *
 	 * @see #newFrame(FEMFunction...)
 	 * @see #withContext(FEMContext)
@@ -328,8 +325,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return new InvokeFrame(this.parent, params, this.context);
 	}
 
-	/** Diese Methode gibt diesen Stapelrahmen ohne {@link #params() zugesicherte Parameterwerte} zurück.<br>
-	 * Sie ist eine Abkürzung für {@code this.parent().newFrame().withContext(this.context())}.
+	/** Diese Methode gibt diesen Stapelrahmen ohne {@link #params() zugesicherte Parameterwerte} zurück. Sie ist eine Abkürzung für
+	 * {@code this.parent().newFrame().withContext(this.context())}.
 	 *
 	 * @see #newFrame()
 	 * @see #withContext(FEMContext)
@@ -345,10 +342,9 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @throws NullPointerException Wenn {@code context} {@code null} ist. */
 	public abstract FEMFrame withContext(final FEMContext context) throws NullPointerException;
 
-	/** Diese Methode gibt den Wert des {@code index}-ten Parameters zurück.<br>
-	 * Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus, können auch zusätzliche Parameterwerte des {@link #parent() übergeordneten
-	 * Stapelrahmens} bereitgestellt werden. Genauer wird für einen {@code index >= this.size()} der Parameterwert {@code this.parent().get(index - this.size())}
-	 * des übergeordneten Stapelrahmens geliefert.
+	/** Diese Methode gibt den Wert des {@code index}-ten Parameters zurück. Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus, können auch
+	 * zusätzliche Parameterwerte des {@link #parent() übergeordneten Stapelrahmens} bereitgestellt werden. Genauer wird für einen {@code index >= this.size()}
+	 * der Parameterwert {@code this.parent().get(index - this.size())} des übergeordneten Stapelrahmens geliefert.
 	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Parameterwert.

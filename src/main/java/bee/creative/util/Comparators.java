@@ -570,8 +570,8 @@ public class Comparators {
 	 * @param comparator {@link Comparator} für die Elemente der {@link Iterable}.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2,
-		final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2, final Comparator<? super GItem> comparator)
+		throws NullPointerException {
 		Objects.notNull(comparator);
 		final Iterator<? extends GItem> iter1 = Iterators.iterator(item1), iter2 = Iterators.iterator(item2);
 		while (true) {

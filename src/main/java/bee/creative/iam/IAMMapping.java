@@ -17,8 +17,8 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert eine abstrakte Abbildung von Schlüsseln auf Werte, welche beide selbst Zahlenfolgen ({@link IAMArray}) sind.
  * <p>
  * Die Methode {@link #entry(int)} liefert einen {@link IAMEntry} mit den von {@link #key(int)} und {@link #value(int)} gelieferten Zahlenfolgen, welcher über
- * {@link IAMEntry#from(IAMArray, IAMArray)} erzeugt wird.<br>
- * Die von {@link #entries()} gelieferte {@link List} delegiert an {@link #entry(int)} und {@link #entryCount()}.
+ * {@link IAMEntry#from(IAMArray, IAMArray)} erzeugt wird. Die von {@link #entries()} gelieferte {@link List} delegiert an {@link #entry(int)} und
+ * {@link #entryCount()}.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMMapping implements Iterable<IAMEntry> {
@@ -298,9 +298,9 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @see #mode() */
 	public static final boolean MODE_SORTED = false;
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMMapping} und gibt dieses zurück.<br>
-	 * Wenn das Objekt ein {@link IAMMapping} ist, wird dieses geliefert. Andernfalls wird {@code new IAMMappingLoader(MMFArray.from(object).withOrder(...))}
-	 * geliefert, wobei die Bytereihenfolge über {@link IAMMappingLoader#HEADER} ermittelt wird.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMMapping} und gibt dieses zurück. Wenn das Objekt ein {@link IAMMapping} ist, wird dieses
+	 * geliefert. Andernfalls wird {@code new IAMMappingLoader(MMFArray.from(object).withOrder(...))} geliefert, wobei die Bytereihenfolge über
+	 * {@link IAMMappingLoader#HEADER} ermittelt wird.
 	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMMappingLoader#IAMMappingLoader(MMFArray)
@@ -334,8 +334,8 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		return entryCount & 536870911;
 	}
 
-	/** Diese Methode gibt nur dann {@link #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden.<br>
-	 * Wenn sie {@link #MODE_SORTED} liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
+	/** Diese Methode gibt nur dann {@link #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden. Wenn sie {@link #MODE_SORTED}
+	 * liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
 	 *
 	 * @see #find(IAMArray)
 	 * @see #MODE_HASHED

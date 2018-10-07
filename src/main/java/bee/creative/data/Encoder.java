@@ -2,8 +2,8 @@ package bee.creative.data;
 
 import java.io.IOException;
 
-/** Diese Schnittstelle definiert eine Methode, die einen Wert in ein {@link CodecTarget} schreibt.<br>
- * Das {@link CodecTarget} kann dazu ein Kontextobjekt mit zusätzlichen Informationen bereitstellen.
+/** Diese Schnittstelle definiert eine Methode, die einen Wert in ein {@link CodecTarget} schreibt. Das {@link CodecTarget} kann dazu ein Kontextobjekt mit
+ * zusätzlichen Informationen bereitstellen.
  *
  * @see CodecTarget#context()
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

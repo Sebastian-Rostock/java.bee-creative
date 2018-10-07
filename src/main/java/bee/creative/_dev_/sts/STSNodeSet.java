@@ -126,8 +126,8 @@ public abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	}
 
-	/** Diese Klasse implementiert die Menge der Knoten zu einer gegebenen {@link IntegerArraySection Positionsliste}.<br>
-	 * <b>Die Positionsliste muss aufsteigend geordnet und Duplikatfrei sein!</b> */
+	/** Diese Klasse implementiert die Menge der Knoten zu einer gegebenen {@link IntegerArraySection Positionsliste}. <b>Die Positionsliste muss aufsteigend
+	 * geordnet und Duplikatfrei sein!</b> */
 	protected static class ArrayNodeSet extends STSNodeSet {
 
 		final IntegerArraySection items;

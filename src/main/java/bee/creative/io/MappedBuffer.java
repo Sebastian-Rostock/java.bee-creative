@@ -126,8 +126,7 @@ public class MappedBuffer {
 		return this.size;
 	}
 
-	/** Diese Methode setzt die Größe des Puffers auf die gegebene.<br>
-	 * <b>Achtung:</b> Die angebundene {@link #file() Datei} kann nur vergrößert werden!
+	/** Diese Methode setzt die Größe des Puffers auf die gegebene. <b>Achtung:</b> Die angebundene {@link #file() Datei} kann nur vergrößert werden!
 	 *
 	 * @param newSize neue Puffergröße.
 	 * @throws IOException Wenn die Puffergröße ungültig ist. */

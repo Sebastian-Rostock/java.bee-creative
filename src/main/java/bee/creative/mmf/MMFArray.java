@@ -7,9 +7,9 @@ import bee.creative.iam.IAMArray;
 import bee.creative.io.IO;
 import bee.creative.io.MappedBuffer;
 
-/** Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch einen {@link ByteBuffer} oder einen {@link MappedBuffer} gegeben sind.<br>
- * Zur Interpretation derer Speicherbereiche können entsprechende Sichten über {@link #toINT8()}, {@link #toUINT8()}, {@link #toINT16()}, {@link #toUINT16()}
- * oder {@link #toINT32()} erzeugte werden.
+/** Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch einen {@link ByteBuffer} oder einen {@link MappedBuffer} gegeben sind. Zur
+ * Interpretation derer Speicherbereiche können entsprechende Sichten über {@link #toINT8()}, {@link #toUINT8()}, {@link #toINT16()}, {@link #toUINT16()} oder
+ * {@link #toINT32()} erzeugte werden.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class MMFArray extends IAMArray {
@@ -23,9 +23,9 @@ public abstract class MMFArray extends IAMArray {
 	/** Dieses Feld speichert die zur nativen umgekehrte Bytereihenfolge. */
 	protected static final ByteOrder REVERSE_ORDER = MMFArray.NATIVE_ORDER == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link MMFArray} und gibt dieses zurück.<br>
-	 * Wenn das Objekt ein {@link MMFArray} ist, wird dieses geliefert. Wenn es ein {@link ByteBuffer} ist, wird dazu eine {@link #toINT8() INT8}-Sicht erzeugt.
-	 * Andernfalls wird das Objekt in einen {@link ByteBuffer} {@link IO#inputBufferFrom(Object) überführt}.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link MMFArray} und gibt dieses zurück. Wenn das Objekt ein {@link MMFArray} ist, wird dieses
+	 * geliefert. Wenn es ein {@link ByteBuffer} ist, wird dazu eine {@link #toINT8() INT8}-Sicht erzeugt. Andernfalls wird das Objekt in einen {@link ByteBuffer}
+	 * {@link IO#inputBufferFrom(Object) überführt}.
 	 *
 	 * @see IO#inputBufferFrom(Object)
 	 * @param object Objekt.

@@ -221,10 +221,9 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt den {@link Marshaller} zurück.<br>
-	 * Wenn über {@link #useMarshaller(Marshaller)} noch kein {@link Marshaller} gesetzt wurden, werden über {@link JAXBContext#createMarshaller()} ein neuer
-	 * erstellt und über {@link #useMarshaller(Marshaller)} gesetzt und über {@link #updateMarshaller()} aktualisiert. Der zur Erstellung verwendeten Kontext kann
-	 * über {@link #openContextData()} konfiguriert werden.
+	/** Diese Methode gibt den {@link Marshaller} zurück. Wenn über {@link #useMarshaller(Marshaller)} noch kein {@link Marshaller} gesetzt wurden, werden über
+	 * {@link JAXBContext#createMarshaller()} ein neuer erstellt und über {@link #useMarshaller(Marshaller)} gesetzt und über {@link #updateMarshaller()}
+	 * aktualisiert. Der zur Erstellung verwendeten Kontext kann über {@link #openContextData()} konfiguriert werden.
 	 *
 	 * @see #useMarshaller(Marshaller)
 	 * @see #updateMarshaller()
@@ -258,10 +257,9 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		return this.useMarshaller(null);
 	}
 
-	/** Diese Methode aktualisiert die Einstellungen des {@link Marshaller} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf den über {@link #getMarshaller()} ermittelten {@link Marshaller} die Einstellungen übertragen, die in
-	 * {@link #openShemaData()}, {@link #openAdapterData()}, {@link #openListenerData()}, {@link #openPropertyData()} und {@link #openValidationData()}
-	 * konfiguriert sind.
+	/** Diese Methode aktualisiert die Einstellungen des {@link Marshaller} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
+	 * {@link #getMarshaller()} ermittelten {@link Marshaller} die Einstellungen übertragen, die in {@link #openShemaData()}, {@link #openAdapterData()},
+	 * {@link #openListenerData()}, {@link #openPropertyData()} und {@link #openValidationData()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link #getMarshaller()} oder {@link SchemaData#getSchema()} eine entsprechende Ausnahme auslöst.

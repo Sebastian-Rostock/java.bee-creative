@@ -555,7 +555,7 @@ public final class Fields {
 
 	}
 
-	/** Diese Klasse implementiert {@link Fields#defaultField(Field, Object)}. */
+	/** Diese Klasse implementiert {@link Fields#defaultField(Object, Field)}. */
 	@SuppressWarnings ("javadoc")
 	public static class DefaultField<GItem, GValue> implements Field<GItem, GValue> {
 
@@ -674,7 +674,7 @@ public final class Fields {
 
 	}
 
-	/** Diese Klasse implementiert {@link Fields#translatedField(Field, Translator)}. */
+	/** Diese Klasse implementiert {@link Fields#translatedField(Translator, Field)}. */
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedField<GItem, GTarget, GSource> implements Field<GItem, GTarget> {
 
@@ -826,10 +826,10 @@ public final class Fields {
 		return new ValueField<>(value);
 	}
 
-	/** Diese Methode gibt ein initialisierendes {@link Field} zurück.<br>
-	 * Das Schreiben wird direkt an das gegebene {@link Field Datenfeld} {@code field} delegiert. Beim Lesen wird der Wert zuerst über das gegebene {@link Field
-	 * Datenfeld} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. gemäß der gegebenen {@link Getter Initialisierung} {@code setup}
-	 * ermittelt, über das {@link Field Datenfeld} {@code field} geschrieben und zurückgegeben. Andernfalls wird der Wertt er direkt zurückgegeben.
+	/** Diese Methode gibt ein initialisierendes {@link Field} zurück. Das Schreiben wird direkt an das gegebene {@link Field Datenfeld} {@code field} delegiert.
+	 * Beim Lesen wird der Wert zuerst über das gegebene {@link Field Datenfeld} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. gemäß
+	 * der gegebenen {@link Getter Initialisierung} {@code setup} ermittelt, über das {@link Field Datenfeld} {@code field} geschrieben und zurückgegeben.
+	 * Andernfalls wird der Wertt er direkt zurückgegeben.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts.
@@ -846,9 +846,9 @@ public final class Fields {
 		return Fields.nativeField(field, true);
 	}
 
-	/** Diese Methode gibt ein {@link Field} zum gegebenen {@link java.lang.reflect.Field nativen Datenfeld} zurück.<br>
-	 * Für eine Eingabe {@code item} erfolgt das Lesen des gelieferten {@link Field} über {@code field.get(item)}. Das Schreiben eines Werts {@code value} erfolgt
-	 * hierbei über {@code field.set(item, value)}. Bei Klassenfeldern wird die Eingabe ignoriert.
+	/** Diese Methode gibt ein {@link Field} zum gegebenen {@link java.lang.reflect.Field nativen Datenfeld} zurück. Für eine Eingabe {@code item} erfolgt das
+	 * Lesen des gelieferten {@link Field} über {@code field.get(item)}. Das Schreiben eines Werts {@code value} erfolgt hierbei über
+	 * {@code field.set(item, value)}. Bei Klassenfeldern wird die Eingabe ignoriert.
 	 *
 	 * @see java.lang.reflect.Field#get(Object)
 	 * @see java.lang.reflect.Field#set(Object, Object)
@@ -858,7 +858,7 @@ public final class Fields {
 	 * @param forceAccessible
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn das native Datenfeld nicht zugrifbar ist. */
+	 * @throws IllegalArgumentException Wenn das Datenfeld nicht zugrifbar ist. */
 	public static <GItem, GValue> Field<GItem, GValue> nativeField(final java.lang.reflect.Field field, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new NativeField<>(field, forceAccessible);
@@ -895,17 +895,17 @@ public final class Fields {
 		return Fields.nativeField(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #defaultField(Field, Object) Fields.defaultField(field, null)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #defaultField(Object, Field) Fields.defaultField(null, field)}. */
 	public static <GItem, GValue> Field<GItem, GValue> defaultField(final Field<? super GItem, GValue> field) throws NullPointerException {
-		return Fields.defaultField(field, null);
+		return Fields.defaultField(null, field);
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@link #compositeField(Getter, Setter) Fields.compositeField(Fields.defaultGetter(field, value),
+	/** Diese Methode ist eine effiziente Alternative zu {@link #compositeField(Getter, Setter) Fields.compositeField(Fields.defaultGetter(value, field),
 	 * Fields.defaultSetter(field))}.
 	 *
-	 * @see Getters#defaultGetter(Getter, Object)
+	 * @see Getters#defaultGetter(Object, Getter)
 	 * @see Setters#defaultSetter(Setter) */
-	public static <GItem, GValue> Field<GItem, GValue> defaultField(final Field<? super GItem, GValue> field, final GValue value) throws NullPointerException {
+	public static <GItem, GValue> Field<GItem, GValue> defaultField(final GValue value, final Field<? super GItem, GValue> field) throws NullPointerException {
 		return new DefaultField<>(field, value);
 	}
 
@@ -931,13 +931,13 @@ public final class Fields {
 		return new NavigatedField<>(toTarget, field);
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@link #translatedField(Field, Getter, Getter) Fields.translatedField(field,
-	 * Translators.toTargetGetter(translator), Translators.toSourceGetter(translator))}.
+	/** Diese Methode ist eine effiziente Alternative zu {@link #translatedField(Getter, Getter, Field)
+	 * Fields.translatedField(Translators.toTargetGetter(translator), Translators.toSourceGetter(translator), field)}.
 	 *
 	 * @see Translators#toTargetGetter(Translator)
 	 * @see Translators#toSourceGetter(Translator) */
-	public static <GItem, GSource, GTarget> Field<GItem, GTarget> translatedField(final Field<? super GItem, GSource> field,
-		final Translator<GSource, GTarget> translator) throws NullPointerException {
+	public static <GItem, GSource, GTarget> Field<GItem, GTarget> translatedField(final Translator<GSource, GTarget> translator,
+		final Field<? super GItem, GSource> field) throws NullPointerException {
 		return new TranslatedField<>(field, translator);
 	}
 
@@ -953,8 +953,8 @@ public final class Fields {
 	 * @param toSource {@link Getter} zum Umwandeln des Wert beim Schreiben.
 	 * @return {@code translated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field}, {@code toTarget} bzw. {@code toSource} {@code null} ist. */
-	public static <GItem, GSource, GTarget> Field<GItem, GTarget> translatedField(final Field<? super GItem, GSource> field,
-		final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
+	public static <GItem, GSource, GTarget> Field<GItem, GTarget> translatedField(final Getter<? super GSource, ? extends GTarget> toTarget,
+		final Getter<? super GTarget, ? extends GSource> toSource, final Field<? super GItem, GSource> field) throws NullPointerException {
 		return Fields.compositeField(Getters.translatedGetter(toTarget, field), Setters.translatedSetter(toSource, field));
 	}
 

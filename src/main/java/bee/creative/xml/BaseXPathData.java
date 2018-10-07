@@ -153,10 +153,9 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt das {@link XPath} zurück.<br>
-	 * Wenn über {@link #useXPath(XPath)} noch keine {@link XPath} gesetzt wurde, wird über {@link XPathFactory#newXPath()} eine neue erstellt, über
-	 * {@link #useXPath(XPath)} gesetzt und über {@link #updateXPath()} aktualisiert. Die zur Erstellung verwendete {@link XPathFactory} kann über
-	 * {@link #openFacroryData()} konfiguriert werden.
+	/** Diese Methode gibt das {@link XPath} zurück. Wenn über {@link #useXPath(XPath)} noch keine {@link XPath} gesetzt wurde, wird über
+	 * {@link XPathFactory#newXPath()} eine neue erstellt, über {@link #useXPath(XPath)} gesetzt und über {@link #updateXPath()} aktualisiert. Die zur Erstellung
+	 * verwendete {@link XPathFactory} kann über {@link #openFacroryData()} konfiguriert werden.
 	 *
 	 * @see #useXPath(XPath)
 	 * @see #updateXPath()

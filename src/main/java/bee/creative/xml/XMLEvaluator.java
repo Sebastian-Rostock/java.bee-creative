@@ -136,8 +136,8 @@ public final class XMLEvaluator {
 		return this.useExpression((XPathExpression)null);
 	}
 
-	/** Diese Methode kompiliert den gegebenen Ausdruck und gibt ihn als {@link XPathExpression} zurück.<br>
-	 * Wenn der Ausdruck {@code null} ist, wird {@code null} geliefert. Die kompilierten Ausdrücke werden {@link #getCache() gepuffert}.
+	/** Diese Methode kompiliert den gegebenen Ausdruck und gibt ihn als {@link XPathExpression} zurück. Wenn der Ausdruck {@code null} ist, wird {@code null}
+	 * geliefert. Die kompilierten Ausdrücke werden {@link #getCache() gepuffert}.
 	 *
 	 * @param expression Ausdruck oder {@code null}.
 	 * @return {@link XPathExpression} oder {@code null}.
@@ -156,8 +156,8 @@ public final class XMLEvaluator {
 		}
 	}
 
-	/** Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in den gegebenen Ergebnistyp und gibt das Ergebnis zurück.<br>
-	 * Wenn der Ausdruck {@code null} ist, wird {@code null} geliefert.
+	/** Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in den gegebenen Ergebnistyp und gibt das Ergebnis zurück. Wenn der Ausdruck
+	 * {@code null} ist, wird {@code null} geliefert.
 	 *
 	 * @see XPathConstants
 	 * @param resultType Ergebnistyp.

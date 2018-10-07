@@ -1,7 +1,6 @@
 package bee.creative.fem;
 
-/** Diese Klasse implementiert einen unveränderlichen Wahrheitswert.<br>
- * Intern wird der Wahrheitswert als {@code boolean} dargestellt.
+/** Diese Klasse implementiert einen unveränderlichen Wahrheitswert. Intern wird der Wahrheitswert als {@code boolean} dargestellt.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean> {
@@ -156,8 +155,8 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		return this.compare(value);
 	}
 
-	/** Diese Methode gibt die Textdarstellung dieses Wahrheitswerts zurück.<br>
-	 * Für die Wahrheitswerte {@code true} und {@code false} sind die Textdarstellungen {@code "true"} und {@code "false"}.
+	/** Diese Methode gibt die Textdarstellung dieses Wahrheitswerts zurück. Für die Wahrheitswerte {@code true} und {@code false} sind die Textdarstellungen
+	 * {@code "true"} und {@code "false"}.
 	 *
 	 * @return Textdarstellung. */
 	@Override

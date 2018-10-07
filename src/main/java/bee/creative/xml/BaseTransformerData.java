@@ -188,11 +188,11 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt den {@link Transformer} zurück.<br>
-	 * Wenn über {@link #useTransformer(Transformer)} noch kein {@link Transformer} gesetzt wurde, wird über {@link Templates#newTransformer()} bzw.
-	 * {@link TransformerFactory#newTransformer()} ein neuer erstellt, über {@link #useTransformer(Transformer)} gesetzt und über {@link #updateTransformer()}
-	 * aktualisiert. Für die Erstellung werden entweder die {@link Templates} oder die {@link TransformerFactoryConfigurationError} genutzt, die in
-	 * {@link #openTemplatesData()} konfiguriert sind. Die {@link TransformerFactory} wird nur dann verwendet, wenn die {@link Templates} {@code null} sind.
+	/** Diese Methode gibt den {@link Transformer} zurück. Wenn über {@link #useTransformer(Transformer)} noch kein {@link Transformer} gesetzt wurde, wird über
+	 * {@link Templates#newTransformer()} bzw. {@link TransformerFactory#newTransformer()} ein neuer erstellt, über {@link #useTransformer(Transformer)} gesetzt
+	 * und über {@link #updateTransformer()} aktualisiert. Für die Erstellung werden entweder die {@link Templates} oder die
+	 * {@link TransformerFactoryConfigurationError} genutzt, die in {@link #openTemplatesData()} konfiguriert sind. Die {@link TransformerFactory} wird nur dann
+	 * verwendet, wenn die {@link Templates} {@code null} sind.
 	 *
 	 * @see #useTransformer(Transformer)
 	 * @see #updateTransformer()
@@ -226,9 +226,9 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		return this.useTransformer(null);
 	}
 
-	/** Diese Methode aktualisiert die Einstellungen des {@link Transformer} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf den über {@link #getTransformer()} ermittelten {@link Transformer} die Einstellungen übertragen, die in
-	 * {@link #openPropertyData()} und {@link #openParameterData()} konfiguriert sind.
+	/** Diese Methode aktualisiert die Einstellungen des {@link Transformer} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
+	 * {@link #getTransformer()} ermittelten {@link Transformer} die Einstellungen übertragen, die in {@link #openPropertyData()} und {@link #openParameterData()}
+	 * konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws TransformerConfigurationException Wenn {@link #getTransformer()} eine entsprechende Ausnahme auslöst. */

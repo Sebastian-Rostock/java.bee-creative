@@ -12,8 +12,7 @@ import bee.creative.util.Comparators.BaseComparator;
  *   public void run() throws Throwable {
  *     ...
  *   }
- * });</pre><br>
- * Als Lambda-Ausdruck wird der TEst entsprechend kürzer: <pre>
+ * });</pre> Als Lambda-Ausdruck wird der TEst entsprechend kürzer: <pre>
  * Tester result = new Tester(() -> { ... });</pre>
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -224,8 +223,8 @@ public class Tester {
 		this.cause = null;
 	}
 
-	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte.<br>
-	 * Die Messung der Speicherbelegung erfolgt synchron mit Bereinigung durch {@link Runtime#gc()}.
+	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der Speicherbelegung erfolgt synchron mit Bereinigung durch
+	 * {@link Runtime#gc()}.
 	 *
 	 * @param method Testmethode.
 	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist. */
@@ -233,9 +232,9 @@ public class Tester {
 		this(-1, method);
 	}
 
-	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte.<br>
-	 * Wenn das gegebene Interval größer als {@code 0} ist, wird ein {@link Sampler} zur asynchronen Messung der maximalen Speicherbelegung verwendet. Wenn es
-	 * kleiner {@code 0} ist, erfolgt die Messung mit Bereinigung durch {@link Runtime#gc()}.
+	/** Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Wenn das gegebene Interval größer als {@code 0} ist, wird ein
+	 * {@link Sampler} zur asynchronen Messung der maximalen Speicherbelegung verwendet. Wenn es kleiner {@code 0} ist, erfolgt die Messung mit Bereinigung durch
+	 * {@link Runtime#gc()}.
 	 *
 	 * @param mode Interval der asynchronen Messung der Speicherbelegung in Millisekunden, nagativ bei synchroner Messung und {@code 0} bei deaktivierter.
 	 * @param method Testmethode.

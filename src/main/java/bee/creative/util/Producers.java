@@ -209,7 +209,7 @@ public class Producers {
 		return Producers.nativeProducer(memberPath, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Producers.nativeProducer(Natives.parse(memberPath))}.
+	/** Diese Methode ist effektiv eine Abkürzung für {@code Producers.nativeProducer(Natives.parse(memberPath), forceAccessible)}.
 	 *
 	 * @see Natives#parse(String)
 	 * @see #nativeProducer(Class, boolean)
@@ -257,7 +257,7 @@ public class Producers {
 	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Methode nicht statisch oder nicht parameterlos ist. */
+	 * @throws IllegalArgumentException Wenn die Methode nicht statisch, nicht parameterlos oder nicht zugreifbar ist. */
 	public static <GValue> Producer<GValue> nativeProducer(final Method method, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new MethodProducer<>(method, forceAccessible);
@@ -290,7 +290,7 @@ public class Producers {
 	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Kontruktor nicht statisch oder nicht parameterlos ist. */
+	 * @throws IllegalArgumentException Wenn der Kontruktor nicht statisch, nicht parameterlos oder nicht zugreifbar ist. */
 	public static <GValue> Producer<GValue> nativeProducer(final Constructor<?> constructor, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new ConstructorProducer<>(constructor, forceAccessible);

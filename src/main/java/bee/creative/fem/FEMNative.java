@@ -22,8 +22,7 @@ public final class FEMNative extends FEMValue {
 	/** Dieses Feld speichert den Wert zu {@code false}. */
 	public static final FEMNative FALSE = new FEMNative(Boolean.FALSE);
 
-	/** Diese Methode gibt das native Objekt als Wert zurück.<br>
-	 * Wenn das Objekt bereits ein {@link FEMNative} ist, wird dieses geliefert.
+	/** Diese Methode gibt das native Objekt als Wert zurück. Wenn das Objekt bereits ein {@link FEMNative} ist, wird dieses geliefert.
 	 *
 	 * @param data Objekt oder {@code null}.
 	 * @return Wert. */
@@ -52,8 +51,8 @@ public final class FEMNative extends FEMValue {
 		return Objects.hash(this.data);
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wert gleich dem gegebenen ist.<br>
-	 * Dies ist nur dann der Fall, wenn die {@link #data() Nutzdaten} einander gleichen, d.h. {@code Objects.equals(this.data(), that.data())}.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wert gleich dem gegebenen ist. Dies ist nur dann der Fall, wenn die {@link #data() Nutzdaten}
+	 * einander gleichen, d.h. {@code Objects.equals(this.data(), that.data())}.
 	 *
 	 * @param that Wert.
 	 * @return Gleichheit.

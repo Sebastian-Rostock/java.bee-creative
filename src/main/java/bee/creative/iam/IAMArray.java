@@ -332,8 +332,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	/** Dieses Feld speichert das leere {@link IAMArray}. */
 	public static final IAMArray EMPTY = new EmptyArray();
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
-	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück. Änderungen am Inhalt von {@code array} werden auf das
+	 * gelieferte {@link IAMArray} übertragen!
 	 *
 	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
@@ -342,8 +342,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return IAMArray.from(array, 0, array.length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
-	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
 	 *
 	 * @param array Zahlenfolge.
 	 * @param offset Beginn der Abschnitts.
@@ -357,8 +357,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return new IntArray(array, offset, length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
-	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück. Änderungen am Inhalt von {@code array} werden auf das
+	 * gelieferte {@link IAMArray} übertragen!
 	 *
 	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
@@ -367,8 +367,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return IAMArray.from(array, 0, array.length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
-	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
 	 *
 	 * @param array Zahlenfolge.
 	 * @param offset Beginn der Abschnitts.
@@ -382,8 +382,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return new ByteArray(array, offset, length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
-	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück. Änderungen am Inhalt von {@code array} werden auf das
+	 * gelieferte {@link IAMArray} übertragen!
 	 *
 	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
@@ -392,8 +392,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return IAMArray.from(array, 0, array.length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
-	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
 	 *
 	 * @param array Zahlenfolge.
 	 * @param offset Beginn der Abschnitts.
@@ -407,8 +407,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return new CharArray(array, offset, length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück.<br>
-	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück. Änderungen am Inhalt von {@code array} werden auf das
+	 * gelieferte {@link IAMArray} übertragen!
 	 *
 	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
@@ -417,8 +417,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return IAMArray.from(array, 0, array.length);
 	}
 
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück.<br>
-	 * Änderungen am Inhalt von {@code array} werden auf das gelieferte {@link IAMArray} übertragen!
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
 	 *
 	 * @param array Zahlenfolge.
 	 * @param offset Beginn der Abschnitts.
@@ -1094,9 +1094,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return this.length;
 	}
 
-	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück.<br>
-	 * Diese Größe ist {@code 0} für eine unspezifische Zahlenfolgen, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für {@code INT16}- sowie
-	 * {@code UINT16}-Zahlen und {@code 4} für {@code INT32}-Zahlen.
+	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück. Diese Größe ist {@code 0} für eine unspezifische Zahlenfolgen, {@code 1} für
+	 * {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code INT32}-Zahlen.
 	 *
 	 * @return Größe jeder Zahl dieser Zahlenfolge (0..4). */
 	public int mode() {
@@ -1143,8 +1142,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return this.compareTo(that);
 	}
 
-	/** Diese Methode gibt einen Abschnitt dieser Zahlenfolge ab der gegebenen Position und mit der gegebenen Länge zurück.<br>
-	 * Wenn der Abschnitt nicht innerhalb der Zahlenfolge liegt oder die Länge kleiner als {@code 1} ist, wird eine leere Zahlenfolge geliefert.
+	/** Diese Methode gibt einen Abschnitt dieser Zahlenfolge ab der gegebenen Position und mit der gegebenen Länge zurück. Wenn der Abschnitt nicht innerhalb der
+	 * Zahlenfolge liegt oder die Länge kleiner als {@code 1} ist, wird eine leere Zahlenfolge geliefert.
 	 *
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.

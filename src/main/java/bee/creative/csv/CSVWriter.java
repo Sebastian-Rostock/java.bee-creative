@@ -7,17 +7,15 @@ import java.io.Writer;
 import bee.creative.io.IO;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert einen Formatter für Daten im {@code CSV}-Format.<br>
- * {@link #getQuote() Maskierungszeichen} und {@link #getComma() Trennzeichen} können eingestellt werden.<br>
- * Als Zeilenende wird die Zeichekette {@code "\r\n"} genutzt.
+/** Diese Klasse implementiert einen Formatter für Daten im {@code CSV}-Format. {@link #getQuote() Maskierungszeichen} und {@link #getComma() Trennzeichen}
+ * können eingestellt werden. Als Zeilenende wird die Zeichekette {@code "\r\n"} genutzt.
  *
  * @see CSVReader
  * @author Sebastian Rostock 2014. */
 public class CSVWriter implements Closeable, Flushable {
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVWriter} und gibt diesen zurück.<br>
-	 * Wenn das Objekt ein {@link CSVWriter} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object)
-	 * überführt}.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVWriter} und gibt diesen zurück. Wenn das Objekt ein {@link CSVWriter} ist, wird dieser
+	 * geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object) überführt}.
 	 *
 	 * @see IO#outputWriterFrom(Object)
 	 * @see CSVWriter#CSVWriter(Writer)
@@ -45,11 +43,10 @@ public class CSVWriter implements Closeable, Flushable {
 	 * ignoriert werden soll (Zeilenanfang). */
 	boolean ignore = true;
 
-	/** Dieser Konstruktor initialisiert die Ausgabe.<br>
-	 * Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird {@code '"'} genutzt. Der {@link #getForce()
-	 * Maskierungszwang} ist aktiviert.<br>
-	 * Die Methoden {@link #useForce(boolean)}, {@link #useQuote(char)}, {@link #useComma(char)}, {@link #writeValue(Object)}, {@link #writeEntry(String...)} und
-	 * {@link #writeTable(Object[][])} synchronisieren auf den gegebenen {@link Writer}.
+	/** Dieser Konstruktor initialisiert die Ausgabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird
+	 * {@code '"'} genutzt. Der {@link #getForce() Maskierungszwang} ist aktiviert. Die Methoden {@link #useForce(boolean)}, {@link #useQuote(char)},
+	 * {@link #useComma(char)}, {@link #writeValue(Object)}, {@link #writeEntry(String...)} und {@link #writeTable(Object[][])} synchronisieren auf den gegebenen
+	 * {@link Writer}.
 	 *
 	 * @param writer Ausgabe.
 	 * @throws IOException Wenn {@link Writer#flush()} eine entsprechende Ausnahme auslöst.
@@ -59,9 +56,9 @@ public class CSVWriter implements Closeable, Flushable {
 		this.writer = writer;
 	}
 
-	/** Diese Methode gibt den Maskierungszwang zurück.<br>
-	 * Wenn dieser {@code true} ist, gelten alle {@link #writeValue(Object) Werte} als zu maskieren. Andernfalls gelten nur die {@link #writeValue(Object) Werte}
-	 * als zu maskieren, in denen ein {@link #getComma() Trennzeichen}, ein {@link #getQuote() Maskierungszeichen} oder ein Zeilenumbruch vorkommt.
+	/** Diese Methode gibt den Maskierungszwang zurück. Wenn dieser {@code true} ist, gelten alle {@link #writeValue(Object) Werte} als zu maskieren. Andernfalls
+	 * gelten nur die {@link #writeValue(Object) Werte} als zu maskieren, in denen ein {@link #getComma() Trennzeichen}, ein {@link #getQuote()
+	 * Maskierungszeichen} oder ein Zeilenumbruch vorkommt.
 	 *
 	 * @return Maskierungszwang. */
 	public boolean getForce() {
@@ -70,10 +67,9 @@ public class CSVWriter implements Closeable, Flushable {
 		}
 	}
 
-	/** Diese Methode gibt das Maskierungszeichen zurück.<br>
-	 * Maskierte {@link #writeValue(Object) Werte} werden in diese Zeichen eingeschlossen und enthalten dieses Zeichen nur gedoppelt.<br>
-	 * Wenn das Zeichen {@code '\0'} ist, werden die {@link #writeValue(Object) Werte} nicht maskiert. Diese Einstellung aht Vorrang gegebnüber dem
-	 * {@link #getForce() Maskierungszwang}.
+	/** Diese Methode gibt das Maskierungszeichen zurück. Maskierte {@link #writeValue(Object) Werte} werden in diese Zeichen eingeschlossen und enthalten dieses
+	 * Zeichen nur gedoppelt. Wenn das Zeichen {@code '\0'} ist, werden die {@link #writeValue(Object) Werte} nicht maskiert. Diese Einstellung aht Vorrang
+	 * gegebnüber dem {@link #getForce() Maskierungszwang}.
 	 *
 	 * @see #getForce()
 	 * @return Maskierungszeichen. */
@@ -83,8 +79,8 @@ public class CSVWriter implements Closeable, Flushable {
 		}
 	}
 
-	/** Diese Methode gibt das Trennzeichen zurück.<br>
-	 * Dieses Zeichen steht zwischen den {@link #writeValue(Object) Werten} eines {@link #writeEntry(String...) Eintrags}.
+	/** Diese Methode gibt das Trennzeichen zurück. Dieses Zeichen steht zwischen den {@link #writeValue(Object) Werten} eines {@link #writeEntry(String...)
+	 * Eintrags}.
 	 *
 	 * @return Trennzeichen. */
 	public char getComma() {
@@ -130,8 +126,8 @@ public class CSVWriter implements Closeable, Flushable {
 		return this;
 	}
 
-	/** Diese Methode schreibt die gegebene Tabelle und gibt this zurück.<br>
-	 * Dabei werden die gegebenen {@link #writeEntry(String...) Einträge} in der gegebenen Reihenfolge ausgegeben.
+	/** Diese Methode schreibt die gegebene Tabelle und gibt this zurück. Dabei werden die gegebenen {@link #writeEntry(String...) Einträge} in der gegebenen
+	 * Reihenfolge ausgegeben.
 	 *
 	 * @see #writeEntry(String...)
 	 * @param entries Tabelle (Liste von Einträgen).
@@ -190,10 +186,9 @@ public class CSVWriter implements Closeable, Flushable {
 		this.writeEntryImpl();
 	}
 
-	/** Diese Methode schreibt den gegebenen Wert und gibt {@code this} zurück.<br>
-	 * Die Maskierung des Werts erfolgt nur dann, wenn das {@link #getQuote() Maskierungszeichen} nicht {@code '\0'} ist und der Wert aufgrund seines Inhalts oder
-	 * des {@link #getForce() Maskierungszwangs} als zu maskieren gilt.<br>
-	 * Das {@link #getComma() Trennzeichen} wird außer beim ersten vor jedem Wert einer Zeile ausgegeben.
+	/** Diese Methode schreibt den gegebenen Wert und gibt {@code this} zurück. Die Maskierung des Werts erfolgt nur dann, wenn das {@link #getQuote()
+	 * Maskierungszeichen} nicht {@code '\0'} ist und der Wert aufgrund seines Inhalts oder des {@link #getForce() Maskierungszwangs} als zu maskieren gilt. Das
+	 * {@link #getComma() Trennzeichen} wird außer beim ersten vor jedem Wert einer Zeile ausgegeben.
 	 *
 	 * @see #getForce()
 	 * @see #getQuote()

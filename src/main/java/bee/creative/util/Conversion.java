@@ -6,11 +6,9 @@ import java.util.List;
 /** Diese Schnittstelle definiert das Paar aus Ein- und Ausgabedaten.
  * <p>
  * Im nachfolgenden Beispiel wird aus den gegebenen Elementen {@code entries} mit Hilfe des {@link Getter} {@code converter} eine {@link List} aus
- * {@link Conversion} {@link Iterables#addAll(java.util.Collection, Iterable) erzeugt}. Diese werden anschließend bezüglich ihrer
- * {@link Conversion#target() Ausgabe} gemäß dem {@link Comparator} {@code comparator} geordnet. Abschließend werden je ein {@link Iterable} für die
- * so geordneten 
- * {@link Conversion#source() Eingaben} und die {@link Conversion#target() Ausgaben} erzeugt.
- * <pre>{@literal
+ * {@link Conversion} {@link Iterables#addAll(java.util.Collection, Iterable) erzeugt}. Diese werden anschließend bezüglich ihrer {@link Conversion#target()
+ * Ausgabe} gemäß dem {@link Comparator} {@code comparator} geordnet. Abschließend werden je ein {@link Iterable} für die so geordneten
+ * {@link Conversion#source() Eingaben} und die {@link Conversion#target() Ausgaben} erzeugt. <pre>{@literal
  * Iterable<I> entries = // ...
  * Getter<I, O> converter = // ...
  * Comparator<O> comparator = // ...
@@ -32,7 +30,7 @@ public interface Conversion<GSource, GTarget> {
 	 * @return Eingabe. */
 	public GSource source();
 
-	/** Diese Methode gibt die Ausgabe  zurück.
+	/** Diese Methode gibt die Ausgabe zurück.
 	 *
 	 * @return Ausgabe. */
 	public GTarget target();

@@ -3,8 +3,8 @@ package bee.creative.fem;
 import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 
-/** Diese Klasse implementiert eine unveränderliche Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
- * Intern wird die Zeitspanne als ein {@code long} dargestellt.<br>
+/** Diese Klasse implementiert eine unveränderliche Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden. Intern wird die
+ * Zeitspanne als ein {@code long} dargestellt.
  * <h5><a name="durationmonths">Gesamtanzahl der Monate</a></h5>
  * <p>
  * Der relative Anteil einer Zeitspanne ist durch die {@link #yearsValue() Jahre} und {@link #monthsValue() Monate} gegeben, welche zur
@@ -164,8 +164,8 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		64, 16, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16, 18,
 		33, 18, 33, 33, 33, 48, 33, 48, 33, 48};
 
-	/** Diese Methode gibt eine neue Zeitspanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
-	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	/** Diese Methode gibt eine neue Zeitspanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
+	 * {@link #toString() Textdarstellung}.
 	 *
 	 * @see #toString()
 	 * @param string Zeichenkette.
@@ -502,9 +502,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * <p>
 	 * Das Paar besteht aus {@code (MAX << 4) | (MIN << 0)}.
 	 * <p>
-	 * Für die Min- und maximalen Monatslängen gilt damit:<br>
-	 * {@code minLengthOf(i) = _lengthOf_(i) - MIN} sowie <br>
-	 * {@code maxLengthOf(i) = _lengthOf_(i) + MAX}.
+	 * Für die Min- und maximalen Monatslängen gilt damit: {@code minLengthOf(i) = _lengthOf_(i) - MIN} sowie {@code maxLengthOf(i) = _lengthOf_(i) + MAX}.
 	 *
 	 * @param months Anzahl an Monaten ({@code 0..119999}).
 	 * @return Min-Max-Paar. */
@@ -660,8 +658,8 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return Integers.toLong(this.valueH, this.valueL);
 	}
 
-	/** Diese Methode gibt das Vorzeichen dieser Zeitspanne zurück.<br>
-	 * Das Vorzeichen ist {@code -1}, {@code 0} oder {@code +1}, wenn alle Komponenten der Zeitspanne kleiner als, gleich bzw. größer als {@code 0} sind.
+	/** Diese Methode gibt das Vorzeichen dieser Zeitspanne zurück. Das Vorzeichen ist {@code -1}, {@code 0} oder {@code +1}, wenn alle Komponenten der Zeitspanne
+	 * kleiner als, gleich bzw. größer als {@code 0} sind.
 	 *
 	 * @return Vorzeichen. */
 	public final int signValue() {
@@ -718,16 +716,15 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return (this.valueL >> 0) & 0x03FF;
 	}
 
-	/** Diese Methode gibt die Gesamtanzahl der Millisekunden zurück.<br>
-	 * Diese fassen {@link #daysValue()}, {@link #hoursValue()}, {@link #minutesValue()}, {@link #secondsValue()} und {@link #millisecondsValue()} zusammen.
+	/** Diese Methode gibt die Gesamtanzahl der Millisekunden zurück. Diese fassen {@link #daysValue()}, {@link #hoursValue()}, {@link #minutesValue()},
+	 * {@link #secondsValue()} und {@link #millisecondsValue()} zusammen.
 	 *
 	 * @return Gesamtanzahl der Millisekunden ({@code 0..315569519999999}). */
 	public final long durationmillisValue() {
 		return FEMDuration.durationmillisOfImpl(this.daysValue(), this.hoursValue(), this.minutesValue(), this.secondsValue(), this.millisecondsValue());
 	}
 
-	/** Diese Methode gibt die Gesamtanzahl der Monate zurück.<br>
-	 * Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
+	/** Diese Methode gibt die Gesamtanzahl der Monate zurück. Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
 	 *
 	 * @return Gesamtanzahl der Monate ({@code 0..119999}). */
 	public final int durationmonthsValue() {
@@ -945,9 +942,9 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return this.compare(that, 0);
 	}
 
-	/** Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück.<br>
-	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#duration-lexical-repr">xsd:duration</a> aus
-	 * <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf genau drei optionale Nachkommastellen für die Sekunden.
+	/** Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück. Diese Textdarstellung entspricht der des Datentyps
+	 * <a href="http://www.w3.org/TR/xmlschema-2/#duration-lexical-repr">xsd:duration</a> aus <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes
+	 * Second Edition</a>, beschränkt auf genau drei optionale Nachkommastellen für die Sekunden.
 	 *
 	 * @return Textdarstellung. */
 	@Override

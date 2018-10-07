@@ -91,10 +91,9 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt den {@link JAXBContext} zurück.<br>
-	 * Wenn über {@link #useContext(JAXBContext)} noch kein {@link JAXBContext} gesetzt wurden, werden über {@link JAXBContext#newInstance(Class[], Map)} ein
-	 * neuer erstellt und dieser über {@link #useContext(JAXBContext)} gesetzt. Die zur Erstellung verwendeten Klassen und Eigenschaften können über
-	 * {@link #openClassData()} bzw. {@link #openPropertyData()} konfiguriert werden.
+	/** Diese Methode gibt den {@link JAXBContext} zurück. Wenn über {@link #useContext(JAXBContext)} noch kein {@link JAXBContext} gesetzt wurden, werden über
+	 * {@link JAXBContext#newInstance(Class[], Map)} ein neuer erstellt und dieser über {@link #useContext(JAXBContext)} gesetzt. Die zur Erstellung verwendeten
+	 * Klassen und Eigenschaften können über {@link #openClassData()} bzw. {@link #openPropertyData()} konfiguriert werden.
 	 *
 	 * @see #useContext(JAXBContext)
 	 * @return {@link JAXBContext}.

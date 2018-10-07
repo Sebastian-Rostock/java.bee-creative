@@ -221,10 +221,9 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		return this.customThis();
 	}
 
-	/** Diese Methode gibt den {@link Unmarshaller} zurück.<br>
-	 * Wenn über {@link #useUnmarshaller(Unmarshaller)} noch kein {@link Unmarshaller} gesetzt wurden, werden über {@link JAXBContext#createUnmarshaller()} ein
-	 * neuer erstellt und über {@link #useUnmarshaller(Unmarshaller)} gesetzt und über {@link #updateUnmarshaller()} aktualisiert. Der zur Erstellung verwendeten
-	 * Kontext kann über {@link #openContextData()} konfiguriert werden.
+	/** Diese Methode gibt den {@link Unmarshaller} zurück. Wenn über {@link #useUnmarshaller(Unmarshaller)} noch kein {@link Unmarshaller} gesetzt wurden, werden
+	 * über {@link JAXBContext#createUnmarshaller()} ein neuer erstellt und über {@link #useUnmarshaller(Unmarshaller)} gesetzt und über
+	 * {@link #updateUnmarshaller()} aktualisiert. Der zur Erstellung verwendeten Kontext kann über {@link #openContextData()} konfiguriert werden.
 	 *
 	 * @see #useUnmarshaller(Unmarshaller)
 	 * @see #updateUnmarshaller()
@@ -258,10 +257,9 @@ public abstract class BaseUnmarshallerData<GThis> extends BaseBuilder<Unmarshall
 		return this.useUnmarshaller(null);
 	}
 
-	/** Diese Methode aktualisiert die Einstellungen des {@link Unmarshaller} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf den über {@link #getUnmarshaller()} ermittelten {@link Unmarshaller} die Einstellungen übertragen, die in
-	 * {@link #openShemaData()}, {@link #openAdapterData()}, {@link #openListenerData()}, {@link #openPropertyData()} und {@link #openValidationData()}
-	 * konfiguriert sind.
+	/** Diese Methode aktualisiert die Einstellungen des {@link Unmarshaller} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
+	 * {@link #getUnmarshaller()} ermittelten {@link Unmarshaller} die Einstellungen übertragen, die in {@link #openShemaData()}, {@link #openAdapterData()},
+	 * {@link #openListenerData()}, {@link #openPropertyData()} und {@link #openValidationData()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link #getUnmarshaller()} oder {@link SchemaData#getSchema()} eine entsprechende Ausnahme auslöst.

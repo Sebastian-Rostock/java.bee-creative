@@ -4,8 +4,7 @@ import java.util.Iterator;
 
 /** Diese Schnittstelle definiert ein von einem {@link Pool} verwalteten Datensatz, welcher als Abstraktion eiens Eintrags einer Tabelle einer Datenbank
  * verstanden werden kann. Ein solcher Datensatz hat einen {@link #type() Datentyp} und besitzt zur Identifikation einen {@link #key() Schlüssel}. Der Schlüssel
- * entspricht dem Identifikator, den auch die Datenbank verwendet.<br>
- * {@link Item} werden von {@link Pool} verwaltet und sind {@link Assignable}.
+ * entspricht dem Identifikator, den auch die Datenbank verwendet. {@link Item} werden von {@link Pool} verwaltet und sind {@link Assignable}.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface Item extends Part, Assignable<Item> {

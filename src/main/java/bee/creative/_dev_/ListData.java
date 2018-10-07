@@ -260,8 +260,7 @@ class ListData<GKey, GValue> {
 		return (index >= 0) && Objects.equals(this.values[index], value);
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Wert zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Wert zurück. Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
 	 *
 	 * @see Map#get(Object)
 	 * @param key Schlüssel des Eintrags.
@@ -291,8 +290,8 @@ class ListData<GKey, GValue> {
 		return (GValue)this.values[entryIndex];
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird {@code -1}
+	 * geliefert.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen Eintrags oder {@code -1}. */
@@ -417,8 +416,8 @@ class ListData<GKey, GValue> {
 		return 0;
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück.<br>
-	 * Wenn kein solcher Eintrag existierte, wird {@code null} geliefert.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel, setzt dessen Wert und gibt seinen vorherigen Wert zurück. Wenn kein solcher Eintrag
+	 * existierte, wird {@code null} geliefert.
 	 *
 	 * @see Map#put(Object, Object)
 	 * @param key Schlüssel des Eintrags.
@@ -454,8 +453,7 @@ class ListData<GKey, GValue> {
 		return (GValue)result;
 	}
 
-	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird er erzeugt.
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird er erzeugt.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
@@ -567,8 +565,8 @@ class ListData<GKey, GValue> {
 		// }
 	}
 
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück.<br>
-	 * Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
+	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel und gibt den Wert des Eintrags zurück. Wenn kein solcher Eintrag existiert, wird
+	 * {@code null} geliefert.
 	 *
 	 * @see Map#remove(Object)
 	 * @param key Schlüssel.

@@ -301,10 +301,10 @@ public class Translators {
 		return new ChainedTranslator<>(translator1, translator2);
 	}
 
-	/** Diese Methode gibt einen zusammengesetzten {@link Translator} zurück, dessen Metoden an die entsprechenden der gegebenen Objekte delegieren.<br>
-	 * Die Methoden {@link Translator#isSource(Object)} und {@link Translator#isTarget(Object)} delegieren an {@link Class#isInstance(Object)} der gegebenen
-	 * Klassen. Die Methoden {@link Translator#toSource(Object)} und {@link Translator#toTarget(Object)} delegieren an {@link Class#cast(Object)} der gegebenen
-	 * Klassen sowie {@link Getter#get(Object)} der gegebenen Konvertierungsmethode.
+	/** Diese Methode gibt einen zusammengesetzten {@link Translator} zurück, dessen Metoden an die entsprechenden der gegebenen Objekte delegieren. Die Methoden
+	 * {@link Translator#isSource(Object)} und {@link Translator#isTarget(Object)} delegieren an {@link Class#isInstance(Object)} der gegebenen Klassen. Die
+	 * Methoden {@link Translator#toSource(Object)} und {@link Translator#toTarget(Object)} delegieren an {@link Class#cast(Object)} der gegebenen Klassen sowie
+	 * {@link Getter#get(Object)} der gegebenen Konvertierungsmethode.
 	 *
 	 * @param <GSource> Typ der Quellobjekte.
 	 * @param <GTarget> Typ der Zielobjekte.
@@ -340,8 +340,8 @@ public class Translators {
 		return new SynchronizedTranslator<>(mutex, translator);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isSource(Object)} des gegebenen {@link Translator} zurück.<br>
-	 * Die Akzeptanz eines Datensatzes {@code item} ist {@code translator.isSource(item)}.
+	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isSource(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
+	 * {@code item} ist {@code translator.isSource(item)}.
 	 *
 	 * @param translator {@link Translator}.
 	 * @return {@link Filter}, der nur Quellobjekte des {@code translator} akzeptiert.
@@ -350,8 +350,8 @@ public class Translators {
 		return new SourceFilter(translator);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück.<br>
-	 * Für einen Datensatz {@code item} liefert er den Wert {@code translator.toSource(item)}.
+	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
+	 * liefert er den Wert {@code translator.toSource(item)}.
 	 *
 	 * @param <GSource> Typ der Quellobjekte des {@link Translator} sowie des Werts des erzeugten {@link Getter}.
 	 * @param <GTarget> Typ der Zielobjekte des {@link Translator} sowie des Datensatzes des erzeugten {@link Getter}.
@@ -363,8 +363,8 @@ public class Translators {
 		return new SourceGetter<>(translator);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isTarget(Object)} des gegebenen {@link Translator} zurück.<br>
-	 * Die Akzeptanz eines Datensatzes {@code item} ist {@code translator.isTarget(item)}.
+	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isTarget(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
+	 * {@code item} ist {@code translator.isTarget(item)}.
 	 *
 	 * @param translator {@link Translator}.
 	 * @return {@link Filter}, der nur Zielobjekte des {@code translator} akzeptiert.
@@ -373,8 +373,8 @@ public class Translators {
 		return new TargetFilter(translator);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toTarget(Object)} des gegebenen {@link Translator} zurück.<br>
-	 * Für einen Datensatz {@code item} liefert er den Wert {@code translator.toTarget(item)}.
+	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toTarget(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
+	 * liefert er den Wert {@code translator.toTarget(item)}.
 	 *
 	 * @param <GSource> Typ der Quellobjekte des {@link Translator} sowie des Datensatzes des erzeugten {@link Getter}.
 	 * @param <GTarget> Typ der Zielobjekte des {@link Translator} sowie des Werts des erzeugten {@link Getter}.

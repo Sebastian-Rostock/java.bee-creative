@@ -9,19 +9,17 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert ein Objekt zum Lesen einer {@code INI}-Datenstruktur über einen {@link Reader}.
  * <p>
  * Die {@code INI}-Datenstruktur ist eine Abfolge beliegig vieler Abschnitte, Eigenschaften, Kommentare und Leerzeilen, welche durch Zeilenumbrüche
- * {@code '\r\n'} voneinander separiert sind. Beim Parsen werden auch einzeln stehenden Zeichen {@code '\r'} und {@code '\n'} als Zeilenumbruch akzeptiert.<br>
- * Ein Abschnitt besteht aus dem Zeichen {@code '['}, dem maskierten Namen des Abschnitts und dem Zeichen {@code ']'}.<br>
- * Eine Eigenschaft besteht aus dem maskierten Schlüssel der Eigenschaft, dem Zeichen {@code '='} und dem maskierten Wert der Eigenschaft.<br>
- * Eine Kommentar besteht aus dem Zeichen {@code ';'} und dem maskierten Text des Kommentars.<br>
- * Die Maskierung der Zeichen {@code '\t'}, {@code '\r'}, {@code '\n'}, {@code '\\'}, {@code '='}, {@code ';'}, {@code '['} und {@code ']'} erfolgt durch das
- * Voranstellen des Zeichens {@code '\\'}.
+ * {@code '\r\n'} voneinander separiert sind. Beim Parsen werden auch einzeln stehenden Zeichen {@code '\r'} und {@code '\n'} als Zeilenumbruch akzeptiert. Ein
+ * Abschnitt besteht aus dem Zeichen {@code '['}, dem maskierten Namen des Abschnitts und dem Zeichen {@code ']'}. Eine Eigenschaft besteht aus dem maskierten
+ * Schlüssel der Eigenschaft, dem Zeichen {@code '='} und dem maskierten Wert der Eigenschaft. Eine Kommentar besteht aus dem Zeichen {@code ';'} und dem
+ * maskierten Text des Kommentars. Die Maskierung der Zeichen {@code '\t'}, {@code '\r'}, {@code '\n'}, {@code '\\'}, {@code '='}, {@code ';'}, {@code '['} und
+ * {@code ']'} erfolgt durch das Voranstellen des Zeichens {@code '\\'}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class INIReader implements Closeable {
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIReader} und gibt diesen zurück.<br>
-	 * Wenn das Objekt ein {@link INIReader} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object)
-	 * überführt}.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIReader} und gibt diesen zurück. Wenn das Objekt ein {@link INIReader} ist, wird dieser
+	 * geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object) überführt}.
 	 *
 	 * @see IO#inputReaderFrom(Object)
 	 * @see INIReader#INIReader(Reader)
@@ -82,8 +80,8 @@ public class INIReader implements Closeable {
 		}
 	}
 
-	/** Diese Methode ließt den Schlüssel einer Eigenschaft und gibt diesen zurück.<br>
-	 * Der Schlüssel beginnt mit dem gegebenen Zeichen und Endet vor dem Zeichen {@code '='}.
+	/** Diese Methode ließt den Schlüssel einer Eigenschaft und gibt diesen zurück. Der Schlüssel beginnt mit dem gegebenen Zeichen und Endet vor dem Zeichen
+	 * {@code '='}.
 	 *
 	 * @param symbol erstes Zeichen des Schlüssels.
 	 * @return Schlüssel einer Eigenschaft.

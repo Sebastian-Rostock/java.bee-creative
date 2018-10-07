@@ -780,8 +780,8 @@ public class Comparables {
 		return new TranslatedComparable<>(toSource, comparable);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) == 0}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) == 0}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
@@ -791,8 +791,8 @@ public class Comparables {
 		return new EqualFilter<>(comparable);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) >= 0}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) >= 0}.
 	 *
 	 * @param <GInput> Typ der Elemente.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
@@ -802,8 +802,8 @@ public class Comparables {
 		return new LowerFilter<>(comparable);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist.<br>
-	 * Die Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) <= 0}.
+	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) <= 0}.
 	 *
 	 * @param <GInput> Typ der Elemente.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.

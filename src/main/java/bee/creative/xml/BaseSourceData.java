@@ -195,8 +195,8 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 		return this.source;
 	}
 
-	/** Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück.<br>
-	 * Der Rückgabewert ist {@code null}, wenn die Quelldaten keine {@link StreamSource} sind.
+	/** Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück. Der Rückgabewert ist {@code null}, wenn die Quelldaten keine
+	 * {@link StreamSource} sind.
 	 *
 	 * @return Quelldaten oder {@code null}. */
 	public final InputSource getInputSource() {

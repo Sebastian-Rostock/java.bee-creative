@@ -16,8 +16,8 @@ public class BEXFile {
 	/** Dieses Feld speichert das leere {@link BEXFile}. */
 	public static final BEXFile EMPTY = new BEXFile();
 
-	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link BEXFile} und gibt dieses zurück.<br>
-	 * Wenn das Objekt ein {@link BEXFile} ist, wird dieses geliefert. Andernfalls wird {@code new BEXFileLoader(IAMIndex.from(object))} geliefert.
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link BEXFile} und gibt dieses zurück. Wenn das Objekt ein {@link BEXFile} ist, wird dieses geliefert.
+	 * Andernfalls wird {@code new BEXFileLoader(IAMIndex.from(object))} geliefert.
 	 *
 	 * @see IAMIndex#from(Object)
 	 * @see BEXFileLoader#BEXFileLoader(IAMIndex)
@@ -30,8 +30,8 @@ public class BEXFile {
 		return new BEXFileLoader(IAMIndex.from(object));
 	}
 
-	/** Diese Methode wandelt die gegebene Zeichenkette in eine nullterminierte Folge von UTF-16-Token um und gibt diese als Zahlenfolge zurück.<br>
-	 * Die gelieferte Zahlenfolge ist damit immer um eins länger, als {@link String#length()}.
+	/** Diese Methode wandelt die gegebene Zeichenkette in eine nullterminierte Folge von UTF-16-Token um und gibt diese als Zahlenfolge zurück. Die gelieferte
+	 * Zahlenfolge ist damit immer um eins länger, als {@link String#length()}.
 	 *
 	 * @param string Zeichenkette.
 	 * @return Zahlenfolge.

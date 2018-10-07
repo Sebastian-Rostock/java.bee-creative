@@ -165,8 +165,8 @@ public final class XMLCleaner {
 		}
 	}
 
-	/** Diese Methode öffnet den Konfigurator für das {@link File} und gibt ihn zurück.<br>
-	 * Das {@link File} steht entweder für eine Quelltextdateien oder ein Verzeichnis mit Quelltextdateien.
+	/** Diese Methode öffnet den Konfigurator für das {@link File} und gibt ihn zurück. Das {@link File} steht entweder für eine Quelltextdateien oder ein
+	 * Verzeichnis mit Quelltextdateien.
 	 *
 	 * @see Files#readAllLines(Path, Charset)
 	 * @see Files#write(Path, Iterable, Charset, OpenOption...)

@@ -22,7 +22,7 @@ public class Conversions {
 		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof Conversion<?, ?>)) return false;
-			Conversion<?, ?> that = (Conversion<?, ?>)object;
+			final Conversion<?, ?> that = (Conversion<?, ?>)object;
 			return Objects.equals(this.target(), that.target());
 		}
 
