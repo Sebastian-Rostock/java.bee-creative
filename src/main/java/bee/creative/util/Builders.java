@@ -14,6 +14,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/** Diese Klasse implementiert grundlegende {@link Producer Konfiguratoren}.
+ *
+ * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Builders {
 
 	/** Diese Klasse implementiert einen abstrakten Konfigurator zur Erzeugung eines Datensatzes.
@@ -579,6 +582,247 @@ public class Builders {
 
 	}
 
+	/** Diese Klasse implementiert einen Konfigurator für ein {@link Set}.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param <GResult> Typ des {@link Set}. */
+	public static class SetBuilder<GItem, GResult extends Set<GItem>> extends BaseSetBuilder<GItem, GResult, SetBuilder<GItem, GResult>> {
+	
+		/** Diese Methode gibt einen {@link SetBuilder} zum gegebenen {@link Set} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @param <GResult> Typ des {@link Set}.
+		 * @param result {@link Set}.
+		 * @return {@link SetBuilder}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		public static <GItem, GResult extends Set<GItem>> SetBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+			return new SetBuilder<>(result);
+		}
+	
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link TreeSet} mit natürlicher Ordnung zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @return {@link SetBuilder} eines {@link TreeSet}. */
+		public static <GItem> SetBuilder<GItem, TreeSet<GItem>> forTreeSet() {
+			return SetBuilder.forTreeSet(null);
+		}
+	
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link TreeSet} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @param comparator Ordnung der Elemente.
+		 * @return {@link SetBuilder} eines {@link TreeSet}. */
+		public static <GItem> SetBuilder<GItem, TreeSet<GItem>> forTreeSet(final Comparator<? super GItem> comparator) {
+			return SetBuilder.from(new TreeSet<>(comparator));
+		}
+	
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link HashSet} mit Steuwertpuffer zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @return {@link SetBuilder} eines {@link HashSet}. */
+		public static <GItem> SetBuilder<GItem, HashSet<GItem>> forHashSet() {
+			return SetBuilder.forHashSet(true);
+		}
+	
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link HashSet} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @param withHashCache Aktivierung des Streuwertpuffers.
+		 * @return {@link SetBuilder} eines {@link HashSet}. */
+		public static <GItem> SetBuilder<GItem, HashSet<GItem>> forHashSet(final boolean withHashCache) {
+			return SetBuilder.from(withHashCache ? new HashSet2<GItem>() : new HashSet<GItem>());
+		}
+	
+		/** Dieser Konstruktor initialisiert das {@link Set}.
+		 *
+		 * @param result {@link Set}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		protected SetBuilder(final GResult result) throws NullPointerException {
+			super(result);
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		protected SetBuilder<GItem, GResult> customThis() {
+			return this;
+		}
+	
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Vereinigungsmenge dieser {@link #get() Menge} und der gegebenen Menge zurück.
+		 *
+		 * @see bee.creative.util.Collections#unionSet(Set, Set)
+		 * @param items zweite Menge.
+		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
+		public SetBuilder<GItem, Set<GItem>> toUnion(final Set<? extends GItem> items) {
+			return SetBuilder.from(bee.creative.util.Collections.unionSet(this.result, items));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für das Kartesische Produkt dieser {@link #get() Menge} und der gegebenen Menge zurück.
+		 *
+		 * @see bee.creative.util.Collections#cartesianSet(Set, Set)
+		 * @param <GItem2> Typ der Elemente in der zweiten Menge.
+		 * @param items zweite Menge.
+		 * @return neuer {@link SetBuilder} zum {@code cartesianSet}. */
+		public <GItem2> SetBuilder<Entry<GItem, GItem2>, Set<Entry<GItem, GItem2>>> toCartesian(final Set<? extends GItem2> items) {
+			return SetBuilder.from(bee.creative.util.Collections.cartesianSet(this.result, items));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Schnittmenge dieser {@link #get() Menge} und der gegebenen Menge zurück.
+		 *
+		 * @see bee.creative.util.Collections#intersectionSet(Set, Set)
+		 * @param items zweite Menge.
+		 * @return neuer {@link SetBuilder} zum {@code intersectionSet}. */
+		public SetBuilder<GItem, Set<GItem>> toIntersection(final Set<? extends GItem> items) {
+			return SetBuilder.from(bee.creative.util.Collections.intersectionSet(this.result, items));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #get() Menge} zurück.
+		 *
+		 * @see java.util.Collections#checkedSet(Set, Class)
+		 * @param itemClazz Klasse der Elemente.
+		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
+		public SetBuilder<GItem, Set<GItem>> toChecked(final Class<GItem> itemClazz) {
+			return SetBuilder.from(Collections.checkedSet(this.result, itemClazz));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #get() Menge} zurück.
+		 *
+		 * @see bee.creative.util.Collections#translatedSet(Set, Translator)
+		 * @param <GItem2> Typ der übersetzten Elemente.
+		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
+		 * @return neuer {@link SetBuilder} zum {@code translatedSet}. */
+		public <GItem2> SetBuilder<GItem2, Set<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
+			return SetBuilder.from(bee.creative.util.Collections.translatedSet(this.result, itemTranslator));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die threadsichere {@link #get() Menge} zurück.
+		 *
+		 * @see java.util.Collections#synchronizedSet(Set)
+		 * @return neuer {@link SetBuilder} zum {@code synchronizedSet}. */
+		public SetBuilder<GItem, Set<GItem>> toSynchronized() {
+			return SetBuilder.from(Collections.synchronizedSet(this.result));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link SetBuilder} für die unveränderliche {@link #get() Menge} zurück.
+		 *
+		 * @see java.util.Collections#unmodifiableSet(Set)
+		 * @return neuer {@link SetBuilder} zum {@code unmodifiableSet}. */
+		public SetBuilder<GItem, Set<GItem>> toUnmodifiable() {
+			return SetBuilder.from(Collections.unmodifiableSet(this.result));
+		}
+	
+	}
+
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link List}.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param <GResult> Typ der {@link List}. */
+	public static class ListBuilder<GItem, GResult extends List<GItem>> extends BaseSetBuilder<GItem, GResult, ListBuilder<GItem, GResult>> {
+	
+		/** Diese Methode gibt einen {@link ListBuilder} zur gegebenen {@link List} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @param <GResult> Typ des {@link List}.
+		 * @param result {@link List}.
+		 * @return {@link ListBuilder}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		public static <GItem, GResult extends List<GItem>> ListBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
+			return new ListBuilder<>(result);
+		}
+	
+		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link ArrayList} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @return {@link ListBuilder} einer {@link ArrayList}. */
+		public static <GItem> ListBuilder<GItem, ArrayList<GItem>> forArrayList() {
+			return ListBuilder.from(new ArrayList<GItem>());
+		}
+	
+		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link LinkedList} mit zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @return {@link ListBuilder} einer {@link LinkedList}. */
+		public static <GItem> ListBuilder<GItem, LinkedList<GItem>> forLinkedList() {
+			return ListBuilder.from(new LinkedList<GItem>());
+		}
+	
+		/** Dieser Konstruktor initialisiert das {@link List}.
+		 *
+		 * @param result {@link List}.
+		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		protected ListBuilder(final GResult result) throws NullPointerException {
+			super(result);
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		protected ListBuilder<GItem, GResult> customThis() {
+			return this;
+		}
+	
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die rückwärts geordnete {@link #get() Liste} zurück.
+		 *
+		 * @see bee.creative.util.Collections#reverseList(List)
+		 * @return neuer {@link ListBuilder} zur {@code reverseList}. */
+		public ListBuilder<GItem, List<GItem>> toReverse() {
+			return ListBuilder.from(bee.creative.util.Collections.reverseList(this.result));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.
+		 *
+		 * @see bee.creative.util.Collections#chainedList(List, List)
+		 * @param items zweite Liste.
+		 * @return neuer {@link ListBuilder} zur {@code chained}. */
+		public ListBuilder<GItem, List<GItem>> toChained(final List<GItem> items) {
+			return ListBuilder.from(bee.creative.util.Collections.chainedList(this.result, items));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.
+		 *
+		 * @see bee.creative.util.Collections#chainedList(List, List, boolean)
+		 * @param items zweite Liste.
+		 * @param extendMode Erweiterungsmodus.
+		 * @return neuer {@link ListBuilder} zur {@code chained}. */
+		public ListBuilder<GItem, List<GItem>> toChained(final List<GItem> items, final boolean extendMode) {
+			return ListBuilder.from(bee.creative.util.Collections.chainedList(this.result, items, extendMode));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #get() Liste} zurück.
+		 *
+		 * @see java.util.Collections#checkedList(List, Class)
+		 * @param itemClazz Klasse der Elemente.
+		 * @return neuer {@link ListBuilder} zur {@code checkedList}. */
+		public ListBuilder<GItem, List<GItem>> toChecked(final Class<GItem> itemClazz) {
+			return ListBuilder.from(java.util.Collections.checkedList(this.result, itemClazz));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #get() Liste} zurück.
+		 *
+		 * @see bee.creative.util.Collections#translatedList(List, Translator)
+		 * @param <GItem2> Typ der übersetzten Elemente.
+		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
+		 * @return neuer {@link ListBuilder} zur {@code translatedList}. */
+		public <GItem2> ListBuilder<GItem2, List<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
+			return ListBuilder.from(bee.creative.util.Collections.translatedList(this.result, itemTranslator));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die threadsichere {@link #get() Liste} zurück.
+		 *
+		 * @see java.util.Collections#synchronizedList(List)
+		 * @return neuer {@link ListBuilder} zur {@code synchronizedList}. */
+		public ListBuilder<GItem, List<GItem>> toSynchronized() {
+			return ListBuilder.from(java.util.Collections.synchronizedList(this.result));
+		}
+	
+		/** Diese Methode gibt einen neuen {@link ListBuilder} für die unveränderliche {@link #get() Liste} zurück.
+		 *
+		 * @see java.util.Collections#unmodifiableList(List)
+		 * @return neuer {@link ListBuilder} zur {@code unmodifiableList}. */
+		public ListBuilder<GItem, List<GItem>> toUnmodifiable() {
+			return ListBuilder.from(java.util.Collections.unmodifiableList(this.result));
+		}
+	
+	}
+
 	/** Diese Klasse implementiert einen Konfigurator für eine {@link Map}.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
@@ -686,247 +930,6 @@ public class Builders {
 		 * @return neuer {@link MapBuilder} zur {@code unmodifiableMap}. */
 		public MapBuilder<GKey, GItem, Map<GKey, GItem>> toUnmodifiable() {
 			return MapBuilder.from(Collections.unmodifiableMap(this.result));
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen Konfigurator für ein {@link Set}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GResult> Typ des {@link Set}. */
-	public static class SetBuilder<GItem, GResult extends Set<GItem>> extends BaseSetBuilder<GItem, GResult, SetBuilder<GItem, GResult>> {
-
-		/** Diese Methode gibt einen {@link SetBuilder} zum gegebenen {@link Set} zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @param <GResult> Typ des {@link Set}.
-		 * @param result {@link Set}.
-		 * @return {@link SetBuilder}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static <GItem, GResult extends Set<GItem>> SetBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new SetBuilder<>(result);
-		}
-
-		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link TreeSet} mit natürlicher Ordnung zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @return {@link SetBuilder} eines {@link TreeSet}. */
-		public static <GItem> SetBuilder<GItem, TreeSet<GItem>> forTreeSet() {
-			return SetBuilder.forTreeSet(null);
-		}
-
-		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link TreeSet} zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @param comparator Ordnung der Elemente.
-		 * @return {@link SetBuilder} eines {@link TreeSet}. */
-		public static <GItem> SetBuilder<GItem, TreeSet<GItem>> forTreeSet(final Comparator<? super GItem> comparator) {
-			return SetBuilder.from(new TreeSet<>(comparator));
-		}
-
-		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link HashSet} mit Steuwertpuffer zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @return {@link SetBuilder} eines {@link HashSet}. */
-		public static <GItem> SetBuilder<GItem, HashSet<GItem>> forHashSet() {
-			return SetBuilder.forHashSet(true);
-		}
-
-		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link HashSet} zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @param withHashCache Aktivierung des Streuwertpuffers.
-		 * @return {@link SetBuilder} eines {@link HashSet}. */
-		public static <GItem> SetBuilder<GItem, HashSet<GItem>> forHashSet(final boolean withHashCache) {
-			return SetBuilder.from(withHashCache ? new HashSet2<GItem>() : new HashSet<GItem>());
-		}
-
-		/** Dieser Konstruktor initialisiert das {@link Set}.
-		 *
-		 * @param result {@link Set}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		protected SetBuilder(final GResult result) throws NullPointerException {
-			super(result);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected SetBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
-		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Vereinigungsmenge dieser {@link #get() Menge} und der gegebenen Menge zurück.
-		 *
-		 * @see bee.creative.util.Collections#unionSet(Set, Set)
-		 * @param items zweite Menge.
-		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
-		public SetBuilder<GItem, Set<GItem>> toUnion(final Set<? extends GItem> items) {
-			return SetBuilder.from(bee.creative.util.Collections.unionSet(this.result, items));
-		}
-
-		/** Diese Methode gibt einen neuen {@link SetBuilder} für das Kartesische Produkt dieser {@link #get() Menge} und der gegebenen Menge zurück.
-		 *
-		 * @see bee.creative.util.Collections#cartesianSet(Set, Set)
-		 * @param <GItem2> Typ der Elemente in der zweiten Menge.
-		 * @param items zweite Menge.
-		 * @return neuer {@link SetBuilder} zum {@code cartesianSet}. */
-		public <GItem2> SetBuilder<Entry<GItem, GItem2>, Set<Entry<GItem, GItem2>>> toCartesian(final Set<? extends GItem2> items) {
-			return SetBuilder.from(bee.creative.util.Collections.cartesianSet(this.result, items));
-		}
-
-		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Schnittmenge dieser {@link #get() Menge} und der gegebenen Menge zurück.
-		 *
-		 * @see bee.creative.util.Collections#intersectionSet(Set, Set)
-		 * @param items zweite Menge.
-		 * @return neuer {@link SetBuilder} zum {@code intersectionSet}. */
-		public SetBuilder<GItem, Set<GItem>> toIntersection(final Set<? extends GItem> items) {
-			return SetBuilder.from(bee.creative.util.Collections.intersectionSet(this.result, items));
-		}
-
-		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #get() Menge} zurück.
-		 *
-		 * @see java.util.Collections#checkedSet(Set, Class)
-		 * @param itemClazz Klasse der Elemente.
-		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
-		public SetBuilder<GItem, Set<GItem>> toChecked(final Class<GItem> itemClazz) {
-			return SetBuilder.from(Collections.checkedSet(this.result, itemClazz));
-		}
-
-		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #get() Menge} zurück.
-		 *
-		 * @see bee.creative.util.Collections#translatedSet(Set, Translator)
-		 * @param <GItem2> Typ der übersetzten Elemente.
-		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
-		 * @return neuer {@link SetBuilder} zum {@code translatedSet}. */
-		public <GItem2> SetBuilder<GItem2, Set<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
-			return SetBuilder.from(bee.creative.util.Collections.translatedSet(this.result, itemTranslator));
-		}
-
-		/** Diese Methode gibt einen neuen {@link SetBuilder} für die threadsichere {@link #get() Menge} zurück.
-		 *
-		 * @see java.util.Collections#synchronizedSet(Set)
-		 * @return neuer {@link SetBuilder} zum {@code synchronizedSet}. */
-		public SetBuilder<GItem, Set<GItem>> toSynchronized() {
-			return SetBuilder.from(Collections.synchronizedSet(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link SetBuilder} für die unveränderliche {@link #get() Menge} zurück.
-		 *
-		 * @see java.util.Collections#unmodifiableSet(Set)
-		 * @return neuer {@link SetBuilder} zum {@code unmodifiableSet}. */
-		public SetBuilder<GItem, Set<GItem>> toUnmodifiable() {
-			return SetBuilder.from(Collections.unmodifiableSet(this.result));
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen Konfigurator für eine {@link List}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GResult> Typ der {@link List}. */
-	public static class ListBuilder<GItem, GResult extends List<GItem>> extends BaseSetBuilder<GItem, GResult, ListBuilder<GItem, GResult>> {
-
-		/** Diese Methode gibt einen {@link ListBuilder} zur gegebenen {@link List} zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @param <GResult> Typ des {@link List}.
-		 * @param result {@link List}.
-		 * @return {@link ListBuilder}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static <GItem, GResult extends List<GItem>> ListBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new ListBuilder<>(result);
-		}
-
-		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link ArrayList} zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @return {@link ListBuilder} einer {@link ArrayList}. */
-		public static <GItem> ListBuilder<GItem, ArrayList<GItem>> forArrayList() {
-			return ListBuilder.from(new ArrayList<GItem>());
-		}
-
-		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link LinkedList} mit zurück.
-		 *
-		 * @param <GItem> Typ der Elemente.
-		 * @return {@link ListBuilder} einer {@link LinkedList}. */
-		public static <GItem> ListBuilder<GItem, LinkedList<GItem>> forLinkedList() {
-			return ListBuilder.from(new LinkedList<GItem>());
-		}
-
-		/** Dieser Konstruktor initialisiert das {@link List}.
-		 *
-		 * @param result {@link List}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		protected ListBuilder(final GResult result) throws NullPointerException {
-			super(result);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected ListBuilder<GItem, GResult> customThis() {
-			return this;
-		}
-
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die rückwärts geordnete {@link #get() Liste} zurück.
-		 *
-		 * @see bee.creative.util.Collections#reverseList(List)
-		 * @return neuer {@link ListBuilder} zur {@code reverseList}. */
-		public ListBuilder<GItem, List<GItem>> toReverse() {
-			return ListBuilder.from(bee.creative.util.Collections.reverseList(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.
-		 *
-		 * @see bee.creative.util.Collections#chainedList(List, List)
-		 * @param items zweite Liste.
-		 * @return neuer {@link ListBuilder} zur {@code chained}. */
-		public ListBuilder<GItem, List<GItem>> toChained(final List<GItem> items) {
-			return ListBuilder.from(bee.creative.util.Collections.chainedList(this.result, items));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.
-		 *
-		 * @see bee.creative.util.Collections#chainedList(List, List, boolean)
-		 * @param items zweite Liste.
-		 * @param extendMode Erweiterungsmodus.
-		 * @return neuer {@link ListBuilder} zur {@code chained}. */
-		public ListBuilder<GItem, List<GItem>> toChained(final List<GItem> items, final boolean extendMode) {
-			return ListBuilder.from(bee.creative.util.Collections.chainedList(this.result, items, extendMode));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #get() Liste} zurück.
-		 *
-		 * @see java.util.Collections#checkedList(List, Class)
-		 * @param itemClazz Klasse der Elemente.
-		 * @return neuer {@link ListBuilder} zur {@code checkedList}. */
-		public ListBuilder<GItem, List<GItem>> toChecked(final Class<GItem> itemClazz) {
-			return ListBuilder.from(java.util.Collections.checkedList(this.result, itemClazz));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #get() Liste} zurück.
-		 *
-		 * @see bee.creative.util.Collections#translatedList(List, Translator)
-		 * @param <GItem2> Typ der übersetzten Elemente.
-		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
-		 * @return neuer {@link ListBuilder} zur {@code translatedList}. */
-		public <GItem2> ListBuilder<GItem2, List<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
-			return ListBuilder.from(bee.creative.util.Collections.translatedList(this.result, itemTranslator));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die threadsichere {@link #get() Liste} zurück.
-		 *
-		 * @see java.util.Collections#synchronizedList(List)
-		 * @return neuer {@link ListBuilder} zur {@code synchronizedList}. */
-		public ListBuilder<GItem, List<GItem>> toSynchronized() {
-			return ListBuilder.from(java.util.Collections.synchronizedList(this.result));
-		}
-
-		/** Diese Methode gibt einen neuen {@link ListBuilder} für die unveränderliche {@link #get() Liste} zurück.
-		 *
-		 * @see java.util.Collections#unmodifiableList(List)
-		 * @return neuer {@link ListBuilder} zur {@code unmodifiableList}. */
-		public ListBuilder<GItem, List<GItem>> toUnmodifiable() {
-			return ListBuilder.from(java.util.Collections.unmodifiableList(this.result));
 		}
 
 	}
