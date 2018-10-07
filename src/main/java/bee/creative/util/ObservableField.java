@@ -40,7 +40,6 @@ public class ObservableField<GInput, GValue> extends ObservableValue<GValue, Obs
 		public final Object newValue;
 
 		/** Dieser Konstruktor initialisiert die Merkmale des Ereignisses. */
-		@SuppressWarnings ("javadoc")
 		public UpdateFieldMessage(final ObservableField<?, ?> sender, final Object input, final Object oldValue, final Object newValue) {
 			this.sender = sender;
 			this.input = input;

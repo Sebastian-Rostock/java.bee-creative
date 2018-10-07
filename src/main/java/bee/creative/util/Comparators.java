@@ -11,7 +11,6 @@ import bee.creative.util.Objects.BaseObject;
 public class Comparators {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Comparator} als {@link BaseObject}. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseComparator<GItem> extends BaseObject implements Comparator<GItem> {
 	}
 
@@ -353,6 +352,31 @@ public class Comparators {
 
 	}
 
+	/** Diese Klasse implementiert {@link Comparators#toComparable(Object, Comparator)} */
+	@SuppressWarnings ("javadoc")
+	static class ComparatorComparable<GItem> implements Comparable<GItem> {
+
+		public final GItem item;
+
+		public final Comparator<? super GItem> comparator;
+
+		public ComparatorComparable(final GItem input, final Comparator<? super GItem> comparator) {
+			this.item = input;
+			this.comparator = Objects.notNull(comparator);
+		}
+
+		@Override
+		public int compareTo(final GItem item) {
+			return this.comparator.compare(this.item, item);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.item, this.comparator);
+		}
+
+	}
+
 	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der kleinsten Ordnung zurück. Dieses ergibt sich aus
 	 * {@code Comparators.compare(item1, item2) <= 0 ? item1 : item2}.
 	 *
@@ -664,21 +688,8 @@ public class Comparators {
 	 * @param comparator {@link Comparator}.
 	 * @return {@code entry}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparable<GItem> itemComparable(final GItem input, final Comparator<? super GItem> comparator) throws NullPointerException {
-		Objects.notNull(comparator);
-		return new Comparable<GItem>() {
-
-			@Override
-			public int compareTo(final GItem item2) {
-				return comparator.compare(input, item2);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString(this, input, comparator);
-			}
-
-		};
+	public static <GItem> Comparable<GItem> toComparable(final GItem input, final Comparator<? super GItem> comparator) throws NullPointerException {
+		return new ComparatorComparable<>(input, comparator);
 	}
 
 }

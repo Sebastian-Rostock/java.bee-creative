@@ -13,7 +13,6 @@ import bee.creative.util.Objects.BaseObject;
 public class Filters {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Filter} als {@link BaseObject}. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseFilter<GItem> extends BaseObject implements Filter<GItem> {
 	}
 

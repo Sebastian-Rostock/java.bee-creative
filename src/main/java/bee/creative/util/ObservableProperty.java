@@ -36,7 +36,6 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 		public final Object newValue;
 
 		/** Dieser Konstruktor initialisiert die Merkmale des Ereignisses. */
-		@SuppressWarnings ("javadoc")
 		public UpdatePropertyMessage(final ObservableProperty<?> sender, final Object oldValue, final Object newValue) {
 			this.sender = sender;
 			this.oldValue = oldValue;

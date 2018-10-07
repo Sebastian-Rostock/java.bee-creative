@@ -20,7 +20,6 @@ import bee.creative.util.Objects.UseToString;
 public class Iterables {
 
 	/** Diese Klasse implementiert ein abstraktes {@link Iterable} mit {@link UseToString}-Merkierung. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseIterable<GItem> extends BaseObject implements Iterable<GItem>, UseToString {
 	}
 

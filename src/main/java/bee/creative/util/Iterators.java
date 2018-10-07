@@ -19,7 +19,6 @@ import bee.creative.util.Objects.UseToString;
 public class Iterators {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Iterator} mit {@link UseToString}. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseIterator<GItem> extends BaseObject implements Iterator<GItem>, UseToString {
 
 		@Override

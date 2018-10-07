@@ -10,7 +10,6 @@ import bee.creative.util.Objects.BaseObject;
 public class Conversions {
 
 	/** Diese Klasse implementiert eine abstrakte {@link Conversion} als {@link BaseObject}. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseConversion<GSource, GTarget> extends BaseObject implements Conversion<GSource, GTarget> {
 
 		@Override
@@ -34,11 +33,11 @@ public class Conversions {
 
 		public final GSource input;
 
-		public final Getter<? super GSource, ? extends GTarget> converter;
+		public final Getter<? super GSource, ? extends GTarget> getter;
 
-		public VirtualConversion(final GSource input, final Getter<? super GSource, ? extends GTarget> converter) throws NullPointerException {
+		public VirtualConversion(final GSource input, final Getter<? super GSource, ? extends GTarget> getter) throws NullPointerException {
 			this.input = input;
-			this.converter = Objects.notNull(converter);
+			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
@@ -48,12 +47,12 @@ public class Conversions {
 
 		@Override
 		public GTarget target() {
-			return this.converter.get(this.input);
+			return this.getter.get(this.input);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.input, this.converter);
+			return Objects.toInvokeString(this, this.input, this.getter);
 		}
 
 	}
@@ -89,28 +88,28 @@ public class Conversions {
 	@SuppressWarnings ("javadoc")
 	public static class CompositeConversion<GSource, GTarget> extends BaseConversion<GSource, GTarget> {
 
-		public GSource input;
+		public GSource source;
 
-		public GTarget output;
+		public GTarget target;
 
-		public CompositeConversion(final GSource input, final GTarget output) {
-			this.input = input;
-			this.output = output;
+		public CompositeConversion(final GSource source, final GTarget target) {
+			this.source = source;
+			this.target = target;
 		}
 
 		@Override
 		public GSource source() {
-			return this.input;
+			return this.source;
 		}
 
 		@Override
 		public GTarget target() {
-			return this.output;
+			return this.target;
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.input, this.output);
+			return Objects.toInvokeString(this, this.source, this.target);
 		}
 
 	}
@@ -147,12 +146,12 @@ public class Conversions {
 	 * @param <GSource> Typ des Eingabe.
 	 * @param <GTarget> Typ der Ausgabe.
 	 * @param input Eingabe.
-	 * @param converter {@link Getter}.
+	 * @param getter {@link Getter}.
 	 * @return {@code dynamic}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
 	public static <GSource, GTarget> Conversion<GSource, GTarget> virtualConversion(final GSource input,
-		final Getter<? super GSource, ? extends GTarget> converter) throws NullPointerException {
-		return new VirtualConversion<>(input, converter);
+		final Getter<? super GSource, ? extends GTarget> getter) throws NullPointerException {
+		return new VirtualConversion<>(input, getter);
 	}
 
 	/** Diese Methode gibt eine inverse {@link Conversion} zurück, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe der gegebenen {@link Conversion} ermittelt
@@ -171,11 +170,11 @@ public class Conversions {
 	 *
 	 * @param <GSource> Typ des Eingabe.
 	 * @param <GTarget> Typ der Ausgabe.
-	 * @param input Eingabe.
-	 * @param output Ausgabe.
+	 * @param source Eingabe.
+	 * @param target Ausgabe.
 	 * @return {@code static}-{@link Conversion}. */
-	public static <GSource, GTarget> Conversion<GSource, GTarget> compositeConversion(final GSource input, final GTarget output) {
-		return new CompositeConversion<>(input, output);
+	public static <GSource, GTarget> Conversion<GSource, GTarget> compositeConversion(final GSource source, final GTarget target) {
+		return new CompositeConversion<>(source, target);
 	}
 
 	/** Diese Methode gibt den {@link Getter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
