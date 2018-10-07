@@ -42,7 +42,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert {@link Properties#setupProperty(Property, Producer)}. */
+	/** Diese Klasse implementiert {@link Properties#setupProperty(Producer, Property)}. */
 	@SuppressWarnings ("javadoc")
 	public static class SetupProperty<GValue> extends BaseProperty<GValue> {
 
@@ -259,11 +259,11 @@ public class Properties {
 	 * {@link Producer} ermittelt und über das {@link Property} geschrieben.
 	 *
 	 * @param <GValue> Typ des Werts.
-	 * @param property Eigenschaft zur Manipulation.
 	 * @param setup Methode zur Initialisierung.
+	 * @param property Eigenschaft zur Manipulation.
 	 * @return {@code setup}-{@link Property}.
 	 * @throws NullPointerException Wenn {@code setup} bzw. {@code property} {@code null} ist. */
-	public static <GValue> Property<GValue> setupProperty(final Property<GValue> property, final Producer<? extends GValue> setup) throws NullPointerException {
+	public static <GValue> Property<GValue> setupProperty(final Producer<? extends GValue> setup, final Property<GValue> property) throws NullPointerException {
 		return new SetupProperty<>(setup, property);
 	}
 

@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,8 +47,8 @@ public final class Fields {
 		 *
 		 * @param item Eingabe.
 		 * @param index Index.
-		 * @param items Elemente. */
-		public void putAll(final GItem item, final int index, final Iterable<? extends GEntry> items);
+		 * @param entries Elemente. */
+		public void putAll(final GItem item, final int index, final Iterable<? extends GEntry> entries);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link List#remove(int)}.
 		 *
@@ -86,8 +87,8 @@ public final class Fields {
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#addAll(Collection)}.
 		 *
 		 * @param item Eingabe.
-		 * @param items Elemente. */
-		public void putAll(final GItem item, final Iterable<? extends GEntry> items);
+		 * @param entries Elemente. */
+		public void putAll(final GItem item, final Iterable<? extends GEntry> entries);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#remove(Object)}.
 		 *
@@ -98,8 +99,8 @@ public final class Fields {
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#removeAll(Collection)}.
 		 *
 		 * @param item Eingabe.
-		 * @param items Elemente. */
-		public void popAll(final GItem item, final Iterable<?> items);
+		 * @param entries Elemente. */
+		public void popAll(final GItem item, final Iterable<?> entries);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#clear()}.
 		 *
@@ -151,7 +152,6 @@ public final class Fields {
 	}
 
 	/** Diese Klasse implementiert ein abstraktes {@link Field} als {@link BaseObject}. */
-	@SuppressWarnings ("javadoc")
 	public static abstract class BaseField<GItem, GValue> extends BaseObject implements Field<GItem, GValue> {
 	}
 
@@ -161,35 +161,6 @@ public final class Fields {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GEntry> Typ der Elemente. */
 	public static abstract class BaseSetField<GItem, GEntry> extends BaseField<GItem, Set<GEntry>> implements SetField<GItem, GEntry> {
-
-		/** Diese Methode gibt ein {@link SetField} zurück, welches das {@link Set} über das gegebene {@link Field} liest und schreibt.
-		 *
-		 * @param <GItem> Typ des Datensatzes.
-		 * @param <GEntry> Typ der Elemente.
-		 * @param field {@link Field} zum Lesen und Schreiben des {@link Set}.
-		 * @return {@link SetField}.
-		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static <GItem, GEntry> BaseSetField<GItem, GEntry> from(final Field<? super GItem, Set<GEntry>> field) throws NullPointerException {
-			Objects.notNull(field);
-			return new BaseSetField<GItem, GEntry>() {
-
-				@Override
-				public Set<GEntry> get(final GItem item) {
-					return field.get(item);
-				}
-
-				@Override
-				public void set(final GItem item, final Set<GEntry> value) {
-					field.set(item, value);
-				}
-
-				@Override
-				public String toString() {
-					return field.toString();
-				}
-
-			};
-		}
 
 		/** Diese Methode gibt eine Bearbeitungskopie des gegebenen {@link Set} zurück.
 		 *
@@ -218,9 +189,9 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void putAll(final GItem item, final Iterable<? extends GEntry> items) {
+		public void putAll(final GItem item, final Iterable<? extends GEntry> entries) {
 			final Set<GEntry> value = this.customCopy(this.get(item));
-			if (!Iterables.addAll(value, items)) return;
+			if (!Iterables.addAll(value, entries)) return;
 			this.set(item, value);
 		}
 
@@ -236,9 +207,9 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void popAll(final GItem item, final Iterable<?> items) {
+		public void popAll(final GItem item, final Iterable<?> entries) {
 			final Set<GEntry> value = this.customCopy(this.get(item));
-			if (!Iterables.removeAll(value, items)) return;
+			if (!Iterables.removeAll(value, entries)) return;
 			this.set(item, value);
 		}
 
@@ -250,35 +221,6 @@ public final class Fields {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GEntry> Typ der Elemente. */
 	public static abstract class BaseListField<GItem, GEntry> extends BaseField<GItem, List<GEntry>> implements ListField<GItem, GEntry> {
-
-		/** Diese Methode gibt ein {@link ListField} zurück, welches das {@link List} über das gegebene {@link Field} liest und schreibt.
-		 *
-		 * @param <GItem> Typ des Datensatzes.
-		 * @param <GEntry> Typ der Elemente.
-		 * @param field {@link Field} zum Lesen und Schreiben einer {@link List}.
-		 * @return {@link ListField}.
-		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static <GItem, GEntry> BaseListField<GItem, GEntry> from(final Field<? super GItem, List<GEntry>> field) throws NullPointerException {
-			Objects.notNull(field);
-			return new BaseListField<GItem, GEntry>() {
-
-				@Override
-				public List<GEntry> get(final GItem item) {
-					return field.get(item);
-				}
-
-				@Override
-				public void set(final GItem item, final List<GEntry> value) {
-					field.set(item, value);
-				}
-
-				@Override
-				public String toString() {
-					return field.toString();
-				}
-
-			};
-		}
 
 		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link List} zurück.
 		 *
@@ -305,9 +247,9 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void putAll(final GItem item, final Iterable<? extends GEntry> items) {
+		public void putAll(final GItem item, final Iterable<? extends GEntry> entries) {
 			final List<GEntry> value = this.customCopy(this.get(item));
-			if (!Iterables.addAll(value, items)) return;
+			if (!Iterables.addAll(value, entries)) return;
 			this.set(item, value);
 		}
 
@@ -321,9 +263,9 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void putAll(final GItem item, final int index, final Iterable<? extends GEntry> items) {
+		public void putAll(final GItem item, final int index, final Iterable<? extends GEntry> entries) {
 			final List<GEntry> value = this.customCopy(this.get(item));
-			if (!Iterables.addAll(value.subList(index, index), items)) return;
+			if (!Iterables.addAll(value.subList(index, index), entries)) return;
 			this.set(item, value);
 		}
 
@@ -346,9 +288,9 @@ public final class Fields {
 
 		/** {@inheritDoc} */
 		@Override
-		public void popAll(final GItem item, final Iterable<?> items) {
+		public void popAll(final GItem item, final Iterable<?> entries) {
 			final List<GEntry> value = this.customCopy(this.get(item));
-			if (!Iterables.removeAll(value, items)) return;
+			if (!Iterables.removeAll(value, entries)) return;
 			this.set(item, value);
 		}
 
@@ -361,37 +303,6 @@ public final class Fields {
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
 	public static abstract class BaseMapField<GItem, GKey, GValue> extends BaseField<GItem, Map<GKey, GValue>> implements MapField<GItem, GKey, GValue> {
-
-		/** Diese Methode gibt ein {@link MapField} zurück, welches die {@link Map} über das gegebene {@link Field} liest und schreibt.
-		 *
-		 * @param <GItem> Typ des Datensatzes.
-		 * @param <GKey> Typ der Schlüssel.
-		 * @param <GValue> Typ der Werte.
-		 * @param field {@link Field} zum Lesen und Schreiben einer {@link Map}.
-		 * @return {@link MapField}.
-		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static <GItem, GKey, GValue> BaseMapField<GItem, GKey, GValue> from(final Field<? super GItem, Map<GKey, GValue>> field)
-			throws NullPointerException {
-			Objects.notNull(field);
-			return new BaseMapField<GItem, GKey, GValue>() {
-
-				@Override
-				public Map<GKey, GValue> get(final GItem item) {
-					return field.get(item);
-				}
-
-				@Override
-				public void set(final GItem item, final Map<GKey, GValue> value) {
-					field.set(item, value);
-				}
-
-				@Override
-				public String toString() {
-					return field.toString();
-				}
-
-			};
-		}
 
 		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link Map} zurück.
 		 *
@@ -521,7 +432,7 @@ public final class Fields {
 
 	}
 
-	/** Diese Klasse implementiert {@link Fields#setupField(Field, Getter)}. */
+	/** Diese Klasse implementiert {@link Fields#setupField(Getter, Field)}. */
 	@SuppressWarnings ("javadoc")
 	public static class SetupField<GItem, GValue> implements Field<GItem, GValue> {
 
@@ -777,6 +688,87 @@ public final class Fields {
 
 	}
 
+	/** Diese Klasse implementiert {@link Fields#toSetField(Field)}. */
+	@SuppressWarnings ("javadoc")
+	public static class SetFieldAdapter<GItem, GEntry> extends BaseSetField<GItem, GEntry> {
+
+		public final Field<? super GItem, Set<GEntry>> field;
+
+		public SetFieldAdapter(final Field<? super GItem, Set<GEntry>> field) {
+			this.field = Objects.notNull(field);
+		}
+
+		@Override
+		public Set<GEntry> get(final GItem item) {
+			return this.field.get(item);
+		}
+
+		@Override
+		public void set(final GItem item, final Set<GEntry> value) {
+			this.field.set(item, value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.field);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Fields#toListField(Field)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ListFieldAdapter<GItem, GEntry> extends BaseListField<GItem, GEntry> {
+
+		public final Field<? super GItem, List<GEntry>> field;
+
+		public ListFieldAdapter(final Field<? super GItem, List<GEntry>> field) {
+			this.field = Objects.notNull(field);
+		}
+
+		@Override
+		public List<GEntry> get(final GItem item) {
+			return this.field.get(item);
+		}
+
+		@Override
+		public void set(final GItem item, final List<GEntry> value) {
+			this.field.set(item, value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.field);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Fields#toMapField(Field)}. */
+	@SuppressWarnings ("javadoc")
+	public static class MapFieldAdapter<GItem, GKey, GValue> extends BaseMapField<GItem, GKey, GValue> {
+
+		public final Field<? super GItem, Map<GKey, GValue>> field;
+
+		public MapFieldAdapter(final Field<? super GItem, Map<GKey, GValue>> field) {
+			this.field = Objects.notNull(field);
+		}
+
+		@Override
+		public Map<GKey, GValue> get(final GItem item) {
+			return this.field.get(item);
+		}
+
+		@Override
+		public void set(final GItem item, final Map<GKey, GValue> value) {
+			this.field.set(item, value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.field);
+		}
+
+	}
+
 	/** Diese Klasse implementiert {@link Fields#toProperty(Object, Field)}. */
 	@SuppressWarnings ("javadoc")
 	static class FieldProperty<GValue, GItem> extends BaseProperty<GValue> {
@@ -807,10 +799,7 @@ public final class Fields {
 
 	}
 
-	/** Diese Methode gibt das leere {@link Field} zurück, das stets {@code null} liefert und das Schreiben ignoriert.
-	 *
-	 * @param <GValue> Typ des Werts.
-	 * @return {@code empty}-{@link Field}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#valueField(Object) Fields.valueField(null)}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Field<Object, GValue> emptyField() {
 		return (Field<Object, GValue>)ValueField.EMPTY;
@@ -826,22 +815,22 @@ public final class Fields {
 		return new ValueField<>(value);
 	}
 
-	/** Diese Methode gibt ein initialisierendes {@link Field} zurück. Das Schreiben wird direkt an das gegebene {@link Field Datenfeld} {@code field} delegiert.
-	 * Beim Lesen wird der Wert zuerst über das gegebene {@link Field Datenfeld} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. gemäß
-	 * der gegebenen {@link Getter Initialisierung} {@code setup} ermittelt, über das {@link Field Datenfeld} {@code field} geschrieben und zurückgegeben.
-	 * Andernfalls wird der Wertt er direkt zurückgegeben.
+	/** Diese Methode gibt ein initialisierendes {@link Field} zurück. Das Schreiben wird direkt an das gegebene {@link Field} {@code field} delegiert. Beim Lesen
+	 * wird der Wert zuerst über das gegebene {@link Field} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. üner den gegebenen
+	 * {@link Getter} {@code setup} ermittelt und über das {@link Field} {@code field} geschrieben.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts.
-	 * @param field Datenfeld zur Manipulation.
 	 * @param setup Methode zur Initialisierung.
+	 * @param field Datenfeld zur Manipulation.
 	 * @return {@code setup}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} bzw. {@code setup} {@code null} ist. */
-	public static <GItem, GValue> Field<GItem, GValue> setupField(final Field<? super GItem, GValue> field, final Getter<? super GItem, ? extends GValue> setup)
+	public static <GItem, GValue> Field<GItem, GValue> setupField(final Getter<? super GItem, ? extends GValue> setup, final Field<? super GItem, GValue> field)
 		throws NullPointerException {
 		return new SetupField<>(setup, field);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(java.lang.reflect.Field, boolean) Fields.nativeField(field, true)}. */
 	public static <GItem, GValue> Field<GItem, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
 		return Fields.nativeField(field, true);
 	}
@@ -854,8 +843,8 @@ public final class Fields {
 	 * @see java.lang.reflect.Field#set(Object, Object)
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param field Datenfeld.
-	 * @param forceAccessible
+	 * @param field natives Datenfeld.
+	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das Datenfeld nicht zugrifbar ist. */
@@ -864,16 +853,17 @@ public final class Fields {
 		return new NativeField<>(field, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #compositeField(Getter, Setter) Fields.compositeField(Getters.nativeGetter(getMethod),
-	 * Setters.nativeSetter(setMethod))}.
-	 *
-	 * @see Getters#nativeGetter(Method)
-	 * @see Setters#nativeSetter(Method) */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Method, Method, boolean) Fields.nativeField(getMethod, setMethod, true)}. */
 	public static <GItem, GValue> Field<GItem, GValue> nativeField(final Method getMethod, final Method setMethod)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.compositeField(Getters.<GItem, GValue>nativeGetter(getMethod), Setters.<GItem, GValue>nativeSetter(setMethod));
+		return Fields.nativeField(getMethod, setMethod, true);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #compositeField(Getter, Setter) Fields.compositeField(Getters.nativeGetter(getMethod, forceAccessible),
+	 * Setters.nativeSetter(setMethod, forceAccessible))}.
+	 *
+	 * @see Getters#nativeGetter(Method, boolean)
+	 * @see Setters#nativeSetter(Method, boolean) */
 	public static <GItem, GValue> Field<GItem, GValue> nativeField(final Method getMethod, final Method setMethod, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Fields.compositeField(Getters.<GItem, GValue>nativeGetter(getMethod, forceAccessible),
@@ -1030,6 +1020,41 @@ public final class Fields {
 	public static <GItem, GValue> Field<GItem, GValue> synchronizedField(final Object mutex, final Field<? super GItem, GValue> field)
 		throws NullPointerException {
 		return new SynchronizedField<>(mutex, field);
+	}
+
+	/** Diese Methode gibt ein {@link SetField} zurück, welches das {@link Set} über das gegebene {@link Field} liest und schreibt.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GEntry> Typ der Elemente.
+	 * @param field {@link Field} zum Lesen und Schreiben des {@link Set}.
+	 * @return {@link SetField}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	public static <GItem, GEntry> BaseSetField<GItem, GEntry> toSetField(final Field<? super GItem, Set<GEntry>> field) throws NullPointerException {
+		return new SetFieldAdapter<>(field);
+	}
+
+	/** Diese Methode gibt ein {@link ListField} zurück, welches das {@link List} über das gegebene {@link Field} liest und schreibt.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GEntry> Typ der Elemente.
+	 * @param field {@link Field} zum Lesen und Schreiben einer {@link List}.
+	 * @return {@link ListField}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	public static <GItem, GEntry> BaseListField<GItem, GEntry> toListField(final Field<? super GItem, List<GEntry>> field) throws NullPointerException {
+		return new ListFieldAdapter<>(field);
+	}
+
+	/** Diese Methode gibt ein {@link MapField} zurück, welches die {@link Map} über das gegebene {@link Field} liest und schreibt.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 * @param field {@link Field} zum Lesen und Schreiben einer {@link Map}.
+	 * @return {@link MapField}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	public static <GItem, GKey, GValue> BaseMapField<GItem, GKey, GValue> toMapField(final Field<? super GItem, Map<GKey, GValue>> field)
+		throws NullPointerException {
+		return new MapFieldAdapter<>(field);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#toProperty(Object, Field) Fields.toProperty(null, field)}. */
