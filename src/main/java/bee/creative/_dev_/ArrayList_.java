@@ -416,8 +416,8 @@ class ArrayList_<GItem> implements List<GItem>, Deque<GItem>, Cloneable, Seriali
 		if (length == 0) return;
 		final Object[] array = new Object[length];
 		for (int i = 0; i < length; array[i++] = stream.readObject()) {
-			this.array = array;
 		}
+		this.array = array;
 		this.length = length;
 	}
 

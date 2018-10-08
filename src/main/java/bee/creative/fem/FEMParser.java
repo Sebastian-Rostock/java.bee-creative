@@ -9,7 +9,7 @@ import bee.creative.util.Parser;
  *
  * @see FEMDomain#parseScript(String, int)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMParser extends Parser {
+public class FEMParser extends Parser {
 
 	/** Dieses Feld speichert die bisher ermittelten Bereiche. */
 	final List<Token> tokens = new ArrayList<>();
@@ -17,7 +17,7 @@ public final class FEMParser extends Parser {
 	/** Diese Methode gibt die Auflistung aller {@link #putToken(Token) erfassten Bereiche} zurück.
 	 *
 	 * @return Bereichsliste. */
-	public final List<Token> tokens() {
+	public List<Token> tokens() {
 		return this.tokens;
 	}
 
@@ -27,7 +27,7 @@ public final class FEMParser extends Parser {
 	 * @param index Position.
 	 * @param type Typ des Bereichs.
 	 * @return {@code this}. */
-	public final FEMParser setToken(final int index, final int type) {
+	public FEMParser setToken(int index, int type) {
 		if (index < 0) return this;
 		return this.setToken(index, this.tokens.get(index).withType(type));
 	}
@@ -38,7 +38,7 @@ public final class FEMParser extends Parser {
 	 * @param index Position.
 	 * @param token Bereich.
 	 * @return {@code this}. */
-	public final FEMParser setToken(final int index, final Token token) {
+	public FEMParser setToken(int index, Token token) {
 		if ((index < 0) || (token == null)) return this;
 		this.tokens.set(index, token);
 		return this;
@@ -51,7 +51,7 @@ public final class FEMParser extends Parser {
 	 * @param type Typ des Bereichs.
 	 * @return Position des Bereichs oder {@code -1}.
 	 * @throws IllegalArgumentException Wenn die Startposition ungültig ist. */
-	public final int putToken(final int type) throws IllegalArgumentException {
+	public int putToken(int type) throws IllegalArgumentException {
 		return this.putToken(type, this.index(), 1);
 	}
 
@@ -62,7 +62,7 @@ public final class FEMParser extends Parser {
 	 * @param offset Startposition des Bereichs.
 	 * @return Position des Bereichs oder {@code -1}.
 	 * @throws IllegalArgumentException Wenn die Startposition ungültig ist. */
-	public final int putToken(final int type, final int offset) throws IllegalArgumentException {
+	public int putToken(int type, int offset) throws IllegalArgumentException {
 		return this.putToken(type, offset, this.index() - offset);
 	}
 
@@ -73,7 +73,7 @@ public final class FEMParser extends Parser {
 	 * @param length Länge des Bereichs.
 	 * @return Position des Bereichs oder {@code -1}.
 	 * @throws IllegalArgumentException Wenn die Startposition ungültig ist. */
-	public final int putToken(final int type, final int offset, final int length) throws IllegalArgumentException {
+	public int putToken(int type, int offset, int length) throws IllegalArgumentException {
 		return this.putToken(new Token(type, offset, length));
 	}
 
@@ -84,9 +84,9 @@ public final class FEMParser extends Parser {
 	 * @see #setToken(int, int)
 	 * @param token Bereiche.
 	 * @return Position des Bereichs oder {@code -1}. */
-	public final int putToken(final Token token) {
+	public int putToken(Token token) {
 		if ((token == null) || (token.length() == 0)) return -1;
-		final int result = this.tokens.size();
+		int result = this.tokens.size();
 		this.tokens.add(result, token);
 		return result;
 	}
@@ -96,7 +96,7 @@ public final class FEMParser extends Parser {
 	 * @param source Eingabe.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public final FEMParser useSource(final String source) throws NullPointerException {
+	public FEMParser useSource(String source) throws NullPointerException {
 		this.source(source);
 		return this;
 	}

@@ -302,8 +302,8 @@ public final class IAMCodec {
 				final int length = array.length;
 				if (length == 0) return "";
 				final StringBuilder result = new StringBuilder().append(array[0]);
-				for (int index = 1; index < length; index++) {
-					result.append(' ').append(array[index]);
+				for (int i = 1; i < length; i++) {
+					result.append(' ').append(array[i]);
 				}
 				return result.toString();
 			}

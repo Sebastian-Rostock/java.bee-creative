@@ -19,6 +19,7 @@ import bee.creative.util.Natives;
 import bee.creative.util.Objects;
 import bee.creative.util.Setter;
 import bee.creative.util.Strings;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
  * Quelltexten und Funktionen ineinander dienen.
@@ -30,13 +31,13 @@ import bee.creative.util.Strings;
  * tragende {@link FEMScript.Token Bereiche} in Funktionen.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class FEMDomain {
+public class FEMDomain extends BaseObject {
 
-	/** Dieses Feld speichert die native {@link FEMDomain}, welche das Kompilieren nativer Konstanten und Methoden unterstützt.
+	/** Diese Klasse implementiert eine {@link FEMDomain}, welche das Kompilieren nativer Konstanten und Methoden unterstützt.
 	 *
 	 * @see FEMNative
 	 * @see FEMReflection */
-	public static final FEMDomain NATIVE = new FEMDomain() {
+	public static class NativeDomain extends FEMDomain {
 
 		@Override
 		protected FEMValue compileValue(final FEMCompiler source, final String string) throws NullPointerException, IllegalArgumentException {
@@ -77,12 +78,10 @@ public class FEMDomain {
 			return source.proxy(string);
 		}
 
-		@Override
-		public String toString() {
-			return "NATIVE";
-		}
+	}
 
-	};
+	/** Dieses Feld speichert die native {@link FEMDomain} */
+	public static final NativeDomain NATIVE = new NativeDomain();
 
 	/** Dieses Feld speichert die normale {@link FEMDomain}. */
 	public static final FEMDomain NORMAL = new FEMDomain();
@@ -136,6 +135,16 @@ public class FEMDomain {
 		target.putToken('!', index, length - index);
 		target.seek(length);
 		return true;
+	}
+
+	/** Diese Methode sollte den {@link FEMParser#tokens() Bereich} an der gegebenen Position als {@link Token Fehlerbereich} mit dem Typ {@code '!'} markieren,
+	 * d.h. {@code target.setToken(index, '!')} aufrufe, wenn die Startbereiche unvollständiger {@link #parseArray(FEMParser) Wertlisten},
+	 * {@link #parseParams(FEMParser) Parameterlisten} bzw. {@link #parseHandler(FEMParser) Funktionszeiger} derart gekennzeichnet werden sollen.
+	 * 
+	 * @param target Parser.
+	 * @param index Position des
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+	protected void parseError(final FEMParser target, final int index) {
 	}
 
 	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer {@link FEMProxy benannten Funktion} und gibt nur dann {@code true} zurück, wenn diese an
@@ -264,7 +273,7 @@ public class FEMDomain {
 			target.skip();
 			return true;
 		} else if (target.isParsed() || !this.parseValue(target)) {
-			target.setToken(openIndex, '!');
+			this.parseError(target, openIndex);
 			return this.parseError(target);
 		} else {
 			while (true) {
@@ -274,14 +283,14 @@ public class FEMDomain {
 					target.skip();
 					return true;
 				} else if (target.isParsed() || (target.symbol() != ';')) {
-					target.setToken(openIndex, '!');
+					this.parseError(target, openIndex);
 					return this.parseError(target);
 				} else {
 					target.putToken(';');
 					target.skip();
 					this.parseComments(target);
 					if (!this.parseValue(target)) {
-						target.setToken(openIndex, '!');
+						this.parseError(target, openIndex);
 						return this.parseError(target);
 					}
 				}
@@ -329,7 +338,7 @@ public class FEMDomain {
 			closeIndex = target.putToken(':');
 			target.skip();
 		} else if (target.isParsed() || !this.parseName(target)) {
-			target.setToken(openIndex, '!');
+			this.parseError(target, openIndex);
 			return this.parseError(target);
 		} else {
 			while (true) {
@@ -339,14 +348,14 @@ public class FEMDomain {
 					target.skip();
 					break;
 				} else if (target.isParsed() || (target.symbol() != ';')) {
-					target.setToken(openIndex, '!');
+					this.parseError(target, openIndex);
 					return this.parseError(target);
 				} else {
 					target.putToken(';');
 					target.skip();
 					this.parseComments(target);
 					if (!this.parseName(target)) {
-						target.setToken(openIndex, '!');
+						this.parseError(target, openIndex);
 						return this.parseError(target);
 					}
 				}
@@ -354,14 +363,14 @@ public class FEMDomain {
 		}
 		this.parseComments(target);
 		if (target.isParsed() || !this.parseFunction(target)) {
-			target.setToken(openIndex, '!');
-			target.setToken(closeIndex, '!');
+			this.parseError(target, openIndex);
+			this.parseError(target, closeIndex);
 			return this.parseError(target);
 		}
 		this.parseComments(target);
 		if (target.isParsed() || (target.symbol() != '}')) {
-			target.setToken(openIndex, '!');
-			target.setToken(closeIndex, '!');
+			this.parseError(target, openIndex);
+			this.parseError(target, closeIndex);
 			return this.parseError(target);
 		}
 		target.putToken('}');
@@ -405,7 +414,7 @@ public class FEMDomain {
 			target.skip();
 			return true;
 		} else if (target.isParsed() || !this.parseFunction(target)) {
-			target.setToken(openIndex, '!');
+			this.parseError(target, openIndex);
 			return this.parseError(target);
 		} else {
 			while (true) {
@@ -415,14 +424,14 @@ public class FEMDomain {
 					target.skip();
 					return true;
 				} else if (target.isParsed() || (target.symbol() != ';')) {
-					target.setToken(openIndex, '!');
+					this.parseError(target, openIndex);
 					return this.parseError(target);
 				} else {
 					target.putToken(';');
 					target.skip();
 					this.parseComments(target);
 					if (!this.parseFunction(target)) {
-						target.setToken(openIndex, '!');
+						this.parseError(target, openIndex);
 						return this.parseError(target);
 					}
 				}
@@ -438,8 +447,8 @@ public class FEMDomain {
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseIndex(final FEMParser target) throws NullPointerException {
 		final int offset = target.index();
-		for (int symbol = target.symbol(); ('0' <= symbol) && (symbol <= '9'); symbol = target.skip())
-			if (target.index() == offset) return false;
+		for (int symbol = target.symbol(); ('0' <= symbol) && (symbol <= '9'); symbol = target.skip()) {}
+		if (target.index() == offset) return false;
 		target.putToken('#', offset);
 		return true;
 	}
