@@ -6,7 +6,7 @@ import java.util.List;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 
-public abstract class SAMValue implements Items<SAMValue>, Iterable<SAMValue> {
+  abstract class SAMValue implements Items<SAMValue>, Iterable<SAMValue> {
 
 	public static SAMValue from(final Object object) throws IllegalArgumentException {
 		if (object instanceof SAMValue) return (SAMValue)object;

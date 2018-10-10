@@ -23,7 +23,7 @@ import bee.creative.util.Getter;
  * Subjekt}, {@link STSEdge#subject() Prädikat} und {@link STSEdge#subject() Objekt} darstellt.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class STSStore {
+  abstract class STSStore {
 
 	/** Diese Klasse implementiert den {@link Getter} zu {@link STSStore#customSelectEdgeSetByObject(int)}. */
 	protected final class SelectObjectEdgeSetGetter implements Getter<STSNode, STSEdgeSet> {

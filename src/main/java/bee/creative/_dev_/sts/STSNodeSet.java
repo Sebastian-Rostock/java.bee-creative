@@ -8,7 +8,7 @@ import bee.creative.array.IntegerArraySection;
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")
-public abstract class STSNodeSet extends STSItemSet<STSNode> {
+  abstract class STSNodeSet extends STSItemSet<STSNode> {
 
 	/** Diese Klasse implementiert die Menge aller Knoten eines Graphspeichers.
 	 *

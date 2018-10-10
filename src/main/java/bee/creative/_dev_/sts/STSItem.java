@@ -5,7 +5,7 @@ import bee.creative.util.Comparators;
 /** Diese abstrakte Klasse implementiert einen Datensatz, der in einem {@link #store() Graphspeicher} verwaltet wird.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class STSItem {
+  abstract class STSItem {
 
 	/** Dieses Feld speichert den Graphspeicher, der dieses Objekt verwaltet. */
 	protected final STSStore store;

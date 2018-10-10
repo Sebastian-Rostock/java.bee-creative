@@ -10,7 +10,7 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert einen {@link STSStore Graphspeicher}, der seine Daten im Arbeitsspeicher verwaltet.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class STSHeapStore extends STSStore {
+  final class STSHeapStore extends STSStore {
 
 	public static void main(final String[] args) throws Exception {
 		final STSHeapStore store = new STSHeapStore();

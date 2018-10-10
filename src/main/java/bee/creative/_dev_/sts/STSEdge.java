@@ -5,7 +5,7 @@ package bee.creative._dev_.sts;
  *
  * @see STSStore
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class STSEdge extends STSItem implements Comparable<STSEdge> {
+  final class STSEdge extends STSItem implements Comparable<STSEdge> {
 
 	@SuppressWarnings ("javadoc")
 	protected STSEdge(final STSStore store, final int index) {

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import bee.creative.util.Objects;
 
-public class SAMValueBuilder extends SAMValue {
+  class SAMValueBuilder extends SAMValue {
 
 	protected List<SAMValue> array;
 

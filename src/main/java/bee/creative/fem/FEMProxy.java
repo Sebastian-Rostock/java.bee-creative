@@ -76,21 +76,6 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 
 	/** {@inheritDoc} */
 	@Override
-	public int hashCode() {
-		return this.name.hashCode();
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMProxy)) return false;
-		final FEMProxy that = (FEMProxy)object;
-		return this.name.equals(that.name);
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public String toString() {
 		final String result = FEMDomain.NORMAL.formatConst(this.name);
 		if (this.function == null) return result;
