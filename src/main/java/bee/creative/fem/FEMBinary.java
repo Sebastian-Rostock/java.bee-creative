@@ -603,6 +603,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
 	public static FEMBinary from(final Iterable<? extends Number> items) throws NullPointerException {
+		if (items instanceof FEMBinary) return (FEMBinary)items;
 		return FEMBinary.from(Iterables.toList(items));
 	}
 

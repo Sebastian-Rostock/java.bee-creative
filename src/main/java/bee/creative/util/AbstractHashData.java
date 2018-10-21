@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMMapping;
 
 /** Diese abstrakte Klasse implementiert eine transponierte {@link Object#hashCode() streuwertbasierte} Datenhaltung als Grundlage einer {@link Map} oder eines
@@ -82,8 +84,9 @@ import bee.creative.iam.IAMMapping;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
-public abstract class AbstractHashData<GKey, GValue> {
+public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 
+	/** Diese Klasse implementiert das {@link Entry} für {@link AbstractHashData.HashIterator#nextEntry()}. */
 	@SuppressWarnings ("javadoc")
 	protected static class HashEntry<GKey, GValue> implements Entry<GKey, GValue> {
 
@@ -130,6 +133,22 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
+	/** Diese Klasse implementiert das unveränderliche {@link AbstractHashData.HashEntry}. */
+	@SuppressWarnings ("javadoc")
+	protected static class HashEntry2<GKey, GValue> extends HashEntry<GKey, GValue> {
+
+		public HashEntry2(AbstractHashData<GKey, GValue> entryData, int entryIndex) {
+			super(entryData, entryIndex);
+		}
+
+		@Override
+		public GValue setValue(GValue value) {
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
+	/** Diese Klasse implementiert den abstrakten {@link Iterator} über die Schlüssel, Werte und Einträge. */
 	@SuppressWarnings ("javadoc")
 	protected static abstract class HashIterator<GKey, GValue, GItem> implements Iterator<GItem> {
 
@@ -157,8 +176,8 @@ public abstract class AbstractHashData<GKey, GValue> {
 		}
 
 		/** Diese Methode gibt den nächsten Eintrag zurück. */
-		protected final HashEntry<GKey, GValue> nextEntry() {
-			return new HashEntry<>(this.entryData, this.nextIndex());
+		protected final Entry<GKey, GValue> nextEntry() {
+			return this.entryData.customGetEntry(this.nextIndex());
 		}
 
 		/** Diese Methode gibt den nächsten Wert zurück. */
@@ -211,6 +230,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
+	/** Diese Klasse implementiert {@link AbstractHashData#newKeysImpl()}. */
 	@SuppressWarnings ("javadoc")
 	protected static class Keys<GKey> extends AbstractSet<GKey> {
 
@@ -275,6 +295,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
+	/** Diese Klasse implementiert {@link AbstractHashData#newKeysIteratorImpl()}. */
 	@SuppressWarnings ("javadoc")
 	protected static class KeysIterator<GKey, GValue> extends HashIterator<GKey, GValue, GKey> {
 
@@ -289,6 +310,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
+	/** Diese Klasse implementiert {@link AbstractHashData#newValuesImpl()}. */
 	@SuppressWarnings ("javadoc")
 	protected static class Values<GValue> extends AbstractCollection<GValue> {
 
@@ -334,6 +356,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
+	/** Diese Klasse implementiert {@link AbstractHashData#newValuesIteratorImpl()}. */
 	@SuppressWarnings ("javadoc")
 	protected static class ValuesIterator<GKey, GValue> extends HashIterator<GKey, GValue, GValue> {
 
@@ -348,6 +371,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
+	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesImpl()}. */
 	@SuppressWarnings ("javadoc")
 	protected static class Entries<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
 
@@ -397,6 +421,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
+	/** Diese Klasse implementiert {@link AbstractHashData#newEntriesIteratorImpl()}. */
 	@SuppressWarnings ("javadoc")
 	protected static class EntriesIterator<GKey, GValue> extends HashIterator<GKey, GValue, Entry<GKey, GValue>> {
 
@@ -411,6 +436,7 @@ public abstract class AbstractHashData<GKey, GValue> {
 
 	}
 
+	/** Diese Klasse implementiert {@link AbstractHashData#newMappingImpl()}. */
 	@SuppressWarnings ("javadoc")
 	protected static class Mapping<GKey, GValue> extends AbstractMap<GKey, GValue> {
 
@@ -544,12 +570,27 @@ public abstract class AbstractHashData<GKey, GValue> {
 	 * @return Schlüssel oder {@code null}. */
 	protected abstract GKey customGetKey(final int entryIndex);
 
+	/** Diese Methode wird in {@link HashIterator#nextEntry()} genutzt und gibt den Eintrag zum gegebenen Index zurück.
+	 *
+	 * @param entryIndex Index eines Eintrags.
+	 * @return Eintrag. */
+	protected Entry<GKey, GValue> customGetEntry(final int entryIndex) {
+		return new HashEntry<>(this, entryIndex);
+	}
+
 	/** Diese Methode wird in {@link #getImpl(Object)}, {@link #popImpl(Object)}, {@link HashEntry#getValue()} sowie {@link HashIterator#nextValue()} genutzt und
 	 * gibt den Wert des gegebenen Eintrags zurück.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @return Wert oder {@code null}. */
 	protected abstract GValue customGetValue(final int entryIndex);
+
+	/** Diese Methode wird von {@link #putIndexImpl(Object)} genutzt und ersetzt den Wert des gegebenen Schlüssels.
+	 *
+	 * @param entryIndex Index eines Eintrags.
+	 * @param key neuer Schlüssel oder {@code null}.
+	 * @param keyHash Streuwert des Schlüssels. */
+	protected abstract void customSetKey(final int entryIndex, final GKey key, int keyHash);
 
 	/** Diese Methode wird in {@link #putImpl(Object, Object)} sowie {@link HashEntry#setValue(Object)} genutzt, ersetzt den Wert des gegebenen Eintrags und gibt
 	 * den vorherigen Wert zurück.
@@ -558,13 +599,6 @@ public abstract class AbstractHashData<GKey, GValue> {
 	 * @param value neuer Wert oder {@code null}.
 	 * @return alter Wert oder {@code null}. */
 	protected abstract GValue customSetValue(final int entryIndex, final GValue value);
-
-	/** Diese Methode wird von {@link #putIndexImpl(Object)} genutzt und ersetzt den Wert des gegebenen Schlüssels.
-	 *
-	 * @param entryIndex Index eines Eintrags.
-	 * @param key neuer Schlüssel oder {@code null}.
-	 * @param keyHash Streuwert des Schlüssels. */
-	protected abstract void customSetKey(final int entryIndex, final GKey key, int keyHash);
 
 	/** Diese Methode wird in {@link #getIndexImpl(Object)}, {@link #putIndexImpl(Object)}, {@link #popIndexImpl(Object)} sowie
 	 * {@link #popEntryImpl(Object, Object)} genutzt und gibt den {@link Object#hashCode() Streuwert} des gegebenen Schlüssels zurück.
@@ -1034,6 +1068,12 @@ public abstract class AbstractHashData<GKey, GValue> {
 		} catch (final Exception cause) {
 			throw new CloneNotSupportedException(cause.getMessage());
 		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long emu() {
+		return EMU.fromObject(this) + EMU.fromArray(this.table) + EMU.fromArray(this.nexts);
 	}
 
 }

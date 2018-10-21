@@ -1140,6 +1140,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
 	public static FEMString from(final Iterable<? extends Number> items) throws NullPointerException {
+		if (items instanceof FEMString) return (FEMString)items;
 		return FEMString.from(Iterables.toList(items));
 	}
 
@@ -1897,15 +1898,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	/** {@inheritDoc} */
 	@Override
-	public final int compareTo(final FEMString o) {
-		return this.compare(o);
+	public final int compareTo(final FEMString that) {
+		return this.compare(that);
 	}
 
 	/** Diese Methode gibt diesen Zeichenkette als {@link String} zurück.
 	 *
 	 * @return {@link String}. */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return new String(this.toChars());
 	}
 

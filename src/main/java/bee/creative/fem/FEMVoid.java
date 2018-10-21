@@ -53,18 +53,6 @@ public final class FEMVoid extends FEMValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMVoid result() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMVoid result(final boolean recursive) {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
 		return 0;
 	}

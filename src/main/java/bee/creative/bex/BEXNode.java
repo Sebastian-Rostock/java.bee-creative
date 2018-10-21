@@ -11,7 +11,7 @@ import bee.creative.util.Objects;
 public abstract class BEXNode {
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyNode extends BEXNode {
+	static class EmptyNode extends BEXNode {
 
 		@Override
 		public int key() {

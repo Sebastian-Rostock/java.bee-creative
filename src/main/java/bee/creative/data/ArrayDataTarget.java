@@ -11,10 +11,10 @@ import bee.creative.util.Objects;
 public class ArrayDataTarget extends BaseDataTarget {
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final CompactByteArray data;
+	protected final CompactByteArray data;
 
 	/** Dieses Feld speichert die Schreibeposition. */
-	int index;
+	protected int index;
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten mit 128 Byte Größe. */
 	public ArrayDataTarget() {

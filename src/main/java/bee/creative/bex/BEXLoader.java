@@ -14,12 +14,12 @@ import bee.creative.util.Objects;
  *
  * @see BEXFileLoader
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class BEXLoader {
+public class BEXLoader {
 
 	/** Diese Klasse implementiert ein {@link BEXFile}, das seine Daten aus dem {@link IAMIndex} bezieht.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXFileLoader extends BEXFile {
+	public static class BEXFileLoader extends BEXFile {
 
 		/** Dieses Feld speichert den leeren {@link BEXFileLoader}. */
 		public static final BEXFileLoader EMPTY = new BEXFileLoader();
@@ -208,55 +208,55 @@ public final class BEXLoader {
 		/** Diese Methode gibt die Verwaltung der URI der Attributknoten zurück.
 		 *
 		 * @return Verwaltung der URI der Attributknoten. */
-		public final BEXStringLoader attrUriCache() {
+		public BEXStringLoader attrUriCache() {
 			return this.attrUriText;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Namen der Attributknoten zurück.
 		 *
 		 * @return Verwaltung der Namen der Attributknoten. */
-		public final BEXStringLoader attrNameCache() {
+		public BEXStringLoader attrNameCache() {
 			return this.attrNameText;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Werte der Attributknoten zurück.
 		 *
 		 * @return Verwaltung der Werte der Attributknoten. */
-		public final BEXStringLoader attrValueCache() {
+		public BEXStringLoader attrValueCache() {
 			return this.attrValueText;
 		}
 
 		/** Diese Methode gibt die Verwaltung der URI der Elementknoten zurück.
 		 *
 		 * @return Verwaltung der URI der Elementknoten. */
-		public final BEXStringLoader chldUriCache() {
+		public BEXStringLoader chldUriCache() {
 			return this.chldUriText;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Namen der Elementknoten zurück.
 		 *
 		 * @return Verwaltung der Namen der Elementknoten. */
-		public final BEXStringLoader chldNameCache() {
+		public BEXStringLoader chldNameCache() {
 			return this.chldNameText;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Werte der Textknoten zurück.
 		 *
 		 * @return Verwaltung der Werte der Textknoten. */
-		public final BEXStringLoader chldValueCache() {
+		public BEXStringLoader chldValueCache() {
 			return this.chldValueText;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXNode root() {
+		public BEXNode root() {
 			if (this.rootRef < 0) return new BEXNodeLoader(this);
 			return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, this.rootRef), this);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXList list(final int key) {
+		public BEXList list(final int key) {
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ATTR_LIST:
 					return this.node(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, BEXLoader.refOf(key))).attributes();
@@ -269,7 +269,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXNode node(final int key) {
+		public BEXNode node(final int key) {
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_ATTR_NODE: {
 					final int ref = BEXLoader.refOf(key);
@@ -301,7 +301,7 @@ public final class BEXLoader {
 	/** Diese Klasse implementiert eine {@link BEXList}, die ihre Daten aus dem {@link IAMIndex} seines Besitzers bezieht.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXListLoader extends BEXList {
+	public static class BEXListLoader extends BEXList {
 
 		/** Dieses Feld speichert den leeren {@link BEXListLoader}. */
 		public static final BEXListLoader EMPTY = new BEXListLoader(BEXFileLoader.EMPTY);
@@ -338,13 +338,13 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final int key() {
+		public int key() {
 			return this.key;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final int type() {
+		public int type() {
 			switch (BEXLoader.typeOf(this.key)) {
 				case BEX_VOID_TYPE:
 					return BEXList.VOID_LIST;
@@ -359,13 +359,13 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXFile owner() {
+		public BEXFile owner() {
 			return this.owner;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXNode get(final int index) {
+		public BEXNode get(final int index) {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -398,7 +398,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final int find(final String uri, final String name, final int start) throws NullPointerException {
+		public int find(final String uri, final String name, final int start) throws NullPointerException {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -461,7 +461,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final int length() {
+		public int length() {
 			final int key = this.key;
 			switch (BEXLoader.typeOf(key)) {
 				case BEX_VOID_TYPE:
@@ -484,7 +484,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXNode parent() {
+		public BEXNode parent() {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -503,7 +503,7 @@ public final class BEXLoader {
 	/** Diese Klasse implementiert einen {@link BEXNode}, der seine Daten aus dem {@link IAMIndex} seines Besitzers bezieht.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXNodeLoader extends BEXNode {
+	public static class BEXNodeLoader extends BEXNode {
 
 		/** Dieses Feld speichert den leeren {@link BEXNodeLoader}. */
 		public static final BEXNodeLoader EMPTY = new BEXNodeLoader(BEXFileLoader.EMPTY);
@@ -532,13 +532,13 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final int key() {
+		public int key() {
 			return this.key;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final int type() {
+		public int type() {
 			switch (BEXLoader.typeOf(this.key)) {
 				case BEX_VOID_TYPE:
 					return BEXNode.VOID_NODE;
@@ -555,13 +555,13 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXFile owner() {
+		public BEXFile owner() {
 			return this.owner;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public final String uri() {
+		public String uri() {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -579,7 +579,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final String name() {
+		public String name() {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -597,7 +597,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final String value() {
+		public String value() {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -620,7 +620,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final int index() {
+		public int index() {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -654,7 +654,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXNode parent() {
+		public BEXNode parent() {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -686,7 +686,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXList children() {
+		public BEXList children() {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -707,7 +707,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final BEXList attributes() {
+		public BEXList attributes() {
 			final int key = this.key;
 			final BEXFileLoader owner = this.owner;
 			switch (BEXLoader.typeOf(key)) {
@@ -723,6 +723,7 @@ public final class BEXLoader {
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
+
 	}
 
 	/** Diese Klasse implementiert eine Verwaltung von gepufferten Zeichenketten, die über {@link BEXFile#stringFrom(IAMArray)} aus den Elementen eines
@@ -730,7 +731,7 @@ public final class BEXLoader {
 	 *
 	 * @see #getEnabled()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXStringLoader implements Items<String> {
+	public static class BEXStringLoader implements Items<String> {
 
 		/** Dieses Feld speichert den leeren {@link BEXStringLoader}. */
 		public static final BEXStringLoader EMPTY = new BEXStringLoader(IAMListing.EMPTY);
@@ -753,7 +754,7 @@ public final class BEXLoader {
 		 * @see IAMListing#item(int)
 		 * @param index Index.
 		 * @return {@code index}-tes Element. */
-		public final IAMArray item(final int index) {
+		public IAMArray item(final int index) {
 			return this.items.item(index);
 		}
 
@@ -762,7 +763,7 @@ public final class BEXLoader {
 		 *
 		 * @see #get(int)
 		 * @return {@code true}, wenn die Pufferung aktiviert ist. */
-		public final boolean getEnabled() {
+		public boolean getEnabled() {
 			return this.cache != null;
 		}
 
@@ -770,7 +771,7 @@ public final class BEXLoader {
 		 *
 		 * @see #get(int)
 		 * @param value {@code true}, wenn die Pufferung aktiviert ist. */
-		public final void setEnabled(final boolean value) {
+		public void setEnabled(final boolean value) {
 			if (!value) {
 				this.cache = null;
 			} else if (this.cache == null) {
@@ -785,7 +786,7 @@ public final class BEXLoader {
 		 * @param index Index.
 		 * @return {@code index}-te Zeichenkette oder {@code ""}. */
 		@Override
-		public final String get(final int index) {
+		public String get(final int index) {
 			final String[] cache = this.cache;
 			if (cache != null) {
 				if ((index < 0) || (index >= cache.length)) return "";
@@ -801,7 +802,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public final String toString() {
+		public String toString() {
 			return Objects.formatIterable(true, Iterables.filteredIterable(Filters.nullFilter(), Arrays.asList(this.cache)));
 		}
 

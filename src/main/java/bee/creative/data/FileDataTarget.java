@@ -13,7 +13,7 @@ import bee.creative.util.Objects;
 public class FileDataTarget extends BaseDataTarget {
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final RandomAccessFile data;
+	protected final RandomAccessFile data;
 
 	/** Dieser Konstruktor initialisiert das {@link RandomAccessFile} mit dem gegebenen {@link File} im Modus {@code "rw"}.
 	 *
@@ -43,7 +43,7 @@ public class FileDataTarget extends BaseDataTarget {
 
 	/** {@inheritDoc} */
 	@Override
-	public final RandomAccessFile data() {
+	public RandomAccessFile data() {
 		return this.data;
 	}
 

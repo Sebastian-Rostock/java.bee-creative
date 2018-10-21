@@ -31,7 +31,69 @@ public class FEMType<GData> {
 	}
 
 	/** Diese Methode gibt den Identifikator dieses Datentyps zurück. Dieser sollte über eine statische Konstante definiert werden, um Fallunterscheidungen mit
-	 * einem {@code switch}-Statement umsetzen zu können.
+	 * einem {@code switch}-Statement umsetzen zu können. Derzeit bekannt sind:
+	 * <table>
+	 * <tr>
+	 * <th>{@link #id()}</th>
+	 * <th>Datentyp</th>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 0}</td>
+	 * <td>{@link FEMVoid}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 1}</td>
+	 * <td>{@link FEMArray}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 2}</td>
+	 * <td>{@link FEMHandler}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 3}</td>
+	 * <td>{@link FEMBoolean}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 4}</td>
+	 * <td>{@link FEMString}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 5}</td>
+	 * <td>{@link FEMBinary}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 6}</td>
+	 * <td>{@link FEMInteger}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 7}</td>
+	 * <td>{@link FEMDecimal}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 8}</td>
+	 * <td>{@link FEMDuration}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 9}</td>
+	 * <td>{@link FEMDatetime}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 10}</td>
+	 * <td>{@link FEMObject}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code 11}</td>
+	 * <td>{@link FEMTable}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code -1}</td>
+	 * <td>{@link FEMNative}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@code -2}</td>
+	 * <td>{@link FEMVariable}</td>
+	 * </tr>
+	 * </table>
 	 *
 	 * @return Identifikator dieses Datentyps. */
 	public final int id() {

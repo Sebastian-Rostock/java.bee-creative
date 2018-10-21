@@ -1,11 +1,12 @@
 package bee.creative.fem;
 
 import bee.creative.util.Objects;
+import bee.creative.util.Property;
 
 /** Diese Klasse implementiert eine Variable als veränderlichen Verweis auf einen Wert.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMVariable extends FEMValue {
+public final class FEMVariable extends FEMValue implements Property<FEMValue> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = -2;
@@ -40,22 +41,24 @@ public final class FEMVariable extends FEMValue {
 	 * @param value initialier Wert, der z.B. als {@link FEMFuture} gegeben sein kann.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public FEMVariable(final FEMValue value) throws NullPointerException {
-		this.update(value);
+		this.set(value);
 	}
 
-	/** Diese Methode gibt den aktuellen Wert der Variable zurück, der über {@link #update(FEMValue)} geändert werden kann.
+	/** Diese Methode gibt den aktuellen Wert der Variable zurück, der über {@link #set(FEMValue)} geändert werden kann.
 	 *
-	 * @see #update(FEMValue)
+	 * @see #set(FEMValue)
 	 * @return aktueller Wert. */
-	public final synchronized FEMValue value() {
+	@Override
+	public synchronized FEMValue get() {
 		return this.value;
 	}
 
-	/** Diese Methode setzt den aktuellen Wert der Variable, der über {@link #value()} gelesen werden kann.
+	/** Diese Methode setzt den aktuellen Wert der Variable, der über {@link #get()} gelesen werden kann.
 	 *
 	 * @param value aktuellen Wert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final synchronized void update(final FEMValue value) throws NullPointerException {
+	@Override
+	public synchronized void set(final FEMValue value) throws NullPointerException {
 		this.value = Objects.notNull(value);
 	}
 

@@ -734,7 +734,7 @@ public class IO {
 
 			@Override
 			public void write(final char[] cbuf, final int off, final int len) throws IOException {
-				object.append(CharacterArraySection.from(cbuf, off, len));
+				object.append(cbuf, off, len);
 			}
 
 			@Override

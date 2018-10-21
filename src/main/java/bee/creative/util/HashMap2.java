@@ -1,6 +1,7 @@
 package bee.creative.util;
 
 import java.util.Map;
+import bee.creative.emu.EMU;
 
 /** Diese Klasse erweitert eine {@link HashMap} um einen Streuwertpuffer, analog zu {@link java.util.HashMap}.
  *
@@ -125,6 +126,12 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 			}
 
 		};
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.hashes);
 	}
 
 	/** {@inheritDoc} */

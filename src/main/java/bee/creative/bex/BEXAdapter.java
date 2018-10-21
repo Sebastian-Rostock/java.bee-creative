@@ -1433,70 +1433,6 @@ public class BEXAdapter {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXElemCollector implements NodeList {
 
-		/** Diese Methode sammelt alle Elementknoten.
-		 *
-		 * @param node Elementknoten.
-		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		final void collectElements(final BEXNodeAdapter node, final boolean self) {
-			if (node.node.type() == BEXNode.ELEM_NODE) {
-				if (self) {
-					this.list.add(node);
-				}
-				final NodeList children = node.getChildNodes();
-				for (int i = 0, length = children.getLength(); i < length; i++) {
-					this.collectElements((BEXNodeAdapter)children.item(i), true);
-				}
-			}
-		}
-
-		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #uri}.
-		 *
-		 * @param node Elementknoten.
-		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		final void collectElementsByUri(final BEXNodeAdapter node, final boolean self) {
-			if (node.node.type() == BEXNode.ELEM_NODE) {
-				if (self && this.uri.equals(node.node.uri())) {
-					this.list.add(node);
-				}
-				final NodeList children = node.getChildNodes();
-				for (int i = 0, length = children.getLength(); i < length; i++) {
-					this.collectElementsByUri((BEXNodeAdapter)children.item(i), true);
-				}
-			}
-		}
-
-		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #name}.
-		 *
-		 * @param node Elementknoten.
-		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		final void collectElementsByName(final BEXNodeAdapter node, final boolean self) {
-			if (node.node.type() == BEXNode.ELEM_NODE) {
-				if (self && this.name.equals(node.node.name())) {
-					this.list.add(node);
-				}
-				final NodeList children = node.getChildNodes();
-				for (int i = 0, length = children.getLength(); i < length; i++) {
-					this.collectElementsByName((BEXNodeAdapter)children.item(i), true);
-				}
-			}
-		}
-
-		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #uri} und {@link #name}.
-		 *
-		 * @param node Elementknoten.
-		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
-		final void collectElementsByLabel(final BEXNodeAdapter node, final boolean self) {
-			if (node.node.type() == BEXNode.ELEM_NODE) {
-				if (self && this.name.equals(node.node.name()) && this.uri.equals(node.node.uri())) {
-					this.list.add(node);
-				}
-				final NodeList children = node.getChildNodes();
-				for (int i = 0, length = children.getLength(); i < length; i++) {
-					this.collectElementsByLabel((BEXNodeAdapter)children.item(i), true);
-				}
-			}
-		}
-
 		/** Dieses Feld speichert die gesuchte {@link BEXNode#uri()} oder {@code "*"}. */
 		protected final String uri;
 
@@ -1534,6 +1470,70 @@ public class BEXAdapter {
 				}
 			}
 			this.size = this.list.size();
+		}
+
+		/** Diese Methode sammelt alle Elementknoten.
+		 *
+		 * @param node Elementknoten.
+		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
+		void collectElements(final BEXNodeAdapter node, final boolean self) {
+			if (node.node.type() == BEXNode.ELEM_NODE) {
+				if (self) {
+					this.list.add(node);
+				}
+				final NodeList children = node.getChildNodes();
+				for (int i = 0, length = children.getLength(); i < length; i++) {
+					this.collectElements((BEXNodeAdapter)children.item(i), true);
+				}
+			}
+		}
+
+		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #uri}.
+		 *
+		 * @param node Elementknoten.
+		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
+		void collectElementsByUri(final BEXNodeAdapter node, final boolean self) {
+			if (node.node.type() == BEXNode.ELEM_NODE) {
+				if (self && this.uri.equals(node.node.uri())) {
+					this.list.add(node);
+				}
+				final NodeList children = node.getChildNodes();
+				for (int i = 0, length = children.getLength(); i < length; i++) {
+					this.collectElementsByUri((BEXNodeAdapter)children.item(i), true);
+				}
+			}
+		}
+
+		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #name}.
+		 *
+		 * @param node Elementknoten.
+		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
+		void collectElementsByName(final BEXNodeAdapter node, final boolean self) {
+			if (node.node.type() == BEXNode.ELEM_NODE) {
+				if (self && this.name.equals(node.node.name())) {
+					this.list.add(node);
+				}
+				final NodeList children = node.getChildNodes();
+				for (int i = 0, length = children.getLength(); i < length; i++) {
+					this.collectElementsByName((BEXNodeAdapter)children.item(i), true);
+				}
+			}
+		}
+
+		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #uri} und {@link #name}.
+		 *
+		 * @param node Elementknoten.
+		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
+		void collectElementsByLabel(final BEXNodeAdapter node, final boolean self) {
+			if (node.node.type() == BEXNode.ELEM_NODE) {
+				if (self && this.name.equals(node.node.name()) && this.uri.equals(node.node.uri())) {
+					this.list.add(node);
+				}
+				final NodeList children = node.getChildNodes();
+				for (int i = 0, length = children.getLength(); i < length; i++) {
+					this.collectElementsByLabel((BEXNodeAdapter)children.item(i), true);
+				}
+			}
 		}
 
 		/** {@inheritDoc} */

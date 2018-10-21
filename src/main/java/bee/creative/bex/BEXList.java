@@ -12,7 +12,7 @@ import bee.creative.util.Objects;
 public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyList extends BEXList {
+	static class EmptyList extends BEXList {
 
 		@Override
 		public int key() {

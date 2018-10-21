@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import bee.creative.emu.EMU;
 
 /** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit beliebigen Elementen. Das {@link #contains(Object) Finden} sowie
  * {@link #add(Object) Einfügen} von Elementen benötigt ca. 60 % der Rechenzeit, die ein {@link java.util.HashSet} benötigen würde. Das {@link #remove(Object)
@@ -175,6 +176,12 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 			}
 
 		};
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.items);
 	}
 
 	/** {@inheritDoc} */

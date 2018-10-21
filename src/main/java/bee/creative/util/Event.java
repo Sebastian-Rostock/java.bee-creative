@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import bee.creative.emu.EMU;
 import bee.creative.ref.PointerQueue;
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
@@ -174,6 +175,11 @@ public abstract class Event<GMessage, GObserver> {
 		 * @param sender Ereignissender, {@link EventItem Verwaltungsdaten} oder {@code null}. */
 		public void pop(final Object sender) {
 			this.popIndexImpl(this.toKey(sender));
+		}
+
+		@Override
+		public long emu() {
+			return super.emu() + EMU.from(this.eventQueue);
 		}
 
 		@Override

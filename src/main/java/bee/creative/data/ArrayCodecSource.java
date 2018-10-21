@@ -9,7 +9,7 @@ import bee.creative.array.ByteArraySection;
 public class ArrayCodecSource<GContext> extends ArrayDataSource implements CodecSource<GContext> {
 
 	/** Dieses Feld speichert das Kontextobjekt. */
-	final GContext context;
+	protected final GContext context;
 
 	/** Dieser Konstruktor initialisiert Kontextobjekt und Nutzdaten.
 	 *
@@ -33,7 +33,7 @@ public class ArrayCodecSource<GContext> extends ArrayDataSource implements Codec
 
 	/** {@inheritDoc} */
 	@Override
-	public final GContext context() {
+	public GContext context() {
 		return this.context;
 	}
 

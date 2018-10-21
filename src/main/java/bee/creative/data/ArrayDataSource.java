@@ -3,6 +3,7 @@ package bee.creative.data;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteOrder;
+import bee.creative.array.ByteArray;
 import bee.creative.array.ByteArraySection;
 import bee.creative.util.Bytes;
 import bee.creative.util.Objects;
@@ -15,10 +16,10 @@ import bee.creative.util.Objects;
 public class ArrayDataSource extends BaseDataSource {
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final ByteArraySection data;
+	protected final ByteArraySection data;
 
 	/** Dieses Feld speichert die Leseposition. */
-	int index;
+	protected int index;
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 *
@@ -26,6 +27,14 @@ public class ArrayDataSource extends BaseDataSource {
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public ArrayDataSource(final byte... data) throws NullPointerException {
 		this.data = ByteArraySection.from(data);
+	}
+
+	/** Dieser Konstruktor initialisiert die Nutzdaten.
+	 *
+	 * @param data Nutzdaten.
+	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
+	public ArrayDataSource(final ByteArray data) throws NullPointerException {
+		this.data = data.section();
 	}
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.

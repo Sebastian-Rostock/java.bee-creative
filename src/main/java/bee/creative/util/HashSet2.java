@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.Collection;
 import java.util.Set;
+import bee.creative.emu.EMU;
 
 /** Diese Klasse erweitert ein {@link HashSet} um einen Streuwertpuffer, analog zu {@link java.util.HashSet}.
  *
@@ -126,6 +127,12 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 			}
 
 		};
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.hashes);
 	}
 
 	/** {@inheritDoc} */

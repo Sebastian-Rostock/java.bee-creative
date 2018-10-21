@@ -14,7 +14,7 @@ import bee.creative.util.Bytes;
 public class BufferDataSource extends BaseDataSource {
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final ByteBuffer data;
+	protected final ByteBuffer data;
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 *
@@ -34,7 +34,7 @@ public class BufferDataSource extends BaseDataSource {
 
 	/** {@inheritDoc} */
 	@Override
-	public final ByteBuffer data() {
+	public ByteBuffer data() {
 		return this.data;
 	}
 

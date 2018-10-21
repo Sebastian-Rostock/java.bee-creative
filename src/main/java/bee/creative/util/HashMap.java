@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
+import bee.creative.emu.EMU;
 
 /** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüssel- und Wertobjekten. Das {@link #get(Object)
  * Finden} sowie {@link #put(Object, Object) Einfügen} von Einträgen benötigt ca. 50 % der Rechenzeit, die eine {@link java.util.HashMap} benötigen würde. Das
@@ -221,6 +222,12 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 			}
 
 		};
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long emu() {
+		return super.emu() + EMU.fromArray(this.keys) + EMU.fromArray(this.values);
 	}
 
 	/** {@inheritDoc} */

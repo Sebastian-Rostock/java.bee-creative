@@ -24,7 +24,7 @@ public final class FEMHandler extends FEMValue {
 		return new FEMHandler(Objects.notNull(function));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMMethod.TYPE)}.
+	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMHandler.TYPE)}.
 	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.

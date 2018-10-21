@@ -142,7 +142,7 @@ public class CSVWriter implements Closeable, Flushable {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void writeTableImpl(final Object[][] values) throws IOException {
+	void writeTableImpl(final Object[][] values) throws IOException {
 		for (final Object[] value: values) {
 			this.writeEntryImpl(value);
 		}
@@ -160,7 +160,7 @@ public class CSVWriter implements Closeable, Flushable {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void writeEntryImpl() throws IOException {
+	void writeEntryImpl() throws IOException {
 		this.writer.write("\r\n");
 		this.ignore = true;
 	}
@@ -181,7 +181,7 @@ public class CSVWriter implements Closeable, Flushable {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void writeEntryImpl(final Object[] values) throws IOException {
+	void writeEntryImpl(final Object[] values) throws IOException {
 		this.writeValueImpl(values);
 		this.writeEntryImpl();
 	}
@@ -205,7 +205,7 @@ public class CSVWriter implements Closeable, Flushable {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void writeValueImpl(final String value) throws IOException {
+	void writeValueImpl(final String value) throws IOException {
 		final Writer target = this.writer;
 		final char quote = this.quote;
 		final char comma = this.comma;
@@ -259,7 +259,7 @@ public class CSVWriter implements Closeable, Flushable {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final void writeValueImpl(final Object... values) throws IOException, NullPointerException {
+	void writeValueImpl(final Object... values) throws IOException, NullPointerException {
 		for (final Object value: values) {
 			this.writeValueImpl(value.toString());
 		}

@@ -415,6 +415,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
+		if (items instanceof FEMArray) return (FEMArray)items;
 		return FEMArray.from(Iterables.toList(items));
 	}
 
@@ -490,6 +491,18 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			}
 		}
 		return true;
+	}
+
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMArray data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMArray> type() {
+		return FEMArray.TYPE;
 	}
 
 	/** Diese Methode konvertiert diese Wertliste in ein {@code FEMValue[]} und gibt dieses zurück.
@@ -698,24 +711,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this.customGet(index);
 	}
 
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMArray data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMArray> type() {
-		return FEMArray.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMArray result() {
-		return this;
-	}
-
 	/** {@inheritDoc} */
 	@Override
 	public FEMArray result(final boolean recursive) {
@@ -748,14 +743,14 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** {@inheritDoc} */
 	@Override
-	public final Iterator<FEMValue> iterator() {
+	public   Iterator<FEMValue> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length);
 	}
 
 	/** Diese Methode gibt die Textdarstellung zurück. Diese Besteht aus den in eckige Klammern eingeschlossenen und mit Semikolon separierten Textdarstellungen
 	 * der Elemente. */
 	@Override
-	public final String toString() {
+	public   String toString() {
 		final FEMFormatter target = new FEMFormatter();
 		FEMDomain.NORMAL.formatArray(target, this);
 		return target.format();
