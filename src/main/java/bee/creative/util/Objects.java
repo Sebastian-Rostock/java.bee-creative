@@ -336,7 +336,8 @@ public class Objects {
 		return object == null ? 0 : object.hashCode();
 	}
 
-	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
+	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Arrays oder {@code 0} zurück. Der {@link Object#hashCode() Streuwert} der
+	 * Elemente des Arrays wird über {@link Objects#hash(Object)} ermittelt.
 	 *
 	 * @see Objects#hash(Object)
 	 * @param objects Objekte oder {@code null}.
@@ -395,21 +396,6 @@ public class Objects {
 		return (prev * 0x01000193) ^ next;
 	}
 
-	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
-	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
-	 * {@link Objects#equals(Object, Object)}. Die Eingabe {@code null} wird als leere Objektliste interpretiert.
-	 *
-	 * @see Objects#equals(Object, Object)
-	 * @param objects Objekte oder {@code null}.
-	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte. */
-	public static boolean equals(final Object... objects) {
-		if (objects == null) return true;
-		for (int i = 0, size = objects.length; i < size; i += 2) {
-			if (!Objects.equals(objects[i], objects[i + 1])) return false;
-		}
-		return true;
-	}
-
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Der Rückgabewert
 	 * entspricht: <pre>
 	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))
@@ -423,7 +409,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
-	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird über {@link Objects#equals(Object, Object)} ermittelt.
+	 * {@link Object#equals(Object) Äquivalenz} der Elemente der Arrays wird über {@link Objects#equals(Object, Object)} ermittelt.
 	 *
 	 * @see Objects#equals(Object, Object)
 	 * @param objects1 Array 1 oder {@code null}.
@@ -441,7 +427,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
-	 * aus der Hilfsklasse {@link Arrays} verwendet.
+	 * aus der Hilfsklasse {@link Arrays} bzw. {@link #deepHash(Object...)} verwendet.
 	 *
 	 * @see Arrays#hashCode(int[])
 	 * @see Arrays#hashCode(long[])
@@ -451,7 +437,6 @@ public class Objects {
 	 * @see Arrays#hashCode(float[])
 	 * @see Arrays#hashCode(double[])
 	 * @see Arrays#hashCode(boolean[])
-	 * @see Objects#deepHash(Object...)
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int deepHash(final Object object) {
@@ -469,10 +454,9 @@ public class Objects {
 		return Objects.deepHash((Object[])object);
 	}
 
-	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
-	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 *
-	 * @see Objects#deepHash(Object)
+	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Arrays oder {@code 0} zurück. Der {@link Object#hashCode() Streuwert} der
+	 * Elemente des Arrays wird über {@link Objects#deepHash(Object)} ermittelt.
+	 * 
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int deepHash(final Object... objects) {
@@ -509,27 +493,9 @@ public class Objects {
 		return Objects.hashPush(Objects.deepHash(object1, object2), Objects.deepHash(object3));
 	}
 
-	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
-	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
-	 * {@link Objects#deepEquals(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet. Die Eingabe
-	 * {@code null} wird als leere Objektliste interpretiert.
-	 *
-	 * @see Objects#deepEquals(Object, Object)
-	 * @param objects Objekte oder {@code null}.
-	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte. */
-	public static boolean deepEquals(final Object... objects) {
-		if (objects == null) return true;
-		for (int i = 0, size = objects.length; i < size; i += 2) {
-			if (!Objects.deepEquals(objects[i], objects[i + 1])) return false;
-		}
-		return true;
-	}
-
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben und Arrays. Für
 	 * Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet. Wenn beide Objekte keine Arrays sind, entspricht der
-	 * Rückgabewert: <pre>
-	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))
-	 * </pre>
+	 * Rückgabewert dem von {@link #equals(Object, Object)}.
 	 *
 	 * @see Arrays#equals(int[], int[])
 	 * @see Arrays#equals(long[], long[])
@@ -562,8 +528,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
-	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird über {@link Objects#deepEquals(Object, Object)} ermittelt. Für Arrays
-	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * {@link Object#equals(Object) Äquivalenz} der Elemente der Arrays wird über {@link Objects#deepEquals(Object, Object)} ermittelt.
 	 *
 	 * @see Objects#deepEquals(Object, Object)
 	 * @param objects1 Array 1 oder {@code null}.
@@ -576,6 +541,23 @@ public class Objects {
 		if (length != objects2.length) return false;
 		for (int i = 0; i < length; i++) {
 			if (!Objects.deepEquals(objects1[i], objects2[i])) return false;
+		}
+		return true;
+	}
+
+	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
+	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird über {@coe ==} ermittelt.
+	 *
+	 * @param objects1 Array 1 oder {@code null}.
+	 * @param objects2 Array 2 oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
+	public static boolean identityEquals(final Object[] objects1, final Object[] objects2) {
+		if (objects1 == objects2) return true;
+		if ((objects1 == null) || (objects2 == null)) return false;
+		final int length = objects1.length;
+		if (length != objects2.length) return false;
+		for (int i = 0; i < length; i++) {
+			if (objects1[i] != objects2[i]) return false;
 		}
 		return true;
 	}

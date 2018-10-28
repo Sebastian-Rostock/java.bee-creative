@@ -1426,16 +1426,16 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		this.length = length;
 	}
 
-	/** Diese Methode gibt den {@code index}-ten Codepoint zurück.
-	 *
+	/** Diese Methode gibt den {@code index}-ten Codepoint zurück. Sie Implementiert {@link #get(int)} ohne Wertebereichsprüfung.
+	 * 
 	 * @param index Index.
 	 * @return {@code index}-ter Codepoint. */
 	protected int customGet(final int index) {
 		return 0;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück. Die Suche beginnt an der gegebenen
-	 * Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück. Sie Implementiert
+	 * {@link #find(int, int)} ohne Wertebereichsprüfung.
 	 *
 	 * @param that gesuchtes Zeichen.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
@@ -1446,9 +1446,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return finder.index + offset;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück. Die Suche beginnt an der gegebenen
-	 * Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
-	 *
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück. *Sie Implementiert
+	 * {@link #find(FEMString, int)} ohne Wertebereichsprüfung.
+	 * 
 	 * @param that gesuchte Zeichenkette.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Zeichenkette ({@code offset..this.length()-that.length()}) oder {@code -1}. */
@@ -1590,8 +1590,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @return Position des ersten Vorkommens des gegebenen Zeichens ({@code offset..this.length()-1}) oder {@code -1}.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final int that, final int offset) throws IllegalArgumentException {
-		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
 		if (offset == this.length) return -1;
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
 		return this.customFind(that, offset);
 	}
 

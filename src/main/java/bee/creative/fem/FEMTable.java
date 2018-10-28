@@ -1,114 +1,131 @@
 package bee.creative.fem;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
-import bee.creative.util.AbstractHashData;
-import bee.creative.util.Builders.MapBuilder;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Getter;
 import bee.creative.util.HashMap;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert eine abstrakte, unveränderliche Tabelle mit einer Schlüssel- und einer Wertspalte als {@link FEMValue}-Variante einer
- * {@link Map}. Der {@link Entry#getValue() Wert} zu einem {@link Entry#getKey() Schlüssel} kann über {@link #get(FEMValue)} ermittelt werden.
+/** Diese Klasse implementiert eine unveränderliche Abbildung von Schlüsseln auf Werte als Tabelle mit einer Schlüssel- und einer Wertspalte. Sie dient der
+ * effizienten {@link #find(FEMValue) Suche} eines Schlüssels bzw. {@link #get(FEMValue) Ermittlung} des einem Schlüssel zugeordnenten Werts. Dieser Wert
+ * befindet sich in der {@link #values() Wertspalte} an der Position, an der sich der Schlüssel in der {@link #keys() Schlüsselspalte} befindet.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue, FEMValue>>, Getter<FEMValue, FEMValue>, Iterable<Entry<FEMValue, FEMValue>> {
+public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Getter<FEMValue, FEMValue>, Iterable<FEMArray> {
 
 	@SuppressWarnings ("javadoc")
-	public static final class HashTable extends FEMTable implements Emuable {
+	static class TableEntry extends FEMArray {
+
+		public final FEMValue key;
+
+		public final FEMValue value;
+
+		public TableEntry(final FEMValue key, final FEMValue value) {
+			super(2);
+			this.key = key;
+			this.value = value;
+		}
+
+		@Override
+		protected FEMValue customGet(final int index) {
+			return index == 0 ? this.key : this.value;
+		}
+
+		@Override
+		public FEMArray compact() {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static final class CompactTable extends FEMTable implements Emuable {
 
 		static class Keys extends FEMArray {
 
 			final Entries entries;
 
-			Keys(final Entries entries) throws IllegalArgumentException {
+			Keys(final Entries entries) {
 				super(entries.size());
 				this.entries = entries;
 			}
 
 			@Override
 			protected FEMValue customGet(final int index) {
-				return this.entries.keysGetImpl(index);
+				return this.entries.getKey(index);
 			}
 
 			@Override
-			public FEMArray compact() {
-				return this;
+			protected int customFind(final FEMValue that, final int offset) {
+				final int result = this.entries.findKey(that);
+				return result < offset ? -1 : result;
 			}
 
 		}
 
 		static class Values extends Keys {
 
-			Values(final Entries entries) throws IllegalArgumentException {
+			Values(final Entries entries) {
 				super(entries);
 			}
 
 			@Override
 			protected FEMValue customGet(final int index) {
-				return this.entries.valuesGetImpl(index);
+				return this.entries.getValue(index);
 			}
 
 		}
 
 		static class Entries extends HashMap<FEMValue, FEMValue> {
 
-			private static final long serialVersionUID = 4632797606591182579L;
+			private static final long serialVersionUID = -7608213911033741973L;
 
-			FEMValue keysGetImpl(final int index) {
+			public Entries() {
+			}
+
+			public Entries(final int capacity, final Iterable<? extends FEMArray> entries) throws NullPointerException, IllegalArgumentException {
+				super(capacity);
+				for (final FEMArray entry: entries) {
+					if (entry.length() != 2) throw new IllegalArgumentException();
+					this.put(entry.customGet(0).result(true), entry.customGet(1));
+				}
+				this.compact();
+			}
+
+			public Entries(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
+				super(entries.size());
+				for (final Entry<? extends FEMValue, ? extends FEMValue> entry: entries.entrySet()) {
+					this.put(entry.getKey().result(true), entry.getValue());
+				}
+				this.compact();
+			}
+
+			FEMValue getKey(final int index) {
 				return this.customGetKey(index);
 			}
 
-			FEMValue valuesGetImpl(final int index) {
+			FEMValue getValue(final int index) {
 				return this.customGetValue(index);
 			}
 
-			Entry<FEMValue, FEMValue> tableGetImpl(final int index) {
-				if ((index < 0) || (index >= this.countImpl())) throw new IllegalArgumentException();
-				return new HashEntry2<>(this, index);
-			}
-
-			int tableFindImpl(final FEMValue key) {
-				return super.getIndexImpl(key);
+			int findKey(final FEMValue key) {
+				return this.getIndexImpl(key);
 			}
 
 		}
 
-		public final FEMArray keys;
+		public final Keys keys;
 
-		public final FEMArray values;
+		public final Values values;
 
-		final Entries entries = new Entries();
-
-		HashTable(final Iterable<? extends Entry<? extends FEMValue, ? extends FEMValue>> entries) {
-			for (final Entry<? extends FEMValue, ? extends FEMValue> entry: entries) {
-				this.entries.put(entry.getKey().result(true), entry.getValue());
-			}
-			this.entries.compact();
-			this.keys = new Keys(this.entries);
-			this.values = new Values(this.entries);
-		}
-
-		@Override
-		public Entry<FEMValue, FEMValue> get(final int index) {
-			if ((index < 0) || (index >= this.length())) throw new IndexOutOfBoundsException();
-			return this.entries.tableGetImpl(index);
-		}
-
-		@Override
-		public FEMValue get(final FEMValue key) {
-			return this.entries.get(key.result());
-		}
-
-		@Override
-		public int find(final FEMValue key) throws NullPointerException {
-			return this.entries.tableFindImpl(key.result());
+		CompactTable(final Entries entries) {
+			this.keys = new Keys(entries);
+			this.values = new Values(entries);
 		}
 
 		@Override
@@ -122,13 +139,13 @@ public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue,
 		}
 
 		@Override
-		public int length() {
-			return this.keys.length;
+		public FEMTable compact() {
+			return this;
 		}
 
 		@Override
 		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.keys) + EMU.from(this.values) + EMU.from(this.entries);
+			return EMU.fromObject(this) + EMU.from(this.keys) + EMU.from(this.values) + this.keys.entries.emu();
 		}
 
 	}
@@ -140,26 +157,10 @@ public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue,
 
 		public final FEMArray values;
 
-		CompositeTable(final FEMArray keys, final FEMArray values) {
+		CompositeTable(final FEMArray keys, final FEMArray values) throws IllegalArgumentException {
 			if (keys.length() != values.length()) throw new IllegalArgumentException();
 			this.keys = keys;
 			this.values = values;
-		}
-
-		@Override
-		public Entry<FEMValue, FEMValue> get(final int index) throws IndexOutOfBoundsException {
-			return new SimpleImmutableEntry<>(this.keys.get(index), this.values.get(index));
-		}
-
-		@Override
-		public FEMValue get(final FEMValue key) {
-			final int index = this.find(key);
-			return index < 0 ? null : this.values.get(index);
-		}
-
-		@Override
-		public int find(final FEMValue key) throws NullPointerException {
-			return this.keys.find(key, 0);
 		}
 
 		@Override
@@ -170,11 +171,6 @@ public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue,
 		@Override
 		public FEMArray values() {
 			return this.values;
-		}
-
-		@Override
-		public int length() {
-			return this.keys.length;
 		}
 
 		@Override
@@ -193,24 +189,28 @@ public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue,
 	/** Dieses Feld speichert die Dezimalzahl {@code 0}. */
 	public static final FEMTable EMPTY = FEMTable.from(FEMArray.EMPTY, FEMArray.EMPTY);
 
-	public static FEMTable from(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
-		return new HashTable(entries.entrySet());
-	}
-
-	public static FEMTable from(final Iterable<? extends Entry<? extends FEMValue, ? extends FEMValue>> entries) throws NullPointerException {
+	public static FEMTable from(final Iterable<? extends FEMArray> entries) throws NullPointerException, IllegalArgumentException {
 		if (entries instanceof FEMTable) return (FEMTable)entries;
-		return new HashTable(entries);
+		return new CompactTable(new CompactTable.Entries(0, entries));
 	}
 
-	/* Diese Methode gibt eine Tabelle mit den gegebenen Spalten zurück.
+	public static FEMTable from(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
+		return new CompactTable(new CompactTable.Entries(entries));
+	}
+
+	/** Diese Methode gibt eine aus den gegebenen Schlüssel- und Wertspalten zusammengesetzte Tabelle zurück. Die Reihenfolge der Elemente in den Spalten wird
+	 * nicht verändert und Duplikate in der Schlüsselspalte werden ignoriert.
 	 *
 	 * @param keys Schlüsselspalte.
-	 * @param values Wertspalte. */
+	 * @param values Wertspalte.
+	 * @return {@code composite}-{@link FEMTable}.
+	 * @throws NullPointerException Wenn {@code keys} bzw. {@code values} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Spalten unterschiedlich lang sind. */
 	public static FEMTable from(final FEMArray keys, final FEMArray values) throws NullPointerException, IllegalArgumentException {
 		return new CompositeTable(keys, values);
 	}
 
-	/* Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMTable.TYPE)}.
+	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMTable.TYPE)}.
 	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
@@ -220,25 +220,45 @@ public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue,
 		return context.dataFrom(value, FEMTable.TYPE);
 	}
 
-	/** Diese Methode gibt den {@code index}-ten Eintrag zurück. Dieser ist nicht veränderbar.
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMTable data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMTable> type() {
+		return FEMTable.TYPE;
+	}
+
+	/** Diese Methode gibt den {@code index}-ten Eintrag als Wertliste aus Schlüssel und Wert zurück. Die gelieferte Wertliste entspricht damit
+	 * {@code FEMArray.from(this.keys().get(index), this.values().get(index))}.
 	 *
 	 * @return {@code index}-ter Eintrag. */
 	@Override
-	public abstract Entry<FEMValue, FEMValue> get(final int index) throws IndexOutOfBoundsException;
+	public FEMArray get(final int index) throws IndexOutOfBoundsException {
+		return new TableEntry(this.keys().get(index), this.values().get(index));
+	}
 
 	/** Diese Methode gibt den Wert des Eintrags mit dem gegebenen Schlüssel zurück. Wenn kein solcher Eintrag existiert, wird {@code null} geliefert.
 	 *
 	 * @param key gesuchter Schlüssel. */
 	@Override
-	public abstract FEMValue get(final FEMValue key) throws NullPointerException;
+	public FEMValue get(final FEMValue key) throws NullPointerException {
+		final int index = this.find(key);
+		return index < 0 ? null : this.values().get(index);
+	}
 
-	/** Diese Methode gibt den Index des Eintrags mit dem gegebenen Schlüssel zurück. Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert.
+	/** Diese Methode gibt den Index des Eintrags mit dem gegebenen Schlüssel zurück. Wenn kein solcher Eintrag existiert, wird {@code -1} geliefert. Die
+	 * gelieferte Position entspricht damit {@code this.keys().find(key, 0)}.
 	 *
-	 * @see FEMArray#find(FEMValue, int)
 	 * @param key gesuchter Schlüssel.
-	 * @return Position des gesuchten Schlüssels in {@link #keys()} oder {@code -1}.
+	 * @return Position des gesuchten Schlüssels oder {@code -1}.
 	 * @throws NullPointerException Wenn {@code key} {@code null} ist. */
-	public abstract int find(final FEMValue key) throws NullPointerException;
+	public int find(final FEMValue key) throws NullPointerException {
+		return this.keys().find(key, 0);
+	}
 
 	/** Diese Methode gibt die Liste der {@link Entry#getKey() Schlüssel} der {@link #get(int) Einträge} zurück. Die Ordnugn der Schlüssel entspricht der der
 	 * Einträge.
@@ -254,7 +274,13 @@ public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue,
 	/** Diese Methode gibt die Länge, d.h. die Anzahl der Einträge in der Tabelle zurück.
 	 *
 	 * @return Länge der Tabelle. */
-	public abstract int length();
+	public int length() {
+		return this.keys().length();
+	}
+
+	public FEMTable compact() {
+		return new CompactTable(new CompactTable.Entries(this.length(), this));
+	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
@@ -271,18 +297,6 @@ public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue,
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMTable that) throws NullPointerException {
 		return (this.length() == that.length()) && Objects.equals(this.keys(), that.keys()) && Objects.equals(this.values(), that.values());
-	}
-
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMTable data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMTable> type() {
-		return FEMTable.TYPE;
 	}
 
 	/** {@inheritDoc} */
@@ -305,15 +319,15 @@ public abstract class FEMTable extends FEMValue implements Items<Entry<FEMValue,
 
 	/** {@inheritDoc} */
 	@Override
-	public Iterator<Entry<FEMValue, FEMValue>> iterator() {
+	public Iterator<FEMArray> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length());
 	}
 
-	/** Diese Methode gibt die Einträge dieser Tabelle als {@link HashMap} zurück.
+	/** Diese Methode gibt die {@link #get(int) Einträge} dieser Tabelle als {@link HashMap} zurück.
 	 *
 	 * @return neue {@link HashMap} mit den Einträge dieser Tabelle. */
 	public Map<FEMValue, FEMValue> toMap() {
-		return MapBuilder.<FEMValue, FEMValue>forHashMap().putAll(this).get();
+		return new CompactTable.Entries(this.length(), this);
 	}
 
 	/** {@inheritDoc} */

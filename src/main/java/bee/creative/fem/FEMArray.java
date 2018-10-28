@@ -14,7 +14,7 @@ import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
-/** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
+/** Diese Klasse implementiert eine unveränderliche Auflistung von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iterable<FEMValue>, UseToString {
@@ -31,13 +31,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ValueFinder implements Collector {
+	static final class ItemFinder implements Collector {
 
 		public final FEMValue that;
 
 		public int index;
 
-		ValueFinder(final FEMValue that) {
+		ItemFinder(final FEMValue that) {
 			this.that = that;
 		}
 
@@ -472,6 +472,45 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return null;
 	}
 
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück. Sie Implementiert
+	 * {@link #find(FEMValue, int)} ohne Wertebereichsprüfung.
+	 *
+	 * @param that gesuchter Wert.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens des gegebenen Werts ({@code offset..this.length()-1}) oder {@code -1}. */
+	protected int customFind(final FEMValue that, final int offset) {
+		final ItemFinder finder = new ItemFinder(that);
+		if (this.customExtract(finder, offset, this.length - offset, true)) return -1;
+		return finder.index + offset;
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück. Sie Implementiert
+	 * {@link #find(FEMArray, int)} ohne Wertebereichsprüfung.
+	 * 
+	 * @param that gesuchte Wertliste.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens der gegebene Wertliste ({@code offset..this.length()-that.length()}) oder {@code -1}.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	protected int customFind(final FEMArray that, final int offset) {
+		final int count = that.length;
+		if (count == 1) return this.find(that.customGet(0), offset);
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
+		if (count == 0) return offset;
+		final FEMValue value = that.customGet(0);
+		final int length = (this.length - count) + 1;
+		FIND: for (int i = offset; i < length; i++) {
+			if (value.equals(this.customGet(i))) {
+				for (int i2 = 1; i2 < count; i2++) {
+					if (!this.customGet(i + i2).equals(that.customGet(i2))) {
+						continue FIND;
+					}
+				}
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an. Das Anfügen wird
 	 * vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 *
@@ -576,14 +615,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param that gesuchter Wert.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens des gegebenen Werts ({@code offset..this.length()-1}) oder {@code -1}.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
-	public final int find(final FEMValue that, final int offset) throws IllegalArgumentException {
-		final int length = this.length - offset;
-		if (length == 0) return -1;
-		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
-		final ValueFinder finder = new ValueFinder(that);
-		if (this.customExtract(finder, offset, length, true)) return -1;
-		return finder.index + offset;
+	public final int find(final FEMValue that, final int offset) throws NullPointerException, IllegalArgumentException {
+		if (offset == this.length) return -1;
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
+		return this.customFind(Objects.notNull(that), offset);
+
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück. Die Suche beginnt an der gegebenen
@@ -595,23 +633,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMArray that, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int count = that.length;
-		if (count == 1) return this.find(that.customGet(0), offset);
 		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
-		if (count == 0) return offset;
-		final FEMValue value = that.customGet(0);
-		final int length = (this.length - count) + 1;
-		FIND: for (int i = offset; i < length; i++) {
-			if (value.equals(this.customGet(i))) {
-				for (int i2 = 1; i2 < count; i2++) {
-					if (!this.customGet(i + i2).equals(that.customGet(i2))) {
-						continue FIND;
-					}
-				}
-				return i;
-			}
-		}
-		return -1;
+		if (that.length == 0) return offset;
+		if (that.length == 1) return this.customFind(that.customGet(0), offset);
+		if (that.length > (this.length - offset)) return -1;
+		return this.customFind(that, offset);
 	}
 
 	/** Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig
@@ -743,14 +769,14 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** {@inheritDoc} */
 	@Override
-	public   Iterator<FEMValue> iterator() {
+	public Iterator<FEMValue> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length);
 	}
 
 	/** Diese Methode gibt die Textdarstellung zurück. Diese Besteht aus den in eckige Klammern eingeschlossenen und mit Semikolon separierten Textdarstellungen
 	 * der Elemente. */
 	@Override
-	public   String toString() {
+	public String toString() {
 		final FEMFormatter target = new FEMFormatter();
 		FEMDomain.NORMAL.formatArray(target, this);
 		return target.format();
