@@ -9,6 +9,7 @@ import bee.creative.iam.IAMArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 import bee.creative.util.Iterables;
+import bee.creative.util.Iterators.BaseIterator;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
@@ -44,7 +45,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ItemFinder implements Collector {
+	static class ItemFinder implements Collector {
 
 		public final int that;
 
@@ -55,7 +56,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			if (value == this.that) return false;
 			this.index++;
 			return true;
@@ -64,7 +65,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ValueFinder implements Collector {
+	static class ValueFinder implements Collector {
 
 		public final int[] that;
 
@@ -78,7 +79,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			int offset = this.offset;
 			final int[] array = this.that;
 			if (array[offset] == value) {
@@ -105,12 +106,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class HashCollector implements Collector {
+	static class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			this.hash = Objects.hashPush(this.hash, value);
 			return true;
 		}
@@ -118,12 +119,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class RangeCollector implements Collector {
+	static class RangeCollector implements Collector {
 
 		public int range;
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			this.range |= value;
 			return true;
 		}
@@ -131,7 +132,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class INT8Encoder implements Collector {
+	static class INT8Encoder implements Collector {
 
 		public final byte[] array;
 
@@ -143,7 +144,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			this.array[this.index++] = value < 256 ? (byte)value : 0;
 			return true;
@@ -152,7 +153,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class INT16Encoder implements Collector {
+	static class INT16Encoder implements Collector {
 
 		public final char[] array;
 
@@ -164,7 +165,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			this.array[this.index++] = value < 65536 ? (char)value : 0;
 			return true;
@@ -173,7 +174,28 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF32Encoder implements Collector {
+	static class INT16Encoder2 implements Collector {
+
+		public final short[] array;
+
+		public int index;
+
+		INT16Encoder2(final short[] array, final int index) {
+			this.array = array;
+			this.index = index;
+		}
+
+		@Override
+		public boolean push(final int value) {
+			if (value < 0) throw new IllegalArgumentException();
+			this.array[this.index++] = value < 65536 ? (short)value : 0;
+			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static class UTF32Encoder implements Collector {
 
 		public final int[] array;
 
@@ -185,7 +207,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			this.array[this.index++] = value;
 			return true;
@@ -194,12 +216,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF8Counter implements Collector {
+	static class UTF8Counter implements Collector {
 
 		public int count;
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			if (value < 128) {
 				this.count += 1;
@@ -216,7 +238,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF8Encoder implements Collector {
+	static class UTF8Encoder implements Collector {
 
 		public final byte[] array;
 
@@ -228,7 +250,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			int index = this.index;
 			if (value < 128) {
@@ -253,12 +275,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF16Counter implements Collector {
+	static class UTF16Counter implements Collector {
 
 		public int count;
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			if (value < 65536) {
 				this.count += 1;
@@ -271,7 +293,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF16Encoder implements Collector {
+	static class UTF16Encoder implements Collector {
 
 		public final char[] array;
 
@@ -283,7 +305,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final boolean push(final int value) {
+		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			final int value2 = value - 65536;
 			int index = this.index;
@@ -300,7 +322,36 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ArrayString extends FEMString {
+	static class UTF16Encoder2 implements Collector {
+
+		public final short[] array;
+
+		public int index;
+
+		UTF16Encoder2(final short[] array, final int index) {
+			this.array = array;
+			this.index = index;
+		}
+
+		@Override
+		public boolean push(final int value) {
+			if (value < 0) throw new IllegalArgumentException();
+			final int value2 = value - 65536;
+			int index = this.index;
+			if (value2 < 0) {
+				this.array[index++] = (short)value;
+			} else {
+				this.array[index++] = (short)(55296 | (value2 >> 10));
+				this.array[index++] = (short)(56320 | (value2 & 1023));
+			}
+			this.index = index;
+			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class ArrayString extends FEMString {
 
 		public final IAMArray array;
 
@@ -311,7 +362,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.array.get(index + 1);
 		}
 
@@ -323,30 +374,30 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ArrayStringINT8 extends FEMString {
+	public static class ArrayStringINT8 extends FEMString {
 
 		public final IAMArray array;
 
 		ArrayStringINT8(final IAMArray array) {
 			super(array.length() - 5);
 			this.array = array;
-			this.hash = Integers.toInt(Integers.toShort(array.get(3), array.get(2)), Integers.toShort(array.get(1), array.get(0)));
+			this.hash = Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0));
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.array.get(index + 4) & 255;
 		}
 
 		@Override
-		public final FEMString compact() {
+		public FEMString compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ArrayStringINT16 extends FEMString {
+	public static class ArrayStringINT16 extends FEMString {
 
 		public final IAMArray array;
 
@@ -357,7 +408,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.array.get(index + 2) & 65535;
 		}
 
@@ -369,18 +420,18 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ArrayStringUTF8 extends FEMString {
+	public static class ArrayStringUTF8 extends FEMString {
 
 		public final IAMArray array;
 
 		ArrayStringUTF8(final IAMArray array) {
-			super(Integers.toInt(Integers.toShort(array.get(7), array.get(6)), Integers.toShort(array.get(5), array.get(4))));
+			super(Integers.toInt(array.get(7), array.get(6), array.get(5), array.get(4)));
 			this.array = array;
-			this.hash = Integers.toInt(Integers.toShort(array.get(3), array.get(2)), Integers.toShort(array.get(1), array.get(0)));
+			this.hash = Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0));
 		}
 
 		@Override
-		protected final int customGet(int index) throws IndexOutOfBoundsException {
+		protected int customGet(int index) throws IndexOutOfBoundsException {
 			int offset = 8;
 			while (index > 0) {
 				index--;
@@ -390,7 +441,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 8;
 				while (offset > 0) {
@@ -421,7 +472,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ArrayStringUTF16 extends FEMString {
+	public static class ArrayStringUTF16 extends FEMString {
 
 		public final IAMArray array;
 
@@ -432,7 +483,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(int index) throws IndexOutOfBoundsException {
+		protected int customGet(int index) throws IndexOutOfBoundsException {
 			int offset = 4;
 			while (index > 0) {
 				index--;
@@ -442,7 +493,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 4;
 				while (offset > 0) {
@@ -473,26 +524,26 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class EmptyString extends FEMString {
+	public static class EmptyString extends FEMString {
 
 		EmptyString() {
 			super(0);
 		}
 
 		@Override
-		public final FEMString reverse() {
+		public FEMString reverse() {
 			return this;
 		}
 
 		@Override
-		public final FEMString compact() {
+		public FEMString compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatString extends FEMString implements Emuable {
+	public static class ConcatString extends FEMString implements Emuable {
 
 		public final FEMString string1;
 
@@ -505,13 +556,13 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.string1.length;
 			return index2 < 0 ? this.string1.customGet(index) : this.string2.customGet(index2);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			final int offset2 = offset - this.string1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.string2.customExtract(target, offset2, length, foreward);
 			if (length2 <= 0) return this.string1.customExtract(target, offset, length, foreward);
@@ -525,12 +576,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.string1) + EMU.from(this.string2);
 		}
 
 		@Override
-		public final FEMString section(final int offset, final int length) throws IllegalArgumentException {
+		public FEMString section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this.string1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.string2.section(offset2, length);
 			if (length2 <= 0) return this.string1.section(offset, length);
@@ -540,7 +591,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class SectionString extends FEMString implements Emuable {
+	public static class SectionString extends FEMString implements Emuable {
 
 		public final FEMString string;
 
@@ -553,29 +604,29 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.string.customGet(index + this.offset);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
 			return this.string.customExtract(target, this.offset + offset2, length2, foreward);
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.string);
 		}
 
 		@Override
-		public final FEMString section(final int offset2, final int length2) throws IllegalArgumentException {
+		public FEMString section(final int offset2, final int length2) throws IllegalArgumentException {
 			return this.string.section(this.offset + offset2, length2);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ReverseString extends FEMString implements Emuable {
+	public static class ReverseString extends FEMString implements Emuable {
 
 		public final FEMString string;
 
@@ -585,39 +636,39 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.string.customGet(this.length - index - 1);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.string.customExtract(target, offset, length, !foreward);
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.string);
 		}
 
 		@Override
-		public final FEMString concat(final FEMString value) throws NullPointerException {
+		public FEMString concat(final FEMString value) throws NullPointerException {
 			return value.reverse().concat(this.string).reverse();
 		}
 
 		@Override
-		public final FEMString section(final int offset, final int length2) throws IllegalArgumentException {
+		public FEMString section(final int offset, final int length2) throws IllegalArgumentException {
 			return this.string.section(this.length - offset - length2, length2).reverse();
 		}
 
 		@Override
-		public final FEMString reverse() {
+		public FEMString reverse() {
 			return this.string;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class UniformString extends FEMString {
+	public static class UniformString extends FEMString {
 
 		public final int item;
 
@@ -627,12 +678,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.item;
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
 				if (!target.push(this.item)) return false;
 				length--;
@@ -641,19 +692,19 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final FEMString reverse() {
+		public FEMString reverse() {
 			return this;
 		}
 
 		@Override
-		public final FEMString compact() {
+		public FEMString compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactString extends FEMString implements Emuable {
+	public static class CompactString extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
 		final int[] items;
@@ -664,22 +715,22 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.items);
 		}
 
 		@Override
-		public final FEMString compact() {
+		public FEMString compact() {
 			return this;
 		}
 
 		@Override
-		public final FEMString compactINT32() {
+		public FEMString compactINT32() {
 			return this;
 		}
 
@@ -691,7 +742,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactStringINT8 extends FEMString implements Emuable {
+	public static class CompactStringINT8 extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
 		final byte[] items;
@@ -702,17 +753,17 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index] & 255;
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.items);
 		}
 
 		@Override
-		public final FEMString compact() {
+		public FEMString compact() {
 			return this;
 		}
 
@@ -730,7 +781,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactStringINT16 extends FEMString implements Emuable {
+	public static class CompactStringINT16 extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
 		final char[] items;
@@ -741,17 +792,17 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(final int index) throws IndexOutOfBoundsException {
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.items);
 		}
 
 		@Override
-		public final FEMString compact() {
+		public FEMString compact() {
 			return this;
 		}
 
@@ -769,7 +820,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactStringUTF8 extends FEMString implements Emuable {
+	public static class CompactStringUTF8 extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der UTF-8-Token, das nicht verändert werden sollte. */
 		final byte[] items;
@@ -781,7 +832,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(int index) throws IndexOutOfBoundsException {
+		protected int customGet(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
@@ -791,7 +842,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
@@ -820,7 +871,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.items);
 		}
 
@@ -832,7 +883,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactStringUTF16 extends FEMString implements Emuable {
+	public static class CompactStringUTF16 extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der UTF-16-Token, das nicht verändert werden sollte. */
 		final char[] items;
@@ -844,7 +895,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final int customGet(int index) throws IndexOutOfBoundsException {
+		protected int customGet(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
@@ -854,7 +905,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
@@ -883,7 +934,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.items);
 		}
 
@@ -1158,8 +1209,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeichenkette und gibt diese zurück. Bei der Kodierung mit Einzelwerten werden die ersten vier
 	 * Byte der Zahlenfolge als {@link #hash() Streuwert}, die darauf folgenden Zahlenwerte als Auflistung der einzelwertkodierten Codepoints und der letzte
 	 * Zahlenwert als abschließende {@code 0} interpretiert. Bei der Mehrwertkodierung werden dagegen die ersten vier Byte der Zahlenfolge als {@link #hash()
-	 * Streuwert}, die nächsten die darauf folgenden Zahlenwerte als Auflistung der mehrwertkodierten Codepoints und der letzte Zahlenwert als abschließende
-	 * {@code 0} interpretiert. Ob eine 8-, 16- oder 32-Bit-Kodierung eingesetzt wird, hängt von der {@link IAMArray#mode() Größe der Zahlenwerte} ab.
+	 * Streuwert}, die nächsten vier Byte als {@link #length() Zeichenanzahl}, die darauf folgenden Zahlenwerte als Auflistung der mehrwertkodierten Codepoints
+	 * und der letzte Zahlenwert als abschließende {@code 0} interpretiert. Ob eine 8-, 16- oder 32-Bit-Kodierung eingesetzt wird, hängt von der
+	 * {@link IAMArray#mode() Größe der Zahlenwerte} ab.
 	 *
 	 * @param array Zahlenfolge.
 	 * @param asUTFx {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
@@ -1427,7 +1479,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	/** Diese Methode gibt den {@code index}-ten Codepoint zurück. Sie Implementiert {@link #get(int)} ohne Wertebereichsprüfung.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Codepoint. */
 	protected int customGet(final int index) {
@@ -1448,7 +1500,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück. *Sie Implementiert
 	 * {@link #find(FEMString, int)} ohne Wertebereichsprüfung.
-	 * 
+	 *
 	 * @param that gesuchte Zeichenkette.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Zeichenkette ({@code offset..this.length()-that.length()}) oder {@code -1}. */
@@ -1483,7 +1535,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *
 	 * @see #toInts()
 	 * @return Array mit den Codepoints. */
-	public final int[] value() {
+	public int[] value() {
 		return this.toInts();
 	}
 
@@ -1543,15 +1595,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	/** Diese Methode gibt die {@link #value() Codepoints dieser Zeichenkette} in einer performanteren oder zumindest gleichwertigen Zeichenkette mit möglichst
-	 * geringerem Speicherverbrauch zurück. Abhängig vom Wertebereich der Codepoints kann hierfür eine {@link #compactINT8() 8-Bit-}, {@link #compactINT16()
-	 * 16-Bit-} oder {@link #compactINT32() 32-Bit-}Einzelwertkodierung zum Einsatz kommen.
+	 * geringerem Speicherverbrauch zurück. Abhängig vom Wertebereich der Codepoints kann hierfür eine {@link #compactINT8() 8-Bit}-, {@link #compactINT16()
+	 * 16-Bit}- oder {@link #compactINT32() 32-Bit}-Einzelwertkodierung zum Einsatz kommen.
 	 *
 	 * @return performanteren Zeichenkette oder {@code this}. */
 	public FEMString compact() {
-		final RangeCollector finder = new RangeCollector();
-		this.extract(finder);
-		if (finder.range < 256) return this.compactINT8();
-		if (finder.range < 65536) return this.compactINT16();
+		final RangeCollector collector = new RangeCollector();
+		this.extract(collector);
+		if (collector.range < 256) return this.compactINT8();
+		if (collector.range < 65536) return this.compactINT16();
 		return this.compactINT32();
 	}
 
@@ -1630,7 +1682,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param offset Beginn des Abschnitts.
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschitt außerhalb des gegebenen Arrays liegt. */
-	public final void extract(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+	public void extract(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || ((offset + this.length) > result.length)) throw new IllegalArgumentException();
 		this.extract(new UTF32Encoder(result, offset));
 	}
@@ -1652,7 +1704,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param that Zeichenkette.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMString that) throws NullPointerException {
+	public boolean equals(final FEMString that) throws NullPointerException {
 		final int length = this.length;
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;
@@ -1669,7 +1721,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param that Zeichenkette.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final int compare(final FEMString that) throws NullPointerException {
+	public int compare(final FEMString that) throws NullPointerException {
 		final int length = Math.min(this.length, that.length);
 		// TODO schneller
 		for (int i = 0; i < length; i++) {
@@ -1755,12 +1807,47 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return encoder.array;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code toArray(mode, false)} und die Umkehroperation zu {@link #from(IAMArray)}.
+	/** Diese Methode gibt die Codepoint in UTF16-Kodierung zurück.
+	 *
+	 * @return Array mit den Codepoints in UTF16-Kodierung. */
+	public short[] toShorts() {
+		final UTF16Counter counter = new UTF16Counter();
+		this.extract(counter);
+		final UTF16Encoder2 encoder = new UTF16Encoder2(new short[counter.count], 0);
+		this.extract(encoder);
+		return encoder.array;
+	}
+
+	/** Diese Methode gibt die Codepoint in 16-Bit-Kodierung zurück.
+	 *
+	 * @param asUTF16 {@code true}, wenn die Codepoint in UTF16 kodiert werden sollen. {@code false}, wenn die Codepoint als Einzelwerte kodiert werden sollen
+	 *        (Codepoint größer als {@code 65535} werden zu {@code 0}).
+	 * @return Array mit den Codepoints in 16-Bit-Kodierung. */
+	public short[] toShorts(final boolean asUTF16) {
+		if (asUTF16) return this.toShorts();
+		final INT16Encoder2 encoder = new INT16Encoder2(new short[this.length], 0);
+		this.extract(encoder);
+		return encoder.array;
+	}
+
+	/** Diese Methode gibt eine Zahlenfolge zurück, welche die einzelwertkodierten Codepoints dieser Zeichenkette enthält. Sie ist die Umkehroperation zu
+	 * {@link #from(IAMArray)}.
+	 *
+	 * @return Zahlenfolge mit den entsprechend kodierten Codepoints. */
+	public IAMArray toArray() {
+		final RangeCollector collector = new RangeCollector();
+		this.extract(collector);
+		if (collector.range < 256) return this.toArray(1, false);
+		if (collector.range < 65536) return this.toArray(2, false);
+		return this.toArray(4, false);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #toArray(int, boolean) toArray(mode, false)} und die Umkehroperation zu {@link #from(IAMArray)}.
 	 *
 	 * @param mode Kodierungskennung mit {@code 1} für {@code 8-Bit}, {@code 2} für {@code 16-Bit} und {@code 4} für {@code 32-Bit}.
 	 * @return Zahlenfolge mit der entsprechend kodierten Zeichenkette.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public final IAMArray toArray(final int mode) throws IllegalArgumentException {
+	public IAMArray toArray(final int mode) throws IllegalArgumentException {
 		return this.toArray(mode, false);
 	}
 
@@ -1803,18 +1890,18 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 				if (asUTFx) {
 					final UTF16Counter counter = new UTF16Counter();
 					this.extract(counter);
-					final char[] array = new char[counter.count + 5];
-					array[0] = (char)(hash >>> 0);
-					array[1] = (char)(hash >>> 16);
-					array[2] = (char)(length >>> 0);
-					array[3] = (char)(length >>> 16);
-					this.extract(new UTF16Encoder(array, 4));
+					final short[] array = new short[counter.count + 5];
+					array[0] = (short)(hash >>> 0);
+					array[1] = (short)(hash >>> 16);
+					array[2] = (short)(length >>> 0);
+					array[3] = (short)(length >>> 16);
+					this.extract(new UTF16Encoder2(array, 4));
 					return IAMArray.from(array);
 				} else {
-					final char[] array = new char[length + 3];
-					array[0] = (char)(hash >>> 0);
-					array[1] = (char)(hash >>> 16);
-					this.extract(new INT16Encoder(array, 2));
+					final short[] array = new short[length + 3];
+					array[0] = (short)(hash >>> 0);
+					array[1] = (short)(hash >>> 16);
+					this.extract(new INT16Encoder2(array, 2));
 					return IAMArray.from(array);
 				}
 			}
@@ -1874,7 +1961,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	/** {@inheritDoc} */
 	@Override
 	public final Iterator<Integer> iterator() {
-		return new Iterator<Integer>() {
+		return new BaseIterator<Integer>() {
 
 			int index = 0;
 
@@ -1886,11 +1973,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			@Override
 			public boolean hasNext() {
 				return this.index < FEMString.this.length;
-			}
-
-			@Override
-			public void remove() {
-				throw new IllegalStateException();
 			}
 
 		};

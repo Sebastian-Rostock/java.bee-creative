@@ -124,8 +124,8 @@ final class IAMCodec_INI {
 					final int oldCount = mappingBuilder.entryCount();
 					for (token = this.readContent(); (token != null) && token.isProperty(); token = this.readContent()) {
 
-						final int[] key = mappingKeyFormat.parse(token.key());
-						final int[] value = mappingValueFormat.parse(token.value());
+						final IAMArray key = mappingKeyFormat.parse(token.key());
+						final IAMArray value = mappingValueFormat.parse(token.value());
 						mappingBuilder.put(key, value);
 
 					}
@@ -152,7 +152,7 @@ final class IAMCodec_INI {
 						} catch (final Exception cause) {
 							throw new IllegalArgumentException(cause);
 						}
-						final int[] item = listingItemFormat.parse(token.value());
+						final IAMArray item = listingItemFormat.parse(token.value());
 
 						if (key != listingBuilder.itemCount()) throw new IllegalArgumentException("inconsistent key in [IAM_LISTING]");
 						listingBuilder.put(item, false);
@@ -186,7 +186,7 @@ final class IAMCodec_INI {
 		this.writeProperty("itemFormat", IAMArrayFormat.ARRAY);
 
 		for (int i = 0; i < itemCount; i++) {
-			this.writeProperty(i, IAMArrayFormat.ARRAY.format(source.item(i).toArray()));
+			this.writeProperty(i, IAMArrayFormat.ARRAY.format(source.item(i)));
 		}
 
 	}
@@ -203,7 +203,7 @@ final class IAMCodec_INI {
 		this.writeProperty("valueFormat", IAMArrayFormat.ARRAY);
 
 		for (int i = 0; i < entryCount; i++) {
-			this.writeProperty(IAMArrayFormat.ARRAY.format(source.key(i).toArray()), IAMArrayFormat.ARRAY.format(source.value(i).toArray()));
+			this.writeProperty(IAMArrayFormat.ARRAY.format(source.key(i)), IAMArrayFormat.ARRAY.format(source.value(i)));
 		}
 
 	}

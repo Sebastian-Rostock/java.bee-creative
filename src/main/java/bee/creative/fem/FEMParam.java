@@ -14,7 +14,7 @@ public final class FEMParam extends FEMFunction {
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (index: Integer): Value}, deren Ergebniswert dem {@code index}-ten Parameterwert des
 	 * Stapelrahmens entspricht. */
-	public static final FEMFunction ITEM = new FEMFunction() {
+	public static final FEMFunction FUNCTION = new FEMFunction() {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
@@ -28,43 +28,6 @@ public final class FEMParam extends FEMFunction {
 		@Override
 		public String toString() {
 			return "$#";
-		}
-
-	};
-
-	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Kopie der Parameterwerte des Stapelrahmens {@code frame} entspricht, d.h.
-	 * {@code frame.params().result(true)}.
-	 *
-	 * @see FEMArray#from(FEMValue...)
-	 * @see FEMFrame#params() */
-	public static final FEMFunction COPY = new FEMFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			return frame.params().result(true);
-		}
-
-		@Override
-		public String toString() {
-			return "$";
-		}
-
-	};
-
-	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Sicht auf die Parameterwerte des Stapelrahmens {@code frame} entspricht, d.h.
-	 * {@code frame.params()}.
-	 *
-	 * @see FEMFrame#params() */
-	public static final FEMFunction VIEW = new FEMFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			return frame.params();
-		}
-
-		@Override
-		public String toString() {
-			return "$";
 		}
 
 	};
@@ -92,7 +55,7 @@ public final class FEMParam extends FEMFunction {
 	 *
 	 * @return Index des Parameterwerts.
 	 * @see #invoke(FEMFrame) */
-	public final int index() {
+	public int index() {
 		return this.index;
 	}
 
@@ -102,7 +65,7 @@ public final class FEMParam extends FEMFunction {
 	 *
 	 * @see #index() */
 	@Override
-	public final FEMValue invoke(final FEMFrame frame) {
+	public FEMValue invoke(final FEMFrame frame) {
 		return frame.get(this.index);
 	}
 
@@ -122,7 +85,7 @@ public final class FEMParam extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "$" + (this.index + 1);
 	}
 

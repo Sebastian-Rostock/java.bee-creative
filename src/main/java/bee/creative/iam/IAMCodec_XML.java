@@ -127,8 +127,8 @@ final class IAMCodec_XML {
 
 				final int oldCount = mappingBuilder.entryCount();
 				for (final IAMENTRYTYPE xmlEntry: xmlMapping.entry) {
-					final int[] key = mappingKeyFormat.parse(xmlEntry.key);
-					final int[] value = mappingValueFormat.parse(xmlEntry.value);
+					final IAMArray key = mappingKeyFormat.parse(xmlEntry.key);
+					final IAMArray value = mappingValueFormat.parse(xmlEntry.value);
 					mappingBuilder.put(key, value);
 				}
 				final int newCount = mappingBuilder.entryCount();
@@ -144,7 +144,7 @@ final class IAMCodec_XML {
 
 				final int oldCount = listingBuilder.itemCount();
 				for (final IAMITEMTYPE xmlItem: xmlListing.item) {
-					final int[] data = listingItemFormat.parse(xmlItem.data);
+					final IAMArray data = listingItemFormat.parse(xmlItem.data);
 					listingBuilder.put(data, false);
 				}
 				final int newCount = listingBuilder.itemCount();
@@ -177,8 +177,8 @@ final class IAMCodec_XML {
 				for (int i = 0; i < entryCount; i++) {
 					final IAMENTRYTYPE xmlEntry = new IAMENTRYTYPE();
 					xmlMapping.entry.add(xmlEntry);
-					xmlEntry.key = IAMArrayFormat.ARRAY.format(mapping.key(i).toArray());
-					xmlEntry.value = IAMArrayFormat.ARRAY.format(mapping.value(i).toArray());
+					xmlEntry.key = IAMArrayFormat.ARRAY.format(mapping.key(i));
+					xmlEntry.value = IAMArrayFormat.ARRAY.format(mapping.value(i));
 				}
 
 			}
@@ -196,7 +196,7 @@ final class IAMCodec_XML {
 				for (int i = 0; i < itemCount; i++) {
 					final IAMITEMTYPE xmlItem = new IAMITEMTYPE();
 					xmlListing.item.add(xmlItem);
-					xmlItem.data = IAMArrayFormat.ARRAY.format(listing.item(i).toArray());
+					xmlItem.data = IAMArrayFormat.ARRAY.format(listing.item(i));
 				}
 
 			}

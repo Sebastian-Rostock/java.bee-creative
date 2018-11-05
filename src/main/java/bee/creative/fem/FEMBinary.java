@@ -8,10 +8,10 @@ import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMArray;
-import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 import bee.creative.util.Iterables;
+import bee.creative.util.Iterators.BaseIterator;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
@@ -32,7 +32,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ValueFinder implements Collector {
+	static class ValueFinder implements Collector {
 
 		public final byte that;
 
@@ -43,7 +43,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		public final boolean push(final byte value) {
+		public boolean push(final byte value) {
 			if (value == this.that) return false;
 			this.index++;
 			return true;
@@ -52,12 +52,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class HashCollector implements Collector {
+	static class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
 
 		@Override
-		public final boolean push(final byte value) {
+		public boolean push(final byte value) {
 			this.hash = Objects.hashPush(this.hash, value);
 			return true;
 		}
@@ -65,7 +65,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ValueCollector implements Collector {
+	static class ValueCollector implements Collector {
 
 		public final byte[] array;
 
@@ -77,7 +77,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		public final boolean push(final byte value) {
+		public boolean push(final byte value) {
 			this.array[this.index++] = value;
 			return true;
 		}
@@ -85,7 +85,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class StringCollector implements Collector {
+	static class StringCollector implements Collector {
 
 		public final char[] array;
 
@@ -103,7 +103,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		public final boolean push(final byte value) {
+		public boolean push(final byte value) {
 			int index = this.index;
 			this.array[index] = FEMBinary.toChar((value >> 4) & 0xF);
 			++index;
@@ -116,29 +116,30 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ArrayBinary extends FEMBinary {
+	public static class ArrayBinary extends FEMBinary {
 
-		public final MMFArray array;
+		public final IAMArray array;
 
-		ArrayBinary(final MMFArray array) {
-			super(array.length());
+		ArrayBinary(final IAMArray array) {
+			super(array.length() - 4);
+			this.hash = Integers.toInt(array.get(0), array.get(1), array.get(2), array.get(3));
 			this.array = array;
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return (byte)this.array.get(index);
 		}
 
 		@Override
-		public final byte[] value() {
-			return IAMArray.toBytes(this.array);
+		public byte[] value() {
+			return this.array.toBytes();
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class BufferBinary extends FEMBinary {
+	public static class BufferBinary extends FEMBinary {
 
 		public final ByteBuffer buffer;
 
@@ -148,33 +149,33 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.buffer.get(index);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class EmptyBinary extends FEMBinary {
+	public static class EmptyBinary extends FEMBinary {
 
 		EmptyBinary() {
 			super(0);
 		}
 
 		@Override
-		public final FEMBinary reverse() {
+		public FEMBinary reverse() {
 			return this;
 		}
 
 		@Override
-		public final FEMBinary compact() {
+		public FEMBinary compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class IntegerBinaryBE extends FEMBinary {
+	public static class IntegerBinaryBE extends FEMBinary {
 
 		public final long value;
 
@@ -184,24 +185,24 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return (byte)(this.value >> ((this.length - index - 1) << 3));
 		}
 
 		@Override
-		public final FEMBinary reverse() {
+		public FEMBinary reverse() {
 			return new IntegerBinaryLE(this.length, this.value);
 		}
 
 		@Override
-		public final FEMBinary compact() {
+		public FEMBinary compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class IntegerBinaryLE extends FEMBinary {
+	public static class IntegerBinaryLE extends FEMBinary {
 
 		public final long value;
 
@@ -211,24 +212,24 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return (byte)(this.value >> (index << 3));
 		}
 
 		@Override
-		public final FEMBinary reverse() {
+		public FEMBinary reverse() {
 			return new IntegerBinaryBE(this.length, this.value);
 		}
 
 		@Override
-		public final FEMBinary compact() {
+		public FEMBinary compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatBinary extends FEMBinary implements Emuable {
+	public static class ConcatBinary extends FEMBinary implements Emuable {
 
 		public final FEMBinary binary1;
 
@@ -241,13 +242,13 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.binary1.length;
 			return index2 < 0 ? this.binary1.customGet(index) : this.binary2.customGet(index2);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			final int offset2 = offset - this.binary1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.binary2.customExtract(target, offset2, length, foreward);
 			if (length2 <= 0) return this.binary1.customExtract(target, offset, length, foreward);
@@ -261,12 +262,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.binary1) + EMU.from(this.binary2);
 		}
 
 		@Override
-		public final FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
+		public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this.binary1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.binary2.section(offset2, length);
 			if (length2 <= 0) return this.binary1.section(offset, length);
@@ -276,7 +277,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class SectionBinary extends FEMBinary implements Emuable {
+	public static class SectionBinary extends FEMBinary implements Emuable {
 
 		public final FEMBinary binary;
 
@@ -289,29 +290,29 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.binary.customGet(index + this.offset);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
 			return this.binary.customExtract(target, this.offset + offset2, length2, foreward);
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.binary);
 		}
 
 		@Override
-		public final FEMBinary section(final int offset2, final int length2) throws IllegalArgumentException {
+		public FEMBinary section(final int offset2, final int length2) throws IllegalArgumentException {
 			return this.binary.section(this.offset + offset2, length2);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ReverseBinary extends FEMBinary implements Emuable {
+	public static class ReverseBinary extends FEMBinary implements Emuable {
 
 		public final FEMBinary binary;
 
@@ -321,39 +322,39 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.binary.customGet(this.length - index - 1);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.binary.customExtract(target, this.length - offset - length, length, !foreward);
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.binary);
 		}
 
 		@Override
-		public final FEMBinary concat(final FEMBinary that) throws NullPointerException {
+		public FEMBinary concat(final FEMBinary that) throws NullPointerException {
 			return that.reverse().concat(this.binary).reverse();
 		}
 
 		@Override
-		public final FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
+		public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
 			return this.binary.section(this.length - offset - length, length).reverse();
 		}
 
 		@Override
-		public final FEMBinary reverse() {
+		public FEMBinary reverse() {
 			return this.binary;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class UniformBinary extends FEMBinary {
+	public static class UniformBinary extends FEMBinary {
 
 		public final byte item;
 
@@ -363,12 +364,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.item;
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
 				if (!target.push(this.item)) return false;
 				length--;
@@ -385,19 +386,19 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		public final FEMBinary reverse() {
+		public FEMBinary reverse() {
 			return this;
 		}
 
 		@Override
-		public final FEMBinary compact() {
+		public FEMBinary compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactBinary extends FEMBinary implements Emuable {
+	public static class CompactBinary extends FEMBinary implements Emuable {
 
 		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden sollte. */
 		final byte[] items;
@@ -408,22 +409,22 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		protected final byte customGet(final int index) throws IndexOutOfBoundsException {
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.items);
 		}
 
 		@Override
-		public final byte[] value() {
+		public byte[] value() {
 			return this.items.clone();
 		}
 
 		@Override
-		public final FEMBinary compact() {
+		public FEMBinary compact() {
 			return this;
 		}
 
@@ -544,13 +545,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return bigEndian ? new IntegerBinaryBE(length, value) : new IntegerBinaryLE(length, value);
 	}
 
-	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
+	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück. TODO mit hash Dabei werden die ersten vier Byte der Zahlenfolge als {@link #hash()
+	 * Streuwert} und die darauf folgenden Zahlenwerte als Bytes der Bytefolge interpretiert.
 	 *
 	 * @param array Zahlenfolge.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link MMFArray#mode() UNI8/UINT8} vorliegt. */
-	public static FEMBinary from(final MMFArray array) throws NullPointerException, IllegalArgumentException {
+	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link IAMArray#mode() UNI8/UINT8} vorliegt. */
+	public static FEMBinary from(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 		if (array.length() == 0) return FEMBinary.EMPTY;
 		if (array.mode() == 1) return new ArrayBinary(array);
 		throw new IllegalArgumentException();
@@ -656,16 +658,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		if (upper < 0) throw new IllegalArgumentException("'9' < hexChar < 'A'");
 		if (upper <= 5) return upper + 10;
 		throw new IllegalArgumentException("'F' < hexChar < 'a'");
-	}
-
-	@SuppressWarnings ("javadoc")
-	private static int toInteger(final byte a, final byte b, final byte c) {
-		return Integers.toInt(a, Integers.toShort(b, c));
-	}
-
-	@SuppressWarnings ("javadoc")
-	private static int toInteger(final byte a, final byte b, final byte c, final byte d) {
-		return Integers.toInt(Integers.toShort(a, b), Integers.toShort(c, d));
 	}
 
 	/** Dieses Feld speichert den Streuwert. */
@@ -919,6 +911,20 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		};
 	}
 
+	/** Diese Methode gibt eine Zahlenfolge zurück, welche die Bytes dieser Bytefolge enthält. Sie ist die Umkehroperation zu {@link #from(IAMArray)}.
+	 *
+	 * @return Zahlenfolge mit den Bytes. */
+	public final IAMArray toArray() {
+		final byte[] array = new byte[this.length + 4];
+		this.extract(new ValueCollector(array, 4));
+		final int hash = this.hash();
+		array[0] = (byte)(hash >>> 0);
+		array[1] = (byte)(hash >>> 8);
+		array[2] = (byte)(hash >>> 16);
+		array[3] = (byte)(hash >>> 24);
+		return IAMArray.from(array);
+	}
+
 	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück. Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} (header) und den Bytes
 	 * dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern, d.h. {@code 0123456789ABCDEF}.
 	 *
@@ -946,20 +952,20 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 				case 2:
 					return Integers.toShort(this.customGet(0), this.customGet(1));
 				case 3:
-					return FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2));
+					return Integers.toInt(0, this.customGet(0), this.customGet(1), this.customGet(2));
 				case 4:
-					return FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3));
+					return Integers.toInt(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3));
 				case 5:
-					return Integers.toLong(this.customGet(0), FEMBinary.toInteger(this.customGet(1), this.customGet(2), this.customGet(3), this.customGet(4)));
+					return Integers.toLong(this.customGet(0), Integers.toInt(this.customGet(1), this.customGet(2), this.customGet(3), this.customGet(4)));
 				case 6:
 					return Integers.toLong(Integers.toShort(this.customGet(0), this.customGet(1)),
-						FEMBinary.toInteger(this.customGet(2), this.customGet(3), this.customGet(4), this.customGet(5)));
+						Integers.toInt(this.customGet(2), this.customGet(3), this.customGet(4), this.customGet(5)));
 				case 7:
-					return Integers.toLong(FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2)),
-						FEMBinary.toInteger(this.customGet(3), this.customGet(4), this.customGet(5), this.customGet(6)));
+					return Integers.toLong(Integers.toInt(0, this.customGet(0), this.customGet(1), this.customGet(2)),
+						Integers.toInt(this.customGet(3), this.customGet(4), this.customGet(5), this.customGet(6)));
 				case 8:
-					return Integers.toLong(FEMBinary.toInteger(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3)),
-						FEMBinary.toInteger(this.customGet(4), this.customGet(5), this.customGet(6), this.customGet(7)));
+					return Integers.toLong(Integers.toInt(this.customGet(0), this.customGet(1), this.customGet(2), this.customGet(3)),
+						Integers.toInt(this.customGet(4), this.customGet(5), this.customGet(6), this.customGet(7)));
 			}
 		} else {
 			switch (this.length) {
@@ -970,20 +976,20 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 				case 2:
 					return Integers.toShort(this.customGet(1), this.customGet(0));
 				case 3:
-					return FEMBinary.toInteger(this.customGet(2), this.customGet(1), this.customGet(0));
+					return Integers.toInt(0, this.customGet(2), this.customGet(1), this.customGet(0));
 				case 4:
-					return FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0));
+					return Integers.toInt(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0));
 				case 5:
-					return Integers.toLong(this.customGet(4), FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+					return Integers.toLong(this.customGet(4), Integers.toInt(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
 				case 6:
 					return Integers.toLong(Integers.toShort(this.customGet(5), this.customGet(4)),
-						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+						Integers.toInt(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
 				case 7:
-					return Integers.toLong(FEMBinary.toInteger(this.customGet(6), this.customGet(5), this.customGet(4)),
-						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+					return Integers.toLong(Integers.toInt(0, this.customGet(6), this.customGet(5), this.customGet(4)),
+						Integers.toInt(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
 				case 8:
-					return Integers.toLong(FEMBinary.toInteger(this.customGet(7), this.customGet(6), this.customGet(5), this.customGet(4)),
-						FEMBinary.toInteger(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
+					return Integers.toLong(Integers.toInt(this.customGet(7), this.customGet(6), this.customGet(5), this.customGet(4)),
+						Integers.toInt(this.customGet(3), this.customGet(2), this.customGet(1), this.customGet(0)));
 			}
 		}
 		throw new IllegalStateException();
@@ -1035,7 +1041,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	/** {@inheritDoc} */
 	@Override
 	public final Iterator<Byte> iterator() {
-		return new Iterator<Byte>() {
+		return new BaseIterator<Byte>() {
 
 			int index = 0;
 
@@ -1047,11 +1053,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			@Override
 			public boolean hasNext() {
 				return this.index < FEMBinary.this.length;
-			}
-
-			@Override
-			public void remove() {
-				throw new IllegalStateException();
 			}
 
 		};

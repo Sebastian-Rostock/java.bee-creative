@@ -12,6 +12,7 @@ import bee.creative.iam.IAMIndex.DataStats;
 import bee.creative.iam.IAMIndex.SizeStats;
 import bee.creative.iam.IAMLoader.IAMMappingLoader;
 import bee.creative.mmf.MMFArray;
+import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte Abbildung von Schlüsseln auf Werte, welche beide selbst Zahlenfolgen ({@link IAMArray}) sind.
@@ -143,8 +144,8 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			final int[] keyData = new int[keyDatalength], valueData = new int[valueDatalength];
 			for (int i = 0; i < entryCount; i++) {
 				final int index = indexArray[i].intValue();
-				that.key(index).toArray(keyData, keyOffset[i]);
-				that.value(index).toArray(valueData, valueOffset[i]);
+				that.key(index).toInts(keyData, keyOffset[i]);
+				that.value(index).toInts(valueData, valueOffset[i]);
 			}
 			this.keyData = keyData;
 			this.keyOffset = keyOffset;
@@ -334,6 +335,35 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		return entryCount & 536870911;
 	}
 
+	/** Diese Methode gibt den Streuwert der gegebenen Zahlenfolge zurück.
+	 *
+	 * @see IAMArray#hash()
+	 * @param array Zahlenfolge.
+	 * @return Streuwert.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+	public static int hash(final int[] array) throws NullPointerException {
+		int hash = 0x811C9DC5;
+		for (int i = 0, size = array.length; i < size; i++) {
+			hash = (hash * 0x01000193) ^ array[i];
+		}
+		return hash;
+	}
+
+	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung der ersten Zahlenfolge lexikografisch kleiner, gleich bzw.
+	 * größer als die der zweiten Zahlenfolge ist.
+	 *
+	 * @see IAMArray#compare(IAMArray)
+	 * @param array1 erste Zahlenfolge.
+	 * @param array2 zweite Zahlenfolge.
+	 * @return Vergleichswert der Ordnungen.
+	 * @throws NullPointerException Wenn {@code array1} bzw. {@code array2} {@code null} ist. */
+	public static int compare(final int[] array1, final int[] array2) throws NullPointerException {
+		final int length1 = array1.length, length2 = array2.length;
+		for (int i = 0, length = length1 < length2 ? length1 : length2, result; i < length; i++)
+			if ((result = Comparators.compare(array1[i], array2[i])) != 0) return result;
+		return length1 - length2;
+	}
+
 	/** Diese Methode gibt nur dann {@link #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden. Wenn sie {@link #MODE_SORTED}
 	 * liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
 	 *
@@ -457,8 +487,8 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		final int[][] valueArray = new int[entryCount][];
 		final Integer[] indexArray = new Integer[entryCount];
 		for (int i = 0; i < entryCount; i++) {
-			keyArray[i] = this.key(i).toArray();
-			valueArray[i] = this.value(i).toArray();
+			keyArray[i] = this.key(i).toInts();
+			valueArray[i] = this.value(i).toInts();
 			indexArray[i] = new Integer(i);
 		}
 
@@ -483,7 +513,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 			final int[] rangeIndex = new int[entryCount];
 			for (int i = 0; i < entryCount; i++) {
-				final int index = IAMBuilder.hash(keyArray[i]) & rangeMask;
+				final int index = IAMMapping.hash(keyArray[i]) & rangeMask;
 				rangeData[index]++;
 				rangeIndex[i] = index;
 			}
@@ -510,7 +540,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 				@Override
 				public int compare(final Integer index1, final Integer index2) {
-					return IAMBuilder.compare(keyArray[index1.intValue()], keyArray[index2.intValue()]);
+					return IAMMapping.compare(keyArray[index1.intValue()], keyArray[index2.intValue()]);
 				}
 
 			});

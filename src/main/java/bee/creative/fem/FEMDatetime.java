@@ -624,7 +624,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @param value interne Darstellung.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
 	public FEMDatetime(final long value) throws IllegalArgumentException {
-		this((int)(value >> 32), (int)value);
+		this(Integers.toIntH(value), Integers.toIntL(value));
 		if (this.hasDate()) {
 			FEMDatetime.checkDate(this.yearValueImpl(), this.monthValueImpl(), this.dateValueImpl());
 		} else {

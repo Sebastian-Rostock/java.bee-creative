@@ -65,7 +65,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 			}
 			final int[] itemData = new int[itemDatalength];
 			for (int index = 0; index < itemCount; index++) {
-				that.item(index).toArray(itemData, itemOffset[index]);
+				that.item(index).toInts(itemData, itemOffset[index]);
 			}
 			this.itemData = itemData;
 			this.itemOffset = itemLength < 0 ? itemOffset : null;
@@ -243,7 +243,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 		final int itemCount = this.itemCount();
 		final int[][] itemArray = new int[itemCount][];
 		for (int i = 0; i < itemCount; i++) {
-			itemArray[i] = this.item(i).toArray();
+			itemArray[i] = this.item(i).toInts();
 		}
 
 		final IAMIndex.DataStats itemData = new IAMIndex.DataStats(Arrays.asList(itemArray));

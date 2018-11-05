@@ -13,7 +13,7 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine unveränderliche Abbildung von Schlüsseln auf Werte als Tabelle mit einer Schlüssel- und einer Wertspalte. Sie dient der
  * effizienten {@link #find(FEMValue) Suche} eines Schlüssels bzw. {@link #get(FEMValue) Ermittlung} des einem Schlüssel zugeordnenten Werts. Dieser Wert
- * befindet sich in der {@link #values() Wertspalte} an der Position, an der sich der Schlüssel in der {@link #keys() Schlüsselspalte} befindet.
+ * befindet sich in der {@link #values() Wertspalte} an der Position, an der sich auch der Schlüssel in der {@link #keys() Schlüsselspalte} befindet.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Getter<FEMValue, FEMValue>, Iterable<FEMArray> {
@@ -44,15 +44,12 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactTable extends FEMTable implements Emuable {
+	public static class CompactTable extends CompositeTable {
 
-		static class Keys extends FEMArray {
-
-			final Entries entries;
+		static class Keys extends Values implements Emuable {
 
 			Keys(final Entries entries) {
-				super(entries.size());
-				this.entries = entries;
+				super(entries);
 			}
 
 			@Override
@@ -66,12 +63,20 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 				return result < offset ? -1 : result;
 			}
 
+			@Override
+			public long emu() {
+				return EMU.fromObject(this) + this.entries.emu();
+			}
+
 		}
 
-		static class Values extends Keys {
+		static class Values extends FEMArray {
+
+			final Entries entries;
 
 			Values(final Entries entries) {
-				super(entries);
+				super(entries.size());
+				this.entries = entries;
 			}
 
 			@Override
@@ -119,23 +124,8 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 
 		}
 
-		public final Keys keys;
-
-		public final Values values;
-
 		CompactTable(final Entries entries) {
-			this.keys = new Keys(entries);
-			this.values = new Values(entries);
-		}
-
-		@Override
-		public FEMArray keys() {
-			return this.keys;
-		}
-
-		@Override
-		public FEMArray values() {
-			return this.values;
+			super(new Keys(entries), new Values(entries));
 		}
 
 		@Override
@@ -143,15 +133,10 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 			return this;
 		}
 
-		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.keys) + EMU.from(this.values) + this.keys.entries.emu();
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompositeTable extends FEMTable implements Emuable {
+	public static class CompositeTable extends FEMTable implements Emuable {
 
 		public final FEMArray keys;
 
@@ -189,11 +174,23 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 	/** Dieses Feld speichert die Dezimalzahl {@code 0}. */
 	public static final FEMTable EMPTY = FEMTable.from(FEMArray.EMPTY, FEMArray.EMPTY);
 
+	/** Diese Methode gibt eine kompakte Tabelle mit den gegebenen Einträgen zurück. Jeder Eintrag muss hierbei als eine zweielementige Wertliste aus einem
+	 * Schlüssel und dem dazugehörigen Wert gegeben sein.
+	 * 
+	 * @param entries Einträge.
+	 * @return {@code compact}-{@link FEMTable}.
+	 * @throws NullPointerException Wenn {@code entries} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn die gegebenen Einträge nicht genau aus zwei Elementen (Schlüssel und Wert) bestehen. */
 	public static FEMTable from(final Iterable<? extends FEMArray> entries) throws NullPointerException, IllegalArgumentException {
 		if (entries instanceof FEMTable) return (FEMTable)entries;
 		return new CompactTable(new CompactTable.Entries(0, entries));
 	}
 
+	/** Diese Methode gibt eine kompakte Tabelle mit den gegebenen Einträgen zurück.
+	 *
+	 * @param entries Einträge.
+	 * @return {@code compact}-{@link FEMTable}.
+	 * @throws NullPointerException Wenn {@code entries} {@code null} ist oder enthält. */
 	public static FEMTable from(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
 		return new CompactTable(new CompactTable.Entries(entries));
 	}
@@ -218,18 +215,6 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
 	public static FEMTable from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMTable.TYPE);
-	}
-
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMTable data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMTable> type() {
-		return FEMTable.TYPE;
 	}
 
 	/** Diese Methode gibt den {@code index}-ten Eintrag als Wertliste aus Schlüssel und Wert zurück. Die gelieferte Wertliste entspricht damit
@@ -278,10 +263,6 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 		return this.keys().length();
 	}
 
-	public FEMTable compact() {
-		return new CompactTable(new CompactTable.Entries(this.length(), this));
-	}
-
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
@@ -297,6 +278,26 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMTable that) throws NullPointerException {
 		return (this.length() == that.length()) && Objects.equals(this.keys(), that.keys()) && Objects.equals(this.values(), that.values());
+	}
+
+	/** Diese Methode gibt die {@link #get(FEMValue) Einträge dieser Tabelle} in einer performanteren oder zumindest gleichwertigen Tabelle zurück. Die
+	 * Reihenfolge der gelieferten Tabelle kann von der dieser Tabelle abweichen.
+	 *
+	 * @return performanteren Tabelle oder {@code this}. */
+	public FEMTable compact() {
+		return new CompactTable(new CompactTable.Entries(this.length(), this));
+	}
+
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMTable data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMTable> type() {
+		return FEMTable.TYPE;
 	}
 
 	/** {@inheritDoc} */

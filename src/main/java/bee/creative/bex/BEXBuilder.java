@@ -19,6 +19,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 import bee.creative.bex.BEXLoader.BEXFileLoader;
+import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
 import bee.creative.iam.IAMIndex;
@@ -835,7 +836,7 @@ public class BEXBuilder {
 			}
 			value[length] = pool.length;
 			final IAMListingBuilder encoder = new IAMListingBuilder();
-			encoder.put(value, false);
+			encoder.put(IAMArray.from(value), false);
 			return encoder;
 		}
 
@@ -860,13 +861,13 @@ public class BEXBuilder {
 			boolean empty = false;
 			for (int i = (prop == 0) || (prop == 4) ? 0 : length; (i < length) && (empty = value[i] == 0); i++) {}
 			final IAMListingBuilder result = new IAMListingBuilder();
-			result.put(empty ? new int[0] : value, false);
+			result.put(empty ? IAMArray.EMPTY : IAMArray.from(value), false);
 			return result;
 		}
 
 		/** Diese Methode kodiert die gegebenen Zeichenketten in eine Liste von Zahlenfolgen und gibt diese zurück.
 		 *
-		 * @see BEXFile#valueFrom(String)
+		 * @see BEXFile#arrayFrom(String)
 		 * @param pool Auflistung von Zeichenketten.
 		 * @return Auflistung von Zahlenfolgen. */
 		IAMListingBuilder encodeTEXT(final BEXTextPool pool) {
@@ -874,7 +875,7 @@ public class BEXBuilder {
 			Collections.sort(texts, BEXTextItem.ORDER);
 			final IAMListingBuilder encoder = new IAMListingBuilder();
 			for (final BEXTextItem text: texts) {
-				text.key = encoder.put(BEXFile.valueFrom(text.text), false);
+				text.key = encoder.put(BEXFile.arrayFrom(text.text), false);
 			}
 			return encoder;
 		}
@@ -884,7 +885,7 @@ public class BEXBuilder {
 		 * @return Auflistung von Zahlenfolgen. */
 		IAMListing encodeHEAD() {
 			final IAMListingBuilder header = new IAMListingBuilder();
-			header.put(new int[]{0xBE10BA5E, this.stack.children.offset});
+			header.put(IAMArray.from(0xBE10BA5E, this.stack.children.offset));
 			return header;
 		}
 

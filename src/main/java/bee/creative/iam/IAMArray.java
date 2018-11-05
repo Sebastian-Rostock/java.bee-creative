@@ -432,90 +432,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return new ShortArray(array, offset, length);
 	}
 
-	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code byte[]} zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @param array Zahlenfolge.
-	 * @return Kopie der Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static byte[] toBytes(final IAMArray array) throws NullPointerException {
-		final byte[] result = new byte[array.length];
-		IAMArray.toBytes(array, result, 0);
-		return result;
-	}
-
-	/** Diese Methode kopiert die gegebene Zahlenfolge an die gegebene Position in das gegebenen {@code byte[]}.
-	 *
-	 * @param array Zahlenfolge.
-	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} bzw. {@code result} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public static void toBytes(final IAMArray array, final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = array.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
-		for (int i = 0; i < length; i++) {
-			result[i + offset] = (byte)array.customGet(i);
-		}
-	}
-
-	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code char[]} zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @param array Zahlenfolge.
-	 * @return Kopie der Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static char[] toChars(final IAMArray array) throws NullPointerException {
-		final char[] result = new char[array.length];
-		IAMArray.toChars(array, result, 0);
-		return result;
-	}
-
-	/** Diese Methode kopiert die gegebene Zahlenfolge an die gegebene Position in das gegebenen {@code char[]}.
-	 *
-	 * @param array Zahlenfolge.
-	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} bzw. {@code result} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public static void toChars(final IAMArray array, final char[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = array.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
-		for (int i = 0; i < length; i++) {
-			result[i + offset] = (char)array.customGet(i);
-		}
-	}
-
-	/** Diese Methode gibt eine Kopie der gegebenen Zahlenfolge als {@code short[]} zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @param array Zahlenfolge.
-	 * @return Kopie der Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static short[] toShorts(final IAMArray array) throws NullPointerException {
-		final short[] result = new short[array.length];
-		IAMArray.toShorts(array, result, 0);
-		return result;
-	}
-
-	/** Diese Methode kopiert die gegebene Zahlenfolge an die gegebene Position in das gegebenen {@code chort[]}.
-	 *
-	 * @param array Zahlenfolge.
-	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} bzw. {@code result} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public static void toShorts(final IAMArray array, final short[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = array.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
-		for (int i = 0; i < length; i++) {
-			result[i + offset] = (short)array.customGet(i);
-		}
-	}
-
 	@SuppressWarnings ("javadoc")
 	static boolean equals(final IntArray array1, final IntArray array2) {
 		int l = array1.length;
@@ -1158,9 +1074,9 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @see #get(int)
 	 * @see #length()
 	 * @return Kopie der Zahlenfolge. */
-	public final int[] toArray() {
+	public int[] toInts() {
 		final int[] result = new int[this.length];
-		this.toArray(result, 0);
+		this.toInts(result, 0);
 		return result;
 	}
 
@@ -1170,11 +1086,86 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param offset Beginn des Bereichs mit der dessen dieser Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public final void toArray(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+	public void toInts(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
 		final int length = this.length;
 		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
 		for (int i = 0; i < length; i++) {
 			result[i + offset] = this.customGet(i);
+		}
+	}
+
+	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code byte[]} zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @return Kopie der Zahlenfolge. */
+	public byte[] toBytes() {
+		final byte[] result = new byte[this.length];
+		this.toBytes(result, 0);
+		return result;
+	}
+
+	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code byte[]}.
+	 *
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public void toBytes(final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = this.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		for (int i = 0; i < length; i++) {
+			result[i + offset] = (byte)this.customGet(i);
+		}
+	}
+
+	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code char[]} zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @return Kopie der Zahlenfolge. */
+	public char[] toChars() {
+		final char[] result = new char[this.length];
+		this.toChars(result, 0);
+		return result;
+	}
+
+	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code char[]}.
+	 *
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public void toChars(final char[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = this.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		for (int i = 0; i < length; i++) {
+			result[i + offset] = (char)this.customGet(i);
+		}
+	}
+
+	/** Diese Methode gibt eine Kopie der gegebenen Zahlenfolge als {@code short[]} zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @return Kopie der Zahlenfolge. */
+	public short[] toShorts() {
+		final short[] result = new short[this.length];
+		this.toShorts(result, 0);
+		return result;
+	}
+
+	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code chort[]}.
+	 *
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public void toShorts(final short[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = this.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		for (int i = 0; i < length; i++) {
+			result[i + offset] = (short)this.customGet(i);
 		}
 	}
 

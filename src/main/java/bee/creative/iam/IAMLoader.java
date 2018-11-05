@@ -64,7 +64,7 @@ public class IAMLoader {
 		 * @return Bytereihenfolge oder {@code null}.
 		 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst. **/
 		public final ByteOrder orderOf(final Object object) throws IOException {
-			final byte[] bytes = IAMArray.toBytes(MMFArray.from(object).section(0, 4));
+			final byte[] bytes = MMFArray.from(object).section(0, 4).toBytes();
 			return this.orderOf(bytes);
 		}
 

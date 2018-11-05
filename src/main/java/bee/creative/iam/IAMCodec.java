@@ -282,8 +282,8 @@ public final class IAMCodec {
 		ARRAY {
 
 			@Override
-			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				if (string.length() == 0) return new int[0];
+			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
+				if (string.length() == 0) return IAMArray.EMPTY;
 				final String[] source = string.trim().split("\\s+", -1);
 				final int length = source.length;
 				final int[] result = new int[length];
@@ -294,16 +294,16 @@ public final class IAMCodec {
 						throw new IllegalArgumentException(cause);
 					}
 				}
-				return result;
+				return IAMArray.from(result);
 			}
 
 			@Override
-			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
+			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				final int length = array.length;
 				if (length == 0) return "";
-				final StringBuilder result = new StringBuilder().append(array[0]);
+				final StringBuilder result = new StringBuilder().append(array.get(0));
 				for (int i = 1; i < length; i++) {
-					result.append(' ').append(array[i]);
+					result.append(' ').append(array.get(i));
 				}
 				return result.toString();
 			}
@@ -315,30 +315,13 @@ public final class IAMCodec {
 		BINARY {
 
 			@Override
-			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				final char[] source = string.toCharArray();
-				final int length = source.length;
-				if ((length & 1) != 0) throw new IllegalArgumentException();
-				final int[] result = new int[length >> 1];
-				for (int i = 0; i < length;) {
-					final int x = i >> 1;
-					final int hi = FEMBinary.toDigit(source[i++]);
-					final int lo = FEMBinary.toDigit(source[i++]);
-					result[x] = (byte)((hi << 4) | (lo << 0));
-				}
-				return result;
+			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMArray.from(FEMBinary.from(string, false).value());
 			}
 
 			@Override
-			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				final int length = array.length << 1;
-				final char[] result = new char[length];
-				for (int i = 0; i < length;) {
-					final int value = array[i >> 1];
-					result[i++] = FEMBinary.toChar((value >> 4) & 0xF);
-					result[i++] = FEMBinary.toChar((value >> 0) & 0xF);
-				}
-				return new String(result);
+			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+				return FEMBinary.from(false, array.toBytes()).toString(false);
 			}
 
 		},
@@ -350,13 +333,13 @@ public final class IAMCodec {
 			final Charset charset = Charset.forName("UTF-8");
 
 			@Override
-			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec.parseBytes(string.getBytes(this.charset));
+			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMArray.from(string.getBytes(this.charset));
 			}
 
 			@Override
-			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec.formatBytes(array), this.charset);
+			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+				return new String(array.toBytes(), this.charset);
 			}
 
 		},
@@ -366,13 +349,13 @@ public final class IAMCodec {
 		STRING_UTF_16 {
 
 			@Override
-			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec.parseChars(string.toCharArray());
+			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMArray.from(string.toCharArray());
 			}
 
 			@Override
-			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec.formatChars(array));
+			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+				return new String(array.toChars());
 			}
 
 		},
@@ -382,19 +365,13 @@ public final class IAMCodec {
 		STRING_UTF_32 {
 
 			@Override
-			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				final int length = string.codePointCount(0, string.length());
-				final int[] result = new int[length];
-				for (int i = 0, j = 0; i < length; i++) {
-					result[i] = string.codePointAt(j);
-					j = string.offsetByCodePoints(j, 1);
-				}
-				return result;
+			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMArray.from(FEMString.from(string).toInts());
 			}
 
 			@Override
-			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(array, 0, array.length);
+			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(array.toInts()).toString();
 			}
 
 		},
@@ -406,13 +383,13 @@ public final class IAMCodec {
 			final Charset charset = Charset.forName("CP1252");
 
 			@Override
-			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec.parseBytes(string.getBytes(this.charset));
+			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMArray.from(string.getBytes(this.charset));
 			}
 
 			@Override
-			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec.formatBytes(array), this.charset);
+			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+				return new String(array.toBytes(), this.charset);
 			}
 
 		},
@@ -424,13 +401,13 @@ public final class IAMCodec {
 			final Charset charset = Charset.forName("ISO-8859-1");
 
 			@Override
-			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec.parseBytes(string.getBytes(this.charset));
+			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMArray.from(string.getBytes(this.charset));
 			}
 
 			@Override
-			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec.formatBytes(array), this.charset);
+			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+				return new String(array.toBytes(), this.charset);
 			}
 
 		},
@@ -442,29 +419,29 @@ public final class IAMCodec {
 			final Charset charset = Charset.forName("ISO-8859-15");
 
 			@Override
-			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMCodec.parseBytes(string.getBytes(this.charset));
+			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMArray.from(string.getBytes(this.charset));
 			}
 
 			@Override
-			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				return new String(IAMCodec.formatBytes(array), this.charset);
+			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+				return new String(array.toBytes(), this.charset);
 			}
 
 		},
 
-		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-		 * 32-Bit-Einzelwertkodierung} eines {@link FEMString} stehen. */
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray()
+		 * Einzelwertkodierung} eines {@link FEMString} stehen. */
 		STRING_FEM {
 
 			@Override
-			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(4, true).toArray();
+			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray();
 			}
 
 			@Override
-			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(source), false).toString();
+			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toString();
 			}
 
 		},
@@ -474,13 +451,13 @@ public final class IAMCodec {
 		STRING_FEM_INT8 {
 
 			@Override
-			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(4, true).toArray();
+			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(1);
 			}
 
 			@Override
-			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(IAMArray.toBytes(IAMArray.from(source))), false).toString();
+			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(source.toBytes())).toString();
 			}
 
 		},
@@ -490,13 +467,29 @@ public final class IAMCodec {
 		STRING_FEM_INT16 {
 
 			@Override
-			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(2, false).toArray();
+			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(2);
 			}
 
 			@Override
-			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(IAMArray.toChars(IAMArray.from(source))), false).toString();
+			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(source.toShorts())).toString();
+			}
+
+		},
+
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 32-Bit-Einzelwertkodierung} eines {@link FEMString} stehen. */
+		STRING_FEM_INT32 {
+
+			@Override
+			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(4);
+			}
+
+			@Override
+			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(source.toInts())).toString();
 			}
 
 		},
@@ -506,13 +499,13 @@ public final class IAMCodec {
 		STRING_FEM_UTF8 {
 
 			@Override
-			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(1, true).toArray();
+			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(1, true);
 			}
 
 			@Override
-			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(IAMArray.toBytes(IAMArray.from(source))), true).toString();
+			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(source.toBytes()), true).toString();
 			}
 
 		},
@@ -522,13 +515,13 @@ public final class IAMCodec {
 		STRING_FEM_UTF16 {
 
 			@Override
-			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(2, true).toArray();
+			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(2, true);
 			}
 
 			@Override
-			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(IAMArray.toChars(IAMArray.from(source))), true).toString();
+			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(source.toShorts()), true).toString();
 			}
 
 		};
@@ -540,9 +533,9 @@ public final class IAMCodec {
 			.put(STRING_UTF_8, "UTF-8").put(STRING_UTF_16, "UTF-16").put(STRING_UTF_32, "UTF-32") //
 			.put(STRING_CP_1252, "CP-1252") //
 			.put(STRING_ISO_8859_1, "ISO-8859-1").put(STRING_ISO_8859_15, "ISO-8859-15") //
-			.put(STRING_FEM, "FEM-32") //
+			.put(STRING_FEM, "FEM") //
 			.put(STRING_FEM_INT8, "FEM-UTF8").put(STRING_FEM_UTF16, "FEM-UTF16") //
-			.put(STRING_FEM_UTF8, "FEM-UTF8").put(STRING_FEM_UTF16, "FEM-UTF16") //
+			.put(STRING_FEM_UTF8, "FEM-UTF8").put(STRING_FEM_UTF16, "FEM-UTF16").put(STRING_FEM_INT32, "FEM-INT32") //
 			.get();
 
 		@SuppressWarnings ("javadoc")
@@ -592,7 +585,7 @@ public final class IAMCodec {
 		 * @return Zahlenfolge.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-		public abstract int[] parse(final String source) throws NullPointerException, IllegalArgumentException;
+		public abstract IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException;
 
 		/** Diese Methode formatiert die gegebene Zahlenfolge in eine Zeichenkette und gibt diese zurück.
 		 *
@@ -600,7 +593,7 @@ public final class IAMCodec {
 		 * @return Zeichenkette.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die Zahlenfolge ungültig ist. */
-		public abstract String format(final int[] source) throws NullPointerException, IllegalArgumentException;
+		public abstract String format(final IAMArray source) throws NullPointerException, IllegalArgumentException;
 
 		/** {@inheritDoc} */
 		@Override
@@ -632,26 +625,6 @@ public final class IAMCodec {
 		final byte[] result = new byte[length];
 		for (int i = 0; i < length; i++) {
 			result[i] = (byte)source[i];
-		}
-		return result;
-	}
-
-	@SuppressWarnings ("javadoc")
-	static int[] parseChars(final char[] source) {
-		final int length = source.length;
-		final int[] result = new int[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = (short)source[i];
-		}
-		return result;
-	}
-
-	@SuppressWarnings ("javadoc")
-	static char[] formatChars(final int[] source) {
-		final int length = source.length;
-		final char[] result = new char[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = (char)source[i];
 		}
 		return result;
 	}

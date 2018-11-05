@@ -1422,10 +1422,10 @@ public class FEMDomain extends BaseObject {
 	 * ist, wird {@code null} geliefert. Wenn diesem Bereich ein {@link #compileIndex(FEMCompiler) Parameterindex} bzw. {@link #compileName(FEMCompiler)
 	 * Parametername} folgt, wird ein {@link FEMParam} mit dem entsprechenden geliefert. Der Parameterindex für den ersten Parameter ist {@code 1}. Kleinere Werte
 	 * sind ungültig. Ein Parametername ist ungültig über {@link FEMCompiler#getParam(String)} dazu kein positiver Index ermittelt werden kann. Wenn dem ersten
-	 * Bereich weder ein Parameterindex noch ein Parametername folgt, wird {@link FEMParam#VIEW} geliefert.
+	 * Bereich weder ein Parameterindex noch ein Parametername folgt, wird {@link FEMFrame#FUNCTION} geliefert.
 	 *
 	 * @see #parseLocale(FEMParser)
-	 * @see FEMParam#VIEW
+	 * @see FEMFrame#FUNCTION
 	 * @see FEMParam#from(int)
 	 * @param source Kompiler.
 	 * @return Parameterverweise oder {@code null}.
@@ -1445,7 +1445,7 @@ public class FEMDomain extends BaseObject {
 			if (index.intValue() < 1) throw new IllegalArgumentException("Parameterindex '" + index + "' ist ungültig.");
 			return FEMParam.from(index.intValue() - 1);
 		}
-		return FEMParam.VIEW;
+		return FEMFrame.FUNCTION;
 	}
 
 	/** Diese Methode kompiliert einen Funktionszeiger und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ

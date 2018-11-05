@@ -23,7 +23,7 @@ public class Iterators {
 
 		@Override
 		public void remove() {
-			throw new IllegalStateException();
+			new UnsupportedOperationException();
 		}
 
 	}
@@ -54,11 +54,6 @@ public class Iterators {
 			if (!this.hasNext()) throw new NoSuchElementException();
 			this.index++;
 			return this.item;
-		}
-
-		@Override
-		public void remove() {
-			throw (this.hasNext() ? new IllegalStateException() : new UnsupportedOperationException());
 		}
 
 		@Override
@@ -98,12 +93,6 @@ public class Iterators {
 		public GItem next() {
 			if (this.index == this.toIndex) throw new NoSuchElementException();
 			return this.items.get(this.index++);
-		}
-
-		@Override
-		public void remove() {
-			if (this.index == this.fromIndex) throw new IllegalStateException();
-			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -384,11 +373,6 @@ public class Iterators {
 		@Override
 		public GItem next() {
 			return this.iterator.next();
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
 		}
 
 		@Override

@@ -31,7 +31,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ItemFinder implements Collector {
+	static class ItemFinder implements Collector {
 
 		public final FEMValue that;
 
@@ -42,7 +42,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public final boolean push(final FEMValue value) {
+		public boolean push(final FEMValue value) {
 			if (value.equals(this.that)) return false;
 			this.index++;
 			return true;
@@ -51,12 +51,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class HashCollector implements Collector {
+	static class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
 
 		@Override
-		public final boolean push(final FEMValue value) {
+		public boolean push(final FEMValue value) {
 			this.hash = Objects.hashPush(this.hash, value.hashCode());
 			return true;
 		}
@@ -64,7 +64,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ValueCollector implements Collector {
+	static class ValueCollector implements Collector {
 
 		public final FEMValue[] array;
 
@@ -76,7 +76,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public final boolean push(final FEMValue value) {
+		public boolean push(final FEMValue value) {
 			this.array[this.index++] = value;
 			return true;
 		}
@@ -84,26 +84,26 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class EmptyArray extends FEMArray {
+	public static class EmptyArray extends FEMArray {
 
 		EmptyArray() throws IllegalArgumentException {
 			super(0);
 		}
 
 		@Override
-		public final FEMArray reverse() {
+		public FEMArray reverse() {
 			return this;
 		}
 
 		@Override
-		public final FEMArray compact() {
+		public FEMArray compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatArray extends FEMArray implements Emuable {
+	public static class ConcatArray extends FEMArray implements Emuable {
 
 		public final FEMArray array1;
 
@@ -116,13 +116,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
+		protected FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.array1.length;
 			return index2 < 0 ? this.array1.customGet(index) : this.array2.customGet(index2);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.array2.customExtract(target, offset2, length, foreward);
 			if (length2 <= 0) return this.array1.customExtract(target, offset, length, foreward);
@@ -136,12 +136,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.array1) + EMU.from(this.array2);
 		}
 
 		@Override
-		public final FEMArray section(final int offset, final int length) throws IllegalArgumentException {
+		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.array2.section(offset2, length);
 			if (length2 <= 0) return this.array1.section(offset, length);
@@ -151,7 +151,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class SectionArray extends FEMArray implements Emuable {
+	public static class SectionArray extends FEMArray implements Emuable {
 
 		public final FEMArray array;
 
@@ -164,29 +164,29 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
+		protected FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			return this.array.customGet(index + this.offset);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
 			return this.array.customExtract(target, this.offset + offset2, length2, foreward);
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.array);
 		}
 
 		@Override
-		public final FEMArray section(final int offset2, final int length2) throws IllegalArgumentException {
+		public FEMArray section(final int offset2, final int length2) throws IllegalArgumentException {
 			return this.array.section(this.offset + offset2, length2);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ReverseArray extends FEMArray implements Emuable {
+	public static class ReverseArray extends FEMArray implements Emuable {
 
 		public final FEMArray array;
 
@@ -196,32 +196,32 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
+		protected FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			return this.array.customGet(this.length - index - 1);
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.array.customExtract(target, this.length - offset - length, length, !foreward);
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.array);
 		}
 
 		@Override
-		public final FEMArray concat(final FEMArray that) throws NullPointerException {
+		public FEMArray concat(final FEMArray that) throws NullPointerException {
 			return that.reverse().concat(this.array).reverse();
 		}
 
 		@Override
-		public final FEMArray section(final int offset, final int length) throws IllegalArgumentException {
+		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 			return this.array.section(this.length - offset - length, length).reverse();
 		}
 
 		@Override
-		public final FEMArray reverse() {
+		public FEMArray reverse() {
 			return this.array;
 		}
 
@@ -238,12 +238,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
+		protected FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			return this.item;
 		}
 
 		@Override
-		protected final boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
 				if (!target.push(this.item)) return false;
 				length--;
@@ -252,32 +252,32 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public final FEMArray reverse() {
+		public FEMArray reverse() {
 			return this;
 		}
 
 		@Override
-		public final FEMArray compact() {
+		public FEMArray compact() {
 			return this;
 		}
 
 		@Override
 		public FEMArray result(final boolean recursive) {
 			if (!recursive) return this;
-			return new UniformResultArray(this.length, this.item.result(true));
+			return new UniformArray2(this.length, this.item.result(true));
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class UniformResultArray extends UniformArray {
+	public static class UniformArray2 extends UniformArray {
 
-		UniformResultArray(final int length, final FEMValue item) throws IllegalArgumentException {
+		UniformArray2(final int length, final FEMValue item) throws IllegalArgumentException {
 			super(length, item);
 		}
 
 		@Override
-		public final FEMArray result(final boolean recursive) {
+		public FEMArray result(final boolean recursive) {
 			return this;
 		}
 
@@ -299,36 +299,36 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		protected final FEMValue customGet(final int index) throws IndexOutOfBoundsException {
+		protected FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			return this.items[index];
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.items);
 		}
 
 		@Override
-		public final FEMValue[] value() {
+		public FEMValue[] value() {
 			return this.items.clone();
 		}
 
 		@Override
-		public final FEMArray compact() {
+		public FEMArray compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompactResultArray extends CompactArray {
+	public static class CompactArray2 extends CompactArray {
 
-		CompactResultArray(final FEMValue[] items) throws IllegalArgumentException {
+		CompactArray2(final FEMValue[] items) throws IllegalArgumentException {
 			super(items);
 		}
 
 		@Override
-		public final FEMArray result(final boolean recursive) {
+		public FEMArray result(final boolean recursive) {
 			return this;
 		}
 
@@ -746,7 +746,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		for (int i = 0; i < length; i++) {
 			result[i] = result[i].result(true);
 		}
-		return new CompactResultArray(result);
+		return new CompactArray2(result);
 	}
 
 	/** {@inheritDoc} */

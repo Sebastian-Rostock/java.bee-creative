@@ -622,7 +622,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param value interne Darstellung der Zeitspanne.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
 	public FEMDuration(final long value) throws IllegalArgumentException {
-		this((int)(value >> 32), (int)value);
+		this(Integers.toIntH(value), Integers.toIntL(value));
 		if (value == 0) return;
 		FEMDuration.checkYears(this.yearsValue());
 		if (this.monthsValue() > 11) throw new IllegalArgumentException();

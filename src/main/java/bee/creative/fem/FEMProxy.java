@@ -6,7 +6,7 @@ import bee.creative.util.Objects;
 import bee.creative.util.Property;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
- * Funktion} delegiert. {@link #hashCode() Streuwert} und {@link #equals(Object) Äquivalenz} beziehen sich auf den {@link #name() Namen} des Platzhalters.
+ * Funktion} delegiert.
  *
  * @see FEMCompiler#proxy(String)
  * @see FEMCompiler#proxies()

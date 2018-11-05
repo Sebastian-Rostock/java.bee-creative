@@ -36,22 +36,13 @@ public class BEXFile {
 	 * @param string Zeichenkette.
 	 * @return Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public static int[] valueFrom(final String string) throws NullPointerException {
+	public static IAMArray arrayFrom(final String string) throws NullPointerException {
 		final int length = string.length();
-		final int[] result = new int[length + 1];
+		final short[] result = new short[length + 1];
 		for (int i = 0; i < length; i++) {
 			result[i] = (short)string.charAt(i);
 		}
-		return result;
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code IAMArray.from(BEXFile.valueFrom(string))}.
-	 *
-	 * @param string Zeichenkette.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public static IAMArray arrayFrom(final String string) throws NullPointerException {
-		return IAMArray.from(BEXFile.valueFrom(string));
+		return IAMArray.from(result);
 	}
 
 	/** Diese Methode wandelt die gegebene nullterminierte Zahlenfolge in eine Zeichenkette um und gibt diese zurück.
@@ -64,7 +55,7 @@ public class BEXFile {
 		final int length = array.length() - 1;
 		if ((length < 0) || (array.get(length) != 0)) throw new IllegalArgumentException();
 		if (length == 0) return "";
-		return new String(IAMArray.toChars(array.section(0, length)));
+		return new String(array.section(0, length).toChars());
 	}
 
 	/** Diese Methode gibt das Wurzelelement des Dokuments zurück.
