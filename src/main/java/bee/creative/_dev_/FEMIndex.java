@@ -1,5 +1,7 @@
 package bee.creative._dev_;
 
+import java.io.IOException;
+import java.nio.ByteOrder;
 import bee.creative.fem.FEMArray;
 import bee.creative.fem.FEMBinary;
 import bee.creative.fem.FEMBoolean;
@@ -21,55 +23,123 @@ import bee.creative.fem.FEMString;
 import bee.creative.fem.FEMTable;
 import bee.creative.fem.FEMValue;
 import bee.creative.fem.FEMVoid;
+import bee.creative.iam.IAMArray;
+import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
-import bee.creative.iam.IAMIndex;
+import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
+import bee.creative.iam.IAMMapping;
+import bee.creative.util.Objects;
 import bee.creative.util.Producer;
 import bee.creative.util.Property;
+import bee.creative.util.Unique;
 
 // TODO de-/coder für ausgewählte fem-datentypen in iam-format (und json-format)
 // json-format aus string und object[] derselben, de-/coder ebenfalls in javascript
+
 public class FEMIndex implements Producer<FEMValue> {
 
-	public static abstract class IndexBuilder extends FEMIndex implements Property<FEMValue> {
+	public static final int TYPE_FUNCTION_COMPOSITE = 0;
 
-		IAMListingBuilder arrayPool = new IAMListingBuilder();
-		
-		IAMListingBuilder handlerPool = new IAMListingBuilder();
-		
-		IAMListingBuilder stringPool = new IAMListingBuilder();
-		
-		IAMListingBuilder binaryPool = new IAMListingBuilder();
-		
-		IAMListingBuilder integerPool = new IAMListingBuilder();
-		
-		IAMListingBuilder decimalPool = new IAMListingBuilder();
-		
-		IAMListingBuilder durationPool = new IAMListingBuilder();
-		
-		IAMListingBuilder datetimePool = new IAMListingBuilder();
-		
-		IAMListingBuilder objectPool = new IAMListingBuilder();
-		
-		IAMListingBuilder tablePool = new IAMListingBuilder();
-		
+	public static final int TYPE_FUNCTION_CONCAT = 0;
+
+	public static final int TYPE_FUNCTION_CLOSURE = 0;
+
+	public static final int TYPE_FUNCTION_PARAM = 0;
+
+	public static class IndexBuilder extends FEMIndex implements Property<FEMValue> {
+
+		private static final int DATA_INTEGER_EMPTY = 0;
+
+		private static final int DATA_INTEGER_MINIMUM = 0;
+
+		private static final int DATA_INTEGER_MAXIMUM = 0;
+
+		ByteOrder byteOrder = ByteOrder.nativeOrder();
+
+		IAMIndexBuilder indexBuilder = new IAMIndexBuilder();
+
+		protected IAMListingBuilder arrayValueListing = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Funktionszeiger, von denen jeder aus einer von {@link #putFunction(FEMFunction)} gelieferten {@code int}-Zahl
+		 * besteht. */
+		protected IAMListingBuilder handlerValuePool = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Zeichenketten, welche gemäß {@link FEMString#toArray()} kodiert sind. */
+		protected IAMListingBuilder stringValueListing = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Bytefolgen, welche gemäß {@link FEMBinary#toArray()} kodiert sind. */
+		protected IAMListingBuilder binaryValueListing = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Dezimalzahlen, von denen jede aus zwei {@code int}-Zahlen besteht (lo, hi). */
+		protected IAMListingBuilder integerValueListing = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Dezimalbrüche, von denen jeder aus zwei {@code int}-Zahlen besteht (lo, hi). */
+		protected IAMListingBuilder decimalValueListing = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Zeitspannen, von denen jede aus zwei {@code int}-Zahlen besteht (lo, hi). */
+		protected IAMListingBuilder durationValueListing = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Zeitangaben, von denen jede aus zwei {@code int}-Zahlen besteht (lo, hi). */
+		protected IAMListingBuilder datetimeValueListing = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die über {@link #customPutObject(FEMObject)} erfassten {@link FEMObject Referenzen}. Der {@link FEMObject#value()} jedes
+		 * {@link FEMObject} wird als zweielementige {@link IAMArray Zahlenfolge} kodiert. */
+		protected IAMListingBuilder objectValueListing = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Tabellen, von denen jede aus drei {@code int}-Zahlen besteht (keyArrayIdx, valueArrayIdx, tableMappingIdx). */
+		protected IAMListingBuilder tableValueListing = new IAMListingBuilder();
+
+		protected Unique<byte[], Integer> tableMappingUnique = new Unique<byte[], Integer>() {
+
+			@Override
+			protected Integer customBuild(final byte[] source) {
+				try {
+					return new Integer(IndexBuilder.this.indexBuilder.putMapping(IAMMapping.from(source)));
+				} catch (final IOException cause) {
+					throw new IllegalArgumentException(cause);
+				}
+			}
+
+			@Override
+			public int hash(final Object source) {
+				return Objects.deepHash(source);
+			}
+
+			@Override
+			public boolean equals(final Object source1, final Object source2) {
+				return Objects.deepEquals(source1, source2);
+			}
+
+		};
+
+		IAMListingBuilder proxyFunctionPool = new IAMListingBuilder();
+
+		IAMListingBuilder concatFunctionPool = new IAMListingBuilder();
+
+		IAMListingBuilder closureFunctionPool = new IAMListingBuilder();
+
+		IAMListingBuilder compositeFunctionPool = new IAMListingBuilder();
+
 		protected FEMValue property;
+
+		protected void fillBuilder() {
+			this.indexBuilder.putListing(this.arrayValueListing);
+		}
 
 		public int putValue(final FEMValue source) throws IllegalArgumentException {
 			switch (source.type().id()) {
-				case FEMNative.ID:
-					return this.customPutNative((FEMNative)source.result());
 				case FEMVoid.ID:
-					return this.customPutVoid();
+					return this.putVoidValue();
 				case FEMArray.ID:
-					return this.customPutArray((FEMArray)source.data());
+					return this.putArrayValue((FEMArray)source.data());
 				case FEMHandler.ID:
-					return this.customPutHandler((FEMHandler)source.data());
+					return this.putHandlerValue((FEMHandler)source.data());
 				case FEMBoolean.ID:
-					return this.customPutBoolean((FEMBoolean)source.data());
+					return this.putBooleanValue((FEMBoolean)source.data());
 				case FEMString.ID:
-					return this.customPutString((FEMString)source.data());
+					return this.putStringValue((FEMString)source.data());
 				case FEMBinary.ID:
-					return this.customPutBinary((FEMBinary)source.data());
+					return this.putBinaryValue((FEMBinary)source.data());
 				case FEMInteger.ID:
 					return this.customPutInteger((FEMInteger)source.data());
 				case FEMDecimal.ID:
@@ -98,9 +168,9 @@ public class FEMIndex implements Producer<FEMValue> {
 		public int putFunction(final FEMFunction source) throws FEMException {
 			if (source instanceof FEMValue) return this.putValue((FEMValue)source);
 			if (source instanceof FEMProxy) return this.customPutProxy((FEMProxy)source);
-			if (source instanceof FEMParam) return this.customPutParam((FEMParam)source);
-			if (source instanceof FEMParam) return this.customPutParam((FEMParam)source);
-			if (source instanceof ConcatFunction) return this.customPutConcat((ConcatFunction)source);
+			if (source instanceof FEMParam) return this.putParamFunction((FEMParam)source);
+			if (source instanceof FEMParam) return this.putParamFunction((FEMParam)source);
+			if (source instanceof ConcatFunction) return this.putConcatFunction((ConcatFunction)source);
 			if (source instanceof ClosureFunction) return this.customPutClosure((ClosureFunction)source);
 			if (source instanceof CompositeFunction) return this.customPutComposite((CompositeFunction)source);
 			throw new IllegalArgumentException();
@@ -115,96 +185,118 @@ public class FEMIndex implements Producer<FEMValue> {
 			return result;
 		}
 
+		private int putLong(final IAMListingBuilder integerPool2, final long value) {
+			return 0;
+		}
+
 		protected int customPutProxy(final FEMProxy source) {
+
 			throw new IllegalArgumentException();
 		}
 
-		protected int customPutParam(final FEMParam source) {
+		protected int customPutProxy(final int nameRef, final int functionRef) {
+
 			throw new IllegalArgumentException();
 		}
 
-		protected int customPutConcat(final ConcatFunction source) {
-			return this.customPutConcat(this.putFunction(source.function()), this.putFunctions(source.params()));
+		protected int putParamFunction(final FEMParam source) throws NullPointerException {
+			final int index = source.index();
+			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_PARAM, index);
 		}
 
-		protected int customPutConcat(final int functionRef, final int[] paramRefs) {
-			throw new IllegalArgumentException();
+		protected int putConcatFunction(final ConcatFunction source) throws NullPointerException, IllegalArgumentException {
+			final IAMArray method = IAMArray.from(this.putFunction(source.function()));
+			final IAMArray params = IAMArray.from(this.putFunctions(source.params()));
+			final IAMArray array = method.concat(params).compact();
+			final int index = this.concatFunctionPool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_CONCAT, index);
 		}
 
-		protected int customPutClosure(final ClosureFunction source) {
-			return this.customPutClosure(this.putFunction(source.function()));
+		protected int customPutClosure(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
+			final IAMArray array = IAMArray.from(this.putFunction(source.function()));
+			final int index = this.closureFunctionPool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_CLOSURE, index);
 		}
 
-		protected int customPutClosure(final int functionRef) {
-			throw new IllegalArgumentException();
+		protected int customPutComposite(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
+			final IAMArray method = IAMArray.from(this.putFunction(source.function()));
+			final IAMArray params = IAMArray.from(this.putFunctions(source.params()));
+			final IAMArray array = method.concat(params).compact();
+			final int index = this.compositeFunctionPool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_COMPOSITE, index);
 		}
 
-		protected int customPutComposite(final CompositeFunction source) {
-			return this.customPutComposite(this.putFunction(source.function()), this.putFunctions(source.params()));
+		protected int putVoidValue() {
+			return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_VOID);
 		}
 
-		protected int customPutComposite(final int functionRef, final int[] paramRefs) {
-			throw new IllegalArgumentException();
+		protected int putArrayValue(final FEMArray source) throws NullPointerException, IllegalArgumentException {
+			final IAMArray array = IAMArray.from(this.putValues(source.value()));
+			final int index = this.arrayValueListing.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_ARRAY, index);
 		}
 
-		protected int customPutNative(final FEMNative source) throws NullPointerException, IllegalArgumentException {
-			throw new IllegalArgumentException();
+		protected int putHandlerValue(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
+			final IAMArray array = IAMArray.from(this.putFunction(source.value()));
+			final int index = this.handlerValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_HANDLER, index);
 		}
 
-		protected int customPutVoid() throws NullPointerException {
-			throw new IllegalArgumentException();
+		protected int putBooleanValue(final FEMBoolean source) throws NullPointerException {
+			return FEMIndex.toRef(FEMIndex.TYPE_CONST, source.value() ? FEMIndex.DATA_TRUE : FEMIndex.DATA_FALSE);
 		}
 
-		protected int customPutArray(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-			return this.customPutArray(this.putValues(source.value()));
+		protected int putStringValue(final FEMString source) throws NullPointerException {
+			final IAMArray array = source.toArray();
+			final int index = this.stringValueListing.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_STRING, index);
 		}
 
-		protected int customPutArray(final int[] valueRefs) {
-			throw new IllegalArgumentException();
+		protected int putBinaryValue(final FEMBinary source) throws NullPointerException {
+			final IAMArray array = source.toArray();
+			final int index = this.binaryValueListing.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_BINARY, index);
 		}
 
-		protected int customPutHandler(final FEMHandler source) throws IllegalArgumentException {
-			return this.customPutHandler(this.putFunction(source.value()));
+		protected int customPutInteger(final FEMInteger source) throws NullPointerException {
+			if(source.equals(FEMInteger.EMPTY)) return toRef(TYPE_CONST, DATA_INTEGER_EMPTY); // XXX muss das sein?
+			if(source.equals(FEMInteger.MINIMUM)) return toRef(TYPE_CONST, DATA_INTEGER_MINIMUM);
+			if(source.equals(FEMInteger.MAXIMUM)) return toRef(TYPE_CONST, DATA_INTEGER_MAXIMUM);
+			final long value = source.value();
+			final int index = this.putLong(this.integerValueListing, value);
+			return FEMIndex.toRef(FEMIndex.TYPE_INTEGER, index);
 		}
 
-		protected int customPutHandler(final int functionRef) {
-			throw new IllegalArgumentException();
+		protected int customPutDecimal(final FEMDecimal source) throws NullPointerException {
+			final long value = Double.doubleToLongBits(source.value());
+			final int index = this.putLong(this.decimalValueListing, value);
+			return FEMIndex.toRef(FEMIndex.TYPE_DECIMAL, index);
 		}
 
-		protected int customPutBoolean(final FEMBoolean source) throws NullPointerException {
-			throw new IllegalArgumentException();
+		protected int customPutDuration(final FEMDuration source) throws NullPointerException {
+			final long value = source.value();
+			final int index = this.putLong(this.durationValueListing, value);
+			return FEMIndex.toRef(FEMIndex.TYPE_DURATION, index);
 		}
 
-		protected int customPutString(final FEMString source) throws IllegalArgumentException {
-			throw new IllegalArgumentException();
+		protected int customPutDatetime(final FEMDatetime source) throws NullPointerException {
+			final long value = source.value();
+			final int index = this.putLong(this.datetimeValueListing, value);
+			return FEMIndex.toRef(FEMIndex.TYPE_DATETIME, index);
 		}
 
-		protected int customPutBinary(final FEMBinary source) throws IllegalArgumentException {
-			throw new IllegalArgumentException();
+		protected int customPutObject(final FEMObject source) throws NullPointerException {
+			final long value = source.value();
+			final int index = this.putLong(this.integerValueListing, value);
+			return FEMIndex.toRef(FEMIndex.TYPE_OBJECT, index);
 		}
 
-		protected int customPutInteger(final FEMInteger source) throws IllegalArgumentException {
-			throw new IllegalArgumentException();
-		}
+		protected int customPutTable(final FEMTable data) {
+			final IAMMapping mapping = new IAMMappingBuilder();
+			// TODO
 
-		protected int customPutDecimal(final FEMDecimal source) throws IllegalArgumentException {
-			throw new IllegalArgumentException();
-		}
-
-		protected int customPutDuration(final FEMDuration source) throws IllegalArgumentException {
-			throw new IllegalArgumentException();
-		}
-
-		protected int customPutDatetime(final FEMDatetime source) throws IllegalArgumentException {
-			throw new IllegalArgumentException();
-		}
-
-		protected int customPutObject(final FEMObject source) throws IllegalArgumentException {
-			throw new IllegalArgumentException();
-		}
-
-		protected int customPutTable(FEMTable data) {
-			throw new IllegalArgumentException();
+			final int tableIdx = this.tableMappingUnique.get(mapping.toBytes(this.byteOrder));
+			return FEMIndex.toRef(FEMIndex.TYPE_TABLE, tableIdx);
 		}
 
 		@Override
@@ -213,7 +305,7 @@ public class FEMIndex implements Producer<FEMValue> {
 		}
 
 		@Override
-		public void set(FEMValue value) {
+		public void set(final FEMValue value) {
 
 		}
 
@@ -223,16 +315,86 @@ public class FEMIndex implements Producer<FEMValue> {
 
 	}
 
+	public static final int TYPE_TABLE = 0;
+
+	protected static final int TYPE_DURATION = 0;
+
+	protected static final int TYPE_DECIMAL = 0;
+
+	protected static final int TYPE_HANDLER = 0;
+
+	protected static final int TYPE_DATETIME = 0;
+
+	protected static final int TYPE_OBJECT = 0;
+
+	protected static final int TYPE_ARRAY = 0;
+
+	protected static final int TYPE_STRING = 0;
+
+	protected static final int TYPE_BINARY = 0;
+
+	protected static final int TYPE_INTEGER = 0;
+
+	public static final int TYPE_CONST = 0;
+
+	public static final int DATA_VOID = 0;
+
+	public static final int DATA_TRUE = 0;
+
+	public static final int DATA_FALSE = 0;
+
+	static int toRef(final int type, final int data) {
+		return (data << 4) | type;
+	}
+
+	// niederwertige 4 bit
+	// PT bei VALUE in array oder als Parameterliste
+
+	// 00 const VALUE
+	// 00.00 void
+	// 00.01 true
+	// 00.02 false
+	// 00.xx min/max/empty von integer, decimal, datetime, duration usw + CUSTOM VALUE ab ???
+	// 01 aray data = [valueRef, ..., valueRef]
+	// 10 table data = mappingIdx
+	// 02 binary
+	// 03 string
+	// 09 object
+	// 04 integer
+	// 05 decimal
+	// 06 duration
+	// 07 datetime
+	// 08 handler -> data = handlerIdx -> handlerItem = VALUE/FUNCTION
+	// 00..10 kommen in array vor
+	// 11..14 für value reserviert
+	// 15 function -> weiter 4 bit unterscheiden den Typ
+
+	// 15.00 const FUNCTION -> data ist ID (CUSTOM/SYSTEM)
+	// 15.01 param fun -> data ist FEMParam.index()
+	// 15.02 closure -> data analog zu handlerIdx
+	// 15.03 proxy fun -> data ist proxyIdx, proxy = [strRef, funRef]
+	// 15.04 concat
+	// 15.05 composite
+	// 15.06..15.15 reserviert
+
+	static int typeOf(final int ref) {
+		return ref & 15;
+	}
+
+	static int dataOf(final int ref) {
+		return ref >>> 4;
+	}
+
 	@Override
 	public FEMValue get() {
 		return FEMVoid.INSTANCE;
 	}
 
-	public FEMValue value(int ref) {
+	public FEMValue value(final int ref) {
 		return FEMVoid.INSTANCE;
 	}
 
-	public FEMFunction function(int ref) {
+	public FEMFunction function(final int ref) {
 		return FEMVoid.INSTANCE;
 	}
 

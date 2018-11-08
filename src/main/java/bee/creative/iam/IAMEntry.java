@@ -11,39 +11,39 @@ package bee.creative.iam;
 public abstract class IAMEntry {
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyEntry extends IAMEntry {
+	static class EmptyEntry extends IAMEntry {
 
 		@Override
-		public final IAMArray value() {
+		public IAMArray value() {
 			return IAMArray.EMPTY;
 		}
 
 		@Override
-		public final IAMArray key() {
+		public IAMArray key() {
 			return IAMArray.EMPTY;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class SimpleEntry extends IAMEntry {
+	static class CompositeEntry extends IAMEntry {
 
 		final IAMArray key;
 
 		final IAMArray value;
 
-		SimpleEntry(final IAMArray key, final IAMArray value) {
+		CompositeEntry(final IAMArray key, final IAMArray value) {
 			this.key = key;
 			this.value = value;
 		}
 
 		@Override
-		public final IAMArray key() {
+		public IAMArray key() {
 			return this.key;
 		}
 
 		@Override
-		public final IAMArray value() {
+		public IAMArray value() {
 			return this.value;
 		}
 
@@ -60,7 +60,7 @@ public abstract class IAMEntry {
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
 	public static IAMEntry from(final IAMArray key, final IAMArray value) throws NullPointerException {
 		if ((key.length() == 0) && (value.length() == 0)) return IAMEntry.EMPTY;
-		return new SimpleEntry(key, value);
+		return new CompositeEntry(key, value);
 	}
 
 	/** Diese Methode gibt den Schlüssel als Zahlenfolge zurück.

@@ -42,6 +42,13 @@ public abstract class MMFArray extends IAMArray {
 		super(length);
 	}
 
+	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück. Diese Größe ist {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für
+	 * {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code INT32}-Zahlen.
+	 *
+	 * @return Größe jeder Zahl dieser Zahlenfolge (1, 2 oder 4). */
+	@Override
+	public abstract int mode();
+
 	/** Diese Methode gibt die Bytereihenfolge zur Interpretation des internen {@link ByteBuffer} bzw. {@link MappedBuffer} zurück.
 	 *
 	 * @see #withOrder(ByteOrder)

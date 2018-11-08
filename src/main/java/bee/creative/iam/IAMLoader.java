@@ -11,8 +11,8 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class IAMLoader {
 
-	/** Diese Klasse implementiert ein Objekt zur Analyse und Prüfung der Kennung einer Datenstruktur in den Kopfdaten von {@code IAM_MAP}, {@code IAM_LIST} oder
-	 * {@code IAM_INDEX}.
+	/** Diese Klasse implementiert ein Objekt zur Analyse und Prüfung der Kennung einer Datenstruktur in den Kopfdaten von {@code IAM_MAPPING},
+	 * {@code IAM_LISTING} oder {@code IAM_INDEX}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMHeader {
@@ -209,7 +209,7 @@ public class IAMLoader {
 		/** Dieses Feld speichert den leeren {@link IAMListingLoader}. */
 		public static final IAMListingLoader EMPTY = new IAMListingLoader();
 
-		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_LIST} Datenstruktur. */
+		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_LISTING} Datenstruktur. */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFF0, 0xF00D2000);
 
 		/** Dieses Feld speichert die Zahlen der Elemente. */
@@ -332,7 +332,7 @@ public class IAMLoader {
 		/** Dieses Feld speichert den leeren {@link IAMMappingLoader}. */
 		public static final IAMMappingLoader EMPTY = new IAMMappingLoader();
 
-		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_MAP} Datenstruktur. */
+		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_MAPPING} Datenstruktur. */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFC00, 0xF00D1000);
 
 		/** Dieses Feld speichert die Zahlen der Schlüssel. */

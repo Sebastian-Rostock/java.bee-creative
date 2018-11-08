@@ -16,6 +16,12 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	/** Dieses Feld speichert die Dezimalzahl {@code 0}. */
 	public static final FEMInteger EMPTY = new FEMInteger(0);
 
+	/** Dieses Feld speichert die größte negative Dezimalzahl. */
+	public static final FEMInteger MINIMUM = new FEMInteger(Long.MIN_VALUE);
+
+	/** Dieses Feld speichert die größte positive Dezimalzahl. */
+	public static final FEMInteger MAXIMUM = new FEMInteger(Long.MAX_VALUE);
+	
 	/** Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
 	 *
 	 * @param value Wert.

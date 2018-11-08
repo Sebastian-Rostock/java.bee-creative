@@ -11,7 +11,7 @@ import bee.creative.util.Objects;
 public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray> {
 
 	@SuppressWarnings ("javadoc")
-	static final class IntArray extends IAMArray {
+	static class IntArray extends IAMArray {
 
 		final int[] array;
 
@@ -24,22 +24,22 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		protected final int customGet(final int index) {
+		protected int customGet(final int index) {
 			return this.array[this.offset + index];
 		}
 
 		@Override
-		protected final IAMArray customSection(final int offset, final int length) {
+		protected IAMArray customSection(final int offset, final int length) {
 			return new IntArray(this.array, this.offset + offset, length);
 		}
 
 		@Override
-		public final int mode() {
+		public int mode() {
 			return 4;
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			int hash = 0x811C9DC5;
 			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
 				hash = (hash * 0x01000193) ^ this.array[i];
@@ -48,7 +48,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (object instanceof IntArray) return IAMArray.equals(this, (IntArray)object);
 			if (object instanceof ByteArray) return IAMArray.equals(this, (ByteArray)object);
@@ -59,9 +59,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
-		public final int compareTo(final IAMArray object) {
+		public int compareTo(final IAMArray object) {
 			if (object instanceof IntArray) return IAMArray.compare(this, (IntArray)object);
 			if (object instanceof ByteArray) return IAMArray.compare(this, (ByteArray)object);
 			if (object instanceof CharArray) return IAMArray.compare(this, (CharArray)object);
@@ -73,7 +72,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ByteArray extends IAMArray {
+	static class ByteArray extends IAMArray {
 
 		final byte[] array;
 
@@ -86,22 +85,22 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		protected final int customGet(final int index) {
+		protected int customGet(final int index) {
 			return this.array[this.offset + index];
 		}
 
 		@Override
-		protected final IAMArray customSection(final int offset, final int length) {
+		protected IAMArray customSection(final int offset, final int length) {
 			return new ByteArray(this.array, this.offset + offset, length);
 		}
 
 		@Override
-		public final int mode() {
+		public int mode() {
 			return 1;
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			int hash = 0x811C9DC5;
 			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
 				hash = (hash * 0x01000193) ^ this.array[i];
@@ -110,7 +109,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
 			if (object instanceof ByteArray) return IAMArray.equals(this, (ByteArray)object);
@@ -121,9 +120,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
-		public final int compareTo(final IAMArray object) {
+		public int compareTo(final IAMArray object) {
 			if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
 			if (object instanceof ByteArray) return IAMArray.compare(this, (ByteArray)object);
 			if (object instanceof CharArray) return IAMArray.compare(this, (CharArray)object);
@@ -135,7 +133,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class CharArray extends IAMArray {
+	static class CharArray extends IAMArray {
 
 		final char[] array;
 
@@ -148,22 +146,22 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		protected final int customGet(final int index) {
+		protected int customGet(final int index) {
 			return this.array[this.offset + index];
 		}
 
 		@Override
-		protected final IAMArray customSection(final int offset, final int length) {
+		protected IAMArray customSection(final int offset, final int length) {
 			return new CharArray(this.array, this.offset + offset, length);
 		}
 
 		@Override
-		public final int mode() {
+		public int mode() {
 			return 2;
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			int hash = 0x811C9DC5;
 			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
 				hash = (hash * 0x01000193) ^ this.array[i];
@@ -172,7 +170,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
 			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
@@ -183,9 +181,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
-		public final int compareTo(final IAMArray object) {
+		public int compareTo(final IAMArray object) {
 			if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
 			if (object instanceof ByteArray) return -IAMArray.compare((ByteArray)object, this);
 			if (object instanceof CharArray) return IAMArray.compare(this, (CharArray)object);
@@ -197,7 +194,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ShortArray extends IAMArray {
+	static class ShortArray extends IAMArray {
 
 		final short[] array;
 
@@ -210,22 +207,22 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		protected final int customGet(final int index) {
+		protected int customGet(final int index) {
 			return this.array[this.offset + index];
 		}
 
 		@Override
-		protected final IAMArray customSection(final int offset, final int length) {
+		protected IAMArray customSection(final int offset, final int length) {
 			return new ShortArray(this.array, this.offset + offset, length);
 		}
 
 		@Override
-		public final int mode() {
+		public int mode() {
 			return 2;
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			int hash = 0x811C9DC5;
 			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
 				hash = (hash * 0x01000193) ^ this.array[i];
@@ -234,7 +231,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
 			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
@@ -245,9 +242,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
-		public final int compareTo(final IAMArray object) {
+		public int compareTo(final IAMArray object) {
 			if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
 			if (object instanceof ByteArray) return -IAMArray.compare((ByteArray)object, this);
 			if (object instanceof CharArray) return -IAMArray.compare((CharArray)object, this);
@@ -259,7 +255,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyArray extends IAMArray {
+	static class EmptyArray extends IAMArray {
 
 		EmptyArray() {
 			super(0);
@@ -267,8 +263,38 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
+	static class ConcatArray extends IAMArray {
+
+		public final IAMArray array1;
+
+		public final IAMArray array2;
+
+		ConcatArray(final IAMArray array1, final IAMArray array2) {
+			super(array1.length + array2.length);
+			this.array1 = array1;
+			this.array2 = array2;
+		}
+
+		@Override
+		public int mode() {
+			return Math.max(this.array1.mode(), this.array2.mode());
+		}
+
+		@Override
+		protected int customGet(final int index) {
+			final int index2 = index - this.array1.length;
+			return index2 < 0 ? this.array1.customGet(index) : this.array2.customGet(index2);
+		}
+
+		@Override
+		protected IAMArray customSection(final int offset, final int length) {
+			return super.customSection(offset, length);
+		}
+
+	}
+
 	@SuppressWarnings ("javadoc")
-	static final class SectionArray extends IAMArray {
+	static class SectionArray extends IAMArray {
 
 		final IAMArray array;
 
@@ -281,22 +307,22 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		protected final int customGet(final int index) {
+		protected int customGet(final int index) {
 			return this.array.customGet(this.offset + index);
 		}
 
 		@Override
-		protected final IAMArray customSection(final int offset, final int length) {
+		protected IAMArray customSection(final int offset, final int length) {
 			return this.array.customSection(this.offset + offset, length);
 		}
 
 		@Override
-		public final int mode() {
+		public int mode() {
 			return this.array.mode();
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			int hash = 0x811C9DC5;
 			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
 				hash = (hash * 0x01000193) ^ this.array.customGet(i);
@@ -305,7 +331,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
 			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
@@ -316,9 +342,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
-		public final int compareTo(final IAMArray object) {
+		public int compareTo(final IAMArray object) {
 			if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
 			if (object instanceof ByteArray) return -IAMArray.compare((ByteArray)object, this);
 			if (object instanceof CharArray) return -IAMArray.compare((CharArray)object, this);
@@ -1010,12 +1035,12 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return this.length;
 	}
 
-	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück. Diese Größe ist {@code 0} für eine unspezifische Zahlenfolgen, {@code 1} für
-	 * {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code INT32}-Zahlen.
+	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück. Diese Größe ist {@code 1} für {@code byte}-Zahlen, {@code 2} für {@code short}-Zahlen
+	 * und {@code 4} für {@code int}-Zahlen.
 	 *
-	 * @return Größe jeder Zahl dieser Zahlenfolge (0..4). */
+	 * @return Größe jeder Zahl dieser Zahlenfolge (1, 2 oder 4). */
 	public int mode() {
-		return 0;
+		return 1;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück. <pre>
@@ -1044,8 +1069,25 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return this.equals(Objects.<Object>notNull(that));
 	}
 
+	public IAMArray concat(final IAMArray that) throws NullPointerException {
+		if (that.length == 0) return this;
+		if (this.length == 0) return that;
+		return new ConcatArray(this, that);
+	}
+
+	public IAMArray compact() {
+		switch (this.mode()) {
+			case 1:
+				return IAMArray.from(this.toBytes());
+			case 2:
+				return IAMArray.from(this.toShorts());
+			default:
+				return IAMArray.from(this.toInts());
+		}
+	}
+
 	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung dieser Zahlenfolge lexikografisch kleiner, gleich bzw.
-	 * größer als die der gegebenen Zahlenfolge ist. <pre>
+	 * größer als die der gegebenen Zahlenfolge ist. <pre> TODO korrigieren mit -1,0,+1
 	 * for (int i = 0, result; i < min(length(), that.length()); i++)
 	 *   if ((result = get(i) – that.get(i)) != 0) return result;
 	 * return length() – that.length();
@@ -1231,8 +1273,9 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return this.length() > 50 ? //
-			Objects.formatIterable(false, Iterables.chainedIterable(this.section(0, 25), Iterables.itemIterable(Objects.toStringObject("...")))) : //
+		return this.length() > 30 ? //
+			Objects.formatIterable(false, Iterables.chainedIterable(this.section(0, 15), Iterables.itemIterable(Objects.toStringObject("...")))) : //
 			Objects.formatIterable(false, this);
 	}
+
 }

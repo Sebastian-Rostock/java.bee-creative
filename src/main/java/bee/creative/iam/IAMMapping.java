@@ -25,7 +25,7 @@ import bee.creative.util.Objects;
 public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyMapping extends IAMMapping {
+	static class EmptyMapping extends IAMMapping {
 
 		@Override
 		public boolean mode() {
@@ -33,35 +33,35 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		}
 
 		@Override
-		public final IAMArray key(final int entryIndex) {
+		public IAMArray key(final int entryIndex) {
 			return IAMArray.EMPTY;
 		}
 
 		@Override
-		public final IAMArray value(final int entryIndex) {
+		public IAMArray value(final int entryIndex) {
 			return IAMArray.EMPTY;
 		}
 
 		@Override
-		public final int entryCount() {
+		public int entryCount() {
 			return 0;
 		}
 
 		@Override
-		public final int find(final IAMArray key) throws NullPointerException {
+		public int find(final IAMArray key) throws NullPointerException {
 			Objects.notNull(key);
 			return -1;
 		}
 
 		@Override
-		public final IAMMapping toMapping() {
+		public IAMMapping toMapping() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class CompactMapping extends IAMMapping {
+	static class CompactMapping extends IAMMapping {
 
 		final int[] keyData;
 
@@ -81,7 +81,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 		final int entryCount;
 
-		public CompactMapping(final IAMMapping that) {
+		CompactMapping(final IAMMapping that) {
 			final int entryCount = that.entryCount();
 			final Integer[] indexArray = new Integer[entryCount];
 			for (int i = 0; i < entryCount; i++) {
@@ -159,12 +159,12 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		}
 
 		@Override
-		public final boolean mode() {
+		public boolean mode() {
 			return this.rangeMask != 0;
 		}
 
 		@Override
-		public final int find(final IAMArray key) throws NullPointerException {
+		public int find(final IAMArray key) throws NullPointerException {
 			Objects.notNull(key);
 			int i = this.rangeMask;
 			if (i != 0) {
@@ -189,7 +189,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		}
 
 		@Override
-		public final IAMArray key(final int entryIndex) {
+		public IAMArray key(final int entryIndex) {
 			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMArray.EMPTY;
 			if (this.keyOffset == null) {
 				final int length = this.keyLength;
@@ -201,7 +201,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		}
 
 		@Override
-		public final int key(final int entryIndex, final int index) {
+		public int key(final int entryIndex, final int index) {
 			if ((index < 0) || (entryIndex < 0) || (entryIndex >= this.entryCount)) return 0;
 			if (this.keyOffset == null) {
 				if (index >= this.keyLength) return 0;
@@ -214,14 +214,14 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		}
 
 		@Override
-		public final int keyLength(final int entryIndex) {
+		public int keyLength(final int entryIndex) {
 			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return 0;
 			if (this.keyOffset == null) return this.keyLength;
 			return this.keyOffset[entryIndex + 1] - this.keyOffset[entryIndex];
 		}
 
 		@Override
-		public final IAMArray value(final int entryIndex) {
+		public IAMArray value(final int entryIndex) {
 			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMArray.EMPTY;
 			if (this.valueOffset == null) {
 				final int length = this.valueLength;
@@ -233,7 +233,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		}
 
 		@Override
-		public final int value(final int entryIndex, final int index) {
+		public int value(final int entryIndex, final int index) {
 			if ((index < 0) || (entryIndex < 0) || (entryIndex >= this.entryCount)) return 0;
 			if (this.valueOffset == null) {
 				if (index >= this.valueLength) return 0;
@@ -246,26 +246,26 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		}
 
 		@Override
-		public final int valueLength(final int entryIndex) {
+		public int valueLength(final int entryIndex) {
 			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return 0;
 			if (this.valueOffset == null) return this.valueLength;
 			return this.valueOffset[entryIndex + 1] - this.valueOffset[entryIndex];
 		}
 
 		@Override
-		public final int entryCount() {
+		public int entryCount() {
 			return this.entryCount;
 		}
 
 		@Override
-		public final IAMMapping toMapping() {
+		public IAMMapping toMapping() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class Entries extends AbstractList<IAMEntry> {
+	static class Entries extends AbstractList<IAMEntry> {
 
 		final IAMMapping owner;
 
@@ -274,13 +274,13 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		}
 
 		@Override
-		public final IAMEntry get(final int index) {
+		public IAMEntry get(final int index) {
 			if ((index < 0) || (index >= this.owner.entryCount())) throw new IndexOutOfBoundsException();
 			return this.owner.entry(index);
 		}
 
 		@Override
-		public final int size() {
+		public int size() {
 			return this.owner.entryCount();
 		}
 
@@ -436,7 +436,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @param entryIndex Index des Eintrags.
 	 * @return {@code entryIndex}-ter Eintrag. */
 	public final IAMEntry entry(final int entryIndex) {
-		if ((entryIndex < 0) || (entryIndex >= this.entryCount())) return IAMEntry.EMPTY;
 		return IAMEntry.from(this.key(entryIndex), this.value(entryIndex));
 	}
 

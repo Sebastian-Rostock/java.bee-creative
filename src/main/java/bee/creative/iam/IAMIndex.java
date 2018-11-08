@@ -18,7 +18,7 @@ import bee.creative.util.Objects;
 public abstract class IAMIndex {
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyIndex extends IAMIndex {
+	static class EmptyIndex extends IAMIndex {
 
 		@Override
 		public IAMMapping mapping(final int index) {
@@ -45,7 +45,7 @@ public abstract class IAMIndex {
 	/** Diese Klasse implementiert ein Objekt zur Ermittlung der Längen gegebener Zahlenlisten.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	static final class SizeStats {
+	static class SizeStats {
 
 		/** Diese Methode füht die Startpositionen der gegebenen Zahlenfolgen an den gegebenen {@link ByteBuffer} an. Die Zahlenfolgen repräsentieren die von
 		 * {@link IAMListing#toBytes(ByteOrder)} bzw. {@link IAMMapping#toBytes(ByteOrder)} kodierten Datenstrukturen.
@@ -122,7 +122,7 @@ public abstract class IAMIndex {
 		/** Diese Methode schreibt die {@link #dataLength} bzw. das {@link #dataOffset} gemäß {@link #type} in den gegebenen Puffer.
 		 *
 		 * @param buffer Puffer. */
-		public final void putSize(final ByteBuffer buffer) {
+		public void putSize(final ByteBuffer buffer) {
 			if (this.type == 0) {
 				buffer.putInt(this.dataLength);
 			} else {
@@ -135,7 +135,7 @@ public abstract class IAMIndex {
 	/** Diese Klasse implementiert ein Objekt zur Ermittlung der Kodierung gegebener Zahlenlisten.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	static final class DataStats {
+	static class DataStats {
 
 		/** Diese Methode speichert die gegebene Zahlenfolge an den gegebenen {@link ByteBuffer} an. Der geschriebene Speicherbereich wird mit Nullwerten ergänzt,
 		 * um eine restlos durch vier teilbare Größe zu erreichen.
@@ -233,14 +233,14 @@ public abstract class IAMIndex {
 		/** Diese Methode schreibt die {@link #dataValue} gemäß {@link #type} in den gegebenen Puffer.
 		 *
 		 * @param buffer Puffer. */
-		public final void putData(final ByteBuffer buffer) {
+		public void putData(final ByteBuffer buffer) {
 			DataStats.putData(buffer, this.type, this.dataValue);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class Listingss extends AbstractList<IAMListing> {
+	static class Listingss extends AbstractList<IAMListing> {
 
 		final IAMIndex owner;
 
@@ -262,7 +262,7 @@ public abstract class IAMIndex {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class Mappings extends AbstractList<IAMMapping> {
+	static class Mappings extends AbstractList<IAMMapping> {
 
 		final IAMIndex owner;
 
@@ -320,7 +320,7 @@ public abstract class IAMIndex {
 	 * @see #mapping(int)
 	 * @see #mappingCount()
 	 * @return Abbildungen. */
-	public final List<IAMMapping> mappings() {
+	public List<IAMMapping> mappings() {
 		return new Mappings(this);
 	}
 
@@ -342,14 +342,14 @@ public abstract class IAMIndex {
 	 * @see #listing(int)
 	 * @see #listingCount()
 	 * @return Auflistungen. */
-	public final List<IAMListing> listings() {
+	public List<IAMListing> listings() {
 		return new Listingss(this);
 	}
 
 	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
 	 *
 	 * @return Binärdatenformat {@code IAM_INDEX}. */
-	public final byte[] toBytes() {
+	public byte[] toBytes() {
 		return this.toBytes(ByteOrder.nativeOrder());
 	}
 
@@ -357,7 +357,7 @@ public abstract class IAMIndex {
 	 *
 	 * @param order Bytereihenfolge.
 	 * @return {@code IAM_INDEX}. */
-	public final byte[] toBytes(final ByteOrder order) {
+	public byte[] toBytes(final ByteOrder order) {
 
 		int length = 20;
 

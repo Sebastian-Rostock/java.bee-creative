@@ -14,6 +14,12 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	/** Dieses Feld speichert den Dezimalbruch {@code NaN}. */
 	public static final FEMDecimal EMPTY = new FEMDecimal(Double.NaN);
 
+	/** Dieses Feld speichert die größte negativen Dezimalbruch. */
+	public static final FEMDecimal MINIMUM = new FEMDecimal(Double.MIN_VALUE);
+
+	/** Dieses Feld speichert die größte positiven Dezimalbruch. */
+	public static final FEMDecimal MAXIMUM = new FEMDecimal(Double.MAX_VALUE);
+
 	/** Diese Methode gibt einen neuen Dezimalbruch mit dem gegebenen Wert zurück.
 	 *
 	 * @param value Wert.
