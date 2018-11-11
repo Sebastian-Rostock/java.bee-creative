@@ -142,7 +142,7 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 
 		public final FEMArray values;
 
-		CompositeTable(final FEMArray keys, final FEMArray values) throws IllegalArgumentException {
+		protected CompositeTable(final FEMArray keys, final FEMArray values) throws IllegalArgumentException {
 			if (keys.length() != values.length()) throw new IllegalArgumentException();
 			this.keys = keys;
 			this.values = values;

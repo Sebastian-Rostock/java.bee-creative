@@ -545,15 +545,15 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return bigEndian ? new IntegerBinaryBE(length, value) : new IntegerBinaryLE(length, value);
 	}
 
-	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück. TODO mit hash Dabei werden die ersten vier Byte der Zahlenfolge als {@link #hash()
-	 * Streuwert} und die darauf folgenden Zahlenwerte als Bytes der Bytefolge interpretiert.
-	 *
+	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück. Dabei werden die ersten vier Byte der Zahlenfolge als {@link #hash() Streuwert} und die
+	 * darauf folgenden Zahlenwerte als Bytes der Bytefolge interpretiert.
+	 * 
+	 * @see #toArray()
 	 * @param array Zahlenfolge.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link IAMArray#mode() UNI8/UINT8} vorliegt. */
+	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link IAMArray#mode() INT8/UINT8} vorliegt. */
 	public static FEMBinary from(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-		if (array.length() == 0) return FEMBinary.EMPTY;
 		if (array.mode() == 1) return new ArrayBinary(array);
 		throw new IllegalArgumentException();
 	}
@@ -660,8 +660,8 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		throw new IllegalArgumentException("'F' < hexChar < 'a'");
 	}
 
-	/** Dieses Feld speichert den Streuwert. */
-	int hash;
+	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hash()} initialisiert. */
+	protected int hash;
 
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;

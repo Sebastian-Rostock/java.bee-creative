@@ -21,6 +21,7 @@ import bee.creative.fem.FEMParam;
 import bee.creative.fem.FEMProxy;
 import bee.creative.fem.FEMString;
 import bee.creative.fem.FEMTable;
+import bee.creative.fem.FEMTable.CompositeTable;
 import bee.creative.fem.FEMValue;
 import bee.creative.fem.FEMVoid;
 import bee.creative.iam.IAMArray;
@@ -38,6 +39,88 @@ import bee.creative.util.Unique;
 // json-format aus string und object[] derselben, de-/coder ebenfalls in javascript
 
 public class FEMIndex implements Producer<FEMValue> {
+
+	@SuppressWarnings ("javadoc")
+	protected class IndexArray extends FEMArray {
+
+		public final FEMIndex index;
+
+		public final IAMArray array;
+
+		public IndexArray(final FEMIndex index, final IAMArray array) {
+			super(array.length() - 1);
+			this.hash = array.get(0);
+			this.index = index;
+			this.array = array;
+		}
+
+		@Override
+		protected FEMValue customGet(final int index) {
+			return this.index.value(this.array.get(index + 1));
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	protected class IndexArray2 extends IndexArray {
+
+		public final FEMValue[] values;
+
+		public IndexArray2(final FEMIndex index, final IAMArray array) {
+			super(index, array);
+			this.values = new FEMValue[this.length()];
+		}
+
+		@Override
+		protected FEMValue customGet(final int index) {
+			final FEMValue result = this.values[index];
+			if (result != null) return result;
+			return this.values[index] = super.customGet(index);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	protected static class IndexTable extends CompositeTable {
+
+		public static class Keys extends FEMArray {
+
+			public final FEMArray items;
+
+			public final IAMMapping mapping;
+
+			public Keys(final FEMArray items, final IAMMapping mapping) {
+				super(items.length());
+				this.hash = items.hash();
+				this.items = items;
+				this.mapping = mapping;
+			}
+
+			@Override
+			protected FEMValue customGet(final int index) {
+				return this.items.get(index);
+			}
+
+			@Override
+			protected int customFind(final FEMValue that, final int offset) {
+				final int entry = this.mapping.find(that.hashCode());
+				if (entry < 0) return -1;
+				final IAMArray value = this.mapping.value(entry);
+				final int length = value.length();
+				for (int i = 0; i < length; i++) {
+					final int result = value.get(i);
+					if (that.equals(this.items.get(result))) return result < offset ? -1 : result;
+				}
+				return -1;
+			}
+
+		}
+
+		public IndexTable(final FEMArray keys, final FEMArray values, final IAMMapping mapping) {
+			super(new Keys(keys, mapping), values);
+		}
+
+	}
 
 	public static class IndexBuilder extends FEMIndex implements Property<FEMValue> {
 
@@ -78,19 +161,19 @@ public class FEMIndex implements Producer<FEMValue> {
 		/** Dieses Feld speichert die Auflistung der Referenzen, von denen jede aus zwei {@code int}-Zahlen besteht (lo, hi). */
 		protected IAMListingBuilder objectValuePool = new IAMListingBuilder();
 
-		/** Dieses Feld speichert die Auflistung der Tabellen, von denen jede aus drei {@code int}-Zahlen besteht (keyArrayRef, valueArrayRef, tableMappingIdx). Die
-		 * dabei referenzierte Abbildung besitzt Einträge der Form (keyHash)::(key1, value1, ..., keyN, valueN). */
+		/** Dieses Feld speichert die Auflistung der Tabellen, von denen jede aus drei {@code int}-Zahlen besteht (keyArrayIdx, valueArrayIdx, tableMappingIdx). Die
+		 * dabei referenzierte Abbildung besitzt Einträge der Form (keyHash)::(keyIdx1, ..., keyIdxN). */
 		protected IAMListingBuilder tableValuePool = new IAMListingBuilder();
 
-		IAMListingBuilder proxyFunctionPool = new IAMListingBuilder();
+		protected IAMListingBuilder proxyFunctionPool = new IAMListingBuilder();
 
-		IAMListingBuilder concatFunctionPool = new IAMListingBuilder();
+		protected IAMListingBuilder concatFunctionPool = new IAMListingBuilder();
 
-		IAMListingBuilder closureFunctionPool = new IAMListingBuilder();
+		protected IAMListingBuilder closureFunctionPool = new IAMListingBuilder();
 
-		IAMListingBuilder compositeFunctionPool = new IAMListingBuilder();
+		protected IAMListingBuilder compositeFunctionPool = new IAMListingBuilder();
 
-		protected FEMValue property;
+		protected int propertyRef;
 
 		public IndexBuilder() {
 			this.indexBuilder.put(-1, this.indexListing);
@@ -138,85 +221,86 @@ public class FEMIndex implements Producer<FEMValue> {
 
 		/** Diese Methode gibt die Wertreferenz auf {@link FEMVoid#INSTANCE} zurück. */
 		protected int putVoidValue() {
-			return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_VOID);
+			return this.toRef(FEMIndex.TYPE_VOID_VALUE, 0);
 		}
 
 		/** Diese Methode fügt die gegebene Wertliste in den {@link #arrayValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putArrayValue(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-			if (source.equals(FEMArray.EMPTY)) return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_ARRAY_EMPTY);
 			final IAMArray hash = IAMArray.from(source.hash());
 			final IAMArray items = IAMArray.from(this.putValues(source.value()));
 			final IAMArray array = hash.concat(items).compact();
 			final int index = this.arrayValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_ARRAY, index);
+			return this.toRef(FEMIndex.TYPE_ARRAY_VALUE, index);
 		}
 
 		/** Diese Methode fügt den gegebenen Funktionszeiger in den {@link #handlerValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putHandlerValue(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
 			final IAMArray array = IAMArray.from(this.putFunction(source.value()));
 			final int index = this.handlerValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_HANDLER, index);
+			return this.toRef(FEMIndex.TYPE_HANDLER_VALUE, index);
 		}
 
 		/** Diese Methode gibt die Wertreferenz auf den gegebenen Wahrheitswert zurück. */
 		protected int putBooleanValue(final FEMBoolean source) throws NullPointerException {
-			return FEMIndex.toRef(FEMIndex.TYPE_CONST, source.value() ? FEMIndex.DATA_TRUE : FEMIndex.DATA_FALSE);
+			return this.toRef(source.value() ? FEMIndex.TYPE_TRUE_VALUE : FEMIndex.TYPE_FALSE_VALUE, 0);
 		}
 
 		/** Diese Methode fügt die gegebene Zeichenkette in den {@link #stringValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putStringValue(final FEMString source) throws NullPointerException {
-			if (source.equals(FEMString.EMPTY)) return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_STRING_EMPTY);
 			final IAMArray array = source.toArray();
 			final int index = this.stringValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_STRING, index);
+			return this.toRef(FEMIndex.TYPE_STRING_VALUE, index);
 		}
 
 		/** Diese Methode fügt die gegebene Bytefolge in den {@link #binaryValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putBinaryValue(final FEMBinary source) throws NullPointerException {
-			if (source.equals(FEMBinary.EMPTY)) return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_BINARY_EMPTY);
 			final IAMArray array = source.toArray();
 			final int index = this.binaryValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_BINARY, index);
+			return this.toRef(FEMIndex.TYPE_BINARY_VALUE, index);
 		}
 
 		/** Diese Methode fügt die gegebene Dezimalzahl in den {@link #integerValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putIntegerValue(final FEMInteger source) throws NullPointerException {
 			final long value = source.value();
-			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final IAMArray array = this.putLong(value);
 			final int index = this.integerValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_INTEGER, index);
+			return this.toRef(FEMIndex.TYPE_INTEGER_VALUE, index);
+		}
+
+		protected IAMArray putLong(final long value) {
+			return IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
 		}
 
 		/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #decimalValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putDecimalValue(final FEMDecimal source) throws NullPointerException {
 			final long value = Double.doubleToLongBits(source.value());
-			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final IAMArray array = this.putLong(value);
 			final int index = this.decimalValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_DECIMAL, index);
+			return this.toRef(FEMIndex.TYPE_DECIMAL_VALUE, index);
 		}
 
 		/** Diese Methode fügt die gegebene Zeitspanne in den {@link #durationValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putDurationValue(final FEMDuration source) throws NullPointerException {
 			final long value = source.value();
-			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final IAMArray array = this.putLong(value);
 			final int index = this.durationValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_DURATION, index);
+			return this.toRef(FEMIndex.TYPE_DURATION_VALUE, index);
 		}
 
 		/** Diese Methode fügt die gegebene Zeitangabe in den {@link #datetimeValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putDatetimeValue(final FEMDatetime source) throws NullPointerException {
 			final long value = source.value();
-			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final IAMArray array = this.putLong(value);
 			final int index = this.datetimeValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_DATETIME, index);
+			return this.toRef(FEMIndex.TYPE_DATETIME_VALUE, index);
 		}
 
 		/** Diese Methode fügt die gegebene Referenz in den {@link #objectValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putObjectValue(final FEMObject source) throws NullPointerException {
 			final long value = source.value();
-			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final IAMArray array = this.putLong(value);
 			final int index = this.objectValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_OBJECT, index);
+			return this.toRef(FEMIndex.TYPE_OBJECT_VALUE, index);
 		}
 
 		/** Diese Methode fügt die gegebene Tabelle in den {@link #tableValuePool} ein und gibt die Wertreferenz darauf zurück. Ihre Schlüssel- und Wertspalten
@@ -225,17 +309,17 @@ public class FEMIndex implements Producer<FEMValue> {
 		 * {@link IAMEntry#value()} enthält dazu die Auflistung entsprechenden Schlüsselreferenz-Wertreferenz-Paare. */
 		protected int putTableValue(final FEMTable source) throws NullPointerException {
 			final Unique<Integer, List<Integer>> unique = new Unique<Integer, List<Integer>>() {
-		
+
 				@Override
 				protected List<Integer> customBuild(final Integer source) {
 					return new ArrayList<>();
 				}
-		
-			};
+
+			};// TODO korrigieren
 			for (final FEMArray entry: source) {
-				final Integer keyRef = new Integer(this.putValue(entry.get(0)));
-				final Integer valueRef = new Integer(this.putValue(entry.get(1)));
-				final List<Integer> items = unique.get(keyRef);
+				final FEMValue key = entry.get(0), value = entry.get(1);
+				final Integer keyRef = new Integer(this.putValue(key)), keyHash = new Integer(key.hashCode()), valueRef = new Integer(this.putValue(value));
+				final List<Integer> items = unique.get(keyHash);
 				items.add(keyRef);
 				items.add(valueRef);
 			}
@@ -246,21 +330,21 @@ public class FEMIndex implements Producer<FEMValue> {
 				mapping.put(key, value);
 			}
 			if (unique.mapping().size() != mapping.entryCount()) throw new IllegalArgumentException();
-			final int keysRef = this.putArrayValue(source.keys());
-			final int valuesRef = this.putArrayValue(source.values());
-			final int mappingRef = this.indexBuilder.put(mapping);
-			final IAMArray array = IAMArray.from(keysRef, valuesRef, mappingRef);
+			final int keysIdx = this.toIndex(this.putArrayValue(source.keys()));
+			final int valuesIdx = this.toIndex(this.putArrayValue(source.values()));
+			final int mappingIdx = this.indexBuilder.put(mapping);
+			final IAMArray array = IAMArray.from(keysIdx, valuesIdx, mappingIdx);
 			final int index = this.tableValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_TABLE, index);
+			return this.toRef(FEMIndex.TYPE_TABLE_VALUE, index);
 		}
 
 		public int putFunction(final FEMFunction source) throws FEMException {
 			if (source instanceof FEMValue) return this.putValue((FEMValue)source);
-			if (source instanceof FEMProxy) return this.customPutProxy((FEMProxy)source);
+			if (source instanceof FEMProxy) return this.putProxyFunction((FEMProxy)source);
 			if (source instanceof FEMParam) return this.putParamFunction((FEMParam)source);
 			if (source instanceof ConcatFunction) return this.putConcatFunction((ConcatFunction)source);
-			if (source instanceof ClosureFunction) return this.customPutClosure((ClosureFunction)source);
-			if (source instanceof CompositeFunction) return this.customPutComposite((CompositeFunction)source);
+			if (source instanceof ClosureFunction) return this.putClosureFunction((ClosureFunction)source);
+			if (source instanceof CompositeFunction) return this.putCompositeFunction((CompositeFunction)source);
 			throw new IllegalArgumentException();
 		}
 
@@ -273,16 +357,17 @@ public class FEMIndex implements Producer<FEMValue> {
 			return result;
 		}
 
-		protected int customPutProxy(final FEMProxy source) {
-		
-			throw new IllegalArgumentException();
+		protected int putProxyFunction(final FEMProxy source) {
+			final int nameIdx = this.toIndex(this.putStringValue(FEMString.from(source.name())));
+			final int functionRef = this.putFunction(source.get());
+			final IAMArray array = IAMArray.from(nameIdx, functionRef);
+			final int index = this.proxyFunctionPool.put(array);
+			return this.toRef(FEMIndex.TYPE_PROXY_FUNCTION, index);
 		}
-
-
 
 		protected int putParamFunction(final FEMParam source) throws NullPointerException {
 			final int index = source.index();
-			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_PARAM, index);
+			return this.toRef(FEMIndex.TYPE_PARAM_FUNCTION, index);
 		}
 
 		protected int putConcatFunction(final ConcatFunction source) throws NullPointerException, IllegalArgumentException {
@@ -290,31 +375,81 @@ public class FEMIndex implements Producer<FEMValue> {
 			final IAMArray params = IAMArray.from(this.putFunctions(source.params()));
 			final IAMArray array = method.concat(params).compact();
 			final int index = this.concatFunctionPool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_CONCAT, index);
+			return this.toRef(FEMIndex.TYPE_CONCAT_FUNCTION, index);
 		}
 
-		protected int customPutClosure(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
+		protected int putClosureFunction(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
 			final IAMArray array = IAMArray.from(this.putFunction(source.function()));
 			final int index = this.closureFunctionPool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_CLOSURE, index);
+			return this.toRef(FEMIndex.TYPE_CLOSURE_FUNCTION, index);
 		}
 
-		protected int customPutComposite(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
+		protected int putCompositeFunction(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
 			final IAMArray method = IAMArray.from(this.putFunction(source.function()));
 			final IAMArray params = IAMArray.from(this.putFunctions(source.params()));
 			final IAMArray array = method.concat(params).compact();
 			final int index = this.compositeFunctionPool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_COMPOSITE, index);
+			return this.toRef(FEMIndex.TYPE_COMPOSITE_FUNCTION, index);
 		}
 
 		@Override
 		public FEMValue get() {
-			return super.get();
+			return this.value(this.propertyRef);
 		}
 
 		@Override
 		public void set(final FEMValue value) {
+			this.propertyRef = this.putValue(value);
+		}
 
+		@Override
+		protected FEMArray getArrayValue(final int index) {
+			return this.getArrayValue(this.arrayValuePool.item(index));
+		}
+
+		@Override
+		protected FEMString getStringValue(final int index) {
+			return this.getStringValue(this.stringValuePool.item(index));
+		}
+
+		@Override
+		protected FEMBinary getBinaryValue(final int index) {
+			return this.getBinaryValue(this.binaryValuePool.item(index));
+		}
+
+		@Override
+		protected FEMInteger getIntegerValue(final int index) {
+			return this.getIntegerValue(this.integerValuePool.item(index));
+		}
+
+		@Override
+		protected FEMDecimal getDecimalValue(final int index) {
+			return this.getDecimalValue(this.decimalValuePool.item(index));
+		}
+
+		@Override
+		protected FEMDatetime getDatetimeValue(final int index) {
+			return this.getDatetimeValue(this.datetimeValuePool.item(index));
+		}
+
+		@Override
+		protected FEMDuration getDurationValue(final int index) {
+			return this.getDurationValue(this.durationValuePool.item(index));
+		}
+
+		@Override
+		protected FEMHandler getHandlerValue(final int index) {
+			return this.getHandlerValue(this.handlerValuePool.item(index));
+		}
+
+		@Override
+		protected FEMObject getObjectValue(final int index) {
+			return this.getObjectValue(this.objectValuePool.item(index));
+		}
+
+		@Override
+		protected FEMTable getTableValue(final int index) {
+			return this.getTableValue(this.tableValuePool.item(index));
 		}
 
 	}
@@ -323,100 +458,257 @@ public class FEMIndex implements Producer<FEMValue> {
 
 	}
 
-	public static final int TYPE_TABLE = 0;
+	protected static final int TYPE_VOID_VALUE = 0;
 
-	protected static final int TYPE_DURATION = 0;
+	protected static final int TYPE_TRUE_VALUE = 1;
 
-	protected static final int TYPE_DECIMAL = 0;
+	protected static final int TYPE_FALSE_VALUE = 2;
 
-	protected static final int TYPE_HANDLER = 0;
+	protected static final int TYPE_ARRAY_VALUE = 3;
 
-	protected static final int TYPE_DATETIME = 0;
+	protected static final int TYPE_STRING_VALUE = 4;
 
-	protected static final int TYPE_OBJECT = 0;
+	protected static final int TYPE_BINARY_VALUE = 5;
 
-	protected static final int TYPE_ARRAY = 0;
+	protected static final int TYPE_INTEGER_VALUE = 6;
 
-	protected static final int TYPE_STRING = 0;
+	protected static final int TYPE_DECIMAL_VALUE = 7;
 
-	protected static final int TYPE_BINARY = 0;
+	protected static final int TYPE_DATETIME_VALUE = 8;
 
-	protected static final int TYPE_INTEGER = 0;
+	protected static final int TYPE_DURATION_VALUE = 9;
 
-	public static final int TYPE_CONST = 0;
+	protected static final int TYPE_HANDLER_VALUE = 10;
 
-	public static final int TYPE_FUNCTION_COMPOSITE = 0;
+	protected static final int TYPE_OBJECT_VALUE = 11;
 
-	public static final int TYPE_FUNCTION_CONCAT = 0;
+	protected static final int TYPE_TABLE_VALUE = 12;
 
-	public static final int TYPE_FUNCTION_CLOSURE = 0;
+	protected static final int TYPE_PROXY_FUNCTION = 13;
 
-	public static final int TYPE_FUNCTION_PARAM = 0;
+	protected static final int TYPE_PARAM_FUNCTION = 14;
 
-	static final int DATA_VOID = 0;
+	protected static final int TYPE_CONCAT_FUNCTION = 15;
 
-	static final int DATA_TRUE = 0;
+	protected static final int TYPE_CLOSURE_FUNCTION = 16;
 
-	static final int DATA_FALSE = 0;
-
-	static final int DATA_ARRAY_EMPTY = 0;
-
-	static final int DATA_STRING_EMPTY = 0;
-
-	static final int DATA_BINARY_EMPTY = 0;
-
-	static int toRef(final int type, final int data) {
-		return (data << 4) | type;
-	}
-
-	// niederwertige 4 bit
-	// PT bei VALUE in array oder als Parameterliste
-
-	// 00 const VALUE
-	// 00.00 void
-	// 00.01 true
-	// 00.02 false
-	// 00.xx CUSTOM VALUE
-	// 01 aray data = [valueRef, ..., valueRef]
-	// 10 table data = mappingIdx
-	// 02 binary
-	// 03 string
-	// 09 object
-	// 04 integer
-	// 05 decimal
-	// 06 duration
-	// 07 datetime
-	// 08 handler -> data = handlerIdx -> handlerItem = VALUE/FUNCTION
-	// 00..10 kommen in array vor
-	// 11..14 für value reserviert
-	// 15 function -> weiter 4 bit unterscheiden den Typ
-
-	// 15.00 const FUNCTION -> data ist ID (CUSTOM/SYSTEM)
-	// 15.01 param fun -> data ist FEMParam.index()
-	// 15.02 closure -> data analog zu handlerIdx
-	// 15.03 proxy fun -> data ist proxyIdx, proxy = [strRef, funRef]
-	// 15.04 concat
-	// 15.05 composite
-	// 15.06..15.15 reserviert
-
-	static int typeOf(final int ref) {
-		return ref & 15;
-	}
-
-	static int dataOf(final int ref) {
-		return ref >>> 4;
-	}
+	protected static final int TYPE_COMPOSITE_FUNCTION = 17;
 
 	@Override
 	public FEMValue get() {
 		return FEMVoid.INSTANCE;
 	}
 
+	/** Diese Methode gibt den Wert zu gegebenen Wertreferenz zurück. Wenn diese ungültig ist, wird {@link FEMVoid#INSTANCE} geliefert.
+	 *
+	 * @param ref Wertreferenz.
+	 * @return Wert. */
 	public FEMValue value(final int ref) {
-		return FEMVoid.INSTANCE;
+		final int type = this.toType(ref), index = this.toIndex(ref);
+		switch (type) {
+			case TYPE_VOID_VALUE:
+				return FEMVoid.INSTANCE;
+			case TYPE_TRUE_VALUE:
+				return FEMBoolean.TRUE;
+			case TYPE_FALSE_VALUE:
+				return FEMBoolean.FALSE;
+			case TYPE_ARRAY_VALUE:
+				return this.getArrayValue(index);
+			case TYPE_STRING_VALUE:
+				return this.getStringValue(index);
+			case TYPE_BINARY_VALUE:
+				return this.getBinaryValue(index);
+			case TYPE_INTEGER_VALUE:
+				return this.getIntegerValue(index);
+			case TYPE_DECIMAL_VALUE:
+				return this.getDecimalValue(index);
+			case TYPE_DATETIME_VALUE:
+				return this.getDatetimeValue(index);
+			case TYPE_DURATION_VALUE:
+				return this.getDurationValue(index);
+			case TYPE_HANDLER_VALUE:
+				return this.getHandlerValue(index);
+			case TYPE_OBJECT_VALUE:
+				return this.getObjectValue(index);
+			case TYPE_TABLE_VALUE:
+				return this.getTableValue(index);
+			default:
+				return this.getCustomValue(type, index);
+		}
 	}
 
 	public FEMFunction function(final int ref) {
+		final int type = this.toType(ref), index = this.toIndex(ref);
+		switch (type) {
+			case TYPE_VOID_VALUE:
+				return FEMVoid.INSTANCE;
+			case TYPE_TRUE_VALUE:
+				return FEMBoolean.TRUE;
+			case TYPE_FALSE_VALUE:
+				return FEMBoolean.FALSE;
+			case TYPE_ARRAY_VALUE:
+				return this.getArrayValue(index);
+			case TYPE_STRING_VALUE:
+				return this.getStringValue(index);
+			case TYPE_BINARY_VALUE:
+				return this.getBinaryValue(index);
+			case TYPE_INTEGER_VALUE:
+				return this.getIntegerValue(index);
+			case TYPE_DECIMAL_VALUE:
+				return this.getDecimalValue(index);
+			case TYPE_DATETIME_VALUE:
+				return this.getDatetimeValue(index);
+			case TYPE_DURATION_VALUE:
+				return this.getDurationValue(index);
+			case TYPE_HANDLER_VALUE:
+				return this.getHandlerValue(index);
+			case TYPE_OBJECT_VALUE:
+				return this.getObjectValue(index);
+			case TYPE_TABLE_VALUE:
+				return this.getTableValue(index);
+			case TYPE_PROXY_FUNCTION:
+				return this.getProxyFunction(index);
+			case TYPE_PARAM_FUNCTION:
+				return this.getParamFunction(index);
+			case TYPE_CONCAT_FUNCTION:
+				return this.getConcatFunction(index);
+			case TYPE_CLOSURE_FUNCTION:
+				return this.getClosureFunction(index);
+			case TYPE_COMPOSITE_FUNCTION:
+				return this.getCompositeFunction(index);
+			default:
+				return this.getCustomFunction(type, index);
+		}
+	}
+
+	protected int toRef(final int type, final int index) {
+		return (index << 5) | type;
+	}
+
+	protected int toType(final int ref) {
+		return ref & 31;
+	}
+
+	protected int toIndex(final int ref) {
+		return ref >>> 5;
+	}
+
+	protected long getLong(final IAMArray array) {
+		return Integers.toLong(array.get(1), array.get(0));
+	}
+
+	protected FEMArray getArrayValue(final int index) {
+		return FEMArray.EMPTY;
+	}
+
+	protected FEMArray getArrayValue(final IAMArray array) {
+		return new IndexArray(this, array);
+	}
+
+	protected FEMString getStringValue(final int index) {
+		return FEMString.EMPTY;
+	}
+
+	protected FEMString getStringValue(final IAMArray array) {
+		return FEMString.from(array);
+	}
+
+	protected FEMBinary getBinaryValue(final int index) {
+		return FEMBinary.EMPTY;
+	}
+
+	protected FEMBinary getBinaryValue(final IAMArray array) {
+		return FEMBinary.from(array);
+	}
+
+	protected FEMInteger getIntegerValue(final int index) {
+		return FEMInteger.EMPTY;
+	}
+
+	protected FEMInteger getIntegerValue(final IAMArray array) {
+		return new FEMInteger(this.getLong(array));
+	}
+
+	protected FEMDecimal getDecimalValue(final int index) {
+		return FEMDecimal.EMPTY;
+	}
+
+	protected FEMDecimal getDecimalValue(final IAMArray array) {
+		return new FEMDecimal(Double.longBitsToDouble(this.getLong(array)));
+	}
+
+	protected FEMDatetime getDatetimeValue(final int index) {
+		return FEMDatetime.EMPTY;
+	}
+
+	protected FEMDatetime getDatetimeValue(final IAMArray array) {
+		return new FEMDatetime(this.getLong(array));
+	}
+
+	protected FEMDuration getDurationValue(final int index) {
+		return FEMDuration.EMPTY;
+	}
+
+	protected FEMDuration getDurationValue(final IAMArray array) {
+		return new FEMDuration(this.getLong(array));
+	}
+
+	protected FEMHandler getHandlerValue(final int index) {
+		return FEMHandler.EMPTY;
+	}
+
+	protected FEMHandler getHandlerValue(final IAMArray array) {
+		return FEMHandler.from(this.function(array.get(0)));
+	}
+
+	protected FEMObject getObjectValue(final int index) {
+		return FEMObject.EMPTY;
+	}
+
+	protected FEMObject getObjectValue(final IAMArray array) {
+		return new FEMObject(this.getLong(array));
+	}
+
+	protected FEMTable getTableValue(final int index) {
+		return FEMTable.EMPTY;
+	}
+
+	protected FEMTable getTableValue(final IAMArray array) {
+		return new IndexTable(this.getArrayValue(array.get(0)), this.getArrayValue(array.get(1)), this.getTableMapping(array.get(2)));
+	}
+
+	/**
+	 * Abbildung von [key.hashCode] auf [keyIdx1, ..., keyIdxN] 
+	 */
+	protected IAMMapping getTableMapping(final int index) {
+		return IAMMapping.EMPTY;
+	}
+
+	protected FEMValue getCustomValue(final int type, final int index) {
+		return FEMVoid.INSTANCE;
+	}
+
+	protected FEMFunction getProxyFunction(final int index) {
+		return null;
+	}
+
+	protected FEMFunction getParamFunction(final int index) {
+		return null;
+	}
+
+	protected FEMFunction getConcatFunction(final int index) {
+		return null;
+	}
+
+	protected FEMFunction getClosureFunction(final int index) {
+		return null;
+	}
+
+	protected FEMFunction getCompositeFunction(final int index) {
+		return null;
+	}
+
+	protected FEMFunction getCustomFunction(final int type, final int index) {
 		return FEMVoid.INSTANCE;
 	}
 

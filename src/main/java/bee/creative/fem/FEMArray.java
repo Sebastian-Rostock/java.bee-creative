@@ -449,8 +449,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return FEMArray.concatAll(values, min, mid).concat(FEMArray.concatAll(values, mid + 1, max));
 	}
 
-	/** Dieses Feld speichert den Streuwert. */
-	int hash;
+	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hash()} initialisiert. */
+	protected int hash;
 
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;

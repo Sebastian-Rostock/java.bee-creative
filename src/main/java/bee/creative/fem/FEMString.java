@@ -1463,8 +1463,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		throw new IllegalArgumentException();
 	}
 
-	/** Dieses Feld speichert den Streuwert. */
-	int hash;
+	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hash()} initialisiert. */
+	protected	int hash;
 
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;

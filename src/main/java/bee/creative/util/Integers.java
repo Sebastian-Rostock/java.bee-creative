@@ -236,11 +236,11 @@ public class Integers {
 
 	/** Diese Methode gibt die gegebennen 16-Bit-Werte als 32-Bit-Wert zurück.
 	 *
-	 * @param short1 msb 16-Bit-Wert.
-	 * @param short0 lsb 16-Bit-Wert.
+	 * @param shortH msb 16-Bit-Wert.
+	 * @param shortL lsb 16-Bit-Wert.
 	 * @return 32-Bit-Wert */
-	public static int toInt(final int short1, final int short0) {
-		return (short1 << 16) | (short0 & 0xFFFF);
+	public static int toInt(final int shortH, final int shortL) {
+		return (shortH << 16) | (shortL & 0xFFFF);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toInt(int, int) toInt(toShort(byte3, byte2), toShort(byte1, byte0))}.
@@ -268,11 +268,11 @@ public class Integers {
 
 	/** Diese Methode gibt die gegebennen 8-Bit-Werte als 16-Bit-Wert zurück.
 	 *
-	 * @param byte1 msb 8-Bit-Wert.
-	 * @param byte0 lsb 8-Bit-Wert.
+	 * @param byteH msb 8-Bit-Wert.
+	 * @param byteL lsb 8-Bit-Wert.
 	 * @return 16-Bit-Wert */
-	public static int toShort(final int byte1, final int byte0) {
-		return (byte1 << 8) | (byte0 & 0xFF);
+	public static int toShort(final int byteH, final int byteL) {
+		return (byteH << 8) | (byteL & 0xFF);
 	}
 
 	/** Diese Methode gibt den lsb 16-Bit-Wert des gegebenen 32-Bit-Werts zurück.
@@ -293,11 +293,11 @@ public class Integers {
 
 	/** Diese Methode gibt die gegebennen 32-Bit-Werte als 64-Bit-Wert zurück.
 	 *
-	 * @param int1 msb 32-Bit-Wert.
-	 * @param int0 lsb 32-Bit-Wert.
+	 * @param intH msb 32-Bit-Wert.
+	 * @param intL lsb 32-Bit-Wert.
 	 * @return 64-Bit-Wert */
-	public static long toLong(final int int1, final int int0) {
-		return ((long)int1 << 32) | (int0 & 0xFFFFFFFFL);
+	public static long toLong(final int intH, final int intL) {
+		return ((long)intH << 32) | (intL & 0xFFFFFFFFL);
 	}
 
 }

@@ -14,6 +14,9 @@ public final class FEMHandler extends FEMValue {
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
 	public static final FEMType<FEMHandler> TYPE = FEMType.from(FEMHandler.ID);
 
+	/** Dieses Feld speichert den Funktionszeiger auf {@link FEMVoid#INSTANCE}. */
+	public static final FEMHandler EMPTY = new FEMHandler(FEMVoid.INSTANCE);
+
 	/** Diese Methode gibt die gegebene Funktion als Funktionszeiger zurück.
 	 *
 	 * @see FEMFunction#toValue()
