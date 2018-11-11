@@ -1,6 +1,7 @@
 package bee.creative.iam;
 
 import java.util.Iterator;
+import java.util.List;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
@@ -255,6 +256,28 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	@SuppressWarnings ("javadoc")
+	static class ValueArray extends IAMArray {
+
+		final int item;
+
+		ValueArray(final int item) {
+			super(1);
+			this.item = item;
+		}
+
+		@Override
+		protected int customGet(final int index) {
+			return this.item;
+		}
+
+		@Override
+		public int mode() {
+			return 4;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
 	static class EmptyArray extends IAMArray {
 
 		EmptyArray() {
@@ -263,6 +286,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	static class ConcatArray extends IAMArray {
 
 		public final IAMArray array1;
@@ -379,6 +403,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	public static IAMArray from(final int[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
 		if (length == 0) return IAMArray.EMPTY;
+		if (length == 1) return new ValueArray(array[offset]);
 		return new IntArray(array, offset, length);
 	}
 
@@ -455,6 +480,22 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
 		if (length == 0) return IAMArray.EMPTY;
 		return new ShortArray(array, offset, length);
+	}
+
+	/** Diese Methode gibt ein neues {@link IAMArray} mit den gegebene Zahlen zurück. Änderungen am Inhalt von {@code array} werden nicht auf das gelieferte
+	 * {@link IAMArray} übertragen!
+	 *
+	 * @param array Zahlen.
+	 * @return {@link IAMArray} aus den {@link Number#intValue()}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+	public static IAMArray from(final List<? extends Number> array) throws NullPointerException {
+		final int length = array.size();
+		final int[] result = new int[length];
+		int offset = 0;
+		for (final Number item: array) {
+			result[offset++] = item.intValue();
+		}
+		return IAMArray.from(result);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -1056,11 +1097,10 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt nur dann true zurück, wenn diese Zahlenfolge gleich der gegebenen Zahlenfolge ist. <pre>
-	 * if (length() != that.length()) return false;
+	 * if (this.length() != that.length()) return false;
 	 * for (int i = 0; i < length(); i++)
-	 *   if (get(i) != that.get(i)) return false;
-	 * return true;
-	 * </pre>
+	 *   if (this.get(i) != that.get(i)) return false;
+	 * return true;</pre>
 	 *
 	 * @param that Zahlenfolge.
 	 * @return Vergleichswert.
@@ -1069,12 +1109,21 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return this.equals(Objects.<Object>notNull(that));
 	}
 
+	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Zahlenfolge mit der gegebenen Zahlenfolge zurück.
+	 *
+	 * @param that Zahlenfolge.
+	 * @return {@link IAMArray}-Sicht auf die Verkettung dieser Zahlenfolge mit der gegebenen Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public IAMArray concat(final IAMArray that) throws NullPointerException {
 		if (that.length == 0) return this;
 		if (this.length == 0) return that;
 		return new ConcatArray(this, that);
 	}
 
+	/** Diese Methode gibt eine Abschrift der Zahlen dieser Zahlenfolge zurück Abhängig von der {@link #mode() Größe der Zahlen} liefert sie dabei
+	 * {@link #toBytes() IAMArray.from(this.toBytes())}, {@link #toShorts() IAMArray.from(this.toShorts())} oder {@link #toInts() IAMArray.from(this.toInts())}.
+	 *
+	 * @return kompaktierte Abschrift der Zahlenfolge. */
 	public IAMArray compact() {
 		switch (this.mode()) {
 			case 1:
@@ -1087,16 +1136,20 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung dieser Zahlenfolge lexikografisch kleiner, gleich bzw.
-	 * größer als die der gegebenen Zahlenfolge ist. <pre> TODO korrigieren mit -1,0,+1
-	 * for (int i = 0, result; i < min(length(), that.length()); i++)
-	 *   if ((result = get(i) – that.get(i)) != 0) return result;
-	 * return length() – that.length();
-	 * </pre>
+	 * größer als die der gegebenen Zahlenfolge ist. <pre>
+	 * for (int i = 0, result; i < min(this.length(), that.length()); i++) {
+	 *   if (this.get(i) < that.get(i)) return -1;
+	 *   if (this.get(i) > that.get(i)) return +1;
+	 * }
+	 * if (this.length() < that.length()) return -1;
+	 * if (this.length() > that.length()) return +1;
+	 * return 0;</pre>
 	 *
+	 * @see #compareTo(IAMArray)
 	 * @param that Zahlenfolge.
 	 * @return Vergleichswert der Ordnungen.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final int compare(final IAMArray that) throws NullPointerException {
+	public int compare(final IAMArray that) throws NullPointerException {
 		return this.compareTo(that);
 	}
 

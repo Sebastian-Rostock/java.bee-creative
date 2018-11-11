@@ -101,13 +101,13 @@ final class IAMCodec_INI {
 			final int mappingCount = this.readPropertyAsInt("mappingCount", 1073741824);
 			mappingBuilders = new IAMMappingBuilder[mappingCount];
 			for (int i = 0; i < mappingCount; i++) {
-				indexBuilder.putMapping(mappingBuilders[i] = new IAMMappingBuilder());
+				indexBuilder.put(-1, mappingBuilders[i] = new IAMMappingBuilder());
 			}
 
 			final int listingCount = this.readPropertyAsInt("listingCount", 1073741824);
 			listingBuilders = new IAMListingBuilder[listingCount];
 			for (int i = 0; i < listingCount; i++) {
-				indexBuilder.putListing(listingBuilders[i] = new IAMListingBuilder());
+				indexBuilder.put(-1, listingBuilders[i] = new IAMListingBuilder());
 			}
 
 			for (token = this.readContent(); true;) {
@@ -155,7 +155,7 @@ final class IAMCodec_INI {
 						final IAMArray item = listingItemFormat.parse(token.value());
 
 						if (key != listingBuilder.itemCount()) throw new IllegalArgumentException("inconsistent key in [IAM_LISTING]");
-						listingBuilder.put(item, false);
+						listingBuilder.put(-1, item);
 
 					}
 					if (count == listingBuilder.itemCount()) throw new IllegalStateException("[IAM_LISTING] incomplete");

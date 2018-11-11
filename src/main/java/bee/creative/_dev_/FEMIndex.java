@@ -1,7 +1,8 @@
 package bee.creative._dev_;
 
-import java.io.IOException;
-import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import bee.creative.fem.FEMArray;
 import bee.creative.fem.FEMBinary;
 import bee.creative.fem.FEMBoolean;
@@ -15,7 +16,6 @@ import bee.creative.fem.FEMFunction.CompositeFunction;
 import bee.creative.fem.FEMFunction.ConcatFunction;
 import bee.creative.fem.FEMHandler;
 import bee.creative.fem.FEMInteger;
-import bee.creative.fem.FEMNative;
 import bee.creative.fem.FEMObject;
 import bee.creative.fem.FEMParam;
 import bee.creative.fem.FEMProxy;
@@ -27,8 +27,9 @@ import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
 import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
+import bee.creative.iam.IAMEntry;
 import bee.creative.iam.IAMMapping;
-import bee.creative.util.Objects;
+import bee.creative.util.Integers;
 import bee.creative.util.Producer;
 import bee.creative.util.Property;
 import bee.creative.util.Unique;
@@ -38,79 +39,48 @@ import bee.creative.util.Unique;
 
 public class FEMIndex implements Producer<FEMValue> {
 
-	public static final int TYPE_FUNCTION_COMPOSITE = 0;
-
-	public static final int TYPE_FUNCTION_CONCAT = 0;
-
-	public static final int TYPE_FUNCTION_CLOSURE = 0;
-
-	public static final int TYPE_FUNCTION_PARAM = 0;
-
 	public static class IndexBuilder extends FEMIndex implements Property<FEMValue> {
 
-		private static final int DATA_INTEGER_EMPTY = 0;
+		/** Dieses Feld speichert den {@link IAMIndexBuilder}, in welchen alle Daten einfließen. */
+		protected final IAMIndexBuilder indexBuilder = new IAMIndexBuilder();
 
-		private static final int DATA_INTEGER_MINIMUM = 0;
+		/** Dieses Feld speichert die erste Auflistung im {@link #indexBuilder}. */
+		protected final IAMListingBuilder indexListing = new IAMListingBuilder();
 
-		private static final int DATA_INTEGER_MAXIMUM = 0;
+		/** Dieses Feld speichert die erste Abbildung im {@link #indexBuilder}. */
+		protected final IAMMappingBuilder indexMapping = new IAMMappingBuilder();
 
-		ByteOrder byteOrder = ByteOrder.nativeOrder();
-
-		IAMIndexBuilder indexBuilder = new IAMIndexBuilder();
-
-		protected IAMListingBuilder arrayValueListing = new IAMListingBuilder();
-
-		/** Dieses Feld speichert die Auflistung der Funktionszeiger, von denen jeder aus einer von {@link #putFunction(FEMFunction)} gelieferten {@code int}-Zahl
+		/** Dieses Feld speichert die Auflistung der Wertlisten, von denen jede aus einem Streuwert und einer Liste von {@link #putValue(FEMValue) Wertreferenzen}
 		 * besteht. */
+		protected IAMListingBuilder arrayValuePool = new IAMListingBuilder();
+
+		/** Dieses Feld speichert die Auflistung der Funktionszeiger, von denen jeder aus einer {@link #putFunction(FEMFunction) Funktionsreferenz} besteht. */
 		protected IAMListingBuilder handlerValuePool = new IAMListingBuilder();
 
 		/** Dieses Feld speichert die Auflistung der Zeichenketten, welche gemäß {@link FEMString#toArray()} kodiert sind. */
-		protected IAMListingBuilder stringValueListing = new IAMListingBuilder();
+		protected IAMListingBuilder stringValuePool = new IAMListingBuilder();
 
 		/** Dieses Feld speichert die Auflistung der Bytefolgen, welche gemäß {@link FEMBinary#toArray()} kodiert sind. */
-		protected IAMListingBuilder binaryValueListing = new IAMListingBuilder();
+		protected IAMListingBuilder binaryValuePool = new IAMListingBuilder();
 
 		/** Dieses Feld speichert die Auflistung der Dezimalzahlen, von denen jede aus zwei {@code int}-Zahlen besteht (lo, hi). */
-		protected IAMListingBuilder integerValueListing = new IAMListingBuilder();
+		protected IAMListingBuilder integerValuePool = new IAMListingBuilder();
 
 		/** Dieses Feld speichert die Auflistung der Dezimalbrüche, von denen jeder aus zwei {@code int}-Zahlen besteht (lo, hi). */
-		protected IAMListingBuilder decimalValueListing = new IAMListingBuilder();
+		protected IAMListingBuilder decimalValuePool = new IAMListingBuilder();
 
 		/** Dieses Feld speichert die Auflistung der Zeitspannen, von denen jede aus zwei {@code int}-Zahlen besteht (lo, hi). */
-		protected IAMListingBuilder durationValueListing = new IAMListingBuilder();
+		protected IAMListingBuilder durationValuePool = new IAMListingBuilder();
 
 		/** Dieses Feld speichert die Auflistung der Zeitangaben, von denen jede aus zwei {@code int}-Zahlen besteht (lo, hi). */
-		protected IAMListingBuilder datetimeValueListing = new IAMListingBuilder();
+		protected IAMListingBuilder datetimeValuePool = new IAMListingBuilder();
 
-		/** Dieses Feld speichert die über {@link #customPutObject(FEMObject)} erfassten {@link FEMObject Referenzen}. Der {@link FEMObject#value()} jedes
-		 * {@link FEMObject} wird als zweielementige {@link IAMArray Zahlenfolge} kodiert. */
-		protected IAMListingBuilder objectValueListing = new IAMListingBuilder();
+		/** Dieses Feld speichert die Auflistung der Referenzen, von denen jede aus zwei {@code int}-Zahlen besteht (lo, hi). */
+		protected IAMListingBuilder objectValuePool = new IAMListingBuilder();
 
-		/** Dieses Feld speichert die Auflistung der Tabellen, von denen jede aus drei {@code int}-Zahlen besteht (keyArrayIdx, valueArrayIdx, tableMappingIdx). */
-		protected IAMListingBuilder tableValueListing = new IAMListingBuilder();
-
-		protected Unique<byte[], Integer> tableMappingUnique = new Unique<byte[], Integer>() {
-
-			@Override
-			protected Integer customBuild(final byte[] source) {
-				try {
-					return new Integer(IndexBuilder.this.indexBuilder.putMapping(IAMMapping.from(source)));
-				} catch (final IOException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public int hash(final Object source) {
-				return Objects.deepHash(source);
-			}
-
-			@Override
-			public boolean equals(final Object source1, final Object source2) {
-				return Objects.deepEquals(source1, source2);
-			}
-
-		};
+		/** Dieses Feld speichert die Auflistung der Tabellen, von denen jede aus drei {@code int}-Zahlen besteht (keyArrayRef, valueArrayRef, tableMappingIdx). Die
+		 * dabei referenzierte Abbildung besitzt Einträge der Form (keyHash)::(key1, value1, ..., keyN, valueN). */
+		protected IAMListingBuilder tableValuePool = new IAMListingBuilder();
 
 		IAMListingBuilder proxyFunctionPool = new IAMListingBuilder();
 
@@ -122,8 +92,9 @@ public class FEMIndex implements Producer<FEMValue> {
 
 		protected FEMValue property;
 
-		protected void fillBuilder() {
-			this.indexBuilder.putListing(this.arrayValueListing);
+		public IndexBuilder() {
+			this.indexBuilder.put(-1, this.indexListing);
+			this.indexBuilder.put(-1, this.indexMapping);
 		}
 
 		public int putValue(final FEMValue source) throws IllegalArgumentException {
@@ -141,17 +112,17 @@ public class FEMIndex implements Producer<FEMValue> {
 				case FEMBinary.ID:
 					return this.putBinaryValue((FEMBinary)source.data());
 				case FEMInteger.ID:
-					return this.customPutInteger((FEMInteger)source.data());
+					return this.putIntegerValue((FEMInteger)source.data());
 				case FEMDecimal.ID:
-					return this.customPutDecimal((FEMDecimal)source.data());
+					return this.putDecimalValue((FEMDecimal)source.data());
 				case FEMDuration.ID:
-					return this.customPutDuration((FEMDuration)source.data());
+					return this.putDurationValue((FEMDuration)source.data());
 				case FEMDatetime.ID:
-					return this.customPutDatetime((FEMDatetime)source.data());
+					return this.putDatetimeValue((FEMDatetime)source.data());
 				case FEMObject.ID:
-					return this.customPutObject((FEMObject)source.data());
+					return this.putObjectValue((FEMObject)source.data());
 				case FEMTable.ID:
-					return this.customPutTable((FEMTable)source.data());
+					return this.putTableValue((FEMTable)source.data());
 			}
 			throw new IllegalArgumentException();
 		}
@@ -165,10 +136,127 @@ public class FEMIndex implements Producer<FEMValue> {
 			return result;
 		}
 
+		/** Diese Methode gibt die Wertreferenz auf {@link FEMVoid#INSTANCE} zurück. */
+		protected int putVoidValue() {
+			return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_VOID);
+		}
+
+		/** Diese Methode fügt die gegebene Wertliste in den {@link #arrayValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putArrayValue(final FEMArray source) throws NullPointerException, IllegalArgumentException {
+			if (source.equals(FEMArray.EMPTY)) return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_ARRAY_EMPTY);
+			final IAMArray hash = IAMArray.from(source.hash());
+			final IAMArray items = IAMArray.from(this.putValues(source.value()));
+			final IAMArray array = hash.concat(items).compact();
+			final int index = this.arrayValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_ARRAY, index);
+		}
+
+		/** Diese Methode fügt den gegebenen Funktionszeiger in den {@link #handlerValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putHandlerValue(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
+			final IAMArray array = IAMArray.from(this.putFunction(source.value()));
+			final int index = this.handlerValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_HANDLER, index);
+		}
+
+		/** Diese Methode gibt die Wertreferenz auf den gegebenen Wahrheitswert zurück. */
+		protected int putBooleanValue(final FEMBoolean source) throws NullPointerException {
+			return FEMIndex.toRef(FEMIndex.TYPE_CONST, source.value() ? FEMIndex.DATA_TRUE : FEMIndex.DATA_FALSE);
+		}
+
+		/** Diese Methode fügt die gegebene Zeichenkette in den {@link #stringValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putStringValue(final FEMString source) throws NullPointerException {
+			if (source.equals(FEMString.EMPTY)) return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_STRING_EMPTY);
+			final IAMArray array = source.toArray();
+			final int index = this.stringValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_STRING, index);
+		}
+
+		/** Diese Methode fügt die gegebene Bytefolge in den {@link #binaryValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putBinaryValue(final FEMBinary source) throws NullPointerException {
+			if (source.equals(FEMBinary.EMPTY)) return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_BINARY_EMPTY);
+			final IAMArray array = source.toArray();
+			final int index = this.binaryValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_BINARY, index);
+		}
+
+		/** Diese Methode fügt die gegebene Dezimalzahl in den {@link #integerValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putIntegerValue(final FEMInteger source) throws NullPointerException {
+			final long value = source.value();
+			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final int index = this.integerValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_INTEGER, index);
+		}
+
+		/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #decimalValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putDecimalValue(final FEMDecimal source) throws NullPointerException {
+			final long value = Double.doubleToLongBits(source.value());
+			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final int index = this.decimalValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_DECIMAL, index);
+		}
+
+		/** Diese Methode fügt die gegebene Zeitspanne in den {@link #durationValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putDurationValue(final FEMDuration source) throws NullPointerException {
+			final long value = source.value();
+			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final int index = this.durationValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_DURATION, index);
+		}
+
+		/** Diese Methode fügt die gegebene Zeitangabe in den {@link #datetimeValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putDatetimeValue(final FEMDatetime source) throws NullPointerException {
+			final long value = source.value();
+			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final int index = this.datetimeValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_DATETIME, index);
+		}
+
+		/** Diese Methode fügt die gegebene Referenz in den {@link #objectValuePool} ein und gibt die Wertreferenz darauf zurück. */
+		protected int putObjectValue(final FEMObject source) throws NullPointerException {
+			final long value = source.value();
+			final IAMArray array = IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+			final int index = this.objectValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_OBJECT, index);
+		}
+
+		/** Diese Methode fügt die gegebene Tabelle in den {@link #tableValuePool} ein und gibt die Wertreferenz darauf zurück. Ihre Schlüssel- und Wertspalten
+		 * werden dabei auch über {@link #putArrayValue(FEMArray)} in den {@link #arrayValuePool} eingetragen. Die Abbildung von Schlüsseln auf Werte wird dazu als
+		 * {@link IAMMapping} realisiert und im {@link #indexBuilder} eingetragen. Der {@link IAMEntry#key()} besteht aus dem Streuwert des Schlüssels. Der
+		 * {@link IAMEntry#value()} enthält dazu die Auflistung entsprechenden Schlüsselreferenz-Wertreferenz-Paare. */
+		protected int putTableValue(final FEMTable source) throws NullPointerException {
+			final Unique<Integer, List<Integer>> unique = new Unique<Integer, List<Integer>>() {
+		
+				@Override
+				protected List<Integer> customBuild(final Integer source) {
+					return new ArrayList<>();
+				}
+		
+			};
+			for (final FEMArray entry: source) {
+				final Integer keyRef = new Integer(this.putValue(entry.get(0)));
+				final Integer valueRef = new Integer(this.putValue(entry.get(1)));
+				final List<Integer> items = unique.get(keyRef);
+				items.add(keyRef);
+				items.add(valueRef);
+			}
+			final IAMMappingBuilder mapping = new IAMMappingBuilder();
+			for (final Entry<Integer, List<Integer>> entry: unique.mapping().entrySet()) {
+				final IAMArray key = IAMArray.from(entry.getKey().intValue());
+				final IAMArray value = IAMArray.from(entry.getValue());
+				mapping.put(key, value);
+			}
+			if (unique.mapping().size() != mapping.entryCount()) throw new IllegalArgumentException();
+			final int keysRef = this.putArrayValue(source.keys());
+			final int valuesRef = this.putArrayValue(source.values());
+			final int mappingRef = this.indexBuilder.put(mapping);
+			final IAMArray array = IAMArray.from(keysRef, valuesRef, mappingRef);
+			final int index = this.tableValuePool.put(array);
+			return FEMIndex.toRef(FEMIndex.TYPE_TABLE, index);
+		}
+
 		public int putFunction(final FEMFunction source) throws FEMException {
 			if (source instanceof FEMValue) return this.putValue((FEMValue)source);
 			if (source instanceof FEMProxy) return this.customPutProxy((FEMProxy)source);
-			if (source instanceof FEMParam) return this.putParamFunction((FEMParam)source);
 			if (source instanceof FEMParam) return this.putParamFunction((FEMParam)source);
 			if (source instanceof ConcatFunction) return this.putConcatFunction((ConcatFunction)source);
 			if (source instanceof ClosureFunction) return this.customPutClosure((ClosureFunction)source);
@@ -185,19 +273,12 @@ public class FEMIndex implements Producer<FEMValue> {
 			return result;
 		}
 
-		private int putLong(final IAMListingBuilder integerPool2, final long value) {
-			return 0;
-		}
-
 		protected int customPutProxy(final FEMProxy source) {
-
+		
 			throw new IllegalArgumentException();
 		}
 
-		protected int customPutProxy(final int nameRef, final int functionRef) {
 
-			throw new IllegalArgumentException();
-		}
 
 		protected int putParamFunction(final FEMParam source) throws NullPointerException {
 			final int index = source.index();
@@ -224,79 +305,6 @@ public class FEMIndex implements Producer<FEMValue> {
 			final IAMArray array = method.concat(params).compact();
 			final int index = this.compositeFunctionPool.put(array);
 			return FEMIndex.toRef(FEMIndex.TYPE_FUNCTION_COMPOSITE, index);
-		}
-
-		protected int putVoidValue() {
-			return FEMIndex.toRef(FEMIndex.TYPE_CONST, FEMIndex.DATA_VOID);
-		}
-
-		protected int putArrayValue(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-			final IAMArray array = IAMArray.from(this.putValues(source.value()));
-			final int index = this.arrayValueListing.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_ARRAY, index);
-		}
-
-		protected int putHandlerValue(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
-			final IAMArray array = IAMArray.from(this.putFunction(source.value()));
-			final int index = this.handlerValuePool.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_HANDLER, index);
-		}
-
-		protected int putBooleanValue(final FEMBoolean source) throws NullPointerException {
-			return FEMIndex.toRef(FEMIndex.TYPE_CONST, source.value() ? FEMIndex.DATA_TRUE : FEMIndex.DATA_FALSE);
-		}
-
-		protected int putStringValue(final FEMString source) throws NullPointerException {
-			final IAMArray array = source.toArray();
-			final int index = this.stringValueListing.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_STRING, index);
-		}
-
-		protected int putBinaryValue(final FEMBinary source) throws NullPointerException {
-			final IAMArray array = source.toArray();
-			final int index = this.binaryValueListing.put(array);
-			return FEMIndex.toRef(FEMIndex.TYPE_BINARY, index);
-		}
-
-		protected int customPutInteger(final FEMInteger source) throws NullPointerException {
-			if(source.equals(FEMInteger.EMPTY)) return toRef(TYPE_CONST, DATA_INTEGER_EMPTY); // XXX muss das sein?
-			if(source.equals(FEMInteger.MINIMUM)) return toRef(TYPE_CONST, DATA_INTEGER_MINIMUM);
-			if(source.equals(FEMInteger.MAXIMUM)) return toRef(TYPE_CONST, DATA_INTEGER_MAXIMUM);
-			final long value = source.value();
-			final int index = this.putLong(this.integerValueListing, value);
-			return FEMIndex.toRef(FEMIndex.TYPE_INTEGER, index);
-		}
-
-		protected int customPutDecimal(final FEMDecimal source) throws NullPointerException {
-			final long value = Double.doubleToLongBits(source.value());
-			final int index = this.putLong(this.decimalValueListing, value);
-			return FEMIndex.toRef(FEMIndex.TYPE_DECIMAL, index);
-		}
-
-		protected int customPutDuration(final FEMDuration source) throws NullPointerException {
-			final long value = source.value();
-			final int index = this.putLong(this.durationValueListing, value);
-			return FEMIndex.toRef(FEMIndex.TYPE_DURATION, index);
-		}
-
-		protected int customPutDatetime(final FEMDatetime source) throws NullPointerException {
-			final long value = source.value();
-			final int index = this.putLong(this.datetimeValueListing, value);
-			return FEMIndex.toRef(FEMIndex.TYPE_DATETIME, index);
-		}
-
-		protected int customPutObject(final FEMObject source) throws NullPointerException {
-			final long value = source.value();
-			final int index = this.putLong(this.integerValueListing, value);
-			return FEMIndex.toRef(FEMIndex.TYPE_OBJECT, index);
-		}
-
-		protected int customPutTable(final FEMTable data) {
-			final IAMMapping mapping = new IAMMappingBuilder();
-			// TODO
-
-			final int tableIdx = this.tableMappingUnique.get(mapping.toBytes(this.byteOrder));
-			return FEMIndex.toRef(FEMIndex.TYPE_TABLE, tableIdx);
 		}
 
 		@Override
@@ -337,11 +345,25 @@ public class FEMIndex implements Producer<FEMValue> {
 
 	public static final int TYPE_CONST = 0;
 
-	public static final int DATA_VOID = 0;
+	public static final int TYPE_FUNCTION_COMPOSITE = 0;
 
-	public static final int DATA_TRUE = 0;
+	public static final int TYPE_FUNCTION_CONCAT = 0;
 
-	public static final int DATA_FALSE = 0;
+	public static final int TYPE_FUNCTION_CLOSURE = 0;
+
+	public static final int TYPE_FUNCTION_PARAM = 0;
+
+	static final int DATA_VOID = 0;
+
+	static final int DATA_TRUE = 0;
+
+	static final int DATA_FALSE = 0;
+
+	static final int DATA_ARRAY_EMPTY = 0;
+
+	static final int DATA_STRING_EMPTY = 0;
+
+	static final int DATA_BINARY_EMPTY = 0;
 
 	static int toRef(final int type, final int data) {
 		return (data << 4) | type;
@@ -354,7 +376,7 @@ public class FEMIndex implements Producer<FEMValue> {
 	// 00.00 void
 	// 00.01 true
 	// 00.02 false
-	// 00.xx min/max/empty von integer, decimal, datetime, duration usw + CUSTOM VALUE ab ???
+	// 00.xx CUSTOM VALUE
 	// 01 aray data = [valueRef, ..., valueRef]
 	// 10 table data = mappingIdx
 	// 02 binary

@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.util.Integers;
+
 /** Diese Klasse implementiert einen unveränderlichen Dezimalbruch. Intern wird der Dezimalbruch als {@code double} dargestellt.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -86,7 +88,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	 * @return Streuwert. */
 	public final int hash() {
 		final long value = Double.doubleToLongBits(this.value);
-		return (int)(value >>> 0) ^ (int)(value >>> 32);
+		return Integers.toIntL(value) ^ Integers.toIntH(value);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Dezimalbruch gleich dem gegebenen ist.

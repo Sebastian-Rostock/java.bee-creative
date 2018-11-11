@@ -1,6 +1,7 @@
 package bee.creative.fem;
 
 import bee.creative.util.Comparators;
+import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine unveränderliche Dezimalzahl. Intern wird die Dezimalzahl als {@code long} dargestellt.
  *
@@ -21,7 +22,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 
 	/** Dieses Feld speichert die größte positive Dezimalzahl. */
 	public static final FEMInteger MAXIMUM = new FEMInteger(Long.MAX_VALUE);
-	
+
 	/** Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
 	 *
 	 * @param value Wert.
@@ -87,8 +88,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		final long value = this.value;
-		return (int)(value >>> 0) ^ (int)(value >>> 32);
+		return Integers.toIntL(this.value) ^ Integers.toIntH(this.value);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Dezimalzahl gleich der gegebenen ist.

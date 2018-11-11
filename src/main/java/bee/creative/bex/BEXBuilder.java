@@ -784,24 +784,24 @@ public class BEXBuilder {
 			this.updatePART(this.attrTablePart, +1);
 			this.updatePART(this.chldTablePart, -1);
 			final IAMIndexBuilder result = new IAMIndexBuilder();
-			result.putListing(this.encodeHEAD());
-			result.putListing(this.encodeTEXT(this.attrUriText));
-			result.putListing(this.encodeTEXT(this.attrNameText));
-			result.putListing(this.encodeTEXT(this.attrValueText));
-			result.putListing(this.encodeTEXT(this.chldUriText));
-			result.putListing(this.encodeTEXT(this.chldNameText));
-			result.putListing(this.encodeTEXT(this.chldValueText));
-			result.putListing(this.encodePROP(this.attrTablePart, 0));
-			result.putListing(this.encodePROP(this.attrTablePart, 1));
-			result.putListing(this.encodePROP(this.attrTablePart, 2));
-			result.putListing(this.encodePROP(this.attrTablePart, 4));
-			result.putListing(this.encodePROP(this.chldTablePart, 0));
-			result.putListing(this.encodePROP(this.chldTablePart, 1));
-			result.putListing(this.encodePROP(this.chldTablePart, 2));
-			result.putListing(this.encodePROP(this.chldTablePart, 3));
-			result.putListing(this.encodePROP(this.chldTablePart, 4));
-			result.putListing(this.encodePART(this.attrTablePart));
-			result.putListing(this.encodePART(this.chldTablePart));
+			result.put(-1, this.encodeHEAD());
+			result.put(-1, this.encodeTEXT(this.attrUriText));
+			result.put(-1, this.encodeTEXT(this.attrNameText));
+			result.put(-1, this.encodeTEXT(this.attrValueText));
+			result.put(-1, this.encodeTEXT(this.chldUriText));
+			result.put(-1, this.encodeTEXT(this.chldNameText));
+			result.put(-1, this.encodeTEXT(this.chldValueText));
+			result.put(-1, this.encodePROP(this.attrTablePart, 0));
+			result.put(-1, this.encodePROP(this.attrTablePart, 1));
+			result.put(-1, this.encodePROP(this.attrTablePart, 2));
+			result.put(-1, this.encodePROP(this.attrTablePart, 4));
+			result.put(-1, this.encodePROP(this.chldTablePart, 0));
+			result.put(-1, this.encodePROP(this.chldTablePart, 1));
+			result.put(-1, this.encodePROP(this.chldTablePart, 2));
+			result.put(-1, this.encodePROP(this.chldTablePart, 3));
+			result.put(-1, this.encodePROP(this.chldTablePart, 4));
+			result.put(-1, this.encodePART(this.attrTablePart));
+			result.put(-1, this.encodePART(this.chldTablePart));
 			return result;
 		}
 
@@ -836,7 +836,7 @@ public class BEXBuilder {
 			}
 			value[length] = pool.length;
 			final IAMListingBuilder encoder = new IAMListingBuilder();
-			encoder.put(IAMArray.from(value), false);
+			encoder.put(-1, IAMArray.from(value));
 			return encoder;
 		}
 
@@ -861,7 +861,7 @@ public class BEXBuilder {
 			boolean empty = false;
 			for (int i = (prop == 0) || (prop == 4) ? 0 : length; (i < length) && (empty = value[i] == 0); i++) {}
 			final IAMListingBuilder result = new IAMListingBuilder();
-			result.put(empty ? IAMArray.EMPTY : IAMArray.from(value), false);
+			result.put(-1, empty ? IAMArray.EMPTY : IAMArray.from(value));
 			return result;
 		}
 
@@ -875,7 +875,7 @@ public class BEXBuilder {
 			Collections.sort(texts, BEXTextItem.ORDER);
 			final IAMListingBuilder encoder = new IAMListingBuilder();
 			for (final BEXTextItem text: texts) {
-				text.key = encoder.put(BEXFile.arrayFrom(text.text), false);
+				text.key = encoder.put(-1, BEXFile.arrayFrom(text.text));
 			}
 			return encoder;
 		}

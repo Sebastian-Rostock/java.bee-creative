@@ -17,34 +17,7 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMIndex {
 
-	@SuppressWarnings ("javadoc")
-	static class EmptyIndex extends IAMIndex {
-
-		@Override
-		public IAMMapping mapping(final int index) {
-			return IAMMapping.EMPTY;
-		}
-
-		@Override
-		public int mappingCount() {
-			return 0;
-		}
-
-		@Override
-		public IAMListing listing(final int index) {
-			return IAMListing.EMPTY;
-		}
-
-		@Override
-		public int listingCount() {
-			return 0;
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein Objekt zur Ermittlung der Längen gegebener Zahlenlisten.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	/** Diese Klasse implementiert ein Objekt zur Ermittlung der Längen gegebener Zahlenlisten. */
 	static class SizeStats {
 
 		/** Diese Methode füht die Startpositionen der gegebenen Zahlenfolgen an den gegebenen {@link ByteBuffer} an. Die Zahlenfolgen repräsentieren die von
@@ -132,9 +105,7 @@ public abstract class IAMIndex {
 
 	}
 
-	/** Diese Klasse implementiert ein Objekt zur Ermittlung der Kodierung gegebener Zahlenlisten.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	/** Diese Klasse implementiert ein Objekt zur Ermittlung der Kodierung gegebener Zahlenlisten. */
 	static class DataStats {
 
 		/** Diese Methode speichert die gegebene Zahlenfolge an den gegebenen {@link ByteBuffer} an. Der geschriebene Speicherbereich wird mit Nullwerten ergänzt,
@@ -240,11 +211,36 @@ public abstract class IAMIndex {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static class Listingss extends AbstractList<IAMListing> {
+	static class EmptyIndex extends IAMIndex {
+
+		@Override
+		public IAMListing listing(final int index) {
+			return IAMListing.EMPTY;
+		}
+
+		@Override
+		public int listingCount() {
+			return 0;
+		}
+
+		@Override
+		public IAMMapping mapping(final int index) {
+			return IAMMapping.EMPTY;
+		}
+
+		@Override
+		public int mappingCount() {
+			return 0;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static class ListingList extends AbstractList<IAMListing> {
 
 		final IAMIndex owner;
 
-		Listingss(final IAMIndex owner) {
+		ListingList(final IAMIndex owner) {
 			this.owner = owner;
 		}
 
@@ -262,11 +258,11 @@ public abstract class IAMIndex {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static class Mappings extends AbstractList<IAMMapping> {
+	static class MappingList extends AbstractList<IAMMapping> {
 
 		final IAMIndex owner;
 
-		Mappings(final IAMIndex owner) {
+		MappingList(final IAMIndex owner) {
 			this.owner = owner;
 		}
 
@@ -302,28 +298,6 @@ public abstract class IAMIndex {
 		return new IAMIndexLoader(array.withOrder(IAMIndexLoader.HEADER.orderOf(array)));
 	}
 
-	/** Diese Methode gibt die {@code index}-te Abbildung zurück. Bei einem ungültigen {@code index} wird eine leere Abbildung geliefert.
-	 *
-	 * @see #mappingCount()
-	 * @param index Index.
-	 * @return {@code index}-te Abbildung. */
-	public abstract IAMMapping mapping(final int index);
-
-	/** Diese Methode gibt die Anzahl der Abbildungen zurück ({@code 0..1073741823}).
-	 *
-	 * @see #mapping(int)
-	 * @return Anzahl der Abbildungen. */
-	public abstract int mappingCount();
-
-	/** Diese Methode gibt eine {@link List}-Sicht auf die Abbildungen zurück.
-	 *
-	 * @see #mapping(int)
-	 * @see #mappingCount()
-	 * @return Abbildungen. */
-	public List<IAMMapping> mappings() {
-		return new Mappings(this);
-	}
-
 	/** Diese Methode gibt die {@code index}-te Auflistung zurück. Bei einem ungültigen {@code index} wird eine leere Auflistung geliefert.
 	 *
 	 * @see #listingCount()
@@ -343,7 +317,29 @@ public abstract class IAMIndex {
 	 * @see #listingCount()
 	 * @return Auflistungen. */
 	public List<IAMListing> listings() {
-		return new Listingss(this);
+		return new ListingList(this);
+	}
+
+	/** Diese Methode gibt die {@code index}-te Abbildung zurück. Bei einem ungültigen {@code index} wird eine leere Abbildung geliefert.
+	 *
+	 * @see #mappingCount()
+	 * @param index Index.
+	 * @return {@code index}-te Abbildung. */
+	public abstract IAMMapping mapping(final int index);
+
+	/** Diese Methode gibt die Anzahl der Abbildungen zurück ({@code 0..1073741823}).
+	 *
+	 * @see #mapping(int)
+	 * @return Anzahl der Abbildungen. */
+	public abstract int mappingCount();
+
+	/** Diese Methode gibt eine {@link List}-Sicht auf die Abbildungen zurück.
+	 *
+	 * @see #mapping(int)
+	 * @see #mappingCount()
+	 * @return Abbildungen. */
+	public List<IAMMapping> mappings() {
+		return new MappingList(this);
 	}
 
 	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.

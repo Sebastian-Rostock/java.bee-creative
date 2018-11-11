@@ -108,12 +108,12 @@ final class IAMCodec_XML {
 
 		final IAMMappingBuilder[] mappingBuilders = new IAMMappingBuilder[mappingCount];
 		for (int i = 0; i < mappingCount; i++) {
-			indexBuilder.putMapping(mappingBuilders[i] = new IAMMappingBuilder());
+			indexBuilder.put(-1, mappingBuilders[i] = new IAMMappingBuilder());
 		}
 
 		final IAMListingBuilder[] listingBuilders = new IAMListingBuilder[listingCount];
 		for (int i = 0; i < listingCount; i++) {
-			indexBuilder.putListing(listingBuilders[i] = new IAMListingBuilder());
+			indexBuilder.put(-1, listingBuilders[i] = new IAMListingBuilder());
 		}
 
 		for (final Object object: xmlIndex.mappingOrListing) {
@@ -145,7 +145,7 @@ final class IAMCodec_XML {
 				final int oldCount = listingBuilder.itemCount();
 				for (final IAMITEMTYPE xmlItem: xmlListing.item) {
 					final IAMArray data = listingItemFormat.parse(xmlItem.data);
-					listingBuilder.put(data, false);
+					listingBuilder.put(-1, data);
 				}
 				final int newCount = listingBuilder.itemCount();
 
