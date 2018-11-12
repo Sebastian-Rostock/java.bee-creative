@@ -1,8 +1,5 @@
 package bee.creative._dev_;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
 import bee.creative.fem.FEMArray;
 import bee.creative.fem.FEMBinary;
 import bee.creative.fem.FEMBoolean;
@@ -21,7 +18,6 @@ import bee.creative.fem.FEMParam;
 import bee.creative.fem.FEMProxy;
 import bee.creative.fem.FEMString;
 import bee.creative.fem.FEMTable;
-import bee.creative.fem.FEMTable.CompositeTable;
 import bee.creative.fem.FEMValue;
 import bee.creative.fem.FEMVoid;
 import bee.creative.iam.IAMArray;
@@ -31,32 +27,63 @@ import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
 import bee.creative.iam.IAMEntry;
 import bee.creative.iam.IAMMapping;
 import bee.creative.util.Integers;
+import bee.creative.util.Objects;
 import bee.creative.util.Producer;
 import bee.creative.util.Property;
-import bee.creative.util.Unique;
 
 // TODO de-/coder für ausgewählte fem-datentypen in iam-format (und json-format)
 // json-format aus string und object[] derselben, de-/coder ebenfalls in javascript
 
 public class FEMIndex implements Producer<FEMValue> {
 
-	@SuppressWarnings ("javadoc")
-	protected class IndexArray extends FEMArray {
+	/** Diese Klasse implementiert ein {@link FEMArray}, dessen Elemente als Wertreferenzen gegeben sind und in {@link #customGet(int)} über einen gegebenen
+	 * {@link FEMIndex} {@link FEMIndex#value(int) in Werte übersetzt} werden. */
+	protected static class IndexArray extends FEMArray {
 
+		/** Dieses Feld speichert den {@link FEMIndex} zur {@link FEMIndex#value(int) Übersetzung} der Wertreferenzen aus {@link #items}. */
 		public final FEMIndex index;
 
-		public final IAMArray array;
+		/** Dieses Feld speichert eine Zahlenfolge mit den Referenzen auf die Werte sowie dem {@link #hash() Streuwert} {@code (item1, ..., itemN, hash)}. Die
+		 * Zahlenfolge ist damit stets um ein länger, als die Wertliste. */
+		public final IAMArray items;
 
-		public IndexArray(final FEMIndex index, final IAMArray array) {
-			super(array.length() - 1);
-			this.hash = array.get(0);
-			this.index = index;
-			this.array = array;
+		@SuppressWarnings ("javadoc")
+		public IndexArray(final FEMIndex index, final IAMArray items) {
+			super(items.length() - 1);
+			this.hash = items.get(this.length);
+			this.index = Objects.notNull(index);
+			this.items = items;
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		protected FEMValue customGet(final int index) {
-			return this.index.value(this.array.get(index + 1));
+			return this.index.value(this.items.get(index));
+		}
+
+	}
+
+	/** Diese Klasse erweitert ein {@link IndexArray} um eine Streuwerttabelle zur Beschleunigung der {@link #customFind(FEMValue, int) Suche einzelner Werte}. */
+	protected static class IndexTable extends IndexArray {
+
+		/** Dieses Feld speichert eine Zahlenfolge, die ab dem dritten Element die Startpositionen der Suchbereiche mit gleichem Streuwert enthält, analog zur
+		 * Kodierung der Streuwerttabelle eines {@link IAMMapping}. Die Länge der Zahlenfolge entspricht damit stets einer um drei erhöhte Potenz von {@code 2}. */
+		public final IAMArray range;
+
+		@SuppressWarnings ("javadoc")
+		public IndexTable(final FEMIndex index, final IAMArray items, final IAMArray range) {
+			super(index, items);
+			this.range = Objects.notNull(range);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected int customFind(final FEMValue that, final int offset) {
+			final int hash = that.hashCode(), mask = this.range.length() - 4, index = hash & mask;
+			for (int l = this.range.get(index), r = this.range.get(index + 1); l < r; l++) {
+				if (that.equals(this.customGet(l))) return l < offset ? -1 : l;
+			}
+			return -1;
 		}
 
 	}
@@ -64,60 +91,18 @@ public class FEMIndex implements Producer<FEMValue> {
 	@SuppressWarnings ("javadoc")
 	protected class IndexArray2 extends IndexArray {
 
-		public final FEMValue[] values;
+		public final FEMValue[] cache;
 
 		public IndexArray2(final FEMIndex index, final IAMArray array) {
 			super(index, array);
-			this.values = new FEMValue[this.length()];
+			this.cache = new FEMValue[this.length()];
 		}
 
 		@Override
 		protected FEMValue customGet(final int index) {
-			final FEMValue result = this.values[index];
+			final FEMValue result = this.cache[index];
 			if (result != null) return result;
-			return this.values[index] = super.customGet(index);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	protected static class IndexTable extends CompositeTable {
-
-		public static class Keys extends FEMArray {
-
-			public final FEMArray items;
-
-			public final IAMMapping mapping;
-
-			public Keys(final FEMArray items, final IAMMapping mapping) {
-				super(items.length());
-				this.hash = items.hash();
-				this.items = items;
-				this.mapping = mapping;
-			}
-
-			@Override
-			protected FEMValue customGet(final int index) {
-				return this.items.get(index);
-			}
-
-			@Override
-			protected int customFind(final FEMValue that, final int offset) {
-				final int entry = this.mapping.find(that.hashCode());
-				if (entry < 0) return -1;
-				final IAMArray value = this.mapping.value(entry);
-				final int length = value.length();
-				for (int i = 0; i < length; i++) {
-					final int result = value.get(i);
-					if (that.equals(this.items.get(result))) return result < offset ? -1 : result;
-				}
-				return -1;
-			}
-
-		}
-
-		public IndexTable(final FEMArray keys, final FEMArray values, final IAMMapping mapping) {
-			super(new Keys(keys, mapping), values);
+			return this.cache[index] = super.customGet(index);
 		}
 
 	}
@@ -133,8 +118,8 @@ public class FEMIndex implements Producer<FEMValue> {
 		/** Dieses Feld speichert die erste Abbildung im {@link #indexBuilder}. */
 		protected final IAMMappingBuilder indexMapping = new IAMMappingBuilder();
 
-		/** Dieses Feld speichert die Auflistung der Wertlisten, von denen jede aus einem Streuwert und einer Liste von {@link #putValue(FEMValue) Wertreferenzen}
-		 * besteht. */
+		/** Dieses Feld speichert die Auflistung der Wertlisten, von denen jede aus einer Liste von {@link #putValue(FEMValue) Wertreferenzen} sowie einem Streuwert
+		 * besteht (ref1, ..., refN, hash). */
 		protected IAMListingBuilder arrayValuePool = new IAMListingBuilder();
 
 		/** Dieses Feld speichert die Auflistung der Funktionszeiger, von denen jeder aus einer {@link #putFunction(FEMFunction) Funktionsreferenz} besteht. */
@@ -210,13 +195,8 @@ public class FEMIndex implements Producer<FEMValue> {
 			throw new IllegalArgumentException();
 		}
 
-		public int[] putValues(final FEMValue... source) throws IllegalArgumentException {
-			final int length = source.length;
-			final int[] result = new int[length];
-			for (int i = 0; i < length; i++) {
-				result[i] = this.putValue(source[i]);
-			}
-			return result;
+		protected IAMArray putLong(final long value) {
+			return IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
 		}
 
 		/** Diese Methode gibt die Wertreferenz auf {@link FEMVoid#INSTANCE} zurück. */
@@ -226,9 +206,13 @@ public class FEMIndex implements Producer<FEMValue> {
 
 		/** Diese Methode fügt die gegebene Wertliste in den {@link #arrayValuePool} ein und gibt die Wertreferenz darauf zurück. */
 		protected int putArrayValue(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-			final IAMArray hash = IAMArray.from(source.hash());
-			final IAMArray items = IAMArray.from(this.putValues(source.value()));
-			final IAMArray array = hash.concat(items).compact();
+			final int length = source.length();
+			final int[] items = new int[length + 1];
+			for (int i = 0; i < length; i++) {
+				items[i] = this.putValue(source.get(i));
+			}
+			items[length] = source.hash();
+			final IAMArray array = IAMArray.from(items);
 			final int index = this.arrayValuePool.put(array);
 			return this.toRef(FEMIndex.TYPE_ARRAY_VALUE, index);
 		}
@@ -265,10 +249,6 @@ public class FEMIndex implements Producer<FEMValue> {
 			final IAMArray array = this.putLong(value);
 			final int index = this.integerValuePool.put(array);
 			return this.toRef(FEMIndex.TYPE_INTEGER_VALUE, index);
-		}
-
-		protected IAMArray putLong(final long value) {
-			return IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
 		}
 
 		/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #decimalValuePool} ein und gibt die Wertreferenz darauf zurück. */
@@ -308,32 +288,30 @@ public class FEMIndex implements Producer<FEMValue> {
 		 * {@link IAMMapping} realisiert und im {@link #indexBuilder} eingetragen. Der {@link IAMEntry#key()} besteht aus dem Streuwert des Schlüssels. Der
 		 * {@link IAMEntry#value()} enthält dazu die Auflistung entsprechenden Schlüsselreferenz-Wertreferenz-Paare. */
 		protected int putTableValue(final FEMTable source) throws NullPointerException {
-			final Unique<Integer, List<Integer>> unique = new Unique<Integer, List<Integer>>() {
-
-				@Override
-				protected List<Integer> customBuild(final Integer source) {
-					return new ArrayList<>();
-				}
-
-			};// TODO korrigieren
-			for (final FEMArray entry: source) {
-				final FEMValue key = entry.get(0), value = entry.get(1);
-				final Integer keyRef = new Integer(this.putValue(key)), keyHash = new Integer(key.hashCode()), valueRef = new Integer(this.putValue(value));
-				final List<Integer> items = unique.get(keyHash);
-				items.add(keyRef);
-				items.add(valueRef);
+			final int entryCount = source.length();
+			final FEMArray keys = source.keys(), values = source.values();
+			final int rangeMask = IAMMapping.mask(entryCount), rangeCount = rangeMask + 4;
+			final int[] tableRanges = new int[rangeCount], bucketIndex = new int[entryCount];
+			for (int i = 0; i < entryCount; i++) {
+				final int bucket = (keys.get(i).hashCode() & rangeMask) + 2;
+				tableRanges[bucket]++;
+				bucketIndex[i] = bucket;
 			}
-			final IAMMappingBuilder mapping = new IAMMappingBuilder();
-			for (final Entry<Integer, List<Integer>> entry: unique.mapping().entrySet()) {
-				final IAMArray key = IAMArray.from(entry.getKey().intValue());
-				final IAMArray value = IAMArray.from(entry.getValue());
-				mapping.put(key, value);
+			for (int i = 2, offset = 0; i < rangeCount; i++) {
+				final int bucketSize = tableRanges[i];
+				tableRanges[i] = offset;
+				offset += bucketSize;
 			}
-			if (unique.mapping().size() != mapping.entryCount()) throw new IllegalArgumentException();
-			final int keysIdx = this.toIndex(this.putArrayValue(source.keys()));
-			final int valuesIdx = this.toIndex(this.putArrayValue(source.values()));
-			final int mappingIdx = this.indexBuilder.put(mapping);
-			final IAMArray array = IAMArray.from(keysIdx, valuesIdx, mappingIdx);
+			final FEMValue[] tableKeys = new FEMValue[entryCount], tableValues = new FEMValue[entryCount];
+			for (int i = 0; i < entryCount; i++) {
+				final int bucket = bucketIndex[i], offset = tableRanges[bucket];
+				tableKeys[offset] = keys.get(i);
+				tableValues[offset] = values.get(i);
+				tableRanges[bucket] = offset + 1;
+			}
+			tableRanges[0] = this.toIndex(this.putArrayValue(FEMArray.from(tableKeys)));
+			tableRanges[1] = this.toIndex(this.putArrayValue(FEMArray.from(tableValues)));
+			final IAMArray array = IAMArray.from(tableRanges);
 			final int index = this.tableValuePool.put(array);
 			return this.toRef(FEMIndex.TYPE_TABLE_VALUE, index);
 		}
@@ -450,6 +428,16 @@ public class FEMIndex implements Producer<FEMValue> {
 		@Override
 		protected FEMTable getTableValue(final int index) {
 			return this.getTableValue(this.tableValuePool.item(index));
+		}
+
+		@Override
+		protected IAMArray getTableKeysArray(final int index) {
+			return this.arrayValuePool.item(index);
+		}
+
+		@Override
+		protected IAMArray getTableValuesArray(final int index) {
+			return this.arrayValuePool.item(index);
 		}
 
 	}
@@ -597,14 +585,18 @@ public class FEMIndex implements Producer<FEMValue> {
 		return Integers.toLong(array.get(1), array.get(0));
 	}
 
+	/** Diese Methode die {@link FEMArray Wertliste} zurück, die unter der gegebenen Position verwaltet wird. */
 	protected FEMArray getArrayValue(final int index) {
 		return FEMArray.EMPTY;
 	}
 
+	/** Diese Methode gibt eine {@link FEMArray Wertliste} zurück, deren Elemente in der gegebenen {@link IAMArray Zahlenfolge} {@link IndexArray#items kodiert}
+	 * sind. */
 	protected FEMArray getArrayValue(final IAMArray array) {
 		return new IndexArray(this, array);
 	}
 
+	/** Diese Methode die {@link FEMString Zeichenkette} zurück, die unter der gegebenen Position verwaltet wird. */
 	protected FEMString getStringValue(final int index) {
 		return FEMString.EMPTY;
 	}
@@ -613,6 +605,7 @@ public class FEMIndex implements Producer<FEMValue> {
 		return FEMString.from(array);
 	}
 
+	/** Diese Methode die {@link FEMBinary Bytefolge} zurück, die unter der gegebenen Position verwaltet wird. */
 	protected FEMBinary getBinaryValue(final int index) {
 		return FEMBinary.EMPTY;
 	}
@@ -674,14 +667,15 @@ public class FEMIndex implements Producer<FEMValue> {
 	}
 
 	protected FEMTable getTableValue(final IAMArray array) {
-		return new IndexTable(this.getArrayValue(array.get(0)), this.getArrayValue(array.get(1)), this.getTableMapping(array.get(2)));
+		return FEMTable.from(new IndexTable(this, this.getTableKeysArray(array.get(0)), array), this.getArrayValue(this.getTableValuesArray(array.get(1))));
 	}
 
-	/**
-	 * Abbildung von [key.hashCode] auf [keyIdx1, ..., keyIdxN] 
-	 */
-	protected IAMMapping getTableMapping(final int index) {
-		return IAMMapping.EMPTY;
+	protected IAMArray getTableKeysArray(final int index) {
+		return IAMArray.EMPTY;
+	}
+
+	protected IAMArray getTableValuesArray(final int index) {
+		return IAMArray.EMPTY;
 	}
 
 	protected FEMValue getCustomValue(final int type, final int index) {
