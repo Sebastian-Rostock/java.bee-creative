@@ -45,7 +45,7 @@ public abstract class FEMValue extends FEMFunction {
 	 *
 	 * @see #result(boolean)
 	 * @return ausgewerteter Ergebniswert. */
-	public FEMValue result() {
+	public final FEMValue result() {
 		return this.result(false);
 	}
 

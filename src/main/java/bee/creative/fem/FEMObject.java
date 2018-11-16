@@ -20,7 +20,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	public static final FEMType<FEMObject> TYPE = FEMType.from(FEMObject.ID);
 
 	/** Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind. */
-	public static final FEMObject EMPTY = new FEMObject(0, (short)0, (short)0);
+	public static final FEMObject EMPTY = new FEMObject(0, 0);
 
 	/** Diese Methode gibt eine neue Referenz mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
 	 * {@link #toString() Textdarstellung}.
@@ -57,7 +57,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		FEMObject.checkMin(ref);
 		FEMObject.checkMax(type);
 		FEMObject.checkMax(owner);
-		return new FEMObject(ref, (short)type, (short)owner);
+		return new FEMObject(ref, Integers.toInt(type, owner));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMObject.TYPE)}.
@@ -81,14 +81,24 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		if (value > 65535) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
-	final int refValue;
+	/** Dieses Feld speichert die 32 LSB der internen 64 Bit Darstellung dieser Referenz.
+	 * <p>
+	 * Die 32 Bit von MBS zum LSB sind:
+	 * <ul>
+	 * <li>typeValue - 16 Bit</li>
+	 * <li>ownerValue - 16 Bit</li>
+	 * </ul>
+	*/
+	final int valueL;
 
-	@SuppressWarnings ("javadoc")
-	final short typeValue;
-
-	@SuppressWarnings ("javadoc")
-	final short ownerValue;
+	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitangabe.
+	 * <p>
+	 * Die 32 Bit von MBS zum LSB sind:
+	 * <ul>
+	 * <li>refValue - 32 Bit</li>
+	 * </ul>
+	*/
+	final int valueH;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung der Referenz.
 	 *
@@ -96,114 +106,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @param value interne Darstellung der Referenz.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
 	public FEMObject(final long value) throws IllegalArgumentException {
-		this((int)(value >> 32), (short)(value >> 0), (short)(value >> 16));
+		this(Integers.toIntH(value), Integers.toIntL(value));
+		FEMObject.checkMin(this.refValue());
 	}
 
 	@SuppressWarnings ("javadoc")
-	FEMObject(final int refValue, final short typeValue, final short ownerValue) {
-		this.refValue = refValue;
-		this.typeValue = typeValue;
-		this.ownerValue = ownerValue;
-	}
-
-	/** Diese Methode gibt die interne Darstellung der Referenz zurück.
-	 * <p>
-	 * Die 64 Bit von MBS zum LSB sind:
-	 * <ul>
-	 * <li>refValue - 32 Bit</li>
-	 * <li>ownerValue - 16 Bit</li>
-	 * <li>typeValue - 16 Bit</li>
-	 * </ul>
-	 *
-	 * @return interne Darstellung der Referenz. */
-	public final long value() {
-		return Integers.toLong(this.refValue, Integers.toInt(this.ownerValue, this.typeValue));
-	}
-
-	/** Diese Methode gibt den Objektschlüssel zurück.
-	 *
-	 * @return Objektschlüssel ({@code 0..2147483647}). */
-	public final int refValue() {
-		return this.refValue;
-	}
-
-	/** Diese Methode gibt die Typkennung zurück.
-	 *
-	 * @see #withType(int)
-	 * @return Typkennung ({@code 0..65535}). */
-	public final int typeValue() {
-		return this.typeValue & 0xFFFF;
-	}
-
-	/** Diese Methode gibt die Besitzerkennung zurück.
-	 *
-	 * @see #withOwner(int)
-	 * @return Besitzerkennung ({@code 0..65535}). */
-	public final int ownerValue() {
-		return this.ownerValue & 0xFFFF;
-	}
-
-	/** Diese Methode gibt diese Referenz mit dem gegebenen Objektschlüssel zurück.
-	 *
-	 * @see #typeValue()
-	 * @param ref Objektschlüssel ({@code 0..2147483647}).
-	 * @return Referenz mit Objektschlüssel.
-	 * @throws IllegalArgumentException Wenn {@code ref} ungültig ist. */
-	public final FEMObject withRef(final int ref) throws IllegalArgumentException {
-		FEMObject.checkMin(ref);
-		return new FEMObject(ref, this.typeValue, this.ownerValue);
-	}
-
-	/** Diese Methode gibt diese Referenz mit der gegebenen Typkennung zurück.
-	 *
-	 * @see #typeValue()
-	 * @param type Typkennung ({@code 0..65535}).
-	 * @return Referenz mit Typkennung.
-	 * @throws IllegalArgumentException Wenn {@code type} ungültig ist. */
-	public final FEMObject withType(final int type) throws IllegalArgumentException {
-		FEMObject.checkMax(type);
-		return new FEMObject(this.refValue, (short)type, this.ownerValue);
-	}
-
-	/** Diese Methode gibt diese Referenz mit der gegebenen Besitzerkennung zurück.
-	 *
-	 * @see #ownerValue()
-	 * @param owner Besitzerkennung ({@code 0..65535}).
-	 * @return Referenz mit Besitzerkennung.
-	 * @throws IllegalArgumentException Wenn {@code owner} ungültig ist. */
-	public final FEMObject withOwner(final int owner) throws IllegalArgumentException {
-		FEMObject.checkMax(owner);
-		return new FEMObject(this.refValue, this.typeValue, (short)owner);
-	}
-
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		return this.refValue ^ this.typeValue ^ this.ownerValue;
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Referenz gleich der gegebenen ist.
-	 *
-	 * @param that Referenz.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMObject that) throws NullPointerException {
-		return (this.refValue == that.refValue) && (this.typeValue == that.typeValue) && (this.ownerValue == that.ownerValue);
-	}
-
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die Ordnung dieser Referenz kleiner, gleich bzw. größer als die der gegebenen
-	 * Referenz ist.
-	 *
-	 * @param that Referenz.
-	 * @return Vergleichswert.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final int compare(final FEMObject that) throws NullPointerException {
-		int result = Comparators.compare(this.refValue(), that.refValue());
-		if (result != 0) return result;
-		result = Comparators.compare(this.ownerValue(), that.ownerValue());
-		if (result != 0) return result;
-		return Comparators.compare(this.typeValue(), that.typeValue());
+	FEMObject(final int valueH, final int valueL) {
+		this.valueH = valueH;
+		this.valueL = valueL;
 	}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -218,10 +128,104 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return FEMObject.TYPE;
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public final FEMObject result() {
-		return this;
+	/** Diese Methode gibt die interne Darstellung der Referenz zurück.
+	 * <p>
+	 * Die 64 Bit von MBS zum LSB sind:
+	 * <ul>
+	 * <li>refValue - 32 Bit</li>
+	 * <li>ownerValue - 16 Bit</li>
+	 * <li>typeValue - 16 Bit</li>
+	 * </ul>
+	 *
+	 * @return interne Darstellung der Referenz. */
+	public final long value() {
+		return Integers.toLong(this.valueH, this.valueL);
+	}
+
+	/** Diese Methode gibt den Objektschlüssel zurück.
+	 *
+	 * @return Objektschlüssel ({@code 0..2147483647}). */
+	public final int refValue() {
+		return this.valueH;
+	}
+
+	/** Diese Methode gibt die Typkennung zurück.
+	 *
+	 * @see #withType(int)
+	 * @return Typkennung ({@code 0..65535}). */
+	public final int typeValue() {
+		return Integers.toShortL(this.valueL);
+	}
+
+	/** Diese Methode gibt die Besitzerkennung zurück.
+	 *
+	 * @see #withOwner(int)
+	 * @return Besitzerkennung ({@code 0..65535}). */
+	public final int ownerValue() {
+		return Integers.toShortH(this.valueL);
+	}
+
+	/** Diese Methode gibt diese Referenz mit dem gegebenen Objektschlüssel zurück.
+	 *
+	 * @see #typeValue()
+	 * @param ref Objektschlüssel ({@code 0..2147483647}).
+	 * @return Referenz mit Objektschlüssel.
+	 * @throws IllegalArgumentException Wenn {@code ref} ungültig ist. */
+	public final FEMObject withRef(final int ref) throws IllegalArgumentException {
+		FEMObject.checkMin(ref);
+		return new FEMObject(ref, this.valueL);
+	}
+
+	/** Diese Methode gibt diese Referenz mit der gegebenen Typkennung zurück.
+	 *
+	 * @see #typeValue()
+	 * @param type Typkennung ({@code 0..65535}).
+	 * @return Referenz mit Typkennung.
+	 * @throws IllegalArgumentException Wenn {@code type} ungültig ist. */
+	public final FEMObject withType(final int type) throws IllegalArgumentException {
+		FEMObject.checkMax(type);
+		return new FEMObject(this.valueH, Integers.toInt(type, this.ownerValue()));
+	}
+
+	/** Diese Methode gibt diese Referenz mit der gegebenen Besitzerkennung zurück.
+	 *
+	 * @see #ownerValue()
+	 * @param owner Besitzerkennung ({@code 0..65535}).
+	 * @return Referenz mit Besitzerkennung.
+	 * @throws IllegalArgumentException Wenn {@code owner} ungültig ist. */
+	public final FEMObject withOwner(final int owner) throws IllegalArgumentException {
+		FEMObject.checkMax(owner);
+		return new FEMObject(this.valueH, Integers.toInt(this.typeValue(), owner));
+	}
+
+	/** Diese Methode gibt den Streuwert zurück.
+	 *
+	 * @return Streuwert. */
+	public final int hash() {
+		return this.valueH ^ this.valueL;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Referenz gleich der gegebenen ist.
+	 *
+	 * @param that Referenz.
+	 * @return Gleichheit.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	public final boolean equals(final FEMObject that) throws NullPointerException {
+		return (this.valueL == that.valueL) && (this.valueH == that.valueH);
+	}
+
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die Ordnung dieser Referenz kleiner, gleich bzw. größer als die der gegebenen
+	 * Referenz ist.
+	 *
+	 * @param that Referenz.
+	 * @return Vergleichswert.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	public final int compare(final FEMObject that) throws NullPointerException {
+		int result = Comparators.compare(this.refValue(), that.refValue());
+		if (result != 0) return result;
+		result = Comparators.compare(this.ownerValue(), that.ownerValue());
+		if (result != 0) return result;
+		return Comparators.compare(this.typeValue(), that.typeValue());
 	}
 
 	/** {@inheritDoc} */

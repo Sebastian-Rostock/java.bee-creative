@@ -68,6 +68,18 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		this.value = value;
 	}
 
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMBoolean data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMBoolean> type() {
+		return FEMBoolean.TYPE;
+	}
+
 	/** Diese Methode gibt die interne Darstellung des Wahrheitswerts zurück. Diese ist ein {@code boolean}.
 	 *
 	 * @return interne Darstellung des Wahrheitswerts. */
@@ -98,31 +110,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMBoolean that) throws NullPointerException {
 		return Boolean.compare(this.value, that.value);
-	}
-
-	/** Diese Methode gibt diesen Wahrheitswert als {@link Boolean} zurück.
-	 *
-	 * @return {@link Boolean}. */
-	public final Boolean toBoolean() {
-		return Boolean.valueOf(this.value);
-	}
-
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMBoolean data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMBoolean> type() {
-		return FEMBoolean.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMBoolean result() {
-		return this;
 	}
 
 	/** {@inheritDoc} */
@@ -162,6 +149,13 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	@Override
 	public final String toString() {
 		return this.value ? "true" : "false";
+	}
+
+	/** Diese Methode gibt diesen Wahrheitswert als {@link Boolean} zurück.
+	 *
+	 * @return {@link Boolean}. */
+	public final Boolean toBoolean() {
+		return Boolean.valueOf(this.value);
 	}
 
 }

@@ -76,6 +76,18 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		this.value = value;
 	}
 
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMDecimal data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMDecimal> type() {
+		return FEMDecimal.TYPE;
+	}
+
 	/** Diese Methode gibt die interne Darstellung des Dezimalbruchs zurück.
 	 *
 	 * @return interne Darstellung des Dezimalbruchs. */
@@ -112,31 +124,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		if (this.value > that.value) return +1;
 		if (this.equals(that)) return 0;
 		return undefined;
-	}
-
-	/** Diese Methode gibt diesen Dezimalbruch als {@link Double} zurück.
-	 *
-	 * @return {@link Double}. */
-	public final Double toNumber() {
-		return new Double(this.value);
-	}
-
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMDecimal data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMDecimal> type() {
-		return FEMDecimal.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMDecimal result() {
-		return this;
 	}
 
 	/** {@inheritDoc} */
@@ -176,6 +163,13 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	@Override
 	public final String toString() {
 		return Double.toString(this.value);
+	}
+
+	/** Diese Methode gibt diesen Dezimalbruch als {@link Double} zurück.
+	 *
+	 * @return {@link Double}. */
+	public final Double toNumber() {
+		return new Double(this.value);
 	}
 
 }

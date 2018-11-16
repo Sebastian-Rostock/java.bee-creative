@@ -639,6 +639,18 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		this.valueL = valueL;
 	}
 
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMDuration data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMDuration> type() {
+		return FEMDuration.TYPE;
+	}
+
 	/** Diese Methode gibt die interne Darstellung der Zeitspanne zurück.
 	 * <p>
 	 * Die 64 Bit von MBS zum LSB sind:
@@ -892,24 +904,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		result = millis + ((length + ((thisRange >> 4) & 0xF) + ((thatRange >> 0) & 0xF)) * 86400000L);
 		if (result < 0) return -1;
 		return undefined;
-	}
-
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMDuration data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMDuration> type() {
-		return FEMDuration.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMDuration result() {
-		return this;
 	}
 
 	/** {@inheritDoc} */

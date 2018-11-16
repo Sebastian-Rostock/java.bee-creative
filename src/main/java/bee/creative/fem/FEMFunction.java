@@ -42,16 +42,16 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMTracer tracer() {
+		public FEMTracer tracer() {
 			return this.tracer;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
+		public FEMValue invoke(final FEMFrame frame) {
 			final FEMTracer tracer = this.tracer;
 			try {
 				final FEMTracer.Listener helper = tracer.getListener();
@@ -69,22 +69,22 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			return this.function.withTracer(tracer);
 		}
 
 		@Override
-		public final FEMFunction withoutTracer() {
+		public FEMFunction withoutTracer() {
 			return this.function.withoutTracer();
 		}
 
 		@Override
-		public final int hashCode() {
-			return this.function.hashCode() ^ 123456789;
+		public int hashCode() {
+			return this.function.hashCode();
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof TraceFunction)) return false;
 			final TraceFunction data = (TraceFunction)object;
@@ -207,41 +207,19 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class ConcatFunction extends BaseFunction implements Emuable {
-
-		final FEMFunction[] params;
-
-		final FEMFunction function;
+	public static class ConcatFunction extends CompositeFunction {
 
 		ConcatFunction(final FEMFunction function, final FEMFunction... params) {
-			this.params = params;
-			this.function = function;
-		}
-
-		public final FEMFunction[] params() {
-			return this.params.clone();
-		}
-
-		public final int paramCount() {
-			return this.params.length;
-		}
-
-		public final FEMFunction function() {
-			return this.function;
+			super(function, params);
 		}
 
 		@Override
-		public final long emu() {
-			return EMU.fromObject(this) + EMU.fromArray(this.params);
-		}
-
-		@Override
-		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			return this.function.invoke(frame).toFunction().invoke(frame.newFrame(this.params));
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withTracer(tracer);
@@ -250,7 +228,7 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final FEMFunction withoutTracer() {
+		public FEMFunction withoutTracer() {
 			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withoutTracer();
@@ -259,12 +237,7 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final int hashCode() {
-			return this.function.hashCode() ^ Objects.hash((Object[])this.params);
-		}
-
-		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof ConcatFunction)) return false;
 			final ConcatFunction data = (ConcatFunction)object;
@@ -282,17 +255,17 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
+		public FEMValue invoke(final FEMFrame frame) {
 			return this.function.toClosure(frame).toValue();
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			return this.function.withTracer(tracer).toClosure();
 		}
 
@@ -303,12 +276,12 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			return this.function.hashCode() ^ 789123456;
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof ClosureFunction)) return false;
 			final ClosureFunction data = (ClosureFunction)object;
@@ -318,7 +291,7 @@ public abstract class FEMFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static final class CompositeFunction extends BaseFunction implements Emuable {
+	public static class CompositeFunction extends BaseFunction implements Emuable {
 
 		final FEMFunction[] params;
 
@@ -329,30 +302,30 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMFunction[] params() {
+		public FEMFunction[] params() {
 			return this.params.clone();
 		}
 
-		public final int paramCount() {
+		public int paramCount() {
 			return this.params.length;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.params);
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			return this.function.invoke(frame.newFrame(this.params));
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withTracer(tracer);
@@ -361,7 +334,7 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final FEMFunction withoutTracer() {
+		public FEMFunction withoutTracer() {
 			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withoutTracer();
@@ -370,12 +343,12 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			return this.function.hashCode() ^ Objects.hash((Object[])this.params);
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof CompositeFunction)) return false;
 			final CompositeFunction data = (CompositeFunction)object;

@@ -1478,6 +1478,18 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		this.length = length;
 	}
 
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMString data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMString> type() {
+		return FEMString.TYPE;
+	}
+
 	/** Diese Methode gibt den {@code index}-ten Codepoint zurück. Sie Implementiert {@link #get(int)} ohne Wertebereichsprüfung.
 	 *
 	 * @param index Index.
@@ -1731,27 +1743,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return Comparators.compare(this.length, that.length);
 	}
 
-	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Codepoints dieser Zeichenkette zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @return {@link List}-Sicht. */
-	public final List<Integer> toList() {
-		return new AbstractList<Integer>() {
-
-			@Override
-			public Integer get(final int index) {
-				return new Integer(FEMString.this.get(index));
-			}
-
-			@Override
-			public int size() {
-				return FEMString.this.length;
-			}
-
-		};
-	}
-
 	/** Diese Methode gibt die 32-Bit-einzelwertkodierten Codepoint zurück.
 	 *
 	 * @return Array mit den Codepoints in 32-Bit-Kodierung. */
@@ -1915,24 +1906,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMString data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMString> type() {
-		return FEMString.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMString result() {
-		return this;
-	}
-
 	/** {@inheritDoc} */
 	@Override
 	public final FEMString result(final boolean recursive) {
@@ -1982,6 +1955,27 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@Override
 	public final int compareTo(final FEMString that) {
 		return this.compare(that);
+	}
+
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Codepoints dieser Zeichenkette zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @return {@link List}-Sicht. */
+	public final List<Integer> toList() {
+		return new AbstractList<Integer>() {
+	
+			@Override
+			public Integer get(final int index) {
+				return new Integer(FEMString.this.get(index));
+			}
+	
+			@Override
+			public int size() {
+				return FEMString.this.length;
+			}
+	
+		};
 	}
 
 	/** Diese Methode gibt diesen Zeichenkette als {@link String} zurück.

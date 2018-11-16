@@ -41,8 +41,20 @@ public final class FEMHandler extends FEMValue {
 	final FEMFunction value;
 
 	@SuppressWarnings ("javadoc")
-	FEMHandler(final FEMFunction value) throws NullPointerException {
+	FEMHandler(final FEMFunction value) {
 		this.value = value;
+	}
+
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMHandler data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMHandler> type() {
+		return FEMHandler.TYPE;
 	}
 
 	/** Diese Methode gibt die Funktion zurück.
@@ -66,24 +78,6 @@ public final class FEMHandler extends FEMValue {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMHandler that) throws NullPointerException {
 		return this.value.equals(that.value);
-	}
-
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMHandler data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMHandler> type() {
-		return FEMHandler.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMHandler result() {
-		return this;
 	}
 
 	/** {@inheritDoc} */

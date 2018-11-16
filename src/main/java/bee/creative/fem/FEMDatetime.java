@@ -650,6 +650,18 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		this.valueL = valueL;
 	}
 
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMDatetime data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMDatetime> type() {
+		return FEMDatetime.TYPE;
+	}
+
 	/** Diese Methode gibt die interne Darstellung der Zeitangabe zurück.
 	 * <p>
 	 * Die 64 Bit von MBS zum LSB sind:
@@ -1366,57 +1378,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		}
 	}
 
-	/** Diese Methode gibt diese Zeitangabe als Anzahl an Millisekunden seit dem Zeitpunkt {@code 1970-01-01T00:00:00Z} zurück. Wenn diese Zeitangabe
-	 * {@link #hasZone() keine Zeitzone} besitzt, wird {@code 0} angenommen. Wenn sie {@link #hasTime() keine Uhrzeit} besitzt, wird {@code 00:00:00.000}
-	 * angenommen.
-	 *
-	 * @return Anzahl an Millisekunden.
-	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
-	public final long toTime() {
-		return FEMDuration.durationmillisOfImpl(this.calendardayValue() - 141427, 0, this.zoneValueImpl(), 0, this.daymillisValueImpl());
-	}
-
-	/** Diese Methode gibt diese Zeitangabe als {@link Calendar} zurück.
-	 *
-	 * @return {@link Calendar}. */
-	public final GregorianCalendar toCalendar() {
-		final GregorianCalendar result = new GregorianCalendar();
-		result.clear();
-		if (this.hasDate()) {
-			result.set(Calendar.YEAR, this.yearValueImpl());
-			result.set(Calendar.MONTH, (this.monthValueImpl() - 1));
-			result.set(Calendar.DATE, this.dateValueImpl());
-		}
-		if (this.hasTime()) {
-			result.set(Calendar.HOUR_OF_DAY, this.hourValueImpl());
-			result.set(Calendar.MINUTE, this.minuteValueImpl());
-			result.set(Calendar.SECOND, this.secondValueImpl());
-			result.set(Calendar.MILLISECOND, this.millisecondValueImpl());
-		}
-		if (this.hasZone()) {
-			result.set(Calendar.ZONE_OFFSET, this.zoneValueImpl() * 60000);
-		}
-		return result;
-	}
-
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMDatetime data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMDatetime> type() {
-		return FEMDatetime.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMDatetime result() {
-		return this;
-	}
-
 	/** {@inheritDoc} */
 	@Override
 	public final FEMDatetime result(final boolean recursive) {
@@ -1445,6 +1406,16 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	@Override
 	public final int compareTo(final FEMDatetime that) {
 		return this.compare(that, 0);
+	}
+
+	/** Diese Methode gibt diese Zeitangabe als Anzahl an Millisekunden seit dem Zeitpunkt {@code 1970-01-01T00:00:00Z} zurück. Wenn diese Zeitangabe
+	 * {@link #hasZone() keine Zeitzone} besitzt, wird {@code 0} angenommen. Wenn sie {@link #hasTime() keine Uhrzeit} besitzt, wird {@code 00:00:00.000}
+	 * angenommen.
+	 *
+	 * @return Anzahl an Millisekunden.
+	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
+	public final long toTime() {
+		return FEMDuration.durationmillisOfImpl(this.calendardayValue() - 141427, 0, this.zoneValueImpl(), 0, this.daymillisValueImpl());
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Zeitangabe zurück. Diese Textdarstellung entspricht der des Datentyps
@@ -1511,6 +1482,29 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 			}
 		}
 		return new String(buffer, 0, offset);
+	}
+
+	/** Diese Methode gibt diese Zeitangabe als {@link Calendar} zurück.
+	 *
+	 * @return {@link Calendar}. */
+	public final GregorianCalendar toCalendar() {
+		final GregorianCalendar result = new GregorianCalendar();
+		result.clear();
+		if (this.hasDate()) {
+			result.set(Calendar.YEAR, this.yearValueImpl());
+			result.set(Calendar.MONTH, (this.monthValueImpl() - 1));
+			result.set(Calendar.DATE, this.dateValueImpl());
+		}
+		if (this.hasTime()) {
+			result.set(Calendar.HOUR_OF_DAY, this.hourValueImpl());
+			result.set(Calendar.MINUTE, this.minuteValueImpl());
+			result.set(Calendar.SECOND, this.secondValueImpl());
+			result.set(Calendar.MILLISECOND, this.millisecondValueImpl());
+		}
+		if (this.hasZone()) {
+			result.set(Calendar.ZONE_OFFSET, this.zoneValueImpl() * 60000);
+		}
+		return result;
 	}
 
 }

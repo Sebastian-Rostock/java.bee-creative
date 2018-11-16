@@ -806,14 +806,14 @@ public class FEMDomain extends BaseObject {
 		} else if (source instanceof FEMProxy) {
 			final FEMProxy value = (FEMProxy)source;
 			this.formatConst(target, value.name);
-		} else if (source instanceof CompositeFunction) {
-			final CompositeFunction value = (CompositeFunction)source;
-			this.formatFunction(target, value.function);
-			this.formatParams(target, Arrays.asList(value.params));
 		} else if (source instanceof ConcatFunction) {
 			final ConcatFunction concatFunction = (ConcatFunction)source;
 			this.formatFunction(target, concatFunction.function);
 			this.formatParams(target, Arrays.asList(concatFunction.params));
+		} else if (source instanceof CompositeFunction) {
+			final CompositeFunction value = (CompositeFunction)source;
+			this.formatFunction(target, value.function);
+			this.formatParams(target, Arrays.asList(value.params));
 		} else if (source instanceof ClosureFunction) {
 			final ClosureFunction closureFunction = (ClosureFunction)source;
 			this.formatFunction(target, closureFunction.function);

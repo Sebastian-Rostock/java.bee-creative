@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
-import bee.creative.iam.IAMArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 import bee.creative.util.Iterables;
@@ -111,29 +110,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			++index;
 			this.index = index;
 			return true;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class ArrayBinary extends FEMBinary {
-
-		public final IAMArray array;
-
-		ArrayBinary(final IAMArray array) {
-			super(array.length() - 4);
-			this.hash = Integers.toInt(array.get(0), array.get(1), array.get(2), array.get(3));
-			this.array = array;
-		}
-
-		@Override
-		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			return (byte)this.array.get(index);
-		}
-
-		@Override
-		public byte[] value() {
-			return this.array.toBytes();
 		}
 
 	}
@@ -545,19 +521,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return bigEndian ? new IntegerBinaryBE(length, value) : new IntegerBinaryLE(length, value);
 	}
 
-	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück. Dabei werden die ersten vier Byte der Zahlenfolge als {@link #hash() Streuwert} und die
-	 * darauf folgenden Zahlenwerte als Bytes der Bytefolge interpretiert.
-	 * 
-	 * @see #toArray()
-	 * @param array Zahlenfolge.
-	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link IAMArray#mode() INT8/UINT8} vorliegt. */
-	public static FEMBinary from(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-		if (array.mode() == 1) return new ArrayBinary(array);
-		throw new IllegalArgumentException();
-	}
-
 	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
 	 *
 	 * @param buffer Zahlenfolge.
@@ -673,6 +636,18 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	protected FEMBinary(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException();
 		this.length = length;
+	}
+
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMBinary data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMBinary> type() {
+		return FEMBinary.TYPE;
 	}
 
 	/** Diese Methode gibt das {@code index}-te Byte zurück.
@@ -890,41 +865,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return Comparators.compare(this.length, that.length);
 	}
 
-	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Bytes dieser Bytefolge zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @return {@link List}-Sicht. */
-	public final List<Byte> toList() {
-		return new AbstractList<Byte>() {
-
-			@Override
-			public Byte get(final int index) {
-				return new Byte(FEMBinary.this.get(index));
-			}
-
-			@Override
-			public int size() {
-				return FEMBinary.this.length;
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt eine Zahlenfolge zurück, welche die Bytes dieser Bytefolge enthält. Sie ist die Umkehroperation zu {@link #from(IAMArray)}.
-	 *
-	 * @return Zahlenfolge mit den Bytes. */
-	public final IAMArray toArray() {
-		final byte[] array = new byte[this.length + 4];
-		this.extract(new ValueCollector(array, 4));
-		final int hash = this.hash();
-		array[0] = (byte)(hash >>> 0);
-		array[1] = (byte)(hash >>> 8);
-		array[2] = (byte)(hash >>> 16);
-		array[3] = (byte)(hash >>> 24);
-		return IAMArray.from(array);
-	}
-
 	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück. Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} (header) und den Bytes
 	 * dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern, d.h. {@code 0123456789ABCDEF}.
 	 *
@@ -995,24 +935,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		throw new IllegalStateException();
 	}
 
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMBinary data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMBinary> type() {
-		return FEMBinary.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMBinary result() {
-		return this;
-	}
-
 	/** {@inheritDoc} */
 	@Override
 	public final FEMBinary result(final boolean recursive) {
@@ -1062,6 +984,27 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	@Override
 	public final int compareTo(final FEMBinary that) {
 		return this.compare(that);
+	}
+
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Bytes dieser Bytefolge zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @return {@link List}-Sicht. */
+	public final List<Byte> toList() {
+		return new AbstractList<Byte>() {
+
+			@Override
+			public Byte get(final int index) {
+				return new Byte(FEMBinary.this.get(index));
+			}
+
+			@Override
+			public int size() {
+				return FEMBinary.this.length;
+			}
+
+		};
 	}
 
 	/** {@inheritDoc} */

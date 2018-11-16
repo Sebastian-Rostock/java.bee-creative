@@ -77,6 +77,18 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		this.value = value;
 	}
 
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMInteger data() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMType<FEMInteger> type() {
+		return FEMInteger.TYPE;
+	}
+
 	/** Diese Methode gibt die interne Darstellung der Dezimalzahl zurück.
 	 *
 	 * @return interne Darstellung der Dezimalzahl. */
@@ -107,31 +119,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMInteger that) throws NullPointerException {
 		return Comparators.compare(this.value, that.value);
-	}
-
-	/** Diese Methode gibt diese Dezimalzahl als {@link Long} zurück.
-	 *
-	 * @return {@link Long}. */
-	public final Long toNumber() {
-		return new Long(this.value);
-	}
-
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMInteger data() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMType<FEMInteger> type() {
-		return FEMInteger.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMInteger result() {
-		return this;
 	}
 
 	/** {@inheritDoc} */
@@ -171,6 +158,13 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	@Override
 	public final String toString() {
 		return Long.toString(this.value);
+	}
+
+	/** Diese Methode gibt diese Dezimalzahl als {@link Long} zurück.
+	 *
+	 * @return {@link Long}. */
+	public final Long toNumber() {
+		return new Long(this.value);
 	}
 
 }
