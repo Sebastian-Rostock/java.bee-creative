@@ -1464,7 +1464,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hash()} initialisiert. */
-	protected	int hash;
+	protected int hash;
 
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;
@@ -1825,7 +1825,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * {@link #from(IAMArray)}.
 	 *
 	 * @return Zahlenfolge mit den entsprechend kodierten Codepoints. */
-	public IAMArray toArray() {
+	public final IAMArray toArray() {
 		final RangeCollector collector = new RangeCollector();
 		this.extract(collector);
 		if (collector.range < 256) return this.toArray(1, false);
@@ -1838,7 +1838,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param mode Kodierungskennung mit {@code 1} für {@code 8-Bit}, {@code 2} für {@code 16-Bit} und {@code 4} für {@code 32-Bit}.
 	 * @return Zahlenfolge mit der entsprechend kodierten Zeichenkette.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public IAMArray toArray(final int mode) throws IllegalArgumentException {
+	public final IAMArray toArray(final int mode) throws IllegalArgumentException {
 		return this.toArray(mode, false);
 	}
 
@@ -1964,17 +1964,17 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @return {@link List}-Sicht. */
 	public final List<Integer> toList() {
 		return new AbstractList<Integer>() {
-	
+
 			@Override
 			public Integer get(final int index) {
 				return new Integer(FEMString.this.get(index));
 			}
-	
+
 			@Override
 			public int size() {
 				return FEMString.this.length;
 			}
-	
+
 		};
 	}
 
