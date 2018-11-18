@@ -876,7 +876,7 @@ class FEMIndex implements Property<FEMValue> {
 	@SuppressWarnings ("javadoc")
 	long getIntegerValueImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() != 2) throw new IllegalArgumentException();
-		return Integers.toLong(source.get(0), source.get(1));
+		return Integers.toLong(source.get(1), source.get(0));
 	}
 
 	/** Diese Methode gibt eine Sicht auf die Liste aller Dezimalzahlen zurück.
@@ -1359,6 +1359,12 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Position des Werts bzw. der Funktion in der ihn bzw. sie verwaltenden {@link IAMListing Auflistung}. */
 	public int toIndex(final int ref) {
 		return ref >>> 5;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toInvokeString(this, this.getArrayValues(), this.getStringValues(), this.getBinaryValues(), this.getIntegerValues(), this.getDecimalValues(),
+			this.getDurationValues(), this.getDatetimeValues(), this.getHandlerValues(), this.getObjectValues(), this.getTableValues());
 	}
 
 }

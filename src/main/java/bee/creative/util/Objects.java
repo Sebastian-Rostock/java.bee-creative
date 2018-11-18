@@ -318,14 +318,15 @@ public class Objects {
 		if (object == null) return "null";
 		final Iterator<?> iter = object.iterator();
 		if (!iter.hasNext()) return "[]";
-		String space = (format ? "[\n  " : "[");
-		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
-		do {
-			result.append(space).append(Objects.format(format, format, iter.next()));
-			space = comma;
-		} while (iter.hasNext());
-		return result.append((format ? "\n]" : "]")).toString();
+		Object next = iter.next();
+		if (!iter.hasNext()) return result.append("[").append(Objects.format(format, format, next)).append("]").toString();
+		result.append(format ? "[\n  " : "[").append(Objects.format(format, format, next));
+		while (iter.hasNext()) {
+			next = iter.next();
+			result.append(format ? ",\n  " : ", ").append(Objects.format(format, format, next));
+		}
+		return result.append(format ? "\n]" : "]").toString();
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück.
@@ -456,7 +457,7 @@ public class Objects {
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Arrays oder {@code 0} zurück. Der {@link Object#hashCode() Streuwert} der
 	 * Elemente des Arrays wird über {@link Objects#deepHash(Object)} ermittelt.
-	 * 
+	 *
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int deepHash(final Object... objects) {

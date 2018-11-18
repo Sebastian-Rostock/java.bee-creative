@@ -21,6 +21,11 @@ public class IAMBuilder {
 		/** Dieses Feld speichert die Position, unter der dieses Objekt in {@link BasePool#targets} verwaltet wird. */
 		public int index;
 
+		@Override
+		public String toString() {
+			return Integer.toString(this.index);
+		}
+
 	}
 
 	/** Diese Klasse implementiert ein abstraktes {@link Unique}, über welches Nutzdaten in der Reihenfolge ihrer Erfassung gesammelt werden können.
