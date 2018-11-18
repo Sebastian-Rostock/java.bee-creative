@@ -660,6 +660,12 @@ class FEMIndex implements Property<FEMValue> {
 		return this.getIntegerArrayImpl(source.value());
 	}
 
+	/** Diese Methode ist die Umkehroperation zu {@link #getTableValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Werttabelle enthält.
+	 *
+	 * @param source Werttabelle.
+	 * @return Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@link #putArrayValue(FEMArray)} diese auslöst. */
 	public IAMArray getTableArray(final FEMTable source) throws NullPointerException, IllegalArgumentException {
 		final int entryCount = source.length();
 		final FEMArray keys = source.keys(), values = source.values();
@@ -695,6 +701,12 @@ class FEMIndex implements Property<FEMValue> {
 		return this.getCompositeArrayImpl(source.function(), source.params());
 	}
 
+	/** Diese Methode ist die Umkehroperation zu {@link #getTableValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Funktionsbindung enthält.
+	 *
+	 * @param source Funktionsbindung.
+	 * @return Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
 	public IAMArray getClosureArray(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
 		return IAMArray.from(this.putFunction(source.function()));
 	}
@@ -780,6 +792,7 @@ class FEMIndex implements Property<FEMValue> {
 		return new FEMInteger(this.getIntegerValueImpl(source));
 	}
 
+	@SuppressWarnings ("javadoc")
 	long getIntegerValueImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() != 2) throw new IllegalArgumentException();
 		return Integers.toLong(source.get(0), source.get(1));
@@ -856,6 +869,7 @@ class FEMIndex implements Property<FEMValue> {
 		return new CompositeFunction(this.getCompositeFunctionImpl(source), this.getCompositeParamsImpl(source));
 	}
 
+	@SuppressWarnings ("javadoc")
 	FEMFunction[] getCompositeParamsImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		final int length = source.length() - 1;
 		if (length < 0) throw new IllegalArgumentException();
@@ -866,11 +880,18 @@ class FEMIndex implements Property<FEMValue> {
 		return result;
 	}
 
+	@SuppressWarnings ("javadoc")
 	FEMFunction getCompositeFunctionImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() == 0) throw new IllegalArgumentException();
 		return this.getFunction(source.get(0));
 	}
 
+	/** Diese Methode nimmt den gegebenen Wert in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
+	 *
+	 * @param source Wert.
+	 * @return Wertreferenz.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Wert nicht aufgenommen werden kann. */
 	public int putValue(final FEMValue source) throws NullPointerException, IllegalArgumentException {
 		switch (source.type().id()) {
 			case FEMVoid.ID:
@@ -901,21 +922,21 @@ class FEMIndex implements Property<FEMValue> {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Wertreferenz auf {@link FEMVoid#INSTANCE} zurück.
+	/** Diese Methode gibt die {@link #toRef(int, int)} Wertreferenz} auf {@link FEMVoid#INSTANCE} zurück.
 	 *
 	 * @return Wertreferenz. */
 	public int putVoidValue() {
 		return this.toRef(FEMIndex.TYPE_VOID_VALUE, 0);
 	}
 
-	/** Diese Methode gibt die Wertreferenz auf {@link FEMBoolean#TRUE} zurück.
+	/** Diese Methode gibt die {@link #toRef(int, int)} Wertreferenz} auf {@link FEMBoolean#TRUE} zurück.
 	 *
 	 * @return Wertreferenz. */
 	public int putTrueValue() {
 		return this.toRef(FEMIndex.TYPE_TRUE_VALUE, 0);
 	}
 
-	/** Diese Methode gibt die Wertreferenz auf {@link FEMBoolean#FALSE} zurück.
+	/** Diese Methode gibt die {@link #toRef(int, int)} Wertreferenz} auf {@link FEMBoolean#FALSE} zurück.
 	 *
 	 * @return Wertreferenz. */
 	public int putFalseValue() {
@@ -1019,6 +1040,12 @@ class FEMIndex implements Property<FEMValue> {
 		return this.toRef(FEMIndex.TYPE_TABLE_VALUE, this.targetTableValuePool.put(this.getTableArray(source)));
 	}
 
+	/** Diese Methode nimmt die gegebene Funktion in die Verwaltung auf und gibt die {@link #toRef(int, int)} Funktionsreferenz} darauf zurück.
+	 *
+	 * @param source Funktion.
+	 * @return Funktionsreferenz.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Funktion nicht aufgenommen werden kann. */
 	public int putFunction(final FEMFunction source) throws NullPointerException, IllegalArgumentException {
 		if (source instanceof FEMValue) return this.putValue((FEMValue)source);
 		if (source instanceof FEMProxy) return this.putProxyFunction((FEMProxy)source);
@@ -1029,10 +1056,21 @@ class FEMIndex implements Property<FEMValue> {
 		throw new IllegalArgumentException();
 	}
 
+	/** Diese Methode nimmt den gegebenen Funktionsaufruf in die Verwaltung auf und gibt die {@link #toRef(int, int)} Funktionsreferenz} darauf zurück.
+	 *
+	 * @param source Funktionsaufruf.
+	 * @return Funktionsreferenz.
+	 * @throws NullPointerException Wenn {@link #getProxyArray(FEMProxy)} diese auslöst.
+	 * @throws IllegalArgumentException Wenn {@link #getProxyArray(FEMProxy)} diese auslöst. */
 	public int putProxyFunction(final FEMProxy source) throws NullPointerException, IllegalArgumentException {
 		return this.toRef(FEMIndex.TYPE_PROXY_FUNCTION, this.targetProxyFunctionPool.put(this.getProxyArray(source)));
 	}
 
+	/** Diese Methode gibt die {@link #toRef(int, int)} Funktionsreferenz} auf die gegebene Parameterfunktion zurück.
+	 *
+	 * @param source Parameterfunktion.
+	 * @return Funktionsreferenz.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 	public int putParamFunction(final FEMParam source) throws NullPointerException {
 		return this.toRef(FEMIndex.TYPE_PARAM_FUNCTION, source.index());
 	}
@@ -1063,7 +1101,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@link #getCompositeArray(CompositeFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getCompositeArray(CompositeFunction)} diese auslöst. */
-	protected int putCompositeFunction(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
+	public int putCompositeFunction(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
 		return this.toRef(FEMIndex.TYPE_COMPOSITE_FUNCTION, this.targetCompositeFunctionPool.put(this.getCompositeArray(source)));
 	}
 
