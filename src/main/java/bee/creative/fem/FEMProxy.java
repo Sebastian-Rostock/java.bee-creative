@@ -77,9 +77,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		final String result = FEMDomain.NORMAL.formatConst(this.name);
-		if (this.function == null) return result;
-		return result + FEMHandler.from(this.function).toString();
+		return FEMDomain.NORMAL.formatConst(this.name);
 	}
 
 }
