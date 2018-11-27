@@ -77,12 +77,13 @@ class FEMIndex implements Property<FEMValue> {
 
 	}
 
-	/** Diese Klasse erweitert ein {@link IndexArray} um eine Streuwerttabelle zur Beschleunigung der {@link #customFind(FEMValue, int) Suche einzelner Werte}. */
+	/** Diese Klasse erweitert ein {@link FEMIndex.IndexArray} um eine Streuwerttabelle zur Beschleunigung der {@link #customFind(FEMValue, int, int) Suche einzelner Werte}. */
 	protected static class RangesArray extends IndexArray {
 
 		/** Dieses Feld speichert eine Zahlenfolge, die ab dem dritten Element die Startpositionen der Suchbereiche mit gleichem Streuwert enthält, analog zur
-		 * Kodierung der Streuwerttabelle eines {@link IAMMapping}. Die Struktur der Zahlenfolge ist {@code (keysIdx, valuesIdx, 0, range1, ..., rangeN)}. Die Länge
-		 * der Zahlenfolge entspricht damit stets einer um drei erhöhte Potenz von {@code 2}. */
+		 * Kodierung der Streuwerttabelle eines {@link IAMMapping}. Die Struktur der Zahlenfolge ist
+		 * {@code (keysIdx, valuesIdx, 0, rangeM, ..., rangeN, index1, ..., indexN)}. Die Länge der Zahlenfolge entspricht damit stets einer um drei sowie um die
+		 * Länge der Wertliste erhöhten Potenz von {@code 2}. */
 		public final IAMArray range;
 
 		@SuppressWarnings ("javadoc")
@@ -91,12 +92,12 @@ class FEMIndex implements Property<FEMValue> {
 			this.range = Objects.notNull(range);
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		protected int customFind(final FEMValue that, final int offset) {
-			final int hash = that.hashCode(), mask = this.range.length() - 4, index = hash & mask;
+		protected int customFind(final FEMValue that, final int offset, int length) {
+			final int hash = that.hashCode(), mask = this.range.length() - this.length - 4, index = hash & mask;
+			length += offset;
 			for (int l = this.range.get(index + 2), r = this.range.get(index + 3); l < r; l++) {
-				if (that.equals(this.customGet(l))) return l < offset ? -1 : l;
+				final int result = this.range.get(l);
+				if (result >= offset && result < length && that.equals(this.customGet(result))) return result;
 			}
 			return -1;
 		}
@@ -697,29 +698,29 @@ class FEMIndex implements Property<FEMValue> {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putArrayValue(FEMArray)} diese auslöst. */
 	public IAMArray getTableArray(final FEMTable source) throws NullPointerException, IllegalArgumentException {
+		// TODO Reihenfolge
 		final int entryCount = source.length();
 		final FEMArray keys = source.keys(), values = source.values();
 		final int rangeMask = IAMMapping.mask(entryCount), rangeCount = rangeMask + 4;
-		final int[] tableRanges = new int[rangeCount], bucketIndex = new int[entryCount];
+		final int[] tableRanges = new int[rangeCount + entryCount], bucketIndex = new int[entryCount];
 		for (int i = 0; i < entryCount; i++) {
 			final int bucket = (keys.get(i).hashCode() & rangeMask) + 3;
 			tableRanges[bucket]++;
 			bucketIndex[i] = bucket;
 		}
-		for (int i = 3, offset = 0; i < rangeCount; i++) {
+		for (int i = 3, offset = rangeCount; i < rangeCount; i++) {
 			final int bucketSize = tableRanges[i];
 			tableRanges[i] = offset;
 			offset += bucketSize;
 		}
-		final FEMValue[] tableKeys = new FEMValue[entryCount], tableValues = new FEMValue[entryCount];
 		for (int i = 0; i < entryCount; i++) {
 			final int bucket = bucketIndex[i], offset = tableRanges[bucket];
-			tableKeys[offset] = keys.get(i);
-			tableValues[offset] = values.get(i);
+			tableRanges[offset] = i;
 			tableRanges[bucket] = offset + 1;
 		}
-		tableRanges[0] = this.toIndex(this.putArrayValue(FEMArray.from(tableKeys)));
-		tableRanges[1] = this.toIndex(this.putArrayValue(FEMArray.from(tableValues)));
+		tableRanges[0] = this.toIndex(this.putArrayValue(keys));
+		tableRanges[1] = this.toIndex(this.putArrayValue(values));
+		tableRanges[2] = rangeCount;
 		return IAMArray.from(tableRanges);
 	}
 
@@ -1363,8 +1364,10 @@ class FEMIndex implements Property<FEMValue> {
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.getArrayValues(), this.getStringValues(), this.getBinaryValues(), this.getIntegerValues(), this.getDecimalValues(),
-			this.getDurationValues(), this.getDatetimeValues(), this.getHandlerValues(), this.getObjectValues(), this.getTableValues());
+		return Objects.toFormatString(true, true, this, "arrayValues", this.getArrayValues(), "stringValues", this.getStringValues(), "binaryValues",
+			this.getBinaryValues(), "integerValues", this.getIntegerValues(), "decimalValues", this.getDecimalValues(), "durationValues", this.getDurationValues(),
+			"datetimeValues", this.getDatetimeValues(), "handlerValues", this.getHandlerValues(), "objectValues", this.getObjectValues(), "tableValues",
+			this.getTableValues());
 	}
 
 }

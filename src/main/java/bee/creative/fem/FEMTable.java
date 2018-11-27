@@ -12,7 +12,7 @@ import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine unveränderliche Abbildung von Schlüsseln auf Werte als Tabelle mit einer Schlüssel- und einer Wertspalte. Sie dient der
- * effizienten {@link #find(FEMValue) Suche} eines Schlüssels bzw. {@link #get(FEMValue) Ermittlung} des einem Schlüssel zugeordnenten Werts. Dieser Wert
+ * effizienten {@link #find(FEMValue) Suche} eines Schlüssels bzw. der {@link #get(FEMValue) Ermittlung} des einem Schlüssel zugeordnenten Werts. Dieser Wert
  * befindet sich in der {@link #values() Wertspalte} an der Position, an der sich auch der Schlüssel in der {@link #keys() Schlüsselspalte} befindet.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -57,8 +57,7 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 				return this.entries.getKey(index);
 			}
 
-			@Override
-			protected int customFind(final FEMValue that, final int offset) {
+			protected int customFind(final FEMValue that, final int offset, int length) {
 				final int result = this.entries.findKey(that);
 				return result < offset ? -1 : result;
 			}
@@ -281,9 +280,9 @@ public abstract class FEMTable extends FEMValue implements Items<FEMArray>, Gett
 	}
 
 	/** Diese Methode gibt die {@link #get(FEMValue) Einträge dieser Tabelle} in einer performanteren oder zumindest gleichwertigen Tabelle zurück. Die
-	 * Reihenfolge der gelieferten Tabelle kann von der dieser Tabelle abweichen.
+	 * Reihenfolge der Einträge in der gelieferten Tabelle bleibt erhalten.
 	 *
-	 * @return performanteren Tabelle oder {@code this}. */
+	 * @return performantere Tabelle oder {@code this}. */
 	public FEMTable compact() {
 		return new CompactTable(new CompactTable.Entries(this.length(), this));
 	}

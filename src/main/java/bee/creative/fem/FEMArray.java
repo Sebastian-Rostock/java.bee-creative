@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
+import bee.creative.iam.IAMMapping;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
@@ -91,6 +92,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
+		public FEMArray index() {
+			return this;
+		}
+
+		@Override
 		public FEMArray reverse() {
 			return this;
 		}
@@ -119,6 +125,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		protected FEMValue customGet(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.array1.length;
 			return index2 < 0 ? this.array1.customGet(index) : this.array2.customGet(index2);
+		}
+
+		@Override
+		protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) { // TODO
+			return super.customFind(that, offset, length, foreward);
 		}
 
 		@Override
@@ -169,8 +180,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		protected boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
-			return this.array.customExtract(target, this.offset + offset2, length2, foreward);
+		protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
+			return super.customFind(that, offset + this.offset, length, foreward);
+		}
+
+		@Override
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
+			return this.array.customExtract(target, this.offset + offset, length, foreward);
 		}
 
 		@Override
@@ -179,8 +195,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public FEMArray section(final int offset2, final int length2) throws IllegalArgumentException {
-			return this.array.section(this.offset + offset2, length2);
+		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
+			return this.array.section(this.offset + offset, length);
 		}
 
 	}
@@ -252,6 +268,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
+		public FEMArray index() {
+			return this;
+		}
+
+		@Override
 		public FEMArray reverse() {
 			return this;
 		}
@@ -286,16 +307,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	@SuppressWarnings ("javadoc")
 	public static class CompactArray extends FEMArray implements Emuable {
 
-		/** Dieses Feld speichert das Array der Werte, das nicht verändert werden sollte. */
+		/** Dieses Feld speichert das Array der Werte, das nicht verändert werden darf. */
 		final FEMValue[] items;
 
 		CompactArray(final FEMValue[] items) throws IllegalArgumentException {
 			super(items.length);
 			this.items = items;
-			final int length = items.length;
-			for (int i = 0; i < length; i++) {
-				if (items[i] == null) throw new NullPointerException();
-			}
+			this.hash();
 		}
 
 		@Override
@@ -305,7 +323,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		@Override
 		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.items);
+			return EMU.fromObject(this) + EMU.fromArray(this.items);
 		}
 
 		@Override
@@ -325,10 +343,78 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		CompactArray2(final FEMValue[] items) throws IllegalArgumentException {
 			super(items);
+			final int length = items.length;
+			for (int i = 0; i < length; i++) {
+				items[i] = items[i].result(true);
+			}
 		}
 
 		@Override
 		public FEMArray result(final boolean recursive) {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class CompactArray3 extends CompactArray2 {
+
+		/** Dieses Feld speichert die Streuwerttabelle zu den Werten in {@link #items}, analog zur Kodierung in {@link IAMMapping}. Die Struktur dieser Zahlenfolge
+		 * ist {@code (range1, ..., rangeM, index1, ..., indexN)}. Die Länge der Zahlenfolge entspricht stets einer um 1 sowie um die Länge der Wertliste erhöhten
+		 * Potenz von {@code 2}. */
+		final int[] table;
+
+		CompactArray3(final FEMValue[] items) throws IllegalArgumentException {
+			super(items);
+			final int length = this.length, mask = IAMMapping.mask(length), count = mask + 2;
+			final int[] table = new int[count + length], hashes = new int[length];
+			for (int i = 0; i < length; i++) {
+				final int hash = (items[i].hashCode() & mask) + 1;
+				table[hash]++;
+				hashes[i] = hash;
+			}
+			for (int i = 1, offset = count; i < count; i++) {
+				final int size = table[i];
+				table[i] = offset;
+				offset += size;
+			}
+			for (int i = 0; i < length; i++) {
+				final int hash = hashes[i], offset = table[hash];
+				table[hash] = offset + 1;
+				table[offset] = i;
+			}
+			table[0] = count;
+			this.table = table;
+		}
+
+		@Override
+		protected int customFind(final FEMValue that, final int offset, int length, final boolean foreward) {
+			final int hash = that.hashCode() & (this.table.length - this.length - 2);
+			int l = this.table[hash], r = this.table[hash + 1] - 1;
+			length += offset;
+			if (foreward) {
+				for (; l <= r; l++) {
+					final int result = this.table[l];
+					if (length <= result) return -1;
+					if ((offset <= result) && that.equals(this.items[result])) return result;
+				}
+			} else {
+				for (; l <= r; r--) {
+					final int result = this.table[r];
+					if (result < offset) return -1;
+					if ((result < length) && that.equals(this.items[result])) return result;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public long emu() {
+			return super.emu() + EMU.fromArray(this.items);
+		}
+
+		@Override
+		public FEMArray index() {
 			return this;
 		}
 
@@ -472,32 +558,22 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return null;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück. Sie Implementiert
-	 * {@link #find(FEMValue, int)} ohne Wertebereichsprüfung.
-	 *
-	 * @param that gesuchter Wert.
-	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
-	 * @return Position des ersten Vorkommens des gegebenen Werts ({@code offset..this.length()-1}) oder {@code -1}. */
-	protected int customFind(final FEMValue that, final int offset) {
-		final ItemFinder finder = new ItemFinder(that);
-		if (this.customExtract(finder, offset, this.length - offset, true)) return -1;
-		return finder.index + offset;
-	}
-
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück. Sie Implementiert
 	 * {@link #find(FEMArray, int)} ohne Wertebereichsprüfung.
-	 * 
-	 * @param that gesuchte Wertliste.
+	 *
+	 * @param that nicht leere gesuchte Wertliste.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Wertliste ({@code offset..this.length()-that.length()}) oder {@code -1}.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	protected int customFind(final FEMArray that, final int offset) {
 		final int count = that.length;
-		if (count == 1) return this.find(that.customGet(0), offset);
-		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
-		if (count == 0) return offset;
-		final FEMValue value = that.customGet(0);
+
 		final int length = (this.length - count) + 1;
+		// TODO
+		final FEMValue value = that.customGet(0);
+
+		this.customFind(that, offset);
+
 		FIND: for (int i = offset; i < length; i++) {
 			if (value.equals(this.customGet(i))) {
 				for (int i2 = 1; i2 < count; i2++) {
@@ -509,6 +585,27 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			}
 		}
 		return -1;
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück. Sie Implementiert
+	 * {@link #find(FEMValue, int)} ohne Wertebereichsprüfung.
+	 *
+	 * @param that gesuchter Wert.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens des gegebenen Werts ({@code offset..offset+length-1}) oder {@code -1}.
+	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
+	protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
+		final ItemFinder finder = new ItemFinder(that);
+		if (this.customExtract(finder, offset, length, foreward)) return -1;
+		return finder.index + offset;
+	}
+
+	protected boolean customEquals(final FEMArray that, final int offset) {
+		final int length = that.length;
+		for (int i = 0; i < length; i++) {
+			if (!this.customGet(offset + i).equals(that.customGet(i))) return false;
+		}
+		return true;
 	}
 
 	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an. Das Anfügen wird
@@ -591,6 +688,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return new SectionArray(this, offset, length);
 	}
 
+	public FEMArray index() {
+		return this.length == 1 ? new UniformArray(1, this.customGet(0)) : new CompactArray3(this.value());
+	}
+
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Wertliste zurück.
 	 *
 	 * @return rückwärts geordnete {@link FEMArray}-Sicht auf diese Wertliste. */
@@ -604,9 +705,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @see #value()
 	 * @return performanteren Wertliste oder {@code this}. */
 	public FEMArray compact() {
-		final FEMArray result = this.length == 1 ? new UniformArray(1, this.customGet(0)) : new CompactArray(this.value());
-		result.hash = this.hash;
-		return result;
+		return this.length == 1 ? new UniformArray(1, this.customGet(0)) : new CompactArray(this.value());
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück. Die Suche beginnt an der gegebenen Position.
@@ -618,10 +717,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMValue that, final int offset) throws NullPointerException, IllegalArgumentException {
-		if (offset == this.length) return -1;
+		Objects.notNull(that);
 		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
-		return this.customFind(Objects.notNull(that), offset);
-
+		if (offset == this.length) return -1;
+		return this.customFind(that, offset, this.length - offset, true);
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück. Die Suche beginnt an der gegebenen
@@ -633,9 +732,9 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMArray that, final int offset) throws NullPointerException, IllegalArgumentException {
+		if (that.length == 1) return this.find(that.customGet(0), offset);
 		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
 		if (that.length == 0) return offset;
-		if (that.length == 1) return this.customFind(that.customGet(0), offset);
 		if (that.length > (this.length - offset)) return -1;
 		return this.customFind(that, offset);
 	}
@@ -686,10 +785,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		final int length = this.length;
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;
-		for (int i = 0; i < length; i++) {
-			if (!this.customGet(i).equals(that.customGet(i))) return false;
-		}
-		return true;
+		return this.customEquals(that, 0);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Wertliste kleiner, gleich oder größer als die
@@ -741,12 +837,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	@Override
 	public FEMArray result(final boolean recursive) {
 		if (!recursive) return this;
-		final FEMValue[] result = this.value();
-		final int length = result.length;
-		for (int i = 0; i < length; i++) {
-			result[i] = result[i].result(true);
-		}
-		return new CompactArray2(result);
+		return new CompactArray2(this.value());
 	}
 
 	/** {@inheritDoc} */

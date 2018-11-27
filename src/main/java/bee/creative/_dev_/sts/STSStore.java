@@ -427,7 +427,6 @@ import bee.creative.util.Getter;
 	}
 
 	/** Diese Methode implementiert {@link #getNodeSet(Iterable)}. */
-	@SuppressWarnings ("javadoc")
 	protected STSNodeSet customGetNodeSetByFields(final Iterator<? extends FEMBinary> values) throws NullPointerException {
 		return this.toNodeSetImpl(new ItemIterator() {
 

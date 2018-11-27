@@ -121,7 +121,7 @@ public final class FEMFuture extends FEMValue {
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMValue)) return false;
-		return this.equals((FEMValue)object);
+		return this.result().equals((FEMValue)object);
 	}
 
 	/** {@inheritDoc} */

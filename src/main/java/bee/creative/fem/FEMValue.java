@@ -62,19 +62,6 @@ public abstract class FEMValue extends FEMFunction {
 		return this;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn {@link #type() Datentyp} und {@link #data() Nutzdaten} dieses Werts
-	 * {@link Objects#equals(Object, Object) äquivalent} zu denen des gegebenen Werts sind.
-	 *
-	 * @see #type()
-	 * @see #data()
-	 * @see Objects#equals(Object, Object)
-	 * @param that Zeitangabe.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMValue that) throws NullPointerException {
-		return Objects.equals(this.type(), that.type()) && Objects.equals(this.data(), that.data());
-	}
-
 	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück. Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen
 	 * {@link FEMHandler#value() referenzierte Funktion}. Jeder andere Wert liefert sich selbst.
 	 *
