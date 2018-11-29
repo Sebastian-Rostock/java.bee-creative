@@ -91,7 +91,7 @@ import bee.creative.util.Objects;
 		this.nodeSubjectEdges = Arrays.copyOf(this.nodeSubjectEdges, nodeCapacity);
 		this.nodePredicateEdges = Arrays.copyOf(this.nodePredicateEdges, nodeCapacity);
 		for (int i = 1; i < count; i++) {
-			final int index = this.nodeValues[i].hash() & mask;
+			final int index = this.nodeValues[i].hashCode() & mask;
 			this.nodeNexts[i] = this.nodeTable[index];
 			this.nodeTable[index] = i;
 		}
@@ -139,7 +139,7 @@ import bee.creative.util.Objects;
 
 	@SuppressWarnings ("javadoc")
 	private STSNode getNodeImpl(final FEMBinary value, final boolean readonly) {
-		final int hash = value.hash();
+		final int hash = value.hashCode();
 		final int hashIndex = hash & (this.nodeTable.length - 1);
 		int nodeIndex = this.nodeTable[hashIndex];
 		while (nodeIndex != 0) {

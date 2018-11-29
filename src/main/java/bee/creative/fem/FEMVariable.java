@@ -23,16 +23,6 @@ public final class FEMVariable extends FEMValue implements Property<FEMValue> {
 		return new FEMVariable(value);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMVariable.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Dezimalzahl.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMVariable from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMVariable.TYPE);
-	}
-
 	/** Dieses Feld speichert den Wert. */
 	FEMValue value;
 

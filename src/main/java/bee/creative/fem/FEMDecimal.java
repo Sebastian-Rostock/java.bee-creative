@@ -56,16 +56,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		}
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDecimal.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Dezimalbruch.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMDecimal from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMDecimal.TYPE);
-	}
-
 	/** Dieses Feld speichert die interne Darstellung des Dezimalbruchs. */
 	final double value;
 
@@ -95,14 +85,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		return this.value;
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		final long value = Double.doubleToLongBits(this.value);
-		return Integers.toIntL(value) ^ Integers.toIntH(value);
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Dezimalbruch gleich dem gegebenen ist.
 	 *
 	 * @param that Dezimalbruch.
@@ -128,14 +110,9 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMDecimal result(final boolean recursive) {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
-		return this.hash();
+		final long value = Double.doubleToLongBits(this.value);
+		return Integers.toIntL(value) ^ Integers.toIntH(value);
 	}
 
 	/** {@inheritDoc} */

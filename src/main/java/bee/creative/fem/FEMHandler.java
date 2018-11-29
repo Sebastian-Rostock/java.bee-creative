@@ -27,16 +27,6 @@ public final class FEMHandler extends FEMValue {
 		return new FEMHandler(Objects.notNull(function));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMHandler.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Funktionszeiger.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMHandler from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMHandler.TYPE);
-	}
-
 	/** Dieses Feld speichert die Nutzdaten. */
 	final FEMFunction value;
 
@@ -64,13 +54,6 @@ public final class FEMHandler extends FEMValue {
 		return this.value;
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		return this.value.hashCode();
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Funktionszeiger gleich der gegebenen ist.
 	 *
 	 * @param that Methode.
@@ -82,14 +65,8 @@ public final class FEMHandler extends FEMValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMHandler result(final boolean recursive) {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
-		return this.hash();
+		return this.value.hashCode();
 	}
 
 	/** {@inheritDoc} */

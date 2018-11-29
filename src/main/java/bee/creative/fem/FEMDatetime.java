@@ -244,16 +244,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return FEMDatetime.EMPTY.withDate(calendar).withTime(calendar).withZone(calendar);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDatetime.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Zeitangabe.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMDatetime from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMDatetime.TYPE);
-	}
-
 	/** Diese Methode gibt eine Zeitangabe mit dem Datum zum gegebenen Kalendertag zurück und ist eine Abkürzung für
 	 * {@code FEE_Datetime.EMPTY.withDate(calendarday)}.
 	 *
@@ -1267,13 +1257,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return this.withTimeImpl(0, 0, 0, 0).moveImpl(0, 86400000);
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		return this.valueH ^ this.valueL;
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe effektiv gleich der gegebenen ist.
 	 *
 	 * @see #compare(FEMDatetime, int)
@@ -1380,14 +1363,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMDatetime result(final boolean recursive) {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
-		return this.hash();
+		return this.valueH ^ this.valueL;
 	}
 
 	/** {@inheritDoc} */

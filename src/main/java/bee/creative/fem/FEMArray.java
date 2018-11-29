@@ -92,17 +92,17 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public FEMArray index() {
-			return this;
-		}
-
-		@Override
 		public FEMArray reverse() {
 			return this;
 		}
 
 		@Override
-		public FEMArray compact() {
+		public FEMArray result(final boolean recursive) {
+			return this;
+		}
+
+		@Override
+		public FEMArray compact(final boolean index) {
 			return this;
 		}
 
@@ -268,24 +268,18 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public FEMArray index() {
-			return this;
-		}
-
-		@Override
 		public FEMArray reverse() {
 			return this;
 		}
 
 		@Override
-		public FEMArray compact() {
-			return this;
+		public FEMArray result(final boolean deep) {
+			return deep ? new UniformArray2(this.length, this.item) : null;
 		}
 
 		@Override
-		public FEMArray result(final boolean recursive) {
-			if (!recursive) return this;
-			return new UniformArray2(this.length, this.item.result(true));
+		public FEMArray compact(final boolean index) {
+			return this.result(index);
 		}
 
 	}
@@ -294,11 +288,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static class UniformArray2 extends UniformArray {
 
 		UniformArray2(final int length, final FEMValue item) throws IllegalArgumentException {
-			super(length, item);
+			super(length, item.result(true));
 		}
 
 		@Override
-		public FEMArray result(final boolean recursive) {
+		public FEMArray result(final boolean deep) {
 			return this;
 		}
 
@@ -313,7 +307,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		CompactArray(final FEMValue[] items) throws IllegalArgumentException {
 			super(items.length);
 			this.items = items;
-			this.hash();
+			final int length = items.length;
+			for (int i = 0; i < length; i++) {
+				Objects.notNull(items[i]);
+			}
 		}
 
 		@Override
@@ -332,8 +329,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public FEMArray compact() {
-			return this;
+		public FEMArray compact(final boolean index) {
+			return index ? super.compact(true) : this;
 		}
 
 	}
@@ -350,7 +347,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public FEMArray result(final boolean recursive) {
+		public FEMArray result(final boolean deep) {
 			return this;
 		}
 
@@ -359,9 +356,9 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	@SuppressWarnings ("javadoc")
 	public static class CompactArray3 extends CompactArray2 {
 
-		/** Dieses Feld speichert die Streuwerttabelle zu den Werten in {@link #items}, analog zur Kodierung in {@link IAMMapping}. Die Struktur dieser Zahlenfolge
-		 * ist {@code (range1, ..., rangeM, index1, ..., indexN)}. Die Länge der Zahlenfolge entspricht stets einer um 1 sowie um die Länge der Wertliste erhöhten
-		 * Potenz von {@code 2}. */
+		/** Dieses Feld speichert die Streuwerttabelle zu den Werten in {@link #items}. Die Länge der Zahlenfolge entspricht stets einer um 1 sowie um die Länge der
+		 * Wertliste {@code length} erhöhten Potenz von {@code 2}. Di um eins verringerte Potenz wird als Bitmaske {@code mask} für die Streuwerte der Elemente
+		 * eingesetzt. Zur auswe */
 		final int[] table;
 
 		CompactArray3(final FEMValue[] items) throws IllegalArgumentException {
@@ -414,7 +411,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public FEMArray index() {
+		public FEMArray compact(final boolean index) {
 			return this;
 		}
 
@@ -505,16 +502,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return FEMArray.from(Iterables.toList(items));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMArray.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMArray from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMArray.TYPE);
-	}
-
 	/** Diese Methode gibt die Verkettung der gegebenen Wertlisten zurück.
 	 *
 	 * @see #concat(FEMArray)
@@ -535,7 +522,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return FEMArray.concatAll(values, min, mid).concat(FEMArray.concatAll(values, mid + 1, max));
 	}
 
-	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hash()} initialisiert. */
+	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
 	protected int hash;
 
 	/** Dieses Feld speichert die Länge. */
@@ -569,7 +556,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		final int count = that.length;
 
 		final int length = (this.length - count) + 1;
-		// TODO
+		// TODO auf customFind für einzelwerte aufbauen
 		final FEMValue value = that.customGet(0);
 
 		this.customFind(that, offset);
@@ -688,10 +675,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return new SectionArray(this, offset, length);
 	}
 
-	public FEMArray index() {
-		return this.length == 1 ? new UniformArray(1, this.customGet(0)) : new CompactArray3(this.value());
-	}
-
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Wertliste zurück.
 	 *
 	 * @return rückwärts geordnete {@link FEMArray}-Sicht auf diese Wertliste. */
@@ -699,13 +682,24 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return new ReverseArray(this);
 	}
 
-	/** Diese Methode gibt die {@link #value() Werte dieser Wertliste} in einer performanteren oder zumindest gleichwertigen Wertliste zurück.
+	/** Diese Methode ist eine abkürzung für {@link #compact(boolean) compact(false)}.
 	 *
-	 * @see #from(FEMValue...)
-	 * @see #value()
 	 * @return performanteren Wertliste oder {@code this}. */
-	public FEMArray compact() {
-		return this.length == 1 ? new UniformArray(1, this.customGet(0)) : new CompactArray(this.value());
+	public final FEMArray compact() {
+		return this.compact(false);
+	}
+
+	/** Diese Methode gibt die {@link #value() Werte dieser Wertliste} in einer performanteren oder zumindest gleichwertigen Wertliste zurück. Wenn diese
+	 * Wertliste diesbezüglich optimiert werden kann, wird grundsätzlich eine Abschrift der {@link #value() Werte} dieser Wertliste analog zu
+	 * {@link #from(FEMValue...) from(values())} geliefert. Wenn die Indizierung aktiviert ist, wird auch die Leistungsfähigkeit der {@link #find(FEMValue, int)
+	 * Einzelwertsuche} optimiert. Hierbei wird grundsätzlich eine Streuwerttabelle angelegt, welche den Speicherverbrauch der Wertliste vervierfachen kann.
+	 *
+	 * @param index {@code true}, wenn die Einzelwertsuche beschleunigt werden sollen.
+	 * @return performanteren Wertliste oder {@code this}. */
+	public FEMArray compact(final boolean index) {
+		if (this.length == 0) return FEMArray.EMPTY;
+		if (this.length == 1) return index ? new UniformArray2(1, this.customGet(0)) : new UniformArray(1, this.customGet(0));
+		return index ? new CompactArray3(this.value()) : new CompactArray(this.value());
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück. Die Suche beginnt an der gegebenen Position.
@@ -761,19 +755,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public final void extract(final FEMValue[] result, final int offset) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || ((offset + this.length) > result.length)) throw new IllegalArgumentException();
 		this.extract(new ValueCollector(result, offset));
-	}
-
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		int result = this.hash;
-		if (result != 0) return result;
-		final int length = this.length;
-		final HashCollector collector = new HashCollector();
-		this.customExtract(collector, 0, length, true);
-		this.hash = (result = (collector.hash | 1));
-		return result;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist.
@@ -835,15 +816,20 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** {@inheritDoc} */
 	@Override
-	public FEMArray result(final boolean recursive) {
-		if (!recursive) return this;
+	public FEMArray result(final boolean deep) {
+		if (!deep) return this;
 		return new CompactArray2(this.value());
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
-		return this.hash();
+		int result = this.hash;
+		if (result != 0) return result;
+		final HashCollector collector = new HashCollector();
+		this.extract(collector);
+		result = collector.hash;
+		return this.hash = result != 0 ? result : 1;
 	}
 
 	/** {@inheritDoc} */

@@ -392,8 +392,8 @@ public abstract class FEMFunction {
 	public abstract FEMValue invoke(FEMFrame frame) throws NullPointerException;
 
 	/** Diese Methode gibt eine verkette Funktion zurück, welche den Ergebniswert dieser Funktion in einen {@link FEMHandler Funktionszeiger}
-	 * {@link FEMHandler#from(FEMValue, FEMContext) umwandelt}, die davon {@link FEMHandler#value() referenzierte} Funktion mit den gegebenen Parameterfunktionen
-	 * aufruft und deren Ergebniswert liefert. Der Ergebniswert der gelieferten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht
+	 * {@link FEMHandler#toFunction() umwandelt}, die davon {@link FEMHandler#value() referenzierte} Funktion mit den gegebenen Parameterfunktionen aufruft und
+	 * deren Ergebniswert liefert. Der Ergebniswert der gelieferten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht
 	 * {@code this.invoke(frame).toFunction().invoke(frame.newFrame(this.params())}.
 	 *
 	 * @see ConcatFunction

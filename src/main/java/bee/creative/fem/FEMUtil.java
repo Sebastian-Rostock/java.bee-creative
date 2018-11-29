@@ -22,7 +22,7 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 3, 3);
-			final FEMBoolean condition = FEMBoolean.from(frame.get(0), frame.context());
+			final FEMBoolean condition = frame.context().dataFrom(frame.get(0), FEMBoolean.TYPE);
 			final FEMValue result = frame.get(condition.value() ? 1 : 2).result();
 			return result;
 		}
@@ -36,7 +36,7 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 2, 2);
-			final FEMVariable variable = FEMVariable.from(frame.get(0), frame.context());
+			final FEMVariable variable = frame.context().dataFrom(frame.get(0), FEMVariable.TYPE);
 			final FEMValue value = frame.get(1);
 			variable.set(value);
 			return value;
@@ -51,7 +51,7 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 1, 1);
-			final FEMVariable variable = FEMVariable.from(frame.get(0), frame.context());
+			final FEMVariable variable = frame.context().dataFrom(frame.get(0), FEMVariable.TYPE);
 			return variable.get();
 		}
 
@@ -96,9 +96,8 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
 			FEMUtil.assertSize(frame, 2, 2);
-			final FEMContext context = frame.context();
-			final FEMArray array = FEMArray.from(frame.get(1), context);
-			final FEMFunction method = FEMHandler.from(frame.get(0), context).value();
+			final FEMArray array = frame.context().dataFrom(frame.get(1), FEMArray.TYPE);
+			final FEMFunction method = frame.get(0).toFunction();
 			final FEMFrame params = frame.withParams(array);
 			return method.invoke(params);
 		}
@@ -113,9 +112,8 @@ public abstract class FEMUtil {
 		public FEMValue invoke(final FEMFrame frame) {
 			FEMUtil.assertSize(frame, 1, Integer.MAX_VALUE);
 			final int index = frame.size() - 1;
-			final FEMContext context = frame.context();
 			final FEMArray array = frame.params().section(0, index);
-			final FEMFunction method = FEMHandler.from(frame.get(index), context).value();
+			final FEMFunction method = frame.get(index).toFunction();
 			final FEMFrame params = frame.withParams(array);
 			return method.invoke(params);
 		}
@@ -132,9 +130,9 @@ public abstract class FEMUtil {
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 1, 1);
 			final FEMContext context = frame.context();
-			final FEMFunction method = FEMHandler.from(frame.get(0), context).value();
+			final FEMFunction method = frame.get(0).toFunction();
 			for (int count = 0; true; count++) {
-				final FEMBoolean repeat = FEMBoolean.from(method.invoke(frame.withoutParams()), context);
+				final FEMBoolean repeat = context.dataFrom(method.invoke(frame.withoutParams()), FEMBoolean.TYPE);
 				if (!repeat.value()) return FEMInteger.from(count);
 			}
 		}

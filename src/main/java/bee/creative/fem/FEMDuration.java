@@ -391,16 +391,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDuration.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Zeitspanne.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMDuration from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMDuration.TYPE);
-	}
-
 	@SuppressWarnings ("javadoc")
 	static void checkDays(final int days) throws IllegalArgumentException {
 		if (days > 3652424) throw new IllegalArgumentException();
@@ -856,13 +846,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return FEMDuration.from((this.durationmonthsValue() * numerator) / denominator, (this.durationmillisValue() * numerator) / denominator);
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		return this.valueH ^ this.valueL;
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitspanne effektiv gleich der gegebenen ist.
 	 *
 	 * @see #compare(FEMDuration, int)
@@ -908,14 +891,8 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMDuration result(final boolean recursive) {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
-		return this.hash();
+		return this.valueH ^ this.valueL;
 	}
 
 	/** {@inheritDoc} */

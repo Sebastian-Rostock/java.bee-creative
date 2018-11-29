@@ -25,16 +25,6 @@ public final class FEMVoid extends FEMValue {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMVoid.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Leerwert.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMVoid from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMVoid.TYPE);
-	}
-
 	@SuppressWarnings ("javadoc")
 	FEMVoid() {
 	}

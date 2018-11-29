@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  *
  * @see FEMValue#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GData> Typ der von {@link #dataFrom(FEMValue, FEMContext)} gelieferten Nutzdaten. */
+ * @param <GData> Typ der von {@link FEMContext#dataFrom(FEMValue, FEMType)} gelieferten Nutzdaten. */
 public class FEMType<GData> {
 
 	/** Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator zurück.
@@ -82,10 +82,6 @@ public class FEMType<GData> {
 	 * <td>{@link FEMObject}</td>
 	 * </tr>
 	 * <tr>
-	 * <td>{@code 11}</td>
-	 * <td>{@link FEMTable}</td>
-	 * </tr>
-	 * <tr>
 	 * <td>{@code -1}</td>
 	 * <td>{@link FEMNative}</td>
 	 * </tr>
@@ -104,24 +100,10 @@ public class FEMType<GData> {
 	 * Datentyp gleich zu diesem oder ein Vorfahre dieses Datentyps ist. Wenn der gegebene Datentyp {@code null} ist, wird {@code false} geliefert.
 	 *
 	 * @see Class#isAssignableFrom(Class)
-	 * @param type Datentyp.
+	 * @param that Datentyp.
 	 * @return {@code true}, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist. */
-	public boolean is(final FEMType<?> type) {
-		return (type == this) || ((type != null) && (type.id == this.id));
-	}
-
-	/** Diese Methode gibt die in den Datentyp {@code GData} kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück. Der Rückgabewert entspricht
-	 * {@code context.dataFrom(value, this)}.
-	 *
-	 * @see FEMContext#dataFrom(FEMValue, FEMType)
-	 * @param value gegebener Wert.
-	 * @param context Kontextobjekt.
-	 * @return Nutzdaten.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können. */
-	public final GData dataFrom(final FEMValue value, final FEMContext context) throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return context.dataFrom(value, this);
+	public boolean is(final FEMType<?> that) {
+		return (this == that) || ((that != null) && (that.id == this.id));
 	}
 
 	/** {@inheritDoc}
@@ -139,8 +121,8 @@ public class FEMType<GData> {
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMType<?>)) return false;
-		final FEMType<?> data = (FEMType<?>)object;
-		return this.id == data.id;
+		final FEMType<?> that = (FEMType<?>)object;
+		return this.id == that.id;
 	}
 
 	/** {@inheritDoc} */

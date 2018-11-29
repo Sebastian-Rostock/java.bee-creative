@@ -44,13 +44,6 @@ public final class FEMNative extends FEMValue {
 		this.data = data;
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		return Objects.hash(this.data);
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wert gleich dem gegebenen ist. Dies ist nur dann der Fall, wenn die {@link #data() Nutzdaten}
 	 * einander gleichen, d.h. {@code Objects.equals(this.data(), that.data())}.
 	 *
@@ -76,15 +69,8 @@ public final class FEMNative extends FEMValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMNative result(final boolean recursive) {
-		if (this.data instanceof FEMValue) return new FEMNative(((FEMValue)this.data).result(recursive));
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
-		return this.hash();
+		return Objects.hash(this.data);
 	}
 
 	/** {@inheritDoc} */

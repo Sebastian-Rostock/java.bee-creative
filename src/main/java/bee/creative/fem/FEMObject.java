@@ -60,16 +60,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return new FEMObject(ref, Integers.toInt(type, owner));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMObject.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMObject from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMObject.TYPE);
-	}
-
 	@SuppressWarnings ("javadoc")
 	static void checkMin(final int value) throws IllegalArgumentException {
 		if (value < 0) throw new IllegalArgumentException();
@@ -198,13 +188,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return new FEMObject(this.valueH, Integers.toInt(this.typeValue(), owner));
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		return this.valueH ^ this.valueL;
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Referenz gleich der gegebenen ist.
 	 *
 	 * @param that Referenz.
@@ -230,14 +213,8 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMObject result(final boolean recursive) {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
-		return this.hash();
+		return this.valueH ^ this.valueL;
 	}
 
 	/** {@inheritDoc} */

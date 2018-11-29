@@ -17,9 +17,9 @@ import bee.creative.util.Filter;
 import bee.creative.util.Getter;
 import bee.creative.util.Natives;
 import bee.creative.util.Objects;
+import bee.creative.util.Objects.BaseObject;
 import bee.creative.util.Setter;
 import bee.creative.util.Strings;
-import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
  * Quelltexten und Funktionen ineinander dienen.
@@ -140,7 +140,7 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode sollte den {@link FEMParser#tokens() Bereich} an der gegebenen Position als {@link Token Fehlerbereich} mit dem Typ {@code '!'} markieren,
 	 * d.h. {@code target.setToken(index, '!')} aufrufe, wenn die Startbereiche unvollständiger {@link #parseArray(FEMParser) Wertlisten},
 	 * {@link #parseParams(FEMParser) Parameterlisten} bzw. {@link #parseHandler(FEMParser) Funktionszeiger} derart gekennzeichnet werden sollen.
-	 * 
+	 *
 	 * @param target Parser.
 	 * @param index Position des
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */

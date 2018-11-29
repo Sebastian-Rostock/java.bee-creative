@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collection;
 import bee.creative.util.Getter;
+import bee.creative.util.Getters.BaseGetter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
@@ -15,6 +16,57 @@ import bee.creative.util.Objects;
  * @see FEMFrame#context()
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMContext {
+
+	@SuppressWarnings ("javadoc")
+	final class DataFromGetter<GData> implements Getter<FEMValue, GData> {
+
+		public final FEMType<? extends GData> type;
+
+		public DataFromGetter(final FEMType<? extends GData> type) {
+			this.type = Objects.notNull(type);
+		}
+
+		@Override
+		public GData get(final FEMValue value) {
+			return FEMContext.this.dataFrom(value, this.type);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.type);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	final class ArrayFromGetter extends BaseGetter<Object, FEMArray> {
+
+		@Override
+		public FEMArray get(final Object object) {
+			return FEMContext.this.arrayFrom(object);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	final class ValueFromGetter extends BaseGetter<Object, FEMValue> {
+
+		@Override
+		public FEMValue get(final Object object) {
+			return FEMContext.this.valueFrom(object);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	final class ObjectFromGetter extends BaseGetter<FEMValue, Object> {
+
+		@Override
+		public Object get(final FEMValue value) {
+			return FEMContext.this.objectFrom(value);
+		}
+
+	}
 
 	/** Dieses Feld speichert das leere Kontextobjekt.
 	 * <p>
@@ -42,20 +94,7 @@ public class FEMContext {
 	 * @return {@code dataFrom}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist. */
 	public final <GData> Getter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
-		Objects.notNull(type);
-		return new Getter<FEMValue, GData>() {
-
-			@Override
-			public GData get(final FEMValue value) {
-				return FEMContext.this.dataFrom(value, type);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("dataFrom", type);
-			}
-
-		};
+		return new DataFromGetter<>(type);
 	}
 
 	/** Diese Methode gibt die in {@link FEMValue#data() Nutzdaten} des gegebenen Werts im gegebenen Datentyp ({@code GData}) zurück. Hierbei werden die Nutzdaten
@@ -80,19 +119,7 @@ public class FEMContext {
 	 *
 	 * @return {@code arrayFrom}-{@link Getter}. */
 	public final Getter<Object, FEMArray> arrayFrom() {
-		return new Getter<Object, FEMArray>() {
-
-			@Override
-			public FEMArray get(final Object object) {
-				return FEMContext.this.arrayFrom(object);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("arrayFrom");
-			}
-
-		};
+		return new ArrayFromGetter();
 	}
 
 	/** Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.
@@ -114,9 +141,14 @@ public class FEMContext {
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann. */
 	public FEMArray arrayFrom(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data instanceof FEMArray) return (FEMArray)data;
-		if (data instanceof Object[]) return this.arrayFromImpl((Object[])data);
 		if (data instanceof Collection<?>) return this.arrayFromImpl((Collection<?>)data);
 		if (data instanceof Iterable<?>) return this.arrayFromImpl((Iterable<?>)data);
+		if (data instanceof Object[]) return this.arrayFromImpl((Object[])data);
+		return this.arrayFromImpl(data);
+	}
+
+	@SuppressWarnings ("javadoc")
+	final FEMArray arrayFromImpl(final Object data) throws NullPointerException, IllegalArgumentException {
 		final int length = Array.getLength(data);
 		if (length == 0) return FEMArray.EMPTY;
 		final FEMValue[] values = new FEMValue[length];
@@ -152,19 +184,7 @@ public class FEMContext {
 	 *
 	 * @return {@code valueFrom}-{@link Getter}. */
 	public final Getter<Object, FEMValue> valueFrom() {
-		return new Getter<Object, FEMValue>() {
-
-			@Override
-			public FEMValue get(final Object object) {
-				return FEMContext.this.valueFrom(object);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("valueFrom");
-			}
-
-		};
+		return new ValueFromGetter();
 	}
 
 	/** Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück. Welcher Wert- und Datentyp hierfür verwendet
@@ -194,19 +214,7 @@ public class FEMContext {
 	 *
 	 * @return {@code objectFrom}-{@link Getter}. */
 	public final Getter<FEMValue, Object> objectFrom() {
-		return new Getter<FEMValue, Object>() {
-
-			@Override
-			public Object get(final FEMValue value) {
-				return FEMContext.this.objectFrom(value);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("objectFrom");
-			}
-
-		};
+		return new ObjectFromGetter();
 	}
 
 	/** Diese Methode gibt ein {@link Object} zurück, welches über {@link #valueFrom(Object)} in einen Wert überführt werden kann, der zum gegebenen Wert

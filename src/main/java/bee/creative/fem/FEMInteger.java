@@ -57,16 +57,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		}
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMInteger.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Dezimalzahl.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMInteger from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMInteger.TYPE);
-	}
-
 	/** Dieses Feld speichert die interne Darstellung der Dezimalzahl. */
 	final long value;
 
@@ -96,13 +86,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		return this.value;
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		return Integers.toIntL(this.value) ^ Integers.toIntH(this.value);
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Dezimalzahl gleich der gegebenen ist.
 	 *
 	 * @param that Dezimalzahl.
@@ -123,14 +106,8 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMInteger result(final boolean recursive) {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
-		return this.hash();
+		return Integers.toIntL(this.value) ^ Integers.toIntH(this.value);
 	}
 
 	/** {@inheritDoc} */

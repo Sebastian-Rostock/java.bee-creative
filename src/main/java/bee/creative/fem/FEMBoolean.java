@@ -48,16 +48,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBoolean.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Wahrheitswert.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMBoolean from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMBoolean.TYPE);
-	}
-
 	/** Dieses Feld speichert die interne Darstellung des Wahrheitswerts. */
 	final boolean value;
 
@@ -87,13 +77,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		return this.value;
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		return this.value ? 1231 : 1237;
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wahrheitswert gleich dem gegebenen ist.
 	 *
 	 * @param that Wahrheitswert.
@@ -114,14 +97,8 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMBoolean result(final boolean recursive) {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final int hashCode() {
-		return this.hash();
+		return this.value ? 1231 : 1237;
 	}
 
 	/** {@inheritDoc} */

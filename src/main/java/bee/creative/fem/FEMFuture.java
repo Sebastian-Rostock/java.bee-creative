@@ -71,13 +71,13 @@ public final class FEMFuture extends FEMValue {
 	/** Diese Methode gibt {@code this.result().data()} zurück. */
 	@Override
 	public final Object data() {
-		return this.result(false).data();
+		return this.result().data();
 	}
 
 	/** Diese Methode gibt {@code this.result().type()} zurück. */
 	@Override
 	public final FEMType<?> type() {
-		return this.result(false).type();
+		return this.result().type();
 	}
 
 	/** Diese Methode gibt das Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} der {@link #function() Funktion} mit den {@link #frame() Stapelrahmen}
@@ -91,23 +91,16 @@ public final class FEMFuture extends FEMValue {
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist. */
 	@Override
-	public final synchronized FEMValue result(final boolean recursive) throws NullPointerException {
+	public final synchronized FEMValue result(final boolean deep) throws NullPointerException {
 		FEMValue result = this.result;
-		if (result != null) {
-			if (!recursive) return result;
-			final FEMValue result2 = result.result(true);
-			if (result == result2) return result;
-			this.result = result2;
-			return result;
-		} else {
-			result = this.function.invoke(this.frame);
-			if (result == null) throw new NullPointerException("function().invoke(frame()) = null");
-			result = result.result(recursive);
-			this.result = result;
-			this.frame = null;
-			this.function = null;
-			return result;
-		}
+		if (result != null) return this.result = result.result(deep);
+		result = this.function.invoke(this.frame);
+		if (result == null) throw new NullPointerException("function().invoke(frame()) = null");
+		result = result.result(deep);
+		this.result = result;
+		this.frame = null;
+		this.function = null;
+		return result;
 	}
 
 	/** {@inheritDoc} */
@@ -121,7 +114,7 @@ public final class FEMFuture extends FEMValue {
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMValue)) return false;
-		return this.result().equals((FEMValue)object);
+		return this.result().equals(object);
 	}
 
 	/** {@inheritDoc} */

@@ -1207,8 +1207,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeichenkette und gibt diese zurück. Bei der Kodierung mit Einzelwerten werden die ersten vier
-	 * Byte der Zahlenfolge als {@link #hash() Streuwert}, die darauf folgenden Zahlenwerte als Auflistung der einzelwertkodierten Codepoints und der letzte
-	 * Zahlenwert als abschließende {@code 0} interpretiert. Bei der Mehrwertkodierung werden dagegen die ersten vier Byte der Zahlenfolge als {@link #hash()
+	 * Byte der Zahlenfolge als {@link #hashCode() Streuwert}, die darauf folgenden Zahlenwerte als Auflistung der einzelwertkodierten Codepoints und der letzte
+	 * Zahlenwert als abschließende {@code 0} interpretiert. Bei der Mehrwertkodierung werden dagegen die ersten vier Byte der Zahlenfolge als {@link #hashCode()
 	 * Streuwert}, die nächsten vier Byte als {@link #length() Zeichenanzahl}, die darauf folgenden Zahlenwerte als Auflistung der mehrwertkodierten Codepoints
 	 * und der letzte Zahlenwert als abschließende {@code 0} interpretiert. Ob eine 8-, 16- oder 32-Bit-Kodierung eingesetzt wird, hängt von der
 	 * {@link IAMArray#mode() Größe der Zahlenwerte} ab.
@@ -1230,16 +1230,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 				return new ArrayString(array);
 		}
 		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMString.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMString from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMString.TYPE);
 	}
 
 	/** Diese Methode gibt die Verkettung der gegebenen Zeichenketten zurück.
@@ -1463,7 +1453,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		throw new IllegalArgumentException();
 	}
 
-	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hash()} initialisiert. */
+	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
 	protected int hash;
 
 	/** Dieses Feld speichert die Länge. */
@@ -1699,18 +1689,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		this.extract(new UTF32Encoder(result, offset));
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		int result = this.hash;
-		if (result != 0) return result;
-		final HashCollector hasher = new HashCollector();
-		this.extract(hasher);
-		result = hasher.hash;
-		return this.hash = result != 0 ? result : 1;
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeichenkette gleich der gegebenen ist.
 	 *
 	 * @param that Zeichenkette.
@@ -1850,7 +1828,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @return Zahlenfolge mit den entsprechend kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public final IAMArray toArray(final int mode, final boolean asUTFx) throws IllegalArgumentException {
-		final int hash = this.hash(), length = this.length();
+		final int hash = this.hashCode(), length = this.length();
 		switch (mode) {
 			case 1: {
 				if (asUTFx) {
@@ -1908,15 +1886,19 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMString result(final boolean recursive) {
-		if (!recursive) return this;
-		return this.compact();
+	public final FEMString result(final boolean deep) {
+		return deep ? this.compact() : this;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
-		return this.hash();
+		int result = this.hash;
+		if (result != 0) return result;
+		final HashCollector hasher = new HashCollector();
+		this.extract(hasher);
+		result = hasher.hash;
+		return this.hash = result != 0 ? result : 1;
 	}
 
 	/** {@inheritDoc} */

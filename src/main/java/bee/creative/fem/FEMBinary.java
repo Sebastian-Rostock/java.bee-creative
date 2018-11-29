@@ -532,16 +532,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return new BufferBinary(buffer);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBinary.TYPE)}.
-	 *
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMBinary from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMBinary.TYPE);
-	}
-
 	/** Diese Methode konvertiert die gegebenen Zahlen in eine Bytefolge und gibt diese zurück.
 	 *
 	 * @see #from(byte[])
@@ -623,7 +613,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		throw new IllegalArgumentException("'F' < hexChar < 'a'");
 	}
 
-	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hash()} initialisiert. */
+	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
 	protected int hash;
 
 	/** Dieses Feld speichert die Länge. */
@@ -822,19 +812,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		this.extract(new ValueCollector(result, offset));
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 *
-	 * @return Streuwert. */
-	public final int hash() {
-		int result = this.hash;
-		if (result != 0) return result;
-		final int length = this.length;
-		final HashCollector collector = new HashCollector();
-		this.customExtract(collector, 0, length, true);
-		this.hash = (result = (collector.hash | 1));
-		return result;
-	}
-
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist.
 	 *
 	 * @param that Bytefolge.
@@ -937,15 +914,19 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMBinary result(final boolean recursive) {
-		if (!recursive) return this;
-		return this.compact();
+	public final FEMBinary result(final boolean deep) {
+		return deep ? this.compact() : this;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
-		return this.hash();
+		int result = this.hash;
+		if (result != 0) return result;
+		final HashCollector hasher = new HashCollector();
+		this.extract(hasher);
+		result = hasher.hash;
+		return this.hash = result != 0 ? result : 1;
 	}
 
 	/** {@inheritDoc} */

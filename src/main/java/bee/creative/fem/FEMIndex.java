@@ -29,7 +29,7 @@ class FEMIndex implements Property<FEMValue> {
 		/** Dieses Feld speichert den {@link FEMIndex} zur {@link FEMIndex#getValue(int) Übersetzung} der Wertreferenzen aus {@link #items}. */
 		public final FEMIndex index;
 
-		/** Dieses Feld speichert eine Zahlenfolge mit den Referenzen auf die Werte sowie dem {@link #hash() Streuwert} der Wertliste in der Struktur
+		/** Dieses Feld speichert eine Zahlenfolge mit den Referenzen auf die Werte sowie dem {@link #hashCode() Streuwert} der Wertliste in der Struktur
 		 * {@code (valueRef1, ..., valueRefN, hash)}. Die Zahlenfolge ist damit stets um ein länger als die Wertliste. Die Elemente werden über den {@link #index}
 		 * aufgelöst. */
 		public final IAMArray items;
@@ -77,7 +77,8 @@ class FEMIndex implements Property<FEMValue> {
 
 	}
 
-	/** Diese Klasse erweitert ein {@link FEMIndex.IndexArray} um eine Streuwerttabelle zur Beschleunigung der {@link #customFind(FEMValue, int, int) Suche einzelner Werte}. */
+	/** Diese Klasse erweitert ein {@link FEMIndex.IndexArray} um eine Streuwerttabelle zur Beschleunigung der {@link #customFind(FEMValue, int, int) Suche
+	 * einzelner Werte}. */
 	protected static class RangesArray extends IndexArray {
 
 		/** Dieses Feld speichert eine Zahlenfolge, die ab dem dritten Element die Startpositionen der Suchbereiche mit gleichem Streuwert enthält, analog zur
@@ -97,7 +98,7 @@ class FEMIndex implements Property<FEMValue> {
 			length += offset;
 			for (int l = this.range.get(index + 2), r = this.range.get(index + 3); l < r; l++) {
 				final int result = this.range.get(l);
-				if (result >= offset && result < length && that.equals(this.customGet(result))) return result;
+				if ((result >= offset) && (result < length) && that.equals(this.customGet(result))) return result;
 			}
 			return -1;
 		}
@@ -602,7 +603,7 @@ class FEMIndex implements Property<FEMValue> {
 		for (int i = 0; i < length; i++) {
 			result[i] = this.putValue(source.get(i));
 		}
-		result[length] = source.hash();
+		result[length] = source.hashCode();
 		return IAMArray.from(result);
 	}
 
@@ -621,7 +622,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 	public IAMArray getBinaryArray(final FEMBinary source) throws NullPointerException {
-		final int hash = source.hash(), index = source.length();
+		final int hash = source.hashCode(), index = source.length();
 		final byte[] result = new byte[index + 4];
 		result[index + 0] = (byte)(hash >>> 0);
 		result[index + 1] = (byte)(hash >>> 8);
@@ -831,7 +832,7 @@ class FEMIndex implements Property<FEMValue> {
 		};
 	}
 
-	/** Diese Methode gibt die Bytefolge zur gegebenen Zahlenfolge zurück. Dabei werden die ersten vier Byte der Zahlenfolge als {@link FEMBinary#hash()
+	/** Diese Methode gibt die Bytefolge zur gegebenen Zahlenfolge zurück. Dabei werden die ersten vier Byte der Zahlenfolge als {@link FEMBinary#hashCode()
 	 * Streuwert} und die darauf folgenden als Bytes der Bytefolge interpretiert.
 	 *
 	 * @param source Zahlenfolge.

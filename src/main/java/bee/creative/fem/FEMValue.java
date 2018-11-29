@@ -41,9 +41,8 @@ public abstract class FEMValue extends FEMFunction {
 	 * @return Nutzdaten. */
 	public abstract Object data();
 
-	/** Diese Methode ist eine Abkürzung für {@code result(false)}.
+	/** Diese Methode ist eine Abkürzung für {@link #result(boolean) result(false)}.
 	 *
-	 * @see #result(boolean)
 	 * @return ausgewerteter Ergebniswert. */
 	public final FEMValue result() {
 		return this.result(false);
@@ -53,12 +52,12 @@ public abstract class FEMValue extends FEMFunction {
 	 *
 	 * @see FEMArray#result(boolean)
 	 * @see FEMFuture#result(boolean)
-	 * @param recursive {@code true}, wenn die in diesem Wert enthaltenen Werte ebenfalls ausgewertet werden sollen, z.B. bei {@link FEMArray}. {@code false},
-	 *        wenn nur dieser Wert ausgewertet werden soll, z.B. bei {@link FEMFuture}.
+	 * @param deep {@code true}, wenn die in diesem Wert enthaltenen Werte ebenfalls ausgewertet werden sollen, z.B. bei {@link FEMArray}. {@code false}, wenn nur
+	 *        dieser Wert ausgewertet werden soll, z.B. bei {@link FEMFuture}.
 	 * @see FEMFrame#get(int)
 	 * @see FEMFunction#invoke(FEMFrame)
 	 * @return ausgewerteter Ergebniswert. */
-	public FEMValue result(final boolean recursive) {
+	public FEMValue result(final boolean deep) {
 		return this;
 	}
 
@@ -73,7 +72,8 @@ public abstract class FEMValue extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMValue invoke(final FEMFrame frame) {
+	public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+		Objects.notNull(frame);
 		return this;
 	}
 
@@ -98,7 +98,8 @@ public abstract class FEMValue extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMFunction toClosure(final FEMFrame frame) {
+	public final FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
+		Objects.notNull(frame);
 		return this;
 	}
 
