@@ -129,7 +129,18 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		@Override
 		protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) { // TODO
-			return super.customFind(that, offset, length, foreward);
+			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
+			if (offset2 >= 0) return this.array2.customFind(that, offset2, length, foreward);
+			if (length2 <= 0) return this.array1.customFind(that, offset, length, foreward);
+			if (foreward) {
+				final int result = this.array1.customFind(that, offset, -offset2, foreward);
+				if (result >= 0) return result;
+				return this.array2.customFind(that, 0, length2, foreward);
+			} else {
+				final int result = this.array2.customFind(that, 0, length2, foreward);
+				if (result >= 0) return result;
+				return this.array1.customFind(that, offset, -offset2, foreward);
+			}
 		}
 
 		@Override
@@ -357,8 +368,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static class CompactArray3 extends CompactArray2 {
 
 		/** Dieses Feld speichert die Streuwerttabelle zu den Werten in {@link #items}. Die Länge der Zahlenfolge entspricht stets einer um 1 sowie um die Länge der
-		 * Wertliste {@code length} erhöhten Potenz von {@code 2}. Di um eins verringerte Potenz wird als Bitmaske {@code mask} für die Streuwerte der Elemente
-		 * eingesetzt. Zur auswe */
+		 * Wertliste {@code length} erhöhten Potenz von {@code 2}. Diese Potenz verringerte um eins wird als Bitmaske {@code mask} für die Streuwerte der Elemente
+		 * eingesetzt. */
 		final int[] table;
 
 		CompactArray3(final FEMValue[] items) throws IllegalArgumentException {
@@ -553,33 +564,22 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return Position des ersten Vorkommens der gegebene Wertliste ({@code offset..this.length()-that.length()}) oder {@code -1}.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	protected int customFind(final FEMArray that, final int offset) {
-		final int count = that.length;
-
-		final int length = (this.length - count) + 1;
-		// TODO auf customFind für einzelwerte aufbauen
 		final FEMValue value = that.customGet(0);
-
-		this.customFind(that, offset);
-
-		FIND: for (int i = offset; i < length; i++) {
-			if (value.equals(this.customGet(i))) {
-				for (int i2 = 1; i2 < count; i2++) {
-					if (!this.customGet(i + i2).equals(that.customGet(i2))) {
-						continue FIND;
-					}
-				}
-				return i;
-			}
+		final int count = (this.length - that.length) + 1;
+		for (int result = offset; true;) {
+			result = this.customFind(value, result, count - result, true);
+			if (result < 0) return -1;
+			if (this.customEquals(that, result)) return result;
 		}
-		return -1;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück. Sie Implementiert
-	 * {@link #find(FEMValue, int)} ohne Wertebereichsprüfung.
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts im gegebenen Abschnitt zurück. Sie Implementiert {@link #find(FEMValue, int)}
+	 * ohne Wertebereichsprüfung.
 	 *
 	 * @param that gesuchter Wert.
-	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
-	 * @return Position des ersten Vorkommens des gegebenen Werts ({@code offset..offset+length-1}) oder {@code -1}.
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Werte im Abschnitt.
+	 * @return Position des ersten Vorkommens des gegebenen Werts oder {@code -1}.
 	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
 	protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
 		final ItemFinder finder = new ItemFinder(that);
