@@ -13,29 +13,75 @@ import bee.creative.util.Property;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMProxy extends FEMFunction implements Property<FEMFunction>, Emuable {
 
+	public static FEMProxy from(final String id) {
+		return FEMProxy.from(FEMString.from(id));
+	}
+
+	public static FEMProxy from(final FEMString id) {
+		return FEMProxy.from(id, null);
+	}
+
+	public static FEMProxy from(final FEMString id, final FEMFunction function) {
+		return new FEMProxy(id, id, null);
+	}
+
+	/** Dieses Feld speichert die Kennung des Platzhalters. */
+	final FEMValue id;
+
 	/** Dieses Feld speichert den Namen. */
-	final String name;
+	FEMString name = FEMString.EMPTY;
 
 	/** Dieses Feld speichert die Funktion. */
 	FEMFunction function;
 
-	/** Dieser Konstruktor initialisiert den Namen.
+	/** Dieser Konstruktor initialisiert den Plathhalter.
 	 *
-	 * @param name Name.
-	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-	public FEMProxy(final String name) throws NullPointerException {
-		this.name = Objects.notNull(name);
+	 * @param id {@link #getId() Kennung}.
+	 * @param name {@link #getName() Name}.
+	 * @param function Funktion
+	 * @throws NullPointerException Wenn {@code id} {@code null} ist. */
+	public FEMProxy(final FEMValue id, final FEMString name, final FEMFunction function) throws NullPointerException {
+		this.id = Objects.notNull(id);
+		this.useName(name);
+		this.useFunction(function);
 	}
 
-	/** Dieser Konstruktor initialisiert Namen und Funktion.
+	/** Diese Methode gibt die Kennung des Platzhalters zurück. Diese wird im Konstruktor initialisiert und bildet die Grundlage für die Berechnung von
+	 * {@link #hashCode() Streuwert} und {@link #equals(Object) Äquivalenz}.
 	 *
-	 * @see #set(FEMFunction)
-	 * @param name Name.
-	 * @param function Funktion.
-	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-	public FEMProxy(final String name, final FEMFunction function) throws NullPointerException {
-		this(name);
+	 * @return Kennung. */
+	public FEMValue getId() {
+		return this.id;
+	}
+
+	/** Diese Methode gibt den Namen des Platzhalters zurück. Dieser wird in der {@link #toString() Textdarstellung} eingesetzt.
+	 *
+	 * @return Name. */
+	public FEMString getName() {
+		return this.name;
+	}
+
+	public FEMFunction getFunction() {
+		return this.get();
+	}
+
+	public FEMProxy useName(final FEMString name) {
+		this.name = Objects.notNull(name, FEMString.EMPTY);
+		return this;
+	}
+
+	public FEMProxy useFunction(final FEMFunction function) {
 		this.set(function);
+		return this;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #getId() Kennung} dieses Platzhalters gleich der des gegebenen ist.
+	 *
+	 * @param that Platzhalter.
+	 * @return Gleichheit.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	public boolean equals(final FEMProxy that) throws NullPointerException {
+		return this.id.equals(that.id);
 	}
 
 	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird. Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch
@@ -55,17 +101,10 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 		this.function = function;
 	}
 
-	/** Diese Methode gibt den Namen des Platzhalters zurück.
-	 *
-	 * @return Name. */
-	public String name() {
-		return this.name;
-	}
-
 	/** {@inheritDoc} */
 	@Override
 	public long emu() {
-		return EMU.fromObject(this) + EMU.from(this.name);
+		return EMU.fromObject(this) + EMU.from(this.id) + EMU.from(this.name);
 	}
 
 	/** {@inheritDoc} */
@@ -74,10 +113,22 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 		return this.function.invoke(frame);
 	}
 
+	@Override
+	public int hashCode() {
+		return this.id.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMProxy)) return false;
+		return this.equals((FEMProxy)object);
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return FEMDomain.NORMAL.formatConst(this.name);
+		return FEMDomain.NORMAL.formatConst(this.name.toString());
 	}
 
 }

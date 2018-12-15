@@ -100,7 +100,7 @@ public final class FEMCompiler extends Parser {
 	public final FEMProxy proxy(final String name) throws NullPointerException {
 		FEMProxy result = this.proxies.get(name);
 		if (result != null) return result;
-		this.proxies.put(name, result = new FEMProxy(name));
+		this.proxies.put(name, result = FEMProxy.from(name));
 		return result;
 	}
 
@@ -128,7 +128,7 @@ public final class FEMCompiler extends Parser {
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
 	public final FEMCompiler putProxies(final Iterable<FEMProxy> proxies) throws NullPointerException {
 		for (final FEMProxy proxy: proxies) {
-			this.proxies.put(proxy.name(), proxy);
+			this.proxies.put(proxy.getName().toString(), proxy);
 		}
 		return this;
 	}

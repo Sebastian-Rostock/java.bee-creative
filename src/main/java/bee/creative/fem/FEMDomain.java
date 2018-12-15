@@ -790,7 +790,7 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode formatiert und erfasst die Textdarstellung der gegebene Funktion. Für eine {@link TraceFunction}, eine {@link FrameFunction}, eine
 	 * {@link FutureFunction} oder eine {@link ClosureFunction} wird die Textdarstellung ihrer referenzierten Funktion mit dieser Methode erfasst. Bei einer
 	 * {@link ConcatFunction} oder einer {@link CompositeFunction} werden die Textdarstellungen der aufzurufenden Funktion mit dieser Methode sowie die der
-	 * Parameterliste mit {@link #formatParams(FEMFormatter, Iterable)} erfasst. Bei einem {@link FEMProxy} wird dessen {@link FEMProxy#name() Name} über
+	 * Parameterliste mit {@link #formatParams(FEMFormatter, Iterable)} erfasst. Bei einem {@link FEMProxy} wird dessen {@link FEMProxy#getName() Name} über
 	 * {@link #formatConst(FEMFormatter, String)} erfasst. Jeder andere {@link FEMValue} würd über {@link #formatValue(FEMFormatter, FEMValue)} erfasst. Jede
 	 * andere {@link FEMFunction} wird über {@link FEMFunction#toString()} in eine Zeichenkette überführt, welche anschließend über
 	 * {@link #formatConst(FEMFormatter, String)} erfasst wird.
@@ -805,7 +805,7 @@ public class FEMDomain extends BaseObject {
 			this.formatValue(target, value);
 		} else if (source instanceof FEMProxy) {
 			final FEMProxy value = (FEMProxy)source;
-			this.formatConst(target, value.name);
+			this.formatConst(target, value.name.toString());
 		} else if (source instanceof ConcatFunction) {
 			final ConcatFunction concatFunction = (ConcatFunction)source;
 			this.formatFunction(target, concatFunction.function);

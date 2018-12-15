@@ -13,6 +13,8 @@ import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
 import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
 import bee.creative.iam.IAMMapping;
+import bee.creative.util.AbstractHashData;
+import bee.creative.util.Comparables.Items;
 import bee.creative.util.Integers;
 import bee.creative.util.Objects;
 import bee.creative.util.Property;
@@ -20,21 +22,21 @@ import bee.creative.util.Property;
 // TODO de-/coder für ausgewählte fem-datentypen in iam-format (und json-format)
 // json-format aus string und object[] derselben, de-/coder ebenfalls in javascript
 
-class FEMIndex implements Property<FEMValue> {
+class FEMCodec implements Property<FEMValue> {
 
-	/** Diese Klasse implementiert eine {@link FEMArray Wertliste}, deren Elemente als {@link IAMArray Zahlenfolge} aus {@link FEMIndex#toRef(int, int)
-	 * Wertreferenzen} gegeben sind und in {@link #customGet(int)} über einen gegebenen {@link FEMIndex} in Werte {@link FEMIndex#getValue(int) übersetzt}
+	/** Diese Klasse implementiert eine {@link FEMArray Wertliste}, deren Elemente als {@link IAMArray Zahlenfolge} aus {@link FEMCodec#toRef(int, int)
+	 * Wertreferenzen} gegeben sind und in {@link #customGet(int)} über einen gegebenen {@link FEMCodec} in Werte {@link FEMCodec#getValue(int) übersetzt}
 	 * werden. */
 	protected static class IndexArray extends FEMArray {
 
-		/** Dieses Feld speichert den {@link FEMIndex} zur {@link FEMIndex#getValue(int) Übersetzung} der Wertreferenzen aus {@link #items}. */
-		public final FEMIndex index;
+		/** Dieses Feld speichert den {@link FEMCodec} zur {@link FEMCodec#getValue(int) Übersetzung} der Wertreferenzen aus {@link #items}. */
+		public final FEMCodec index;
 
-		/** Dieses Feld speichert die Zahlenfolge mit den Wertreferenzen. Ihre Struktur wird in {@link FEMIndex#getArrayValue(IAMArray)} beschrieben. */
+		/** Dieses Feld speichert die Zahlenfolge mit den Wertreferenzen. Ihre Struktur wird in {@link FEMCodec#getArrayValue(IAMArray)} beschrieben. */
 		public final IAMArray items;
 
 		@SuppressWarnings ("javadoc")
-		public IndexArray(final int length, final FEMIndex index, final IAMArray items) throws IllegalArgumentException {
+		public IndexArray(final int length, final FEMCodec index, final IAMArray items) throws IllegalArgumentException {
 			super(length);
 			this.index = Objects.notNull(index);
 			this.items = Objects.notNull(items);
@@ -53,18 +55,29 @@ class FEMIndex implements Property<FEMValue> {
 	protected static class IndexArray2 extends IndexArray {
 
 		@SuppressWarnings ("javadoc")
-		public IndexArray2(int length, FEMIndex index, IAMArray items) throws IllegalArgumentException {
+		public IndexArray2(final int length, final FEMCodec index, final IAMArray items) throws IllegalArgumentException {
 			super(length, index, items);
 		}
 
+		/** {@inheritDoc} */
 		@Override
-		protected int customFind(FEMValue that, int offset, int length, boolean foreward) {
-// TODO
-			final int hash = that.hashCode(), mask = this.range.length() - this.length - 4, index = hash & mask;
+		protected int customFind(final FEMValue that, final int offset, int length, final boolean foreward) {
+			// (value[length], hash[1], index[length], range[count], length[1])
+			final int count = (this.length() * 2) + 1, index = (that.hashCode() & (this.items.length() - count - 3)) + count;
+			int l = this.items.get(index), r = this.items.get(index + 1) - 1;
 			length += offset;
-			for (int l = this.range.get(index + 2), r = this.range.get(index + 3); l < r; l++) {
-				final int result = this.range.get(l);
-				if ((result >= offset) && (result < length) && that.equals(this.customGet(result))) return result;
+			if (foreward) {
+				for (; l <= r; l++) {
+					final int result = this.items.get(l);
+					if (length <= result) return -1;
+					if ((offset <= result) && that.equals(this.customGet(result))) return result;
+				}
+			} else {
+				for (; l <= r; r--) {
+					final int result = this.items.get(r);
+					if (result < offset) return -1;
+					if ((result < length) && that.equals(this.customGet(result))) return result;
+				}
 			}
 			return -1;
 		}
@@ -87,18 +100,40 @@ class FEMIndex implements Property<FEMValue> {
 		}
 
 		@Override
+		public FEMBinary compact() {
+			return this;
+		}
+
+		@Override
 		protected byte customGet(final int index) throws IndexOutOfBoundsException {
 			return (byte)this.items.get(index);
 		}
 
+	}
+
+	protected static abstract class BaseCache<GItem> implements Items<GItem> {
+
+		Object[] items = {};
+
 		@Override
-		public byte[] value() {
-			return this.items.section(0, this.length()).toBytes();
+		public GItem get(int index) {
+
+			return null;
+		}
+
+		protected abstract GItem customGet(final int index);
+
+		public void clear() {
+			Object[] items = this.items;
+			for (int i = 0, size = items.length; i < size; i++) {
+
+			}
 		}
 
 	}
 
-	public static final FEMIndex EMPTY = new FEMIndex().switchToLoader(IAMIndex.EMPTY);
+	/** Dieses Feld speichert den leeren {@link FEMCodec} als Leser des leeren {@link IAMIndex}. */
+	public static final FEMCodec EMPTY = new FEMCodec().switchToLoader(IAMIndex.EMPTY);
 
 	/** Dieses Feld speichert die {@link #toType(int) Typkennung} für {@link #putVoidValue()}. */
 	protected static final int TYPE_VOID_VALUE = 0;
@@ -262,28 +297,36 @@ class FEMIndex implements Property<FEMValue> {
 		this.propertyRef = this.putValue(value);
 	}
 
+	public IAMIndexBuilder getTarget() {
+		return targetIndex;
+	}
+
+	public IAMIndex getSource() {
+		return sourceIndex;
+	}
+
 	/** Diese Methode bestückt die Felder zum Lesen des gegebenen {@link IAMIndex} und gibt {@code this} zurück.
 	 *
 	 * @param source Datenquelle.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public FEMIndex switchToLoader(final IAMIndex source) throws NullPointerException {
+	public FEMCodec switchToLoader(final IAMIndex source) throws NullPointerException {
 		this.sourceIndex = Objects.notNull(source);
 		this.sourceIndexListing = source.listing(0);
 		this.sourceIndexMapping = source.mapping(0);
-		this.sourceArrayValuePool = this.getListing(FEMIndex.TYPE_ARRAY_VALUE);
-		this.sourceStringValuePool = this.getListing(FEMIndex.TYPE_STRING_VALUE);
-		this.sourceBinaryValuePool = this.getListing(FEMIndex.TYPE_BINARY_VALUE);
-		this.sourceIntegerValuePool = this.getListing(FEMIndex.TYPE_INTEGER_VALUE);
-		this.sourceDecimalValuePool = this.getListing(FEMIndex.TYPE_DECIMAL_VALUE);
-		this.sourceDurationValuePool = this.getListing(FEMIndex.TYPE_DURATION_VALUE);
-		this.sourceDatetimeValuePool = this.getListing(FEMIndex.TYPE_DATETIME_VALUE);
-		this.sourceHandlerValuePool = this.getListing(FEMIndex.TYPE_HANDLER_VALUE);
-		this.sourceObjectValuePool = this.getListing(FEMIndex.TYPE_OBJECT_VALUE);
-		this.sourceProxyFunctionPool = this.getListing(FEMIndex.TYPE_PROXY_FUNCTION);
-		this.sourceConcatFunctionPool = this.getListing(FEMIndex.TYPE_CONCAT_FUNCTION);
-		this.sourceClosureFunctionPool = this.getListing(FEMIndex.TYPE_CLOSURE_FUNCTION);
-		this.sourceCompositeFunctionPool = this.getListing(FEMIndex.TYPE_COMPOSITE_FUNCTION);
+		this.sourceArrayValuePool = this.getListing(FEMCodec.TYPE_ARRAY_VALUE);
+		this.sourceStringValuePool = this.getListing(FEMCodec.TYPE_STRING_VALUE);
+		this.sourceBinaryValuePool = this.getListing(FEMCodec.TYPE_BINARY_VALUE);
+		this.sourceIntegerValuePool = this.getListing(FEMCodec.TYPE_INTEGER_VALUE);
+		this.sourceDecimalValuePool = this.getListing(FEMCodec.TYPE_DECIMAL_VALUE);
+		this.sourceDurationValuePool = this.getListing(FEMCodec.TYPE_DURATION_VALUE);
+		this.sourceDatetimeValuePool = this.getListing(FEMCodec.TYPE_DATETIME_VALUE);
+		this.sourceHandlerValuePool = this.getListing(FEMCodec.TYPE_HANDLER_VALUE);
+		this.sourceObjectValuePool = this.getListing(FEMCodec.TYPE_OBJECT_VALUE);
+		this.sourceProxyFunctionPool = this.getListing(FEMCodec.TYPE_PROXY_FUNCTION);
+		this.sourceConcatFunctionPool = this.getListing(FEMCodec.TYPE_CONCAT_FUNCTION);
+		this.sourceClosureFunctionPool = this.getListing(FEMCodec.TYPE_CLOSURE_FUNCTION);
+		this.sourceCompositeFunctionPool = this.getListing(FEMCodec.TYPE_COMPOSITE_FUNCTION);
 		this.targetIndex = null;
 		this.targetIndexListing = null;
 		this.targetIndexMapping = null;
@@ -303,37 +346,38 @@ class FEMIndex implements Property<FEMValue> {
 		return this;
 	}
 
-	protected IAMListing getListing(final int type) {
-		return this.sourceIndex.listing(this.sourceIndexMapping.value(this.sourceIndexMapping.find(type), 0));
-	}
-
 	/** Diese Methode bestückt die Felder zur Befüllung eines neuen {@link IAMIndexBuilder} und gibt {@code this} zurück.
 	 *
 	 * @return {@code this}. */
-	public FEMIndex switchToBuilder() {
+	public FEMCodec switchToBuilder() {
 		this.sourceIndex = this.targetIndex = new IAMIndexBuilder();
 		this.targetIndex.put(-1, this.sourceIndexListing = this.targetIndexListing = new IAMListingBuilder());
 		this.targetIndex.put(-1, this.sourceIndexMapping = this.targetIndexMapping = new IAMMappingBuilder());
-		this.sourceArrayValuePool = this.targetArrayValuePool = this.putListing(FEMIndex.TYPE_ARRAY_VALUE);
-		this.sourceStringValuePool = this.targetStringValuePool = this.putListing(FEMIndex.TYPE_STRING_VALUE);
-		this.sourceBinaryValuePool = this.targetBinaryValuePool = this.putListing(FEMIndex.TYPE_BINARY_VALUE);
-		this.sourceIntegerValuePool = this.targetIntegerValuePool = this.putListing(FEMIndex.TYPE_INTEGER_VALUE);
-		this.sourceDecimalValuePool = this.targetDecimalValuePool = this.putListing(FEMIndex.TYPE_DECIMAL_VALUE);
-		this.sourceDurationValuePool = this.targetDurationValuePool = this.putListing(FEMIndex.TYPE_DURATION_VALUE);
-		this.sourceDatetimeValuePool = this.targetDatetimeValuePool = this.putListing(FEMIndex.TYPE_DATETIME_VALUE);
-		this.sourceHandlerValuePool = this.targetHandlerValuePool = this.putListing(FEMIndex.TYPE_HANDLER_VALUE);
-		this.sourceObjectValuePool = this.targetObjectValuePool = this.putListing(FEMIndex.TYPE_OBJECT_VALUE);
-		this.sourceProxyFunctionPool = this.targetProxyFunctionPool = this.putListing(FEMIndex.TYPE_PROXY_FUNCTION);
-		this.sourceConcatFunctionPool = this.targetConcatFunctionPool = this.putListing(FEMIndex.TYPE_CONCAT_FUNCTION);
-		this.sourceClosureFunctionPool = this.targetClosureFunctionPool = this.putListing(FEMIndex.TYPE_CLOSURE_FUNCTION);
-		this.sourceCompositeFunctionPool = this.targetCompositeFunctionPool = this.putListing(FEMIndex.TYPE_COMPOSITE_FUNCTION);
+		this.sourceArrayValuePool = this.targetArrayValuePool = this.putListing(FEMCodec.TYPE_ARRAY_VALUE);
+		this.sourceStringValuePool = this.targetStringValuePool = this.putListing(FEMCodec.TYPE_STRING_VALUE);
+		this.sourceBinaryValuePool = this.targetBinaryValuePool = this.putListing(FEMCodec.TYPE_BINARY_VALUE);
+		this.sourceIntegerValuePool = this.targetIntegerValuePool = this.putListing(FEMCodec.TYPE_INTEGER_VALUE);
+		this.sourceDecimalValuePool = this.targetDecimalValuePool = this.putListing(FEMCodec.TYPE_DECIMAL_VALUE);
+		this.sourceDurationValuePool = this.targetDurationValuePool = this.putListing(FEMCodec.TYPE_DURATION_VALUE);
+		this.sourceDatetimeValuePool = this.targetDatetimeValuePool = this.putListing(FEMCodec.TYPE_DATETIME_VALUE);
+		this.sourceHandlerValuePool = this.targetHandlerValuePool = this.putListing(FEMCodec.TYPE_HANDLER_VALUE);
+		this.sourceObjectValuePool = this.targetObjectValuePool = this.putListing(FEMCodec.TYPE_OBJECT_VALUE);
+		this.sourceProxyFunctionPool = this.targetProxyFunctionPool = this.putListing(FEMCodec.TYPE_PROXY_FUNCTION);
+		this.sourceConcatFunctionPool = this.targetConcatFunctionPool = this.putListing(FEMCodec.TYPE_CONCAT_FUNCTION);
+		this.sourceClosureFunctionPool = this.targetClosureFunctionPool = this.putListing(FEMCodec.TYPE_CLOSURE_FUNCTION);
+		this.sourceCompositeFunctionPool = this.targetCompositeFunctionPool = this.putListing(FEMCodec.TYPE_COMPOSITE_FUNCTION);
 		return this;
 	}
 
-	protected IAMListingBuilder putListing(final int type) {
-		final IAMListingBuilder result = new IAMListingBuilder();
-		this.targetIndexMapping.put(IAMArray.from(type), IAMArray.from(this.targetIndex.put(-1, result)));
-		return result;
+	/** Diese Methode gibt die Auflistung zur gegebenen Typkennung zurück. Die Typkennung wird dazu in eine Zahlenfolge {@link IAMArray#from(int...) umgewandelt}
+	 * und als Schlüssel im {@link #sourceIndexMapping} {@link IAMMapping#find(IAMArray) gesucht}. Die erste Zahl des zum Schlüssel ermittelten
+	 * {@link IAMMapping#value(int) Werts} wird dann als {@link IAMIndex#listing(int) Position der Auflistung} interpretiert, unter welcher sie in
+	 * {@link #sourceIndex} verwaltet wird.
+	 *
+	 * @param type {@link #toType(int) Typkennunng} der Auflistung.
+	 * @return Auflistung zur Typkennung. */
+	protected IAMListing getListing(final int type) {
+		return this.sourceIndex.listing(this.sourceIndexMapping.value(this.sourceIndexMapping.find(type), 0));
 	}
 
 	/** Diese Methode gibt den Wert zur gegebenen {@link #toRef(int, int) Wertreferenz} zurück. Wenn deren {@link #toType(int) Typkennung} unbekannt ist, wird
@@ -428,8 +472,22 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertliste.
 	 * @throws IllegalArgumentException Wenn {@link #getArrayValue(IAMArray)} diese auslöst. */
 	protected FEMArray getArrayValue(final int index) throws IllegalArgumentException {
+		// getItem(sourceArrayValueCache, sourceArrayValueItems, index);
+		return getArrayValueImpl(index);
+	}
+
+	protected FEMArray getArrayValueImpl(final int index) throws IllegalArgumentException {
 		return this.getArrayValue(this.sourceArrayValuePool.item(index));
 	}
+
+	protected Items<FEMArray> sourceArrayValueItems = new Items<FEMArray>() {
+
+		@Override
+		public FEMArray get(int index) {
+			return getArrayValueImpl(index);
+		}
+
+	};
 
 	/** Diese Methode gibt die Zeichenkette zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
 	 *
@@ -675,6 +733,8 @@ class FEMIndex implements Property<FEMValue> {
 		return this.getIntegerArrayImpl(source.value());
 	}
 
+	
+	// TODO 
 	/** Diese Methode ist die Umkehroperation zu {@link #getProxyFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsaufruf enthält.
 	 *
 	 * @param source Funktionsaufruf.
@@ -682,7 +742,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
 	public IAMArray getProxyArray(final FEMProxy source) throws NullPointerException, IllegalArgumentException {
-		return IAMArray.from(this.toIndex(this.putStringValue(FEMString.from(source.name()))), this.putFunction(source.get()));
+		return IAMArray.from(this.toIndex(this.putStringValue(source.getName())), this.putFunction(source.get()));
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #getConcatFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsaufruf enthält.
@@ -741,19 +801,7 @@ class FEMIndex implements Property<FEMValue> {
 	public FEMArray getArrayValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		final int length1 = source.length() - 2, length2 = source.get(length1 + 1);
 		if (length1 == length2) return new IndexArray(length1, this, source);
-		
-		new IndexArray2
-		
-		// TODOd
-		return null;
-	}
-
-	/* Diese Methode fügt die gegebene Tabelle in den {@link #targetTableValuePool} ein und gibt die Wertreferenz darauf zurück. Ihre Schlüssel- und Wertspalten
-	 * werden dabei auch über {@link #putArrayValue(FEMArray)} in den {@link #targetArrayValuePool} eingetragen. Die Abbildung von Schlüsseln auf Werte wird dazu
-	 * als {@link IAMMapping} realisiert und im {@link #targetIndex} eingetragen. Der {@link IAMEntry#key()} besteht aus dem Streuwert des Schlüssels. Der
-	 * {@link IAMEntry#value()} enthält dazu die Auflistung entsprechenden Schlüsselreferenz-Wertreferenz-Paare. */
-	public FEMTable getTableValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return FEMTable.from(new IndexArray2(this, this.sourceArrayValuePool.item(source.get(0)), source), this.getArrayValue(source.get(1)));
+		return new IndexArray2(length2, this, source);
 	}
 
 	/** Diese Methode gibt eine Sicht auf die Liste aller Wertlisten zurück.
@@ -765,12 +813,12 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMArray get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getArrayValue(index);
+				return FEMCodec.this.getArrayValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceArrayValuePool.itemCount();
+				return FEMCodec.this.sourceArrayValuePool.itemCount();
 			}
 
 		};
@@ -795,12 +843,12 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMString get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getStringValue(index);
+				return FEMCodec.this.getStringValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceStringValuePool.itemCount();
+				return FEMCodec.this.sourceStringValuePool.itemCount();
 			}
 
 		};
@@ -827,12 +875,12 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMBinary get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getBinaryValue(index);
+				return FEMCodec.this.getBinaryValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceBinaryValuePool.itemCount();
+				return FEMCodec.this.sourceBinaryValuePool.itemCount();
 			}
 
 		};
@@ -864,12 +912,12 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMInteger get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getIntegerValue(index);
+				return FEMCodec.this.getIntegerValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceIntegerValuePool.itemCount();
+				return FEMCodec.this.sourceIntegerValuePool.itemCount();
 			}
 
 		};
@@ -895,12 +943,12 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMDecimal get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getDecimalValue(index);
+				return FEMCodec.this.getDecimalValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceDecimalValuePool.itemCount();
+				return FEMCodec.this.sourceDecimalValuePool.itemCount();
 			}
 
 		};
@@ -926,12 +974,12 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMDuration get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getDurationValue(index);
+				return FEMCodec.this.getDurationValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceDurationValuePool.itemCount();
+				return FEMCodec.this.sourceDurationValuePool.itemCount();
 			}
 
 		};
@@ -956,12 +1004,12 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMDatetime get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getDatetimeValue(index);
+				return FEMCodec.this.getDatetimeValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceDatetimeValuePool.itemCount();
+				return FEMCodec.this.sourceDatetimeValuePool.itemCount();
 			}
 
 		};
@@ -988,12 +1036,12 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMHandler get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getHandlerValue(index);
+				return FEMCodec.this.getHandlerValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceHandlerValuePool.itemCount();
+				return FEMCodec.this.sourceHandlerValuePool.itemCount();
 			}
 
 		};
@@ -1019,20 +1067,21 @@ class FEMIndex implements Property<FEMValue> {
 			@Override
 			public FEMObject get(final int index) {
 				if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-				return FEMIndex.this.getObjectValue(index);
+				return FEMCodec.this.getObjectValue(index);
 			}
 
 			@Override
 			public int size() {
-				return FEMIndex.this.sourceObjectValuePool.itemCount();
+				return FEMCodec.this.sourceObjectValuePool.itemCount();
 			}
 
 		};
 	}
 
+	// TODO
 	public FEMProxy getProxyFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		if (source.length() != 2) throw new IllegalArgumentException();
-		return new FEMProxy(this.getStringValue(source.get(0)).toString(), this.getFunction(source.get(1)));
+		if (source.length() != 3) throw new IllegalArgumentException();
+		return new FEMProxy(getValue(source.get(0)), this.getStringValue(source.get(1)), this.getFunction(source.get(2)));
 	}
 
 	public ConcatFunction getConcatFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
@@ -1063,6 +1112,17 @@ class FEMIndex implements Property<FEMValue> {
 	FEMFunction getCompositeFunctionImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() == 0) throw new IllegalArgumentException();
 		return this.getFunction(source.get(0));
+	}
+
+	/** Diese Methode erzeugt die Auflistung zur gegebenen Typkennung und gibt sie zurück. Die Position der Auflistung, unter welcher sie in {@link #targetIndex}
+	 * verwaltet wird, wird dazu auch inter der Typkennung als Schlüssel im {@link #targetIndexMapping} hinterlegt.
+	 *
+	 * @param type {@link #toType(int) Typkennunng} der Auflistung.
+	 * @return Auflistung zur Typkennung. */
+	protected IAMListingBuilder putListing(final int type) {
+		final IAMListingBuilder result = new IAMListingBuilder();
+		this.targetIndexMapping.put(IAMArray.from(type), IAMArray.from(this.targetIndex.put(-1, result)));
+		return result;
 	}
 
 	/** Diese Methode nimmt den gegebenen Wert in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1103,21 +1163,21 @@ class FEMIndex implements Property<FEMValue> {
 	 *
 	 * @return Wertreferenz. */
 	public int putVoidValue() {
-		return this.toRef(FEMIndex.TYPE_VOID_VALUE, 0);
+		return this.toRef(FEMCodec.TYPE_VOID_VALUE, 0);
 	}
 
 	/** Diese Methode gibt die {@link #toRef(int, int)} Wertreferenz} auf {@link FEMBoolean#TRUE} zurück.
 	 *
 	 * @return Wertreferenz. */
 	public int putTrueValue() {
-		return this.toRef(FEMIndex.TYPE_TRUE_VALUE, 0);
+		return this.toRef(FEMCodec.TYPE_TRUE_VALUE, 0);
 	}
 
 	/** Diese Methode gibt die {@link #toRef(int, int)} Wertreferenz} auf {@link FEMBoolean#FALSE} zurück.
 	 *
 	 * @return Wertreferenz. */
 	public int putFalseValue() {
-		return this.toRef(FEMIndex.TYPE_FALSE_VALUE, 0);
+		return this.toRef(FEMCodec.TYPE_FALSE_VALUE, 0);
 	}
 
 	/** Diese Methode nimmt die gegebene Wertliste in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1127,7 +1187,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #getArrayArray(FEMArray)} diese auslöst. */
 	public int putArrayValue(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-		return this.toRef(FEMIndex.TYPE_ARRAY_VALUE, this.targetArrayValuePool.put(this.getArrayArray(source)));
+		return this.toRef(FEMCodec.TYPE_ARRAY_VALUE, this.targetArrayValuePool.put(this.getArrayArray(source)));
 	}
 
 	/** Diese Methode nimmt die gegebene Zeichenkette in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1136,7 +1196,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getStringArray(FEMString)} diese auslöst. */
 	public int putStringValue(final FEMString source) throws NullPointerException {
-		return this.toRef(FEMIndex.TYPE_STRING_VALUE, this.targetStringValuePool.put(this.getStringArray(source)));
+		return this.toRef(FEMCodec.TYPE_STRING_VALUE, this.targetStringValuePool.put(this.getStringArray(source)));
 	}
 
 	/** Diese Methode nimmt die gegebene Bytefolge in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1145,7 +1205,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getBinaryArray(FEMBinary)} diese auslöst. */
 	public int putBinaryValue(final FEMBinary source) throws NullPointerException {
-		return this.toRef(FEMIndex.TYPE_BINARY_VALUE, this.targetBinaryValuePool.put(this.getBinaryArray(source)));
+		return this.toRef(FEMCodec.TYPE_BINARY_VALUE, this.targetBinaryValuePool.put(this.getBinaryArray(source)));
 	}
 
 	/** Diese Methode nimmt die gegebene Dezimalzahl in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1154,7 +1214,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getIntegerArray(FEMInteger)} diese auslöst. */
 	public int putIntegerValue(final FEMInteger source) throws NullPointerException {
-		return this.toRef(FEMIndex.TYPE_INTEGER_VALUE, this.targetIntegerValuePool.put(this.getIntegerArray(source)));
+		return this.toRef(FEMCodec.TYPE_INTEGER_VALUE, this.targetIntegerValuePool.put(this.getIntegerArray(source)));
 	}
 
 	/** Diese Methode nimmt den gegebenen Dezimalbruch in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1163,7 +1223,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getDatetimeArray(FEMDatetime)} diese auslöst. */
 	public int putDecimalValue(final FEMDecimal source) throws NullPointerException {
-		return this.toRef(FEMIndex.TYPE_DECIMAL_VALUE, this.targetDecimalValuePool.put(this.getDecimalArray(source)));
+		return this.toRef(FEMCodec.TYPE_DECIMAL_VALUE, this.targetDecimalValuePool.put(this.getDecimalArray(source)));
 	}
 
 	/** Diese Methode nimmt die gegebene Zeitspanne in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1172,7 +1232,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getDurationArray(FEMDuration)} diese auslöst. */
 	public int putDurationValue(final FEMDuration source) throws NullPointerException {
-		return this.toRef(FEMIndex.TYPE_DURATION_VALUE, this.targetDurationValuePool.put(this.getDurationArray(source)));
+		return this.toRef(FEMCodec.TYPE_DURATION_VALUE, this.targetDurationValuePool.put(this.getDurationArray(source)));
 	}
 
 	/** Diese Methode nimmt die gegebene Zeitangabe in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1181,7 +1241,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getDatetimeArray(FEMDatetime)} diese auslöst. */
 	public int putDatetimeValue(final FEMDatetime source) throws NullPointerException {
-		return this.toRef(FEMIndex.TYPE_DATETIME_VALUE, this.targetDatetimeValuePool.put(this.getDatetimeArray(source)));
+		return this.toRef(FEMCodec.TYPE_DATETIME_VALUE, this.targetDatetimeValuePool.put(this.getDatetimeArray(source)));
 	}
 
 	/** Diese Methode gibt die Wertreferenz auf den gegebenen Wahrheitswert zurück. */
@@ -1195,7 +1255,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getHandlerArray(FEMHandler)} diese auslöst. */
 	public int putHandlerValue(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
-		return this.toRef(FEMIndex.TYPE_HANDLER_VALUE, this.targetHandlerValuePool.put(this.getHandlerArray(source)));
+		return this.toRef(FEMCodec.TYPE_HANDLER_VALUE, this.targetHandlerValuePool.put(this.getHandlerArray(source)));
 	}
 
 	/** Diese Methode nimmt die gegebene Objektreferenz in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1204,7 +1264,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getObjectArray(FEMObject)} diese auslöst. */
 	public int putObjectValue(final FEMObject source) throws NullPointerException {
-		return this.toRef(FEMIndex.TYPE_OBJECT_VALUE, this.targetObjectValuePool.put(this.getObjectArray(source)));
+		return this.toRef(FEMCodec.TYPE_OBJECT_VALUE, this.targetObjectValuePool.put(this.getObjectArray(source)));
 	}
 
 	/** Diese Methode nimmt die gegebene Funktion in die Verwaltung auf und gibt die {@link #toRef(int, int)} Funktionsreferenz} darauf zurück.
@@ -1230,7 +1290,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @throws NullPointerException Wenn {@link #getProxyArray(FEMProxy)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getProxyArray(FEMProxy)} diese auslöst. */
 	public int putProxyFunction(final FEMProxy source) throws NullPointerException, IllegalArgumentException {
-		return this.toRef(FEMIndex.TYPE_PROXY_FUNCTION, this.targetProxyFunctionPool.put(this.getProxyArray(source)));
+		return this.toRef(FEMCodec.TYPE_PROXY_FUNCTION, this.targetProxyFunctionPool.put(this.getProxyArray(source)));
 	}
 
 	/** Diese Methode gibt die {@link #toRef(int, int)} Funktionsreferenz} auf die gegebene Parameterfunktion zurück.
@@ -1239,7 +1299,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 	public int putParamFunction(final FEMParam source) throws NullPointerException {
-		return this.toRef(FEMIndex.TYPE_PARAM_FUNCTION, source.index());
+		return this.toRef(FEMCodec.TYPE_PARAM_FUNCTION, source.index());
 	}
 
 	/** Diese Methode nimmt den gegebenen Funktionsaufruf in die Verwaltung auf und gibt die {@link #toRef(int, int)} Funktionsreferenz} darauf zurück.
@@ -1249,7 +1309,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @throws NullPointerException Wenn {@link #getConcatArray(ConcatFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getConcatArray(ConcatFunction)} diese auslöst. */
 	public int putConcatFunction(final ConcatFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.toRef(FEMIndex.TYPE_CONCAT_FUNCTION, this.targetConcatFunctionPool.put(this.getConcatArray(source)));
+		return this.toRef(FEMCodec.TYPE_CONCAT_FUNCTION, this.targetConcatFunctionPool.put(this.getConcatArray(source)));
 	}
 
 	/** Diese Methode nimmt die gegebene Funktionsbindung in die Verwaltung auf und gibt die {@link #toRef(int, int)} Funktionsreferenz} darauf zurück.
@@ -1259,7 +1319,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @throws NullPointerException Wenn {@link #getClosureArray(ClosureFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getClosureArray(ClosureFunction)} diese auslöst. */
 	public int putClosureFunction(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.toRef(FEMIndex.TYPE_CLOSURE_FUNCTION, this.targetClosureFunctionPool.put(this.getClosureArray(source)));
+		return this.toRef(FEMCodec.TYPE_CLOSURE_FUNCTION, this.targetClosureFunctionPool.put(this.getClosureArray(source)));
 	}
 
 	/** Diese Methode nimmt den gegebenen Funktionsaufruf in die Verwaltung auf und gibt die {@link #toRef(int, int)} Funktionsreferenz} darauf zurück.
@@ -1269,7 +1329,7 @@ class FEMIndex implements Property<FEMValue> {
 	 * @throws NullPointerException Wenn {@link #getCompositeArray(CompositeFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getCompositeArray(CompositeFunction)} diese auslöst. */
 	public int putCompositeFunction(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.toRef(FEMIndex.TYPE_COMPOSITE_FUNCTION, this.targetCompositeFunctionPool.put(this.getCompositeArray(source)));
+		return this.toRef(FEMCodec.TYPE_COMPOSITE_FUNCTION, this.targetCompositeFunctionPool.put(this.getCompositeArray(source)));
 	}
 
 	/** Diese Methode gibt eine Wert- bzw. Funktionsreferenz mit den gegebenen Markmalen zurück.

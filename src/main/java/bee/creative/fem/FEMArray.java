@@ -587,6 +587,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return finder.index + offset;
 	}
 
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Wertliste an der gegebenen Position in dieser Wertliste liegt. Sie Implementiert
+	 * {@link #equals(FEMArray)} ohne Wertebereichsprüfung. */
 	protected boolean customEquals(final FEMArray that, final int offset) {
 		final int length = that.length;
 		for (int i = 0; i < length; i++) {
