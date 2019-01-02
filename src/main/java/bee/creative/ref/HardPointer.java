@@ -11,7 +11,7 @@ public final class HardPointer<GValue> implements Pointer<GValue> {
 
 	@SuppressWarnings ("javadoc")
 	static int hash(final Pointer<?> thiz) {
-		return Objects.hash(thiz.get());
+		return Objects.deepHash(thiz.get());
 	}
 
 	@SuppressWarnings ("javadoc")

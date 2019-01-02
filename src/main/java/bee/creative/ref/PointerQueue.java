@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference;
 public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 
 	@SuppressWarnings ("javadoc")
-	private static final class QueueNode extends WeakReference<Object> {
+	private static final class QueueNode extends WeakReference<PointerQueue<?>> {
 
 		public static final QueueNode head = new QueueNode();
 
@@ -26,7 +26,7 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 			this.prev = (this.next = this);
 		}
 
-		public QueueNode(final Object referent) {
+		public QueueNode(final PointerQueue<?> referent) {
 			super(referent);
 			final QueueNode head = QueueNode.head;
 			synchronized (head) {
@@ -40,7 +40,7 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 	private static final class QueueThread extends Thread {
 
 		public QueueThread() {
-			super("QueueThread");
+			super("PointerQueue-Thread");
 			this.setPriority(Thread.MAX_PRIORITY);
 			this.setDaemon(true);
 			this.start();
@@ -55,7 +55,7 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 					node = head.next;
 				}
 				while (head != node) {
-					final PointerQueue<?> queue = (PointerQueue<?>)node.get();
+					final PointerQueue<?> queue = node.get();
 					if (queue != null) {
 						try {
 							while (queue.poll() != null) {}
