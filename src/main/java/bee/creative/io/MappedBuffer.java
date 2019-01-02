@@ -14,6 +14,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import bee.creative.mmf.MMFArray;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien per
@@ -199,10 +200,32 @@ public class MappedBuffer {
 	 * @see ByteBuffer#order(ByteOrder)
 	 * @param order Bytereihenfolge. */
 	public void order(ByteOrder order) {
-		this.order = order = order == ByteOrder.BIG_ENDIAN ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+		order = order == ByteOrder.BIG_ENDIAN ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+		if (this.order == order) return;
+		this.order = order;
 		for (final MappedByteBuffer buffer: this.buffers) {
 			buffer.order(order);
 		}
+	}
+
+	/** Diese Methode gibt den größtmöglichen Speicherbereich (16KB..1GB) ab der gegebenen Adresse als Zahlenfolge zurück.
+	 *
+	 * @param address Adresse, ab welcher der Speicherbereich beginnt. */
+	public MMFArray array(final long address) {
+		try {
+			return MMFArray.from(this.buffers[MappedBuffer.bufferIndex(address)]).section(MappedBuffer.valueIndex(address));
+		} catch (final IOException ignore) {
+			return MMFArray.EMPTY;
+		}
+	}
+
+	/** Diese Methode gibt den größtmöglichen Speicherbereich (16KB..1GB) ab der gegebenen Adresse als {@link ByteBuffer} zurück.
+	 *
+	 * @param address Adresse, ab welcher der Speicherbereich beginnt. */
+	public ByteBuffer buffer(final long address) {
+		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
+		source.position(MappedBuffer.valueIndex(address));
+		return source.slice();
 	}
 
 	/** Diese Methode gibt die Datei zurück, an die dieser Puffer gebunden ist.
