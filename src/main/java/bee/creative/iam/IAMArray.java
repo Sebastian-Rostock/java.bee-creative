@@ -312,7 +312,10 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 		@Override
 		protected IAMArray customSection(final int offset, final int length) {
-			return super.customSection(offset, length);
+			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
+			if (offset2 >= 0) return this.array2.section(offset2, length);
+			if (length2 <= 0) return this.array1.section(offset, length);
+			return this.array1.section(offset, -offset2).concat(this.array2.section(0, length2));
 		}
 
 	}
@@ -1151,6 +1154,13 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public int compare(final IAMArray that) throws NullPointerException {
 		return this.compareTo(that);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.
+	 *
+	 * @see #length() */
+	public IAMArray section(final int offset) {
+		return this.section(offset, this.length - offset);
 	}
 
 	/** Diese Methode gibt einen Abschnitt dieser Zahlenfolge ab der gegebenen Position und mit der gegebenen Länge zurück. Wenn der Abschnitt nicht innerhalb der
