@@ -39,8 +39,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final int[] values) {
-			this.get(index, IntegerArraySection.from(values));
+		public void getAll(final int index, final int[] values) {
+			this.getAll(index, IntegerArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -51,8 +51,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final int[] values) {
-			this.set(index, IntegerArraySection.from(values));
+		public void setAll(final int index, final int[] values) {
+			this.setAll(index, IntegerArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -63,8 +63,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int[] values) {
-			this.add(this.size(), values);
+		public void addAll(final int[] values) {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
@@ -76,8 +76,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final int[] values) {
-			this.add(this.size(), IntegerArraySection.from(values));
+		public void addAll(final int index, final int[] values) {
+			this.addAll(this.size(), IntegerArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -247,8 +247,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final int[] values) {
-		this.get(index, IntegerArraySection.from(values));
+	public void getAll(final int index, final int[] values) {
+		this.getAll(index, IntegerArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -259,8 +259,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final int[] values) {
-		this.set(index, IntegerArraySection.from(values));
+	public void setAll(final int index, final int[] values) {
+		this.setAll(index, IntegerArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -271,8 +271,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int[] values) {
-		this.add(this.size, values);
+	public void addAll(final int[] values) {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -284,8 +284,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final int[] values) {
-		this.add(this.size, IntegerArraySection.from(values));
+	public void addAll(final int index, final int[] values) {
+		this.addAll(this.size, IntegerArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */

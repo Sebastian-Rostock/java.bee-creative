@@ -36,21 +36,21 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** Diese Methode füllt das gegebene {@code boolean}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see BooleanArray#get(int, ArraySection)
+	 * @see BooleanArray#getAll(int, ArraySection)
 	 * @see BooleanArraySection#from(boolean[])
 	 * @param index Position.
 	 * @param values {@code boolean}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code boolean}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void get(int index, boolean[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, boolean[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super boolean[], ? super Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super boolean[], ? super Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -61,21 +61,21 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code boolean}-Arrays an die gegebene Position.
 	 *
-	 * @see BooleanArray#set(int, ArraySection)
+	 * @see BooleanArray#setAll(int, ArraySection)
 	 * @see BooleanArraySection#from(boolean[])
 	 * @param index Position.
 	 * @param values {@code boolean}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code boolean}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, boolean[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, boolean[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -84,7 +84,7 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code boolean}-Arrays am Ende ein.
 	 *
-	 * @see BooleanArray#add(ArraySection)
+	 * @see BooleanArray#addAll(ArraySection)
 	 * @see BooleanArraySection#from(boolean[])
 	 * @param values {@code boolean}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code boolean}-Array {@code null} ist. */
@@ -92,11 +92,11 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException;
+	public void addAll(Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends boolean[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends boolean[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -107,7 +107,7 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code boolean}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see BooleanArray#add(int, ArraySection)
+	 * @see BooleanArray#addAll(int, ArraySection)
 	 * @see BooleanArraySection#from(boolean[])
 	 * @param index Position.
 	 * @param values {@code boolean}-Array.
@@ -117,11 +117,11 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

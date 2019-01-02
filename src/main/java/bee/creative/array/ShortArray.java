@@ -36,21 +36,21 @@ public interface ShortArray extends Array<short[], Short> {
 
 	/** Diese Methode füllt das gegebene {@code short}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see ShortArray#get(int, ArraySection)
+	 * @see ShortArray#getAll(int, ArraySection)
 	 * @see ShortArraySection#from(short[])
 	 * @param index Position.
 	 * @param values {@code short}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code short}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void get(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super short[], ? super Short> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super short[], ? super Short> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super short[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super short[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -61,21 +61,21 @@ public interface ShortArray extends Array<short[], Short> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code short}-Arrays an die gegebene Position.
 	 *
-	 * @see ShortArray#set(int, ArraySection)
+	 * @see ShortArray#setAll(int, ArraySection)
 	 * @see ShortArraySection#from(short[])
 	 * @param index Position.
 	 * @param values {@code short}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code short}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends short[], ? extends Short> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends short[], ? extends Short> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends short[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends short[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -84,19 +84,19 @@ public interface ShortArray extends Array<short[], Short> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code short}-Arrays am Ende ein.
 	 *
-	 * @see ShortArray#add(ArraySection)
+	 * @see ShortArray#addAll(ArraySection)
 	 * @see ShortArraySection#from(short[])
 	 * @param values {@code short}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code short}-Array {@code null} ist. */
-	public void add(short[] values) throws NullPointerException;
+	public void addAll(short[] values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends short[], ? extends Short> values) throws NullPointerException;
+	public void addAll(Array<? extends short[], ? extends Short> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends short[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends short[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -107,21 +107,21 @@ public interface ShortArray extends Array<short[], Short> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code short}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see ShortArray#add(int, ArraySection)
+	 * @see ShortArray#addAll(int, ArraySection)
 	 * @see ShortArraySection#from(short[])
 	 * @param index Position.
 	 * @param values {@code short}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code short}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends short[], ? extends Short> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends short[], ? extends Short> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends short[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends short[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

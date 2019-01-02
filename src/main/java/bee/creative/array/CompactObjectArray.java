@@ -43,8 +43,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final GValue[] values) {
-			this.get(index, ObjectArraySection.from(this.owner, values));
+		public void getAll(final int index, final GValue[] values) {
+			this.getAll(index, ObjectArraySection.from(this.owner, values));
 		}
 
 		/** {@inheritDoc} */
@@ -55,8 +55,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final GValue[] values) {
-			this.set(index, ObjectArraySection.from(this.owner, values));
+		public void setAll(final int index, final GValue[] values) {
+			this.setAll(index, ObjectArraySection.from(this.owner, values));
 		}
 
 		/** {@inheritDoc} */
@@ -67,8 +67,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final GValue[] values) {
-			this.add(this.size(), values);
+		public void addAll(final GValue[] values) {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
@@ -80,8 +80,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final GValue[] values) {
-			this.add(this.size(), ObjectArraySection.from(this.owner, values));
+		public void addAll(final int index, final GValue[] values) {
+			this.addAll(this.size(), ObjectArraySection.from(this.owner, values));
 		}
 
 		/** {@inheritDoc} */
@@ -266,8 +266,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final GValue[] values) {
-		this.get(index, ObjectArraySection.from(this, values));
+	public void getAll(final int index, final GValue[] values) {
+		this.getAll(index, ObjectArraySection.from(this, values));
 	}
 
 	/** {@inheritDoc} */
@@ -278,8 +278,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final GValue[] values) {
-		this.set(index, ObjectArraySection.from(this, values));
+	public void setAll(final int index, final GValue[] values) {
+		this.setAll(index, ObjectArraySection.from(this, values));
 	}
 
 	/** {@inheritDoc} */
@@ -290,8 +290,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final GValue[] values) {
-		this.add(this.size, values);
+	public void addAll(final GValue[] values) {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -303,8 +303,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final GValue[] values) {
-		this.add(this.size, ObjectArraySection.from(this, values));
+	public void addAll(final int index, final GValue[] values) {
+		this.addAll(this.size, ObjectArraySection.from(this, values));
 	}
 
 	/** {@inheritDoc} */

@@ -36,21 +36,21 @@ public interface IntegerArray extends Array<int[], Integer> {
 
 	/** Diese Methode füllt das gegebene {@code int}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see IntegerArray#get(int, ArraySection)
+	 * @see IntegerArray#getAll(int, ArraySection)
 	 * @see IntegerArraySection#from(int[])
 	 * @param index Position.
 	 * @param values {@code int}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code int}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void get(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super int[], ? super Integer> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super int[], ? super Integer> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super int[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super int[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -61,21 +61,21 @@ public interface IntegerArray extends Array<int[], Integer> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code int}-Arrays an die gegebene Position.
 	 *
-	 * @see IntegerArray#set(int, ArraySection)
+	 * @see IntegerArray#setAll(int, ArraySection)
 	 * @see IntegerArraySection#from(int[])
 	 * @param index Position.
 	 * @param values {@code int}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code int}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends int[], ? extends Integer> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends int[], ? extends Integer> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends int[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends int[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -84,19 +84,19 @@ public interface IntegerArray extends Array<int[], Integer> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code int}-Arrays am Ende ein.
 	 *
-	 * @see IntegerArray#add(ArraySection)
+	 * @see IntegerArray#addAll(ArraySection)
 	 * @see IntegerArraySection#from(int[])
 	 * @param values {@code int}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code int}-Array {@code null} ist. */
-	public void add(int[] values) throws NullPointerException;
+	public void addAll(int[] values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends int[], ? extends Integer> values) throws NullPointerException;
+	public void addAll(Array<? extends int[], ? extends Integer> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends int[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends int[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -107,21 +107,21 @@ public interface IntegerArray extends Array<int[], Integer> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code int}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see IntegerArray#add(int, ArraySection)
+	 * @see IntegerArray#addAll(int, ArraySection)
 	 * @see IntegerArraySection#from(int[])
 	 * @param index Position.
 	 * @param values {@code int}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code int}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends int[], ? extends Integer> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends int[], ? extends Integer> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends int[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends int[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

@@ -39,8 +39,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final boolean[] values) {
-			this.get(index, BooleanArraySection.from(values));
+		public void getAll(final int index, final boolean[] values) {
+			this.getAll(index, BooleanArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -51,8 +51,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final boolean[] values) {
-			this.set(index, BooleanArraySection.from(values));
+		public void setAll(final int index, final boolean[] values) {
+			this.setAll(index, BooleanArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -77,7 +77,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final boolean[] values) {
-			this.add(this.size(), BooleanArraySection.from(values));
+			this.addAll(this.size(), BooleanArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -247,8 +247,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final boolean[] values) {
-		this.get(index, BooleanArraySection.from(values));
+	public void getAll(final int index, final boolean[] values) {
+		this.getAll(index, BooleanArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -259,8 +259,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final boolean[] values) {
-		this.set(index, BooleanArraySection.from(values));
+	public void setAll(final int index, final boolean[] values) {
+		this.setAll(index, BooleanArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -285,7 +285,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final boolean[] values) {
-		this.add(this.size, BooleanArraySection.from(values));
+		this.addAll(this.size, BooleanArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */

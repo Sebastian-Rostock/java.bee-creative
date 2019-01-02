@@ -36,21 +36,21 @@ public interface LongArray extends Array<long[], Long> {
 
 	/** Diese Methode füllt das gegebene {@code long}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see LongArray#get(int, ArraySection)
+	 * @see LongArray#getAll(int, ArraySection)
 	 * @see LongArraySection#from(long[])
 	 * @param index Position.
 	 * @param values {@code long}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code long}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void get(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super long[], ? super Long> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super long[], ? super Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super long[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -61,21 +61,21 @@ public interface LongArray extends Array<long[], Long> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code long}-Arrays an die gegebene Position.
 	 *
-	 * @see LongArray#set(int, ArraySection)
+	 * @see LongArray#setAll(int, ArraySection)
 	 * @see LongArraySection#from(long[])
 	 * @param index Position.
 	 * @param values {@code long}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code long}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends long[], ? extends Long> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends long[], ? extends Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends long[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -84,19 +84,19 @@ public interface LongArray extends Array<long[], Long> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code long}-Arrays am Ende ein.
 	 *
-	 * @see LongArray#add(ArraySection)
+	 * @see LongArray#addAll(ArraySection)
 	 * @see LongArraySection#from(long[])
 	 * @param values {@code long}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code long}-Array {@code null} ist. */
-	public void add(long[] values) throws NullPointerException;
+	public void addAll(long[] values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends long[], ? extends Long> values) throws NullPointerException;
+	public void addAll(Array<? extends long[], ? extends Long> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends long[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends long[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -107,21 +107,21 @@ public interface LongArray extends Array<long[], Long> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code long}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see LongArray#add(int, ArraySection)
+	 * @see LongArray#addAll(int, ArraySection)
 	 * @see LongArraySection#from(long[])
 	 * @param index Position.
 	 * @param values {@code long}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code long}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends long[], ? extends Long> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends long[], ? extends Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends long[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

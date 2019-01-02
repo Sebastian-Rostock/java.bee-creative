@@ -36,21 +36,21 @@ public interface ByteArray extends Array<byte[], Byte> {
 
 	/** Diese Methode füllt das gegebene {@code byte}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see ByteArray#get(int, ArraySection)
+	 * @see ByteArray#getAll(int, ArraySection)
 	 * @see ByteArraySection#from(byte[])
 	 * @param index Position.
 	 * @param values {@code byte}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code byte}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void get(int index, byte[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, byte[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super byte[], ? super Byte> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super byte[], ? super Byte> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -61,21 +61,21 @@ public interface ByteArray extends Array<byte[], Byte> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code byte}-Arrays an die gegebene Position.
 	 *
-	 * @see ByteArray#set(int, ArraySection)
+	 * @see ByteArray#setAll(int, ArraySection)
 	 * @see ByteArraySection#from(byte[])
 	 * @param index Position.
 	 * @param values {@code byte}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code byte}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, byte[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, byte[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends byte[], ? extends Byte> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends byte[], ? extends Byte> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -84,19 +84,19 @@ public interface ByteArray extends Array<byte[], Byte> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code byte}-Arrays am Ende ein.
 	 *
-	 * @see ByteArray#add(ArraySection)
+	 * @see ByteArray#addAll(ArraySection)
 	 * @see ByteArraySection#from(byte[])
 	 * @param values {@code byte}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code byte}-Array {@code null} ist. */
-	public void add(byte[] values) throws NullPointerException;
+	public void addAll(byte[] values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends byte[], ? extends Byte> values) throws NullPointerException;
+	public void addAll(Array<? extends byte[], ? extends Byte> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends byte[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends byte[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -107,21 +107,21 @@ public interface ByteArray extends Array<byte[], Byte> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code byte}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see ByteArray#add(int, ArraySection)
+	 * @see ByteArray#addAll(int, ArraySection)
 	 * @see ByteArraySection#from(byte[])
 	 * @param index Position.
 	 * @param values {@code byte}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code byte}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, byte[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, byte[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends byte[], ? extends Byte> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends byte[], ? extends Byte> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends byte[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

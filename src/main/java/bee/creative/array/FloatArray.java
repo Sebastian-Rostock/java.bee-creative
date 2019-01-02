@@ -36,21 +36,21 @@ public interface FloatArray extends Array<float[], Float> {
 
 	/** Diese Methode füllt das gegebene {@code float}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see FloatArray#get(int, ArraySection)
+	 * @see FloatArray#getAll(int, ArraySection)
 	 * @see FloatArraySection#from(float[])
 	 * @param index Position.
 	 * @param values {@code float}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code float}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void get(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super float[], ? super Float> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super float[], ? super Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super float[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -61,21 +61,21 @@ public interface FloatArray extends Array<float[], Float> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code float}-Arrays an die gegebene Position.
 	 *
-	 * @see FloatArray#set(int, ArraySection)
+	 * @see FloatArray#setAll(int, ArraySection)
 	 * @see FloatArraySection#from(float[])
 	 * @param index Position.
 	 * @param values {@code float}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code float}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -84,19 +84,19 @@ public interface FloatArray extends Array<float[], Float> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code float}-Arrays am Ende ein.
 	 *
-	 * @see FloatArray#add(ArraySection)
+	 * @see FloatArray#addAll(ArraySection)
 	 * @see FloatArraySection#from(float[])
 	 * @param values {@code float}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code float}-Array {@code null} ist. */
-	public void add(float[] values) throws NullPointerException;
+	public void addAll(float[] values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends float[], ? extends Float> values) throws NullPointerException;
+	public void addAll(Array<? extends float[], ? extends Float> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends float[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends float[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -107,21 +107,21 @@ public interface FloatArray extends Array<float[], Float> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code float}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see FloatArray#add(int, ArraySection)
+	 * @see FloatArray#addAll(int, ArraySection)
 	 * @see FloatArraySection#from(float[])
 	 * @param index Position.
 	 * @param values {@code float}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code float}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

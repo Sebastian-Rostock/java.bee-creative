@@ -36,21 +36,21 @@ public interface DoubleArray extends Array<double[], Double> {
 
 	/** Diese Methode füllt das gegebene {@code double}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see DoubleArray#get(int, ArraySection)
+	 * @see DoubleArray#getAll(int, ArraySection)
 	 * @see DoubleArraySection#from(double[])
 	 * @param index Position.
 	 * @param values {@code double}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code double}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void get(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super double[], ? super Double> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super double[], ? super Double> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super double[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super double[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -61,21 +61,21 @@ public interface DoubleArray extends Array<double[], Double> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code double}-Arrays an die gegebene Position.
 	 *
-	 * @see DoubleArray#set(int, ArraySection)
+	 * @see DoubleArray#setAll(int, ArraySection)
 	 * @see DoubleArraySection#from(double[])
 	 * @param index Position.
 	 * @param values {@code double}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code double}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends double[], ? extends Double> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends double[], ? extends Double> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends double[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends double[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -84,19 +84,19 @@ public interface DoubleArray extends Array<double[], Double> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code double}-Arrays am Ende ein.
 	 *
-	 * @see DoubleArray#add(ArraySection)
+	 * @see DoubleArray#addAll(ArraySection)
 	 * @see DoubleArraySection#from(double[])
 	 * @param values {@code double}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code double}-Array {@code null} ist. */
-	public void add(double[] values) throws NullPointerException;
+	public void addAll(double[] values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends double[], ? extends Double> values) throws NullPointerException;
+	public void addAll(Array<? extends double[], ? extends Double> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends double[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends double[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -107,21 +107,21 @@ public interface DoubleArray extends Array<double[], Double> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code double}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see DoubleArray#add(int, ArraySection)
+	 * @see DoubleArray#addAll(int, ArraySection)
 	 * @see DoubleArraySection#from(double[])
 	 * @param index Position.
 	 * @param values {@code double}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code double}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, double[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends double[], ? extends Double> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends double[], ? extends Double> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends double[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends double[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

@@ -224,51 +224,51 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final Array<? super GArray, ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-			this.owner.get(this.ownerIndex(index), values);
+		public void getAll(final int index, final Array<? super GArray, ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException {
+			this.owner.getAll(this.ownerIndex(index), values);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final ArraySection<? super GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-			this.owner.get(this.ownerIndex(index), values);
+		public void getAll(final int index, final ArraySection<? super GArray> values) throws NullPointerException, IndexOutOfBoundsException {
+			this.owner.getAll(this.ownerIndex(index), values);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final Array<? extends GArray, ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-			this.owner.set(this.ownerIndex(index), values);
+		public void setAll(final int index, final Array<? extends GArray, ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException {
+			this.owner.setAll(this.ownerIndex(index), values);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-			this.owner.set(this.ownerIndex(index), values);
+		public void setAll(final int index, final ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException {
+			this.owner.setAll(this.ownerIndex(index), values);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final Array<? extends GArray, ? extends GValue> values) throws NullPointerException {
-			this.add(this.size(), values);
+		public void addAll(final Array<? extends GArray, ? extends GValue> values) throws NullPointerException {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final ArraySection<? extends GArray> values) throws NullPointerException {
-			this.add(this.size(), values);
+		public void addAll(final ArraySection<? extends GArray> values) throws NullPointerException {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final Array<? extends GArray, ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-			this.add(index, values.section());
+		public void addAll(final int index, final Array<? extends GArray, ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException {
+			this.addAll(index, values.section());
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException {
+		public void addAll(final int index, final ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 			this.insert(index, values.size());
-			this.set(index, values);
+			this.setAll(index, values);
 		}
 
 		/** {@inheritDoc} */
@@ -469,13 +469,13 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final Array<? super GArray, ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-		this.get(index, values.section());
+	public void getAll(final int index, final Array<? super GArray, ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException {
+		this.getAll(index, values.section());
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final ArraySection<? super GArray> values) throws NullPointerException, IndexOutOfBoundsException {
+	public void getAll(final int index, final ArraySection<? super GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
 		if ((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
@@ -485,13 +485,13 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final Array<? extends GArray, ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-		this.set(index, values.section());
+	public void setAll(final int index, final Array<? extends GArray, ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException {
+		this.setAll(index, values.section());
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException {
+	public void setAll(final int index, final ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
 		if ((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
@@ -501,25 +501,25 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final Array<? extends GArray, ? extends GValue> values) throws NullPointerException {
-		this.add(this.size, values);
+	public void addAll(final Array<? extends GArray, ? extends GValue> values) throws NullPointerException {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final ArraySection<? extends GArray> values) throws NullPointerException {
-		this.add(this.size, values);
+	public void addAll(final ArraySection<? extends GArray> values) throws NullPointerException {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final Array<? extends GArray, ? extends GValue> values) {
-		this.add(index, values.section());
+	public void addAll(final int index, final Array<? extends GArray, ? extends GValue> values) {
+		this.addAll(index, values.section());
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException {
+	public void addAll(final int index, final ArraySection<? extends GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 		final int valuesSize = values.size();
 		if (valuesSize == 0) return;
 		this.insert(index, valuesSize);

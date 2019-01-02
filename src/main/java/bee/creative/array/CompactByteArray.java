@@ -39,8 +39,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final byte[] values) {
-			this.get(index, ByteArraySection.from(values));
+		public void getAll(final int index, final byte[] values) {
+			this.getAll(index, ByteArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -51,8 +51,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final byte[] values) {
-			this.set(index, ByteArraySection.from(values));
+		public void setAll(final int index, final byte[] values) {
+			this.setAll(index, ByteArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -63,8 +63,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final byte[] values) {
-			this.add(this.size(), values);
+		public void addAll(final byte[] values) {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
@@ -76,8 +76,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final byte[] values) {
-			this.add(this.size(), ByteArraySection.from(values));
+		public void addAll(final int index, final byte[] values) {
+			this.addAll(this.size(), ByteArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -247,8 +247,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final byte[] values) {
-		this.get(index, ByteArraySection.from(values));
+	public void getAll(final int index, final byte[] values) {
+		this.getAll(index, ByteArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -259,8 +259,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final byte[] values) {
-		this.set(index, ByteArraySection.from(values));
+	public void setAll(final int index, final byte[] values) {
+		this.setAll(index, ByteArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -271,8 +271,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final byte[] values) {
-		this.add(this.size, values);
+	public void addAll(final byte[] values) {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -284,8 +284,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final byte[] values) {
-		this.add(this.size, ByteArraySection.from(values));
+	public void addAll(final int index, final byte[] values) {
+		this.addAll(this.size, ByteArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */

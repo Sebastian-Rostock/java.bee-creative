@@ -36,7 +36,7 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** Diese Methode füllt das gegebene {@code char}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see CharacterArray#get(int, ArraySection)
+	 * @see CharacterArray#getAll(int, ArraySection)
 	 * @see CharacterArraySection#from(char[])
 	 * @param index Position.
 	 * @param values {@code char}-Array.
@@ -46,11 +46,11 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super char[], ? super Character> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super char[], ? super Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super char[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -61,7 +61,7 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code char}-Arrays an die gegebene Position.
 	 *
-	 * @see CharacterArray#set(int, ArraySection)
+	 * @see CharacterArray#setAll(int, ArraySection)
 	 * @see CharacterArraySection#from(char[])
 	 * @param index Position.
 	 * @param values {@code char}-Array.
@@ -71,11 +71,11 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends char[], ? extends Character> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends char[], ? extends Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends char[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -84,7 +84,7 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code char}-Arrays am Ende ein.
 	 *
-	 * @see CharacterArray#add(ArraySection)
+	 * @see CharacterArray#addAll(ArraySection)
 	 * @see CharacterArraySection#from(char[])
 	 * @param values {@code char}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code char}-Array {@code null} ist. */
@@ -92,11 +92,11 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends char[], ? extends Character> values) throws NullPointerException;
+	public void addAll(Array<? extends char[], ? extends Character> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends char[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends char[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -107,7 +107,7 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code char}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see CharacterArray#add(int, ArraySection)
+	 * @see CharacterArray#addAll(int, ArraySection)
 	 * @see CharacterArraySection#from(char[])
 	 * @param index Position.
 	 * @param values {@code char}-Array.
@@ -117,11 +117,11 @@ public interface CharacterArray extends Array<char[], Character> {
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends char[], ? extends Character> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends char[], ? extends Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends char[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override

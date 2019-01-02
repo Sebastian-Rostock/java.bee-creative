@@ -39,8 +39,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final long[] values) {
-			this.get(index, LongArraySection.from(values));
+		public void getAll(final int index, final long[] values) {
+			this.getAll(index, LongArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -51,8 +51,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final long[] values) {
-			this.set(index, LongArraySection.from(values));
+		public void setAll(final int index, final long[] values) {
+			this.setAll(index, LongArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -63,8 +63,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final long[] values) {
-			this.add(this.size(), values);
+		public void addAll(final long[] values) {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
@@ -76,8 +76,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final long[] values) {
-			this.add(this.size(), LongArraySection.from(values));
+		public void addAll(final int index, final long[] values) {
+			this.addAll(this.size(), LongArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -247,8 +247,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final long[] values) {
-		this.get(index, LongArraySection.from(values));
+	public void getAll(final int index, final long[] values) {
+		this.getAll(index, LongArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -259,8 +259,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final long[] values) {
-		this.set(index, LongArraySection.from(values));
+	public void setAll(final int index, final long[] values) {
+		this.setAll(index, LongArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -271,8 +271,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final long[] values) {
-		this.add(this.size, values);
+	public void addAll(final long[] values) {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -284,8 +284,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final long[] values) {
-		this.add(this.size, LongArraySection.from(values));
+	public void addAll(final int index, final long[] values) {
+		this.addAll(this.size, LongArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */

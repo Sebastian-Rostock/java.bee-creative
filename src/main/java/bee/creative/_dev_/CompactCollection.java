@@ -104,7 +104,7 @@ abstract class CompactCollection<GItem> extends CompactData implements Collectio
 	 * @param index Index.
 	 * @param items {@code index}-tes Elemente. */
 	protected final void setItems(final int index, final Object[] items) {
-		this.items.set(index, items);
+		this.items.setAll(index, items);
 	}
 
 	/** {@inheritDoc} */

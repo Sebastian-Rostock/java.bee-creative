@@ -39,8 +39,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final short[] values) {
-			this.get(index, ShortArraySection.from(values));
+		public void getAll(final int index, final short[] values) {
+			this.getAll(index, ShortArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -51,8 +51,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final short[] values) {
-			this.set(index, ShortArraySection.from(values));
+		public void setAll(final int index, final short[] values) {
+			this.setAll(index, ShortArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -63,8 +63,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final short[] values) {
-			this.add(this.size(), values);
+		public void addAll(final short[] values) {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
@@ -76,8 +76,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final short[] values) {
-			this.add(this.size(), ShortArraySection.from(values));
+		public void addAll(final int index, final short[] values) {
+			this.addAll(this.size(), ShortArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -247,8 +247,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final short[] values) {
-		this.get(index, ShortArraySection.from(values));
+	public void getAll(final int index, final short[] values) {
+		this.getAll(index, ShortArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -259,8 +259,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final short[] values) {
-		this.set(index, ShortArraySection.from(values));
+	public void setAll(final int index, final short[] values) {
+		this.setAll(index, ShortArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -271,8 +271,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final short[] values) {
-		this.add(this.size, values);
+	public void addAll(final short[] values) {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -284,8 +284,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final short[] values) {
-		this.add(this.size, ShortArraySection.from(values));
+	public void addAll(final int index, final short[] values) {
+		this.addAll(this.size, ShortArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */

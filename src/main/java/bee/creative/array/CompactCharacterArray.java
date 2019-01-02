@@ -40,7 +40,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		/** {@inheritDoc} */
 		@Override
 		public void get(final int index, final char[] values) {
-			this.get(index, CharacterArraySection.from(values));
+			this.getAll(index, CharacterArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -52,7 +52,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final char[] values) {
-			this.set(index, CharacterArraySection.from(values));
+			this.setAll(index, CharacterArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -77,7 +77,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final char[] values) {
-			this.add(this.size(), CharacterArraySection.from(values));
+			this.addAll(this.size(), CharacterArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -248,7 +248,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	/** {@inheritDoc} */
 	@Override
 	public void get(final int index, final char[] values) {
-		this.get(index, CharacterArraySection.from(values));
+		this.getAll(index, CharacterArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -260,7 +260,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final char[] values) {
-		this.set(index, CharacterArraySection.from(values));
+		this.setAll(index, CharacterArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -285,7 +285,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final char[] values) {
-		this.add(this.size, CharacterArraySection.from(values));
+		this.addAll(this.size, CharacterArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */

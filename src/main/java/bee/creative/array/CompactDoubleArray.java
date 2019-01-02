@@ -39,8 +39,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final double[] values) {
-			this.get(index, DoubleArraySection.from(values));
+		public void getAll(final int index, final double[] values) {
+			this.getAll(index, DoubleArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -51,8 +51,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final double[] values) {
-			this.set(index, DoubleArraySection.from(values));
+		public void setAll(final int index, final double[] values) {
+			this.setAll(index, DoubleArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -63,8 +63,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final double[] values) {
-			this.add(this.size(), values);
+		public void addAll(final double[] values) {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
@@ -76,8 +76,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final double[] values) {
-			this.add(this.size(), DoubleArraySection.from(values));
+		public void addAll(final int index, final double[] values) {
+			this.addAll(this.size(), DoubleArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -247,8 +247,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final double[] values) {
-		this.get(index, DoubleArraySection.from(values));
+	public void getAll(final int index, final double[] values) {
+		this.getAll(index, DoubleArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -259,8 +259,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final double[] values) {
-		this.set(index, DoubleArraySection.from(values));
+	public void setAll(final int index, final double[] values) {
+		this.setAll(index, DoubleArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -271,8 +271,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final double[] values) {
-		this.add(this.size, values);
+	public void addAll(final double[] values) {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -284,8 +284,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final double[] values) {
-		this.add(this.size, DoubleArraySection.from(values));
+	public void addAll(final int index, final double[] values) {
+		this.addAll(this.size, DoubleArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */

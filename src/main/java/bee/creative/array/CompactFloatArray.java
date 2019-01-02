@@ -39,8 +39,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 		/** {@inheritDoc} */
 		@Override
-		public void get(final int index, final float[] values) {
-			this.get(index, FloatArraySection.from(values));
+		public void getAll(final int index, final float[] values) {
+			this.getAll(index, FloatArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -51,8 +51,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 		/** {@inheritDoc} */
 		@Override
-		public void set(final int index, final float[] values) {
-			this.set(index, FloatArraySection.from(values));
+		public void setAll(final int index, final float[] values) {
+			this.setAll(index, FloatArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -63,8 +63,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final float[] values) {
-			this.add(this.size(), values);
+		public void addAll(final float[] values) {
+			this.addAll(this.size(), values);
 		}
 
 		/** {@inheritDoc} */
@@ -76,8 +76,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 		/** {@inheritDoc} */
 		@Override
-		public void add(final int index, final float[] values) {
-			this.add(this.size(), FloatArraySection.from(values));
+		public void addAll(final int index, final float[] values) {
+			this.addAll(this.size(), FloatArraySection.from(values));
 		}
 
 		/** {@inheritDoc} */
@@ -247,8 +247,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(final int index, final float[] values) {
-		this.get(index, FloatArraySection.from(values));
+	public void getAll(final int index, final float[] values) {
+		this.getAll(index, FloatArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -259,8 +259,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(final int index, final float[] values) {
-		this.set(index, FloatArraySection.from(values));
+	public void setAll(final int index, final float[] values) {
+		this.setAll(index, FloatArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */
@@ -271,8 +271,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final float[] values) {
-		this.add(this.size, values);
+	public void addAll(final float[] values) {
+		this.addAll(this.size, values);
 	}
 
 	/** {@inheritDoc} */
@@ -284,8 +284,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(final int index, final float[] values) {
-		this.add(this.size, FloatArraySection.from(values));
+	public void addAll(final int index, final float[] values) {
+		this.addAll(this.size, FloatArraySection.from(values));
 	}
 
 	/** {@inheritDoc} */

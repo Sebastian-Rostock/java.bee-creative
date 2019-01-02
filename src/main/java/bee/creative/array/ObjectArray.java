@@ -37,21 +37,21 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** Diese Methode füllt das gegebene {@code GValue}-Array mit den Werten ab der gegebenen Position.
 	 *
-	 * @see ObjectArray#get(int, ArraySection)
+	 * @see ObjectArray#getAll(int, ArraySection)
 	 * @see ObjectArraySection#from(java.util.Comparator, Object...)
 	 * @param index Position.
 	 * @param values {@code GValue}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code GValue}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
-	public void get(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, Array<? super GValue[], ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, Array<? super GValue[], ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void get(int index, ArraySection<? super GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void getAll(int index, ArraySection<? super GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
 	 *
@@ -62,21 +62,21 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code GValue}-Arrays an die gegebene Position.
 	 *
-	 * @see ObjectArray#set(int, ArraySection)
+	 * @see ObjectArray#setAll(int, ArraySection)
 	 * @see ObjectArraySection#from(java.util.Comparator, Object...)
 	 * @param index Position.
 	 * @param values {@code GValue}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code GValue}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
-	public void set(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, Array<? extends GValue[], ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, Array<? extends GValue[], ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void set(int index, ArraySection<? extends GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void setAll(int index, ArraySection<? extends GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
 	 *
@@ -85,19 +85,19 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code GValue}-Arrays am Ende ein.
 	 *
-	 * @see ObjectArray#add(ArraySection)
+	 * @see ObjectArray#addAll(ArraySection)
 	 * @see ObjectArraySection#from(java.util.Comparator, Object...)
 	 * @param values {@code GValue}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code GValue}-Array {@code null} ist. */
-	public void add(GValue[] values) throws NullPointerException;
+	public void addAll(GValue[] values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(Array<? extends GValue[], ? extends GValue> values) throws NullPointerException;
+	public void addAll(Array<? extends GValue[], ? extends GValue> values) throws NullPointerException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(ArraySection<? extends GValue[]> values) throws NullPointerException;
+	public void addAll(ArraySection<? extends GValue[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
 	 *
@@ -108,21 +108,21 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
 	/** Diese Methode fügt die Werte des gegebenen {@code GValue}-Arrays an der gegebenen Position ein.
 	 *
-	 * @see ObjectArray#add(int, ArraySection)
+	 * @see ObjectArray#addAll(int, ArraySection)
 	 * @see ObjectArraySection#from(java.util.Comparator, Object...)
 	 * @param index Position.
 	 * @param values {@code GValue}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code GValue}-Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
-	public void add(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, Array<? extends GValue[], ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, Array<? extends GValue[], ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
-	public void add(int index, ArraySection<? extends GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
+	public void addAll(int index, ArraySection<? extends GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** {@inheritDoc} */
 	@Override
