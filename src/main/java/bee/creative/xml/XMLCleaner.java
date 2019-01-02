@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * </ul>
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class XMLCleaner {
+public class XMLCleaner {
 
 	/** Diese Klasse implementiert den Konfigurator für das {@link File} eines {@link XMLCleaner}.
 	 *
