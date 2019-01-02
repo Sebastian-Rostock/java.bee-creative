@@ -54,7 +54,6 @@ public class BEXFile {
 	public static String stringFrom(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 		final int length = array.length() - 1;
 		if ((length < 0) || (array.get(length) != 0)) throw new IllegalArgumentException();
-		if (length == 0) return "";
 		return new String(array.section(0, length).toChars());
 	}
 

@@ -1,6 +1,7 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 import bee.creative.array.CompactByteArray;
+import bee.creative.io.ArrayDataTarget;
 
 /** Diese Klasse implementiert ein {@link CodecTarget} als {@link ArrayDataTarget}.
  *

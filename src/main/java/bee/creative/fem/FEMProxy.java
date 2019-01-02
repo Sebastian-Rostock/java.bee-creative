@@ -6,7 +6,8 @@ import bee.creative.util.Objects;
 import bee.creative.util.Property;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
- * Funktion} delegiert.
+ * Funktion} delegiert. Der Platzhalter wird zur erzeugung rekursiver Funktionsaufrufe eingesetz, weshalb {@link #hashCode() Streuwert} und
+ * {@link #equals(Object) Äquivalenz} nicht auf diesem, sondren auf einer gegebenen {@link #id() Kennung} aufbauen.
  *
  * @see FEMCompiler#proxy(String)
  * @see FEMCompiler#proxies()
@@ -18,64 +19,50 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	}
 
 	public static FEMProxy from(final FEMString id) {
-		return FEMProxy.from(id, null);
+		return FEMProxy.from(id, id);
 	}
 
-	public static FEMProxy from(final FEMString id, final FEMFunction function) {
-		return new FEMProxy(id, id, null);
+	public static FEMProxy from(final FEMValue id, final FEMString name) {
+		return new FEMProxy(id, name, null);
 	}
 
 	/** Dieses Feld speichert die Kennung des Platzhalters. */
 	final FEMValue id;
 
 	/** Dieses Feld speichert den Namen. */
-	FEMString name = FEMString.EMPTY;
+	final FEMString name;
 
 	/** Dieses Feld speichert die Funktion. */
-	FEMFunction function;
+	FEMFunction target;
 
 	/** Dieser Konstruktor initialisiert den Plathhalter.
 	 *
-	 * @param id {@link #getId() Kennung}.
-	 * @param name {@link #getName() Name}.
-	 * @param function Funktion
-	 * @throws NullPointerException Wenn {@code id} {@code null} ist. */
+	 * @param id {@link #id() Kennung}.
+	 * @param name {@link #name() Name}.
+	 * @param function {@link #get() Funktion} oder {@code null}.
+	 * @throws NullPointerException Wenn {@code id} bzw. {@code name} {@code null} ist. */
 	public FEMProxy(final FEMValue id, final FEMString name, final FEMFunction function) throws NullPointerException {
 		this.id = Objects.notNull(id);
-		this.useName(name);
-		this.useFunction(function);
+		this.name = Objects.notNull(name);
+		this.set(function);
 	}
 
-	/** Diese Methode gibt die Kennung des Platzhalters zurück. Diese wird im Konstruktor initialisiert und bildet die Grundlage für die Berechnung von
-	 * {@link #hashCode() Streuwert} und {@link #equals(Object) Äquivalenz}.
+	/** Diese Methode gibt die Kennung des Platzhalters zurück. Diese Kennung wird im Konstruktor initialisiert und zur Berechnung von {@link #hashCode()
+	 * Streuwert} und {@link #equals(Object) Äquivalenz} eingesetzt.
 	 *
 	 * @return Kennung. */
-	public FEMValue getId() {
+	public FEMValue id() {
 		return this.id;
 	}
 
 	/** Diese Methode gibt den Namen des Platzhalters zurück. Dieser wird in der {@link #toString() Textdarstellung} eingesetzt.
 	 *
 	 * @return Name. */
-	public FEMString getName() {
+	public FEMString name() {
 		return this.name;
 	}
 
-	public FEMFunction getFunction() {
-		return this.get();
-	}
-
-	public FEMProxy useName(final FEMString name) {
-		this.name = Objects.notNull(name, FEMString.EMPTY);
-		return this;
-	}
-
-	public FEMProxy useFunction(final FEMFunction function) {
-		this.set(function);
-		return this;
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #getId() Kennung} dieses Platzhalters gleich der des gegebenen ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #id() Kennung} dieses Platzhalters gleich der des gegebenen ist.
 	 *
 	 * @param that Platzhalter.
 	 * @return Gleichheit.
@@ -90,7 +77,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	 * @return Funktion oder {@code null}. */
 	@Override
 	public FEMFunction get() {
-		return this.function;
+		return this.target;
 	}
 
 	/** Diese Methode setzt die in {@link #invoke(FEMFrame)} aufzurufende Funktion.
@@ -98,7 +85,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	 * @param function Funktion oder {@code null}. */
 	@Override
 	public void set(final FEMFunction function) {
-		this.function = function;
+		this.target = function;
 	}
 
 	/** {@inheritDoc} */
@@ -110,7 +97,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	/** {@inheritDoc} */
 	@Override
 	public FEMValue invoke(final FEMFrame frame) {
-		return this.function.invoke(frame);
+		return this.target.invoke(frame);
 	}
 
 	@Override

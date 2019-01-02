@@ -1,7 +1,6 @@
 package bee.creative._deprecated_;
 
 import java.io.IOException;
-import bee.creative.data.CodecTarget;
 
 /** Diese Schnittstelle definiert ein Objekt, dass sich selbst in ein {@link CodecTarget} schreiben kann.
  *

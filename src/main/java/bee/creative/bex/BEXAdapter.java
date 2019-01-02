@@ -331,15 +331,15 @@ public class BEXAdapter {
 
 		/** Diese Methode implementeirt {@link #getTextContent()}.
 		 *
-		 * @param content {@link StringBuffer} mit dem bisher gesammelten Texten.
+		 * @param result Puffer mit dem bisher gesammelten Texten.
 		 * @param children {@link BEXList} der rekursiv analysierten Kindknoten.
 		 * @throws NullPointerException Wenn eine der Eingabe {@code null} ist. */
-		static void collectContent(final StringBuffer content, final BEXList children) throws NullPointerException {
+		static void collectContent(final StringBuilder result, final BEXList children) throws NullPointerException {
 			for (final BEXNode child: children) {
 				if (child.type() == BEXNode.ELEM_NODE) {
-					BEXElemAdapter.collectContent(content, child.children());
+					BEXElemAdapter.collectContent(result, child.children());
 				} else {
-					content.append(child.value());
+					result.append(child.value());
 				}
 			}
 		}
@@ -516,7 +516,7 @@ public class BEXAdapter {
 		/** {@inheritDoc} */
 		@Override
 		public String getTextContent() throws DOMException {
-			final StringBuffer content = new StringBuffer();
+			final StringBuilder content = new StringBuilder();
 			BEXElemAdapter.collectContent(content, this.node.children());
 			return content.toString();
 		}

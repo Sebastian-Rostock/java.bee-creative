@@ -1,6 +1,7 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 import bee.creative.array.ByteArraySection;
+import bee.creative.io.ArrayDataSource;
 
 /** Diese Klasse implementiert ein {@link CodecSource} als {@link ArrayDataSource}.
  *

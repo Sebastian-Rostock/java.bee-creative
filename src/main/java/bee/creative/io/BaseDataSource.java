@@ -1,4 +1,4 @@
-package bee.creative.data;
+package bee.creative.io;
 
 import java.io.DataInputStream;
 import java.io.EOFException;

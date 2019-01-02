@@ -29,14 +29,6 @@ import bee.creative.array.ByteArraySection;
 import bee.creative.array.CharacterArray;
 import bee.creative.array.CharacterArraySection;
 import bee.creative.array.CompactByteArray;
-import bee.creative.data.ArrayDataSource;
-import bee.creative.data.ArrayDataTarget;
-import bee.creative.data.BaseDataSource;
-import bee.creative.data.BaseDataTarget;
-import bee.creative.data.DataSource;
-import bee.creative.data.DataTarget;
-import bee.creative.data.FileDataSource;
-import bee.creative.data.FileDataTarget;
 import bee.creative.util.Getter;
 import bee.creative.util.Iterables;
 
@@ -498,38 +490,7 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static DataTarget outputDataFrom(final ByteBuffer object) {
-		return new BaseDataTarget() {
-
-			@Override
-			public Object data() {
-				return object;
-			}
-
-			@Override
-			public void write(final byte[] b, final int off, final int len) throws IOException {
-				object.put(b, off, len);
-			}
-
-			@Override
-			public void seek(final long index) throws IOException {
-				try {
-					object.position((int)index);
-				} catch (final IllegalArgumentException cause) {
-					throw new IOException(cause);
-				}
-			}
-
-			@Override
-			public long index() throws IOException {
-				return object.position();
-			}
-
-			@Override
-			public long length() throws IOException {
-				return object.limit();
-			}
-
-		};
+		return new BufferDataTarget(object);
 	}
 
 	@SuppressWarnings ("javadoc")

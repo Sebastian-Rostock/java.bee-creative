@@ -162,7 +162,7 @@ public abstract class FEMUtil {
 	}
 
 	/** Diese Methode setzt die {@link FEMProxy#set(FEMFunction) aufzurufende Funktion} des gegebenen {@link FEMProxy}, wenn diesem noch keinen zugeordnet ist,
-	 * d.h. wenn {@link FEMProxy#get()} {@code null} liefert. Die aufzurufende Funktion des {@link FEMProxy} wird dazu über dessen {@link FEMProxy#getName() Namen}
+	 * d.h. wenn {@link FEMProxy#get()} {@code null} liefert. Die aufzurufende Funktion des {@link FEMProxy} wird dazu über dessen {@link FEMProxy#name() Namen}
 	 * ermittelt, d.h. {@link #get(String) FEMUtil.get(proxy.getName().toString())}.
 	 *
 	 * @see #get(String)
@@ -172,7 +172,7 @@ public abstract class FEMUtil {
 	 * @throws NullPointerException Wenn {@code proxy} {@code null} ist. */
 	public static void update(final FEMProxy proxy) throws NullPointerException {
 		if (proxy.get() != null) return;
-		proxy.set(FEMUtil.get(proxy.getName().toString()));
+		proxy.set(FEMUtil.get(proxy.name().toString()));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code updateAll(Arrays.asList(proxies))}.

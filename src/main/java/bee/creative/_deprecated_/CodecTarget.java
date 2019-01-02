@@ -1,4 +1,6 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
+
+import bee.creative.io.DataTarget;
 
 /** Diese Schnittstelle definiert die Ausgabedaten eines {@link Encoder}.
  *

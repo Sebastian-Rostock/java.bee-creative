@@ -742,7 +742,7 @@ class FEMCodec implements Property<FEMValue> {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
 	public IAMArray getProxyArray(final FEMProxy source) throws NullPointerException, IllegalArgumentException {
-		return IAMArray.from(this.toIndex(this.putStringValue(source.getName())), this.putFunction(source.get()));
+		return IAMArray.from(this.toIndex(this.putStringValue(source.name())), this.putFunction(source.get()));
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #getConcatFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsaufruf enthält.

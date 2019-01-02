@@ -1,4 +1,4 @@
-package bee.creative.data;
+package bee.creative.io;
 
 import java.io.Closeable;
 import java.io.DataOutput;

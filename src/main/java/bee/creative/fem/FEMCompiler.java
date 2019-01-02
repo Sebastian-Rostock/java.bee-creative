@@ -27,7 +27,7 @@ public final class FEMCompiler extends Parser {
 	/** Diese Methode gibt den zu kompilierenden Quelltext zurück.
 	 *
 	 * @return Quelltext. */
-	public final FEMScript script() {
+	public FEMScript script() {
 		return this.script;
 	}
 
@@ -37,7 +37,7 @@ public final class FEMCompiler extends Parser {
 	 * @see #token()
 	 * @see Token#start()
 	 * @return Startposition des aktuellen Quelltextbereichs. */
-	public final int scriptOffset() {
+	public int scriptOffset() {
 		return this.token().start();
 	}
 
@@ -46,7 +46,7 @@ public final class FEMCompiler extends Parser {
 	 * @see #script()
 	 * @see FEMScript#source()
 	 * @return Zeichenkette des Quelltexts. */
-	public final String scriptSource() {
+	public String scriptSource() {
 		return this.script().source();
 	}
 
@@ -55,14 +55,14 @@ public final class FEMCompiler extends Parser {
 	 * @see #script()
 	 * @see FEMScript#source()
 	 * @return Länge des Quelltexts. */
-	public final int scriptLength() {
+	public int scriptLength() {
 		return this.script().source().length();
 	}
 
 	/** Diese Methode gibt die Spaltennummer zur {@link #scriptOffset() aktuellen Quelltextposition} zurück.
 	 *
 	 * @return aktuelle Spaltennummer. */
-	public final int scriptColIndex() {
+	public int scriptColIndex() {
 		final String source = this.script().source();
 		final int offset = this.scriptOffset(), index = source.lastIndexOf('\n', offset);
 		return (offset + 1) - (index < 0 ? 0 : index);
@@ -71,7 +71,7 @@ public final class FEMCompiler extends Parser {
 	/** Diese Methode gibt die Zeilennummer zur {@link #scriptOffset() aktuellen Quelltextposition} zurück.
 	 *
 	 * @return aktuelle Zeilennummer. */
-	public final int scriptRowIndex() {
+	public int scriptRowIndex() {
 		final String source = this.script().source();
 		int result = 0;
 		for (int index = this.scriptOffset() + 1; index >= 0; index = source.lastIndexOf('\n', index - 1)) {
@@ -86,7 +86,7 @@ public final class FEMCompiler extends Parser {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	public final FEMCompiler useScript(final FEMScript script) throws NullPointerException {
+	public FEMCompiler useScript(final FEMScript script) throws NullPointerException {
 		this.source(script.types());
 		this.script = script;
 		return this;
@@ -97,7 +97,7 @@ public final class FEMCompiler extends Parser {
 	 * @param name Name des Platzhalters.
 	 * @return Platzhalterfunktion.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-	public final FEMProxy proxy(final String name) throws NullPointerException {
+	public FEMProxy proxy(final String name) throws NullPointerException {
 		FEMProxy result = this.proxies.get(name);
 		if (result != null) return result;
 		this.proxies.put(name, result = FEMProxy.from(name));
@@ -107,7 +107,7 @@ public final class FEMCompiler extends Parser {
 	/** Diese Methode gibt die über {@link #proxy(String)} erzeugten Platzhalter zurück.
 	 *
 	 * @return Abbildung von Namen auf Platzhalter. */
-	public final Map<String, FEMProxy> proxies() {
+	public Map<String, FEMProxy> proxies() {
 		return this.proxies;
 	}
 
@@ -117,7 +117,7 @@ public final class FEMCompiler extends Parser {
 	 * @param proxies Platzhalter.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
-	public final FEMCompiler putProxies(final FEMProxy... proxies) throws NullPointerException {
+	public FEMCompiler putProxies(final FEMProxy... proxies) throws NullPointerException {
 		return this.putProxies(Arrays.asList(proxies));
 	}
 
@@ -126,9 +126,9 @@ public final class FEMCompiler extends Parser {
 	 * @param proxies Platzhalter.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
-	public final FEMCompiler putProxies(final Iterable<FEMProxy> proxies) throws NullPointerException {
+	public FEMCompiler putProxies(final Iterable<FEMProxy> proxies) throws NullPointerException {
 		for (final FEMProxy proxy: proxies) {
-			this.proxies.put(proxy.getName().toString(), proxy);
+			this.proxies.put(proxy.name().toString(), proxy);
 		}
 		return this;
 	}
@@ -136,7 +136,7 @@ public final class FEMCompiler extends Parser {
 	/** Diese Methode gibt die Liste der aktellen Parameternamen zurück.
 	 *
 	 * @return Parameternamen. */
-	public final List<String> params() {
+	public List<String> params() {
 		return this.params;
 	}
 
@@ -146,7 +146,7 @@ public final class FEMCompiler extends Parser {
 	 * @param name Parametername.
 	 * @return Position oder {@code -1}.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-	public final int getParam(final String name) throws NullPointerException {
+	public int getParam(final String name) throws NullPointerException {
 		return this.params.indexOf(name.toString());
 	}
 
@@ -158,7 +158,7 @@ public final class FEMCompiler extends Parser {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index} ungültig ist. */
-	public final FEMCompiler putParam(final int index, final String name) throws NullPointerException, IllegalArgumentException {
+	public FEMCompiler putParam(final int index, final String name) throws NullPointerException, IllegalArgumentException {
 		this.params.add(index, name.toString());
 		return this;
 	}
@@ -169,7 +169,7 @@ public final class FEMCompiler extends Parser {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	public final FEMCompiler useParams(final String... value) throws NullPointerException {
+	public FEMCompiler useParams(final String... value) throws NullPointerException {
 		return this.useParams(Arrays.asList(value));
 	}
 
@@ -179,7 +179,7 @@ public final class FEMCompiler extends Parser {
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	public final FEMCompiler useParams(final List<String> value) throws NullPointerException {
+	public FEMCompiler useParams(final List<String> value) throws NullPointerException {
 		if (value.contains(null)) throw new NullPointerException();
 		this.params.clear();
 		this.params.addAll(value);
@@ -191,7 +191,7 @@ public final class FEMCompiler extends Parser {
 	 * @param count Anzahl.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist. */
-	public final FEMCompiler popParams(final int count) throws IllegalArgumentException {
+	public FEMCompiler popParams(final int count) throws IllegalArgumentException {
 		this.params.subList(0, count).clear();
 		return this;
 	}
@@ -202,7 +202,7 @@ public final class FEMCompiler extends Parser {
 	 * @see #script()
 	 * @see FEMScript#get(int)
 	 * @return aktueller Bereich. */
-	public final Token token() {
+	public Token token() {
 		return this.isParsed() ? Token.EMPTY : this.script.get(this.index());
 	}
 
@@ -211,7 +211,7 @@ public final class FEMCompiler extends Parser {
 	 * @see #token()
 	 * @see Token#extract(String)
 	 * @return Aktuelle Zeichenkette. */
-	public final String section() {
+	public String section() {
 		return this.token().extract(this.script.source());
 	}
 

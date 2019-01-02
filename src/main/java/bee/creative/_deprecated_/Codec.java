@@ -1,4 +1,4 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 /** Diese Schnittstelle definiert die Kombination eines {@link Encoder} und eines {@link Decoder} als ein Objekt, dass einen gegebenen Wert in ein
  * {@link CodecTarget} schreiben sowie einen solchen Wert wieder aus einer {@link CodecSource} einlesen kann.

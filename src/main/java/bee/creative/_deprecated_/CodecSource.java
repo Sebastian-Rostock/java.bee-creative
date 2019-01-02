@@ -1,4 +1,6 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
+
+import bee.creative.io.DataSource;
 
 /** Diese Schnittstelle definiert die Eingabedaten eines {@link Decoder}.
  *

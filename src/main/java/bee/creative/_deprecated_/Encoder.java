@@ -1,4 +1,4 @@
-package bee.creative.data;
+package bee.creative._deprecated_;
 
 import java.io.IOException;
 

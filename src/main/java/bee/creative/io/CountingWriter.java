@@ -4,40 +4,48 @@ import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-/** Diese Klasse implementiert erweitert einen {@link FilterWriter} um den {@link #writeCount() Zähler der geschriebenen Zeichen}.
+/** Diese Klasse implementiert erweitert einen {@link FilterWriter} um den {@link #getWriteCount() Zähler der geschriebenen Zeichen}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")
 public class CountingWriter extends FilterWriter {
 
-	protected long writeCount;
+	private long writeCount;
 
 	/** Dieser Konstruktor initialisiert den {@link Writer}. */
 	public CountingWriter(final Writer writer) {
 		super(writer);
 	}
 
+	/** Diese Methode setzt die Anzahl der geschriebenen Zeichen. */
+	protected void setWriteCount(final long value) {
+		this.writeCount = value;
+	}
+
 	/** Diese Methode gibt die Anzahl der geschriebenen Zeichen zurück. */
-	public long writeCount() {
+	public long getWriteCount() {
 		return this.writeCount;
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public void write(final int c) throws IOException {
-		super.write(c);
-		this.writeCount++;
+	public void write(final int value) throws IOException {
+		super.write(value);
+		this.setWriteCount(this.writeCount + 1);
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public void write(final String string, final int offset, final int length) throws IOException {
-		super.write(string, offset, length);
-		this.writeCount += length;
+	public void write(final String source, final int offset, final int length) throws IOException {
+		super.write(source, offset, length);
+		this.setWriteCount(this.writeCount + length);
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public void write(final char[] chars, final int offset, final int length) throws IOException {
-		super.write(chars, offset, length);
-		this.writeCount += length;
+	public void write(final char[] source, final int offset, final int length) throws IOException {
+		super.write(source, offset, length);
+		this.setWriteCount(this.writeCount + length);
 	}
 
 }

@@ -4,21 +4,26 @@ import java.io.FilterReader;
 import java.io.IOException;
 import java.io.Reader;
 
-/** Diese Klasse implementiert erweitert einen {@link FilterReader} um den {@link #readCount() Zähler der gelesenen bzw. ausgelassenen Zeichen}.
+/** Diese Klasse implementiert erweitert einen {@link FilterReader} um den {@link #getReadCount() Zähler der gelesenen bzw. ausgelassenen Zeichen}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")
 public class CountingReader extends FilterReader {
 
-	protected long readCount;
+	private long readCount;
 
 	/** Dieser Konstruktor initialisiert den {@link Reader}. */
 	public CountingReader(final Reader reader) {
 		super(reader);
 	}
 
+	/** Diese Methode setzt die Anzahl der gelesenen bzw. ausgelassenen Zeichen. */
+	protected void setReadCount(long value) {
+		this.readCount = value;
+	}
+
 	/** Diese Methode gibt die Anzahl der gelesenen bzw. ausgelassenen Zeichen zurück. */
-	public long readCount() {
+	public long getReadCount() {
 		return this.readCount;
 	}
 
@@ -27,16 +32,16 @@ public class CountingReader extends FilterReader {
 	public int read() throws IOException {
 		final int result = super.read();
 		if (result < 0) return result;
-		this.readCount++;
+		setReadCount(this.readCount + 1);
 		return result;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public int read(final char[] chars, final int offset, final int length) throws IOException {
-		final int result = super.read(chars, offset, length);
+	public int read(final char[] target, final int offset, final int length) throws IOException {
+		final int result = super.read(target, offset, length);
 		if (result < 0) return result;
-		this.readCount += result;
+		setReadCount(this.readCount + result);
 		return result;
 	}
 
@@ -44,7 +49,7 @@ public class CountingReader extends FilterReader {
 	@Override
 	public long skip(final long count) throws IOException {
 		final long result = super.skip(count);
-		this.readCount += result;
+		setReadCount(this.readCount + result);
 		return result;
 	}
 
