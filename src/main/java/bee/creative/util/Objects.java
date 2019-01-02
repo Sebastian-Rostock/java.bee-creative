@@ -589,7 +589,7 @@ public class Objects {
 
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der gegebene Zeichenkette entspricht.
 	 *
-	 * @param string Textdarstelung .
+	 * @param string Textdarstelung.
 	 * @return Textdarstelung-Objekt. */
 	public static Object toStringObject(final String string) {
 		if (string == null) return "null";
