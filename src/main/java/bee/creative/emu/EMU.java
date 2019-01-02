@@ -15,12 +15,6 @@ import java.util.Map;
 @SuppressWarnings ("rawtypes")
 public class EMU {
 
-	/** Dieses Feld speichert die in {@link #use(Class, Emuator)} registrierten {@link Emuator}. */
-	private static final Map<Class<?>, Emuator<?>> emuators = new bee.creative.util.HashMap<>();
-
-	/** Dieses Feld speichert die in {@link #from(Object)} gepufferten {@link Emuator}. */
-	private static final Map<Class<?>, Emuator<?>> emuatorsCache = new bee.creative.util.HashMap<>();
-
 	/** Dieses Feld speichert den {@link Emuator} zu {@link #fromClass(Class)}. */
 	private static final Emuator<?> defaultEmuator = new Emuator<Object>() {
 
@@ -30,6 +24,12 @@ public class EMU {
 		}
 
 	};
+
+	/** Dieses Feld speichert die in {@link #use(Class, Emuator)} registrierten {@link Emuator}. */
+	private static final Map<Class<?>, Emuator<?>> emuatorMap = new bee.creative.util.HashMap<>();
+
+	/** Dieses Feld speichert die in {@link #from(Object)} gepufferten {@link Emuator}. */
+	private static final Map<Class<?>, Emuator<?>> emuatorCache = new bee.creative.util.HashMap<>();
 
 	static {
 		EMU.use(String.class, new Emuator<String>() {
@@ -85,11 +85,11 @@ public class EMU {
 	public static <GItem> void use(final Class<GItem> clazz, final Emuator<? super GItem> emuator) throws NullPointerException, IllegalArgumentException {
 		if (clazz.isArray() || clazz.isPrimitive()) throw new IllegalArgumentException();
 		if (emuator == null) {
-			EMU.emuators.remove(clazz);
+			EMU.emuatorMap.remove(clazz);
 		} else {
-			EMU.emuators.put(clazz, emuator);
+			EMU.emuatorMap.put(clazz, emuator);
 		}
-		EMU.emuatorsCache.clear();
+		EMU.emuatorCache.clear();
 	}
 
 	/** Diese Methode gibt den gegebenen Speicherverbrauch auf ein Vielfaches von {@code 8} aufgerundet zurück.
@@ -119,29 +119,28 @@ public class EMU {
 	public static long from(final Object object) {
 		if (object == null) return 0;
 		if (object instanceof Emuable) return ((Emuable)object).emu();
-		final Class<?> objectClass = object.getClass();
-		if (objectClass.isArray()) return EMU.fromArray(object);
-		Emuator<Object> emuator = (Emuator<Object>)EMU.emuatorsCache.get(objectClass);
+		final Class<?> clazz = object.getClass();
+		if (clazz.isArray()) return EMU.fromArray(clazz.getComponentType(), Array.getLength(object));
+		Emuator<Object> emuator = (Emuator<Object>)EMU.emuatorCache.get(clazz);
 		if (emuator != null) return emuator.emu(object);
-		for (Class<?> key = objectClass; key != null; key = key.getSuperclass()) {
-			emuator = (Emuator<Object>)EMU.emuators.get(key);
+		for (Class<?> key = clazz; key != null; key = key.getSuperclass()) {
+			emuator = (Emuator<Object>)EMU.emuatorMap.get(key);
 			if (emuator != null) {
-				EMU.emuatorsCache.put(key, emuator);
+				EMU.emuatorCache.put(clazz, emuator);
 				return emuator.emu(object);
 			}
 		}
-		EMU.emuatorsCache.put(objectClass, EMU.defaultEmuator);
-		return EMU.fromClass(objectClass);
+		EMU.emuatorCache.put(clazz, EMU.defaultEmuator);
+		return EMU.fromClass(clazz);
 	}
 
 	/** Diese Methode gibt die Summe der für jedes gegebenen Objekt {@link #from(Object) geschätzten Speicherverbräuche} zurück.
 	 *
 	 * @see #from(Object)
-	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte.
 	 * @return geschätzter Speicherverbrauch. */
 	@SafeVarargs
-	public static <GItem> long fromAll(final GItem... items) {
+	public static long fromAll(final Object... items) {
 		long result = 0;
 		for (final Object item: items) {
 			result += EMU.from(item);
@@ -207,8 +206,8 @@ public class EMU {
 		return EMU.align(12 + (EMU.fromType(type) * (long)length));
 	}
 
-	/** Diese Methode gibt den geschätzten Speicherverbrauch für die Kopfdaten sowie die Instanzdatenfelder der Instanzen der gegebenen Klasse zurück. Wenn sie
-	 * {@code null} ist, wird {@code 8} geliefert.
+	/** Diese Methode gibt den geschätzten Speicherverbrauch für die Kopfdaten sowie die Instanzdatenfelder der gegebenen Klasse zurück. Wenn sie {@code null}
+	 * ist, wird {@code 8} geliefert.
 	 *
 	 * @see #align(int)
 	 * @see #fromField(Field)
@@ -235,9 +234,8 @@ public class EMU {
 	 * @return geschätzter Speicherverbrauch. */
 	public static long fromObject(final Object object) {
 		if (object == null) return 0;
-		final Class<?> type = object.getClass();
-		if (type.isArray()) return EMU.fromArray(object);
-		return EMU.fromClass(object.getClass());
+		final Class<?> clazz = object.getClass();
+		return clazz.isArray() ? EMU.fromArray(clazz.getComponentType(), Array.getLength(object)) : EMU.fromClass(clazz);
 	}
 
 }
