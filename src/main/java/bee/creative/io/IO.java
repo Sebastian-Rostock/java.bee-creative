@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
@@ -37,14 +38,14 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class IO {
 
-	/** Diese Methode kopiert den Inhalt des gegebenen {@link Reader} in den gegebenen {@link Writer}.
+	/** Diese Methode kopiert den Inhalt des gegebenen {@link InputStream} in den gegebenen {@link OutputStream}.
 	 *
 	 * @param input Quellobjekt.
 	 * @param output Zielobjekt.
-	 * @return Anzahl der kopierten Zeichen.
+	 * @return Anzahl der kopierten Bytes.
 	 * @throws IOException - */
-	public static long copy(final Reader input, final Writer output) throws IOException {
-		final char[] buffer = new char[128 * 1024];
+	public static long copyBytes(final InputStream input, final OutputStream output) throws IOException {
+		final byte[] buffer = new byte[256 * 1024];
 		long result = 0;
 		while (true) {
 			final int count = input.read(buffer);
@@ -54,14 +55,14 @@ public class IO {
 		}
 	}
 
-	/** Diese Methode kopiert den Inhalt des gegebenen {@link InputStream} in den gegebenen {@link OutputStream}.
+	/** Diese Methode kopiert den Inhalt des gegebenen {@link Reader} in den gegebenen {@link Writer}.
 	 *
 	 * @param input Quellobjekt.
 	 * @param output Zielobjekt.
-	 * @return Anzahl der kopierten Bytes.
+	 * @return Anzahl der kopierten Zeichen.
 	 * @throws IOException - */
-	public static long copy(final InputStream input, final OutputStream output) throws IOException {
-		final byte[] buffer = new byte[256 * 1024];
+	public static long copyChars(final Reader input, final Writer output) throws IOException {
+		final char[] buffer = new char[128 * 1024];
 		long result = 0;
 		while (true) {
 			final int count = input.read(buffer);
@@ -79,7 +80,7 @@ public class IO {
 	 * @throws IOException - */
 	public static byte[] readBytes(final Object input) throws IOException {
 		try (InputStream stream = IO.inputStreamFrom(input); ByteArrayOutputStream result = new ByteArrayOutputStream()) {
-			IO.copy(stream, result);
+			IO.copyBytes(stream, result);
 			return result.toByteArray();
 		}
 	}
@@ -90,9 +91,9 @@ public class IO {
 	 * @param input Quellobjekt.
 	 * @return Zeichenkette.
 	 * @throws IOException - */
-	public static String readString(final Object input) throws IOException {
+	public static String readChars(final Object input) throws IOException {
 		try (Reader reader = IO.inputReaderFrom(input); StringWriter result = new StringWriter()) {
-			IO.copy(reader, result);
+			IO.copyChars(reader, result);
 			return result.toString();
 		}
 	}
@@ -113,7 +114,7 @@ public class IO {
 	 * @param output Zielobjekt.
 	 * @param value Zeichenkette.
 	 * @throws IOException - */
-	public static void writeString(final Object output, final String value) throws IOException {
+	public static void writeChars(final Object output, final String value) throws IOException {
 		try (Writer writer = IO.outputWriterFrom(output)) {
 			writer.write(value);
 		}
@@ -288,7 +289,7 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static ByteBuffer inputBufferFrom(final byte[] object) {
-		return ByteBuffer.wrap(object);
+		return ByteBuffer.wrap(object).order(ByteOrder.nativeOrder());
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -298,7 +299,7 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static ByteBuffer inputBufferFrom(final ByteArraySection object) {
-		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size());
+		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size()).order(ByteOrder.nativeOrder());
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -310,7 +311,7 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static ByteBuffer inputBufferFrom(final FileChannel object) throws IOException {
-		return object.map(MapMode.READ_ONLY, 0, object.size());
+		return object.map(MapMode.READ_ONLY, 0, object.size()).order(ByteOrder.nativeOrder());
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -482,7 +483,7 @@ public class IO {
 
 			@Override
 			public void write(final byte[] b, final int off, final int len) throws IOException {
-				object.add(ByteArraySection.from(b, off, off + len));
+				object.addAll(ByteArraySection.from(b, off, off + len));
 			}
 
 		};
@@ -566,7 +567,7 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static ByteBuffer outputBufferFrom(final FileChannel object) throws IOException {
-		return object.map(MapMode.READ_WRITE, 0, object.size());
+		return object.map(MapMode.READ_WRITE, 0, object.size()).order(ByteOrder.nativeOrder());
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -576,7 +577,7 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static ByteBuffer outputBufferFrom(final byte[] object) {
-		return ByteBuffer.wrap(object);
+		return ByteBuffer.wrap(object).order(ByteOrder.nativeOrder());
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -586,7 +587,7 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static ByteBuffer outputBufferFrom(final ByteArraySection object) {
-		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size());
+		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size()).order(ByteOrder.nativeOrder());
 	}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link OutputStream} und gibt diesen zurück. Hierbei werden folgende Datentypen für {@code object}
@@ -626,7 +627,7 @@ public class IO {
 
 			@Override
 			public void write(final byte[] b, final int off, final int len) throws IOException {
-				object.add(ByteArraySection.from(b, off, len));
+				object.addAll(ByteArraySection.from(b, off, len));
 			}
 
 		};
@@ -675,7 +676,7 @@ public class IO {
 
 			@Override
 			public void write(final char[] cbuf, final int off, final int len) throws IOException {
-				object.add(CharacterArraySection.from(cbuf, off, len));
+				object.addAll(CharacterArraySection.from(cbuf, off, len));
 			}
 
 			@Override
