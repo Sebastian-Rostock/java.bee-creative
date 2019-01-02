@@ -5,7 +5,7 @@ import bee.creative.util.Objects.BaseObject;
 /** Diese abstrakte Klasse implementiert einen {@link Observable überwachbaren} Wert.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ des Werts .
+ * @param <GValue> Typ des Werts.
  * @param <GMessage> Typ der Ereignisnachricht.
  * @param <GObserver> Typ der Ereignisempfänger. */
 public abstract class ObservableValue<GValue, GMessage, GObserver> extends BaseObject implements Observable<GMessage, GObserver> {
@@ -27,7 +27,7 @@ public abstract class ObservableValue<GValue, GMessage, GObserver> extends BaseO
 	 * @param value2 neuer Wert.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
 	protected boolean customEquals(final GValue value1, final GValue value2) {
-		return Objects.equals(value1, value2);
+		return Objects.deepEquals(value1, value2);
 	}
 
 }
