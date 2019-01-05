@@ -4,11 +4,12 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import bee.creative.util.Bytes;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert einen abstrakten {@link DataSource}.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class BaseDataSource implements DataSource {
+public abstract class BaseDataSource extends BaseObject implements DataSource {
 
 	/** Dieses Feld speichert den Lesepuffer. */
 	protected final byte[] array = new byte[8];

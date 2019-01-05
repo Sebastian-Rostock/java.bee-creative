@@ -8,7 +8,6 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link RandomAccessFile}.
  *
- * @see RandomAccessFile
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FileDataTarget extends BaseDataTarget {
 
@@ -33,12 +32,12 @@ public class FileDataTarget extends BaseDataTarget {
 		this(new RandomAccessFile(name, "rw"));
 	}
 
-	/** Dieser Konstruktor initialisiert das {@link RandomAccessFile}.
+	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 *
-	 * @param file {@link RandomAccessFile}.
-	 * @throws NullPointerException Wenn das {@link RandomAccessFile} {@code null} ist. */
-	public FileDataTarget(final RandomAccessFile file) throws NullPointerException {
-		this.data = Objects.notNull(file);
+	 * @param data Nutzdaten.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
+	public FileDataTarget(final RandomAccessFile data) throws NullPointerException {
+		this.data = Objects.notNull(data);
 	}
 
 	/** {@inheritDoc} */

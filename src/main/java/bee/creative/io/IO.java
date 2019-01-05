@@ -142,124 +142,15 @@ public class IO {
 	 * @throws IOException Wenn der {@link DataSource} nicht erzeugt werden kann. */
 	public static DataSource inputDataFrom(final Object object) throws IOException {
 		if (object instanceof DataSource) return (DataSource)object;
-		if (object instanceof File) return IO.inputDataFrom((File)object);
-		if (object instanceof RandomAccessFile) return IO.inputDataFrom((RandomAccessFile)object);
-		if (object instanceof ByteArraySection) return IO.inputDataFrom((ByteArraySection)object);
-		if (object instanceof ByteArray) return IO.inputDataFrom((ByteArray)object);
-		if (object instanceof byte[]) return IO.inputDataFrom((byte[])object);
-		if (object instanceof DataInput) return IO.inputDataFrom((DataInput)object);
-		if (object instanceof InputStream) return IO.inputDataFrom((InputStream)object);
-		if (object instanceof ByteBuffer) return IO.inputDataFrom((ByteBuffer)object);
+		if (object instanceof File) return new FileDataSource((File)object);
+		if (object instanceof RandomAccessFile) return new FileDataSource((RandomAccessFile)object);
+		if (object instanceof ByteArraySection) return new ArrayDataSource((ByteArraySection)object);
+		if (object instanceof ByteArray) return new ArrayDataSource((ByteArray)object);
+		if (object instanceof byte[]) return new ArrayDataSource((byte[])object);
+		if (object instanceof DataInput) return new InputDataSource((DataInput)object);
+		if (object instanceof InputStream) return new StreamDataSource((InputStream)object);
+		if (object instanceof ByteBuffer) return new BufferDataSource((ByteBuffer)object);
 		throw new IOException();
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataSource inputDataFrom(final ByteBuffer object) {
-		return new BaseDataSource() {
-
-			@Override
-			public Object data() {
-				return object;
-			}
-
-			@Override
-			public void readFully(final byte[] b, final int off, final int len) throws IOException {
-				object.get(b, off, len);
-			}
-
-			@Override
-			public void seek(final long index) throws IOException {
-				try {
-					object.position((int)index);
-				} catch (final IllegalArgumentException cause) {
-					throw new IOException(cause);
-				}
-			}
-
-			@Override
-			public long index() throws IOException {
-				return object.position();
-			}
-
-			@Override
-			public long length() throws IOException {
-				return object.limit();
-			}
-
-		};
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataSource inputDataFrom(final byte[] object) {
-		return new ArrayDataSource(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataSource inputDataFrom(final ByteArray object) {
-		return new ArrayDataSource(object.section());
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataSource inputDataFrom(final ByteArraySection object) {
-		return new ArrayDataSource(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataSource inputDataFrom(final File object) throws IOException {
-		return new FileDataSource(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataSource inputDataFrom(final RandomAccessFile object) throws IOException {
-		return new FileDataSource(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataSource inputDataFrom(final DataInput object) {
-		return new BaseDataSource() {
-
-			@Override
-			public Object data() {
-				return object;
-			}
-
-			@Override
-			public void readFully(final byte[] b, final int off, final int len) throws IOException {
-				object.readFully(b, off, len);
-			}
-
-			@Override
-			public int skipBytes(final int n) throws IOException {
-				return object.skipBytes(n);
-			}
-
-		};
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataSource inputDataFrom(final InputStream object) {
-		return new BaseDataSource() {
-
-			@Override
-			public Object data() {
-				return object;
-			}
-
-			@Override
-			public void readFully(final byte[] b, int off, int len) throws IOException {
-				while (len != 0) {
-					final int cnt = object.read(b, off, len);
-					off += cnt;
-					len -= cnt;
-				}
-			}
-
-			@Override
-			public int skipBytes(final int n) throws IOException {
-				return (int)object.skip(n);
-			}
-
-		};
 	}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link ByteBuffer} zum Lesen und gibt diesen zurück. Hierbei werden folgende Datentypen für
@@ -335,21 +226,11 @@ public class IO {
 	 * @throws IOException Wenn der {@link InputStream} nicht erzeugt werden kann. */
 	public static InputStream inputStreamFrom(final Object object) throws IOException {
 		if (object instanceof InputStream) return (InputStream)object;
-		if (object instanceof File) return IO.inputStreamFrom((File)object);
+		if (object instanceof File) return new FileInputStream((File)object);
 		if (object instanceof ByteArraySection) return IO.inputStreamFrom((ByteArraySection)object);
 		if (object instanceof ByteArray) return IO.inputStreamFrom((ByteArray)object);
-		if (object instanceof byte[]) return IO.inputStreamFrom((byte[])object);
+		if (object instanceof byte[]) return new ByteArrayInputStream((byte[])object);
 		throw new IOException();
-	}
-
-	@SuppressWarnings ("javadoc")
-	static InputStream inputStreamFrom(final File object) throws IOException {
-		return new FileInputStream(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static InputStream inputStreamFrom(final byte[] object) {
-		return new ByteArrayInputStream(object);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -382,33 +263,13 @@ public class IO {
 	 * @throws IOException Wenn der {@link Reader} nicht erzeugt werden kann. */
 	public static Reader inputReaderFrom(final Object object) throws IOException {
 		if (object instanceof Reader) return (Reader)object;
-		if (object instanceof File) return IO.inputReaderFrom((File)object);
-		if (object instanceof InputStream) return IO.inputReaderFrom((InputStream)object);
+		if (object instanceof File) return new FileReader((File)object);
+		if (object instanceof InputStream) return new InputStreamReader((InputStream)object);
 		if (object instanceof CharacterArraySection) return IO.inputReaderFrom((CharacterArraySection)object);
 		if (object instanceof CharacterArray) return IO.inputReaderFrom((CharacterArray)object);
-		if (object instanceof char[]) return IO.inputReaderFrom((char[])object);
-		if (object instanceof String) return IO.inputReaderFrom((String)object);
+		if (object instanceof char[]) return new CharArrayReader((char[])object);
+		if (object instanceof String) return new StringReader((String)object);
 		throw new IOException();
-	}
-
-	@SuppressWarnings ("javadoc")
-	static Reader inputReaderFrom(final File object) throws IOException {
-		return new FileReader(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static Reader inputReaderFrom(final char[] object) throws IOException {
-		return new CharArrayReader(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static Reader inputReaderFrom(final String object) throws IOException {
-		return new StringReader(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static Reader inputReaderFrom(final InputStream object) throws IOException {
-		return new InputStreamReader(object);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -447,29 +308,14 @@ public class IO {
 	 * @throws IOException Wenn der {@link DataTarget} nicht erzeugt werden kann. */
 	public static DataTarget outputDataFrom(final Object object) throws IOException {
 		if (object instanceof DataTarget) return (DataTarget)object;
-		if (object instanceof File) return IO.outputDataFrom((File)object);
-		if (object instanceof RandomAccessFile) return IO.outputDataFrom((RandomAccessFile)object);
-		if (object instanceof CompactByteArray) return IO.outputDataFrom((CompactByteArray)object);
+		if (object instanceof File) return new FileDataTarget((File)object);
+		if (object instanceof RandomAccessFile) return new FileDataTarget((RandomAccessFile)object);
+		if (object instanceof CompactByteArray) return new ArrayDataTarget((CompactByteArray)object);
 		if (object instanceof ByteArray) return IO.outputDataFrom((ByteArray)object);
-		if (object instanceof DataOutput) return IO.outputDataFrom((DataOutput)object);
-		if (object instanceof OutputStream) return IO.outputDataFrom((OutputStream)object);
-		if (object instanceof ByteBuffer) return IO.outputDataFrom((ByteBuffer)object);
+		if (object instanceof DataOutput) return new OutputDataTarget((DataOutput)object);
+		if (object instanceof OutputStream) return new StreamDataTarget((OutputStream)object);
+		if (object instanceof ByteBuffer) return new BufferDataTarget((ByteBuffer)object);
 		throw new IOException();
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataTarget outputDataFrom(final File object) throws IOException {
-		return new FileDataTarget(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataTarget outputDataFrom(final RandomAccessFile object) throws IOException {
-		return new FileDataTarget(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataTarget outputDataFrom(final CompactByteArray object) throws IOException {
-		return new ArrayDataTarget(object);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -484,50 +330,6 @@ public class IO {
 			@Override
 			public void write(final byte[] b, final int off, final int len) throws IOException {
 				object.addAll(ByteArraySection.from(b, off, off + len));
-			}
-
-		};
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataTarget outputDataFrom(final ByteBuffer object) {
-		return new BufferDataTarget(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataTarget outputDataFrom(final DataOutput object) {
-		return new BaseDataTarget() {
-
-			@Override
-			public Object data() {
-				return object;
-			}
-
-			@Override
-			public void write(final byte[] b, final int off, final int len) throws IOException {
-				object.write(b, off, len);
-			}
-
-		};
-	}
-
-	@SuppressWarnings ("javadoc")
-	static DataTarget outputDataFrom(final OutputStream object) {
-		return new BaseDataTarget() {
-
-			@Override
-			public Object data() {
-				return object;
-			}
-
-			@Override
-			public void write(final byte[] b, final int off, final int len) throws IOException {
-				object.write(b, off, len);
-			}
-
-			@Override
-			public void close() throws IOException {
-				object.close();
 			}
 
 		};
@@ -606,14 +408,9 @@ public class IO {
 	 * @throws IOException Wenn der {@link OutputStream} nicht erzeugt werden kann. */
 	public static OutputStream outputStreamFrom(final Object object) throws IOException {
 		if (object instanceof OutputStream) return (OutputStream)object;
-		if (object instanceof File) return IO.outputStreamFrom((File)object);
+		if (object instanceof File) return new FileOutputStream((File)object);
 		if (object instanceof ByteArray) return IO.outputStreamFrom((ByteArray)object);
 		throw new IOException();
-	}
-
-	@SuppressWarnings ("javadoc")
-	static OutputStream outputStreamFrom(final File object) throws IOException {
-		return new FileOutputStream(object);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -653,21 +450,11 @@ public class IO {
 	 * @throws IOException Wenn der {@link OutputStream} nicht erzeugt werden kann. */
 	public static Writer outputWriterFrom(final Object object) throws IOException {
 		if (object instanceof Writer) return (Writer)object;
-		if (object instanceof File) return IO.outputWriterFrom((File)object);
-		if (object instanceof OutputStream) return IO.outputWriterFrom((OutputStream)object);
+		if (object instanceof File) return new FileWriter((File)object);
+		if (object instanceof OutputStream) return new OutputStreamWriter((OutputStream)object);
 		if (object instanceof CharacterArray) return IO.outputWriterFrom((CharacterArray)object);
 		if (object instanceof StringBuilder) return IO.outputWriterFrom((StringBuilder)object);
 		throw new IOException();
-	}
-
-	@SuppressWarnings ("javadoc")
-	static Writer outputWriterFrom(final File object) throws IOException {
-		return new FileWriter(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static Writer outputWriterFrom(final OutputStream object) throws IOException {
-		return new OutputStreamWriter(object);
 	}
 
 	@SuppressWarnings ("javadoc")

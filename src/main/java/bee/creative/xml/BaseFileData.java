@@ -2,13 +2,13 @@ package bee.creative.xml;
 
 import java.io.File;
 import java.net.URI;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 
 /** Diese Klasse implementiert den Konfigurator eines {@link File}.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseFileData<GThis> extends BaseValueBuilder<File, GThis> {
+public abstract class BaseFileData<GThis> extends BaseItemBuilder<File, GThis> {
 
 	/** Diese Methode setzt den Wert auf {@link File#File(String) new File(filePath)} und gibt {@code this} zurück.
 	 *

@@ -7,7 +7,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder}.
@@ -41,7 +41,7 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class HandlerData<GOwner> extends BaseValueBuilder<ErrorHandler, HandlerData<GOwner>> {
+	public static abstract class HandlerData<GOwner> extends BaseItemBuilder<ErrorHandler, HandlerData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -61,7 +61,7 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ResolverData<GOwner> extends BaseValueBuilder<EntityResolver, ResolverData<GOwner>> {
+	public static abstract class ResolverData<GOwner> extends BaseItemBuilder<EntityResolver, ResolverData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

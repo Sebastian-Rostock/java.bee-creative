@@ -1,43 +1,66 @@
 package bee.creative.io;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import bee.creative.util.Objects;
 
-public  class BufferDataTarget extends BaseDataTarget {
+/** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link ByteBuffer}.
+ *
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public class BufferDataTarget extends BaseDataTarget {
 
+	/** Dieses Feld speichert die Nutzdaten. */
 	protected final ByteBuffer data;
 
-	public BufferDataTarget(ByteBuffer data) {
-		this.data = data.slice().order(ByteOrder.BIG_ENDIAN);
+	/** Dieser Konstruktor initialisiert die Nutzdaten.
+	 *
+	 * @param data Nutzdaten.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
+	public BufferDataTarget(final ByteBuffer data) throws NullPointerException {
+		this.data = Objects.notNull(data);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public Object data() {
-		return data;
+		return this.data;
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public void write(final byte[] b, final int off, final int len) throws IOException {
-		data.put(b, off, len);
+	public void write(final byte[] array, final int offset, final int length) throws IOException {
+		try {
+			this.data.put(array, offset, length);
+		} catch (final BufferUnderflowException e) {
+			throw new EOFException();
+		} catch (final IndexOutOfBoundsException e) {
+			throw new EOFException();
+		}
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
+		if ((index < 0) || (index > this.length())) throw new IOException();
 		try {
-			data.position((int)index);
+			this.data.position((int)index);
 		} catch (final IllegalArgumentException cause) {
 			throw new IOException(cause);
 		}
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
-		return data.position();
+		return this.data.position();
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
-		return data.limit();
+		return this.data.limit();
 	}
+
 }

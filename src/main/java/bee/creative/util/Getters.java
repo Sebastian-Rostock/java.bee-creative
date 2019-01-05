@@ -659,7 +659,7 @@ public class Getters {
 	 * @param mutex Synchronisationsobjekt oder {@code null}.
 	 * @param getter {@link Getter}.
 	 * @return {@code synchronized}-{@link Getter}.
-	 * @throws NullPointerException Wenn der {@code getter} bzw. {@code mutex} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code getter} bzw. {@code mutex} {@code null} ist. */
 	public static <GItem, GValue> Getter<GItem, GValue> synchronizedGetter(final Object mutex, final Getter<? super GItem, ? extends GValue> getter)
 		throws NullPointerException {
 		return new SynchronizedGetter<>(mutex, getter);

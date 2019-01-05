@@ -7,7 +7,7 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link XPath}.
@@ -41,7 +41,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 * @see XPath#setNamespaceContext(NamespaceContext)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ContextData<GOwner> extends BaseValueBuilder<NamespaceContext, ContextData<GOwner>> {
+	public static abstract class ContextData<GOwner> extends BaseItemBuilder<NamespaceContext, ContextData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -61,7 +61,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 * @see XPath#setXPathVariableResolver(XPathVariableResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class VariableData<GOwner> extends BaseValueBuilder<XPathVariableResolver, VariableData<GOwner>> {
+	public static abstract class VariableData<GOwner> extends BaseItemBuilder<XPathVariableResolver, VariableData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -81,7 +81,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 * @see XPath#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class FunctionData<GOwner> extends BaseValueBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
+	public static abstract class FunctionData<GOwner> extends BaseItemBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

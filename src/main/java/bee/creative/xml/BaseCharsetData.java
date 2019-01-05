@@ -4,14 +4,14 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 
 /** Diese Klasse implementiert den Konfigurator eines {@link Charset}. Initialisiert wird dieses {@link Charset} über {@link #useDEFAULT()}.
  *
  * @see Charset#forName(String)
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseCharsetData<GThis> extends BaseValueBuilder<Charset, GThis> {
+public abstract class BaseCharsetData<GThis> extends BaseItemBuilder<Charset, GThis> {
 
 	/** Dieser Konstruktor initialisiert das {@link Charset} über {@link #useDEFAULT()}. */
 	public BaseCharsetData() {

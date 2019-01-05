@@ -9,8 +9,8 @@ import java.util.Map;
 import bee.creative.emu.EMU;
 
 /** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüssel- und Wertobjekten. Das {@link #get(Object)
- * Finden} sowie {@link #put(Object, Object) Einfügen} von Einträgen benötigt ca. 50 % der Rechenzeit, die eine {@link java.util.HashMap} benötigen würde. Das
- * {@link #remove(Object) Entfernen} von Einträge liegt dazu bei ca. 80 % der Rechenzeit.
+ * Finden} von Einträgen benötigt ca. 75 % der Rechenzeit, die eine {@link java.util.HashMap} benötigen würde. {@link #put(Object, Object) Einfügen} und 
+ * {@link #remove(Object) Entfernen} von Einträge liegen dazu bei ca. 55 % bzw. 95 % der Rechenzeit.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
@@ -24,6 +24,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		private static final long serialVersionUID = -4549473363883050977L;
 
 		public final Hasher hasher;
+
 
 		public HasherHashMap(final Hasher hasher) {
 			this.hasher = Objects.notNull(hasher);

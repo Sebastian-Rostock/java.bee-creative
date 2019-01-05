@@ -11,7 +11,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMResult;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #marshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Marshaller}.
@@ -23,7 +23,7 @@ public final class XMLMarshaller {
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class SourceData extends BaseValueBuilder<Object, SourceData> {
+	public final class SourceData extends BaseItemBuilder<Object, SourceData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

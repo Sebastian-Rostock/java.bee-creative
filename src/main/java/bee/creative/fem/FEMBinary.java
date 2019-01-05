@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
+import bee.creative.iam.IAMArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 import bee.creative.util.Iterables;
@@ -110,6 +111,29 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			++index;
 			this.index = index;
 			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class ArrayBinary extends FEMBinary {
+
+		public final IAMArray items;
+
+		public ArrayBinary(final IAMArray items) throws NullPointerException, IllegalArgumentException {
+			super(items.length() - 4);
+			this.hash = Integers.toInt(items.get(0), items.get(1), items.get(2), items.get(3));
+			this.items = items;
+		}
+
+		@Override
+		public FEMBinary compact() {
+			return this;
+		}
+
+		@Override
+		protected byte customGet(final int index) throws IndexOutOfBoundsException {
+			return (byte)this.items.get(index + 4);
 		}
 
 	}
@@ -562,6 +586,19 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return FEMBinary.from(Iterables.toList(items));
 	}
 
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Bytefolge und gibt diese zurück. Die ersten vier Byte der Zahlenfolge werden als
+	 * {@link #hashCode() Streuwert} und die darauf folgenden Zahlenwerte als Auflistung der Bytes interpretiert. Die {@link IAMArray#mode() Größe der
+	 * Zahlenwerte} muss eine 8-Bit-Kodierung anzeigen.
+	 *
+	 * @param array Zahlenfolge.
+	 * @return {@link FEMBinary}-Sicht auf die gegebene Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	public static FEMBinary from(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+		if (array.mode() != 1) throw new IllegalArgumentException();
+		return new ArrayBinary(array);
+	}
+
 	/** Diese Methode gibt die Verkettung der gegebenen Bytefolgen zurück.
 	 *
 	 * @see #concat(FEMBinary)
@@ -986,6 +1023,20 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			}
 
 		};
+	}
+
+	/** Diese Methode gibt eine Zahlenfolge zurück, welche die Bytes dieser Bytefolge enthält. Sie ist die Umkehroperation zu {@link #from(IAMArray)}.
+	 *
+	 * @return Zahlenfolge mit den kodierten Bytes dieser Bytefolge. */
+	public final IAMArray toArray() {
+		final byte[] array = new byte[this.length + 4];
+		final int hash = this.hash;
+		array[0] = (byte)(hash >>> 0);
+		array[1] = (byte)(hash >>> 8);
+		array[2] = (byte)(hash >>> 16);
+		array[3] = (byte)(hash >>> 24);
+		this.extract(new ValueCollector(array, 4));
+		return IAMArray.from(array);
 	}
 
 	/** {@inheritDoc} */

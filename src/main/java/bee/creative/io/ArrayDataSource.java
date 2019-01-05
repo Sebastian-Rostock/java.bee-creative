@@ -2,16 +2,12 @@ package bee.creative.io;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.nio.ByteOrder;
 import bee.creative.array.ByteArray;
 import bee.creative.array.ByteArraySection;
-import bee.creative.util.Bytes;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einer {@link ByteArraySection}. Die Dekidierung der Zahlen erfolgt über {@link Bytes} und
- * damit in {@link ByteOrder#BIG_ENDIAN}.
+/** Diese Klasse implementiert die {@link DataSource}-Schnittstelle zu einer {@link ByteArraySection}. 
  *
- * @see ByteArraySection
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ArrayDataSource extends BaseDataSource {
 
@@ -24,7 +20,7 @@ public class ArrayDataSource extends BaseDataSource {
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 *
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
 	public ArrayDataSource(final byte... data) throws NullPointerException {
 		this.data = ByteArraySection.from(data);
 	}
@@ -32,7 +28,7 @@ public class ArrayDataSource extends BaseDataSource {
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 *
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
 	public ArrayDataSource(final ByteArray data) throws NullPointerException {
 		this.data = data.section();
 	}
@@ -40,7 +36,7 @@ public class ArrayDataSource extends BaseDataSource {
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 *
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
 	public ArrayDataSource(final ByteArraySection data) throws NullPointerException {
 		this.data = Objects.notNull(data);
 	}

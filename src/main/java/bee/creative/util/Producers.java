@@ -354,7 +354,7 @@ public class Producers {
 	 * @param mutex Synchronisationsobjekt oder {@code null}.
 	 * @param producer {@link Producer}.
 	 * @return {@code synchronized}-{@link Producer}.
-	 * @throws NullPointerException Wenn der {@code producer} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code producer} {@code null} ist. */
 	public static <GValue> Producer<GValue> synchronizedProducer(final Object mutex, final Producer<? extends GValue> producer) throws NullPointerException {
 		return new SynchronizedProducer<>(mutex, producer);
 	}

@@ -94,7 +94,7 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode gibt den Platzhalter der Funktion mit dem gegebenen Namen zurück.
 	 *
-	 * @param name Name des Platzhalters.
+	 * @param name {@link FEMProxy#from(String) Name und Kennung} des Platzhalters.
 	 * @return Platzhalterfunktion.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
 	public FEMProxy proxy(final String name) throws NullPointerException {

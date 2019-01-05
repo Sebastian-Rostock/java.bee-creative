@@ -3,11 +3,12 @@ package bee.creative.io;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import bee.creative.util.Bytes;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert einen abstrakten {@link DataTarget}.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class BaseDataTarget implements DataTarget {
+public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 
 	/** Dieses Feld speichert den Schreibpuffer. */
 	protected final byte[] array = new byte[8];
@@ -98,12 +99,11 @@ public abstract class BaseDataTarget implements DataTarget {
 
 	/** {@inheritDoc} */
 	@Override
+	@SuppressWarnings ("deprecation")
 	public void writeBytes(final String s) throws IOException {
 		final int len = s.length();
 		final byte[] data = new byte[len];
-		for (int i = 0; i < len; i++) {
-			Bytes.setInt1(data, i, s.charAt(i));
-		}
+		s.getBytes(0, len, data, 0);
 		this.write(data);
 	}
 

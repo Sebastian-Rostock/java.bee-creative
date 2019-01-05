@@ -227,7 +227,7 @@ public class Tester {
 	 * {@link Runtime#gc()}.
 	 *
 	 * @param method Testmethode.
-	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
 	public Tester(final Method method) throws NullPointerException {
 		this(-1, method);
 	}

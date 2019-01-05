@@ -6,7 +6,7 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link XPathFactory}.
@@ -21,7 +21,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ModelData<GOwner> extends BaseValueBuilder<String, ModelData<GOwner>> {
+	public static abstract class ModelData<GOwner> extends BaseItemBuilder<String, ModelData<GOwner>> {
 
 		/** Dieser Konstruktor initialisiert den Wert über {@link #useDEFAULT_OBJECT_MODEL_URI()}. */
 		public ModelData() {
@@ -30,7 +30,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 
 		/** Diese Methode setzt den Wert auf {@link XPathFactory#DEFAULT_OBJECT_MODEL_URI} und gibt {@code this} zurück.
 		 *
-		 * @see #use(BaseValueBuilder)
+		 * @see #use(BaseItemBuilder)
 		 * @return {@code this}. */
 		public final ModelData<GOwner> useDEFAULT_OBJECT_MODEL_URI() {
 			return super.use(XPathFactory.DEFAULT_OBJECT_MODEL_URI);
@@ -74,7 +74,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class VariableData<GOwner> extends BaseValueBuilder<XPathVariableResolver, VariableData<GOwner>> {
+	public static abstract class VariableData<GOwner> extends BaseItemBuilder<XPathVariableResolver, VariableData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -94,7 +94,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class FunctionData<GOwner> extends BaseValueBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
+	public static abstract class FunctionData<GOwner> extends BaseItemBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

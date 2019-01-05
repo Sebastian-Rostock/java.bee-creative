@@ -10,7 +10,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseMapBuilder2;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link TransformerFactory} zur Erzeugung von {@link Templates} oder eines
@@ -67,7 +67,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ListenerData<GOwner> extends BaseValueBuilder<ErrorListener, ListenerData<GOwner>> {
+	public static abstract class ListenerData<GOwner> extends BaseItemBuilder<ErrorListener, ListenerData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -87,7 +87,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ResolverData<GOwner> extends BaseValueBuilder<URIResolver, ResolverData<GOwner>> {
+	public static abstract class ResolverData<GOwner> extends BaseItemBuilder<URIResolver, ResolverData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

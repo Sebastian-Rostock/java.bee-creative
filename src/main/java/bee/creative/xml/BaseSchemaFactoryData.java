@@ -8,7 +8,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseMapBuilder2;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link SchemaFactory}.
@@ -62,7 +62,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setErrorHandler(ErrorHandler)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class HandlerData<GOwner> extends BaseValueBuilder<ErrorHandler, HandlerData<GOwner>> {
+	public static abstract class HandlerData<GOwner> extends BaseItemBuilder<ErrorHandler, HandlerData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -82,7 +82,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setResourceResolver(LSResourceResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ResolverData<GOwner> extends BaseValueBuilder<LSResourceResolver, ResolverData<GOwner>> {
+	public static abstract class ResolverData<GOwner> extends BaseItemBuilder<LSResourceResolver, ResolverData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -103,7 +103,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class LanguageData<GOwner> extends BaseValueBuilder<String, LanguageData<GOwner>> {
+	public static abstract class LanguageData<GOwner> extends BaseItemBuilder<String, LanguageData<GOwner>> {
 
 		/** Dieser Konstruktor initialisiert den Wert über {@link #useW3C_XML_SCHEMA_NS_URI()}. */
 		public LanguageData() {

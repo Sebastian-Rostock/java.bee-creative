@@ -7,22 +7,30 @@ import bee.creative.util.Property;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert. Der Platzhalter wird zur erzeugung rekursiver Funktionsaufrufe eingesetz, weshalb {@link #hashCode() Streuwert} und
- * {@link #equals(Object) Äquivalenz} nicht auf diesem, sondren auf einer gegebenen {@link #id() Kennung} aufbauen.
+ * {@link #equals(Object) Äquivalenz} nicht auf diesem, sondern auf extra dafür bereit gestellten {@link #id() Kennung} aufbauen.
  *
  * @see FEMCompiler#proxy(String)
  * @see FEMCompiler#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMProxy extends FEMFunction implements Property<FEMFunction>, Emuable {
 
-	public static FEMProxy from(final String id) {
+	/** Diese Methode ist eine Abkürzung für {@link #from(FEMString) FEMProxy.from(FEMString.from(id))}. */
+	public static FEMProxy from(final String id) throws NullPointerException {
 		return FEMProxy.from(FEMString.from(id));
 	}
 
-	public static FEMProxy from(final FEMString id) {
+	/** Diese Methode ist eine Abkürzung für {@link #from(FEMValue, FEMString) FEMProxy.from(id, id)}. */
+	public static FEMProxy from(final FEMString id) throws NullPointerException {
 		return FEMProxy.from(id, id);
 	}
 
-	public static FEMProxy from(final FEMValue id, final FEMString name) {
+	/** Diese Methode gibt einen neuen Platzhalter mit den gegebenen Merkmalen zurück.
+	 * 
+	 * @param id Kennung.
+	 * @param name Name.
+	 * @return Platzhalter.
+	 * @throws NullPointerException Wenn {@code id} bzw. {@code name} {@code null} ist. */
+	public static FEMProxy from(final FEMValue id, final FEMString name) throws NullPointerException {
 		return new FEMProxy(id, name, null);
 	}
 

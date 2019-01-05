@@ -12,7 +12,7 @@ import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseMapBuilder2;
 import bee.creative.util.Builders.BaseSetBuilder2;
-import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Objects;
 import bee.creative.xml.BaseDocumentBuilderFactoryData.SchemaData;
 
@@ -88,7 +88,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 	 * @see Marshaller#setListener(Listener)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ListenerData<GOwner> extends BaseValueBuilder<Listener, ListenerData<GOwner>> {
+	public static abstract class ListenerData<GOwner> extends BaseItemBuilder<Listener, ListenerData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -128,7 +128,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 	 * @see Marshaller#setEventHandler(ValidationEventHandler)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ValidationData<GOwner> extends BaseValueBuilder<ValidationEventHandler, ValidationData<GOwner>> {
+	public static abstract class ValidationData<GOwner> extends BaseItemBuilder<ValidationEventHandler, ValidationData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

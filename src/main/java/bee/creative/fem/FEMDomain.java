@@ -1060,9 +1060,8 @@ public class FEMDomain extends BaseObject {
 		target.putToken(source.toString());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.formatConst(name, false)}.
+	/** Diese Methode ist eine Abkürzung für {@link #formatConst(String, boolean) this.formatConst(name, false)}.
 	 *
-	 * @see #formatConst(String, boolean)
 	 * @param string Zeichenkette.
 	 * @return gegebene bzw. formateirte Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */

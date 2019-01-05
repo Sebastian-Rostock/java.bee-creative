@@ -62,7 +62,7 @@ class FEMCodec implements Property<FEMValue> {
 		/** {@inheritDoc} */
 		@Override
 		protected int customFind(final FEMValue that, final int offset, int length, final boolean foreward) {
-			// (value[length], hash[1], index[length], range[count], length[1])
+			// items = (value[length], hash[1], index[length], range[count], length[1])
 			final int count = (this.length() * 2) + 1, index = (that.hashCode() & (this.items.length() - count - 3)) + count;
 			int l = this.items.get(index), r = this.items.get(index + 1) - 1;
 			length += offset;
@@ -80,33 +80,6 @@ class FEMCodec implements Property<FEMValue> {
 				}
 			}
 			return -1;
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein {@link FEMBinary Bytefolge}, deren Bytes als {@link IAMArray Zahlenfolge} gegeben sind. */
-	protected static class IndexBinary extends FEMBinary {
-
-		/** Dieses Feld speichert eine Zahlenfolge mit den Bytes sowie dem Streuwert der Bytefolge in der Struktur
-		 * {@code (byte1, ..., byteN, hash1, hash2, hash3, hash4)}. Die Zahlenfolge ist damit stets um vier länger als die Bytefolge. */
-		public final IAMArray items;
-
-		@SuppressWarnings ("javadoc")
-		public IndexBinary(final IAMArray items) throws NullPointerException, IllegalArgumentException {
-			super(items.length() - 4);
-			final int index = this.length();
-			this.hash = Integers.toInt(items.get(index + 0), items.get(index + 1), items.get(index + 2), items.get(index + 3));
-			this.items = items;
-		}
-
-		@Override
-		public FEMBinary compact() {
-			return this;
-		}
-
-		@Override
-		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			return (byte)this.items.get(index);
 		}
 
 	}
@@ -663,14 +636,7 @@ class FEMCodec implements Property<FEMValue> {
 	 * @return Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 	public IAMArray getBinaryArray(final FEMBinary source) throws NullPointerException {
-		final int hash = source.hashCode(), index = source.length();
-		final byte[] result = new byte[index + 4];
-		result[index + 0] = (byte)(hash >>> 0);
-		result[index + 1] = (byte)(hash >>> 8);
-		result[index + 2] = (byte)(hash >>> 16);
-		result[index + 3] = (byte)(hash >>> 24);
-		source.extract(result, 0);
-		return IAMArray.from(result);
+		return source.toArray();
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #getIntegerValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Dezimalzahl enthält.
@@ -733,8 +699,7 @@ class FEMCodec implements Property<FEMValue> {
 		return this.getIntegerArrayImpl(source.value());
 	}
 
-	
-	// TODO 
+	// TODO
 	/** Diese Methode ist die Umkehroperation zu {@link #getProxyFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsaufruf enthält.
 	 *
 	 * @param source Funktionsaufruf.
@@ -854,16 +819,14 @@ class FEMCodec implements Property<FEMValue> {
 		};
 	}
 
-	/** Diese Methode gibt die Bytefolge zur gegebenen Zahlenfolge zurück. Dabei werden die ersten vier Byte der Zahlenfolge als {@link FEMBinary#hashCode()
-	 * Streuwert} und die darauf folgenden als Bytes der Bytefolge interpretiert.
+	/** Diese Methode gibt die Bytefolge zur gegebenen Zahlenfolge zurück, deren Bytes in der gegebenen Zahlenfolge {@link FEMBinary#toArray() kodiert} sind.
 	 *
 	 * @param source Zahlenfolge.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link IAMArray#mode() INT8/UINT8} vorliegt. */
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public FEMBinary getBinaryValue(final IAMArray source) {
-		if (source.mode() != 1) throw new IllegalArgumentException();
-		return new IndexBinary(source);
+		return FEMBinary.from(source);
 	}
 
 	/** Diese Methode gibt eine Sicht auf die Liste aller Bytefolgen zurück.
