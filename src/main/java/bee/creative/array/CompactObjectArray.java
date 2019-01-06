@@ -1,14 +1,19 @@
 package bee.creative.array;
 
+import java.lang.reflect.Array;
 import java.util.Comparator;
+import java.util.List;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert ein {@link ObjectArray} als {@link CompactArray}.
- *
+/** Diese Klasse implementiert ein {@link ObjectArray} als {@link CompactArray}. Das {@link List#add(int, Object) Einfügen} von Elementen an beliebigen
+ * Positionen in die über {@link #values()} bereit gestellte {@link List}-Sicht benötigt im Durchschnitt ca. 45 % der Rechenzeit, die ein
+ * {@link java.util.ArrayList} benötigen würde. Das {@link List#remove(int) Entfernen} von Elementen an beliebigen Positionen liegt dazu bei ca. 37 % der
+ * Rechenzeit.
+ * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ der Elemente. */
-public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> implements ObjectArray<GValue>, Comparator<GValue> {
+public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> implements ObjectArray<GValue>, Comparator<GValue> {
 
 	/** Diese Klasse implementiert ein {@link ObjectArray} als modifizierbare Sicht auf einen Teil eines {@link CompactObjectArray}.
 	 *
@@ -194,18 +199,16 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/** Dieses Feld speichert das {@code GValue}-Array. */
 	protected GValue[] array;
 
-	/** Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}. */
-	public CompactObjectArray() {
-		super();
-	}
+	/** Dieses Feld speichert die Klasse der Elemente zur Erzeugung des {@link #array} in {@link #customNewArray(int)} über
+	 * {@link Array#newInstance(Class, int)}. */
+	protected final Class<? extends GValue> valueClass;
 
-	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
+	/** Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
 	 *
-	 * @see ArrayData#allocate(int)
-	 * @param capacity Kapazität.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
-	public CompactObjectArray(final int capacity) throws IllegalArgumentException {
-		super(capacity);
+	 * @param valueClass Klasse der Elemente für {@link #customNewArray(int)}.
+	 * @throws NullPointerException Wenn {@code valueClass} {@code null} ist. */
+	public CompactObjectArray(final Class<? extends GValue> valueClass) throws NullPointerException {
+		this(valueClass, 0);
 	}
 
 	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
@@ -213,12 +216,28 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 *
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)
+	 * @param valueClass Klasse der Elemente für {@link #customNewArray(int)}.
 	 * @param section {@link ArraySection}.
-	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
+	 * @throws NullPointerException Wenn {@code valueClass}, {@code section} bzw. {@code section.array()} {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
 	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
-	public CompactObjectArray(final ArraySection<? extends GValue[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public CompactObjectArray(final Class<? extends GValue> valueClass, final ArraySection<? extends GValue[]> section)
+		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
+		this.valueClass = Objects.notNull(valueClass);
+	}
+
+	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
+	 *
+	 * @see ArrayData#allocate(int)
+	 * @param valueClass Klasse der Elemente für {@link #customNewArray(int)}.
+	 * @param capacity Kapazität.
+	 * @throws NullPointerException Wenn {@code valueClass} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
+	@SuppressWarnings ("unchecked")
+	public CompactObjectArray(final Class<? extends GValue> valueClass, final int capacity) throws NullPointerException, IllegalArgumentException {
+		this(valueClass, ObjectArraySection.from((GValue[])Array.newInstance(valueClass, capacity), 0, 0));
+		this.customSetCapacity(capacity);
 	}
 
 	/** {@inheritDoc} */
@@ -249,6 +268,13 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	@SuppressWarnings ("unchecked")
+	protected GValue[] customNewArray(final int length) {
+		return (GValue[])Array.newInstance(this.valueClass, length);
 	}
 
 	/** {@inheritDoc} */

@@ -19,13 +19,8 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @return {@link ObjectArraySection}.
 	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
 	@SafeVarargs
-	public static <GValue extends Comparable<? super GValue>> ObjectArraySection<GValue> from(final GValue... array) throws NullPointerException {
+	public static <GValue> ObjectArraySection<GValue> from(final GValue... array) throws NullPointerException {
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
-
-			@Override
-			protected int customCompare(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
-				return Comparators.compare(array1[index1], array2[index2]);
-			}
 
 			@Override
 			public GValue[] array() {
@@ -91,15 +86,9 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
-	public static <GValue extends Comparable<? super GValue>> ObjectArraySection<GValue> from(final GValue[] array, final int startIndex, final int finalIndex)
+	public static <GValue> ObjectArraySection<GValue> from(final GValue[] array, final int startIndex, final int finalIndex)
 		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
-
-			/** {@inheritDoc} */
-			@Override
-			protected int customCompare(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
-				return Comparators.compare(array1[index1], array2[index2]);
-			}
 
 			@Override
 			public GValue[] array() {
@@ -172,14 +161,20 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 
 	/** {@inheritDoc} */
 	@Override
-	protected boolean customEquals(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
-		return Objects.equals(array1[index1], array2[index2]);
+	protected void customPrint(final GValue[] array, final int index, final StringBuilder target) {
+		target.append(array[index]);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void customPrint(final GValue[] array, final int index, final StringBuilder target) {
-		target.append(array[index]);
+	protected boolean customEquals(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+		return Objects.equals(array1[index1], array2[index2]);
+	}
+
+	@Override
+	@SuppressWarnings ({"unchecked", "rawtypes"})
+	protected int customCompare(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+		return Comparators.compare((Comparable)array1[index1], (Comparable)array2[index2]);
 	}
 
 	/** {@inheritDoc} */

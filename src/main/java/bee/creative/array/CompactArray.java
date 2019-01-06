@@ -359,7 +359,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	public CompactArray(final int capacity) throws IllegalArgumentException {
 		if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
 		this.customSetArray(this.customNewArray(capacity));
-		this.allocate(capacity);
+		this.customSetCapacity(capacity);
 	}
 
 	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen

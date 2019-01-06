@@ -29,14 +29,13 @@ abstract class CompactData {
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static final class CompactDataArray extends CompactObjectArray<Object> {
 
+		public CompactDataArray( ) throws NullPointerException {
+			super(Object.class);
+		}
+
 		/** Dieses Feld speichert das leere Array. */
 		static final Object[] empty = new Object[0];
-
-		/** {@inheritDoc} */
-		@Override
-		public int compare(final Object o1, final Object o2) {
-			return 0;
-		}
+ 
 
 		/** {@inheritDoc} */
 		@Override
