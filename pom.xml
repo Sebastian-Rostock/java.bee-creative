@@ -4,7 +4,7 @@
 	<groupId>bee-creative</groupId>
 	<artifactId>bee-creative</artifactId>
 	<version>13.0.1.223</version>
-	<name>bee-creative</name> 
+	<name>bee-creative</name>
 	<description>TODO</description>
 	<licenses>
 		<license>
@@ -16,6 +16,9 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 [ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]</comments>
 		</license>
 	</licenses>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
@@ -30,6 +33,7 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
