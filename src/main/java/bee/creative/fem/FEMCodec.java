@@ -84,7 +84,7 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static abstract class BaseCache<GItem> implements Items<GItem> {
+	protected static abstract class ItemCache<GItem> implements Items<GItem> {
 
 		Object[] items = {};
 

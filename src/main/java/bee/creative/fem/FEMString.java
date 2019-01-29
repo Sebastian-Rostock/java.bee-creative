@@ -651,11 +651,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public FEMString concat(final FEMString value) throws NullPointerException {
-			return value.reverse().concat(this.string).reverse();
-		}
-
-		@Override
 		public FEMString section(final int offset, final int length2) throws IllegalArgumentException {
 			return this.string.section(this.length - offset - length2, length2).reverse();
 		}
@@ -1593,6 +1588,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *
 	 * @return rückwärts geordnete {@link FEMString}-Sicht auf diese Zeichenkette. */
 	public FEMString reverse() {
+		if (this.length < 2) return this;
 		return new ReverseString(this);
 	}
 

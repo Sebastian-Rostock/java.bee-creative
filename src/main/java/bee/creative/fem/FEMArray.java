@@ -238,11 +238,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public FEMArray concat(final FEMArray that) throws NullPointerException {
-			return that.reverse().concat(this.array).reverse();
-		}
-
-		@Override
 		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 			return this.array.section(this.length - offset - length, length).reverse();
 		}
@@ -681,6 +676,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 *
 	 * @return rückwärts geordnete {@link FEMArray}-Sicht auf diese Wertliste. */
 	public FEMArray reverse() {
+		if (this.length < 2) return this;
 		return new ReverseArray(this);
 	}
 

@@ -337,11 +337,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		public FEMBinary concat(final FEMBinary that) throws NullPointerException {
-			return that.reverse().concat(this.binary).reverse();
-		}
-
-		@Override
 		public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
 			return this.binary.section(this.length - offset - length, length).reverse();
 		}
@@ -767,6 +762,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 *
 	 * @return rückwärts geordnete {@link FEMBinary}-Sicht auf diese Bytefolge. */
 	public FEMBinary reverse() {
+		if (this.length < 2) return this;
 		return new ReverseBinary(this);
 	}
 
