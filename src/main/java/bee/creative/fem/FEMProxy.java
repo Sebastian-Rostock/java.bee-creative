@@ -25,7 +25,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	}
 
 	/** Diese Methode gibt einen neuen Platzhalter mit den gegebenen Merkmalen zurück.
-	 * 
+	 *
 	 * @param id Kennung.
 	 * @param name Name.
 	 * @return Platzhalter.
@@ -108,11 +108,13 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 		return this.target.invoke(frame);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return this.id.hashCode();
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

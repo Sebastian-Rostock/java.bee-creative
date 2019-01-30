@@ -85,10 +85,10 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 			public final FEMFrame frame;
 
 			/** Dieses Feld speichert das Array der Parameterwerte, das nicht verändert werden darf. */
-			public final FEMValue[] values;
+			final FEMValue[] values;
 
 			/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
-			public final FEMFunction[] functions;
+			final FEMFunction[] functions;
 
 			Params(final FEMFrame frame, final FEMFunction[] params) {
 				super(params.length);
@@ -119,7 +119,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 					if (result != null) return result;
 					final FEMFunction param = this.functions[index];
 					if (param == null) throw new NullPointerException("params[index] = null");
-					result = new FEMFuture(this.frame, param);
+					result = param.toFuture(this.frame);
 					this.values[index] = result;
 					return result;
 				}

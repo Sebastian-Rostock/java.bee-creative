@@ -144,7 +144,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @see #withType(int)
 	 * @return Typkennung ({@code 0..65535}). */
 	public final int typeValue() {
-		return Integers.toShortL(this.valueL);
+		return Integers.toShortH(this.valueL);
 	}
 
 	/** Diese Methode gibt die Besitzerkennung zurück.
@@ -152,7 +152,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @see #withOwner(int)
 	 * @return Besitzerkennung ({@code 0..65535}). */
 	public final int ownerValue() {
-		return Integers.toShortH(this.valueL);
+		return Integers.toShortL(this.valueL);
 	}
 
 	/** Diese Methode gibt diese Referenz mit dem gegebenen Objektschlüssel zurück.
