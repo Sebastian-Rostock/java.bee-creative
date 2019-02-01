@@ -24,7 +24,7 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.1</version>
+				<version>3.8.0</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
@@ -33,7 +33,7 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>

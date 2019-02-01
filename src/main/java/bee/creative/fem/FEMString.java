@@ -477,7 +477,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		public final IAMArray array;
 
 		ArrayStringUTF16(final IAMArray array) {
-			super(Integers.toInt(array.get(3), array.get(3)));
+			super(Integers.toInt(array.get(3), array.get(2)));
 			this.array = array;
 			this.hash = Integers.toInt(array.get(1), array.get(0));
 		}
@@ -720,11 +720,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public FEMString compact() {
-			return this;
-		}
-
-		@Override
 		public FEMString compactINT32() {
 			return this;
 		}
@@ -755,11 +750,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.items);
-		}
-
-		@Override
-		public FEMString compact() {
-			return this;
 		}
 
 		@Override
@@ -794,11 +784,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.items);
-		}
-
-		@Override
-		public FEMString compact() {
-			return this;
 		}
 
 		@Override
@@ -1709,7 +1694,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public int compare(final FEMString that) throws NullPointerException {
 		final int length = Math.min(this.length, that.length);
-		// TODO schneller
+		// TODO schneller, ggf. über ectract int[32] und IAMArray.from(...).compare
 		for (int i = 0; i < length; i++) {
 			final int result = Comparators.compare(this.customGet(i), that.customGet(i));
 			if (result != 0) return result;

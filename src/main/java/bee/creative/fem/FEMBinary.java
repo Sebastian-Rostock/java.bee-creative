@@ -32,13 +32,13 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	static class ValueFinder implements Collector {
+	static class ItemFinder implements Collector {
 
 		public final byte that;
 
 		public int index;
 
-		ValueFinder(final byte that) {
+		ItemFinder(final byte that) {
 			this.that = that;
 		}
 
@@ -122,8 +122,8 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 		public ArrayBinary(final IAMArray items) throws NullPointerException, IllegalArgumentException {
 			super(items.length() - 4);
-			this.hash = Integers.toInt(items.get(0), items.get(1), items.get(2), items.get(3));
 			this.items = items;
+			this.hash = Integers.toInt(items.get(3), items.get(2), items.get(1), items.get(0));
 		}
 
 		@Override
@@ -434,7 +434,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	/** Dieses Feld speichert die leere Bytefolge. */
 	public static final FEMBinary EMPTY = new EmptyBinary();
 
-	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück. Das gegebene Array wird kopiert.
+	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück. Das gegebene Array wird falls nötig kopiert.
 	 *
 	 * @param items Bytes.
 	 * @return Bytefolge.
@@ -456,7 +456,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return new CompactBinary(items);
 	}
 
-	/** Diese Methode gibt eine Bytefolge mit den Bytes im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
+	/** Diese Methode gibt eine Bytefolge mit den Bytes im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird falls nötig kopiert.
 	 *
 	 * @param items Bytes.
 	 * @param offset Beginn des Abschnitts.
@@ -788,7 +788,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		final int length = this.length - offset;
 		if (length == 0) return -1;
 		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
-		final ValueFinder finder = new ValueFinder(that);
+		final ItemFinder finder = new ItemFinder(that);
 		if (this.customExtract(finder, offset, length, true)) return -1;
 		return finder.index + offset;
 	}

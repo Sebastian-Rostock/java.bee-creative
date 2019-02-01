@@ -192,12 +192,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		@Override
 		protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
-			return super.customFind(that, offset + this.offset, length, foreward);
+			return this.array.customFind(that, offset + this.offset, length, foreward);
 		}
 
 		@Override
 		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
-			return this.array.customExtract(target, this.offset + offset, length, foreward);
+			return this.array.customExtract(target, offset + this.offset, length, foreward);
 		}
 
 		@Override
@@ -207,7 +207,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		@Override
 		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
-			return this.array.section(this.offset + offset, length);
+			return this.array.section(offset + this.offset, length);
 		}
 
 	}
@@ -311,12 +311,16 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		final FEMValue[] items;
 
 		CompactArray(final FEMValue[] items) throws IllegalArgumentException {
-			super(items.length);
-			this.items = items;
+			this(items.length, items);
 			final int length = items.length;
 			for (int i = 0; i < length; i++) {
 				Objects.notNull(items[i]);
 			}
+		}
+
+		public CompactArray(int length, FEMValue[] items) throws IllegalArgumentException {
+			super(length);
+			this.items = items;
 		}
 
 		@Override
@@ -345,7 +349,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static class CompactArray2 extends CompactArray {
 
 		CompactArray2(final FEMValue[] items) throws IllegalArgumentException {
-			super(items);
+			super(items.length, items);
 			final int length = items.length;
 			for (int i = 0; i < length; i++) {
 				items[i] = items[i].result(true);
