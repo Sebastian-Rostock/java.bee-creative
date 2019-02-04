@@ -6,7 +6,7 @@ import bee.creative.array.ByteArray;
 import bee.creative.array.ByteArraySection;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert die {@link DataSource}-Schnittstelle zu einer {@link ByteArraySection}. 
+/** Diese Klasse implementiert die {@link DataSource}-Schnittstelle zu einer {@link ByteArraySection}.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ArrayDataSource extends BaseDataSource {

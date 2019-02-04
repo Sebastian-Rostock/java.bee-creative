@@ -149,8 +149,8 @@ public class Conversions {
 	 * @param getter {@link Getter}.
 	 * @return {@code dynamic}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GSource, GTarget> Conversion<GSource, GTarget> virtualConversion(final GSource input,
-		final Getter<? super GSource, ? extends GTarget> getter) throws NullPointerException {
+	public static <GSource, GTarget> Conversion<GSource, GTarget> virtualConversion(final GSource input, final Getter<? super GSource, ? extends GTarget> getter)
+		throws NullPointerException {
 		return new VirtualConversion<>(input, getter);
 	}
 

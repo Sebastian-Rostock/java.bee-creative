@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /** Diese Klasse implementiert die {@link DataSource}-Schnittstelle zu einem {@link InputStream}.
-*
-* @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+ *
+ * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class StreamDataSource extends BaseDataSource {
 
 	/** Dieses Feld speichert die Nutzdaten. */

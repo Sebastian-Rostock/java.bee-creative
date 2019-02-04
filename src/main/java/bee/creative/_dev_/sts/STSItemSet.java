@@ -11,8 +11,8 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Datensätze. */
 @SuppressWarnings ("javadoc")
-  abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GItem> {
- 
+abstract class STSItemSet<GItem extends STSItem> extends AbstractSet<GItem> {
+
 	/** Diese Schnittstelle definiert einen laufenden Zeiger, der ägnlich einem {@link Iterator} über eine aufsteigend geordneten Positionsmenge läuft und mit der
 	 * Konstanten {@link Integer#MAX_VALUE} das Ende der Iteration anzeigt. */
 	protected static interface ItemIndex {

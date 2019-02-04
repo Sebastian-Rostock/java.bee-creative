@@ -236,68 +236,84 @@ public class Integers {
 
 	/** Diese Methode gibt die gegebennen 16-Bit-Werte als 32-Bit-Wert zurück.
 	 *
-	 * @param shortH MSB 16-Bit-Wert.
-	 * @param shortL LSB 16-Bit-Wert.
+	 * @param int16H MSB 16-Bit-Wert.
+	 * @param int16L LSB 16-Bit-Wert.
 	 * @return 32-Bit-Wert */
-	public static int toInt(final int shortH, final int shortL) {
-		return (shortH << 16) | (shortL & 0xFFFF);
+	public static int toInt(final int int16H, final int int16L) {
+		return (int16H << 16) | (int16L & 0xFFFF);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toInt(int, int) toInt(toShort(byte3, byte2), toShort(byte1, byte0))}.
-	 * 
+	 *
 	 * @see #toShort(int, int) */
 	public static int toInt(final int byte3, final int byte2, final int byte1, final int byte0) {
 		return Integers.toInt(Integers.toShort(byte3, byte2), Integers.toShort(byte1, byte0));
 	}
 
 	/** Diese Methode gibt den LSB 32-Bit-Wert des gegebenen 64-Bit-Werts zurück.
-	 * 
-	 * @param value 64-Bit-Wert.
+	 *
+	 * @param int64 64-Bit-Wert.
 	 * @return LSB 32-Bit-Wert. */
-	public static int toIntL(final long value) {
-		return (int)value;
+	public static int toIntL(final long int64) {
+		return (int)int64;
 	}
 
 	/** Diese Methode gibt den MSB 32-Bit-Wert des gegebenen 64-Bit-Werts zurück.
-	 * 
-	 * @param value 64-Bit-Wert.
+	 *
+	 * @param int64 64-Bit-Wert.
 	 * @return MSB 32-Bit-Wert. */
-	public static int toIntH(final long value) {
-		return toIntL(value >> 32);
+	public static int toIntH(final long int64) {
+		return Integers.toIntL(int64 >> 32);
+	}
+
+	/** Diese Methode gibt den LSB 8-Bit-Wert des gegebenen 16-Bit-Werts zurück.
+	 *
+	 * @param int16 16-Bit-Wert.
+	 * @return LSB 8-Bit-Wert. */
+	public static int toByteL(final int int16) {
+		return int16 & 0xFF;
+	}
+
+	/** Diese Methode gibt den MSB 8-Bit-Wert des gegebenen 16-Bit-Werts zurück.
+	 *
+	 * @param int16 16-Bit-Wert.
+	 * @return MSB 8-Bit-Wert. */
+	public static int toByteH(final int int16) {
+		return Integers.toByteL(int16 >> 8);
 	}
 
 	/** Diese Methode gibt die gegebennen 8-Bit-Werte als 16-Bit-Wert zurück.
 	 *
-	 * @param byteH MSB 8-Bit-Wert.
-	 * @param byteL LSB 8-Bit-Wert.
+	 * @param int8H MSB 8-Bit-Wert.
+	 * @param int8L LSB 8-Bit-Wert.
 	 * @return 16-Bit-Wert */
-	public static int toShort(final int byteH, final int byteL) {
-		return (byteH << 8) | (byteL & 0xFF);
+	public static int toShort(final int int8H, final int int8L) {
+		return (int8H << 8) | (int8L & 0xFF);
 	}
 
 	/** Diese Methode gibt den LSB 16-Bit-Wert des gegebenen 32-Bit-Werts zurück.
-	 * 
-	 * @param value 32-Bit-Wert.
+	 *
+	 * @param int32 32-Bit-Wert.
 	 * @return LSB 16-Bit-Wert. */
-	public static int toShortL(final int value) {
-		return value & 0xFFFF;
+	public static int toShortL(final int int32) {
+		return int32 & 0xFFFF;
 	}
 
 	/** Diese Methode gibt den MSB 16-Bit-Wert des gegebenen 32-Bit-Werts zurück.
-	 * 
-	 * @param value 32-Bit-Wert.
+	 *
+	 * @param int32 32-Bit-Wert.
 	 * @return MSB 16-Bit-Wert. */
-	public static int toShortH(final int value) {
-		return toShortL(value >> 16);
+	public static int toShortH(final int int32) {
+		return Integers.toShortL(int32 >> 16);
 	}
 
 	/** Diese Methode gibt die gegebennen 32-Bit-Werte als 64-Bit-Wert zurück.
 	 *
-	 * @param intH MSB 32-Bit-Wert.
-	 * @param intL LSB 32-Bit-Wert.
+	 * @param int32H MSB 32-Bit-Wert.
+	 * @param int32L LSB 32-Bit-Wert.
 	 * @return 64-Bit-Wert */
-	public static long toLong(final int intH, final int intL) {
-		return ((long)intH << 32) | (intL & 0xFFFFFFFFL);
+	public static long toLong(final int int32H, final int int32L) {
+		return ((long)int32H << 32) | (int32L & 0xFFFFFFFFL);
 	}
 
 }

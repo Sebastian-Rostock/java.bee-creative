@@ -13,7 +13,6 @@ import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
 import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
 import bee.creative.iam.IAMMapping;
-import bee.creative.util.AbstractHashData;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Integers;
 import bee.creative.util.Objects;
@@ -89,7 +88,7 @@ class FEMCodec implements Property<FEMValue> {
 		Object[] items = {};
 
 		@Override
-		public GItem get(int index) {
+		public GItem get(final int index) {
 
 			return null;
 		}
@@ -97,7 +96,7 @@ class FEMCodec implements Property<FEMValue> {
 		protected abstract GItem customGet(final int index);
 
 		public void clear() {
-			Object[] items = this.items;
+			final Object[] items = this.items;
 			for (int i = 0, size = items.length; i < size; i++) {
 
 			}
@@ -271,11 +270,11 @@ class FEMCodec implements Property<FEMValue> {
 	}
 
 	public IAMIndexBuilder getTarget() {
-		return targetIndex;
+		return this.targetIndex;
 	}
 
 	public IAMIndex getSource() {
-		return sourceIndex;
+		return this.sourceIndex;
 	}
 
 	/** Diese Methode bestückt die Felder zum Lesen des gegebenen {@link IAMIndex} und gibt {@code this} zurück.
@@ -446,7 +445,7 @@ class FEMCodec implements Property<FEMValue> {
 	 * @throws IllegalArgumentException Wenn {@link #getArrayValue(IAMArray)} diese auslöst. */
 	protected FEMArray getArrayValue(final int index) throws IllegalArgumentException {
 		// getItem(sourceArrayValueCache, sourceArrayValueItems, index);
-		return getArrayValueImpl(index);
+		return this.getArrayValueImpl(index);
 	}
 
 	protected FEMArray getArrayValueImpl(final int index) throws IllegalArgumentException {
@@ -456,8 +455,8 @@ class FEMCodec implements Property<FEMValue> {
 	protected Items<FEMArray> sourceArrayValueItems = new Items<FEMArray>() {
 
 		@Override
-		public FEMArray get(int index) {
-			return getArrayValueImpl(index);
+		public FEMArray get(final int index) {
+			return FEMCodec.this.getArrayValueImpl(index);
 		}
 
 	};
@@ -1044,7 +1043,7 @@ class FEMCodec implements Property<FEMValue> {
 	// TODO
 	public FEMProxy getProxyFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() != 3) throw new IllegalArgumentException();
-		return new FEMProxy(getValue(source.get(0)), this.getStringValue(source.get(1)), this.getFunction(source.get(2)));
+		return new FEMProxy(this.getValue(source.get(0)), this.getStringValue(source.get(1)), this.getFunction(source.get(2)));
 	}
 
 	public ConcatFunction getConcatFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {

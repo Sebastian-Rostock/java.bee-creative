@@ -137,12 +137,12 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	@SuppressWarnings ("javadoc")
 	protected static class HashEntry2<GKey, GValue> extends HashEntry<GKey, GValue> {
 
-		public HashEntry2(AbstractHashData<GKey, GValue> entryData, int entryIndex) {
+		public HashEntry2(final AbstractHashData<GKey, GValue> entryData, final int entryIndex) {
 			super(entryData, entryIndex);
 		}
 
 		@Override
-		public GValue setValue(GValue value) {
+		public GValue setValue(final GValue value) {
 			throw new UnsupportedOperationException();
 		}
 

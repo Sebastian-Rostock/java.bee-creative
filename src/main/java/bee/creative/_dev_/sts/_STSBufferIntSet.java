@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 // INNER NODE [ H | P0 | V1 | P1 | ... | V7 | P7 ]
 // HEAD [ Type: short | Offset: byte | Length: byte ]
 // NODE-Address zeigt auf H
-  class _STSBufferIntSet {
+class _STSBufferIntSet {
 
 	static final int NODE_SIZE = 16 * 4; // byte
 

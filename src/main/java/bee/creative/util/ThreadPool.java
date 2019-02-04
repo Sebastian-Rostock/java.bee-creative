@@ -1,11 +1,12 @@
 package bee.creative.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
-/** Diese Klasse implementiert einen {@link Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable) Überwachen},
+/** Diese Klasse implementiert einen {@link Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isActive(Runnable) Überwachen},
  * {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Berechnung eines {@link Thread} bezüglich beliebiger {@link Runnable}
- * bereitstellt. Jeder inter dazu eingesetzte {@link Thread} arbeitet in einer gegebenen {@link #getPriority() Priorität} und kann nach der Abarbeitung eines
- * {@link Runnable} innerhalb einer gegebenen {@link #getTimeout() Wartezeit} wiederverwendet werden.
+ * bereitstellt. Jeder inter dazu eingesetzte {@link Thread} arbeitet in einer gegebenen {@link #getActivePriority() Priorität} und kann nach der Abarbeitung eines
+ * {@link Runnable} innerhalb einer gegebenen {@link #getWaitingTimeout() Wartezeit} wiederverwendet werden.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ThreadPool {
@@ -62,18 +63,27 @@ public class ThreadPool {
 	}
 
 	/** Dieses Feld bildet von den ausgeführten {@link Runnable} auf die dafür eingesetzten {@link ThreadItem} ab.<br>
-	 * Es schützt als Mutex auch die Modifikation von {@link ThreadPool#active}, {@link ThreadPool#waiting}, {@link ThreadItem#join} und {@link ThreadItem#task}.
-	 * In {@link ThreadItem#run()} wird das Ende der Berechnung signalisiert, auf welche in {@link ThreadPool#join(Runnable, long)} gewartet wird. */
-	private final HashMap3<Runnable, ThreadItem> active = new HashMap3<>();
+	 * Es ist {@code synchronized} über {@link #activeMap}. In {@link ThreadItem#run()} wird das Ende der Berechnung darüber signalisiert, auf welche in
+	 * {@link ThreadPool#join(long, Runnable)} gewartet wird. */
+	private final HashMap3<Runnable, ThreadItem> activeMap = new HashMap3<>();
 
-	/** Dieses Feld speichert die wiederverwendbaren {@link ThreadItem}. */
-	private final ThreadNode waiting = new ThreadNode(this);
+	private String activeName;
 
-	private final String name;
+	private int activePriority = Thread.NORM_PRIORITY;
 
-	private final int priority;
+	/** Dieses Feld speichert die wiederverwendbaren {@link ThreadItem}.<br>
+	 * Es ist {@code synchronized} über {@link #activeMap}. */
+	private final ThreadNode waitingList = new ThreadNode(this);
 
-	private final long timeout;
+	/** Dieses Feld speichert die Anzahl {@link ThreadItem} die mindestens vorgehalten werden sollen.<br>
+	 * Es ist {@code synchronized} über {@link #waitingList}. */
+	private int waitingReserve = 0;
+
+	/** Dieses Feld speichert die Anzahl der wartenden {@link ThreadItem} in {@link #waitingList}.<br>
+	 * Es ist {@code synchronized} über {@link #activeMap}. */
+	private int waitingCount = 0;
+
+	private long waitingTimeout = 60000;
 
 	public ThreadPool() {
 		this("ThreadPool-Item");
@@ -89,138 +99,242 @@ public class ThreadPool {
 
 	public ThreadPool(final String name, final int priority, final long cleanup) throws NullPointerException, IllegalArgumentException {
 		if ((priority < Thread.MIN_PRIORITY) || (priority > Thread.MAX_PRIORITY) || (cleanup < 0)) throw new IllegalArgumentException();
-		this.name = Objects.notNull(name);
-		this.timeout = cleanup;
-		this.priority = priority;
+		this.activeName = Objects.notNull(name);
+		this.activePriority = priority;
+	}
+
+	@SuppressWarnings ("javadoc")
+	final ThreadItem toItemImpl(final Runnable task) throws NullPointerException {
+		return this.activeMap.get(Objects.notNull(task));
+	}
+
+	@SuppressWarnings ("javadoc")
+	final HashSet3<ThreadItem> toItemsImpl(final Iterable<? extends Runnable> tasks) throws NullPointerException {
+		final HashSet3<ThreadItem> items = new HashSet3<>();
+		for (final Runnable task: tasks) {
+			items.add(this.toItemImpl(task));
+		}
+		return items;
+	}
+
+	private final void checkTimeoutImpl(final long timeout) {
+		if (timeout < 0) throw new IllegalArgumentException();
+	}
+
+	private final Runnable getTaskImpl(final ThreadItem item) {
+		synchronized (this.waitingList) {
+			synchronized (this.activeMap) {
+				item.setName(this.activeName);
+				item.setPriority(this.activePriority);
+				final Runnable task = item.task;
+				if (task != null) return task;
+			}
+			final long until = System.currentTimeMillis() + this.waitingTimeout;
+			long sleep = this.waitingTimeout;
+			while (true) {
+				try {
+					this.waitingList.wait(sleep);
+				} catch (final InterruptedException ignore) {}
+				synchronized (this.activeMap) {
+					Runnable task = item.task;
+					if (task != null) return task;
+					if (this.waitingTimeout == 0 || this.waitingCount <= this.waitingReserve) {
+						sleep = 0;
+					} else {
+						sleep = until - System.currentTimeMillis();
+						if (sleep <= 0) {
+							item.node.delete();
+							return null;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private final void runTaskImpl(final ThreadItem item, final Runnable task) {
+		boolean okay = false;
+		try {
+			Thread.interrupted();
+			task.run();
+			okay = true;
+		} finally {
+			synchronized (this.activeMap) {
+				item.join = null;
+				item.task = null;
+				this.activeMap.remove(task);
+				if (okay) {
+					item.node.insert(this.waitingList);
+					this.waitingCount++;
+				}
+				this.activeMap.notifyAll();
+			}
+		}
 	}
 
 	/** Diese Methode implementiert {@link ThreadItem#run()}. */
 	final void run(final ThreadItem item) {
-		final long timeout = this.timeout;
-		final ThreadNode waiting = this.waiting;
-		final HashMap3<?, ?> active = this.active;
-		Runnable task;
 		while (true) {
-			synchronized (waiting) {
-				synchronized (active) {
-					task = item.task;
-				}
-				if (task == null) {
-					final long until = System.currentTimeMillis() + timeout;
-					long delay = timeout;
-					while (true) {
-						try {
-							waiting.wait(delay);
-						} catch (final InterruptedException ignore) {}
-						if (timeout != 0) {
-							delay = until - System.currentTimeMillis();
-						}
-						synchronized (active) {
-							task = item.task;
-							if (task != null) {
-								break;
-							}
-							if ((timeout != 0) && (delay <= 0)) {
-								item.node.delete();
-								return;
-							}
-						}
-					}
-				}
-			}
-			boolean taskReady = false;
-			try {
-				Thread.interrupted();
-				task.run();
-				taskReady = true;
-			} finally {
-				synchronized (active) {
-					item.join = null;
-					item.task = null;
-					active.remove(task);
-					active.notifyAll();
-					if (taskReady) {
-						item.node.insert(waiting);
-					}
-				}
-			}
+			final Runnable task = this.getTaskImpl(item);
+			if (task == null) return;
+			this.runTaskImpl(item, task);
 		}
 	}
 
-	// ok
-	public void join(final Runnable task) throws NullPointerException, InterruptedException {
-		this.join(task, 0);
-	}
-
-	// okay
-	public void join(final Runnable task, final long timeout) throws NullPointerException, IllegalArgumentException, InterruptedException {
-		Objects.notNull(task);
-		if (timeout < 0) throw new IllegalArgumentException();
-		final HashMap3<?, ThreadItem> active = this.active;
-		synchronized (active) {
-			final ThreadItem item = active.get(task);
-			if (item == null) return;
-			final Object join = item.join;
-			final long until = System.currentTimeMillis() + timeout;
-			long delay = timeout;
+	/** Diese Methode implementiert {@link #join(long, Runnable)} ohne Synchronisation. */
+	private final void joinImpl(final ThreadItem item, final long timeout) throws InterruptedException {
+		if (item == null) return;
+		final Object join = item.join;
+		if (timeout == 0) {
 			while (true) {
-				active.wait(delay);
+				this.activeMap.wait(0);
 				if (item.join != join) return;
-				if (timeout != 0) {
-					delay = until - System.currentTimeMillis();
-					if (delay <= 0) return;
+			}
+		} else {
+			final long until = System.currentTimeMillis() + timeout;
+			long sleep = timeout;
+			while (true) {
+				this.activeMap.wait(sleep);
+				if (item.join != join) return;
+				sleep = until - System.currentTimeMillis();
+				if (sleep <= 0) return;
+			}
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #join(long, Runnable) this.join(0, task)}.
+	 *
+	 * @param task Berechnung.
+	 * @throws NullPointerException Wenn {@code task} {@code null} ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void join(final Runnable task) throws NullPointerException, InterruptedException {
+		this.join(0, task);
+	}
+
+	/** Diese Methode {@link Object#wait(long) wartet} auf den Abschluss der gegebenen Berechnung, sofern diese aktuell {@link #isActive(Runnable) verarbeitet}
+	 * wird. Wenn die gegebene Wartezeit nicht {@code 0} ist, wird höchstens solange gewartet.
+	 *
+	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
+	 * @param task Berechnung.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void join(final long timeout, final Runnable task) throws NullPointerException, IllegalArgumentException, InterruptedException {
+		this.checkTimeoutImpl(timeout);
+		synchronized (this.activeMap) {
+			this.joinImpl(this.toItemImpl(task), timeout);
+		}
+	}
+
+	/** Diese Methode implementiert {@link #joinAll(long, Iterable)} ohne Synchronisation. */
+	private final void joinAllImpl(final Iterable<? extends ThreadItem> items, final long timeout) throws InterruptedException {
+		if (timeout == 0) {
+			for (final ThreadItem item: items) {
+				this.joinImpl(item, 0);
+			}
+		} else {
+			final long until = System.currentTimeMillis() + timeout;
+			long sleep = timeout;
+			while (true) {
+				for (final ThreadItem item: items) {
+					this.joinImpl(item, sleep);
+					sleep = until - System.currentTimeMillis();
+					if (sleep <= 0) return;
 				}
 			}
 		}
 	}
 
-	public void joinAll(final Runnable... tasks) throws NullPointerException, InterruptedException { // ok
-		this.joinAll(tasks, 0);
+	/** Diese Methode ist eine Abkürzung für {@link #joinAll(long, Runnable...) this.joinAll(0, tasks)}.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void joinAll(final Runnable... tasks) throws NullPointerException, InterruptedException {
+		this.joinAll(0, tasks);
 	}
 
-	public void joinAll(final Runnable[] tasks, final long timeout) throws NullPointerException, IllegalArgumentException, InterruptedException { // ok
-		this.joinAll(Arrays.asList(tasks), 0);
+	/** Diese Methode ist eine Abkürzung für {@link #joinAll(long, Iterable) this.joinAll(0, tasks)}.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void joinAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, InterruptedException {
+		this.joinAll(0, tasks);
 	}
 
-	public void joinAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, InterruptedException { // ok
-		this.joinAll(tasks, 0);
+	/** Diese Methode ist eine Abkürzung für {@link #joinAll(long, Iterable) this.joinAll(0, Arrays.asList(tasks))}.
+	 *
+	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void joinAll(final long timeout, final Runnable... tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
+		this.joinAll(0, Arrays.asList(tasks));
 	}
 
-	public void joinAll(final Iterable<? extends Runnable> tasks, final long timeout)
-		throws NullPointerException, IllegalArgumentException, InterruptedException { // ok
-		for (final Runnable task: tasks) {
-			this.join(task, timeout);
+	/** Diese Methode {@link #join(long, Runnable) wartet} auf den Abschluss der gegebenen Berechnungen, sofern diese aktuell {@link #isActive(Runnable)
+	 * verarbeitet} werden. Wenn die gegebene Wartezeit nicht {@code 0} ist, wird höchstens solange gewartet.
+	 *
+	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void joinAll(final long timeout, final Iterable<? extends Runnable> tasks)
+		throws NullPointerException, IllegalArgumentException, InterruptedException {
+		this.checkTimeoutImpl(timeout);
+		synchronized (this.activeMap) {
+			this.joinAllImpl(this.toItemsImpl(tasks), timeout);
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #joinAllActive(long) this.joinAllActivejoinAll(0)}.
+	 *
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void joinAllActive() throws InterruptedException {
+		this.joinAllActive(0);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #joinAll(long, Iterable) this.joinAll(timeout, this.getActiveTasks())}.
+	 *
+	 * @see #getActiveTasks()
+	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
+	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void joinAllActive(final long timeout) throws IllegalArgumentException, InterruptedException {
+		this.checkTimeoutImpl(timeout);
+		synchronized (this.activeMap) {
+			this.joinAllImpl(new ArrayList<>(this.activeMap.values()), timeout);
 		}
 	}
 
 	public void start(final Runnable task) throws NullPointerException, IllegalThreadStateException {
 		Objects.notNull(task);
-		final ThreadNode waiting = this.waiting;
-		final HashMap3<Runnable, ThreadItem> active = this.active;
-		synchronized (active) {
-			if (active.containsKey(task)) throw new IllegalThreadStateException();
-			final ThreadNode next = waiting.next;
-			final ThreadItem item;
-			if (waiting != next) {
-				next.delete();
+		final ThreadItem item;
+		synchronized (this.activeMap) {
+			if (this.activeMap.containsKey(task)) throw new IllegalThreadStateException();
+			final ThreadNode next = this.waitingList.next;
+			if (this.waitingList != next) {
 				item = next.item;
+				next.delete();
+				this.waitingCount--;
 			} else {
 				item = new ThreadItem(this);
-				item.setName(this.name);
 				item.setDaemon(true);
-				item.setPriority(this.priority);
 				item.start();
 			}
 			item.join = new Object();
 			item.task = task;
-			active.put(task, item);
-			final int capacity = active.capacity() / 3;
-			if (active.size() < capacity) {
-				active.allocate(capacity);
+			this.activeMap.put(task, item);
+
+			if (this.activeMap.size() < (this.activeMap.capacity() / 4)) {
+				this.activeMap.allocate(this.activeMap.capacity() / 2);
 			}
 		}
-		synchronized (waiting) {
-			waiting.notifyAll();
+		synchronized (this.waitingList) {
+			this.waitingList.notifyAll();
 		}
 	}
 
@@ -234,62 +348,138 @@ public class ThreadPool {
 		}
 	}
 
+	/** Diese Methode implementiert {@link #interrupt(Runnable)} ohne Synchronisation. */
+	private final void interruptImpl(final ThreadItem item) throws SecurityException {
+		if (item == null) return;
+		item.interrupt();
+	}
+
+	/** Diese Methode {@link Thread#interrupt() unterbricht} die gegebene Berechnung, sofern diese aktuell {@link #isActive(Runnable) verarbeitet} wird.
+	 *
+	 * @param task Berechnung.
+	 * @throws NullPointerException Wenn {@code task} {@code null} ist.
+	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
 	public void interrupt(final Runnable task) throws NullPointerException, SecurityException {
-		final HashMap3<?, ThreadItem> active = this.active;
-		synchronized (active) {
-			final ThreadItem item = active.get(task);
-			if (item == null) return;
-			item.interrupt();
+		synchronized (this.activeMap) {
+			this.interruptImpl(this.toItemImpl(task));
 		}
 	}
 
+	/** Diese Methode implementiert {@link #interruptAll(Iterable)} ohne Synchronisation. */
+	private final void interruptAllImpl(final Iterable<? extends ThreadItem> items) {
+		for (final ThreadItem item: items) {
+			this.interruptImpl(item);
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #interruptAll(Iterable) this.interruptAll(Arrays.asList(tasks))}.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
 	public void interruptAll(final Runnable... tasks) throws NullPointerException, SecurityException { // ok
 		this.interruptAll(Arrays.asList(tasks));
 	}
 
-	public void interruptAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, SecurityException { // ok
-		for (final Runnable task: tasks) {
-			this.interrupt(task);
+	/** Diese Methode {@link Thread#interrupt() unterbricht} die gegebenen Berechnungen, sofern diese aktuell {@link #isActive(Runnable) verarbeitet} werden.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
+	public void interruptAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, SecurityException {
+		synchronized (this.activeMap) {
+			this.interruptAllImpl(this.toItemsImpl(tasks));
 		}
 	}
 
-	public boolean isAlive(final Runnable task) throws NullPointerException {// ok
-		Objects.notNull(task);
-		final HashMap3<?, ?> active = this.active;
-		synchronized (active) {
-			return active.containsKey(task);
+	/** Diese Methode ist eine Abkürzung für {@link #interruptAll(Iterable) this.interruptAll(this.getActiveTasks())}.
+	 *
+	 * @see #getActiveTasks()
+	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
+	public void interruptAllActive() throws SecurityException {
+		synchronized (this.activeMap) {
+			this.interruptAllImpl(new ArrayList<>(this.activeMap.values()));
 		}
 	}
 
-	public Runnable[] activeTasks() {
-		final HashMap3<Runnable, ?> active = this.active;
-		synchronized (active) {
-			return active.keySet().toArray(new Runnable[active.size()]);
+	public boolean isActive(final Runnable task) throws NullPointerException {
+		synchronized (this.activeMap) {
+			return this.activeMap.containsKey(Objects.notNull(task));
 		}
 	}
 
-	public int activeCount() {
-		final HashMap3<?, ?> active = this.active;
-		synchronized (active) {
-			return active.size();
+	public Runnable[] getActiveTasks() {
+		synchronized (this.activeMap) {
+			return this.activeMap.keySet().toArray(new Runnable[this.activeMap.size()]);
 		}
 	}
 
-	public String getName() {
-		return this.name;
+	public int getActiveCount() {
+		synchronized (this.activeMap) {
+			return this.activeMap.size();
+		}
 	}
 
-	public int getPriority() {
-		return this.priority;
+	public String getActiveName() {
+		synchronized (this.activeMap) {
+			return this.activeName;
+		}
 	}
 
-	public long getTimeout() {
-		return this.timeout;
+	public void setActiveName(final String value) {
+		synchronized (this.activeMap) {
+			this.activeName = Objects.notNull(value);
+		}
+	}
+
+	public int getActivePriority() {
+		synchronized (this.activeMap) {
+			return this.activePriority;
+		}
+	}
+
+	public void setActivePriority(final int value) {
+		if ((value < Thread.MIN_PRIORITY) || (value > Thread.MAX_PRIORITY)) throw new IllegalArgumentException();
+		synchronized (this.activeMap) {
+			this.activePriority = value;
+		}
+	}
+
+	public int getWaitingReserve() {
+		synchronized (this.waitingList) {
+			return this.waitingReserve;
+		}
+	}
+
+	public int getWaitingCount() {
+		synchronized (this.activeMap) {
+			return this.waitingCount;
+		}
+	}
+
+	public long getWaitingTimeout() {
+		synchronized (this.waitingList) {
+			return this.waitingTimeout;
+		}
+	}
+
+	public void setWaitingReserve(final int value) throws IllegalAccessException {
+		if (value < 0) throw new IllegalArgumentException();
+		synchronized (this.waitingList) {
+			this.waitingReserve = value;
+		}
+	}
+
+	public void setWaitingTimeout(final long value) throws IllegalAccessException {
+		this.checkTimeoutImpl(value);
+		synchronized (this.waitingList) {
+			this.waitingTimeout = value;
+		}
 	}
 
 	@Override
 	public String toString() {
-		return "[" + this.name + "-" + this.priority + "-]";
+		return "[" + this.getActiveName() + "-" + this.getActivePriority() + "-]";
 	}
 
 }

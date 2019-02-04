@@ -10,7 +10,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
 
-  class STSFileStore {
+class STSFileStore {
 
 	/** Dieses Feld speichert die Dateikennung einer Datei mit Kantenlisten. */
 	private static final long LIST_MAGIC = 0x5354535F4C495354L;

@@ -10,7 +10,7 @@ import bee.creative.fem.FEMBinary;
  *
  * @see STSStore
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-  final class STSNode extends STSItem implements Comparable<STSNode> {
+final class STSNode extends STSItem implements Comparable<STSNode> {
 
 	@SuppressWarnings ("javadoc")
 	protected STSNode(final STSStore store, final int index) {

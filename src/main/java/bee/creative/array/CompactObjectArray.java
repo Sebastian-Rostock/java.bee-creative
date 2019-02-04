@@ -10,7 +10,7 @@ import bee.creative.util.Objects;
  * Positionen in die über {@link #values()} bereit gestellte {@link List}-Sicht benötigt im Durchschnitt ca. 45 % der Rechenzeit, die ein
  * {@link java.util.ArrayList} benötigen würde. Das {@link List#remove(int) Entfernen} von Elementen an beliebigen Positionen liegt dazu bei ca. 37 % der
  * Rechenzeit.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ der Elemente. */
 public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> implements ObjectArray<GValue>, Comparator<GValue> {

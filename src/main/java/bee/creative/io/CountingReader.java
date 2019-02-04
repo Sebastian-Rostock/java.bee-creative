@@ -18,7 +18,7 @@ public class CountingReader extends FilterReader {
 	}
 
 	/** Diese Methode setzt die Anzahl der gelesenen bzw. ausgelassenen Zeichen. */
-	protected void setReadCount(long value) {
+	protected void setReadCount(final long value) {
 		this.readCount = value;
 	}
 
@@ -32,7 +32,7 @@ public class CountingReader extends FilterReader {
 	public int read() throws IOException {
 		final int result = super.read();
 		if (result < 0) return result;
-		setReadCount(this.readCount + 1);
+		this.setReadCount(this.readCount + 1);
 		return result;
 	}
 
@@ -41,7 +41,7 @@ public class CountingReader extends FilterReader {
 	public int read(final char[] target, final int offset, final int length) throws IOException {
 		final int result = super.read(target, offset, length);
 		if (result < 0) return result;
-		setReadCount(this.readCount + result);
+		this.setReadCount(this.readCount + result);
 		return result;
 	}
 
@@ -49,7 +49,7 @@ public class CountingReader extends FilterReader {
 	@Override
 	public long skip(final long count) throws IOException {
 		final long result = super.skip(count);
-		setReadCount(this.readCount + result);
+		this.setReadCount(this.readCount + result);
 		return result;
 	}
 

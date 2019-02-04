@@ -18,7 +18,7 @@ public class CountingInputStream extends FilterInputStream {
 	}
 
 	/** Diese Methode setzt die Anzahl der gelesenen bzw. ausgelassenen Bytes. */
-	protected void setReadCount(long value) {
+	protected void setReadCount(final long value) {
 		this.readCount = value;
 	}
 
@@ -32,7 +32,7 @@ public class CountingInputStream extends FilterInputStream {
 	public int read() throws IOException {
 		final int result = super.read();
 		if (result < 0) return result;
-		setReadCount(this.readCount + 1);
+		this.setReadCount(this.readCount + 1);
 		return result;
 	}
 
@@ -41,7 +41,7 @@ public class CountingInputStream extends FilterInputStream {
 	public int read(final byte[] target, final int offset, final int length) throws IOException {
 		final int result = super.read(target, offset, length);
 		if (result < 0) return result;
-		setReadCount(this.readCount + result);
+		this.setReadCount(this.readCount + result);
 		return result;
 	}
 
@@ -49,7 +49,7 @@ public class CountingInputStream extends FilterInputStream {
 	@Override
 	public long skip(final long count) throws IOException {
 		final long result = super.skip(count);
-		setReadCount(this.readCount + result);
+		this.setReadCount(this.readCount + result);
 		return result;
 	}
 
