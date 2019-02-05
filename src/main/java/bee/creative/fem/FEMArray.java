@@ -133,9 +133,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			if (offset2 >= 0) return this.array2.customFind(that, offset2, length, foreward) + length1;
 			if (length2 <= 0) return this.array1.customFind(that, offset1, length, foreward);
 			if (foreward) {
-				final int result = this.array1.customFind(that, offset1, -offset2, foreward);
+				int result = this.array1.customFind(that, offset1, -offset2, foreward);
 				if (result >= 0) return result;
-				return this.array2.customFind(that, 0, length2, foreward) + length1;
+				result = this.array2.customFind(that, 0, length2, foreward);
+				if (result >= 0) return result + length1;
+				return result;
 			} else {
 				final int result = this.array2.customFind(that, 0, length2, foreward);
 				if (result >= 0) return result + length1;

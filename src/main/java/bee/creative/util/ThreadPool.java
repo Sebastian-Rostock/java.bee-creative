@@ -3,35 +3,40 @@ package bee.creative.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/** Diese Klasse implementiert einen {@link Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isActive(Runnable) Überwachen},
- * {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Berechnung eines {@link Thread} bezüglich beliebiger {@link Runnable}
- * bereitstellt. Jeder inter dazu eingesetzte {@link Thread} arbeitet in einer gegebenen {@link #getActivePriority() Priorität} und kann nach der Abarbeitung eines
- * {@link Runnable} innerhalb einer gegebenen {@link #getWaitingTimeout() Wartezeit} wiederverwendet werden.
+/** Diese Klasse implementiert einen {@link Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable) Überwachen},
+ * {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Auswertung beliebiger {@link Runnable Berechnungen} bereitstellt.<br>
+ * {@link #getActiveName() Name} und {@link #getActivePriority() Priorität} der zur Auswerung eingesetzten {@link Thread Threads} können jederzeit angepasst
+ * werden und werden beim Starten neuer Berechnungen angewendet. Nach der Auswertung ihrer Berechnung warten diese Threads auf ihre Wiederverwendung. Dazu kann
+ * eingestellt werden, wieviele auf ihre Wiederverwendung wartende Threads {@link #getWaitingReserve() mindestens vorgehalten werden} und wie lange die nicht
+ * hierfür reservierten Threads {@link #getWaitingTimeout() maximal warten}, bevor sie verworfen werden.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ThreadPool {
 
 	/** Diese Klasse implementiert einen wiederverwendbaren Thread zur Ausführung eines {@link Runnable}. */
+	@SuppressWarnings ("javadoc")
 	private static final class ThreadItem extends Thread {
 
 		public final ThreadNode node;
 
-		public Object join;
+		public Object run;
 
 		public Runnable task;
 
-		public ThreadItem(final ThreadPool pool) {
+		public ThreadItem(final ThreadPool pool, final ThreadGroup group) {
+			super(group, "");
 			this.node = new ThreadNode(pool, this);
 		}
 
 		@Override
 		public void run() {
-			this.node.pool.run(this);
+			this.node.pool.runItem(this);
 		}
 
 	}
 
-	/** Diese Klasse implementiert einen Knoten der doppelt verketteten Liste zur Verwaltung der wartenden {@link ThreadItem}. */
+	/** Diese Klasse implementiert einen Knoten in der doppelt verketteten Liste zur Verwaltung der wartenden {@link ThreadItem}. */
+	@SuppressWarnings ("javadoc")
 	private static final class ThreadNode {
 
 		public final ThreadPool pool;
@@ -62,86 +67,117 @@ public class ThreadPool {
 
 	}
 
-	/** Dieses Feld bildet von den ausgeführten {@link Runnable} auf die dafür eingesetzten {@link ThreadItem} ab.<br>
-	 * Es ist {@code synchronized} über {@link #activeMap}. In {@link ThreadItem#run()} wird das Ende der Berechnung darüber signalisiert, auf welche in
-	 * {@link ThreadPool#join(long, Runnable)} gewartet wird. */
-	private final HashMap3<Runnable, ThreadItem> activeMap = new HashMap3<>();
+	/** Dieses Feld speichert den initialwert für {@link Thread#getThreadGroup()} neu erzeugter {@link ThreadItem}. */
+	private final ThreadGroup group;
 
-	private String activeName;
+	/** Dieses Feld speichert den initialwert für {@link Thread#isDaemon()} neu erzeugter {@link ThreadItem}. */
+	private final boolean daemon;
 
+	/** Dieses Feld bildet von den aktuell ausgeführten {@link Runnable Berehnungen} auf die dafür eingesetzten {@link ThreadItem Threads} ab. */
+	private final HashMap3<Runnable, ThreadItem> activeMap = new HashMap3<>(0);
+
+	/** Dieses Feld speichert den {@link Thread#setName(String) Namen} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem Threads}. */
+	private String activeName = ThreadItem.class.getSimpleName();
+
+	/** Dieses Feld speichert die {@link Thread#setPriority(int) Priorität} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem Threads}. */
 	private int activePriority = Thread.NORM_PRIORITY;
 
-	/** Dieses Feld speichert die wiederverwendbaren {@link ThreadItem}.<br>
-	 * Es ist {@code synchronized} über {@link #activeMap}. */
+	/** Dieses Feld speichert die auf ihre Wiederverwendung wartenden {@link ThreadItem Threads}. */
 	private final ThreadNode waitingList = new ThreadNode(this);
 
-	/** Dieses Feld speichert die Anzahl {@link ThreadItem} die mindestens vorgehalten werden sollen.<br>
-	 * Es ist {@code synchronized} über {@link #waitingList}. */
-	private int waitingReserve = 0;
+	/** Dieses Feld speichert die Anzahl der in {@link #waitingList} enthaltenen {@link ThreadItem Threads}. */
+	private int waitingCount;
 
-	/** Dieses Feld speichert die Anzahl der wartenden {@link ThreadItem} in {@link #waitingList}.<br>
-	 * Es ist {@code synchronized} über {@link #activeMap}. */
-	private int waitingCount = 0;
+	/** Dieses Feld speichert die Anzahl der in {@link #waitingList} mindestens vorgehalten {@link ThreadItem Threads}. */
+	private int waitingReserve;
 
+	/** Dieses Feld speichert die Begrenzung der Lebenszeit der in {@link #waitingList} enthaltenen {@link ThreadItem Threads}. */
 	private long waitingTimeout = 60000;
 
+	/** Dieser Konstruktor ist eine Abkürzung für {@link #ThreadPool(boolean) new ThreadPool(true)}. */
 	public ThreadPool() {
-		this("ThreadPool-Item");
+		this(true);
 	}
 
-	public ThreadPool(final String name) throws NullPointerException, IllegalArgumentException {
-		this(name, Thread.NORM_PRIORITY);
+	/** Dieser Konstruktor ist eine Abkürzung für {@link #ThreadPool(ThreadGroup, boolean) new ThreadPool(null, daemon)}. */
+	public ThreadPool(final boolean daemon) {
+		this(null, daemon);
 	}
 
-	public ThreadPool(final String name, final int priority) throws NullPointerException, IllegalArgumentException {
-		this(name, priority, 60000);
-	}
-
-	public ThreadPool(final String name, final int priority, final long cleanup) throws NullPointerException, IllegalArgumentException {
-		if ((priority < Thread.MIN_PRIORITY) || (priority > Thread.MAX_PRIORITY) || (cleanup < 0)) throw new IllegalArgumentException();
-		this.activeName = Objects.notNull(name);
-		this.activePriority = priority;
-	}
-
-	@SuppressWarnings ("javadoc")
-	final ThreadItem toItemImpl(final Runnable task) throws NullPointerException {
-		return this.activeMap.get(Objects.notNull(task));
-	}
-
-	@SuppressWarnings ("javadoc")
-	final HashSet3<ThreadItem> toItemsImpl(final Iterable<? extends Runnable> tasks) throws NullPointerException {
-		final HashSet3<ThreadItem> items = new HashSet3<>();
-		for (final Runnable task: tasks) {
-			items.add(this.toItemImpl(task));
+	/** Dieser Konstruktor initialisiert das den {@link ThreadPool} mit den gegebenen Merkmalen zur Erzeugung von Threads, ohne {@link #setWaitingReserve(int)
+	 * Reserve} und mit einer {@link #setWaitingTimeout(long) Wiederverwendungszeit} von einer Minute.
+	 *
+	 * @see Thread#setDaemon(boolean)
+	 * @see Thread#getThreadGroup()
+	 * @param group Thread-Gruppe zur Erzeugung der Threads oder {@code null}.
+	 * @param daemon {@code true}, wenn zur Auswertung der Berechnung Daemon-Threads eingesetzt werden sollen. */
+	public ThreadPool(ThreadGroup group, final boolean daemon) {
+		if (group == null) {
+			final SecurityManager security = System.getSecurityManager();
+			if (security != null) {
+				group = security.getThreadGroup();
+			}
+			if (group == null) {
+				group = Thread.currentThread().getThreadGroup();
+			}
 		}
-		return items;
+		this.group = group;
+		this.daemon = daemon;
 	}
 
-	private final void checkTimeoutImpl(final long timeout) {
-		if (timeout < 0) throw new IllegalArgumentException();
+	/** Diese Methode implementiert {@link ThreadItem#run()}. */
+	final void runItem(final ThreadItem item) {
+		while (true) {
+			final Runnable task = this.getTask(item);
+			if (task == null) return;
+			this.runTask(item, task);
+		}
 	}
 
-	private final Runnable getTaskImpl(final ThreadItem item) {
+	/** Diese Methode führt den gegebenen {@code task} aus, entfernt ihn anschließend aus {@link #activeMap}, löst seine Verbindung zum gegebenen {@code item} und
+	 * trägt das {@code item} nach fehlerfreier Berechnung in die {@link #waitingList} ein. */
+	private final void runTask(final ThreadItem item, final Runnable task) {
+		boolean okay = false;
+		try {
+			task.run();
+			okay = true;
+		} finally {
+			synchronized (this.activeMap) {
+				item.run = null;
+				item.task = null;
+				this.activeMap.remove(task);
+				this.activeMap.notifyAll();
+				if (okay) {
+					item.node.insert(this.waitingList);
+					this.waitingCount++;
+					Thread.interrupted();
+					this.checkActive();
+				}
+			}
+		}
+	}
+
+	/** Diese Methode wartet auf die Bestückung des gegebenen Threads mit einer Berechnung und gibt diese zurück. Wenn der Thread verworfen wurde, wird
+	 * {@code null} geliefert. */
+	private final Runnable getTask(final ThreadItem item) {
 		synchronized (this.waitingList) {
 			synchronized (this.activeMap) {
-				item.setName(this.activeName);
-				item.setPriority(this.activePriority);
 				final Runnable task = item.task;
 				if (task != null) return task;
 			}
-			final long until = System.currentTimeMillis() + this.waitingTimeout;
+			final long start = System.currentTimeMillis();
 			long sleep = this.waitingTimeout;
 			while (true) {
 				try {
 					this.waitingList.wait(sleep);
 				} catch (final InterruptedException ignore) {}
 				synchronized (this.activeMap) {
-					Runnable task = item.task;
+					final Runnable task = item.task;
 					if (task != null) return task;
-					if (this.waitingTimeout == 0 || this.waitingCount <= this.waitingReserve) {
+					if ((this.waitingTimeout == 0) || (this.waitingCount <= this.waitingReserve)) {
 						sleep = 0;
 					} else {
-						sleep = until - System.currentTimeMillis();
+						sleep = (start + this.waitingTimeout) - System.currentTimeMillis();
 						if (sleep <= 0) {
 							item.node.delete();
 							return null;
@@ -152,50 +188,57 @@ public class ThreadPool {
 		}
 	}
 
-	private final void runTaskImpl(final ThreadItem item, final Runnable task) {
-		boolean okay = false;
-		try {
-			Thread.interrupted();
-			task.run();
-			okay = true;
-		} finally {
-			synchronized (this.activeMap) {
-				item.join = null;
-				item.task = null;
-				this.activeMap.remove(task);
-				if (okay) {
-					item.node.insert(this.waitingList);
-					this.waitingCount++;
-				}
-				this.activeMap.notifyAll();
-			}
-		}
+	/** Diese Methode liefert den aktiven Thread zur gegebenen Berechnung oder {@code null}.
+	 *
+	 * @param task Berechnung.
+	 * @return Thread oder null.
+	 * @throws NullPointerException Wenn {@code task} {@code null} ist. */
+	private final ThreadItem getThread(final Runnable task) throws NullPointerException {
+		return this.activeMap.get(Objects.notNull(task));
 	}
 
-	/** Diese Methode implementiert {@link ThreadItem#run()}. */
-	final void run(final ThreadItem item) {
-		while (true) {
-			final Runnable task = this.getTaskImpl(item);
-			if (task == null) return;
-			this.runTaskImpl(item, task);
+	/** Diese Methode liefert die aktiven Threads zu den gegebenen Berechnungen.
+	 *
+	 * @param tasks Berechnungen.
+	 * @return Threads.
+	 * @throws NullPointerException Wenn {@link Thread#interrupt()} diese auslöst. */
+	private final HashSet3<ThreadItem> getThreads(final Iterable<? extends Runnable> tasks) throws NullPointerException {
+		final HashSet3<ThreadItem> items = new HashSet3<>(10);
+		for (final Runnable task: tasks) {
+			items.add(this.getThread(task));
+		}
+		items.remove(null);
+		return items;
+	}
+
+	/** Diese Methode halbiert die {@link HashMap3#capacity() Kapazität} der {@link #activeMap}, wenn diese Kapazität unter 25 % ausgenutzt wird. */
+	private final void checkActive() {
+		if (this.activeMap.size() >= (this.activeMap.capacity() / 4)) return;
+		this.activeMap.allocate(this.activeMap.capacity() / 2);
+	}
+
+	/** Diese Methode {@link Object#notifyAll() benachrichtigt} alle auf {@link #waitingList} {@link Object#wait(long) wartenden} Threads. */
+	private final void checkWaiting() {
+		synchronized (this.waitingList) {
+			this.waitingList.notifyAll();
 		}
 	}
 
 	/** Diese Methode implementiert {@link #join(long, Runnable)} ohne Synchronisation. */
 	private final void joinImpl(final ThreadItem item, final long timeout) throws InterruptedException {
 		if (item == null) return;
-		final Object join = item.join;
+		final Object run = item.run;
 		if (timeout == 0) {
 			while (true) {
 				this.activeMap.wait(0);
-				if (item.join != join) return;
+				if (item.run != run) return;
 			}
 		} else {
 			final long until = System.currentTimeMillis() + timeout;
 			long sleep = timeout;
 			while (true) {
 				this.activeMap.wait(sleep);
-				if (item.join != join) return;
+				if (item.run != run) return;
 				sleep = until - System.currentTimeMillis();
 				if (sleep <= 0) return;
 			}
@@ -211,8 +254,8 @@ public class ThreadPool {
 		this.join(0, task);
 	}
 
-	/** Diese Methode {@link Object#wait(long) wartet} auf den Abschluss der gegebenen Berechnung, sofern diese aktuell {@link #isActive(Runnable) verarbeitet}
-	 * wird. Wenn die gegebene Wartezeit nicht {@code 0} ist, wird höchstens solange gewartet.
+	/** Diese Methode wartet auf den Abschluss der gegebenen Berechnung, sofern diese aktuell {@link #isAlive(Runnable) verarbeitet} wird. Wenn die gegebene
+	 * Wartezeit nicht {@code 0} ist, wird höchstens solange gewartet.
 	 *
 	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
 	 * @param task Berechnung.
@@ -220,9 +263,9 @@ public class ThreadPool {
 	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void join(final long timeout, final Runnable task) throws NullPointerException, IllegalArgumentException, InterruptedException {
-		this.checkTimeoutImpl(timeout);
+		if (timeout < 0) throw new IllegalArgumentException();
 		synchronized (this.activeMap) {
-			this.joinImpl(this.toItemImpl(task), timeout);
+			this.joinImpl(this.getThread(task), timeout);
 		}
 	}
 
@@ -274,7 +317,7 @@ public class ThreadPool {
 		this.joinAll(0, Arrays.asList(tasks));
 	}
 
-	/** Diese Methode {@link #join(long, Runnable) wartet} auf den Abschluss der gegebenen Berechnungen, sofern diese aktuell {@link #isActive(Runnable)
+	/** Diese Methode {@link #join(long, Runnable) wartet} auf den Abschluss der gegebenen Berechnungen, sofern diese aktuell {@link #isAlive(Runnable)
 	 * verarbeitet} werden. Wenn die gegebene Wartezeit nicht {@code 0} ist, wird höchstens solange gewartet.
 	 *
 	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
@@ -284,9 +327,9 @@ public class ThreadPool {
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void joinAll(final long timeout, final Iterable<? extends Runnable> tasks)
 		throws NullPointerException, IllegalArgumentException, InterruptedException {
-		this.checkTimeoutImpl(timeout);
+		if (timeout < 0) throw new IllegalArgumentException();
 		synchronized (this.activeMap) {
-			this.joinAllImpl(this.toItemsImpl(tasks), timeout);
+			this.joinAllImpl(this.getThreads(tasks), timeout);
 		}
 	}
 
@@ -304,48 +347,72 @@ public class ThreadPool {
 	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void joinAllActive(final long timeout) throws IllegalArgumentException, InterruptedException {
-		this.checkTimeoutImpl(timeout);
+		if (timeout < 0) throw new IllegalArgumentException();
 		synchronized (this.activeMap) {
 			this.joinAllImpl(new ArrayList<>(this.activeMap.values()), timeout);
 		}
 	}
 
-	public void start(final Runnable task) throws NullPointerException, IllegalThreadStateException {
-		Objects.notNull(task);
+	/** Diese Methode implementiert {@link #start(Runnable)} ohne Synchronisation. */
+	private final void startImpl(final Runnable task) throws IllegalThreadStateException {
+		if (this.activeMap.containsKey(Objects.notNull(task))) throw new IllegalThreadStateException();
+		final ThreadNode node = this.waitingList.next;
 		final ThreadItem item;
-		synchronized (this.activeMap) {
-			if (this.activeMap.containsKey(task)) throw new IllegalThreadStateException();
-			final ThreadNode next = this.waitingList.next;
-			if (this.waitingList != next) {
-				item = next.item;
-				next.delete();
-				this.waitingCount--;
-			} else {
-				item = new ThreadItem(this);
-				item.setDaemon(true);
-				item.start();
-			}
-			item.join = new Object();
-			item.task = task;
-			this.activeMap.put(task, item);
-
-			if (this.activeMap.size() < (this.activeMap.capacity() / 4)) {
-				this.activeMap.allocate(this.activeMap.capacity() / 2);
-			}
+		if (this.waitingList != node) {
+			item = node.item;
+			node.delete();
+			this.waitingCount--;
+		} else {
+			item = new ThreadItem(this, this.group);
+			item.setDaemon(this.daemon);
+			item.start();
 		}
-		synchronized (this.waitingList) {
-			this.waitingList.notifyAll();
+		item.run = new Object();
+		item.setName(this.activeName);
+		if (item.getPriority() != this.activePriority) {
+			item.setPriority(this.activePriority);
 		}
+		this.activeMap.put(task, item);
+		item.task = task;
 	}
 
-	public void startAll(final Runnable... tasks) throws NullPointerException, IllegalThreadStateException { // ok
+	/** Diese Methode startet die gegebene Berechnung in einem eigenen {@link Thread}.
+	 *
+	 * @see #join(long, Runnable)
+	 * @see #interrupt(Runnable)
+	 * @param task Berechnung.
+	 * @throws NullPointerException Wenn {@code task} {@code null} ist.
+	 * @throws IllegalThreadStateException Wenn die Berechnung bereits {@link #isAlive(Runnable) verarbeitet} wird. */
+	public void start(final Runnable task) throws NullPointerException, IllegalThreadStateException {
+		synchronized (this.activeMap) {
+			this.checkActive();
+			this.startImpl(task);
+		}
+		this.checkWaiting();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #startAll(Iterable) this.startAll(Arrays.asList(tasks))}.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalThreadStateException Wenn {@link #startAll(Iterable)} diese auslöst. */
+	public void startAll(final Runnable... tasks) throws NullPointerException, IllegalThreadStateException {
 		this.startAll(Arrays.asList(tasks));
 	}
 
-	public void startAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, IllegalThreadStateException { // ok
-		for (final Runnable task: tasks) {
-			this.start(task);
+	/** Diese Methode {@link #start(Runnable) startet} die gegebenen Berechnungen in jeweils einem eigenen {@link Thread}.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalThreadStateException Wenn {@link #start(Runnable)} diese auslöst. Dies kann auch auftreten, wenn {@code tasks} Duplikate enthält. */
+	public void startAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, IllegalThreadStateException {
+		synchronized (this.activeMap) {
+			for (final Runnable task: tasks) {
+				this.startImpl(task);
+			}
+			this.checkActive();
 		}
+		this.checkWaiting();
 	}
 
 	/** Diese Methode implementiert {@link #interrupt(Runnable)} ohne Synchronisation. */
@@ -354,14 +421,14 @@ public class ThreadPool {
 		item.interrupt();
 	}
 
-	/** Diese Methode {@link Thread#interrupt() unterbricht} die gegebene Berechnung, sofern diese aktuell {@link #isActive(Runnable) verarbeitet} wird.
+	/** Diese Methode {@link Thread#interrupt() unterbricht} die gegebene Berechnung, sofern diese aktuell {@link #isAlive(Runnable) verarbeitet} wird.
 	 *
 	 * @param task Berechnung.
 	 * @throws NullPointerException Wenn {@code task} {@code null} ist.
 	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
 	public void interrupt(final Runnable task) throws NullPointerException, SecurityException {
 		synchronized (this.activeMap) {
-			this.interruptImpl(this.toItemImpl(task));
+			this.interruptImpl(this.getThread(task));
 		}
 	}
 
@@ -381,14 +448,14 @@ public class ThreadPool {
 		this.interruptAll(Arrays.asList(tasks));
 	}
 
-	/** Diese Methode {@link Thread#interrupt() unterbricht} die gegebenen Berechnungen, sofern diese aktuell {@link #isActive(Runnable) verarbeitet} werden.
+	/** Diese Methode {@link Thread#interrupt() unterbricht} die gegebenen Berechnungen, sofern diese aktuell {@link #isAlive(Runnable) verarbeitet} werden.
 	 *
 	 * @param tasks Berechnungen.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
 	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
 	public void interruptAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, SecurityException {
 		synchronized (this.activeMap) {
-			this.interruptAllImpl(this.toItemsImpl(tasks));
+			this.interruptAllImpl(this.getThreads(tasks));
 		}
 	}
 
@@ -402,67 +469,114 @@ public class ThreadPool {
 		}
 	}
 
-	public boolean isActive(final Runnable task) throws NullPointerException {
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebene Berechnung {@link #start(Runnable) gestartet} und noch nicht abgeschlossen wurde.
+	 *
+	 * @param task Berechnung.
+	 * @return {@code true}, wenn die Berechnung aktuell ausgeführt wird; sonst {@code false}.
+	 * @throws NullPointerException Wenn {@code task} {@code null} ist. */
+	public boolean isAlive(final Runnable task) throws NullPointerException {
 		synchronized (this.activeMap) {
 			return this.activeMap.containsKey(Objects.notNull(task));
 		}
 	}
 
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn zur Auswertung der Berechnung Daemon-Threads eingesetzt werden. Wenn sie {@code false} liefert,
+	 * werden hierfür User-Threads eingesetzt.
+	 *
+	 * @see Thread#setDaemon(boolean)
+	 * @return {@code true} für Daemon-Threads; {@code false} für User-Threads. */
+	public boolean isDaemon() {
+		return this.daemon;
+	}
+
+	/** Diese Methode gibt die Liste der {@link #isAlive(Runnable) aktuell ausgeführten} Berehnungen zurück.
+	 *
+	 * @return Liste ausgeführter Berehnungen. */
 	public Runnable[] getActiveTasks() {
 		synchronized (this.activeMap) {
 			return this.activeMap.keySet().toArray(new Runnable[this.activeMap.size()]);
 		}
 	}
 
+	/** Diese Methode gibt die Anzahl der {@link #isAlive(Runnable) aktuell ausgeführten} Berehnungen zurück.
+	 *
+	 * @return Anzahl ausgeführter Berehnungen. */
 	public int getActiveCount() {
 		synchronized (this.activeMap) {
 			return this.activeMap.size();
 		}
 	}
 
+	/** Diese Methode gibt den {@link Thread#getName() Namen} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen zurück.
+	 *
+	 * @return Name der nächsten Threads. */
 	public String getActiveName() {
 		synchronized (this.activeMap) {
 			return this.activeName;
 		}
 	}
 
-	public void setActiveName(final String value) {
-		synchronized (this.activeMap) {
-			this.activeName = Objects.notNull(value);
-		}
-	}
-
+	/** Diese Methode gibt die {@link Thread#getPriority() Priorität} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen zurück.
+	 *
+	 * @return Priorität der nächsten Threads. */
 	public int getActivePriority() {
 		synchronized (this.activeMap) {
 			return this.activePriority;
 		}
 	}
 
-	public void setActivePriority(final int value) {
-		if ((value < Thread.MIN_PRIORITY) || (value > Thread.MAX_PRIORITY)) throw new IllegalArgumentException();
-		synchronized (this.activeMap) {
-			this.activePriority = value;
-		}
-	}
-
-	public int getWaitingReserve() {
-		synchronized (this.waitingList) {
-			return this.waitingReserve;
-		}
-	}
-
+	/** Diese Methode gibt die Anzahl der aktuell auf ihre Wiederverwendung wartenden Threads zurück.
+	 *
+	 * @return Anzahl wiederverwendbarer Threads. */
 	public int getWaitingCount() {
 		synchronized (this.activeMap) {
 			return this.waitingCount;
 		}
 	}
 
+	/** Diese Methode gibt die maximale Anzahl der auf ihre Wiederverwendung wartenden und als Reserve vorgehalten Threads zurück.
+	 *
+	 * @return Reserve an wartenden Threads. */
+	public int getWaitingReserve() {
+		synchronized (this.waitingList) {
+			return this.waitingReserve;
+		}
+	}
+
+	/** Diese Methode gibt Begrenzug der Lebenszeit der auf ihre Wiederverwendung wartenden Threads zurück.
+	 *
+	 * @return Maximale Lebenszeit in Millisekunden oder {@code 0}, bei unbegrenzter Lebenszeit. */
 	public long getWaitingTimeout() {
 		synchronized (this.waitingList) {
 			return this.waitingTimeout;
 		}
 	}
 
+	/** Diese Methode setzt den {@link Thread#getName() Namen} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen.
+	 *
+	 * @param value Name.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	public void setActiveName(final String value) throws NullPointerException {
+		synchronized (this.activeMap) {
+			this.activeName = Objects.notNull(value);
+		}
+	}
+
+	/** Diese Methode setzt die {@link Thread#getPriority() Priorität} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen.
+	 *
+	 * @param value Priorität.
+	 * @throws IllegalArgumentException Wenn {@link Thread#setPriority(int)} diese auslösen würde. */
+	public void setActivePriority(final int value) throws IllegalArgumentException {
+		if ((value < Thread.MIN_PRIORITY) || (value > Thread.MAX_PRIORITY)) throw new IllegalArgumentException();
+		synchronized (this.activeMap) {
+			this.activePriority = value;
+		}
+	}
+
+	/** Diese Methode setzt die maximale Anzahl der auf ihre Wiederverwendung wartenden und als Reserve vorgehalten Threads.
+	 *
+	 * @param value Reserve an wartenden Threads.
+	 * @throws IllegalAccessException Wenn {@code value} negativ ist. */
 	public void setWaitingReserve(final int value) throws IllegalAccessException {
 		if (value < 0) throw new IllegalArgumentException();
 		synchronized (this.waitingList) {
@@ -470,16 +584,21 @@ public class ThreadPool {
 		}
 	}
 
-	public void setWaitingTimeout(final long value) throws IllegalAccessException {
-		this.checkTimeoutImpl(value);
+	/** Diese Methode setzt die Begrenzug der Lebenszeit der auf ihre Wiederverwendung wartenden Threads.
+	 *
+	 * @param value Maximale Lebenszeit in Millisekunden oder {@code 0}, bei unbegrenzter Lebenszeit.
+	 * @throws IllegalArgumentException Wenn {@code value} negativ ist. */
+	public void setWaitingTimeout(final long value) throws IllegalArgumentException {
+		if (value < 0) throw new IllegalArgumentException();
 		synchronized (this.waitingList) {
 			this.waitingTimeout = value;
+			this.waitingList.notifyAll();
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "[" + this.getActiveName() + "-" + this.getActivePriority() + "-]";
+		return Objects.toInvokeString(this, this.isDaemon(), this.getWaitingReserve(), this.getWaitingTimeout());
 	}
 
 }

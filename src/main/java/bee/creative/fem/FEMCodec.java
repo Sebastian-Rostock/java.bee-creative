@@ -18,8 +18,8 @@ import bee.creative.util.Integers;
 import bee.creative.util.Objects;
 import bee.creative.util.Property;
 
-// TODO de-/coder für ausgewählte fem-datentypen in iam-format (und json-format)
-// json-format aus string und object[] derselben, de-/coder ebenfalls in javascript
+// TODO de-/coder für ausgewählte fem-datentypen in iam-format (und json-format?)
+// json-format aus string und object[] derselben, de-/coder ebenfalls in javascript??
 
 class FEMCodec implements Property<FEMValue> {
 
@@ -93,13 +93,33 @@ class FEMCodec implements Property<FEMValue> {
 			return null;
 		}
 
-		protected abstract GItem customGet(final int index);
+		protected abstract GItem customItem(final int index);
+
+		protected abstract int customSize();
 
 		public void clear() {
 			final Object[] items = this.items;
 			for (int i = 0, size = items.length; i < size; i++) {
 
 			}
+		}
+
+	}
+
+	protected static abstract class ItemCache2<GItem> extends ItemCache<GItem> {
+
+		protected abstract GItem customItem(final IAMArray array);
+
+		protected abstract IAMListing customListing();
+
+		@Override
+		protected GItem customItem(final int index) {
+			return this.customItem(this.customListing().item(index));
+		}
+
+		@Override
+		protected int customSize() {
+			return this.customListing().itemCount();
 		}
 
 	}
@@ -438,28 +458,28 @@ class FEMCodec implements Property<FEMValue> {
 		}
 	}
 
+	final ItemCache<FEMArray> sourceArrayValueCache = new ItemCache<FEMArray>() {
+
+		@Override
+		protected FEMArray customItem(final int index) {
+			return FEMCodec.this.getArrayValue(FEMCodec.this.sourceArrayValuePool.item(index));
+		}
+
+		@Override
+		protected int customSize() {
+			return FEMCodec.this.sourceArrayValuePool.itemCount();
+		}
+
+	};
+
 	/** Diese Methode gibt die Wertliste zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
 	 *
 	 * @param index Position in {@link #sourceArrayValuePool}.
 	 * @return Wertliste.
 	 * @throws IllegalArgumentException Wenn {@link #getArrayValue(IAMArray)} diese auslöst. */
 	protected FEMArray getArrayValue(final int index) throws IllegalArgumentException {
-		// getItem(sourceArrayValueCache, sourceArrayValueItems, index);
-		return this.getArrayValueImpl(index);
+		return this.sourceArrayValueCache.get(index);
 	}
-
-	protected FEMArray getArrayValueImpl(final int index) throws IllegalArgumentException {
-		return this.getArrayValue(this.sourceArrayValuePool.item(index));
-	}
-
-	protected Items<FEMArray> sourceArrayValueItems = new Items<FEMArray>() {
-
-		@Override
-		public FEMArray get(final int index) {
-			return FEMCodec.this.getArrayValueImpl(index);
-		}
-
-	};
 
 	/** Diese Methode gibt die Zeichenkette zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
 	 *
