@@ -83,10 +83,10 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static abstract class BasePool<GItem, GCodec extends FEMCodec> implements Items<GItem> {
+	protected static abstract class BasePool<GItem> implements Items<GItem> {
 
 		/** Dieses Feld speichert den Besitzer. */
-		protected GCodec codec;
+		protected FEMCodec codec;
 
 		protected Object[] items = {};
 
@@ -96,7 +96,7 @@ class FEMCodec implements Property<FEMValue> {
 		/** Dieses Feld speichert die Auflistung über {@link #putArrayValue(FEMArray)} hinzugefügten Wertlisten. */
 		protected IAMListingBuilder targetPool;
 
-		public BasePool(final GCodec codec) {
+		public BasePool(final FEMCodec codec) {
 			this.codec = codec;
 		}
 
@@ -160,9 +160,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class ArrayValuePool<GCodec extends FEMCodec> extends BasePool<FEMArray, GCodec> {
+	protected static class ArrayValuePool extends BasePool<FEMArray> {
 
-		public ArrayValuePool(final GCodec codec) {
+		public ArrayValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -183,9 +183,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class StringValuePool<GCodec extends FEMCodec> extends BasePool<FEMString, GCodec> {
+	protected static class StringValuePool extends BasePool<FEMString> {
 
-		public StringValuePool(final GCodec codec) {
+		public StringValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -206,9 +206,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class BinaryValuePool<GCodec extends FEMCodec> extends BasePool<FEMBinary, GCodec> {
+	protected static class BinaryValuePool extends BasePool<FEMBinary> {
 
-		public BinaryValuePool(final GCodec codec) {
+		public BinaryValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -229,9 +229,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class IntegerValuePool<GCodec extends FEMCodec> extends BasePool<FEMInteger, GCodec> {
+	protected static class IntegerValuePool extends BasePool<FEMInteger> {
 
-		public IntegerValuePool(final GCodec codec) {
+		public IntegerValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -252,9 +252,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class DecimalValuePool<GCodec extends FEMCodec> extends BasePool<FEMDecimal, GCodec> {
+	protected static class DecimalValuePool extends BasePool<FEMDecimal> {
 
-		public DecimalValuePool(final GCodec codec) {
+		public DecimalValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -275,9 +275,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class DurationValuePool<GCodec extends FEMCodec> extends BasePool<FEMDuration, GCodec> {
+	protected static class DurationValuePool extends BasePool<FEMDuration> {
 
-		public DurationValuePool(final GCodec codec) {
+		public DurationValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -298,9 +298,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class DatetimeValuePool<GCodec extends FEMCodec> extends BasePool<FEMDatetime, GCodec> {
+	protected static class DatetimeValuePool extends BasePool<FEMDatetime> {
 
-		public DatetimeValuePool(final GCodec codec) {
+		public DatetimeValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -321,9 +321,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class HandlerValuePool<GCodec extends FEMCodec> extends BasePool<FEMHandler, GCodec> {
+	protected static class HandlerValuePool extends BasePool<FEMHandler> {
 
-		public HandlerValuePool(final GCodec codec) {
+		public HandlerValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -344,9 +344,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class ObjectValuePool<GCodec extends FEMCodec> extends BasePool<FEMObject, GCodec> {
+	protected static class ObjectValuePool extends BasePool<FEMObject> {
 
-		public ObjectValuePool(final GCodec codec) {
+		public ObjectValuePool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -367,9 +367,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class ProxyFunctionPool<GCodec extends FEMCodec> extends BasePool<FEMProxy, GCodec> {
+	protected static class ProxyFunctionPool extends BasePool<FEMProxy> {
 
-		public ProxyFunctionPool(final GCodec codec) {
+		public ProxyFunctionPool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -390,9 +390,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class ConcatFunctionPool<GCodec extends FEMCodec> extends BasePool<ConcatFunction, GCodec> {
+	protected static class ConcatFunctionPool extends BasePool<ConcatFunction> {
 
-		public ConcatFunctionPool(final GCodec codec) {
+		public ConcatFunctionPool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -413,9 +413,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class ClosureFunctionPool<GCodec extends FEMCodec> extends BasePool<ClosureFunction, GCodec> {
+	protected static class ClosureFunctionPool extends BasePool<ClosureFunction> {
 
-		public ClosureFunctionPool(final GCodec codec) {
+		public ClosureFunctionPool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -436,9 +436,9 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
-	protected static class CompositeFunctionPool<GCodec extends FEMCodec> extends BasePool<CompositeFunction, GCodec> {
+	protected static class CompositeFunctionPool extends BasePool<CompositeFunction> {
 
-		public CompositeFunctionPool(final GCodec codec) {
+		public CompositeFunctionPool(final FEMCodec codec) {
 			super(codec);
 		}
 
@@ -537,43 +537,43 @@ class FEMCodec implements Property<FEMValue> {
 	protected IAMMappingBuilder targetIndexMapping;
 
 	/** Dieses Feld speichert die Auflistung der Wertlisten. */
-	protected ArrayValuePool<?> arrayValuePool = new ArrayValuePool<>(this);
+	protected ArrayValuePool arrayValuePool = new ArrayValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Zeichenketten. */
-	protected StringValuePool<?> stringValuePool = new StringValuePool<>(this);
+	protected StringValuePool stringValuePool = new StringValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Bytefolgen. */
-	protected BinaryValuePool<?> binaryValuePool = new BinaryValuePool<>(this);
+	protected BinaryValuePool binaryValuePool = new BinaryValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Dezimalzahlen. */
-	protected IntegerValuePool<?> integerValuePool = new IntegerValuePool<>(this);
+	protected IntegerValuePool integerValuePool = new IntegerValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Dezimalbrüche. */
-	protected DecimalValuePool<?> decimalValuePool = new DecimalValuePool<>(this);
+	protected DecimalValuePool decimalValuePool = new DecimalValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Zeitspannen. */
-	protected DurationValuePool<?> durationValuePool = new DurationValuePool<>(this);
+	protected DurationValuePool durationValuePool = new DurationValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Zeitangaben. */
-	protected DatetimeValuePool<?> datetimeValuePool = new DatetimeValuePool<>(this);
+	protected DatetimeValuePool datetimeValuePool = new DatetimeValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Funktionszeiger. */
-	protected HandlerValuePool<?> handlerValuePool = new HandlerValuePool<>(this);
+	protected HandlerValuePool handlerValuePool = new HandlerValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Objektreferenzen. */
-	protected ObjectValuePool<?> objectValuePool = new ObjectValuePool<>(this);
+	protected ObjectValuePool objectValuePool = new ObjectValuePool(this);
 
 	/** Dieses Feld speichert die Auflistung der Funktionsplatzhalter. */
-	protected ProxyFunctionPool<?> proxyFunctionPool = new ProxyFunctionPool<>(this);
+	protected ProxyFunctionPool proxyFunctionPool = new ProxyFunctionPool(this);
 
 	/** Dieses Feld speichert die Auflistung der Funktionsaufrufe. */
-	protected ConcatFunctionPool<?> concatFunctionPool = new ConcatFunctionPool<>(this);
+	protected ConcatFunctionPool concatFunctionPool = new ConcatFunctionPool(this);
 
 	/** Dieses Feld speichert die Auflistung der Funktionsbindungen. */
-	protected ClosureFunctionPool<?> closureFunctionPool = new ClosureFunctionPool<>(this);
+	protected ClosureFunctionPool closureFunctionPool = new ClosureFunctionPool(this);
 
 	/** Dieses Feld speichert die Auflistung der Funktionsaufrufe. */
-	protected CompositeFunctionPool<?> compositeFunctionPool = new CompositeFunctionPool<>(this);
+	protected CompositeFunctionPool compositeFunctionPool = new CompositeFunctionPool(this);
 
 	@Override
 	public FEMValue get() {
@@ -644,11 +644,11 @@ class FEMCodec implements Property<FEMValue> {
 		return this;
 	}
 
-	protected void setSource(final BasePool<?, ?> pool, final int type) {
+	protected void setSource(final BasePool<?> pool, final int type) {
 		pool.setSource(this.getListing(type));
 	}
 
-	protected void setTarget(final BasePool<?, ?> pool, final int type) {
+	protected void setTarget(final BasePool<?> pool, final int type) {
 		pool.setTarget(this.putListing(type));
 	}
 
