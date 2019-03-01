@@ -26,12 +26,7 @@ public class Producers {
 
 		public MethodProducer(final Method method, final boolean forceAccessible) {
 			if (!Modifier.isStatic(method.getModifiers()) || (method.getParameterTypes().length != 0)) throw new IllegalArgumentException();
-			try {
-				method.setAccessible(forceAccessible);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-			this.method = method;
+			this.method = forceAccessible ? Natives.forceAccessible(method) : Objects.notNull(method);
 		}
 
 		@Override
@@ -59,12 +54,7 @@ public class Producers {
 
 		public ConstructorProducer(final Constructor<?> constructor, final boolean forceAccessible) {
 			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 0)) throw new IllegalArgumentException();
-			try {
-				constructor.setAccessible(forceAccessible);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-			this.constructor = constructor;
+			this.constructor = forceAccessible ? Natives.forceAccessible(constructor) : Objects.notNull(constructor);
 		}
 
 		@Override

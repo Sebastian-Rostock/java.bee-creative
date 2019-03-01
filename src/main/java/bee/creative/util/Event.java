@@ -5,6 +5,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import bee.creative.emu.EMU;
 import bee.creative.ref.PointerQueue;
+import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
  * {@link #pop(Object, Object) abgemeldet} bzw. {@link #fire(Object, Object) benachrichtigt} werden können und bezüglich eines {@link WeakReference schwach}
@@ -43,7 +44,7 @@ import bee.creative.ref.PointerQueue;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GMessage> Typ der Nachricht.
  * @param <GObserver> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
-public abstract class Event<GMessage, GObserver> {
+public abstract class Event<GMessage, GObserver> extends BaseObject {
 
 	/** Diese Klasse implementiert die Verwaltungsdaten eines Ereignissenders. Jede Instanz benötigt mindestens 24 Byte. */
 	private static final class EventItem extends WeakReference<Object> {
@@ -244,11 +245,6 @@ public abstract class Event<GMessage, GObserver> {
 					}
 				}
 			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this);
 		}
 
 	}

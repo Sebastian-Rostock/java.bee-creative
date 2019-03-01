@@ -36,10 +36,31 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 		public final Object newValue;
 
 		/** Dieser Konstruktor initialisiert die Merkmale des Ereignisses. */
-		public UpdatePropertyMessage(final ObservableProperty<?> sender, final Object oldValue, final Object newValue) {
+		public <GValue> UpdatePropertyMessage(final ObservableProperty<GValue> sender, final GValue oldValue, final GValue newValue) {
 			this.sender = sender;
 			this.oldValue = oldValue;
 			this.newValue = newValue;
+		}
+
+		@SuppressWarnings ({"unchecked", "javadoc", "rawtypes"})
+		private void setValue(final Object value) {
+			((ObservableProperty)this.sender).set(value);
+		}
+
+		/** Diese Methode setzt den Wert der {@link #sender Eigenschaft} auf den {@link #oldValue alten Wert}. */
+		public void setOldValue() {
+			this.setValue(this.oldValue);
+		}
+
+		/** Diese Methode setzt den Wert der {@link #sender Eigenschaft} auf den {@link #newValue neuen Wert}. */
+		public void setNewValue() {
+			this.setValue(this.newValue);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.sender, this.oldValue, this.newValue);
 		}
 
 	}

@@ -396,14 +396,7 @@ public final class Fields {
 		public final java.lang.reflect.Field field;
 
 		public NativeField(final java.lang.reflect.Field field, final boolean forceAccessible) {
-			if (forceAccessible) {
-				try {
-					field.setAccessible(true);
-				} catch (final SecurityException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-			this.field = Objects.notNull(field);
+			this.field = forceAccessible ? Natives.forceAccessible(field) : Objects.notNull(field);
 		}
 
 		@Override
@@ -948,6 +941,17 @@ public final class Fields {
 		return Fields.compositeField(Getters.translatedGetter(toTarget, field), Setters.translatedSetter(toSource, field));
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link ObservableField new ObservableField<>(field)}. */
+	public static <GItem, GValue> Field<GItem, GValue> observableField(final Field<? super GItem, GValue> field) throws NullPointerException {
+		return new ObservableField<>(field);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #observableField(Field) Fields.observableField(Fields.compositeField(getter, setter))}. */
+	public static <GItem, GValue> Field<GItem, GValue> observableField(final Getter<? super GItem, ? extends GValue> getter,
+		final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
+		return Fields.observableField(Fields.compositeField(getter, setter));
+	}
+
 	/** Diese Methode gibt ein zusammengesetztes {@link Field} zurück, dessen Methoden an die des gegebenen {@link Getter} und {@link Setter} delegieren.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
@@ -961,8 +965,8 @@ public final class Fields {
 		return new CompositeField<>(getter, setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für
-	 * {@code #aggregatedField(Getter, Getter, Field) Fields.aggregatedField(Getters.neutralGetter(), Getters.neutralGetter(), field)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #aggregatedField(Getter, Getter, Field) Fields.aggregatedField(Getters.neutralGetter(),
+	 * Getters.neutralGetter(), field)}. */
 	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field) throws NullPointerException {
 		return Fields.aggregatedField(Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter(), field);
 	}

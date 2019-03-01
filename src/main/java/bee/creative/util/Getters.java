@@ -43,12 +43,7 @@ public class Getters {
 
 		public MethodGetter(final Method method, final boolean forceAccessible) {
 			if (method.getParameterTypes().length != (Modifier.isStatic(method.getModifiers()) ? 1 : 0)) throw new IllegalArgumentException();
-			try {
-				method.setAccessible(forceAccessible);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-			this.method = method;
+			this.method = forceAccessible ? Natives.forceAccessible(method) : Objects.notNull(method);
 		}
 
 		@Override
@@ -82,12 +77,7 @@ public class Getters {
 
 		public ConstructorGetter(final Constructor<?> constructor, final boolean forceAccessible) {
 			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 1)) throw new IllegalArgumentException();
-			try {
-				constructor.setAccessible(forceAccessible);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-			this.constructor = constructor;
+			this.constructor =  forceAccessible ? Natives.forceAccessible(constructor) : Objects.notNull(constructor);
 		}
 
 		@Override

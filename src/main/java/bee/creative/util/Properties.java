@@ -84,12 +84,7 @@ public class Properties {
 
 		public NativeProperty(final java.lang.reflect.Field field, final boolean forceAccessible) {
 			if (!Modifier.isStatic(field.getModifiers())) throw new IllegalArgumentException();
-			try {
-				field.setAccessible(forceAccessible);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-			this.field = field;
+			this.field = forceAccessible ? Natives.forceAccessible(field) : Objects.notNull(field);
 		}
 
 		@Override
@@ -361,6 +356,18 @@ public class Properties {
 	public static <GSource, GTarget> Property<GTarget> translatedProperty(final Getter<? super GSource, ? extends GTarget> toTarget,
 		final Getter<? super GTarget, ? extends GSource> toSource, final Property<GSource> property) throws NullPointerException {
 		return Properties.compositeProperty(Producers.translatedProducer(toTarget, property), Consumers.translatedConsumer(toSource, property));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ObservableProperty new ObservableProperty<>(property)}. */
+	public static <GValue> Property<GValue> observableProperty(final Property<GValue> property) throws NullPointerException {
+		return new ObservableProperty<>(property);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #observableProperty(Property) Properties.observableProperty(Properties.compositeProperty(producer,
+	 * consumer))}. */
+	public static <GValue> Property<GValue> observableProperty(final Producer<? extends GValue> producer, final Consumer<? super GValue> consumer)
+		throws NullPointerException {
+		return Properties.observableProperty(Properties.compositeProperty(producer, consumer));
 	}
 
 	/** Diese Methode gibt ein zusammengesetztes {@link Property} zurück, dessen Methoden an die des gegebenen {@link Producer} und {@link Consumer} delegieren.

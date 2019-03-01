@@ -1,10 +1,12 @@
 package bee.creative.util;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import bee.creative.util.Builders.MapBuilder;
 
 /** Diese Klasse implementiert Methoden zum Parsen von {@link Class Klassen}, {@link Field Datenfeldern}, {@link Method Methoden} und {@link Constructor
  * Konstruktoren} aus deren Textdarstellung sowie zur Erzeugung dieser Textdarstellungen.
@@ -13,7 +15,7 @@ import java.util.Arrays;
 public class Natives {
 
 	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
-	static final HashMap<Object, Class<?>> parseClass = Builders.MapBuilder.<Object, Class<?>>forHashMap(false).putAllKeysFrom(new Getter<Class<?>, Object>() {
+	static final HashMap<Object, Class<?>> parseClass = MapBuilder.<Object, Class<?>>forHashMap(false).putAllKeysFrom(new Getter<Class<?>, Object>() {
 
 		@Override
 		public Object get(final Class<?> input) {
@@ -288,6 +290,21 @@ public class Natives {
 	@SuppressWarnings ("javadoc")
 	static String formatMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
 		return Natives.formatClass(methodOwner) + "." + methodName + Natives.formatParams(methodParams);
+	}
+
+	/** Diese Methode erzwingt die {@link AccessibleObject#setAccessible(boolean) Zugreifbarkeit} des gegebenen Objekts und gibt es zurück.
+	 * 
+	 * @param result Objekt mit Zugreifbarkeit.
+	 * @return zugreifbares Objekt.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn das Objekt nicht zugrifbar ist. */
+	public static <GResult extends AccessibleObject> GResult forceAccessible(GResult result) throws NullPointerException, IllegalArgumentException {
+		try {
+			result.setAccessible(true);
+			return result;
+		} catch (final SecurityException cause) {
+			throw new IllegalArgumentException(cause);
+		}
 	}
 
 }

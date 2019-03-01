@@ -25,12 +25,7 @@ public class Consumers {
 
 		public NativeConsumer(final Method method, final boolean forceAccessible) {
 			if (!Modifier.isStatic(method.getModifiers()) || (method.getParameterTypes().length != 1)) throw new IllegalArgumentException();
-			try {
-				method.setAccessible(forceAccessible);
-			} catch (final SecurityException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-			this.method = method;
+			this.method = forceAccessible ? Natives.forceAccessible(method) : Objects.notNull(method);
 		}
 
 		@Override
