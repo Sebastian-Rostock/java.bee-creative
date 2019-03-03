@@ -102,7 +102,7 @@ class FEMCodec implements Property<FEMValue> {
 
 		@Override
 		public GItem get(final int index) {
-
+			// TODO cache
 			return this.toItem(this.sourcePool.item(index));
 		}
 
@@ -122,9 +122,13 @@ class FEMCodec implements Property<FEMValue> {
 
 		public abstract int toRef(int index);
 
-		public abstract GItem toItem(final IAMArray source);
+		public abstract GItem toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException;
 
-		public abstract IAMArray toArray(final GItem source);
+		public abstract IAMArray toArray(final GItem source) throws NullPointerException, IllegalArgumentException;
+
+		public int size() {
+			return this.sourcePool.itemCount();
+		}
 
 		public void clear() {
 			final Object[] items = this.items;
@@ -142,7 +146,7 @@ class FEMCodec implements Property<FEMValue> {
 				@Override
 				public GItem get(final int index) {
 					if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-					return this.get(index);
+					return BasePool.this.get(index);
 				}
 
 				@Override
@@ -160,6 +164,7 @@ class FEMCodec implements Property<FEMValue> {
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class ArrayValuePool extends BasePool<FEMArray> {
 
 		public ArrayValuePool(final FEMCodec codec) {
@@ -172,17 +177,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMArray toItem(final IAMArray source) {
+		public FEMArray toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getArrayValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMArray source) {
+		public IAMArray toArray(final FEMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getArrayArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class StringValuePool extends BasePool<FEMString> {
 
 		public StringValuePool(final FEMCodec codec) {
@@ -195,17 +201,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMString toItem(final IAMArray source) {
+		public FEMString toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getStringValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMString source) {
+		public IAMArray toArray(final FEMString source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getStringArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class BinaryValuePool extends BasePool<FEMBinary> {
 
 		public BinaryValuePool(final FEMCodec codec) {
@@ -218,17 +225,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMBinary toItem(final IAMArray source) {
+		public FEMBinary toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getBinaryValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMBinary source) {
+		public IAMArray toArray(final FEMBinary source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getBinaryArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class IntegerValuePool extends BasePool<FEMInteger> {
 
 		public IntegerValuePool(final FEMCodec codec) {
@@ -241,17 +249,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMInteger toItem(final IAMArray source) {
+		public FEMInteger toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getIntegerValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMInteger source) {
+		public IAMArray toArray(final FEMInteger source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getIntegerArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class DecimalValuePool extends BasePool<FEMDecimal> {
 
 		public DecimalValuePool(final FEMCodec codec) {
@@ -264,17 +273,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMDecimal toItem(final IAMArray source) {
+		public FEMDecimal toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getDecimalValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMDecimal source) {
+		public IAMArray toArray(final FEMDecimal source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getDecimalArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class DurationValuePool extends BasePool<FEMDuration> {
 
 		public DurationValuePool(final FEMCodec codec) {
@@ -287,17 +297,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMDuration toItem(final IAMArray source) {
+		public FEMDuration toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getDurationValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMDuration source) {
+		public IAMArray toArray(final FEMDuration source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getDurationArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class DatetimeValuePool extends BasePool<FEMDatetime> {
 
 		public DatetimeValuePool(final FEMCodec codec) {
@@ -310,17 +321,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMDatetime toItem(final IAMArray source) {
+		public FEMDatetime toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getDatetimeValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMDatetime source) {
+		public IAMArray toArray(final FEMDatetime source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getDatetimeArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class HandlerValuePool extends BasePool<FEMHandler> {
 
 		public HandlerValuePool(final FEMCodec codec) {
@@ -333,17 +345,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMHandler toItem(final IAMArray source) {
+		public FEMHandler toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getHandlerValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMHandler source) {
+		public IAMArray toArray(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getHandlerArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class ObjectValuePool extends BasePool<FEMObject> {
 
 		public ObjectValuePool(final FEMCodec codec) {
@@ -356,17 +369,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMObject toItem(final IAMArray source) {
+		public FEMObject toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getObjectValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMObject source) {
+		public IAMArray toArray(final FEMObject source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getObjectArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class ProxyFunctionPool extends BasePool<FEMProxy> {
 
 		public ProxyFunctionPool(final FEMCodec codec) {
@@ -379,17 +393,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMProxy toItem(final IAMArray source) {
+		public FEMProxy toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getProxyFunction(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMProxy source) {
+		public IAMArray toArray(final FEMProxy source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getProxyArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class ConcatFunctionPool extends BasePool<ConcatFunction> {
 
 		public ConcatFunctionPool(final FEMCodec codec) {
@@ -402,17 +417,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public ConcatFunction toItem(final IAMArray source) {
+		public ConcatFunction toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getConcatFunction(source);
 		}
 
 		@Override
-		public IAMArray toArray(final ConcatFunction source) {
+		public IAMArray toArray(final ConcatFunction source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getConcatArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class ClosureFunctionPool extends BasePool<ClosureFunction> {
 
 		public ClosureFunctionPool(final FEMCodec codec) {
@@ -425,17 +441,18 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public ClosureFunction toItem(final IAMArray source) {
+		public ClosureFunction toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getClosureFunction(source);
 		}
 
 		@Override
-		public IAMArray toArray(final ClosureFunction source) {
+		public IAMArray toArray(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getClosureArray(source);
 		}
 
 	}
 
+	@SuppressWarnings ("javadoc")
 	protected static class CompositeFunctionPool extends BasePool<CompositeFunction> {
 
 		public CompositeFunctionPool(final FEMCodec codec) {
@@ -448,12 +465,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public CompositeFunction toItem(final IAMArray source) {
+		public CompositeFunction toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getCompositeFunction(source);
 		}
 
 		@Override
-		public IAMArray toArray(final CompositeFunction source) {
+		public IAMArray toArray(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
 			return this.codec.getCompositeArray(source);
 		}
 
@@ -566,7 +583,7 @@ class FEMCodec implements Property<FEMValue> {
 	/** Dieses Feld speichert die Auflistung der Funktionsplatzhalter. */
 	protected ProxyFunctionPool proxyFunctionPool = new ProxyFunctionPool(this);
 
-	/** Dieses Feld speichert die Auflistung der Funktionsaufrufe. */
+	/** Dieses Feld speichert die Auflistung der Funktionketten. */
 	protected ConcatFunctionPool concatFunctionPool = new ConcatFunctionPool(this);
 
 	/** Dieses Feld speichert die Auflistung der Funktionsbindungen. */
@@ -587,10 +604,6 @@ class FEMCodec implements Property<FEMValue> {
 
 	public IAMIndex getSource() {
 		return this.sourceIndex;
-	}
-
-	public IAMIndexBuilder getTarget() {
-		return this.targetIndex;
 	}
 
 	/** Diese Methode bestückt die Felder zum Lesen des gegebenen {@link IAMIndex} und gibt {@code this} zurück.
@@ -621,6 +634,17 @@ class FEMCodec implements Property<FEMValue> {
 		return this;
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link BasePool#setSource(IAMListing) pool.setSource(this.getListing(type))}.
+	 * 
+	 * @see #getListing(int) */
+	protected void setSource(final BasePool<?> pool, final int type) throws NullPointerException {
+		pool.setSource(this.getListing(type));
+	}
+
+	public IAMIndexBuilder getTarget() {
+		return this.targetIndex;
+	}
+
 	/** Diese Methode bestückt die Felder zur Befüllung eines neuen {@link IAMIndexBuilder} und gibt {@code this} zurück.
 	 *
 	 * @return {@code this}. */
@@ -644,11 +668,10 @@ class FEMCodec implements Property<FEMValue> {
 		return this;
 	}
 
-	protected void setSource(final BasePool<?> pool, final int type) {
-		pool.setSource(this.getListing(type));
-	}
-
-	protected void setTarget(final BasePool<?> pool, final int type) {
+	/** Diese Methode ist eine Abkürzung für {@link BasePool#setTarget(IAMListingBuilder) pool.setTarget(this.putListing(type))}.
+	 * 
+	 * @see #putListing(int) */
+	protected void setTarget(final BasePool<?> pool, final int type) throws NullPointerException {
 		pool.setTarget(this.putListing(type));
 	}
 
@@ -838,10 +861,10 @@ class FEMCodec implements Property<FEMValue> {
 		return this.proxyFunctionPool.get(index);
 	}
 
-	/** Diese Methode gibt den Funktionsaufruf zurück, der unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
+	/** Diese Methode gibt die Funktionkette zurück, der unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
 	 *
 	 * @param index Position in {@link #concatFunctionPool}.
-	 * @return Funktionsaufruf.
+	 * @return Funktionkette.
 	 * @throws IllegalArgumentException Wenn {@link #getConcatFunction(IAMArray)} diese auslöst. */
 	protected ConcatFunction getConcatFunction(final int index) throws IllegalArgumentException {
 		return this.concatFunctionPool.get(index);
@@ -1006,9 +1029,9 @@ class FEMCodec implements Property<FEMValue> {
 		return IAMArray.from(this.toIndex(this.putStringValue(source.name())), this.putFunction(source.get()));
 	}
 
-	/** Diese Methode ist die Umkehroperation zu {@link #getConcatFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsaufruf enthält.
+	/** Diese Methode ist die Umkehroperation zu {@link #getConcatFunction(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Funktionkette enthält.
 	 *
-	 * @param source Funktionsaufruf.
+	 * @param source Funktionkette.
 	 * @return Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
@@ -1237,13 +1260,34 @@ class FEMCodec implements Property<FEMValue> {
 		return new ConcatFunction(this.getCompositeFunctionImpl(source), this.getCompositeParamsImpl(source));
 	}
 
+	/** Diese Methode gibt eine Sicht auf die Liste aller Funktionketten zurück.
+	 *
+	 * @return Funktionketten. */
+	public List<ConcatFunction> getConcatFunctions() {
+		return this.concatFunctionPool.toList();
+	}
+
 	public ClosureFunction getClosureFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() == 0) throw new IllegalArgumentException();
 		return new ClosureFunction(this.getFunction(source.get(0)));
 	}
 
+	/** Diese Methode gibt eine Sicht auf die Liste aller Funktionsbindungen zurück.
+	 *
+	 * @return Funktionsbindungen. */
+	public List<ClosureFunction> getClosureFunctions() {
+		return this.closureFunctionPool.toList();
+	}
+
 	public CompositeFunction getCompositeFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		return new CompositeFunction(this.getCompositeFunctionImpl(source), this.getCompositeParamsImpl(source));
+	}
+
+	/** Diese Methode gibt eine Sicht auf die Liste aller Funktionsaufrufe zurück.
+	 *
+	 * @return Funktionsaufrufe. */
+	public List<CompositeFunction> getCompositeFunctions() {
+		return this.compositeFunctionPool.toList();
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -1345,7 +1389,7 @@ class FEMCodec implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getStringArray(FEMString)} diese auslöst. */
 	public int putStringValue(final FEMString source) throws NullPointerException {
-		return stringValuePool.put(source);
+		return this.stringValuePool.put(source);
 	}
 
 	/** Diese Methode nimmt die gegebene Bytefolge in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1354,7 +1398,7 @@ class FEMCodec implements Property<FEMValue> {
 	 * @return Wertreferenz.
 	 * @throws NullPointerException Wenn {@link #getBinaryArray(FEMBinary)} diese auslöst. */
 	public int putBinaryValue(final FEMBinary source) throws NullPointerException {
-		return binaryValuePool.put(source);
+		return this.binaryValuePool.put(source);
 	}
 
 	/** Diese Methode nimmt die gegebene Dezimalzahl in die Verwaltung auf und gibt die {@link #toRef(int, int)} Wertreferenz} darauf zurück.
@@ -1451,9 +1495,9 @@ class FEMCodec implements Property<FEMValue> {
 		return this.toRef(FEMCodec.TYPE_PARAM_FUNCTION, source.index());
 	}
 
-	/** Diese Methode nimmt den gegebenen Funktionsaufruf in die Verwaltung auf und gibt die {@link #toRef(int, int)} Funktionsreferenz} darauf zurück.
+	/** Diese Methode nimmt die gegebene Funktionkette in die Verwaltung auf und gibt die {@link #toRef(int, int)} Funktionsreferenz} darauf zurück.
 	 *
-	 * @param source Funktionsaufruf.
+	 * @param source Funktionkette.
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@link #getConcatArray(ConcatFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getConcatArray(ConcatFunction)} diese auslöst. */
@@ -1506,11 +1550,12 @@ class FEMCodec implements Property<FEMValue> {
 		return ref >>> 5;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toFormatString(true, true, this, "arrayValues", this.getArrayValues(), "stringValues", this.getStringValues(), "binaryValues",
-			this.getBinaryValues(), "integerValues", this.getIntegerValues(), "decimalValues", this.getDecimalValues(), "durationValues", this.getDurationValues(),
-			"datetimeValues", this.getDatetimeValues(), "handlerValues", this.getHandlerValues(), "objectValues", this.getObjectValues());
+		return Objects.toInvokeString(this, this.arrayValuePool, this.stringValuePool, this.binaryValuePool, this.integerValuePool, this.decimalValuePool,
+			this.durationValuePool, this.datetimeValuePool, this.handlerValuePool, this.objectValuePool, this.proxyFunctionPool, this.concatFunctionPool,
+			this.closureFunctionPool, this.compositeFunctionPool);
 	}
 
 }
