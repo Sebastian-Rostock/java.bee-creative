@@ -9,6 +9,9 @@ import java.util.Arrays;
  * werden und werden beim Starten neuer Berechnungen angewendet. Nach der Auswertung ihrer Berechnung warten diese Threads auf ihre Wiederverwendung. Dazu kann
  * eingestellt werden, wieviele auf ihre Wiederverwendung wartende Threads {@link #getWaitingReserve() mindestens vorgehalten werden} und wie lange die nicht
  * hierfür reservierten Threads {@link #getWaitingTimeout() maximal warten}, bevor sie verworfen werden.
+ * <p>
+ * <b>Achtung: </b> Bei der Verwendung von {@link ThreadLocal} muss darauf geachtet werden, diese diese korrekt initialisiert und finalisiert werden, da deren
+ * Wert sonst unbeabsichtigt wiederverwendet werden oder ein Speicherleck entstehen kann.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ThreadPool {
