@@ -1,10 +1,17 @@
 package bee.creative.fem;
 
 import java.util.AbstractList;
+import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.RandomAccess;
+import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMMapping;
@@ -12,6 +19,7 @@ import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
+import bee.creative.util.Iterators.BaseIterator;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
@@ -28,6 +36,242 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		 * @param value Wert.
 		 * @return {@code true}, wenn das Sammeln fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll. */
 		public boolean push(FEMValue value);
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static class ItemMap implements Map<FEMValue, FEMValue> {
+
+		class Keys extends AbstractSet<FEMValue> {
+
+			@Override
+			public boolean contains(final Object o) {
+				return ItemMap.this.keys.firstIndexOf(o) >= 0;
+			}
+
+			@Override
+			public Iterator<FEMValue> iterator() {
+				return ItemMap.this.keys.iterator();
+			}
+
+			@Override
+			public int size() {
+				return ItemMap.this.keys.length;
+			}
+
+		}
+
+		class Values extends AbstractSet<FEMValue> {
+
+			@Override
+			public boolean contains(final Object o) {
+				return ItemMap.this.values.firstIndexOf(o) >= 0;
+			}
+
+			@Override
+			public Iterator<FEMValue> iterator() {
+				return ItemMap.this.values.iterator();
+			}
+
+			@Override
+			public int size() {
+				return ItemMap.this.values.length;
+			}
+
+		}
+
+		class EntrySet extends AbstractSet<Entry<FEMValue, FEMValue>> {
+
+			@Override
+			public boolean contains(final Object o) {
+				return (o instanceof Entry<?, ?>) && ItemMap.this.containsEntry((Entry<?, ?>)o);
+			}
+
+			@Override
+			public Iterator<Entry<FEMValue, FEMValue>> iterator() {
+				return new EntryIterator();
+			}
+
+			@Override
+			public int size() {
+				return ItemMap.this.keys.length;
+			}
+		}
+
+		class EntryMap extends AbstractMap<FEMValue, FEMValue> {
+
+			@Override
+			public EntrySet entrySet() {
+				return new EntrySet();
+			}
+
+		}
+
+		class EntryIterator extends BaseIterator<Entry<FEMValue, FEMValue>> {
+
+			final Iterator<FEMValue> keys = ItemMap.this.keys.iterator();
+
+			final Iterator<FEMValue> values = ItemMap.this.values.iterator();
+
+			@Override
+			public boolean hasNext() {
+				return this.keys.hasNext() && this.values.hasNext();
+			}
+
+			@Override
+			public Entry<FEMValue, FEMValue> next() {
+				return new SimpleImmutableEntry<>(this.keys.next(), this.values.next());
+			}
+
+		}
+
+		public final FEMArray keys;
+
+		public final FEMArray values;
+
+		public ItemMap(final FEMArray keys, final FEMArray values) {
+			this.keys = keys;
+			this.values = values;
+		}
+
+		@Override
+		public int size() {
+			return this.keys.length;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.size() == 0;
+		}
+
+		@Override
+		public boolean containsKey(final Object key) {
+			return this.keys.firstIndexOf(key) >= 0;
+		}
+
+		@Override
+		public boolean containsValue(final Object value) {
+			return this.values.firstIndexOf(value) >= 0;
+		}
+
+		boolean containsEntry(final Entry<?, ?> entry) {
+			return (entry != null) && this.containsEntry(entry.getKey(), entry.getKey());
+		}
+
+		boolean containsEntry(final Object key, final Object value) {
+			if (!(value instanceof FEMValue)) return false;
+			final int index = this.keys.firstIndexOf(key);
+			return (index >= 0) && this.values.get(index).equals(value);
+		}
+
+		@Override
+		public FEMValue get(final Object key) {
+			final int index = this.keys.firstIndexOf(key);
+			return index >= 0 ? this.values.get(index) : null;
+		}
+
+		@Override
+		public FEMValue put(final FEMValue key, final FEMValue value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public FEMValue remove(final Object key) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void putAll(final Map<? extends FEMValue, ? extends FEMValue> m) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Set<FEMValue> keySet() {
+			return new Keys();
+		}
+
+		@Override
+		public Collection<FEMValue> values() {
+			return new Values();
+		}
+
+		@Override
+		public Set<Entry<FEMValue, FEMValue>> entrySet() {
+			return new EntrySet();
+		}
+
+		@Override
+		public int hashCode() {
+			return new EntryMap().hashCode();
+		}
+
+		@Override
+		public boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof Map<?, ?>)) return false;
+			final Map<?, ?> that = (Map<?, ?>)object;
+			if (that.size() != this.size()) return false;
+			for (final Entry<?, ?> entry: that.entrySet()) {
+				if (!this.containsEntry(entry)) return false;
+			}
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return new EntryMap().toString();
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static class ItemList extends AbstractList<FEMValue> implements RandomAccess {
+
+		public final FEMArray items;
+
+		public ItemList(final FEMArray array) {
+			this.items = array;
+		}
+
+		@Override
+		public FEMValue get(final int index) {
+			return this.items.get(index);
+		}
+
+		@Override
+		public int size() {
+			return this.items.length;
+		}
+
+		@Override
+		public Iterator<FEMValue> iterator() {
+			return this.items.iterator();
+		}
+
+		@Override
+		public boolean contains(final Object o) {
+			return this.indexOf(o) >= 0;
+		}
+
+		@Override
+		public int indexOf(final Object o) {
+			return this.items.firstIndexOf(o);
+		}
+
+		@Override
+		public int lastIndexOf(final Object o) {
+			return this.items.lastIndexOf(o);
+		}
+
+		@Override
+		public List<FEMValue> subList(final int fromIndex, final int toIndex) {
+			return this.items.section(fromIndex, toIndex - fromIndex).toList();
+		}
 
 	}
 
@@ -370,8 +614,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static class CompactArray3 extends CompactArray2 {
 
 		/** Dieses Feld speichert die Streuwerttabelle zu den Werten in {@link #items}. Die Länge der Zahlenfolge entspricht stets einer um 1 sowie um die Länge der
-		 * Wertliste {@code length} erhöhten Potenz von {@code 2}. Diese Potenz verringerte um eins wird als Bitmaske {@code mask} für die Streuwerte der Elemente
-		 * eingesetzt. Die erste Zahl enthält die Anzahl der Streuwertbereiche und ist gleich der um {@code 2} erhöhten Bitmaske. */
+		 * Wertliste {@code length} erhöhten Potenz von {@code 2}. Diese Potenz verringerte um eins wird als Bitmaske für die Streuwerte der Elemente eingesetzt.
+		 * Die erste Zahl enthält die Anzahl der Streuwertbereiche und ist gleich der um {@code 2} erhöhten Bitmaske. */
 		final int[] table;
 
 		CompactArray3(final FEMValue[] items) throws IllegalArgumentException {
@@ -533,6 +777,24 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		if (min == max) return values[min];
 		final int mid = (min + max) >> 1;
 		return FEMArray.concatAll(values, min, mid).concat(FEMArray.concatAll(values, mid + 1, max));
+	}
+
+	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die gegebenen Schlüssel- und Wertliste zurück.<br>
+	 * Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an der Position, an der sich in {@code values} der
+	 * zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche {@link #compact(boolean) indiziert} sein.
+	 *
+	 * @see #get(int)
+	 * @see #find(FEMValue, int)
+	 * @see #length()
+	 * @see #iterator()
+	 * @param keys Schlüsselliste.
+	 * @param values Wertliste.
+	 * @return {@link Map}-Sicht.
+	 * @throws NullPointerException Wenn {@code keys} bzw. {@code values} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Längen der gegebenen Wertlisten ungleich sind. */
+	public static Map<FEMValue, FEMValue> toMap(final FEMArray keys, final FEMArray values) throws NullPointerException, IllegalArgumentException {
+		if (keys.length != values.length) throw new IllegalArgumentException();
+		return new ItemMap(keys, values);
 	}
 
 	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
@@ -738,6 +1000,16 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this.customFind(that, offset);
 	}
 
+	@SuppressWarnings ("javadoc")
+	int lastIndexOf(final Object key) {
+		return key instanceof FEMValue ? this.reverse().find((FEMValue)key, 0) : -1;
+	}
+
+	@SuppressWarnings ("javadoc")
+	int firstIndexOf(final Object key) {
+		return key instanceof FEMValue ? this.find((FEMValue)key, 0) : -1;
+	}
+
 	/** Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig
 	 * abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 *
@@ -795,21 +1067,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 *
 	 * @see #get(int)
 	 * @see #length()
+	 * @see #iterator()
 	 * @return {@link List}-Sicht. */
 	public final List<FEMValue> toList() {
-		return new AbstractList<FEMValue>() {
-
-			@Override
-			public FEMValue get(final int index) {
-				return FEMArray.this.get(index);
-			}
-
-			@Override
-			public int size() {
-				return FEMArray.this.length;
-			}
-
-		};
+		return new ItemList(this);
 	}
 
 	/** Diese Methode gibt den {@code index}-ten Wert zurück. */

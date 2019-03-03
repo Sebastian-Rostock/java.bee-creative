@@ -3,6 +3,7 @@ package bee.creative.iam;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.util.Iterables;
+import bee.creative.util.Iterators.BaseIterator;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Auflistung ({@link IAMListing}) für die Elemente sowie einer Abbildung
@@ -1277,7 +1278,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	/** {@inheritDoc} */
 	@Override
 	public final Iterator<Integer> iterator() {
-		return new Iterator<Integer>() {
+		return new BaseIterator<Integer>() {
 
 			int index = 0;
 
@@ -1289,11 +1290,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			@Override
 			public Integer next() {
 				return new Integer(IAMArray.this.customGet(this.index++));
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
 			}
 
 		};
