@@ -1,6 +1,7 @@
 package bee.creative.fem;
 
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.List;
 import bee.creative.fem.FEMArray.CompactArray3;
 import bee.creative.fem.FEMFunction.ClosureFunction;
@@ -13,14 +14,16 @@ import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
 import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
 import bee.creative.iam.IAMMapping;
+import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Integers;
 import bee.creative.util.Objects;
 import bee.creative.util.Property;
 
-// TODO de-/coder für ausgewählte fem-datentypen in iam-format (und json-format?)
-// json-format aus string und object[] derselben, de-/coder ebenfalls in javascript??
-
+/** Diese Klasse implementiert ein Objekt zur Kodierung und Dekodierung von {@link FEMValue Werten} und {@link FEMFunction Funktionen} in {@link IAMArray
+ * Zahlenlisten}. Damit ist es möglich, beliebig große Wert- und Funktionsgraphen über ein {@link MMFArray} in eine Binärdatei auszulagern.
+ *
+ * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class FEMCodec implements Property<FEMValue> {
 
 	/** Diese Klasse implementiert eine {@link FEMArray Wertliste}, deren Elemente als {@link IAMArray Zahlenfolge} aus {@link FEMCodec#toRef(int, int)
@@ -38,7 +41,7 @@ class FEMCodec implements Property<FEMValue> {
 		public IndexArray(final int length, final FEMCodec index, final IAMArray items) throws IllegalArgumentException {
 			super(length);
 			this.index = Objects.notNull(index);
-			this.items = Objects.notNull(items);
+			this.items = items;
 			this.hash = items.get(length);
 		}
 
@@ -85,76 +88,113 @@ class FEMCodec implements Property<FEMValue> {
 
 	protected static abstract class BasePool<GItem> implements Items<GItem> {
 
+		@SuppressWarnings ("javadoc")
+		final class ItemList extends AbstractList<GItem> {
+
+			@Override
+			public GItem get(final int index) {
+				return BasePool.this.get(index);
+			}
+
+			@Override
+			public int size() {
+				return BasePool.this.source.itemCount();
+			}
+
+		}
+
 		/** Dieses Feld speichert den Besitzer. */
 		protected FEMCodec codec;
 
-		protected Object[] items = {};
+		/** Dieses Feld speichert den Puffer der über {@link #get(int)} gelieferten Datensätze. */
+		protected Object[] cache = {};
 
-		/** Dieses Feld speichert die Auflistung der Wertlisten für {@link #getArrayValue(int)}. */
-		protected IAMListing sourcePool;
+		/** Dieses Feld speichert die Wertlisten der über {@link #get(int)} gelesenen Datensätzen. */
+		protected IAMListing source;
 
-		/** Dieses Feld speichert die Auflistung über {@link #putArrayValue(FEMArray)} hinzugefügten Wertlisten. */
-		protected IAMListingBuilder targetPool;
+		/** Dieses Feld speichert die Wertlisten der über {@link #put(Object)} angefügten Datensätzen. */
+		protected IAMListingBuilder target;
 
+		@SuppressWarnings ("javadoc")
 		public BasePool(final FEMCodec codec) {
 			this.codec = codec;
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public GItem get(final int index) {
-			// TODO cache
-			return this.toItem(this.sourcePool.item(index));
+			if (index < 0) throw new IndexOutOfBoundsException();
+			final IAMListing pool = this.source;
+			final int poolSize = pool.itemCount();
+			if (index >= poolSize) throw new IndexOutOfBoundsException();
+			Object[] cache = this.cache;
+			final int cacheSize = cache.length;
+			if (index >= cacheSize) {
+				cache = Arrays.copyOf(cache, poolSize);
+				this.cache = cache;
+			}
+			@SuppressWarnings ("unchecked")
+			GItem item = (GItem)cache[index];
+			if (item != null) return item;
+			item = this.toItem(pool.item(index));
+			cache[index] = item;
+			return item;
 		}
 
 		public int put(final GItem source) {
-			return this.toRef(this.targetPool.put(this.toArray(source)));
-		}
-
-		protected void setSource(final IAMListing source) {
-			this.sourcePool = source;
-			this.targetPool = null;
-		}
-
-		protected void setTarget(final IAMListingBuilder target) {
-			this.sourcePool = target;
-			this.targetPool = target;
-		}
-
-		public abstract int toRef(int index);
-
-		public abstract GItem toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException;
-
-		public abstract IAMArray toArray(final GItem source) throws NullPointerException, IllegalArgumentException;
-
-		public int size() {
-			return this.sourcePool.itemCount();
+			return this.toRef(this.target.put(this.toArray(source)));
 		}
 
 		public void clear() {
-			final Object[] items = this.items;
-			for (int i = 0, size = items.length; i < size; i++) {
-
-			}
+			this.cache = new Object[0];
 		}
+
+		public IAMListing getSource() {
+			return source;
+		}
+
+		protected void setSource(final IAMListing source) {
+			this.source = source;
+			this.target = null;
+			this.clear();
+		}
+
+		public IAMListingBuilder getTarget() {
+			return target;
+		}
+
+		protected void setTarget(final IAMListingBuilder target) {
+			this.source = target;
+			this.target = target;
+			this.clear();
+		}
+
+		/** Diese Methode gibt die Referenz zur gegebenen Position zurück.
+		 *
+		 * @param index {@link #toIndex(int) Position} des Datensatzes in {@link #getSource()}.
+		 * @return Referenz. */
+		public abstract int toRef(int index);
+
+		/** Diese Methode interpretiert die gegebene Zahlenfolge als Datensatz und gibt diesen zurück.
+		 * 
+		 * @param source Zahlenfolge.
+		 * @return Datensatz.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+		public abstract GItem toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException;
+
+		/** Diese Methode ist die Umkehroperation zu {@link #toItem(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Datensatz enthält.
+		 *
+		 * @param source Datensatz.
+		 * @return Zahlenfolge.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+		public abstract IAMArray toArray(final GItem source) throws NullPointerException, IllegalArgumentException;
 
 		/** Diese Methode gibt eine Sicht auf die Liste aller Wertlisten zurück.
 		 *
 		 * @return Wertlisten. */
 		public List<GItem> toList() {
-			return new AbstractList<GItem>() {
-
-				@Override
-				public GItem get(final int index) {
-					if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
-					return BasePool.this.get(index);
-				}
-
-				@Override
-				public int size() {
-					return BasePool.this.sourcePool.itemCount();
-				}
-
-			};
+			return new ItemList();
 		}
 
 		@Override
@@ -177,12 +217,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMArray toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMArray toItem(final IAMArray source) {
 			return this.codec.getArrayValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMArray source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMArray source) {
 			return this.codec.getArrayArray(source);
 		}
 
@@ -201,12 +241,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMString toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMString toItem(final IAMArray source) {
 			return this.codec.getStringValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMString source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMString source) {
 			return this.codec.getStringArray(source);
 		}
 
@@ -225,12 +265,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMBinary toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMBinary toItem(final IAMArray source) {
 			return this.codec.getBinaryValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMBinary source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMBinary source) {
 			return this.codec.getBinaryArray(source);
 		}
 
@@ -249,12 +289,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMInteger toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMInteger toItem(final IAMArray source) {
 			return this.codec.getIntegerValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMInteger source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMInteger source) {
 			return this.codec.getIntegerArray(source);
 		}
 
@@ -273,12 +313,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMDecimal toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMDecimal toItem(final IAMArray source) {
 			return this.codec.getDecimalValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMDecimal source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMDecimal source) {
 			return this.codec.getDecimalArray(source);
 		}
 
@@ -297,12 +337,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMDuration toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMDuration toItem(final IAMArray source) {
 			return this.codec.getDurationValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMDuration source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMDuration source) {
 			return this.codec.getDurationArray(source);
 		}
 
@@ -321,12 +361,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMDatetime toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMDatetime toItem(final IAMArray source) {
 			return this.codec.getDatetimeValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMDatetime source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMDatetime source) {
 			return this.codec.getDatetimeArray(source);
 		}
 
@@ -345,12 +385,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMHandler toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMHandler toItem(final IAMArray source) {
 			return this.codec.getHandlerValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMHandler source) {
 			return this.codec.getHandlerArray(source);
 		}
 
@@ -369,12 +409,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMObject toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMObject toItem(final IAMArray source) {
 			return this.codec.getObjectValue(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMObject source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMObject source) {
 			return this.codec.getObjectArray(source);
 		}
 
@@ -393,12 +433,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public FEMProxy toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public FEMProxy toItem(final IAMArray source) {
 			return this.codec.getProxyFunction(source);
 		}
 
 		@Override
-		public IAMArray toArray(final FEMProxy source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final FEMProxy source) {
 			return this.codec.getProxyArray(source);
 		}
 
@@ -417,12 +457,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public ConcatFunction toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public ConcatFunction toItem(final IAMArray source) {
 			return this.codec.getConcatFunction(source);
 		}
 
 		@Override
-		public IAMArray toArray(final ConcatFunction source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final ConcatFunction source) {
 			return this.codec.getConcatArray(source);
 		}
 
@@ -441,12 +481,12 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public ClosureFunction toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public ClosureFunction toItem(final IAMArray source) {
 			return this.codec.getClosureFunction(source);
 		}
 
 		@Override
-		public IAMArray toArray(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final ClosureFunction source) {
 			return this.codec.getClosureArray(source);
 		}
 
@@ -465,19 +505,19 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		@Override
-		public CompositeFunction toItem(final IAMArray source) throws NullPointerException, IllegalArgumentException {
+		public CompositeFunction toItem(final IAMArray source) {
 			return this.codec.getCompositeFunction(source);
 		}
 
 		@Override
-		public IAMArray toArray(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
+		public IAMArray toArray(final CompositeFunction source) {
 			return this.codec.getCompositeArray(source);
 		}
 
 	}
 
 	/** Dieses Feld speichert den leeren {@link FEMCodec} als Leser des leeren {@link IAMIndex}. */
-	public static final FEMCodec EMPTY = new FEMCodec().switchToLoader(IAMIndex.EMPTY);
+	public static final FEMCodec EMPTY = new FEMCodec().setSource(IAMIndex.EMPTY);
 
 	/** Dieses Feld speichert die {@link #toType(int) Typkennung} für {@link #putVoidValue()}. */
 	protected static final int TYPE_VOID_VALUE = 0;
@@ -533,7 +573,7 @@ class FEMCodec implements Property<FEMValue> {
 	/** Dieses Feld speichert die {@link #toRef(int, int)} Wertreferenz} des über {@link #get()} und {@link #set(FEMValue)} modifizierbaren Werts. */
 	protected int propertyRef;
 
-	/** Dieses Feld speichert den in {@link #switchToLoader(IAMIndex)} initialisierten {@link IAMIndex}, in aus welchem alle übrogen {@code source}-Datenfelder
+	/** Dieses Feld speichert den in {@link #setSource(IAMIndex)} initialisierten {@link IAMIndex}, in aus welchem alle übrogen {@code source}-Datenfelder
 	 * bestückt werden müssen. */
 	protected IAMIndex sourceIndex;
 
@@ -543,7 +583,7 @@ class FEMCodec implements Property<FEMValue> {
 	/** Dieses Feld speichert die erste Abbildung im {@link #sourceIndex}. */
 	protected IAMMapping sourceIndexMapping;
 
-	/** Dieses Feld speichert den on {@link #switchToBuilder()} initialisierten {@link IAMIndexBuilder}, in welchen bis aus {@link #targetIndexListing} und
+	/** Dieses Feld speichert den in {@link #setTarget()} initialisierten {@link IAMIndexBuilder}, in welchen bis aus {@link #targetIndexListing} und
 	 * {@link #targetIndexMapping} alle übrigen {@code target}-Datenfelder eingefügt werden müssen. */
 	protected IAMIndexBuilder targetIndex;
 
@@ -606,12 +646,12 @@ class FEMCodec implements Property<FEMValue> {
 		return this.sourceIndex;
 	}
 
-	/** Diese Methode bestückt die Felder zum Lesen des gegebenen {@link IAMIndex} und gibt {@code this} zurück.
+	/** Diese Methode bestückt diesen {@link FEMCodec} zum Lesen des gegebenen {@link IAMIndex} und gibt {@code this} zurück.
 	 *
 	 * @param source Datenquelle.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public FEMCodec switchToLoader(final IAMIndex source) throws NullPointerException {
+	public FEMCodec setSource(final IAMIndex source) throws NullPointerException {
 		this.sourceIndex = Objects.notNull(source);
 		this.sourceIndexListing = source.listing(0);
 		this.sourceIndexMapping = source.mapping(0);
@@ -635,7 +675,7 @@ class FEMCodec implements Property<FEMValue> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link BasePool#setSource(IAMListing) pool.setSource(this.getListing(type))}.
-	 * 
+	 *
 	 * @see #getListing(int) */
 	protected void setSource(final BasePool<?> pool, final int type) throws NullPointerException {
 		pool.setSource(this.getListing(type));
@@ -645,13 +685,13 @@ class FEMCodec implements Property<FEMValue> {
 		return this.targetIndex;
 	}
 
-	/** Diese Methode bestückt die Felder zur Befüllung eines neuen {@link IAMIndexBuilder} und gibt {@code this} zurück.
+	/** Diese Methode bestückt diesen {@link FEMCodec} zur Befüllung eines neuen {@link IAMIndexBuilder} und gibt {@code this} zurück.
 	 *
 	 * @return {@code this}. */
-	public FEMCodec switchToBuilder() {
+	public FEMCodec setTarget() {
 		this.sourceIndex = this.targetIndex = new IAMIndexBuilder();
-		this.targetIndex.put(-1, this.sourceIndexListing = this.targetIndexListing = new IAMListingBuilder());
-		this.targetIndex.put(-1, this.sourceIndexMapping = this.targetIndexMapping = new IAMMappingBuilder());
+		this.targetIndex.put(-1, this.sourceIndexListing = (this.targetIndexListing = new IAMListingBuilder()));
+		this.targetIndex.put(-1, this.sourceIndexMapping = (this.targetIndexMapping = new IAMMappingBuilder()));
 		this.setTarget(this.arrayValuePool, FEMCodec.TYPE_ARRAY_VALUE);
 		this.setTarget(this.stringValuePool, FEMCodec.TYPE_STRING_VALUE);
 		this.setTarget(this.binaryValuePool, FEMCodec.TYPE_BINARY_VALUE);
@@ -669,7 +709,7 @@ class FEMCodec implements Property<FEMValue> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link BasePool#setTarget(IAMListingBuilder) pool.setTarget(this.putListing(type))}.
-	 * 
+	 *
 	 * @see #putListing(int) */
 	protected void setTarget(final BasePool<?> pool, final int type) throws NullPointerException {
 		pool.setTarget(this.putListing(type));
@@ -759,6 +799,17 @@ class FEMCodec implements Property<FEMValue> {
 			default:
 				return this.getCustomFunction(type, index);
 		}
+	}
+
+	/** Diese Methode gibt die Auflistung zur gegebenen Typkennung zurück. Die Typkennung wird dazu in eine Zahlenfolge {@link IAMArray#from(int...) umgewandelt}
+	 * und als Schlüssel im {@link #sourceIndexMapping} {@link IAMMapping#find(IAMArray) gesucht}. Die erste Zahl des zum Schlüssel ermittelten
+	 * {@link IAMMapping#value(int) Werts} wird dann als {@link IAMIndex#listing(int) Position der Auflistung} interpretiert, unter welcher sie in
+	 * {@link #sourceIndex} verwaltet wird.
+	 *
+	 * @param type {@link #toType(int) Typkennunng} der Auflistung.
+	 * @return Auflistung zur Typkennung. */
+	protected IAMListing getListing(final int type) {
+		return this.sourceIndex.listing(this.sourceIndexMapping.value(this.sourceIndexMapping.find(type), 0));
 	}
 
 	/** Diese Methode gibt die Wertliste zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
@@ -896,17 +947,6 @@ class FEMCodec implements Property<FEMValue> {
 	 * @throws IllegalArgumentException Wenn die Funktionsreferenz ungültig ist. */
 	protected FEMFunction getCustomFunction(final int type, final int index) throws IllegalArgumentException {
 		return FEMVoid.INSTANCE;
-	}
-
-	/** Diese Methode gibt die Auflistung zur gegebenen Typkennung zurück. Die Typkennung wird dazu in eine Zahlenfolge {@link IAMArray#from(int...) umgewandelt}
-	 * und als Schlüssel im {@link #sourceIndexMapping} {@link IAMMapping#find(IAMArray) gesucht}. Die erste Zahl des zum Schlüssel ermittelten
-	 * {@link IAMMapping#value(int) Werts} wird dann als {@link IAMIndex#listing(int) Position der Auflistung} interpretiert, unter welcher sie in
-	 * {@link #sourceIndex} verwaltet wird.
-	 *
-	 * @param type {@link #toType(int) Typkennunng} der Auflistung.
-	 * @return Auflistung zur Typkennung. */
-	protected IAMListing getListing(final int type) {
-		return this.sourceIndex.listing(this.sourceIndexMapping.value(this.sourceIndexMapping.find(type), 0));
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #getArrayValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Wertliste enthält. Eine über
