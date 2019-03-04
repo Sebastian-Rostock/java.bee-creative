@@ -7,89 +7,93 @@ import bee.creative.util.Strings;
  * entsprechend eingerückt dargestellt.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class Logger {
+public class ScopedLogger {
 
 	/** Dieses Feld speichert den Ring der erfassten Protokollzeilen. */
-	private final LoggerNode head = new LoggerNode(null, null);
+	private final ScopedEntryNode head = new ScopedEntryNode(null, null);
 
-	/** Diese Methode ist eine Abkürzung für {@link #openScope(Object) this.openScope(null)}. */
-	public void openScope() {
-		this.openScope(null);
+	/** Diese Methode öffnet eine neue Protokollebene, wodurch alle danach erfassten Protokollzeilen um eins weiter eingerückt werden. */
+	public void enterScope() {
+		this.enterScopeImpl(null, null);
 	}
 
 	/** Diese Methode öffnet eine neue Protokollebene mit der gegebenen Protokollzeilen als Kopfzeile, wodurch alle danach erfassten Protokollzeilen um eins
 	 * weiter eingerückt werden.
 	 *
-	 * @see LoggerResult#push(Object)
-	 * @param text Kopfzeile oder {@code null}. */
-	public void openScope(final Object text) {
-		this.openScopeImpl(text, null);
+	 * @see ScopedLoggerStrings#push(Object)
+	 * @param text Kopfzeile.
+	 * @throws NullPointerException Wenn {@code text} {@code null} ist. */
+	public void enterScope(final Object text) throws NullPointerException {
+		this.enterScopeImpl(Objects.notNull(text), null);
 	}
 
 	/** Diese Methode öffnet eine neue Protokollebene mit der gegebenen Protokollzeilen als Kopfzeile, wodurch alle danach erfassten Protokollzeilen um eins
 	 * weiter eingerückt werden.
 	 *
-	 * @see LoggerResult#push(Object, Object[])
+	 * @see ScopedLoggerStrings#push(Object, Object[])
 	 * @param text Formattext der Kopfzeile oder {@code null}.
 	 * @param args Formatargumente oder Textbausteine der Kopfzeile.
 	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
-	public void openScope(final String text, final Object... args) throws NullPointerException {
-		this.openScopeImpl(text, Objects.notNull(args));
+	public void enterScope(final String text, final Object... args) throws NullPointerException {
+		this.enterScopeImpl(text, Objects.notNull(args));
 	}
 
 	@SuppressWarnings ("javadoc")
-	void openScopeImpl(final Object text, final Object[] args) {
-		this.head.pushOpen(text, args);
+	void enterScopeImpl(final Object text, final Object[] args) {
+		this.head.pushEnter(text, args);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #closeScope(Object) this.closeScope(null)}. */
-	public void closeScope() {
-		this.closeScope(null);
-	}
-
-	/** Diese Methode verlässt die aktuelle Protokollebene mit der gegebenen Protokollzeilen als Fußzeile, wodurch alle danach erfassten Protokollzeilen um eins
-	 * weniger eingerückt werden. Sie entfernt die Protokollebene zusammen mit ihrer Kopf- und Fußzeile nur dann, wenn in der Protokollebene keine weiteren
-	 * Protokollzeilen erfasst wurden.
-	 *
-	 * @see LoggerResult#push(Object)
-	 * @param text Fußzeile oder {@code null}. */
-	public void closeScope(final Object text) {
-		this.closeScopeImpl(text, null);
+	/** Diese Methode verlässt die aktuelle Protokollebene, wodurch alle danach erfassten Protokollzeilen um eins weniger eingerückt werden. Sie entfernt die
+	 * Protokollebene zusammen mit ihrer Kopfzeile nur dann, wenn in der Protokollebene keine weiteren Protokollzeilen erfasst wurden. */
+	public void leaveScope() {
+		this.leaveScopeImpl(null, null);
 	}
 
 	/** Diese Methode verlässt die aktuelle Protokollebene mit der gegebenen Protokollzeilen als Fußzeile, wodurch alle danach erfassten Protokollzeilen um eins
 	 * weniger eingerückt werden. Sie entfernt die Protokollebene zusammen mit ihrer Kopf- und Fußzeile nur dann, wenn in der Protokollebene keine weiteren
 	 * Protokollzeilen erfasst wurden.
 	 *
-	 * @see LoggerResult#push(Object, Object[])
+	 * @see ScopedLoggerStrings#push(Object)
+	 * @param text Fußzeile.
+	 * @throws NullPointerException Wenn {@code text} {@code null} ist. */
+	public void leaveScope(final Object text) throws NullPointerException {
+		this.leaveScopeImpl(Objects.notNull(text), null);
+	}
+
+	/** Diese Methode verlässt die aktuelle Protokollebene mit der gegebenen Protokollzeilen als Fußzeile, wodurch alle danach erfassten Protokollzeilen um eins
+	 * weniger eingerückt werden. Sie entfernt die Protokollebene zusammen mit ihrer Kopf- und Fußzeile nur dann, wenn in der Protokollebene keine weiteren
+	 * Protokollzeilen erfasst wurden.
+	 *
+	 * @see ScopedLoggerStrings#push(Object, Object[])
 	 * @param text Formattext der Fußzeile oder {@code null}.
 	 * @param args Formatargumente oder Textbausteine der Fußzeile.
 	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
-	public void closeScope(final String text, final Object... args) throws NullPointerException {
-		this.closeScopeImpl(text, Objects.notNull(args));
+	public void leaveScope(final String text, final Object... args) throws NullPointerException {
+		this.leaveScopeImpl(text, Objects.notNull(args));
 	}
 
 	@SuppressWarnings ("javadoc")
-	void closeScopeImpl(final Object text, final Object[] args) {
-		final LoggerNode prev = this.head.prev;
-		if (prev.isOpen()) {
+	void leaveScopeImpl(final Object text, final Object[] args) {
+		final ScopedEntryNode prev = this.head.prev;
+		if (prev.indent() > 0) {
 			prev.delete();
 		} else {
-			this.head.pushClose(text, args);
+			this.head.pushLeave(text, args);
 		}
 	}
 
 	/** Diese Methode erfasst die gegebene Protokollzeile in der aktuellen Protokollebene.
 	 *
-	 * @see LoggerResult#push(Object)
-	 * @param text Protokollzeile oder {@code null}. */
-	public void pushEntry(final Object text) {
-		this.pushEntryImpl(text, null);
+	 * @see ScopedLoggerStrings#push(Object)
+	 * @param text Protokollzeile oder {@code null}.
+	 * @throws NullPointerException Wenn {@code text} {@code null} ist. */
+	public void pushEntry(final Object text) throws NullPointerException {
+		this.pushEntryImpl(Objects.notNull(text), null);
 	}
 
 	/** Diese Methode erfasst die gegebene Protokollzeile in der aktuellen Protokollebene.
 	 *
-	 * @see LoggerResult#push(Object, Object[])
+	 * @see ScopedLoggerStrings#push(Object, Object[])
 	 * @param text Formattext der Protokollzeile oder {@code null}.
 	 * @param args Formatargumente oder Textbausteine der Protokollzeile.
 	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
@@ -100,29 +104,35 @@ public class Logger {
 	@SuppressWarnings ("javadoc")
 	void pushEntryImpl(final Object text, final Object[] args) {
 		if ((text == null) && (args == null)) return;
-		this.head.pushLine(text, args);
+		this.head.pushEntry(text, args);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #pushEntry(Object) this.pushEntry(cause)}. */
+	public void pushError(final Throwable cause) throws NullPointerException {
+		this.pushEntry(cause);
 	}
 
 	/** Diese Methode erfasst die gegebene Protokollzeile in der aktuellen Protokollebene als Kopfzeile der gegebenen Fehlerursache. Die Protokollzeile zur
 	 * Fehlerursache wird danach um eins weiter eingerückt über {@link #pushEntry(Object)} erfasst.
 	 *
-	 * @see LoggerResult#push(Object)
-	 * @param cause Fehlerursache oder {@code null}.
-	 * @param text Protokollzeile oder {@code null}. */
-	public void pushError(final Throwable cause, final Object text) {
-		this.pushErrorImpl(cause, text, null);
+	 * @see ScopedLoggerStrings#push(Object)
+	 * @param cause Fehlerursache.
+	 * @param text Protokollzeile.
+	 * @throws NullPointerException Wenn {@code cause} bzw. {@code text} {@code null} ist. */
+	public void pushError(final Throwable cause, final Object text) throws NullPointerException {
+		this.pushErrorImpl(Objects.notNull(cause), Objects.notNull(text), null);
 	}
 
 	/** Diese Methode erfasst die gegebene Protokollzeile in der aktuellen Protokollebene als Kopfzeile der gegebenen Fehlerursache. Die Protokollzeile zur
 	 * Fehlerursache wird danach um eins weiter eingerückt über {@link #pushEntry(Object)} erfasst.
 	 *
-	 * @see LoggerResult#push(Object, Object[])
+	 * @see ScopedLoggerStrings#push(Object, Object[])
 	 * @param cause Fehlerursache oder {@code null}.
 	 * @param text Formattext der Protokollzeile oder {@code null}.
 	 * @param args Formatargumente oder Textbausteine der Protokollzeile.
-	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code cause} bzw. {@code args} {@code null} ist. */
 	public void pushError(final Throwable cause, final String text, final Object... args) throws NullPointerException {
-		this.pushErrorImpl(cause, text, Objects.notNull(args));
+		this.pushErrorImpl(Objects.notNull(cause), text, Objects.notNull(args));
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -130,18 +140,16 @@ public class Logger {
 		if (cause == null) {
 			this.pushEntryImpl(text, args);
 		} else if ((text == null) && (args == null)) {
-			this.pushEntryImpl(cause, null);
+			this.head.pushEntry(cause, null);
 		} else {
-			this.head.pushOpen(text, args);
-			this.head.pushClose(cause, null);
+			this.head.pushEnter(text, args);
+			this.head.pushLeave(cause, null);
 		}
 	}
 
-	/** Diese Methode erfasst die gegebenen Protokollzeilen in der aktuellen Protokollebene.
-	 *
-	 * @param logger Protokollzeilen oder {@code null}. */
-	public void pushLogger(final Logger logger) {
-		this.pushEntryImpl(logger, null);
+	/** Diese Methode ist eine Abkürzung für {@link #pushEntry(Object) this.pushEntry(logger)}. */
+	public void pushLogger(final ScopedLogger logger) throws NullPointerException {
+		this.pushEntry(logger);
 	}
 
 	/** Diese Methode entfernt alle bisher erfassten Protokollzeilen. */
@@ -158,28 +166,28 @@ public class Logger {
 		return Strings.join("\n", (Object[])this.toStrings());
 	}
 
-	/** Diese Methode gibt die Textdarstellungen aller erfassten Protokollzeilen zurück. Diese werden über ein neues {@link LoggerResult} formatiert.
+	/** Diese Methode gibt die Textdarstellungen aller erfassten Protokollzeilen zurück. Diese werden über ein neues {@link ScopedLoggerStrings} formatiert.
 	 *
-	 * @see #toStrings(LoggerResult)
+	 * @see #toStrings(ScopedLoggerStrings)
 	 * @return Textdarstellungen. */
 	public String[] toStrings() {
-		return this.toStrings(new LoggerResult());
+		return this.toStrings(new ScopedLoggerStrings());
 	}
 
-	/** Diese Methode gibt die Textdarstellungen aller erfassten Protokollzeilen zurück. Diese werden über den gegebenen {@link LoggerResult} formatiert.
+	/** Diese Methode gibt die Textdarstellungen aller erfassten Protokollzeilen zurück. Diese werden über den gegebenen {@link ScopedLoggerStrings} formatiert.
 	 *
 	 * @param result Generator der Textdarstellungen.
 	 * @return Textdarstellungen.
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-	public String[] toStrings(final LoggerResult result) throws NullPointerException {
-		toStringImpl(result);
+	public String[] toStrings(final ScopedLoggerStrings result) throws NullPointerException {
+		this.toStringImpl(result);
 		return result.get();
 	}
 
 	@SuppressWarnings ("javadoc")
-	void toStringImpl(final LoggerResult result) throws NullPointerException {
-		final LoggerNode prev = this.head;
-		for (LoggerNode next = prev.next; prev != next; next = next.next) {
+	void toStringImpl(final ScopedLoggerStrings result) throws NullPointerException {
+		final ScopedEntryNode prev = this.head;
+		for (ScopedEntryNode next = prev.next; prev != next; next = next.next) {
 			result.pushImpl(next);
 		}
 	}

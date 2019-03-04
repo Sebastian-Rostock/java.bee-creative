@@ -6,10 +6,10 @@ import bee.creative.util.Integers;
 import bee.creative.util.Producer;
 import bee.creative.util.Strings;
 
-/** Diese Klasse implementiert den Generator der Textdarstellungen eines {@link Logger}.
+/** Diese Klasse implementiert den Generator der Textdarstellungen eines {@link ScopedLogger}.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class LoggerResult implements Producer<String[]> {
+public class ScopedLoggerStrings implements Producer<String[]> {
 
 	/** Dieses Feld speichert die erfassten Protokollzeilen. */
 	private final List<String> result = new ArrayList<>();
@@ -45,27 +45,27 @@ public class LoggerResult implements Producer<String[]> {
 
 	/** Diese Methode erfasst die gegebene Protokollzeile.
 	 * <ul>
-	 * <li>Wenn das Objekt {@code text} ein {@link Logger} ist, werden dessen Protokollzeilen rekursiv erfasst. Die Rekursion ist nicht gegen Endlosschleifen
-	 * abgesichert.</li>
+	 * <li>Wenn das Objekt {@code text} ein {@link ScopedLogger} ist, werden dessen Protokollzeilen rekursiv erfasst. Die Rekursion ist nicht gegen
+	 * Endlosschleifen abgesichert.</li>
 	 * <li>Wenn die Objektliste {@code args} {@code null} ist, wird die Protokollzeile über {@link #push(Object) this.push(toString(text))} erfasst.<br>
-	 * Solche Protokollzeilen werden durch {@link Logger#openScope()}, {@link Logger#openScope(Object)}, {@link Logger#pushEntry(Object)},
-	 * {@link Logger#pushError(Throwable, Object)}, {@link Logger#closeScope()} und {@link Logger#closeScope(Object)} bereitgestellt.</li>
+	 * Solche Protokollzeilen werden durch  {@link ScopedLogger#enterScope(Object)}, {@link ScopedLogger#pushEntry(Object)},
+	 *  und {@link ScopedLogger#leaveScope(Object)} bereitgestellt.</li>
 	 * <li>Wenn das Objekt {@code text} {@code null} ist, wird die über {@link Strings#join(Object[]) Strings.join(this.toObjects(args))} erzeugte Zeichenkette
 	 * über {@link #push(String)} erfast.<br>
-	 * Solche Protokollzeilen können durch {@link Logger#openScope(String, Object...)}, {@link Logger#pushEntry(String, Object...)},
-	 * {@link Logger#pushError(Throwable, String, Object...)} und {@link Logger#closeScope(String, Object...)} erzeugt werden, wenn als Formattext {@code null}
-	 * eingesetzt wird.</li>
+	 * Solche Protokollzeilen können durch {@link ScopedLogger#enterScope(String, Object...)}, {@link ScopedLogger#pushEntry(String, Object...)},
+	 * {@link ScopedLogger#pushError(Throwable, String, Object...)} und {@link ScopedLogger#leaveScope(String, Object...)} erzeugt werden, wenn als Formattext
+	 * {@code null} eingesetzt wird.</li>
 	 * <li>Andernfalls wird die über {@link String#format(String, Object...) String.format(this.toString(text), this.toObjects(args)))} erzeugte Zeichenkette über
 	 * {@link #push(String)} erfasst.</li>
 	 * </ul>
 	 *
 	 * @see #toString(Object)
 	 * @see #toObjects(Object[])
-	 * @param text {@link Logger}, Textbaustein, Formattext oder {@code null}.
+	 * @param text {@link ScopedLogger}, Textbaustein, Formattext oder {@code null}.
 	 * @param args Textbausteine, Formatargumente oder {@code null}. */
 	public void push(final Object text, final Object[] args) {
-		if (text instanceof Logger) {
-			((Logger)text).toStringImpl(this);
+		if (text instanceof ScopedLogger) {
+			((ScopedLogger)text).toStringImpl(this);
 		} else if (args == null) {
 			this.push(this.toString(text));
 		} else if (text == null) {
@@ -76,13 +76,9 @@ public class LoggerResult implements Producer<String[]> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	void pushImpl(final LoggerNode node) {
+	void pushImpl(final ScopedEntryNode node) {
 		this.push(node.text, node.args);
-		if (node.isOpen()) {
-			this.indent++;
-		} else if (node.isClose()) {
-			this.indent--;
-		}
+		this.indent += node.indent();
 	}
 
 	/** Diese Methode gibt die Zeichenkette zum gegebenen Objekt zurück. Sie wird in {@link #push(Object)} und {@link #push(Object, Object[])} zur Ermittlung des
