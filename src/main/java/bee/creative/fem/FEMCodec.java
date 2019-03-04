@@ -104,15 +104,15 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		/** Dieses Feld speichert den Besitzer. */
-		protected FEMCodec codec;
+		protected final FEMCodec codec;
 
 		/** Dieses Feld speichert den Puffer der über {@link #get(int)} gelieferten Datensätze. */
 		protected Object[] cache = {};
 
-		/** Dieses Feld speichert die Wertlisten der über {@link #get(int)} gelesenen Datensätzen. */
-		protected IAMListing source;
+		/** Dieses Feld speichert die Zahlenfolgen der über {@link #get(int)} gelesenen Datensätzen. */
+		protected IAMListing source = IAMListing.EMPTY;
 
-		/** Dieses Feld speichert die Wertlisten der über {@link #put(Object)} angefügten Datensätzen. */
+		/** Dieses Feld speichert die Zahlenfolgen der über {@link #put(Object)} angefügten Datensätzen. */
 		protected IAMListingBuilder target;
 
 		@SuppressWarnings ("javadoc")
@@ -150,7 +150,7 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		public IAMListing getSource() {
-			return source;
+			return this.source;
 		}
 
 		protected void setSource(final IAMListing source) {
@@ -160,7 +160,7 @@ class FEMCodec implements Property<FEMValue> {
 		}
 
 		public IAMListingBuilder getTarget() {
-			return target;
+			return this.target;
 		}
 
 		protected void setTarget(final IAMListingBuilder target) {
@@ -176,7 +176,7 @@ class FEMCodec implements Property<FEMValue> {
 		public abstract int toRef(int index);
 
 		/** Diese Methode interpretiert die gegebene Zahlenfolge als Datensatz und gibt diesen zurück.
-		 * 
+		 *
 		 * @param source Zahlenfolge.
 		 * @return Datensatz.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -190,13 +190,14 @@ class FEMCodec implements Property<FEMValue> {
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 		public abstract IAMArray toArray(final GItem source) throws NullPointerException, IllegalArgumentException;
 
-		/** Diese Methode gibt eine Sicht auf die Liste aller Wertlisten zurück.
+		/** Diese Methode gibt eine Sicht auf die Liste aller Datensätze zurück.
 		 *
-		 * @return Wertlisten. */
+		 * @return {@link List}-Sicht auf die Datensätze. */
 		public List<GItem> toList() {
 			return new ItemList();
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.toList());
@@ -575,13 +576,13 @@ class FEMCodec implements Property<FEMValue> {
 
 	/** Dieses Feld speichert den in {@link #setSource(IAMIndex)} initialisierten {@link IAMIndex}, in aus welchem alle übrogen {@code source}-Datenfelder
 	 * bestückt werden müssen. */
-	protected IAMIndex sourceIndex;
+	protected IAMIndex sourceIndex = IAMIndex.EMPTY;
 
 	/** Dieses Feld speichert die erste Auflistung im {@link #sourceIndex}. */
-	protected IAMListing sourceIndexListing;
+	protected IAMListing sourceIndexListing = IAMListing.EMPTY;
 
 	/** Dieses Feld speichert die erste Abbildung im {@link #sourceIndex}. */
-	protected IAMMapping sourceIndexMapping;
+	protected IAMMapping sourceIndexMapping = IAMMapping.EMPTY;
 
 	/** Dieses Feld speichert den in {@link #setTarget()} initialisierten {@link IAMIndexBuilder}, in welchen bis aus {@link #targetIndexListing} und
 	 * {@link #targetIndexMapping} alle übrigen {@code target}-Datenfelder eingefügt werden müssen. */
@@ -642,12 +643,16 @@ class FEMCodec implements Property<FEMValue> {
 		this.propertyRef = this.putValue(value);
 	}
 
+	/** Diese Methode gibt die Datenquelle zurück, auf welche alle lesenden Methoden zugreifen.
+	 *
+	 * @return Datenquelle. */
 	public IAMIndex getSource() {
 		return this.sourceIndex;
 	}
 
-	/** Diese Methode bestückt diesen {@link FEMCodec} zum Lesen des gegebenen {@link IAMIndex} und gibt {@code this} zurück.
-	 *
+	/** Diese Methode bestückt diesen {@link FEMCodec} zum Lesen der gegebenen {@link IAMIndex Datenquelle} und gibt {@code this} zurück. Die {@link #getTarget()
+	 * Datensenke} wird dabei auf {@code null} gesetzt.
+	 * 
 	 * @param source Datenquelle.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
@@ -681,12 +686,16 @@ class FEMCodec implements Property<FEMValue> {
 		pool.setSource(this.getListing(type));
 	}
 
+	/** Diese Methode gibt die Datensenke zurück, auf welche alle schreibenden Methoden zugreifen.
+	 *
+	 * @return Datensenke oder {@code null}. */
 	public IAMIndexBuilder getTarget() {
 		return this.targetIndex;
 	}
 
-	/** Diese Methode bestückt diesen {@link FEMCodec} zur Befüllung eines neuen {@link IAMIndexBuilder} und gibt {@code this} zurück.
-	 *
+	/** Diese Methode bestückt diesen {@link FEMCodec} zur Befüllung einer neuen {@link IAMIndexBuilder Datensenke} und gibt {@code this} zurück. Die
+	 * {@link #getSource() Datenquelle} ist dabei gleich dieser Datensenke.
+	 * 
 	 * @return {@code this}. */
 	public FEMCodec setTarget() {
 		this.sourceIndex = this.targetIndex = new IAMIndexBuilder();
@@ -1058,10 +1067,10 @@ class FEMCodec implements Property<FEMValue> {
 		return this.getIntegerArrayImpl(source.value());
 	}
 
-	// TODO
-	/** Diese Methode ist die Umkehroperation zu {@link #getProxyFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsaufruf enthält.
+	/** Diese Methode ist die Umkehroperation zu {@link #getProxyFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsplatzhalter
+	 * enthält.
 	 *
-	 * @param source Funktionsaufruf.
+	 * @param source Funktionsplatzhalter.
 	 * @return Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
@@ -1121,7 +1130,11 @@ class FEMCodec implements Property<FEMValue> {
 	 * Die Zahlenfolge beginnt ebenfalls mit den Wertreferenzen sowie dem Streuwert und endet auch mit der Länge der Wertliste. Dazwischen enthält sie die Inhalte
 	 * sowie die Größen der Streuwertbereiche.</li>
 	 * </ul>
-	*/
+	 * 
+	 * @param source Zahlenfolge.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public FEMArray getArrayValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		final int length1 = source.length() - 2, length2 = source.get(length1 + 1);
 		if (length1 == length2) return new IndexArray(length1, this, source);
@@ -1247,7 +1260,7 @@ class FEMCodec implements Property<FEMValue> {
 	}
 
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionszeiger und gibt diese zurück. Die Zahlenfolge muss dazu aus einer
-	 * {@link #toRef(int, int) Funktionsreferenz } bestehen, welche über {@link #getFunction(int)} interpretiert wird.
+	 * {@link #toRef(int, int) Funktionsreferenz} bestehen, welche über {@link #getFunction(int)} interpretiert wird.
 	 *
 	 * @param source Zahlenfolge.
 	 * @return Funktionszeiger.
@@ -1283,7 +1296,15 @@ class FEMCodec implements Property<FEMValue> {
 		return this.objectValuePool.toList();
 	}
 
-	// TODO
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionsplatzhalter und gibt diese zurück. Die Zahlenfolge muss dazu aus drei Zahlen bestehen,
+	 * der über {@link #putValue(FEMValue)} ermittelten Wertreferenzen seiner {@link FEMProxy#id() Kennung}, der über {@link #putStringValue(FEMString)}
+	 * ermittelten Position seines {@link FEMProxy#name() Namnes} sowie der über {@link #putFunction(FEMFunction)} ermittelten Funktionsreferenz seines
+	 * {@link FEMProxy#get() Ziels}.
+	 *
+	 * @param source Zahlenfolge.
+	 * @return Funktionsplatzhalter.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public FEMProxy getProxyFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() != 3) throw new IllegalArgumentException();
 		return new FEMProxy(this.getValue(source.get(0)), this.getStringValue(source.get(1)), this.getFunction(source.get(2)));
@@ -1296,6 +1317,14 @@ class FEMCodec implements Property<FEMValue> {
 		return this.proxyFunctionPool.toList();
 	}
 
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionkette und gibt diese zurück. Die Zahlenfolge muss dazu aus den über
+	 * {@link #putFunction(FEMFunction)} ermittelten {@link #toRef(int, int) Funktionsreferenzen} der {@link ConcatFunction#function() verketteten Funktion} und
+	 * iher {@link ConcatFunction#params() Parameterfunktionen} bestehen.
+	 *
+	 * @param source Zahlenfolge.
+	 * @return Funktionkette.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public ConcatFunction getConcatFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		return new ConcatFunction(this.getCompositeFunctionImpl(source), this.getCompositeParamsImpl(source));
 	}
@@ -1307,8 +1336,15 @@ class FEMCodec implements Property<FEMValue> {
 		return this.concatFunctionPool.toList();
 	}
 
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionsbindungen und gibt diese zurück. Die Zahlenfolge muss dazu aus einer
+	 * {@link #toRef(int, int) Funktionsreferenz} bestehen, welche über {@link #getFunction(int)} interpretiert wird.
+	 *
+	 * @param source Zahlenfolge.
+	 * @return Funktionsbindungen.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public ClosureFunction getClosureFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		if (source.length() == 0) throw new IllegalArgumentException();
+		if (source.length() != 1) throw new IllegalArgumentException();
 		return new ClosureFunction(this.getFunction(source.get(0)));
 	}
 
@@ -1319,6 +1355,14 @@ class FEMCodec implements Property<FEMValue> {
 		return this.closureFunctionPool.toList();
 	}
 
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionsaufruf und gibt diese zurück. Die Zahlenfolge muss dazu aus den über
+	 * {@link #putFunction(FEMFunction)} ermittelten {@link #toRef(int, int) Funktionsreferenzen} der {@link CompositeFunction#function() aufgerufenen Funktion}
+	 * und iher {@link CompositeFunction#params() Parameterfunktionen} bestehen.
+	 *
+	 * @param source Zahlenfolge.
+	 * @return Funktionsaufruf.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public CompositeFunction getCompositeFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		return new CompositeFunction(this.getCompositeFunctionImpl(source), this.getCompositeParamsImpl(source));
 	}
