@@ -6,7 +6,7 @@ package bee.creative.emu;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface Emuable {
 
-	/** Diese Methode gibt den Speicherverbrauch dieses Objekts zurück.
+	/** Diese Methode gibt den geschätzten Speicherverbrauch dieses Objekts zurück.
 	 *
 	 * @return Speicherverbrauch. */
 	public long emu();
