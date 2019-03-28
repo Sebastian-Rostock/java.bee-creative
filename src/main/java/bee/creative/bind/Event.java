@@ -1,10 +1,12 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import bee.creative.emu.EMU;
 import bee.creative.ref.PointerQueue;
+import bee.creative.util.HashSet;
+import bee.creative.util.Objects;
 import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},

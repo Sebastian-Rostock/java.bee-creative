@@ -1,7 +1,7 @@
 package bee.creative._deprecated_;
 
 import java.util.Iterator;
-import bee.creative.util.Field;
+import bee.creative.bind.Field;
 
 /** Diese Schnittstelle definiert eine Teilmenge der Datensätze (z.B. der {@link Item}) einer Sammlung (z.B. eines {@link Pool}) als Ergebnis eienr Suche, auf
  * welcher auch weiter gesucht werden kann.

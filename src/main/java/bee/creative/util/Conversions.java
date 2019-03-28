@@ -1,6 +1,7 @@
 package bee.creative.util;
 
-import bee.creative.util.Getters.BaseGetter;
+import bee.creative.bind.Getter;
+import bee.creative.bind.Getters.BaseGetter;
 import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert grundlegende {@link Conversion}.

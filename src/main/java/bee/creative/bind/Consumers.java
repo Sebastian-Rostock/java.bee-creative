@@ -1,11 +1,13 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import bee.creative.bind.Setters.BaseSetter;
+import bee.creative.util.Natives;
+import bee.creative.util.Objects;
 import bee.creative.util.Objects.BaseObject;
-import bee.creative.util.Setters.BaseSetter;
 
 /** Diese Klasse implementiert grundlegende {@link Consumer}.
  *

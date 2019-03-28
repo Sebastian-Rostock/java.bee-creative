@@ -1,4 +1,6 @@
-package bee.creative.util;
+package bee.creative.bind;
+
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine {@link Observable überwachbare} {@link Property Eigenschaft}.
  *

@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 /** Diese Schnittstelle definiert einen Übersetzer, der Quellobjekte in Zielobjekte und umgekehrt übersetzen kann. Ein {@link Translator} ähnelt damit einem
  * bidirektionalen {@link Getter}.

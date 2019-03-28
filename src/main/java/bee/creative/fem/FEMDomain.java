@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.bind.Getter;
+import bee.creative.bind.Setter;
 import bee.creative.fem.FEMFunction.ClosureFunction;
 import bee.creative.fem.FEMFunction.CompositeFunction;
 import bee.creative.fem.FEMFunction.ConcatFunction;
@@ -14,11 +16,9 @@ import bee.creative.fem.FEMFunction.FutureFunction;
 import bee.creative.fem.FEMFunction.TraceFunction;
 import bee.creative.fem.FEMScript.Token;
 import bee.creative.util.Filter;
-import bee.creative.util.Getter;
 import bee.creative.util.Natives;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.BaseObject;
-import bee.creative.util.Setter;
 import bee.creative.util.Strings;
 
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete

@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 /** Diese Schnittstelle definiert einen Adapter zum Schreiben einer Eigenschaft eines gegebenen Datensatzes.
  *

@@ -4,6 +4,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import bee.creative.bind.Field;
+import bee.creative.bind.Getter;
+import bee.creative.bind.Getters;
+import bee.creative.bind.Setter;
+import bee.creative.bind.Setters;
 
 /** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten. Dazu werden
  * gegebene Eingabeobjekte mit daraus {@link #customBuild(Object) berechneten} Ausgabeobjekten über in einer {@link Map Abbildung} verwaltet. Wenn über

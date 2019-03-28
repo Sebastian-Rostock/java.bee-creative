@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 /** Diese Schnittstelle definiert eine Methode zur Bereitstellung eines Werts, welcher bspw. durch den Besitzer dieser Methode erzeugt, verwaltet oder
  * konfiguriert werden kann.

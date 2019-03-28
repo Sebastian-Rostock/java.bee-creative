@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 /** Diese Schnittstelle definiert einen Adapter zum Lesen einer Eigenschaft eines gegebenen Datensatzes. Das Lesen der Eigenschaft kann auch als Umwandlung oder
  * Navigation verstanden werden.

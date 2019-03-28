@@ -4,8 +4,8 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collection;
-import bee.creative.util.Getter;
-import bee.creative.util.Getters.BaseGetter;
+import bee.creative.bind.Getter;
+import bee.creative.bind.Getters.BaseGetter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 

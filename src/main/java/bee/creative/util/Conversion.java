@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.Comparator;
 import java.util.List;
+import bee.creative.bind.Getter;
 
 /** Diese Schnittstelle definiert das Paar aus Ein- und Ausgabedaten.
  * <p>

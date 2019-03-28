@@ -1,6 +1,6 @@
 package bee.creative._deprecated_;
 
-import bee.creative.util.Field;
+import bee.creative.bind.Field;
 
 /** Diese Schnittstelle definiert den Identifikator eines Datentyps, welcher eine {@link #label() Beschriftung} besitzt und zur {@link #is(Type) Typprüfung}
  * verwendet werden kann. Die {@link #fields()} ermöglichen den generischen Zugriff auf die Attributen eines Datensatzes dieses Datentyps.

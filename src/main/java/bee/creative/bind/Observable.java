@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 import java.lang.ref.WeakReference;
 

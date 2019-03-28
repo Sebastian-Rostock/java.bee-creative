@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 /** Diese Schnittstelle definiert einen Adapter zum Lesen und Schreiben des Werts einer Eigenschaft, die durch dieses Objekt repräsentiert wird.
  *

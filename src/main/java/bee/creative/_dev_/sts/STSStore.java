@@ -15,8 +15,8 @@ import bee.creative._dev_.sts.STSNodeSet.SingleNodeSet;
 import bee.creative._dev_.sts.STSNodeSet.StoreNodeSet;
 import bee.creative.array.CompactIntegerArray;
 import bee.creative.array.IntegerArraySection;
+import bee.creative.bind.Getter;
 import bee.creative.fem.FEMBinary;
-import bee.creative.util.Getter;
 
 /** Diese Klasse implementiert einen abstrakten Speicher zur Verwaltung eines Graphe aus {@link STSNode Knoten} und {@link STSEdge Kanten}, bei welchem jeder
  * Knoten einen ihn identifizierenden {@link STSNode#value() Wert} besitzt und jede Kante eine Verbindung dreier Knoten in den Rollen {@link STSEdge#subject()

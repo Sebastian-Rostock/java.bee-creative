@@ -7,7 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import bee.creative.array.Array;
-import bee.creative.util.Getters.BaseGetter;
+import bee.creative.bind.Getter;
+import bee.creative.bind.Getters.BaseGetter;
 import bee.creative.util.Objects.BaseObject;
 import bee.creative.util.Objects.UseToString;
 

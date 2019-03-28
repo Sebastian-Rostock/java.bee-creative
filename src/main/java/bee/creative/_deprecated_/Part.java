@@ -1,6 +1,6 @@
 package bee.creative._deprecated_;
 
-import bee.creative.util.Field;
+import bee.creative.bind.Field;
 
 /** Diese Schnittstelle definiert ein Objekt als Bestandteil seines Besitzers.
  *

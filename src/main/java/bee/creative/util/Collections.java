@@ -12,6 +12,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import bee.creative.bind.Translator;
+import bee.creative.bind.Translators;
 
 /** Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}, {@link Map}, {@link List} und {@link Collection}.
  *
@@ -140,7 +142,7 @@ public class Collections {
 
 	/** Diese Klasse implementiert {@link Collections#intersectionSet(Set, Set)} */
 	@SuppressWarnings ("javadoc")
-	public static final class IntersectionSet<GItem> extends AbstractSet<GItem> {
+	public static class IntersectionSet<GItem> extends AbstractSet<GItem> {
 
 		public final Set<? extends GItem> items1;
 
@@ -1002,6 +1004,351 @@ public class Collections {
 		@Override
 		public Iterator<GTarget> iterator() {
 			return Iterators.translatedIterator(Translators.toTargetGetter(this.translator), this.items.iterator());
+		}
+
+	}
+
+	public static abstract class BaseSetAdapter<GItem> implements Set<GItem> {
+
+		protected abstract Set<GItem> getItems(boolean readonly);
+
+		protected abstract void setItems(final Set<GItem> items);
+
+		@Override
+		public int size() {
+			return this.getItems(true).size();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.getItems(true).isEmpty();
+		}
+
+		@Override
+		public boolean add(final GItem e) {
+			final Set<GItem> items = this.getItems(false);
+			if (!items.add(e)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public boolean addAll(final Collection<? extends GItem> c) {
+			final Set<GItem> items = this.getItems(false);
+			if (!items.addAll(c)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public boolean remove(final Object o) {
+			final Set<GItem> items = this.getItems(false);
+			if (!items.remove(o)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public boolean removeAll(final Collection<?> c) {
+			final Set<GItem> items = this.getItems(false);
+			if (!items.removeAll(c)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.getItems(true).contains(item);
+		}
+
+		@Override
+		public boolean containsAll(final Collection<?> c) {
+			return this.getItems(true).containsAll(c);
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> c) {
+			final Set<GItem> items = this.getItems(false);
+			if (!items.retainAll(c)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public void clear() {
+			final Set<GItem> items = this.getItems(false);
+			items.clear();
+			this.setItems(items);
+		}
+
+		@Override
+		public int hashCode() {
+			return this.getItems(true).hashCode();
+		}
+
+		@Override
+		public boolean equals(final Object object) {
+			return this.getItems(true).equals(object);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			final Set<GItem> items = this.getItems(false);
+			final Iterator<GItem> iterator = items.iterator();
+			return new Iterator<GItem>() {
+
+				@Override
+				public boolean hasNext() {
+					return iterator.hasNext();
+				}
+
+				@Override
+				public GItem next() {
+					return iterator.next();
+				}
+
+				@Override
+				public void remove() {
+					iterator.remove();
+					BaseSetAdapter.this.setItems(items);
+				}
+
+			};
+		}
+
+		@Override
+		public Object[] toArray() {
+			return this.getItems(true).toArray();
+		}
+
+		@Override
+		public <T> T[] toArray(final T[] result) {
+			return this.getItems(true).toArray(result);
+		}
+
+		@Override
+		public String toString() {
+			return this.getItems(true).toString();
+		}
+
+	}
+
+	public static abstract class BaseListAdapter<GItem> extends AbstractList<GItem> {
+
+		protected abstract List<GItem> getItems(boolean readonly);
+
+		protected abstract void setItems(final List<GItem> items);
+
+		@Override
+		protected void removeRange(final int fromIndex, final int toIndex) {
+			final List<GItem> items = this.getItems(false);
+			items.subList(fromIndex, toIndex).clear();
+			this.setItems(items);
+		}
+
+		@Override
+		public int size() {
+			return this.getItems(true).size();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.getItems(true).isEmpty();
+		}
+
+		@Override
+		public GItem get(final int index) {
+			return this.getItems(true).get(index);
+		}
+
+		@Override
+		public GItem set(final int index, final GItem e) {
+			final List<GItem> items = this.getItems(false);
+			final GItem result = items.set(index, e);
+			this.setItems(items);
+			return result;
+		}
+
+		@Override
+		public boolean add(final GItem e) {
+			final List<GItem> items = this.getItems(false);
+			if (!items.add(e)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public void add(final int index, final GItem c) {
+			final List<GItem> items = this.getItems(false);
+			items.add(index, c);
+			this.setItems(items);
+		}
+
+		@Override
+		public boolean addAll(final Collection<? extends GItem> c) {
+			final List<GItem> items = this.getItems(false);
+			if (!items.addAll(c)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public boolean addAll(final int index, final Collection<? extends GItem> c) {
+			final List<GItem> items = this.getItems(false);
+			if (!items.addAll(index, c)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public GItem remove(final int index) {
+			final List<GItem> items = this.getItems(false);
+			final GItem result = items.remove(index);
+			this.setItems(items);
+			return result;
+		}
+
+		@Override
+		public boolean remove(final Object o) {
+			final List<GItem> items = this.getItems(false);
+			if (!items.remove(o)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public boolean removeAll(final Collection<?> c) {
+			final List<GItem> items = this.getItems(false);
+			if (!items.removeAll(c)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public boolean contains(final Object item) {
+			return this.getItems(true).contains(item);
+		}
+
+		@Override
+		public boolean containsAll(final Collection<?> c) {
+			return this.getItems(true).containsAll(c);
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> c) {
+			final List<GItem> items = this.getItems(false);
+			if (!items.retainAll(c)) return false;
+			this.setItems(items);
+			return true;
+		}
+
+		@Override
+		public int indexOf(final Object o) {
+			return this.getItems(true).indexOf(o);
+		}
+
+		@Override
+		public int lastIndexOf(final Object o) {
+			return this.getItems(true).lastIndexOf(o);
+		}
+
+		@Override
+		public ListIterator<GItem> listIterator() {
+			return this.listIterator(0);
+		}
+
+		@Override
+		public ListIterator<GItem> listIterator(final int index) {
+			final List<GItem> items = this.getItems(false);
+			final ListIterator<GItem> iterator = items.listIterator(index); // TODO
+			return new ListIterator<GItem>() {
+
+				@Override
+				public boolean hasNext() {
+					return iterator.hasNext();
+				}
+
+				@Override
+				public GItem next() {
+					return iterator.next();
+				}
+
+				@Override
+				public boolean hasPrevious() {
+					return iterator.hasPrevious();
+				}
+
+				@Override
+				public GItem previous() {
+					return iterator.previous();
+				}
+
+				@Override
+				public int nextIndex() {
+					return iterator.nextIndex();
+				}
+
+				@Override
+				public int previousIndex() {
+					return iterator.previousIndex();
+				}
+
+				@Override
+				public void remove() {
+					iterator.remove();
+					BaseListAdapter.this.setItems(items);
+				}
+
+				@Override
+				public void set(final GItem e) {
+					iterator.set(e);
+					BaseListAdapter.this.setItems(items);
+				}
+
+				@Override
+				public void add(final GItem e) {
+					iterator.add(e);
+					BaseListAdapter.this.setItems(items);
+				}
+
+			};
+		}
+
+		@Override
+		public void clear() {
+			final List<GItem> items = this.getItems(false);
+			items.clear();
+			this.setItems(items);
+		}
+
+		@Override
+		public int hashCode() {
+			return this.getItems(true).hashCode();
+		}
+
+		@Override
+		public boolean equals(final Object object) {
+			return this.getItems(true).equals(object);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return this.listIterator(0);
+		}
+
+		@Override
+		public Object[] toArray() {
+			return this.getItems(true).toArray();
+		}
+
+		@Override
+		public <T> T[] toArray(final T[] result) {
+			return this.getItems(true).toArray(result);
+		}
+
+		@Override
+		public String toString() {
+			return this.getItems(true).toString();
 		}
 
 	}

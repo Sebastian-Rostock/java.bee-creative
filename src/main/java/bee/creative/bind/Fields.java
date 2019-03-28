@@ -1,155 +1,32 @@
-package bee.creative.util;
+package bee.creative.bind;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import bee.creative._deprecated_.ListField;
+import bee.creative._deprecated_.MapField;
+import bee.creative._deprecated_.SetField;
+import bee.creative.bind.Properties.BaseProperty;
+import bee.creative.util.Filter;
+import bee.creative.util.HashMap2;
+import bee.creative.util.HashSet2;
+import bee.creative.util.Iterables;
+import bee.creative.util.Natives;
+import bee.creative.util.Objects;
 import bee.creative.util.Objects.BaseObject;
-import bee.creative.util.Properties.BaseProperty;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Field}-Instanzen.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
-
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation eines {@link Set}, welches über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie des {@link Set}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
-	 * wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GEntry> Typ der Elemente. */
-	public static interface SetField<GItem, GEntry> extends ItemsField<GItem, GEntry>, Field<GItem, Set<GEntry>> {
-	}
-
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link List}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link List}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
-	 * wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GEntry> Typ der Elemente. */
-	public static interface ListField<GItem, GEntry> extends ItemsField<GItem, GEntry>, Field<GItem, List<GEntry>> {
-
-		/** Diese Methode verändert die Sammlung analog zu {@link List#add(int, Object)}.
-		 *
-		 * @param item Eingabe.
-		 * @param index Index.
-		 * @param entry Element. */
-		public void put(final GItem item, final int index, final GEntry entry);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link List#addAll(int, Collection)}.
-		 *
-		 * @param item Eingabe.
-		 * @param index Index.
-		 * @param entries Elemente. */
-		public void putAll(final GItem item, final int index, final Iterable<? extends GEntry> entries);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link List#remove(int)}.
-		 *
-		 * @param item Eingabe.
-		 * @param index Index. */
-		public void pop(final GItem item, final int index);
-
-	}
-
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
-	 * wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte. */
-	public static interface MapField<GItem, GKey, GValue> extends EntriesField<GItem, GKey, GValue>, Field<GItem, Map<GKey, GValue>> {
-	}
-
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Collection}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der Objektsammlung, welche nach ihrer Modifikation über {@link Field#set(Object, Object)}
-	 * zugewiesen wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GEntry> Typ der Elemente. */
-	public static interface ItemsField<GItem, GEntry> {
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#add(Object)}.
-		 *
-		 * @param item Eingabe.
-		 * @param entry Element. */
-		public void put(final GItem item, final GEntry entry);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#addAll(Collection)}.
-		 *
-		 * @param item Eingabe.
-		 * @param entries Elemente. */
-		public void putAll(final GItem item, final Iterable<? extends GEntry> entries);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#remove(Object)}.
-		 *
-		 * @param item Eingabe.
-		 * @param entry Element. */
-		public void pop(final GItem item, final Object entry);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#removeAll(Collection)}.
-		 *
-		 * @param item Eingabe.
-		 * @param entries Elemente. */
-		public void popAll(final GItem item, final Iterable<?> entries);
-
-		/** Diese Methode verändert die Sammlung analog zu {@link Collection#clear()}.
-		 *
-		 * @param item Eingabe. */
-		public void clear(final GItem item);
-
-	}
-
-	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
-	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link Field#set(Object, Object)} zugewiesen
-	 * wird.
-	 *
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte. */
-	public static interface EntriesField<GItem, GKey, GValue> {
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#put(Object, Object)}.
-		 *
-		 * @param item Eingabe.
-		 * @param key Schlüssel.
-		 * @param value Wert. */
-		public void put(final GItem item, final GKey key, GValue value);
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#putAll(Map)}.
-		 *
-		 * @param item Eingabe.
-		 * @param entries Elemente. */
-		public void putAll(final GItem item, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries);
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#remove(Object)}.
-		 *
-		 * @param item Eingabe.
-		 * @param key Schlüssel. */
-		public void pop(final GItem item, final Object key);
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#keySet()} mit {@link Set#removeAll(Collection)}.
-		 *
-		 * @param item Eingabe.
-		 * @param keys Schlüssel. */
-		public void popAll(final GItem item, final Iterable<?> keys);
-
-		/** Diese Methode verändert die {@link Map} analog zu {@link Map#clear()}.
-		 *
-		 * @param item Eingabe. */
-		public void clear(final GItem item);
-
-	}
 
 	/** Diese Klasse implementiert ein abstraktes {@link Field} als {@link BaseObject}. */
 	public static abstract class BaseField<GItem, GValue> extends BaseObject implements Field<GItem, GValue> {
@@ -761,10 +638,119 @@ public final class Fields {
 		}
 
 	}
+	
+
 
 	/** Diese Klasse implementiert {@link Fields#toProperty(Object, Field)}. */
 	@SuppressWarnings ("javadoc")
-	static class FieldProperty<GValue, GItem> extends BaseProperty<GValue> {
+	public	static class FieldSet<GValue, GItem> implements Set<GValue> {
+
+		public final GItem item;
+
+		public final Field<? super GItem, Set<GValue>> field;
+
+		public FieldSet(final GItem item, final Field<? super GItem, Set<GValue>> field) {
+			this.item = item;
+			this.field = Objects.notNull(field);
+		}
+
+		protected Set<GValue> getContent() {
+			return this.field.get(this.item);
+		}
+
+		public void setAll(final Set<GValue> value) {
+			this.field.set(this.item, value);
+		}
+
+		@Override
+		public int size() {
+			return 0;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			return false;
+		}
+
+		@Override
+		public Iterator<GValue> iterator() {
+			return null;
+		}
+
+		@Override
+		public Object[] toArray() {
+			return null;
+		}
+
+		@Override
+		public <T> T[] toArray(T[] a) {
+			return null;
+		}
+
+		@Override
+		public boolean add(GValue e) {
+			return false;
+		}
+
+		@Override
+		public boolean remove(Object o) {
+			return false;
+		}
+
+		@Override
+		public boolean containsAll(Collection<?> c) {
+			return false;
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends GValue> c) {
+			return false;
+		}
+
+		@Override
+		public boolean retainAll(Collection<?> c) {
+			return false;
+		}
+
+		@Override
+		public boolean removeAll(Collection<?> c) {
+			return false;
+		}
+
+		@Override
+		public void clear() {
+		}
+
+		@Override
+		public int hashCode() {
+			return super.hashCode();
+		}
+		
+		
+		@Override
+		public boolean equals(Object obj) {
+			return super.equals(obj);
+		}
+		
+		
+		@Override
+		public String toString() {
+			return super.toString();
+		}
+		
+		
+ 
+		 
+	}
+
+	/** Diese Klasse implementiert {@link Fields#toProperty(Object, Field)}. */
+	@SuppressWarnings ("javadoc")
+	public	static class FieldProperty<GValue, GItem> extends BaseProperty<GValue> {
 
 		public final GItem item;
 

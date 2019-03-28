@@ -30,7 +30,7 @@ import bee.creative.array.ByteArraySection;
 import bee.creative.array.CharacterArray;
 import bee.creative.array.CharacterArraySection;
 import bee.creative.array.CompactByteArray;
-import bee.creative.util.Getter;
+import bee.creative.bind.Getter;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert Methoden zur Erzeugung von Ein- und Ausgabe.

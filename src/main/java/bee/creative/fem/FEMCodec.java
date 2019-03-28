@@ -3,6 +3,7 @@ package bee.creative.fem;
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
+import bee.creative.bind.Property;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMArray.CompactArray3;
@@ -20,7 +21,6 @@ import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Integers;
 import bee.creative.util.Objects;
-import bee.creative.util.Property;
 
 /** Diese Klasse implementiert ein Objekt zur Kodierung und Dekodierung von {@link FEMValue Werten} und {@link FEMFunction Funktionen} in {@link IAMArray
  * Zahlenlisten}. Damit ist es möglich, beliebig große Wert- und Funktionsgraphen über ein {@link MMFArray} in eine Binärdatei auszulagern.
