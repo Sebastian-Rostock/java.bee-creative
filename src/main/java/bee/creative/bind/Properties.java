@@ -3,6 +3,12 @@ package bee.creative.bind;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import bee.creative.util.Collections.BaseListAdapter;
+import bee.creative.util.Collections.BaseMapAdapter;
+import bee.creative.util.Collections.BaseSetAdapter;
 import bee.creative.util.Natives;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.BaseObject;
@@ -209,6 +215,72 @@ public class Properties {
 
 	}
 
+	/** Diese Klasse implementiert {@link Properties#toSet(Property)}. */
+	@SuppressWarnings ("javadoc")
+	public static class PropertySet<GItem> extends BaseSetAdapter<GItem> {
+
+		public final Property<Set<GItem>> property;
+
+		public PropertySet(final Property<Set<GItem>> property) {
+			this.property = Objects.notNull(property);
+		}
+
+		@Override
+		protected Set<GItem> getData(final boolean readonly) {
+			return this.property.get();
+		}
+
+		@Override
+		protected void setData(final Set<GItem> items) {
+			this.property.set(items);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Properties#toList(Property)}. */
+	@SuppressWarnings ("javadoc")
+	public static class PropertyList<GItem> extends BaseListAdapter<GItem> {
+
+		public final Property<List<GItem>> property;
+
+		public PropertyList(final Property<List<GItem>> property) {
+			this.property = Objects.notNull(property);
+		}
+
+		@Override
+		protected List<GItem> getData(final boolean readonly) {
+			return this.property.get();
+		}
+
+		@Override
+		protected void setData(final List<GItem> items) {
+			this.property.set(items);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Properties#toMap(Property)}. */
+	@SuppressWarnings ("javadoc")
+	public static class PropertyMap<GKey, GValue> extends BaseMapAdapter<GKey, GValue> {
+
+		public final Property<Map<GKey, GValue>> property;
+
+		public PropertyMap(final Property<Map<GKey, GValue>> property) {
+			this.property = Objects.notNull(property);
+		}
+
+		@Override
+		protected Map<GKey, GValue> getData(final boolean readonly) {
+			return this.property.get();
+		}
+
+		@Override
+		protected void setData(final Map<GKey, GValue> items) {
+			this.property.set(items);
+		}
+
+	}
+
 	/** Diese Klasse implementiert {@link Properties#toField(Property)}. */
 	@SuppressWarnings ("javadoc")
 	static class PropertyField<GValue> implements Field<Object, GValue> {
@@ -399,6 +471,18 @@ public class Properties {
 	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
 	public static <GValue> Property<GValue> synchronizedProperty(final Object mutex, final Property<GValue> property) throws NullPointerException {
 		return new SynchronizedProperty<>(mutex, property);
+	}
+
+	public static <GItem> Set<GItem> toSet(final Property<Set<GItem>> property) {
+		return new PropertySet<>(property);
+	}
+
+	public static <GItem> List<GItem> toList(final Property<List<GItem>> property) {
+		return new PropertyList<>(property);
+	}
+
+	public static <GKey, GValue> Map<GKey, GValue> toMap(final Property<Map<GKey, GValue>> property) {
+		return new PropertyMap<>(property);
 	}
 
 	/** Diese Methode gibt ein {@link Field} zurück, das seinen Datensatz ignoriert und den Wert des gegebenen {@link Property} manipuliert.
