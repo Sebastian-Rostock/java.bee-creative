@@ -3,12 +3,14 @@ package bee.creative.bind;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import bee.creative.util.Collections.BaseListAdapter;
-import bee.creative.util.Collections.BaseMapAdapter;
-import bee.creative.util.Collections.BaseSetAdapter;
+import bee.creative.util.Collections.BaseCollectionProxy;
+import bee.creative.util.Collections.BaseListProxy;
+import bee.creative.util.Collections.BaseMapProxy;
+import bee.creative.util.Collections.BaseSetProxy;
 import bee.creative.util.Natives;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.BaseObject;
@@ -215,9 +217,36 @@ public class Properties {
 
 	}
 
+	/** Diese Klasse implementiert {@link Properties#toField(Property)}. */
+	@SuppressWarnings ("javadoc")
+	static class PropertyField<GValue> implements Field<Object, GValue> {
+	
+		public final Property<GValue> property;
+	
+		public PropertyField(final Property<GValue> property) {
+			this.property = Objects.notNull(property);
+		}
+	
+		@Override
+		public GValue get(final Object input) {
+			return this.property.get();
+		}
+	
+		@Override
+		public void set(final Object input, final GValue value) {
+			this.property.set(value);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.property);
+		}
+	
+	}
+
 	/** Diese Klasse implementiert {@link Properties#toSet(Property)}. */
 	@SuppressWarnings ("javadoc")
-	public static class PropertySet<GItem> extends BaseSetAdapter<GItem> {
+	static class PropertySet<GItem> extends BaseSetProxy<GItem> {
 
 		public final Property<Set<GItem>> property;
 
@@ -239,7 +268,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#toList(Property)}. */
 	@SuppressWarnings ("javadoc")
-	public static class PropertyList<GItem> extends BaseListAdapter<GItem> {
+	static class PropertyList<GItem> extends BaseListProxy<GItem> {
 
 		public final Property<List<GItem>> property;
 
@@ -261,7 +290,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#toMap(Property)}. */
 	@SuppressWarnings ("javadoc")
-	public static class PropertyMap<GKey, GValue> extends BaseMapAdapter<GKey, GValue> {
+	static class PropertyMap<GKey, GValue> extends BaseMapProxy<GKey, GValue> {
 
 		public final Property<Map<GKey, GValue>> property;
 
@@ -281,31 +310,26 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert {@link Properties#toField(Property)}. */
+	/** Diese Klasse implementiert {@link Properties#toCollection(Property)}. */
 	@SuppressWarnings ("javadoc")
-	static class PropertyField<GValue> implements Field<Object, GValue> {
-
-		public final Property<GValue> property;
-
-		public PropertyField(final Property<GValue> property) {
+	static class PropertyCollection<GItem> extends BaseCollectionProxy<GItem> {
+	
+		public final Property<Collection<GItem>> property;
+	
+		public PropertyCollection(final Property<Collection<GItem>> property) {
 			this.property = Objects.notNull(property);
 		}
-
+	
 		@Override
-		public GValue get(final Object input) {
+		protected Collection<GItem> getData(final boolean readonly) {
 			return this.property.get();
 		}
-
+	
 		@Override
-		public void set(final Object input, final GValue value) {
-			this.property.set(value);
+		protected void setData(final Collection<GItem> items) {
+			this.property.set(items);
 		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.property);
-		}
-
+	
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#valueProperty(Object) Properties.valueProperty(null)}. */
@@ -473,18 +497,6 @@ public class Properties {
 		return new SynchronizedProperty<>(mutex, property);
 	}
 
-	public static <GItem> Set<GItem> toSet(final Property<Set<GItem>> property) {
-		return new PropertySet<>(property);
-	}
-
-	public static <GItem> List<GItem> toList(final Property<List<GItem>> property) {
-		return new PropertyList<>(property);
-	}
-
-	public static <GKey, GValue> Map<GKey, GValue> toMap(final Property<Map<GKey, GValue>> property) {
-		return new PropertyMap<>(property);
-	}
-
 	/** Diese Methode gibt ein {@link Field} zurück, das seinen Datensatz ignoriert und den Wert des gegebenen {@link Property} manipuliert.
 	 *
 	 * @param <GValue> Typ des Werts.
@@ -493,6 +505,46 @@ public class Properties {
 	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
 	public static <GValue> Field<Object, GValue> toField(final Property<GValue> property) {
 		return new PropertyField<>(property);
+	}
+
+	/** Diese Methode gibt ein {@link Set} zurück, dessen Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
+	 *
+	 * @see BaseSetProxy
+	 * @param property {@link Property}.
+	 * @return {@link Set}-{@code Proxy}.
+	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
+	public static <GItem> Set<GItem> toSet(final Property<Set<GItem>> property) throws NullPointerException {
+		return new PropertySet<>(property);
+	}
+
+	/** Diese Methode gibt eine {@link List} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
+	 *
+	 * @see BaseListProxy
+	 * @param property {@link Property}.
+	 * @return {@link List}-{@code Proxy}.
+	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
+	public static <GItem> List<GItem> toList(final Property<List<GItem>> property) throws NullPointerException {
+		return new PropertyList<>(property);
+	}
+
+	/** Diese Methode gibt eine {@link Map} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
+	 *
+	 * @see BaseMapProxy
+	 * @param property {@link Property}.
+	 * @return {@link Map}-{@code Proxy}.
+	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
+	public static <GKey, GValue> Map<GKey, GValue> toMap(final Property<Map<GKey, GValue>> property) throws NullPointerException {
+		return new PropertyMap<>(property);
+	}
+
+	/** Diese Methode gibt eine {@link Collection} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
+	 *
+	 * @see BaseCollectionProxy
+	 * @param property {@link Property}.
+	 * @return {@link Collection}-{@code Proxy}.
+	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
+	public static <GItem> Collection<GItem> toCollection(final Property<Collection<GItem>> property) {
+		return new PropertyCollection<>(property);
 	}
 
 }

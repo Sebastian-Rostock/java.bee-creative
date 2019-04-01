@@ -1,6 +1,5 @@
 package bee.creative.bind;
 
-
-public class RemoteProperty {
+class RemoteProperty {
 
 }

@@ -2,23 +2,14 @@ package bee.creative.bind;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
-import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import bee.creative._deprecated_.BaseListField;
-import bee.creative._deprecated_.BaseMapField;
-import bee.creative._deprecated_.BaseSetField;
-import bee.creative._deprecated_.ListField;
-import bee.creative._deprecated_.MapField;
-import bee.creative._deprecated_.SetField;
 import bee.creative.bind.Properties.BaseProperty;
 import bee.creative.util.Filter;
 import bee.creative.util.Natives;
 import bee.creative.util.Objects;
-import bee.creative.util.Collections.BaseSetAdapter;
 import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Field}-Instanzen.
@@ -614,43 +605,6 @@ public final class Fields {
 		return new SynchronizedField<>(mutex, field);
 	}
 
-	/** Diese Methode gibt ein {@link SetField} zurück, welches das {@link Set} über das gegebene {@link Field} liest und schreibt.
-	 * @param item 
-	 * @param field {@link Field} zum Lesen und Schreiben des {@link Set}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GEntry> Typ der Elemente.
-	 * @return {@link SetField}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GItem, GEntry> Set<GEntry> toSet(GItem item, final Field<? super GItem, Set<GEntry>> field) throws NullPointerException {
-		return Properties.toSet(toProperty(item, field));
-	}
-
-	/** Diese Methode gibt ein {@link ListField} zurück, welches das {@link List} über das gegebene {@link Field} liest und schreibt.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GEntry> Typ der Elemente.
-	 * @param field {@link Field} zum Lesen und Schreiben einer {@link List}.
-	 * @return {@link ListField}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GItem, GEntry> List<GEntry> toList(final GItem item, final Field<? super GItem, List<GEntry>> field) throws NullPointerException {
-		return Properties.toList(toProperty(item, field));
-	}
-
-	/** Diese Methode gibt ein {@link MapField} zurück, welches die {@link Map} über das gegebene {@link Field} liest und schreibt.
-	 * @param item 
-	 * @param field {@link Field} zum Lesen und Schreiben einer {@link Map}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 * @return {@link MapField}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GItem, GKey, GValue> Map<GKey, GValue> toMap(GItem item, final Field<? super GItem, Map<GKey, GValue>> field)
-		throws NullPointerException {
-		return Properties.toMap(toProperty(item, field));
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link Fields#toProperty(Object, Field) Fields.toProperty(null, field)}. */
 	public static <GItem, GValue> Property<GValue> toProperty(final Field<? super GItem, GValue> field) throws NullPointerException {
 		return Fields.toProperty(null, field);
@@ -666,6 +620,27 @@ public final class Fields {
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GItem, GValue> Property<GValue> toProperty(final GItem item, final Field<? super GItem, GValue> field) throws NullPointerException {
 		return new FieldProperty<>(item, field);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#toSet(Property) Properties.toSet(Fields.toProperty(item, field))}. */
+	public static <GItem, GEntry> Set<GEntry> toSet(final GItem item, final Field<? super GItem, Set<GEntry>> field) throws NullPointerException {
+		return Properties.toSet(Fields.toProperty(item, field));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#toList(Property) Properties.toList(Fields.toProperty(item, field))}. */
+	public static <GItem, GEntry> List<GEntry> toList(final GItem item, final Field<? super GItem, List<GEntry>> field) throws NullPointerException {
+		return Properties.toList(Fields.toProperty(item, field));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#toMap(Property) Properties.toMap(Fields.toProperty(item, field))}. */
+	public static <GItem, GKey, GValue> Map<GKey, GValue> toMap(final GItem item, final Field<? super GItem, Map<GKey, GValue>> field)
+		throws NullPointerException {
+		return Properties.toMap(Fields.toProperty(item, field));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Properties#toCollection(Property) Properties.toCollection(Fields.toProperty(item, field))}. */
+	public static <GItem, GEntry> Collection<GEntry> toCollection(final GItem item, final Field<? super GItem, Collection<GEntry>> field) throws NullPointerException {
+		return Properties.toCollection(Fields.toProperty(item, field));
 	}
 
 }

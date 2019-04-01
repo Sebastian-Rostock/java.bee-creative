@@ -1008,20 +1008,30 @@ public class Collections {
 
 	}
 
-	public static abstract class BaseSetAdapter<GItem> extends BaseItemsAdapter<GItem, Set<GItem>> implements Set<GItem> {
+	public static abstract class BaseSetProxy<GItem> extends BaseItemsProxy<GItem, Set<GItem>> implements Set<GItem> {
 
+		/** {@inheritDoc} */
 		@Override
 		protected abstract Set<GItem> getData(boolean readonly);
 
+		/** {@inheritDoc} */
 		@Override
 		protected abstract void setData(final Set<GItem> items);
 
 	}
 
-	public static abstract class BaseListAdapter<GItem> extends AbstractList<GItem> {
+	public static abstract class BaseListProxy<GItem> extends AbstractList<GItem> {
 
+		/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück.
+		 * 
+		 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
+		 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
+		 * @return Inhalt. */
 		protected abstract List<GItem> getData(boolean readonly);
 
+		/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
+		 * 
+		 * @param items neuer Inhalt. */
 		protected abstract void setData(final List<GItem> items);
 
 		@Override
@@ -1181,22 +1191,27 @@ public class Collections {
 				@Override
 				public void remove() {
 					iter.remove();
-					BaseListAdapter.this.setData(data);
+					BaseListProxy.this.setData(data);
 				}
 
 				@Override
 				public void set(final GItem e) {
 					iter.set(e);
-					BaseListAdapter.this.setData(data);
+					BaseListProxy.this.setData(data);
 				}
 
 				@Override
 				public void add(final GItem e) {
 					iter.add(e);
-					BaseListAdapter.this.setData(data);
+					BaseListProxy.this.setData(data);
 				}
 
 			};
+		}
+
+		@Override
+		public List<GItem> subList(int fromIndex, int toIndex) {
+			return super.subList(fromIndex, toIndex);
 		}
 
 		@Override
@@ -1238,10 +1253,18 @@ public class Collections {
 
 	}
 
-	public static abstract class BaseMapAdapter<GKey, GValue> extends AbstractMap<GKey, GValue> {
+	public static abstract class BaseMapProxy<GKey, GValue> extends AbstractMap<GKey, GValue> {
 
+		/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück.
+		 * 
+		 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
+		 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
+		 * @return Inhalt. */
 		protected abstract Map<GKey, GValue> getData(boolean readonly);
 
+		/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
+		 * 
+		 * @param items neuer Inhalt. */
 		protected abstract void setData(final Map<GKey, GValue> items);
 
 		@Override
@@ -1301,18 +1324,18 @@ public class Collections {
 
 		@Override
 		public Set<GKey> keySet() {
-			return new BaseSetAdapter<GKey>() {
+			return new BaseSetProxy<GKey>() {
 
 				@Override
 				protected Set<GKey> getData(final boolean readonly) {
-					return BaseMapAdapter.this.getData(readonly).keySet();
+					return BaseMapProxy.this.getData(readonly).keySet();
 				}
 
 				@Override
 				protected void setData(final Set<GKey> items) {
-					final Map<GKey, GValue> data = BaseMapAdapter.this.getData(false);
-					data.keySet().retainAll(items);
-					BaseMapAdapter.this.setData(data);
+					final Map<GKey, GValue> data = BaseMapProxy.this.getData(false);
+					data.keySet().retainAll(items);// Fehler: hier muss die an items gebundene map hin! 
+					BaseMapProxy.this.setData(data);
 				}
 
 				@Override
@@ -1330,18 +1353,18 @@ public class Collections {
 
 		@Override
 		public Collection<GValue> values() {
-			return new BaseCollectionAdapter<GValue>() {
+			return new BaseCollectionProxy<GValue>() {
 
 				@Override
 				protected Collection<GValue> getData(final boolean readonly) {
-					return BaseMapAdapter.this.getData(readonly).values();
+					return BaseMapProxy.this.getData(readonly).values();
 				}
 
 				@Override
 				protected void setData(final Collection<GValue> items) {
-					final Map<GKey, GValue> data = BaseMapAdapter.this.getData(false);
-					data.values().retainAll(items);
-					BaseMapAdapter.this.setData(data);
+					final Map<GKey, GValue> data = BaseMapProxy.this.getData(false);
+					data.values().retainAll(items);// Fehler: hier muss die an items gebundene map hin! 
+					BaseMapProxy.this.setData(data);
 				}
 
 				@Override
@@ -1359,18 +1382,18 @@ public class Collections {
 
 		@Override
 		public Set<Entry<GKey, GValue>> entrySet() {
-			return new BaseSetAdapter<Entry<GKey, GValue>>() {
+			return new BaseSetProxy<Entry<GKey, GValue>>() {
 
 				@Override
 				protected Set<Entry<GKey, GValue>> getData(final boolean readonly) {
-					return BaseMapAdapter.this.getData(readonly).entrySet();
+					return BaseMapProxy.this.getData(readonly).entrySet();
 				}
 
 				@Override
 				protected void setData(final Set<Entry<GKey, GValue>> items) {
-					final Map<GKey, GValue> data = BaseMapAdapter.this.getData(false);
-					data.entrySet().retainAll(items);
-					BaseMapAdapter.this.setData(data);
+					final Map<GKey, GValue> data = BaseMapProxy.this.getData(false);
+					data.entrySet().retainAll(items);//  Fehler: hier muss die an items gebundene map hin! 
+					BaseMapProxy.this.setData(data);
 				}
 
 				@Override
@@ -1403,11 +1426,24 @@ public class Collections {
 
 	}
 
-	public static abstract class BaseItemsAdapter<GItem, GItems extends Collection<GItem>> implements Collection<GItem> {
+	/** Diese Klasse implementiert eine Collection als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden über
+	 * {@link #setData(Collection)} geschrieben.
+	 * 
+	 * @param <GItem> Typ der Elemente.
+	 * @param <GData> Typ des Inhalts. */
+	public static abstract class BaseItemsProxy<GItem, GData extends Collection<GItem>> implements Collection<GItem> {
 
-		protected abstract GItems getData(boolean readonly);
+		/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück.
+		 * 
+		 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
+		 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
+		 * @return Inhalt. */
+		protected abstract GData getData(boolean readonly);
 
-		protected abstract void setData(final GItems items);
+		/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
+		 * 
+		 * @param items neuer Inhalt. */
+		protected abstract void setData(final GData items);
 
 		@Override
 		public int size() {
@@ -1421,7 +1457,7 @@ public class Collections {
 
 		@Override
 		public boolean add(final GItem e) {
-			final GItems data = this.getData(false);
+			final GData data = this.getData(false);
 			if (!data.add(e)) return false;
 			this.setData(data);
 			return true;
@@ -1429,7 +1465,7 @@ public class Collections {
 
 		@Override
 		public boolean addAll(final Collection<? extends GItem> c) {
-			final GItems data = this.getData(false);
+			final GData data = this.getData(false);
 			if (!data.addAll(c)) return false;
 			this.setData(data);
 			return true;
@@ -1437,7 +1473,7 @@ public class Collections {
 
 		@Override
 		public boolean remove(final Object o) {
-			final GItems data = this.getData(false);
+			final GData data = this.getData(false);
 			if (!data.remove(o)) return false;
 			this.setData(data);
 			return true;
@@ -1445,7 +1481,7 @@ public class Collections {
 
 		@Override
 		public boolean removeAll(final Collection<?> c) {
-			final GItems data = this.getData(false);
+			final GData data = this.getData(false);
 			if (!data.removeAll(c)) return false;
 			this.setData(data);
 			return true;
@@ -1463,7 +1499,7 @@ public class Collections {
 
 		@Override
 		public boolean retainAll(final Collection<?> c) {
-			final GItems data = this.getData(false);
+			final GData data = this.getData(false);
 			if (!data.retainAll(c)) return false;
 			this.setData(data);
 			return true;
@@ -1471,7 +1507,7 @@ public class Collections {
 
 		@Override
 		public void clear() {
-			final GItems data = this.getData(false);
+			final GData data = this.getData(false);
 			data.clear();
 			this.setData(data);
 		}
@@ -1488,7 +1524,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			final GItems data = this.getData(false);
+			final GData data = this.getData(false);
 			final Iterator<GItem> iter = data.iterator();
 			return new Iterator<GItem>() {
 
@@ -1505,7 +1541,7 @@ public class Collections {
 				@Override
 				public void remove() {
 					iter.remove();
-					BaseItemsAdapter.this.setData(data);
+					BaseItemsProxy.this.setData(data);
 				}
 
 			};
@@ -1528,11 +1564,13 @@ public class Collections {
 
 	}
 
-	public static abstract class BaseCollectionAdapter<GItem> extends BaseItemsAdapter<GItem, Collection<GItem>> {
+	public static abstract class BaseCollectionProxy<GItem> extends BaseItemsProxy<GItem, Collection<GItem>> {
 
+		/** {@inheritDoc} */
 		@Override
 		protected abstract Collection<GItem> getData(boolean readonly);
 
+		/** {@inheritDoc} */
 		@Override
 		protected abstract void setData(final Collection<GItem> items);
 
