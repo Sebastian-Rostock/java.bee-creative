@@ -76,13 +76,13 @@ public class Collections {
 	@SuppressWarnings ("javadoc")
 	public static class CartesianSet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
 
-		public class EntryIterator implements Iterator<Entry<GKey, GValue>> {
+		class EntryIterator implements Iterator<Entry<GKey, GValue>> {
 
-			protected GKey nextKey;
+			GKey nextKey;
 
-			protected Iterator<? extends GKey> keyIter = CartesianSet.this.keys.iterator();
+			Iterator<? extends GKey> keyIter = CartesianSet.this.keys.iterator();
 
-			protected Iterator<? extends GValue> valueIter = Iterators.emptyIterator();
+			Iterator<? extends GValue> valueIter = Iterators.emptyIterator();
 
 			@Override
 			public boolean hasNext() {
@@ -195,59 +195,60 @@ public class Collections {
 	@SuppressWarnings ("javadoc")
 	public static class ReverseList<GItem> extends AbstractList<GItem> {
 
-		public class ReverseIterator implements ListIterator<GItem> {
+		class ReverseIterator implements ListIterator<GItem> {
 
-			public final ListIterator<GItem> iterator;
+			final ListIterator<GItem> iter;
 
-			public ReverseIterator(final int index) {
-				this.iterator = ReverseList.this.items.listIterator(ReverseList.this.items.size() - index);
+			ReverseIterator(final int index) {
+				final List<GItem> items = ReverseList.this.items;
+				this.iter = items.listIterator(items.size() - index);
 			}
 
 			@Override
 			public boolean hasNext() {
-				return this.iterator.hasPrevious();
+				return this.iter.hasPrevious();
 			}
 
 			@Override
 			public boolean hasPrevious() {
-				return this.iterator.hasNext();
+				return this.iter.hasNext();
 			}
 
 			@Override
 			public void set(final GItem item2) {
-				this.iterator.set(item2);
+				this.iter.set(item2);
 			}
 
 			@Override
 			public void add(final GItem item2) {
-				this.iterator.add(item2);
-				this.iterator.hasPrevious();
-				this.iterator.previous();
+				this.iter.add(item2);
+				this.iter.hasPrevious();
+				this.iter.previous();
 			}
 
 			@Override
 			public GItem next() {
-				return this.iterator.previous();
+				return this.iter.previous();
 			}
 
 			@Override
 			public int nextIndex() {
-				return ReverseList.this.items.size() - this.iterator.previousIndex() - 1;
+				return ReverseList.this.items.size() - this.iter.previousIndex() - 1;
 			}
 
 			@Override
 			public GItem previous() {
-				return this.iterator.next();
+				return this.iter.next();
 			}
 
 			@Override
 			public int previousIndex() {
-				return ReverseList.this.items.size() - this.iterator.nextIndex() - 1;
+				return ReverseList.this.items.size() - this.iter.nextIndex() - 1;
 			}
 
 			@Override
 			public void remove() {
-				this.iterator.remove();
+				this.iter.remove();
 			}
 
 		}
@@ -339,11 +340,6 @@ public class Collections {
 		@Override
 		public ListIterator<GItem> listIterator(final int index) {
 			return new ReverseIterator(index);
-		}
-
-		@Override
-		public List<GItem> subList(final int fromIndex, final int toIndex) {
-			return Collections.reverseList(this.items.subList(this.items.size() - toIndex - 2, this.items.size() - fromIndex - 2));
 		}
 
 	}
@@ -607,13 +603,13 @@ public class Collections {
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedMap<GTargetKey, GTargetValue, GSourceKey, GSourceValue> extends AbstractMap<GTargetKey, GTargetValue> {
 
-		public class SourceEntry extends SimpleEntry<GSourceKey, GSourceValue> {
+		class SourceEntry extends SimpleEntry<GSourceKey, GSourceValue> {
 
 			private static final long serialVersionUID = -1304243507468561381L;
 
-			public final Entry<GTargetKey, GTargetValue> entry;
+			final Entry<GTargetKey, GTargetValue> entry;
 
-			public SourceEntry(final Entry<GTargetKey, GTargetValue> entry) {
+			SourceEntry(final Entry<GTargetKey, GTargetValue> entry) {
 				super(TranslatedMap.this.keyTranslator.toSource(entry.getKey()), TranslatedMap.this.valueTranslator.toSource(entry.getValue()));
 				this.entry = entry;
 			}
@@ -626,13 +622,13 @@ public class Collections {
 
 		}
 
-		public class TargetEntry extends SimpleEntry<GTargetKey, GTargetValue> {
+		class TargetEntry extends SimpleEntry<GTargetKey, GTargetValue> {
 
 			private static final long serialVersionUID = 3378767550974847519L;
 
-			public final Entry<GSourceKey, GSourceValue> entry;
+			final Entry<GSourceKey, GSourceValue> entry;
 
-			public TargetEntry(final Entry<GSourceKey, GSourceValue> entry) {
+			TargetEntry(final Entry<GSourceKey, GSourceValue> entry) {
 				super(TranslatedMap.this.keyTranslator.toTarget(entry.getKey()), TranslatedMap.this.valueTranslator.toTarget(entry.getValue()));
 				this.entry = entry;
 			}
@@ -645,7 +641,7 @@ public class Collections {
 
 		}
 
-		public class EntryTranslator implements Translator<Entry<GSourceKey, GSourceValue>, Entry<GTargetKey, GTargetValue>> {
+		class EntryTranslator implements Translator<Entry<GSourceKey, GSourceValue>, Entry<GTargetKey, GTargetValue>> {
 
 			@Override
 			public boolean isSource(final Object object) {
@@ -1005,574 +1001,6 @@ public class Collections {
 		public Iterator<GTarget> iterator() {
 			return Iterators.translatedIterator(Translators.toTargetGetter(this.translator), this.items.iterator());
 		}
-
-	}
-
-	public static abstract class BaseSetProxy<GItem> extends BaseItemsProxy<GItem, Set<GItem>> implements Set<GItem> {
-
-		/** {@inheritDoc} */
-		@Override
-		protected abstract Set<GItem> getData(boolean readonly);
-
-		/** {@inheritDoc} */
-		@Override
-		protected abstract void setData(final Set<GItem> items);
-
-	}
-
-	public static abstract class BaseListProxy<GItem> extends AbstractList<GItem> {
-
-		/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück.
-		 * 
-		 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
-		 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
-		 * @return Inhalt. */
-		protected abstract List<GItem> getData(boolean readonly);
-
-		/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
-		 * 
-		 * @param items neuer Inhalt. */
-		protected abstract void setData(final List<GItem> items);
-
-		@Override
-		protected void removeRange(final int fromIndex, final int toIndex) {
-			final List<GItem> data = this.getData(false);
-			data.subList(fromIndex, toIndex).clear();
-			this.setData(data);
-		}
-
-		@Override
-		public int size() {
-			return this.getData(true).size();
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return this.getData(true).isEmpty();
-		}
-
-		@Override
-		public GItem get(final int index) {
-			return this.getData(true).get(index);
-		}
-
-		@Override
-		public GItem set(final int index, final GItem e) {
-			final List<GItem> data = this.getData(false);
-			final GItem result = data.set(index, e);
-			this.setData(data);
-			return result;
-		}
-
-		@Override
-		public boolean add(final GItem e) {
-			final List<GItem> data = this.getData(false);
-			if (!data.add(e)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public void add(final int index, final GItem c) {
-			final List<GItem> data = this.getData(false);
-			data.add(index, c);
-			this.setData(data);
-		}
-
-		@Override
-		public boolean addAll(final Collection<? extends GItem> c) {
-			final List<GItem> data = this.getData(false);
-			if (!data.addAll(c)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public boolean addAll(final int index, final Collection<? extends GItem> c) {
-			final List<GItem> data = this.getData(false);
-			if (!data.addAll(index, c)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public GItem remove(final int index) {
-			final List<GItem> data = this.getData(false);
-			final GItem result = data.remove(index);
-			this.setData(data);
-			return result;
-		}
-
-		@Override
-		public boolean remove(final Object o) {
-			final List<GItem> data = this.getData(false);
-			if (!data.remove(o)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public boolean removeAll(final Collection<?> c) {
-			final List<GItem> data = this.getData(false);
-			if (!data.removeAll(c)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public boolean contains(final Object item) {
-			return this.getData(true).contains(item);
-		}
-
-		@Override
-		public boolean containsAll(final Collection<?> c) {
-			return this.getData(true).containsAll(c);
-		}
-
-		@Override
-		public boolean retainAll(final Collection<?> c) {
-			final List<GItem> data = this.getData(false);
-			if (!data.retainAll(c)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public int indexOf(final Object o) {
-			return this.getData(true).indexOf(o);
-		}
-
-		@Override
-		public int lastIndexOf(final Object o) {
-			return this.getData(true).lastIndexOf(o);
-		}
-
-		@Override
-		public ListIterator<GItem> listIterator() {
-			return this.listIterator(0);
-		}
-
-		@Override
-		public ListIterator<GItem> listIterator(final int index) {
-			final List<GItem> data = this.getData(false);
-			final ListIterator<GItem> iter = data.listIterator(index); // TODO
-			return new ListIterator<GItem>() {
-
-				@Override
-				public boolean hasNext() {
-					return iter.hasNext();
-				}
-
-				@Override
-				public GItem next() {
-					return iter.next();
-				}
-
-				@Override
-				public boolean hasPrevious() {
-					return iter.hasPrevious();
-				}
-
-				@Override
-				public GItem previous() {
-					return iter.previous();
-				}
-
-				@Override
-				public int nextIndex() {
-					return iter.nextIndex();
-				}
-
-				@Override
-				public int previousIndex() {
-					return iter.previousIndex();
-				}
-
-				@Override
-				public void remove() {
-					iter.remove();
-					BaseListProxy.this.setData(data);
-				}
-
-				@Override
-				public void set(final GItem e) {
-					iter.set(e);
-					BaseListProxy.this.setData(data);
-				}
-
-				@Override
-				public void add(final GItem e) {
-					iter.add(e);
-					BaseListProxy.this.setData(data);
-				}
-
-			};
-		}
-
-		@Override
-		public List<GItem> subList(int fromIndex, int toIndex) {
-			return super.subList(fromIndex, toIndex);
-		}
-
-		@Override
-		public void clear() {
-			final List<GItem> data = this.getData(false);
-			data.clear();
-			this.setData(data);
-		}
-
-		@Override
-		public int hashCode() {
-			return this.getData(true).hashCode();
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			return this.getData(true).equals(object);
-		}
-
-		@Override
-		public Iterator<GItem> iterator() {
-			return this.listIterator(0);
-		}
-
-		@Override
-		public Object[] toArray() {
-			return this.getData(true).toArray();
-		}
-
-		@Override
-		public <T> T[] toArray(final T[] result) {
-			return this.getData(true).toArray(result);
-		}
-
-		@Override
-		public String toString() {
-			return this.getData(true).toString();
-		}
-
-	}
-
-	public static abstract class BaseMapProxy<GKey, GValue> extends AbstractMap<GKey, GValue> {
-
-		/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück.
-		 * 
-		 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
-		 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
-		 * @return Inhalt. */
-		protected abstract Map<GKey, GValue> getData(boolean readonly);
-
-		/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
-		 * 
-		 * @param items neuer Inhalt. */
-		protected abstract void setData(final Map<GKey, GValue> items);
-
-		@Override
-		public int size() {
-			return this.getData(true).size();
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return this.getData(true).isEmpty();
-		}
-
-		@Override
-		public GValue get(final Object key) {
-			return this.getData(true).get(key);
-		}
-
-		@Override
-		public GValue put(final GKey key, final GValue value) {
-			final Map<GKey, GValue> data = this.getData(false);
-			final GValue result = data.put(key, value);
-			this.setData(data);
-			return result;
-		}
-
-		@Override
-		public void putAll(final Map<? extends GKey, ? extends GValue> m) {
-			final Map<GKey, GValue> data = this.getData(false);
-			data.putAll(m);
-			this.setData(data);
-		}
-
-		@Override
-		public boolean containsKey(final Object key) {
-			return this.getData(true).containsKey(key);
-		}
-
-		@Override
-		public boolean containsValue(final Object value) {
-			return this.getData(true).containsValue(value);
-		}
-
-		@Override
-		public GValue remove(final Object key) {
-			final Map<GKey, GValue> data = this.getData(false);
-			final GValue result = data.remove(key);
-			this.setData(data);
-			return result;
-		}
-
-		@Override
-		public void clear() {
-			final Map<GKey, GValue> data = this.getData(false);
-			data.clear();
-			this.setData(data);
-		}
-
-		@Override
-		public Set<GKey> keySet() {
-			return new BaseSetProxy<GKey>() {
-
-				@Override
-				protected Set<GKey> getData(final boolean readonly) {
-					return BaseMapProxy.this.getData(readonly).keySet();
-				}
-
-				@Override
-				protected void setData(final Set<GKey> items) {
-					final Map<GKey, GValue> data = BaseMapProxy.this.getData(false);
-					data.keySet().retainAll(items);// Fehler: hier muss die an items gebundene map hin! 
-					BaseMapProxy.this.setData(data);
-				}
-
-				@Override
-				public boolean add(final GKey e) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public boolean addAll(final Collection<? extends GKey> c) {
-					throw new UnsupportedOperationException();
-				}
-
-			};
-		}
-
-		@Override
-		public Collection<GValue> values() {
-			return new BaseCollectionProxy<GValue>() {
-
-				@Override
-				protected Collection<GValue> getData(final boolean readonly) {
-					return BaseMapProxy.this.getData(readonly).values();
-				}
-
-				@Override
-				protected void setData(final Collection<GValue> items) {
-					final Map<GKey, GValue> data = BaseMapProxy.this.getData(false);
-					data.values().retainAll(items);// Fehler: hier muss die an items gebundene map hin! 
-					BaseMapProxy.this.setData(data);
-				}
-
-				@Override
-				public boolean add(final GValue e) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public boolean addAll(final Collection<? extends GValue> c) {
-					throw new UnsupportedOperationException();
-				}
-
-			};
-		}
-
-		@Override
-		public Set<Entry<GKey, GValue>> entrySet() {
-			return new BaseSetProxy<Entry<GKey, GValue>>() {
-
-				@Override
-				protected Set<Entry<GKey, GValue>> getData(final boolean readonly) {
-					return BaseMapProxy.this.getData(readonly).entrySet();
-				}
-
-				@Override
-				protected void setData(final Set<Entry<GKey, GValue>> items) {
-					final Map<GKey, GValue> data = BaseMapProxy.this.getData(false);
-					data.entrySet().retainAll(items);//  Fehler: hier muss die an items gebundene map hin! 
-					BaseMapProxy.this.setData(data);
-				}
-
-				@Override
-				public boolean add(final Entry<GKey, GValue> e) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public boolean addAll(final Collection<? extends Entry<GKey, GValue>> c) {
-					throw new UnsupportedOperationException();
-				}
-
-			};
-		}
-
-		@Override
-		public int hashCode() {
-			return this.getData(true).hashCode();
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			return this.getData(true).equals(object);
-		}
-
-		@Override
-		public String toString() {
-			return this.getData(true).toString();
-		}
-
-	}
-
-	/** Diese Klasse implementiert eine Collection als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden über
-	 * {@link #setData(Collection)} geschrieben.
-	 * 
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GData> Typ des Inhalts. */
-	public static abstract class BaseItemsProxy<GItem, GData extends Collection<GItem>> implements Collection<GItem> {
-
-		/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück.
-		 * 
-		 * @param readonly {@code true}, wenn der Inhalt nur zum Lesen verwendet wird und eine Kopie damit nicht nötig ist.<br>
-		 *        {@code false}, wenn der Inhalt verändert werden könnte und daher ggf. eine Kopie nötig ist.
-		 * @return Inhalt. */
-		protected abstract GData getData(boolean readonly);
-
-		/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
-		 * 
-		 * @param items neuer Inhalt. */
-		protected abstract void setData(final GData items);
-
-		@Override
-		public int size() {
-			return this.getData(true).size();
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return this.getData(true).isEmpty();
-		}
-
-		@Override
-		public boolean add(final GItem e) {
-			final GData data = this.getData(false);
-			if (!data.add(e)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public boolean addAll(final Collection<? extends GItem> c) {
-			final GData data = this.getData(false);
-			if (!data.addAll(c)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public boolean remove(final Object o) {
-			final GData data = this.getData(false);
-			if (!data.remove(o)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public boolean removeAll(final Collection<?> c) {
-			final GData data = this.getData(false);
-			if (!data.removeAll(c)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public boolean contains(final Object item) {
-			return this.getData(true).contains(item);
-		}
-
-		@Override
-		public boolean containsAll(final Collection<?> c) {
-			return this.getData(true).containsAll(c);
-		}
-
-		@Override
-		public boolean retainAll(final Collection<?> c) {
-			final GData data = this.getData(false);
-			if (!data.retainAll(c)) return false;
-			this.setData(data);
-			return true;
-		}
-
-		@Override
-		public void clear() {
-			final GData data = this.getData(false);
-			data.clear();
-			this.setData(data);
-		}
-
-		@Override
-		public int hashCode() {
-			return this.getData(true).hashCode();
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			return this.getData(true).equals(object);
-		}
-
-		@Override
-		public Iterator<GItem> iterator() {
-			final GData data = this.getData(false);
-			final Iterator<GItem> iter = data.iterator();
-			return new Iterator<GItem>() {
-
-				@Override
-				public boolean hasNext() {
-					return iter.hasNext();
-				}
-
-				@Override
-				public GItem next() {
-					return iter.next();
-				}
-
-				@Override
-				public void remove() {
-					iter.remove();
-					BaseItemsProxy.this.setData(data);
-				}
-
-			};
-		}
-
-		@Override
-		public Object[] toArray() {
-			return this.getData(true).toArray();
-		}
-
-		@Override
-		public <T> T[] toArray(final T[] result) {
-			return this.getData(true).toArray(result);
-		}
-
-		@Override
-		public String toString() {
-			return this.getData(true).toString();
-		}
-
-	}
-
-	public static abstract class BaseCollectionProxy<GItem> extends BaseItemsProxy<GItem, Collection<GItem>> {
-
-		/** {@inheritDoc} */
-		@Override
-		protected abstract Collection<GItem> getData(boolean readonly);
-
-		/** {@inheritDoc} */
-		@Override
-		protected abstract void setData(final Collection<GItem> items);
 
 	}
 

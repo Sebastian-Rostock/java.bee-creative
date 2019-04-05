@@ -7,10 +7,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import bee.creative.util.Collections.BaseCollectionProxy;
-import bee.creative.util.Collections.BaseListProxy;
-import bee.creative.util.Collections.BaseMapProxy;
-import bee.creative.util.Collections.BaseSetProxy;
+import bee.creative.util.AbstractProxyCollection;
+import bee.creative.util.AbstractProxyList;
+import bee.creative.util.AbstractProxyMap;
+import bee.creative.util.AbstractProxySet;
 import bee.creative.util.Natives;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.BaseObject;
@@ -220,33 +220,33 @@ public class Properties {
 	/** Diese Klasse implementiert {@link Properties#toField(Property)}. */
 	@SuppressWarnings ("javadoc")
 	static class PropertyField<GValue> implements Field<Object, GValue> {
-	
+
 		public final Property<GValue> property;
-	
+
 		public PropertyField(final Property<GValue> property) {
 			this.property = Objects.notNull(property);
 		}
-	
+
 		@Override
 		public GValue get(final Object input) {
 			return this.property.get();
 		}
-	
+
 		@Override
 		public void set(final Object input, final GValue value) {
 			this.property.set(value);
 		}
-	
+
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.property);
 		}
-	
+
 	}
 
 	/** Diese Klasse implementiert {@link Properties#toSet(Property)}. */
 	@SuppressWarnings ("javadoc")
-	static class PropertySet<GItem> extends BaseSetProxy<GItem> {
+	static class PropertySet<GItem> extends AbstractProxySet<GItem, Set<GItem>> {
 
 		public final Property<Set<GItem>> property;
 
@@ -268,7 +268,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#toList(Property)}. */
 	@SuppressWarnings ("javadoc")
-	static class PropertyList<GItem> extends BaseListProxy<GItem> {
+	static class PropertyList<GItem> extends AbstractProxyList<GItem, List<GItem>> {
 
 		public final Property<List<GItem>> property;
 
@@ -290,7 +290,7 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#toMap(Property)}. */
 	@SuppressWarnings ("javadoc")
-	static class PropertyMap<GKey, GValue> extends BaseMapProxy<GKey, GValue> {
+	static class PropertyMap<GKey, GValue> extends AbstractProxyMap<GKey, GValue, Map<GKey, GValue>> {
 
 		public final Property<Map<GKey, GValue>> property;
 
@@ -312,24 +312,24 @@ public class Properties {
 
 	/** Diese Klasse implementiert {@link Properties#toCollection(Property)}. */
 	@SuppressWarnings ("javadoc")
-	static class PropertyCollection<GItem> extends BaseCollectionProxy<GItem> {
-	
+	static class PropertyCollection<GItem> extends AbstractProxyCollection<GItem, Collection<GItem>> {
+
 		public final Property<Collection<GItem>> property;
-	
+
 		public PropertyCollection(final Property<Collection<GItem>> property) {
 			this.property = Objects.notNull(property);
 		}
-	
+
 		@Override
 		protected Collection<GItem> getData(final boolean readonly) {
 			return this.property.get();
 		}
-	
+
 		@Override
 		protected void setData(final Collection<GItem> items) {
 			this.property.set(items);
 		}
-	
+
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#valueProperty(Object) Properties.valueProperty(null)}. */
@@ -509,7 +509,7 @@ public class Properties {
 
 	/** Diese Methode gibt ein {@link Set} zurück, dessen Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
 	 *
-	 * @see BaseSetProxy
+	 * @see AbstractProxySet
 	 * @param property {@link Property}.
 	 * @return {@link Set}-{@code Proxy}.
 	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
@@ -519,7 +519,7 @@ public class Properties {
 
 	/** Diese Methode gibt eine {@link List} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
 	 *
-	 * @see BaseListProxy
+	 * @see AbstractProxyList
 	 * @param property {@link Property}.
 	 * @return {@link List}-{@code Proxy}.
 	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
@@ -529,7 +529,7 @@ public class Properties {
 
 	/** Diese Methode gibt eine {@link Map} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
 	 *
-	 * @see BaseMapProxy
+	 * @see AbstractProxyMap
 	 * @param property {@link Property}.
 	 * @return {@link Map}-{@code Proxy}.
 	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
@@ -539,7 +539,7 @@ public class Properties {
 
 	/** Diese Methode gibt eine {@link Collection} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
 	 *
-	 * @see BaseCollectionProxy
+	 * @see AbstractProxyCollection
 	 * @param property {@link Property}.
 	 * @return {@link Collection}-{@code Proxy}.
 	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
