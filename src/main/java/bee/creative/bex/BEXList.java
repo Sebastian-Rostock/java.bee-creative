@@ -2,8 +2,8 @@ package bee.creative.bex;
 
 import java.util.Iterator;
 import bee.creative.util.Comparables.Items;
+import bee.creative.lang.Objects;
 import bee.creative.util.Iterators;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die homogene Sicht auf Kind- und Attributknotenlisten. Die aufsteigende Navigation von einer Knotenliste zu deren Elternknoten
  * ist optional.

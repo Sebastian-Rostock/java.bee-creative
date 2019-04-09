@@ -1,6 +1,6 @@
 package bee.creative.fem;
 
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein Überwachungsobjekt zur Verwaltung der Zustandsdaten bei der Verfolgung und Überwachung der Verarbeitung von Funktionen.
  * Dieses Objekt wird dazu das Argument für die Methoden des {@link Listener} genutzt, welcher auf die Ereignisse der Überwachung reagieren kann.

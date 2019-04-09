@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.lang.Integers;
 import bee.creative.util.Comparators;
-import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine unveränderliche Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue()
  * Objektschlüssel} identifiziert wird. Datentyp und Besitzer des Objekts werden über eine {@link #typeValue() Typkennung} bzw. {@link #ownerValue()

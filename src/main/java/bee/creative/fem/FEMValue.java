@@ -1,6 +1,6 @@
 package bee.creative.fem;
 
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Wert, der als Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} einer {@link FEMFunction Funktion}
  * oder als {@link FEMFrame#get(int) Parameterwert} in einem {@link FEMFrame Stapelrahmen} zur Auswertung einer Funktion verwendet werden kann.

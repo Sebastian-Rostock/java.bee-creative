@@ -11,9 +11,9 @@ import java.util.List;
 import bee.creative.iam.IAMIndex.DataStats;
 import bee.creative.iam.IAMIndex.SizeStats;
 import bee.creative.iam.IAMLoader.IAMMappingLoader;
+import bee.creative.lang.Objects;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte Abbildung von Schlüsseln auf Werte, welche beide selbst Zahlenfolgen ({@link IAMArray}) sind.
  * <p>

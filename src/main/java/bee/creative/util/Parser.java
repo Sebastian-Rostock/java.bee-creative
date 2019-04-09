@@ -1,5 +1,7 @@
 package bee.creative.util;
 
+import bee.creative.lang.Objects;
+
 /** Diese Klasse implementiert ein Objekt zum Parsen einer Zeichenkette.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

@@ -7,7 +7,7 @@ import java.util.NavigableSet;
 import bee.creative.array.Array;
 import bee.creative.array.CompactArray;
 import bee.creative.array.CompactObjectArray;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine abstrakte Sammlung von Elementen, die in einem (sortierten) Array verwaltet werden.
  * <p>

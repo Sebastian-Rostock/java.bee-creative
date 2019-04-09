@@ -24,7 +24,7 @@ import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 import org.w3c.dom.TypeInfo;
 import org.w3c.dom.UserDataHandler;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert die Adapter zur Überführung von {@link BEXFile}, {@link BEXNode} und {@link BEXList} in {@link Document}, {@link Text},
  * {@link Attr}, {@link Element}, {@link NodeList} und {@link NamedNodeMap}.

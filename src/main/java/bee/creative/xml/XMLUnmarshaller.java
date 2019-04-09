@@ -9,7 +9,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #unmarshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Unmarshaller}.
  *

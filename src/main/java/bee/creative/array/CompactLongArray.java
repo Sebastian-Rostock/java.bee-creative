@@ -1,6 +1,6 @@
 package bee.creative.array;
 
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein {@link LongArray} als {@link CompactArray}.
  *

@@ -2,9 +2,9 @@ package bee.creative.iam;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
+import bee.creative.lang.Bytes;
+import bee.creative.lang.Objects;
 import bee.creative.mmf.MMFArray;
-import bee.creative.util.Bytes;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@code Integer Array Model} Datenstrukturen.
  *

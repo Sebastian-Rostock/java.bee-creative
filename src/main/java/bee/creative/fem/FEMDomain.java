@@ -15,11 +15,11 @@ import bee.creative.fem.FEMFunction.FrameFunction;
 import bee.creative.fem.FEMFunction.FutureFunction;
 import bee.creative.fem.FEMFunction.TraceFunction;
 import bee.creative.fem.FEMScript.Token;
+import bee.creative.lang.Natives;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Strings;
+import bee.creative.lang.Objects.BaseObject;
 import bee.creative.util.Filter;
-import bee.creative.util.Natives;
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.BaseObject;
-import bee.creative.util.Strings;
 
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
  * Quelltexten und Funktionen ineinander dienen.

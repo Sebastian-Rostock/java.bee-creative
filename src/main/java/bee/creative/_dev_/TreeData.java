@@ -14,8 +14,8 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import bee.creative.lang.Objects;
 import bee.creative.util.Comparators;
-import bee.creative.util.Objects;
 
 // TODO CURSOR = int, das in prevs/next zeigt, wo der Index des gesuchten Eintrags drin steht
 // nagativ, wenn prevs, positiv, wenn nexts gemeint

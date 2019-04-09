@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import bee.creative.iam.IAMLoader.IAMListingLoader;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 import bee.creative.util.Unique;
 
 /** Diese Klasse implementiert Klassen und Methoden zur erzeugung der {code Integer Array Model} Datenstrukturen.

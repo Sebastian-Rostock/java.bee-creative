@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import bee.creative.fem.FEMScript.Token;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 import bee.creative.util.Parser;
 
 /** Diese Klasse implementiert einen Kompiler, welcher als {@link Parser} auf den {@link FEMScript#types() Bereichstypen} eines {@link FEMScript aufbereiteten

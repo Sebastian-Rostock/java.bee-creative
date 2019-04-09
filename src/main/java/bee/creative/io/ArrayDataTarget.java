@@ -2,7 +2,7 @@ package bee.creative.io;
 
 import java.io.IOException;
 import bee.creative.array.CompactByteArray;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link CompactByteArray}.
  *

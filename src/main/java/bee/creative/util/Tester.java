@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import bee.creative.lang.Objects;
 import bee.creative.util.Comparators.BaseComparator;
 
 /** Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Method Testmethode} benötigt werden.
@@ -71,7 +72,9 @@ public class Tester {
 		 *
 		 * @see #join() */
 		public final void deactivate() {
-			this.millis = 0;
+			synchronized (this) {
+				this.millis = 0;
+			}
 			try {
 				this.join();
 			} catch (final InterruptedException e) {}
@@ -81,21 +84,27 @@ public class Tester {
 		@Override
 		public final void run() {
 			final Runtime runtime = Runtime.getRuntime();
-			long enterTime = 0;
-			long leaveTime = 0;
-			do {
+			int sleep;
+			long enterTime = 0, leaveTime = 0;
+			while (true) {
 				final long enterTime2 = System.nanoTime();
 				this.usedTime += leaveTime - enterTime;
 				runtime.gc();
 				this.usedMemory = Math.max(runtime.totalMemory() - runtime.freeMemory(), this.usedMemory);
 				enterTime = enterTime2;
 				leaveTime = System.nanoTime();
+				synchronized (this) {
+					sleep = this.millis;
+				}
+				if (sleep <= 0) {
+					break;
+				}
 				try {
-					Thread.sleep(this.millis);
+					Thread.sleep(sleep);
 				} catch (final InterruptedException e) {
 					break;
 				}
-			} while (this.millis != 0);
+			}
 			this.usedTime += leaveTime - enterTime;
 		}
 
@@ -292,7 +301,7 @@ public class Tester {
 
 	/** {@inheritDoc} */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return String.format("usedTime: %4.3f ms  usedMemory: %+4.3f MB  cause: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.cause);
 	}
 

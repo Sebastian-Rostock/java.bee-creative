@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 import bee.creative.emu.EMU;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüssel- und Wertobjekten. Das {@link #get(Object)
  * Finden} von Einträgen benötigt ca. 75 % der Rechenzeit, die eine {@link java.util.HashMap} benötigen würde. {@link #put(Object, Object) Einfügen} und

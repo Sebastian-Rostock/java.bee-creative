@@ -5,7 +5,7 @@ import bee.creative.bex.BEXLoader.BEXFileLoader;
 import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMException;
 import bee.creative.iam.IAMIndex;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert die Verwaltung aller Element-, Text- und Attributknoten sowie aller Kind- und Attributknotenlisten, die in einem XML Dokument
  * enthalten sind.

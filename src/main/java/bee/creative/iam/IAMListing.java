@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.iam.IAMLoader.IAMListingLoader;
+import bee.creative.lang.Objects;
 import bee.creative.mmf.MMFArray;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte geordnete Auflistung von Elementen, welche selbst Zahlenfolgen ({@link IAMArray}) sind.
  * <p>

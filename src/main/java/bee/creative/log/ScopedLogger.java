@@ -1,7 +1,7 @@
 package bee.creative.log;
 
-import bee.creative.util.Objects;
-import bee.creative.util.Strings;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Strings;
 
 /** Diese Klasse dient der Erfassung hierarchischer Protokollzeilen. Diese werden in der {@link #toStrings() Textdarstellung} innerhalb von Protokollebenen
  * entsprechend eingerückt dargestellt.

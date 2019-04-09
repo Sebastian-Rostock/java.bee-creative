@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import bee.creative.bind.Properties.BaseProperty;
+import bee.creative.lang.Natives;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 import bee.creative.util.Filter;
-import bee.creative.util.Natives;
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Field}-Instanzen.
  *

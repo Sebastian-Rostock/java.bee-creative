@@ -6,10 +6,10 @@ import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Builders.BaseMapBuilder2;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link SchemaFactory}.
  *

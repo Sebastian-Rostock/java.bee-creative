@@ -11,8 +11,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMResult;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseItemBuilder;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #marshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Marshaller}.
  *

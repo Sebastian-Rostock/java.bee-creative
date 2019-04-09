@@ -3,7 +3,8 @@ package bee.creative.util;
 import java.util.Comparator;
 import java.util.Iterator;
 import bee.creative.bind.Getter;
-import bee.creative.util.Objects.BaseObject;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 
 /** Diese Klasse implementiert grundlegende {@link Comparator}.
  *

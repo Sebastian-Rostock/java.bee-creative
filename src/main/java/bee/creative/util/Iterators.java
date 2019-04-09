@@ -7,9 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import bee.creative.bind.Getter;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
+import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.Comparables.Items;
-import bee.creative.util.Objects.BaseObject;
-import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert grundlegende {@link Iterator}.
  *

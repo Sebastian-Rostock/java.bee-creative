@@ -6,11 +6,11 @@ import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMScript.Token;
+import bee.creative.lang.Objects;
 import bee.creative.util.Comparables;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterators;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  *

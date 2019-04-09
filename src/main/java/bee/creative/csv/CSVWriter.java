@@ -5,7 +5,7 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 import bee.creative.io.IO;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen Formatter für Daten im {@code CSV}-Format. {@link #getQuote() Maskierungszeichen} und {@link #getComma() Trennzeichen}
  * können eingestellt werden. Als Zeilenende wird die Zeichekette {@code "\r\n"} genutzt.

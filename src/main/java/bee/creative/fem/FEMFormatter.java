@@ -3,7 +3,7 @@ package bee.creative.fem;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen Formatierer, der Daten, Werten und Funktionen in eine Zeichenkette überführen kann. Er realisiert damit die
  * entgegengesetzte Operation zur Kombination von {@link FEMParser} und {@link FEMCompiler}.

@@ -3,8 +3,8 @@ package bee.creative._deprecated_;
 import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.bind.Field;
+import bee.creative.lang.Objects;
 import bee.creative.util.Iterators;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen {@link Pool}. Die Datensätze müssen Nachfahren von {@link BaseItem} sein.
  *

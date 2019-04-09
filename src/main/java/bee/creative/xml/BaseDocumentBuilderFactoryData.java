@@ -5,9 +5,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import org.xml.sax.SAXException;
+import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseMapBuilder2;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory}.
  *

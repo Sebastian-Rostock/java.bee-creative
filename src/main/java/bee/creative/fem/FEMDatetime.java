@@ -2,8 +2,8 @@ package bee.creative.fem;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import bee.creative.lang.Integers;
 import bee.creative.util.Comparators;
-import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender. Intern wird die Zeitangabe als ein {@code long}
  * dargestellt.

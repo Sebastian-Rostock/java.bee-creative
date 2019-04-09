@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import bee.creative.emu.EMU;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit beliebigen Elementen. Das {@link #contains(Object) Finden} von
  * Elementen benötigt ca. 45 % der Rechenzeit, die ein {@link java.util.HashSet} benötigen würde. {@link #add(Object) Einfügen} und {@link #remove(Object)

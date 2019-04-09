@@ -1,6 +1,6 @@
 package bee.creative.fem;
 
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. ein als {@link FEMValue} verpackter Verweis auf eine {@link FEMFunction Funktion}.
  * Intern wird der Funktionszeiger als {@link FEMFunction} dargestellt.

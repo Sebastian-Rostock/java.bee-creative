@@ -1,6 +1,6 @@
 package bee.creative.log;
 
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen Knoten im doppelt verketteten Ring der von einem {@link ScopedLogger} erfassten Zeilen.
  *

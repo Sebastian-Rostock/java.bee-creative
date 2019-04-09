@@ -4,10 +4,11 @@ import java.util.Map;
 import bee.creative.bind.Field;
 import bee.creative.bind.Getter;
 import bee.creative.bind.Getters;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
 import bee.creative.ref.SoftPointer;
-import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert grundlegende {@link Filter}.
  *

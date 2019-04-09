@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.Collection;
 import java.util.Set;
 import bee.creative.emu.EMU;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse erweitert ein {@link HashSet} um einen Streuwertpuffer, analog zu {@link java.util.HashSet}.
  *

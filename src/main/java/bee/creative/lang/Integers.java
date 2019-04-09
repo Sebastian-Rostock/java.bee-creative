@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.lang;
 
 /** Diese Klasse implementiert stellt Methoden zum Parsen und Formatieren von Tezimalzahlen zur Verfügung.
  *

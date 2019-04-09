@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import bee.creative.io.IO;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen Parser für Daten im {@code CSV}-Format. {@link #getQuote() Maskierungszeichen} und {@link #getComma() Trennzeichen} können
  * eingestellt werden. Die Zeichen {@code '\r'} und {@code '\n'} werden außerhalb maskierter Werte immer als Ende einer Zeile und damit auch Ende eines

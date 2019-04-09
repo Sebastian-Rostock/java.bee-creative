@@ -1,7 +1,7 @@
 package bee.creative.array;
 
 import java.util.Comparator;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Abschnitt eines Arrays. Definiert wird ein Abschnitt für ein Array {@link #array()} der Länge
  * {@link #arrayLength()} mit dem Index des ersten Werts im Abschnitt ({@link #startIndex()}) sowie dem Index des ersten Werts nach dem Abschnitt (

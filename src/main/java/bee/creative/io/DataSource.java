@@ -3,7 +3,7 @@ package bee.creative.io;
 import java.io.Closeable;
 import java.io.DataInput;
 import java.io.IOException;
-import bee.creative.util.Bytes;
+import bee.creative.lang.Bytes;
 
 /** Diese Schnittstelle definiert eine Erweiterung eines {@link Closeable} {@link DataInput} um die in {@link DataBase} spezifizierte Navigationsposition.
  *

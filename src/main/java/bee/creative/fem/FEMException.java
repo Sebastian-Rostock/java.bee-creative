@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.lang.Strings;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
-import bee.creative.util.Strings;
 
 /** Diese Klasse implementiert eine Ausnahme, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(String) angefügt} werden können und welche mit
  * einem {@link #getValue() Wert} sowie einem {@link #getContext() Kontextobjekt} die {@link #getCause() Ursache} eines Ausnahmefalls genauer beschreiben kann.

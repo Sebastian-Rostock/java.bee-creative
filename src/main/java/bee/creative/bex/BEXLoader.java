@@ -5,10 +5,10 @@ import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMException;
 import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
+import bee.creative.lang.Objects;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die Algorithmen zur Dekodierung der {@code Binary Encoded XML} Datenstrukturen.
  *

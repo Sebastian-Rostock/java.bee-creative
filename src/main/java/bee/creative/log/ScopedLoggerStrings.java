@@ -3,8 +3,8 @@ package bee.creative.log;
 import java.util.ArrayList;
 import java.util.List;
 import bee.creative.bind.Producer;
-import bee.creative.util.Integers;
-import bee.creative.util.Strings;
+import bee.creative.lang.Integers;
+import bee.creative.lang.Strings;
 
 /** Diese Klasse implementiert den Generator der Textdarstellungen eines {@link ScopedLogger}.
  *

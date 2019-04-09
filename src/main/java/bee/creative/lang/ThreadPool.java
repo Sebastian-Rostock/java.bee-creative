@@ -1,7 +1,9 @@
-package bee.creative.util;
+package bee.creative.lang;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import bee.creative.util.HashMap3;
+import bee.creative.util.HashSet3;
 
 /** Diese Klasse implementiert einen {@link Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable) Überwachen},
  * {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Auswertung beliebiger {@link Runnable Berechnungen} bereitstellt.<br>

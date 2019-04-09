@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import bee.creative.bind.Translator;
 import bee.creative.bind.Translators;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}, {@link Map}, {@link List} und {@link Collection}.
  *

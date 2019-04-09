@@ -10,12 +10,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import bee.creative.bind.Getter;
-import bee.creative.bind.Producer;
-import bee.creative.bind.Translator;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import bee.creative.bind.Getter;
+import bee.creative.bind.Producer;
+import bee.creative.bind.Translator;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Producer Konfiguratoren}.
  *
@@ -24,9 +25,9 @@ public class Builders {
 
 	/** Diese Klasse implementiert einen abstrakten Konfigurator zur Erzeugung eines Datensatzes.
 	 *
-	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GResult> Typ des Datensatzes.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseBuilder<GItem, GThis> implements Producer<GItem> {
+	public static abstract class BaseBuilder<GResult, GThis> implements Producer<GResult> {
 
 		/** Diese Methode gibt {@code this} zurück.
 		 *
@@ -191,11 +192,11 @@ public class Builders {
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link Map}.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GItem> Typ der Werte.
+	 * @param <GValue> Typ der Werte.
 	 * @param <GResult> Typ der {@link Map}.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseMapBuilder<GKey, GItem, GResult extends Map<GKey, GItem>, GThis> extends BaseBuilder2<GResult, GThis>
-		implements Iterable<Entry<GKey, GItem>> {
+	public static abstract class BaseMapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>, GThis> extends BaseBuilder2<GResult, GThis>
+		implements Iterable<Entry<GKey, GValue>> {
 
 		/** Dieses Feld speichert den über {@link #forKey(Object)} gewählten Schlüssel, der in {@link #useValue(Object)} eingesetzt wird. */
 		protected GKey key;
@@ -209,22 +210,22 @@ public class Builders {
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected void putImpl(final Entry<? extends GKey, ? extends GItem> entry) {
+		protected void putImpl(final Entry<? extends GKey, ? extends GValue> entry) {
 			this.result.put(entry.getKey(), entry.getValue());
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected void putKeyFromImpl(final Getter<? super GItem, ? extends GKey> key, final GItem value) {
-			this.result.put(key.get(value), value);
+		protected void putKeyImpl(final Getter<? super GKey, ? extends GValue> toValue, final GKey key) {
+			this.result.put(key, toValue.get(key));
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected void putValueFromImpl(final Getter<? super GKey, ? extends GItem> value, final GKey key) {
-			this.result.put(key, value.get(key));
+		protected void putValueImpl(final Getter<? super GValue, ? extends GKey> toKey, final GValue value) {
+			this.result.put(toKey.get(value), value);
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected void putInverseImpl(final Entry<? extends GItem, ? extends GKey> entry) {
+		protected void putInverseImpl(final Entry<? extends GValue, ? extends GKey> entry) {
 			this.result.put(entry.getValue(), entry.getKey());
 		}
 
@@ -235,7 +236,7 @@ public class Builders {
 		 * @param source Konfigurator.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-		public GThis use(final BaseMapBuilder<? extends GKey, ? extends GItem, ?, ?> source) throws NullPointerException {
+		public GThis use(final BaseMapBuilder<? extends GKey, ? extends GValue, ?, ?> source) throws NullPointerException {
 			Objects.notNull(source);
 			return this.putAll(source.result);
 		}
@@ -244,7 +245,7 @@ public class Builders {
 		 *
 		 * @param entry Eintrag.
 		 * @return {@code this}. */
-		public GThis put(final Entry<? extends GKey, ? extends GItem> entry) {
+		public GThis put(final Entry<? extends GKey, ? extends GValue> entry) {
 			this.putImpl(entry);
 			return this.customThis();
 		}
@@ -254,28 +255,28 @@ public class Builders {
 		 * @param key Schlüssel des Eintrags.
 		 * @param value Wert des Eintrags.
 		 * @return {@code this}. */
-		public GThis put(final GKey key, final GItem value) {
+		public GThis put(final GKey key, final GValue value) {
 			this.result.put(key, value);
 			return this.customThis();
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
 		 *
-		 * @param key {@link Getter} zur Ermittlung des Schlüssels zum gegebenen Wert des Eintrags.
-		 * @param value Wert des Eintrags.
+		 * @param toValue {@link Getter} zur Ermittlung des Werts zum gegebenen Schlüssel des Eintrags.
+		 * @param key Schlüssel des Eintrags.
 		 * @return {@code this}. */
-		public GThis putKeyFrom(final Getter<? super GItem, ? extends GKey> key, final GItem value) {
-			this.putKeyFromImpl(key, value);
+		public GThis putKey(final Getter<? super GKey, ? extends GValue> toValue, final GKey key) {
+			this.putKeyImpl(toValue, key);
 			return this.customThis();
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt den gegebenen Eintrag ein} und gibt {@code this} zurück.
 		 *
-		 * @param value {@link Getter} zur Ermittlung des Werts zum gegebenen Schlüssel des Eintrags.
-		 * @param key Schlüssel des Eintrags.
+		 * @param toKey {@link Getter} zur Ermittlung des Schlüssels zum gegebenen Wert des Eintrags.
+		 * @param value Wert des Eintrags.
 		 * @return {@code this}. */
-		public GThis putValueFrom(final Getter<? super GKey, ? extends GItem> value, final GKey key) {
-			this.putValueFromImpl(value, key);
+		public GThis putValue(final Getter<? super GValue, ? extends GKey> toKey, final GValue value) {
+			this.putValueImpl(toKey, value);
 			return this.customThis();
 		}
 
@@ -284,7 +285,7 @@ public class Builders {
 		 *
 		 * @param entry Eintrag.
 		 * @return {@code this}. */
-		public GThis putInverse(final Entry<? extends GItem, ? extends GKey> entry) {
+		public GThis putInverse(final Entry<? extends GValue, ? extends GKey> entry) {
 			this.putInverseImpl(entry);
 			return this.customThis();
 		}
@@ -293,7 +294,7 @@ public class Builders {
 		 *
 		 * @param entries Einträge.
 		 * @return {@code this}. */
-		public GThis putAll(final Map<? extends GKey, ? extends GItem> entries) {
+		public GThis putAll(final Map<? extends GKey, ? extends GValue> entries) {
 			return this.putAll(entries.entrySet());
 		}
 
@@ -301,7 +302,7 @@ public class Builders {
 		 *
 		 * @param entries Einträge.
 		 * @return {@code this}. */
-		public GThis putAll(final Iterator<? extends Entry<? extends GKey, ? extends GItem>> entries) {
+		public GThis putAll(final Iterator<? extends Entry<? extends GKey, ? extends GValue>> entries) {
 			while (entries.hasNext()) {
 				this.putImpl(entries.next());
 			}
@@ -312,7 +313,7 @@ public class Builders {
 		 *
 		 * @param entries Einträge.
 		 * @return {@code this}. */
-		public GThis putAll(final Iterable<? extends Entry<? extends GKey, ? extends GItem>> entries) {
+		public GThis putAll(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
 			return this.putAll(entries.iterator());
 		}
 
@@ -321,7 +322,7 @@ public class Builders {
 		 * @param keys Schlüssel der Einträge.
 		 * @param values Werte der Einträge.
 		 * @return {@code this}. */
-		public GThis putAll(final GKey[] keys, final GItem[] values) {
+		public GThis putAll(final GKey[] keys, final GValue[] values) {
 			return this.putAll(Arrays.asList(keys), Arrays.asList(values));
 		}
 
@@ -330,7 +331,7 @@ public class Builders {
 		 * @param keys Schlüssel der Einträge.
 		 * @param values Werte der Einträge.
 		 * @return {@code this}. */
-		public GThis putAll(final Iterator<? extends GKey> keys, final Iterator<? extends GItem> values) {
+		public GThis putAll(final Iterator<? extends GKey> keys, final Iterator<? extends GValue> values) {
 			while (keys.hasNext() && values.hasNext()) {
 				this.put(keys.next(), values.next());
 			}
@@ -342,77 +343,77 @@ public class Builders {
 		 * @param keys Schlüssel der Einträge.
 		 * @param values Werte der Einträge.
 		 * @return {@code this}. */
-		public GThis putAll(final Iterable<? extends GKey> keys, final Iterable<? extends GItem> values) {
+		public GThis putAll(final Iterable<? extends GKey> keys, final Iterable<? extends GValue> values) {
 			return this.putAll(keys.iterator(), values.iterator());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
 		 *
-		 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
-		 * @param values Werte der Einträge.
-		 * @return {@code this}. */
-		@SuppressWarnings ("unchecked")
-		public GThis putAllKeysFrom(final Getter<? super GItem, ? extends GKey> key, final GItem... values) {
-			return this.putAllKeysFrom(key, Arrays.asList(values));
-		}
-
-		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-		 *
-		 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
-		 * @param values Werte der Einträge.
-		 * @return {@code this}. */
-		public GThis putAllKeysFrom(final Getter<? super GItem, ? extends GKey> key, final Iterator<? extends GItem> values) {
-			while (values.hasNext()) {
-				this.putKeyFromImpl(key, values.next());
-			}
-			return this.customThis();
-		}
-
-		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-		 *
-		 * @param key {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
-		 * @param values Werte der Einträge.
-		 * @return {@code this}. */
-		public GThis putAllKeysFrom(final Getter<? super GItem, ? extends GKey> key, final Iterable<? extends GItem> values) {
-			return this.putAllKeysFrom(key, values.iterator());
-		}
-
-		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
-		 *
-		 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
+		 * @param toValue {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
 		 * @param keys Schlüssel der Einträge.
 		 * @return {@code this}. */
 		@SuppressWarnings ("unchecked")
-		public GThis putAllValuesFrom(final Getter<? super GKey, ? extends GItem> value, final GKey... keys) {
-			return this.putAllValuesFrom(value, Arrays.asList(keys));
+		public GThis putAllKeys(final Getter<? super GKey, ? extends GValue> toValue, final GKey... keys) {
+			return this.putAllKeys(toValue, Arrays.asList(keys));
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
 		 *
-		 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
+		 * @param toValue {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
 		 * @param keys Schlüssel der Einträge.
 		 * @return {@code this}. */
-		public GThis putAllValuesFrom(final Getter<? super GKey, ? extends GItem> value, final Iterator<? extends GKey> keys) {
+		public GThis putAllKeys(final Getter<? super GKey, ? extends GValue> toValue, final Iterator<? extends GKey> keys) {
 			while (keys.hasNext()) {
-				this.putValueFromImpl(value, keys.next());
+				this.putKeyImpl(toValue, keys.next());
 			}
 			return this.customThis();
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
 		 *
-		 * @param value {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
+		 * @param toValue {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
 		 * @param keys Schlüssel der Einträge.
 		 * @return {@code this}. */
-		public GThis putAllValuesFrom(final Getter<? super GKey, ? extends GItem> value, final Iterable<? extends GKey> keys) {
-			return this.putAllValuesFrom(value, keys.iterator());
+		public GThis putAllKeys(final Getter<? super GKey, ? extends GValue> toValue, final Iterable<? extends GKey> keys) {
+			return this.putAllKeys(toValue, keys.iterator());
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param toKey {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		@SuppressWarnings ("unchecked")
+		public GThis putAllValues(final Getter<? super GValue, ? extends GKey> toKey, final GValue... values) {
+			return this.putAllValues(toKey, Arrays.asList(values));
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param toKey {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		public GThis putAllValues(final Getter<? super GValue, ? extends GKey> toKey, final Iterator<? extends GValue> values) {
+			while (values.hasNext()) {
+				this.putValueImpl(toKey, values.next());
+			}
+			return this.customThis();
+		}
+
+		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge ein} und gibt {@code this} zurück.
+		 *
+		 * @param toKey {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
+		 * @param values Werte der Einträge.
+		 * @return {@code this}. */
+		public GThis putAllValues(final Getter<? super GValue, ? extends GKey> toKey, final Iterable<? extends GValue> values) {
+			return this.putAllValues(toKey, values.iterator());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt die gegebenen Einträge invertiert ein} und gibt {@code this} zurück.
 		 *
 		 * @param entries Einträge.
 		 * @return {@code this}. */
-		public GThis putAllInverse(final Map<? extends GItem, ? extends GKey> entries) {
+		public GThis putAllInverse(final Map<? extends GValue, ? extends GKey> entries) {
 			return this.putAllInverse(entries.entrySet());
 		}
 
@@ -420,7 +421,7 @@ public class Builders {
 		 *
 		 * @param entries Einträge.
 		 * @return {@code this}. */
-		public GThis putAllInverse(final Iterator<? extends Entry<? extends GItem, ? extends GKey>> entries) {
+		public GThis putAllInverse(final Iterator<? extends Entry<? extends GValue, ? extends GKey>> entries) {
 			while (entries.hasNext()) {
 				this.putInverseImpl(entries.next());
 			}
@@ -431,7 +432,7 @@ public class Builders {
 		 *
 		 * @param entries Einträge.
 		 * @return {@code this}. */
-		public GThis putAllInverse(final Iterable<? extends Entry<? extends GItem, ? extends GKey>> entries) {
+		public GThis putAllInverse(final Iterable<? extends Entry<? extends GValue, ? extends GKey>> entries) {
 			return this.putAllInverse(entries.iterator());
 		}
 
@@ -496,7 +497,7 @@ public class Builders {
 		 * @see #forKey(Object)
 		 * @see #useValue(Object)
 		 * @return Wert zum gewählten Schlüssel. */
-		public GItem getValue() {
+		public GValue getValue() {
 			try {
 				return this.result.get(this.key);
 			} finally {
@@ -510,7 +511,7 @@ public class Builders {
 		 * @see #getValue()
 		 * @param value Wert.
 		 * @return {@code this}. */
-		public GThis useValue(final GItem value) {
+		public GThis useValue(final GValue value) {
 			try {
 				this.put(this.key, value);
 			} finally {
@@ -521,7 +522,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		public Iterator<Entry<GKey, GItem>> iterator() {
+		public Iterator<Entry<GKey, GValue>> iterator() {
 			return this.result.entrySet().iterator();
 		}
 
@@ -530,13 +531,13 @@ public class Builders {
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link HashMap}.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GItem> Typ der Werte.
+	 * @param <GValue> Typ der Werte.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseMapBuilder2<GKey, GItem, GThis> extends BaseMapBuilder<GKey, GItem, HashMap<GKey, GItem>, GThis> {
+	public static abstract class BaseMapBuilder2<GKey, GValue, GThis> extends BaseMapBuilder<GKey, GValue, HashMap<GKey, GValue>, GThis> {
 
 		/** Dieser Konstruktor initialisiert die interne {@link HashMap}. */
 		public BaseMapBuilder2() {
-			super(new HashMap<GKey, GItem>());
+			super(new HashMap<GKey, GValue>());
 		}
 
 	}
@@ -851,9 +852,10 @@ public class Builders {
 	/** Diese Klasse implementiert einen Konfigurator für eine {@link Map}.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GItem> Typ der Werte.
+	 * @param <GValue> Typ der Werte.
 	 * @param <GResult> Typ der {@link Map}. */
-	public static class MapBuilder<GKey, GItem, GResult extends Map<GKey, GItem>> extends BaseMapBuilder<GKey, GItem, GResult, MapBuilder<GKey, GItem, GResult>> {
+	public static class MapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>>
+		extends BaseMapBuilder<GKey, GValue, GResult, MapBuilder<GKey, GValue, GResult>> {
 
 		/** Diese Methode gibt einen {@link MapBuilder} zur gegebenen {@link Map} zurück.
 		 *
@@ -914,7 +916,7 @@ public class Builders {
 
 		/** {@inheritDoc} */
 		@Override
-		protected MapBuilder<GKey, GItem, GResult> customThis() {
+		protected MapBuilder<GKey, GValue, GResult> customThis() {
 			return this;
 		}
 
@@ -924,7 +926,7 @@ public class Builders {
 		 * @param keyClazz Klasse der Schlüssel.
 		 * @param valueClazz Klasse der Werte.
 		 * @return neuer {@link MapBuilder} zur {@code checkedMap}. */
-		public MapBuilder<GKey, GItem, Map<GKey, GItem>> toChecked(final Class<GKey> keyClazz, final Class<GItem> valueClazz) {
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
 			return MapBuilder.from(Collections.checkedMap(this.result, keyClazz, valueClazz));
 		}
 
@@ -937,7 +939,7 @@ public class Builders {
 		 * @param valueTranslator {@link Translator} zur Übersetzung der Werte.
 		 * @return neuer {@link MapBuilder} zur {@code translatedMap}. */
 		public <GKey2, GValue2> MapBuilder<GKey2, GValue2, Map<GKey2, GValue2>> toTranslated(final Translator<GKey, GKey2> keyTranslator,
-			final Translator<GItem, GValue2> valueTranslator) {
+			final Translator<GValue, GValue2> valueTranslator) {
 			return MapBuilder.from(bee.creative.util.Collections.translatedMap(this.result, keyTranslator, valueTranslator));
 		}
 
@@ -945,7 +947,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#synchronizedMap(Map)
 		 * @return neuer {@link MapBuilder} zur {@code synchronizedMap}. */
-		public MapBuilder<GKey, GItem, Map<GKey, GItem>> toSynchronized() {
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toSynchronized() {
 			return MapBuilder.from(Collections.synchronizedMap(this.result));
 		}
 
@@ -953,7 +955,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableMap(Map)
 		 * @return neuer {@link MapBuilder} zur {@code unmodifiableMap}. */
-		public MapBuilder<GKey, GItem, Map<GKey, GItem>> toUnmodifiable() {
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toUnmodifiable() {
 			return MapBuilder.from(Collections.unmodifiableMap(this.result));
 		}
 

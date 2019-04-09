@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.lang;
 
 import java.nio.ByteOrder;
 

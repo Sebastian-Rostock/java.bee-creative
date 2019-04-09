@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.lang.Integers;
 import bee.creative.util.Comparators;
-import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine unveränderliche Dezimalzahl. Intern wird die Dezimalzahl als {@code long} dargestellt.
  *

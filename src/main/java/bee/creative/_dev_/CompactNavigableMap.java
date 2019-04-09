@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link NavigableMap}, deren Daten in einem Array verwaltet werden.
  *

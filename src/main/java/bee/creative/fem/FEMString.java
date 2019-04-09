@@ -6,12 +6,12 @@ import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMArray;
+import bee.creative.lang.Integers;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.Comparators;
-import bee.creative.util.Integers;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators.BaseIterator;
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert eine unveränderliche Zeichenkette sowie Methoden zur Erzeugung solcher Zeichenketten.
  * <p>

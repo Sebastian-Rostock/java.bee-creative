@@ -13,6 +13,7 @@ import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMMapping;
+import bee.creative.lang.Objects;
 
 /** Diese abstrakte Klasse implementiert eine transponierte {@link Object#hashCode() streuwertbasierte} Datenhaltung als Grundlage einer {@link Map} oder eines
  * {@link Set}.

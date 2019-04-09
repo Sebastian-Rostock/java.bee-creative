@@ -8,8 +8,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Node}.
  *

@@ -1,6 +1,6 @@
 package bee.creative.ref;
 
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen harten {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer} wird nicht
  * automatisch aufgelöst.

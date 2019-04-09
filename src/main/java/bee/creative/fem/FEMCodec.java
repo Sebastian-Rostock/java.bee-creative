@@ -14,13 +14,13 @@ import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
 import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
+import bee.creative.lang.Integers;
+import bee.creative.lang.Objects;
 import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
 import bee.creative.iam.IAMMapping;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparables.Items;
-import bee.creative.util.Integers;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein Objekt zur Kodierung und Dekodierung von {@link FEMValue Werten} und {@link FEMFunction Funktionen} in {@link IAMArray
  * Zahlenlisten}. Damit ist es möglich, beliebig große Wert- und Funktionsgraphen über ein {@link MMFArray} in eine Binärdatei auszulagern.

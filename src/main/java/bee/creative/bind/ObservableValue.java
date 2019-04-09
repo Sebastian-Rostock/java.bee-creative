@@ -1,7 +1,7 @@
 package bee.creative.bind;
 
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.BaseObject;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 
 /** Diese abstrakte Klasse implementiert einen {@link Observable überwachbaren} Wert.
  *

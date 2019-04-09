@@ -9,6 +9,7 @@ import bee.creative.bind.Getter;
 import bee.creative.bind.Getters;
 import bee.creative.bind.Setter;
 import bee.creative.bind.Setters;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten. Dazu werden
  * gegebene Eingabeobjekte mit daraus {@link #customBuild(Object) berechneten} Ausgabeobjekten über in einer {@link Map Abbildung} verwaltet. Wenn über

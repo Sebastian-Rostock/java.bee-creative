@@ -85,7 +85,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	protected abstract GData getData(boolean readonly);
 
 	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
-	 * 
+	 *
 	 * @param items neuer Inhalt. */
 	protected abstract void setData(final GData items);
 

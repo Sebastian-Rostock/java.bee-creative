@@ -7,13 +7,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import bee.creative.lang.Natives;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 import bee.creative.util.AbstractProxyCollection;
 import bee.creative.util.AbstractProxyList;
 import bee.creative.util.AbstractProxyMap;
 import bee.creative.util.AbstractProxySet;
-import bee.creative.util.Natives;
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert gundlegende {@link Property}.
  *

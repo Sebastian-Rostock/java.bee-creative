@@ -5,8 +5,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import bee.creative.util.Natives;
-import bee.creative.util.Objects;
+import bee.creative.lang.Natives;
+import bee.creative.lang.Objects;
 
 /** Diese Funktion kann zum Lesen und Schreiben von {@link Field nativen Datenfeldern} sowie zum Aufrufen von {@link Method nativen Methoden} und
  * {@link Constructor nativen Konstruktoren} eingesetzt werden. Der dieser Funktion zugrundeliegende {@link Member} kann hierbei als {@link Field},

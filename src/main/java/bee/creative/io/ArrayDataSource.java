@@ -4,7 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import bee.creative.array.ByteArray;
 import bee.creative.array.ByteArraySection;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert die {@link DataSource}-Schnittstelle zu einer {@link ByteArraySection}.
  *

@@ -1,4 +1,4 @@
-package bee.creative.util;
+package bee.creative.lang;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
@@ -8,6 +8,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import bee.creative.bind.Getter;
 import bee.creative.util.Builders.MapBuilder;
+import bee.creative.util.HashMap;
+import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert Methoden zum Parsen von {@link Class Klassen}, {@link Field Datenfeldern}, {@link Method Methoden} und {@link Constructor
  * Konstruktoren} aus deren Textdarstellung sowie zur Erzeugung dieser Textdarstellungen.
@@ -16,7 +18,7 @@ import bee.creative.util.Builders.MapBuilder;
 public class Natives {
 
 	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
-	static final HashMap<Object, Class<?>> parseClass = MapBuilder.<Object, Class<?>>forHashMap(false).putAllKeysFrom(new Getter<Class<?>, Object>() {
+	static final HashMap<Object, Class<?>> parseClass = MapBuilder.<Object, Class<?>>forHashMap(false).putAllValues(new Getter<Class<?>, Object>() {
 
 		@Override
 		public Object get(final Class<?> input) {
@@ -294,12 +296,12 @@ public class Natives {
 	}
 
 	/** Diese Methode erzwingt die {@link AccessibleObject#setAccessible(boolean) Zugreifbarkeit} des gegebenen Objekts und gibt es zurück.
-	 * 
+	 *
 	 * @param result Objekt mit Zugreifbarkeit.
 	 * @return zugreifbares Objekt.
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das Objekt nicht zugrifbar ist. */
-	public static <GResult extends AccessibleObject> GResult forceAccessible(GResult result) throws NullPointerException, IllegalArgumentException {
+	public static <GResult extends AccessibleObject> GResult forceAccessible(final GResult result) throws NullPointerException, IllegalArgumentException {
 		try {
 			result.setAccessible(true);
 			return result;

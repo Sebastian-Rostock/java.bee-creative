@@ -6,8 +6,8 @@ import java.nio.ByteOrder;
 import java.util.AbstractList;
 import java.util.List;
 import bee.creative.iam.IAMLoader.IAMIndexLoader;
+import bee.creative.lang.Objects;
 import bee.creative.mmf.MMFArray;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte Zusammenstellung beliebig vieler Auflistungen ({@link IAMListing}) und Abbildungen ({@link IAMMapping}).
  * <p>

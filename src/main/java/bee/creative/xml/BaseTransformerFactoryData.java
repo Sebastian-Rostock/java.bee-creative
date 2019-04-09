@@ -8,10 +8,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
+import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseItemBuilder;
 import bee.creative.util.Builders.BaseMapBuilder2;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link TransformerFactory} zur Erzeugung von {@link Templates} oder eines
  * {@link Transformer}.

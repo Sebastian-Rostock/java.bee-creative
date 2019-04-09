@@ -4,10 +4,10 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import bee.creative.emu.EMU;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.PointerQueue;
 import bee.creative.util.HashSet;
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
  * {@link #pop(Object, Object) abgemeldet} bzw. {@link #fire(Object, Object) benachrichtigt} werden können und bezüglich eines {@link WeakReference schwach}
@@ -258,9 +258,9 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 			return object instanceof EventObserver ? ((EventObserver)object).get() : object;
 		}
 
-		public EventItem eventItem;
+		public final EventItem eventItem;
 
-		public EventStore eventStore;
+		public final EventStore eventStore;
 
 		public EventObserver(final Object referent, final EventItem eventItem, final EventStore eventStore) {
 			super(referent, eventStore.eventQueue);
@@ -290,7 +290,7 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 		}
 
 		@Override
-		public GObserver putWeak(final GObserver observer) throws IllegalArgumentException {
+		public GObserver putWeak(final GObserver observer) {
 			return Event.this.putWeak(this.sender, observer);
 		}
 

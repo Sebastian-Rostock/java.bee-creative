@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.Map;
 import bee.creative.emu.EMU;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse erweitert eine {@link HashMap} um einen Streuwertpuffer, analog zu {@link java.util.HashMap}.
  *

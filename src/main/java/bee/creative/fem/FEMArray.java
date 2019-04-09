@@ -15,13 +15,13 @@ import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMMapping;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
 import bee.creative.util.Iterators.BaseIterator;
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert eine unveränderliche Auflistung von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
  *

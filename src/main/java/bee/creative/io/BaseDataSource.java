@@ -3,8 +3,8 @@ package bee.creative.io;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import bee.creative.util.Bytes;
-import bee.creative.util.Objects.BaseObject;
+import bee.creative.lang.Bytes;
+import bee.creative.lang.Objects.BaseObject;
 
 /** Diese Klasse implementiert einen abstrakten {@link DataSource}.
  *

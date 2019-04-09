@@ -1,8 +1,8 @@
 package bee.creative.array;
 
 import java.util.Comparator;
+import bee.creative.lang.Objects;
 import bee.creative.util.Comparators;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine {@link ArraySection} für {@link Object}-Arrays.
  *

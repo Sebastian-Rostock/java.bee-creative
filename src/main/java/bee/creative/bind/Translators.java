@@ -1,7 +1,7 @@
 package bee.creative.bind;
 
+import bee.creative.lang.Objects;
 import bee.creative.util.Filter;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Translator}.
  *

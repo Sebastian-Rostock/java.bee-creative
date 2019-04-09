@@ -6,9 +6,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseItemBuilder;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder}.
  *

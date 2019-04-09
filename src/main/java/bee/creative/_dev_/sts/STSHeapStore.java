@@ -5,7 +5,7 @@ import bee.creative._dev_.sts.STSEdgeSet.ArrayEdgeSet;
 import bee.creative.array.IntegerArraySection;
 import bee.creative.fem.FEMBinary;
 import bee.creative.iam.IAMMapping;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen {@link STSStore Graphspeicher}, der seine Daten im Arbeitsspeicher verwaltet.
  *

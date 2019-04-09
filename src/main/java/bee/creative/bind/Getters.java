@@ -9,13 +9,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import bee.creative.lang.Natives;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
 import bee.creative.util.Filter;
 import bee.creative.util.Filters;
-import bee.creative.util.Natives;
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Getter}-Konstruktion und -Verarbeitung.
  *

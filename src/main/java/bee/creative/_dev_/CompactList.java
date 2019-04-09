@@ -8,7 +8,7 @@ import java.util.ListIterator;
 import java.util.RandomAccess;
 import bee.creative.array.Array;
 import bee.creative.array.CompactArray;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link List}, deren Daten in einem Array verwaltet werden. Der Speicherverbrauch einer {@link CompactList} liegt bei ca.
  * {@code 100%} des Speicherverbrauchs einer {@link ArrayList}.

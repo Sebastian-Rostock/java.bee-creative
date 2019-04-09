@@ -9,8 +9,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import bee.creative.lang.Objects;
 import bee.creative.util.Iterables;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein {@link NavigableSet}, dessen Daten in einem Array verwaltet werden. Der Speicherverbrauch eines {@link CompactNavigableSet}
  * liegt bei ca. {@code 13%} des Speicherverbrauchs eines {@link TreeSet}s.

@@ -14,8 +14,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import bee.creative.lang.Objects;
 import bee.creative.mmf.MMFArray;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien per
  * momory-mapping zum Lesen und Schreiben zugänglich machen kann.

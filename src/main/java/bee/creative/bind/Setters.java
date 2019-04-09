@@ -8,10 +8,10 @@ import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.Map;
 import bee.creative.bind.Consumers.BaseConsumer;
+import bee.creative.lang.Natives;
+import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 import bee.creative.util.Filter;
-import bee.creative.util.Natives;
-import bee.creative.util.Objects;
-import bee.creative.util.Objects.BaseObject;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Setter}-Konstruktion und -Verarbeitung.
  *

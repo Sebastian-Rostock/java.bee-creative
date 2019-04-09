@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import bee.creative.lang.Objects;
 import bee.creative.util.HashMap2;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Assignment} und {@link Assignable}.
  *

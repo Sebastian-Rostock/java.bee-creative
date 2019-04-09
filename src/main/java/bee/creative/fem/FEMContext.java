@@ -6,8 +6,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import bee.creative.bind.Getter;
 import bee.creative.bind.Getters.BaseGetter;
+import bee.creative.lang.Objects;
 import bee.creative.util.Iterables;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein abstraktes Kontextobjekt, das über einen {@link FEMFrame Stapelrahmen} der Auswertung von Funktionen bereitgestellt wird und
  * in Funktionen zur Umwandlung von Werten genutzt werden kann. Nachfahren sollten die Methoden {@link #dataFrom(FEMValue, FEMType)}, {@link #arrayFrom(Object)}

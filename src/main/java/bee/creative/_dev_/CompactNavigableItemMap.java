@@ -2,7 +2,7 @@ package bee.creative._dev_;
 
 import java.util.Comparator;
 import java.util.Map;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Daten in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren.
  * Diese Implementation erlaubt deshalb {@code null} nicht als Wert.

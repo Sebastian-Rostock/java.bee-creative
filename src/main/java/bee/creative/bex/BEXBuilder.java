@@ -22,10 +22,10 @@ import bee.creative.bex.BEXLoader.BEXFileLoader;
 import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
+import bee.creative.lang.Objects;
 import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
 import bee.creative.util.Comparators;
-import bee.creative.util.Objects;
 import bee.creative.util.Unique;
 
 /** Diese Klasse implementiert die Algorithmen zur Kodierung der {@code Binary Encoded XML} Datenstrukturen.

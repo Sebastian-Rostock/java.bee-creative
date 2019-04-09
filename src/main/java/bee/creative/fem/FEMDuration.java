@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.lang.Integers;
 import bee.creative.util.Comparators;
-import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine unveränderliche Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden. Intern wird die
  * Zeitspanne als ein {@code long} dargestellt.

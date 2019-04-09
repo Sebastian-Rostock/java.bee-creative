@@ -1,6 +1,6 @@
 package bee.creative.ini;
 
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein abstraktes Element, welches über einen {@link INIReader} aus einer {@code INI}-Datenstruktur gelesene und für einen
  * Abschnitt, eine Eigenschaft oder einen Kommentar stehen kann.

@@ -3,8 +3,8 @@ package bee.creative.array;
 import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.List;
+import bee.creative.lang.Objects;
 import bee.creative.util.Comparators;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein {@link ObjectArray} als {@link CompactArray}. Das {@link List#add(int, Object) Einfügen} von Elementen an beliebigen
  * Positionen in die über {@link #values()} bereit gestellte {@link List}-Sicht benötigt im Durchschnitt ca. 45 % der Rechenzeit, die ein

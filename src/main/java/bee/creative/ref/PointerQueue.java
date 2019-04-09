@@ -3,7 +3,7 @@ package bee.creative.ref;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen {@link ReferenceQueue}, der automatisch bereinigt wird. Jede über {@link #poll()}, {@link #remove()} oder
  * {@link #remove(long)} entfernte {@link Reference} wird dabei an {@link #customRemove(Reference)} übergeben, sofern sie nicht {@code null} ist. In dieser

@@ -3,7 +3,7 @@ package bee.creative.array;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.RandomAccess;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein abstraktes {@link Array} auf Basis einer {@link ArrayData}.
  *

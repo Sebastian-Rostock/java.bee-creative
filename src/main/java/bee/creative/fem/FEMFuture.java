@@ -1,6 +1,6 @@
 package bee.creative.fem;
 
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
  * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann. Der Wert kapselt dazu eine gegebene {@link #function() Funktion} sowie einen gegebenen

@@ -6,9 +6,9 @@ import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
+import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseItemBuilder;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link XPath}.
  *

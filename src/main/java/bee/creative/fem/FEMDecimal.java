@@ -1,6 +1,6 @@
 package bee.creative.fem;
 
-import bee.creative.util.Integers;
+import bee.creative.lang.Integers;
 
 /** Diese Klasse implementiert einen unveränderlichen Dezimalbruch. Intern wird der Dezimalbruch als {@code double} dargestellt.
  *

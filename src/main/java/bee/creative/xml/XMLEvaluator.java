@@ -8,7 +8,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import bee.creative.util.Objects;
+import bee.creative.lang.Objects;
 import bee.creative.util.Unique;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #compile(String) Kompilieren} sowie {@link #evaluate(QName) Auswerten} von {@link XPathExpression}.

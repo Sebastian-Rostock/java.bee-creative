@@ -4,8 +4,8 @@ import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import bee.creative.lang.Objects;
 import bee.creative.util.Iterables;
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein abstraktes {@link Set}, dessen Daten in einem Array verwaltet werden.
  *

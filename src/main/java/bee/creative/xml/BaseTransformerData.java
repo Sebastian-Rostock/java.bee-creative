@@ -7,9 +7,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseMapBuilder2;
-import bee.creative.util.Objects;
 import bee.creative.xml.BaseTemplatesData.FactoryData;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link Transformer}.
