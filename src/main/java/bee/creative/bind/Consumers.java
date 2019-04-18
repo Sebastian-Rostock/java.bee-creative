@@ -99,7 +99,6 @@ public class Consumers {
 	}
 
 	/** Diese Klasse implementiert {@link Consumers#toSetter(Consumer)} */
-	@SuppressWarnings ("javadoc")
 	static class ConsumerSetter<GValue> extends BaseSetter<Object, GValue> {
 
 		public final Consumer<? super GValue> consumer;

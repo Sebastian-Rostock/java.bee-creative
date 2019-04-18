@@ -163,7 +163,6 @@ public final class IAMCodec {
 
 		};
 
-		@SuppressWarnings ("javadoc")
 		static final Map<?, IAMFindMode> values = Builders.MapBuilder.<Object, IAMFindMode>forHashMap() //
 			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
 			.put(IAMMapping.MODE_HASHED, HASHED).put("H", HASHED).put("HASHED", HASHED) //
@@ -238,7 +237,6 @@ public final class IAMCodec {
 
 		};
 
-		@SuppressWarnings ("javadoc")
 		static final Map<?, IAMByteOrder> values = Builders.MapBuilder.<Object, IAMByteOrder>forHashMap() //
 			.put(null, AUTO).put("", AUTO).put("A", AUTO).put("AUTO", AUTO) //
 			.put("B", BIGENDIAN).put("BIGENDIAN", BIGENDIAN).put(BIGENDIAN.toOrder(), BIGENDIAN) //
@@ -526,7 +524,6 @@ public final class IAMCodec {
 
 		};
 
-		@SuppressWarnings ("javadoc")
 		static final Map<IAMArrayFormat, String> strings = Builders.MapBuilder.<IAMArrayFormat, String>forHashMap() //
 			.put(ARRAY, "ARRAY") //
 			.put(BINARY, "BINARY") //
@@ -538,7 +535,6 @@ public final class IAMCodec {
 			.put(STRING_FEM_UTF8, "FEM-UTF8").put(STRING_FEM_UTF16, "FEM-UTF16").put(STRING_FEM_INT32, "FEM-INT32") //
 			.get();
 
-		@SuppressWarnings ("javadoc")
 		static final Map<?, IAMArrayFormat> values = Builders.MapBuilder.<Object, IAMArrayFormat>forHashMap() //
 			.putAllInverse(IAMArrayFormat.strings).put(null, ARRAY).put("", ARRAY).put("A", ARRAY).put("B", BINARY) //
 			.get();
@@ -603,13 +599,11 @@ public final class IAMCodec {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int checkRange(final int value, final int length) throws IllegalArgumentException {
 		if ((value >= 0) && (value < length)) return value;
 		throw new IllegalArgumentException("illegal integer: " + value);
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int[] parseBytes(final byte[] source) {
 		final int length = source.length;
 		final int[] result = new int[length];
@@ -619,7 +613,6 @@ public final class IAMCodec {
 		return result;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static byte[] formatBytes(final int[] source) {
 		final int length = source.length;
 		final byte[] result = new byte[length];

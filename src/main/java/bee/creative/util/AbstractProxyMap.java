@@ -14,7 +14,6 @@ import java.util.Set;
  * @param <GData> Typ des Inhalts. */
 public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GValue>> implements Map<GKey, GValue> {
 
-	@SuppressWarnings ("javadoc")
 	static abstract class Data<GItem, GData extends Collection<GItem>> extends AbstractProxyCollection<GItem, GData> {
 
 		@Override
@@ -33,7 +32,6 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	class Keys extends Data<GKey, KeysData> implements Set<GKey> {
 
 		@Override
@@ -48,7 +46,6 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	class KeysData extends Data<GKey, Set<GKey>> implements Set<GKey> {
 
 		final GData data;
@@ -64,7 +61,6 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	class Values extends Data<GValue, ValuesData> {
 
 		@Override
@@ -79,7 +75,6 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	class ValuesData extends Data<GValue, Collection<GValue>> {
 
 		final GData data;
@@ -95,7 +90,6 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	class Entries extends Data<Entry<GKey, GValue>, EntriesData> implements Set<Entry<GKey, GValue>> {
 
 		final class Iter implements Iterator<Entry<GKey, GValue>> {
@@ -160,7 +154,6 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	class EntriesData extends Data<Entry<GKey, GValue>, Set<Entry<GKey, GValue>>> implements Set<Entry<GKey, GValue>> {
 
 		final GData data;

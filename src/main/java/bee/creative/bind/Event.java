@@ -57,7 +57,6 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 		/** Dieses Feld speichert die angemeldeten Empfänger als {@link EventObserver}, {@code GListener} oder {@code Object[]} solcher Empfänger sein. */
 		public volatile Object observer;
 
-		@SuppressWarnings ("javadoc")
 		public EventItem(final Object sender, final ReferenceQueue<? super Object> queue) {
 			super(sender, queue);
 			this.hash = System.identityHashCode(sender);
@@ -137,7 +136,6 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 	}
 
 	/** Diese Klasse implementiert die Verwaltung der Ereignissender und ihrer Ereignisempfänger. */
-	@SuppressWarnings ("javadoc")
 	private static final class EventStore extends HashSet<Object> {
 
 		/** Dieses Feld speichert das serialVersionUID. */
@@ -219,7 +217,6 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	private static final class EventQueue extends PointerQueue<Object> {
 
 		public final EventStore eventStore;
@@ -251,7 +248,6 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	private static final class EventObserver extends WeakReference<Object> {
 
 		public static Object get(final Object object) {
@@ -275,7 +271,6 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	private final class EventObservable implements Observable<GMessage, GObserver> {
 
 		public final Object sender;
@@ -401,7 +396,6 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 		return message;
 	}
 
-	@SuppressWarnings ("javadoc")
 	private void fireImpl(final Object sender, final Object observer, final GMessage message) {
 		@SuppressWarnings ("unchecked")
 		final GObserver observer2 = (GObserver)EventObserver.get(observer);

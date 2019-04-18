@@ -81,7 +81,7 @@ public class Getters {
 
 		public ConstructorGetter(final Constructor<?> constructor, final boolean forceAccessible) {
 			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 1)) throw new IllegalArgumentException();
-			this.constructor =  forceAccessible ? Natives.forceAccessible(constructor) : Objects.notNull(constructor);
+			this.constructor = forceAccessible ? Natives.forceAccessible(constructor) : Objects.notNull(constructor);
 		}
 
 		@Override
@@ -319,7 +319,6 @@ public class Getters {
 	}
 
 	/** Diese Klasse implementiert {@link Getters#toFilter(Getter)}. */
-	@SuppressWarnings ("javadoc")
 	static class GetterFilter<GItem> implements Filter<GItem> {
 
 		public final Getter<? super GItem, Boolean> getter;
@@ -342,7 +341,6 @@ public class Getters {
 	}
 
 	/** Diese Klasse implementiert {@link Getters#toProducer(Object, Getter)}. */
-	@SuppressWarnings ("javadoc")
 	static class GetterProducer<GItem, GValue> implements Producer<GValue> {
 
 		public final GItem item;
@@ -367,7 +365,6 @@ public class Getters {
 	}
 
 	/** Diese Klasse implementiert {@link Getters#toComparable(Getter)}. */
-	@SuppressWarnings ("javadoc")
 	static class GetterComparable<GItem> implements Comparable<GItem> {
 
 		public final Getter<? super GItem, ? extends Number> getter;

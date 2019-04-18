@@ -17,7 +17,6 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMContext {
 
-	@SuppressWarnings ("javadoc")
 	final class DataFromGetter<GData> implements Getter<FEMValue, GData> {
 
 		public final FEMType<? extends GData> type;
@@ -38,7 +37,6 @@ public class FEMContext {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	final class ArrayFromGetter extends BaseGetter<Object, FEMArray> {
 
 		@Override
@@ -48,7 +46,6 @@ public class FEMContext {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	final class ValueFromGetter extends BaseGetter<Object, FEMValue> {
 
 		@Override
@@ -58,7 +55,6 @@ public class FEMContext {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	final class ObjectFromGetter extends BaseGetter<FEMValue, Object> {
 
 		@Override
@@ -147,7 +143,6 @@ public class FEMContext {
 		return this.arrayFromImpl(data);
 	}
 
-	@SuppressWarnings ("javadoc")
 	final FEMArray arrayFromImpl(final Object data) throws NullPointerException, IllegalArgumentException {
 		final int length = Array.getLength(data);
 		if (length == 0) return FEMArray.EMPTY;
@@ -158,7 +153,6 @@ public class FEMContext {
 		return FEMArray.from(values);
 	}
 
-	@SuppressWarnings ("javadoc")
 	final FEMArray arrayFromImpl(final Object[] data) throws NullPointerException, IllegalArgumentException {
 		final int length = data.length;
 		if (length == 0) return FEMArray.EMPTY;
@@ -169,12 +163,10 @@ public class FEMContext {
 		return FEMArray.from(values);
 	}
 
-	@SuppressWarnings ("javadoc")
 	final FEMArray arrayFromImpl(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
 		return this.arrayFromImpl(Iterables.toList(data));
 	}
 
-	@SuppressWarnings ("javadoc")
 	final FEMArray arrayFromImpl(final Collection<?> data) throws NullPointerException, IllegalArgumentException {
 		return this.arrayFromImpl(data.toArray());
 	}
@@ -247,7 +239,6 @@ public class FEMContext {
 		return value.data();
 	}
 
-	@SuppressWarnings ("javadoc")
 	final Object[] objectFromImpl(final FEMArray array) {
 		final int length = array.length();
 		final Object[] result = new Object[length];

@@ -39,7 +39,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ItemMap implements Map<FEMValue, FEMValue> {
 
 		class Keys extends AbstractSet<FEMValue> {
@@ -229,7 +228,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ItemList extends AbstractList<FEMValue> implements RandomAccess {
 
 		public final FEMArray items;
@@ -275,7 +273,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ItemFinder implements Collector {
 
 		public final FEMValue that;
@@ -295,7 +292,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
@@ -308,7 +304,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ValueCollector implements Collector {
 
 		public final FEMValue[] array;
@@ -774,7 +769,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return FEMArray.concatAll(values, 0, length - 1);
 	}
 
-	@SuppressWarnings ("javadoc")
 	static FEMArray concatAll(final FEMArray[] values, final int min, final int max) throws NullPointerException {
 		if (min == max) return values[min];
 		final int mid = (min + max) >> 1;
@@ -1002,12 +996,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this.customFind(that, offset);
 	}
 
-	@SuppressWarnings ("javadoc")
 	int lastIndexOf(final Object key) {
 		return key instanceof FEMValue ? this.reverse().find((FEMValue)key, 0) : -1;
 	}
 
-	@SuppressWarnings ("javadoc")
 	int firstIndexOf(final Object key) {
 		return key instanceof FEMValue ? this.find((FEMValue)key, 0) : -1;
 	}

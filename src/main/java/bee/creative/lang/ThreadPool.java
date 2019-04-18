@@ -5,8 +5,9 @@ import java.util.Arrays;
 import bee.creative.util.HashMap3;
 import bee.creative.util.HashSet3;
 
-/** Diese Klasse implementiert einen {@link Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable) Überwachen},
- * {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Auswertung beliebiger {@link Runnable Berechnungen} bereitstellt.<br>
+/** Diese Klasse implementiert einen {@link java.lang.Thread Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable)
+ * Überwachen}, {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Auswertung beliebiger {@link Runnable Berechnungen}
+ * bereitstellt.<br>
  * {@link #getActiveName() Name} und {@link #getActivePriority() Priorität} der zur Auswerung eingesetzten {@link Thread Threads} können jederzeit angepasst
  * werden und werden beim Starten neuer Berechnungen angewendet. Nach der Auswertung ihrer Berechnung warten diese Threads auf ihre Wiederverwendung. Dazu kann
  * eingestellt werden, wieviele auf ihre Wiederverwendung wartende Threads {@link #getWaitingReserve() mindestens vorgehalten werden} und wie lange die nicht
@@ -19,8 +20,7 @@ import bee.creative.util.HashSet3;
 public class ThreadPool {
 
 	/** Diese Klasse implementiert einen wiederverwendbaren Thread zur Ausführung eines {@link Runnable}. */
-	@SuppressWarnings ("javadoc")
-	private static final class ThreadItem extends Thread {
+	private static final class ThreadItem extends java.lang.Thread {
 
 		public final ThreadNode node;
 
@@ -41,7 +41,6 @@ public class ThreadPool {
 	}
 
 	/** Diese Klasse implementiert einen Knoten in der doppelt verketteten Liste zur Verwaltung der wartenden {@link ThreadItem}. */
-	@SuppressWarnings ("javadoc")
 	private static final class ThreadNode {
 
 		public final ThreadPool pool;
@@ -72,20 +71,22 @@ public class ThreadPool {
 
 	}
 
-	/** Dieses Feld speichert den initialwert für {@link Thread#getThreadGroup()} neu erzeugter {@link ThreadItem}. */
+	/** Dieses Feld speichert den initialwert für {@link java.lang.Thread#getThreadGroup()} neu erzeugter {@link ThreadItem}. */
 	private final ThreadGroup group;
 
-	/** Dieses Feld speichert den initialwert für {@link Thread#isDaemon()} neu erzeugter {@link ThreadItem}. */
+	/** Dieses Feld speichert den initialwert für {@link java.lang.Thread#isDaemon()} neu erzeugter {@link ThreadItem}. */
 	private final boolean daemon;
 
 	/** Dieses Feld bildet von den aktuell ausgeführten {@link Runnable Berehnungen} auf die dafür eingesetzten {@link ThreadItem Threads} ab. */
 	private final HashMap3<Runnable, ThreadItem> activeMap = new HashMap3<>(0);
 
-	/** Dieses Feld speichert den {@link Thread#setName(String) Namen} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem Threads}. */
-	private String activeName = ThreadItem.class.getSimpleName();
+	/** Dieses Feld speichert den {@link java.lang.Thread#setName(String) Namen} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem
+	 * Threads}. */
+	private String activeName = "ThreadItem";
 
-	/** Dieses Feld speichert die {@link Thread#setPriority(int) Priorität} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem Threads}. */
-	private int activePriority = Thread.NORM_PRIORITY;
+	/** Dieses Feld speichert die {@link java.lang.Thread#setPriority(int) Priorität} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem
+	 * Threads}. */
+	private int activePriority = java.lang.Thread.NORM_PRIORITY;
 
 	/** Dieses Feld speichert die auf ihre Wiederverwendung wartenden {@link ThreadItem Threads}. */
 	private final ThreadNode waitingList = new ThreadNode(this);
@@ -112,8 +113,8 @@ public class ThreadPool {
 	/** Dieser Konstruktor initialisiert das den {@link ThreadPool} mit den gegebenen Merkmalen zur Erzeugung von Threads, ohne {@link #setWaitingReserve(int)
 	 * Reserve} und mit einer {@link #setWaitingTimeout(long) Wiederverwendungszeit} von einer Minute.
 	 *
-	 * @see Thread#setDaemon(boolean)
-	 * @see Thread#getThreadGroup()
+	 * @see java.lang.Thread#setDaemon(boolean)
+	 * @see java.lang.Thread#getThreadGroup()
 	 * @param group Thread-Gruppe zur Erzeugung der Threads oder {@code null}.
 	 * @param daemon {@code true}, wenn zur Auswertung der Berechnung Daemon-Threads eingesetzt werden sollen. */
 	public ThreadPool(ThreadGroup group, final boolean daemon) {
@@ -123,7 +124,7 @@ public class ThreadPool {
 				group = security.getThreadGroup();
 			}
 			if (group == null) {
-				group = Thread.currentThread().getThreadGroup();
+				group = java.lang.Thread.currentThread().getThreadGroup();
 			}
 		}
 		this.group = group;
@@ -155,7 +156,7 @@ public class ThreadPool {
 				if (okay) {
 					item.node.insert(this.waitingList);
 					this.waitingCount++;
-					Thread.interrupted();
+					java.lang.Thread.interrupted();
 					this.checkActive();
 				}
 			}
@@ -206,7 +207,7 @@ public class ThreadPool {
 	 *
 	 * @param tasks Berechnungen.
 	 * @return Threads.
-	 * @throws NullPointerException Wenn {@link Thread#interrupt()} diese auslöst. */
+	 * @throws NullPointerException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
 	private final HashSet3<ThreadItem> getThreads(final Iterable<? extends Runnable> tasks) throws NullPointerException {
 		final HashSet3<ThreadItem> items = new HashSet3<>(10);
 		for (final Runnable task: tasks) {
@@ -426,11 +427,11 @@ public class ThreadPool {
 		item.interrupt();
 	}
 
-	/** Diese Methode {@link Thread#interrupt() unterbricht} die gegebene Berechnung, sofern diese aktuell {@link #isAlive(Runnable) verarbeitet} wird.
+	/** Diese Methode {@link java.lang.Thread#interrupt() unterbricht} die gegebene Berechnung, sofern diese aktuell {@link #isAlive(Runnable) verarbeitet} wird.
 	 *
 	 * @param task Berechnung.
 	 * @throws NullPointerException Wenn {@code task} {@code null} ist.
-	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
+	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
 	public void interrupt(final Runnable task) throws NullPointerException, SecurityException {
 		synchronized (this.activeMap) {
 			this.interruptImpl(this.getThread(task));
@@ -448,16 +449,17 @@ public class ThreadPool {
 	 *
 	 * @param tasks Berechnungen.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
-	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
+	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
 	public void interruptAll(final Runnable... tasks) throws NullPointerException, SecurityException { // ok
 		this.interruptAll(Arrays.asList(tasks));
 	}
 
-	/** Diese Methode {@link Thread#interrupt() unterbricht} die gegebenen Berechnungen, sofern diese aktuell {@link #isAlive(Runnable) verarbeitet} werden.
+	/** Diese Methode {@link java.lang.Thread#interrupt() unterbricht} die gegebenen Berechnungen, sofern diese aktuell {@link #isAlive(Runnable) verarbeitet}
+	 * werden.
 	 *
 	 * @param tasks Berechnungen.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
-	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
+	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
 	public void interruptAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, SecurityException {
 		synchronized (this.activeMap) {
 			this.interruptAllImpl(this.getThreads(tasks));
@@ -467,7 +469,7 @@ public class ThreadPool {
 	/** Diese Methode ist eine Abkürzung für {@link #interruptAll(Iterable) this.interruptAll(this.getActiveTasks())}.
 	 *
 	 * @see #getActiveTasks()
-	 * @throws SecurityException Wenn {@link Thread#interrupt()} diese auslöst. */
+	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
 	public void interruptAllActive() throws SecurityException {
 		synchronized (this.activeMap) {
 			this.interruptAllImpl(new ArrayList<>(this.activeMap.values()));
@@ -488,10 +490,18 @@ public class ThreadPool {
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn zur Auswertung der Berechnung Daemon-Threads eingesetzt werden. Wenn sie {@code false} liefert,
 	 * werden hierfür User-Threads eingesetzt.
 	 *
-	 * @see Thread#setDaemon(boolean)
+	 * @see java.lang.Thread#setDaemon(boolean)
 	 * @return {@code true} für Daemon-Threads; {@code false} für User-Threads. */
 	public boolean isDaemon() {
 		return this.daemon;
+	}
+
+	/** Diese Methode gibt die {@link ThreadGroup} zurück, die zur Erzeugung neuer Threads verwendet wird. Diese wurd im
+	 * {@link ThreadPool#ThreadPool(ThreadGroup, boolean) Konstruktor} initialisiert.
+	 *
+	 * @return {@link ThreadGroup} zur {@link java.lang.Thread#Thread(ThreadGroup, String) Erzeugung} neuer Threads. */
+	public ThreadGroup geThreadGroup() {
+		return this.group;
 	}
 
 	/** Diese Methode gibt die Liste der {@link #isAlive(Runnable) aktuell ausgeführten} Berehnungen zurück.
@@ -512,7 +522,7 @@ public class ThreadPool {
 		}
 	}
 
-	/** Diese Methode gibt den {@link Thread#getName() Namen} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen zurück.
+	/** Diese Methode gibt den {@link java.lang.Thread#getName() Namen} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen zurück.
 	 *
 	 * @return Name der nächsten Threads. */
 	public String getActiveName() {
@@ -521,7 +531,8 @@ public class ThreadPool {
 		}
 	}
 
-	/** Diese Methode gibt die {@link Thread#getPriority() Priorität} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen zurück.
+	/** Diese Methode gibt die {@link java.lang.Thread#getPriority() Priorität} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen
+	 * zurück.
 	 *
 	 * @return Priorität der nächsten Threads. */
 	public int getActivePriority() {
@@ -557,7 +568,7 @@ public class ThreadPool {
 		}
 	}
 
-	/** Diese Methode setzt den {@link Thread#getName() Namen} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen.
+	/** Diese Methode setzt den {@link java.lang.Thread#getName() Namen} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen.
 	 *
 	 * @param value Name.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -567,12 +578,12 @@ public class ThreadPool {
 		}
 	}
 
-	/** Diese Methode setzt die {@link Thread#getPriority() Priorität} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen.
+	/** Diese Methode setzt die {@link java.lang.Thread#getPriority() Priorität} für die Threads der nächsten {@link #start(Runnable) gestarteten} Berechnungen.
 	 *
 	 * @param value Priorität.
-	 * @throws IllegalArgumentException Wenn {@link Thread#setPriority(int)} diese auslösen würde. */
+	 * @throws IllegalArgumentException Wenn {@link java.lang.Thread#setPriority(int)} diese auslösen würde. */
 	public void setActivePriority(final int value) throws IllegalArgumentException {
-		if ((value < Thread.MIN_PRIORITY) || (value > Thread.MAX_PRIORITY)) throw new IllegalArgumentException();
+		if ((value < java.lang.Thread.MIN_PRIORITY) || (value > java.lang.Thread.MAX_PRIORITY)) throw new IllegalArgumentException();
 		synchronized (this.activeMap) {
 			this.activePriority = value;
 		}
@@ -581,8 +592,8 @@ public class ThreadPool {
 	/** Diese Methode setzt die maximale Anzahl der auf ihre Wiederverwendung wartenden und als Reserve vorgehalten Threads.
 	 *
 	 * @param value Reserve an wartenden Threads.
-	 * @throws IllegalAccessException Wenn {@code value} negativ ist. */
-	public void setWaitingReserve(final int value) throws IllegalAccessException {
+	 * @throws IllegalArgumentException Wenn {@code value} negativ ist. */
+	public void setWaitingReserve(final int value) throws IllegalArgumentException {
 		if (value < 0) throw new IllegalArgumentException();
 		synchronized (this.waitingList) {
 			this.waitingReserve = value;

@@ -44,7 +44,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ItemFinder implements Collector {
 
 		public final int that;
@@ -64,7 +63,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ValueFinder implements Collector {
 
 		public final int[] that;
@@ -105,7 +103,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
@@ -118,7 +115,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class RangeCollector implements Collector {
 
 		public int range;
@@ -131,7 +127,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class INT8Encoder implements Collector {
 
 		public final byte[] array;
@@ -152,7 +147,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class INT16Encoder implements Collector {
 
 		public final char[] array;
@@ -173,7 +167,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class INT16Encoder2 implements Collector {
 
 		public final short[] array;
@@ -194,7 +187,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class UTF32Encoder implements Collector {
 
 		public final int[] array;
@@ -215,7 +207,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class UTF8Counter implements Collector {
 
 		public int count;
@@ -237,7 +228,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class UTF8Encoder implements Collector {
 
 		public final byte[] array;
@@ -274,7 +264,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class UTF16Counter implements Collector {
 
 		public int count;
@@ -292,7 +281,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class UTF16Encoder implements Collector {
 
 		public final char[] array;
@@ -321,7 +309,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class UTF16Encoder2 implements Collector {
 
 		public final short[] array;
@@ -1225,7 +1212,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return FEMString.concatAll(values, 0, length - 1);
 	}
 
-	@SuppressWarnings ("javadoc")
 	static FEMString concatAll(final FEMString[] values, final int min, final int max) throws NullPointerException {
 		if (min == max) return values[min];
 		final int mid = (min + max) >> 1;

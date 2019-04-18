@@ -181,7 +181,6 @@ public class Translators {
 	}
 
 	/** Diese Klasse implementiert {@link Translators#toSourceFilter(Translator)}. */
-	@SuppressWarnings ("javadoc")
 	static class SourceFilter implements Filter<Object> {
 
 		public final Translator<?, ?> translator;
@@ -203,7 +202,6 @@ public class Translators {
 	}
 
 	/** Diese Klasse implementiert {@link Translators#toSourceGetter(Translator)}. */
-	@SuppressWarnings ("javadoc")
 	static class SourceGetter<GSource, GTarget> implements Getter<GTarget, GSource> {
 
 		public final Translator<? extends GSource, ? super GTarget> translator;
@@ -225,7 +223,6 @@ public class Translators {
 	}
 
 	/** Diese Klasse implementiert {@link Translators#toTargetFilter(Translator)}. */
-	@SuppressWarnings ("javadoc")
 	static class TargetFilter implements Filter<Object> {
 
 		public final Translator<?, ?> translator;
@@ -247,7 +244,6 @@ public class Translators {
 	}
 
 	/** Diese Klasse implementiert {@link Translators#toTargetGetter(Translator)}. */
-	@SuppressWarnings ("javadoc")
 	static class TargetGetter<GSource, GTarget> implements Getter<GSource, GTarget> {
 
 		public final Translator<? super GSource, ? extends GTarget> translator;

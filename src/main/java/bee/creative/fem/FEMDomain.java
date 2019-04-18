@@ -17,8 +17,8 @@ import bee.creative.fem.FEMFunction.TraceFunction;
 import bee.creative.fem.FEMScript.Token;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
-import bee.creative.lang.Strings;
 import bee.creative.lang.Objects.BaseObject;
+import bee.creative.lang.Strings;
 import bee.creative.util.Filter;
 
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete

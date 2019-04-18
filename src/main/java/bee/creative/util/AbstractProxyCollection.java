@@ -10,7 +10,6 @@ import java.util.Iterator;
  * @param <GData> Typ des Inhalts. */
 public abstract class AbstractProxyCollection<GItem, GData extends Collection<GItem>> implements Collection<GItem> {
 
-	@SuppressWarnings ("javadoc")
 	final class Iter implements Iterator<GItem> {
 
 		final GData data;

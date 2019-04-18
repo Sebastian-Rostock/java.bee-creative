@@ -26,7 +26,6 @@ public class Iterables {
 	}
 
 	/** Diese Klasse implementiert {@link Iterables#emptyIterable()}. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyIterable extends BaseIterable<Object> {
 
 		static final Iterable<?> INSTANCE = new EmptyIterable();
@@ -230,7 +229,6 @@ public class Iterables {
 	}
 
 	/** Diese Klasse implementiert {@link Iterables#toIteratorGetter()}. */
-	@SuppressWarnings ("javadoc")
 	static class IteratorGetter extends BaseGetter<Iterable<?>, Iterator<?>> {
 
 		public static final Getter<?, ?> INSTANCE = new IteratorGetter();

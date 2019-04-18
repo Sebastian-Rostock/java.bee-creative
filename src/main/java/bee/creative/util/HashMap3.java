@@ -11,7 +11,6 @@ import java.util.Map;
  * @param <GValue> Typ der Werte. */
 public class HashMap3<GKey, GValue> extends HashMap<GKey, GValue> {
 
-	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = 5981031863657384681L;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */

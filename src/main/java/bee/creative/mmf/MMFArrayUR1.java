@@ -2,7 +2,6 @@ package bee.creative.mmf;
 
 import java.nio.ByteBuffer;
 
-@SuppressWarnings ("javadoc")
 class MMFArrayUR1 extends MMFArraySR1 {
 
 	protected MMFArrayUR1(final int length, final ByteBuffer buffer, final int offset) {

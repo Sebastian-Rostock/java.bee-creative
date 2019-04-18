@@ -218,7 +218,6 @@ public class Setters {
 	}
 
 	/** Diese Klasse implementiert {@link Setters#toConsumer(Object, Setter)} */
-	@SuppressWarnings ("javadoc")
 	static class SetterConsumer<GValue, GItem> extends BaseConsumer<GValue> {
 
 		public final GItem item;

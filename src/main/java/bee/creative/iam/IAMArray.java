@@ -12,7 +12,6 @@ import bee.creative.util.Iterators.BaseIterator;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray> {
 
-	@SuppressWarnings ("javadoc")
 	static class IntArray extends IAMArray {
 
 		final int[] array;
@@ -73,7 +72,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ByteArray extends IAMArray {
 
 		final byte[] array;
@@ -134,7 +132,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class CharArray extends IAMArray {
 
 		final char[] array;
@@ -195,7 +192,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ShortArray extends IAMArray {
 
 		final short[] array;
@@ -256,7 +252,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ValueArray extends IAMArray {
 
 		final int item;
@@ -278,7 +273,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class EmptyArray extends IAMArray {
 
 		EmptyArray() {
@@ -287,7 +281,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ConcatArray extends IAMArray {
 
 		public final IAMArray array1;
@@ -321,7 +314,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class SectionArray extends IAMArray {
 
 		final IAMArray array;
@@ -502,7 +494,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return IAMArray.from(result);
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final IntArray array1, final IntArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -513,7 +504,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final IntArray array1, final ByteArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -524,7 +514,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final IntArray array1, final CharArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -535,7 +524,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final IntArray array1, final ShortArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -546,7 +534,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final IntArray array1, final SectionArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -557,7 +544,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final IntArray array1, final IAMArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -567,7 +553,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final ByteArray array1, final ByteArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -578,7 +563,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final ByteArray array1, final CharArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -589,7 +573,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final ByteArray array1, final ShortArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -600,7 +583,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final ByteArray array1, final SectionArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -611,7 +593,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final ByteArray array1, final IAMArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -621,7 +602,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final CharArray array1, final CharArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -632,7 +612,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final CharArray array1, final ShortArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -643,7 +622,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final CharArray array1, final SectionArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -654,7 +632,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final CharArray array1, final IAMArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -664,7 +641,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final ShortArray array1, final ShortArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -675,7 +651,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final ShortArray array1, final SectionArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -686,7 +661,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final ShortArray array1, final IAMArray array2) {
 		int length = array1.length;
 		if (length != array2.length) return false;
@@ -696,7 +670,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final SectionArray array1, final SectionArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -707,7 +680,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final SectionArray array1, final IAMArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -717,7 +689,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final IAMArray array1, final IAMArray array2) {
 		int l = array1.length;
 		if (l != array2.length) return false;
@@ -726,7 +697,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return true;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final IntArray array1, final IntArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final int[] a1 = array1.array;
@@ -741,7 +711,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final IntArray array1, final ByteArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final int[] a1 = array1.array;
@@ -756,7 +725,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final IntArray array1, final CharArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final int[] a1 = array1.array;
@@ -771,7 +739,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final IntArray array1, final ShortArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final int[] a1 = array1.array;
@@ -786,7 +753,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final IntArray array1, final SectionArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final int[] a1 = array1.array;
@@ -801,7 +767,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final IntArray array1, final IAMArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final int[] a1 = array1.array;
@@ -815,7 +780,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final ByteArray array1, final ByteArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final byte[] a1 = array1.array;
@@ -830,7 +794,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final ByteArray array1, final CharArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final byte[] a1 = array1.array;
@@ -845,7 +808,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final ByteArray array1, final ShortArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final byte[] a1 = array1.array;
@@ -860,7 +822,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final ByteArray array1, final SectionArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final byte[] a1 = array1.array;
@@ -875,7 +836,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final ByteArray array1, final IAMArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final byte[] a1 = array1.array;
@@ -889,7 +849,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final CharArray array1, final CharArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final char[] a1 = array1.array;
@@ -904,7 +863,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final CharArray array1, final ShortArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final char[] a1 = array1.array;
@@ -919,7 +877,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final CharArray array1, final SectionArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final char[] a1 = array1.array;
@@ -934,7 +891,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final CharArray array1, final IAMArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final char[] a1 = array1.array;
@@ -948,7 +904,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final ShortArray array1, final ShortArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final short[] a1 = array1.array;
@@ -963,7 +918,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final ShortArray array1, final SectionArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final short[] a1 = array1.array;
@@ -978,7 +932,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final ShortArray array1, final IAMArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final short[] a1 = array1.array;
@@ -992,7 +945,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final SectionArray array1, final SectionArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final IAMArray a1 = array1.array;
@@ -1007,7 +959,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final SectionArray array1, final IAMArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		final IAMArray a1 = array1.array;
@@ -1021,7 +972,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return 0;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int compare(final IAMArray array1, final IAMArray array2) {
 		final int l1 = array1.length, l2 = array2.length;
 		for (int i = 0, l = l1 < l2 ? l1 : l2; l != 0; ++i, --l) {

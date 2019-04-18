@@ -3,7 +3,6 @@ package bee.creative.mmf;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-@SuppressWarnings ("javadoc")
 class MMFArraySN1 extends MMFArray {
 
 	/** Dieses Feld speichert den Speicherbereich. */

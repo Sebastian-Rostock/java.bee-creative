@@ -254,13 +254,11 @@ public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 		return FEMScript.from(mode, source, tokens.toArray(new Token[tokens.size()]));
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkSource(final String source, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
 		final int index = tokens.length - 1, length = source.length();
 		if ((index >= 0) && (tokens[index].end() > length)) throw new IllegalArgumentException("tokens exceeding");
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkToken(final String source, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
 		int offset = 0;
 		for (final Token token: tokens) {
@@ -280,7 +278,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 	/** Dieses Feld speichert die Bereiche. */
 	final Token[] tokens;
 
-	@SuppressWarnings ("javadoc")
 	FEMScript(final int mode, final String source, final Token[] tokens) {
 		this.mode = mode;
 		this.source = source;

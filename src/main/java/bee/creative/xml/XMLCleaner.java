@@ -64,25 +64,18 @@ public class XMLCleaner {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static final Pattern listFieldPattern = Pattern.compile("^(\\s+)protected (List<\\S+)( [^;]+);");
 
-	@SuppressWarnings ("javadoc")
 	static final String listFieldReplace = "$1 public Array$2$3 = new Array$2();";
 
-	@SuppressWarnings ("javadoc")
 	static final Pattern listMethodPattern = Pattern.compile("^(\\s+)public List<");
 
-	@SuppressWarnings ("javadoc")
 	static final Pattern itemFieldPattern = Pattern.compile("^(\\s+)(?:protected|private) (.*)");
 
-	@SuppressWarnings ("javadoc")
 	static final String itemFieldReplace = "$1public $2";
 
-	@SuppressWarnings ("javadoc")
 	static final Pattern itemMethodPattern = Pattern.compile("^(\\s+)public \\S+ (value\\(\\)|([gs]et|is)\\S+)");
 
-	@SuppressWarnings ("javadoc")
 	static final Pattern commentPattern = Pattern.compile("^\\s*[*/]");
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFileData()}. */
@@ -111,7 +104,6 @@ public class XMLCleaner {
 		return this;
 	}
 
-	@SuppressWarnings ("javadoc")
 	final void cleanup(final File file, final Charset charset) throws IllegalStateException {
 		try {
 			if (!file.isFile() || !file.getName().endsWith(".java")) return;

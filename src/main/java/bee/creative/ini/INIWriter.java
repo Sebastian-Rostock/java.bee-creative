@@ -49,7 +49,6 @@ public class INIWriter implements Closeable {
 		return this;
 	}
 
-	@SuppressWarnings ("javadoc")
 	final void writeImpl(final INIToken token) throws IOException, NullPointerException, IllegalArgumentException {
 		switch (token.type()) {
 			case INIToken.SECTION:
@@ -109,7 +108,6 @@ public class INIWriter implements Closeable {
 		return this;
 	}
 
-	@SuppressWarnings ("javadoc")
 	final void writeSectionImpl(final String section) throws IOException {
 		this.writer.write('[');
 		this.writeStringImpl(section);
@@ -129,7 +127,6 @@ public class INIWriter implements Closeable {
 		return this;
 	}
 
-	@SuppressWarnings ("javadoc")
 	final void writePropertyImpl(final String key, final String value) throws IOException {
 		this.writeStringImpl(key);
 		this.writer.write('=');
@@ -147,7 +144,6 @@ public class INIWriter implements Closeable {
 		}
 	}
 
-	@SuppressWarnings ("javadoc")
 	final void writeCommentImpl(final String comment) throws IOException {
 		this.writer.write(';');
 		this.writeStringImpl(comment);

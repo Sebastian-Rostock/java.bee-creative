@@ -91,7 +91,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		this.putAll(source);
 	}
 
-	@SuppressWarnings ({"javadoc", "unchecked"})
+	@SuppressWarnings ("unchecked")
 	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		final int count = stream.readInt();
 		this.allocateImpl(count);
@@ -102,7 +102,6 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		}
 	}
 
-	@SuppressWarnings ("javadoc")
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
 		stream.writeInt(this.count);
 		for (final Entry<GKey, GValue> entry: this.newEntriesImpl()) {

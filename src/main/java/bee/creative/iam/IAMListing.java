@@ -19,7 +19,6 @@ import bee.creative.mmf.MMFArray;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMListing implements Iterable<IAMArray> {
 
-	@SuppressWarnings ("javadoc")
 	static final class EmptyListing extends IAMListing {
 
 		@Override
@@ -39,7 +38,6 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static final class CompactListing extends IAMListing {
 
 		final int[] itemData;
@@ -117,7 +115,6 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static final class Items extends AbstractList<IAMArray> {
 
 		final IAMListing owner;

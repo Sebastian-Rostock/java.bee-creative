@@ -12,7 +12,6 @@ import bee.creative.ini.INIToken;
 import bee.creative.ini.INIWriter;
 
 /** @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
 final class IAMCodec_INI {
 
 	INIReader reader;

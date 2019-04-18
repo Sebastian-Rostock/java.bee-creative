@@ -18,7 +18,6 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMException extends RuntimeException implements Iterable<String> {
 
-	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -2654985371977072939L;
 
 	/** Diese Methode gibt die gegebene Ausnahme als {@link FEMException} zurück. Wenn {@code cause} eine {@link FEMException} ist, wird diese unverändert

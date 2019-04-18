@@ -14,11 +14,11 @@ import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
 import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
-import bee.creative.lang.Integers;
-import bee.creative.lang.Objects;
 import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
 import bee.creative.iam.IAMMapping;
+import bee.creative.lang.Integers;
+import bee.creative.lang.Objects;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparables.Items;
 
@@ -94,7 +94,6 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 	 * @param <GItem> Typ der Datensätze. */
 	protected static abstract class BasePool<GItem> implements Items<GItem>, Emuable {
 
-		@SuppressWarnings ("javadoc")
 		final class ItemList extends AbstractList<GItem> {
 
 			@Override
@@ -930,7 +929,6 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 		return this.getIntegerArrayImpl(source.value());
 	}
 
-	@SuppressWarnings ("javadoc")
 	IAMArray getIntegerArrayImpl(final long value) {
 		return IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
 	}
@@ -1023,7 +1021,6 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 		return this.getCompositeArrayImpl(source.function(), source.params());
 	}
 
-	@SuppressWarnings ("javadoc")
 	IAMArray getCompositeArrayImpl(final FEMFunction function, final FEMFunction... params) throws NullPointerException, IllegalArgumentException {
 		final int length = params.length;
 		final int[] result = new int[length + 1];
@@ -1107,7 +1104,6 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 		return new FEMInteger(this.getIntegerValueImpl(source));
 	}
 
-	@SuppressWarnings ("javadoc")
 	long getIntegerValueImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() != 2) throw new IllegalArgumentException();
 		return Integers.toLong(source.get(1), source.get(0));
@@ -1288,7 +1284,6 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 		return this.compositeFunctionPool.toList();
 	}
 
-	@SuppressWarnings ("javadoc")
 	FEMFunction[] getCompositeParamsImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		final int length = source.length() - 1;
 		if (length < 0) throw new IllegalArgumentException();
@@ -1299,7 +1294,6 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 		return result;
 	}
 
-	@SuppressWarnings ("javadoc")
 	FEMFunction getCompositeFunctionImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
 		if (source.length() == 0) throw new IllegalArgumentException();
 		return this.getFunction(source.get(0));

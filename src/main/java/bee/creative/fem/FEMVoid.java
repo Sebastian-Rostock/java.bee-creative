@@ -25,7 +25,6 @@ public final class FEMVoid extends FEMValue {
 		throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	FEMVoid() {
 	}
 

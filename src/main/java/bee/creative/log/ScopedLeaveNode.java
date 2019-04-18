@@ -1,6 +1,5 @@
 package bee.creative.log;
 
-@SuppressWarnings ("javadoc")
 class ScopedLeaveNode extends ScopedEntryNode {
 
 	ScopedLeaveNode(final Object text, final Object[] args) {

@@ -231,7 +231,6 @@ public class Comparables {
 	}
 
 	/** Diese Klasse implementiert {@link Comparables#toLowerFilter(Comparable)} */
-	@SuppressWarnings ("javadoc")
 	static class LowerFilter<GItem> implements Filter<GItem> {
 
 		public final Comparable<? super GItem> comparable;
@@ -253,7 +252,6 @@ public class Comparables {
 	}
 
 	/** Diese Klasse implementiert {@link Comparables#toHigherFilter(Comparable)} */
-	@SuppressWarnings ("javadoc")
 	static class HigherFilter<GItem> implements Filter<GItem> {
 
 		public final Comparable<? super GItem> comparable;
@@ -275,7 +273,6 @@ public class Comparables {
 	}
 
 	/** Diese Klasse implementiert {@link Comparables#toEqualFilter(Comparable)} */
-	@SuppressWarnings ("javadoc")
 	static class EqualFilter<GItem> implements Filter<GItem> {
 
 		public final Comparable<? super GItem> comparable;
@@ -296,19 +293,16 @@ public class Comparables {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void check(final int fromIndex, final int toIndex) throws IllegalArgumentException {
 		if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void check(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException, IndexOutOfBoundsException {
 		Comparables.check(fromIndex, toIndex);
 		if (fromIndex < 0) throw new IndexOutOfBoundsException("fromIndex < 0");
 		if (toIndex > length) throw new IndexOutOfBoundsException("toIndex > length");
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void check(final Items<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
 		Objects.notNull(items);
@@ -316,14 +310,12 @@ public class Comparables {
 		Comparables.check(fromIndex, toIndex);
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void check(final List<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
 		Objects.notNull(comparable);
 		Comparables.check(items.size(), fromIndex, toIndex);
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void check(final Object[] items, final Comparable<?> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
 		Objects.notNull(comparable);

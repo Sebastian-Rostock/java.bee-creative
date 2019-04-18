@@ -50,7 +50,7 @@ public class ObservableField<GItem, GValue> extends ObservableValue<GValue, Obse
 			this.newValue = newValue;
 		}
 
-		@SuppressWarnings ({"unchecked", "javadoc", "rawtypes"})
+		@SuppressWarnings ({"unchecked", "rawtypes"})
 		private void setValue(final Object value) {
 			((ObservableField)this.sender).set(this.item, value);
 		}

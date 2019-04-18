@@ -48,8 +48,8 @@ public class ScopedLoggerStrings implements Producer<String[]> {
 	 * <li>Wenn das Objekt {@code text} ein {@link ScopedLogger} ist, werden dessen Protokollzeilen rekursiv erfasst. Die Rekursion ist nicht gegen
 	 * Endlosschleifen abgesichert.</li>
 	 * <li>Wenn die Objektliste {@code args} {@code null} ist, wird die Protokollzeile über {@link #push(Object) this.push(toString(text))} erfasst.<br>
-	 * Solche Protokollzeilen werden durch  {@link ScopedLogger#enterScope(Object)}, {@link ScopedLogger#pushEntry(Object)},
-	 *  und {@link ScopedLogger#leaveScope(Object)} bereitgestellt.</li>
+	 * Solche Protokollzeilen werden durch {@link ScopedLogger#enterScope(Object)}, {@link ScopedLogger#pushEntry(Object)}, und
+	 * {@link ScopedLogger#leaveScope(Object)} bereitgestellt.</li>
 	 * <li>Wenn das Objekt {@code text} {@code null} ist, wird die über {@link Strings#join(Object[]) Strings.join(this.toObjects(args))} erzeugte Zeichenkette
 	 * über {@link #push(String)} erfast.<br>
 	 * Solche Protokollzeilen können durch {@link ScopedLogger#enterScope(String, Object...)}, {@link ScopedLogger#pushEntry(String, Object...)},
@@ -75,7 +75,6 @@ public class ScopedLoggerStrings implements Producer<String[]> {
 		}
 	}
 
-	@SuppressWarnings ("javadoc")
 	void pushImpl(final ScopedEntryNode node) {
 		this.push(node.text, node.args);
 		this.indent += node.indent();

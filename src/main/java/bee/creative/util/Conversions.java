@@ -117,7 +117,6 @@ public class Conversions {
 	}
 
 	/** Diese Klasse implementiert {@link Conversions#inputGetter()} */
-	@SuppressWarnings ("javadoc")
 	static class InputGetter extends BaseGetter<Conversion<?, ?>, Object> {
 
 		static final Getter<?, ?> INSTANCE = new InputGetter();
@@ -130,7 +129,6 @@ public class Conversions {
 	}
 
 	/** Diese Klasse implementiert {@link Conversions#outputGetter()} */
-	@SuppressWarnings ("javadoc")
 	static class OutputGetter extends BaseGetter<Conversion<?, ?>, Object> {
 
 		static final Getter<?, ?> INSTANCE = new OutputGetter();

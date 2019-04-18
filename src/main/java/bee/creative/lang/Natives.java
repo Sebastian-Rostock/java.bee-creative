@@ -290,7 +290,6 @@ public class Natives {
 		return Natives.formatMethod(constructor.getDeclaringClass(), "new", constructor.getParameterTypes());
 	}
 
-	@SuppressWarnings ("javadoc")
 	static String formatMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
 		return Natives.formatClass(methodOwner) + "." + methodName + Natives.formatParams(methodParams);
 	}

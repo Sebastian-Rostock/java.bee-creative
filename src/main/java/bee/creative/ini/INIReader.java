@@ -57,7 +57,6 @@ public class INIReader implements Closeable {
 		}
 	}
 
-	@SuppressWarnings ("javadoc")
 	final INIToken readImpl() throws IOException {
 		while (true) {
 			final int symbol = this.reader.read();

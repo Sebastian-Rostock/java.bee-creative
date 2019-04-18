@@ -40,7 +40,6 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -8419791227943208230L;
 
 	/** Diese Methode gibt eine neue {@link HashMap2} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.

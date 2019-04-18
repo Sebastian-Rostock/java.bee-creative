@@ -5,7 +5,6 @@ package bee.creative.iam;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class IAMException extends RuntimeException {
 
-	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -4587723938056298739L;
 
 	/** Dieses Feld identifiziert die Ausnahme bei der Erkennugn einer ungültigen Anzahl oder eines ungültigen Werts. */

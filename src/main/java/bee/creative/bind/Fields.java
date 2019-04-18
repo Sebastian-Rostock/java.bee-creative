@@ -342,7 +342,6 @@ public final class Fields {
 	}
 
 	/** Diese Klasse implementiert {@link Fields#toProperty(Object, Field)}. */
-	@SuppressWarnings ("javadoc")
 	static class FieldProperty<GValue, GItem> extends BaseProperty<GValue> {
 
 		public final GItem item;
@@ -639,7 +638,8 @@ public final class Fields {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#toCollection(Property) Properties.toCollection(Fields.toProperty(item, field))}. */
-	public static <GItem, GEntry> Collection<GEntry> toCollection(final GItem item, final Field<? super GItem, Collection<GEntry>> field) throws NullPointerException {
+	public static <GItem, GEntry> Collection<GEntry> toCollection(final GItem item, final Field<? super GItem, Collection<GEntry>> field)
+		throws NullPointerException {
 		return Properties.toCollection(Fields.toProperty(item, field));
 	}
 

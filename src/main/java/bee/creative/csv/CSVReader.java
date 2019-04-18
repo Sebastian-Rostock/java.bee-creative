@@ -28,7 +28,6 @@ public class CSVReader implements Closeable {
 		return new CSVReader(IO.inputReaderFrom(data));
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void check(final char symbol) throws IllegalArgumentException {
 		if ((symbol == '\r') || (symbol == '\n')) throw new IllegalArgumentException();
 	}
@@ -127,7 +126,6 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	@SuppressWarnings ("javadoc")
 	String[][] readTableImpl() throws IOException, IllegalArgumentException {
 		final ArrayList<String[]> result = new ArrayList<>();
 		while (true) {
@@ -150,7 +148,6 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	@SuppressWarnings ("javadoc")
 	String[] readEntryImpl() throws IOException, IllegalArgumentException {
 		final Reader reader = this.reader;
 		int symbol = this.symbol;
@@ -191,7 +188,6 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	@SuppressWarnings ("javadoc")
 	String readValueImpl() throws IOException, IllegalArgumentException {
 		final Reader reader = this.reader;
 		final StringBuilder result = this.value;

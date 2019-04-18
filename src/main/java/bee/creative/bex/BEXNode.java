@@ -10,7 +10,6 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class BEXNode {
 
-	@SuppressWarnings ("javadoc")
 	static class EmptyNode extends BEXNode {
 
 		@Override

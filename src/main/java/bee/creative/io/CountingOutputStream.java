@@ -7,7 +7,6 @@ import java.io.OutputStream;
 /** Diese Klasse implementiert erweitert einen {@link FilterOutputStream} um den {@link #getWriteCount() Zähler der geschriebenen Bytes}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
 public class CountingOutputStream extends FilterOutputStream {
 
 	private long writeCount;

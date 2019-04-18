@@ -210,7 +210,6 @@ public abstract class IAMIndex {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class EmptyIndex extends IAMIndex {
 
 		@Override
@@ -235,7 +234,6 @@ public abstract class IAMIndex {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ListingList extends AbstractList<IAMListing> {
 
 		final IAMIndex owner;
@@ -257,7 +255,6 @@ public abstract class IAMIndex {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class MappingList extends AbstractList<IAMMapping> {
 
 		final IAMIndex owner;

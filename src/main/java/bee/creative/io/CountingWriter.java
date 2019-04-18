@@ -7,7 +7,6 @@ import java.io.Writer;
 /** Diese Klasse implementiert erweitert einen {@link FilterWriter} um den {@link #getWriteCount() Zähler der geschriebenen Zeichen}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
 public class CountingWriter extends FilterWriter {
 
 	private long writeCount;

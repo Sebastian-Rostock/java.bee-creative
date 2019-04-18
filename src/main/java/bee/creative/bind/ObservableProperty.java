@@ -44,7 +44,7 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 			this.newValue = newValue;
 		}
 
-		@SuppressWarnings ({"unchecked", "javadoc", "rawtypes"})
+		@SuppressWarnings ({"unchecked", "rawtypes"})
 		private void setValue(final Object value) {
 			((ObservableProperty)this.sender).set(value);
 		}

@@ -7,7 +7,6 @@ import java.io.Reader;
 /** Diese Klasse implementiert erweitert einen {@link FilterReader} um den {@link #getReadCount() Zähler der gelesenen bzw. ausgelassenen Zeichen}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
 public class CountingReader extends FilterReader {
 
 	private long readCount;

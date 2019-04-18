@@ -30,7 +30,6 @@ public final class FEMHandler extends FEMValue {
 	/** Dieses Feld speichert die Nutzdaten. */
 	final FEMFunction value;
 
-	@SuppressWarnings ("javadoc")
 	FEMHandler(final FEMFunction value) {
 		this.value = value;
 	}

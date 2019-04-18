@@ -7,7 +7,6 @@ import java.io.InputStream;
 /** Diese Klasse implementiert erweitert einen {@link FilterInputStream} um den {@link #getReadCount() Zähler der gelesenen bzw. ausgelassenen Bytes}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
 public class CountingInputStream extends FilterInputStream {
 
 	private long readCount;

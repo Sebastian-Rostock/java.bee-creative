@@ -391,42 +391,34 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkDays(final int days) throws IllegalArgumentException {
 		if (days > 3652424) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkYears(final int years) throws IllegalArgumentException {
 		if (years > 9999) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkMonths(final int months) throws IllegalArgumentException {
 		if (months > 119999) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkHours(final int hours) throws IllegalArgumentException {
 		if (hours > 87658199) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkMinutes(final long minutes) throws IllegalArgumentException {
 		if (minutes > 5259491999L) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkSeconds(final long seconds) throws IllegalArgumentException {
 		if (seconds > 315569519999L) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkMilliseconds(final long milliseconds) throws IllegalArgumentException {
 		if (milliseconds > 315569519999999L) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	static void checkPositive(final int value) throws IllegalArgumentException {
 		if (value < 0) throw new IllegalArgumentException();
 	}
@@ -554,7 +546,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return result;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static long durationmillisOfImpl(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
 		throws IllegalArgumentException {
 		return (days * 86400000L) + (hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds;
@@ -577,7 +568,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return result;
 	}
 
-	@SuppressWarnings ("javadoc")
 	static int durationmonthsOfImpl(final int years, final int months) {
 		return (years * 12) + months;
 	}
@@ -623,7 +613,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		if (this.millisecondsValue() > 999) throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings ("javadoc")
 	FEMDuration(final int valueH, final int valueL) {
 		this.valueH = valueH;
 		this.valueL = valueL;
@@ -818,7 +807,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return this.move(duration.durationmonthsValue(), duration.durationmillisValue());
 	}
 
-	@SuppressWarnings ("javadoc")
 	final FEMDuration moveImpl(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
 		if (this.signValue() < 0) return FEMDuration.from(durationmonths - this.durationmonthsValue(), durationmillis - this.durationmillisValue());
 		return FEMDuration.from(durationmonths + this.durationmonthsValue(), durationmillis + this.durationmillisValue());
@@ -870,7 +858,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return thisSign;
 	}
 
-	@SuppressWarnings ("javadoc")
 	final int compareImpl(final FEMDuration that, final int undefined) {
 		final int thisMonths = this.durationmonthsValue(), thatMonths = that.durationmonthsValue();
 		final long thisMillis = this.durationmillisValue(), thatMillis = that.durationmillisValue();

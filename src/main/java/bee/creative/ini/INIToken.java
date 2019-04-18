@@ -65,7 +65,6 @@ public final class INIToken {
 	/** Dieses Feld speichert den {@link #value()}. den {@link #comment()} oder {@code null}. */
 	final String string2;
 
-	@SuppressWarnings ("javadoc")
 	INIToken(final String string1, final String string2) {
 		this.string1 = string1;
 		this.string2 = string2;

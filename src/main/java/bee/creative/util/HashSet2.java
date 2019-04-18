@@ -40,7 +40,6 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -6978391927144580624L;
 
 	/** Diese Methode gibt ein neues {@link HashSet2} zurück, welche Streuwert und Äquivalenz der Elemente über den gegebenen {@link Hasher} ermittelt.

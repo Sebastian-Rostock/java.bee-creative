@@ -355,7 +355,6 @@ public class Comparators {
 	}
 
 	/** Diese Klasse implementiert {@link Comparators#toComparable(Object, Comparator)} */
-	@SuppressWarnings ("javadoc")
 	static class ComparatorComparable<GItem> implements Comparable<GItem> {
 
 		public final GItem item;

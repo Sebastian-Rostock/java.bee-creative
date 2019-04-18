@@ -19,7 +19,6 @@ class ScopedEntryNode {
 	/** Dieses Feld speichert den nächsten Knoten des Rings. */
 	ScopedEntryNode next = this;
 
-	@SuppressWarnings ("javadoc")
 	public ScopedEntryNode(final Object text, final Object[] args) {
 		this.text = text;
 		this.args = args;

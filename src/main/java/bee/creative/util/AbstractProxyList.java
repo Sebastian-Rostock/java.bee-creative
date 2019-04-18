@@ -13,7 +13,6 @@ import java.util.ListIterator;
  * @param <GData> Typ des Inhalts. */
 public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extends AbstractList<GItem> {
 
-	@SuppressWarnings ("javadoc")
 	class Iter implements ListIterator<GItem> {
 
 		final GData data;

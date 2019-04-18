@@ -38,7 +38,6 @@ public class ScopedLogger {
 		this.enterScopeImpl(text, Objects.notNull(args));
 	}
 
-	@SuppressWarnings ("javadoc")
 	void enterScopeImpl(final Object text, final Object[] args) {
 		this.head.pushEnter(text, args);
 	}
@@ -72,7 +71,6 @@ public class ScopedLogger {
 		this.leaveScopeImpl(text, Objects.notNull(args));
 	}
 
-	@SuppressWarnings ("javadoc")
 	void leaveScopeImpl(final Object text, final Object[] args) {
 		final ScopedEntryNode prev = this.head.prev;
 		if (prev.indent() > 0) {
@@ -101,7 +99,6 @@ public class ScopedLogger {
 		this.pushEntryImpl(text, Objects.notNull(args));
 	}
 
-	@SuppressWarnings ("javadoc")
 	void pushEntryImpl(final Object text, final Object[] args) {
 		if ((text == null) && (args == null)) return;
 		this.head.pushEntry(text, args);
@@ -135,7 +132,6 @@ public class ScopedLogger {
 		this.pushErrorImpl(Objects.notNull(cause), text, Objects.notNull(args));
 	}
 
-	@SuppressWarnings ("javadoc")
 	void pushErrorImpl(final Throwable cause, final Object text, final Object[] args) {
 		if (cause == null) {
 			this.pushEntryImpl(text, args);
@@ -184,7 +180,6 @@ public class ScopedLogger {
 		return result.get();
 	}
 
-	@SuppressWarnings ("javadoc")
 	void toStringImpl(final ScopedLoggerStrings result) throws NullPointerException {
 		final ScopedEntryNode prev = this.head;
 		for (ScopedEntryNode next = prev.next; prev != next; next = next.next) {

@@ -221,7 +221,6 @@ public class Tester {
 	/** Dieses Feld speichert die Fehlerursache, wenn die Testmethode eiene ausnahme auslöst, oder {@code null}. */
 	public final Throwable cause;
 
-	@SuppressWarnings ("javadoc")
 	private Tester(final long usedTime, final long usedMemory) throws NullPointerException {
 		this.usedTime = usedTime;
 		this.usedMemory = usedMemory;

@@ -2,9 +2,9 @@ package bee.creative.fem;
 
 import java.util.Collection;
 import java.util.Iterator;
-import bee.creative.util.Comparables.Items;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
+import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert einen Stapelrahmen ({@code stack-frame}), über welchen einer Funktion eine Liste von Parameterwerten sowie ein Kontextobjekt zur
@@ -201,7 +201,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	/** Dieses Feld speichert das Kontextobjekt. */
 	protected final FEMContext context;
 
-	@SuppressWarnings ("javadoc")
 	FEMFrame() {
 		this.parent = this;
 		this.context = FEMContext.EMPTY;

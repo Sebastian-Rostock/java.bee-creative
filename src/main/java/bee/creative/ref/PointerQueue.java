@@ -13,7 +13,6 @@ import bee.creative.lang.Objects;
  * @param <GObject> Typ der Objekte, auf welches die verwalteten {@link Reference} verweisen. */
 public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 
-	@SuppressWarnings ("javadoc")
 	private static final class QueueNode extends WeakReference<PointerQueue<?>> {
 
 		public static final QueueNode head = new QueueNode();
@@ -37,7 +36,6 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	private static final class QueueThread extends Thread {
 
 		public QueueThread() {

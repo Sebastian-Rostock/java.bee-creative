@@ -9,12 +9,10 @@ import bee.creative.lang.Objects;
  * @param <GValue> Typ des Datensatzes. */
 public final class HardPointer<GValue> implements Pointer<GValue> {
 
-	@SuppressWarnings ("javadoc")
 	static int hash(final Pointer<?> thiz) {
 		return Objects.deepHash(thiz.get());
 	}
 
-	@SuppressWarnings ("javadoc")
 	static boolean equals(final Pointer<?> thiz, final Object object) {
 		if (object == thiz) return true;
 		if (!(object instanceof Pointer<?>)) return false;

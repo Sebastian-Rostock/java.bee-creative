@@ -24,7 +24,6 @@ import bee.creative.util.Comparators;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMMapping implements Iterable<IAMEntry> {
 
-	@SuppressWarnings ("javadoc")
 	static class EmptyMapping extends IAMMapping {
 
 		@Override
@@ -60,7 +59,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class CompactMapping extends IAMMapping {
 
 		final int[] keyData;
@@ -264,7 +262,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class Entries extends AbstractList<IAMEntry> {
 
 		final IAMMapping owner;

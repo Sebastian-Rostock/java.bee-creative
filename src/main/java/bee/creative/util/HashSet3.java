@@ -9,7 +9,6 @@ import java.util.Set;
  * @param <GItem> Typ der Elemente. */
 public class HashSet3<GItem> extends HashSet<GItem> {
 
-	@SuppressWarnings ("javadoc")
 	private static final long serialVersionUID = -472585728645140310L;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */

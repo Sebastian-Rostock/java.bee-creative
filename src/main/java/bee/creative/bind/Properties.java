@@ -218,7 +218,6 @@ public class Properties {
 	}
 
 	/** Diese Klasse implementiert {@link Properties#toField(Property)}. */
-	@SuppressWarnings ("javadoc")
 	static class PropertyField<GValue> implements Field<Object, GValue> {
 
 		public final Property<GValue> property;
@@ -245,7 +244,6 @@ public class Properties {
 	}
 
 	/** Diese Klasse implementiert {@link Properties#toSet(Property)}. */
-	@SuppressWarnings ("javadoc")
 	static class PropertySet<GItem> extends AbstractProxySet<GItem, Set<GItem>> {
 
 		public final Property<Set<GItem>> property;
@@ -267,7 +265,6 @@ public class Properties {
 	}
 
 	/** Diese Klasse implementiert {@link Properties#toList(Property)}. */
-	@SuppressWarnings ("javadoc")
 	static class PropertyList<GItem> extends AbstractProxyList<GItem, List<GItem>> {
 
 		public final Property<List<GItem>> property;
@@ -289,7 +286,6 @@ public class Properties {
 	}
 
 	/** Diese Klasse implementiert {@link Properties#toMap(Property)}. */
-	@SuppressWarnings ("javadoc")
 	static class PropertyMap<GKey, GValue> extends AbstractProxyMap<GKey, GValue, Map<GKey, GValue>> {
 
 		public final Property<Map<GKey, GValue>> property;
@@ -311,7 +307,6 @@ public class Properties {
 	}
 
 	/** Diese Klasse implementiert {@link Properties#toCollection(Property)}. */
-	@SuppressWarnings ("javadoc")
 	static class PropertyCollection<GItem> extends AbstractProxyCollection<GItem, Collection<GItem>> {
 
 		public final Property<Collection<GItem>> property;

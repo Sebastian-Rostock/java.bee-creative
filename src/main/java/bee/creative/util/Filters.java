@@ -231,7 +231,6 @@ public class Filters {
 	}
 
 	/** Diese Klasse implementiert {@link Filters#toGetter(Filter)} */
-	@SuppressWarnings ("javadoc")
 	static class FilterGetter<GItem> implements Getter<GItem, Boolean> {
 
 		public final Filter<? super GItem> filter;

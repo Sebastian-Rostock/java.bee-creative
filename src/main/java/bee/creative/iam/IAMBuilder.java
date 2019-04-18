@@ -70,12 +70,10 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static abstract class BasePoolA<GTarget> extends BasePool<IAMArray, GTarget> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static abstract class BasePoolB<GTarget> extends BasePool<byte[], GTarget> {
 
 		@Override
@@ -90,7 +88,6 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ItemData extends BaseData {
 
 		public IAMArray data;
@@ -102,7 +99,6 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ItemPool extends BasePoolA<ItemData> {
 
 		@Override
@@ -112,7 +108,6 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class EntryData extends BaseData {
 
 		public IAMArray key;
@@ -127,7 +122,6 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class EntryPool extends BasePoolA<EntryData> {
 
 		@Override
@@ -137,7 +131,6 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ListingData extends BaseData {
 
 		public IAMListing listing;
@@ -149,7 +142,6 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ListingPool extends BasePoolB<ListingData> {
 
 		@Override
@@ -163,7 +155,6 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class MappingData extends BaseData {
 
 		public IAMMapping mapping;
@@ -175,7 +166,6 @@ public class IAMBuilder {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class MappingPool extends BasePoolB<MappingData> {
 
 		@Override

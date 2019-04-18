@@ -1006,7 +1006,6 @@ public class Collections {
 	}
 
 	/** Diese Klasse implementiert {@link Collections#toContainsFilter(Collection)} */
-	@SuppressWarnings ("javadoc")
 	static class ContainsFilter implements Filter<Object> {
 
 		public final Collection<?> collection;

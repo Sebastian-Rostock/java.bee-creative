@@ -165,7 +165,6 @@ public class Producers {
 	}
 
 	/** Diese Klasse implementiert {@link Producers#toGetter(Producer)}. */
-	@SuppressWarnings ("javadoc")
 	static class ProducerGetter<GValue> implements Getter<Object, GValue> {
 
 		public final Producer<? extends GValue> producer;

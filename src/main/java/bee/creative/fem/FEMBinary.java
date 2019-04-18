@@ -31,7 +31,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ItemFinder implements Collector {
 
 		public final byte that;
@@ -51,7 +50,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
@@ -64,7 +62,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class ValueCollector implements Collector {
 
 		public final byte[] array;
@@ -84,7 +81,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class StringCollector implements Collector {
 
 		public final char[] array;
@@ -607,7 +603,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return FEMBinary.concatAll(values, 0, length - 1);
 	}
 
-	@SuppressWarnings ("javadoc")
 	static FEMBinary concatAll(final FEMBinary[] values, final int min, final int max) throws NullPointerException {
 		if (min == max) return values[min];
 		final int mid = (min + max) >> 1;

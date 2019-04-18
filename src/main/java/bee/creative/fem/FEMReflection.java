@@ -180,26 +180,6 @@ public abstract class FEMReflection extends FEMFunction {
 
 	}
 
-	/** Diese Methode gibt die native Funktion zur gegebenen Pfadangabe zurück. Die Pfadangabe kodiert hierbei eine Funktion, die eine Klasse liefert, an eine
-	 * Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw. schreibt. Die unterstützten Pfadangaben sind bei {@link Natives#parse(String)}
-	 * beschrieben.
-	 *
-	 * @see Natives#parse(String)
-	 * @see #from(Field)
-	 * @see #from(Method)
-	 * @see #from(Constructor)
-	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktors oder eines Datenfelds.
-	 * @return {@link FEMReflection}.
-	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
-	public static FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException {
-		final Object object = Natives.parse(memberPath);
-		if (object instanceof Class<?>) return new FEMNative(object);
-		if (object instanceof Constructor<?>) return FEMReflection.from((Constructor<?>)object);
-		if (object instanceof Method) return FEMReflection.from((Method)object);
-		return FEMReflection.from((Field)object);
-	}
-
 	@SuppressWarnings ("javadoc")
 	public static final class InstanceMethod extends FEMReflection {
 
@@ -242,6 +222,26 @@ public abstract class FEMReflection extends FEMFunction {
 		return Modifier.isStatic(field.getModifiers()) ? new StaticField(field) : new InstanceField(field);
 	}
 
+	/** Diese Methode gibt die native Funktion zur gegebenen Pfadangabe zurück. Die Pfadangabe kodiert hierbei eine Funktion, die eine Klasse liefert, an eine
+	 * Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw. schreibt. Die unterstützten Pfadangaben sind bei {@link Natives#parse(String)}
+	 * beschrieben.
+	 *
+	 * @see Natives#parse(String)
+	 * @see #from(Field)
+	 * @see #from(Method)
+	 * @see #from(Constructor)
+	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktors oder eines Datenfelds.
+	 * @return {@link FEMReflection}.
+	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	public static FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException {
+		final Object object = Natives.parse(memberPath);
+		if (object instanceof Class<?>) return new FEMNative(object);
+		if (object instanceof Constructor<?>) return FEMReflection.from((Constructor<?>)object);
+		if (object instanceof Method) return FEMReflection.from((Method)object);
+		return FEMReflection.from((Field)object);
+	}
+
 	/** Diese Methode gibt eine Funktion zurück, die an die gegebene Methode delegiert.
 	 *
 	 * @param method Methode.
@@ -260,7 +260,6 @@ public abstract class FEMReflection extends FEMFunction {
 		return new StaticConstructor(Objects.notNull(constructor));
 	}
 
-	@SuppressWarnings ("javadoc")
 	static Object[] params(final FEMFrame frame, final boolean skipFirst) {
 		final int offset = skipFirst ? 1 : 0, length = frame.size() - offset;
 		final Object[] result = new Object[length];

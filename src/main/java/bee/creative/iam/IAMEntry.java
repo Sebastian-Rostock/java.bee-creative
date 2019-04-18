@@ -10,7 +10,6 @@ package bee.creative.iam;
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMEntry {
 
-	@SuppressWarnings ("javadoc")
 	static class EmptyEntry extends IAMEntry {
 
 		@Override
@@ -25,7 +24,6 @@ public abstract class IAMEntry {
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	static class CompositeEntry extends IAMEntry {
 
 		final IAMArray key;

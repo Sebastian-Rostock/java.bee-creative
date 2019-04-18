@@ -46,7 +46,6 @@ public final class FEMParam extends FEMFunction {
 	/** Dieses Feld speichert den Index des Parameterwerts. */
 	final int index;
 
-	@SuppressWarnings ("javadoc")
 	FEMParam(final int index) {
 		this.index = index;
 	}

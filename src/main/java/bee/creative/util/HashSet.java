@@ -89,7 +89,7 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		this.addAll(source);
 	}
 
-	@SuppressWarnings ({"javadoc", "unchecked"})
+	@SuppressWarnings ({"unchecked"})
 	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		final int count = stream.readInt();
 		this.allocateImpl(count);
@@ -98,7 +98,6 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		}
 	}
 
-	@SuppressWarnings ("javadoc")
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
 		stream.writeInt(this.count);
 		for (final GItem item: this) {

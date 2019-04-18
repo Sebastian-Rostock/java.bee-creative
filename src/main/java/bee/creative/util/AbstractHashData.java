@@ -533,12 +533,10 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
 	protected static final int[] EMPTY_INTEGERS = {};
 
-	@SuppressWarnings ("javadoc")
 	private static void setupNextsImpl(final int[] array) {
 		for (int i = 0, size = array.length; i < size; array[i] = ++i) {}
 	}
 
-	@SuppressWarnings ("javadoc")
 	private static void setupTableImpl(final int[] array) {
 		Arrays.fill(array, -1);
 	}
@@ -791,7 +789,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.getIndexImpl2(key, this.customHash(key));
 	}
 
-	@SuppressWarnings ("javadoc")
 	private final int getIndexImpl2(final Object key, final int keyHash) {
 		final int[] table = this.table, nexts = this.nexts;
 		final int index = keyHash & (table.length - 1), entry = table[index];
@@ -841,7 +838,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.putIndexImpl2(key, keyHash);
 	}
 
-	@SuppressWarnings ("javadoc")
 	private final int putIndexImpl2(final GKey key, final int keyHash) {
 		final int[] table = this.table, nexts = this.nexts;
 		final int index = keyHash & (table.length - 1), result = this.empty;
@@ -970,7 +966,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.popIndexImpl2(key, this.customHash(key));
 	}
 
-	@SuppressWarnings ("javadoc")
 	private final int popIndexImpl2(final Object key, final int keyHash) {
 		final int[] table = this.table, nexts = this.nexts;
 		final int index = keyHash & (table.length - 1);
