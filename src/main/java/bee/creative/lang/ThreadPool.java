@@ -35,7 +35,17 @@ public class ThreadPool {
 
 		@Override
 		public void run() {
-			this.node.pool.runItem(this);
+			while (true) {
+				final Runnable task = this.node.pool.openTask(this);
+				if (task == null) return;
+				boolean error = true;
+				try {
+					task.run();
+					error = false;
+				} finally {
+					this.node.pool.closeTask(this, error);
+				}
+			}
 		}
 
 	}
@@ -82,11 +92,11 @@ public class ThreadPool {
 
 	/** Dieses Feld speichert den {@link java.lang.Thread#setName(String) Namen} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem
 	 * Threads}. */
-	private String activeName = "ThreadItem";
+	private String activeName;
 
 	/** Dieses Feld speichert die {@link java.lang.Thread#setPriority(int) Priorität} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem
 	 * Threads}. */
-	private int activePriority = java.lang.Thread.NORM_PRIORITY;
+	private int activePriority;
 
 	/** Dieses Feld speichert die auf ihre Wiederverwendung wartenden {@link ThreadItem Threads}. */
 	private final ThreadNode waitingList = new ThreadNode(this);
@@ -98,7 +108,7 @@ public class ThreadPool {
 	private int waitingReserve;
 
 	/** Dieses Feld speichert die Begrenzung der Lebenszeit der in {@link #waitingList} enthaltenen {@link ThreadItem Threads}. */
-	private long waitingTimeout = 60000;
+	private long waitingTimeout;
 
 	/** Dieser Konstruktor ist eine Abkürzung für {@link #ThreadPool(boolean) new ThreadPool(true)}. */
 	public ThreadPool() {
@@ -110,14 +120,31 @@ public class ThreadPool {
 		this(null, daemon);
 	}
 
-	/** Dieser Konstruktor initialisiert das den {@link ThreadPool} mit den gegebenen Merkmalen zur Erzeugung von Threads, ohne {@link #setWaitingReserve(int)
-	 * Reserve} und mit einer {@link #setWaitingTimeout(long) Wiederverwendungszeit} von einer Minute.
+	/** Dieser Konstruktor ist eine Abkürzung für {@link #ThreadPool(ThreadGroup, boolean, int, int) new ThreadPool(group, daemon, 0, 60000)}. */
+	public ThreadPool(final ThreadGroup group, final boolean daemon) {
+		this(group, daemon, 0, 60000);
+	}
+
+	/** Dieser Konstruktor ist eine Abkürzung für {@link #ThreadPool(ThreadGroup, boolean, String, int, int, int) new ThreadPool(group, daemon, "ThreadItem",
+	 * Thread.NORM_PRIORITY, waitingReserve, waitingTimeout)}. */
+	public ThreadPool(final ThreadGroup group, final boolean daemon, final int waitingReserve, final int waitingTimeout) {
+		this(group, daemon, "ThreadItem", java.lang.Thread.NORM_PRIORITY, waitingReserve, waitingTimeout);
+	}
+
+	/** Dieser Konstruktor initialisiert den {@link ThreadPool} mit den gegebenen Merkmalen.
 	 *
 	 * @see java.lang.Thread#setDaemon(boolean)
 	 * @see java.lang.Thread#getThreadGroup()
 	 * @param group Thread-Gruppe zur Erzeugung der Threads oder {@code null}.
-	 * @param daemon {@code true}, wenn zur Auswertung der Berechnung Daemon-Threads eingesetzt werden sollen. */
-	public ThreadPool(ThreadGroup group, final boolean daemon) {
+	 * @param daemon {@code true}, wenn zur Auswertung der Berechnung Daemon-Threads eingesetzt werden sollen.
+	 * @param activeName {@link #setActiveName(String) Name der Threads}.
+	 * @param activePriority {@link #setActivePriority(int) Priorität der Threads}.
+	 * @param waitingReserve Reserve an wartenden Threads.
+	 * @param waitingTimeout Lebenszeit eines wartenden Threads.
+	 * @throws NullPointerException Wenn {@code activeName} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code activePriority}, {@code waitingReserve} bzw. {@code waitingTimeout} ungültig ist. */
+	public ThreadPool(ThreadGroup group, final boolean daemon, final String activeName, final int activePriority, final int waitingReserve,
+		final int waitingTimeout) throws NullPointerException, IllegalArgumentException {
 		if (group == null) {
 			final SecurityManager security = System.getSecurityManager();
 			if (security != null) {
@@ -129,43 +156,15 @@ public class ThreadPool {
 		}
 		this.group = group;
 		this.daemon = daemon;
-	}
-
-	/** Diese Methode implementiert {@link ThreadItem#run()}. */
-	final void runItem(final ThreadItem item) {
-		while (true) {
-			final Runnable task = this.getTask(item);
-			if (task == null) return;
-			this.runTask(item, task);
-		}
-	}
-
-	/** Diese Methode führt den gegebenen {@code task} aus, entfernt ihn anschließend aus {@link #activeMap}, löst seine Verbindung zum gegebenen {@code item} und
-	 * trägt das {@code item} nach fehlerfreier Berechnung in die {@link #waitingList} ein. */
-	private final void runTask(final ThreadItem item, final Runnable task) {
-		boolean okay = false;
-		try {
-			task.run();
-			okay = true;
-		} finally {
-			synchronized (this.activeMap) {
-				item.run = null;
-				item.task = null;
-				this.activeMap.remove(task);
-				this.activeMap.notifyAll();
-				if (okay) {
-					item.node.insert(this.waitingList);
-					this.waitingCount++;
-					java.lang.Thread.interrupted();
-					this.checkActive();
-				}
-			}
-		}
+		this.setActiveName(activeName);
+		this.setActivePriority(activePriority);
+		this.setWaitingReserve(waitingReserve);
+		this.setWaitingTimeout(waitingTimeout);
 	}
 
 	/** Diese Methode wartet auf die Bestückung des gegebenen Threads mit einer Berechnung und gibt diese zurück. Wenn der Thread verworfen wurde, wird
 	 * {@code null} geliefert. */
-	private final Runnable getTask(final ThreadItem item) {
+	final Runnable openTask(final ThreadItem item) {
 		synchronized (this.waitingList) {
 			synchronized (this.activeMap) {
 				final Runnable task = item.task;
@@ -191,6 +190,23 @@ public class ThreadPool {
 					}
 				}
 			}
+		}
+	}
+
+	/** Diese Methode entfernt die Berechnung des gegebenen Threads aus {@link #activeMap}, löst seine Verbindung zum gegebenen Thread und trägt diesen nach
+	 * fehlerfreier Berechnung in die {@link #waitingList} ein. */
+	final void closeTask(final ThreadItem item, final boolean error) {
+		synchronized (this.activeMap) {
+			final Runnable task = item.task;
+			item.run = null;
+			item.task = null;
+			this.activeMap.remove(task);
+			this.activeMap.notifyAll();
+			if (error) return;
+			item.node.insert(this.waitingList);
+			this.waitingCount++;
+			java.lang.Thread.interrupted();
+			this.checkActive();
 		}
 	}
 

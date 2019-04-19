@@ -4,6 +4,7 @@ import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -775,7 +776,32 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return FEMArray.concatAll(values, min, mid).concat(FEMArray.concatAll(values, mid + 1, max));
 	}
 
-	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die gegebenen Schlüssel- und Wertliste zurück.<br>
+	/** Diese Methode ist eine Abkürzung für {@link #toMap(Iterable) FEMArray.toMap(entries.entrySet())}.
+	 * 
+	 * @param entries Abbildung.
+	 * @return {@link Map}-Sicht.
+	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
+	public static Map<FEMValue, FEMValue> toMap(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
+		return FEMArray.toMap(entries.entrySet());
+	}
+
+	/** Diese Methode überführt die gegebenen {@link Entry Einträge} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie eine {@link #compact()
+	 * kompaktierte Wertliste} und liefert dazu eine unveränderliche {@link Map} als Sicht auf diese Listen.
+	 * 
+	 * @see #toMap(FEMArray, FEMArray)
+	 * @param entries Einträge einer Abbildung.
+	 * @return {@link Map}-Sicht auf die Schlüssel- und Wertliste.
+	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
+	public static Map<FEMValue, FEMValue> toMap(final Iterable<? extends Entry<? extends FEMValue, ? extends FEMValue>> entries) throws NullPointerException {
+		final ArrayList<FEMValue> keys = new ArrayList<>(), values = new ArrayList<>();
+		for (final Entry<? extends FEMValue, ? extends FEMValue> entry: entries) {
+			keys.add(entry.getKey());
+			values.add(entry.getValue());
+		}
+		return FEMArray.toMap(FEMArray.from(keys).compact(true), FEMArray.from(values).compact());
+	}
+
+	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die gegebenen Schlüssel- und Wertlisten zurück.<br>
 	 * Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an der Position, an der sich in {@code values} der
 	 * zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche {@link #compact(boolean) indiziert} sein.
 	 *
@@ -1047,7 +1073,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param order {@link Comparator} zum Vergleichen der Werte.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} bzw. {@code order} {@code null} ist. */
-	public final int compare(final FEMArray that, final Comparator<FEMValue> order) throws NullPointerException {
+	public int compare(final FEMArray that, final Comparator<FEMValue> order) throws NullPointerException {
 		final int length = Math.min(this.length, that.length);
 		for (int i = 0; i < length; i++) {
 			final int result = order.compare(this.customGet(i), that.customGet(i));
