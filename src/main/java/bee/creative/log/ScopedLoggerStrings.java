@@ -82,7 +82,7 @@ public class ScopedLoggerStrings implements Producer<String[]> {
 
 	/** Diese Methode gibt die Zeichenkette zum gegebenen Objekt zurück. Sie wird in {@link #push(Object)} und {@link #push(Object, Object[])} zur Ermittlung des
 	 * Textbausteins bzw. Formattexts einer Protokollzeile verwendet. Nachfahren sollten diese Methode überschreiben, wenn bspw. für {@link Throwable} oder andere
-	 * besondere Objekte eine bessere Zeichenkette ermittelt werden soll, als deren einfache {@link Object#toString() Textdarstellung}. Wenn das gegebene Objekt
+	 * besondere Objekte eine bessere Zeichenkette ermittelt werden soll, als deren {@link Object#toString() Textdarstellung}. Wenn das gegebene Objekt
 	 * {@code null} ist, wird {@code null} geliefert.
 	 *
 	 * @param object Objekt oder {@code null}.
@@ -92,7 +92,7 @@ public class ScopedLoggerStrings implements Producer<String[]> {
 		return object.toString();
 	}
 
-	/** Diese Methode gibt die Zeichenkette zur Einrückung um die gegebene Anzahl an Protokollebenen zurück. Die ersten {@code 100} Zeichenkette werden zur
+	/** Diese Methode gibt die Zeichenkette zur Einrückung um die gegebene Anzahl an Protokollebenen zurück. Die ersten {@code 100} Zeichenketten werden zur
 	 * schnellen Wiederverwendung gepuffert. Eine negative Anzahl wird wie {@code 0} behandelt. Nachfahren können die Berechnung der Zeichenkette in
 	 * {@link #customIndent(int)} anpassen.
 	 *
@@ -110,7 +110,7 @@ public class ScopedLoggerStrings implements Producer<String[]> {
 
 	/** Diese Methode gibt die Textbausteine bzw. Formatargumente zur gegebenen Objektliste zurück. Sie wird von {@link #push(Object, Object[])} zur Anpassung der
 	 * Textbausteine bzw. Formatargumente einer Protokollzeile verwendet. Dies kann notwendig werden, wenn für besondere Objekte ein bessere Textbaustein
-	 * ermittelt werden soll, als die seiner {@link Object#toString() Textdarstellung}. Die gegebene Objektliste wird dazu elementweise über
+	 * verwendet werden soll, als seine {@link Object#toString() Textdarstellung}. Die gegebene Objektliste wird dazu elementweise über
 	 * {@link #customObject(Object)} umgewandelt.
 	 *
 	 * @param objects Objektliste.
@@ -136,7 +136,7 @@ public class ScopedLoggerStrings implements Producer<String[]> {
 		return "(" + count + ")" + space.substring(0, 40 - Integers.stringSize(count));
 	}
 
-	/** Diese Methode ird in {@link #toObjects(Object[])} zur Anpassung von Textbausteinen bzw. Formatargumenten eingesetzt.
+	/** Diese Methode wird in {@link #toObjects(Object[])} zur Anpassung von Textbausteinen bzw. Formatargumenten eingesetzt.
 	 *
 	 * @param object Objekt.
 	 * @return Textbaustein bzw. Formatargument. */

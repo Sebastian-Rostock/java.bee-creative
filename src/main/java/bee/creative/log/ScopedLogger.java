@@ -153,6 +153,14 @@ public class ScopedLogger {
 		this.head.delete();
 	}
 
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn aktuell keine Protokollzeilen erfasst sind.
+	 *
+	 * @return {@code true}, wenn das Protokoll leer ist. */
+	public boolean isEmpty() {
+		final ScopedEntryNode prev = this.head;
+		return prev == prev.next;
+	}
+
 	/** Diese Methode gibt die Textdarstellung der erfassten Protokollzeilen zurück. Diese entsteht aus {@link Strings#join(String, Object...) Strings.join("\n",
 	 * this.toStrings())}.
 	 *
