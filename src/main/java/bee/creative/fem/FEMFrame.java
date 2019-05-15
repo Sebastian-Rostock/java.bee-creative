@@ -379,7 +379,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	@Override
 	public final String toString() {
 		final FEMFormatter target = new FEMFormatter();
-		FEMDomain.NORMAL.formatFrame(target, this);
+		FEMDomain.NORMAL.formatFrame(target, this.params());
 		return target.format();
 	}
 

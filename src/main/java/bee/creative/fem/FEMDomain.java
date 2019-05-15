@@ -170,7 +170,7 @@ public class FEMDomain extends BaseObject {
 	 * @return {@code true}, wenn die Konstante erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseConst(final FEMParser target) throws NullPointerException {
-		if (this.parseSequence(target, '<', '/', '>')) return true;
+		if (this.parseSequence(target, '<', '<', '>')) return true;
 		final int offset = target.index();
 		int symbol = target.symbol();
 		LOOP: while (true) {
@@ -601,7 +601,7 @@ public class FEMDomain extends BaseObject {
 	 * @return gegebene bzw. geparste Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
 	public String parseConst(final String string) throws NullPointerException {
-		final String result = Strings.parseSequence(string, '<', '/', '>');
+		final String result = Strings.parseSequence(string, '<', '<', '>');
 		return result != null ? result : string;
 	}
 
@@ -772,8 +772,8 @@ public class FEMDomain extends BaseObject {
 	 * @param source Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatFrame(final FEMFormatter target, final FEMFrame source) throws NullPointerException, IllegalArgumentException {
-		this.formatItems(target, source.params(), "(", ";", ")", new Setter<FEMFormatter, FEMValue>() {
+	protected void formatFrame(final FEMFormatter target, final Iterable<? extends FEMValue> source) throws NullPointerException, IllegalArgumentException {
+		this.formatItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMValue>() {
 
 			int index = 1;
 
@@ -904,7 +904,7 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Ergebniswerts. Die Formatierung erfolgt dazu für eine bereits ausgewertete
 	 * {@link FEMFuture} mit deren {@link FEMFuture#result(boolean) Ergebniswert} über {@link #formatValue(FEMFormatter, FEMValue)}. Andernfalls werden deren
 	 * {@link FEMFuture#function() Funktion} über {@link #formatFunction(FEMFormatter, FEMFunction)} und deren {@link FEMFuture#frame() Stapelrahmen} über
-	 * {@link #formatFrame(FEMFormatter, FEMFrame)} erfasst.
+	 * {@link #formatFrame(FEMFormatter, Iterable)} erfasst.
 	 *
 	 * @param target Formatierer.
 	 * @param source Ergebniswert.
@@ -916,7 +916,7 @@ public class FEMDomain extends BaseObject {
 				this.formatValue(target, source.result());
 			} else {
 				this.formatFunction(target, source.function());
-				this.formatFrame(target, source.frame());
+				this.formatFrame(target, source.frame().params());
 			}
 		}
 	}
@@ -1070,21 +1070,33 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit Maskierung als formatierte Zeichenkette zurück. Die
-	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder die Zeichenkette ein Leerzeichen, Semikolon, Schrägstrich bzw. eine runde, eckige oder
-	 * geschweifte Klammer enthält. Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<',
-	 * '/', '>')}. Wenn die Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
+	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder wenn die Zeichenkette ein {@link #formatConstCheck(String) zu maskierendes Zeichen
+	 * enthält}. Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<', '<', '>')}. Wenn
+	 * die Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
 	 *
 	 * @param string Zeichenkette.
 	 * @param forceMask {@code true}, wenn die Maskierung notwendig ist.
 	 * @return gegebene bzw. formateirte Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
 	public String formatConst(final String string, final boolean forceMask) throws NullPointerException {
-		if (forceMask) return Strings.formatSequence(string, '<', '/', '>');
+		return forceMask || this.formatConstCheck(string) ? Strings.formatSequence(string, '<', '<', '>') : Objects.notNull(string);
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebene Zeichenkette ein zu maskierendes Steuerzeichen enthält, bspw. ein Leerzeichen,
+	 * Dollarzeichen, Semikolon, Schrägstrich, Apostroph oder eine runde, spitze, eckige bzw. geschweifte Klammer.
+	 *
+	 * @param string Zeichenkette.
+	 * @return {@code true}, wenn die Zeichenkette Steuerzeichen enthält.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	protected boolean formatConstCheck(final String string) throws NullPointerException {
 		for (int i = string.length(); i != 0;) {
 			final char symbol = string.charAt(--i);
-			if (symbol <= ' ') return Strings.formatSequence(string, '<', '/', '>');
+			if (symbol <= ' ') return true;
 			switch (symbol) {
+				case '\'':
+				case '"':
 				case ';':
+				case '$':
 				case '/':
 				case '{':
 				case '}':
@@ -1092,10 +1104,12 @@ public class FEMDomain extends BaseObject {
 				case ')':
 				case '[':
 				case ']':
-					return Strings.formatSequence(string, '<', '/', '>');
+				case '<':
+				case '>':
+					return true;
 			}
 		}
-		return string;
+		return false;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.formatScript(source, null)}.
@@ -1134,15 +1148,38 @@ public class FEMDomain extends BaseObject {
 		return this.formatFrame(source, null);
 	}
 
-	/** Diese Methode gibt die Textdarstellung des gegebenen Stapelrahmen zurück.
+	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source.params(), indent)}.
 	 *
-	 * @see #formatFrame(FEMFormatter, FEMFrame)
+	 * @see #formatFrame(FEMArray, String)
 	 * @param source Stapelrahmen.
 	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
 	 * @return Textdarstellung.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
 	public String formatFrame(final FEMFrame source, final String indent) throws NullPointerException, IllegalArgumentException {
+		return this.formatFrame(source.params(), indent);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source, null)}.
+	 *
+	 * @see #formatFrame(FEMArray, String)
+	 * @param source Stapelrahmen.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFrame(final FEMArray source) throws NullPointerException, IllegalArgumentException {
+		return this.formatFrame(source, null);
+	}
+
+	/** Diese Methode gibt die Textdarstellung des gegebenen Stapelrahmen zurück.
+	 *
+	 * @see #formatFrame(FEMFormatter, Iterable)
+	 * @param source Stapelrahmen.
+	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFrame(final FEMArray source, final String indent) throws NullPointerException, IllegalArgumentException {
 		final FEMFormatter target = new FEMFormatter().useIndent(indent);
 		this.formatFrame(target, source);
 		return target.format();
