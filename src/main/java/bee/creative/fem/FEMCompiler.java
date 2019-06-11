@@ -2,8 +2,6 @@ package bee.creative.fem;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import bee.creative.fem.FEMScript.Token;
 import bee.creative.lang.Objects;
@@ -13,16 +11,13 @@ import bee.creative.util.Parser;
  * Quelltexts} arbeitet.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMCompiler extends Parser {
+public class FEMCompiler extends FEMParser {
 
 	/** Dieses Feld speichert den Quelltext. */
 	FEMScript script = FEMScript.EMPTY;
 
 	/** Dieses Feld speichert die über {@link #proxy(String)} erzeugten Platzhalter. */
 	final Map<String, FEMProxy> proxies = new LinkedHashMap<>();
-
-	/** Dieses Feld speichert die Parameternamen. */
-	final List<String> params = new LinkedList<>();
 
 	/** Diese Methode gibt den zu kompilierenden Quelltext zurück.
 	 *
@@ -117,7 +112,7 @@ public final class FEMCompiler extends Parser {
 	 * @param proxies Platzhalter.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
-	public FEMCompiler putProxies(final FEMProxy... proxies) throws NullPointerException {
+	public FEMParser putProxies(final FEMProxy... proxies) throws NullPointerException {
 		return this.putProxies(Arrays.asList(proxies));
 	}
 
@@ -126,73 +121,10 @@ public final class FEMCompiler extends Parser {
 	 * @param proxies Platzhalter.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
-	public FEMCompiler putProxies(final Iterable<FEMProxy> proxies) throws NullPointerException {
+	public FEMParser putProxies(final Iterable<FEMProxy> proxies) throws NullPointerException {
 		for (final FEMProxy proxy: proxies) {
 			this.proxies.put(proxy.name().toString(), proxy);
 		}
-		return this;
-	}
-
-	/** Diese Methode gibt die Liste der aktellen Parameternamen zurück.
-	 *
-	 * @return Parameternamen. */
-	public List<String> params() {
-		return this.params;
-	}
-
-	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Parameternames in {@link #params()} zurück.
-	 *
-	 * @see List#indexOf(Object)
-	 * @param name Parametername.
-	 * @return Position oder {@code -1}.
-	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-	public int getParam(final String name) throws NullPointerException {
-		return this.params.indexOf(name.toString());
-	}
-
-	/** Diese Methode fügt den gegebenen Parameternamen an der gegebenen Position in {@link #params()} ein und gibt {@code this} zurück.
-	 *
-	 * @see List#add(int, Object)
-	 * @param index Einfügelosition.
-	 * @param name Parameternamen.
-	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code name} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code index} ungültig ist. */
-	public FEMCompiler putParam(final int index, final String name) throws NullPointerException, IllegalArgumentException {
-		this.params.add(index, name.toString());
-		return this;
-	}
-
-	/** Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
-	 *
-	 * @param value Parameternamen.
-	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	public FEMCompiler useParams(final String... value) throws NullPointerException {
-		return this.useParams(Arrays.asList(value));
-	}
-
-	/** Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
-	 *
-	 * @param value Parameternamen.
-	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	public FEMCompiler useParams(final List<String> value) throws NullPointerException {
-		if (value.contains(null)) throw new NullPointerException();
-		this.params.clear();
-		this.params.addAll(value);
-		return this;
-	}
-
-	/** Diese Methode entfernt die gegebene Anzahl der an Parameternamen ab dem BEginn der Liste aus {@link #params()} und gibt {@code this} zurück.
-	 *
-	 * @param count Anzahl.
-	 * @return {@code this}.
-	 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist. */
-	public FEMCompiler popParams(final int count) throws IllegalArgumentException {
-		this.params.subList(0, count).clear();
 		return this;
 	}
 

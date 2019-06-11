@@ -1,6 +1,8 @@
 package bee.creative.fem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import bee.creative.fem.FEMScript.Token;
 import bee.creative.util.Parser;
@@ -14,11 +16,21 @@ public class FEMParser extends Parser {
 	/** Dieses Feld speichert die bisher ermittelten Bereiche. */
 	final List<Token> tokens = new ArrayList<>();
 
+	/** Dieses Feld speichert die Parameternamen. */
+	final List<String> params = new LinkedList<>();
+
 	/** Diese Methode gibt die Auflistung aller {@link #putToken(Token) erfassten Bereiche} zurück.
 	 *
 	 * @return Bereichsliste. */
 	public List<Token> tokens() {
 		return this.tokens;
+	}
+
+	/** Diese Methode gibt die Liste der aktellen Parameternamen zurück.
+	 *
+	 * @return Parameternamen. */
+	public List<String> params() {
+		return this.params;
 	}
 
 	/** Diese Methode ersetzt den Bereich an der gegebenen Position in der {@link #tokens() Auflistung aller erfassten Bereiche} durch einen gleichwertigen mit
@@ -98,6 +110,62 @@ public class FEMParser extends Parser {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 	public FEMParser useSource(final String source) throws NullPointerException {
 		this.source(source);
+		return this;
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Parameternames in {@link #params()} zurück.
+	 *
+	 * @see List#indexOf(Object)
+	 * @param name Parametername.
+	 * @return Position oder {@code -1}.
+	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
+	public int getParam(final String name) throws NullPointerException {
+		return this.params.indexOf(name.toString());
+	}
+
+	/** Diese Methode fügt den gegebenen Parameternamen an der gegebenen Position in {@link #params()} ein und gibt {@code this} zurück.
+	 *
+	 * @see List#add(int, Object)
+	 * @param index Einfügelosition.
+	 * @param name Parameternamen.
+	 * @return {@code this}.
+	 * @throws NullPointerException Wenn {@code name} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code index} ungültig ist. */
+	public FEMParser putParam(final int index, final String name) throws NullPointerException, IllegalArgumentException {
+		this.params.add(index, name.toString());
+		return this;
+	}
+
+	/** Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
+	 *
+	 * @param value Parameternamen.
+	 * @return {@code this}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
+	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
+	public FEMParser useParams(final String... value) throws NullPointerException {
+		return this.useParams(Arrays.asList(value));
+	}
+
+	/** Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
+	 *
+	 * @param value Parameternamen.
+	 * @return {@code this}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
+	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
+	public FEMParser useParams(final List<String> value) throws NullPointerException {
+		if (value.contains(null)) throw new NullPointerException();
+		this.params.clear();
+		this.params.addAll(value);
+		return this;
+	}
+
+	/** Diese Methode entfernt die gegebene Anzahl der an Parameternamen ab dem BEginn der Liste aus {@link #params()} und gibt {@code this} zurück.
+	 *
+	 * @param count Anzahl.
+	 * @return {@code this}.
+	 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist. */
+	public FEMParser popParams(final int count) throws IllegalArgumentException {
+		this.params.subList(0, count).clear();
 		return this;
 	}
 

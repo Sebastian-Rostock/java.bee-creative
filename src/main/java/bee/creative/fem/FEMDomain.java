@@ -20,6 +20,7 @@ import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.lang.Strings;
 import bee.creative.util.Filter;
+import bee.creative.util.Parser;
 
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
  * Quelltexten und Funktionen ineinander dienen.
@@ -101,6 +102,43 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Wertliste ({@code Map<String, FEMProxy>}). */
 	public static final int PARSE_PROXY_MAP = 6;
 
+	/** Diese Methode überspringt alle nicht zu maskierenden Steuerzeichen. Ein solches Steuerzeichen ist bspw. ein Leerzeichen, Dollarzeichen, Semikolon,
+	 * Schrägstrich, Apostroph oder eine runde, spitze, eckige bzw. geschweifte Klammer.
+	 *
+	 * @param target Parser, der bis zum nächsten Steuerzeichen oder dem Ende seiner Eingabe navigiert wird.
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+	protected void skipConst(final Parser target) throws NullPointerException {
+		int symbol = target.symbol();
+		while (true) {
+			if (symbol <= ' ') return;
+			switch (symbol) {
+				case '\'':
+				case '"':
+				case ';':
+				case '$':
+				case '/':
+				case '{':
+				case '}':
+				case '(':
+				case ')':
+				case '[':
+				case ']':
+				case '<':
+				case '>':
+					return;
+			}
+			symbol = target.skip();
+		}
+	}
+
+	/** Diese Methode parst Leerraum, erfasst diese jedoch nicht als {@link Token Bereich}. Zum Leerraum zählen alle Symbole kleiner oder gleich {@code ' '}.
+	 *
+	 * @param target Parser.
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+	protected void skipSpace(final Parser target) throws NullPointerException {
+		for (int symbol = target.symbol(); (symbol >= 0) && (symbol <= ' '); symbol = target.skip()) {}
+	}
+
 	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer mit Semikolon separierten Auflistung von über den gegebenen {@code itemParser} erkannten
 	 * Elementen und gibt nur dann {@code true} zurück, wenn diese Auflistung am ersten Element erkannt wurden. Das Symbol {@code ';'} wird direkt als Typ des
 	 * erfassten Bereichs eingesetzt. Zwischen all diesen Komponenten können beliebig viele {@link #parseComments(FEMParser) Kommentare/Leerraum} stehen.
@@ -162,9 +200,8 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Konstante und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert
-	 * hierfür in spitze Klammen eingeschlossene und mit Schrägstrich {@link #parseSequence(FEMParser, char, char, char) maskierte} Zeichenkette sowie unmaskierte
-	 * Bezeichner durch. Ein unmaskierter Bezeichner ist eine Zeichenkette ohne Leerraum, Schrägstrich, Semikolon sowie ohne runde, eckige oder geschweifte
-	 * Klammer und nutzen den Bereichstyp {@code '?'}.
+	 * hierfür in spitze Klammen eingeschlossene {@link #parseSequence(FEMParser, char, char, char) maskierte Zeichenketten} sowie {@link #skipConst(Parser)
+	 * unmaskierte Bezeichner} durch. Ein unmaskierter Bezeichner nutzen den Bereichstyp {@code '?'}.
 	 *
 	 * @param target Parser.
 	 * @return {@code true}, wenn die Konstante erkannt wurde.
@@ -172,26 +209,7 @@ public class FEMDomain extends BaseObject {
 	protected boolean parseConst(final FEMParser target) throws NullPointerException {
 		if (this.parseSequence(target, '<', '<', '>')) return true;
 		final int offset = target.index();
-		int symbol = target.symbol();
-		LOOP: while (true) {
-			if (symbol <= ' ') {
-				break LOOP;
-			}
-			switch (symbol) {
-				case ';':
-				case '/':
-				case '(':
-				case ')':
-				case '[':
-				case ']':
-				case '{':
-				case '}':
-				case '<':
-				case '>':
-				break LOOP;
-			}
-			symbol = target.skip();
-		}
+		this.skipConst(target);
 		if (target.index() == offset) return false;
 		target.putToken('?', offset);
 		return true;
@@ -316,7 +334,7 @@ public class FEMDomain extends BaseObject {
 	 * @return {@code true}, wenn die Zeichenkette erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseString(final FEMParser target) throws NullPointerException {
-		return this.parseSequence(target, '\'') || this.parseSequence(target, '\"');
+		return this.parseSequence(target, '\"') || this.parseSequence(target, '\'');
 	}
 
 	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Funktionszeigers und gibt nur dann {@code true} zurück, wenn dieser an der öffnenden
@@ -331,6 +349,7 @@ public class FEMDomain extends BaseObject {
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseHandler(final FEMParser target) throws NullPointerException {
 		if (target.symbol() != '{') return false;
+		int count = 0;
 		final int openIndex = target.putToken('{'), closeIndex;
 		target.skip();
 		this.parseComments(target);
@@ -341,6 +360,7 @@ public class FEMDomain extends BaseObject {
 			this.parseError(target, openIndex);
 			return this.parseError(target);
 		} else {
+			target.putParam(count++, target.target());
 			while (true) {
 				this.parseComments(target);
 				if (target.symbol() == ':') {
@@ -359,6 +379,7 @@ public class FEMDomain extends BaseObject {
 						return this.parseError(target);
 					}
 				}
+				target.putParam(count++, target.target());
 			}
 		}
 		this.parseComments(target);
@@ -373,6 +394,7 @@ public class FEMDomain extends BaseObject {
 			this.parseError(target, closeIndex);
 			return this.parseError(target);
 		}
+		target.popParams(count);
 		target.putToken('}');
 		target.skip();
 		return true;
@@ -454,37 +476,18 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameternamen und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie sucht
-	 * dazu eine nicht leere Zeichenkette ohne Leerraum, Schrägstrich, Doppelpunkt, Semikolon sowie ohne Klammer. Das Symbol {@code '~'} wird als Typ des
-	 * erfassten Bereichs eingesetzt.
+	 * dazu eine nicht leere {@link #skipConst(Parser) unmaskierte} Zeichenkette. Das Symbol {@code '~'} wird als Typ des erfassten Bereichs eingesetzt.
 	 *
 	 * @param target Parser.
 	 * @return {@code true}, wenn der Parametername erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseName(final FEMParser target) throws NullPointerException {
 		final int offset = target.index();
-		int symbol = target.symbol();
-		LOOP: while (true) {
-			if (symbol <= ' ') {
-				break LOOP;
-			}
-			switch (symbol) {
-				case '/':
-				case ':':
-				case ';':
-				case '(':
-				case ')':
-				case '[':
-				case ']':
-				case '{':
-				case '}':
-				case '<':
-				case '>':
-				break LOOP;
-			}
-			symbol = target.skip();
-		}
+		this.skipConst(target);
 		if (target.index() == offset) return false;
 		target.putToken('~', offset);
+		target.clear();
+		target.take(target.source().substring(offset, target.index()));
 		return true;
 	}
 
@@ -492,47 +495,41 @@ public class FEMDomain extends BaseObject {
 	 * erkannt wurde. Diesem Zeichen kann ein {@link #parseIndex(FEMParser) Parameterindex} oder ein {@link #parseName(FEMParser) Parametername} folgen. Das
 	 * Symbol {@code '$'} wird direkt als Typ des erfassten Bereichs eingesetzt.
 	 *
-	 * @param source Parser.
+	 * @param target Parser.
 	 * @return {@code true}, wenn der Parameterverweis erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseLocale(final FEMParser source) throws NullPointerException {
-		if (source.symbol() != '$') return false;
-		source.putToken('$');
-		source.skip();
-		if (this.parseIndex(source)) return true;
-		this.parseName(source);
+	protected boolean parseLocale(final FEMParser target) throws NullPointerException {
+		if (target.symbol() != '$') return false;
+		target.putToken('$');
+		target.skip();
+		final int offset = target.index();
+		if (this.parseIndex(target) || !this.parseName(target)) return true;
+		if (target.getParam(target.target()) >= 0) return true;
+		target.putToken('!', offset, target.index() - offset);
 		return true;
-	}
-
-	/** Diese Methode parst den {@link Token Bereich} von Leerraum, erfasst diese jedoch nicht. Zum Leerraum zählen alle Symbole kleiner oder gleich {@code ' '}.
-	 *
-	 * @param source Parser.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void parseSpace(final FEMParser source) throws NullPointerException {
-		for (int symbol = source.symbol(); (symbol >= 0) && (symbol <= ' '); symbol = source.skip()) {}
 	}
 
 	/** Diese Methode parst und erfasst die {@link Token Bereiche} von Kommentaren. Ein Kommentar wird als mit Schrägstrich
 	 * {@link #parseSequence(FEMParser, char)} maskierte} Zeichenkette erkannt und erfasst. Vor und nach einem Kommentar kann beliebig viel
-	 * {@link #parseSpace(FEMParser) Leerraum} stehen.
+	 * {@link #skipSpace(Parser) Leerraum} stehen.
 	 *
-	 * @param source Parser.
+	 * @param target Parser.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void parseComments(final FEMParser source) throws NullPointerException {
+	protected void parseComments(final FEMParser target) throws NullPointerException {
 		do {
-			this.parseSpace(source);
-		} while (this.parseSequence(source, '/'));
+			this.skipSpace(target);
+		} while (this.parseSequence(target, '/'));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.parseSequence(source, maskSymbol, maskSymbol, maskSymbol)}.
 	 *
 	 * @see #parseSequence(FEMParser, char, char, char)
-	 * @param source Parser.
+	 * @param target Parser.
 	 * @param maskSymbol Maskierungszeichen.
 	 * @return {@code true}, wenn die Sequenz erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseSequence(final FEMParser source, final char maskSymbol) throws NullPointerException {
-		return this.parseSequence(source, maskSymbol, maskSymbol, maskSymbol);
+	protected boolean parseSequence(final FEMParser target, final char maskSymbol) throws NullPointerException {
+		return this.parseSequence(target, maskSymbol, maskSymbol, maskSymbol);
 	}
 
 	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Zeichenkette analog zu {@link Strings#parseSequence(CharSequence, char, char, char)} und
@@ -1070,46 +1067,19 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit Maskierung als formatierte Zeichenkette zurück. Die
-	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder wenn die Zeichenkette ein {@link #formatConstCheck(String) zu maskierendes Zeichen
-	 * enthält}. Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<', '<', '>')}. Wenn
-	 * die Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
+	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder wenn die Zeichenkette ein {@link #skipConst(Parser) zu maskierendes Zeichen enthält}.
+	 * Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<', '<', '>')}. Wenn die
+	 * Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
 	 *
 	 * @param string Zeichenkette.
 	 * @param forceMask {@code true}, wenn die Maskierung notwendig ist.
 	 * @return gegebene bzw. formateirte Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
 	public String formatConst(final String string, final boolean forceMask) throws NullPointerException {
-		return forceMask || this.formatConstCheck(string) ? Strings.formatSequence(string, '<', '<', '>') : Objects.notNull(string);
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebene Zeichenkette ein zu maskierendes Steuerzeichen enthält, bspw. ein Leerzeichen,
-	 * Dollarzeichen, Semikolon, Schrägstrich, Apostroph oder eine runde, spitze, eckige bzw. geschweifte Klammer.
-	 *
-	 * @param string Zeichenkette.
-	 * @return {@code true}, wenn die Zeichenkette Steuerzeichen enthält.
-	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	protected boolean formatConstCheck(final String string) throws NullPointerException {
-		for (int i = string.length(); i != 0;) {
-			final char symbol = string.charAt(--i);
-			if (symbol <= ' ') return true;
-			switch (symbol) {
-				case '\'':
-				case '"':
-				case ';':
-				case '$':
-				case '/':
-				case '{':
-				case '}':
-				case '(':
-				case ')':
-				case '[':
-				case ']':
-				case '<':
-				case '>':
-					return true;
-			}
-		}
-		return false;
+		if (forceMask) return Strings.formatSequence(string, '<', '<', '>');
+		final Parser parser = new Parser(string);
+		this.skipConst(parser);
+		return !parser.isParsed() ? Strings.formatSequence(string, '<', '<', '>') : Objects.notNull(string);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.formatScript(source, null)}.
