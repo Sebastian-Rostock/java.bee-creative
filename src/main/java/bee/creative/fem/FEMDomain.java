@@ -102,18 +102,17 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Wertliste ({@code Map<String, FEMProxy>}). */
 	public static final int PARSE_PROXY_MAP = 6;
 
-	/** Diese Methode überspringt alle nicht zu maskierenden Steuerzeichen. Ein solches Steuerzeichen ist bspw. ein Leerzeichen, Dollarzeichen, Semikolon,
-	 * Schrägstrich, Apostroph oder eine runde, spitze, eckige bzw. geschweifte Klammer.
+	/** Diese Methode überspringt alle Zeichen eines {@link #parseName(FEMParser) Parameternemen}. Dieser darf keine Steuerzeichen, insbesondere kein Leerzeichen,
+	 * Doppelpunkt, Semikolon, Schrägstrich oder Klammer.
 	 *
 	 * @param target Parser, der bis zum nächsten Steuerzeichen oder dem Ende seiner Eingabe navigiert wird.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void skipConst(final Parser target) throws NullPointerException {
+	protected void skipName(final Parser target) throws NullPointerException {
 		int symbol = target.symbol();
 		while (true) {
 			if (symbol <= ' ') return;
 			switch (symbol) {
-				case '\'':
-				case '"':
+				case ':':
 				case ';':
 				case '$':
 				case '/':
@@ -125,6 +124,37 @@ public class FEMDomain extends BaseObject {
 				case ']':
 				case '<':
 				case '>':
+				case '"':
+				case '\'':
+					return;
+			}
+			symbol = target.skip();
+		}
+	}
+
+	/** Diese Methode überspringt alle Zeichen einer {@link #parseConst(FEMParser) Konstanten}. Dieser darf keine Steuerzeichen, insbesondere kein Leerzeichen,
+	 * Semikolon, Schrägstrich oder Klammer.
+	 *
+	 * @param target Parser, der bis zum nächsten Steuerzeichen oder dem Ende seiner Eingabe navigiert wird.
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+	protected void skipConst(final Parser target) throws NullPointerException {
+		int symbol = target.symbol();
+		while (true) {
+			if (symbol <= ' ') return;
+			switch (symbol) {
+				case ';':
+				case '$':
+				case '/':
+				case '{':
+				case '}':
+				case '(':
+				case ')':
+				case '[':
+				case ']':
+				case '<':
+				case '>':
+				case '"':
+				case '\'':
 					return;
 			}
 			symbol = target.skip();
@@ -476,14 +506,14 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameternamen und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie sucht
-	 * dazu eine nicht leere {@link #skipConst(Parser) unmaskierte} Zeichenkette. Das Symbol {@code '~'} wird als Typ des erfassten Bereichs eingesetzt.
+	 * dazu eine nicht leere {@link #skipName(Parser) unmaskierte} Zeichenkette. Das Symbol {@code '~'} wird als Typ des erfassten Bereichs eingesetzt.
 	 *
 	 * @param target Parser.
 	 * @return {@code true}, wenn der Parametername erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseName(final FEMParser target) throws NullPointerException {
 		final int offset = target.index();
-		this.skipConst(target);
+		this.skipName(target);
 		if (target.index() == offset) return false;
 		target.putToken('~', offset);
 		target.clear();
