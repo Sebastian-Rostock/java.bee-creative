@@ -532,10 +532,9 @@ public class FEMDomain extends BaseObject {
 		if (target.symbol() != '$') return false;
 		target.putToken('$');
 		target.skip();
-		final int offset = target.index();
 		if (this.parseIndex(target) || !this.parseName(target)) return true;
 		if (target.getParam(target.target()) >= 0) return true;
-		target.putToken('!', offset, target.index() - offset);
+		target.setToken(target.tokens().size(), '!');
 		return true;
 	}
 
@@ -1509,6 +1508,7 @@ public class FEMDomain extends BaseObject {
 				source.skip();
 			} else if (source.symbol() == ':') {
 				source.skip();
+				this.compileComments(source);
 				final FEMFunction result = this.compileFunction(source);
 				if (result == null) throw new IllegalArgumentException();
 				this.compileComments(source);

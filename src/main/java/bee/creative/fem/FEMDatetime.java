@@ -2,7 +2,9 @@ package bee.creative.fem;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import bee.creative.lang.Integers;
+import bee.creative.lang.Objects;
 import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender. Intern wird die Zeitangabe als ein {@code long}
@@ -940,6 +942,15 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 			(this.valueL & 0xFFFF8000) | (hour << 10) | (millisecond << 0));
 	}
 
+	/** Diese Methode gibt diese Zeitangabe mit der {@link TimeZone#getDefault() aktuellen Zeitzone} zurück. Wenn diese Zeitangabe bereits eine Zeitzone besitzt,
+	 * werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.
+	 *
+	 * @see #withoutZone()
+	 * @return Zeitangabe mit Zeitzone. */
+	public final FEMDatetime withZone() {
+		return this.withZone(TimeZone.getDefault());
+	}
+
 	/** Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück. Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum
 	 * sofern vorhanden entsprechend angepasst.
 	 *
@@ -974,6 +985,17 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return this.moveZoneImpl(zone - this.zoneValueImpl());
 	}
 
+	/** Diese Methode gibt diese Zeitangabe mit der zur gegebenen Kennung {@link TimeZone#getTimeZone(String) ermittelten Zeitzone} zurück. Wenn diese Zeitangabe
+	 * bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.
+	 *
+	 * @see #withoutZone()
+	 * @param zoneId Kennung einer Zeitzone.
+	 * @return Zeitangabe mit Zeitzone.
+	 * @throws NullPointerException Wenn {@code zoneId} {@code null} ist. */
+	public final FEMDatetime withZone(final String zoneId) throws NullPointerException {
+		return this.withZone(TimeZone.getTimeZone(Objects.notNull(zoneId)));
+	}
+
 	/** Diese Methode gibt diese Zeitangabe mit der Zeitzone des gegebenen {@link Calendar} zurück. Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden
 	 * Uhrzeit und Datum sofern vorhanden entsprechend angepasst. Wenn am gegebenen {@link Calendar} das Feld {@link Calendar#ZONE_OFFSET} undefiniert ist, hat
 	 * die gelieferte Zeitangabe keine Zeitzone.
@@ -985,8 +1007,19 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws IllegalArgumentException Wenn die Zeitzone ungültig ist. */
 	public final FEMDatetime withZone(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
 		if (!calendar.isSet(Calendar.ZONE_OFFSET)) return this.withoutZone();
-		final int zone = calendar.get(Calendar.ZONE_OFFSET) / 60000;
+		final int zone = (calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET)) / 60000;
 		return this.withZone(zone);
+	}
+
+	/** Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück. Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum
+	 * sofern vorhanden entsprechend angepasst.
+	 *
+	 * @see #withoutZone()
+	 * @param zone Zeitzone.
+	 * @return Zeitangabe mit Zeitzone.
+	 * @throws NullPointerException Wenn {@code zone} {@code null} ist. */
+	public final FEMDatetime withZone(final TimeZone zone) throws NullPointerException {
+		return this.withZone((this.hasDate() ? zone.getOffset(this.toTime()) : zone.getRawOffset()) / 60000);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der Zeitzone der gegebenen Zeitangabe zurück. Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit
@@ -1347,7 +1380,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 *
 	 * @return Anzahl an Millisekunden.
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
-	public final long toTime() {
+	public final long toTime() throws IllegalStateException {
 		return FEMDuration.durationmillisOfImpl(this.calendardayValue() - 141427, 0, this.zoneValueImpl(), 0, this.daymillisValueImpl());
 	}
 
