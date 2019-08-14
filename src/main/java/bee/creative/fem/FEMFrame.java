@@ -30,9 +30,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		@Override
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.params.length;
-			if (index2 >= 0) return this.parent.get(index2);
-			final FEMValue result = this.params.customGet(index);
-			return result;
+			return index2 >= 0 ? this.parent.get(index2) : this.params.customGet(index).result();
 		}
 
 		@Override
@@ -102,11 +100,10 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 				if (index2 >= 0) return this.frame.get(index2);
 				synchronized (this.values) {
 					FEMValue result = this.values[index];
-					if (result != null) return result;
-					final FEMFunction param = this.functions[index];
-					if (param == null) throw new NullPointerException("params().get(index) = null");
-					result = param.invoke(this.frame);
-					if (result == null) throw new NullPointerException("params().get(index).invoke(frame) = null");
+					if (result != null) return result.result();
+					final FEMFunction function = this.functions[index];
+					result = function.invoke(this.frame);
+					result = result.result();
 					this.values[index] = result;
 					return result;
 				}
@@ -117,9 +114,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 				synchronized (this.values) {
 					FEMValue result = this.values[index];
 					if (result != null) return result;
-					final FEMFunction param = this.functions[index];
-					if (param == null) throw new NullPointerException("params[index] = null");
-					result = param.toFuture(this.frame);
+					final FEMFunction function = this.functions[index];
+					result = function.toFuture(this.frame);
 					this.values[index] = result;
 					return result;
 				}
@@ -142,8 +138,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		@Override
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.params.length;
-			if (index2 >= 0) return this.parent.get(index2);
-			return this.params.frameGet(index);
+			return index2 >= 0 ? this.parent.get(index2) : this.params.frameGet(index);
 		}
 
 		@Override
@@ -359,10 +354,11 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @throws NullPointerException Wenn {@code context} {@code null} ist. */
 	public abstract FEMFrame withContext(final FEMContext context) throws NullPointerException;
 
-	/** Diese Methode gibt den Wert des {@code index}-ten Parameters zurück. Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus, können auch
-	 * zusätzliche Parameterwerte des {@link #parent() übergeordneten Stapelrahmens} bereitgestellt werden. Genauer wird für einen {@code index >= this.size()}
-	 * der Parameterwert {@code this.parent().get(index - this.size())} des übergeordneten Stapelrahmens geliefert.
+	/** Diese Methode gibt den ausgewerteten Wert des {@code index}-ten Parameters zurück. Über die {@link #size() Anzahl der zugesicherten Parameterwerte}
+	 * hinaus, können auch zusätzliche Parameterwerte des {@link #parent() übergeordneten Stapelrahmens} bereitgestellt werden. Genauer wird für einen
+	 * {@code index >= this.size()} der Parameterwert {@code this.parent().get(index - this.size())} des übergeordneten Stapelrahmens geliefert.
 	 *
+	 * @see FEMValue#result()
 	 * @param index Index.
 	 * @return {@code index}-ter Parameterwert.
 	 * @throws IndexOutOfBoundsException Wenn für den gegebenen Index kein Parameterwert existiert. */
