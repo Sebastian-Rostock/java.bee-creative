@@ -35,14 +35,16 @@ public class ThreadPool {
 
 		@Override
 		public void run() {
+			Runnable task;
 			while (true) {
-				final Runnable task = this.node.pool.openTask(this);
+				task = this.node.pool.openTask(this);
 				if (task == null) return;
 				boolean error = true;
 				try {
 					task.run();
 					error = false;
 				} finally {
+					task = null;
 					this.node.pool.closeTask(this, error);
 				}
 			}
