@@ -199,11 +199,6 @@ public abstract class FEMFunction {
 			return this;
 		}
 
-		@Override
-		public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
-			return this.function.toFuture(frame);
-		}
-
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -512,7 +507,7 @@ public abstract class FEMFunction {
 	 *
 	 * @see ClosureFunction
 	 * @return Funktionszeiger mit Stapalrahmenbindung. */
-	public final FEMFunction toClosure() {
+	public FEMFunction toClosure() {
 		return new ClosureFunction(this);
 	}
 

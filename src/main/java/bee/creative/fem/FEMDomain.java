@@ -1236,7 +1236,6 @@ public class FEMDomain extends BaseObject {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist oder einen Fehlerbereich vom Typ {@code '!'} enthält. */
 	public Object compileScript(final FEMScript source) throws NullPointerException, IllegalArgumentException {
-		if (source.contains('!')) throw new IllegalArgumentException();
 		return this.compileScript(new FEMCompiler().useScript(source));
 	}
 

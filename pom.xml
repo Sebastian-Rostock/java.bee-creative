@@ -3,17 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bee-creative</groupId>
 	<artifactId>bee-creative</artifactId>
-	<version>14.6.1.238</version>
+	<version>14.6.1.239</version>
 	<name>bee-creative</name>
 	<description>TODO</description>
 	<licenses>
 		<license>
 			<url>http://creativecommons.org/licenses/by/3.0/de/</url>
 			<name>Creative Commons Namensnennung 3.0 Deutschland</name>
-			<comments>bee-creative.util - [cc-by] Sebastian Rostock
-Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz
-anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an:
-[ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]</comments>
+			<comments>bee-creative [cc-by] Sebastian Rostock
+Dieses Werk ist unter einer Creative Commons Lizenz vom Typ Namensnennung 3.0 Deutschland zugänglich. Um eine Kopie dieser Lizenz einzusehen, konsultieren Sie 
+http://creativecommons.org/licenses/by/3.0/de/ oder wenden Sie sich brieflich an Creative Commons, Postfach 1866, Mountain View, California, 94042, USA.</comments>
 		</license>
 	</licenses>
 	<properties>

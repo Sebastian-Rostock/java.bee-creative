@@ -7,9 +7,7 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implements BooleanArray {
 
-	/** Diese Klasse implementiert ein {@link BooleanArray} als modifizierbare Sicht auf einen Teil eines {@link CompactBooleanArray}.
-	 *
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	/** Diese Klasse implementiert ein {@link BooleanArray} als modifizierbare Sicht auf einen Teil eines {@link CompactBooleanArray}. */
 	protected static class CompactBooleanSubArray extends CompactSubArray<CompactBooleanArray, boolean[], Boolean> implements BooleanArray {
 
 		/** Dieser Konstruktor initialisiert Besitzer und Indices.
@@ -88,9 +86,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 
 	}
 
-	/** Diese Klasse implementiert die live {@link BooleanArraySection} eines {@link CompactBooleanArray}.
-	 *
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	/** Diese Klasse implementiert die live {@link BooleanArraySection} eines {@link CompactBooleanArray}. */
 	protected static class CompactBooleanArraySection extends BooleanArraySection {
 
 		/** Dieses Feld speichert den Besitzer. */
@@ -131,9 +127,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 
 	}
 
-	/** Diese Klasse implementiert die live {@link BooleanArraySection} eines {@link CompactBooleanSubArray}.
-	 *
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	/** Diese Klasse implementiert die live {@link BooleanArraySection} eines {@link CompactBooleanSubArray}. */
 	protected static class CompactBooleanSubArraySection extends BooleanArraySection {
 
 		/** Dieses Feld speichert den Besitzer. */

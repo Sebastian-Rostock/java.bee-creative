@@ -30,7 +30,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		@Override
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this.params.length;
-			return index2 >= 0 ? this.parent.get(index2) : this.params.customGet(index).result();
+			return index2 >= 0 ? this.parent.get(index2) : this.params.customGet(index);
 		}
 
 		@Override
@@ -78,61 +78,16 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	@SuppressWarnings ("javadoc")
 	public static class InvokeFrame extends FEMFrame {
 
-		public static class Params extends FEMArray {
+		public final InvokeParams params;
 
-			public final FEMFrame frame;
-
-			/** Dieses Feld speichert das Array der Parameterwerte, das nicht verändert werden darf. */
-			final FEMValue[] values;
-
-			/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
-			final FEMFunction[] functions;
-
-			Params(final FEMFrame frame, final FEMFunction[] params) {
-				super(params.length);
-				this.frame = frame;
-				this.functions = params;
-				this.values = new FEMValue[params.length];
-			}
-
-			FEMValue frameGet(final int index) {
-				final int index2 = index - this.length;
-				if (index2 >= 0) return this.frame.get(index2);
-				synchronized (this.values) {
-					FEMValue result = this.values[index];
-					if (result != null) return result.result();
-					final FEMFunction function = this.functions[index];
-					result = function.invoke(this.frame);
-					result = result.result();
-					this.values[index] = result;
-					return result;
-				}
-			}
-
-			@Override
-			protected FEMValue customGet(final int index) {
-				synchronized (this.values) {
-					FEMValue result = this.values[index];
-					if (result != null) return result;
-					final FEMFunction function = this.functions[index];
-					result = function.toFuture(this.frame);
-					this.values[index] = result;
-					return result;
-				}
-			}
-
-		}
-
-		public final Params params;
-
-		InvokeFrame(final FEMFrame parent, final Params params, final FEMContext context) {
+		InvokeFrame(final FEMFrame parent, final InvokeParams params, final FEMContext context) {
 			super(parent, context);
 			this.params = params;
 		}
 
 		InvokeFrame(final FEMFrame parent, final FEMFunction[] params, final FEMContext context) {
 			super(parent, context);
-			this.params = new Params(parent, params);
+			this.params = new InvokeParams(parent, params);
 		}
 
 		@Override
@@ -154,6 +109,47 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		@Override
 		public FEMFrame withContext(final FEMContext context) throws NullPointerException {
 			return new InvokeFrame(this.parent, this.params, Objects.notNull(context));
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class InvokeParams extends FEMArray {
+
+		public final FEMFrame frame;
+
+		/** Dieses Feld speichert das Array der Parameterwerte, das nicht verändert werden darf. */
+		final FEMValue[] values;
+
+		/** Dieses Feld speichert das Array der Parameterfunktionen, das nicht verändert werden darf. */
+		final FEMFunction[] functions;
+
+		InvokeParams(final FEMFrame frame, final FEMFunction[] params) {
+			super(params.length);
+			this.frame = frame;
+			this.functions = params;
+			this.values = new FEMValue[params.length];
+		}
+
+		FEMValue frameGet(final int index) {
+			synchronized (this.values) {
+				FEMValue result = this.values[index];
+				if (result != null) return result;
+				result = this.functions[index].invoke(this.frame);
+				this.values[index] = Objects.notNull(result);
+				return result;
+			}
+		}
+
+		@Override
+		protected FEMValue customGet(final int index) {
+			synchronized (this.values) {
+				FEMValue result = this.values[index];
+				if (result != null) return result;
+				result = this.functions[index].toFuture(this.frame);
+				this.values[index] = Objects.notNull(result);
+				return result;
+			}
 		}
 
 	}
@@ -354,11 +350,10 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @throws NullPointerException Wenn {@code context} {@code null} ist. */
 	public abstract FEMFrame withContext(final FEMContext context) throws NullPointerException;
 
-	/** Diese Methode gibt den ausgewerteten Wert des {@code index}-ten Parameters zurück. Über die {@link #size() Anzahl der zugesicherten Parameterwerte}
-	 * hinaus, können auch zusätzliche Parameterwerte des {@link #parent() übergeordneten Stapelrahmens} bereitgestellt werden. Genauer wird für einen
-	 * {@code index >= this.size()} der Parameterwert {@code this.parent().get(index - this.size())} des übergeordneten Stapelrahmens geliefert.
+	/** Diese Methode gibt den Wert des {@code index}-ten Parameters zurück. Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus, können auch
+	 * zusätzliche Parameterwerte des {@link #parent() übergeordneten Stapelrahmens} bereitgestellt werden. Genauer wird für einen {@code index >= this.size()}
+	 * der Parameterwert {@code this.parent().get(index - this.size())} des übergeordneten Stapelrahmens geliefert.
 	 *
-	 * @see FEMValue#result()
 	 * @param index Index.
 	 * @return {@code index}-ter Parameterwert.
 	 * @throws IndexOutOfBoundsException Wenn für den gegebenen Index kein Parameterwert existiert. */
@@ -374,9 +369,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		final FEMFormatter target = new FEMFormatter();
-		FEMDomain.NORMAL.formatFrame(target, this.params());
-		return target.format();
+		return FEMDomain.NORMAL.formatFrame(this);
 	}
 
 }

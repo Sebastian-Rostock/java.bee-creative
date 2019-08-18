@@ -16,7 +16,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 
 	/** Diese Klasse implementiert eine {@link List} als modifizierbare Sicht auf die Werte eines {@link CompactArray}.
 	 *
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see Array#values()
 	 * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]}
 	 *        oder {@code boolean[]}).
@@ -70,7 +69,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 
 	/** Diese Klasse implementiert eine {@link List} als unmodifizierbare Sicht auf die Werte eines {@link CompactArray}.
 	 *
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see Array#values()
 	 * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]}
 	 *        oder {@code boolean[]}).
@@ -143,7 +141,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 
 	/** Diese Klasse implementiert ein abstraktes {@link Array} als modifizierbare Sicht auf einen Teil eines {@link CompactArray}.
 	 *
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des {@link CompactArray}.
 	 * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]}
 	 *        oder {@code boolean[]}).

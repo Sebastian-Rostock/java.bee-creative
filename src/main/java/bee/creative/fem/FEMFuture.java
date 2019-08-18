@@ -1,7 +1,5 @@
 package bee.creative.fem;
 
-import bee.creative.lang.Objects;
-
 /** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
  * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann. Der Wert kapselt dazu eine gegebene {@link #function() Funktion} sowie einen gegebenen
  * {@link #frame() Stapelrahmen} und wertet diese Funktion erst dann mit diesem Stapelrahmen einmalig aus, wenn auf {@link #type() Datentyp} oder {@link #data()
@@ -11,59 +9,34 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFuture extends FEMValue {
 
-	/** Diese Methode gibt den Ergebniswert des {@link FEMFunction#invoke(FEMFrame) Aufrufs} der gegebenen Funktion mit dem gegebenen Stapelrahmen als Wert mit
-	 * <em>call-by-reference</em>-Semantik zurück. Der gelieferte Ergebniswert verzögert die Auswertung der Funktion bis zum ersten {@link #result(boolean)
-	 * Zugriff} auf seinen {@link #type() Datentyp} bzw. seine {@link #data() Nutzdaten}.
-	 *
-	 * @param frame Stapelrahmen.
-	 * @param function Funktion.
-	 * @return Ergebniswert.
-	 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist. */
-	public static FEMFuture from(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
-		return new FEMFuture(Objects.notNull(frame), Objects.notNull(function));
-	}
-
-	/** Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
-	 *
-	 * @see FEMFunction#invoke(FEMFrame) */
-	FEMValue result;
-
-	/** Dieses Feld speichert die Stapelrahmen zur Auswertung der Funktion oder {@code null}.
-	 *
-	 * @see FEMFunction#invoke(FEMFrame) */
 	FEMFrame frame;
 
-	/** Dieses Feld speichert die Funktion oder {@code null}.
-	 *
-	 * @see FEMFunction#invoke(FEMFrame) */
 	FEMFunction function;
 
-	/** Dieser Konstruktor initialisiert Stapelrahmen und Funktion.
-	 *
-	 * @param frame Stapelrahmen.
-	 * @param function Funktion. */
 	FEMFuture(final FEMFrame frame, final FEMFunction function) {
 		this.frame = frame;
 		this.function = function;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #result() Ergebniswert} noch nicht ausgewertet wurde.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #result() Ergebniswert} ausgewertet wurde, d.h. wenn {@link #function()} einen
+	 * {@link FEMValue} liefert.
 	 *
 	 * @return Auswertungsstatus. */
 	public final synchronized boolean ready() {
-		return this.result != null;
+		return this.function instanceof FEMValue;
 	}
 
-	/** Diese Methode gibt die Stapelrahmen oder {@code null} zurück. Der erste Aufruf von {@link #result(boolean)} setzt die Stapelrahmen auf {@code null}.
+	/** Diese Methode gibt die Stapelrahmen zurück. Der erste Aufruf von {@link #result(boolean)} setzt die Stapelrahmen auf {@link FEMFrame#EMPTY leeren
+	 * Stapelrahmen}.
 	 *
-	 * @return Stapelrahmen oder {@code null}. */
+	 * @return Stapelrahmen . */
 	public final synchronized FEMFrame frame() {
 		return this.frame;
 	}
 
-	/** Diese Methode gibt die Funktion oder {@code null} zurück. Der erste Aufruf von {@link #result(boolean)} setzt die Funktion auf {@code null}.
+	/** Diese Methode gibt die Funktion zurück. Der erste Aufruf von {@link #result(boolean)} setzt die Funktion auf den Ergebniswert.
 	 *
-	 * @return Funktion oder {@code null}. */
+	 * @return Funktion. */
 	public final synchronized FEMFunction function() {
 		return this.function;
 	}
@@ -84,7 +57,6 @@ public final class FEMFuture extends FEMValue {
 	 * zurück. Dieser Ergebniswert wird nur beim ersten Aufruf dieser Methode ermittelt und zur Wiederverwendung zwischengespeichert. Dabei werden die Verweise
 	 * auf Stapelrahmen und Funktion aufgelöst.
 	 *
-	 * @see FEMFuture
 	 * @see #frame()
 	 * @see #function()
 	 * @see FEMFunction#invoke(FEMFrame)
@@ -92,14 +64,9 @@ public final class FEMFuture extends FEMValue {
 	 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist. */
 	@Override
 	public final synchronized FEMValue result(final boolean deep) throws NullPointerException {
-		FEMValue result = this.result;
-		if (result != null) return this.result = result.result(deep);
-		result = this.function.invoke(this.frame);
-		if (result == null) throw new NullPointerException("function().invoke(frame()) = null");
-		result = result.result(deep);
-		this.result = result;
-		this.frame = null;
-		this.function = null;
+		final FEMValue result = this.function.invoke(this.frame).result(deep);
+		this.function = result;
+		this.frame = FEMFrame.EMPTY;
 		return result;
 	}
 
@@ -119,8 +86,8 @@ public final class FEMFuture extends FEMValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final synchronized String toString() {
-		if (this.result != null) return this.result.toString();
+	public synchronized String toString() {
+		if (this.function instanceof FEMValue) return this.function.toString();
 		return this.function.toString() + this.frame.toString();
 	}
 
