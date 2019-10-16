@@ -1,6 +1,5 @@
 package bee.creative.lang;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import bee.creative.util.HashMap3;
 import bee.creative.util.HashSet3;
@@ -235,7 +234,7 @@ public class ThreadPool {
 		return items;
 	}
 
-	/** Diese Methode halbiert die {@link HashMap3#capacity() Kapazität} der {@link #activeMap}, wenn diese Kapazität unter 25 % ausgenutzt wird. */
+	/** Diese Methode halbiert die {@link HashMap3#capacity() Kapazität} der {@link #activeMap}, wenn diese Kapazität zu weniger als 25 % ausgenutzt wird. */
 	private final void checkActive() {
 		if (this.activeMap.size() >= (this.activeMap.capacity() / 4)) return;
 		this.activeMap.allocate(this.activeMap.capacity() / 2);
@@ -294,7 +293,8 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #joinAll(long, Iterable)} ohne Synchronisation. */
-	private final void joinAllImpl(final Iterable<? extends ThreadItem> items, final long timeout) throws InterruptedException {
+	private final void joinAllImpl(final HashSet3<? extends ThreadItem> items, final long timeout) throws InterruptedException {
+		if (items.isEmpty()) return;
 		if (timeout == 0) {
 			for (final ThreadItem item: items) {
 				this.joinImpl(item, 0);
@@ -373,13 +373,13 @@ public class ThreadPool {
 	public void joinAllActive(final long timeout) throws IllegalArgumentException, InterruptedException {
 		if (timeout < 0) throw new IllegalArgumentException();
 		synchronized (this.activeMap) {
-			this.joinAllImpl(new ArrayList<>(this.activeMap.values()), timeout);
+			this.joinAllImpl(new HashSet3<>(this.activeMap.values()), timeout);
 		}
 	}
 
 	/** Diese Methode implementiert {@link #start(Runnable)} ohne Synchronisation. */
-	private final void startImpl(final Runnable task) throws IllegalThreadStateException {
-		if (this.activeMap.containsKey(Objects.notNull(task))) throw new IllegalThreadStateException();
+	private final boolean startImpl(final Runnable task) {
+		if (this.activeMap.containsKey(Objects.notNull(task))) return false;
 		final ThreadNode node = this.waitingList.next;
 		final ThreadItem item;
 		if (this.waitingList != node) {
@@ -398,38 +398,40 @@ public class ThreadPool {
 		}
 		this.activeMap.put(task, item);
 		item.task = task;
+		return true;
 	}
 
-	/** Diese Methode startet die gegebene Berechnung in einem eigenen {@link Thread}.
+	/** Diese Methode startet die gegebene Berechnung in einem eigenen {@link Thread} und gibt im Erfolgsfall {@code true} zurück.
 	 *
 	 * @see #join(long, Runnable)
 	 * @see #interrupt(Runnable)
 	 * @param task Berechnung.
-	 * @throws NullPointerException Wenn {@code task} {@code null} ist.
-	 * @throws IllegalThreadStateException Wenn die Berechnung bereits {@link #isAlive(Runnable) verarbeitet} wird. */
-	public void start(final Runnable task) throws NullPointerException, IllegalThreadStateException {
+	 * @return {@code true}, wenn die Berechnung gestartet werden konnte;<br>
+	 *         {@code false}, wenn sie bereits {@link #isAlive(Runnable) verarbeitet} wird.
+	 * @throws NullPointerException Wenn {@code task} {@code null} ist. */
+	public boolean start(final Runnable task) throws NullPointerException {
+		boolean result;
 		synchronized (this.activeMap) {
 			this.checkActive();
-			this.startImpl(task);
+			result = this.startImpl(task);
 		}
 		this.checkWaiting();
+		return result;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #startAll(Iterable) this.startAll(Arrays.asList(tasks))}.
 	 *
 	 * @param tasks Berechnungen.
-	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
-	 * @throws IllegalThreadStateException Wenn {@link #startAll(Iterable)} diese auslöst. */
-	public void startAll(final Runnable... tasks) throws NullPointerException, IllegalThreadStateException {
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public void startAll(final Runnable... tasks) throws NullPointerException {
 		this.startAll(Arrays.asList(tasks));
 	}
 
 	/** Diese Methode {@link #start(Runnable) startet} die gegebenen Berechnungen in jeweils einem eigenen {@link Thread}.
 	 *
 	 * @param tasks Berechnungen.
-	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
-	 * @throws IllegalThreadStateException Wenn {@link #start(Runnable)} diese auslöst. Dies kann auch auftreten, wenn {@code tasks} Duplikate enthält. */
-	public void startAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, IllegalThreadStateException {
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public void startAll(final Iterable<? extends Runnable> tasks) throws NullPointerException {
 		synchronized (this.activeMap) {
 			for (final Runnable task: tasks) {
 				this.startImpl(task);
@@ -457,7 +459,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #interruptAll(Iterable)} ohne Synchronisation. */
-	private final void interruptAllImpl(final Iterable<? extends ThreadItem> items) {
+	private final void interruptAllImpl(final HashSet3<? extends ThreadItem> items) {
 		for (final ThreadItem item: items) {
 			this.interruptImpl(item);
 		}
@@ -490,7 +492,7 @@ public class ThreadPool {
 	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
 	public void interruptAllActive() throws SecurityException {
 		synchronized (this.activeMap) {
-			this.interruptAllImpl(new ArrayList<>(this.activeMap.values()));
+			this.interruptAllImpl(new HashSet3<>(this.activeMap.values()));
 		}
 	}
 
