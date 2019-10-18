@@ -1,8 +1,8 @@
 package bee.creative.lang;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import bee.creative.util.HashMap3;
-import bee.creative.util.HashSet3;
 
 /** Diese Klasse implementiert einen {@link java.lang.Thread Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable)
  * Überwachen}, {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Auswertung beliebiger {@link Runnable Berechnungen}
@@ -23,8 +23,10 @@ public class ThreadPool {
 
 		public final ThreadNode node;
 
+		/** Dieses Feld speichert die Kennung des aktuellen Verarbeitungslaufs. Diese wird zusammen mit {@link #task} initialisiert. */
 		public Object run;
 
+		/** Dieses Feld speichert die nächste von diesem Thread ausgeführte Berechnung. */
 		public Runnable task;
 
 		public ThreadItem(final ThreadPool pool, final ThreadGroup group) {
@@ -225,12 +227,11 @@ public class ThreadPool {
 	 * @param tasks Berechnungen.
 	 * @return Threads.
 	 * @throws NullPointerException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
-	private final HashSet3<ThreadItem> getThreads(final Iterable<? extends Runnable> tasks) throws NullPointerException {
-		final HashSet3<ThreadItem> items = new HashSet3<>(10);
+	private final ArrayList<ThreadItem> getThreads(final Iterable<? extends Runnable> tasks) throws NullPointerException {
+		final ArrayList<ThreadItem> items = new ArrayList<>(10);
 		for (final Runnable task: tasks) {
 			items.add(this.getThread(task));
 		}
-		items.remove(null);
 		return items;
 	}
 
@@ -293,8 +294,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #joinAll(long, Iterable)} ohne Synchronisation. */
-	private final void joinAllImpl(final HashSet3<? extends ThreadItem> items, final long timeout) throws InterruptedException {
-		if (items.isEmpty()) return;
+	private final void joinAllImpl(final Iterable<? extends ThreadItem> items, final long timeout) throws InterruptedException {
 		if (timeout == 0) {
 			for (final ThreadItem item: items) {
 				this.joinImpl(item, 0);
@@ -302,12 +302,10 @@ public class ThreadPool {
 		} else {
 			final long until = System.currentTimeMillis() + timeout;
 			long sleep = timeout;
-			while (true) {
-				for (final ThreadItem item: items) {
-					this.joinImpl(item, sleep);
-					sleep = until - System.currentTimeMillis();
-					if (sleep <= 0) return;
-				}
+			for (final ThreadItem item: items) {
+				this.joinImpl(item, sleep);
+				sleep = until - System.currentTimeMillis();
+				if (sleep <= 0) return;
 			}
 		}
 	}
@@ -373,7 +371,7 @@ public class ThreadPool {
 	public void joinAllActive(final long timeout) throws IllegalArgumentException, InterruptedException {
 		if (timeout < 0) throw new IllegalArgumentException();
 		synchronized (this.activeMap) {
-			this.joinAllImpl(new HashSet3<>(this.activeMap.values()), timeout);
+			this.joinAllImpl(new ArrayList<>(this.activeMap.values()), timeout);
 		}
 	}
 
@@ -459,7 +457,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #interruptAll(Iterable)} ohne Synchronisation. */
-	private final void interruptAllImpl(final HashSet3<? extends ThreadItem> items) {
+	private final void interruptAllImpl(final ArrayList<? extends ThreadItem> items) {
 		for (final ThreadItem item: items) {
 			this.interruptImpl(item);
 		}
@@ -492,7 +490,7 @@ public class ThreadPool {
 	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
 	public void interruptAllActive() throws SecurityException {
 		synchronized (this.activeMap) {
-			this.interruptAllImpl(new HashSet3<>(this.activeMap.values()));
+			this.interruptAllImpl(new ArrayList<>(this.activeMap.values()));
 		}
 	}
 
@@ -627,6 +625,7 @@ public class ThreadPool {
 	public void setWaitingTimeout(final long value) throws IllegalArgumentException {
 		if (value < 0) throw new IllegalArgumentException();
 		synchronized (this.waitingList) {
+			if (this.waitingTimeout == value) return;
 			this.waitingTimeout = value;
 			this.waitingList.notifyAll();
 		}
