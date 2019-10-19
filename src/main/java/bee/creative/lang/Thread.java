@@ -1,52 +1,54 @@
 package bee.creative.lang;
 
-/** Diese Klasse implementiert ein abstraktes {@link Runnable} als leichtgewichtiger Thread, desses Ausführung über einen {@link ThreadPool} realisiert wird.
+/** Diese Klasse implementiert eine abstrakte {@link Runnable Berechnung}, die als leichtgewichtiger {@link Thread} über einen {@link ThreadPool} ausgeführt
+ * wird.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class Thread implements Runnable {
 
-	/** Diese Methode wartet auf den Abschluss dieses Thread, sofern diese aktuell {@link #isAlive() verarbeitet} wird.
+	/** Diese Methode {@link ThreadPool#join(Runnable) wartet} auf den Abschluss dieser Berechnung.
 	 *
 	 * @throws IllegalThreadStateException Wenn {@link ThreadPool#join(long, Runnable)} diese auslöst. */
 	public void join() throws InterruptedException {
 		this.geThreadPool().join(this);
 	}
 
-	/** Diese Methode wartet auf den Abschluss dieses Thread, sofern diese aktuell {@link #isAlive() verarbeitet} wird. Wenn die gegebene Wartezeit nicht
-	 * {@code 0} ist, wird höchstens solange gewartet.
+	/** Diese Methode {@link ThreadPool#join(long, Runnable) wartet} auf den Abschluss dieser Berechnung. Wenn die gegebene Wartezeit größer {@code 0} ist, wird
+	 * höchstens solange gewartet.
 	 *
 	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
 	 * @throws IllegalThreadStateException Wenn {@link ThreadPool#join(long, Runnable)} diese auslöst.
-	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	 * @throws InterruptedException Wenn {@link ThreadPool#join(long, Runnable)} diese auslöst. */
 	public void join(final long timeout) throws IllegalArgumentException, InterruptedException {
 		this.geThreadPool().join(timeout, this);
 	}
 
-	/** Diese Methode startet diesen Thread.
+	/** Diese Methode {@link ThreadPool#start(Runnable) startet} diese Berechnung.
 	 *
-	 * @throws IllegalThreadStateException Wenn {@link ThreadPool#start(Runnable)} diese auslöst. */
-	public void start() throws IllegalThreadStateException {
-		this.geThreadPool().start(this);
+	 * @return {@code true}, wenn die Berechnung gestartet wurde;<br>
+	 *         {@code false}, wenn sie bereits {@link #isAlive() verarbeitet} wird. */
+	public boolean start() {
+		return this.geThreadPool().start(this);
 	}
 
-	/** Diese Methode unterbricht diesen Thread, sofern dieser aktuell {@link #isAlive() verarbeitet} wird.
+	/** Diese Methode {@link ThreadPool#interrupt(Runnable) unterbricht} diese Berechnung.
 	 *
 	 * @throws SecurityException Wenn {@link ThreadPool#interrupt(Runnable)} diese auslöst. */
 	public void interrupt() throws SecurityException {
 		this.geThreadPool().interrupt(this);
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Thread {@link #start() gestartet} und noch nicht abgeschlossen wurde.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Berechnung {@link ThreadPool#interrupt(Runnable) ausgeführt} wird.
 	 *
-	 * @return {@code true}, wenn der Thread aktuell ausgeführt wird; sonst {@code false}. */
+	 * @return {@code true}, wenn diese Berechnung aktuell ausgeführt wird; sonst {@code false}. */
 	public boolean isAlive() {
 		return this.geThreadPool().isAlive(this);
 	}
 
-	/** Diese Methode gibt den {@link ThreadPool} zurück, der für die Ausführung dieses Thread verwendet wird. Dieser {@link ThreadPool} ist wärend der Ausführung
-	 * dieses Thread konstant. Er wird meist über eine statische Konstante bereitgestellt.
+	/** Diese Methode gibt den {@link ThreadPool} zurück, der für die Ausführung dieser Berechnung verwendet wird. Dieser {@link ThreadPool} ist mindestens wärend
+	 * der Ausführung dieser Berechnung konstant. Er wird meist über eine statische Konstante bereitgestellt.
 	 *
-	 * @return {@link ThreadPool} zur Ausführung dieses Thread. */
+	 * @return {@link ThreadPool} zur Ausführung dieser Berechnung. */
 	public abstract ThreadPool geThreadPool();
 
 }

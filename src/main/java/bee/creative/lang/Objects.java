@@ -72,12 +72,12 @@ public class Objects {
 
 		@Override
 		public int hash(final Object input) {
-			return System.identityHashCode(input);
+			return Objects.identityHash(input);
 		}
 
 		@Override
 		public boolean equals(final Object input1, final Object input2) {
-			return input1 == input2;
+			return Objects.identityEquals(input1, input2);
 		}
 
 	}
@@ -155,7 +155,7 @@ public class Objects {
 	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#deepHash(Object)} und {@link Objects#deepEquals(Object, Object)} delegiert. */
 	public static final Hasher DEEP_HASHER = new DeepHasher();
 
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link System#identityHashCode(Object)} und die Objekte über ihre Referenz vergleicht. */
+	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#identityHash(Object)} und {@link Objects#identityEquals(Object, Object)} delegiert. */
 	public static final Hasher IDENTITY_HASHER = new IdentityHasher();
 
 	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
@@ -546,6 +546,26 @@ public class Objects {
 			if (!Objects.deepEquals(objects1[i], objects2[i])) return false;
 		}
 		return true;
+	}
+
+	/** Diese Methode gibt den {@link System#identityHashCode(Object) nativen Streuwert} des gegebenen Objekts oder {@code 0} zurück.
+	 *
+	 * @param object Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
+	public static int identityHash(final Object object) {
+		return System.identityHashCode(object);
+	}
+
+	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Der Rückgabewert
+	 * entspricht: <pre>
+	 * object1 == object2
+	 * </pre>
+	 *
+	 * @param object1 Objekt 1 oder {@code null}.
+	 * @param object2 Objekt 2 oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
+	public static boolean identityEquals(final Object object1, final Object object2) {
+		return object1 == object2;
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die

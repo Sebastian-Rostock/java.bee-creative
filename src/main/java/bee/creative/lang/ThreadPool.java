@@ -90,7 +90,8 @@ public class ThreadPool {
 	/** Dieses Feld speichert den initialwert für {@link java.lang.Thread#isDaemon()} neu erzeugter {@link ThreadItem}. */
 	private final boolean daemon;
 
-	/** Dieses Feld bildet von den aktuell ausgeführten {@link Runnable Berehnungen} auf die dafür eingesetzten {@link ThreadItem Threads} ab. */
+	/** Dieses Feld bildet von den aktuell ausgeführten {@link Runnable Berehnungen} auf die dafür eingesetzten {@link ThreadItem Threads} ab.<br>
+	 * Es wird zum {@link Object#wait(long) Warten} auf dan Abschluss von Berechnungen in {@link #joinImpl(ThreadItem, long)} eingesetzt. */
 	private final HashMap3<Runnable, ThreadItem> activeMap = new HashMap3<>(0);
 
 	/** Dieses Feld speichert den {@link java.lang.Thread#setName(String) Namen} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem
@@ -101,7 +102,8 @@ public class ThreadPool {
 	 * Threads}. */
 	private int activePriority;
 
-	/** Dieses Feld speichert die auf ihre Wiederverwendung wartenden {@link ThreadItem Threads}. */
+	/** Dieses Feld speichert die auf ihre Wiederverwendung wartenden {@link ThreadItem Threads}.<br>
+	 * Es wird zum {@link Object#wait(long) Warten} auf die Bestückung der {@link ThreadItem} eingesetzt. */
 	private final ThreadNode waitingList = new ThreadNode(this);
 
 	/** Dieses Feld speichert die Anzahl der in {@link #waitingList} enthaltenen {@link ThreadItem Threads}. */
@@ -399,12 +401,13 @@ public class ThreadPool {
 		return true;
 	}
 
-	/** Diese Methode startet die gegebene Berechnung in einem eigenen {@link Thread} und gibt im Erfolgsfall {@code true} zurück.
+	/** Diese Methode startet die gegebene Berechnung in einem eigenen {@link Thread} und gibt nur dann {@code true} zurück, wenn sie aktuell nicht
+	 * {@link #isAlive(Runnable) verarbeitet} wird.
 	 *
 	 * @see #join(long, Runnable)
 	 * @see #interrupt(Runnable)
 	 * @param task Berechnung.
-	 * @return {@code true}, wenn die Berechnung gestartet werden konnte;<br>
+	 * @return {@code true}, wenn die Berechnung gestartet wurde;<br>
 	 *         {@code false}, wenn sie bereits {@link #isAlive(Runnable) verarbeitet} wird.
 	 * @throws NullPointerException Wenn {@code task} {@code null} ist. */
 	public boolean start(final Runnable task) throws NullPointerException {
