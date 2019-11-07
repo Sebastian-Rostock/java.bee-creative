@@ -14,14 +14,12 @@ import java.util.Set;
  * @param <GValue> Typ der Werte. */
 public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKey, GValue> implements Map<GKey, GValue> {
 
-	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
+	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann.
 	 *
 	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
-	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
-	public AbstractHashMap<GKey, GValue> allocate(final int capacity) throws IllegalArgumentException {
+	public void allocate(final int capacity) throws IllegalArgumentException {
 		this.allocateImpl(capacity);
-		return this;
 	}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreservierung verwaltet werden kann.
@@ -31,12 +29,9 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 		return this.capacityImpl();
 	}
 
-	/** Diese Methode verkleinert die Kapazität auf das Minimum und gibt {@code this} zurück.
-	 *
-	 * @return {@code this}. */
-	public AbstractHashMap<GKey, GValue> compact() {
+	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
+	public void compact() {
 		this.allocateImpl(this.countImpl());
-		return this;
 	}
 
 	/** {@inheritDoc} */

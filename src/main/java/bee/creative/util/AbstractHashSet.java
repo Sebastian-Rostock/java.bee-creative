@@ -13,14 +13,12 @@ import java.util.Set;
  * @param <GItem> Typ der Elemente. */
 public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GItem> implements Set<GItem> {
 
-	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann, und gibt {@code this} zurück.
+	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann.
 	 *
 	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
-	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
-	public AbstractHashSet<GItem> allocate(final int capacity) throws IllegalArgumentException {
+	public void allocate(final int capacity) throws IllegalArgumentException {
 		this.allocateImpl(capacity);
-		return this;
 	}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreservierung verwaltet werden kann.
@@ -30,12 +28,9 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 		return this.capacityImpl();
 	}
 
-	/** Diese Methode verkleinert die Kapazität auf das Minimum und gibt {@code this} zurück.
-	 *
-	 * @return {@code this}. */
-	public AbstractHashSet<GItem> compact() {
+	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
+	public void compact() {
 		this.allocateImpl(this.countImpl());
-		return this;
 	}
 
 	/** {@inheritDoc} */
