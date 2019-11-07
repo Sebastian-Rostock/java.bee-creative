@@ -79,7 +79,6 @@ public class Iterators {
 
 		public ItemsIterator(final int fromIndex, final int toIndex, final Items<? extends GItem> items) {
 			Comparables.check(fromIndex, toIndex);
-
 			this.items = Objects.notNull(items);
 			this.fromIndex = fromIndex;
 			this.toIndex = toIndex;
@@ -93,8 +92,46 @@ public class Iterators {
 
 		@Override
 		public GItem next() {
-			if (this.index == this.toIndex) throw new NoSuchElementException();
+			if (this.index >= this.toIndex) throw new NoSuchElementException();
 			return this.items.get(this.index++);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.items, this.fromIndex, this.toIndex);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#arrayIterator(Object[], int, int)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ArrayIterator<GItem> extends BaseIterator<GItem> {
+
+		public final int fromIndex;
+
+		public final int toIndex;
+
+		protected final GItem[] items;
+
+		protected int index;
+
+		public ArrayIterator(final int fromIndex, final int toIndex, final GItem[] items) {
+			Comparables.check(fromIndex, toIndex);
+			this.items = Objects.notNull(items);
+			this.fromIndex = fromIndex;
+			this.toIndex = toIndex;
+			this.index = fromIndex;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.index < this.toIndex;
+		}
+
+		@Override
+		public GItem next() {
+			if (this.index >= this.toIndex) throw new NoSuchElementException();
+			return this.items[this.index++];
 		}
 
 		@Override
@@ -128,7 +165,7 @@ public class Iterators {
 
 		public final int count;
 
-		int value = 0;
+		protected int value = 0;
 
 		public IntegerIterator(final int count) {
 			if (count < 0) throw new IllegalArgumentException();
@@ -599,6 +636,31 @@ public class Iterators {
 	public static <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
 		return new ItemsIterator<>(fromIndex, toIndex, items);
+	}
+
+	/** Diese Methode gibt einen {@link Iterator} über die Elemente des gegebenen Arrays zurück.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param items {@link Items}.
+	 * @return Array-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	@SafeVarargs
+	public static <GItem> Iterator<GItem> arrayIterator(final GItem... items) throws NullPointerException {
+		return Iterators.arrayIterator(items, 0, items.length);
+	}
+
+	/** Diese Methode gibt einen {@link Iterator} über die Elemente eines Abschnitts des gegebenen Arrays zurück.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param items {@link Items}.
+	 * @param fromIndex Index des ersten Elements, dass vom erzeugten {@link Iterator} geliefert wird.
+	 * @param toIndex Index nach dem letzten Element, dass vom erzeugten {@link Iterator} geliefert wird.
+	 * @return Array-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
+	public static <GItem> Iterator<GItem> arrayIterator(final GItem[] items, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException {
+		return new ArrayIterator<>(fromIndex, toIndex, items);
 	}
 
 	/** Diese Methode gibt den leeren {@link Iterator} zurück.
