@@ -534,7 +534,7 @@ public class FEMDomain extends BaseObject {
 		target.skip();
 		if (this.parseIndex(target) || !this.parseName(target)) return true;
 		if (target.getParam(target.target()) >= 0) return true;
-		target.setToken(target.tokens().size(), '!');
+		target.setToken(target.tokens().size() - 1, '!');
 		return true;
 	}
 
