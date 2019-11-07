@@ -12,9 +12,9 @@ import bee.creative.bind.Setters;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten. Dazu werden
- * gegebene Eingabeobjekte mit daraus {@link #customBuild(Object) berechneten} Ausgabeobjekten über in einer {@link Map Abbildung} verwaltet. Wenn über
- * {@link #get(Object)} das mit einem gegebenen Eingabeobjekten assoziierte Ausgabeobjekt ermittelt werden soll und dieses zuvor bereits
- * {@link #customBuild(Object) erzeugt} wurde, wird dessen Wiederverwendung über {@link #customReuse(Object, Object)} signalisiert.
+ * gegebene Eingabeobjekte {@link #customSource(Object) optimiert} und mit den daraus {@link #customTarget(Object) berechneten} Ausgabeobjekten über in einer
+ * {@link Map Abbildung} verwaltet. Wenn über {@link #get(Object)} das mit einem gegebenen Eingabeobjekten assoziierte Ausgabeobjekt ermittelt werden soll und
+ * dieses zuvor bereits {@link #customTarget(Object) erzeugt} wurde, wird dessen Wiederverwendung über {@link #customReuse(Object, Object)} signalisiert.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GSource> Typ der Eingabe.
@@ -45,7 +45,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		}
 
 		@Override
-		public GTarget customBuild(final GSource source) {
+		public GTarget customTarget(final GSource source) {
 			return this.builder.get(source);
 		}
 
@@ -90,7 +90,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		}
 
 		@Override
-		public GTarget customBuild(final GSource source) {
+		public GTarget customTarget(final GSource source) {
 			return this.builder.get(source);
 		}
 
@@ -128,7 +128,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	 * @param <GSource> Typ der Eingabe.
 	 * @param <GTarget> Typ der Ausgabe.
 	 * @param sorter {@link Comparator} zur Ermittlung der Ordnung der Eingaben in {@link #compare(Object, Object)}.
-	 * @param builder {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
+	 * @param builder {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customTarget(Object)}.
 	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
 	 * @return ordnungsbasiertes {@link Unique}.
 	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
@@ -168,7 +168,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	 * @param <GSource> Typ der Eingabe.
 	 * @param <GTarget> Typ der Ausgabe.
 	 * @param hasher {@link Hasher} zur Ermittlung von Streuwert und Äquivalenz der Eingaben in {@link #hash(Object)} und {@link #equals(Object, Object)}.
-	 * @param builder {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customBuild(Object)}.
+	 * @param builder {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customTarget(Object)}.
 	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
 	 * @return streuwertbasiertes {@link Unique}.
 	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
@@ -202,7 +202,8 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 
 	/** Diese Methode gibt die mit der gegebenen Eingabe in der {@link #mapping() angebundenen Abbildung} assoziierte Ausgabe zurück. Wenn der gegebenen Eingabe
 	 * bereits eine Ausgabe zugeordnet {@link Map#get(Object) ist}, wird deren Wiederverwendung {@link #customReuse(Object, Object) signalisiert}. Sollte der
-	 * Eingabe noch keine Ausgabe zugeordnet sein, wird diese {@link #customBuild(Object) erzeugt} und mit der Eingabe {@link Map#put(Object, Object) assoziiert}.
+	 * Eingabe noch keine Ausgabe zugeordnet sein, wird diese {@link #customTarget(Object) erzeugt} und mit der Eingabe {@link Map#put(Object, Object)
+	 * assoziiert}.
 	 *
 	 * @see Map#get(Object)
 	 * @see Map#containsKey(Object)
@@ -211,12 +212,13 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	 * @return Ausgabe oder {@code null}.
 	 * @throws RuntimeException Wenn die gegebene Eingabe bzw. die erzeugte Ausgabe ungültig ist. */
 	@Override
-	public GTarget get(final GSource source) throws RuntimeException {
+	public GTarget get(GSource source) throws RuntimeException {
 		GTarget target = this.mapping.get(source);
 		if ((target != null) || this.mapping.containsKey(source)) {
 			this.customReuse(source, target);
 		} else {
-			target = this.customBuild(source);
+			source = this.customSource(source);
+			target = this.customTarget(source);
 			this.set(source, target);
 		}
 		return target;
@@ -235,12 +237,21 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		return this.mapping;
 	}
 
+	/** Diese Methode überführt die gegebene Eingabe in das als Schlüssel im {@link #mapping} einzusetzende Objekt und gibt dieses zurück.
+	 *
+	 * @see Unique#get(Object)
+	 * @param source Eingabe oder {@code null}.
+	 * @return Schlüssel oder {@code null}. */
+	protected GSource customSource(final GSource source) {
+		return source;
+	}
+
 	/** Diese Methode überführt die gegebene Eingabe in die zugeordnete Ausgabe und gibt diese zurück.
 	 *
 	 * @see Unique#get(Object)
 	 * @param source Eingabe oder {@code null}.
 	 * @return Ausgabe oder {@code null}. */
-	protected abstract GTarget customBuild(GSource source);
+	protected abstract GTarget customTarget(GSource source);
 
 	/** Diese Methode wird bei der Wiederverwendung der gegebenen Ausgabe für die gegebene Eingabe von aufgerufen.
 	 *

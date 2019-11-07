@@ -57,7 +57,7 @@ public class IAMBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected GTarget customBuild(final GSource source) {
+		protected GTarget customTarget(final GSource source) {
 			return this.put(source);
 		}
 

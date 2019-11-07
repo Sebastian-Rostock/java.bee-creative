@@ -44,7 +44,7 @@ public final class XMLEvaluator {
 
 		/** {@inheritDoc} */
 		@Override
-		protected final XPathExpression customBuild(final String input) {
+		protected final XPathExpression customTarget(final String input) {
 			try {
 				final XPath xxath = XMLEvaluator.this.xpathData.getXPath();
 				return xxath.compile(input);

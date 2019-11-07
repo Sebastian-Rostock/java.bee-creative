@@ -223,7 +223,7 @@ public class BEXBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected BEXTextItem customBuild(final String input) {
+		protected BEXTextItem customTarget(final String input) {
 			return this.put(new BEXTextItem(input));
 		}
 
@@ -252,7 +252,7 @@ public class BEXBuilder {
 
 		/** {@inheritDoc} */
 		@Override
-		protected BEXGroupItem customBuild(final List<BEXItem> input) {
+		protected BEXGroupItem customTarget(final List<BEXItem> input) {
 			return this.put(new BEXGroupItem(input));
 		}
 
