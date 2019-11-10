@@ -342,15 +342,27 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 		public final IAMArray array;
 
+		public final int offset;
+
 		ArrayString(final IAMArray array) {
-			super(array.length() - 2);
-			this.array = array;
+			this(array, 1, array.length() - 2);
 			this.hash = array.get(0);
 		}
 
+		public ArrayString(final IAMArray array, final int offset, final int length) {
+			super(length);
+			this.array = array;
+			this.offset = offset;
+		}
+
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.array.get(index + 1);
+			return this.array.get(this.offset + index);
+		}
+
+		@Override
+		protected FEMString customSection(final int offset, final int length) {
+			return new ArrayString(this.array, this.offset + offset, length);
 		}
 
 		@Override
@@ -361,47 +373,49 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ArrayStringINT8 extends FEMString {
-
-		public final IAMArray array;
+	public static class ArrayStringINT8 extends ArrayString {
 
 		ArrayStringINT8(final IAMArray array) {
-			super(array.length() - 5);
-			this.array = array;
+			this(array, 4, array.length() - 5);
 			this.hash = Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0));
 		}
 
-		@Override
-		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.array.get(index + 4) & 255;
+		public ArrayStringINT8(final IAMArray array, final int offset, final int length) {
+			super(array, offset, length);
 		}
 
 		@Override
-		public FEMString compact() {
-			return this;
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
+			return this.array.get(this.offset + index) & 255;
+		}
+
+		@Override
+		protected FEMString customSection(final int offset, final int length) {
+			return new ArrayStringINT8(this.array, this.offset + offset, length);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ArrayStringINT16 extends FEMString {
-
-		public final IAMArray array;
+	public static class ArrayStringINT16 extends ArrayString {
 
 		ArrayStringINT16(final IAMArray array) {
-			super(array.length() - 3);
-			this.array = array;
+			this(array, 2, array.length() - 3);
 			this.hash = Integers.toInt(array.get(1), array.get(0));
+		}
+
+		public ArrayStringINT16(final IAMArray array, final int offset, final int length) {
+			super(array, offset, length);
 		}
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.array.get(index + 2) & 65535;
+			return this.array.get(this.offset + index) & 65535;
 		}
 
 		@Override
-		public FEMString compact() {
-			return this;
+		protected FEMString customSection(final int offset, final int length) {
+			return new ArrayStringINT16(this.array, this.offset + offset, length);
 		}
 
 	}
@@ -1499,6 +1513,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return true;
 	}
 
+	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Zeichenkette zurück. Sie Implementiert {@link #section(int, int)} ohne Wertebereichsprüfung.
+	 *
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Bytes im Abschnitt.
+	 * @return {@link FEMString}-Sicht auf einen Abschnitt dieser Zeichenkette. */
+	protected FEMString customSection(final int offset, final int length) {
+		return new SectionString(this, offset, length);
+	}
+
 	/** Diese Methode gibt die Codepoint zurück.
 	 *
 	 * @see #toInts()
@@ -1552,7 +1575,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		if ((offset == 0) && (length == this.length)) return this;
 		if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMString.EMPTY;
-		return new SectionString(this, offset, length);
+		return this.customSection(offset, length);
 	}
 
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Zeichenkette zurück.
