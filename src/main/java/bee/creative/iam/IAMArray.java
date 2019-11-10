@@ -279,6 +279,11 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			super(0);
 		}
 
+		@Override
+		public int mode() {
+			return 4;
+		}
+
 	}
 
 	static class ConcatArray extends IAMArray {
@@ -1030,13 +1035,11 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return this.length;
 	}
 
-	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück. Diese Größe ist {@code 1} für {@code byte}-Zahlen, {@code 2} für {@code short}-Zahlen
-	 * und {@code 4} für {@code int}-Zahlen.
+	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück. Diese Größe ist {@code 1} für 8-Bit-Zahlen, {@code 2} für 16-Bit-Zahlen und {@code 4}
+	 * für 32-Bit-Zahlen.
 	 *
 	 * @return Größe jeder Zahl dieser Zahlenfolge (1, 2 oder 4). */
-	public int mode() {
-		return 1;
-	}
+	public abstract int mode();
 
 	/** Diese Methode gibt den Streuwert zurück. <pre>
 	 * int result = 0x811C9DC5;
