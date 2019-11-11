@@ -344,15 +344,19 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 		public final int offset;
 
-		ArrayString(final IAMArray array) {
-			this(array, 1, array.length() - 2);
-			this.hash = array.get(0);
+		ArrayString(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			this(array, 1, array.length() - 2, array.get(0));
 		}
 
-		public ArrayString(final IAMArray array, final int offset, final int length) {
+		public ArrayString(final IAMArray array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
 			super(length);
-			this.array = array;
+			this.array = Objects.notNull(array);
 			this.offset = offset;
+		}
+
+		public ArrayString(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
+			this(array, offset, length);
+			this.hash = hash;
 		}
 
 		@Override
@@ -375,13 +379,17 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	public static class ArrayStringINT8 extends ArrayString {
 
-		ArrayStringINT8(final IAMArray array) {
-			this(array, 4, array.length() - 5);
-			this.hash = Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0));
+		ArrayStringINT8(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			this(array, 4, array.length() - 5, Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0)));
 		}
 
-		public ArrayStringINT8(final IAMArray array, final int offset, final int length) {
+		public ArrayStringINT8(final IAMArray array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
 			super(array, offset, length);
+		}
+
+		public ArrayStringINT8(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
+			super(array, offset, length);
+			this.hash = hash;
 		}
 
 		@Override
@@ -399,13 +407,17 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	public static class ArrayStringINT16 extends ArrayString {
 
-		ArrayStringINT16(final IAMArray array) {
-			this(array, 2, array.length() - 3);
-			this.hash = Integers.toInt(array.get(1), array.get(0));
+		ArrayStringINT16(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			this(array, 2, array.length() - 3, Integers.toInt(array.get(1), array.get(0)));
 		}
 
-		public ArrayStringINT16(final IAMArray array, final int offset, final int length) {
+		public ArrayStringINT16(final IAMArray array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
 			super(array, offset, length);
+		}
+
+		public ArrayStringINT16(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
+			super(array, offset, length);
+			this.hash = hash;
 		}
 
 		@Override

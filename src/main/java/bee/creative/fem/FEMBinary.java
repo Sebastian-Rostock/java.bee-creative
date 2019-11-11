@@ -114,12 +114,23 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	@SuppressWarnings ("javadoc")
 	public static class ArrayBinary extends FEMBinary {
 
-		public final IAMArray items;
+		public final IAMArray array;
 
-		public ArrayBinary(final IAMArray items) throws NullPointerException, IllegalArgumentException {
-			super(items.length() - 4);
-			this.items = items;
-			this.hash = Integers.toInt(items.get(3), items.get(2), items.get(1), items.get(0));
+		public final int offset;
+
+		ArrayBinary(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			this(array, 4, array.length() - 4, Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0)));
+		}
+
+		public ArrayBinary(final IAMArray array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+			super(length);
+			this.array = Objects.notNull(array);
+			this.offset = offset;
+		}
+
+		public ArrayBinary(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
+			this(array, offset, length);
+			this.hash = hash;
 		}
 
 		@Override
@@ -129,7 +140,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 		@Override
 		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			return (byte)this.items.get(index + 4);
+			return (byte)this.array.get(this.offset + index);
+		}
+
+		@Override
+		protected FEMBinary customSection(final int offset, final int length) {
+			return new ArrayBinary(this.array, this.offset + offset, length);
 		}
 
 	}
@@ -696,6 +712,15 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return true;
 	}
 
+	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Bytefolge zurück.
+	 *
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Bytes im Abschnitt.
+	 * @return {@link FEMBinary}-Sicht auf einen Abschnitt dieser Bytefolge. */
+	protected FEMBinary customSection(final int offset, final int length) {
+		return new SectionBinary(this, offset, length);
+	}
+
 	/** Diese Methode konvertiert diese Bytefolge in ein {@code byte[]} und gibt dieses zurück.
 	 *
 	 * @return Array mit den Bytes dieser Bytefolge. */
@@ -750,7 +775,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		if ((offset == 0) && (length == this.length)) return this;
 		if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMBinary.EMPTY;
-		return new SectionBinary(this, offset, length);
+		return this.customSection(offset, length);
 	}
 
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Bytefolge zurück.
