@@ -199,7 +199,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		final int offset;
 
 		ShortArray(final short[] array, final int offset, final int length) {
-			super(array.length);
+			super(length);
 			this.array = array;
 			this.offset = offset;
 		}
