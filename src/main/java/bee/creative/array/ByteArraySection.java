@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import java.util.List;
+
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code byte}-Arrays.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -92,6 +94,13 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 	@Override
 	protected void customPrint(final byte[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
+	}
+
+	/** Diese Methode gibt diese {@link ByteArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactByteArray(this).values()}.
+	 * 
+	 * @return {@link Byte}-{@link List}. */
+	public List<Byte> asList() {
+		return new CompactByteArray(this).values();
 	}
 
 	/** {@inheritDoc} */

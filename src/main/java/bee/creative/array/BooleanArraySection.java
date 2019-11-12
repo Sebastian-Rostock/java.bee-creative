@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import java.util.List;
+
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code boolean}-Arrays.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -95,6 +97,13 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 	@Override
 	protected void customPrint(final boolean[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
+	}
+
+	/** Diese Methode gibt diese {@link BooleanArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactBooleanArray(this).values()}.
+	 * 
+	 * @return {@link Boolean}-{@link List}. */
+	public List<Boolean> asList() {
+		return new CompactBooleanArray(this).values();
 	}
 
 	/** {@inheritDoc} */

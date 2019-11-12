@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import java.util.List;
+
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code float}-Arrays.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -92,6 +94,13 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 	@Override
 	protected void customPrint(final float[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
+	}
+
+	/** Diese Methode gibt diese {@link FloatArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactFloatArray(this).values()}.
+	 * 
+	 * @return {@link Float}-{@link List}. */
+	public List<Float> asList() {
+		return new CompactFloatArray(this).values();
 	}
 
 	/** {@inheritDoc} */

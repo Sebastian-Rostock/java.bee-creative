@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import java.util.List;
+
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code short}-Arrays.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -92,6 +94,13 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 	@Override
 	protected void customPrint(final short[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
+	}
+
+	/** Diese Methode gibt diese {@link ShortArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactShortArray(this).values()}.
+	 * 
+	 * @return {@link Short}-{@link List}. */
+	public List<Short> asList() {
+		return new CompactShortArray(this).values();
 	}
 
 	/** {@inheritDoc} */

@@ -1,6 +1,7 @@
 package bee.creative.array;
 
 import java.util.Comparator;
+import java.util.List;
 import bee.creative.lang.Objects;
 import bee.creative.util.Comparators;
 
@@ -175,6 +176,15 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	@SuppressWarnings ({"unchecked", "rawtypes"})
 	protected int customCompare(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 		return Comparators.compare((Comparable)array1[index1], (Comparable)array2[index2]);
+	}
+
+	/** Diese Methode gibt diese {@link ObjectArraySection} als {@link List} zurück und ist eine Abkürzung für
+	 * {@code new CompactObjectArray(valueClass, this).values()}.
+	 *
+	 * @param valueClass Klasse der Elemente.
+	 * @return {@code GValue}-{@link List}. */
+	public List<GValue> asList(final Class<? extends GValue> valueClass) {
+		return new CompactObjectArray<>(valueClass, this).values();
 	}
 
 	/** {@inheritDoc} */

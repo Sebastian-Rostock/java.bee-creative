@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import java.util.List;
+
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code char}-Arrays.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -92,6 +94,13 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	@Override
 	protected void customPrint(final char[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
+	}
+
+	/** Diese Methode gibt diese {@link CharacterArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactCharacterArray(this).values()}.
+	 * 
+	 * @return {@link Character}-{@link List}. */
+	public List<Character> asList() {
+		return new CompactCharacterArray(this).values();
 	}
 
 	/** {@inheritDoc} */

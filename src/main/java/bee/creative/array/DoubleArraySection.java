@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import java.util.List;
+
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code double}-Arrays.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -93,6 +95,13 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	@Override
 	protected void customPrint(final double[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
+	}
+
+	/** Diese Methode gibt diese {@link DoubleArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactDoubleArray(this).values()}.
+	 * 
+	 * @return {@link Double}-{@link List}. */
+	public List<Double> asList() {
+		return new CompactDoubleArray(this).values();
 	}
 
 	/** {@inheritDoc} */

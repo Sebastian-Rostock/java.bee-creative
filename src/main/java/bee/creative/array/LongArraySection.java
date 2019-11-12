@@ -1,5 +1,7 @@
 package bee.creative.array;
 
+import java.util.List;
+
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code long}-Arrays.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -96,6 +98,13 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 	@Override
 	protected void customPrint(final long[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
+	}
+
+	/** Diese Methode gibt diese {@link LongArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactLongArray(this).values()}.
+	 * 
+	 * @return {@link Long}-{@link List}. */
+	public List<Long> asList() {
+		return new CompactLongArray(this).values();
 	}
 
 	/** {@inheritDoc} */
