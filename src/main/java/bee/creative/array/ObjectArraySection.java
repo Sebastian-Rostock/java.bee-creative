@@ -178,13 +178,11 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		return Comparators.compare((Comparable)array1[index1], (Comparable)array2[index2]);
 	}
 
-	/** Diese Methode gibt diese {@link ObjectArraySection} als {@link List} zurück und ist eine Abkürzung für
-	 * {@code new CompactObjectArray(valueClass, this).values()}.
+	/** Diese Methode gibt diese {@link ObjectArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactObjectArray<>(this).values()}.
 	 *
-	 * @param valueClass Klasse der Elemente.
 	 * @return {@code GValue}-{@link List}. */
-	public List<GValue> asList(final Class<? extends GValue> valueClass) {
-		return new CompactObjectArray<>(valueClass, this).values();
+	public List<GValue> asList() {
+		return new CompactObjectArray<>(this).values();
 	}
 
 	/** {@inheritDoc} */

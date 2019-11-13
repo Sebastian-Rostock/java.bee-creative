@@ -211,22 +211,6 @@ public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> i
 		this(valueClass, 0);
 	}
 
-	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
-	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
-	 *
-	 * @see ArrayData#allocate(int)
-	 * @see ArraySection#validate(ArraySection)
-	 * @param valueClass Klasse der Elemente für {@link #customNewArray(int)}.
-	 * @param section {@link ArraySection}.
-	 * @throws NullPointerException Wenn {@code valueClass}, {@code section} bzw. {@code section.array()} {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
-	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
-	public CompactObjectArray(final Class<? extends GValue> valueClass, final ArraySection<? extends GValue[]> section)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
-		super(section);
-		this.valueClass = Objects.notNull(valueClass);
-	}
-
 	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
 	 *
 	 * @see ArrayData#allocate(int)
@@ -236,8 +220,23 @@ public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> i
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
 	@SuppressWarnings ("unchecked")
 	public CompactObjectArray(final Class<? extends GValue> valueClass, final int capacity) throws NullPointerException, IllegalArgumentException {
-		this(valueClass, ObjectArraySection.from((GValue[])Array.newInstance(valueClass, capacity), 0, 0));
+		this(ObjectArraySection.from((GValue[])Array.newInstance(valueClass, capacity), 0, 0));
 		this.customSetCapacity(capacity);
+	}
+
+	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
+	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
+	 * 
+	 * @param section {@link ArraySection}.
+	 * @see ArrayData#allocate(int)
+	 * @see ArraySection#validate(ArraySection)
+	 * @throws NullPointerException Wenn {@code valueClass}, {@code section} bzw. {@code section.array()} {@code null} ist.
+	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
+	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
+	@SuppressWarnings ("unchecked")
+	public CompactObjectArray(final ArraySection<? extends GValue[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+		super(section);
+		this.valueClass = (Class<? extends GValue>)section.array().getClass().getComponentType();
 	}
 
 	/** {@inheritDoc} */
