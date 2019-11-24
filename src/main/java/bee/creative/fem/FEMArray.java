@@ -984,7 +984,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * Einzelwertsuche} optimiert. Hierbei wird grundsätzlich eine Streuwerttabelle angelegt, welche den Speicherverbrauch der Wertliste vervierfachen kann.
 	 *
 	 * @param index {@code true}, wenn die Einzelwertsuche beschleunigt werden sollen.
-	 * @return performanteren Wertliste oder {@code this}. */
+	 * @return performantere Wertliste oder {@code this}. */
 	public FEMArray compact(final boolean index) {
 		if (this.length == 0) return FEMArray.EMPTY;
 		if (this.length == 1) return index ? new UniformArray2(1, this.customGet(0)) : new UniformArray(1, this.customGet(0));

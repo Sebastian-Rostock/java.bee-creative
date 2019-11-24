@@ -11,26 +11,26 @@ class MMFArraySR1 extends MMFArraySN1 {
 
 	@Override
 	public ByteOrder order() {
-		return MMFArray.REVERSE_ORDER;
+		return BufferArray.REVERSE_ORDER;
 	}
 
 	@Override
-	public MMFArray toINT16() {
+	public MMFArray asINT16() {
 		return new MMFArraySR2(this.length / 2, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toINT32() {
+	public MMFArray asINT32() {
 		return new MMFArraySR4(this.length / 4, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toUINT8() {
+	public MMFArray asUINT8() {
 		return new MMFArrayUR1(this.length, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toUINT16() {
+	public MMFArray asUINT16() {
 		return new MMFArrayUR2(this.length / 2, this.buffer, this.offset);
 	}
 

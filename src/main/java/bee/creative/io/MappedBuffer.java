@@ -14,16 +14,251 @@ import java.nio.MappedByteBuffer;
 import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import bee.creative.iam.IAMArray;
+import bee.creative.iam.IAMArray.BufferArray;
 import bee.creative.lang.Objects;
-import bee.creative.mmf.MMFArray;
 
 /** Diese Klasse implementiert eine alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien per
  * momory-mapping zum Lesen und Schreiben zugänglich machen kann.
  * <p>
- * Die Anbindung der Datei erfolgt intern über {@link MappedByteBuffer} pro Gigabyte.
+ * Die Anbindung der Datei erfolgt intern über einen {@link MappedByteBuffer} pro Gigabyte. Wenn eine der Methoden eine ungültige Adresse übergeben wird, welche
+ * zu einer Zugriffsverletzung führt, wird grundsätzlich eine {@link IndexOutOfBoundsException} ausgelöst, auch wenn diese nicht deklariert ist. Analog dazu
+ * wird auf negative Anzahlen mit einer {@link IllegalArgumentException} reagiert.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MappedBuffer {
+
+	/** Diese Klasse implementiert ein {@link BufferArray} als Sicht auf einen Abschnitt eines {@link MappedByteBuffer}. */
+	public static abstract class INTXView extends BufferArray {
+
+		/** Dieses Feld speichert die Datenquelle. */
+		public final MappedBuffer buffer;
+
+		/** Dieses Feld speichert den Beginn des Speicherbereichs. */
+		public final long address;
+
+		INTXView(final MappedBuffer buffer, final int length, final long address) {
+			super(length);
+			this.buffer = buffer;
+			this.address = address;
+		}
+
+	}
+
+	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_INT8}. */
+	public static class INT8View extends INTXView {
+
+		INT8View(final MappedBuffer buffer, final int length, final long address) {
+			super(buffer, length, address);
+		}
+
+		@Override
+		public byte mode() {
+			return IAMArray.MODE_INT8;
+		}
+
+		@Override
+		public INTXView asINT8() {
+			return this;
+		}
+
+		@Override
+		public INTXView asINT16() {
+			return new INT16View(this.buffer, this.length / 2, this.address);
+		}
+
+		@Override
+		public INTXView asINT32() {
+			return new INT32View(this.buffer, this.length / 4, this.address);
+		}
+
+		@Override
+		public INTXView asUINT8() {
+			return new UINT8View(this.buffer, this.length, this.address);
+		}
+
+		@Override
+		public INTXView asUINT16() {
+			return new UINT16View(this.buffer, this.length / 2, this.address);
+		}
+
+		@Override
+		protected int customGet(final int index) {
+			return this.buffer.get(this.address + index);
+		}
+
+		@Override
+		protected INTXView customSection(final int offset, final int length) {
+			return new INT8View(this.buffer, length, this.address + offset);
+		}
+
+	}
+
+	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_INT16}. */
+	public static class INT16View extends INTXView {
+
+		INT16View(final MappedBuffer buffer, final int length, final long address) {
+			super(buffer, length, address);
+		}
+
+		@Override
+		public byte mode() {
+			return IAMArray.MODE_INT16;
+		}
+
+		@Override
+		public INTXView asINT8() {
+			return new INT8View(this.buffer, this.length * 2, this.address);
+		}
+
+		@Override
+		public INTXView asINT16() {
+			return this;
+		}
+
+		@Override
+		public INTXView asINT32() {
+			return new INT32View(this.buffer, this.length / 2, this.address);
+		}
+
+		@Override
+		public INTXView asUINT8() {
+			return new UINT8View(this.buffer, this.length * 2, this.address);
+		}
+
+		@Override
+		public INTXView asUINT16() {
+			return new UINT16View(this.buffer, this.length, this.address);
+		}
+
+		@Override
+		protected int customGet(final int index) {
+			return this.buffer.getShort(this.address + (index * 2));
+		}
+
+		@Override
+		protected INTXView customSection(final int offset, final int length) {
+			return new INT16View(this.buffer, length, this.address + (offset * 2));
+		}
+
+	}
+
+	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_INT32}. */
+	public static class INT32View extends INTXView {
+
+		INT32View(final MappedBuffer buffer, final int length, final long address) {
+			super(buffer, length, address);
+		}
+
+		@Override
+		public byte mode() {
+			return IAMArray.MODE_INT32;
+		}
+
+		@Override
+		public INTXView asINT8() {
+			return new INT8View(this.buffer, this.length * 4, this.address);
+		}
+
+		@Override
+		public INTXView asINT16() {
+			return new INT16View(this.buffer, this.length * 2, this.address);
+		}
+
+		@Override
+		public INTXView asINT32() {
+			return this;
+		}
+
+		@Override
+		public INTXView asUINT8() {
+			return new UINT8View(this.buffer, this.length * 4, this.address);
+		}
+
+		@Override
+		public INTXView asUINT16() {
+			return new UINT16View(this.buffer, this.length * 2, this.address);
+		}
+
+		@Override
+		protected int customGet(final int index) {
+			return this.buffer.getInt(this.address + (index * 4));
+		}
+
+		@Override
+		protected INTXView customSection(final int offset, final int length) {
+			return new INT32View(this.buffer, length, this.address + (offset * 4));
+		}
+
+	}
+
+	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_UINT8}. */
+	public static class UINT8View extends INT8View {
+
+		UINT8View(final MappedBuffer buffer, final int length, final long address) {
+			super(buffer, length, address);
+		}
+
+		@Override
+		public byte mode() {
+			return IAMArray.MODE_UINT8;
+		}
+
+		@Override
+		public INTXView asINT8() {
+			return new INT8View(this.buffer, this.length, this.address);
+		}
+
+		@Override
+		public INTXView asUINT8() {
+			return this;
+		}
+
+		@Override
+		protected int customGet(final int index) {
+			return super.customGet(index) & 0xFF;
+		}
+
+		@Override
+		protected INTXView customSection(final int offset, final int length) {
+			return new UINT8View(this.buffer, length, this.address + offset);
+		}
+
+	}
+
+	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_UINT16}. */
+	public static class UINT16View extends INT16View {
+
+		UINT16View(final MappedBuffer buffer, final int length, final long address) {
+			super(buffer, length, address);
+		}
+
+		@Override
+		public byte mode() {
+			return IAMArray.MODE_UINT16;
+		}
+
+		@Override
+		public INTXView asINT16() {
+			return new INT16View(this.buffer, this.length, this.address);
+		}
+
+		@Override
+		public INTXView asUINT16() {
+			return this;
+		}
+
+		@Override
+		protected int customGet(final int index) {
+			return super.customGet(index) & 0xFFFF;
+		}
+
+		@Override
+		protected INTXView customSection(final int offset, final int length) {
+			return new UINT16View(this.buffer, length, this.address + (offset * 2));
+		}
+
+	}
 
 	/** Dieses Feld speichert die Anzahl der niederwertigen Bit einer Adresse, die zur Positionsangabe innerhalb eines {@link MappedByteBuffer} eingesetzt
 	 * werden. */
@@ -64,17 +299,17 @@ public class MappedBuffer {
 	/** Dieses Feld speichert die gebundene Datei. */
 	private final File file;
 
-	/** Dieses Feld speichert den Zugriffsmodus. */
-	private final boolean readonly;
-
-	/** Dieses Feld speichert die Puffergröße.. */
+	/** Dieses Feld speichert die Puffergröße. */
 	private long size = -1;
-
-	/** Dieses Feld speichert die aktuelle Bytereihenfolge. */
-	private ByteOrder order = ByteOrder.nativeOrder();
 
 	/** Dieses Feld speichert die {@link MappedByteBuffer}, welche jeweils {@link #BUFFER_LENGTH} Byte der Datei anbinden. */
 	private MappedByteBuffer[] buffers;
+
+	/** Dieses Feld speichert {@code true} bei nativer Bytereihenfolge. */
+	private boolean isNaive = true;
+
+	/** Dieses Feld speichert {@code true} bei Schreibschutz. */
+	private final boolean isReadonly;
 
 	/** Dieser Konstruktor initialisiert den Puffer zum Lesen und Schreiben der gegebenen Datei.
 	 *
@@ -116,25 +351,55 @@ public class MappedBuffer {
 		if (size < 0) throw new IllegalArgumentException();
 		this.file = file.getAbsoluteFile();
 		this.buffers = new MappedByteBuffer[1];
-		this.readonly = readonly;
+		this.isReadonly = readonly;
 		this.resize(size);
+	}
+
+	/** Diese Methode gibt die Datei zurück, an die dieser Puffer gebunden ist.
+	 *
+	 * @return gebundene Datei. */
+	public File file() {
+		return this.file;
+	}
+
+	/** Diese Methode gibt gibt nur dann {@code true} zurück, wenn dieser Puffer die {@link #file() Datei} nur für den Lesezugriff angebunden hat.
+	 *
+	 * @return Zugriffsmodus. */
+	public boolean isReadonly() {
+		return this.isReadonly;
 	}
 
 	/** Diese Methode gibt die Größe des Puffers zurück.
 	 *
 	 * @return Puffergröße. */
-	public long size() {
+	public synchronized long size() {
 		return this.size;
 	}
 
-	/** Diese Methode setzt die Größe des Puffers auf die gegebene. <b>Achtung:</b> Die angebundene {@link #file() Datei} kann nur vergrößert werden!
+	/** Diese Methode vergrößert den Puffer auf das eineinhalbfache der gegebenen Puffergröße, wenn die Größe dieses Puffers kleiner als die gegebene ist.
+	 *
+	 * @param minSize minimale Puffergröße.
+	 * @throws IOException Wenn die Puffergröße ungültig ist. */
+	public synchronized void grow(final long minSize) throws IOException {
+		if (minSize < 0) throw new IOException();
+		if (minSize <= this.size) return;
+		this.resizeImpl(minSize + (minSize / 2));
+	}
+
+	/** Diese Methode setzt die Größe des Puffers auf die gegebene.<br>
+	 * <b>Achtung:</b> Wegen der Fehlenden Kontrolle über die Lebenszeit der {@link MappedByteBuffer} kann die angebundene {@link #file() Datei} kann nur
+	 * vergrößert werden, aich wenn dieser Puffer nur einen Teil davon zugänglich macht!
 	 *
 	 * @param newSize neue Puffergröße.
 	 * @throws IOException Wenn die Puffergröße ungültig ist. */
-	public void resize(final long newSize) throws IOException {
+	public synchronized void resize(final long newSize) throws IOException {
 		if (newSize < 0) throw new IOException();
 		final long oldSize = this.size;
 		if (oldSize == newSize) return;
+		this.resizeImpl(newSize);
+	}
+
+	private void resizeImpl(final long newSize) throws IOException {
 		final MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
 		final int oldLength = oldBuffers.length, newLength = Math.max(MappedBuffer.bufferIndex(newSize - 1) + 1, 1);
 		if (oldLength != newLength) {
@@ -143,16 +408,15 @@ public class MappedBuffer {
 		} else {
 			newBuffers = oldBuffers;
 		}
-		try (final RandomAccessFile file = new RandomAccessFile(this.file, this.readonly ? "r" : "rw")) {
-			try (final FileChannel fileChannel = file.getChannel()) {
-				final MapMode mode = this.readonly ? MapMode.READ_ONLY : MapMode.READ_WRITE;
-				final long scale = MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD;
-				for (int i = oldLength; i < newLength; i++) {
-					(newBuffers[i - 1] = fileChannel.map(mode, (i - 1) * scale, MappedBuffer.BUFFER_LENGTH)).order(this.order);
-				}
-				final long offset = (newLength - 1) * scale;
-				(newBuffers[newLength - 1] = fileChannel.map(mode, offset, newSize - offset)).order(this.order);
+		try (final RandomAccessFile file = new RandomAccessFile(this.file, this.isReadonly ? "r" : "rw"); final FileChannel channel = file.getChannel()) {
+			final long scale = MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD;
+			final MapMode mode = this.isReadonly ? MapMode.READ_ONLY : MapMode.READ_WRITE;
+			final ByteOrder order = this.orderImpl();
+			for (int i = oldLength; i < newLength; i++) {
+				(newBuffers[i - 1] = channel.map(mode, (i - 1) * scale, MappedBuffer.BUFFER_LENGTH)).order(order);
 			}
+			final long offset = (newLength - 1) * scale;
+			(newBuffers[newLength - 1] = channel.map(mode, offset, newSize - offset)).order(order);
 		}
 		this.size = newSize;
 		this.buffers = newBuffers;
@@ -191,55 +455,33 @@ public class MappedBuffer {
 	 *
 	 * @see ByteBuffer#order()
 	 * @return Bytereihenfolge. */
-	public ByteOrder order() {
-		return this.order;
+	public synchronized ByteOrder order() {
+		return this.orderImpl();
 	}
 
 	/** Diese Methode setzt die Bytereihenfolge.
 	 *
 	 * @see ByteBuffer#order(ByteOrder)
 	 * @param order Bytereihenfolge. */
-	public void order(ByteOrder order) {
-		order = order == ByteOrder.BIG_ENDIAN ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-		if (this.order == order) return;
-		this.order = order;
+	public synchronized void order(final ByteOrder order) {
+		final boolean isNaive = order != BufferArray.REVERSE_ORDER;
+		if (this.isNaive == isNaive) return;
+		this.isNaive = isNaive;
+		final ByteOrder order2 = this.orderImpl();
 		for (final MappedByteBuffer buffer: this.buffers) {
-			buffer.order(order);
+			buffer.order(order2);
 		}
 	}
 
-	/** Diese Methode gibt den größtmöglichen Speicherbereich (16KB..1GB) ab der gegebenen Adresse als Zahlenfolge zurück.
-	 *
-	 * @param address Adresse, ab welcher der Speicherbereich beginnt. */
-	public MMFArray array(final long address) {
-		try {
-			return MMFArray.from(this.buffers[MappedBuffer.bufferIndex(address)]).section(MappedBuffer.valueIndex(address));
-		} catch (final IOException ignore) {
-			return MMFArray.EMPTY;
-		}
+	private ByteOrder orderImpl() {
+		return this.isNaive ? BufferArray.NATIVE_ORDER : BufferArray.REVERSE_ORDER;
 	}
 
 	/** Diese Methode gibt den größtmöglichen Speicherbereich (16KB..1GB) ab der gegebenen Adresse als {@link ByteBuffer} zurück.
 	 *
 	 * @param address Adresse, ab welcher der Speicherbereich beginnt. */
 	public ByteBuffer buffer(final long address) {
-		final MappedByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)];
-		source.position(MappedBuffer.valueIndex(address));
-		return source.slice();
-	}
-
-	/** Diese Methode gibt die Datei zurück, an die dieser Puffer gebunden ist.
-	 *
-	 * @return gebundene Datei. */
-	public File file() {
-		return this.file;
-	}
-
-	/** Diese Methode gibt gibt nur dann {@code true} zurück, wenn dieser Puffer die {@link #file() Datei} nur für den Lesezugriff angebunden hat.
-	 *
-	 * @return Zugriffsmodus. */
-	public boolean isReadonly() {
-		return this.readonly;
+		return this.asByteBufferImpl(this.buffers[MappedBuffer.bufferIndex(address)], MappedBuffer.valueIndex(address));
 	}
 
 	/** Diese Methode gibt das {@code byte} an der gegebenen Adresse zurück.
@@ -279,8 +521,10 @@ public class MappedBuffer {
 					array[offset] = source.get(index);
 				}
 			} else {
-				source.position(index);
-				source.get(array, offset, count);
+				synchronized (this) {
+					source.position(index);
+					source.get(array, offset, count);
+				}
 			}
 		}
 	}
@@ -322,9 +566,18 @@ public class MappedBuffer {
 					source.put(index, array[offset]);
 				}
 			} else {
-				source.position(index);
-				source.put(array, offset, count);
+				synchronized (this) {
+					source.position(index);
+					source.put(array, offset, count);
+				}
 			}
+		}
+	}
+
+	private ByteBuffer asByteBufferImpl(final MappedByteBuffer source, final int position) {
+		synchronized (source) {
+			source.position(position);
+			return source.slice();
 		}
 	}
 
@@ -365,8 +618,7 @@ public class MappedBuffer {
 					array[offset] = source.getChar(index);
 				}
 			} else {
-				source.position(index);
-				source.asCharBuffer().get(array, offset, count);
+				this.asCharBufferImpl(source, index).get(array, offset, count);
 			}
 		}
 	}
@@ -408,9 +660,15 @@ public class MappedBuffer {
 					source.putChar(index, array[offset]);
 				}
 			} else {
-				source.position(index);
-				source.asCharBuffer().put(array, offset, count);
+				this.asCharBufferImpl(source, index).put(array, offset, count);
 			}
+		}
+	}
+
+	private CharBuffer asCharBufferImpl(final MappedByteBuffer source, final int position) {
+		synchronized (source) {
+			source.position(position);
+			return source.asCharBuffer();
 		}
 	}
 
@@ -451,8 +709,7 @@ public class MappedBuffer {
 					array[offset] = source.getShort(index);
 				}
 			} else {
-				source.position(index);
-				source.asShortBuffer().get(array, offset, count);
+				this.asShortBufferImpl(source, index).get(array, offset, count);
 			}
 		}
 	}
@@ -494,9 +751,15 @@ public class MappedBuffer {
 					source.putShort(index, array[offset]);
 				}
 			} else {
-				source.position(index);
-				source.asShortBuffer().put(array, offset, count);
+				this.asShortBufferImpl(source, index).put(array, offset, count);
 			}
+		}
+	}
+
+	private ShortBuffer asShortBufferImpl(final MappedByteBuffer source, final int position) {
+		synchronized (source) {
+			source.position(position);
+			return source.asShortBuffer();
 		}
 	}
 
@@ -537,8 +800,7 @@ public class MappedBuffer {
 					array[offset] = source.getInt(index);
 				}
 			} else {
-				source.position(index);
-				source.asIntBuffer().get(array, offset, count);
+				this.asIntBufferImpl(source, index).get(array, offset, count);
 			}
 		}
 	}
@@ -580,9 +842,15 @@ public class MappedBuffer {
 					source.putInt(index, array[offset]);
 				}
 			} else {
-				source.position(index);
-				source.asIntBuffer().put(array, offset, count);
+				this.asIntBufferImpl(source, index).put(array, offset, count);
 			}
+		}
+	}
+
+	private IntBuffer asIntBufferImpl(final MappedByteBuffer source, final int position) {
+		synchronized (source) {
+			source.position(position);
+			return source.asIntBuffer();
 		}
 	}
 
@@ -623,8 +891,7 @@ public class MappedBuffer {
 					array[offset] = source.getLong(index);
 				}
 			} else {
-				source.position(index);
-				source.asLongBuffer().get(array, offset, count);
+				this.asLongBufferImpl(source, index).get(array, offset, count);
 			}
 		}
 	}
@@ -666,9 +933,15 @@ public class MappedBuffer {
 					source.putLong(index, array[offset]);
 				}
 			} else {
-				source.position(index);
-				source.asLongBuffer().put(array, offset, count);
+				this.asLongBufferImpl(source, index).put(array, offset, count);
 			}
+		}
+	}
+
+	private LongBuffer asLongBufferImpl(final MappedByteBuffer source, final int position) {
+		synchronized (source) {
+			source.position(position);
+			return source.asLongBuffer();
 		}
 	}
 
@@ -709,8 +982,7 @@ public class MappedBuffer {
 					array[offset] = source.getFloat(index);
 				}
 			} else {
-				source.position(index);
-				source.asFloatBuffer().get(array, offset, count);
+				this.asFloatBufferImpl(source, index).get(array, offset, count);
 			}
 		}
 	}
@@ -752,9 +1024,15 @@ public class MappedBuffer {
 					source.putFloat(index, array[offset]);
 				}
 			} else {
-				source.position(index);
-				source.asFloatBuffer().put(array, offset, count);
+				this.asFloatBufferImpl(source, index).put(array, offset, count);
 			}
+		}
+	}
+
+	private FloatBuffer asFloatBufferImpl(final MappedByteBuffer source, final int position) {
+		synchronized (source) {
+			source.position(position);
+			return source.asFloatBuffer();
 		}
 	}
 
@@ -795,8 +1073,7 @@ public class MappedBuffer {
 					array[offset] = source.getDouble(index);
 				}
 			} else {
-				source.position(index);
-				source.asDoubleBuffer().get(array, offset, count);
+				this.asDoubleBufferImpl(source, index).get(array, offset, count);
 			}
 		}
 	}
@@ -838,16 +1115,57 @@ public class MappedBuffer {
 					source.putDouble(index, array[offset]);
 				}
 			} else {
-				source.position(index);
-				source.asDoubleBuffer().put(array, offset, count);
+				this.asDoubleBufferImpl(source, index).put(array, offset, count);
 			}
 		}
+	}
+
+	private DoubleBuffer asDoubleBufferImpl(final MappedByteBuffer source, final int position) {
+		synchronized (source) {
+			source.position(position);
+			return source.asDoubleBuffer();
+		}
+	}
+
+	/** Diese Methode gibt den Speicherbereich ab der gegebenen Adresse als {@link INTXView Zahlenfolge} interpretiert zurück.
+	 *
+	 * @see IAMArray#MODE_INT8
+	 * @see IAMArray#MODE_INT16
+	 * @see IAMArray#MODE_INT32
+	 * @see IAMArray#MODE_UINT8
+	 * @see IAMArray#MODE_UINT16
+	 * @param address Beginn des Speicherbereichs.
+	 * @param length Anzahl der Zahlen im Speicherbereich.
+	 * @param mode Zahlenkodierung zur Interpretation des Speicherbereichs.
+	 * @return {@link INTXView}-Sicht auf den Speicherbereich. 
+
+	 * @throws IllegalArgumentException Wenn 
+	 */
+	public INTXView getArray(final long address, final int length, final byte mode) throws IllegalArgumentException{
+		switch (mode) {
+			case IAMArray.MODE_INT8:
+				if (this.size < (address + length)) throw new IllegalArgumentException();
+				return new INT8View(this, length, address);
+			case IAMArray.MODE_INT16:
+				if (this.size < (address + (length * 2))) throw new IllegalArgumentException();
+				return new INT16View(this, length, address);
+			case IAMArray.MODE_INT32:
+				if (this.size < (address + (length * 4))) throw new IllegalArgumentException();
+				return new INT32View(this, length, address);
+			case IAMArray.MODE_UINT8:
+				if (this.size < (address + length)) throw new IllegalArgumentException();
+				return new UINT8View(this, length, address);
+			case IAMArray.MODE_UINT16:
+				if (this.size < (address + (length * 2))) throw new IllegalArgumentException();
+				return new UINT16View(this, length, address);
+		}
+		throw new IllegalArgumentException();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.file, this.size, this.readonly);
+		return Objects.toInvokeString(this, this.file(), this.size(), this.isReadonly());
 	}
 
 }

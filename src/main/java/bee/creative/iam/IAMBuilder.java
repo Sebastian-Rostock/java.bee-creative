@@ -3,6 +3,8 @@ package bee.creative.iam;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMLoader.IAMListingLoader;
 import bee.creative.lang.Objects;
 import bee.creative.util.Unique;
@@ -16,7 +18,7 @@ import bee.creative.util.Unique;
 public class IAMBuilder {
 
 	/** Diese Klasse implementiert den abstrakten Ausgabedatensatz eines {@link BasePool}. */
-	static class BaseData {
+	static abstract class BaseData implements Emuable {
 
 		/** Dieses Feld speichert die Position, unter der dieses Objekt in {@link BasePool#targets} verwaltet wird. */
 		public int index;
@@ -32,7 +34,7 @@ public class IAMBuilder {
 	 *
 	 * @param <GSource> Typ der Eingabe.
 	 * @param <GTarget> Typ der Ausgabe. */
-	static abstract class BasePool<GSource, GTarget> extends Unique<GSource, GTarget> {
+	static abstract class BasePool<GSource, GTarget> extends Unique<GSource, GTarget> implements Emuable {
 
 		/** Dieses Feld speichert die gesammelten Ausgabedaten. */
 		public final List<GTarget> targets = new ArrayList<>();
@@ -47,6 +49,11 @@ public class IAMBuilder {
 			final GTarget target = this.customBuild(index, Objects.notNull(source));
 			this.targets.add(index, target);
 			return target;
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.mapping) + EMU.from(this.targets) + EMU.fromAll(this.targets);
 		}
 
 		/** Diese Methode leert den Pool. */
@@ -97,6 +104,11 @@ public class IAMBuilder {
 			this.data = data;
 		}
 
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.data);
+		}
+
 	}
 
 	static class ItemPool extends BasePoolA<ItemData> {
@@ -120,6 +132,11 @@ public class IAMBuilder {
 			this.value = key;
 		}
 
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.key) + EMU.from(this.value);
+		}
+
 	}
 
 	static class EntryPool extends BasePoolA<EntryData> {
@@ -138,6 +155,11 @@ public class IAMBuilder {
 		public ListingData(final int index, final IAMListing listing) {
 			this.index = index;
 			this.listing = listing;
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.listing);
 		}
 
 	}
@@ -162,6 +184,11 @@ public class IAMBuilder {
 		public MappingData(final int index, final IAMMapping mapping) {
 			this.index = index;
 			this.mapping = mapping;
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.mapping);
 		}
 
 	}
@@ -301,7 +328,7 @@ public class IAMBuilder {
 	}
 
 	/** Diese Klasse implementiert ein modifizierbares {@link IAMListing}. */
-	public static class IAMListingBuilder extends IAMListing {
+	public static class IAMListingBuilder extends IAMListing implements Emuable {
 
 		/** Dieses Feld speichert die bisher gesammelten Elemente. */
 		protected final ItemPool items = new ItemPool();
@@ -340,6 +367,11 @@ public class IAMBuilder {
 			return index;
 		}
 
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.items);
+		}
+
 		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
 		public void clear() {
 			this.items.clear();
@@ -362,7 +394,7 @@ public class IAMBuilder {
 	}
 
 	/** Diese Klasse implementiert ein modifizierbares {@link IAMMapping}. */
-	public static class IAMMappingBuilder extends IAMMapping {
+	public static class IAMMappingBuilder extends IAMMapping implements Emuable {
 
 		/** Dieses Feld speichert den Modus. */
 		protected boolean mode = IAMMapping.MODE_HASHED;
@@ -398,6 +430,11 @@ public class IAMBuilder {
 		 * @param mode Modus. */
 		public void mode(final boolean mode) {
 			this.mode = mode;
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.entries);
 		}
 
 		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */

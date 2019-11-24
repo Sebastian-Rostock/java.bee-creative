@@ -594,7 +594,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Bytefolge und gibt diese zurück. Die ersten vier Byte der Zahlenfolge werden als
-	 * {@link #hashCode() Streuwert} und die darauf folgenden Zahlenwerte als Auflistung der Bytes interpretiert. Die {@link IAMArray#mode() Größe der
+	 * {@link #hashCode() Streuwert} und die darauf folgenden Zahlenwerte als Auflistung der Bytes interpretiert. Die {@link IAMArray#mode() Kodierung der
 	 * Zahlenwerte} muss eine 8-Bit-Kodierung anzeigen.
 	 *
 	 * @param array Zahlenfolge.
@@ -602,7 +602,8 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMBinary from(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-		if (array.mode() != 1) throw new IllegalArgumentException();
+		final int mode = array.mode();
+		if ((mode != IAMArray.MODE_INT8) && (mode != IAMArray.MODE_UINT8)) throw new IllegalArgumentException();
 		return new ArrayBinary(array);
 	}
 
@@ -790,7 +791,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 *
 	 * @see #from(byte[])
 	 * @see #value()
-	 * @return performanteren Bytefolge oder {@code this}. */
+	 * @return performantere Bytefolge oder {@code this}. */
 	public FEMBinary compact() {
 		final FEMBinary result = this.length == 1 ? new UniformBinary(1, this.customGet(0)) : new CompactBinary(this.value());
 		result.hash = this.hash;

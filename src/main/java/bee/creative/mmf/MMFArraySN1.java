@@ -2,6 +2,7 @@ package bee.creative.mmf;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import bee.creative.iam.IAMArray;
 
 class MMFArraySN1 extends MMFArray {
 
@@ -18,37 +19,37 @@ class MMFArraySN1 extends MMFArray {
 	}
 
 	@Override
-	public int mode() {
-		return 1;
+	public byte mode() {
+		return IAMArray.MODE_INT8;
 	}
 
 	@Override
 	public ByteOrder order() {
-		return MMFArray.NATIVE_ORDER;
+		return BufferArray.NATIVE_ORDER;
 	}
 
 	@Override
-	public MMFArray toINT8() {
+	public MMFArray asINT8() {
 		return this;
 	}
 
 	@Override
-	public MMFArray toINT16() {
+	public MMFArray asINT16() {
 		return new MMFArraySN2(this.length / 2, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toINT32() {
+	public MMFArray asINT32() {
 		return new MMFArraySN4(this.length / 4, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toUINT8() {
+	public MMFArray asUINT8() {
 		return new MMFArrayUN1(this.length, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toUINT16() {
+	public MMFArray asUINT16() {
 		return new MMFArrayUN2(this.length / 2, this.buffer, this.offset);
 	}
 

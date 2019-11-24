@@ -1204,7 +1204,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * Zahlenwert als abschließende {@code 0} interpretiert. Bei der Mehrwertkodierung werden dagegen die ersten vier Byte der Zahlenfolge als {@link #hashCode()
 	 * Streuwert}, die nächsten vier Byte als {@link #length() Zeichenanzahl}, die darauf folgenden Zahlenwerte als Auflistung der mehrwertkodierten Codepoints
 	 * und der letzte Zahlenwert als abschließende {@code 0} interpretiert. Ob eine 8-, 16- oder 32-Bit-Kodierung eingesetzt wird, hängt von der
-	 * {@link IAMArray#mode() Größe der Zahlenwerte} ab.
+	 * {@link IAMArray#mode() Kodierung der Zahlenwerte} ab.
 	 *
 	 * @param array Zahlenfolge.
 	 * @param asUTFx {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
@@ -1213,13 +1213,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	public static FEMString from(final IAMArray array, final boolean asUTFx) throws NullPointerException, IllegalArgumentException {
 		switch (array.mode()) {
-			case 1:
+			case IAMArray.MODE_INT8:
+			case IAMArray.MODE_UINT8:
 				if (asUTFx) return new ArrayStringUTF8(array);
 				return new ArrayStringINT8(array);
-			case 2:
+			case IAMArray.MODE_INT16:
+			case IAMArray.MODE_UINT16:
 				if (asUTFx) return new ArrayStringUTF16(array);
 				return new ArrayStringINT16(array);
-			case 4:
+			case IAMArray.MODE_INT32:
 				return new ArrayString(array);
 		}
 		throw new IllegalArgumentException();
@@ -1602,7 +1604,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * geringerem Speicherverbrauch zurück. Abhängig vom Wertebereich der Codepoints kann hierfür eine {@link #compactINT8() 8-Bit}-, {@link #compactINT16()
 	 * 16-Bit}- oder {@link #compactINT32() 32-Bit}-Einzelwertkodierung zum Einsatz kommen.
 	 *
-	 * @return performanteren Zeichenkette oder {@code this}. */
+	 * @return performantere Zeichenkette oder {@code this}. */
 	public FEMString compact() {
 		final RangeCollector collector = new RangeCollector();
 		this.extract(collector);

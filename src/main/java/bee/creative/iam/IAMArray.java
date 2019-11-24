@@ -1,84 +1,45 @@
 package bee.creative.iam;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators.BaseIterator;
+// TODO equals und compare
 
 /** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Auflistung ({@link IAMListing}) für die Elemente sowie einer Abbildung
  * ({@link IAMMapping}) für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+/** Diese Klasse implementiert . Diese Schnittstelle definiert .
+ *
+ * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray> {
 
-	static class IntArray extends IAMArray {
+	/** Diese Klasse implementiert die Zahlenfolge für {@link IAMArray#MODE_INT8}. */
+	public static class INT8Array extends IAMArray implements Emuable {
 
-		final int[] array;
-
-		final int offset;
-
-		IntArray(final int[] array, final int offset, final int length) {
-			super(length);
-			this.array = array;
-			this.offset = offset;
-		}
-
-		@Override
-		protected int customGet(final int index) {
-			return this.array[this.offset + index];
-		}
-
-		@Override
-		protected IAMArray customSection(final int offset, final int length) {
-			return new IntArray(this.array, this.offset + offset, length);
-		}
-
-		@Override
-		public int mode() {
-			return 4;
-		}
-
-		@Override
-		public int hashCode() {
-			int hash = 0x811C9DC5;
-			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
-				hash = (hash * 0x01000193) ^ this.array[i];
-			}
-			return hash;
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (object instanceof IntArray) return IAMArray.equals(this, (IntArray)object);
-			if (object instanceof ByteArray) return IAMArray.equals(this, (ByteArray)object);
-			if (object instanceof CharArray) return IAMArray.equals(this, (CharArray)object);
-			if (object instanceof ShortArray) return IAMArray.equals(this, (ShortArray)object);
-			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
-			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
-			return false;
-		}
-
-		@Override
-		public int compareTo(final IAMArray object) {
-			if (object instanceof IntArray) return IAMArray.compare(this, (IntArray)object);
-			if (object instanceof ByteArray) return IAMArray.compare(this, (ByteArray)object);
-			if (object instanceof CharArray) return IAMArray.compare(this, (CharArray)object);
-			if (object instanceof ShortArray) return IAMArray.compare(this, (ShortArray)object);
-			if (object instanceof SectionArray) return IAMArray.compare(this, (SectionArray)object);
-			return IAMArray.compare(this, object);
-		}
-
-	}
-
-	static class ByteArray extends IAMArray {
+		/** Dieses Feld speichert das leere {@link INT8Array}. */
+		public static final INT8Array EMPTY = new INT8Array(new byte[0]);
 
 		final byte[] array;
 
 		final int offset;
 
-		ByteArray(final byte[] array, final int offset, final int length) {
+		/** Dieser Konstruktor initialisiert das Array.
+		 *
+		 * @param array Array.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+		public INT8Array(final byte[] array) throws NullPointerException {
+			this(array, 0, array.length);
+		}
+
+		INT8Array(final byte[] array, final int offset, final int length) {
 			super(length);
 			this.array = array;
 			this.offset = offset;
@@ -91,114 +52,46 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 		@Override
 		protected IAMArray customSection(final int offset, final int length) {
-			return new ByteArray(this.array, this.offset + offset, length);
+			if (length == 0) return INT8Array.EMPTY;
+			return new INT8Array(this.array, this.offset + offset, length);
 		}
 
 		@Override
-		public int mode() {
-			return 1;
+		protected boolean customIsCompact() {
+			return (this.offset == 0) && (this.length == this.array.length);
 		}
 
 		@Override
-		public int hashCode() {
-			int hash = 0x811C9DC5;
-			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
-				hash = (hash * 0x01000193) ^ this.array[i];
-			}
-			return hash;
+		public long emu() {
+			return EMU.fromObject(this) + (this.customIsCompact() ? EMU.fromArray(this.array) : 0);
 		}
 
 		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
-			if (object instanceof ByteArray) return IAMArray.equals(this, (ByteArray)object);
-			if (object instanceof CharArray) return IAMArray.equals(this, (CharArray)object);
-			if (object instanceof ShortArray) return IAMArray.equals(this, (ShortArray)object);
-			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
-			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
-			return false;
-		}
-
-		@Override
-		public int compareTo(final IAMArray object) {
-			if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
-			if (object instanceof ByteArray) return IAMArray.compare(this, (ByteArray)object);
-			if (object instanceof CharArray) return IAMArray.compare(this, (CharArray)object);
-			if (object instanceof ShortArray) return IAMArray.compare(this, (ShortArray)object);
-			if (object instanceof SectionArray) return IAMArray.compare(this, (SectionArray)object);
-			return IAMArray.compare(this, object);
+		public byte mode() {
+			return IAMArray.MODE_INT8;
 		}
 
 	}
 
-	static class CharArray extends IAMArray {
+	/** Diese Klasse implementiert die Zahlenfolge für {@link IAMArray#MODE_INT16}. */
+	public static class INT16Array extends IAMArray implements Emuable {
 
-		final char[] array;
-
-		final int offset;
-
-		CharArray(final char[] array, final int offset, final int length) {
-			super(length);
-			this.array = array;
-			this.offset = offset;
-		}
-
-		@Override
-		protected int customGet(final int index) {
-			return this.array[this.offset + index];
-		}
-
-		@Override
-		protected IAMArray customSection(final int offset, final int length) {
-			return new CharArray(this.array, this.offset + offset, length);
-		}
-
-		@Override
-		public int mode() {
-			return 2;
-		}
-
-		@Override
-		public int hashCode() {
-			int hash = 0x811C9DC5;
-			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
-				hash = (hash * 0x01000193) ^ this.array[i];
-			}
-			return hash;
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
-			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
-			if (object instanceof CharArray) return IAMArray.equals(this, (CharArray)object);
-			if (object instanceof ShortArray) return IAMArray.equals(this, (ShortArray)object);
-			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
-			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
-			return false;
-		}
-
-		@Override
-		public int compareTo(final IAMArray object) {
-			if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
-			if (object instanceof ByteArray) return -IAMArray.compare((ByteArray)object, this);
-			if (object instanceof CharArray) return IAMArray.compare(this, (CharArray)object);
-			if (object instanceof ShortArray) return IAMArray.compare(this, (ShortArray)object);
-			if (object instanceof SectionArray) return IAMArray.compare(this, (SectionArray)object);
-			return IAMArray.compare(this, object);
-		}
-
-	}
-
-	static class ShortArray extends IAMArray {
+		/** Dieses Feld speichert das leere {@link INT16Array}. */
+		public static final INT16Array EMPTY = new INT16Array(new short[0]);
 
 		final short[] array;
 
 		final int offset;
 
-		ShortArray(final short[] array, final int offset, final int length) {
+		/** Dieser Konstruktor initialisiert das Array.
+		 *
+		 * @param array Array.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+		public INT16Array(final short[] array) throws NullPointerException {
+			this(array, 0, array.length);
+		}
+
+		INT16Array(final short[] array, final int offset, final int length) {
 			super(length);
 			this.array = array;
 			this.offset = offset;
@@ -211,96 +104,249 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 		@Override
 		protected IAMArray customSection(final int offset, final int length) {
-			return new ShortArray(this.array, this.offset + offset, length);
+			if (length == 0) return INT16Array.EMPTY;
+			return new INT16Array(this.array, this.offset + offset, length);
 		}
 
 		@Override
-		public int mode() {
-			return 2;
+		protected boolean customIsCompact() {
+			return (this.offset == 0) && (this.length == this.array.length);
 		}
 
 		@Override
-		public int hashCode() {
-			int hash = 0x811C9DC5;
-			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
-				hash = (hash * 0x01000193) ^ this.array[i];
-			}
-			return hash;
+		public long emu() {
+			return EMU.fromObject(this) + (this.customIsCompact() ? EMU.fromArray(this.array) : 0);
 		}
 
 		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
-			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
-			if (object instanceof CharArray) return IAMArray.equals((CharArray)object, this);
-			if (object instanceof ShortArray) return IAMArray.equals(this, (ShortArray)object);
-			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
-			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
-			return false;
-		}
-
-		@Override
-		public int compareTo(final IAMArray object) {
-			if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
-			if (object instanceof ByteArray) return -IAMArray.compare((ByteArray)object, this);
-			if (object instanceof CharArray) return -IAMArray.compare((CharArray)object, this);
-			if (object instanceof ShortArray) return IAMArray.compare(this, (ShortArray)object);
-			if (object instanceof SectionArray) return IAMArray.compare(this, (SectionArray)object);
-			return IAMArray.compare(this, object);
+		public byte mode() {
+			return IAMArray.MODE_INT16;
 		}
 
 	}
 
-	static class ValueArray extends IAMArray {
+	/** Diese Klasse implementiert die Zahlenfolge für {@link IAMArray#MODE_INT32}. */
+	public static class INT32Array extends IAMArray implements Emuable {
 
-		final int item;
+		/** Dieses Feld speichert das leere {@link INT32Array}. */
+		public static final INT32Array EMPTY = new INT32Array(new int[0]);
 
-		ValueArray(final int item) {
-			super(1);
-			this.item = item;
+		final int[] array;
+
+		final int offset;
+
+		/** Dieser Konstruktor initialisiert das Array.
+		 *
+		 * @param array Array.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+		public INT32Array(final int[] array) throws NullPointerException {
+			this(array, 0, array.length);
+		}
+
+		INT32Array(final int[] array, final int offset, final int length) {
+			super(length);
+			this.array = array;
+			this.offset = offset;
 		}
 
 		@Override
 		protected int customGet(final int index) {
-			return this.item;
+			return this.array[this.offset + index];
 		}
 
 		@Override
-		public int mode() {
-			return 4;
+		protected IAMArray customSection(final int offset, final int length) {
+			if (length == 0) return INT32Array.EMPTY;
+			return new INT32Array(this.array, this.offset + offset, length);
+		}
+
+		@Override
+		protected boolean customIsCompact() {
+			return (this.offset == 0) && (this.length == this.array.length);
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + (this.customIsCompact() ? EMU.fromArray(this.array) : 0);
+		}
+
+		@Override
+		public byte mode() {
+			return IAMArray.MODE_INT32;
 		}
 
 	}
 
-	static class EmptyArray extends IAMArray {
+	/** Diese Klasse implementiert die Zahlenfolge für {@link IAMArray#MODE_UINT8}. */
+	public static class UINT8Array extends INT8Array {
 
-		EmptyArray() {
-			super(0);
+		/** Dieses Feld speichert das leere {@link UINT8Array}. */
+		public static final UINT8Array EMPTY = new UINT8Array(new byte[0]);
+
+		/** Dieser Konstruktor initialisiert das Array.
+		 *
+		 * @param array Array.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+		public UINT8Array(final byte[] array) throws NullPointerException {
+			super(array);
+		}
+
+		UINT8Array(final byte[] array, final int offset, final int length) {
+			super(array, offset, length);
+
 		}
 
 		@Override
-		public int mode() {
-			return 4;
+		protected int customGet(final int index) {
+			return super.customGet(index) & 0xFF;
+		}
+
+		@Override
+		protected IAMArray customSection(final int offset, final int length) {
+			if (length == 0) return UINT8Array.EMPTY;
+			return new UINT8Array(this.array, this.offset + offset, length);
+		}
+
+		@Override
+		public byte mode() {
+			return IAMArray.MODE_UINT8;
+		}
+
+		@Override
+		public INT8Array compactINT8() {
+			return this;
 		}
 
 	}
 
-	static class ConcatArray extends IAMArray {
+	/** Diese Klasse implementiert die Zahlenfolge für {@link IAMArray#MODE_UINT16}. */
+	public static class UINT16Array extends INT16Array {
+
+		/** Dieses Feld speichert das leere {@link UINT16Array}. */
+		public static final UINT16Array EMPTY = new UINT16Array(new short[0]);
+
+		/** Dieser Konstruktor initialisiert das Array.
+		 *
+		 * @param array Array.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+		public UINT16Array(final short[] array) throws NullPointerException {
+			super(array);
+		}
+
+		UINT16Array(final short[] array, final int offset, final int length) {
+			super(array, offset, length);
+		}
+
+		@Override
+		protected int customGet(final int index) {
+			return super.customGet(index) & 0xFFFF;
+		}
+
+		@Override
+		protected IAMArray customSection(final int offset, final int length) {
+			if (length == 0) return UINT16Array.EMPTY;
+			return new UINT16Array(this.array, this.offset + offset, length);
+		}
+
+		@Override
+		public byte mode() {
+			return IAMArray.MODE_UINT16;
+		}
+
+	}
+
+	/** Diese Klasse implementiert eine abstrakte {@link IAMArray Zahlenfolge}, deren Zahlen durch einen Speicherbereich gegeben sind. Zur Interpretation dieses
+	 * Speicherbereiches können über {@link #asINT8()}, {@link #asUINT8()}, {@link #asINT16()}, {@link #asUINT16()} bzw. {@link #asINT32()} entsprechende Sichten
+	 * erzeugte werden. Die Bytereihenfolge zur Interpretation des Speicherbereichs ist von der konkreten Implementation abhängig und wird hierbei nicht
+	 * vorgegeben. */
+	public static abstract class BufferArray extends IAMArray {
+
+		/** Dieses Feld speichert die native Bytereihenfolge. */
+		public static final ByteOrder NATIVE_ORDER = ByteOrder.nativeOrder();
+
+		/** Dieses Feld speichert die zur nativen umgekehrte Bytereihenfolge. */
+		public static final ByteOrder REVERSE_ORDER = BufferArray.NATIVE_ORDER == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+
+		/** Dieser Konstruktor initialisiert die Länge.
+		 *
+		 * @param length Länge. */
+		protected BufferArray(final int length) {
+			super(length);
+		}
+
+		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen ({@code byte}) interpretiert zurück.
+		 *
+		 * @return {@code byte}-{@link BufferArray}. */
+		public abstract BufferArray asINT8();
+
+		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT16}-Zahlen ({@code short}) interpretiert zurück.
+		 *
+		 * @return {@code short}-{@link BufferArray}. */
+		public abstract BufferArray asINT16();
+
+		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT32}-Zahlen ({@code int}) interpretiert zurück.
+		 *
+		 * @return {@code int}-{@link BufferArray}. */
+		public abstract BufferArray asINT32();
+
+		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT8}-Zahlen ({@code unsigned byte}) interpretiert zurück.
+		 *
+		 * @return {@code unsigned byte}-{@link BufferArray}. */
+		public abstract BufferArray asUINT8();
+
+		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT16}-Zahlen ({@code unsigned short}) interpretiert zurück.
+		 *
+		 * @see ByteBuffer#getShort()
+		 * @return {@code unsigned short}-{@link BufferArray}. */
+		public abstract BufferArray asUINT16();
+
+		/** {@inheritDoc} */
+		@Override
+		public BufferArray section(final int offset) {
+			return this.section(offset, this.length - offset);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public BufferArray section(final int offset, final int length) {
+			return (offset < 0) || (length <= 0) || ((offset + length) > this.length) ? this.customSection(0, 0) : this.customSection(offset, length);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		protected abstract BufferArray customSection(final int offset, final int length);
+
+		@Override
+		protected boolean customIsCompact() {
+			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class ConcatArray extends IAMArray {
+
+		private static final byte[] MODES = { //
+			IAMArray.MODE_INT8, IAMArray.MODE_INT16, IAMArray.MODE_INT32, IAMArray.MODE_INT16, IAMArray.MODE_INT32, //
+			IAMArray.MODE_INT16, IAMArray.MODE_INT16, IAMArray.MODE_INT32, IAMArray.MODE_INT16, IAMArray.MODE_INT32, //
+			IAMArray.MODE_INT32, IAMArray.MODE_INT32, IAMArray.MODE_INT32, IAMArray.MODE_INT32, IAMArray.MODE_INT32, //
+			IAMArray.MODE_INT16, IAMArray.MODE_INT16, IAMArray.MODE_INT32, IAMArray.MODE_UINT8, IAMArray.MODE_UINT16, //
+			IAMArray.MODE_INT32, IAMArray.MODE_INT32, IAMArray.MODE_INT32, IAMArray.MODE_UINT16, IAMArray.MODE_UINT16};
 
 		public final IAMArray array1;
 
 		public final IAMArray array2;
 
-		ConcatArray(final IAMArray array1, final IAMArray array2) {
+		public ConcatArray(final IAMArray array1, final IAMArray array2) {
 			super(array1.length + array2.length);
 			this.array1 = array1;
 			this.array2 = array2;
 		}
 
 		@Override
-		public int mode() {
-			return Math.max(this.array1.mode(), this.array2.mode());
+		public byte mode() {
+			final int mode1 = this.array1.mode(), mode2 = this.array2.mode();
+			return ConcatArray.MODES[(mode1 * 5) + mode2];
 		}
 
 		@Override
@@ -310,25 +356,88 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
+		protected void customGet(final int index, final int[] array, final int offset, final int length) {
+			final int count1 = this.array1.length - index, count2 = length - count1;
+			if (count1 <= 0) {
+				this.array2.customGet(-count1, array, offset, length);
+			} else if (count2 <= 0) {
+				this.array1.customGet(index, array, offset, length);
+			} else {
+				this.array1.customGet(index, array, offset, count1);
+				this.array2.customGet(0, array, offset + count1, count2);
+			}
+		}
+
+		@Override
+		protected void customGet(final int index, final byte[] array, final int offset, final int length) {
+			final int count1 = this.array1.length - index, count2 = length - count1;
+			if (count1 <= 0) {
+				this.array2.customGet(-count1, array, offset, length);
+			} else if (count2 <= 0) {
+				this.array1.customGet(index, array, offset, length);
+			} else {
+				this.array1.customGet(index, array, offset, count1);
+				this.array2.customGet(0, array, offset + count1, count2);
+			}
+		}
+
+		@Override
+		protected void customGet(final int index, final short[] array, final int offset, final int length) {
+			final int count1 = this.array1.length - index, count2 = length - count1;
+			if (count1 <= 0) {
+				this.array2.customGet(-count1, array, offset, length);
+			} else if (count2 <= 0) {
+				this.array1.customGet(index, array, offset, length);
+			} else {
+				this.array1.customGet(index, array, offset, count1);
+				this.array2.customGet(0, array, offset + count1, count2);
+			}
+		}
+
+		@Override
 		protected IAMArray customSection(final int offset, final int length) {
-			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
-			if (offset2 >= 0) return this.array2.section(offset2, length);
-			if (length2 <= 0) return this.array1.section(offset, length);
-			return this.array1.section(offset, -offset2).concat(this.array2.section(0, length2));
+			final int count1 = this.array1.length - offset, count2 = length - count1;
+			if (count1 <= 0) return this.array2.section(-count1, length);
+			if (count2 <= 0) return this.array1.section(offset, length);
+			return this.array1.section(offset, count1).concat(this.array2.section(0, count2));
+		}
+
+		@Override
+		protected boolean customEquals(final int index, final IAMArray that, final int offset, final int length) {
+			final int count1 = this.array1.length - offset, count2 = length - count1;
+			if (count1 <= 0) return this.array2.customEquals(-count1, that, offset, length);
+			if (count2 <= 0) return this.array1.customEquals(index, that, offset, length);
+			return this.array1.customEquals(index, that, offset, count1) && this.array2.customEquals(0, that, offset + count1, count2);
+		}
+
+		@Override
+		protected int customCompare(final int index, final IAMArray that, final int offset, final int length) {
+			final int count1 = this.array1.length - offset, count2 = length - count1;
+			if (count1 <= 0) return this.array2.customCompare(-count1, that, offset, length);
+			if (count2 <= 0) return this.array1.customCompare(index, that, offset, length);
+			final int result = this.array1.customCompare(index, that, offset, count1);
+			if (result != 0) return result;
+			return this.array2.customCompare(0, that, offset + count1, count2);
 		}
 
 	}
 
-	static class SectionArray extends IAMArray {
+	@SuppressWarnings ("javadoc")
+	public static class SectionArray extends IAMArray {
 
-		final IAMArray array;
+		public final IAMArray array;
 
-		final int offset;
+		public final int offset;
 
-		SectionArray(final IAMArray array, final int offset, final int length) {
+		public SectionArray(final IAMArray array, final int offset, final int length) {
 			super(length);
 			this.array = array;
 			this.offset = offset;
+		}
+
+		@Override
+		public byte mode() {
+			return this.array.mode();
 		}
 
 		@Override
@@ -337,50 +446,54 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
+		protected void customGet(final int index, final int[] array, final int offset, final int length) {
+			this.array.customGet(this.offset + index, array, offset, length);
+		}
+
+		@Override
+		protected void customGet(final int index, final byte[] array, final int offset, final int length) {
+			this.array.customGet(this.offset + index, array, offset, length);
+		}
+
+		@Override
+		protected void customGet(final int index, final short[] array, final int offset, final int length) {
+			this.array.customGet(this.offset + index, array, offset, length);
+		}
+
+		@Override
+		protected boolean customEquals(final int index, final IAMArray that, final int offset, final int length) {
+			return that.customEquals(offset, this.array, this.offset + index, length);
+		}
+
+		@Override
+		protected int customCompare(final int index, final IAMArray that, final int offset, final int length) {
+			return -that.customCompare(offset, this.array, this.offset + index, length);
+		}
+
+		@Override
 		protected IAMArray customSection(final int offset, final int length) {
 			return this.array.customSection(this.offset + offset, length);
 		}
 
-		@Override
-		public int mode() {
-			return this.array.mode();
-		}
-
-		@Override
-		public int hashCode() {
-			int hash = 0x811C9DC5;
-			for (int i = this.offset, l = this.length; l != 0; ++i, --l) {
-				hash = (hash * 0x01000193) ^ this.array.customGet(i);
-			}
-			return hash;
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
-			if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
-			if (object instanceof CharArray) return IAMArray.equals((CharArray)object, this);
-			if (object instanceof ShortArray) return IAMArray.equals((ShortArray)object, this);
-			if (object instanceof SectionArray) return IAMArray.equals(this, (SectionArray)object);
-			if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
-			return false;
-		}
-
-		@Override
-		public int compareTo(final IAMArray object) {
-			if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
-			if (object instanceof ByteArray) return -IAMArray.compare((ByteArray)object, this);
-			if (object instanceof CharArray) return -IAMArray.compare((CharArray)object, this);
-			if (object instanceof ShortArray) return -IAMArray.compare((ShortArray)object, this);
-			if (object instanceof SectionArray) return IAMArray.compare(this, (SectionArray)object);
-			return IAMArray.compare(this, object);
-		}
-
 	}
 
-	/** Dieses Feld speichert das leere {@link IAMArray}. */
-	public static final IAMArray EMPTY = new EmptyArray();
+	/** Dieses Feld identifiziert die Kodierung für 8-Bit-Binärzahlen. Diese erlaubt Zahlen von {@code -128} bis {@code +127}. */
+	public static final byte MODE_INT8 = 0;
+
+	/** Dieses Feld identifiziert die Kodierung für 16-Bit-Binärzahlen. Diese erlaubt Zahlen von {@code -32768} bis {@code +32767}. */
+	public static final byte MODE_INT16 = 1;
+
+	/** Dieses Feld identifiziert die Kodierung für 32-Bit-Binärzahlen. */
+	public static final byte MODE_INT32 = 2;
+
+	/** Dieses Feld identifiziert die Kodierung für vorzeichenlose 8-Bit-Binärzahlen. Diese erlaubt Zahlen von {@code 0} bis {@code 255}. */
+	public static final byte MODE_UINT8 = 3;
+
+	/** Dieses Feld identifiziert die Kodierung für vorzeichenlose 16-Bit-Binärzahlen. Diese erlaubt Zahlen von {@code 0} bis {@code 65535}. */
+	public static final byte MODE_UINT16 = 4;
+
+	/** Dieses Feld speichert ein leeres {@link IAMArray}. */
+	public static final IAMArray EMPTY = INT32Array.EMPTY;
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück. Änderungen am Inhalt von {@code array} werden auf das
 	 * gelieferte {@link IAMArray} übertragen!
@@ -388,99 +501,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param array Zahlenfolge.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static IAMArray from(final int... array) throws NullPointerException {
+	public static INT32Array from(final int... array) throws NullPointerException {
 		return IAMArray.from(array, 0, array.length);
-	}
-
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
-	 * werden auf das gelieferte {@link IAMArray} übertragen!
-	 *
-	 * @param array Zahlenfolge.
-	 * @param offset Beginn der Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
-	public static IAMArray from(final int[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
-		if (length == 0) return IAMArray.EMPTY;
-		if (length == 1) return new ValueArray(array[offset]);
-		return new IntArray(array, offset, length);
-	}
-
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück. Änderungen am Inhalt von {@code array} werden auf das
-	 * gelieferte {@link IAMArray} übertragen!
-	 *
-	 * @param array Zahlenfolge.
-	 * @return {@link IAMArray}-Sicht auf {@code array}.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static IAMArray from(final byte[] array) throws NullPointerException {
-		return IAMArray.from(array, 0, array.length);
-	}
-
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
-	 * werden auf das gelieferte {@link IAMArray} übertragen!
-	 *
-	 * @param array Zahlenfolge.
-	 * @param offset Beginn der Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
-	public static IAMArray from(final byte[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
-		if (length == 0) return IAMArray.EMPTY;
-		return new ByteArray(array, offset, length);
-	}
-
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück. Änderungen am Inhalt von {@code array} werden auf das
-	 * gelieferte {@link IAMArray} übertragen!
-	 *
-	 * @param array Zahlenfolge.
-	 * @return {@link IAMArray}-Sicht auf {@code array}.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static IAMArray from(final char[] array) throws NullPointerException {
-		return IAMArray.from(array, 0, array.length);
-	}
-
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
-	 * werden auf das gelieferte {@link IAMArray} übertragen!
-	 *
-	 * @param array Zahlenfolge.
-	 * @param offset Beginn der Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
-	public static IAMArray from(final char[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
-		if (length == 0) return IAMArray.EMPTY;
-		return new CharArray(array, offset, length);
-	}
-
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebene Zahlenfolge zurück. Änderungen am Inhalt von {@code array} werden auf das
-	 * gelieferte {@link IAMArray} übertragen!
-	 *
-	 * @param array Zahlenfolge.
-	 * @return {@link IAMArray}-Sicht auf {@code array}.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static IAMArray from(final short[] array) throws NullPointerException {
-		return IAMArray.from(array, 0, array.length);
-	}
-
-	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
-	 * werden auf das gelieferte {@link IAMArray} übertragen!
-	 *
-	 * @param array Zahlenfolge.
-	 * @param offset Beginn der Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
-	public static IAMArray from(final short[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
-		if (length == 0) return IAMArray.EMPTY;
-		return new ShortArray(array, offset, length);
 	}
 
 	/** Diese Methode gibt ein neues {@link IAMArray} mit den gegebene Zahlen zurück. Änderungen am Inhalt von {@code array} werden nicht auf das gelieferte
@@ -489,7 +511,17 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param array Zahlen.
 	 * @return {@link IAMArray} aus den {@link Number#intValue()}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static IAMArray from(final List<? extends Number> array) throws NullPointerException {
+	public static INT32Array from(final Number[] array) throws NullPointerException {
+		return IAMArray.from(Arrays.asList(array));
+	}
+
+	/** Diese Methode gibt ein neues {@link IAMArray} mit den gegebene Zahlen zurück. Änderungen am Inhalt von {@code array} werden nicht auf das gelieferte
+	 * {@link IAMArray} übertragen!
+	 *
+	 * @param array Zahlen.
+	 * @return {@link IAMArray} aus den {@link Number#intValue()}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+	public static INT32Array from(final List<? extends Number> array) throws NullPointerException {
 		final int length = array.size();
 		final int[] result = new int[length];
 		int offset = 0;
@@ -499,494 +531,105 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return IAMArray.from(result);
 	}
 
-	static boolean equals(final IntArray array1, final IntArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final int[] a1 = array1.array;
-		final int[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
+	 *
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static INT32Array from(final int[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return INT32Array.EMPTY;
+		return new INT32Array(array, offset, length);
 	}
 
-	static boolean equals(final IntArray array1, final ByteArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final int[] a1 = array1.array;
-		final byte[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, byte[]) IAMArray.from(true, array)}. */
+	public static INT8Array from(final byte[] array) throws NullPointerException {
+		return IAMArray.from(true, array);
 	}
 
-	static boolean equals(final IntArray array1, final CharArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final int[] a1 = array1.array;
-		final char[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) IAMArray.from(signed, array, 0, array.length)}. */
+	public static INT8Array from(final boolean signed, final byte[] array) throws NullPointerException {
+		return IAMArray.from(signed, array, 0, array.length);
 	}
 
-	static boolean equals(final IntArray array1, final ShortArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final int[] a1 = array1.array;
-		final short[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
+	 *
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static INT8Array from(final byte[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return INT8Array.EMPTY;
+		return new INT8Array(array, offset, length);
 	}
 
-	static boolean equals(final IntArray array1, final SectionArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final int[] a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2.customGet(i2)) return false;
-		return true;
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
+	 *
+	 * @param signed {@code true}, für {@link #MODE_INT8}-Kodierung; {@code false} für {@link #MODE_UINT8}-Kodierung.
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static INT8Array from(final boolean signed, final byte[] array, final int offset, final int length)
+		throws NullPointerException, IllegalArgumentException {
+		if (signed) return IAMArray.from(array, offset, length);
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return UINT8Array.EMPTY;
+		return new UINT8Array(array, offset, length);
 	}
 
-	static boolean equals(final IntArray array1, final IAMArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final int[] a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != array2.customGet(i2)) return false;
-		return true;
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[]) IAMArray.from(true, array)}. */
+	public static INT16Array from(final short[] array) throws NullPointerException {
+		return IAMArray.from(true, array);
 	}
 
-	static boolean equals(final ByteArray array1, final ByteArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final byte[] a1 = array1.array;
-		final byte[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[], int, int) IAMArray.from(signed, array, 0, array.length)}. */
+	public static INT16Array from(final boolean signed, final short[] array) throws NullPointerException {
+		return IAMArray.from(signed, array, 0, array.length);
 	}
 
-	static boolean equals(final ByteArray array1, final CharArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final byte[] a1 = array1.array;
-		final char[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
+	 *
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static INT16Array from(final short[] array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return INT16Array.EMPTY;
+		return new INT16Array(array, offset, length);
 	}
 
-	static boolean equals(final ByteArray array1, final ShortArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final byte[] a1 = array1.array;
-		final short[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
-	}
-
-	static boolean equals(final ByteArray array1, final SectionArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final byte[] a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2.customGet(i2)) return false;
-		return true;
-	}
-
-	static boolean equals(final ByteArray array1, final IAMArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final byte[] a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != array2.customGet(i2)) return false;
-		return true;
-	}
-
-	static boolean equals(final CharArray array1, final CharArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final char[] a1 = array1.array;
-		final char[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
-	}
-
-	static boolean equals(final CharArray array1, final ShortArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final char[] a1 = array1.array;
-		final short[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
-	}
-
-	static boolean equals(final CharArray array1, final SectionArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final char[] a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2.customGet(i2)) return false;
-		return true;
-	}
-
-	static boolean equals(final CharArray array1, final IAMArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final char[] a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != array2.customGet(i2)) return false;
-		return true;
-	}
-
-	static boolean equals(final ShortArray array1, final ShortArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final short[] a1 = array1.array;
-		final short[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2[i2]) return false;
-		return true;
-	}
-
-	static boolean equals(final ShortArray array1, final SectionArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final short[] a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1[i1] != a2.customGet(i2)) return false;
-		return true;
-	}
-
-	static boolean equals(final ShortArray array1, final IAMArray array2) {
-		int length = array1.length;
-		if (length != array2.length) return false;
-		final short[] a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0; length != 0; ++i1, ++i2, --length)
-			if (a1[i1] != array2.customGet(i2)) return false;
-		return true;
-	}
-
-	static boolean equals(final SectionArray array1, final SectionArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final IAMArray a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset; l != 0; ++i1, ++i2, --l)
-			if (a1.customGet(i1) != a2.customGet(i2)) return false;
-		return true;
-	}
-
-	static boolean equals(final SectionArray array1, final IAMArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		final IAMArray a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0; l != 0; ++i1, ++i2, --l)
-			if (a1.customGet(i1) != array2.customGet(i2)) return false;
-		return true;
-	}
-
-	static boolean equals(final IAMArray array1, final IAMArray array2) {
-		int l = array1.length;
-		if (l != array2.length) return false;
-		for (int i2 = 0; l != 0; ++i2, --l)
-			if (array1.customGet(i2) != array2.customGet(i2)) return false;
-		return true;
-	}
-
-	static int compare(final IntArray array1, final IntArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final int[] a1 = array1.array;
-		final int[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final IntArray array1, final ByteArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final int[] a1 = array1.array;
-		final byte[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final IntArray array1, final CharArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final int[] a1 = array1.array;
-		final char[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final IntArray array1, final ShortArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final int[] a1 = array1.array;
-		final short[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final IntArray array1, final SectionArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final int[] a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final IntArray array1, final IAMArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final int[] a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = array2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final ByteArray array1, final ByteArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final byte[] a1 = array1.array;
-		final byte[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final ByteArray array1, final CharArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final byte[] a1 = array1.array;
-		final char[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final ByteArray array1, final ShortArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final byte[] a1 = array1.array;
-		final short[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final ByteArray array1, final SectionArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final byte[] a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final ByteArray array1, final IAMArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final byte[] a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = array2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final CharArray array1, final CharArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final char[] a1 = array1.array;
-		final char[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final CharArray array1, final ShortArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final char[] a1 = array1.array;
-		final short[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final CharArray array1, final SectionArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final char[] a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final CharArray array1, final IAMArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final char[] a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = array2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final ShortArray array1, final ShortArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final short[] a1 = array1.array;
-		final short[] a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2[i2];
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final ShortArray array1, final SectionArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final short[] a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = a2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final ShortArray array1, final IAMArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final short[] a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1[i1], v2 = array2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final SectionArray array1, final SectionArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final IAMArray a1 = array1.array;
-		final IAMArray a2 = array2.array;
-		for (int i1 = array1.offset, i2 = array2.offset, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1.customGet(i1), v2 = a2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final SectionArray array1, final IAMArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		final IAMArray a1 = array1.array;
-		for (int i1 = array1.offset, i2 = 0, l = l1 < l2 ? l1 : l2; l != 0; ++i1, ++i2, --l) {
-			final int v1 = a1.customGet(i1), v2 = array2.customGet(i2);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
-	}
-
-	static int compare(final IAMArray array1, final IAMArray array2) {
-		final int l1 = array1.length, l2 = array2.length;
-		for (int i = 0, l = l1 < l2 ? l1 : l2; l != 0; ++i, --l) {
-			final int v1 = array1.customGet(i), v2 = array2.customGet(i);
-			if (v1 < v2) return -1;
-			if (v1 > v2) return +1;
-		}
-		if (l1 < l2) return -1;
-		if (l1 > l2) return +1;
-		return 0;
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf einen Abschnitt der gegebenen Zahlenfolge zurück. Änderungen am Inhalt von {@code array}
+	 * werden auf das gelieferte {@link IAMArray} übertragen!
+	 *
+	 * @param signed {@code true}, für {@link #MODE_INT16}-Kodierung; {@code false} für {@link #MODE_UINT16}-Kodierung.
+	 * @param array Zahlenfolge.
+	 * @param offset Beginn der Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return {@link IAMArray}-Sicht auf einen Abschnitt von {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebene Abschnitt nicht in {@code array} liegt. */
+	public static INT16Array from(final boolean signed, final short[] array, final int offset, final int length)
+		throws NullPointerException, IllegalArgumentException {
+		if (signed) return IAMArray.from(array, offset, length);
+		if ((offset < 0) || (length < 0) || ((offset + length) > array.length)) throw new IllegalArgumentException();
+		if (length == 0) return UINT16Array.EMPTY;
+		return new UINT16Array(array, offset, length);
 	}
 
 	/** Dieses Feld speichert die Länge. */
@@ -995,7 +638,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	/** Dieser Konstruktor initialisiert die Länge.
 	 *
 	 * @param length Länge. */
-	protected IAMArray(final int length) {
+	protected IAMArray(final int length) throws IllegalArgumentException {
+		if (length < 0) throw new IllegalArgumentException();
 		this.length = length;
 	}
 
@@ -1003,18 +647,84 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 *
 	 * @param index Index.
 	 * @return {@code index}-te Zahl. */
-	protected int customGet(final int index) {
+	protected abstract int customGet(final int index);
+
+	/** Diese Methode implementiert {@link #get(int[], int)} ohne Parameterprüfung.
+	 *
+	 * @param index Beginn des Bereichs in {@code this}.
+	 * @param array Array, in welches die Zahlen geschrieben werden.
+	 * @param offset Beginn des Bereichs in {@code array}.
+	 * @param length Länge des Bereichs in {@code array}. */
+	protected void customGet(final int index, final int[] array, final int offset, final int length) {
+		for (int i1 = index, i2 = offset, l = length; 0 < l; i2++, i1++, l--) {
+			array[i2] = this.customGet(i1);
+		}
+	}
+
+	/** Diese Methode implementiert {@link #get(byte[], int)} ohne Parameterprüfung.
+	 *
+	 * @param index Beginn des Bereichs in {@code this}.
+	 * @param array Array, in welches die Zahlen geschrieben werden.
+	 * @param offset Beginn des Bereichs in {@code array}.
+	 * @param length Länge des Bereichs in {@code array}. */
+	protected void customGet(final int index, final byte[] array, final int offset, final int length) {
+		for (int i1 = index, i2 = offset, l = length; 0 < l; i2++, i1++, l--) {
+			array[i2] = (byte)this.customGet(i1);
+		}
+	}
+
+	/** Diese Methode implementiert {@link #get(short[], int)} ohne Parameterprüfung.
+	 *
+	 * @param index Beginn des Bereichs in {@code this}.
+	 * @param array Array, in welches die Zahlen geschrieben werden.
+	 * @param offset Beginn des Bereichs in {@code array}.
+	 * @param length Länge des Bereichs in {@code array}. */
+	protected void customGet(final int index, final short[] array, final int offset, final int length) {
+		for (int i1 = index, i2 = offset, l = length; 0 < l; i2++, i1++, l--) {
+			array[i2] = (short)this.customGet(i1);
+		}
+	}
+
+	/** Diese Methode implementiert {@link #equals(IAMArray)} ohne Parameterprüfung.
+	 *
+	 * @param index Beginn des Bereichs in {@code this}.
+	 * @param that Zahlenfolge, mit welcher diese vergleichen wird.
+	 * @param offset Beginn des Bereichs in {@code array}.
+	 * @param length Länge des Bereichs in {@code array}.
+	 * @return Vergleichswert. */
+	protected boolean customEquals(final int index, final IAMArray that, final int offset, final int length) {
+		for (int i1 = index, i2 = offset, l = length; 0 < l; i2++, i1++, l--) {
+			if (this.customGet(i1) != that.customGet(i2)) return false;
+		}
+		return true;
+	}
+
+	/** Diese Methode implementiert {@link #compare(IAMArray)} ohne Parameterprüfung.
+	 *
+	 * @param index Beginn des Bereichs in {@code this}.
+	 * @param that Zahlenfolge, mit welcher diese vergleichen wird.
+	 * @param offset Beginn des Bereichs in {@code array}.
+	 * @param length Länge des Bereichs in {@code array}.
+	 * @return Vergleichswert. */
+	protected int customCompare(final int index, final IAMArray that, final int offset, final int length) {
+		for (int i1 = index, i2 = offset, l = length; 0 < l; i2++, i1++, l--) {
+			final int v1 = this.customGet(i1), v2 = that.customGet(i2);
+			if (v1 < v2) return -1;
+			if (v1 > v2) return +1;
+		}
 		return 0;
 	}
 
-	/** Diese Methode implementiert {@link #section(int, int)} ohne Parameterprüfung.
-	 *
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return Abschnitt. */
+	/** Diese Methode implementiert {@link #section(int, int)} ohne Parameterprüfung. */
 	protected IAMArray customSection(final int offset, final int length) {
-		if (length == 0) return IAMArray.EMPTY;
 		return new SectionArray(this, offset, length);
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn {@link #compact()} {@code this} liefern soll.
+	 *
+	 * @return Kompaktheit. */
+	protected boolean customIsCompact() {
+		return false;
 	}
 
 	/** Diese Methode gibt die {@code index}-te Zahl zurück. Bei einem ungültigen {@code index} wird {@code 0} geliefert.
@@ -1027,6 +737,42 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return this.customGet(index);
 	}
 
+	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code int[]}.
+	 *
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge dieser Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public void get(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = this.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		this.customGet(0, result, offset, length);
+	}
+
+	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code byte[]}.
+	 *
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge dieser Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public void get(final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = this.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		this.customGet(0, result, offset, length);
+	}
+
+	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code chort[]}.
+	 *
+	 * @param result Ergebnis.
+	 * @param offset Beginn des Bereichs mit der Länge dieser Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
+	public void get(final short[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = this.length;
+		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+		this.customGet(0, result, offset, length);
+	}
+
 	/** Diese Methode gibt die Länge der Zahlenfolge zurück ({@code 0..1073741823}).
 	 *
 	 * @see #get(int)
@@ -1035,11 +781,15 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return this.length;
 	}
 
-	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück. Diese Größe ist {@code 1} für 8-Bit-Zahlen, {@code 2} für 16-Bit-Zahlen und {@code 4}
-	 * für 32-Bit-Zahlen.
+	/** Diese Methode gibt die Kodierung der Zahl dieser Zahlenfolge zurück.
 	 *
-	 * @return Größe jeder Zahl dieser Zahlenfolge (1, 2 oder 4). */
-	public abstract int mode();
+	 * @see #MODE_INT8
+	 * @see #MODE_INT16
+	 * @see #MODE_INT32
+	 * @see #MODE_UINT8
+	 * @see #MODE_UINT16
+	 * @return Zahlenkodierung. */
+	public abstract byte mode();
 
 	/** Diese Methode gibt den Streuwert zurück. <pre>
 	 * int result = 0x811C9DC5;
@@ -1063,33 +813,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final IAMArray that) throws NullPointerException {
-		return this.equals(Objects.<Object>notNull(that));
-	}
-
-	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Zahlenfolge mit der gegebenen Zahlenfolge zurück.
-	 *
-	 * @param that Zahlenfolge.
-	 * @return {@link IAMArray}-Sicht auf die Verkettung dieser Zahlenfolge mit der gegebenen Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public IAMArray concat(final IAMArray that) throws NullPointerException {
-		if (that.length == 0) return this;
-		if (this.length == 0) return that;
-		return new ConcatArray(this, that);
-	}
-
-	/** Diese Methode gibt eine Abschrift der Zahlen dieser Zahlenfolge zurück Abhängig von der {@link #mode() Größe der Zahlen} liefert sie dabei
-	 * {@link #toBytes() IAMArray.from(this.toBytes())}, {@link #toShorts() IAMArray.from(this.toShorts())} oder {@link #toInts() IAMArray.from(this.toInts())}.
-	 *
-	 * @return kompaktierte Abschrift der Zahlenfolge. */
-	public IAMArray compact() {
-		switch (this.mode()) {
-			case 1:
-				return IAMArray.from(this.toBytes());
-			case 2:
-				return IAMArray.from(this.toShorts());
-			default:
-				return IAMArray.from(this.toInts());
-		}
+		return (this.length == that.length) && this.customEquals(0, that, 0, this.length);
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung dieser Zahlenfolge lexikografisch kleiner, gleich bzw.
@@ -1106,8 +830,75 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param that Zahlenfolge.
 	 * @return Vergleichswert der Ordnungen.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public int compare(final IAMArray that) throws NullPointerException {
-		return this.compareTo(that);
+	public final int compare(final IAMArray that) throws NullPointerException {
+		final int l1 = this.length, l2 = that.length;
+		if (l1 < l2) {
+			final int result = this.customCompare(0, that, 0, l1);
+			return result != 0 ? result : -1;
+		}
+		if (l1 > l2) {
+			final int result = this.customCompare(0, that, 0, l2);
+			return result != 0 ? result : +1;
+		}
+		return this.customCompare(0, that, 0, l2);
+	}
+
+	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Zahlenfolge mit der gegebenen Zahlenfolge zurück.
+	 *
+	 * @param that Zahlenfolge.
+	 * @return {@link IAMArray}-Sicht auf die Verkettung dieser Zahlenfolge mit der gegebenen Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	public IAMArray concat(final IAMArray that) throws NullPointerException {
+		if (that.length == 0) return this;
+		if (this.length == 0) return that;
+		return new ConcatArray(this, that);
+	}
+
+	/** Diese Methode gibt die Zahlen dieser Zahlenfolge Abhängig von ihrer {@link #mode() Kodierung} in einer performanteren oder zumindest gleichwertigen
+	 * Zahlenfolge zurück.
+	 *
+	 * @see #concat(IAMArray)
+	 * @see #section(int, int)
+	 * @return performantere Zahlenfolge oder {@code this}. */
+	public IAMArray compact() {
+		if (this.customIsCompact()) return this;
+		switch (this.mode()) {
+			case MODE_INT8:
+				return this.compactINT8();
+			case MODE_INT16:
+				return this.compactINT16();
+			case MODE_UINT8:
+				return this.compactUINT8();
+			case MODE_UINT16:
+				return this.compactUINT16();
+			default:
+				return this.compactINT32();
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, byte[]) IAMArray.from(true, this.toBytes())}. */
+	public INT8Array compactINT8() {
+		return IAMArray.from(true, this.toBytes());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[]) IAMArray.from(true, this.toShorts())}. */
+	public INT16Array compactINT16() {
+		return IAMArray.from(true, this.toShorts());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(int[]) IAMArray.from(this.toInts())}. */
+	public INT32Array compactINT32() {
+		return IAMArray.from(this.toInts());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, byte[]) IAMArray.from(false, this.toBytes())}. */
+	public INT8Array compactUINT8() {
+		return IAMArray.from(false, this.toBytes());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, short[]) IAMArray.from(false, this.toShorts())}. */
+	public INT16Array compactUINT16() {
+		return IAMArray.from(false, this.toShorts());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.
@@ -1124,8 +915,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param length Länge des Abschnitts.
 	 * @return Abschnitt. */
 	public IAMArray section(final int offset, final int length) {
-		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length)) return this.customSection(0, 0);
-		return this.customSection(offset, length);
+		return (offset < 0) || (length <= 0) || ((offset + length) > this.length) ? this.customSection(0, 0) : this.customSection(offset, length);
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code int[]} zurück.
@@ -1135,22 +925,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Kopie der Zahlenfolge. */
 	public int[] toInts() {
 		final int[] result = new int[this.length];
-		this.toInts(result, 0);
+		this.get(result, 0);
 		return result;
-	}
-
-	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code int[]}.
-	 *
-	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der dessen dieser Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public void toInts(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = this.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
-		for (int i = 0; i < length; i++) {
-			result[i + offset] = this.customGet(i);
-		}
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code byte[]} zurück.
@@ -1160,47 +936,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Kopie der Zahlenfolge. */
 	public byte[] toBytes() {
 		final byte[] result = new byte[this.length];
-		this.toBytes(result, 0);
+		this.get(result, 0);
 		return result;
-	}
-
-	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code byte[]}.
-	 *
-	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public void toBytes(final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = this.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
-		for (int i = 0; i < length; i++) {
-			result[i + offset] = (byte)this.customGet(i);
-		}
-	}
-
-	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code char[]} zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @return Kopie der Zahlenfolge. */
-	public char[] toChars() {
-		final char[] result = new char[this.length];
-		this.toChars(result, 0);
-		return result;
-	}
-
-	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code char[]}.
-	 *
-	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public void toChars(final char[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = this.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
-		for (int i = 0; i < length; i++) {
-			result[i + offset] = (char)this.customGet(i);
-		}
 	}
 
 	/** Diese Methode gibt eine Kopie der gegebenen Zahlenfolge als {@code short[]} zurück.
@@ -1210,22 +947,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Kopie der Zahlenfolge. */
 	public short[] toShorts() {
 		final short[] result = new short[this.length];
-		this.toShorts(result, 0);
+		this.get(result, 0);
 		return result;
-	}
-
-	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code chort[]}.
-	 *
-	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge der gegebenen Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public void toShorts(final short[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = this.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
-		for (int i = 0; i < length; i++) {
-			result[i + offset] = (short)this.customGet(i);
-		}
 	}
 
 	/** {@inheritDoc} */
@@ -1250,42 +973,30 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** {@inheritDoc} */
 	@Override
-	public int hashCode() {
-		int hash = 0x811C9DC5;
+	public final int hashCode() {
+		int hash = Objects.hashInit();
 		for (int i = 0, l = this.length; l != 0; ++i, --l) {
-			hash = (hash * 0x01000193) ^ this.customGet(i);
+			hash = Objects.hashPush(hash, this.customGet(i));
 		}
 		return hash;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (object instanceof IntArray) return IAMArray.equals((IntArray)object, this);
-		if (object instanceof ByteArray) return IAMArray.equals((ByteArray)object, this);
-		if (object instanceof CharArray) return IAMArray.equals((CharArray)object, this);
-		if (object instanceof ShortArray) return IAMArray.equals((ShortArray)object, this);
-		if (object instanceof SectionArray) return IAMArray.equals((SectionArray)object, this);
-		if (object instanceof IAMArray) return IAMArray.equals(this, (IAMArray)object);
-		return false;
+	public final boolean equals(final Object object) {
+		return (object == this) || ((object instanceof IAMArray) && this.equals((IAMArray)object));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public int compareTo(final IAMArray object) {
-		if (object instanceof IntArray) return -IAMArray.compare((IntArray)object, this);
-		if (object instanceof ByteArray) return -IAMArray.compare((ByteArray)object, this);
-		if (object instanceof CharArray) return -IAMArray.compare((CharArray)object, this);
-		if (object instanceof ShortArray) return -IAMArray.compare((ShortArray)object, this);
-		if (object instanceof SectionArray) return -IAMArray.compare((SectionArray)object, this);
-		return IAMArray.compare(this, object);
+	public final int compareTo(final IAMArray object) {
+		return this.compare(object);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return this.length() > 30 ? //
+		return this.length > 30 ? //
 			Objects.formatIterable(false, Iterables.chainedIterable(this.section(0, 15), Iterables.itemIterable(Objects.toStringObject("...")))) : //
 			Objects.formatIterable(false, this);
 	}

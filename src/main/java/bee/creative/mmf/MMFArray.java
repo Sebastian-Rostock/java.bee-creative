@@ -4,50 +4,46 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import bee.creative.iam.IAMArray;
+import bee.creative.iam.IAMArray.BufferArray;
 import bee.creative.io.IO;
 
 /** Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch einen {@link ByteBuffer} gegeben sind. Zur Interpretation dieses Speicherbereiches
- * können entsprechende Sichten über {@link #toINT8()}, {@link #toUINT8()}, {@link #toINT16()}, {@link #toUINT16()} bzw. {@link #toINT32()} erzeugte werden. Die
+ * können entsprechende Sichten über {@link #asINT8()}, {@link #asUINT8()}, {@link #asINT16()}, {@link #asUINT16()} bzw. {@link #asINT32()} erzeugte werden. Die
  * Bytereihenfolge kann ebenfalls eingestellt werden.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class MMFArray extends IAMArray {
+public abstract class MMFArray extends BufferArray {
 
 	/** Dieses Feld speichert das leere {@link MMFArray}. */
 	public static final MMFArray EMPTY = new MMFArraySN1(0, ByteBuffer.wrap(new byte[0]), 0);
 
-	/** Dieses Feld speichert die native Bytereihenfolge. */
-	protected static final ByteOrder NATIVE_ORDER = ByteOrder.nativeOrder();
-
-	/** Dieses Feld speichert die zur nativen umgekehrte Bytereihenfolge. */
-	protected static final ByteOrder REVERSE_ORDER = MMFArray.NATIVE_ORDER == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
-
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link MMFArray} und gibt dieses zurück. Wenn das Objekt ein {@link MMFArray} ist, wird dieses
-	 * geliefert. Wenn es ein {@link ByteBuffer} ist, wird dazu eine {@link #toINT8() INT8}-Sicht erzeugt. Andernfalls wird das Objekt in einen {@link ByteBuffer}
-	 * {@link IO#inputBufferFrom(Object) überführt}.
+	 * geliefert. Andernfalls wird das Objekt in einen {@link ByteBuffer} {@link IO#inputBufferFrom(Object) überführt} und dazu ein {@link MMFArray}
+	 * {@link #from(ByteBuffer) erzeugt}.
 	 *
+	 * @see #from(ByteBuffer)
 	 * @see IO#inputBufferFrom(Object)
 	 * @param object Objekt.
 	 * @return {@link MMFArray}.
 	 * @throws IOException Wenn das {@link MMFArray} nicht erzeugt werden kann. */
 	public static MMFArray from(final Object object) throws IOException {
 		if (object instanceof MMFArray) return (MMFArray)object;
-		final ByteBuffer buffer = IO.inputBufferFrom(object);
+		return MMFArray.from(IO.inputBufferFrom(object));
+	}
+
+	/** Diese Methode erzeugt auf dem gegebenen Speicherbereich eine {@link #asINT8() INT8}-{@link MMFArray}-Sicht und gibt dieses zurück.
+	 *
+	 * @param buffer Speicherbereich.
+	 * @return {@link MMFArray}. */
+	public static MMFArray from(final ByteBuffer buffer) {
 		final int length = Math.min(buffer.limit(), 1073741823);
-		return buffer.order() == MMFArray.NATIVE_ORDER ? new MMFArraySN1(length, buffer, 0) : new MMFArraySR1(length, buffer, 0);
+		return buffer.order() == BufferArray.NATIVE_ORDER ? new MMFArraySN1(length, buffer, 0) : new MMFArraySR1(length, buffer, 0);
 	}
 
 	@SuppressWarnings ("javadoc")
 	protected MMFArray(final int length) {
 		super(length);
 	}
-
-	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück. Diese Größe ist {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für
-	 * {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code INT32}-Zahlen.
-	 *
-	 * @return Größe jeder Zahl dieser Zahlenfolge (1, 2 oder 4). */
-	@Override
-	public abstract int mode();
 
 	/** Diese Methode gibt die Bytereihenfolge zur Interpretation des internen {@link ByteBuffer} zurück.
 	 *
@@ -58,49 +54,54 @@ public abstract class MMFArray extends IAMArray {
 	/** Diese Methode ist eine Abkürzung für {@link #withOrder(ByteOrder) this.withOrder(ByteOrder.nativeOrder())}.
 	 *
 	 * @see ByteOrder#nativeOrder() */
-	public MMFArray toNE() {
-		return this.withOrder(MMFArray.NATIVE_ORDER);
+	public MMFArray asNE() {
+		return this.withOrder(BufferArray.NATIVE_ORDER);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #withOrder(ByteOrder) this.withOrder(ByteOrder.BIG_ENDIAN)}.
 	 *
 	 * @see ByteOrder#BIG_ENDIAN */
-	public MMFArray toBE() {
+	public MMFArray asBE() {
 		return this.withOrder(ByteOrder.BIG_ENDIAN);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #withOrder(ByteOrder) this.withOrder(ByteOrder.LITTLE_ENDIAN)}.
 	 *
 	 * @see ByteOrder#LITTLE_ENDIAN */
-	public MMFArray toLE() {
+	public MMFArray asLE() {
 		return this.withOrder(ByteOrder.BIG_ENDIAN);
 	}
 
-	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen ({@code byte}) interpretiert zurück.
+	/** {@inheritDoc}
 	 *
 	 * @return {@code byte}-{@link MMFArray}. */
-	public abstract MMFArray toINT8();
+	@Override
+	public abstract MMFArray asINT8();
 
-	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT16}-Zahlen ({@code short}) interpretiert zurück.
+	/** {@inheritDoc}
 	 *
 	 * @return {@code short}-{@link MMFArray}. */
-	public abstract MMFArray toINT16();
+	@Override
+	public abstract MMFArray asINT16();
 
-	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT32}-Zahlen ({@code int}) interpretiert zurück.
+	/** {@inheritDoc}
 	 *
 	 * @return {@code int}-{@link MMFArray}. */
-	public abstract MMFArray toINT32();
+	@Override
+	public abstract MMFArray asINT32();
 
-	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT8}-Zahlen ({@code unsigned byte}) interpretiert zurück.
+	/** {@inheritDoc}
 	 *
 	 * @return {@code unsigned byte}-{@link MMFArray}. */
-	public abstract MMFArray toUINT8();
+	@Override
+	public abstract MMFArray asUINT8();
 
-	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT16}-Zahlen ({@code unsigned short}) interpretiert zurück.
+	/** {@inheritDoc}
 	 *
 	 * @see ByteBuffer#getShort()
 	 * @return {@code unsigned short}-{@link MMFArray}. */
-	public abstract MMFArray toUINT16();
+	@Override
+	public abstract MMFArray asUINT16();
 
 	/** Diese Methode gibt diese Zahlenfolge mit der gegebenen Bytereihenfolge zurück.
 	 *
@@ -127,8 +128,7 @@ public abstract class MMFArray extends IAMArray {
 	/** {@inheritDoc} */
 	@Override
 	public MMFArray section(final int offset, final int length) {
-		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length)) return this.customSection(0, 0);
-		return this.customSection(offset, length);
+		return (offset < 0) || (length <= 0) || ((offset + length) > this.length) ? this.customSection(0, 0) : this.customSection(offset, length);
 	}
 
 	/** {@inheritDoc} */

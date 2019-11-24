@@ -105,7 +105,7 @@ public class IAMLoader {
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 		public IAMIndexLoader(MMFArray array) throws IAMException, NullPointerException {
-			array = array.toINT32();
+			array = array.asINT32();
 			if (array.length() < 5) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
@@ -135,11 +135,11 @@ public class IAMLoader {
 			final int listingDataLength = listingOffset.get(listingCount);
 			if ((listingDataLength < 0) || (listingDataLength > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final MMFArray mappingData = array.section(offset, mappingDataLength).toINT32();
+			final MMFArray mappingData = array.section(offset, mappingDataLength).asINT32();
 			offset += mappingDataLength;
 			if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			final MMFArray listingData = array.section(offset, listingDataLength).toINT32();
+			final MMFArray listingData = array.section(offset, listingDataLength).asINT32();
 			offset += listingDataLength;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
@@ -147,14 +147,14 @@ public class IAMLoader {
 			for (int i = 0; i < mappingCount; i++) {
 				final int offset2 = mappingOffset.get(i);
 				final int length2 = mappingOffset.get(i + 1) - offset2;
-				this.mappings[i] = new IAMMappingLoader(mappingData.section(offset2, length2).toINT32());
+				this.mappings[i] = new IAMMappingLoader(mappingData.section(offset2, length2).asINT32());
 			}
 
 			this.listings = new IAMListingLoader[listingCount];
 			for (int i = 0; i < listingCount; i++) {
 				final int offset2 = listingOffset.get(i);
 				final int length2 = listingOffset.get(i + 1) - offset2;
-				this.listings[i] = new IAMListingLoader(listingData.section(offset2, length2).toINT32());
+				this.listings[i] = new IAMListingLoader(listingData.section(offset2, length2).asINT32());
 			}
 
 		}
@@ -238,7 +238,7 @@ public class IAMLoader {
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 		public IAMListingLoader(MMFArray array) throws IAMException, NullPointerException {
-			array = array.toINT32();
+			array = array.asINT32();
 			if (array.length() < 3) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
@@ -381,7 +381,7 @@ public class IAMLoader {
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 		public IAMMappingLoader(MMFArray array) throws IAMException, NullPointerException {
-			array = array.toINT32();
+			array = array.asINT32();
 			if (array.length() < 4) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
@@ -589,9 +589,9 @@ public class IAMLoader {
 
 	/** Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen zurück.
 	 *
-	 * @see MMFArray#toUINT8()
-	 * @see MMFArray#toUINT16()
-	 * @see MMFArray#toINT32()
+	 * @see MMFArray#asUINT8()
+	 * @see MMFArray#asUINT16()
+	 * @see MMFArray#asINT32()
 	 * @param array Zahlenfolge.
 	 * @param sizeType Größentyp ({@code 1..3}).
 	 * @return Folge von {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen.
@@ -599,20 +599,20 @@ public class IAMLoader {
 	public static MMFArray sizeArray(final MMFArray array, final int sizeType) throws IllegalArgumentException {
 		switch (sizeType) {
 			case 1:
-				return array.toUINT8();
+				return array.asUINT8();
 			case 2:
-				return array.toUINT16();
+				return array.asUINT16();
 			case 3:
-				return array.toINT32();
+				return array.asINT32();
 		}
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen zurück.
 	 *
-	 * @see MMFArray#toINT8()
-	 * @see MMFArray#toINT16()
-	 * @see MMFArray#toINT32()
+	 * @see MMFArray#asINT8()
+	 * @see MMFArray#asINT16()
+	 * @see MMFArray#asINT32()
 	 * @param array Zahlenfolge.
 	 * @param dataType Datentyp ({@code 1..3}).
 	 * @return Folge von {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen.
@@ -620,11 +620,11 @@ public class IAMLoader {
 	public static MMFArray dataArray(final MMFArray array, final int dataType) throws IllegalArgumentException {
 		switch (dataType) {
 			case 1:
-				return array.toINT8();
+				return array.asINT8();
 			case 2:
-				return array.toINT16();
+				return array.asINT16();
 			case 3:
-				return array.toINT32();
+				return array.asINT32();
 		}
 		throw new IllegalArgumentException();
 	}

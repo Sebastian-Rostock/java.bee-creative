@@ -142,8 +142,8 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			final int[] keyData = new int[keyDatalength], valueData = new int[valueDatalength];
 			for (int i = 0; i < entryCount; i++) {
 				final int index = indexArray[i].intValue();
-				that.key(index).toInts(keyData, keyOffset[i]);
-				that.value(index).toInts(valueData, valueOffset[i]);
+				that.key(index).get(keyData, keyOffset[i]);
+				that.value(index).get(valueData, valueOffset[i]);
 			}
 			this.keyData = keyData;
 			this.keyOffset = keyOffset;

@@ -1,6 +1,7 @@
 package bee.creative.mmf;
 
 import java.nio.ByteBuffer;
+import bee.creative.iam.IAMArray;
 
 class MMFArraySR2 extends MMFArraySR1 {
 
@@ -9,32 +10,32 @@ class MMFArraySR2 extends MMFArraySR1 {
 	}
 
 	@Override
-	public int mode() {
-		return 2;
+	public byte mode() {
+		return IAMArray.MODE_INT16;
 	}
 
 	@Override
-	public MMFArray toINT8() {
+	public MMFArray asINT8() {
 		return new MMFArraySR1(this.length * 2, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toINT16() {
+	public MMFArray asINT16() {
 		return this;
 	}
 
 	@Override
-	public MMFArray toINT32() {
+	public MMFArray asINT32() {
 		return new MMFArraySR4(this.length / 2, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toUINT8() {
+	public MMFArray asUINT8() {
 		return new MMFArrayUR1(this.length * 2, this.buffer, this.offset);
 	}
 
 	@Override
-	public MMFArray toUINT16() {
+	public MMFArray asUINT16() {
 		return new MMFArrayUR2(this.length, this.buffer, this.offset);
 	}
 

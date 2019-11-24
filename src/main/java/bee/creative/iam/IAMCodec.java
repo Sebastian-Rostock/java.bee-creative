@@ -348,12 +348,12 @@ public final class IAMCodec {
 
 			@Override
 			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMArray.from(string.toCharArray());
+				return IAMArray.from(FEMString.from(string).toShorts());
 			}
 
 			@Override
 			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-				return new String(array.toChars());
+				return FEMString.from(array.toShorts()).toString();
 			}
 
 		},
