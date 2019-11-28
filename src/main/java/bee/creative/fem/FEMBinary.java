@@ -1,13 +1,12 @@
 package bee.creative.fem;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
-import bee.creative.iam.IAMArray;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
@@ -107,81 +106,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			++index;
 			this.index = index;
 			return true;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class ArrayBinary extends FEMBinary {
-
-		public final IAMArray array;
-
-		public final int offset;
-
-		ArrayBinary(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-			this(array, 4, array.length() - 4, Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0)));
-		}
-
-		public ArrayBinary(final IAMArray array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-			super(length);
-			this.array = Objects.notNull(array);
-			this.offset = offset;
-		}
-
-		public ArrayBinary(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
-			this(array, offset, length);
-			this.hash = hash;
-		}
-
-		@Override
-		public FEMBinary compact() {
-			return this;
-		}
-
-		@Override
-		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			return (byte)this.array.get(this.offset + index);
-		}
-
-		@Override
-		protected FEMBinary customSection(final int offset, final int length) {
-			return new ArrayBinary(this.array, this.offset + offset, length);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class BufferBinary extends FEMBinary {
-
-		public final ByteBuffer buffer;
-
-		BufferBinary(final ByteBuffer buffer) {
-			super(buffer.limit());
-			this.buffer = buffer;
-		}
-
-		@Override
-		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			return this.buffer.get(index);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class EmptyBinary extends FEMBinary {
-
-		EmptyBinary() {
-			super(0);
-		}
-
-		@Override
-		public FEMBinary reverse() {
-			return this;
-		}
-
-		@Override
-		public FEMBinary compact() {
-			return this;
 		}
 
 	}
@@ -385,10 +309,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
-		public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
-			if ((offset == 0) && (length == this.length)) return this;
-			if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
-			if (length == 0) return FEMBinary.EMPTY;
+		protected FEMBinary customSection(final int offset, final int length) {
 			return new UniformBinary(length, this.item);
 		}
 
@@ -408,31 +329,44 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	public static class CompactBinary extends FEMBinary implements Emuable {
 
 		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden sollte. */
-		final byte[] items;
+		final byte[] array;
 
-		CompactBinary(final byte[] items) throws IllegalArgumentException {
-			super(items.length);
-			this.items = items;
+		final int offset;
+
+		CompactBinary(final byte[] array) {
+			this(array, 0, array.length);
+		}
+
+		CompactBinary(final byte[] array, final int offset, final int length) throws IllegalArgumentException {
+			super(length);
+			this.array = Objects.notNull(array);
+			this.offset = offset;
 		}
 
 		@Override
 		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			return this.items[index];
+			return this.array[this.offset + index];
+		}
+
+		@Override
+		protected FEMBinary customSection(final int offset, final int length) {
+			return new CompactBinary(this.array, this.offset + offset, length);
 		}
 
 		@Override
 		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.items);
+			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.array.length) ? EMU.from(this.array) : 0);
 		}
 
 		@Override
 		public byte[] value() {
-			return this.items.clone();
+			return Arrays.copyOfRange(this.array, this.offset, this.offset + this.length);
 		}
 
 		@Override
 		public FEMBinary compact() {
-			return this;
+			if ((this.offset == 0) && (this.length == this.array.length)) return this;
+			return super.compact();
 		}
 
 	}
@@ -444,28 +378,35 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	public static final FEMType<FEMBinary> TYPE = FEMType.from(FEMBinary.ID);
 
 	/** Dieses Feld speichert die leere Bytefolge. */
-	public static final FEMBinary EMPTY = new EmptyBinary();
+	public static final FEMBinary EMPTY = new UniformBinary(0, (byte)0);
 
-	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück. Das gegebene Array wird falls nötig kopiert.
+	/** Diese Methode ist eine Abkürzung von {@link #from(int, byte) FEMBinary.from(length, 0)}.
+	 * 
+	 * @param length Länge.
+	 * @return Bytefolge.
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
+	public static FEMBinary from(final int length) throws IllegalArgumentException {
+		return FEMBinary.from(length, (byte)0);
+	}
+
+	/** Diese Methode gibt eine uniforme Bytefolge mit der gegebenen Länge zurück.
+	 * 
+	 * @param length Länge.
+	 * @param item Wert jedes Byte der Bytefolge.
+	 * @return Bytefolge.
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
+	public static FEMBinary from(final int length, final byte item) throws IllegalArgumentException {
+		if (length == 0) return FEMBinary.EMPTY;
+		return new UniformBinary(length, item);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, byte[]) FEMBinary.from(true, items)}.
 	 *
 	 * @param items Bytes.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMBinary from(final byte[] items) throws NullPointerException {
-		if (items.length == 0) return FEMBinary.EMPTY;
-		if (items.length == 1) return new UniformBinary(1, items[0]);
-		return new CompactBinary(items.clone());
-	}
-
-	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.
-	 *
-	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
-	 * @param items Bytes.
-	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMBinary from(final boolean copy, final byte[] items) throws NullPointerException {
-		if (copy) return FEMBinary.from(items);
-		return new CompactBinary(items);
+		return FEMBinary.from(true, items);
 	}
 
 	/** Diese Methode gibt eine Bytefolge mit den Bytes im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird falls nötig kopiert.
@@ -485,15 +426,17 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return new CompactBinary(result);
 	}
 
-	/** Diese Methode gibt eine uniforme Bytefolge mit der gegebenen Länge zurück, deren Bytes alle gleich dem gegebenen sind.
+	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.
 	 *
-	 * @param item Byte.
-	 * @param length Länge.
+	 * @param copy {@code true}, wenn das gegebene Array kopiert werden soll.
+	 * @param items Bytes.
 	 * @return Bytefolge.
-	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static FEMBinary from(final byte item, final int length) throws IllegalArgumentException {
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMBinary from(final boolean copy, final byte[] items) throws NullPointerException {
+		final int length = items.length;
 		if (length == 0) return FEMBinary.EMPTY;
-		return new UniformBinary(length, item);
+		if (length == 1) return new UniformBinary(1, items[0]);
+		return new CompactBinary(copy ? items.clone() : items);
 	}
 
 	/** Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
@@ -505,19 +448,19 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMBinary from(final String string) throws NullPointerException, IllegalArgumentException {
-		return FEMBinary.from(string, true);
+		return FEMBinary.from(true, string);
 	}
 
 	/** Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
 	 * {@link #toString(boolean) Textdarstellung}.
-	 *
-	 * @see #toString()
-	 * @param string Zeichenkette.
+	 * 
 	 * @param header {@code true}, wenn die Zeichenkette mit {@code "0x"} beginnt.
+	 * @param string Zeichenkette.
+	 * @see #toString()
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMBinary from(final String string, final boolean header) throws NullPointerException, IllegalArgumentException {
+	public static FEMBinary from(final boolean header, final String string) throws NullPointerException, IllegalArgumentException {
 		int count = string.length(), index = 0;
 		if ((count & 1) != 0) throw new IllegalArgumentException();
 		if (header) {
@@ -552,17 +495,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return bigEndian ? new IntegerBinaryBE(length, value) : new IntegerBinaryLE(length, value);
 	}
 
-	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
-	 *
-	 * @param buffer Zahlenfolge.
-	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code buffer} {@code null} ist. */
-	public static FEMBinary from(final ByteBuffer buffer) throws NullPointerException {
-		if (buffer.limit() == 0) return FEMBinary.EMPTY;
-		if (buffer.limit() == 1) return new UniformBinary(1, buffer.get(0));
-		return new BufferBinary(buffer);
-	}
-
 	/** Diese Methode konvertiert die gegebenen Zahlen in eine Bytefolge und gibt diese zurück.
 	 *
 	 * @see #from(byte[])
@@ -573,7 +505,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	public static FEMBinary from(final List<? extends Number> items) throws NullPointerException {
 		final int length = items.size();
 		if (length == 0) return FEMBinary.EMPTY;
-		if (length == 1) return FEMBinary.from(items.get(0).byteValue(), 1);
+		if (length == 1) return FEMBinary.from(1, items.get(0).byteValue());
 		final byte[] result = new byte[length];
 		for (int i = 0; i < length; i++) {
 			result[i] = items.get(i).byteValue();
@@ -591,20 +523,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	public static FEMBinary from(final Iterable<? extends Number> items) throws NullPointerException {
 		if (items instanceof FEMBinary) return (FEMBinary)items;
 		return FEMBinary.from(Iterables.toList(items));
-	}
-
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Bytefolge und gibt diese zurück. Die ersten vier Byte der Zahlenfolge werden als
-	 * {@link #hashCode() Streuwert} und die darauf folgenden Zahlenwerte als Auflistung der Bytes interpretiert. Die {@link IAMArray#mode() Kodierung der
-	 * Zahlenwerte} muss eine 8-Bit-Kodierung anzeigen.
-	 *
-	 * @param array Zahlenfolge.
-	 * @return {@link FEMBinary}-Sicht auf die gegebene Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMBinary from(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-		final int mode = array.mode();
-		if ((mode != IAMArray.MODE_INT8) && (mode != IAMArray.MODE_UINT8)) throw new IllegalArgumentException();
-		return new ArrayBinary(array);
 	}
 
 	/** Diese Methode gibt die Verkettung der gegebenen Bytefolgen zurück.
@@ -688,9 +606,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Byte. */
-	protected byte customGet(final int index) {
-		return 0;
-	}
+	protected abstract byte customGet(final int index);
 
 	/** Diese Methode fügt alle Bytes im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an. Das Anfügen wird
 	 * vorzeitig abgebrochen, wenn {@link Collector#push(byte)} {@code false} liefert.
@@ -698,7 +614,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @param target {@link Collector}, an den die Bytes geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
-	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
+	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
@@ -1040,20 +956,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			}
 
 		};
-	}
-
-	/** Diese Methode gibt eine Zahlenfolge zurück, welche die Bytes dieser Bytefolge enthält. Sie ist die Umkehroperation zu {@link #from(IAMArray)}.
-	 *
-	 * @return Zahlenfolge mit den kodierten Bytes dieser Bytefolge. */
-	public final IAMArray toArray() {
-		final byte[] array = new byte[this.length + 4];
-		final int hash = this.hash;
-		array[0] = (byte)(hash >>> 0);
-		array[1] = (byte)(hash >>> 8);
-		array[2] = (byte)(hash >>> 16);
-		array[3] = (byte)(hash >>> 24);
-		this.extract(new ValueCollector(array, 4));
-		return IAMArray.from(array);
 	}
 
 	/** {@inheritDoc} */

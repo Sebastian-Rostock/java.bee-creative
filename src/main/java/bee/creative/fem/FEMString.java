@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
-import bee.creative.iam.IAMArray;
-import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.Comparators;
@@ -149,31 +147,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	static class INT16Encoder implements Collector {
 
-		public final char[] array;
-
-		public int index;
-
-		INT16Encoder(final char[] array, final int index) {
-			this.array = array;
-			this.index = index;
-		}
-
-		@Override
-		public boolean push(final int value) {
-			if (value < 0) throw new IllegalArgumentException();
-			this.array[this.index++] = value < 65536 ? (char)value : 0;
-			return true;
-		}
-
-	}
-
-	static class INT16Encoder2 implements Collector {
-
 		public final short[] array;
 
 		public int index;
 
-		INT16Encoder2(final short[] array, final int index) {
+		INT16Encoder(final short[] array, final int index) {
 			this.array = array;
 			this.index = index;
 		}
@@ -182,6 +160,26 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			this.array[this.index++] = value < 65536 ? (short)value : 0;
+			return true;
+		}
+
+	}
+
+	static class UINT16Encoder implements Collector {
+
+		public final char[] array;
+
+		public int index;
+
+		UINT16Encoder(final char[] array, final int index) {
+			this.array = array;
+			this.index = index;
+		}
+
+		@Override
+		public boolean push(final int value) {
+			if (value < 0) throw new IllegalArgumentException();
+			this.array[this.index++] = value < 65536 ? (char)value : 0;
 			return true;
 		}
 
@@ -283,39 +281,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	static class UTF16Encoder implements Collector {
 
-		public final char[] array;
-
-		public int index;
-
-		UTF16Encoder(final char[] array, final int index) {
-			this.array = array;
-			this.index = index;
-		}
-
-		@Override
-		public boolean push(final int value) {
-			if (value < 0) throw new IllegalArgumentException();
-			final int value2 = value - 65536;
-			int index = this.index;
-			if (value2 < 0) {
-				this.array[index++] = (char)value;
-			} else {
-				this.array[index++] = (char)(55296 | (value2 >> 10));
-				this.array[index++] = (char)(56320 | (value2 & 1023));
-			}
-			this.index = index;
-			return true;
-		}
-
-	}
-
-	static class UTF16Encoder2 implements Collector {
-
 		public final short[] array;
 
 		public int index;
 
-		UTF16Encoder2(final short[] array, final int index) {
+		UTF16Encoder(final short[] array, final int index) {
 			this.array = array;
 			this.index = index;
 		}
@@ -337,220 +307,30 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
-	public static class ArrayString extends FEMString {
+	static class UTF16Encoder2 implements Collector {
 
-		public final IAMArray array;
+		public final char[] array;
 
-		public final int offset;
+		public int index;
 
-		ArrayString(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-			this(array, 1, array.length() - 2, array.get(0));
-		}
-
-		public ArrayString(final IAMArray array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-			super(length);
-			this.array = Objects.notNull(array);
-			this.offset = offset;
-		}
-
-		public ArrayString(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
-			this(array, offset, length);
-			this.hash = hash;
-		}
-
-		@Override
-		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.array.get(this.offset + index);
-		}
-
-		@Override
-		protected FEMString customSection(final int offset, final int length) {
-			return new ArrayString(this.array, this.offset + offset, length);
-		}
-
-		@Override
-		public FEMString compact() {
-			return this;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class ArrayStringINT8 extends ArrayString {
-
-		ArrayStringINT8(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-			this(array, 4, array.length() - 5, Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0)));
-		}
-
-		public ArrayStringINT8(final IAMArray array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-			super(array, offset, length);
-		}
-
-		public ArrayStringINT8(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
-			super(array, offset, length);
-			this.hash = hash;
-		}
-
-		@Override
-		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.array.get(this.offset + index) & 255;
-		}
-
-		@Override
-		protected FEMString customSection(final int offset, final int length) {
-			return new ArrayStringINT8(this.array, this.offset + offset, length);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class ArrayStringINT16 extends ArrayString {
-
-		ArrayStringINT16(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-			this(array, 2, array.length() - 3, Integers.toInt(array.get(1), array.get(0)));
-		}
-
-		public ArrayStringINT16(final IAMArray array, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-			super(array, offset, length);
-		}
-
-		public ArrayStringINT16(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
-			super(array, offset, length);
-			this.hash = hash;
-		}
-
-		@Override
-		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.array.get(this.offset + index) & 65535;
-		}
-
-		@Override
-		protected FEMString customSection(final int offset, final int length) {
-			return new ArrayStringINT16(this.array, this.offset + offset, length);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class ArrayStringUTF8 extends FEMString {
-
-		public final IAMArray array;
-
-		ArrayStringUTF8(final IAMArray array) {
-			super(Integers.toInt(array.get(7), array.get(6), array.get(5), array.get(4)));
+		UTF16Encoder2(final char[] array, final int index) {
 			this.array = array;
-			this.hash = Integers.toInt(array.get(3), array.get(2), array.get(1), array.get(0));
+			this.index = index;
 		}
 
 		@Override
-		protected int customGet(int index) throws IndexOutOfBoundsException {
-			int offset = 8;
-			while (index > 0) {
-				index--;
-				offset += FEMString.utf8Length(this.array.get(offset));
-			}
-			return FEMString.utf8Codepoint(this.array, offset);
-		}
-
-		@Override
-		protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
-			if (foreward) {
-				int index = 8;
-				while (offset > 0) {
-					offset--;
-					index += FEMString.utf8Length(this.array.get(index));
-				}
-				while (length > 0) {
-					if (!target.push(FEMString.utf8Codepoint(this.array, index))) return false;
-					length--;
-					index += FEMString.utf8Length(this.array.get(index));
-				}
+		public boolean push(final int value) {
+			if (value < 0) throw new IllegalArgumentException();
+			final int value2 = value - 65536;
+			int index = this.index;
+			if (value2 < 0) {
+				this.array[index++] = (char)value;
 			} else {
-				int index = 8;
-				offset += length;
-				while (offset > 0) {
-					offset--;
-					index += FEMString.utf8Length(this.array.get(index));
-				}
-				while (length > 0) {
-					while (!FEMString.utf8Header(this.array.get(--index)))
-						if (!target.push(FEMString.utf8Codepoint(this.array, index))) return false;
-					length--;
-				}
+				this.array[index++] = (char)(55296 | (value2 >> 10));
+				this.array[index++] = (char)(56320 | (value2 & 1023));
 			}
+			this.index = index;
 			return true;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class ArrayStringUTF16 extends FEMString {
-
-		public final IAMArray array;
-
-		ArrayStringUTF16(final IAMArray array) {
-			super(Integers.toInt(array.get(3), array.get(2)));
-			this.array = array;
-			this.hash = Integers.toInt(array.get(1), array.get(0));
-		}
-
-		@Override
-		protected int customGet(int index) throws IndexOutOfBoundsException {
-			int offset = 4;
-			while (index > 0) {
-				index--;
-				offset += FEMString.utf16Length(this.array.get(offset));
-			}
-			return FEMString.utf16Codepoint(this.array, offset);
-		}
-
-		@Override
-		protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
-			if (foreward) {
-				int index = 4;
-				while (offset > 0) {
-					offset--;
-					index += FEMString.utf16Length(this.array.get(index));
-				}
-				while (length > 0) {
-					if (!target.push(FEMString.utf16Codepoint(this.array, index))) return false;
-					length--;
-					index += FEMString.utf16Length(this.array.get(index));
-				}
-			} else {
-				int index = 4;
-				offset += length;
-				while (offset > 0) {
-					offset--;
-					index += FEMString.utf16Length(this.array.get(index));
-				}
-				while (length > 0) {
-					while (!FEMString.utf16Header(this.array.get(--index)))
-						if (!target.push(FEMString.utf16Codepoint(this.array, index))) return false;
-					length--;
-				}
-			}
-			return true;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class EmptyString extends FEMString {
-
-		EmptyString() {
-			super(0);
-		}
-
-		@Override
-		public FEMString reverse() {
-			return this;
-		}
-
-		@Override
-		public FEMString compact() {
-			return this;
 		}
 
 	}
@@ -589,16 +369,16 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.string1) + EMU.from(this.string2);
-		}
-
-		@Override
-		public FEMString section(final int offset, final int length) throws IllegalArgumentException {
+		protected FEMString customSection(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this.string1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.string2.section(offset2, length);
 			if (length2 <= 0) return this.string1.section(offset, length);
 			return this.string1.section(offset, -offset2).concat(this.string2.section(0, length2));
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.string1) + EMU.from(this.string2);
 		}
 
 	}
@@ -627,13 +407,13 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.string);
+		protected FEMString customSection(final int offset2, final int length2) throws IllegalArgumentException {
+			return this.string.section(this.offset + offset2, length2);
 		}
 
 		@Override
-		public FEMString section(final int offset2, final int length2) throws IllegalArgumentException {
-			return this.string.section(this.offset + offset2, length2);
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.string);
 		}
 
 	}
@@ -659,13 +439,13 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.string);
+		protected FEMString customSection(final int offset, final int length2) throws IllegalArgumentException {
+			return this.string.section(this.length - offset - length2, length2).reverse();
 		}
 
 		@Override
-		public FEMString section(final int offset, final int length2) throws IllegalArgumentException {
-			return this.string.section(this.length - offset - length2, length2).reverse();
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.string);
 		}
 
 		@Override
@@ -712,68 +492,38 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactString extends FEMString implements Emuable {
-
-		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
-		final int[] items;
-
-		CompactString(final int[] items) throws IllegalArgumentException {
-			super(items.length);
-			this.items = items;
-		}
-
-		@Override
-		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.items[index];
-		}
-
-		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.fromArray(this.items);
-		}
-
-		@Override
-		public FEMString compactINT32() {
-			return this;
-		}
-
-		@Override
-		public int[] toInts() {
-			return this.items.clone();
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
 	public static class CompactStringINT8 extends FEMString implements Emuable {
 
 		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
 		final byte[] items;
 
-		CompactStringINT8(final byte[] items) throws IllegalArgumentException {
-			super(items.length);
+		final int offset;
+
+		CompactStringINT8(final byte[] items, final int offset, final int length) throws IllegalArgumentException {
+			super(length);
 			this.items = items;
+			this.offset = offset;
 		}
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.items[index] & 255;
+			return this.items[this.offset + index] & 255;
+		}
+
+		@Override
+		protected FEMString customSection(final int offset, final int length) {
+			return new CompactStringINT8(this.items, this.offset + offset, length);
 		}
 
 		@Override
 		public long emu() {
-			return EMU.fromObject(this) + EMU.fromArray(this.items);
+			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.fromArray(this.items) : 0);
 		}
 
 		@Override
 		public FEMString compactINT8() {
-			return this;
-		}
-
-		@Override
-		public byte[] toBytes(final boolean asUTF8) {
-			if (asUTF8) return this.toBytes();
-			return this.items.clone();
+			if ((this.offset == 0) && (this.length == this.items.length)) return this;
+			return super.compactINT8();
 		}
 
 	}
@@ -781,33 +531,75 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	public static class CompactStringINT16 extends FEMString implements Emuable {
 
-		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
-		final char[] items;
+		final short[] items;
 
-		CompactStringINT16(final char[] items) throws IllegalArgumentException {
-			super(items.length);
+		final int offset;
+
+		CompactStringINT16(final short[] items) throws IllegalArgumentException {
+			this(items, 0, items.length);
+		}
+
+		CompactStringINT16(final short[] items, final int offset, final int length) throws IllegalArgumentException {
+			super(length);
 			this.items = items;
+			this.offset = offset;
 		}
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.items[index];
+			return this.items[this.offset + index] & 65535;
+		}
+
+		@Override
+		protected FEMString customSection(final int offset, final int length) {
+			return new CompactStringINT16(this.items, this.offset + offset, length);
 		}
 
 		@Override
 		public long emu() {
-			return EMU.fromObject(this) + EMU.fromArray(this.items);
+			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.fromArray(this.items) : 0);
 		}
 
 		@Override
 		public FEMString compactINT16() {
-			return this;
+			if ((this.offset == 0) && (this.length == this.items.length)) return this;
+			return super.compactINT16();
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class CompactStringINT32 extends FEMString implements Emuable {
+
+		final int[] items;
+
+		final int offset;
+
+		CompactStringINT32(final int[] items, final int offset, final int length) throws IllegalArgumentException {
+			super(length);
+			this.items = items;
+			this.offset = offset;
 		}
 
 		@Override
-		public char[] toChars(final boolean asUTF16) {
-			if (asUTF16) return this.toChars();
-			return this.items.clone();
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
+			return this.items[this.offset + index];
+		}
+
+		@Override
+		protected FEMString customSection(final int offset, final int length) {
+			return new CompactStringINT32(this.items, this.offset + offset, length);
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.fromArray(this.items) : 0);
+		}
+
+		@Override
+		public FEMString compactINT32() {
+			if ((this.offset == 0) && (this.length == this.items.length)) return this;
+			return super.compactINT32();
 		}
 
 	}
@@ -815,62 +607,50 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	public static class CompactStringUTF8 extends FEMString implements Emuable {
 
-		/** Dieses Feld speichert das Array der UTF-8-Token, das nicht verändert werden sollte. */
 		final byte[] items;
 
-		CompactStringUTF8(final int length, final byte[] items) throws IllegalArgumentException {
+		final int offset;
+
+		CompactStringUTF8(final byte[] items, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
-			if (length > items.length) throw new IllegalStateException();
 			this.items = items;
+			this.offset = offset;
 		}
 
 		@Override
-		protected int customGet(int index) throws IndexOutOfBoundsException {
-			int offset = 0;
-			while (index > 0) {
-				index--;
-				offset += FEMString.utf8Length(this.items[offset]);
-			}
-			return FEMString.utf8Codepoint(this.items, offset);
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
+			return FEMString.utf8Value(this.items, FEMString.utf8Offset(this.items, this.offset, index));
 		}
 
 		@Override
-		protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			if (foreward) {
-				int index = 0;
-				while (offset > 0) {
-					offset--;
-					index += FEMString.utf8Length(this.items[index]);
-				}
-				while (length > 0) {
-					if (!target.push(FEMString.utf8Codepoint(this.items, index))) return false;
-					length--;
-					index += FEMString.utf8Length(this.items[index]);
+				int offset2 = FEMString.utf8Offset(this.items, this.offset, offset), length2 = length;
+				while (length2 > 0) {
+					if (!target.push(FEMString.utf8Value(this.items, offset2))) return false;
+					length2--;
+					offset2 += FEMString.utf8Size(this.items[offset2]);
 				}
 			} else {
-				int index = 0;
-				offset += length;
-				while (offset > 0) {
-					offset--;
-					index += FEMString.utf8Length(this.items[index]);
-				}
-				while (length > 0) {
-					while (!FEMString.utf8Header(this.items[--index]))
-						if (!target.push(FEMString.utf8Codepoint(this.items, index))) return false;
-					length--;
+				int offset2 = FEMString.utf8Offset(this.items, this.offset, offset + length), length2 = length;
+				while (length2 > 0) {
+					while (!FEMString.utf8Header(this.items[--offset2])) {
+						if (!target.push(FEMString.utf8Value(this.items, offset2))) return false;
+					}
+					length2--;
 				}
 			}
 			return true;
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.fromArray(this.items);
+		protected FEMString customSection(final int offset, final int length) {
+			return new CompactStringUTF8(this.items, FEMString.utf8Offset(this.items, this.offset, offset), length);
 		}
 
 		@Override
-		public byte[] toBytes() {
-			return this.items.clone();
+		public long emu() {
+			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.fromArray(this.items) : 0);
 		}
 
 	}
@@ -878,62 +658,50 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	public static class CompactStringUTF16 extends FEMString implements Emuable {
 
-		/** Dieses Feld speichert das Array der UTF-16-Token, das nicht verändert werden sollte. */
-		final char[] items;
+		final short[] items;
 
-		CompactStringUTF16(final int length, final char[] items) throws IllegalArgumentException {
+		final int offset;
+
+		CompactStringUTF16(final short[] items, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
-			if (length > items.length) throw new IllegalStateException();
 			this.items = items;
+			this.offset = offset;
 		}
 
 		@Override
-		protected int customGet(int index) throws IndexOutOfBoundsException {
-			int offset = 0;
-			while (index > 0) {
-				index--;
-				offset += FEMString.utf16Length(this.items[offset]);
-			}
-			return FEMString.utf16Codepoint(this.items, offset);
+		protected int customGet(final int index) throws IndexOutOfBoundsException {
+			return FEMString.utf16Value(this.items, FEMString.utf16Offset(this.items, this.offset, index));
 		}
 
 		@Override
-		protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			if (foreward) {
-				int index = 0;
-				while (offset > 0) {
-					offset--;
-					index += FEMString.utf16Length(this.items[index]);
-				}
-				while (length > 0) {
-					if (!target.push(FEMString.utf16Codepoint(this.items, index))) return false;
-					length--;
-					index += FEMString.utf16Length(this.items[index]);
+				int offset2 = FEMString.utf16Offset(this.items, this.offset, offset), length2 = length;
+				while (length2 > 0) {
+					if (!target.push(FEMString.utf16Value(this.items, offset2))) return false;
+					length2--;
+					offset2 += FEMString.utf16Size(this.items[offset2]);
 				}
 			} else {
-				int index = 0;
-				offset += length;
-				while (offset > 0) {
-					offset--;
-					index += FEMString.utf16Length(this.items[index]);
-				}
-				while (length > 0) {
-					while (!FEMString.utf16Header(this.items[--index]))
-						if (!target.push(FEMString.utf16Codepoint(this.items, index))) return false;
-					length--;
+				int offset2 = FEMString.utf16Offset(this.items, this.offset, offset + length), length2 = length;
+				while (length2 > 0) {
+					while (!FEMString.utf16Header(this.items[--offset2])) {
+						if (!target.push(FEMString.utf16Value(this.items, offset2))) return false;
+					}
+					length2--;
 				}
 			}
 			return true;
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.fromArray(this.items);
+		protected FEMString customSection(final int offset, final int length) {
+			return new CompactStringUTF16(this.items, FEMString.utf16Offset(this.items, this.offset, offset), length);
 		}
 
 		@Override
-		public char[] toChars() {
-			return this.items.clone();
+		public long emu() {
+			return EMU.fromObject(this) + ((this.offset == 0) && (this.length == this.items.length) ? EMU.fromArray(this.items) : 0);
 		}
 
 	}
@@ -945,207 +713,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	public static final FEMType<FEMString> TYPE = FEMType.from(FEMString.ID);
 
 	/** Dieses Feld speichert die leere Zeichenkette. */
-	public static final FEMString EMPTY = new EmptyString();
-
-	/** Diese Methode eine Zeichenkette mit den gegebenen Codepoints zurück. Das gegebene Array wird falls nötig kopiert.
-	 *
-	 * @see #toInts()
-	 * @param items Codepoints.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMString from(final int[] items) throws NullPointerException {
-		return FEMString.from(items, true);
-	}
-
-	/** Diese Methode eine Zeichenkette mit den gegebenen Codepoints zurück.
-	 *
-	 * @see #toInts()
-	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
-	 * @param items Codepoints.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMString from(final int[] items, final boolean copy) throws NullPointerException {
-		if (items.length == 0) return FEMString.EMPTY;
-		if (items.length == 1) return new UniformString(1, items[0]);
-		return new CompactString(copy ? items.clone() : items);
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den Codepoints im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird falls nötig kopiert.
-	 *
-	 * @see #toInts()
-	 * @param items Codepoints.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
-	public static FEMString from(final int[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
-		if (length == 1) return new UniformString(1, items[offset]);
-		final int[] result = new int[length];
-		System.arraycopy(items, offset, result, 0, length);
-		return new CompactString(result);
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück. Das gegebene Array wird falls nötig kopiert.
-	 *
-	 * @see #toBytes()
-	 * @param items UTF8-kodierte Codepoints.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final byte[] items) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(items, true, true);
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück.
-	 *
-	 * @see #toBytes()
-	 * @param items UTF8-kodierte Codepoints.
-	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final byte[] items, final boolean copy) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(items, copy, true);
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den gegebenen 8-Bit-kodierten Codepoints zurück.
-	 *
-	 * @see #toBytes(boolean)
-	 * @param items 8-Bit-kodierte Codepoints.
-	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
-	 * @param asUTF8 {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final byte[] items, final boolean copy, final boolean asUTF8) throws NullPointerException, IllegalArgumentException {
-		if (items.length == 0) return FEMString.EMPTY;
-		if (asUTF8) {
-			final int length = FEMString.utf8Length(items);
-			if (length == 1) return new UniformString(1, FEMString.utf8Codepoint(items, 0));
-			return new CompactStringUTF8(length, copy ? items.clone() : items);
-		} else {
-			if (items.length == 1) return new UniformString(1, items[0] & 255);
-			return new CompactStringINT8(copy ? items.clone() : items);
-		}
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den UTF8-kodierte Codepoints im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
-	 *
-	 * @see #toBytes()
-	 * @param items UTF8-kodierte Codepoints.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
-	public static FEMString from(final byte[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(items, offset, length, true);
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den gegebenen 8-Bit-kodierten Codepoints im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
-	 *
-	 * @see #toBytes(boolean)
-	 * @param items 8-Bit-kodierte Codepoints.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @param asUTF8 {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final byte[] items, final int offset, final int length, final boolean asUTF8)
-		throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
-		final byte[] result = new byte[length];
-		System.arraycopy(items, offset, result, 0, length);
-		return FEMString.from(result, false, asUTF8);
-	}
-
-	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück. Das gegebene Array wird falls nötig kopiert.
-	 *
-	 * @param items UTF16-kodierte Codepoints.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final char[] items) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(items, true, true);
-	}
-
-	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück.
-	 *
-	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
-	 * @param items UTF16-kodierte Codepoints.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final char[] items, final boolean copy) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(items, copy, true);
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den gegebenen 16-Bit-kodierten Codepoints zurück.
-	 *
-	 * @see #toChars(boolean)
-	 * @param items 16-Bit-kodierte Codepoints.
-	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
-	 * @param asUTF16 {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final char[] items, final boolean copy, final boolean asUTF16) throws NullPointerException, IllegalArgumentException {
-		if (items.length == 0) return FEMString.EMPTY;
-		if (asUTF16) {
-			final int length = FEMString.utf16Length(items);
-			if (length == 1) return new UniformString(1, FEMString.utf16Codepoint(items, 0));
-			return new CompactStringUTF16(length, copy ? items.clone() : items);
-		} else {
-			if (items.length == 1) return new UniformString(1, items[0]);
-			return new CompactStringINT16(copy ? items.clone() : items);
-		}
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den UTF16-kodierte Codepoints im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
-	 *
-	 * @param items UTF16-kodierte Codepoints.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
-	public static FEMString from(final char[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(items, offset, length, true);
-	}
-
-	/** Diese Methode gibt eine Zeichenkette mit den gegebenen 16-Bit-kodierten Codepoints im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
-	 *
-	 * @see #toChars(boolean)
-	 * @param items 16-Bit-kodierte Codepoints.
-	 * @param offset Beginn des Abschnitts.
-	 * @param length Länge des Abschnitts.
-	 * @param asUTF16 {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final char[] items, final int offset, final int length, final boolean asUTF16)
-		throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
-		final char[] result = new char[length];
-		System.arraycopy(items, offset, result, 0, length);
-		return FEMString.from(result, false, asUTF16);
-	}
-
-	/** Diese Methode eine Zeichenkette mit den gegebenen Codepoints zurück.
-	 *
-	 * @param string Codepoints.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public static FEMString from(final String string) throws NullPointerException {
-		if (string.length() == 0) return FEMString.EMPTY;
-		return FEMString.from(string.toCharArray(), false, true);
-	}
+	public static final FEMString EMPTY = new UniformString(0, 0);
 
 	/** Diese Methode gibt eine uniforme Zeichenkette mit der gegebenen Länge zurück, deren Codepoints alle gleich dem gegebenen sind.
 	 *
@@ -1156,6 +724,265 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	public static FEMString from(final int item, final int length) throws IllegalArgumentException {
 		if (length == 0) return FEMString.EMPTY;
 		return new UniformString(length, item);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) FEMString.from(true, items, 0, items.length)}.
+	 *
+	 * @param items Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMString from(final int[] items) throws NullPointerException {
+		return FEMString.from(true, items, 0, items.length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) FEMString.from(true, items, offset, length)}.
+	 *
+	 * @param items Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final int[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(true, items, offset, length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, int[], int, int) FEMString.from(copy, items, 0, items.length)}.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
+	 * @param items Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMString from(final boolean copy, final int[] items) throws NullPointerException {
+		return FEMString.from(copy, items, 0, items.length);
+	}
+
+	/** Diese Methode gibt eine Zeichenkette mit den Codepoints im gegebenen Abschnitt zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
+	 * @param items Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final boolean copy, final int[] items, final int offset, final int length)
+		throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMString.EMPTY;
+		if (length == 1) return new UniformString(1, items[offset]);
+		if (!copy) return new CompactStringINT32(items, offset, length);
+		final int[] result = new int[length];
+		System.arraycopy(items, offset, result, 0, length);
+		return new CompactStringINT32(result, 0, length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(true, false, items, 0, items.length)}.
+	 *
+	 * @param items 8-Bit-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	public static FEMString from(final byte[] items) throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(true, false, items, 0, items.length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(true, false, items, offset, length)}.
+	 *
+	 * @param items 8-Bit-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final byte[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(true, false, items, offset, length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(copy, false, items, 0, items.length)}.
+	 *
+	 * @param items 8-Bit-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final boolean copy, final byte[] items) throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(copy, false, items, 0, items.length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(copy, false, items, offset, length)}.
+	 *
+	 * @param items 8-Bit-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final boolean copy, final byte[] items, final int offset, final int length)
+		throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(copy, false, items, offset, length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, byte[], int, int) FEMString.from(copy, asUTF8, items, 0, items.length)}.
+	 *
+	 * @param items 8-Bit-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final boolean copy, final boolean asUTF8, final byte[] items) {
+		return FEMString.from(copy, asUTF8, items, 0, items.length);
+	}
+
+	/** Diese Methode gibt eine Zeichenkette mit den 8-Bit-kodierten Codepoints im gegebenen Abschnitt zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
+	 * @param asUTF8 {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
+	 * @param items 8-Bit-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt bzw. die Kodierung ungültig ist. */
+	public static FEMString from(final boolean copy, final boolean asUTF8, final byte[] items, final int offset, final int length)
+		throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMString.EMPTY;
+		if (asUTF8) {
+			final int count = FEMString.utf8Count(items, offset, length);
+			if (count == 1) return new UniformString(1, FEMString.utf8Value(items, offset));
+			if (!copy) return new CompactStringUTF8(items, offset, count);
+			final byte[] result = new byte[length];
+			System.arraycopy(items, offset, result, 0, length);
+			return new CompactStringUTF8(result, 0, count);
+		} else {
+			if (length == 1) return new UniformString(1, items[offset] & 255);
+			if (!copy) return new CompactStringINT8(items, offset, length);
+			final byte[] result = new byte[length];
+			System.arraycopy(items, offset, result, 0, length);
+			return new CompactStringINT8(result, 0, length);
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, short[], int, int) FEMString.from(true, false, items, 0, items.length)}.
+	 *
+	 * @param items 16-Bit-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	public static FEMString from(final short[] items) throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(true, false, items, 0, items.length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, short[], int, int) FEMString.from(true, false, items, offset, length)}.
+	 *
+	 * @param items 16-Bit-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final short[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(true, false, items, offset, length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, short[], int, int) FEMString.from(copy, false, items, 0, items.length)}.
+	 *
+	 * @param items 16-Bit-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final boolean copy, final short[] items) throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(copy, false, items, 0, items.length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, short[], int, int) FEMString.from(copy, false, items, offset, length)}.
+	 *
+	 * @param items 16-Bit-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final boolean copy, final short[] items, final int offset, final int length)
+		throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(copy, false, items, offset, length);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(boolean, boolean, short[], int, int) FEMString.from(copy, asUTF16, items, 0, items.length)}.
+	 *
+	 * @param items 16-Bit-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final boolean copy, final boolean asUTF16, final short[] items) {
+		return FEMString.from(copy, asUTF16, items, 0, items.length);
+	}
+
+	/** Diese Methode gibt eine Zeichenkette mit den 16-Bit-kodierten Codepoints im gegebenen Abschnitt zurück.
+	 *
+	 * @param copy {@code true}, wenn das gegebene Array falls nötig kopiert werden soll.
+	 * @param asUTF16 {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
+	 * @param items 16-Bit-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt bzw. die Kodierung ungültig ist. */
+	public static FEMString from(final boolean copy, final boolean asUTF16, final short[] items, final int offset, final int length)
+		throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMString.EMPTY;
+		if (asUTF16) {
+			final int count = FEMString.utf16Count(items, offset, length);
+			if (count == 1) return new UniformString(1, FEMString.utf16Value(items, offset));
+			if (!copy) return new CompactStringUTF16(items, offset, count);
+			final short[] result = new short[length];
+			System.arraycopy(items, offset, result, 0, length);
+			return new CompactStringUTF16(result, 0, count);
+		} else {
+			if (length == 1) return new UniformString(1, items[offset] & 65535);
+			if (!copy) return new CompactStringINT16(items, offset, length);
+			final short[] result = new short[length];
+			System.arraycopy(items, offset, result, 0, length);
+			return new CompactStringINT16(result, 0, length);
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(char[]) FEMString.from(string.toCharArray())}.
+	 *
+	 * @param string Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public static FEMString from(final String string) throws NullPointerException {
+		if (string.isEmpty()) return FEMString.EMPTY;
+		return FEMString.from(string.toCharArray());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(char[], int, int) FEMString.from(items, 0, items.length)}.
+	 *
+	 * @param items UTF16-kodierte Codepoints.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	public static FEMString from(final char[] items) throws NullPointerException, IllegalArgumentException {
+		return FEMString.from(items, 0, items.length);
+	}
+
+	/** Diese Methode gibt eine Zeichenkette mit den UTF16-kodierten Codepoints im gegebenen Abschnitt zurück.
+	 *
+	 * @param items UTF16-kodierte Codepoints.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt ungültig ist. */
+	public static FEMString from(final char[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
+		if (length == 0) return FEMString.EMPTY;
+		final short[] result = new short[length];
+		for (int i1 = 0, i2 = offset, l = length; 0 <= l; i1++, i2++, l--) {
+			result[i1] = (short)items[i2];
+		}
+		return FEMString.from(false, true, result, 0, length);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Codepoints in eine Zeichenkette und gibt diese zurück.
@@ -1173,7 +1000,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		for (int i = 0; i < length; i++) {
 			result[i] = items.get(i).intValue();
 		}
-		return FEMString.from(result, false);
+		return FEMString.from(false, result);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Codepoints in eine Zeichenkette und gibt diese zurück.
@@ -1186,45 +1013,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	public static FEMString from(final Iterable<? extends Number> items) throws NullPointerException {
 		if (items instanceof FEMString) return (FEMString)items;
 		return FEMString.from(Iterables.toList(items));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code from(array, false)} und die Umkehroperation zu {@link #toArray(int)}.
-	 *
-	 * @see #from(IAMArray, boolean)
-	 * @param array Zahlenfolge.
-	 * @return {@link FEMString}-Sicht auf die gegebene Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final IAMArray array) throws NullPointerException, IllegalArgumentException {
-		return FEMString.from(array, false);
-	}
-
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeichenkette und gibt diese zurück. Bei der Kodierung mit Einzelwerten werden die ersten vier
-	 * Byte der Zahlenfolge als {@link #hashCode() Streuwert}, die darauf folgenden Zahlenwerte als Auflistung der einzelwertkodierten Codepoints und der letzte
-	 * Zahlenwert als abschließende {@code 0} interpretiert. Bei der Mehrwertkodierung werden dagegen die ersten vier Byte der Zahlenfolge als {@link #hashCode()
-	 * Streuwert}, die nächsten vier Byte als {@link #length() Zeichenanzahl}, die darauf folgenden Zahlenwerte als Auflistung der mehrwertkodierten Codepoints
-	 * und der letzte Zahlenwert als abschließende {@code 0} interpretiert. Ob eine 8-, 16- oder 32-Bit-Kodierung eingesetzt wird, hängt von der
-	 * {@link IAMArray#mode() Kodierung der Zahlenwerte} ab.
-	 *
-	 * @param array Zahlenfolge.
-	 * @param asUTFx {@code true}, wenn die Codepoints mehrwertkodiert sind. {@code false}, wenn die Codepoints einzelwertkodiert sind.
-	 * @return {@link FEMString}-Sicht auf die gegebene Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final IAMArray array, final boolean asUTFx) throws NullPointerException, IllegalArgumentException {
-		switch (array.mode()) {
-			case IAMArray.MODE_INT8:
-			case IAMArray.MODE_UINT8:
-				if (asUTFx) return new ArrayStringUTF8(array);
-				return new ArrayStringINT8(array);
-			case IAMArray.MODE_INT16:
-			case IAMArray.MODE_UINT16:
-				if (asUTFx) return new ArrayStringUTF16(array);
-				return new ArrayStringINT16(array);
-			case IAMArray.MODE_INT32:
-				return new ArrayString(array);
-		}
-		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode gibt die Verkettung der gegebenen Zeichenketten zurück.
@@ -1246,20 +1034,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return FEMString.concatAll(values, min, mid).concat(FEMString.concatAll(values, mid + 1, max));
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Token den Beginn eines UTF8-kodierten Codepoints ist.
+	/** Diese Methode gibt die Anzahl der Token für den UTF8-kodierten Codepoint zurück, der mit dem gegebenen Token beginnt.
 	 *
-	 * @param item Token.
-	 * @return {@code true}, wenn ein UTF8-kodierter Codepoint am Token beginnt. */
-	static boolean utf8Header(final int item) {
-		return (item & 192) != 128;
-	}
-
-	/** Diese Methode gibt die Anzahl der Token für den UTF8-kodierten Codepoint zurück, der am gegebenen Token beginnt.
-	 *
-	 * @param item Token, an dem ein UTF8-kodierter Codepoint beginnt.
+	 * @param item Token, mit dem ein UTF8-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF8-kodierten Codepoint.
-	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist. */
-	static int utf8Length(final int item) throws IllegalArgumentException {
+	 * @throws IllegalArgumentException Wenn der Token ungültig ist. */
+	static int utf8Size(final int item) throws IllegalArgumentException {
 		switch ((item >> 4) & 15) {
 			case 0:
 			case 1:
@@ -1281,46 +1061,14 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 *
-	 * @param array Tokenliste.
-	 * @return Anzahl an UTF8-kodierten Codepoints.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf8Length(final byte[] array) throws IllegalArgumentException {
-		int index = 0, result = 0;
-		final int length = array.length;
-		while (index < length) {
-			result++;
-			index += FEMString.utf8Length(array[index]);
-		}
-		if (index != length) throw new IllegalArgumentException();
-		return result;
-	}
-
-	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 *
-	 * @param array Tokenliste.
-	 * @return Anzahl an UTF8-kodierten Codepoints.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf8Length(final IAMArray array) throws IllegalArgumentException {
-		int index = 0, result = 0;
-		final int length = array.length();
-		while (index < length) {
-			result++;
-			index += FEMString.utf8Length(array.get(index));
-		}
-		if (index != length) throw new IllegalArgumentException();
-		return result;
-	}
-
 	/** Diese Methode gibt den UTF8-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
 	 *
-	 * @param array Tokenliste.
-	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt..
+	 * @param items Tokenliste.
+	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt.
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf8Codepoint(final byte[] array, final int offset) throws IllegalArgumentException {
-		switch ((array[offset] >> 4) & 15) {
+	static int utf8Value(final byte[] items, final int offset) throws IllegalArgumentException {
+		switch ((items[offset] >> 4) & 15) {
 			case 0:
 			case 1:
 			case 2:
@@ -1329,122 +1077,123 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			case 5:
 			case 6:
 			case 7:
-				return array[offset] & 127;
+				return items[offset] & 127;
 			case 12:
 			case 13:
-				return ((array[offset] & 31) << 6) | (array[offset + 1] & 63);
+				return ((items[offset] & 31) << 6) | (items[offset + 1] & 63);
 			case 14:
-				return ((array[offset] & 15) << 12) | ((array[offset + 1] & 63) << 6) | (array[offset + 2] & 63);
+				return ((items[offset] & 15) << 12) | ((items[offset + 1] & 63) << 6) | (items[offset + 2] & 63);
 			case 15:
-				return ((array[offset] & 7) << 18) | ((array[offset + 1] & 63) << 12) | ((array[offset + 2] & 63) << 6) | (array[offset + 3] & 63);
+				return ((items[offset] & 7) << 18) | ((items[offset + 1] & 63) << 12) | ((items[offset + 2] & 63) << 6) | (items[offset + 3] & 63);
 		}
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt den UTF8-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
+	/** Diese Methode verschiebt die gegebene Position um die gegebene Anzal an UTF8-kodierten Codepoint in der gegebenen Tokenliste und gibt sie zurück.
 	 *
-	 * @param array Tokenliste.
-	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt..
-	 * @return Codepoint.
+	 * @param items Tokenliste.
+	 * @param offset Position des Tokens, an dem der erste UTF8-kodierte Codepoint beginnt.
+	 * @param count Anzahl der Codepoints.
+	 * @return Position des ersten Tokens nach der gegebenen Anzahl an Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf8Codepoint(final IAMArray array, final int offset) throws IllegalArgumentException {
-		switch ((array.get(offset) >> 4) & 15) {
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-				return array.get(offset) & 127;
-			case 12:
-			case 13:
-				return ((array.get(offset) & 31) << 6) | (array.get(offset + 1) & 63);
-			case 14:
-				return ((array.get(offset) & 15) << 12) | ((array.get(offset + 1) & 63) << 6) | (array.get(offset + 2) & 63);
-			case 15:
-				return ((array.get(offset) & 7) << 18) | ((array.get(offset + 1) & 63) << 12) | ((array.get(offset + 2) & 63) << 6) | (array.get(offset + 3) & 63);
+	static int utf8Offset(final byte[] items, int offset, int count) throws IllegalArgumentException {
+		while (count > 0) {
+			count--;
+			offset += FEMString.utf8Size(items[offset]);
 		}
-		throw new IllegalArgumentException();
+		return offset;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Token den Beginn eines UTF16-kodierten Codepoints ist.
+	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
+	 *
+	 * @param items Tokenliste.
+	 * @param offset Position des Tokens, an dem der erste UTF8-kodierte Codepoint beginnt.
+	 * @param length Anzahl der Token.
+	 * @return Anzahl an UTF8-kodierten Codepoints.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	static int utf8Count(final byte[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		int result = 0, offset2 = offset;
+		final int length2 = offset + length;
+		while (offset2 < length2) {
+			result++;
+			offset2 += FEMString.utf8Size(items[offset2]);
+		}
+		if (offset2 != length2) throw new IllegalArgumentException();
+		return result;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Token den Beginn eines UTF8-kodierten Codepoints anzeigt.
 	 *
 	 * @param item Token.
-	 * @return {@code true}, wenn ein UTF16-kodierter Codepoint am Token beginnt. */
-	static boolean utf16Header(final int item) {
-		return (item & 64512) != 56320;
+	 * @return {@code true}, wenn ein UTF8-kodierter Codepoint am Token beginnt. */
+	static boolean utf8Header(final int item) {
+		return (item & 192) != 128;
 	}
 
-	/** Diese Methode gibt die Anzahl der Token für den UTF16-kodierten Codepoint zurück, der am gegebenen Token beginnt.
+	/** Diese Methode gibt die Anzahl der Token für den UTF16-kodierten Codepoint zurück, der mit dem gegebenen Token beginnt.
 	 *
-	 * @param item Token, an dem ein UTF16-kodierter Codepoint beginnt.
+	 * @param item Token, mit dem ein UTF16-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF16-kodierten Codepoint.
-	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist. */
-	static int utf16Length(final int item) throws IllegalArgumentException {
+	 * @throws IllegalArgumentException Wenn der Token ungültig ist. */
+	static int utf16Size(final int item) throws IllegalArgumentException {
 		final int value = item & 64512;
 		if (value == 55296) return 2;
 		if (value != 56320) return 1;
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Anzahl an UTF16-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 *
-	 * @param array Tokenliste.
-	 * @return Anzahl an UTF16-kodierten Codepoints.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf16Length(final char[] array) throws IllegalArgumentException {
-		int index = 0, result = 0;
-		final int length = array.length;
-		while (index < length) {
-			result++;
-			index += FEMString.utf16Length(array[index]);
-		}
-		if (index != length) throw new IllegalArgumentException();
-		return result;
-	}
-
-	/** Diese Methode gibt die Anzahl an UTF16-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 *
-	 * @param array Tokenliste.
-	 * @return Anzahl an UTF16-kodierten Codepoints.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf16Length(final IAMArray array) throws IllegalArgumentException {
-		int index = 0, result = 0;
-		final int length = array.length();
-		while (index < length) {
-			result++;
-			index += FEMString.utf16Length(array.get(index));
-		}
-		if (index != length) throw new IllegalArgumentException();
-		return result;
-	}
-
 	/** Diese Methode gibt den UTF16-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
 	 *
-	 * @param array Tokenliste.
-	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
+	 * @param items Tokenliste.
+	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt.
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf16Codepoint(final char[] array, final int offset) throws IllegalArgumentException {
-		final int token = array[offset], value = token & 64512;
-		if (value == 55296) return (((token & 1023) << 10) | (array[offset + 1] & 1023)) + 65536;
-		if (value != 56320) return token;
+	static int utf16Value(final short[] items, final int offset) throws IllegalArgumentException {
+		final int token = items[offset], value = token & 64512;
+		if (value == 55296) return (((token & 1023) << 10) | (items[offset + 1] & 1023)) + 65536;
+		if (value != 56320) return token & 65535;
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt den UTF16-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
+	/** Diese Methode verschiebt die gegebene Position um die gegebene Anzal an UTF16-kodierten Codepoint in der gegebenen Tokenliste und gibt sie zurück.
 	 *
-	 * @param array Tokenliste.
-	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
-	 * @return Codepoint.
+	 * @param items Tokenliste.
+	 * @param offset Position des Tokens, an dem der erste UTF16-kodierte Codepoint beginnt.
+	 * @param count Anzahl der Codepoints.
+	 * @return Position des ersten Tokens nach der gegebenen Anzahl an Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf16Codepoint(final IAMArray array, final int offset) throws IllegalArgumentException {
-		final int token = array.get(offset), value = token & 64512;
-		if (value == 55296) return (((token & 1023) << 10) | (array.get(offset + 1) & 1023)) + 65536;
-		if (value != 56320) return token;
-		throw new IllegalArgumentException();
+	static int utf16Offset(final short[] items, int offset, int count) throws IllegalArgumentException {
+		while (count > 0) {
+			count--;
+			offset += FEMString.utf16Size(items[offset]);
+		}
+		return offset;
+	}
+
+	/** Diese Methode gibt die Anzahl an UTF16-kodierten Codepoints in der gegebenen Tokenliste zurück.
+	 *
+	 * @param items Tokenliste.
+	 * @param offset Position des Tokens, an dem der erste UTF8-kodierte Codepoint beginnt.
+	 * @param length Anzahl der Token.
+	 * @return Anzahl an UTF16-kodierten Codepoints.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	static int utf16Count(final short[] items, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		int result = 0, offset2 = offset;
+		final int length2 = offset + length;
+		while (offset2 < length2) {
+			result++;
+			offset2 += FEMString.utf16Size(items[offset2]);
+		}
+		if (offset2 != length2) throw new IllegalArgumentException();
+		return result;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Token den Beginn eines UTF16-kodierten Codepoints anzeigt.
+	 *
+	 * @param item Token.
+	 * @return {@code true}, wenn ein UTF16-kodierter Codepoint am Token beginnt. */
+	static boolean utf16Header(final int item) {
+		return (item & 64512) != 56320;
 	}
 
 	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
@@ -1512,7 +1261,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param target {@link Collector}, an den die Codepoints geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
-	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
+	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
@@ -1615,29 +1364,29 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	/** Diese Methode gibt diese Zeichenkette mit 8-Bit Einzelwertkodierung zurück. Codepoints größer als {@code 255} werden bei dieser Kodierung zu {@code 0}.
 	 *
-	 * @see #from(byte[], int, int)
-	 * @see #toBytes(boolean)
+	 * @see #from(boolean, boolean, byte[])
+	 * @see #toBytes()
 	 * @return Zeichenkette in 8-Bit-Einzelwertkodierung. */
 	public FEMString compactINT8() {
-		return FEMString.from(this.toBytes(false), false, false);
+		return FEMString.from(false, false, this.toBytes());
 	}
 
 	/** Diese Methode gibt diese Zeichenkette mit 16-Bit Einzelwertkodierung zurück. Codepoints größer als {@code 65535} werden bei dieser Kodierung zu {@code 0}.
 	 *
-	 * @see #from(char[], boolean, boolean)
-	 * @see #toChars(boolean)
+	 * @see #from(boolean, boolean, short[])
+	 * @see #toShorts()
 	 * @return Zeichenkette in 16-Bit-Einzelwertkodierung. */
 	public FEMString compactINT16() {
-		return FEMString.from(this.toChars(false), false, false);
+		return FEMString.from(false, false, this.toShorts());
 	}
 
 	/** Diese Methode gibt diese Zeichenkette mit 32-Bit Einzelwertkodierung zurück.
 	 *
-	 * @see #from(int[], boolean)
+	 * @see #from(boolean, int[])
 	 * @see #toInts()
 	 * @return Zeichenkette in 32-Bit-Einzelwertkodierung. */
 	public FEMString compactINT32() {
-		return FEMString.from(this.toInts(), false);
+		return FEMString.from(false, this.toInts());
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück. Die Suche beginnt an der gegebenen
@@ -1702,8 +1451,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		final int length = this.length;
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;
-		// TODO schneller
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < length; i++) { // TODO schneller
 			if (this.customGet(i) != that.customGet(i)) return false;
 		}
 		return true;
@@ -1717,8 +1465,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public int compare(final FEMString that) throws NullPointerException {
 		final int length = Math.min(this.length, that.length);
-		// TODO schneller, ggf. über ectract int[32] und IAMArray.from(...).compare
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < length; i++) { // TODO schneller, ggf. über ectract int[32] und IAMArray.from(...).compare
 			final int result = Comparators.compare(this.customGet(i), that.customGet(i));
 			if (result != 0) return result;
 		}
@@ -1734,13 +1481,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return encoder.array;
 	}
 
-	/** Diese Methode gibt die Codepoint in UTF8-Kodierung zurück.
+	/** Diese Methode gibt die 8-Bit-einzelwertkodierten Codepoint zurück.
 	 *
-	 * @return Array mit den Codepoints in UTF8-Kodierung. */
+	 * @return Array mit den Codepoints in 8-Bit-Kodierung. */
 	public byte[] toBytes() {
-		final UTF8Counter counter = new UTF8Counter();
-		this.extract(counter);
-		final UTF8Encoder encoder = new UTF8Encoder(new byte[counter.count], 0);
+		final INT8Encoder encoder = new INT8Encoder(new byte[this.length], 0);
 		this.extract(encoder);
 		return encoder.array;
 	}
@@ -1751,42 +1496,19 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *        (Codepoint größer als {@code 255} werden zu {@code 0}).
 	 * @return Array mit den Codepoints in 8-Bit-Kodierung. */
 	public byte[] toBytes(final boolean asUTF8) {
-		if (asUTF8) return this.toBytes();
-		final INT8Encoder encoder = new INT8Encoder(new byte[this.length], 0);
-		this.extract(encoder);
-		return encoder.array;
-	}
-
-	/** Diese Methode gibt die Codepoint in UTF16-Kodierung zurück.
-	 *
-	 * @return Array mit den Codepoints in UTF16-Kodierung. */
-	public char[] toChars() {
-		final UTF16Counter counter = new UTF16Counter();
+		if (!asUTF8) return this.toBytes();
+		final UTF8Counter counter = new UTF8Counter();
 		this.extract(counter);
-		final UTF16Encoder encoder = new UTF16Encoder(new char[counter.count], 0);
+		final UTF8Encoder encoder = new UTF8Encoder(new byte[counter.count], 0);
 		this.extract(encoder);
 		return encoder.array;
 	}
 
-	/** Diese Methode gibt die Codepoint in 16-Bit-Kodierung zurück.
+	/** Diese Methode gibt die 16-Bit-einzelwertkodierten Codepoint zurück.
 	 *
-	 * @param asUTF16 {@code true}, wenn die Codepoint in UTF16 kodiert werden sollen. {@code false}, wenn die Codepoint als Einzelwerte kodiert werden sollen
-	 *        (Codepoint größer als {@code 65535} werden zu {@code 0}).
 	 * @return Array mit den Codepoints in 16-Bit-Kodierung. */
-	public char[] toChars(final boolean asUTF16) {
-		if (asUTF16) return this.toChars();
-		final INT16Encoder encoder = new INT16Encoder(new char[this.length], 0);
-		this.extract(encoder);
-		return encoder.array;
-	}
-
-	/** Diese Methode gibt die Codepoint in UTF16-Kodierung zurück.
-	 *
-	 * @return Array mit den Codepoints in UTF16-Kodierung. */
 	public short[] toShorts() {
-		final UTF16Counter counter = new UTF16Counter();
-		this.extract(counter);
-		final UTF16Encoder2 encoder = new UTF16Encoder2(new short[counter.count], 0);
+		final INT16Encoder encoder = new INT16Encoder(new short[this.length], 0);
 		this.extract(encoder);
 		return encoder.array;
 	}
@@ -1797,95 +1519,23 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *        (Codepoint größer als {@code 65535} werden zu {@code 0}).
 	 * @return Array mit den Codepoints in 16-Bit-Kodierung. */
 	public short[] toShorts(final boolean asUTF16) {
-		if (asUTF16) return this.toShorts();
-		final INT16Encoder2 encoder = new INT16Encoder2(new short[this.length], 0);
+		if (!asUTF16) return this.toShorts();
+		final UTF16Counter counter = new UTF16Counter();
+		this.extract(counter);
+		final UTF16Encoder encoder = new UTF16Encoder(new short[counter.count], 0);
 		this.extract(encoder);
 		return encoder.array;
 	}
 
-	/** Diese Methode gibt eine Zahlenfolge zurück, welche die einzelwertkodierten Codepoints dieser Zeichenkette enthält. Sie ist die Umkehroperation zu
-	 * {@link #from(IAMArray)}.
+	/** Diese Methode gibt die Codepoint in UTF16-Kodierung zurück.
 	 *
-	 * @return Zahlenfolge mit den entsprechend kodierten Codepoints. */
-	public final IAMArray toArray() {
-		final RangeCollector collector = new RangeCollector();
-		this.extract(collector);
-		if (collector.range < 256) return this.toArray(1, false);
-		if (collector.range < 65536) return this.toArray(2, false);
-		return this.toArray(4, false);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #toArray(int, boolean) toArray(mode, false)} und die Umkehroperation zu {@link #from(IAMArray)}.
-	 *
-	 * @param mode Kodierungskennung mit {@code 1} für {@code 8-Bit}, {@code 2} für {@code 16-Bit} und {@code 4} für {@code 32-Bit}.
-	 * @return Zahlenfolge mit der entsprechend kodierten Zeichenkette.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public final IAMArray toArray(final int mode) throws IllegalArgumentException {
-		return this.toArray(mode, false);
-	}
-
-	/** Diese Methode gibt eine Zahlenfolge zurück, welche die einzel- oder mehrwertkodierten Codepoints dieser Zeichenkette enthält. Sie ist die Umkehroperation
-	 * zu {@link #from(IAMArray, boolean)}.
-	 *
-	 * @param mode Größe der Zahlen der Zahlenfolge: {@code 1} für {@code 8-Bit}, {@code 2} für {@code 16-Bit} und {@code 4} für {@code 32-Bit}.
-	 * @param asUTFx {@code true}, wenn die Codepoints mehrwertkodiert werden sollen. {@code false}, wenn die Codepoints einzelwertkodiert werden sollen.
-	 * @return Zahlenfolge mit den entsprechend kodierten Codepoints.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public final IAMArray toArray(final int mode, final boolean asUTFx) throws IllegalArgumentException {
-		final int hash = this.hashCode(), length = this.length();
-		switch (mode) {
-			case 1: {
-				if (asUTFx) {
-					final UTF8Counter counter = new UTF8Counter();
-					this.extract(counter);
-					final byte[] array = new byte[counter.count + 9];
-					array[0] = (byte)(hash >>> 0);
-					array[1] = (byte)(hash >>> 8);
-					array[2] = (byte)(hash >>> 16);
-					array[3] = (byte)(hash >>> 24);
-					array[4] = (byte)(length >>> 0);
-					array[5] = (byte)(length >>> 8);
-					array[6] = (byte)(length >>> 16);
-					array[7] = (byte)(length >>> 24);
-					this.extract(new UTF8Encoder(array, 8));
-					return IAMArray.from(array);
-				} else {
-					final byte[] array = new byte[length + 5];
-					array[0] = (byte)(hash >>> 0);
-					array[1] = (byte)(hash >>> 8);
-					array[2] = (byte)(hash >>> 16);
-					array[3] = (byte)(hash >>> 24);
-					this.extract(new INT8Encoder(array, 4));
-					return IAMArray.from(array);
-				}
-			}
-			case 2: {
-				if (asUTFx) {
-					final UTF16Counter counter = new UTF16Counter();
-					this.extract(counter);
-					final short[] array = new short[counter.count + 5];
-					array[0] = (short)(hash >>> 0);
-					array[1] = (short)(hash >>> 16);
-					array[2] = (short)(length >>> 0);
-					array[3] = (short)(length >>> 16);
-					this.extract(new UTF16Encoder2(array, 4));
-					return IAMArray.from(array);
-				} else {
-					final short[] array = new short[length + 3];
-					array[0] = (short)(hash >>> 0);
-					array[1] = (short)(hash >>> 16);
-					this.extract(new INT16Encoder2(array, 2));
-					return IAMArray.from(array);
-				}
-			}
-			case 4: {
-				final int[] array = new int[length + 2];
-				array[0] = hash;
-				this.extract(new UTF32Encoder(array, 1));
-				return IAMArray.from(array);
-			}
-		}
-		throw new IllegalArgumentException();
+	 * @return Array mit den Codepoints in UTF16-Kodierung. */
+	public char[] toChars() {
+		final UTF16Counter counter = new UTF16Counter();
+		this.extract(counter);
+		final UTF16Encoder2 encoder = new UTF16Encoder2(new char[counter.count], 0);
+		this.extract(encoder);
+		return encoder.array;
 	}
 
 	/** {@inheritDoc} */

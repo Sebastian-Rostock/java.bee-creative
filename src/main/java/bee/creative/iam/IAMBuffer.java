@@ -2,14 +2,11 @@ package bee.creative.iam;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Random;
 import bee.creative.bind.Getter;
 import bee.creative.emu.EMU;
-import bee.creative.iam.IAMArray.ByteArray;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
 import bee.creative.io.MappedBuffer;
-import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 
 public abstract class IAMBuffer extends BaseObject implements Getter<IAMArray, IAMArray> {
@@ -27,7 +24,8 @@ public abstract class IAMBuffer extends BaseObject implements Getter<IAMArray, I
 		@Override
 		public synchronized IAMArray get(final IAMArray item) {
 			final long pos = this.address;
-			final int mod = item.mode(), len = item.length();
+			byte mod = item.mode();
+			final int len = item.length();
 			if ((mod == IAMArray.MODE_INT8) || (mod == IAMArray.MODE_UINT8)) {
 				this.seek(pos + len);
 				this.buffer.put(pos, item.toBytes());
@@ -42,10 +40,8 @@ public abstract class IAMBuffer extends BaseObject implements Getter<IAMArray, I
 		}
 
 		void seek(final long pos) {
-			this.address = pos;
-			if (this.address <= this.buffer.size()) return;
 			try {
-				this.buffer.resize(pos + (pos / 2));
+				this.buffer.grow(address = pos);
 			} catch (final IOException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -84,7 +80,7 @@ public abstract class IAMBuffer extends BaseObject implements Getter<IAMArray, I
 			r.nextBytes(b);
 			IAMArray a = IAMArray.from(b);
 			IAMArray a2 = f.get(a);
-			lb.put(a);
+			lb.put(a2);
 		}
 		System.out.println(cc - lb.itemCount());
 

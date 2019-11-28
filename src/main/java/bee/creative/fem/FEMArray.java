@@ -325,30 +325,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class EmptyArray extends FEMArray {
-
-		EmptyArray() throws IllegalArgumentException {
-			super(0);
-		}
-
-		@Override
-		public FEMArray reverse() {
-			return this;
-		}
-
-		@Override
-		public FEMArray result(final boolean recursive) {
-			return this;
-		}
-
-		@Override
-		public FEMArray compact(final boolean index) {
-			return this;
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
 	public static class ConcatArray extends FEMArray implements Emuable {
 
 		public final FEMArray array1;
@@ -563,7 +539,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			}
 		}
 
-		public CompactArray(final int length, final FEMValue[] items) throws IllegalArgumentException {
+		CompactArray(final int length, final FEMValue[] items) throws IllegalArgumentException {
 			super(length);
 			this.items = items;
 		}
@@ -679,17 +655,29 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static final FEMType<FEMArray> TYPE = FEMType.from(FEMArray.ID);
 
 	/** Dieses Feld speichert die leere Wertliste. */
-	public static final FEMArray EMPTY = new EmptyArray();
+	public static final FEMArray EMPTY = new UniformArray(0, null);
 
-	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück. Das gegebene Array wird kopiert.
+	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
+	 * 
+	 * @param length Länge.
+	 * @param item Wert.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
+	public static FEMArray from(final int length, final FEMValue item) throws NullPointerException, IllegalArgumentException {
+		Objects.notNull(item);
+		if (length == 0) return FEMArray.EMPTY;
+		return new UniformArray(length, item);
+	}
+
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück und ist eine Abkürzung für {@link #from(boolean, FEMValue...)
+	 * FEMArray.from(true, items)}
 	 *
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
 	public static FEMArray from(final FEMValue... items) throws NullPointerException {
-		if (items.length == 0) return FEMArray.EMPTY;
-		if (items.length == 1) return new UniformArray(1, items[0]);
-		return new CompactArray(items.clone());
+		return FEMArray.from(true, items);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
@@ -699,8 +687,9 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält. */
 	public static FEMArray from(final boolean copy, final FEMValue... items) throws NullPointerException {
-		if (copy) return FEMArray.from(items);
-		return new CompactArray(items);
+		if (items.length == 0) return FEMArray.EMPTY;
+		if (items.length == 1) return new UniformArray(1, items[0]);
+		return new CompactArray(copy ? items.clone() : items);
 	}
 
 	/** Diese Methode gibt eine Wertliste mit den Werten im gegebenen Abschnitt zurück. Der gegebene Abschnitt wird kopiert.
@@ -718,19 +707,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		final FEMValue[] result = new FEMValue[length];
 		System.arraycopy(items, offset, result, 0, length);
 		return new CompactArray(result);
-	}
-
-	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
-	 *
-	 * @param item Wert.
-	 * @param length Länge.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static FEMArray from(final FEMValue item, final int length) throws NullPointerException, IllegalArgumentException {
-		Objects.notNull(item);
-		if (length == 0) return FEMArray.EMPTY;
-		return new UniformArray(length, item);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
@@ -777,7 +753,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toMap(Iterable) FEMArray.toMap(entries.entrySet())}.
-	 * 
+	 *
 	 * @param entries Abbildung.
 	 * @return {@link Map}-Sicht.
 	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
@@ -787,7 +763,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Diese Methode überführt die gegebenen {@link Entry Einträge} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie eine {@link #compact()
 	 * kompaktierte Wertliste} und liefert dazu eine unveränderliche {@link Map} als Sicht auf diese Listen.
-	 * 
+	 *
 	 * @see #toMap(FEMArray, FEMArray)
 	 * @param entries Einträge einer Abbildung.
 	 * @return {@link Map}-Sicht auf die Schlüssel- und Wertliste.
@@ -838,9 +814,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Wert. */
-	protected FEMValue customGet(final int index) {
-		return null;
-	}
+	protected abstract FEMValue customGet(final int index);
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück. Sie Implementiert
 	 * {@link #find(FEMArray, int)} ohne Wertebereichsprüfung.
@@ -866,7 +840,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @return Position des ersten Vorkommens des gegebenen Werts oder {@code -1}.
-	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
+	 * @param foreward {@code true}, wenn die Reihenfolge c ist, bzw. {@code false}, wenn sie rückwärts ist. */
 	protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
 		final ItemFinder finder = new ItemFinder(that);
 		if (this.customExtract(finder, offset, length, foreward)) return -1;
@@ -889,7 +863,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
-	 * @param foreward {@code true}, wenn die Reihenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
+	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {

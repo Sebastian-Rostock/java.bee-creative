@@ -6,6 +6,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Map;
 import bee.creative.fem.FEMBinary;
+import bee.creative.fem.FEMCodec;
 import bee.creative.fem.FEMString;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
@@ -314,7 +315,7 @@ public final class IAMCodec {
 
 			@Override
 			public IAMArray parse(final String string) throws NullPointerException, IllegalArgumentException {
-				return IAMArray.from(FEMBinary.from(string, false).value());
+				return IAMArray.from(FEMBinary.from(false, string).value());
 			}
 
 			@Override
@@ -434,12 +435,12 @@ public final class IAMCodec {
 
 			@Override
 			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray();
+				return FEMCodec.toArray_(FEMString.from(source));
 			}
 
 			@Override
 			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toString();
+				return FEMCodec.from(source).toString();
 			}
 
 		},
@@ -450,12 +451,12 @@ public final class IAMCodec {
 
 			@Override
 			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(1);
+				return FEMCodec.toArray_(FEMString.from(source), 1, false);
 			}
 
 			@Override
 			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(source.toBytes())).toString();
+				return FEMCodec.from(IAMArray.from(source.toBytes())).toString();
 			}
 
 		},
@@ -466,12 +467,12 @@ public final class IAMCodec {
 
 			@Override
 			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(2);
+				return FEMCodec.toArray_(FEMString.from(source), 2, false);
 			}
 
 			@Override
 			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(source.toShorts())).toString();
+				return FEMCodec.from(IAMArray.from(source.toShorts())).toString();
 			}
 
 		},
@@ -482,12 +483,12 @@ public final class IAMCodec {
 
 			@Override
 			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(4);
+				return FEMCodec.toArray_(FEMString.from(source), 4, false);
 			}
 
 			@Override
 			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(source.toInts())).toString();
+				return FEMCodec.from(IAMArray.from(source.toInts())).toString();
 			}
 
 		},
@@ -498,12 +499,13 @@ public final class IAMCodec {
 
 			@Override
 			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(1, true);
+				FEMString r = FEMString.from(source);
+				return FEMCodec.toArray_(r, 1, true);
 			}
 
 			@Override
 			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(source.toBytes()), true).toString();
+				return FEMCodec.from(true, IAMArray.from(source.toBytes())).toString();
 			}
 
 		},
@@ -514,12 +516,13 @@ public final class IAMCodec {
 
 			@Override
 			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(source).toArray(2, true);
+				FEMString r = FEMString.from(source);
+				return FEMCodec.toArray_(r, 2, true);
 			}
 
 			@Override
 			public String format(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-				return FEMString.from(IAMArray.from(source.toShorts()), true).toString();
+				return FEMCodec.from(true, IAMArray.from(source.toShorts())).toString();
 			}
 
 		};
