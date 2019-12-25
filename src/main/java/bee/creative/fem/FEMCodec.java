@@ -22,19 +22,19 @@ import bee.creative.fem.FEMString.UTF32Encoder;
 import bee.creative.fem.FEMString.UTF8Counter;
 import bee.creative.fem.FEMString.UTF8Encoder;
 import bee.creative.iam.IAMArray;
-import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
-import bee.creative.iam.IAMBuilder.IAMListingBuilder;
-import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
 import bee.creative.iam.IAMIndex;
+import bee.creative.iam.IAMIndexBuilder;
 import bee.creative.iam.IAMListing;
+import bee.creative.iam.IAMListingBuilder;
 import bee.creative.iam.IAMMapping;
+import bee.creative.iam.IAMMappingBuilder;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
-import bee.creative.mmf.MMFArray;
+import bee.creative.mmf.MMIArray;
 import bee.creative.util.Comparables.Items;
 
 /** Diese Klasse implementiert ein Objekt zur Kodierung und Dekodierung von {@link FEMValue Werten} und {@link FEMFunction Funktionen} in {@link IAMArray
- * Zahlenlisten}. Damit ist es möglich, beliebig große Wert- und Funktionsgraphen über ein {@link MMFArray} in eine Binärdatei auszulagern.
+ * Zahlenlisten}. Damit ist es möglich, beliebig große Wert- und Funktionsgraphen über ein {@link MMIArray} in eine Binärdatei auszulagern.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMCodec implements Property<FEMValue>, Emuable {
@@ -103,7 +103,7 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 	 * Lesen} und {@link #put(Object) Schreiben} werden die Methoden {@link #toItem(IAMArray)} bsw. {@link #toArray(Object)} eingesetzt.
 	 *
 	 * @param <GItem> Typ der Datensätze. */
-	protected static abstract class BasePool<GItem> implements Items<GItem>, Emuable {
+	protected static abstract class BasePool<GItem> implements Items<GItem> {
 
 		final class ItemList extends AbstractList<GItem> {
 
@@ -120,6 +120,7 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 		}
 
 		/** Dieses Feld speichert den Puffer der über {@link #get(int)} gelieferten Datensätze. */
+		@Deprecated
 		protected Object[] cache = {};
 
 		/** Dieses Feld speichert die Zahlenfolgen der über {@link #get(int)} gelesenen Datensätzen. */
@@ -141,18 +142,17 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 			final IAMListing pool = this.source;
 			final int poolSize = pool.itemCount();
 			if (index >= poolSize) throw new IndexOutOfBoundsException();
-			Object[] cache = this.cache;
-			final int cacheSize = cache.length;
-			if (index >= cacheSize) {
-				cache = Arrays.copyOf(cache, poolSize);
-				this.cache = cache;
-			}
-			@SuppressWarnings ("unchecked")
-			GItem item = (GItem)cache[index];
-			if (item != null) return item;
-			item = this.toItem(pool.item(index));
-			cache[index] = item;
-			return item;
+//			Object[] cache = this.cache;
+//			final int cacheSize = cache.length;
+//			if (index >= cacheSize) {
+//				cache = Arrays.copyOf(cache, poolSize);
+//				this.cache = cache;
+//			}
+//			@SuppressWarnings ("unchecked")
+//			GItem item = (GItem)cache[index];
+//			if (item != null) return item;
+			//			cache[index] = item;
+			return this.toItem(pool.item(index));
 		}
 
 		/** Diese Methode nimmt den gegebenen Datensatz in die Verwaltung auf und gibt dessen Position zurück.
@@ -202,13 +202,10 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 			this.cleanup();
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.fromAll(this.cache);
-		}
+ 
 
 		/** Diese Methode leert den Puffer der über {@link #get(int)} gelieferten Datensätze. */
+		@Deprecated
 		public void cleanup() {
 			this.cache = new Object[0];
 		}
@@ -581,7 +578,7 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 			int offset = 8;
 			while (index > 0) {
 				index--;
-				offset += FEMString.utf8Length(this.array.get(offset));
+				offset += FEMString.utf8Size(this.array.get(offset));
 			}
 			return FEMCodec.utf8Codepoint(this.array, offset);
 		}
@@ -592,19 +589,19 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 				int index = 8;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.utf8Length(this.array.get(index));
+					index += FEMString.utf8Size(this.array.get(index));
 				}
 				while (length > 0) {
 					if (!target.push(FEMCodec.utf8Codepoint(this.array, index))) return false;
 					length--;
-					index += FEMString.utf8Length(this.array.get(index));
+					index += FEMString.utf8Size(this.array.get(index));
 				}
 			} else {
 				int index = 8;
 				offset += length;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.utf8Length(this.array.get(index));
+					index += FEMString.utf8Size(this.array.get(index));
 				}
 				while (length > 0) {
 					while (!FEMString.utf8Header(this.array.get(--index)))
@@ -1898,12 +1895,12 @@ public class FEMCodec implements Property<FEMValue>, Emuable {
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF8-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int utf8Length(final IAMArray array) throws IllegalArgumentException {
+	static int utf8Size(final IAMArray array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length();
 		while (index < length) {
 			result++;
-			index += FEMString.utf8Length(array.get(index));
+			index += FEMString.utf8Size(array.get(index));
 		}
 		if (index != length) throw new IllegalArgumentException();
 		return result;

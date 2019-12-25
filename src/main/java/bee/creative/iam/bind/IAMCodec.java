@@ -1,4 +1,4 @@
-package bee.creative.iam;
+package bee.creative.iam.bind;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,9 +8,13 @@ import java.util.Map;
 import bee.creative.fem.FEMBinary;
 import bee.creative.fem.FEMCodec;
 import bee.creative.fem.FEMString;
+import bee.creative.iam.IAMArray;
+import bee.creative.iam.IAMIndex;
+import bee.creative.iam.IAMMapping;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
 import bee.creative.io.IO;
+import bee.creative.lang.Bytes;
 import bee.creative.util.Builders;
 
 /** Diese Klasse implementiert den Konfigurator, mit welchem ein {@link IAMIndex} aus bzw. in unterschiedliche Datenformate gelesen bzw. geschieben werden kann.
@@ -208,7 +212,7 @@ public final class IAMCodec {
 
 			@Override
 			public ByteOrder toOrder() {
-				return ByteOrder.nativeOrder();
+				return Bytes.NATIVE_ORDER;
 			}
 
 			@Override
@@ -429,8 +433,8 @@ public final class IAMCodec {
 
 		},
 
-		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray()
-		 * Einzelwertkodierung} eines {@link FEMString} stehen. */
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte Einzelwertkodierung eines
+		 * {@link FEMString} stehen. */
 		STRING_FEM {
 
 			@Override
@@ -445,8 +449,8 @@ public final class IAMCodec {
 
 		},
 
-		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-		 * 8-Bit-Einzelwertkodierung} eines {@link FEMString} stehen. */
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte 8-Bit-Einzelwertkodierung eines
+		 * {@link FEMString} stehen. */
 		STRING_FEM_INT8 {
 
 			@Override
@@ -461,8 +465,8 @@ public final class IAMCodec {
 
 		},
 
-		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-		 * 16-Bit-Einzelwertkodierung} eines {@link FEMString} stehen. */
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte 16-Bit-Einzelwertkodierung eines
+		 * {@link FEMString} stehen. */
 		STRING_FEM_INT16 {
 
 			@Override
@@ -477,8 +481,8 @@ public final class IAMCodec {
 
 		},
 
-		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-		 * 32-Bit-Einzelwertkodierung} eines {@link FEMString} stehen. */
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte 32-Bit-Einzelwertkodierung eines
+		 * {@link FEMString} stehen. */
 		STRING_FEM_INT32 {
 
 			@Override
@@ -493,13 +497,13 @@ public final class IAMCodec {
 
 		},
 
-		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-		 * 8-Bit-Mehrwertkodierung} eines {@link FEMString} stehen. */
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte 8-Bit-Mehrwertkodierung eines
+		 * {@link FEMString} stehen. */
 		STRING_FEM_UTF8 {
 
 			@Override
 			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
-				FEMString r = FEMString.from(source);
+				final FEMString r = FEMString.from(source);
 				return FEMCodec.toArray_(r, 1, true);
 			}
 
@@ -510,13 +514,13 @@ public final class IAMCodec {
 
 		},
 
-		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
-		 * 16-Bit-Mehrwertkodierung} eines {@link FEMString} stehen. */
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte 16-Bit-Mehrwertkodierung eines
+		 * {@link FEMString} stehen. */
 		STRING_FEM_UTF16 {
 
 			@Override
 			public IAMArray parse(final String source) throws NullPointerException, IllegalArgumentException {
-				FEMString r = FEMString.from(source);
+				final FEMString r = FEMString.from(source);
 				return FEMCodec.toArray_(r, 2, true);
 			}
 

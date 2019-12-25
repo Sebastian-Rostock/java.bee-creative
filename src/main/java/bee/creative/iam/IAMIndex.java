@@ -5,9 +5,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.AbstractList;
 import java.util.List;
-import bee.creative.iam.IAMLoader.IAMIndexLoader;
+import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
-import bee.creative.mmf.MMFArray;
+import bee.creative.mmi.MMIArray;
 
 /** Diese Klasse implementiert eine abstrakte Zusammenstellung beliebig vieler Auflistungen ({@link IAMListing}) und Abbildungen ({@link IAMMapping}).
  * <p>
@@ -86,7 +86,7 @@ public abstract class IAMIndex {
 			} else {
 				this.type = SizeStats.computeSizeType(this.dataOffset[count]);
 				this.dataLength = 0;
-				final int dataOffsetBytes = this.dataOffset.length * IAMLoader.byteCount(this.type);
+				final int dataOffsetBytes = this.dataOffset.length * IAMIndexLoader.byteCount(this.type);
 				this.bytes = (dataOffsetBytes + 3) & -4;
 			}
 
@@ -197,7 +197,7 @@ public abstract class IAMIndex {
 				}
 			}
 			this.type = Math.max(DataStats.computeDataType(minValue), DataStats.computeDataType(maxValue));
-			final int dataValueBytes = this.dataValue.length * IAMLoader.byteCount(this.type);
+			final int dataValueBytes = this.dataValue.length * IAMIndexLoader.byteCount(this.type);
 			this.bytes = (dataValueBytes + 3) & -4;
 		}
 
@@ -280,19 +280,20 @@ public abstract class IAMIndex {
 	public static final IAMIndex EMPTY = new EmptyIndex();
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMIndex} und gibt diesen zurück. Wenn das Objekt ein {@link IAMIndex} ist, wird dieser
-	 * geliefert. Andernfalls wird {@code new IAMIndexLoader(MMFArray.from(object).withOrder(...))} geliefert, wobei die Bytereihenfolge über
-	 * {@link IAMIndexLoader#HEADER} ermittelt wird.
+	 * geliefert. Wenn es ein {@link MMIArray} ist, wird dazu ein {@link IAMIndexLoader} erzeugt. Andernfalls wird es in ein {@link MMIArray} mit einer
+	 * Bytereihenfolge passen zum {@link IAMIndexLoader#HEADER} überführt und dazu ein {@link IAMIndexLoader} erzeugt.
 	 *
-	 * @see MMFArray#from(Object)
-	 * @see IAMIndexLoader#IAMIndexLoader(MMFArray)
+	 * @see MMIArray#from(Object)
+	 * @see IAMIndexLoader#IAMIndexLoader(MMIArray)
 	 * @param object Objekt.
 	 * @return {@link IAMIndex}.
-	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
-	 * @throws IAMException Wenn {@link IAMIndexLoader#IAMIndexLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IOException Wenn {@link MMIArray#from(Object)} eine entsprechende Ausnahme auslöst.
+	 * @throws IAMException Wenn {@link IAMIndexLoader#IAMIndexLoader(MMIArray)} eine entsprechende Ausnahme auslöst. */
 	public static IAMIndex from(final Object object) throws IOException, IAMException {
 		if (object instanceof IAMIndex) return (IAMIndex)object;
-		final MMFArray array = MMFArray.from(object);
-		return new IAMIndexLoader(array.withOrder(IAMIndexLoader.HEADER.orderOf(array)));
+		if (object instanceof MMIArray) return new IAMIndexLoader((MMIArray)object);
+		final MMIArray array = MMIArray.from(object);
+		return new IAMIndexLoader(array.as(IAMIndexLoader.HEADER.orderOf(array)));
 	}
 
 	/** Diese Methode gibt die {@code index}-te Auflistung zurück. Bei einem ungültigen {@code index} wird eine leere Auflistung geliefert.
@@ -339,11 +340,11 @@ public abstract class IAMIndex {
 		return new MappingList(this);
 	}
 
-	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
+	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(Bytes.NATIVE_ORDER)}.
 	 *
 	 * @return Binärdatenformat {@code IAM_INDEX}. */
 	public byte[] toBytes() {
-		return this.toBytes(ByteOrder.nativeOrder());
+		return this.toBytes(Bytes.NATIVE_ORDER);
 	}
 
 	/** Diese Methode kodiert diesen {@link IAMIndex} in das binäre optimierte Datenformat {@code IAM_INDEX} und gibt dieses als Bytefolge zurück.

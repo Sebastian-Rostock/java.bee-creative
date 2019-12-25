@@ -1,7 +1,5 @@
 package bee.creative.iam;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +37,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			this(array, 0, array.length);
 		}
 
-		INT8Array(final byte[] array, final int offset, final int length) {
+		INT8Array(final byte[] array, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
 			this.array = array;
 			this.offset = offset;
@@ -91,7 +89,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			this(array, 0, array.length);
 		}
 
-		INT16Array(final short[] array, final int offset, final int length) {
+		INT16Array(final short[] array, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
 			this.array = array;
 			this.offset = offset;
@@ -143,7 +141,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			this(array, 0, array.length);
 		}
 
-		INT32Array(final int[] array, final int offset, final int length) {
+		INT32Array(final int[] array, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
 			this.array = array;
 			this.offset = offset;
@@ -191,7 +189,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			super(array);
 		}
 
-		UINT8Array(final byte[] array, final int offset, final int length) {
+		UINT8Array(final byte[] array, final int offset, final int length) throws IllegalArgumentException {
 			super(array, offset, length);
 
 		}
@@ -233,7 +231,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			super(array);
 		}
 
-		UINT16Array(final short[] array, final int offset, final int length) {
+		UINT16Array(final short[] array, final int offset, final int length) throws IllegalArgumentException {
 			super(array, offset, length);
 		}
 
@@ -255,74 +253,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	}
 
-	/** Diese Klasse implementiert eine abstrakte {@link IAMArray Zahlenfolge}, deren Zahlen durch einen Speicherbereich gegeben sind. Zur Interpretation dieses
-	 * Speicherbereiches können über {@link #asINT8()}, {@link #asUINT8()}, {@link #asINT16()}, {@link #asUINT16()} bzw. {@link #asINT32()} entsprechende Sichten
-	 * erzeugte werden. Die Bytereihenfolge zur Interpretation des Speicherbereichs ist von der konkreten Implementation abhängig und wird hierbei nicht
-	 * vorgegeben. */
-	public static abstract class BufferArray extends IAMArray {
-
-		/** Dieses Feld speichert die native Bytereihenfolge. */
-		public static final ByteOrder NATIVE_ORDER = ByteOrder.nativeOrder();
-
-		/** Dieses Feld speichert die zur nativen umgekehrte Bytereihenfolge. */
-		public static final ByteOrder REVERSE_ORDER = BufferArray.NATIVE_ORDER == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
-
-		/** Dieser Konstruktor initialisiert die Länge.
-		 *
-		 * @param length Länge. */
-		protected BufferArray(final int length) {
-			super(length);
-		}
-
-		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen ({@code byte}) interpretiert zurück.
-		 *
-		 * @return {@code byte}-{@link BufferArray}. */
-		public abstract BufferArray asINT8();
-
-		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT16}-Zahlen ({@code short}) interpretiert zurück.
-		 *
-		 * @return {@code short}-{@link BufferArray}. */
-		public abstract BufferArray asINT16();
-
-		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT32}-Zahlen ({@code int}) interpretiert zurück.
-		 *
-		 * @return {@code int}-{@link BufferArray}. */
-		public abstract BufferArray asINT32();
-
-		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT8}-Zahlen ({@code unsigned byte}) interpretiert zurück.
-		 *
-		 * @return {@code unsigned byte}-{@link BufferArray}. */
-		public abstract BufferArray asUINT8();
-
-		/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT16}-Zahlen ({@code unsigned short}) interpretiert zurück.
-		 *
-		 * @see ByteBuffer#getShort()
-		 * @return {@code unsigned short}-{@link BufferArray}. */
-		public abstract BufferArray asUINT16();
-
-		/** {@inheritDoc} */
-		@Override
-		public BufferArray section(final int offset) {
-			return this.section(offset, this.length - offset);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public BufferArray section(final int offset, final int length) {
-			return (offset < 0) || (length <= 0) || ((offset + length) > this.length) ? this.customSection(0, 0) : this.customSection(offset, length);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		protected abstract BufferArray customSection(final int offset, final int length);
-
-		@Override
-		protected boolean customIsCompact() {
-			return true;
-		}
-
-	}
-
 	@SuppressWarnings ("javadoc")
 	public static class ConcatArray extends IAMArray {
 
@@ -337,7 +267,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 		public final IAMArray array2;
 
-		public ConcatArray(final IAMArray array1, final IAMArray array2) {
+		public ConcatArray(final IAMArray array1, final IAMArray array2) throws IllegalArgumentException {
 			super(array1.length + array2.length);
 			this.array1 = array1;
 			this.array2 = array2;
@@ -429,7 +359,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 		public final int offset;
 
-		public SectionArray(final IAMArray array, final int offset, final int length) {
+		public SectionArray(final IAMArray array, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
 			this.array = array;
 			this.offset = offset;
@@ -633,13 +563,13 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Dieses Feld speichert die Länge. */
-	protected final int length;
+	public final int length;
 
 	/** Dieser Konstruktor initialisiert die Länge.
 	 *
 	 * @param length Länge. */
 	protected IAMArray(final int length) throws IllegalArgumentException {
-		if (length < 0) throw new IllegalArgumentException();
+		if ((length & 0xC0000000) != 0) throw new IllegalArgumentException();
 		this.length = length;
 	}
 

@@ -140,7 +140,7 @@ public class EMU {
 	 * @param items Objekte.
 	 * @return geschätzter Speicherverbrauch. */
 	@SafeVarargs
-	public static long fromAll(final Object... items) {
+	public static <GItem> long fromAll(final GItem... items) {
 		long result = 0;
 		for (final Object item: items) {
 			result += EMU.from(item);

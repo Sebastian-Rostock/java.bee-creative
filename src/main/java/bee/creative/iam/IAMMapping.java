@@ -10,9 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 import bee.creative.iam.IAMIndex.DataStats;
 import bee.creative.iam.IAMIndex.SizeStats;
-import bee.creative.iam.IAMLoader.IAMMappingLoader;
+import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
-import bee.creative.mmf.MMFArray;
+import bee.creative.mmi.MMIArray;
 import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine abstrakte Abbildung von Schlüsseln auf Werte, welche beide selbst Zahlenfolgen ({@link IAMArray}) sind.
@@ -297,19 +297,18 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	public static final boolean MODE_SORTED = false;
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMMapping} und gibt dieses zurück. Wenn das Objekt ein {@link IAMMapping} ist, wird dieses
-	 * geliefert. Andernfalls wird {@code new IAMMappingLoader(MMFArray.from(object).withOrder(...))} geliefert, wobei die Bytereihenfolge über
-	 * {@link IAMMappingLoader#HEADER} ermittelt wird.
+	 * geliefert. Wenn es ein {@link MMIArray} ist, wird zu diesem ein {@link IAMMappingLoader} erzeugt. Andernfalls wird das {@link MMIArray} über
+	 * {@link MMIArray#from(Object)} ermittelt und in die Bytereihenfolge passend zu {@link IAMMappingLoader#HEADER} überführt.
 	 *
-	 * @see MMFArray#from(Object)
-	 * @see IAMMappingLoader#IAMMappingLoader(MMFArray)
 	 * @param object Objekt.
 	 * @return {@link IAMMapping}.
-	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
-	 * @throws IAMException Wenn {@link IAMMappingLoader#IAMMappingLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IOException Wenn {@link MMIArray#from(Object)} eine entsprechende Ausnahme auslöst.
+	 * @throws IAMException Wenn {@link IAMMappingLoader#IAMMappingLoader(MMIArray)} eine entsprechende Ausnahme auslöst. */
 	public static IAMMapping from(final Object object) throws IOException, IAMException {
 		if (object instanceof IAMMapping) return (IAMMapping)object;
-		final MMFArray array = MMFArray.from(object);
-		return new IAMMappingLoader(array.withOrder(IAMMappingLoader.HEADER.orderOf(array)));
+		if (object instanceof MMIArray) return new IAMMappingLoader((MMIArray)object);
+		final MMIArray array = MMIArray.from(object);
+		return new IAMMappingLoader(array.as(IAMMappingLoader.HEADER.orderOf(array)));
 	}
 
 	/** Diese Methode gibt die Bitmaske zurück, die der Umrechnung des {@link IAMArray#hash() Streuwerts} eines gesuchten {@link #key(int) Schlüssels} in den
@@ -465,11 +464,11 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @throws NullPointerException Wenn {@code key} {@code null} ist. */
 	public abstract int find(final IAMArray key) throws NullPointerException;
 
-	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
+	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(Bytes.NATIVE_ORDER)}.
 	 *
 	 * @return Binärdatenformat {@code IAM_LISTING}. */
 	public final byte[] toBytes() {
-		return this.toBytes(ByteOrder.nativeOrder());
+		return this.toBytes(Bytes.NATIVE_ORDER);
 	}
 
 	/** Diese Methode kodiert dieses {@link IAMMapping} in das binäre optimierte Datenformat {@code IAM_MAPPING} und gibt dieses als Bytefolge zurück.
@@ -504,7 +503,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 			rangeCount = rangeMask + 2;
 			rangeData = new int[rangeCount];
 			rangeDataType = SizeStats.computeSizeType(entryCount);
-			rangeDataBytes = rangeCount * IAMLoader.byteCount(rangeDataType);
+			rangeDataBytes = rangeCount * IAMIndexLoader.byteCount(rangeDataType);
 			rangeBytes = ((rangeDataBytes + 3) & -4) + 4;
 
 			final int[] rangeIndex = new int[entryCount];

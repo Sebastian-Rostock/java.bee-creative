@@ -21,7 +21,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
@@ -31,6 +30,7 @@ import bee.creative.array.CharacterArray;
 import bee.creative.array.CharacterArraySection;
 import bee.creative.array.CompactByteArray;
 import bee.creative.bind.Getter;
+import bee.creative.lang.Bytes;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert Methoden zur Erzeugung von Ein- und Ausgabe.
@@ -159,9 +159,9 @@ public class IO {
 	 * <dt>{@link ByteBuffer}</dt>
 	 * <dd>Der gegebene {@link ByteBuffer} wird geliefert.</dd>
 	 * <dt>{@link File}, {@link FileChannel}, {@link RandomAccessFile}</dt>
-	 * <dd>Es wird ein zur gegebenen Datei {@link FileChannel#map(MapMode, long, long) erzeugter} {@link ByteBuffer} geliefert.</dd>
+	 * <dd>Es wird ein zur gegebenen Datei {@link FileChannel#map(MapMode, long, long) erzeugter} {@link ByteBuffer} in nativer Bytereihenfolge geliefert.</dd>
 	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
-	 * <dd>Es wird ein zum gegebenen Array {@link ByteBuffer#wrap(byte[], int, int) erzeugter} {@link ByteBuffer} geliefert.</dd>
+	 * <dd>Es wird ein zum gegebenen Array {@link ByteBuffer#wrap(byte[], int, int) erzeugter} {@link ByteBuffer} in nativer Bytereihenfolge geliefert.</dd>
 	 * </dl>
 	 *
 	 * @param object Objekt.
@@ -179,7 +179,7 @@ public class IO {
 	}
 
 	static ByteBuffer inputBufferFrom(final byte[] object) {
-		return ByteBuffer.wrap(object).order(ByteOrder.nativeOrder());
+		return ByteBuffer.wrap(object).order(Bytes.NATIVE_ORDER);
 	}
 
 	static ByteBuffer inputBufferFrom(final ByteArray object) {
@@ -187,7 +187,7 @@ public class IO {
 	}
 
 	static ByteBuffer inputBufferFrom(final ByteArraySection object) {
-		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size()).order(ByteOrder.nativeOrder());
+		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size()).order(Bytes.NATIVE_ORDER);
 	}
 
 	static ByteBuffer inputBufferFrom(final File object) throws IOException {
@@ -197,7 +197,7 @@ public class IO {
 	}
 
 	static ByteBuffer inputBufferFrom(final FileChannel object) throws IOException {
-		return object.map(MapMode.READ_ONLY, 0, object.size()).order(ByteOrder.nativeOrder());
+		return object.map(MapMode.READ_ONLY, 0, object.size()).order(Bytes.NATIVE_ORDER);
 	}
 
 	static ByteBuffer inputBufferFrom(final RandomAccessFile object) throws IOException {
@@ -330,9 +330,9 @@ public class IO {
 	 * <dt>{@link ByteBuffer}</dt>
 	 * <dd>Der gegebene {@link ByteBuffer} wird geliefert.</dd>
 	 * <dt>{@link File}, {@link FileChannel}, {@link RandomAccessFile}</dt>
-	 * <dd>Es wird ein zur gegebenen Datei {@link FileChannel#map(MapMode, long, long) erzeugter} {@link ByteBuffer} geliefert.</dd>
+	 * <dd>Es wird ein zur gegebenen Datei {@link FileChannel#map(MapMode, long, long) erzeugter} {@link ByteBuffer} in nativer Bytereihenfolge geliefert.</dd>
 	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
-	 * <dd>Es wird ein zum gegebenen Array {@link ByteBuffer#wrap(byte[], int, int) erzeugter} {@link ByteBuffer} geliefert.</dd>
+	 * <dd>Es wird ein zum gegebenen Array {@link ByteBuffer#wrap(byte[], int, int) erzeugter} {@link ByteBuffer} in nativer Bytereihenfolge geliefert.</dd>
 	 * </dl>
 	 *
 	 * @param object Objekt.
@@ -356,7 +356,7 @@ public class IO {
 	}
 
 	static ByteBuffer outputBufferFrom(final FileChannel object) throws IOException {
-		return object.map(MapMode.READ_WRITE, 0, object.size()).order(ByteOrder.nativeOrder());
+		return object.map(MapMode.READ_WRITE, 0, object.size()).order(Bytes.NATIVE_ORDER);
 	}
 
 	static ByteBuffer outputBufferFrom(final RandomAccessFile object) throws IOException {
@@ -364,7 +364,7 @@ public class IO {
 	}
 
 	static ByteBuffer outputBufferFrom(final byte[] object) {
-		return ByteBuffer.wrap(object).order(ByteOrder.nativeOrder());
+		return ByteBuffer.wrap(object).order(Bytes.NATIVE_ORDER);
 	}
 
 	static ByteBuffer outputBufferFrom(final ByteArray object) {
@@ -372,7 +372,7 @@ public class IO {
 	}
 
 	static ByteBuffer outputBufferFrom(final ByteArraySection object) {
-		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size()).order(ByteOrder.nativeOrder());
+		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size()).order(Bytes.NATIVE_ORDER);
 	}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link OutputStream} und gibt diesen zurück. Hierbei werden folgende Datentypen für {@code object}

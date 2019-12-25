@@ -1,4 +1,4 @@
-package bee.creative.iam;
+package bee.creative.iam.bind;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,12 +10,16 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
-import bee.creative.iam.IAMBuilder.IAMListingBuilder;
-import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
-import bee.creative.iam.IAMCodec.IAMArrayFormat;
-import bee.creative.iam.IAMCodec.IAMByteOrder;
-import bee.creative.iam.IAMCodec.IAMFindMode;
+import bee.creative.iam.IAMArray;
+import bee.creative.iam.IAMIndex;
+import bee.creative.iam.IAMIndexBuilder;
+import bee.creative.iam.IAMListing;
+import bee.creative.iam.IAMListingBuilder;
+import bee.creative.iam.IAMMapping;
+import bee.creative.iam.IAMMappingBuilder;
+import bee.creative.iam.bind.IAMCodec.IAMArrayFormat;
+import bee.creative.iam.bind.IAMCodec.IAMByteOrder;
+import bee.creative.iam.bind.IAMCodec.IAMFindMode;
 import bee.creative.io.IO;
 
 /** @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

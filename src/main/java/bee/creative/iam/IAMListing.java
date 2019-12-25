@@ -7,9 +7,10 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import bee.creative.iam.IAMLoader.IAMListingLoader;
+import java.util.RandomAccess;
+import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
-import bee.creative.mmf.MMFArray;
+import bee.creative.mmi.MMIArray;
 
 /** Diese Klasse implementiert eine abstrakte geordnete Auflistung von Elementen, welche selbst Zahlenfolgen ({@link IAMArray}) sind.
  * <p>
@@ -115,7 +116,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 
 	}
 
-	static final class Items extends AbstractList<IAMArray> {
+	static final class Items extends AbstractList<IAMArray> implements RandomAccess {
 
 		final IAMListing owner;
 
@@ -140,19 +141,18 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	public static final IAMListing EMPTY = new EmptyListing();
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link IAMListing} und gibt dieses zurück. Wenn das Objekt ein {@link IAMListing} ist, wird dieses
-	 * geliefert. Andernfalls wird {@code new IAMListingLoader(MMFArray.from(object).withOrder(...))} geliefert, wobei die Bytereihenfolge über
-	 * {@link IAMListingLoader#HEADER} ermittelt wird.
+	 * geliefert. Wenn es ein {@link MMIArray} ist, wird zu diesem ein {@link IAMListingLoader} erzeugt. Andernfalls wird das {@link MMIArray} über
+	 * {@link MMIArray#from(Object)} ermittelt und in die Bytereihenfolge passend zu {@link IAMListingLoader#HEADER} überführt.
 	 *
-	 * @see MMFArray#from(Object)
-	 * @see IAMListingLoader#IAMListingLoader(MMFArray)
 	 * @param object Objekt.
 	 * @return {@link IAMListing}.
-	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
-	 * @throws IAMException Wenn {@link IAMListingLoader#IAMListingLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IOException Wenn {@link MMIArray#from(Object)} eine entsprechende Ausnahme auslöst.
+	 * @throws IAMException Wenn {@link IAMListingLoader#IAMListingLoader(MMIArray)} eine entsprechende Ausnahme auslöst. */
 	public static IAMListing from(final Object object) throws IOException, IAMException {
 		if (object instanceof IAMListing) return (IAMListing)object;
-		final MMFArray array = MMFArray.from(object);
-		return new IAMListingLoader(array.withOrder(IAMListingLoader.HEADER.orderOf(array)));
+		if (object instanceof MMIArray) return new IAMListingLoader((MMIArray)object);
+		final MMIArray array = MMIArray.from(object);
+		return new IAMListingLoader(array.as(IAMListingLoader.HEADER.orderOf(array)));
 	}
 
 	/** Diese Methode gibt das {@code itemIndex}-te Element als Zahlenfolge zurück. Bei einem ungültigen {@code itemIndex} wird eine leere Zahlenfolge geliefert.
@@ -224,11 +224,11 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 		return new Items(this);
 	}
 
-	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
+	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(Bytes.NATIVE_ORDER)}.
 	 *
 	 * @return Binärdatenformat {@code IAM_LISTING}. */
 	public final byte[] toBytes() {
-		return this.toBytes(ByteOrder.nativeOrder());
+		return this.toBytes(Bytes.NATIVE_ORDER);
 	}
 
 	/** Diese Methode kodiert dieses {@link IAMListing} in das binäre optimierte Datenformat {@code IAM_LISTING} und gibt dieses als Bytefolge zurück.

@@ -8,6 +8,12 @@ import java.nio.ByteOrder;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Bytes {
 
+	/** Dieses Feld speichert das Ergebnis von {@link ByteOrder#nativeOrder()}. */
+	public static final ByteOrder NATIVE_ORDER = ByteOrder.nativeOrder();
+
+	/** Dieses Feld speichert das Ergebnis von {@link Bytes#reverseOrder(ByteOrder) Bytes.reverseOrder(Bytes.NATIVE_ORDER)}. */
+	public static final ByteOrder REVERSE_ORDER = Bytes.reverseOrder(Bytes.NATIVE_ORDER);
+
 	/** Diese Methode ließt {@code 1 byte} aus der gegebenen Bytefolge und gib diese als {@code int} interpretiert zurück.
 	 *
 	 * @see #setInt1(byte[], int, int)
@@ -628,6 +634,24 @@ public final class Bytes {
 	 * @return Länge (0..8). */
 	public static int lengthOf(final long value) {
 		return value > 0xFFFFFFFFL ? Bytes.lengthOf((int)(value >> 32)) + 4 : Bytes.lengthOf((int)value);
+	}
+
+	/** Diese Methode gibt nur dann {@link ByteOrder#LITTLE_ENDIAN}, wenn die gegebene Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN} ist. Andernfalls wird
+	 * {@link ByteOrder#BIG_ENDIAN} geliefert.
+	 *
+	 * @param order Bytereihenfolge oder {@code null}.
+	 * @return Bytereihenfolge. */
+	public static ByteOrder directOrder(final ByteOrder order) {
+		return order == ByteOrder.LITTLE_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+	}
+
+	/** Diese Methode gibt nur dann {@link ByteOrder#BIG_ENDIAN}, wenn die gegebene Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN} ist. Andernfalls wird
+	 * {@link ByteOrder#LITTLE_ENDIAN} geliefert.
+	 *
+	 * @param order Bytereihenfolge oder {@code null}.
+	 * @return Bytereihenfolge. */
+	public static ByteOrder reverseOrder(final ByteOrder order) {
+		return order != ByteOrder.LITTLE_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
 	}
 
 }

@@ -15,8 +15,9 @@ import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import bee.creative.iam.IAMArray;
-import bee.creative.iam.IAMArray.BufferArray;
+import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
+import bee.creative.mmi.MMIArray;
 
 /** Diese Klasse implementiert eine alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien per
  * momory-mapping zum Lesen und Schreiben zugänglich machen kann.
@@ -27,238 +28,6 @@ import bee.creative.lang.Objects;
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MappedBuffer {
-
-	/** Diese Klasse implementiert ein {@link BufferArray} als Sicht auf einen Abschnitt eines {@link MappedByteBuffer}. */
-	public static abstract class INTXView extends BufferArray {
-
-		/** Dieses Feld speichert die Datenquelle. */
-		public final MappedBuffer buffer;
-
-		/** Dieses Feld speichert den Beginn des Speicherbereichs. */
-		public final long address;
-
-		INTXView(final MappedBuffer buffer, final int length, final long address) {
-			super(length);
-			this.buffer = buffer;
-			this.address = address;
-		}
-
-	}
-
-	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_INT8}. */
-	public static class INT8View extends INTXView {
-
-		INT8View(final MappedBuffer buffer, final int length, final long address) {
-			super(buffer, length, address);
-		}
-
-		@Override
-		public byte mode() {
-			return IAMArray.MODE_INT8;
-		}
-
-		@Override
-		public INTXView asINT8() {
-			return this;
-		}
-
-		@Override
-		public INTXView asINT16() {
-			return new INT16View(this.buffer, this.length / 2, this.address);
-		}
-
-		@Override
-		public INTXView asINT32() {
-			return new INT32View(this.buffer, this.length / 4, this.address);
-		}
-
-		@Override
-		public INTXView asUINT8() {
-			return new UINT8View(this.buffer, this.length, this.address);
-		}
-
-		@Override
-		public INTXView asUINT16() {
-			return new UINT16View(this.buffer, this.length / 2, this.address);
-		}
-
-		@Override
-		protected int customGet(final int index) {
-			return this.buffer.get(this.address + index);
-		}
-
-		@Override
-		protected INTXView customSection(final int offset, final int length) {
-			return new INT8View(this.buffer, length, this.address + offset);
-		}
-
-	}
-
-	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_INT16}. */
-	public static class INT16View extends INTXView {
-
-		INT16View(final MappedBuffer buffer, final int length, final long address) {
-			super(buffer, length, address);
-		}
-
-		@Override
-		public byte mode() {
-			return IAMArray.MODE_INT16;
-		}
-
-		@Override
-		public INTXView asINT8() {
-			return new INT8View(this.buffer, this.length * 2, this.address);
-		}
-
-		@Override
-		public INTXView asINT16() {
-			return this;
-		}
-
-		@Override
-		public INTXView asINT32() {
-			return new INT32View(this.buffer, this.length / 2, this.address);
-		}
-
-		@Override
-		public INTXView asUINT8() {
-			return new UINT8View(this.buffer, this.length * 2, this.address);
-		}
-
-		@Override
-		public INTXView asUINT16() {
-			return new UINT16View(this.buffer, this.length, this.address);
-		}
-
-		@Override
-		protected int customGet(final int index) {
-			return this.buffer.getShort(this.address + (index * 2));
-		}
-
-		@Override
-		protected INTXView customSection(final int offset, final int length) {
-			return new INT16View(this.buffer, length, this.address + (offset * 2));
-		}
-
-	}
-
-	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_INT32}. */
-	public static class INT32View extends INTXView {
-
-		INT32View(final MappedBuffer buffer, final int length, final long address) {
-			super(buffer, length, address);
-		}
-
-		@Override
-		public byte mode() {
-			return IAMArray.MODE_INT32;
-		}
-
-		@Override
-		public INTXView asINT8() {
-			return new INT8View(this.buffer, this.length * 4, this.address);
-		}
-
-		@Override
-		public INTXView asINT16() {
-			return new INT16View(this.buffer, this.length * 2, this.address);
-		}
-
-		@Override
-		public INTXView asINT32() {
-			return this;
-		}
-
-		@Override
-		public INTXView asUINT8() {
-			return new UINT8View(this.buffer, this.length * 4, this.address);
-		}
-
-		@Override
-		public INTXView asUINT16() {
-			return new UINT16View(this.buffer, this.length * 2, this.address);
-		}
-
-		@Override
-		protected int customGet(final int index) {
-			return this.buffer.getInt(this.address + (index * 4));
-		}
-
-		@Override
-		protected INTXView customSection(final int offset, final int length) {
-			return new INT32View(this.buffer, length, this.address + (offset * 4));
-		}
-
-	}
-
-	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_UINT8}. */
-	public static class UINT8View extends INT8View {
-
-		UINT8View(final MappedBuffer buffer, final int length, final long address) {
-			super(buffer, length, address);
-		}
-
-		@Override
-		public byte mode() {
-			return IAMArray.MODE_UINT8;
-		}
-
-		@Override
-		public INTXView asINT8() {
-			return new INT8View(this.buffer, this.length, this.address);
-		}
-
-		@Override
-		public INTXView asUINT8() {
-			return this;
-		}
-
-		@Override
-		protected int customGet(final int index) {
-			return super.customGet(index) & 0xFF;
-		}
-
-		@Override
-		protected INTXView customSection(final int offset, final int length) {
-			return new UINT8View(this.buffer, length, this.address + offset);
-		}
-
-	}
-
-	/** Diese Klasse implementiert den {@link INTXView} mit Kodierung {@link IAMArray#MODE_UINT16}. */
-	public static class UINT16View extends INT16View {
-
-		UINT16View(final MappedBuffer buffer, final int length, final long address) {
-			super(buffer, length, address);
-		}
-
-		@Override
-		public byte mode() {
-			return IAMArray.MODE_UINT16;
-		}
-
-		@Override
-		public INTXView asINT16() {
-			return new INT16View(this.buffer, this.length, this.address);
-		}
-
-		@Override
-		public INTXView asUINT16() {
-			return this;
-		}
-
-		@Override
-		protected int customGet(final int index) {
-			return super.customGet(index) & 0xFFFF;
-		}
-
-		@Override
-		protected INTXView customSection(final int offset, final int length) {
-			return new UINT16View(this.buffer, length, this.address + (offset * 2));
-		}
-
-	}
 
 	/** Dieses Feld speichert die Anzahl der niederwertigen Bit einer Adresse, die zur Positionsangabe innerhalb eines {@link MappedByteBuffer} eingesetzt
 	 * werden. */
@@ -464,7 +233,7 @@ public class MappedBuffer {
 	 * @see ByteBuffer#order(ByteOrder)
 	 * @param order Bytereihenfolge. */
 	public synchronized void order(final ByteOrder order) {
-		final boolean isNaive = order != BufferArray.REVERSE_ORDER;
+		final boolean isNaive = order != Bytes.REVERSE_ORDER;
 		if (this.isNaive == isNaive) return;
 		this.isNaive = isNaive;
 		final ByteOrder order2 = this.orderImpl();
@@ -474,7 +243,7 @@ public class MappedBuffer {
 	}
 
 	private ByteOrder orderImpl() {
-		return this.isNaive ? BufferArray.NATIVE_ORDER : BufferArray.REVERSE_ORDER;
+		return this.isNaive ? Bytes.NATIVE_ORDER : Bytes.REVERSE_ORDER;
 	}
 
 	/** Diese Methode gibt den größtmöglichen Speicherbereich (16KB..1GB) ab der gegebenen Adresse als {@link ByteBuffer} zurück.
@@ -1127,7 +896,7 @@ public class MappedBuffer {
 		}
 	}
 
-	/** Diese Methode gibt den Speicherbereich ab der gegebenen Adresse als {@link INTXView Zahlenfolge} interpretiert zurück.
+	/** Diese Methode gibt den Speicherbereich ab der gegebenen Adresse als {@link MMIArray Zahlenfolge} interpretiert zurück.
 	 *
 	 * @see IAMArray#MODE_INT8
 	 * @see IAMArray#MODE_INT16
@@ -1137,29 +906,10 @@ public class MappedBuffer {
 	 * @param address Beginn des Speicherbereichs.
 	 * @param length Anzahl der Zahlen im Speicherbereich.
 	 * @param mode Zahlenkodierung zur Interpretation des Speicherbereichs.
-	 * @return {@link INTXView}-Sicht auf den Speicherbereich. 
-
-	 * @throws IllegalArgumentException Wenn 
-	 */
-	public INTXView getArray(final long address, final int length, final byte mode) throws IllegalArgumentException{
-		switch (mode) {
-			case IAMArray.MODE_INT8:
-				if (this.size < (address + length)) throw new IllegalArgumentException();
-				return new INT8View(this, length, address);
-			case IAMArray.MODE_INT16:
-				if (this.size < (address + (length * 2))) throw new IllegalArgumentException();
-				return new INT16View(this, length, address);
-			case IAMArray.MODE_INT32:
-				if (this.size < (address + (length * 4))) throw new IllegalArgumentException();
-				return new INT32View(this, length, address);
-			case IAMArray.MODE_UINT8:
-				if (this.size < (address + length)) throw new IllegalArgumentException();
-				return new UINT8View(this, length, address);
-			case IAMArray.MODE_UINT16:
-				if (this.size < (address + (length * 2))) throw new IllegalArgumentException();
-				return new UINT16View(this, length, address);
-		}
-		throw new IllegalArgumentException();
+	 * @return {@link MMIArray}-Sicht auf den Speicherbereich.
+	 * @throws IllegalArgumentException Wenn */
+	public MMIArray getArray(final long address, final int length, final byte mode) throws IllegalArgumentException {
+		return MMIArray.from(this, address, length, mode);
 	}
 
 	/** {@inheritDoc} */

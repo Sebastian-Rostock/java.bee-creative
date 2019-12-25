@@ -38,11 +38,11 @@ public class BEXFile {
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
 	public static IAMArray arrayFrom(final String string) throws NullPointerException {
 		final int length = string.length();
-		final short[] result = new short[length + 1];
+		final short[] shorts = new short[length + 1];
 		for (int i = 0; i < length; i++) {
-			result[i] = (short)string.charAt(i);
+			shorts[i] = (short)string.charAt(i);
 		}
-		return IAMArray.from(result);
+		return IAMArray.from(shorts);
 	}
 
 	/** Diese Methode wandelt die gegebene nullterminierte Zahlenfolge in eine Zeichenkette um und gibt diese zurück.
@@ -54,7 +54,12 @@ public class BEXFile {
 	public static String stringFrom(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 		final int length = array.length() - 1;
 		if ((length < 0) || (array.get(length) != 0)) throw new IllegalArgumentException();
-		return new String(array.section(0, length).toChars());
+		final short[] shorts = array.toShorts();
+		final char[] chars = new char[length];
+		for (int i = 0; i < length; i++) {
+			chars[i] = (char)shorts[i];
+		}
+		return new String(chars);
 	}
 
 	/** Diese Methode gibt das Wurzelelement des Dokuments zurück.
