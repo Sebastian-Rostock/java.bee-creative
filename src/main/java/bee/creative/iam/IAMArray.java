@@ -561,7 +561,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		if (length == 0) return UINT16Array.EMPTY;
 		return new UINT16Array(array, offset, length);
 	}
-	
+
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;
 
@@ -670,36 +670,36 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code int[]}.
 	 *
 	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge dieser Zahlenfolge.
+	 * @param offset Beginn des Bereichs mit höchstens der Länge dieser Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public void get(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = this.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+	public final void get(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = Math.min(result.length - offset, this.length);
+		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		this.customGet(0, result, offset, length);
 	}
 
 	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code byte[]}.
 	 *
 	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge dieser Zahlenfolge.
+	 * @param offset Beginn des Bereichs mit höchstens der Länge dieser Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public void get(final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = this.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+	public final void get(final byte[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = Math.min(result.length - offset, this.length);
+		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		this.customGet(0, result, offset, length);
 	}
 
 	/** Diese Methode kopiert diese Zahlenfolge an die gegebene Position in das gegebenen {@code chort[]}.
 	 *
 	 * @param result Ergebnis.
-	 * @param offset Beginn des Bereichs mit der Länge dieser Zahlenfolge.
+	 * @param offset Beginn des Bereichs mit höchstens der Länge dieser Zahlenfolge.
 	 * @throws NullPointerException Wenn {@code result} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn diese Zahlenfolge nicht in den gegebenen Bereich passt. */
-	public void get(final short[] result, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int length = this.length;
-		if ((offset < 0) || ((offset + length) > result.length)) throw new IllegalArgumentException();
+	public final void get(final short[] result, final int offset) throws NullPointerException, IllegalArgumentException {
+		final int length = Math.min(result.length - offset, this.length);
+		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
 		this.customGet(0, result, offset, length);
 	}
 
