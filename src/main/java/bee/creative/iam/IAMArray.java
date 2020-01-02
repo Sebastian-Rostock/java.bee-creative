@@ -65,7 +65,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public byte mode() {
+		public int mode() {
 			return IAMArray.MODE_INT8;
 		}
 
@@ -117,7 +117,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public byte mode() {
+		public int mode() {
 			return IAMArray.MODE_INT16;
 		}
 
@@ -169,7 +169,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public byte mode() {
+		public int mode() {
 			return IAMArray.MODE_INT32;
 		}
 
@@ -206,7 +206,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public byte mode() {
+		public int mode() {
 			return IAMArray.MODE_UINT8;
 		}
 
@@ -247,7 +247,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public byte mode() {
+		public int mode() {
 			return IAMArray.MODE_UINT16;
 		}
 
@@ -274,7 +274,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public byte mode() {
+		public int mode() {
 			final int mode1 = this.array1.mode(), mode2 = this.array2.mode();
 			return ConcatArray.MODES[(mode1 * 5) + mode2];
 		}
@@ -366,7 +366,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		}
 
 		@Override
-		public byte mode() {
+		public int mode() {
 			return this.array.mode();
 		}
 
@@ -561,9 +561,9 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		if (length == 0) return UINT16Array.EMPTY;
 		return new UINT16Array(array, offset, length);
 	}
-
+	
 	/** Dieses Feld speichert die Länge. */
-	public final int length;
+	protected final int length;
 
 	/** Dieser Konstruktor initialisiert die Länge.
 	 *
@@ -719,7 +719,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @see #MODE_UINT8
 	 * @see #MODE_UINT16
 	 * @return Zahlenkodierung. */
-	public abstract byte mode();
+	public abstract int mode();
 
 	/** Diese Methode gibt den Streuwert zurück. <pre>
 	 * int result = 0x811C9DC5;

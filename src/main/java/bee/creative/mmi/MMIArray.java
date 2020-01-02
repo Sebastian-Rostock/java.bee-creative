@@ -18,11 +18,19 @@ public abstract class MMIArray extends IAMArray {
 	/** Dieses Feld speichert das leere {@link MMIArray}. */
 	public static final MMIArray EMPTY = new MMIArrayS0D(ByteBuffer.wrap(new byte[0]), 0, 0);
 
+	/** Diese Methode gibt den Speicherverbrauch einer Zahl in der gegebenen Kodierung zurück.
+	 *
+	 * @param mode Kodierung.
+	 * @return Speicherverbrauch. */
+	public static int size(final int mode) {
+		return (0x021421 >> (mode << 4)) & 15;
+	}
+
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link MMIArray} und gibt dieses zurück. Wenn das Objekt ein {@link MMIArray} ist, wird dieses
-	 * geliefert. Wenn es ein {@link MappedBuffer} ist, wird dieser über {@link #from(MappedBuffer, long, int, byte)} mit seiner aktuellen Größe in eine
+	 * geliefert. Wenn es ein {@link MappedBuffer} ist, wird dieser über {@link #from(MappedBuffer, long, int, int)} mit seiner aktuellen Größe in eine
 	 * Zahlenfolge überführt. Wenn es ein {@link IAMArray} ist, wird dieses in eine {@link IAMArray#toBytes() Bytefolge} überführt und rekursiv weiter
 	 * verarbeitet. Andernfalls wird das Objekt in einen {@link ByteBuffer} {@link IO#inputBufferFrom(Object) überführt} und dazu über
-	 * {@link #from(ByteBuffer, int, int, byte)} eine Zahlenfolge erzeugt.
+	 * {@link #from(ByteBuffer, int, int, int)} eine Zahlenfolge erzeugt.
 	 *
 	 * @param object Objekt.
 	 * @return {@link MMIArray}.
@@ -54,7 +62,7 @@ public abstract class MMIArray extends IAMArray {
 	 *        {@link IAMArray#MODE_UINT8}, {@link IAMArray#MODE_UINT16}).
 	 * @return Zahlenfolge
 	 * @throws IllegalArgumentException Wenn Beginn, Länge und/oder Kodierung ungültig sind. */
-	public static MMIArray from(final ByteBuffer buffer, final int address, final int length, final byte mode) throws IllegalArgumentException {
+	public static MMIArrayS from(final ByteBuffer buffer, final int address, final int length, final int mode) throws IllegalArgumentException {
 		if (mode == IAMArray.MODE_INT8) return new MMIArrayS0D(buffer, length, address);
 		if (mode == IAMArray.MODE_INT16) return new MMIArrayS1D(buffer, length, address);
 		if (mode == IAMArray.MODE_INT32) return new MMIArrayS2D(buffer, length, address);
@@ -72,7 +80,7 @@ public abstract class MMIArray extends IAMArray {
 	 *        {@link IAMArray#MODE_UINT8}, {@link IAMArray#MODE_UINT16}).
 	 * @return Zahlenfolge
 	 * @throws IllegalArgumentException Wenn Beginn, Länge und/oder Kodierung ungültig sind. */
-	public static MMIArray from(final MappedBuffer buffer, final long address, final int length, final byte mode) throws IllegalArgumentException {
+	public static MMIArrayL from(final MappedBuffer buffer, final long address, final int length, final int mode) throws IllegalArgumentException {
 		if (mode == IAMArray.MODE_INT8) return new MMIArrayL0D(buffer, length, address);
 		if (mode == IAMArray.MODE_INT16) return new MMIArrayL1D(buffer, length, address);
 		if (mode == IAMArray.MODE_INT32) return new MMIArrayL2D(buffer, length, address);

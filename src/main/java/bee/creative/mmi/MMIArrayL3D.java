@@ -12,7 +12,7 @@ final class MMIArrayL3D extends MMIArrayL {
 	}
 
 	@Override
-	public byte mode() {
+	public int mode() {
 		return IAMArray.MODE_UINT8;
 	}
 
