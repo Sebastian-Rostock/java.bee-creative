@@ -28,35 +28,20 @@ public abstract class IAMArrayBuilder extends BaseObject implements Getter<IAMAr
 				final MMIArrayL array = (MMIArrayL)item;
 				if (array.buffer == this.buffer) return array;
 			}
-			final long address;
-			final byte mode = item.mode();
-			final int length = item.length();
-			if ((mode == IAMArray.MODE_INT8) || (mode == IAMArray.MODE_UINT8)) {
-				address = this.grow(length);
-				this.buffer.put(address, item.toBytes());
-			} else if ((mode == IAMArray.MODE_INT16) || (mode == IAMArray.MODE_UINT16)) {
-				address = this.grow(length * 2);
-				this.buffer.putShort(address, item.toShorts());
-			} else {
-				address = this.grow(length * 4);
-				this.buffer.putInt(address, item.toInts());
+			try {
+				final int mode = item.mode(), length = item.length();
+				final long result = this.address;
+				this.buffer.grow(this.address = result + (MMIArray.size(mode) * (long)length));
+				this.buffer.putArray(result, item);
+				return this.buffer.getArray(result, length, mode);
+			} catch (final IOException cause) {
+				throw new IllegalArgumentException(cause);
 			}
-			return MMIArray.from(this.buffer, address, length, mode);
 		}
 
 		@Override
 		public File file() {
 			return this.buffer.file();
-		}
-
-		long grow(final long size) {
-			try {
-				final long result = this.address;
-				this.buffer.grow(this.address = result + size);
-				return result;
-			} catch (final IOException cause) {
-				throw new IllegalArgumentException(cause);
-			}
 		}
 
 	}

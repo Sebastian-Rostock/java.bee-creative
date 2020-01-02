@@ -18,6 +18,7 @@ import bee.creative.iam.IAMArray;
 import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
 import bee.creative.mmi.MMIArray;
+import bee.creative.mmi.MMIArrayL;
 
 /** Diese Klasse implementiert eine alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien per
  * momory-mapping zum Lesen und Schreiben zugänglich machen kann.
@@ -117,7 +118,7 @@ public class MappedBuffer {
 	 * @param readonly {@code true}, wenn die Datei nur zum Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public MappedBuffer(final File file, final long size, final boolean readonly) throws IOException {
-		if (size < 0) throw new IllegalArgumentException();
+		if (size < 0) throw new IOException();
 		this.file = file.getAbsoluteFile();
 		this.buffers = new MappedByteBuffer[1];
 		this.isReadonly = readonly;
@@ -907,9 +908,29 @@ public class MappedBuffer {
 	 * @param length Anzahl der Zahlen im Speicherbereich.
 	 * @param mode Zahlenkodierung zur Interpretation des Speicherbereichs.
 	 * @return {@link MMIArray}-Sicht auf den Speicherbereich.
-	 * @throws IllegalArgumentException Wenn */
-	public MMIArray getArray(final long address, final int length, final byte mode) throws IllegalArgumentException {
+	 * @throws IllegalArgumentException Wenn {@link MMIArray#from(MappedBuffer, long, int, int)} diese auslöst. */
+	public MMIArrayL getArray(final long address, final int length, final int mode) throws IllegalArgumentException {
 		return MMIArray.from(this, address, length, mode);
+	}
+
+	/** Diese Methode schreibt die {@link MMIArray Zahlenfolge} an die gegebene Adresse. Diese wird dazu abhängig von ihrer {@link IAMArray#mode() Kodierung} in
+	 * ein {@link IAMArray#toBytes() byte}-, {@link IAMArray#toShorts() short}- bzw. {@link IAMArray#toInts() int}-Array überführt, welches anschließend
+	 * geschrieben wird.
+	 *
+	 * @see #put(long, byte[])
+	 * @see #putShort(long, short[])
+	 * @see #putInt(long, int[])
+	 * @param address Adresse.
+	 * @param array Zahlenfolge. */
+	public void putArray(final long address, final IAMArray array) {
+		final int mode = array.mode();
+		if ((mode == IAMArray.MODE_INT8) || (mode == IAMArray.MODE_UINT8)) {
+			this.put(address, array.toBytes());
+		} else if ((mode == IAMArray.MODE_INT16) || (mode == IAMArray.MODE_UINT16)) {
+			this.putShort(address, array.toShorts());
+		} else {
+			this.putInt(address, array.toInts());
+		}
 	}
 
 	/** {@inheritDoc} */
