@@ -8,7 +8,6 @@ import bee.creative.fem.FEMFunction.ClosureFunction;
 import bee.creative.fem.FEMFunction.CompositeFunction;
 import bee.creative.fem.FEMFunction.ConcatFunction;
 import bee.creative.iam.IAMArray;
-import bee.creative.iam.IAMIndex;
 import bee.creative.io.MappedBuffer;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
@@ -25,8 +24,8 @@ import bee.creative.util.HashMap2;
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMCodec implements Property<FEMFunction>, Emuable {
 
-	/** Diese Klasse implementiert eine {@link FEMArray Wertliste}, deren Elemente als {@link IAMArray Zahlenfolge} aus {@link FEMCodec#___toRef(int, int)
-	 * Referenzen} gegeben sind und in {@link #customGet(int)} über einen gegebenen {@link FEMCodec} in Werte {@link FEMCodec#getValue(int) übersetzt} werden. */
+	/** Diese Klasse implementiert eine {@link FEMArray Wertliste}, deren Elemente als {@link IAMArray Zahlenfolge} aus Referenzen gegeben sind und in
+	 * {@link #customGet(int)} über einen gegebenen {@link FEMCodec} in Werte {@link FEMCodec#getValue(int) übersetzt} werden. */
 	protected static class IndexArray extends FEMArray {
 
 		/** Dieses Feld speichert den {@link FEMCodec} zur {@link FEMCodec#getValue(int) Übersetzung} der Referenzen aus {@link #items}. */
@@ -212,73 +211,70 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	}
 
-	/** Dieses Feld speichert den leeren {@link FEMCodec} als Leser des leeren {@link IAMIndex}. */
-	public static final FEMCodec EMPTY = new FEMCodec().useSource(IAMIndex.EMPTY);
-
 	protected static final int MAGIC_NUMBER = 0x6005BABE;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putVoidValue()}. */
+	/** Dieses Feld speichert die Typkennung für {@link FEMVoid#INSTANCE}. */
 	protected static final int TYPE_VOID = 0;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putTrueValue()}. */
+	/** Dieses Feld speichert die Typkennung für {@link FEMBoolean#TRUE}. */
 	protected static final int TYPE_TRUE = 1;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putFalseValue()}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putFalseValue()}. */
 	protected static final int TYPE_FALSE = 2;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putArrayValue(FEMArray)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putArrayValue(FEMArray)}. */
 	protected static final int TYPE_ARRAY_LIST = 3;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putArrayValue(FEMArray)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putArrayValue(FEMArray)}. */
 	protected static final int TYPE_ARRAY_HASH = 3;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putStringValue(FEMString)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putStringValue(FEMString)}. */
 	protected static final int TYPE_STRING_INT8 = 4;
 
 	protected static final int TYPE_STRING_INT16 = 4;
 
 	protected static final int TYPE_STRING_INT32 = 4;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putBinaryValue(FEMBinary)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putBinaryValue(FEMBinary)}. */
 	protected static final int TYPE_BINARY_VALUE = 5;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putIntegerValue(FEMInteger)}. */
-	protected static final int TYPE_INTEGER_VALUE = 6;
+	/** Dieses Feld speichert die Typkennung für {@link #putIntegerValue(FEMInteger)}. */
+	protected static final int TYPE_INTEGER = 6;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putDecimalValue(FEMDecimal)}. */
-	protected static final int TYPE_DECIMAL_VALUE = 7;
+	/** Dieses Feld speichert die Typkennung für {@link #putDecimalValue(FEMDecimal)}. */
+	protected static final int TYPE_DECIMAL = 7;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putDurationValue(FEMDuration)}. */
-	protected static final int TYPE_DURATION_VALUE = 8;
+	/** Dieses Feld speichert die Typkennung für {@link #putDurationValue(FEMDuration)}. */
+	protected static final int TYPE_DURATION = 8;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putDatetimeValue(FEMDatetime)}. */
-	protected static final int TYPE_DATETIME_VALUE = 9;
+	/** Dieses Feld speichert die Typkennung für {@link #putDatetimeValue(FEMDatetime)}. */
+	protected static final int TYPE_DATETIME = 9;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putHandlerValue(FEMHandler)}. */
-	protected static final int TYPE_HANDLER_VALUE = 10;
+	/** Dieses Feld speichert die Typkennung für {@link #putHandlerValue(FEMHandler)}. */
+	protected static final int TYPE_HANDLER = 10;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putObjectValue(FEMObject)}. */
-	protected static final int TYPE_OBJECT_VALUE = 11;
+	/** Dieses Feld speichert die Typkennung für {@link #putObjectValue(FEMObject)}. */
+	protected static final int TYPE_OBJECT = 11;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putProxyFunction(FEMProxy)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putProxyFunction(FEMProxy)}. */
 	protected static final int TYPE_PROXY_FUNCTION = 12;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putParamFunction(FEMParam)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putParamFunction(FEMParam)}. */
 	protected static final int TYPE_PARAM_FUNCTION = 13;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putConcatFunction(ConcatFunction)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putConcatFunction(ConcatFunction)}. */
 	protected static final int TYPE_CONCAT_FUNCTION = 14;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putClosureFunction(ClosureFunction)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putClosureFunction(ClosureFunction)}. */
 	protected static final int TYPE_CLOSURE_FUNCTION = 15;
 
-	/** Dieses Feld speichert die {@link #_getType(int) Typkennung} für {@link #putCompositeFunction(CompositeFunction)}. */
+	/** Dieses Feld speichert die Typkennung für {@link #putCompositeFunction(CompositeFunction)}. */
 	protected static final int TYPE_COMPOSITE_FUNCTION = 16;
 
-	/** Dieses Feld speichert die Referenz der nächsten {@link #putData(IAMArray) angefügten} Zahlenfolge. */
+	/** Dieses Feld speichert die Referenz der nächsten {@link #putImpl(IAMArray) angefügten} Zahlenfolge. */
 	private int nextRef;
 
-	/** Dieses Feld speichert die Referenz auf die als {@link #set(FEMValue) Wurzel gesetzten} Wert. */
+	/** Dieses Feld speichert die Referenz auf die als {@link #set(FEMFunction) Wurzel gesetzte} Funktion. */
 	private int rootRef;
 
 	/** Dieses Feld speichert den Puffer, in dem die Yahlenfolgen abgelegt sind. */
@@ -286,7 +282,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	private boolean reuseEnabled = true;
 
-	/** Dieses Feld bildet von einer Zahlenfolge auf deren Referenz ab und wird zusammen mit {@link #reuseEnabled} inn {@link #putData(IAMArray)} eingesetzt. */
+	/** Dieses Feld bildet von einer Zahlenfolge auf deren Referenz ab und wird zusammen mit {@link #reuseEnabled} inn {@link #putImpl(IAMArray)} eingesetzt. */
 	private HashMap2<IAMArray, Integer> reuseMapping;
 
 	private final boolean cacheEnabled = true;
@@ -309,10 +305,11 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		return this.buffer;
 	}
 
-	/** Diese Methode setzt die Aktivierung der Wiederverwendung von Zahlenfolgen und gibt {@code this} zurück. Wenn {@link #putData(IAMArray)}
+	/** Diese Methode setzt die Aktivierung der Wiederverwendung von Zahlenfolgen und gibt {@code this} zurück. Wenn diese aktiv ist, werden durch
+	 * {@link #putImpl(IAMArray)} keine redundanten Zahlenfolgen in den {@link #getBuffer() Puffer} übertragen.
 	 *
-	 * @param enabled
-	 * @return */
+	 * @param enabled Aktivierung der Wiederverwendung.
+	 * @return {@code this}. */
 	public FEMCodec useReuse(final boolean enabled) {
 		this.reuseEnabled = enabled;
 		return this;
@@ -325,15 +322,15 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode bestückt diesen {@link FEMCodec} zum Lesen des gegebenen {@link MappedBuffer Puffers} und gibt {@code this} zurück.
 	 *
-	 * @param source Datenquelle.
+	 * @param src Datenquelle.
 	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public FEMCodec useSource(final MappedBuffer source) throws NullPointerException {
-		this.buffer = Objects.notNull(source);
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist. */
+	public FEMCodec useSource(final MappedBuffer src) throws NullPointerException {
+		this.buffer = Objects.notNull(src);
 		this.reuseMapping = null;
 
-		this.nextRef = source.getInt(4);
-		this.rootRef = source.getInt(8);
+		this.nextRef = src.getInt(4);
+		this.rootRef = src.getInt(8);
 		// TODO check MAGIC-NUMBER
 		return this;
 	}
@@ -350,15 +347,15 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		return this;
 	}
 
-	/** Diese Methode gibt die Referenz zur gegebenen {@link #___toAddr(int) Adresse} zurück.
+	/** Diese Methode gibt die Referenz zur gegebenen {@link #getAddrImpl(int) Adresse} zurück.
 	 *
 	 * @param addr Adresse.
 	 * @return Referenz. */
-	final int ___toRef(final long addr) {
+	private final int getRefImpl(final long addr) {
 		return (int)(addr >>> 4);
 	}
 
-	/** Diese Methode gibt die Adresse des Speicherbereichs der {@link MMIArray Zahlenfolge} zur gegebenen {@link #___toRef(long) Refernez} zurück.<ber> Die
+	/** Diese Methode gibt die Adresse des Speicherbereichs der {@link MMIArray Zahlenfolge} zur gegebenen {@link #getRefImpl(long) Refernez} zurück.<ber> Die
 	 * Kopfdaten dieses Speicherbereichs stehten in den vier Byte davor und nennen Länge sowie Kodierung der Zahlenfolge. Bei den Kodierungen werden nur
 	 * {@link IAMArray#MODE_INT8}, {@link IAMArray#MODE_INT16} und {@link IAMArray#MODE_INT32} unterschieden.
 	 * <p>
@@ -367,45 +364,20 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 *
 	 * @param ref Referenz (1..2147483647).
 	 * @return Adresse. */
-	final long ___toAddr(final int ref) {
+	private final long getAddrImpl(final int ref) {
 		return (long)ref << 4;
 	}
 
-	/** Diese Methode gibt die {@link MMIArray Zahlenfolge} zur gegebenen {@link #putData(IAMArray) Referenz} zurück.
-	 *
-	 * @param ref Referenz.
-	 * @return Zahlenfolge.
-	 * @throws IllegalArgumentException Wenn {@link MappedBuffer#getInt(long)} bzw. {@link MappedBuffer#getArray(long, int, int)} eine ausnahme auslöst. */
-	public final MMIArrayL getData(final int ref) throws IllegalArgumentException {
+	private final int putImpl(final IAMArray src) throws NullPointerException, IllegalStateException {
+		final int result = this.nextRef, length = src.length(), size = MMIArray.size(src.mode());
+		final long address = this.getAddrImpl(result), capacity = (19 + address + (size * (long)length)) & -15;
 		try {
-			final long addr = this.___toAddr(ref);
-			final int head = this.buffer.getInt(addr - 4);
-			return this.buffer.getArray(addr, head >>> 2, head & 3);
-		} catch (final IllegalArgumentException cause) {
-			throw cause;
-		} catch (final Exception cause) {
-			throw new IllegalArgumentException(cause);
-		}
-	}
-
-	public final int putData(final IAMArray array) throws NullPointerException, IllegalStateException {
-		this.checkPut();
-		if (this.reuseEnabled) {
-			final Integer result = this.reuseMapping.get(array);
-			if (result != null) return result.intValue();
-		}
-		try {
-			final int length = array.length(), size = MMIArray.size(array.mode()), ref = this.nextRef;
-			final long addr = this.___toAddr(ref), capacity = (19 + addr + (size * (long)length)) & -15;
-			this.buffer.grow(capacity);
-			this.buffer.putInt(addr - 4, (length << 2) | (size >> 1));
-			this.buffer.putArray(addr, array);
-			this.nextRef = this.___toRef(capacity);
-			if (this.reuseEnabled) {
-				final MMIArrayL data = this.getData(ref);
-				this.reuseMapping.put(data, new Integer(ref));
-			}
-			return ref;
+			final MappedBuffer buffer = this.buffer;
+			buffer.grow(capacity);
+			buffer.putInt(address - 4, (length << 2) | (size >> 1));
+			buffer.putArray(address, src);
+			this.nextRef = this.getRefImpl(capacity);
+			return result;
 		} catch (final IllegalStateException cause) {
 			throw cause;
 		} catch (final Exception cause) {
@@ -413,12 +385,40 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		}
 	}
 
+	/** Diese Methode gibt die {@link MMIArray Zahlenfolge} zur gegebenen {@link #putImpl(IAMArray) Referenz} zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Zahlenfolge.
+	 * @throws IllegalArgumentException Wenn {@link MappedBuffer#getInt(long)} bzw. {@link MappedBuffer#getArray(long, int, int)} eine ausnahme auslöst. */
+	protected final MMIArrayL getData(final int ref) throws IllegalArgumentException {
+		try {
+			final long address = this.getAddrImpl(ref);
+			final int head = this.buffer.getInt(address - 4);
+			return this.buffer.getArray(address, head >>> 2, head & 3);
+		} catch (final IllegalArgumentException cause) {
+			throw cause;
+		} catch (final Exception cause) {
+			throw new IllegalArgumentException(cause);
+		}
+	}
+
+	protected final int putData(final IAMArray src) throws NullPointerException, IllegalStateException {
+		this.checkPut();
+		if (!this.reuseEnabled) return this.putImpl(src);
+		final Integer value = this.reuseMapping.get(src);
+		if (value != null) return value.intValue();
+		final int result = this.putImpl(src);
+		final MMIArrayL data = this.getData(result);
+		this.reuseMapping.put(data, new Integer(result));
+		return result;
+	}
+
 	void checkPut() throws IllegalStateException {
 		if (this.reuseMapping == null) throw new IllegalStateException();
 	}
 
-	public FEMValue getValue(final int ref) throws IllegalArgumentException {
-		return (FEMValue)this.getFunction(ref);
+	public final FEMValue getValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMValue.class);
 	}
 
 	/** Diese Methode gibt die Funktion zur gegebenen Referenz zurück. Wenn deren Typkennung unbekannt ist, wird {@link FEMVoid#INSTANCE} geliefert.
@@ -427,7 +427,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public FEMFunction getFunction(final int ref) throws IllegalArgumentException {
-		long addr = this.___toAddr(ref);
+		long addr = this.getAddrImpl(ref);
 		final int type = this.buffer.getInt(addr);
 		addr += 4;
 		final int size = this.buffer.getInt(addr);
@@ -435,8 +435,8 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		return this.get(type, size, addr);
 	}
 
-	/** Diese Methode gibt die Funktion zur gegebenen {@link #___toRef(int, int) Funktionsreferenz} zurück. Wenn deren {@link #_getType(int) Typkennung} unbekannt
-	 * ist, wird {@link FEMVoid#INSTANCE} geliefert.
+	/** Diese Methode gibt die Funktion zur gegebenen {@link #getRefImpl(int, int) Funktionsreferenz} zurück. Wenn deren Typkennung unbekannt ist, wird
+	 * {@link FEMVoid#INSTANCE} geliefert.
 	 *
 	 * @param ref Funktionsreferenz.
 	 * @return Funktion.
@@ -455,20 +455,20 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 				return this.getStringValue(index);
 			case TYPE_BINARY_VALUE:
 				return this.getBinaryValue(index);
-			case TYPE_INTEGER_VALUE:
+			case TYPE_INTEGER:
 				return this.getIntegerValue(index);
-			case TYPE_DECIMAL_VALUE:
+			case TYPE_DECIMAL:
 				return this.getDecimalValue(index);
-			case TYPE_DATETIME_VALUE:
+			case TYPE_DATETIME:
 				return this.getDatetimeValue(index);
-			case TYPE_DURATION_VALUE:
+			case TYPE_DURATION:
 				return this.getDurationValue(index);
-			case TYPE_HANDLER_VALUE:
+			case TYPE_HANDLER:
 				return this.getHandlerValue(index);
-			case TYPE_OBJECT_VALUE:
+			case TYPE_OBJECT:
 				return this.getObjectValue(index);
 			case TYPE_PROXY_FUNCTION:
-				return this.toProxyFunction(index);
+				return this.getProxyFunction(index);
 			case TYPE_PARAM_FUNCTION:
 				return FEMParam.from(index);
 			case TYPE_CONCAT_FUNCTION:
@@ -484,25 +484,25 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode nimmt die gegebene Funktion in die Verwaltung auf und gibt die Referenz darauf zurück.
 	 *
-	 * @param source Funktion.
+	 * @param src Funktion.
 	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Funktion nicht aufgenommen werden kann. */
-	public int putFunction(final FEMFunction source) throws NullPointerException, IllegalArgumentException {
-		if (source instanceof FEMValue) return this.putValue((FEMValue)source);
-		if (source instanceof FEMProxy) return this.putProxyFunction((FEMProxy)source);
-		if (source instanceof FEMParam) return this.putParamFunction((FEMParam)source);
-		if (source instanceof ConcatFunction) return this.putConcatFunction((ConcatFunction)source);
-		if (source instanceof ClosureFunction) return this.putClosureFunction((ClosureFunction)source);
-		if (source instanceof CompositeFunction) return this.putCompositeFunction((CompositeFunction)source);
-		putCustomFunction(source);
+	public int putFunction(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		if (src instanceof FEMValue) return this.putValue((FEMValue)src);
+		if (src instanceof FEMProxy) return this.putProxyFunction((FEMProxy)src);
+		if (src instanceof FEMParam) return this.putParamFunction((FEMParam)src);
+		if (src instanceof ConcatFunction) return this.putConcatFunction((ConcatFunction)src);
+		if (src instanceof ClosureFunction) return this.putClosureFunction((ClosureFunction)src);
+		if (src instanceof CompositeFunction) return this.putCompositeFunction((CompositeFunction)src);
+		return this.putCustomFunction(src);
 	}
 
-	public int putFutureValue(final FEMFuture source) {
+	public int putFutureValue(final FEMFuture src) {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt den Wert zur gegebenen {@link #_getType(int) Typkennung} und {@link #toIndex(int) Position} zurück.
+	/** Diese Methode gibt den Wert zur gegebenen Typkennung und {@link #toIndex(int) Position} zurück.
 	 *
 	 * @param type Typkennung
 	 * @param index Position.
@@ -512,7 +512,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		return FEMVoid.INSTANCE;
 	}
 
-	/** Diese Methode gibt die Funktion zur gegebenen {@link #_getType(int) Typkennung} und {@link #toIndex(int) Position} zurück.
+	/** Diese Methode gibt die Funktion zur gegebenen Typkennung und {@link #toIndex(int) Position} zurück.
 	 *
 	 * @param type Typkennung
 	 * @param index Position.
@@ -524,92 +524,81 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode nimmt den gegebenen Wert in die Verwaltung auf und gibt die Referenz darauf zurück.
 	 *
-	 * @param source Wert.
+	 * @param src Wert.
 	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Wert nicht aufgenommen werden kann. */
-	public int putValue(final FEMValue source) throws NullPointerException, IllegalArgumentException {
-		if (source instanceof FEMVoid) return this.putVoidValue();
-		if (source instanceof FEMArray) return this.putArrayValue((FEMArray)source.data());
-		if (source instanceof FEMHandler) return this.putHandlerValue((FEMHandler)source.data());
-		if (source instanceof FEMBoolean) return this.putBooleanValue((FEMBoolean)source.data());
-		if (source instanceof FEMString) return this.putStringValue((FEMString)source.data());
-		if (source instanceof FEMBinary) return this.putBinaryValue((FEMBinary)source.data());
-		if (source instanceof FEMInteger) return this.putIntegerValue((FEMInteger)source.data());
-		if (source instanceof FEMDecimal) return this.putDecimalValue((FEMDecimal)source.data());
-		if (source instanceof FEMDuration) return this.putDurationValue((FEMDuration)source.data());
-		if (source instanceof FEMDatetime) return this.putDatetimeValue((FEMDatetime)source.data());
-		if (source instanceof FEMObject) return this.putObjectValue((FEMObject)source.data());
-		if (source instanceof FEMFuture) return this.putFutureValue((FEMFuture)source);
-		if (source instanceof FEMNative) return this.putNativeValue((FEMNative)source);
-		return this.putCustomValue(source);
+	public int putValue(final FEMValue src) throws NullPointerException, IllegalArgumentException {
+		if (src instanceof FEMVoid) return this.putVoidValue();
+		if (src instanceof FEMArray) return this.putArrayValue((FEMArray)src.data());
+		if (src instanceof FEMHandler) return this.putHandlerValue((FEMHandler)src.data());
+		if (src instanceof FEMBoolean) return this.putBooleanValue((FEMBoolean)src.data());
+		if (src instanceof FEMString) return this.putStringValue((FEMString)src.data());
+		if (src instanceof FEMBinary) return this.putBinaryValue((FEMBinary)src.data());
+		if (src instanceof FEMInteger) return this.putIntegerValue((FEMInteger)src.data());
+		if (src instanceof FEMDecimal) return this.putDecimalValue((FEMDecimal)src.data());
+		if (src instanceof FEMDuration) return this.putDurationValue((FEMDuration)src.data());
+		if (src instanceof FEMDatetime) return this.putDatetimeValue((FEMDatetime)src.data());
+		if (src instanceof FEMObject) return this.putObjectValue((FEMObject)src.data());
+		if (src instanceof FEMFuture) return this.putFutureValue((FEMFuture)src);
+		if (src instanceof FEMNative) return this.putNativeValue((FEMNative)src);
+		return this.putCustomValue(src);
 	}
 
-	public int putNativeValue(FEMNative source) {
+	public int putNativeValue(final FEMNative src) {
 		throw new IllegalArgumentException();
 	}
 
-	protected int putCustomValue(final FEMValue source) throws NullPointerException, IllegalArgumentException {
+	protected int putCustomValue(final FEMValue src) throws NullPointerException, IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 
-	protected int putCustomFunction(final FEMFunction source) throws NullPointerException, IllegalArgumentException {
+	protected int putCustomFunction(final FEMFunction src) throws NullPointerException, IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode fügt {@link FEMVoid#INSTANCE} hinzu und gibt die Referenz darauf zurück.
 	 *
 	 * @return Referenz. */
-	public int putVoidValue() {
-		return this.putData(IAMArray.from(TYPE_VOID));
-	}
-
-	/** Diese Methode fügt {@link FEMBoolean#TRUE} hinzu und gibt die Referenz darauf zurück.
-	 *
-	 * @return Referenz. */
-	public int putTrueValue() {
-		return this.putData(IAMArray.from(TYPE_TRUE));
+	public final int putVoidValue() {
+		return this.putImpl(IAMArray.from(FEMCodec.TYPE_VOID));
 	}
 
 	/** Diese Methode fügt {@link FEMBoolean#FALSE} hinzu und gibt die Referenz darauf zurück.
 	 *
 	 * @return Referenz. */
-	public int putFalseValue() {
-		return this.putData(IAMArray.from(TYPE_FALSE));
+	public final int putFalseValue() {
+		return this.putImpl(IAMArray.from(FEMCodec.TYPE_FALSE));
 	}
 
-	/** Diese Methode gibt die Wertliste zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #arrayValuePool}.
-	 * @return Wertliste.
-	 * @throws IllegalArgumentException Wenn {@link #toArrayValue(IAMArray)} diese auslöst. */
-	protected FEMArray getArrayValue(final int index) throws IllegalArgumentException {
-		return this.arrayValuePool.get(index);
+	/** Diese Methode gibt die Wertliste zur gegebenen Referenz zurück. */
+	public final FEMArray getArrayValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMArray.class);
 	}
 
-	/** Diese Methode nimmt die gegebene Wertliste in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
+	/** Diese Methode nimmt die gegebene Wertliste in die Verwaltung auf und gibt die {@link #getRefImpl(int, int)} Referenz} darauf zurück.
 	 *
-	 * @param source Dezimalbruch.
+	 * @param src Dezimalbruch.
 	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #toArrayArray(FEMArray)} diese auslöst. */
-	public int putArrayValue(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-		return this.___toRef(FEMCodec.TYPE_ARRAY_LIST, this.arrayValuePool.put(source));
+	public int putArrayValue(final FEMArray src) throws NullPointerException, IllegalArgumentException {
+		return this.getRefImpl(FEMCodec.TYPE_ARRAY_LIST, this.arrayValuePool.put(src));
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #toArrayValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Wertliste enthält. Eine über
 	 * {@link FEMArray#compact(boolean)} indizierte Wertliste wird mit der Indizierung kodiert.
 	 *
-	 * @param source Wertliste.
+	 * @param src Wertliste.
 	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putValue(FEMValue)} diese auslöst. */
-	public IAMArray toArrayArray(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-		final int length = source.length();
+	public IAMArray toArrayArray(final FEMArray src) throws NullPointerException, IllegalArgumentException {
+		final int length = src.length();
 		final int[] result;
-		if (source instanceof CompactArray3) {
+		if (src instanceof CompactArray3) {
 			// value[length], hash[1], index[length], range[count], length[1] => 2xlength + count + 2
-			final int[] table = ((CompactArray3)source).table;
+			final int[] table = ((CompactArray3)src).table;
 			final int count = table[0], offset1 = length + 1, offset2 = offset1 + length, offset3 = offset1 - count;
 			result = new int[offset2 + count + 1];
 			System.arraycopy(table, count, result, offset1, length);
@@ -620,10 +609,10 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 			// value[length], hash[1], length[1] => 1xlength + 2
 			result = new int[length + 2];
 		}
-		result[length] = source.hashCode();
+		result[length] = src.hashCode();
 		result[result.length - 1] = length;
 		for (int i = 0; i < length; i++) {
-			result[i] = this.putValue(source.customGet(i));
+			result[i] = this.putValue(src.customGet(i));
 		}
 		return IAMArray.from(result);
 	}
@@ -632,397 +621,312 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * vorliegen:
 	 * <ul>
 	 * <li>Einfach - {@code (value[length], hash[1], length[1])}<br>
-	 * Die Zahlenfolge beginnt mit den über {@link #putValue(FEMValue)} ermittelten {@link #___toRef(int, int) Referenzen} der Elemente der gegebenen Wertliste
+	 * Die Zahlenfolge beginnt mit den über {@link #putValue(FEMValue)} ermittelten {@link #getRefImpl(int, int) Referenzen} der Elemente der gegebenen Wertliste
 	 * und endet mit dem {@link FEMArray#hashCode() Streuwert} sowie der {@link FEMArray#length() Länge} der Wertliste.</li>
 	 * <li>Indiziert - {@code (value[length], hash[1], index[length], range[count], length[1])}<br>
 	 * Die Zahlenfolge beginnt ebenfalls mit den Referenzen sowie dem Streuwert und endet auch mit der Länge der Wertliste. Dazwischen enthält sie die Inhalte
 	 * sowie die Größen der Streuwertbereiche.</li>
 	 * </ul>
 	 *
-	 * @param source Zahlenfolge.
+	 * @param src Zahlenfolge.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMArray toArrayValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		final int length1 = source.length() - 2, length2 = source.get(length1 + 1);
-		if (length1 == length2) return new IndexArray(length1, this, source);
-		return new IndexArray2(length2, this, source);
+	public FEMArray toArrayValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		final int length1 = src.length() - 2, length2 = src.get(length1 + 1);
+		if (length1 == length2) return new IndexArray(length1, this, src);
+		return new IndexArray2(length2, this, src);
 	}
 
-	/** Diese Methode nimmt die gegebene Zeichenkette in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
+	/** Diese Methode gibt die Zeichenkette zur gegebenen Referenz zurück. */
+	public final FEMString getStringValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMString.class);
+	}
+
+	/** Diese Methode nimmt die gegebene Zeichenkette in die Verwaltung auf und gibt die {@link #getRefImpl(int, int)} Referenz} darauf zurück.
 	 *
-	 * @param source Zeichenkette.
+	 * @param src Zeichenkette.
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@link #getStringArray(FEMString)} diese auslöst. */
-	public int putStringValue(final FEMString source) throws NullPointerException {
-		return this.___toRef(FEMCodec.TYPE_STRING_INT8, this.stringValuePool.put(source));
+	public int putStringValue(final FEMString src) throws NullPointerException {
+		return this.getRefImpl(FEMCodec.TYPE_STRING_INT8, this.stringValuePool.put(src));
 	}
 
-	/** Diese Methode gibt die Zeichenkette zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #stringValuePool}.
-	 * @return Zeichenkette.
-	 * @throws IllegalArgumentException Wenn {@link #getStringValue(IAMArray)} diese auslöst. */
-	protected FEMString getStringValue(final int index) throws IllegalArgumentException {
-		return this.stringValuePool.get(index);
+	protected final <GResult> GResult getFunction(final int ref, final Class<GResult> functionClass) {
+		try {
+			return functionClass.cast(this.getFunction(ref));
+		} catch (final IllegalArgumentException cause) {
+			throw cause;
+		} catch (final Exception cause) {
+			throw new IllegalArgumentException(cause);
+		}
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #getStringValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Zeichenkette enthält.
 	 *
-	 * @param source Zeichenkette.
+	 * @param src Zeichenkette.
 	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public IAMArray getStringArray(final FEMString source) {
-		return FEMCodec.toArray_(source);
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist. */
+	public IAMArray getStringArray(final FEMString src) {
+		return FEMCodec.toArray_(src);
 	}
 
 	/** Diese Methode gibt eine Zeichenkette zurück, deren Codepoints in der gegebenen Zahlenfolge {@link FEMString#toArray() kodiert} sind.
 	 *
-	 * @param source Zahlenfolge.
+	 * @param src Zahlenfolge.
 	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMString getStringValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return FEMCodec.from(source);
+	public FEMString getStringValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		return FEMCodec.from(src);
 	}
 
-	/** Diese Methode nimmt die gegebene Bytefolge in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
+	/** Diese Methode nimmt die gegebene Bytefolge in die Verwaltung auf und gibt die {@link #getRefImpl(int, int)} Referenz} darauf zurück.
 	 *
-	 * @param source Bytefolge.
+	 * @param src Bytefolge.
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@link #getBinaryArray(FEMBinary)} diese auslöst. */
-	public int putBinaryValue(final FEMBinary source) throws NullPointerException {
-		return this.___toRef(FEMCodec.TYPE_BINARY_VALUE, this.binaryValuePool.put(source));
+	public int putBinaryValue(final FEMBinary src) throws NullPointerException {
+		return this.getRefImpl(FEMCodec.TYPE_BINARY_VALUE, this.binaryValuePool.put(src));
 	}
 
-	/** Diese Methode gibt die Bytefolge zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #binaryValuePool}.
-	 * @return Bytefolge.
-	 * @throws IllegalArgumentException Wenn {@link #getBinaryValue(IAMArray)} diese auslöst. */
-	protected FEMBinary getBinaryValue(final int index) throws IllegalArgumentException {
-		return this.binaryValuePool.get(index);
+	/** Diese Methode gibt die Bytefolge zur gegebenen Referenz zurück. */
+	public final FEMBinary getBinaryValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMBinary.class);
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #getBinaryValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Bytefolge enthält.
 	 *
-	 * @param source Bytefolge.
+	 * @param src Bytefolge.
 	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public IAMArray getBinaryArray(final FEMBinary source) throws NullPointerException {
-		return FEMCodec.toArray(source);
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist. */
+	public IAMArray getBinaryArray(final FEMBinary src) throws NullPointerException {
+		return FEMCodec.toArray(src);
 	}
 
 	/** Diese Methode gibt die Bytefolge zur gegebenen Zahlenfolge zurück, deren Bytes in der gegebenen Zahlenfolge {@link FEMBinary#toArray() kodiert} sind.
 	 *
-	 * @param source Zahlenfolge.
+	 * @param src Zahlenfolge.
 	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMBinary getBinaryValue(final IAMArray source) {
-		return FEMCodec.from(source);
+	public FEMBinary getBinaryValue(final IAMArray src) {
+		return FEMCodec.from(src);
 	}
 
-	/** Diese Methode nimmt die gegebene Dezimalzahl in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
-	 *
-	 * @param source Dezimalzahl.
-	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@link #getIntegerArray(FEMInteger)} diese auslöst. */
-	public int putIntegerValue(final FEMInteger source) throws NullPointerException {
-		return this.___toRef(FEMCodec.TYPE_INTEGER_VALUE, this.integerValuePool.put(source));
+	/** Diese Methode ist die Umkehroperation zu {@link #getIntegerValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Dezimalzahl enthält. */
+	public final IAMArray getIntegerData(final FEMInteger src) throws NullPointerException {
+		final long val = src.value();
+		return IAMArray.from(FEMCodec.TYPE_INTEGER, Integers.toIntH(val), Integers.toIntL(val));
 	}
 
-	/** Diese Methode gibt die Dezimalzanl zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #integerValuePool}.
-	 * @return Dezimalzahl.
-	 * @throws IllegalArgumentException Wenn {@link #getIntegerValue(IAMArray)} diese auslöst. */
-	protected FEMInteger getIntegerValue(final int index) throws IllegalArgumentException {
-		return this.integerValuePool.get(index);
+	/** Diese Methode gibt die Dezimalzahl zur gegebenen Referenz zurück. */
+	public final FEMInteger getIntegerValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMInteger.class);
 	}
 
-	/** Diese Methode ist die Umkehroperation zu {@link #getIntegerValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Dezimalzahl enthält.
-	 *
-	 * @param source Dezimalzahl.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public IAMArray getIntegerArray(final FEMInteger source) throws NullPointerException {
-		return this.getIntegerArrayImpl(source.value());
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Dezimalzahl und gibt diese zurück. Die Zahlenfolge muss dazu aus den folgenden drei Zahlen
+	 * bestehen: (1) Typkennung sowie (2) MSB-{@code int} und (3) LSB-{@code int} der {@link FEMInteger#value() internen Darstellung} der Dezimalzahl. */
+	public final FEMInteger getIntegerValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if ((src.length() != 3) || (src.get(0) != FEMCodec.TYPE_INTEGER)) throw new IllegalArgumentException();
+		return new FEMInteger(Integers.toLong(src.get(1), src.get(2)));
 	}
 
-	IAMArray getIntegerArrayImpl(final long value) {
-		return IAMArray.from(Integers.toIntL(value), Integers.toIntH(value));
+	/** Diese Methode ergänzt die gegebene Dezimalzahl und gibt die Referenz darauf zurück. */
+	public final int putIntegerValue(final FEMInteger src) throws NullPointerException, IllegalStateException {
+		return this.putData(this.getIntegerData(src));
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Dezimalzahl und gibt diese zurück. Die Zahlenfolge muss dazu aus zwei Zahlen bestehen, von denen
-	 * die erste den MSB-{@code int} und die zweiten den LSB-{@code int} der {@link FEMInteger#value() internen Darstellung} der Dezimalzahl enthält.
-	 *
-	 * @param source Zahlenfolge.
-	 * @return Dezimalzahl.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMInteger getIntegerValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return new FEMInteger(this.getIntegerValueImpl(source));
+	/** Diese Methode ist die Umkehroperation zu {@link #getDecimalValue(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Dezimalbruch enthält. */
+	public final IAMArray getDecimalData(final FEMDecimal src) throws NullPointerException {
+		final long val = Double.doubleToLongBits(src.value());
+		return IAMArray.from(FEMCodec.TYPE_DECIMAL, Integers.toIntH(val), Integers.toIntL(val));
 	}
 
-	long getIntegerValueImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		if (source.length() != 2) throw new IllegalArgumentException();
-		return Integers.toLong(source.get(1), source.get(0));
+	/** Diese Methode gibt den Dezimalbruch zur gegebenen Referenz zurück. */
+	public final FEMDecimal getDecimalValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMDecimal.class);
 	}
 
-	/** Diese Methode nimmt den gegebenen Dezimalbruch in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
-	 *
-	 * @param source Dezimalbruch.
-	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@link #getDatetimeArray(FEMDatetime)} diese auslöst. */
-	public int putDecimalValue(final FEMDecimal source) throws NullPointerException {
-		return this.___toRef(FEMCodec.TYPE_DECIMAL_VALUE, this.decimalValuePool.put(source));
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Dezimalbruch und gibt diesen zurück. Die Zahlenfolge muss dazu aus den folgenden drei Zahlen
+	 * bestehen: (1) Typkennung sowie (2) MSB-{@code int} und (3) LSB-{@code int} der {@link FEMDecimal#value() internen Darstellung} des Dezimalbruchs. */
+	public final FEMDecimal getDecimalValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if ((src.length() != 3) || (src.get(0) != FEMCodec.TYPE_DECIMAL)) throw new IllegalArgumentException();
+		return new FEMDecimal(Double.longBitsToDouble(Integers.toLong(src.get(1), src.get(2))));
 	}
 
-	/** Diese Methode gibt den Dezimalbruch zurück, der unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #decimalValuePool}.
-	 * @return Dezimalbruch.
-	 * @throws IllegalArgumentException Wenn {@link #getDecimalValue(IAMArray)} diese auslöst. */
-	protected FEMDecimal getDecimalValue(final int index) throws IllegalArgumentException {
-		return this.decimalValuePool.get(index);
+	/** Diese Methode ergänzt den gegebenen Dezimalbruch und gibt die Referenz darauf zurück. */
+	public final int putDecimalValue(final FEMDecimal src) throws NullPointerException, IllegalStateException {
+		return this.putData(this.getDecimalData(src));
 	}
 
-	/** Diese Methode ist die Umkehroperation zu {@link #getDecimalValue(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Dezimalbruch enthält.
-	 *
-	 * @param source Dezimalbruch.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public IAMArray getDecimalArray(final FEMDecimal source) throws NullPointerException {
-		return this.getIntegerArrayImpl(Double.doubleToLongBits(source.value()));
+	/** Diese Methode ist die Umkehroperation zu {@link #getDurationValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Zeitspanne enthält. */
+	public final IAMArray getDurationData(final FEMDuration src) throws NullPointerException {
+		final long val = src.value();
+		return IAMArray.from(FEMCodec.TYPE_DURATION, Integers.toIntH(val), Integers.toIntL(val));
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Dezimalbruch und gibt diesen zurück. Die Zahlenfolge muss dazu aus zwei Zahlen bestehen, von
-	 * denen die erste den MSB-{@code int} und die zweiten den LSB-{@code int} der {@link FEMDecimal#value() internen Darstellung} des Dezimalbruchs enthält.
-	 *
-	 * @param source Zahlenfolge.
-	 * @return Dezimalbruch.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMDecimal getDecimalValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return new FEMDecimal(Double.longBitsToDouble(this.getIntegerValueImpl(source)));
+	/** Diese Methode gibt die Zeitspanne zur gegebenen Referenz zurück. */
+	public final FEMDuration getDurationValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMDuration.class);
 	}
 
-	/** Diese Methode nimmt die gegebene Zeitspanne in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
-	 *
-	 * @param source Zeitspanne.
-	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@link #getDurationArray(FEMDuration)} diese auslöst. */
-	public int putDurationValue(final FEMDuration source) throws NullPointerException {
-		return this.___toRef(FEMCodec.TYPE_DURATION_VALUE, this.durationValuePool.put(source));
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeitspanne und gibt diese zurück. Die Zahlenfolge muss dazu aus folgenden drei Zahlen bestehen:
+	 * (1) Typkennung sowie (2) MSB-{@code int} und (3) LSB-{@code int} der {@link FEMDuration#value() internen Darstellung} der Zeitspanne. */
+	public final FEMDuration getDurationValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if ((src.length() != 3) || (src.get(0) != FEMCodec.TYPE_DURATION)) throw new IllegalArgumentException();
+		return new FEMDuration(Integers.toLong(src.get(1), src.get(2)));
 	}
 
-	/** Diese Methode gibt die Zeitspanne zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #datetimeValuePool}.
-	 * @return Zeitspanne.
-	 * @throws IllegalArgumentException Wenn {@link #getDurationValue(IAMArray)} diese auslöst. */
-	protected FEMDuration getDurationValue(final int index) throws IllegalArgumentException {
-		return this.durationValuePool.get(index);
+	/** Diese Methode ergänzt die gegebene Zeitspanne und gibt die Referenz darauf zurück. */
+	public final int putDurationValue(final FEMDuration src) throws NullPointerException, IllegalStateException {
+		return this.putData(this.getDurationData(src));
 	}
 
-	/** Diese Methode ist die Umkehroperation zu {@link #getDurationValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Zeitspanne enthält.
-	 *
-	 * @param source Zeitspanne.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public IAMArray getDurationArray(final FEMDuration source) throws NullPointerException {
-		return this.getIntegerArrayImpl(source.value());
+	/** Diese Methode ist die Umkehroperation zu {@link #getDatetimeValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Zeitangabe enthält. */
+	public final IAMArray getDatetimeData(final FEMDatetime src) throws NullPointerException {
+		final long val = src.value();
+		return IAMArray.from(FEMCodec.TYPE_DATETIME, Integers.toIntH(val), Integers.toIntL(val));
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeitspanne und gibt diese zurück. Die Zahlenfolge muss dazu aus zwei Zahlen bestehen, von denen
-	 * die erste den MSB-{@code int} und die zweiten den LSB-{@code int} der {@link FEMDuration#value() internen Darstellung} der Zeitspanne enthält.
-	 *
-	 * @param source Zahlenfolge.
-	 * @return Zeitspanne.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMDuration getDurationValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return new FEMDuration(this.getIntegerValueImpl(source));
+	/** Diese Methode gibt die Zeitangabe zur gegebenen Referenz zurück. */
+	public final FEMDatetime getDatetimeValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMDatetime.class);
 	}
 
-	/** Diese Methode nimmt die gegebene Zeitangabe in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
-	 *
-	 * @param source Zeitangabe.
-	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@link #getDatetimeArray(FEMDatetime)} diese auslöst. */
-	public int putDatetimeValue(final FEMDatetime source) throws NullPointerException {
-		return this.___toRef(FEMCodec.TYPE_DATETIME_VALUE, this.datetimeValuePool.put(source));
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeitangabe und gibt diese zurück. Die Zahlenfolge muss dazu aus folgenden drei Zahlen bestehen:
+	 * (1) Typkennung sowie (2) MSB-{@code int} und (3) LSB-{@code int} der {@link FEMDatetime#value() internen Darstellung} der Zeitangabe. */
+	public final FEMDatetime getDatetimeValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if ((src.length() != 3) || (src.get(0) != FEMCodec.TYPE_DATETIME)) throw new IllegalArgumentException();
+		return new FEMDatetime(Integers.toLong(src.get(1), src.get(2)));
 	}
 
-	/** Diese Methode gibt die Zeitangabe zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #datetimeValuePool}.
-	 * @return Zeitangabe.
-	 * @throws IllegalArgumentException Wenn {@link #getDatetimeValue(IAMArray)} diese auslöst. */
-	protected FEMDatetime getDatetimeValue(final int index) throws IllegalArgumentException {
-		return this.datetimeValuePool.get(index);
+	/** Diese Methode ergänzt die gegebene Zeitangabe und gibt die Referenz darauf zurück. */
+	public final int putDatetimeValue(final FEMDatetime src) throws NullPointerException, IllegalStateException {
+		return this.putData(this.getDatetimeData(src));
 	}
 
-	/** Diese Methode ist die Umkehroperation zu {@link #getDatetimeValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Zeitangabe enthält.
-	 *
-	 * @param source Zeitangabe.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public IAMArray getDatetimeArray(final FEMDatetime source) throws NullPointerException {
-		return this.getIntegerArrayImpl(source.value());
+	/** Diese Methode ist die Umkehroperation zu {@link #getBooleanValue(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Wahrheitswert enthält. */
+	public final IAMArray getBooleanData(final FEMBoolean src) throws NullPointerException {
+		return IAMArray.from(src.value() ? FEMCodec.TYPE_TRUE : FEMCodec.TYPE_FALSE);
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeitangabe und gibt diese zurück. Die Zahlenfolge muss dazu aus zwei Zahlen bestehen, von denen
-	 * die erste den MSB-{@code int} und die zweiten den LSB-{@code int} der {@link FEMDatetime#value() internen Darstellung} der Zeitangabe enthält.
-	 *
-	 * @return Zeitangabe zur Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMDatetime getDatetimeValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return new FEMDatetime(this.getIntegerValueImpl(source));
+	/** Diese Methode gibt den Wahrheitswert zur gegebenen Referenz zurück. */
+	public final FEMBoolean getBooleanValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMBoolean.class);
 	}
 
-	/** Diese Methode gibt die Referenz auf den gegebenen Wahrheitswert zurück. */
-	public int putBooleanValue(final FEMBoolean source) throws NullPointerException {
-		return source.value() ? this.putTrueValue() : this.putFalseValue();
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeitangabe und gibt diese zurück. Die Zahlenfolge muss dazu aus der Typkennung bestehen. */
+	public final FEMBoolean getBooleanValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if (src.length() != 1) throw new IllegalArgumentException();
+		final int type = src.get(0);
+		if (type == FEMCodec.TYPE_TRUE) return FEMBoolean.TRUE;
+		if (type == FEMCodec.TYPE_FALSE) return FEMBoolean.FALSE;
+		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode nimmt den gegebenen Funktionszeiger in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
-	 *
-	 * @param source Funktionszeiger.
-	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@link #getHandlerArray(FEMHandler)} diese auslöst. */
-	public int putHandlerValue(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
-		return this.___toRef(FEMCodec.TYPE_HANDLER_VALUE, this.handlerValuePool.put(source));
+	/** Diese Methode ergänzt den gegebenen Wahrheitswert und gibt die Referenz darauf zurück. */
+	public final int putBooleanValue(final FEMBoolean src) throws NullPointerException, IllegalStateException {
+		return this.putData(this.getBooleanData(src));
 	}
 
-	/** Diese Methode gibt den Funktionszeiger zurück, der unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #handlerValuePool}.
-	 * @return Funktionszeiger.
-	 * @throws IllegalArgumentException Wenn {@link #getHandlerValue(IAMArray)} diese auslöst. */
-	protected FEMHandler getHandlerValue(final int index) throws IllegalArgumentException {
-		return this.handlerValuePool.get(index);
+	/** Diese Methode ist die Umkehroperation zu {@link #getHandlerValue(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionszeiger enthält. */
+	public final IAMArray getHandlerData(final FEMHandler src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		return IAMArray.from(FEMCodec.TYPE_HANDLER, this.putFunction(src.value()));
 	}
 
-	/** Diese Methode ist die Umkehroperation zu {@link #getHandlerValue(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionszeiger enthält.
-	 *
-	 * @param source Funktionszeiger.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
-	public IAMArray getHandlerArray(final FEMHandler source) throws NullPointerException, IllegalArgumentException {
-		return IAMArray.from(this.putFunction(source.value()));
+	/** Diese Methode gibt den Funktionszeiger zur gegebenen Referenz zurück. */
+	public final FEMHandler getHandlerValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMHandler.class);
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionszeiger und gibt diese zurück. Die Zahlenfolge muss dazu aus einer
-	 * {@link #___toRef(int, int) Funktionsreferenz} bestehen, welche über {@link #getFunction(int)} interpretiert wird.
-	 *
-	 * @param source Zahlenfolge.
-	 * @return Funktionszeiger.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMHandler getHandlerValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		if (source.length() != 1) throw new IllegalArgumentException();
-		return new FEMHandler(this.getFunction(source.get(0)));
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionszeiger und gibt diese zurück. Die Zahlenfolge muss dazu aus der Typkennung sowie der
+	 * Referenz auf die Zielfunktion bestehen. */
+	public final FEMHandler getHandlerValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if ((src.length() != 2) || (src.get(0) != FEMCodec.TYPE_HANDLER)) throw new IllegalArgumentException();
+		return new FEMHandler(this.getFunction(src.get(1)));
 	}
 
-	/** Diese Methode nimmt die gegebene Objektreferenz in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Referenz} darauf zurück.
-	 *
-	 * @param source Objektreferenz.
-	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@link #getObjectArray(FEMObject)} diese auslöst. */
-	public int putObjectValue(final FEMObject source) throws NullPointerException {
-		return this.___toRef(FEMCodec.TYPE_OBJECT_VALUE, this.objectValuePool.put(source));
+	/** Diese Methode ergänzt den gegebenen Funktionszeiger und gibt die Referenz darauf zurück. */
+	public final int putHandlerValue(final FEMHandler src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		return this.putData(this.getHandlerData(src));
 	}
 
-	/** Diese Methode gibt die Objektreferenz zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
-	 *
-	 * @param index Position in {@link #objectValuePool}.
-	 * @return Objektreferenz.
-	 * @throws IllegalArgumentException Wenn {@link #getObjectValue(IAMArray)} diese auslöst. */
-	protected FEMObject getObjectValue(final int index) throws IllegalArgumentException {
-		return this.objectValuePool.get(index);
+	/** Diese Methode ist die Umkehroperation zu {@link #getObjectValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Objektreferenz enthält. */
+	public final IAMArray getObjectData(final FEMObject src) throws NullPointerException {
+		final long val = src.value();
+		return IAMArray.from(FEMCodec.TYPE_OBJECT, Integers.toIntH(val), Integers.toIntL(val));
 	}
 
-	/** Diese Methode ist die Umkehroperation zu {@link #getObjectValue(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Objektreferenz enthält.
-	 *
-	 * @param source Objektreferenz.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public IAMArray getObjectArray(final FEMObject source) throws NullPointerException {
-		return this.getIntegerArrayImpl(source.value());
+	/** Diese Methode gibt die Objektreferenz zur gegebenen Referenz zurück. */
+	public final FEMObject getObjectValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMObject.class);
 	}
 
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Objektreferenz und gibt diesen zurück. Die Zahlenfolge muss dazu aus zwei Zahlen bestehen, von
 	 * denen die erste den MSB-{@code int} und die zweiten den LSB-{@code int} der {@link FEMObject#value() internen Darstellung} der Objektreferenz enthält.
 	 *
-	 * @param source Zahlenfolge.
+	 * @param src Zahlenfolge.
 	 * @return Objektreferenz.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMObject getObjectValue(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return new FEMObject(this.getIntegerValueImpl(source));
+	public FEMObject getObjectValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if ((src.length() != 3) || (src.get(0) != FEMCodec.TYPE_OBJECT)) throw new IllegalArgumentException();
+		return new FEMObject(Integers.toLong(src.get(1), src.get(2)));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toProxyFunction(IAMArray) this.toProxyFunction(this.getData(ref))}.
+	/** Diese Methode ergänzt den gegebenen Objektreferenz und gibt die Referenz darauf zurück. */
+	public final int putObjectValue(final FEMObject src) throws NullPointerException, IllegalStateException {
+		return this.putData(this.getObjectData(src));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #getProxyFunction(IAMArray) this.toProxyFunction(this.getData(ref))}.
 	 *
 	 * @param ref Referenz.
 	 * @return Funktionsplatzhalter. */
 	public final FEMProxy getProxyFunction(final int ref) throws IllegalArgumentException {
-		return this.toProxyFunction(this.getData(ref));
+		return this.getProxyFunction(this.getData(ref));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toProxyArray(FEMProxy) this.putData(this.toProxyArray(source))}.
+	/** Diese Methode ist eine Abkürzung für {@link #getProxyData(FEMProxy) this.putData(this.toProxyArray(src))}.
 	 *
 	 * @param src Funktionsaufruf.
 	 * @return Referenz. */
 	public final int putProxyFunction(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
-		return this.putData(this.toProxyArray(src));
+		return this.putImpl(this.getProxyData(src));
 	}
 
-	/** Diese Methode ist die Umkehroperation zu {@link #toProxyFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsplatzhalter
-	 * enthält.
-	 *
-	 * @param source Funktionsplatzhalter.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
-	public IAMArray toProxyArray(final FEMProxy source) throws NullPointerException, IllegalArgumentException {
-		return IAMArray.from(FEMCodec.TYPE_PROXY_FUNCTION, this.putValue(source.id()), this.putStringValue(source.name()), this.putFunction(source.get()));
+	/** Diese Methode ist die Umkehroperation zu {@link #getProxyFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsplatzhalter
+	 * enthält. */
+	public IAMArray getProxyData(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
+		return IAMArray.from(FEMCodec.TYPE_PROXY_FUNCTION, this.putValue(src.id()), this.putStringValue(src.name()), this.putFunction(src.get()));
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionsplatzhalter und gibt diese zurück. Die Zahlenfolge muss dazu aus vier Zahlen bestehen:
-	 * der Typkennung, der über {@link #putValue(FEMValue) Referenz} seiner {@link FEMProxy#id() Kennung}, der {@link #putValue(FEMValue) Referenz} seines
-	 * {@link FEMProxy#name() Namnes} sowie der {@link #putFunction(FEMFunction) Referenz} seines {@link FEMProxy#get() Ziels}.
-	 *
-	 * @param source Zahlenfolge.
-	 * @return Funktionsplatzhalter.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public FEMProxy toProxyFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		if ((source.length() != 4) || (source.get(0) != FEMCodec.TYPE_PROXY_FUNCTION)) throw new IllegalArgumentException();
-		return new FEMProxy(this.getValue(source.get(1)), this.getStringValue(source.get(2)), this.getFunction(source.get(3)));
+	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionsplatzhalter und gibt diese zurück. Die Zahlenfolge muss dazu aus den folgenden vier
+	 * Zahlen bestehen: (1) Typkennung, (2) {@link #putValue(FEMValue) Referenz} der {@link FEMProxy#id() Kennung}, (3) {@link #putValue(FEMValue) Referenz} des
+	 * {@link FEMProxy#name() Namnes} und (4) {@link #putFunction(FEMFunction) Referenz} des {@link FEMProxy#get() Ziels}. */
+	public FEMProxy getProxyFunction(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if ((src.length() != 4) || (src.get(0) != FEMCodec.TYPE_PROXY_FUNCTION)) throw new IllegalArgumentException();
+		return new FEMProxy(this.getValue(src.get(1)), this.getStringValue(src.get(2)), this.getFunction(src.get(3)));
 	}
 
-	/** Diese Methode gibt die {@link #___toRef(int, int)} Funktionsreferenz} auf die gegebene Parameterfunktion zurück.
+	/** Diese Methode gibt die {@link #getRefImpl(int, int)} Funktionsreferenz} auf die gegebene Parameterfunktion zurück.
 	 *
-	 * @param source Parameterfunktion.
+	 * @param src Parameterfunktion.
 	 * @return Funktionsreferenz.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public int putParamFunction(final FEMParam source) throws NullPointerException {
-		return this.___toRef(FEMCodec.TYPE_PARAM_FUNCTION, source.index());
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist. */
+	public int putParamFunction(final FEMParam src) throws NullPointerException, IllegalStateException {
+		return this.getRefImpl(FEMCodec.TYPE_PARAM_FUNCTION, src.index());
 	}
 
-	/** Diese Methode nimmt die gegebene Funktionkette in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Funktionsreferenz} darauf zurück.
+	/** Diese Methode nimmt die gegebene Funktionkette in die Verwaltung auf und gibt die {@link #getRefImpl(int, int)} Funktionsreferenz} darauf zurück.
 	 *
-	 * @param source Funktionkette.
+	 * @param src Funktionkette.
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@link #getConcatArray(ConcatFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getConcatArray(ConcatFunction)} diese auslöst. */
-	public int putConcatFunction(final ConcatFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.___toRef(FEMCodec.TYPE_CONCAT_FUNCTION, this.concatFunctionPool.put(source));
+	public int putConcatFunction(final ConcatFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		return this.getRefImpl(FEMCodec.TYPE_CONCAT_FUNCTION, this.concatFunctionPool.put(src));
 	}
 
 	/** Diese Methode gibt die Funktionkette zurück, der unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
@@ -1030,40 +934,41 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param index Position in {@link #concatFunctionPool}.
 	 * @return Funktionkette.
 	 * @throws IllegalArgumentException Wenn {@link #getConcatFunction(IAMArray)} diese auslöst. */
-	protected ConcatFunction getConcatFunction(final int index) throws IllegalArgumentException {
-		return this.concatFunctionPool.get(index);
+	/** Diese Methode gibt die Wertliste zur gegebenen Referenz zurück. */
+	public final ConcatFunction getConcatFunction(final int index) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMDatetime.class);
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #getConcatFunction(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Funktionkette enthält.
 	 *
-	 * @param source Funktionkette.
+	 * @param src Funktionkette.
 	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
-	public IAMArray getConcatArray(final ConcatFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.getCompositeArrayImpl(source.function(), source.params());
+	public IAMArray getConcatArray(final ConcatFunction src) throws NullPointerException, IllegalArgumentException {
+		return this.getCompositeArrayImpl(src.function(), src.params());
 	}
 
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionkette und gibt diese zurück. Die Zahlenfolge muss dazu aus den über
-	 * {@link #putFunction(FEMFunction)} ermittelten {@link #___toRef(int, int) Funktionsreferenzen} der {@link ConcatFunction#function() verketteten Funktion}
+	 * {@link #putFunction(FEMFunction)} ermittelten {@link #getRefImpl(int, int) Funktionsreferenzen} der {@link ConcatFunction#function() verketteten Funktion}
 	 * und iher {@link ConcatFunction#params() Parameterfunktionen} bestehen.
 	 *
-	 * @param source Zahlenfolge.
+	 * @param src Zahlenfolge.
 	 * @return Funktionkette.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public ConcatFunction getConcatFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return new ConcatFunction(this.getCompositeFunctionImpl(source), this.getCompositeParamsImpl(source));
+	public ConcatFunction getConcatFunction(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		return new ConcatFunction(this.getCompositeFunctionImpl(src), this.getCompositeParamsImpl(src));
 	}
 
-	/** Diese Methode nimmt die gegebene Funktionsbindung in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Funktionsreferenz} darauf zurück.
+	/** Diese Methode nimmt die gegebene Funktionsbindung in die Verwaltung auf und gibt die {@link #getRefImpl(int, int)} Funktionsreferenz} darauf zurück.
 	 *
-	 * @param source Funktionsbindung.
+	 * @param src Funktionsbindung.
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@link #getClosureArray(ClosureFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getClosureArray(ClosureFunction)} diese auslöst. */
-	public int putClosureFunction(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.___toRef(FEMCodec.TYPE_CLOSURE_FUNCTION, this.closureFunctionPool.put(source));
+	public int putClosureFunction(final ClosureFunction src) throws NullPointerException, IllegalArgumentException {
+		return this.getRefImpl(FEMCodec.TYPE_CLOSURE_FUNCTION, this.closureFunctionPool.put(src));
 	}
 
 	/** Diese Methode gibt die Funktionsbindung zurück, die unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
@@ -1071,40 +976,41 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param index Position in {@link #closureFunctionPool}.
 	 * @return Funktionsbindung.
 	 * @throws IllegalArgumentException Wenn {@link #getClosureFunction(IAMArray)} diese auslöst. */
-	protected ClosureFunction getClosureFunction(final int index) throws IllegalArgumentException {
-		return this.closureFunctionPool.get(index);
+	/** Diese Methode gibt die Wertliste zur gegebenen Referenz zurück. */
+	public final ClosureFunction getClosureFunction(final int index) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMDatetime.class);
 	}
 
 	/** Diese Methode ist die Umkehroperation zu {@link #getClosureFunction(IAMArray)} und liefert eine Zahlenfolge, welche die gegebene Funktionsbindung enthält.
 	 *
-	 * @param source Funktionsbindung.
+	 * @param src Funktionsbindung.
 	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
-	public IAMArray getClosureArray(final ClosureFunction source) throws NullPointerException, IllegalArgumentException {
-		return IAMArray.from(this.putFunction(source.function()));
+	public IAMArray getClosureArray(final ClosureFunction src) throws NullPointerException, IllegalArgumentException {
+		return IAMArray.from(this.putFunction(src.function()));
 	}
 
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionsbindungen und gibt diese zurück. Die Zahlenfolge muss dazu aus einer
-	 * {@link #___toRef(int, int) Funktionsreferenz} bestehen, welche über {@link #getFunction(int)} interpretiert wird.
+	 * {@link #getRefImpl(int, int) Funktionsreferenz} bestehen, welche über {@link #getFunction(int)} interpretiert wird.
 	 *
-	 * @param source Zahlenfolge.
+	 * @param src Zahlenfolge.
 	 * @return Funktionsbindungen.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public ClosureFunction getClosureFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		if (source.length() != 1) throw new IllegalArgumentException();
-		return new ClosureFunction(this.getFunction(source.get(0)));
+	public ClosureFunction getClosureFunction(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if (src.length() != 1) throw new IllegalArgumentException();
+		return new ClosureFunction(this.getFunction(src.get(0)));
 	}
 
-	/** Diese Methode nimmt den gegebenen Funktionsaufruf in die Verwaltung auf und gibt die {@link #___toRef(int, int)} Funktionsreferenz} darauf zurück.
+	/** Diese Methode nimmt den gegebenen Funktionsaufruf in die Verwaltung auf und gibt die {@link #getRefImpl(int, int)} Funktionsreferenz} darauf zurück.
 	 *
-	 * @param source Funktionsaufruf.
+	 * @param src Funktionsaufruf.
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@link #getCompositeArray(CompositeFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getCompositeArray(CompositeFunction)} diese auslöst. */
-	public int putCompositeFunction(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.___toRef(FEMCodec.TYPE_COMPOSITE_FUNCTION, this.compositeFunctionPool.put(source));
+	public int putCompositeFunction(final CompositeFunction src) throws NullPointerException, IllegalArgumentException {
+		return this.getRefImpl(FEMCodec.TYPE_COMPOSITE_FUNCTION, this.compositeFunctionPool.put(src));
 	}
 
 	/** Diese Methode gibt den Funktionsaufruf zurück, der unter der gegebenen {@link #toIndex(int) Position} verwaltet wird.
@@ -1112,8 +1018,9 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param index Position in {@link #compositeFunctionPool}.
 	 * @return Funktionsaufruf.
 	 * @throws IllegalArgumentException Wenn {@link #getCompositeFunction(IAMArray)} diese auslöst. */
-	protected CompositeFunction getCompositeFunction(final int index) throws IllegalArgumentException {
-		return this.compositeFunctionPool.get(index);
+	/** Diese Methode gibt die Wertliste zur gegebenen Referenz zurück. */
+	public final CompositeFunction getCompositeFunction(final int index) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMDatetime.class);
 	}
 
 	IAMArray getCompositeArrayImpl(final FEMFunction function, final FEMFunction... params) throws NullPointerException, IllegalArgumentException {
@@ -1129,37 +1036,37 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	/** Diese Methode ist die Umkehroperation zu {@link #getCompositeFunction(IAMArray)} und liefert eine Zahlenfolge, welche den gegebenen Funktionsaufruf
 	 * enthält.
 	 *
-	 * @param source Funktionsaufruf.
+	 * @param src Funktionsaufruf.
 	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #putFunction(FEMFunction)} diese auslöst. */
-	public IAMArray getCompositeArray(final CompositeFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.getCompositeArrayImpl(source.function(), source.params());
+	public IAMArray getCompositeArray(final CompositeFunction src) throws NullPointerException, IllegalArgumentException {
+		return this.getCompositeArrayImpl(src.function(), src.params());
 	}
 
-	FEMFunction getCompositeFunctionImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		if (source.length() == 0) throw new IllegalArgumentException();
-		return this.getFunction(source.get(0));
+	FEMFunction getCompositeFunctionImpl(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		if (src.length() == 0) throw new IllegalArgumentException();
+		return this.getFunction(src.get(0));
 	}
 
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionsaufruf und gibt diese zurück. Die Zahlenfolge muss dazu aus den über
-	 * {@link #putFunction(FEMFunction)} ermittelten {@link #___toRef(int, int) Funktionsreferenzen} der {@link CompositeFunction#function() aufgerufenen
+	 * {@link #putFunction(FEMFunction)} ermittelten {@link #getRefImpl(int, int) Funktionsreferenzen} der {@link CompositeFunction#function() aufgerufenen
 	 * Funktion} und iher {@link CompositeFunction#params() Parameterfunktionen} bestehen.
 	 *
-	 * @param source Zahlenfolge.
+	 * @param src Zahlenfolge.
 	 * @return Funktionsaufruf.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public CompositeFunction getCompositeFunction(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		return new CompositeFunction(this.getCompositeFunctionImpl(source), this.getCompositeParamsImpl(source));
+	public CompositeFunction getCompositeFunction(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		return new CompositeFunction(this.getCompositeFunctionImpl(src), this.getCompositeParamsImpl(src));
 	}
 
-	FEMFunction[] getCompositeParamsImpl(final IAMArray source) throws NullPointerException, IllegalArgumentException {
-		final int length = source.length() - 1;
+	FEMFunction[] getCompositeParamsImpl(final IAMArray src) throws NullPointerException, IllegalArgumentException {
+		final int length = src.length() - 1;
 		if (length < 0) throw new IllegalArgumentException();
 		final FEMFunction[] result = new FEMFunction[length];
 		for (int i = 0; i < length; i++) {
-			result[i] = this.getFunction(source.get(i + 1));
+			result[i] = this.getFunction(src.get(i + 1));
 		}
 		return result;
 	}
