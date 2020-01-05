@@ -63,14 +63,14 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	 * @param hasher Methoden zum Abgleich der Schlüssel.
 	 * @return An {@link Hasher} gebundene {@link HashMap}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
-	public static <GKey, GValue> AbstractHashData<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
+	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
 		return new HasherHashMap<>(hasher);
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
 
-	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
