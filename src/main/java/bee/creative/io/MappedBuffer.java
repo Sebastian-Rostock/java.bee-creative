@@ -132,6 +132,27 @@ public class MappedBuffer {
 		return this.file;
 	}
 
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #order() Bytereihenfolge} der nativen entspricht.
+	 *
+	 * @return {@code true} bei nativer Bytereihenfolge. */
+	public synchronized boolean isNE() {
+		return this.isNaive;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #order() Bytereihenfolge} {@link ByteOrder#LITTLE_ENDIAN} ist.
+	 *
+	 * @return {@code true} bei Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN}. */
+	public synchronized boolean isLE() {
+		return this.orderImpl() == ByteOrder.LITTLE_ENDIAN;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #order() Bytereihenfolge} {@link ByteOrder#BIG_ENDIAN} ist.
+	 *
+	 * @return {@code true} bei Bytereihenfolge {@link ByteOrder#BIG_ENDIAN}. */
+	public synchronized boolean isBE() {
+		return this.orderImpl() == ByteOrder.BIG_ENDIAN;
+	}
+
 	/** Diese Methode gibt gibt nur dann {@code true} zurück, wenn dieser Puffer die {@link #file() Datei} nur für den Lesezugriff angebunden hat.
 	 *
 	 * @return Zugriffsmodus. */
