@@ -4,7 +4,8 @@ import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse erweitert eine {@link HashMap} um einen Streuwertpuffer, analog zu {@link java.util.HashMap}.
+/** Diese Klasse erweitert eine {@link HashMap} um einen Streuwertpuffer, analog zu {@link java.util.HashMap}. Der Speicerverbrauch liegt bei ca. 56 % (20 Byte
+ * je {@link #capacity() reservierten} Eintrag) von dem, den eine {@link java.util.HashMap} benötigen würde.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.

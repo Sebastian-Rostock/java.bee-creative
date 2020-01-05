@@ -11,7 +11,8 @@ import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüssel- und Wertobjekten. Das {@link #get(Object)
  * Finden} von Einträgen benötigt ca. 75 % der Rechenzeit, die eine {@link java.util.HashMap} benötigen würde. {@link #put(Object, Object) Einfügen} und
- * {@link #remove(Object) Entfernen} von Einträge liegen dazu bei ca. 55 % bzw. 95 % der Rechenzeit.
+ * {@link #remove(Object) Entfernen} von Einträge liegen dazu bei ca. 55 % bzw. 95 % der Rechenzeit. Der Speicerverbrauch liegt bei ca. 44 % (16 Byte je
+ * {@link #capacity() reservierten} Eintrag).
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
