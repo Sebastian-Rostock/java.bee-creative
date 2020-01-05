@@ -9,11 +9,9 @@ import java.util.Set;
  * @param <GData> Typ des Inhalts. */
 public abstract class AbstractProxySet<GItem, GData extends Set<GItem>> extends AbstractProxyCollection<GItem, GData> implements Set<GItem> {
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GData getData(boolean readonly);
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract void setData(GData items);
 

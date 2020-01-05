@@ -28,7 +28,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		 * @return Besitzer. */
 		public abstract GOwner closeClassesData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected ClassData<GOwner> customThis() {
 			return this;
@@ -48,7 +47,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected PropertyData<GOwner> customThis() {
 			return this;
@@ -140,7 +138,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		return this.propertyData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -156,7 +153,6 @@ public abstract class BaseContextData<GThis> extends BaseBuilder<JAXBContext, GT
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.classData, this.propertyData);

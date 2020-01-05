@@ -31,25 +31,21 @@ public class HashMap3<GKey, GValue> extends HashMap<GKey, GValue> {
 		super(source);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final Object key) {
 		return System.identityHashCode(key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHashKey(final int entryIndex) {
 		return System.identityHashCode(this.keys[entryIndex]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
 		return this.keys[entryIndex] == key;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
 		return this.keys[entryIndex] == key;

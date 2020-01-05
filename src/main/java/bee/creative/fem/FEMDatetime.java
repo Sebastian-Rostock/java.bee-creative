@@ -620,7 +620,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMDatetime> type() {
 		return FEMDatetime.TYPE;
@@ -1350,13 +1349,11 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.valueH ^ this.valueL;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -1368,7 +1365,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return this.equals((FEMDatetime)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMDatetime that) {
 		return this.compare(that, 0);

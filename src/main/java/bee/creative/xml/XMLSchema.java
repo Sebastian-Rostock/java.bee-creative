@@ -7,7 +7,6 @@ import javax.xml.validation.Schema;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLSchema extends BaseSchemaData<XMLSchema> {
 
-	/** {@inheritDoc} */
 	@Override
 	protected final XMLSchema customThis() {
 		return this;

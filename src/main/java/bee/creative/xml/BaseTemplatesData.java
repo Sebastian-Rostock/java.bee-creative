@@ -27,7 +27,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		 * @return Besitzer. */
 		public abstract GOwner closeSourceData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final SourceData<GOwner> customThis() {
 			return this;
@@ -46,7 +45,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		 * @return Besitzer. */
 		public abstract GOwner closeFactoryData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FactoryData<GOwner> customThis() {
 			return this;
@@ -140,7 +138,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		return this.factoryData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -156,7 +153,6 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.scriptData, this.factoryData);

@@ -260,7 +260,6 @@ public class CSVWriter implements Closeable, Flushable {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 		synchronized (this.writer) {
@@ -268,7 +267,6 @@ public class CSVWriter implements Closeable, Flushable {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void flush() throws IOException {
 		synchronized (this.writer) {
@@ -276,7 +274,6 @@ public class CSVWriter implements Closeable, Flushable {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		synchronized (this.writer) {

@@ -6,7 +6,6 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Map;
 import bee.creative.fem.FEMBinary;
-import bee.creative.fem.FEMCodec;
 import bee.creative.fem.FEMString;
 import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMIndex;
@@ -431,11 +430,9 @@ public final class IAMCodec {
 				return new String(array.toBytes(), this.charset);
 			}
 
-		} 
+		}
 
-	 
-
-	 ;
+		;
 
 		static final Map<IAMArrayFormat, String> strings = Builders.MapBuilder.<IAMArrayFormat, String>forHashMap() //
 			.put(ARRAY, "ARRAY") //
@@ -496,7 +493,6 @@ public final class IAMCodec {
 		 * @throws IllegalArgumentException Wenn die Zahlenfolge ungültig ist. */
 		public abstract String format(final IAMArray source) throws NullPointerException, IllegalArgumentException;
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return IAMArrayFormat.strings.get(this);

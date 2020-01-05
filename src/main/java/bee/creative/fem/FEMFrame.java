@@ -360,13 +360,11 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	@Override
 	public abstract FEMValue get(final int index) throws IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public final Iterator<FEMValue> iterator() {
 		return Iterators.itemsIterator(this, 0, this.size());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return FEMDomain.NORMAL.formatFrame(this);

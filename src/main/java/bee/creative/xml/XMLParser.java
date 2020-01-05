@@ -26,7 +26,6 @@ public final class XMLParser {
 			return XMLParser.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final SourceData customThis() {
 			return this;
@@ -46,7 +45,6 @@ public final class XMLParser {
 			return XMLParser.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final BuilderData customThis() {
 			return this;
@@ -110,7 +108,6 @@ public final class XMLParser {
 		return this.builderData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.sourceData, this.builderData);

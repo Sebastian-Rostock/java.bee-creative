@@ -16,7 +16,6 @@ public class ObservableField<GItem, GValue> extends ObservableValue<GValue, Obse
 		/** Dieses Feld speichert das {@link UpdateFieldEvent}. */
 		public static final UpdateFieldEvent INSTANCE = new UpdateFieldEvent();
 
-		/** {@inheritDoc} */
 		@Override
 		protected void customFire(final Object sender, final UpdateFieldMessage message, final UpdateFieldObserver observer) {
 			observer.onUpdateField(message);
@@ -65,7 +64,6 @@ public class ObservableField<GItem, GValue> extends ObservableValue<GValue, Obse
 			this.setValue(this.newValue);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.sender, this.item, this.oldValue, this.newValue);
@@ -93,13 +91,11 @@ public class ObservableField<GItem, GValue> extends ObservableValue<GValue, Obse
 		this.field = Objects.notNull(field);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue get(final GItem input) {
 		return this.field.get(input);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final GItem input, final GValue newValue) {
 		GValue oldValue = this.field.get(input);
@@ -109,31 +105,26 @@ public class ObservableField<GItem, GValue> extends ObservableValue<GValue, Obse
 		this.fire(new UpdateFieldMessage(this, input, oldValue, newValue));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ObservableField.UpdateFieldObserver put(final UpdateFieldObserver listener) throws IllegalArgumentException {
 		return UpdateFieldEvent.INSTANCE.put(this, listener);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ObservableField.UpdateFieldObserver putWeak(final UpdateFieldObserver listener) throws IllegalArgumentException {
 		return UpdateFieldEvent.INSTANCE.putWeak(this, listener);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void pop(final UpdateFieldObserver listener) throws IllegalArgumentException {
 		UpdateFieldEvent.INSTANCE.pop(this, listener);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public UpdateFieldMessage fire(final UpdateFieldMessage event) throws NullPointerException {
 		return UpdateFieldEvent.INSTANCE.fire(this, event);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this.field.toString();

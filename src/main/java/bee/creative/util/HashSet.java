@@ -105,56 +105,47 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ("unchecked")
 	protected GItem customGetKey(final int entryIndex) {
 		return (GItem)this.items[entryIndex];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetKey(final int entryIndex, final GItem item, final int itemHash) {
 		this.items[entryIndex] = item;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final Object item) {
 		return Objects.hash(item);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHashKey(final int entryIndex) {
 		return Objects.hash(this.items[entryIndex]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object item) {
 		return Objects.equals(this.items[entryIndex], item);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object item, final int keyHash) {
 		return Objects.equals(this.items[entryIndex], item);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customClear() {
 		Arrays.fill(this.items, null);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customClearKey(final int entryIndex) {
 		this.items[entryIndex] = null;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected HashAllocator customAllocator(final int capacity) {
 		final Object[] items2;
@@ -178,13 +169,11 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		};
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long emu() {
 		return super.emu() + EMU.fromArray(this.items);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {

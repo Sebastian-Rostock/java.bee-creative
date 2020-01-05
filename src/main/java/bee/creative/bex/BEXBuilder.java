@@ -49,7 +49,6 @@ public class BEXBuilder {
 			return this.key;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return "@" + this.key();
@@ -85,7 +84,6 @@ public class BEXBuilder {
 			this.text = text;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return "@" + this.key + ":" + Objects.toString(this.text);
@@ -139,7 +137,6 @@ public class BEXBuilder {
 			return this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return "@" + this.key + ":" + Objects.toString(this.items);
@@ -169,7 +166,6 @@ public class BEXBuilder {
 			this.index = index;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int key() {
 			return this.group.offset + this.index;
@@ -202,13 +198,11 @@ public class BEXBuilder {
 			this.items.clear();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected void customReuse(final GData input, final GItem output) {
 			output.key--;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.toString(true, this.items);
@@ -221,19 +215,16 @@ public class BEXBuilder {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static class BEXTextPool extends BEXPool<String, BEXTextItem> {
 
-		/** {@inheritDoc} */
 		@Override
 		protected BEXTextItem customTarget(final String input) {
 			return this.put(new BEXTextItem(input));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXTextItem get(final String input) throws NullPointerException {
 			return super.get(input != null ? input : "");
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void clear() {
 			super.clear();
@@ -250,19 +241,16 @@ public class BEXBuilder {
 		/** Dieses Feld speichert die Anzahl der Zeilen der Tabelle, die durch die Datensätze in {@link #items} beschrieben wird. */
 		public int length;
 
-		/** {@inheritDoc} */
 		@Override
 		protected BEXGroupItem customTarget(final List<BEXItem> input) {
 			return this.put(new BEXGroupItem(input));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXGroupItem get(final List<BEXItem> input) throws NullPointerException {
 			return super.get(input != null ? input : Collections.<BEXItem>emptyList());
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void clear() {
 			super.clear();
@@ -889,7 +877,6 @@ public class BEXBuilder {
 			return header;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.attrTablePart.items.size(), this.chldTablePart.items.size());

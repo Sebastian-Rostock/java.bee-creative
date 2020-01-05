@@ -66,44 +66,38 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 		});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final byte[] array) {
 		return array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final byte[] array, final int index) {
 		return array[index];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEquals(final byte[] array1, final byte[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customCompare(final byte[] array1, final byte[] array2, final int index1, final int index2) {
 		return array1[index1] - array2[index2];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customPrint(final byte[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
 	/** Diese Methode gibt diese {@link ByteArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactByteArray(this).values()}.
-	 * 
+	 *
 	 * @return {@link Byte}-{@link List}. */
 	public List<Byte> asList() {
 		return new CompactByteArray(this).values();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

@@ -148,25 +148,21 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final GValue[] array) {
 		return array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final GValue[] array, final int index) {
 		return Objects.hash(array[index]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customPrint(final GValue[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEquals(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 		return Objects.equals(array1[index1], array2[index2]);
@@ -185,7 +181,6 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		return new CompactObjectArray<>(this).values();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ("unchecked")
 	public boolean equals(final Object object) {

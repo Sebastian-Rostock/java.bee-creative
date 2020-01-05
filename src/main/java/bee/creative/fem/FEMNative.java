@@ -61,19 +61,16 @@ public final class FEMNative extends FEMValue {
 		return this.data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<Object> type() {
 		return FEMNative.TYPE;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return Objects.hash(this.data);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -85,7 +82,6 @@ public final class FEMNative extends FEMValue {
 		return this.equals((FEMNative)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toString(this.data);

@@ -114,19 +114,16 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 	 * @return Elternknoten. */
 	public abstract BEXNode parent();
 
-	/** {@inheritDoc} */
 	@Override
 	public Iterator<BEXNode> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return this.key() ^ this.owner().hashCode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (this == object) return true;
@@ -135,7 +132,6 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 		return (this.key() == that.key()) && this.owner().equals(that.owner());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this);

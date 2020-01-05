@@ -193,19 +193,16 @@ public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 			return new Token(type, this.offset, this.length);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public final int compareTo(final Token value) {
 			return Comparators.compare(this.offset, value.offset);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public final int hashCode() {
 			return this.type ^ this.offset ^ this.length;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public final boolean equals(final Object object) {
 			if (object == this) return true;
@@ -214,7 +211,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 			return (this.offset == that.offset) && (this.length == that.length) && (this.type == that.type);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
 			return "'" + this.type + "'@" + this.offset + "/" + this.length;
@@ -410,25 +406,21 @@ public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 		return this.tokens[index];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long emu() {
 		return EMU.fromObject(this) + EMU.fromArray(this.tokens) + EMU.fromAll((Object[])this.tokens);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Iterator<Token> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return Objects.hashPush(this.source.hashCode(), Objects.hash((Object[])this.tokens));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
@@ -437,7 +429,6 @@ public final class FEMScript implements Items<Token>, Iterable<Token>, Emuable {
 		return this.source.equals(that.source) && Objects.equals(this.tokens, that.tokens);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return this.source;

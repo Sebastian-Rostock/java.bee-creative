@@ -7,23 +7,18 @@ import java.util.List;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface LongArray extends Array<long[], Long> {
 
-	/** {@inheritDoc} */
 	@Override
 	public int size();
 
-	/** {@inheritDoc} */
 	@Override
 	public void clear();
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean isEmpty();
 
-	/** {@inheritDoc} */
 	@Override
 	public List<Long> values();
 
-	/** {@inheritDoc} */
 	@Override
 	public LongArraySection section();
 
@@ -44,11 +39,9 @@ public interface LongArray extends Array<long[], Long> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
 	public void getAll(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, Array<? super long[], ? super Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, ArraySection<? super long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -69,11 +62,9 @@ public interface LongArray extends Array<long[], Long> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
 	public void setAll(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, Array<? extends long[], ? extends Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, ArraySection<? extends long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -90,11 +81,9 @@ public interface LongArray extends Array<long[], Long> {
 	 * @throws NullPointerException Wenn das gegebene {@code long}-Array {@code null} ist. */
 	public void addAll(long[] values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(Array<? extends long[], ? extends Long> values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(ArraySection<? extends long[]> values) throws NullPointerException;
 
@@ -115,27 +104,21 @@ public interface LongArray extends Array<long[], Long> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
 	public void addAll(int index, long[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, Array<? extends long[], ? extends Long> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, ArraySection<? extends long[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void insert(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public void remove(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public LongArray subArray(int fromIndex, int toIndex);
 
-	/** {@inheritDoc} */
 	@Override
 	public long[] toArray();
 

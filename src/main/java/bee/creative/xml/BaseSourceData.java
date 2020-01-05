@@ -228,7 +228,6 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 		return this.getSource();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.source, this.systemId);

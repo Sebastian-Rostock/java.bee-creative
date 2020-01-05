@@ -659,7 +659,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static final FEMArray EMPTY = new UniformArray(0, null);
 
 	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
-	 * 
+	 *
 	 * @param length Länge.
 	 * @param item Wert.
 	 * @return Wertliste.
@@ -885,7 +885,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMArray> type() {
 		return FEMArray.TYPE;
@@ -1075,14 +1074,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this.customGet(index);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FEMArray result(final boolean deep) {
 		if (!deep) return this;
 		return new CompactArray2(this.value());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		int result = this.hash;
@@ -1093,7 +1090,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this.hash = result != 0 ? result : 1;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -1105,7 +1101,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this.equals((FEMArray)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Iterator<FEMValue> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length);

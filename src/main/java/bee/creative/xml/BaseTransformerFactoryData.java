@@ -34,7 +34,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FeatureData<GOwner> customThis() {
 			return this;
@@ -54,7 +53,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		 * @return Besitzer. */
 		public abstract GOwner closeAttributeData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final AttributeData<GOwner> customThis() {
 			return this;
@@ -74,7 +72,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		 * @return Besitzer. */
 		public abstract GOwner closeListenerData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ListenerData<GOwner> customThis() {
 			return this;
@@ -94,7 +91,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		 * @return Besitzer. */
 		public abstract GOwner closeResolverData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ResolverData<GOwner> customThis() {
 			return this;
@@ -248,7 +244,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		return this.resolverData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -264,7 +259,6 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.featureData, this.attributeData, this.listenerData, this.resolverData);

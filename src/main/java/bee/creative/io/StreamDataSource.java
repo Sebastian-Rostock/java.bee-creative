@@ -20,13 +20,11 @@ public class StreamDataSource extends BaseDataSource {
 		this.data = data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object data() {
 		return this.data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void readFully(final byte[] b, int off, int len) throws IOException {
 		while (len != 0) {
@@ -37,7 +35,6 @@ public class StreamDataSource extends BaseDataSource {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int skipBytes(final int n) throws IOException {
 		return (int)this.data.skip(n);

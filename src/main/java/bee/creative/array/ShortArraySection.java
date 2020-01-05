@@ -66,44 +66,38 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 		});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final short[] array) {
 		return array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final short[] array, final int index) {
 		return array[index];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEquals(final short[] array1, final short[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customCompare(final short[] array1, final short[] array2, final int index1, final int index2) {
 		return array1[index1] - array2[index2];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customPrint(final short[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
 	/** Diese Methode gibt diese {@link ShortArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactShortArray(this).values()}.
-	 * 
+	 *
 	 * @return {@link Short}-{@link List}. */
 	public List<Short> asList() {
 		return new CompactShortArray(this).values();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

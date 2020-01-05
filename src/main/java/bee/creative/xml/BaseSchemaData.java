@@ -25,7 +25,6 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 		 * @return Besitzer. */
 		public abstract GOwner closeSourceData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final SourceData<GOwner> customThis() {
 			return this;
@@ -45,7 +44,6 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 		 * @return Besitzer. */
 		public abstract GOwner closeFactoryData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FactoryData<GOwner> customThis() {
 			return this;
@@ -139,7 +137,6 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 		return this.factoryData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -155,7 +152,6 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.sourceData, this.factoryData);

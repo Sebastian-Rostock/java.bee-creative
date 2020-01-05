@@ -19,13 +19,11 @@ public class OutputDataTarget extends BaseDataTarget {
 		this.data = data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object data() {
 		return this.data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] b, final int off, final int len) throws IOException {
 		this.data.write(b, off, len);

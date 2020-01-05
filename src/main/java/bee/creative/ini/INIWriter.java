@@ -150,7 +150,6 @@ public class INIWriter implements Closeable {
 		this.writer.write("\r\n");
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 		synchronized (this.writer) {
@@ -158,7 +157,6 @@ public class INIWriter implements Closeable {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		synchronized (this.writer) {

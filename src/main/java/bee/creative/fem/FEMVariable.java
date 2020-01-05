@@ -58,13 +58,11 @@ public final class FEMVariable extends FEMValue implements Property<FEMValue> {
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMVariable> type() {
 		return FEMVariable.TYPE;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.value);

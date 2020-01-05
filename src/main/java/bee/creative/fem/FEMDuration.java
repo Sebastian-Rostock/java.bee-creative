@@ -624,7 +624,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMDuration> type() {
 		return FEMDuration.TYPE;
@@ -876,13 +875,11 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return undefined;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.valueH ^ this.valueL;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -894,7 +891,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return this.equals((FEMDuration)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMDuration that) {
 		return this.compare(that, 0);

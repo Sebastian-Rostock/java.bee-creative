@@ -30,25 +30,21 @@ public final class HardPointer<GValue> implements Pointer<GValue> {
 		this.value = value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue get() {
 		return this.value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return HardPointer.hash(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		return HardPointer.equals(this, object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return String.valueOf(this.get());

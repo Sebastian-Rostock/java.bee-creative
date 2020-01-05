@@ -291,7 +291,6 @@ public abstract class FEMFunction {
 			return this.function.withTracer(tracer).toClosure();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public FEMFunction withoutTracer() {
 			return this.function.withoutTracer().toClosure();
@@ -525,7 +524,6 @@ public abstract class FEMFunction {
 		return new FrameFunction(params, this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName();

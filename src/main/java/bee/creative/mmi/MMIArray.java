@@ -183,13 +183,11 @@ public abstract class MMIArray extends IAMArray {
 	 * @return {@code unsigned short}-{@link MMIArray}. */
 	public abstract MMIArray asUINT16();
 
-	/** {@inheritDoc} */
 	@Override
 	public MMIArray section(final int offset) {
 		return this.section(offset, this.length - offset);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public MMIArray section(final int offset, final int length) {
 		return (offset < 0) || (length <= 0) || ((offset + length) > this.length) ? this.customSection(0, 0) : this.customSection(offset, length);

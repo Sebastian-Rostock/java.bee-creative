@@ -91,7 +91,6 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 	protected void customRemove(final Reference<?> reference) {
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Reference<? extends GObject> poll() {
 		final Reference<? extends GObject> result = super.poll();
@@ -100,13 +99,11 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 		return result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Reference<? extends GObject> remove() throws InterruptedException {
 		return this.remove(0);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Reference<? extends GObject> remove(final long timeout) throws IllegalArgumentException, InterruptedException {
 		final Reference<? extends GObject> result = super.remove(timeout);
@@ -115,7 +112,6 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 		return result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this);

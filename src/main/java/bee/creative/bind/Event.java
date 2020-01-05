@@ -127,7 +127,6 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 			}
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.get(), this.observer);

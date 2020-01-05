@@ -586,13 +586,11 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		return new CompactMapping(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Iterator<IAMEntry> iterator() {
 		return this.entries().iterator();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.entryCount());

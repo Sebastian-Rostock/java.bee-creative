@@ -70,33 +70,28 @@ public abstract class FEMValue extends FEMFunction {
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 		Objects.notNull(frame);
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMValue toValue() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMFunction toFuture() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
 		Objects.notNull(frame);
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
 		Objects.notNull(frame);

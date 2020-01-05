@@ -7,7 +7,6 @@ import javax.xml.transform.Source;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLSource extends BaseSourceData<XMLSource> {
 
-	/** {@inheritDoc} */
 	@Override
 	protected final XMLSource customThis() {
 		return this;

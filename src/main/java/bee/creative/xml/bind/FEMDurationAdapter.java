@@ -9,14 +9,12 @@ import bee.creative.fem.FEMDuration;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDurationAdapter extends XmlAdapter<String, FEMDuration> {
 
-	/** {@inheritDoc} */
 	@Override
 	public String marshal(final FEMDuration value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FEMDuration unmarshal(final String value) throws Exception {
 		if (value == null) return null;

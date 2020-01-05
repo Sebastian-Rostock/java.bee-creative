@@ -50,109 +50,91 @@ public class BEXAdapter {
 			this.parent = Objects.notNull(parent);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNamespaceURI() {
 			return this.node.uri();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public short getNodeType() {
 			return Node.ATTRIBUTE_NODE;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNodeName() {
 			return this.node.name();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNodeValue() throws DOMException {
 			return this.node.value();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getLocalName() {
 			return this.node.name();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getParentNode() {
 			return this.getOwnerElement();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getName() {
 			return this.getNodeName();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getValue() {
 			return this.getNodeValue();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setValue(final String value) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean getSpecified() {
 			return true;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getTextContent() throws DOMException {
 			return this.getNodeValue();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Element getOwnerElement() {
 			return this.parent;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public TypeInfo getSchemaTypeInfo() {
 			return BEXDocuAdapter.VOID_TYPE_INFO;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isId() {
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isSameNode(final Node object) {
 			return this.equals(object) && this.getParentNode().isSameNode(object.getParentNode());
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isEqualNode(final Node object) {
 			return this.equals(object);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
 			return this.node.hashCode();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean equals(final Object object) {
 			if (object == this) return true;
@@ -161,7 +143,6 @@ public class BEXAdapter {
 			return Objects.equals(this.node, data.node);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return this.getNodeName() + "=" + Objects.toString(this.getNodeValue());
@@ -183,55 +164,46 @@ public class BEXAdapter {
 			super(node, parent);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public short getNodeType() {
 			return Node.TEXT_NODE;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNodeName() {
 			return "#text";
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNodeValue() throws DOMException {
 			return this.node.value();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getData() throws DOMException {
 			return this.getNodeValue();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setData(final String data) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int getLength() {
 			return this.getNodeValue().length();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getTextContent() throws DOMException {
 			return this.getNodeValue();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getWholeText() {
 			return this.getNodeValue();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String substringData(final int offset, final int count) throws DOMException {
 			try {
@@ -241,55 +213,46 @@ public class BEXAdapter {
 			}
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Text splitText(final int offset) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void insertData(final int offset, final String arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void deleteData(final int offset, final int count) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void appendData(final String arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void replaceData(final int offset, final int count, final String arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Text replaceWholeText(final String content) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isSameNode(final Node object) {
 			return this.equals(object) && this.getParentNode().isSameNode(object.getParentNode());
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isEqualNode(final Node object) {
 			return this.equals(object);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isElementContentWhitespace() {
 			final String nodeValue = this.getNodeValue();
@@ -301,13 +264,11 @@ public class BEXAdapter {
 			return true;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
 			return this.node.hashCode();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean equals(final Object object) {
 			if (object == this) return true;
@@ -316,7 +277,6 @@ public class BEXAdapter {
 			return Objects.equals(this.node, data.node);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return this.getNodeValue();
@@ -353,99 +313,83 @@ public class BEXAdapter {
 			super(node, parent);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNamespaceURI() {
 			return this.node.uri();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public short getNodeType() {
 			return Node.ELEMENT_NODE;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNodeName() {
 			return this.node.name();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNodeValue() throws DOMException {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getTagName() {
 			return this.getNodeName();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getLocalName() {
 			return this.node.name();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getFirstChild() {
 			final NodeList c = this.getChildNodes();
 			return c.item(0);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getLastChild() {
 			final NodeList c = this.getChildNodes();
 			return c.item(c.getLength() - 1);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean hasChildNodes() {
 			return this.node.children().length() != 0;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NodeList getChildNodes() {
 			return new BEXChldListAdapter(this.node.children(), this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NamedNodeMap getAttributes() {
 			return new BEXAttrListAdapter(this.node.attributes(), this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean hasAttributes() {
 			return this.node.attributes().length() != 0;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getAttribute(final String name) {
 			return this.getAttributeNS(XMLConstants.NULL_NS_URI, name);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean hasAttribute(final String name) {
 			return this.hasAttributeNS(XMLConstants.NULL_NS_URI, name);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setAttribute(final String name, final String value) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getAttributeNS(final String uri, final String name) throws DOMException {
 			final BEXList attributes = this.node.attributes();
@@ -454,7 +398,6 @@ public class BEXAdapter {
 			return attributes.get(index).value();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean hasAttributeNS(final String uri, final String name) throws DOMException {
 			final BEXList attributes = this.node.attributes();
@@ -462,25 +405,21 @@ public class BEXAdapter {
 			return index >= 0;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setAttributeNS(final String namespaceURI, final String qualifiedName, final String value) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Attr getAttributeNode(final String name) {
 			return this.getAttributeNodeNS(XMLConstants.NULL_NS_URI, name);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Attr setAttributeNode(final Attr newAttr) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Attr getAttributeNodeNS(final String uri, final String name) throws DOMException {
 			final BEXList attributes = this.node.attributes();
@@ -489,31 +428,26 @@ public class BEXAdapter {
 			return new BEXAttrAdapter(attributes.get(index), this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Attr setAttributeNodeNS(final Attr newAttr) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setIdAttribute(final String name, final boolean isId) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setIdAttributeNS(final String namespaceURI, final String localName, final boolean isId) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setIdAttributeNode(final Attr idAttr, final boolean isId) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getTextContent() throws DOMException {
 			final StringBuilder content = new StringBuilder();
@@ -521,61 +455,51 @@ public class BEXAdapter {
 			return content.toString();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public TypeInfo getSchemaTypeInfo() {
 			return BEXDocuAdapter.VOID_TYPE_INFO;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void removeAttribute(final String name) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void removeAttributeNS(final String namespaceURI, final String localName) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Attr removeAttributeNode(final Attr oldAttr) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NodeList getElementsByTagName(final String name) {
 			return this.getElementsByTagNameNS(XMLConstants.NULL_NS_URI, name);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NodeList getElementsByTagNameNS(final String uri, final String name) throws DOMException {
 			return new BEXElemCollector(this, uri, name, false);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isSameNode(final Node object) {
 			return this.isEqualNode(object) && this.getParentNode().isSameNode(object.getParentNode());
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isEqualNode(final Node object) {
 			return this.equals(object);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
 			return this.node.hashCode();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean equals(final Object object) {
 			if (object == this) return true;
@@ -584,7 +508,6 @@ public class BEXAdapter {
 			return Objects.equals(this.node, data.node);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return "<" + this.getNodeName() + this.getAttributes() + ">";
@@ -728,43 +651,36 @@ public class BEXAdapter {
 			super(file.root());
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public short getNodeType() {
 			return Node.DOCUMENT_NODE;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNodeName() {
 			return "#document";
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNodeValue() throws DOMException {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getParentNode() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getFirstChild() {
 			return this.getDocumentElement();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getLastChild() {
 			return this.getDocumentElement();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NodeList getChildNodes() {
 			return new NodeList() {
@@ -783,256 +699,213 @@ public class BEXAdapter {
 			};
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean hasChildNodes() {
 			return true;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NamedNodeMap getAttributes() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean hasAttributes() {
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getTextContent() throws DOMException {
 			return this.getDocumentElement().getTextContent();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public DocumentType getDoctype() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public DOMImplementation getImplementation() {
 			return BEXDocuAdapter.VOID_DOM_IMPLEMENTATION;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String lookupPrefix(final String namespaceURI) {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String lookupNamespaceURI(final String prefix) {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isDefaultNamespace(final String uri) {
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Element getElementById(final String elementId) {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NodeList getElementsByTagName(final String name) {
 			return this.getElementsByTagNameNS(XMLConstants.NULL_NS_URI, name);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NodeList getElementsByTagNameNS(final String uri, final String name) {
 			return new BEXElemCollector(this, uri, name, true);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Element getDocumentElement() {
 			return new BEXElemAdapter(this.node, this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Element createElement(final String tagName) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public DocumentFragment createDocumentFragment() {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Text createTextNode(final String data) {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Comment createComment(final String data) {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public CDATASection createCDATASection(final String data) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public ProcessingInstruction createProcessingInstruction(final String target, final String data) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Attr createAttribute(final String name) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public EntityReference createEntityReference(final String name) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node importNode(final Node importedNode, final boolean deep) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Element createElementNS(final String namespaceURI, final String qualifiedName) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Attr createAttributeNS(final String namespaceURI, final String qualifiedName) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getInputEncoding() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getXmlEncoding() {
 			return "UTF-8";
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean getXmlStandalone() {
 			return true;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setXmlStandalone(final boolean xmlStandalone) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getXmlVersion() {
 			return "1.0";
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setXmlVersion(final String xmlVersion) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean getStrictErrorChecking() {
 			return true;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setStrictErrorChecking(final boolean strictErrorChecking) {
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getDocumentURI() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setDocumentURI(final String documentURI) {
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node adoptNode(final Node source) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public DOMConfiguration getDomConfig() {
 			return BEXDocuAdapter.VOID_DOM_CONFIGURATION;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void normalizeDocument() {
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node renameNode(final Node n, final String namespaceURI, final String qualifiedName) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isSameNode(final Node object) {
 			return this.equals(object);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isEqualNode(final Node object) {
 			return this.equals(object);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Document getOwnerDocument() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
 			return this.node.hashCode();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean equals(final Object object) {
 			if (object == this) return true;
@@ -1041,7 +914,6 @@ public class BEXAdapter {
 			return Objects.equals(this.node, data.node);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return this.getDocumentElement().toString();
@@ -1065,180 +937,150 @@ public class BEXAdapter {
 			this.node = Objects.notNull(node);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getPrefix() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setPrefix(final String prefix) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getBaseURI() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getNamespaceURI() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getFirstChild() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getLastChild() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getNextSibling() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getPreviousSibling() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean hasAttributes() {
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NamedNodeMap getAttributes() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean hasChildNodes() {
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public NodeList getChildNodes() {
 			return BEXDocuAdapter.VOID_NODE_LIST;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String getLocalName() {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setNodeValue(final String nodeValue) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setTextContent(final String textContent) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String lookupPrefix(final String uri) {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String lookupNamespaceURI(final String prefix) {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isDefaultNamespace(final String uri) {
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Object getFeature(final String feature, final String version) {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean isSupported(final String feature, final String version) {
 			return false;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Object getUserData(final String key) {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Object setUserData(final String key, final Object data, final UserDataHandler handler) {
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Document getOwnerDocument() {
 			return new BEXDocuAdapter(this.node.owner());
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node insertBefore(final Node newChild, final Node refChild) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node replaceChild(final Node newChild, final Node oldChild) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node cloneNode(final boolean deep) {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node removeChild(final Node node) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node appendChild(final Node node) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void normalize() {
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public short compareDocumentPosition(final Node node) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
@@ -1265,13 +1107,11 @@ public class BEXAdapter {
 			this.parent = parent;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getParentNode() {
 			return this.parent;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getPreviousSibling() {
 			final Node parent = this.getParentNode();
@@ -1281,7 +1121,6 @@ public class BEXAdapter {
 			return parent.getChildNodes().item(index - 1);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getNextSibling() {
 			final Node parent = this.getParentNode();
@@ -1314,7 +1153,6 @@ public class BEXAdapter {
 			this.parent = Objects.notNull(parent);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node item(final int index) {
 			final BEXNode node = this.list.get(index);
@@ -1322,25 +1160,21 @@ public class BEXAdapter {
 			return new BEXAttrAdapter(node, this.parent);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int getLength() {
 			return this.list.length();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getNamedItem(final String name) {
 			return this.getNamedItemNS(XMLConstants.NULL_NS_URI, name);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node setNamedItem(final Node arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node getNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
 			final int index = this.list.find(namespaceURI, localName, 0);
@@ -1348,25 +1182,21 @@ public class BEXAdapter {
 			return new BEXAttrAdapter(this.list.get(index), this.parent);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node setNamedItemNS(final Node arg) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node removeNamedItem(final String name) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node removeNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			final StringBuilder builder = new StringBuilder();
@@ -1399,7 +1229,6 @@ public class BEXAdapter {
 			this.parent = Objects.notNull(parent);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node item(final int index) {
 			final BEXNode node = this.list.get(index);
@@ -1408,13 +1237,11 @@ public class BEXAdapter {
 			return new BEXTextAdapter(node, this.parent);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int getLength() {
 			return this.list.length();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			final StringBuilder builder = new StringBuilder();
@@ -1536,14 +1363,12 @@ public class BEXAdapter {
 			}
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Node item(final int index) {
 			if (index < this.size) return this.list.get(index);
 			return null;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int getLength() {
 			return this.size;

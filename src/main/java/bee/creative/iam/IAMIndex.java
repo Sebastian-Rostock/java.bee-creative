@@ -387,7 +387,6 @@ public abstract class IAMIndex {
 		return result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.mappings(), this.listings());

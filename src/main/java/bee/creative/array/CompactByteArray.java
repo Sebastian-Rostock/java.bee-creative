@@ -25,62 +25,52 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 			super(owner, startIndex, finalIndex);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public ByteArraySection section() {
 			return new CompactByteSubArraySection(this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public byte get(final int index) {
 			return this.owner.get(this.ownerIndex(index));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void getAll(final int index, final byte[] values) {
 			this.getAll(index, ByteArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final byte value) {
 			this.owner.set(this.ownerIndex(index), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setAll(final int index, final byte[] values) {
 			this.setAll(index, ByteArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final byte value) {
 			this.add(this.size(), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final byte[] values) {
 			this.addAll(this.size(), values);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final byte value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final int index, final byte[] values) {
 			this.addAll(this.size(), ByteArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public ByteArray subArray(final int fromIndex, final int toIndex) {
 			return (ByteArray)this.ownerSubArray(fromIndex, toIndex);
@@ -104,25 +94,21 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public byte[] array() {
 			return this.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.from;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactByteArray owner = this.owner;
@@ -147,25 +133,21 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public byte[] array() {
 			return this.owner.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.startIndex;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this.owner.finalIndex;
@@ -203,104 +185,87 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		super(section);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected byte[] customGetArray() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetArray(final byte[] array) {
 		this.array = array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected byte[] customNewArray(final int length) {
 		return new byte[length];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected Byte customGet(final int index) {
 		return Byte.valueOf(this.get(index));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSet(final int index, final Byte value) {
 		this.set(index, value.byteValue());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public byte get(final int index) {
 		return this.array[this.inclusiveIndex(index)];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(final int index, final byte[] values) {
 		this.getAll(index, ByteArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final byte value) {
 		this.array[this.inclusiveIndex(index)] = value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(final int index, final byte[] values) {
 		this.setAll(index, ByteArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final byte value) {
 		this.add(this.size, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final byte[] values) {
 		this.addAll(this.size, values);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final byte value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final int index, final byte[] values) {
 		this.addAll(this.size, ByteArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public byte[] array() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ByteArraySection section() {
 		return new CompactByteArraySection(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ByteArray subArray(final int startIndex, final int finalIndex) {
 		return new CompactByteSubArray(this, startIndex, finalIndex);

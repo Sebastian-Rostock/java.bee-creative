@@ -302,13 +302,11 @@ public abstract class FEMReflection extends FEMFunction {
 		return this.member() instanceof Constructor<?>;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.member().hashCode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;

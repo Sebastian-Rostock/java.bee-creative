@@ -35,7 +35,6 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		 * @return Besitzer. */
 		public abstract GOwner closeContextData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected ContextData<GOwner> customThis() {
 			return this;
@@ -55,7 +54,6 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		 * @return Besitzer. */
 		public abstract GOwner closeShemaData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected ShemaData<GOwner> customThis() {
 			return this;
@@ -75,7 +73,6 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		 * @return Besitzer. */
 		public abstract GOwner closeAdapterData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected AdapterData<GOwner> customThis() {
 			return this;
@@ -95,7 +92,6 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		 * @return Besitzer. */
 		public abstract GOwner closeListenerData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected ListenerData<GOwner> customThis() {
 			return this;
@@ -115,7 +111,6 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected PropertyData<GOwner> customThis() {
 			return this;
@@ -135,7 +130,6 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		 * @return Besitzer. */
 		public abstract GOwner closeValidationData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected ValidationData<GOwner> customThis() {
 			return this;
@@ -327,7 +321,6 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		return this._contextData_;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -345,7 +338,6 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.shemaData, this.adapterData, this.listenerData, this.propertyData, this.validationData);

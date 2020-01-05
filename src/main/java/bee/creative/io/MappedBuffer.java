@@ -954,7 +954,6 @@ public class MappedBuffer {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.file(), this.size(), this.isReadonly());

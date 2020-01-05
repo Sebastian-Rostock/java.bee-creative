@@ -247,14 +247,12 @@ public class BEXLoader {
 			return this.chldValueText;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXNode root() {
 			if (this.rootRef < 0) return new BEXNodeLoader(this);
 			return new BEXNodeLoader(BEXLoader.keyOf(BEXLoader.BEX_ELEM_NODE, this.rootRef), this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXList list(final int key) {
 			switch (BEXLoader.typeOf(key)) {
@@ -267,7 +265,6 @@ public class BEXLoader {
 			return new BEXListLoader(this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXNode node(final int key) {
 			switch (BEXLoader.typeOf(key)) {
@@ -336,13 +333,11 @@ public class BEXLoader {
 			this.owner = owner;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int key() {
 			return this.key;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int type() {
 			switch (BEXLoader.typeOf(this.key)) {
@@ -357,13 +352,11 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXFile owner() {
 			return this.owner;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXNode get(final int index) {
 			final int key = this.key;
@@ -396,7 +389,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int find(final String uri, final String name, final int start) throws NullPointerException {
 			final int key = this.key;
@@ -459,7 +451,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int length() {
 			final int key = this.key;
@@ -482,7 +473,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXNode parent() {
 			final int key = this.key;
@@ -530,13 +520,11 @@ public class BEXLoader {
 			this.owner = owner;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int key() {
 			return this.key;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int type() {
 			switch (BEXLoader.typeOf(this.key)) {
@@ -553,13 +541,11 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXFile owner() {
 			return this.owner;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String uri() {
 			final int key = this.key;
@@ -577,7 +563,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String name() {
 			final int key = this.key;
@@ -595,7 +580,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String value() {
 			final int key = this.key;
@@ -618,7 +602,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int index() {
 			final int key = this.key;
@@ -652,7 +635,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXNode parent() {
 			final int key = this.key;
@@ -684,7 +666,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXList children() {
 			final int key = this.key;
@@ -705,7 +686,6 @@ public class BEXLoader {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BEXList attributes() {
 			final int key = this.key;
@@ -800,7 +780,6 @@ public class BEXLoader {
 			}
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.formatIterable(true, Iterables.filteredIterable(Filters.nullFilter(), Arrays.asList(this.cache)));

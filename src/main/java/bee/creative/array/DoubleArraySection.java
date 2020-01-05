@@ -66,45 +66,39 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 		});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final double[] array) {
 		return array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final double[] array, final int index) {
 		final long value = Double.doubleToLongBits(array[index]);
 		return (int)(value ^ (value >>> 32));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEquals(final double[] array1, final double[] array2, final int index1, final int index2) {
 		return Double.doubleToLongBits(array1[index1]) == Double.doubleToLongBits(array2[index2]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customCompare(final double[] array1, final double[] array2, final int index1, final int index2) {
 		return Double.compare(array1[index1], array2[index2]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customPrint(final double[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
 	/** Diese Methode gibt diese {@link DoubleArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactDoubleArray(this).values()}.
-	 * 
+	 *
 	 * @return {@link Double}-{@link List}. */
 	public List<Double> asList() {
 		return new CompactDoubleArray(this).values();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

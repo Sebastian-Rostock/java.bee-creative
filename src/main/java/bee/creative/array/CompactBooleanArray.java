@@ -23,62 +23,52 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 			super(owner, startIndex, finalIndex);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BooleanArraySection section() {
 			return new CompactBooleanSubArraySection(this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean get(final int index) {
 			return this.owner.get(this.ownerIndex(index));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void getAll(final int index, final boolean[] values) {
 			this.getAll(index, BooleanArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final boolean value) {
 			this.owner.set(this.ownerIndex(index), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setAll(final int index, final boolean[] values) {
 			this.setAll(index, BooleanArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final boolean value) {
 			this.add(this.size(), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final boolean[] values) {
 			this.add(this.size(), values);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final boolean value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final boolean[] values) {
 			this.addAll(this.size(), BooleanArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public BooleanArray subArray(final int fromIndex, final int toIndex) {
 			return (BooleanArray)this.ownerSubArray(fromIndex, toIndex);
@@ -100,25 +90,21 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean[] array() {
 			return this.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.from;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactBooleanArray owner = this.owner;
@@ -141,25 +127,21 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public boolean[] array() {
 			return this.owner.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.startIndex;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this.owner.finalIndex;
@@ -197,104 +179,87 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		super(section);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean[] customGetArray() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetArray(final boolean[] array) {
 		this.array = array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean[] customNewArray(final int length) {
 		return new boolean[length];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected Boolean customGet(final int index) {
 		return Boolean.valueOf(this.get(index));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSet(final int index, final Boolean value) {
 		this.set(index, value.booleanValue());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean get(final int index) {
 		return this.array[this.inclusiveIndex(index)];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(final int index, final boolean[] values) {
 		this.getAll(index, BooleanArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final boolean value) {
 		this.array[this.inclusiveIndex(index)] = value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(final int index, final boolean[] values) {
 		this.setAll(index, BooleanArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final boolean value) {
 		this.add(this.size, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final boolean[] values) {
 		this.add(this.size, values);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final boolean value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final boolean[] values) {
 		this.addAll(this.size, BooleanArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean[] array() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public BooleanArraySection section() {
 		return new CompactBooleanArraySection(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public BooleanArray subArray(final int startIndex, final int finalIndex) {
 		return new CompactBooleanSubArray(this, startIndex, finalIndex);

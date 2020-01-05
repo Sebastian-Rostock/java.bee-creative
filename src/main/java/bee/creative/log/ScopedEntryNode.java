@@ -56,7 +56,6 @@ class ScopedEntryNode {
 		return 0;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.text, this.args);

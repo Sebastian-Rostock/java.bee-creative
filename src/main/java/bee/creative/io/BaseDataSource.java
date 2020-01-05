@@ -14,26 +14,22 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 	/** Dieses Feld speichert den Lesepuffer. */
 	protected final byte[] array = new byte[8];
 
-	/** {@inheritDoc} */
 	@Override
 	public int skipBytes(final int n) throws IOException {
 		this.seek(this.index() + n);
 		return n;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void readFully(final byte[] b) throws IOException {
 		this.readFully(b, 0, b.length);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean readBoolean() throws IOException {
 		return this.readByte() != 0;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public byte readByte() throws IOException {
 		final byte[] array = this.array;
@@ -41,7 +37,6 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 		return array[0];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int readUnsignedByte() throws IOException {
 		final byte[] array = this.array;
@@ -49,19 +44,16 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 		return Bytes.getInt1(array, 0);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public short readShort() throws IOException {
 		return (short)this.readChar();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int readUnsignedShort() throws IOException {
 		return this.readChar();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public char readChar() throws IOException {
 		final byte[] array = this.array;
@@ -69,7 +61,6 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 		return (char)Bytes.getInt2BE(array, 0);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int readInt() throws IOException {
 		final byte[] array = this.array;
@@ -77,7 +68,6 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 		return Bytes.getInt4BE(array, 0);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int readInt(final int size) throws IOException {
 		final byte[] array = this.array;
@@ -85,7 +75,6 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 		return Bytes.getIntBE(array, 0, size);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long readLong() throws IOException {
 		final byte[] array = this.array;
@@ -93,7 +82,6 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 		return Bytes.getLong8BE(array, 0);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long readLong(final int size) throws IOException {
 		final byte[] array = this.array;
@@ -101,19 +89,16 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 		return Bytes.getLongBE(array, 0, size);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public float readFloat() throws IOException {
 		return Float.intBitsToFloat(this.readInt());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public double readDouble() throws IOException {
 		return Double.longBitsToDouble(this.readLong());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String readLine() throws IOException {
 		final StringBuffer result = new StringBuffer();
@@ -136,30 +121,25 @@ public abstract class BaseDataSource extends BaseObject implements DataSource {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String readUTF() throws IOException {
 		return DataInputStream.readUTF(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
 		throw new IOException();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
 		throw new IOException();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
 		throw new IOException();

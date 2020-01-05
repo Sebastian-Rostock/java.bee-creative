@@ -109,7 +109,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMObject> type() {
 		return FEMObject.TYPE;
@@ -208,13 +207,11 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return Comparators.compare(this.typeValue(), that.typeValue());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.valueH ^ this.valueL;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -226,7 +223,6 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return this.equals((FEMObject)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMObject that) {
 		return this.compare(that);

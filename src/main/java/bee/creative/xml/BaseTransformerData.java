@@ -94,7 +94,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final PropertyData<GOwner> customThis() {
 			return this;
@@ -114,7 +113,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		 * @return Besitzer. */
 		public abstract GOwner closeParameterData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ParameterData<GOwner> customThis() {
 			return this;
@@ -134,7 +132,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		 * @return Besitzer. */
 		public abstract GOwner closeTemplatesData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final TemplatesData<GOwner> customThis() {
 			return this;
@@ -268,7 +265,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		return this.templatesData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -284,7 +280,6 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.propertyData, this.parameterData, this.templatesData);

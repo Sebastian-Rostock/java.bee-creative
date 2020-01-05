@@ -166,23 +166,23 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	static class INT32Encoder implements Collector {
-	
+
 		public final int[] array;
-	
+
 		public int index;
-	
+
 		INT32Encoder(final int[] array, final int index) {
 			this.array = array;
 			this.index = index;
 		}
-	
+
 		@Override
 		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			this.array[this.index++] = value;
 			return true;
 		}
-	
+
 	}
 
 	static class UINT16Encoder implements Collector {
@@ -1217,7 +1217,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMString> type() {
 		return FEMString.TYPE;
@@ -1538,13 +1537,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return encoder.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMString result(final boolean deep) {
 		return deep ? this.compact() : this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		int result = this.hash;
@@ -1555,7 +1552,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return this.hash = result != 0 ? result : 1;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -1567,7 +1563,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return this.equals((FEMString)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Iterator<Integer> iterator() {
 		return new BaseIterator<Integer>() {
@@ -1587,7 +1582,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		};
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMString that) {
 		return this.compare(that);

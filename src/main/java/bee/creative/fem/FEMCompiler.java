@@ -147,7 +147,6 @@ public class FEMCompiler extends FEMParser {
 		return this.token().extract(this.script.source());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.params, this.script, this.proxies);

@@ -28,7 +28,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		 * @return Besitzer. */
 		public abstract GOwner closeFactoryData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FactoryData<GOwner> customThis() {
 			return this;
@@ -48,7 +47,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		 * @return Besitzer. */
 		public abstract GOwner closeHandlerData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final HandlerData<GOwner> customThis() {
 			return this;
@@ -68,7 +66,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		 * @return Besitzer. */
 		public abstract GOwner closeResolverData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ResolverData<GOwner> customThis() {
 			return this;
@@ -200,7 +197,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		return this.resolverData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -216,7 +212,6 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.factoryData, this.handlerData, this.resolverData);

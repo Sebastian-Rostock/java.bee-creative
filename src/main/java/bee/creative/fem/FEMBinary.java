@@ -381,7 +381,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	public static final FEMBinary EMPTY = new UniformBinary(0, (byte)0);
 
 	/** Diese Methode ist eine Abkürzung von {@link #from(int, byte) FEMBinary.from(length, 0)}.
-	 * 
+	 *
 	 * @param length Länge.
 	 * @return Bytefolge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
@@ -390,7 +390,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	/** Diese Methode gibt eine uniforme Bytefolge mit der gegebenen Länge zurück.
-	 * 
+	 *
 	 * @param length Länge.
 	 * @param item Wert jedes Byte der Bytefolge.
 	 * @return Bytefolge.
@@ -453,7 +453,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	/** Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück. Das Format der Zeichenkette entspricht dem der
 	 * {@link #toString(boolean) Textdarstellung}.
-	 * 
+	 *
 	 * @param header {@code true}, wenn die Zeichenkette mit {@code "0x"} beginnt.
 	 * @param string Zeichenkette.
 	 * @see #toString()
@@ -596,7 +596,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMBinary> type() {
 		return FEMBinary.TYPE;
@@ -882,13 +881,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		throw new IllegalStateException();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMBinary result(final boolean deep) {
 		return deep ? this.compact() : this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		int result = this.hash;
@@ -899,7 +896,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return this.hash = result != 0 ? result : 1;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -911,7 +907,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return this.equals((FEMBinary)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Iterator<Byte> iterator() {
 		return new BaseIterator<Byte>() {
@@ -931,7 +926,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		};
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMBinary that) {
 		return this.compare(that);
@@ -958,7 +952,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		};
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return this.toString(true);

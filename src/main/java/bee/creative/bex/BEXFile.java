@@ -89,7 +89,6 @@ public class BEXFile {
 		return BEXNode.EMPTY;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.root());

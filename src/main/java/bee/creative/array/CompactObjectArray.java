@@ -34,62 +34,52 @@ public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> i
 			super(owner, startIndex, finalIndex);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public ObjectArraySection<GValue> section() {
 			return new CompactObjectSubArraySection<>(this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public GValue get(final int index) {
 			return this.owner.get(this.ownerIndex(index));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void getAll(final int index, final GValue[] values) {
 			this.getAll(index, ObjectArraySection.from(this.owner, values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final GValue value) {
 			this.owner.set(this.ownerIndex(index), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setAll(final int index, final GValue[] values) {
 			this.setAll(index, ObjectArraySection.from(this.owner, values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final GValue value) {
 			this.add(this.size(), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final GValue[] values) {
 			this.addAll(this.size(), values);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final GValue value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final int index, final GValue[] values) {
 			this.addAll(this.size(), ObjectArraySection.from(this.owner, values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public ObjectArray<GValue> subArray(final int fromIndex, final int toIndex) {
 			return (ObjectArray<GValue>)this.ownerSubArray(fromIndex, toIndex);
@@ -114,31 +104,26 @@ public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> i
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected int customCompare(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 			return Comparators.compare(array1[index1], array2[index2], this.owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public GValue[] array() {
 			return this.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.from;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactObjectArray<GValue> owner = this.owner;
@@ -164,31 +149,26 @@ public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> i
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected int customCompare(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 			return Comparators.compare(array1[index1], array2[index2], this.owner.owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public GValue[] array() {
 			return this.owner.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.startIndex;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this.owner.finalIndex;
@@ -226,7 +206,7 @@ public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> i
 
 	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
 	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
-	 * 
+	 *
 	 * @param section {@link ArraySection}.
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)
@@ -239,118 +219,99 @@ public class CompactObjectArray<GValue> extends CompactArray<GValue[], GValue> i
 		this.valueClass = (Class<? extends GValue>)section.array().getClass().getComponentType();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected GValue[] customGetArray() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetArray(final GValue[] array) {
 		this.array = array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected GValue customGet(final int index) {
 		return this.get(index);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSet(final int index, final GValue value) {
 		this.set(index, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ("unchecked")
 	protected GValue[] customNewArray(final int length) {
 		return (GValue[])Array.newInstance(this.valueClass, length);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customClearArray(final int startIndex, final int finalIndex) {
 		final Object[] array = this.array;
 		for (int i = startIndex, size = finalIndex; i < size; array[i++] = null) {}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue get(final int index) {
 		return this.array[this.inclusiveIndex(index)];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(final int index, final GValue[] values) {
 		this.getAll(index, ObjectArraySection.from(this, values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final GValue value) {
 		this.array[this.inclusiveIndex(index)] = value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(final int index, final GValue[] values) {
 		this.setAll(index, ObjectArraySection.from(this, values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final GValue value) {
 		this.add(this.size, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final GValue[] values) {
 		this.addAll(this.size, values);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final GValue value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final int index, final GValue[] values) {
 		this.addAll(this.size, ObjectArraySection.from(this, values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue[] array() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ObjectArraySection<GValue> section() {
 		return new CompactObjectArraySection<>(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ObjectArray<GValue> subArray(final int startIndex, final int finalIndex) {
 		return new CompactObjectSubArray<>(this, startIndex, finalIndex);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ({"unchecked", "rawtypes"})
 	public int compare(final GValue o1, final GValue o2) {

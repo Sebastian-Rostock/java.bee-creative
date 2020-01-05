@@ -68,13 +68,11 @@ public final class FEMParam extends FEMFunction {
 		return frame.get(this.index);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.index;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
@@ -82,7 +80,6 @@ public final class FEMParam extends FEMFunction {
 		return this.index == ((FEMParam)object).index;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return "$" + (this.index + 1);

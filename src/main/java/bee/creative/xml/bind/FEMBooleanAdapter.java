@@ -9,14 +9,12 @@ import bee.creative.fem.FEMBoolean;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMBooleanAdapter extends XmlAdapter<String, FEMBoolean> {
 
-	/** {@inheritDoc} */
 	@Override
 	public String marshal(final FEMBoolean value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FEMBoolean unmarshal(final String value) throws Exception {
 		if (value == null) return null;

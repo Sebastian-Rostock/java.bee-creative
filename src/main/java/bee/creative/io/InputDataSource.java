@@ -19,19 +19,16 @@ public class InputDataSource extends BaseDataSource {
 		this.data = data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object data() {
 		return this.data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void readFully(final byte[] b, final int off, final int len) throws IOException {
 		this.data.readFully(b, off, len);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int skipBytes(final int n) throws IOException {
 		return this.data.skipBytes(n);

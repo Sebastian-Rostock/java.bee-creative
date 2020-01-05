@@ -126,7 +126,6 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @return Index des ersten Elements nach dem Abschnitt. */
 	public abstract int finalIndex();
 
-	/** {@inheritDoc} */
 	@Override
 	public int compareTo(final ArraySection<GArray> section) {
 		final GArray array1 = this.array(), array2 = section.array();
@@ -152,7 +151,6 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		int hash = 1;
@@ -163,7 +161,6 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		return hash;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		int index = this.startIndex();

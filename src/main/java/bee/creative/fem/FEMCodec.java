@@ -20,6 +20,7 @@ import bee.creative.iam.IAMArray;
 import bee.creative.io.MappedBuffer;
 import bee.creative.io.MappedBuffer2;
 import bee.creative.lang.Objects;
+import bee.creative.mmi.MMIArrayL;
 
 /** Diese Klasse implementiert ein Objekt zur Kodierung und Dekodierung von {@link FEMFunction Funktionen} in {@link IAMArray Zahlenlisten}, die in einen
  * {@link MappedBuffer2 Dateipuffer} ausgelagert sind.
@@ -56,7 +57,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		@Override
 		protected FEMValue customGet(final int index) {
 			// addr: value[length]
-			return this.codec.__getValue(this.store.getInt(this.addr + (index * 4)));
+			return this.codec.__getValue(this.store.getInt(this.addr + (index * 4L)));
 		}
 
 	}
@@ -66,24 +67,25 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 		MappedArrayB(final FEMCodec codec, final long addr, final int length, final int hash) throws IllegalArgumentException {
 			super(codec, addr, length, hash);
-
 		}
 
 		@Override
 		protected int customFind(final FEMValue that, final int offset, int length, final boolean foreward) {
-			// addr: value[length], count[1], range[count-1], index[length], length[1]
-			final int count = (this.length() * 2) + 1, index = (that.hashCode() & (this.items.length() - count - 3)) + count;
-			int l = this.items.get(index), r = this.items.get(index + 1) - 1;
+			// addr: value[length], count[1], range[count], index[length], length[1]
+			final long addr = this.addr + (this.length * 4L);
+			final int count = this.store.getInt(addr), hash = that.hashCode() & (count - 2);
+			final long addr2 = addr + (hash * 4L);
+			int l = this.store.getInt(addr2), r = this.store.getInt(addr2 + 4) - 1;
 			length += offset;
 			if (foreward) {
 				for (; l <= r; l++) {
-					final int result = this.items.get(l);
+					final int result = this.store.getInt(addr + (l * 4L));
 					if (length <= result) return -1;
 					if ((offset <= result) && that.equals(this.customGet(result))) return result;
 				}
 			} else {
 				for (; l <= r; r--) {
-					final int result = this.items.get(r);
+					final int result = this.store.getInt(addr + (r * 4L));
 					if (result < offset) return -1;
 					if ((result < length) && that.equals(this.customGet(result))) return result;
 				}
@@ -154,12 +156,12 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.store.getShort(this.addr + (index * 2)) & 0xFFFF;
+			return this.store.getShort(this.addr + (index * 2L)) & 0xFFFF;
 		}
 
 		@Override
 		protected FEMString customSection(final int offset, final int length) {
-			return new MappedStringB(this.store, this.addr + (offset * 2), length, 0);
+			return new MappedStringB(this.store, this.addr + (offset * 2L), length, 0);
 		}
 
 	}
@@ -173,12 +175,12 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.store.getInt(this.addr + (index * 4));
+			return this.store.getInt(this.addr + (index * 4L));
 		}
 
 		@Override
 		protected FEMString customSection(final int offset, final int length) {
-			return new MappedStringC(this.store, this.addr + (offset * 4), length, 0);
+			return new MappedStringC(this.store, this.addr + (offset * 4L), length, 0);
 		}
 
 	}
@@ -266,16 +268,27 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		this.store = new MappedBuffer2(file, readonly);
 	}
 
-	/** {@inheritDoc} Sie ist eine Abkürzung für {@link MappedBuffer2#getRoot() this.getFunction(this.getStore().getRoot())}. */
 	@Override
-	public FEMFunction get() {
+	public final FEMFunction get() {
 		return this.getFunction(this.store.getRoot());
 	}
 
-	/** {@inheritDoc} Sie ist eine Abkürzung für {@link MappedBuffer2#setRoot(int) this.getStore().setRoot(this.putFunction(value))}. */
 	@Override
-	public void set(final FEMFunction value) {
-		this.store.setRoot(this.putFunction(value));
+	public final void set(final FEMFunction value) {
+		this.store.setRoot(this.put(value));
+	}
+
+	public final int put(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		return this.putFunction(src);
+	}
+
+	public final int[] putAll(final FEMFunction... src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		final int length = src.length;
+		final int[] result = new int[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = this.put(src[i]);
+		}
+		return result;
 	}
 
 	/** Diese Methode gibt den angebundenen {@link MappedBuffer2 Datenspeicher} zurück, in welchem die kodierten {@link FEMFunction Funktionen} abgelegt sind.
@@ -297,15 +310,6 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	public FEMCodec useCache(final boolean enabled) {
 		this.cacheEnabled = enabled;
 		return this;
-	}
-
-	public int[] putAll(final FEMFunction... src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int length = src.length;
-		final int[] result = new int[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = this.putFunction(src[i]);
-		}
-		return result;
 	}
 
 	/** Diese Methode gibt den Wert zur gegebenen Referenz zurück.
@@ -384,13 +388,18 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	public static void main(final String[] args) throws Exception {
 		final FEMCodec codec = new FEMCodec(File.createTempFile("fem-codec", ".bin"), false);
 
-		final FEMArray arr = FEMArray.from(FEMInteger.from(1), FEMInteger.from(2), FEMInteger.from(3), FEMInteger.from(4), FEMInteger.from(5)).compact(true);
+		final FEMInteger x = FEMInteger.from(3);
+		final FEMArray arr = FEMArray.from(FEMInteger.from(1), FEMInteger.from(2), x, FEMInteger.from(4), FEMInteger.from(5)).compact(true);
 
-		final int i = codec.__putValue(arr);
-		final FEMArray arr2 = codec.__getArrayValue(i);
+		codec.set(arr);
+		final FEMArray arr2 = (FEMArray)codec.get();
 
-		System.out.println(EMU.from(arr));
-		System.out.println(EMU.from(arr2));
+		final MappedBuffer2 s = codec.store;
+		final MMIArrayL h = s.getArray(0, (int)s.size() / 4, IAMArray.MODE_INT32);
+		System.out.println(Arrays.toString(h.toInts()));
+
+		System.out.println(arr);
+		System.out.println(arr2);
 		System.out.println(Arrays.toString(((CompactArray3)arr).table));
 	}
 
@@ -858,7 +867,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode nimmt die gegebene Funktion in die Verwaltung auf und gibt die Referenz darauf zurück.<br>
 	 * Nachfahren sollten diese Methode zur weiteren Fallunterscheidungen überschreiben.
-	 * 
+	 *
 	 * @param src Funktion.
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.

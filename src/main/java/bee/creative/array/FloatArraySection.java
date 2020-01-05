@@ -66,44 +66,38 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 		});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final float[] array) {
 		return array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final float[] array, final int index) {
 		return Float.floatToIntBits(array[index]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEquals(final float[] array1, final float[] array2, final int index1, final int index2) {
 		return Float.floatToIntBits(array1[index1]) == Float.floatToIntBits(array2[index2]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customCompare(final float[] array1, final float[] array2, final int index1, final int index2) {
 		return Float.compare(array1[index1], array2[index2]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customPrint(final float[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
 	/** Diese Methode gibt diese {@link FloatArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactFloatArray(this).values()}.
-	 * 
+	 *
 	 * @return {@link Float}-{@link List}. */
 	public List<Float> asList() {
 		return new CompactFloatArray(this).values();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

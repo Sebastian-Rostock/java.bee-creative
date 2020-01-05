@@ -34,49 +34,41 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 		this.allocateImpl(this.countImpl());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int size() {
 		return this.countImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean isEmpty() {
 		return this.countImpl() == 0;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean containsKey(final Object key) {
 		return this.hasKeyImpl(key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean containsValue(final Object value) {
 		return this.hasValueImpl(value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue get(final Object key) {
 		return this.getImpl(key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
 		return this.putImpl(key, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue remove(final Object key) {
 		return this.popImpl(key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void putAll(final Map<? extends GKey, ? extends GValue> map) {
 		for (final Entry<? extends GKey, ? extends GValue> entry: map.entrySet()) {
@@ -84,37 +76,31 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void clear() {
 		this.clearImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Set<GKey> keySet() {
 		return this.newKeysImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Collection<GValue> values() {
 		return this.newValuesImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Set<Entry<GKey, GValue>> entrySet() {
 		return this.newEntriesImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return this.newEntriesImpl().hashCode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;
@@ -127,7 +113,6 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 		return true;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this.newMappingImpl().toString();

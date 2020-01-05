@@ -73,7 +73,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMInteger> type() {
 		return FEMInteger.TYPE;
@@ -104,13 +103,11 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		return Comparators.compare(this.value, that.value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return Integers.toIntL(this.value) ^ Integers.toIntH(this.value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -122,7 +119,6 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 		return this.equals((FEMInteger)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMInteger value) {
 		return this.compare(value);

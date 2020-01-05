@@ -22,13 +22,11 @@ public class BufferDataTarget extends BaseDataTarget {
 		this.data = Objects.notNull(data);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object data() {
 		return this.data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
 		try {
@@ -40,7 +38,6 @@ public class BufferDataTarget extends BaseDataTarget {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
 		if ((index < 0) || (index > this.length())) throw new IOException();
@@ -51,13 +48,11 @@ public class BufferDataTarget extends BaseDataTarget {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
 		return this.data.position();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
 		return this.data.limit();

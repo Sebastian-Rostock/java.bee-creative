@@ -1052,7 +1052,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		this.count = 0;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		try {
@@ -1066,7 +1065,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long emu() {
 		return EMU.fromObject(this) + EMU.fromArray(this.table) + EMU.fromArray(this.nexts);

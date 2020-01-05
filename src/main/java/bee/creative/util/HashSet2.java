@@ -81,26 +81,22 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		this.addAll(source);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetKey(final int entryIndex, final GItem item, final int itemHash) {
 		this.items[entryIndex] = item;
 		this.hashes[entryIndex] = itemHash;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHashKey(final int entryIndex) {
 		return this.hashes[entryIndex];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
 		return (this.hashes[entryIndex] == itemHash) && Objects.equals(this.items[entryIndex], item);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected HashAllocator customAllocator(final int capacity) {
 		final Object[] items2;
@@ -129,13 +125,11 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		};
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long emu() {
 		return super.emu() + EMU.fromArray(this.hashes);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {

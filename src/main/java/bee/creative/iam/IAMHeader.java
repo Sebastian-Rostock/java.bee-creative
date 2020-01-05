@@ -60,7 +60,6 @@ public final class IAMHeader {
 		return this.orderOf(bytes);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Integer.toHexString(this.value);

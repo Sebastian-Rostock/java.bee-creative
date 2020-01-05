@@ -34,19 +34,16 @@ public final class FEMVoid extends FEMValue {
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMVoid> type() {
 		return FEMVoid.TYPE;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return 0;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;

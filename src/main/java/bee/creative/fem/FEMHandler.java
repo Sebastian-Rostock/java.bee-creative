@@ -40,7 +40,6 @@ public final class FEMHandler extends FEMValue {
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMHandler> type() {
 		return FEMHandler.TYPE;
@@ -62,13 +61,11 @@ public final class FEMHandler extends FEMValue {
 		return this.value.equals(that.value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.value.hashCode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -81,13 +78,11 @@ public final class FEMHandler extends FEMValue {
 		return this.equals((FEMHandler)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 		return FEMHandler.from(this.value.withTracer(tracer));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		final FEMFormatter target = new FEMFormatter();
@@ -95,7 +90,6 @@ public final class FEMHandler extends FEMValue {
 		return target.format();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMFunction toFunction() {
 		return this.value;

@@ -219,7 +219,6 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 		synchronized (this.reader) {
@@ -227,7 +226,6 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		synchronized (this.reader) {

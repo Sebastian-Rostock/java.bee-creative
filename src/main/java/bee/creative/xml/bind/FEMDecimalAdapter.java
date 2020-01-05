@@ -9,14 +9,12 @@ import bee.creative.fem.FEMDecimal;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDecimalAdapter extends XmlAdapter<String, FEMDecimal> {
 
-	/** {@inheritDoc} */
 	@Override
 	public String marshal(final FEMDecimal value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FEMDecimal unmarshal(final String value) throws Exception {
 		if (value == null) return null;

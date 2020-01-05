@@ -96,25 +96,21 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 		this.target = function;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long emu() {
 		return EMU.fromObject(this) + EMU.from(this.id) + EMU.from(this.name);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FEMValue invoke(final FEMFrame frame) {
 		return this.target.invoke(frame);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return this.id.hashCode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;
@@ -122,7 +118,6 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 		return this.equals((FEMProxy)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return FEMDomain.NORMAL.formatConst(this.name.toString());

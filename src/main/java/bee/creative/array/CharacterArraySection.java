@@ -66,44 +66,39 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 		});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final char[] array) {
 		return array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final char[] array, final int index) {
 		return array[index];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEquals(final char[] array1, final char[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customCompare(final char[] array1, final char[] array2, final int index1, final int index2) {
 		return array1[index1] - array2[index2];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customPrint(final char[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
-	/** Diese Methode gibt diese {@link CharacterArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactCharacterArray(this).values()}.
-	 * 
+	/** Diese Methode gibt diese {@link CharacterArraySection} als {@link List} zurück und ist eine Abkürzung für
+	 * {@code new CompactCharacterArray(this).values()}.
+	 *
 	 * @return {@link Character}-{@link List}. */
 	public List<Character> asList() {
 		return new CompactCharacterArray(this).values();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

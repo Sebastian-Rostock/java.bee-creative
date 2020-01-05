@@ -25,62 +25,52 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 			super(owner, startIndex, finalIndex);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public DoubleArraySection section() {
 			return new CompactDoubleSubArraySection(this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public double get(final int index) {
 			return this.owner.get(this.ownerIndex(index));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void getAll(final int index, final double[] values) {
 			this.getAll(index, DoubleArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final double value) {
 			this.owner.set(this.ownerIndex(index), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setAll(final int index, final double[] values) {
 			this.setAll(index, DoubleArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final double value) {
 			this.add(this.size(), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final double[] values) {
 			this.addAll(this.size(), values);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final double value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final int index, final double[] values) {
 			this.addAll(this.size(), DoubleArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public DoubleArray subArray(final int fromIndex, final int toIndex) {
 			return (DoubleArray)this.ownerSubArray(fromIndex, toIndex);
@@ -104,25 +94,21 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public double[] array() {
 			return this.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.from;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactDoubleArray owner = this.owner;
@@ -147,25 +133,21 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public double[] array() {
 			return this.owner.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.startIndex;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this.owner.finalIndex;
@@ -203,104 +185,87 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 		super(section);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected double[] customGetArray() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetArray(final double[] array) {
 		this.array = array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected double[] customNewArray(final int length) {
 		return new double[length];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected Double customGet(final int index) {
 		return Double.valueOf(this.get(index));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSet(final int index, final Double value) {
 		this.set(index, value.doubleValue());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public double get(final int index) {
 		return this.array[this.inclusiveIndex(index)];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(final int index, final double[] values) {
 		this.getAll(index, DoubleArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final double value) {
 		this.array[this.inclusiveIndex(index)] = value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(final int index, final double[] values) {
 		this.setAll(index, DoubleArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final double value) {
 		this.add(this.size, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final double[] values) {
 		this.addAll(this.size, values);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final double value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final int index, final double[] values) {
 		this.addAll(this.size, DoubleArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public double[] array() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public DoubleArraySection section() {
 		return new CompactDoubleArraySection(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public DoubleArray subArray(final int startIndex, final int finalIndex) {
 		return new CompactDoubleSubArray(this, startIndex, finalIndex);

@@ -25,62 +25,52 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 			super(owner, startIndex, finalIndex);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public FloatArraySection section() {
 			return new CompactFloatSubArraySection(this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public float get(final int index) {
 			return this.owner.get(this.ownerIndex(index));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void getAll(final int index, final float[] values) {
 			this.getAll(index, FloatArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final float value) {
 			this.owner.set(this.ownerIndex(index), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setAll(final int index, final float[] values) {
 			this.setAll(index, FloatArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final float value) {
 			this.add(this.size(), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final float[] values) {
 			this.addAll(this.size(), values);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final float value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final int index, final float[] values) {
 			this.addAll(this.size(), FloatArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public FloatArray subArray(final int fromIndex, final int toIndex) {
 			return (FloatArray)this.ownerSubArray(fromIndex, toIndex);
@@ -104,25 +94,21 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public float[] array() {
 			return this.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.from;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactFloatArray owner = this.owner;
@@ -147,25 +133,21 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public float[] array() {
 			return this.owner.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.startIndex;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this.owner.finalIndex;
@@ -203,104 +185,87 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		super(section);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected float[] customGetArray() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetArray(final float[] array) {
 		this.array = array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected float[] customNewArray(final int length) {
 		return new float[length];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected Float customGet(final int index) {
 		return Float.valueOf(this.get(index));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSet(final int index, final Float value) {
 		this.set(index, value.floatValue());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public float get(final int index) {
 		return this.array[this.inclusiveIndex(index)];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(final int index, final float[] values) {
 		this.getAll(index, FloatArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final float value) {
 		this.array[this.inclusiveIndex(index)] = value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(final int index, final float[] values) {
 		this.setAll(index, FloatArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final float value) {
 		this.add(this.size, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final float[] values) {
 		this.addAll(this.size, values);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final float value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final int index, final float[] values) {
 		this.addAll(this.size, FloatArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public float[] array() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FloatArraySection section() {
 		return new CompactFloatArraySection(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FloatArray subArray(final int startIndex, final int finalIndex) {
 		return new CompactFloatSubArray(this, startIndex, finalIndex);

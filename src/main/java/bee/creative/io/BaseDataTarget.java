@@ -13,25 +13,21 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 	/** Dieses Feld speichert den Schreibpuffer. */
 	protected final byte[] array = new byte[8];
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final int b) throws IOException {
 		this.writeByte(b);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] b) throws IOException {
 		this.write(b, 0, b.length);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeBoolean(final boolean v) throws IOException {
 		this.write(v ? 1 : 0);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeByte(final int v) throws IOException {
 		final byte[] array = this.array;
@@ -39,7 +35,6 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		this.write(array, 0, 1);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeShort(final int v) throws IOException {
 		final byte[] array = this.array;
@@ -47,13 +42,11 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		this.write(array, 0, 2);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeChar(final int v) throws IOException {
 		this.writeShort(v);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeInt(final int v) throws IOException {
 		final byte[] array = this.array;
@@ -61,7 +54,6 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		this.write(array, 0, 4);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeInt(final int v, final int size) throws IOException {
 		final byte[] array = this.array;
@@ -69,7 +61,6 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		this.write(array, 0, size);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeLong(final long v) throws IOException {
 		final byte[] array = this.array;
@@ -77,7 +68,6 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		this.write(array, 0, 8);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeLong(final long v, final int size) throws IOException {
 		final byte[] array = this.array;
@@ -85,19 +75,16 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		this.write(array, 0, size);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeFloat(final float v) throws IOException {
 		this.writeInt(Float.floatToIntBits(v));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeDouble(final double v) throws IOException {
 		this.writeLong(Double.doubleToLongBits(v));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ("deprecation")
 	public void writeBytes(final String s) throws IOException {
@@ -107,7 +94,6 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		this.write(data);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeChars(final String s) throws IOException {
 		for (int i = 0, size = s.length(); i < size; i++) {
@@ -115,7 +101,6 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void writeUTF(final String s) throws IOException {
 		new DataOutputStream(null) {
@@ -132,30 +117,25 @@ public abstract class BaseDataTarget extends BaseObject implements DataTarget {
 		}.writeUTF(s);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
 		throw new IOException();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
 		throw new IOException();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
 		throw new IOException();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void allocate(final long value) throws IOException {
 		throw new IOException();

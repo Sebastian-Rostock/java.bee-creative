@@ -33,43 +33,36 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 		this.allocateImpl(this.countImpl());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected GItem customGetValue(final int entryIndex) {
 		return null;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected GItem customSetValue(final int entryIndex, final GItem value) {
 		return null;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int size() {
 		return this.countImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean isEmpty() {
 		return this.countImpl() == 0;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void clear() {
 		this.clearImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean add(final GItem item) {
 		return this.putKeyImpl(item);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean addAll(final Collection<? extends GItem> items) {
 		final int count = this.countImpl();
@@ -79,49 +72,41 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 		return count != this.countImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean contains(final Object item) {
 		return this.hasKeyImpl(item);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean containsAll(final Collection<?> items) {
 		return this.newKeysImpl().containsAll(items);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean remove(final Object item) {
 		return this.popKeyImpl(item);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean removeAll(final Collection<?> items) {
 		return this.newKeysImpl().removeAll(items);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean retainAll(final Collection<?> items) {
 		return this.newKeysImpl().retainAll(items);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Iterator<GItem> iterator() {
 		return this.newKeysIteratorImpl();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return this.newKeysImpl().hashCode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;
@@ -131,19 +116,16 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 		return this.containsAll(that);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object[] toArray() {
 		return this.newKeysImpl().toArray();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public <GItem> GItem[] toArray(final GItem[] result) {
 		return this.newKeysImpl().toArray(result);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this.newKeysImpl().toString();

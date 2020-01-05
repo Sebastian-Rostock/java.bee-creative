@@ -32,7 +32,6 @@ public final class XMLMarshaller {
 			return XMLMarshaller.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final SourceData customThis() {
 			return this;
@@ -53,7 +52,6 @@ public final class XMLMarshaller {
 			return XMLMarshaller.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ResultData customThis() {
 			return this;
@@ -73,7 +71,6 @@ public final class XMLMarshaller {
 			return XMLMarshaller.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final MarshallerData customThis() {
 			return this;
@@ -197,7 +194,6 @@ public final class XMLMarshaller {
 		return this.marshallerData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.sourceData, this.resultData, this.marshallerData);

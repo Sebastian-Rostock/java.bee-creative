@@ -72,7 +72,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMDecimal> type() {
 		return FEMDecimal.TYPE;
@@ -108,14 +107,12 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		return undefined;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		final long value = Double.doubleToLongBits(this.value);
 		return Integers.toIntL(value) ^ Integers.toIntH(value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -127,7 +124,6 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 		return this.equals((FEMDecimal)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMDecimal value) {
 		return this.compare(value, 0);

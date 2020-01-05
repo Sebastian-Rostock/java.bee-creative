@@ -66,25 +66,21 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 		});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final boolean[] array) {
 		return array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final boolean[] array, final int index) {
 		return (array[index] ? 1231 : 1237);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEquals(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customCompare(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
 		final boolean value1 = array1[index1], value2 = array2[index2];
@@ -93,20 +89,18 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 		return 1;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customPrint(final boolean[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
 	/** Diese Methode gibt diese {@link BooleanArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactBooleanArray(this).values()}.
-	 * 
+	 *
 	 * @return {@link Boolean}-{@link List}. */
 	public List<Boolean> asList() {
 		return new CompactBooleanArray(this).values();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

@@ -7,23 +7,18 @@ import java.util.List;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface BooleanArray extends Array<boolean[], Boolean> {
 
-	/** {@inheritDoc} */
 	@Override
 	public int size();
 
-	/** {@inheritDoc} */
 	@Override
 	public void clear();
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean isEmpty();
 
-	/** {@inheritDoc} */
 	@Override
 	public List<Boolean> values();
 
-	/** {@inheritDoc} */
 	@Override
 	public BooleanArraySection section();
 
@@ -44,11 +39,9 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
 	public void getAll(int index, boolean[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, Array<? super boolean[], ? super Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, ArraySection<? super boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -69,11 +62,9 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
 	public void setAll(int index, boolean[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, ArraySection<? extends boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -90,11 +81,9 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 	 * @throws NullPointerException Wenn das gegebene {@code boolean}-Array {@code null} ist. */
 	public void add(boolean[] values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(ArraySection<? extends boolean[]> values) throws NullPointerException;
 
@@ -115,27 +104,21 @@ public interface BooleanArray extends Array<boolean[], Boolean> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
 	public void add(int index, boolean[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, Array<? extends boolean[], ? extends Boolean> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, ArraySection<? extends boolean[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void insert(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public void remove(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public BooleanArray subArray(int fromIndex, int toIndex);
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean[] toArray();
 

@@ -48,7 +48,6 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 			}
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final AttrData<GOwner> customThis() {
 			return this;
@@ -117,7 +116,6 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 			}
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ChldData<GOwner> customThis() {
 			return this;
@@ -589,7 +587,6 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newChldData();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -601,7 +598,6 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.getNode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.getNode());

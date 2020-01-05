@@ -66,25 +66,21 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 		});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customLength(final int[] array) {
 		return array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final int[] array, final int index) {
 		return array[index];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEquals(final int[] array1, final int[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customCompare(final int[] array1, final int[] array2, final int index1, final int index2) {
 		final int value1 = array1[index1], value2 = array2[index2];
@@ -93,20 +89,18 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 		return 1;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customPrint(final int[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
 	/** Diese Methode gibt diese {@link IntegerArraySection} als {@link List} zurück und ist eine Abkürzung für {@code new CompactIntegerArray(this).values()}.
-	 * 
+	 *
 	 * @return {@link Integer}-{@link List}. */
 	public List<Integer> asList() {
 		return new CompactIntegerArray(this).values();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

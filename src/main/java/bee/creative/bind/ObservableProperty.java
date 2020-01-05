@@ -15,7 +15,6 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 		/** Dieses Feld speichert das {@link UpdatePropertyEvent}. */
 		public static final UpdatePropertyEvent INSTANCE = new UpdatePropertyEvent();
 
-		/** {@inheritDoc} */
 		@Override
 		protected void customFire(final Object sender, final UpdatePropertyMessage message, final UpdatePropertyObserver observer) {
 			observer.onUpdateProperty(message);
@@ -59,7 +58,6 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 			this.setValue(this.newValue);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.sender, this.oldValue, this.newValue);
@@ -87,13 +85,11 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 		this.property = Objects.notNull(property);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue get() {
 		return this.property.get();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final GValue newValue) {
 		GValue oldValue = this.property.get();
@@ -103,31 +99,26 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 		this.fire(new UpdatePropertyMessage(this, oldValue, newValue));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ObservableProperty.UpdatePropertyObserver put(final UpdatePropertyObserver listener) throws IllegalArgumentException {
 		return UpdatePropertyEvent.INSTANCE.put(this, listener);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ObservableProperty.UpdatePropertyObserver putWeak(final UpdatePropertyObserver listener) throws IllegalArgumentException {
 		return UpdatePropertyEvent.INSTANCE.putWeak(this, listener);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void pop(final UpdatePropertyObserver listener) throws IllegalArgumentException {
 		UpdatePropertyEvent.INSTANCE.pop(this, listener);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public UpdatePropertyMessage fire(final UpdatePropertyMessage event) throws NullPointerException {
 		return UpdatePropertyEvent.INSTANCE.fire(this, event);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this.property.toString();

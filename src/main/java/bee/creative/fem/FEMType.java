@@ -125,7 +125,6 @@ public class FEMType<GData> {
 		return this.id == that.id;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.id);

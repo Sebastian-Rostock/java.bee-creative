@@ -136,13 +136,11 @@ public abstract class BEXNode {
 	 * @return Attributknotenliste. */
 	public abstract BEXList attributes();
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return this.key() ^ this.owner().hashCode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (this == object) return true;
@@ -151,7 +149,6 @@ public abstract class BEXNode {
 		return (this.key() == that.key()) && this.owner().equals(that.owner());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.key(), this.type(), this.index(), //

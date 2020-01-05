@@ -9,14 +9,12 @@ import bee.creative.fem.FEMBinary;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMBinaryAdapter extends XmlAdapter<String, FEMBinary> {
 
-	/** {@inheritDoc} */
 	@Override
 	public String marshal(final FEMBinary value) throws Exception {
 		if (value == null) return null;
 		return value.toString(false);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FEMBinary unmarshal(final String value) throws Exception {
 		if (value == null) return null;

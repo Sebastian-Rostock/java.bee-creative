@@ -41,13 +41,11 @@ public class ArrayDataSource extends BaseDataSource {
 		this.data = Objects.notNull(data);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ByteArraySection data() {
 		return this.data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void readFully(final byte[] array, final int offset, final int length) throws IOException {
 		final ByteArraySection data = this.data;
@@ -57,25 +55,21 @@ public class ArrayDataSource extends BaseDataSource {
 		this.index = index2;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
 		this.index = (int)index;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
 		return this.index;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
 		return this.data.size();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 	}

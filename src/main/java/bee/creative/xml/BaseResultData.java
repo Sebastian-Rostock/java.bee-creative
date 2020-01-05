@@ -148,13 +148,11 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 		return this.useResult(null);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Result get() throws IllegalStateException {
 		return this.getResult();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.result, this.systemId);

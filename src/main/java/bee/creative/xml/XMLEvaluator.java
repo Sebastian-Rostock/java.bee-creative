@@ -28,7 +28,6 @@ public final class XMLEvaluator {
 			return XMLEvaluator.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final XPathData customThis() {
 			return this;
@@ -42,7 +41,6 @@ public final class XMLEvaluator {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public final class CacheData extends Unique<String, XPathExpression> {
 
-		/** {@inheritDoc} */
 		@Override
 		protected final XPathExpression customTarget(final String input) {
 			try {
@@ -231,7 +229,6 @@ public final class XMLEvaluator {
 		return this.xpathData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.base, this.expression, this.xpathData, this.cacheData);

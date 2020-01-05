@@ -8,23 +8,18 @@ import java.util.List;
  * @param <GValue> Typ der Elemente. */
 public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 
-	/** {@inheritDoc} */
 	@Override
 	public int size();
 
-	/** {@inheritDoc} */
 	@Override
 	public void clear();
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean isEmpty();
 
-	/** {@inheritDoc} */
 	@Override
 	public List<GValue> values();
 
-	/** {@inheritDoc} */
 	@Override
 	public ObjectArraySection<GValue> section();
 
@@ -45,11 +40,9 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
 	public void getAll(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, Array<? super GValue[], ? super GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, ArraySection<? super GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -70,11 +63,9 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
 	public void setAll(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, Array<? extends GValue[], ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, ArraySection<? extends GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -91,11 +82,9 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * @throws NullPointerException Wenn das gegebene {@code GValue}-Array {@code null} ist. */
 	public void addAll(GValue[] values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(Array<? extends GValue[], ? extends GValue> values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(ArraySection<? extends GValue[]> values) throws NullPointerException;
 
@@ -116,27 +105,21 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
 	public void addAll(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, Array<? extends GValue[], ? extends GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, ArraySection<? extends GValue[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void insert(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public void remove(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public ObjectArray<GValue> subArray(int fromIndex, int toIndex);
 
-	/** {@inheritDoc} */
 	@Override
 	public GValue[] toArray();
 

@@ -27,7 +27,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FeatureData<GOwner> customThis() {
 			return this;
@@ -47,7 +46,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @return Besitzer. */
 		public abstract GOwner closeSchemaData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final SchemaData<GOwner> customThis() {
 			return this;
@@ -144,7 +142,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final PropertyData<GOwner> customThis() {
 			return this;
@@ -164,7 +161,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @return Besitzer. */
 		public abstract GOwner closeAttributeData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final AttributeData<GOwner> customThis() {
 			return this;
@@ -328,7 +324,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		return this.attributeData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -344,7 +339,6 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.featureData, this._schemaData_, this.propertyData, this.attributeData);

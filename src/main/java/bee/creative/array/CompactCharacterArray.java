@@ -25,62 +25,52 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 			super(owner, startIndex, finalIndex);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public CharacterArraySection section() {
 			return new CompactCharacterSubArraySection(this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public char get(final int index) {
 			return this.owner.get(this.ownerIndex(index));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void get(final int index, final char[] values) {
 			this.getAll(index, CharacterArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final char value) {
 			this.owner.set(this.ownerIndex(index), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final char[] values) {
 			this.setAll(index, CharacterArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final char value) {
 			this.add(this.size(), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final char[] values) {
 			this.add(this.size(), values);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final char value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final char[] values) {
 			this.addAll(this.size(), CharacterArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public CharacterArray subArray(final int fromIndex, final int toIndex) {
 			return (CharacterArray)this.ownerSubArray(fromIndex, toIndex);
@@ -104,25 +94,21 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public char[] array() {
 			return this.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.from;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactCharacterArray owner = this.owner;
@@ -147,25 +133,21 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public char[] array() {
 			return this.owner.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.startIndex;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this.owner.finalIndex;
@@ -203,104 +185,87 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		super(section);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected char[] customGetArray() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetArray(final char[] array) {
 		this.array = array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected char[] customNewArray(final int length) {
 		return new char[length];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected Character customGet(final int index) {
 		return Character.valueOf(this.get(index));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSet(final int index, final Character value) {
 		this.set(index, value.charValue());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public char get(final int index) {
 		return this.array[this.inclusiveIndex(index)];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void get(final int index, final char[] values) {
 		this.getAll(index, CharacterArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final char value) {
 		this.array[this.inclusiveIndex(index)] = value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final char[] values) {
 		this.setAll(index, CharacterArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final char value) {
 		this.add(this.size, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final char[] values) {
 		this.add(this.size, values);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final char value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final char[] values) {
 		this.addAll(this.size, CharacterArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public char[] array() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public CharacterArraySection section() {
 		return new CompactCharacterArraySection(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public CharacterArray subArray(final int startIndex, final int finalIndex) {
 		return new CompactCharacterSubArray(this, startIndex, finalIndex);

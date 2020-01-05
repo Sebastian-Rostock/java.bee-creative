@@ -9,14 +9,12 @@ import bee.creative.fem.FEMInteger;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMIntegerAdapter extends XmlAdapter<String, FEMInteger> {
 
-	/** {@inheritDoc} */
 	@Override
 	public String marshal(final FEMInteger value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FEMInteger unmarshal(final String value) throws Exception {
 		if (value == null) return null;

@@ -8,7 +8,6 @@ import org.w3c.dom.Document;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLDocumentBuilder extends BaseDocumentBuilderData<XMLDocumentBuilder> {
 
-	/** {@inheritDoc} */
 	@Override
 	protected final XMLDocumentBuilder customThis() {
 		return this;

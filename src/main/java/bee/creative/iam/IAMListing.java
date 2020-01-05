@@ -266,13 +266,11 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 		return new CompactListing(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Iterator<IAMArray> iterator() {
 		return this.items().iterator();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.itemCount());

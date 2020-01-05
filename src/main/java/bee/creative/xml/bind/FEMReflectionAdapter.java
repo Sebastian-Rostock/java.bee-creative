@@ -10,14 +10,12 @@ import bee.creative.fem.FEMReflection;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMReflectionAdapter extends XmlAdapter<String, FEMFunction> {
 
-	/** {@inheritDoc} */
 	@Override
 	public String marshal(final FEMFunction value) throws Exception {
 		if (value == null) return null;
 		return value.toString();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public FEMFunction unmarshal(final String value) throws Exception {
 		if (value == null) return null;

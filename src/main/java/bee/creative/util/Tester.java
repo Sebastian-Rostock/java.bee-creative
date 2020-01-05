@@ -80,7 +80,6 @@ public class Tester {
 			} catch (final InterruptedException e) {}
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public final void run() {
 			final Runtime runtime = Runtime.getRuntime();
@@ -298,7 +297,6 @@ public class Tester {
 		this.cause = cause;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return String.format("usedTime: %4.3f ms  usedMemory: %+4.3f MB  cause: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.cause);

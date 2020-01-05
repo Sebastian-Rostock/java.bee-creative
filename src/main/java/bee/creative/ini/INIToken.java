@@ -135,13 +135,11 @@ public final class INIToken {
 		return this.string1 == null;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return Objects.hash(this.string1, this.string2);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
@@ -150,7 +148,6 @@ public final class INIToken {
 		return Objects.equals(this.string1, that.string1) && Objects.equals(this.string2, that.string2);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		if (this.string1 == null) return ";" + Objects.toString(this.string2);

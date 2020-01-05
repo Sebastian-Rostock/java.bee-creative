@@ -36,7 +36,6 @@ public class XMLCleaner {
 			return XMLCleaner.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FileData customThis() {
 			return this;
@@ -56,7 +55,6 @@ public class XMLCleaner {
 			return XMLCleaner.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final CharsetData customThis() {
 			return this;

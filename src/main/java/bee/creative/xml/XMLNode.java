@@ -11,19 +11,16 @@ import org.w3c.dom.Text;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLNode extends BaseNodeData<XMLNode> {
 
-	/** {@inheritDoc} */
 	@Override
 	public final XMLNode use(final BaseNodeData<?> data) {
 		return super.use(data);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final XMLNode useNode(final Node node) {
 		return super.useNode(node);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected final XMLNode customThis() {
 		return this;

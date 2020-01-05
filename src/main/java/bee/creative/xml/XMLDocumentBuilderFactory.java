@@ -8,7 +8,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLDocumentBuilderFactory extends BaseDocumentBuilderFactoryData<XMLDocumentBuilderFactory> {
 
-	/** {@inheritDoc} */
 	@Override
 	protected final XMLDocumentBuilderFactory customThis() {
 		return this;

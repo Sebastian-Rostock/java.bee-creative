@@ -26,7 +26,6 @@ public class CountingReader extends FilterReader {
 		return this.readCount;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int read() throws IOException {
 		final int result = super.read();
@@ -35,7 +34,6 @@ public class CountingReader extends FilterReader {
 		return result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int read(final char[] target, final int offset, final int length) throws IOException {
 		final int result = super.read(target, offset, length);
@@ -44,7 +42,6 @@ public class CountingReader extends FilterReader {
 		return result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long skip(final long count) throws IOException {
 		final long result = super.skip(count);

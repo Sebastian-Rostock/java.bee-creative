@@ -164,19 +164,16 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Iterator<String> iterator() {
 		return this.messages.iterator();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final synchronized Throwable getCause() {
 		return this.cause;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String getMessage() {
 		return Strings.join("\n", this.messages);

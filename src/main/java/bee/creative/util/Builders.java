@@ -45,13 +45,11 @@ public class Builders {
 		/** Dieses Feld speichert den Wert. */
 		protected GResult result;
 
-		/** {@inheritDoc} */
 		@Override
 		public GResult get() {
 			return this.result;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.toString(true, this.result);
@@ -168,7 +166,6 @@ public class Builders {
 			return this.customThis();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Iterator<GItem> iterator() {
 			return this.result.iterator();
@@ -520,7 +517,6 @@ public class Builders {
 			return this.customThis();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Iterator<Entry<GKey, GValue>> iterator() {
 			return this.result.entrySet().iterator();
@@ -576,7 +572,6 @@ public class Builders {
 			return this.customThis();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public Iterator<GResult> iterator() {
 			final GResult result = this.result;
@@ -600,7 +595,6 @@ public class Builders {
 			return new ItemBuilder<GItem>().use(result);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected ItemBuilder<GItem> customThis() {
 			return this;
@@ -667,7 +661,6 @@ public class Builders {
 			super(result);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected SetBuilder<GItem, GResult> customThis() {
 			return this;
@@ -779,7 +772,6 @@ public class Builders {
 			super(result);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected ListBuilder<GItem, GResult> customThis() {
 			return this;
@@ -914,7 +906,6 @@ public class Builders {
 			super(result);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected MapBuilder<GKey, GValue, GResult> customThis() {
 			return this;

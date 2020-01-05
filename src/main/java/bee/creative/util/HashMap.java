@@ -111,27 +111,23 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ("unchecked")
 	protected GKey customGetKey(final int entryIndex) {
 		return (GKey)this.keys[entryIndex];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ("unchecked")
 	protected GValue customGetValue(final int entryIndex) {
 		return (GValue)this.values[entryIndex];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
 		this.keys[entryIndex] = key;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ("unchecked")
 	protected GValue customSetValue(final int entryIndex, final GValue value) {
@@ -141,62 +137,52 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		return (GValue)result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final Object key) {
 		return Objects.hash(key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHashKey(final int entryIndex) {
 		return Objects.hash(this.keys[entryIndex]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHashValue(final int entryIndex) {
 		return Objects.hash(this.values[entryIndex]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
 		return Objects.equals(this.keys[entryIndex], key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
 		return Objects.equals(this.keys[entryIndex], key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsValue(final int entryIndex, final Object value) {
 		return Objects.equals(this.values[entryIndex], value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customClear() {
 		Arrays.fill(this.keys, null);
 		Arrays.fill(this.values, null);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customClearKey(final int entryIndex) {
 		this.keys[entryIndex] = null;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customClearValue(final int entryIndex) {
 		this.values[entryIndex] = null;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected HashAllocator customAllocator(final int capacity) {
 		final Object[] keys2;
@@ -225,13 +211,11 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		};
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long emu() {
 		return super.emu() + EMU.fromArray(this.keys) + EMU.fromArray(this.values);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {

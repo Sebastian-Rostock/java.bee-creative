@@ -15,32 +15,32 @@ public class IAMIndexBuilder extends IAMIndex {
 
 	/** Diese Klasse implementiert den abstrakten Ausgabedatensatz eines {@link BasePool}. */
 	static abstract class BaseData implements Emuable {
-	
+
 		/** Dieses Feld speichert die Position, unter der dieses Objekt in {@link BasePool#datas} verwaltet wird. */
 		public int index;
-	
+
 		@Override
 		public String toString() {
 			return Integer.toString(this.index);
 		}
-	
+
 	}
 
 	/** Diese Klasse implementiert ein abstraktes {@link Unique}, über welches Nutzdaten in der Reihenfolge ihrer Erfassung gesammelt werden können.
 	 *
 	 * @param <GData> Typ der Ausgabe. */
 	static abstract class BasePool<GData> extends Unique<IAMArray, GData> implements Emuable {
-	
+
 		/** Dieses Feld speichert die gesammelten Ausgabedaten. */
 		public final List<GData> datas = new ArrayList<>();
-	
+
 		/** Dieses Feld speichert Puffer zur Optimierung bzw. Aulagerung der Eingaben in {@link #customSource(IAMArray)}. */
 		public final IAMArrayBuilder builder;
-	
+
 		public BasePool(final IAMArrayBuilder builder) {
 			this.builder = Objects.notNull(builder);
 		}
-	
+
 		/** Diese Methode nimmt einen neuen Ausgabedatensatz mit den gegebenen Eingabedaten in die Verwaltung auf und gibt diesen zurück.
 		 *
 		 * @param source Eingabedatensatz.
@@ -52,35 +52,35 @@ public class IAMIndexBuilder extends IAMIndex {
 			this.datas.add(index, data);
 			return data;
 		}
-	
+
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.mapping) + EMU.from(this.datas) + EMU.fromAll(this.datas);
 		}
-	
+
 		/** Diese Methode leert den Pool. */
 		public void clear() {
 			this.mapping.clear();
 			this.datas.clear();
 		}
-	
+
 		@Override
 		protected final IAMArray customSource(final IAMArray source) {
 			return this.builder.get(source);
 		}
-	
+
 		@Override
 		protected final GData customTarget(final IAMArray source) {
 			return this.put(source);
 		}
-	
+
 		/** Diese Methode erzeugt einen neuen Ausgabedatensatz und gibt diesen zurück.
 		 *
 		 * @param index Position, unter welcher der Ausgabedatensatz in {@link #datas} verwaltet wird.
 		 * @param source Eingabedatensatz.
 		 * @return Ausgabedatensatz. */
 		protected abstract GData customData(int index, IAMArray source);
-	
+
 	}
 
 	static class ListingData extends IAMIndexBuilder.BaseData {

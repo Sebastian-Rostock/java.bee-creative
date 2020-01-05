@@ -40,43 +40,36 @@ public class FileDataTarget extends BaseDataTarget {
 		this.data = Objects.notNull(data);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public RandomAccessFile data() {
 		return this.data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
 		this.data.write(array, offset, length);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
 		this.data.seek(index);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
 		return this.data.getFilePointer();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
 		return this.data.length();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void allocate(final long value) throws IOException {
 		this.data.setLength(value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 		this.data.close();

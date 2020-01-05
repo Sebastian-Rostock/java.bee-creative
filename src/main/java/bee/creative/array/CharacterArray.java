@@ -7,23 +7,18 @@ import java.util.List;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface CharacterArray extends Array<char[], Character> {
 
-	/** {@inheritDoc} */
 	@Override
 	public int size();
 
-	/** {@inheritDoc} */
 	@Override
 	public void clear();
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean isEmpty();
 
-	/** {@inheritDoc} */
 	@Override
 	public List<Character> values();
 
-	/** {@inheritDoc} */
 	@Override
 	public CharacterArraySection section();
 
@@ -44,11 +39,9 @@ public interface CharacterArray extends Array<char[], Character> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
 	public void get(int index, char[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, Array<? super char[], ? super Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, ArraySection<? super char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -69,11 +62,9 @@ public interface CharacterArray extends Array<char[], Character> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
 	public void set(int index, char[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, Array<? extends char[], ? extends Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, ArraySection<? extends char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -90,11 +81,9 @@ public interface CharacterArray extends Array<char[], Character> {
 	 * @throws NullPointerException Wenn das gegebene {@code char}-Array {@code null} ist. */
 	public void add(char[] values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(Array<? extends char[], ? extends Character> values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(ArraySection<? extends char[]> values) throws NullPointerException;
 
@@ -115,27 +104,21 @@ public interface CharacterArray extends Array<char[], Character> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
 	public void add(int index, char[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, Array<? extends char[], ? extends Character> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, ArraySection<? extends char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void insert(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public void remove(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public CharacterArray subArray(int fromIndex, int toIndex);
 
-	/** {@inheritDoc} */
 	@Override
 	public char[] toArray();
 

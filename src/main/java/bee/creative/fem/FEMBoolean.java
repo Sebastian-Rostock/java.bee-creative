@@ -64,7 +64,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		return this;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMBoolean> type() {
 		return FEMBoolean.TYPE;
@@ -95,13 +94,11 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		return Boolean.compare(this.value, that.value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.value ? 1231 : 1237;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -113,7 +110,6 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		return this.equals((FEMBoolean)object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMBoolean value) {
 		return this.compare(value);

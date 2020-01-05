@@ -224,7 +224,6 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		return target;
 	}
 
-	/** {@inheritDoc} Dazu ruft sie {@link Map#put(Object, Object)} der {@link #mapping() angebundenen Abbildung} auf. */
 	@Override
 	public void set(final GSource source, final GTarget target) {
 		this.mapping.put(source, target);
@@ -261,32 +260,27 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	protected void customReuse(final GSource source, final GTarget target) {
 	}
 
-	/** {@inheritDoc} **/
 	@Override
 	public int hash(final Object source) throws NullPointerException {
 		return Objects.hash(source);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object source1, final Object source2) throws NullPointerException {
 		return Objects.equals(source1, source2);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ({"rawtypes", "unchecked"})
 	public int compare(final GSource source1, final GSource source2) throws NullPointerException {
 		return Comparators.compare((Comparable)source1, (Comparable)source2);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Iterator<GTarget> iterator() {
 		return this.mapping.values().iterator();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toString(true, this.mapping);

@@ -29,7 +29,6 @@ public final class XMLFormatter {
 			return XMLFormatter.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final SourceData customThis() {
 			return this;
@@ -50,7 +49,6 @@ public final class XMLFormatter {
 			return XMLFormatter.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ResultData customThis() {
 			return this;
@@ -70,7 +68,6 @@ public final class XMLFormatter {
 			return XMLFormatter.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final TransformerData customThis() {
 			return this;
@@ -166,7 +163,6 @@ public final class XMLFormatter {
 		return this.transformerData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.sourceData, this.resultData, this.transformerData);

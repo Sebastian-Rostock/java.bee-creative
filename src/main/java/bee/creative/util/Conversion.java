@@ -36,11 +36,9 @@ public interface Conversion<GSource, GTarget> {
 	 * @return Ausgabe. */
 	public GTarget target();
 
-	/** Der Streuwert entspricht dem der {@link #target() Ausgabe}. {@inheritDoc} */
 	@Override
 	public int hashCode();
 
-	/** Die Äquivalenz dieses und der gegebenen {@link Conversion} basiert auf der Äquivalenz ihrer {@link #target() Ausgaben}. {@inheritDoc} */
 	@Override
 	public boolean equals(Object object);
 

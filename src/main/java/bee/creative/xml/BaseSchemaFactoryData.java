@@ -29,7 +29,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FeatureData<GOwner> customThis() {
 			return this;
@@ -49,7 +48,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final PropertyData<GOwner> customThis() {
 			return this;
@@ -69,7 +67,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 * @return Besitzer. */
 		public abstract GOwner closeHandlerData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final HandlerData<GOwner> customThis() {
 			return this;
@@ -89,7 +86,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 * @return Besitzer. */
 		public abstract GOwner closeResolverData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ResolverData<GOwner> customThis() {
 			return this;
@@ -131,7 +127,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		 * @return Besitzer. */
 		public abstract GOwner closeLanguageData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final LanguageData<GOwner> customThis() {
 			return this;
@@ -305,11 +300,9 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		return this.languageData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
-	/** {@inheritDoc} */
 	@Override
 	public final SchemaFactory get() throws IllegalStateException {
 		try {
@@ -319,7 +312,6 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.featureData, this.propertyData, this.handlerData, this.resolverData, this.languageData);

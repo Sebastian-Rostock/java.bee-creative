@@ -25,62 +25,52 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 			super(owner, startIndex, finalIndex);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public LongArraySection section() {
 			return new CompactLongSubArraySection(this);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public long get(final int index) {
 			return this.owner.get(this.ownerIndex(index));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void getAll(final int index, final long[] values) {
 			this.getAll(index, LongArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final long value) {
 			this.owner.set(this.ownerIndex(index), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void setAll(final int index, final long[] values) {
 			this.setAll(index, LongArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final long value) {
 			this.add(this.size(), value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final long[] values) {
 			this.addAll(this.size(), values);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final long value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void addAll(final int index, final long[] values) {
 			this.addAll(this.size(), LongArraySection.from(values));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public LongArray subArray(final int fromIndex, final int toIndex) {
 			return (LongArray)this.ownerSubArray(fromIndex, toIndex);
@@ -104,25 +94,21 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public long[] array() {
 			return this.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.from;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactLongArray owner = this.owner;
@@ -147,25 +133,21 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 			this.owner = Objects.notNull(owner);
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.owner.size();
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public long[] array() {
 			return this.owner.owner.array;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this.owner.startIndex;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this.owner.finalIndex;
@@ -203,104 +185,87 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 		super(section);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected long[] customGetArray() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetArray(final long[] array) {
 		this.array = array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected long[] customNewArray(final int length) {
 		return new long[length];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected Long customGet(final int index) {
 		return Long.valueOf(this.get(index));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSet(final int index, final Long value) {
 		this.set(index, value.longValue());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customGetCapacity() {
 		return this.array.length;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long get(final int index) {
 		return this.array[this.inclusiveIndex(index)];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(final int index, final long[] values) {
 		this.getAll(index, LongArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final long value) {
 		this.array[this.inclusiveIndex(index)] = value;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(final int index, final long[] values) {
 		this.setAll(index, LongArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final long value) {
 		this.add(this.size, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final long[] values) {
 		this.addAll(this.size, values);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final long value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(final int index, final long[] values) {
 		this.addAll(this.size, LongArraySection.from(values));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long[] array() {
 		return this.array;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public LongArraySection section() {
 		return new CompactLongArraySection(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public LongArray subArray(final int startIndex, final int finalIndex) {
 		return new CompactLongSubArray(this, startIndex, finalIndex);

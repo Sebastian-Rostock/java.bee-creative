@@ -76,26 +76,22 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		this.putAll(source);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
 		this.keys[entryIndex] = key;
 		this.hashes[entryIndex] = keyHash;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHashKey(final int entryIndex) {
 		return this.hashes[entryIndex];
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
 		return (this.hashes[entryIndex] == keyHash) && Objects.equals(this.keys[entryIndex], key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected HashAllocator customAllocator(final int capacity) {
 		final Object[] keys2;
@@ -129,13 +125,11 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		};
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long emu() {
 		return super.emu() + EMU.fromArray(this.hashes);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {

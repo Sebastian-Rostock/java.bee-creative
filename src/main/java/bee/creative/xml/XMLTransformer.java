@@ -7,7 +7,6 @@ import javax.xml.transform.Transformer;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLTransformer extends BaseTransformerData<XMLTransformer> {
 
-	/** {@inheritDoc} */
 	@Override
 	protected final XMLTransformer customThis() {
 		return this;

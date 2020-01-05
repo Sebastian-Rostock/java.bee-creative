@@ -41,7 +41,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		 * @return Besitzer. */
 		public abstract GOwner closeModelData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final ModelData<GOwner> customThis() {
 			return this;
@@ -61,7 +60,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FeatureData<GOwner> customThis() {
 			return this;
@@ -81,7 +79,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		 * @return Besitzer. */
 		public abstract GOwner closeVariableData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final VariableData<GOwner> customThis() {
 			return this;
@@ -101,7 +98,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		 * @return Besitzer. */
 		public abstract GOwner closeFunctionData();
 
-		/** {@inheritDoc} */
 		@Override
 		protected final FunctionData<GOwner> customThis() {
 			return this;
@@ -253,7 +249,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		return this.functionData;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis customThis();
 
@@ -269,7 +264,6 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.modelData, this.featureData, this.variableData, this.functionData);

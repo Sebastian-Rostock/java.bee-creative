@@ -26,21 +26,18 @@ public class CountingWriter extends FilterWriter {
 		return this.writeCount;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final int value) throws IOException {
 		super.write(value);
 		this.setWriteCount(this.writeCount + 1);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final String source, final int offset, final int length) throws IOException {
 		super.write(source, offset, length);
 		this.setWriteCount(this.writeCount + length);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final char[] source, final int offset, final int length) throws IOException {
 		super.write(source, offset, length);

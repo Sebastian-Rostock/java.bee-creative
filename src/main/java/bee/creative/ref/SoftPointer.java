@@ -26,19 +26,16 @@ public final class SoftPointer<GValue> extends SoftReference<GValue> implements 
 		super(value, queue);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return HardPointer.hash(this);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		return HardPointer.equals(this, object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return String.valueOf(this.get());

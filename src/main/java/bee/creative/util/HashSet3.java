@@ -37,25 +37,21 @@ public class HashSet3<GItem> extends HashSet<GItem> {
 		this.addAll(source);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHash(final Object key) {
 		return System.identityHashCode(key);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected int customHashKey(final int entryIndex) {
 		return System.identityHashCode(this.items[entryIndex]);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
 		return this.items[entryIndex] == key;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
 		return this.items[entryIndex] == key;

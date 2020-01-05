@@ -107,13 +107,11 @@ public abstract class IAMEntry {
 		return this.value().length();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.key().hash() ^ this.value().hash();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
@@ -122,7 +120,6 @@ public abstract class IAMEntry {
 		return this.key().equals(that.key()) && this.value().equals(that.value());
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this.key() + "=" + this.value();

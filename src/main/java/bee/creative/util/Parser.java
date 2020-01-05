@@ -243,7 +243,6 @@ public class Parser {
 		this.reset();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.source);

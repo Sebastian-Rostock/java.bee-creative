@@ -62,7 +62,6 @@ public final class FEMFormatter {
 			return (this.data & 2) != 0;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
 			return "T" + (this.level() == 0 ? "" : (this.isLast() ? "-" : this.isSpace() ? "=" : "+") + (this.isEnabled() ? "E" : ""));
@@ -225,7 +224,6 @@ public final class FEMFormatter {
 		return result.toString();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.indent, this.items);

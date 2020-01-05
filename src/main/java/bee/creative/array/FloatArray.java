@@ -7,23 +7,18 @@ import java.util.List;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface FloatArray extends Array<float[], Float> {
 
-	/** {@inheritDoc} */
 	@Override
 	public int size();
 
-	/** {@inheritDoc} */
 	@Override
 	public void clear();
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean isEmpty();
 
-	/** {@inheritDoc} */
 	@Override
 	public List<Float> values();
 
-	/** {@inheritDoc} */
 	@Override
 	public FloatArraySection section();
 
@@ -44,11 +39,9 @@ public interface FloatArray extends Array<float[], Float> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}). */
 	public void getAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, Array<? super float[], ? super Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void getAll(int index, ArraySection<? super float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -69,11 +62,9 @@ public interface FloatArray extends Array<float[], Float> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}). */
 	public void setAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void setAll(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -90,11 +81,9 @@ public interface FloatArray extends Array<float[], Float> {
 	 * @throws NullPointerException Wenn das gegebene {@code float}-Array {@code null} ist. */
 	public void addAll(float[] values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(Array<? extends float[], ? extends Float> values) throws NullPointerException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(ArraySection<? extends float[]> values) throws NullPointerException;
 
@@ -115,27 +104,21 @@ public interface FloatArray extends Array<float[], Float> {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
 	public void addAll(int index, float[] values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, Array<? extends float[], ? extends Float> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void addAll(int index, ArraySection<? extends float[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
-	/** {@inheritDoc} */
 	@Override
 	public void insert(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public void remove(int index, int count);
 
-	/** {@inheritDoc} */
 	@Override
 	public FloatArray subArray(int fromIndex, int toIndex);
 
-	/** {@inheritDoc} */
 	@Override
 	public float[] toArray();
 

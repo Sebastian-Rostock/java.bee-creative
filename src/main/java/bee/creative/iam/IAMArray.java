@@ -878,7 +878,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final Iterator<Integer> iterator() {
 		return new BaseIterator<Integer>() {
@@ -898,7 +897,6 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		};
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		int hash = Objects.hashInit();
@@ -908,19 +906,16 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return hash;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		return (object == this) || ((object instanceof IAMArray) && this.equals((IAMArray)object));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final IAMArray object) {
 		return this.compare(object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this.length > 30 ? //

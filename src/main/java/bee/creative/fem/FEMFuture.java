@@ -70,13 +70,11 @@ public final class FEMFuture extends FEMValue {
 		return result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.result().hashCode();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
@@ -84,7 +82,6 @@ public final class FEMFuture extends FEMValue {
 		return this.result().equals(object);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public synchronized String toString() {
 		if (this.function instanceof FEMValue) return this.function.toString();

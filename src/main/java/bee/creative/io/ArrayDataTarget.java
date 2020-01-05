@@ -37,13 +37,11 @@ public class ArrayDataTarget extends BaseDataTarget {
 		this.data = Objects.notNull(data);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public CompactByteArray data() {
 		return this.data;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
 		if ((offset < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
@@ -54,25 +52,21 @@ public class ArrayDataTarget extends BaseDataTarget {
 		this.index = index2;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
 		this.index = (int)index;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
 		return this.index;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
 		return this.data.size();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void allocate(final long value) throws IOException {
 		final int size = this.data.size();

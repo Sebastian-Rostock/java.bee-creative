@@ -29,7 +29,6 @@ public final class XMLUnmarshaller {
 			return XMLUnmarshaller.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final SourceData customThis() {
 			return this;
@@ -49,7 +48,6 @@ public final class XMLUnmarshaller {
 			return XMLUnmarshaller.this;
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		protected final UnmarshallerData customThis() {
 			return this;
@@ -157,7 +155,6 @@ public final class XMLUnmarshaller {
 		return result;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.sourceData, this.unmarshallerData);
