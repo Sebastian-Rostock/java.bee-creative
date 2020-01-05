@@ -165,6 +165,26 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
+	static class INT32Encoder implements Collector {
+	
+		public final int[] array;
+	
+		public int index;
+	
+		INT32Encoder(final int[] array, final int index) {
+			this.array = array;
+			this.index = index;
+		}
+	
+		@Override
+		public boolean push(final int value) {
+			if (value < 0) throw new IllegalArgumentException();
+			this.array[this.index++] = value;
+			return true;
+		}
+	
+	}
+
 	static class UINT16Encoder implements Collector {
 
 		public final char[] array;
@@ -180,26 +200,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		public boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			this.array[this.index++] = value < 65536 ? (char)value : 0;
-			return true;
-		}
-
-	}
-
-	static class UTF32Encoder implements Collector {
-
-		public final int[] array;
-
-		public int index;
-
-		public UTF32Encoder(final int[] array, final int index) {
-			this.array = array;
-			this.index = index;
-		}
-
-		@Override
-		public boolean push(final int value) {
-			if (value < 0) throw new IllegalArgumentException();
-			this.array[this.index++] = value;
 			return true;
 		}
 
@@ -1439,7 +1439,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws IllegalArgumentException Wenn der Abschitt außerhalb des gegebenen Arrays liegt. */
 	public void extract(final int[] result, final int offset) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || ((offset + this.length) > result.length)) throw new IllegalArgumentException();
-		this.extract(new UTF32Encoder(result, offset));
+		this.extract(new INT32Encoder(result, offset));
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeichenkette gleich der gegebenen ist.
@@ -1476,7 +1476,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 *
 	 * @return Array mit den Codepoints in 32-Bit-Kodierung. */
 	public int[] toInts() {
-		final UTF32Encoder encoder = new UTF32Encoder(new int[this.length], 0);
+		final INT32Encoder encoder = new INT32Encoder(new int[this.length], 0);
 		this.extract(encoder);
 		return encoder.array;
 	}
