@@ -2,7 +2,6 @@ package bee.creative.fem;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import bee.creative.array.CompactArray;
 import bee.creative.bind.Property;
@@ -21,6 +20,7 @@ import bee.creative.io.MappedBuffer;
 import bee.creative.io.MappedBuffer2;
 import bee.creative.lang.Objects;
 import bee.creative.mmi.MMIArrayL;
+import bee.creative.util.HashMapIO;
 
 /** Diese Klasse implementiert ein Objekt zur Kodierung und Dekodierung von {@link FEMFunction Funktionen} in {@link IAMArray Zahlenlisten}, die in einen
  * {@link MappedBuffer2 Dateipuffer} ausgelagert sind.
@@ -254,9 +254,9 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld speichert den Puffer, in dem die Yahlenfolgen abgelegt sind. */
 	final MappedBuffer2 store;
 
-	private ArrayList<FEMFunction> cacheListing;
+	private final HashMapIO<FEMFunction> cache = new HashMapIO<>();
 
-	private boolean cacheEnabled = true;
+	private boolean caching = true;
 
 	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei.
 	 *
@@ -308,7 +308,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	}
 
 	public FEMCodec useCache(final boolean enabled) {
-		this.cacheEnabled = enabled;
+		this.caching = enabled;
 		return this;
 	}
 
@@ -401,6 +401,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		System.out.println(arr);
 		System.out.println(arr2);
 		System.out.println(Arrays.toString(((CompactArray3)arr).table));
+		System.out.println(codec.cache );
 	}
 
 	/** Diese Methode fügt die gegebene Wertliste in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.Eine über
@@ -786,8 +787,19 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public FEMFunction getFunction(final int ref) throws IllegalArgumentException {
+		if (!this.caching) return this.getFunctionNoCache(ref);
+		final Integer key = ref;
+		FEMFunction value = this.cache.get(key);
+		if (value != null) return value;
+		value = this.getFunctionNoCache(ref);
+		this.cache.put(key, value);
+		return value;
+	}
+
+	private FEMFunction getFunctionNoCache(final int ref) {
 		final long addr = this.store.getRegionAddr(ref);
-		return this.getFunction(this.store.getInt(addr), addr + 8, this.store.getInt(addr + 4));
+		final FEMFunction result = this.getFunction(this.store.getInt(addr), addr + 8, this.store.getInt(addr + 4));
+		return result;
 	}
 
 	/** Diese Methode gibt die Funktion zu den gegebenen Merkmalen zurück. Wenn die Typkennung unbekannt ist, wird {@link FEMVoid#INSTANCE} geliefert. Nachfahren
@@ -1012,7 +1024,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode leert den Cache der {@link #getFunction(int) gelesenen} Funktionen. */
 	public void cleanup() {
-		// TODO
+		this.cache.clear();
 	}
 
 }
