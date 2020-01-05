@@ -14,9 +14,6 @@ import bee.creative.util.Iterators.BaseIterator;
  * ({@link IAMMapping}) für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-/** Diese Klasse implementiert . Diese Schnittstelle definiert .
- *
- * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray> {
 
 	/** Diese Klasse implementiert die Zahlenfolge für {@link IAMArray#MODE_INT8}. */
@@ -408,19 +405,19 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Dieses Feld identifiziert die Kodierung für 8-Bit-Binärzahlen. Diese erlaubt Zahlen von {@code -128} bis {@code +127}. */
-	public static final byte MODE_INT8 = 0;
+	public static final int MODE_INT8 = 0;
 
 	/** Dieses Feld identifiziert die Kodierung für 16-Bit-Binärzahlen. Diese erlaubt Zahlen von {@code -32768} bis {@code +32767}. */
-	public static final byte MODE_INT16 = 1;
+	public static final int MODE_INT16 = 1;
 
 	/** Dieses Feld identifiziert die Kodierung für 32-Bit-Binärzahlen. */
-	public static final byte MODE_INT32 = 2;
+	public static final int MODE_INT32 = 2;
 
 	/** Dieses Feld identifiziert die Kodierung für vorzeichenlose 8-Bit-Binärzahlen. Diese erlaubt Zahlen von {@code 0} bis {@code 255}. */
-	public static final byte MODE_UINT8 = 3;
+	public static final int MODE_UINT8 = 3;
 
 	/** Dieses Feld identifiziert die Kodierung für vorzeichenlose 16-Bit-Binärzahlen. Diese erlaubt Zahlen von {@code 0} bis {@code 65535}. */
-	public static final byte MODE_UINT16 = 4;
+	public static final int MODE_UINT16 = 4;
 
 	/** Dieses Feld speichert ein leeres {@link IAMArray}. */
 	public static final IAMArray EMPTY = INT32Array.EMPTY;
