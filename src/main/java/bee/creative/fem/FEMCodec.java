@@ -16,11 +16,9 @@ import bee.creative.fem.FEMString.CompactStringINT16;
 import bee.creative.fem.FEMString.CompactStringINT32;
 import bee.creative.fem.FEMString.CompactStringINT8;
 import bee.creative.iam.IAMArray;
+import bee.creative.io.MappedBuffer;
 import bee.creative.io.MappedBuffer2;
-import bee.creative.lang.Bytes;
-import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
-import bee.creative.mmi.MMIArrayL;
 
 /** Diese Klasse implementiert ein Objekt zur Kodierung und Dekodierung von {@link FEMFunction Funktionen} in {@link IAMArray Zahlenlisten}, die in einen
  * {@link MappedBuffer2 Dateipuffer} ausgelagert sind.
@@ -28,18 +26,20 @@ import bee.creative.mmi.MMIArrayL;
  * FILE = [HEAD][BODY...]<br>
  * HEAD = [MAGIC:4][COUNT:4][VALUE:4][ZERO:4]<br>
  * BODY = [TYPE:4][SIZE:4][DATA:SIZE][ZERO:0..15]<br>
+ * <p>
+ * {@link FEMFuture} und {@link FEMNative} werden zwar angeboten aber bei der Kodierun nicht unterstützt.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	/** Diese Klasse implementiert eine {@link FEMArray Wertliste}, deren Elemente als {@link IAMArray Zahlenfolge} aus Referenzen gegeben sind und in
-	 * {@link #customGet(int)} über einen gegebenen {@link FEMCodec} in Werte {@link FEMCodec#getValue(int) übersetzt} werden. */
+	 * {@link #customGet(int)} über einen gegebenen {@link FEMCodec} in Werte {@link FEMCodec#__getValue(int) übersetzt} werden. */
 	protected static class IndexArray extends FEMArray {
 
-		/** Dieses Feld speichert den {@link FEMCodec} zur {@link FEMCodec#getValue(int) Übersetzung} der Referenzen aus {@link #items}. */
+		/** Dieses Feld speichert den {@link FEMCodec} zur {@link FEMCodec#__getValue(int) Übersetzung} der Referenzen aus {@link #items}. */
 		public final FEMCodec index;
 
-		/** Dieses Feld speichert die Zahlenfolge mit den Referenzen. Ihre Struktur wird in {@link FEMCodec#OK_getArrayValue(IAMArray)} beschrieben. */
+		/** Dieses Feld speichert die Zahlenfolge mit den Referenzen. Ihre Struktur wird in {@link FEMCodec#__getArrayValue(IAMArray)} beschrieben. */
 		public final IAMArray items;
 
 		@SuppressWarnings ("javadoc")
@@ -53,7 +53,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		/** {@inheritDoc} */
 		@Override
 		protected FEMValue customGet(final int index) {
-			return this.index.getValue(this.items.get(index));
+			return this.index.__getValue(this.items.get(index));
 		}
 
 	}
@@ -92,101 +92,91 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ArrayBinary extends FEMBinary {
+	public static class MappedBinary extends FEMBinary {
 
-		public final IAMArray array;
+		public final MappedBuffer store;
 
-		public final int offset;
+		public final long addr;
 
-		ArrayBinary(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
+		MappedBinary(final MappedBuffer store, final long addr, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
 			super(length);
-			this.array = Objects.notNull(array);
-			this.offset = offset;
+			this.store = Objects.notNull(store);
+			this.addr = addr;
 			this.hash = hash;
 		}
 
 		@Override
 		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			return (byte)this.array.get(this.offset + index);
+			return this.store.get(this.addr + index);
 		}
 
 		@Override
 		protected FEMBinary customSection(final int offset, final int length) {
-			return new ArrayBinary(this.array, this.offset + offset, length, 0);
-		}
-
-		@Override
-		public FEMBinary compact() {
-			return this;
+			return new MappedBinary(this.store, this.addr + offset, length, 0);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ArrayString32 extends FEMString {
+	public static class MappedStringA extends FEMString {
 
-		public final IAMArray array;
+		public final MappedBuffer store;
 
-		public final int offset;
+		public final long addr;
 
-		ArrayString32(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
+		MappedStringA(final MappedBuffer store, final long addr, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
 			super(length);
-			this.array = Objects.notNull(array);
-			this.offset = offset;
+			this.store = Objects.notNull(store);
+			this.addr = addr;
 			this.hash = hash;
 		}
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.array.get(this.offset + index);
+			return this.store.get(this.addr + index) & 0xFF;
 		}
 
 		@Override
 		protected FEMString customSection(final int offset, final int length) {
-			return new ArrayString32(this.array, this.offset + offset, length, 0);
-		}
-
-		@Override
-		public FEMString compact() {
-			return this;
+			return new MappedStringA(this.store, this.addr + offset, length, 0);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ArrayString8 extends ArrayString32 {
+	public static class MappedStringB extends MappedStringA {
 
-		ArrayString8(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
-			super(array, offset, length, hash);
+		MappedStringB(final MappedBuffer store, final long addr, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
+			super(store, addr, length, hash);
 		}
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return super.customGet(index) & 0xFF;
+			return this.store.getShort(this.addr + (index * 2)) & 0xFFFF;
 		}
 
 		@Override
 		protected FEMString customSection(final int offset, final int length) {
-			return new ArrayString8(this.array, this.offset + offset, length, 0);
+			return new MappedStringB(this.store, this.addr + (offset * 2), length, 0);
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ArrayString16 extends ArrayString32 {
+	public static class MappedStringC extends MappedStringA {
 
-		ArrayString16(final IAMArray array, final int offset, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
-			super(array, offset, length, hash);
+		MappedStringC(final MappedBuffer store, final long addr, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
+			super(store, addr, length, hash);
 		}
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return super.customGet(index) & 0xFFFF;
+			return this.store.getInt(this.addr + (index * 4));
 		}
 
 		@Override
 		protected FEMString customSection(final int offset, final int length) {
-			return new ArrayString16(this.array, this.offset + offset, length, 0);
+			return new MappedStringC(this.store, this.addr + (offset * 4), length, 0);
 		}
 
 	}
@@ -207,13 +197,13 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	protected static final int TYPE_ARRAY_B = 5;
 
 	/** Dieses Feld speichert die Typkennung für {@link CompactStringINT8}. */
-	protected static final int TYPE_STRING8 = 6;
+	protected static final int TYPE_STRING_A = 6;
 
 	/** Dieses Feld speichert die Typkennung für {@link CompactStringINT16}. */
-	protected static final int TYPE_STRING16 = 7;
+	protected static final int TYPE_STRING_B = 7;
 
 	/** Dieses Feld speichert die Typkennung für {@link CompactStringINT32}. */
-	protected static final int TYPE_STRING32 = 8;
+	protected static final int TYPE_STRING_C = 8;
 
 	/** Dieses Feld speichert die Typkennung für {@link CompactBinary}. */
 	protected static final int TYPE_BINARY = 9;
@@ -264,27 +254,26 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param file Datei.
 	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
-
 	public FEMCodec(final File file, final boolean readonly) throws IOException {
 		this.store = new MappedBuffer2(file, readonly);
 	}
 
+	/** {@inheritDoc} Sie ist eine Abkürzung für {@link MappedBuffer2#getRoot() this.getFunction(this.getStore().getRoot())}. */
 	@Override
-	public final FEMFunction get() {
+	public FEMFunction get() {
 		return this.getFunction(this.store.getRoot());
 	}
 
+	/** {@inheritDoc} Sie ist eine Abkürzung für {@link MappedBuffer2#setRoot(int) this.getStore().setRoot(this.putFunction(value))}. */
 	@Override
-	public final void set(final FEMFunction value) {
+	public void set(final FEMFunction value) {
 		this.store.setRoot(this.putFunction(value));
 	}
 
-	/** Diese Methode gibt den angebundenen {@link MappedBuffer2 Puffer} zurück, in welchem die kodierten {@link FEMFunction Funktionen} abgelegt sind.
+	/** Diese Methode gibt den angebundenen {@link MappedBuffer2 Datenspeicher} zurück, in welchem die kodierten {@link FEMFunction Funktionen} abgelegt sind.
 	 *
-	 * @see #useSource(MappedBuffer2)
-	 * @see #useTarget(MappedBuffer2)
-	 * @return Puffer oder {@code null}. */
-	public final MappedBuffer2 getBuffer() {
+	 * @return Datenspeicher. */
+	public MappedBuffer2 getStore() {
 		return this.store;
 	}
 
@@ -302,38 +291,43 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		return this;
 	}
 
-	public FEMValue getValue(final int ref) throws IllegalArgumentException {
+	/** Diese Methode gibt den Wert zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Wert.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMValue __getValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMValue.class);
 	}
 
-	/** Diese Methode nimmt den gegebenen Wert in die Verwaltung auf und gibt die Referenz darauf zurück.
+	/** Diese Methode fügt den gegebenen Wert in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
 	 *
 	 * @param src Wert.
-	 * @return Referenz.
+	 * @return Referenz auf den Wert.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Wert nicht aufgenommen werden kann. */
-	public int putValue(final FEMValue src) throws NullPointerException, IllegalArgumentException {
-		if (src instanceof FEMVoid) return this.OK_putVoidValue();
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
+	public int __putValue(final FEMValue src) throws NullPointerException, IllegalArgumentException {
+		if (src instanceof FEMVoid) return this.__putVoidValue();
 		if (src instanceof FEMArray) return this.putArrayValue((FEMArray)src.data());
-		if (src instanceof FEMHandler) return this.putHandlerValue((FEMHandler)src.data());
-		if (src instanceof FEMBoolean) return this.putBooleanValue((FEMBoolean)src.data());
-		if (src instanceof FEMString) return this.putStringValue((FEMString)src.data());
-		if (src instanceof FEMBinary) return this.putBinaryValue((FEMBinary)src.data());
-		if (src instanceof FEMInteger) return this.OK_putIntegerValue((FEMInteger)src.data());
-		if (src instanceof FEMDecimal) return this.OK_putDecimalValue((FEMDecimal)src.data());
-		if (src instanceof FEMDuration) return this.putDurationValue((FEMDuration)src.data());
-		if (src instanceof FEMDatetime) return this.putDatetimeValue((FEMDatetime)src.data());
-		if (src instanceof FEMObject) return this.putObjectValue((FEMObject)src.data());
-		if (src instanceof FEMFuture) return this.putFutureValue((FEMFuture)src);
-		if (src instanceof FEMNative) return this.putNativeValue((FEMNative)src);
-		return this.putCustomValue(src);
+		if (src instanceof FEMHandler) return this.__putHandlerValue((FEMHandler)src.data());
+		if (src instanceof FEMBoolean) return this.__putBooleanValue((FEMBoolean)src.data());
+		if (src instanceof FEMString) return this.__putStringValue((FEMString)src.data());
+		if (src instanceof FEMBinary) return this.__putBinaryValue((FEMBinary)src.data());
+		if (src instanceof FEMInteger) return this.__putIntegerValue((FEMInteger)src.data());
+		if (src instanceof FEMDecimal) return this.__putDecimalValue((FEMDecimal)src.data());
+		if (src instanceof FEMDuration) return this.__putDurationValue((FEMDuration)src.data());
+		if (src instanceof FEMDatetime) return this.__putDatetimeValue((FEMDatetime)src.data());
+		if (src instanceof FEMObject) return this.__putObjectValue((FEMObject)src.data());
+		if (src instanceof FEMFuture) return this.__putFutureValue((FEMFuture)src);
+		if (src instanceof FEMNative) return this.__putNativeValue((FEMNative)src);
+		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode fügt {@link FEMVoid#INSTANCE} in den {@link #getBuffer() Puffer} ein und gibt die Referenz darauf zurück.
+	/** Diese Methode fügt {@link FEMVoid#INSTANCE} in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
 	 *
-	 * @return Referenz.
+	 * @return Referenz auf {@link FEMVoid#INSTANCE}.
 	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int OK_putVoidValue() throws IllegalStateException {
+	public int __putVoidValue() throws IllegalStateException {
 		this.store.setupRegion(FEMCodec.TYPE_VOID, 0);
 		return this.store.commitRegion();
 	}
@@ -343,17 +337,59 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param ref Referenz.
 	 * @return Wertliste.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public FEMArray OK_getArrayValue(final int ref) throws IllegalArgumentException {
+	public FEMArray __getArrayValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMArray.class);
 	}
 
-	/** Diese Methode nimmt die gegebene Wertliste in die Verwaltung auf und gibt die {@link #getDataRef(int, int)} Referenz} darauf zurück. Eine über *
-	 * {@link FEMArray#compact(boolean)} indizierte Wertliste wird mit der Indizierung kodiert.
-	 * 
-	 * @param src Dezimalbruch.
-	 * @return Referenz.
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Wertliste zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Wertliste. */
+
+	/** Diese Methode gibt eine Wertliste zurück, deren Elemente in der gegebenen Zahlenfolge sind. Die Zahlenfolge kann dazu in einer der folgenden Strukturen
+	 * vorliegen:
+	 * <ul>
+	 * <li>Einfach - {@code (value[length], hash[1], length[1])}<br>
+	 * Die Zahlenfolge beginnt mit den über {@link #__putValue(FEMValue)} ermittelten {@link #getDataRef(int, int) Referenzen} der Elemente der gegebenen
+	 * Wertliste und endet mit dem {@link FEMArray#hashCode() Streuwert} sowie der {@link FEMArray#length() Länge} der Wertliste.</li>
+	 * </ul>
+	 *
+	 * @param src Zahlenfolge.
+	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link #toArrayArray(FEMArray)} diese auslöst. */
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	protected FEMArray getArrayValueA(final long addr, final int size) throws NullPointerException, IllegalArgumentException {
+		final int length1 = src.length() - 2, length2 = src.get(length1 + 1);
+		if (length1 == length2) return new IndexArray(length1, this, src);
+		return new IndexArray2(length2, this, src);
+	}
+
+	/** Diese Methode gibt eine Wertliste zurück, deren Elemente in der gegebenen Zahlenfolge sind. Die Zahlenfolge kann dazu in einer der folgenden Strukturen
+	 * vorliegen:
+	 * <ul>
+	 * <li>Indiziert - {@code (value[length], hash[1], index[length], range[count], length[1])}<br>
+	 * Die Zahlenfolge beginnt ebenfalls mit den Referenzen sowie dem Streuwert und endet auch mit der Länge der Wertliste. Dazwischen enthält sie die Inhalte
+	 * sowie die Größen der Streuwertbereiche.</li>
+	 * </ul>
+	 *
+	 * @param src Zahlenfolge.
+	 * @return Wertliste.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	protected FEMArray getArrayValueB(final long addr, final int size) throws NullPointerException, IllegalArgumentException {
+		final int length1 = src.length() - 2, length2 = src.get(length1 + 1);
+		if (length1 == length2) return new IndexArray(length1, this, src);
+		return new IndexArray2(length2, this, src);
+	}
+
+	/** Diese Methode fügt die gegebene Wertliste in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.Eine über
+	 * {@link FEMArray#compact(boolean)} indizierte Wertliste wird mit der Indizierung kodiert.
+	 *
+	 * @param src Wertliste.
+	 * @return Referenz auf die Wertliste.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
 	public int putArrayValue(final FEMArray src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		final int length = src.length();
 		final int[] result;
@@ -373,110 +409,72 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		result[length] = src.hashCode();
 		result[result.length - 1] = length;
 		for (int i = 0; i < length; i++) {
-			result[i] = this.putValue(src.customGet(i));
+			result[i] = this.__putValue(src.customGet(i));
 		}
 		return IAMArray.from(result);
 	}
 
-	/** Diese Methode gibt eine Wertliste zurück, deren Elemente in der gegebenen Zahlenfolge sind. Die Zahlenfolge kann dazu in einer der folgenden Strukturen
-	 * vorliegen:
-	 * <ul>
-	 * <li>Einfach - {@code (value[length], hash[1], length[1])}<br>
-	 * Die Zahlenfolge beginnt mit den über {@link #putValue(FEMValue)} ermittelten {@link #getDataRef(int, int) Referenzen} der Elemente der gegebenen Wertliste
-	 * und endet mit dem {@link FEMArray#hashCode() Streuwert} sowie der {@link FEMArray#length() Länge} der Wertliste.</li>
-	 * </ul>
+	/** Diese Methode gibt die Zeichenkette zur gegebenen Referenz zurück.
 	 *
-	 * @param src Zahlenfolge.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	protected FEMArray getArrayValueA(long addr, int size) throws NullPointerException, IllegalArgumentException {
-		final int length1 = src.length() - 2, length2 = src.get(length1 + 1);
-		if (length1 == length2) return new IndexArray(length1, this, src);
-		return new IndexArray2(length2, this, src);
-	}
-
-	/** Diese Methode gibt eine Wertliste zurück, deren Elemente in der gegebenen Zahlenfolge sind. Die Zahlenfolge kann dazu in einer der folgenden Strukturen
-	 * vorliegen:
-	 * <ul>
-	 * <li>Indiziert - {@code (value[length], hash[1], index[length], range[count], length[1])}<br>
-	 * Die Zahlenfolge beginnt ebenfalls mit den Referenzen sowie dem Streuwert und endet auch mit der Länge der Wertliste. Dazwischen enthält sie die Inhalte
-	 * sowie die Größen der Streuwertbereiche.</li>
-	 * </ul>
-	 *
-	 * @param src Zahlenfolge.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	protected FEMArray getArrayValueB(long addr, int size) throws NullPointerException, IllegalArgumentException {
-		final int length1 = src.length() - 2, length2 = src.get(length1 + 1);
-		if (length1 == length2) return new IndexArray(length1, this, src);
-		return new IndexArray2(length2, this, src);
-	}
-
-	/** Diese Methode gibt die Zeichenkette zur gegebenen Referenz zurück. */
-	public final FEMString getStringValue(final int ref) throws IllegalArgumentException {
+	 * @param ref Referenz.
+	 * @return Zeichenkette.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMString __getStringValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMString.class);
 	}
 
-	/** Diese Methode gibt eine Zeichenkette zurück, deren Codepoints in der gegebenen Zahlenfolge kodiert sind.
-	 * <p>
-	 * Diese Methode interpretiert die gegebene Zahlenfolge als Zeichenkette und gibt diese zurück. Bei der Kodierung mit Einzelwerten werden die ersten vier Byte
-	 * der Zahlenfolge als {@link #hashCode() Streuwert}, die darauf folgenden Zahlenwerte als Auflistung der einzelwertkodierten Codepoints und der letzte
-	 * Zahlenwert als abschließende {@code 0} interpretiert. Bei der Mehrwertkodierung werden dagegen die ersten vier Byte der Zahlenfolge als {@link #hashCode()
-	 * Streuwert}, die nächsten vier Byte als {@link FEMString#length() Zeichenanzahl}, die darauf folgenden Zahlenwerte als Auflistung der mehrwertkodierten
-	 * Codepoints und der letzte Zahlenwert als abschließende {@code 0} interpretiert. Ob eine 8-, 16- oder 32-Bit-Kodierung eingesetzt wird, hängt von der
-	 * {@link IAMArray#mode() Kodierung der Zahlenwerte} ab. */
-	protected FEMString getStringValue(final long addr, final int size) throws NullPointerException, IllegalArgumentException {
-		final MappedBuffer2 store = this.store;
-		final int length = size - 4;
-		final byte[] temp = new byte[4];
-		store.get(addr, temp);
-		final int hash = Integers.toInt(temp[0], temp[1], temp[2], temp[3]);
-		final IAMArray array = store.getArray(addr + 4, length, IAMArray.MODE_INT8);
-		return new ArrayString8(array, 0, length, hash);
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene {@code byte}-Zeichenkette zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Zeichenkette. */
+	protected FEMString __getStringValueA(final long addr, final int size) {
+		return new MappedStringA(this.store, addr + 4, size - 4, this.store.getInt(addr));
 	}
 
-	protected FEMString getStringValue16(final long addr, final int size) throws NullPointerException, IllegalArgumentException {
-		final MappedBuffer2 store = this.store;
-		final int length = (size - 4) / 2;
-		final short[] temp = new short[2];
-		store.getShort(addr, temp);
-		final int hash = Integers.toInt(temp[0], temp[1]);
-		final IAMArray array = store.getArray(addr + 4, length, IAMArray.MODE_INT16);
-		return new ArrayString16(array, 0, length, hash);
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene {@code short}-Zeichenkette zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Zeichenkette. */
+	protected FEMString __getStringValueB(final long addr, final int size) {
+		return new MappedStringB(this.store, addr + 4, (size - 4) / 2, this.store.getInt(addr));
 	}
 
-	protected FEMString getStringValue32(final long addr, final int size) throws NullPointerException, IllegalArgumentException {
-		final MappedBuffer2 store = this.store;
-		final int length = (size - 4) / 4;
-		final int hash = store.getInt(addr);
-		final MMIArrayL array = store.getArray(addr + 4, length, IAMArray.MODE_INT32);
-		return new ArrayString32(array, 0, length, hash);
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene {@code int}-Zeichenkette zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Zeichenkette. */
+	protected FEMString __getStringValueC(final long addr, final int size) {
+		return new MappedStringC(this.store, addr + 4, (size - 4) / 4, this.store.getInt(addr));
 	}
 
-	public int putStringValue(final FEMString src) throws NullPointerException {
+	/** Diese Methode fügt die gegebene Zeichenkette in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück. Dazu werden die
+	 * {@link FEMString#compact() kompaktierten} Formen der Zeichenkette analysiert und entsprechend als {@code byte}, {@code short} oder {@code int}-Codepoints
+	 * gespeichert.
+	 *
+	 * @param src Zeichenkette.
+	 * @return Referenz auf die Zeichenkette.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
+	public int __putStringValue(final FEMString src) throws NullPointerException, IllegalStateException {
 		final FEMString str = src.compact();
-		final int hash = str.hashCode(), length = str.length();
 		if (str instanceof FEMString.CompactStringINT8) {
-			final byte[] data = new byte[length + 4];
-			data[0] = (byte)(hash >>> 24);
-			data[1] = (byte)(hash >>> 16);
-			data[2] = (byte)(hash >>> 8);
-			data[3] = (byte)(hash >>> 0);
-			str.extract(new FEMString.INT8Encoder(data, 4));
-			return this.putData(FEMCodec.TYPE_STRING8, data);
+			final long addr = this.store.setupRegion(FEMCodec.TYPE_STRING_A, str.length() + 4);
+			this.store.putInt(addr, str.hashCode());
+			this.store.put(addr, str.toBytes());
+			return this.store.commitRegion();
 		} else if (str instanceof FEMString.CompactStringINT16) {
-			final short[] data = new short[length + 2];
-			data[0] = (short)(hash >>> 16);
-			data[1] = (short)(hash >>> 0);
-			str.extract(new FEMString.INT16Encoder(data, 2));
-			return this.putData(FEMCodec.TYPE_STRING16, data);
+			final long addr = this.store.setupRegion(FEMCodec.TYPE_STRING_B, (str.length() * 2) + 2);
+			this.store.putInt(addr, str.hashCode());
+			this.store.putShort(addr, str.toShorts());
+			return this.store.commitRegion();
 		} else {
-			final int[] data = new int[length + 1];
-			data[0] = hash;
-			str.extract(new FEMString.INT32Encoder(data, 1));
-			return this.putData(FEMCodec.TYPE_STRING32, data);
+			final long addr = this.store.setupRegion(FEMCodec.TYPE_STRING_C, (str.length() * 4) + 1);
+			this.store.putInt(addr, str.hashCode());
+			this.store.putInt(addr, str.toInts());
+			return this.store.commitRegion();
 		}
 	}
 
@@ -485,31 +483,30 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param ref Referenz.
 	 * @return Bytefolge.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public FEMBinary OK_getBinaryValue(final int ref) throws IllegalArgumentException {
+	public FEMBinary __getBinaryValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMBinary.class);
 	}
 
-	/** Diese Methode gibt die Bytefolge zur gegebenen Zahlenfolge zurück, deren Bytes in der gegebenen Zahlenfolge kodiert sind. Die Zahlenfolge muss dazu in
-	 * {@link IAMArray#MODE_INT8} vorliegen und in ihren ersten vier Byte die Typkennung sowie in den zweiten vier Byte den Streuwert (beides little-endian)
-	 * enthalten. */
-	protected final FEMBinary getBinaryValue(final long addr, final int size) throws NullPointerException, IllegalArgumentException {
-		final int length = size - 4;
-		if (length < 0) throw new IllegalArgumentException();
-		if (length == 0) return FEMBinary.EMPTY;
-		final byte[] temp = new byte[4];
-		final MappedBuffer2 store = this.store;
-		store.get(addr, temp);
-		final int hash = Bytes.getInt4LE(temp, 0);
-		final IAMArray array = store.getArray(addr + 4, length, IAMArray.MODE_INT8);
-		return new ArrayBinary(array, 0, length, hash);
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Bytefolge zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Bytefolge. */
+	protected FEMBinary __getBinaryValue(final long addr, final int size) {
+		return new MappedBinary(this.store, addr + 4, size - 4, this.store.getInt(addr));
 	}
 
-	/** Diese Methode ergänzt die gegebene Bytefolge und gibt die Referenz darauf zurück. */
-	public final int putBinaryValue(final FEMBinary src) throws NullPointerException, IllegalStateException {
-		final byte[] data = new byte[src.length() + 4];
-		Bytes.setInt4LE(data, 0, src.hashCode());
-		src.extract(data, 4);
-		return this.putData(FEMCodec.TYPE_BINARY, data);
+	/** Diese Methode fügt die gegebene Bytefolge in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Bytefolge.
+	 * @return Referenz auf die Bytefolge.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
+	public int __putBinaryValue(final FEMBinary src) throws NullPointerException, IllegalStateException {
+		final long addr = this.store.setupRegion(FEMCodec.TYPE_BINARY, src.length() + 4);
+		this.store.putInt(addr, src.hashCode());
+		this.store.put(addr, src.value());
+		return this.store.commitRegion();
 	}
 
 	/** Diese Methode gibt die Dezimalzahl zur gegebenen Referenz zurück.
@@ -517,28 +514,26 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param ref Referenz.
 	 * @return Dezimalzahl.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public FEMInteger OK_getIntegerValue(final int ref) throws IllegalArgumentException {
+	public FEMInteger __getIntegerValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMInteger.class);
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Dezimalzahl zurück.<br>
-	 * Diese muss den MSB-{@code int} sowie den LSB-{@code int} der {@link FEMInteger#value() internen Darstellung} der Dezimalzahl enthalten.
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Dezimalzahl zurück.
 	 *
 	 * @param addr Adresse des Speicherbereichs.
 	 * @param size Größe des Speicherbereichs
 	 * @return Dezimalzahl. */
-	protected FEMInteger OK_getIntegerValue(final long addr, final int size) {
-		final MappedBuffer2 store = this.store;
-		return new FEMInteger(Integers.toLong(store.getInt(addr), store.getInt(addr + 4)));
+	protected FEMInteger __getIntegerValue(final long addr, final int size) {
+		return new FEMInteger(this.store.getLong(addr));
 	}
 
-	/** Diese Methode fügt die gegebene Dezimalzahl in den {@link #getBuffer() Puffer} ein und gibt die Referenz darauf zurück.
+	/** Diese Methode fügt die gegebene Dezimalzahl in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
 	 *
 	 * @param src Dezimalzahl.
-	 * @return Referenz.
+	 * @return Referenz auf die Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int OK_putIntegerValue(final FEMInteger src) throws NullPointerException, IllegalStateException {
+	public int __putIntegerValue(final FEMInteger src) throws NullPointerException, IllegalStateException {
 		this.store.putLong(this.store.setupRegion(FEMCodec.TYPE_INTEGER, 8), src.value());
 		return this.store.commitRegion();
 	}
@@ -547,134 +542,223 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 *
 	 * @param ref Referenz.
 	 * @return Dezimalbruch.
-	 * @throws IllegalStateException Wenn kein {@link #getBuffer() Puffer} angebunden ist.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public FEMDecimal OK_getDecimalValue(final int ref) throws IllegalStateException, IllegalArgumentException {
+	public FEMDecimal __getDecimalValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMDecimal.class);
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Dezimalbruch und gibt diesen zurück. Die Zahlenfolge muss dazu aus den folgenden drei Zahlen
-	 * bestehen: (1) Typkennung sowie (2) MSB-{@code int} und (3) LSB-{@code int} der {@link FEMDecimal#value() internen Darstellung} des Dezimalbruchs.
-	 * Andernfalls wird {@code null} geliefert. */
-	final FEMDecimal getDecimalValue(final long addr, final int size) throws NullPointerException {
-		final MappedBuffer2 store = this.store;
-		return new FEMDecimal(Double.longBitsToDouble(Integers.toLong(store.getInt(addr), store.getInt(addr + 4))));
+	/** Diese Methode gibt den im gegebenen Speicherbereich enthaltene Dezimalbruch zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Dezimalbruch. */
+	protected FEMDecimal __getDecimalValue(final long addr, final int size) {
+		return new FEMDecimal(this.store.getDouble(addr));
 	}
 
-	/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #getBuffer() Puffer} ein und gibt die Referenz darauf zurück.
+	/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
 	 *
 	 * @param src Dezimalbruch.
-	 * @return Referenz.
+	 * @return Referenz auf den Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum {@link #useSource(MappedBuffer2) Lesen} angebunden ist. */
-	public int OK_putDecimalValue(final FEMDecimal src) throws NullPointerException, IllegalStateException {
-		final long value = Double.doubleToLongBits(src.value());
-		return this.putData(FEMCodec.TYPE_DECIMAL, Integers.toIntH(value), Integers.toIntL(value));
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
+	public int __putDecimalValue(final FEMDecimal src) throws NullPointerException, IllegalStateException {
+		this.store.putDouble(this.store.setupRegion(FEMCodec.TYPE_DECIMAL, 8), src.value());
+		return this.store.commitRegion();
 	}
 
-	/** Diese Methode gibt die Zeitspanne zur gegebenen Referenz zurück. */
-	public final FEMDuration getDurationValue(final int ref) throws IllegalArgumentException {
+	/** Diese Methode gibt die Zeitspanne zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Zeitspanne.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMDuration __getDurationValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMDuration.class);
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeitspanne und gibt diese zurück. Die Zahlenfolge muss dazu aus folgenden drei Zahlen bestehen:
-	 * (1) Typkennung sowie (2) MSB-{@code int} und (3) LSB-{@code int} der {@link FEMDuration#value() internen Darstellung} der Zeitspanne. Andernfalls wird
-	 * {@code null} geliefert. */
-	final FEMDuration getDurationValue(final long addr, final int size) throws NullPointerException, IllegalArgumentException {
-		final MappedBuffer2 store = this.store;
-		return new FEMDuration(Integers.toLong(store.getInt(addr), store.getInt(addr + 4)));
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Zeitspanne zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Zeitspanne. */
+	protected FEMDuration __getDurationValue(final long addr, final int size) {
+		return new FEMDuration(this.store.getLong(addr));
 	}
 
-	/** Diese Methode ergänzt die gegebene Zeitspanne und gibt die Referenz darauf zurück. */
-	public final int putDurationValue(final FEMDuration src) throws NullPointerException, IllegalStateException {
-		final long value = src.value();
-		return this.putData(FEMCodec.TYPE_DURATION, Integers.toIntH(value), Integers.toIntL(value));
+	/** Diese Methode fügt den gegebenen Zeitspanne in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Zeitspanne.
+	 * @return Referenz auf den Zeitspanne.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
+	public int __putDurationValue(final FEMDuration src) throws NullPointerException, IllegalStateException {
+		this.store.putDouble(this.store.setupRegion(FEMCodec.TYPE_DURATION, 8), src.value());
+		return this.store.commitRegion();
 	}
 
-	/** Diese Methode gibt die Zeitangabe zur gegebenen Referenz zurück. */
-	public final FEMDatetime getDatetimeValue(final int ref) throws IllegalArgumentException {
+	/** Diese Methode gibt die Zeitangabe zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Zeichenkette.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMDatetime __getDatetimeValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMDatetime.class);
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Zeitangabe und gibt diese zurück. Die Zahlenfolge muss dazu aus folgenden drei Zahlen bestehen:
-	 * (1) Typkennung sowie (2) MSB-{@code int} und (3) LSB-{@code int} der {@link FEMDatetime#value() internen Darstellung} der Zeitangabe. Andernfalls wird
-	 * {@code null} geliefert. */
-	public final FEMDatetime getDatetimeValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
-		if ((src.length() != 3) || (src.get(0) != FEMCodec.TYPE_DATETIME)) return null;
-		return new FEMDatetime(Integers.toLong(src.get(1), src.get(2)));
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Zeitangabe zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Zeitangabe. */
+	protected FEMDatetime __getDatetimeValue(final long addr, final int size) {
+		return new FEMDatetime(this.store.getLong(addr));
 	}
 
-	/** Diese Methode ergänzt die gegebene Zeitangabe und gibt die Referenz darauf zurück. */
-	public final int putDatetimeValue(final FEMDatetime src) throws NullPointerException, IllegalStateException {
-		final long value = src.value();
-		return this.putData(FEMCodec.TYPE_DATETIME, Integers.toIntH(value), Integers.toIntL(value));
+	/** Diese Methode fügt die gegebene Zeitangabe in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Zeitangabe.
+	 * @return Referenz auf die Zeitangabe.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
+	public int __putDatetimeValue(final FEMDatetime src) throws NullPointerException, IllegalStateException {
+		this.store.putDouble(this.store.setupRegion(FEMCodec.TYPE_DATETIME, 8), src.value());
+		return this.store.commitRegion();
 	}
 
-	/** Diese Methode gibt den Wahrheitswert zur gegebenen Referenz zurück. */
-	public final FEMBoolean getBooleanValue(final int ref) throws IllegalArgumentException {
+	/** Diese Methode gibt den Wahrheitswert zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Wahrheitswert.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMBoolean __getBooleanValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMBoolean.class);
 	}
 
-	/** Diese Methode ergänzt den gegebenen Wahrheitswert und gibt die Referenz darauf zurück. */
-	public final int putBooleanValue(final FEMBoolean src) throws NullPointerException, IllegalStateException {
-		return this.putData(src.value() ? FEMCodec.TYPE_TRUE : FEMCodec.TYPE_FALSE);
+	/** Diese Methode fügt den gegebenen Wahrheitswert in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Wahrheitswert.
+	 * @return Referenz auf den Wahrheitswert.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
+	public int __putBooleanValue(final FEMBoolean src) throws NullPointerException, IllegalStateException {
+		this.store.setupRegion(src.value() ? FEMCodec.TYPE_TRUE : FEMCodec.TYPE_FALSE, 0);
+		return this.store.commitRegion();
 	}
 
-	/** Diese Methode gibt den Funktionszeiger zur gegebenen Referenz zurück. */
-	public final FEMHandler getHandlerValue(final int ref) throws IllegalArgumentException {
+	/** Diese Methode gibt den Funktionszeiger zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Funktionszeiger.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMHandler __getHandlerValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMHandler.class);
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionszeiger und gibt diese zurück. Die Zahlenfolge muss dazu aus der Typkennung sowie der
-	 * Referenz auf die Zielfunktion bestehen. Andernfalls wird {@code null} geliefert. */
-	public final FEMHandler getHandlerValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
-		if ((src.length() != 2) || (src.get(0) != FEMCodec.TYPE_HANDLER)) return null;
-		return new FEMHandler(this.getFunction(src.get(1)));
+	/** Diese Methode gibt den im gegebenen Speicherbereich enthaltene Funktionszeiger zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Funktionszeiger. */
+	protected FEMHandler __getHandlerValue(final long addr, final int size) {
+		return new FEMHandler(this.getFunction(this.store.getInt(addr)));
 	}
 
-	/** Diese Methode ergänzt den gegebenen Funktionszeiger und gibt die Referenz darauf zurück. */
-	public final int putHandlerValue(final FEMHandler src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		return this.putData(FEMCodec.TYPE_HANDLER, this.putFunction(src.value()));
+	/** Diese Methode fügt den gegebenen Funktionszeiger in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Funktionszeiger.
+	 * @return Referenz auf den Funktionszeiger.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
+	 * @throws IllegalArgumentException Wenn die Funktion des Funktionszeigers nicht angefügt werden kann. */
+	public int __putHandlerValue(final FEMHandler src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		this.store.putInt(this.store.setupRegion(FEMCodec.TYPE_HANDLER, 4), this.putFunction(src.value()));
+		return this.store.commitRegion();
 	}
 
-	/** Diese Methode gibt die Objektreferenz zur gegebenen Referenz zurück. */
-	public final FEMObject getObjectValue(final int ref) throws IllegalArgumentException {
+	/** Diese Methode gibt die Objektreferenz zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Objektreferenz.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMObject __getObjectValue(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMObject.class);
 	}
 
-	/** Diese Methode interpretiert die gegebene Zahlenfolge als Objektreferenz und gibt diesen zurück. Die Zahlenfolge muss dazu aus der Typkennung und dem
-	 * MSB-{@code int} sowie dem LSB-{@code int} der {@link FEMObject#value() internen Darstellung} der Objektreferenz bestehen. Andernfalls wird {@code null}
-	 * geliefert. */
-	public final FEMObject getObjectValue(final IAMArray src) throws NullPointerException, IllegalArgumentException {
-		if ((src.length() != 3) || (src.get(0) != FEMCodec.TYPE_OBJECT)) return null;
-		return new FEMObject(Integers.toLong(src.get(1), src.get(2)));
-	}
-
-	/** Diese Methode ergänzt den gegebenen Objektreferenz und gibt die Referenz darauf zurück. */
-	public final int putObjectValue(final FEMObject src) throws NullPointerException, IllegalStateException {
-		final long value = src.value();
-		return this.putData(FEMCodec.TYPE_OBJECT, Integers.toIntH(value), Integers.toIntL(value));
-	}
-
-	public int putFutureValue(final FEMFuture src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		throw new IllegalArgumentException();
-	}
-
-	public int putNativeValue(final FEMNative src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode gibt den Wert zur gegebenen Typkennung und {@link #toIndex(int) Position} zurück.
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Objektreferenz zurück.
 	 *
-	 * @param type Typkennung
-	 * @param index Position.
-	 * @return Wert.
-	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	protected FEMValue getCustomValue(final int type, final int index) throws IllegalArgumentException {
-		return FEMVoid.INSTANCE;
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Objektreferenz. */
+	protected FEMObject __getObjectValue(final long addr, final int size) {
+		return new FEMObject(this.store.getLong(addr));
 	}
 
-	protected int putCustomValue(final FEMValue src) throws NullPointerException, IllegalArgumentException {
+	/** Diese Methode fügt den gegebenen Objektreferenz in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Objektreferenz.
+	 * @return Referenz auf den Objektreferenz.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
+	public int __putObjectValue(final FEMObject src) throws NullPointerException, IllegalStateException {
+		this.store.putLong(this.store.setupRegion(FEMCodec.TYPE_OBJECT, 8), src.value());
+		return this.store.commitRegion();
+	}
+
+	/** Diese Methode gibt den Ergebniswert zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Ergebniswert.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMFuture __getFutureValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMFuture.class);
+	}
+
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Ergebniswert zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Ergebniswert. */
+	protected FEMFuture __getFutureValue(final long addr, final int size) {
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode fügt den gegebenen Ergebniswert in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Ergebniswert.
+	 * @return Referenz auf den Ergebniswert.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
+	 * @throws IllegalArgumentException Wenn die Funktion des Funktionszeigers nicht angefügt werden kann. */
+	public int __putFutureValue(final FEMFuture src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode gibt den Nativwert zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Nativwert.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
+	public FEMNative __getNativeValue(final int ref) throws IllegalArgumentException {
+		return this.getFunction(ref, FEMNative.class);
+	}
+
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Nativwert zurück.
+	 *
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param size Größe des Speicherbereichs
+	 * @return Nativwert. */
+	protected FEMNative __getNativeValue(final long addr, final int size) {
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode fügt den gegebenen Nativwert in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Nativwert.
+	 * @return Referenz auf den Ergebniswert.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
+	 * @throws IllegalArgumentException Wenn die Funktion des Funktionszeigers nicht angefügt werden kann. */
+	public int __putNativeValue(final FEMNative src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 
@@ -689,7 +773,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		return this.OK_getFunction(store.getInt(addr), addr + 8, store.getInt(addr + 4));
 	}
 
-	protected final <GResult> GResult getFunction(final int ref, final Class<GResult> functionClass) throws IllegalArgumentException {
+	protected <GResult> GResult getFunction(final int ref, final Class<GResult> functionClass) throws IllegalArgumentException {
 		try {
 			return functionClass.cast(this.getFunction(ref));
 		} catch (final IllegalArgumentException cause) {
@@ -701,7 +785,7 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die Funktion zu den gegebenen Merkmalen zurück. Wenn die Typkennung unbekannt ist, wird {@link FEMVoid#INSTANCE} geliefert. Nachfahren
 	 * sollten diese Methode zur weiteren Fallunterscheidungen überschreiben.
-	 * 
+	 *
 	 * @param type Typkennung.
 	 * @param addr Adresse des Speicherbereichs im {@link #store}.
 	 * @param size Größe des Speicherbereichs im {@link #store}.
@@ -714,23 +798,23 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 			case TYPE_FALSE:
 				return FEMBoolean.FALSE;
 			case TYPE_ARRAY_A:
-				return this.OK_getArrayValue(addr, size);
-			case TYPE_STRING8:
-				return this.getStringValue(addr, size);
+				return this.__getArrayValue(addr, size);
+			case TYPE_STRING_A:
+				return this.__getStringValueA(addr, size);
 			case TYPE_BINARY:
-				return this.getBinaryValue(addr, size);
+				return this.__getBinaryValue(addr, size);
 			case TYPE_INTEGER:
-				return this.OK_getIntegerValue(addr, size);
+				return this.__getIntegerValue(addr, size);
 			case TYPE_DECIMAL:
-				return this.OK_getDecimalValue(addr, size);
+				return this.__getDecimalValue(addr, size);
 			case TYPE_DATETIME:
-				return this.getDatetimeValue(addr, size);
+				return this.__getDatetimeValue(addr, size);
 			case TYPE_DURATION:
-				return this.getDurationValue(addr, size);
+				return this.__getDurationValue(addr, size);
 			case TYPE_HANDLER:
-				return this.getHandlerValue(addr, size);
+				return this.__getHandlerValue(addr, size);
 			case TYPE_OBJECT:
-				return this.getObjectValue(addr, size);
+				return this.__getObjectValue(addr, size);
 			case TYPE_PROXY:
 				return this.getProxyFunction(addr, size);
 			case TYPE_PARAM_FUNCTION:
@@ -750,9 +834,9 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param src Funktion.
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Funktion nicht aufgenommen werden kann. */
+	 * @throws IllegalArgumentException Wenn die Funktion nicht angefügt werden kann. */
 	public int putFunction(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		if (src instanceof FEMValue) return this.putValue((FEMValue)src);
+		if (src instanceof FEMValue) return this.__putValue((FEMValue)src);
 		if (src instanceof FEMProxy) return this.putProxyFunction((FEMProxy)src);
 		if (src instanceof FEMParam) return this.putParamFunction((FEMParam)src);
 		if (src instanceof ConcatFunction) return this.putConcatFunction((ConcatFunction)src);
@@ -761,21 +845,32 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 		return this.putCustomFunction(src);
 	}
 
+	/** Diese Methode gibt die Zeichenkette zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Zeichenkette.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public final FEMProxy getProxyFunction(final int ref) throws IllegalArgumentException {
 		return this.getProxyFunction(this.getData(ref));
 	}
 
 	/** Diese Methode interpretiert die gegebene Zahlenfolge als Funktionsplatzhalter und gibt diese zurück. Die Zahlenfolge muss dazu aus den folgenden vier
-	 * Zahlen bestehen: (1) Typkennung, (2) {@link #putValue(FEMValue) Referenz} der {@link FEMProxy#id() Kennung}, (3) {@link #putValue(FEMValue) Referenz} des
-	 * {@link FEMProxy#name() Namnes} und (4) {@link #putFunction(FEMFunction) Referenz} des {@link FEMProxy#get() Ziels}. Andernfalls wird {@code null}
+	 * Zahlen bestehen: (1) Typkennung, (2) {@link #__putValue(FEMValue) Referenz} der {@link FEMProxy#id() Kennung}, (3) {@link #__putValue(FEMValue) Referenz}
+	 * des {@link FEMProxy#name() Namnes} und (4) {@link #putFunction(FEMFunction) Referenz} des {@link FEMProxy#get() Ziels}. Andernfalls wird {@code null}
 	 * geliefert. */
 	public final FEMProxy getProxyFunction(final IAMArray src) throws NullPointerException, IllegalArgumentException {
 		if ((src.length() != 4) || (src.get(0) != FEMCodec.TYPE_PROXY)) return null;
-		return new FEMProxy(this.getValue(src.get(1)), this.getStringValue(src.get(2)), this.getFunction(src.get(3)));
+		return new FEMProxy(this.__getValue(src.get(1)), this.__getStringValue(src.get(2)), this.getFunction(src.get(3)));
 	}
 
+	/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Dezimalbruch.
+	 * @return Referenz auf den Dezimalbruch.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
 	public final int putProxyFunction(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
-		return this.putData(FEMCodec.TYPE_PROXY, this.putValue(src.id()), this.putStringValue(src.name()), this.putFunction(src.get()));
+		return this.putData(FEMCodec.TYPE_PROXY, this.__putValue(src.id()), this.__putStringValue(src.name()), this.putFunction(src.get()));
 	}
 
 	/** Diese Methode gibt die {@link #getDataRef(int, int)} Funktionsreferenz} auf die gegebene Parameterfunktion zurück.
@@ -783,6 +878,12 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @param src Parameterfunktion.
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist. */
+	/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Dezimalbruch.
+	 * @return Referenz auf den Dezimalbruch.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
 	public int putParamFunction(final FEMParam src) throws NullPointerException, IllegalStateException {
 		return this.getDataRef(FEMCodec.TYPE_PARAM_FUNCTION, src.index());
 	}
@@ -793,6 +894,12 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@link #getConcatArray(ConcatFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getConcatArray(ConcatFunction)} diese auslöst. */
+	/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Dezimalbruch.
+	 * @return Referenz auf den Dezimalbruch.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
 	public int putConcatFunction(final ConcatFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		return this.getDataRef(FEMCodec.TYPE_CONCAT_FUNCTION, this.concatFunctionPool.put(src));
 	}
@@ -803,6 +910,11 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @return Funktionkette.
 	 * @throws IllegalArgumentException Wenn {@link #getConcatFunction(IAMArray)} diese auslöst. */
 	/** Diese Methode gibt die Wertliste zur gegebenen Referenz zurück. */
+	/** Diese Methode gibt die Zeichenkette zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Zeichenkette.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public final ConcatFunction getConcatFunction(final int index) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMDatetime.class);
 	}
@@ -836,6 +948,11 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	}
 
 	/** Diese Methode gibt die Funktionsbindung zur gegebenen Referenz zurück. */
+	/** Diese Methode gibt die Zeichenkette zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Zeichenkette.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public final ClosureFunction getClosureFunction(final int ref) throws IllegalArgumentException {
 		return this.getFunction(ref, ClosureFunction.class);
 	}
@@ -858,6 +975,12 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @return Funktionsreferenz.
 	 * @throws NullPointerException Wenn {@link #getClosureArray(ClosureFunction)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn {@link #getClosureArray(ClosureFunction)} diese auslöst. */
+	/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Dezimalbruch.
+	 * @return Referenz auf den Dezimalbruch.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
 	public int putClosureFunction(final ClosureFunction src) throws NullPointerException, IllegalArgumentException {
 		return this.getDataRef(FEMCodec.TYPE_CLOSURE, this.closureFunctionPool.put(src));
 	}
@@ -878,6 +1001,11 @@ public class FEMCodec implements Property<FEMFunction>, Emuable {
 	 * @return Funktionsaufruf.
 	 * @throws IllegalArgumentException Wenn {@link #getCompositeFunction(IAMArray)} diese auslöst. */
 	/** Diese Methode gibt die Wertliste zur gegebenen Referenz zurück. */
+	/** Diese Methode gibt die Zeichenkette zur gegebenen Referenz zurück.
+	 *
+	 * @param ref Referenz.
+	 * @return Zeichenkette.
+	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public final CompositeFunction getCompositeFunction(final int index) throws IllegalArgumentException {
 		return this.getFunction(ref, FEMDatetime.class);
 	}
