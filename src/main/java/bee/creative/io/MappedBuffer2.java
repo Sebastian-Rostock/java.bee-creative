@@ -2,6 +2,8 @@ package bee.creative.io;
 
 import java.io.File;
 import java.io.IOException;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMArray;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
@@ -22,7 +24,7 @@ import bee.creative.util.HashMap2;
  * und {@code ZERO} = Füllwert.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class MappedBuffer2 extends MappedBuffer {
+public class MappedBuffer2 extends MappedBuffer implements Emuable {
 
 	/** Diese Klasse implementiert eine auf 16 Byte ausgerichteten Speicherbereich innerhalb eines {@link MappedBuffer2} mit {@link #hashCode()} und
 	 * {@link #equals(Object)} zur Erkennung von Duplikaten. */
@@ -82,17 +84,17 @@ public class MappedBuffer2 extends MappedBuffer {
 	/** Dieses Feld speichert die Referenz auf den Wurzelspeicherbereich oder {@code 0}. */
 	private int blockRoot;
 
-	/** Dieses Feld speichert nach den erfolgreichen Aufrufen von {@link #setupRegion(int, int)} bzw. {@link #commitRegion()} {@code true} bzw. {@code false}. */
+	/** Dieses Feld speichert nach den erfolgreichen Aufrufen von {@link #openRegion(int, int)} bzw. {@link #closeRegion()} {@code true} bzw. {@code false}. */
 	private boolean blockSetup;
 
-	/** Dieses Feld speichert die Anzahl der 16 Byte-Blöcke und damit die Referenz des nächsten {@link #commitRegion() angefügten} Speicherbereichs. Diese ist
+	/** Dieses Feld speichert die Anzahl der 16 Byte-Blöcke und damit die Referenz des nächsten {@link #closeRegion() angefügten} Speicherbereichs. Diese ist
 	 * mindestens {@code 2}. */
 	private int blockCount;
 
-	/** Dieses Feld speichert {@code true}, wenn Speicherbereiche bei {@link #commitRegion()} wiederverwendet werden sollen. . */
+	/** Dieses Feld speichert {@code true}, wenn Speicherbereiche bei {@link #closeRegion()} wiederverwendet werden sollen. . */
 	private boolean reuseEnabled;
 
-	/** Dieses Feld bildet von einer Zahlenfolge auf deren Referenz ab und wird zusammen mit {@link #reuseEnabled} in {@link #commitRegion()} eingesetzt. */
+	/** Dieses Feld bildet von einer Zahlenfolge auf deren Referenz ab und wird zusammen mit {@link #reuseEnabled} in {@link #closeRegion()} eingesetzt. */
 	private final HashMap<Object, Integer> reuseMapping;
 
 	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei. Wenn die Datei zum Schreiben angebunden wird und leer ist, werden ihre
@@ -142,7 +144,7 @@ public class MappedBuffer2 extends MappedBuffer {
 		this.putInt(8, this.blockRoot = value);
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn bei den über {@link #commitRegion()} abgeschlossenen Speicherbereichen Duplikate elliminiert werden,
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn bei den über {@link #closeRegion()} abgeschlossenen Speicherbereichen Duplikate elliminiert werden,
 	 * d.h. bereits abgeschlossene Speicherbereiche wiederverwendet werden sollen. Zur Erkennung der Duplikate werden je Speicherbereich ca. 56 Byte
 	 * Verwaltungsdaten benötigt.
 	 *
@@ -169,8 +171,8 @@ public class MappedBuffer2 extends MappedBuffer {
 
 	/** Diese Methode gibt den Speicherbereich zur gegebenen Referenz als {@link MMIArray Zahlenfolge} zurück.
 	 *
-	 * @see #setupRegion(int, int)
-	 * @see #commitRegion()
+	 * @see #openRegion(int, int)
+	 * @see #closeRegion()
 	 * @param ref Referenz.
 	 * @return Zahlenfolge.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
@@ -181,14 +183,14 @@ public class MappedBuffer2 extends MappedBuffer {
 
 	/** Diese Methode reserviert einen Speicherbereich mit den gegebenen Merkmalen am Ende des Puffers und gibt die Adresse dieses Speicherbereichs zurück.
 	 * Mehrfache Aufrufe dieser Methode aktualisieren die Merkmale des Speicherbereichs und überschreiben seine letzten 8 Byte mit Null. <b>Abschließend angefügt
-	 * wird der Speicherbereich erst durch {@link #commitRegion()}.</b>
+	 * wird der Speicherbereich erst durch {@link #closeRegion()}.</b>
 	 *
 	 * @param dataType Typkennung des Speicherbereichs.
 	 * @param dataSize Größe des Speicherbereichs (0..0x3FFFFFFF).
 	 * @return Adresse des Speicherbereichs.
 	 * @throws IllegalStateException Wenn die Datei nur zum {@link #isReadonly() Lesen} geöffnet wurde.
 	 * @throws IllegalArgumentException Wenn die Größe ungültig ist. */
-	public final long setupRegion(final int dataType, final int dataSize) throws IllegalStateException, IllegalArgumentException {
+	public final long openRegion(final int dataType, final int dataSize) throws IllegalStateException, IllegalArgumentException {
 		if (this.isReadonly()) throw new IllegalStateException();
 		if ((dataSize & 0xC0000000) != 0) throw new IllegalArgumentException();
 		try {
@@ -206,13 +208,13 @@ public class MappedBuffer2 extends MappedBuffer {
 		}
 	}
 
-	/** Diese Methode schließt die Barbeitung des über {@link #setupRegion(int, int)} reservierten Steicherbereichs ab, fügt diesen an das Dateiende an, hebt die
+	/** Diese Methode schließt die Barbeitung des über {@link #openRegion(int, int)} reservierten Steicherbereichs ab, fügt diesen an das Dateiende an, hebt die
 	 * Reservierung auf und gibt die Referenz auf den Steicherbereich zurück. Die Referenz entspricht der Adresse des Steicherbereichs geteilt durch 16. Wenn
 	 * {@link #reuseEnabled}
 	 *
 	 * @return Referenz.
 	 * @throws IllegalStateException Wenn aktuell kein Steicherbereich reserviert ist. */
-	public final int commitRegion() throws IllegalStateException {
+	public final int closeRegion() throws IllegalStateException {
 		if (!this.blockSetup) throw new IllegalStateException();
 		final int result = this.blockCount, length = (this.getInt((result * 16L) + 4) + 23) / 16;
 		if (this.reuseEnabled) {
@@ -224,6 +226,11 @@ public class MappedBuffer2 extends MappedBuffer {
 		this.putInt(4, this.blockCount = result + length);
 		this.blockSetup = false;
 		return result;
+	}
+
+	@Override
+	public long emu() {
+		return EMU.fromObject(this) + this.reuseMapping.emu();
 	}
 
 }
