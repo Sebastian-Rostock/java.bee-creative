@@ -200,7 +200,10 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 
 	@Override
 	public Integer put(final GKey key, final Integer value) {
-		return super.put(key, Objects.notNull(value));
+		final int value2 = value.intValue(), count = this.count, index = this.putIndexImpl(key);
+		final Integer result = (count != this.count) ? null : this.values[index];
+		this.values[index] = value2;
+		return result;
 	}
 
 	/** Diese Methode erhöht den zum gegebenen Schlüssel hinterlegten Wert um das gegebene Inkrement. Wenn noch kein Wert hinterlegt ist, wird das Inkrement
@@ -209,12 +212,8 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	 * @param key Schlüssel.
 	 * @param value Inklement */
 	public void add(final GKey key, final int value) {
-		final int index = this.getIndexImpl(key);
-		if (index < 0) {
-			this.put(key, value);
-		} else {
-			this.values[index] += value;
-		}
+		final int count = this.count, index = this.putIndexImpl(key), start = (count != this.count) ? 0 : this.values[index];
+		this.values[index] = start + value;
 	}
 
 	@Override

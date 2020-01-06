@@ -9,8 +9,7 @@ import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
 import bee.creative.mmi.MMIArray;
 import bee.creative.mmi.MMIArrayL;
-import bee.creative.util.HashMap;
-import bee.creative.util.HashMap2;
+import bee.creative.util.HashMapOI;
 
 /** Diese Klasse ergänzt einen {@link MappedBuffer} um Methoden zur Auslagerung typisierter Speicherbereiche in eine Datei mit der nachfolgend spezifizierten
  * Dateistruktur.
@@ -95,7 +94,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	private boolean reuseEnabled;
 
 	/** Dieses Feld bildet von einer Zahlenfolge auf deren Referenz ab und wird zusammen mit {@link #reuseEnabled} in {@link #closeRegion()} eingesetzt. */
-	private final HashMap<Object, Integer> reuseMapping;
+	private final HashMapOI<Object> reuseMapping;
 
 	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei. Wenn die Datei zum Schreiben angebunden wird und leer ist, werden ihre
 	 * Kopfdaten initialisiert. Andernfals werden ihre Kopfdaten ausgelesen und geprüft.
@@ -107,7 +106,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 		super(file, readonly);
 		if (!readonly) {
 			this.reuseEnabled = true;
-			this.reuseMapping = new HashMap2<>();
+			this.reuseMapping = new HashMapOI<>();
 			if (this.size() == 0) {
 				this.grow(16);
 				this.putInt(0, 0xABAD1DEA);
@@ -145,7 +144,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn bei den über {@link #closeRegion()} abgeschlossenen Speicherbereichen Duplikate elliminiert werden,
-	 * d.h. bereits abgeschlossene Speicherbereiche wiederverwendet werden sollen. Zur Erkennung der Duplikate werden je Speicherbereich ca. 56 Byte
+	 * d.h. bereits abgeschlossene Speicherbereiche wiederverwendet werden sollen. Zur Erkennung der Duplikate werden je Speicherbereich ca. 40 Byte
 	 * Verwaltungsdaten benötigt.
 	 *
 	 * @return Aktivierung der Wiederverwendung. */
