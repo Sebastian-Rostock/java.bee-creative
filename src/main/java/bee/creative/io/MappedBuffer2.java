@@ -90,7 +90,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	 * mindestens {@code 2}. */
 	private int blockCount;
 
-	/** Dieses Feld speichert {@code true}, wenn Speicherbereiche bei {@link #closeRegion()} wiederverwendet werden sollen. . */
+	/** Dieses Feld speichert {@code true}, wenn Speicherbereiche bei {@link #closeRegion()} wiederverwendet werden sollen. */
 	private boolean reuseEnabled;
 
 	/** Dieses Feld bildet von einer Zahlenfolge auf deren Referenz ab und wird zusammen mit {@link #reuseEnabled} in {@link #closeRegion()} eingesetzt. */
@@ -128,7 +128,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	 * Speicherbereichen abgelegten Datenstrukturen verwendet werden.
 	 *
 	 * @return Referenz auf den Wurzelspeicherbereich oder {@code 0}. */
-	public final int getRoot() {
+	public int getRoot() {
 		return this.blockRoot;
 	}
 
@@ -137,7 +137,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	 * @param value Referenz oder {@code 0}.
 	 * @throws IllegalStateException Wenn die Datei nur zum {@link #isReadonly() Lesen} geöffnet wurde.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public final void setRoot(final int value) throws IllegalStateException, IllegalArgumentException {
+	public void setRoot(final int value) throws IllegalStateException, IllegalArgumentException {
 		if (this.isReadonly()) throw new IllegalStateException();
 		if ((value < 0) || (value > this.blockCount)) throw new IllegalArgumentException();
 		this.putInt(8, this.blockRoot = value);
@@ -148,14 +148,14 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	 * Verwaltungsdaten benötigt.
 	 *
 	 * @return Aktivierung der Wiederverwendung. */
-	public final boolean getReusing() {
+	public boolean isReusing() {
 		return this.reuseEnabled;
 	}
 
-	/** Diese Methode setzt die {@link #getReusing() Aktivierung der Wiederverwendung} von Speicherbereichen.
+	/** Diese Methode setzt die {@link #isReusing() Aktivierung der Wiederverwendung} von Speicherbereichen.
 	 *
 	 * @param value Aktivierung der Wiederverwendung. */
-	public final void setReusing(final boolean value) {
+	public void setReusing(final boolean value) {
 		this.reuseEnabled = value;
 	}
 
@@ -164,7 +164,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	 *
 	 * @param ref Referenz.
 	 * @return Adresse der Kopfdaten. */
-	public final long getRegionAddr(final int ref) {
+	public long getRegionAddr(final int ref) {
 		return ref * 16L;
 	}
 
@@ -175,7 +175,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	 * @param ref Referenz.
 	 * @return Zahlenfolge.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public final MMIArrayL getRegionArray(final int ref) throws IllegalArgumentException {
+	public MMIArrayL getRegionArray(final int ref) throws IllegalArgumentException {
 		final long addr = ref * 16L;
 		return this.getArray(addr + 8, this.getInt(addr + 4), IAMArray.MODE_INT8);
 	}
@@ -189,7 +189,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	 * @return Adresse des Speicherbereichs.
 	 * @throws IllegalStateException Wenn die Datei nur zum {@link #isReadonly() Lesen} geöffnet wurde.
 	 * @throws IllegalArgumentException Wenn die Größe ungültig ist. */
-	public final long openRegion(final int dataType, final int dataSize) throws IllegalStateException, IllegalArgumentException {
+	public long openRegion(final int dataType, final int dataSize) throws IllegalStateException, IllegalArgumentException {
 		if (this.isReadonly()) throw new IllegalStateException();
 		if ((dataSize & 0xC0000000) != 0) throw new IllegalArgumentException();
 		try {
@@ -213,7 +213,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 	 *
 	 * @return Referenz.
 	 * @throws IllegalStateException Wenn aktuell kein Steicherbereich reserviert ist. */
-	public final int closeRegion() throws IllegalStateException {
+	public int closeRegion() throws IllegalStateException {
 		if (!this.blockSetup) throw new IllegalStateException();
 		final int result = this.blockCount, length = (this.getInt((result * 16L) + 4) + 23) / 16;
 		if (this.reuseEnabled) {

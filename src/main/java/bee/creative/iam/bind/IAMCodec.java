@@ -21,7 +21,7 @@ import bee.creative.util.Builders;
  * Ausgabedaten} unterschiedlicher {@link #getTargetFormat() Ausgabeformate} überführt werden.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class IAMCodec {
+final class IAMCodec {
 
 	/** Diese Klasse implementiert die Aufzählung der unterstützten Ein- und Ausgabedatenformate eines {@link IAMCodec}.
 	 *
