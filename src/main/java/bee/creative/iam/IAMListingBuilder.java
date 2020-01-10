@@ -27,8 +27,8 @@ public class IAMListingBuilder extends IAMListing implements Emuable {
 
 	static class ItemPool extends IAMIndexBuilder.BasePool<ItemData> {
 
-		ItemPool(final IAMArrayBuilder builder) {
-			super(builder);
+		ItemPool(final IAMBuffer buffer) {
+			super(buffer);
 		}
 
 		@Override
@@ -41,14 +41,14 @@ public class IAMListingBuilder extends IAMListing implements Emuable {
 	/** Dieses Feld speichert die bisher gesammelten Elemente. */
 	protected final ItemPool items;
 
-	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit {@link IAMArrayBuilder#EMPTY}. */
+	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit {@link IAMBuffer#EMPTY}. */
 	public IAMListingBuilder() {
-		this(IAMArrayBuilder.EMPTY);
+		this(IAMBuffer.EMPTY);
 	}
 
 	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit dem gegebenen. */
-	public IAMListingBuilder(final IAMArrayBuilder builder) {
-		this.items = new ItemPool(builder);
+	public IAMListingBuilder(final IAMBuffer buffer) {
+		this.items = new ItemPool(buffer);
 	}
 
 	/** Diese Methode fügt das Element mit den gegebenen Daten hinzu und gibt die Position zurück, unter welcher dieses verwaltet wird. Wenn bereits ein Element
@@ -77,7 +77,7 @@ public class IAMListingBuilder extends IAMListing implements Emuable {
 	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist. */
 	public int put(final int index, final IAMArray data) throws NullPointerException, IndexOutOfBoundsException {
 		if (index < 0) return this.items.put(data).index;
-		this.items.datas.get(index).data = this.items.builder.get(data);
+		this.items.datas.get(index).data = this.items.buffer.get(data);
 		return index;
 	}
 

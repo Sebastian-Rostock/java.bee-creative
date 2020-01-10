@@ -195,7 +195,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 		try {
 			final int dataRef = this.blockCount;
 			if (dataRef < 0) throw new IllegalStateException();
-			final long addr = dataRef * 16L, size = (addr + dataSize + 23) & -15L;
+			final long addr = dataRef * 16L, size = (addr + dataSize + 23) & -16L;
 			this.grow(size);
 			this.putLong(size - 8, 0);
 			this.putInt(addr + 0, dataType);

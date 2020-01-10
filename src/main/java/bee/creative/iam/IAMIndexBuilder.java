@@ -35,10 +35,10 @@ public class IAMIndexBuilder extends IAMIndex {
 		public final List<GData> datas = new ArrayList<>();
 
 		/** Dieses Feld speichert Puffer zur Optimierung bzw. Aulagerung der Eingaben in {@link #customSource(IAMArray)}. */
-		public final IAMArrayBuilder builder;
+		public final IAMBuffer buffer;
 
-		public BasePool(final IAMArrayBuilder builder) {
-			this.builder = Objects.notNull(builder);
+		public BasePool(final IAMBuffer builder) {
+			this.buffer = Objects.notNull(builder);
 		}
 
 		/** Diese Methode nimmt einen neuen Ausgabedatensatz mit den gegebenen Eingabedaten in die Verwaltung auf und gibt diesen zurück.
@@ -48,7 +48,7 @@ public class IAMIndexBuilder extends IAMIndex {
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 		public GData put(final IAMArray source) throws NullPointerException {
 			final int index = this.datas.size();
-			final GData data = this.customData(index, this.builder.get(source));
+			final GData data = this.customData(index, this.buffer.get(source));
 			this.datas.add(index, data);
 			return data;
 		}
@@ -66,7 +66,7 @@ public class IAMIndexBuilder extends IAMIndex {
 
 		@Override
 		protected final IAMArray customSource(final IAMArray source) {
-			return this.builder.get(source);
+			return this.buffer.get(source);
 		}
 
 		@Override
@@ -101,8 +101,8 @@ public class IAMIndexBuilder extends IAMIndex {
 
 	static class ListingPool extends IAMIndexBuilder.BasePool<ListingData> {
 
-		public ListingPool(final IAMArrayBuilder builder) {
-			super(builder);
+		public ListingPool(final IAMBuffer buffer) {
+			super(buffer);
 
 		}
 
@@ -135,8 +135,8 @@ public class IAMIndexBuilder extends IAMIndex {
 
 	static class MappingPool extends IAMIndexBuilder.BasePool<MappingData> {
 
-		public MappingPool(final IAMArrayBuilder builder) {
-			super(builder);
+		public MappingPool(final IAMBuffer buffer) {
+			super(buffer);
 
 		}
 
@@ -157,15 +157,15 @@ public class IAMIndexBuilder extends IAMIndex {
 	/** Dieses Feld speichert die {@link IAMMapping}. */
 	protected final MappingPool mappings;
 
-	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit {@link IAMArrayBuilder#EMPTY}. */
+	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit {@link IAMBuffer#EMPTY}. */
 	public IAMIndexBuilder() {
-		this(IAMArrayBuilder.EMPTY);
+		this(IAMBuffer.EMPTY);
 	}
 
 	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit dem gegebenen. */
-	public IAMIndexBuilder(final IAMArrayBuilder builder) {
-		this.listings = new ListingPool(builder);
-		this.mappings = new MappingPool(builder);
+	public IAMIndexBuilder(final IAMBuffer buffer) {
+		this.listings = new ListingPool(buffer);
+		this.mappings = new MappingPool(buffer);
 	}
 
 	/** Diese Methode fügt eine Abbildung mit den gegebenen Daten hinzu und gibt die Position zurück, unter welcher diese verwaltet wird. Wenn bereits ein

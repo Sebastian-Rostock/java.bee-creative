@@ -31,8 +31,8 @@ public class IAMMappingBuilder extends IAMMapping implements Emuable {
 
 	static class EntryPool extends IAMIndexBuilder.BasePool<EntryData> {
 
-		EntryPool(final IAMArrayBuilder builder) {
-			super(builder);
+		EntryPool(final IAMBuffer buffer) {
+			super(buffer);
 		}
 
 		@Override
@@ -48,14 +48,14 @@ public class IAMMappingBuilder extends IAMMapping implements Emuable {
 	/** Dieses Feld speichert die Einträge. */
 	protected final EntryPool entries;
 
-	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit {@link IAMArrayBuilder#EMPTY}. */
+	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit {@link IAMBuffer#EMPTY}. */
 	public IAMMappingBuilder() {
-		this(IAMArrayBuilder.EMPTY);
+		this(IAMBuffer.EMPTY);
 	}
 
 	/** Dieser Konstruktor initialisiert den Zahlenfolgenpuffer mit dem gegebenen. */
-	public IAMMappingBuilder(final IAMArrayBuilder builder) {
-		this.entries = new EntryPool(builder);
+	public IAMMappingBuilder(final IAMBuffer buffer) {
+		this.entries = new EntryPool(buffer);
 	}
 
 	/** Diese Methode fügt einen Eintrag mit dem gegebenen Schlüssel sowie dem gegebenen Wert hinzu. Wenn bereits ein Eintrag mit diesem Schlüssel existiert, wird
@@ -66,7 +66,7 @@ public class IAMMappingBuilder extends IAMMapping implements Emuable {
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
 	public void put(final IAMArray key, final IAMArray value) throws NullPointerException {
 		Objects.notNull(value);
-		this.entries.get(key).value = this.entries.builder.get(value);
+		this.entries.get(key).value = this.entries.buffer.get(value);
 	}
 
 	@Override

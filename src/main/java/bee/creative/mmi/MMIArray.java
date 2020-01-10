@@ -23,7 +23,7 @@ public abstract class MMIArray extends IAMArray {
 	 * @param mode Kodierung.
 	 * @return Speicherverbrauch. */
 	public static int size(final int mode) {
-		return (0x021421 >> (mode << 4)) & 15;
+		return (0x021421 >> (mode << 2)) & 15;
 	}
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link MMIArray} und gibt dieses zurück. Wenn das Objekt ein {@link MMIArray} ist, wird dieses
