@@ -1,8 +1,8 @@
 package bee.creative.log;
 
-class ScopedLeaveNode extends ScopedEntryNode {
+class LOGLeave extends LOGEntry {
 
-	ScopedLeaveNode(final Object text, final Object[] args) {
+	LOGLeave(final Object text, final Object[] args) {
 		super(text, args);
 	}
 

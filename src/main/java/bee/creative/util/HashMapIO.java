@@ -104,12 +104,7 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return Objects.equals(this.keys[entryIndex], key);
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-		return Objects.equals(this.keys[entryIndex], key);
+		return (key instanceof Integer) && (((Integer)key).intValue() == this.keys[entryIndex]);
 	}
 
 	@Override

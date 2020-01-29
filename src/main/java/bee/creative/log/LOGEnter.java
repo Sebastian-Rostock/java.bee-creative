@@ -1,8 +1,8 @@
 package bee.creative.log;
 
-class ScopedEnterNode extends ScopedEntryNode {
+class LOGEnter extends LOGEntry {
 
-	ScopedEnterNode(final Object text, final Object[] args) {
+	LOGEnter(final Object text, final Object[] args) {
 		super(text, args);
 	}
 
