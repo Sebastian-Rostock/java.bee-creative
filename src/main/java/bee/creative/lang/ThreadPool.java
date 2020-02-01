@@ -2,6 +2,7 @@ package bee.creative.lang;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import bee.creative.util.HashMap3;
 
 /** Diese Klasse implementiert einen {@link java.lang.Thread Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable)
@@ -80,6 +81,32 @@ public class ThreadPool {
 
 		public void delete() {
 			(this.prev.next = this.next).prev = this.prev;
+		}
+
+	}
+
+	/** Diese Klasse implementiert das von {@link ThreadPool#runAll(int, Iterator)} verwendete {@link Runnable}. */
+	private final class ThreadWorker implements Runnable {
+
+		public final int[] idle;
+
+		public final Runnable task;
+
+		public ThreadWorker(final int[] idle, final Runnable task) {
+			this.idle = idle;
+			this.task = task;
+		}
+
+		@Override
+		public void run() {
+			try {
+				this.task.run();
+			} finally {
+				synchronized (this.idle) {
+					this.idle[0]++;
+					this.idle.notifyAll();
+				}
+			}
 		}
 
 	}
@@ -250,21 +277,71 @@ public class ThreadPool {
 		}
 	}
 
+	/** Diese Methode verarbeitet die gegebenen Berechungen mit der gegebenen Anzahl an Threads und wartet auf deren Abschluss.
+	 *
+	 * @param threads Threadanzahl.
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void runAll(final int threads, final Runnable... tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
+		this.runAll(threads, Arrays.asList(tasks));
+	}
+
+	/** Diese Methode verarbeitet die gegebenen Berechungen mit der gegebenen Anzahl an Threads und wartet auf deren Abschluss.
+	 *
+	 * @param threads Threadanzahl.
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void runAll(final int threads, final Iterable<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
+		this.runAll(threads, tasks.iterator());
+	}
+
+	/** Diese Methode verarbeitet die gegebenen Berechungen mit der gegebenen Anzahl an Threads und wartet auf deren Abschluss.
+	 *
+	 * @param threads Threadanzahl.
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void runAll(final int threads, final Iterator<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
+		if (threads < 1) throw new IllegalArgumentException();
+		final int[] idle = {threads};
+		while (tasks.hasNext()) {
+			synchronized (idle) {
+				if (idle[0] > 0) {
+					idle.wait(1000);
+					continue;
+				}
+				idle[0]--;
+			}
+			this.start(new ThreadWorker(idle, Objects.notNull(tasks.next())));
+		}
+		while (true) {
+			synchronized (idle) {
+				if (idle[0] >= threads) return;
+				idle.wait(1000);
+			}
+		}
+	}
+
 	/** Diese Methode implementiert {@link #join(long, Runnable)} ohne Synchronisation. */
 	private final void joinImpl(final ThreadItem item, final long timeout) throws InterruptedException {
 		if (item == null) return;
 		final Object run = item.run;
 		if (timeout == 0) {
-			while (true) {
-				this.activeMap.wait(0);
+			while (this.activeMap.containsKey(item.task)) {
 				if (item.run != run) return;
+				this.activeMap.wait(0);
 			}
 		} else {
 			final long until = System.currentTimeMillis() + timeout;
 			long sleep = timeout;
-			while (true) {
-				this.activeMap.wait(sleep);
+			while (this.activeMap.containsKey(item.task)) {
 				if (item.run != run) return;
+				this.activeMap.wait(sleep);
 				sleep = until - System.currentTimeMillis();
 				if (sleep <= 0) return;
 			}

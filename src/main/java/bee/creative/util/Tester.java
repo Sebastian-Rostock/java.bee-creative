@@ -100,7 +100,7 @@ public class Tester {
 				}
 				try {
 					Thread.sleep(sleep);
-				} catch (final InterruptedException e) {
+				} catch (final InterruptedException pause) {
 					break;
 				}
 			}
