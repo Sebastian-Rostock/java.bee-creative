@@ -18,10 +18,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	/** Dieses Feld speichert die Anzahl der Protokollebenen. */
 	protected int indent;
 
-	/** Dieses Feld puffert die Zeichenketten zur Einrückung für {@link #toIndent(int)}. */
-	protected final String[] indents = new String[100];
-
-	/** Diese Methode gibt die Textdarstellungen der {@link #push(String) erfassten} Protokollzeilen zurück.
+	/** Diese Methode gibt die Textdarstellungen der {@link #print(String) erfassten} Protokollzeilen zurück.
 	 *
 	 * @return Textdarstellungen. */
 	@Override
@@ -39,77 +36,95 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 		return this.get();
 	}
 
+	/** Diese Methode erfasst die gegebene Zeichenkette mit der aktuellen Einrückung als Protokollzeile nur dann, wenn sie nicht {@code null} ist. Die Einrückung
+	 * wird dazu über {@link #customIndent(int)} ermittelt.
+	 *
+	 * @param text Zeichenkette oder {@code null}. */
+	public void print(final String text) {
+		if (text == null) return;
+		this.result.add(this.customIndent(this.indent).concat(text));
+	}
+
+	/** Diese Methode {@link #customPrint(Object, Object[]) erfasst} die gegebene Protokollzeile.
+	 * 
+	 * @param node Protokollzeile. */
 	public void print(final LOGEntry node) {
 		this.customPrint(node.text, node.args);
 		this.indent += node.indent();
 	}
 
+	/** Diese Methode {@link #print(LOGEntry) erfasst} die gegebenen Protokollzeilen.
+	 * 
+	 * @param entries Protokollzeilen. */
 	public void printAll(final Iterable<? extends LOGEntry> entries) {
-		for (LOGEntry entry: entries) {
-			print(entry);
+		for (final LOGEntry entry: entries) {
+			this.print(entry);
 		}
-	}
-
-	/** Diese Methode erfasst die gegebene Zeichenkette mit der aktuellen Einrückung als Protokollzeile nur dann, wenn sie nicht {@code null} ist. Die Einrückung
-	 * wird dazu über {@link #toIndent(int)} ermittelt.
-	 *
-	 * @param text Zeichenkette oder {@code null}. */
-	public void push(final String text) {
-		if (text == null) return;
-		final String indent = this.toIndent(this.indent);
-		this.result.add(indent.concat(text));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #customPrint(Object, Object[]) this.push(text, null)}. */
-	public void push(final Object object) {
-		this.customPrint(object, null);
 	}
 
 	/** Diese Methode erfasst die gegebene Protokollzeile.
 	 * <ul>
-	 * <li>Wenn das Objekt {@code text} ein {@link LOGBuilder} ist, werden dessen Protokollzeilen rekursiv erfasst. Die Rekursion ist nicht gegen Endlosschleifen
-	 * abgesichert.</li>
-	 * <li>Wenn die Objektliste {@code args} {@code null} ist, wird die Protokollzeile über {@link #push(Object) this.push(toString(text))} erfasst.<br>
-	 * Solche Protokollzeilen werden durch {@link LOGBuilder#enterScope(Object)}, {@link LOGBuilder#pushEntry(Object)}, und {@link LOGBuilder#leaveScope(Object)}
-	 * bereitgestellt.</li>
-	 * <li>Wenn das Objekt {@code text} {@code null} ist, wird die über {@link Strings#join(Object[]) Strings.join(this.toObjects(args))} erzeugte Zeichenkette
-	 * über {@link #push(String)} erfast.<br>
-	 * Solche Protokollzeilen können durch {@link LOGBuilder#enterScope(String, Object...)}, {@link LOGBuilder#pushEntry(String, Object...)},
-	 * {@link LOGBuilder#pushError(Throwable, String, Object...)} und {@link LOGBuilder#leaveScope(String, Object...)} erzeugt werden, wenn als Formattext
-	 * {@code null} eingesetzt wird.</li>
-	 * <li>Andernfalls wird die über {@link String#format(String, Object...) String.format(this.toString(text), this.toObjects(args)))} erzeugte Zeichenkette über
-	 * {@link #push(String)} erfasst.</li>
+	 * <li>Wenn das Objekt {@code text} ein {@link LOGBuilder} ist, werden dessen Protokollzeilen rekursiv {@link #printAll(Iterable) erfasst}. Die Rekursion ist
+	 * nicht gegen Endlosschleifen abgesichert.</li>
+	 * <li>Wenn die Objektliste {@code args} {@code null} ist, wird die Protokollzeile über {@link #customText(Object) this.print(this.customText(text))}
+	 * {@link #print(String) erfasst}. Solche Protokollzeilen werden durch {@link LOGBuilder#enterScope(Object)}, {@link LOGBuilder#pushEntry(Object)}, und
+	 * {@link LOGBuilder#leaveScope(Object)} bereitgestellt.</li>
+	 * <li>Wenn das Objekt {@code text} {@code null} ist, wird die über {@link #customArgs(Object[]) Strings.join(this.customArgs(args))} erzeugte Zeichenkette
+	 * {@link #print(String) erfast}. Solche Protokollzeilen können durch {@link LOGBuilder#enterScope(String, Object...)},
+	 * {@link LOGBuilder#pushEntry(String, Object...)}, {@link LOGBuilder#pushError(Throwable, String, Object...)} und
+	 * {@link LOGBuilder#leaveScope(String, Object...)} erzeugt werden, wenn als Formattext {@code null} eingesetzt wird.</li>
+	 * <li>Andernfalls wird die über {@code String.format(this.customText(text), this.customArgs(args)))} erzeugte Zeichenkette {@link #print(String)
+	 * erfasst}.</li>
 	 * </ul>
 	 *
-	 * @see #customString(Object)
-	 * @see #customObjects(Object[])
 	 * @param text {@link LOGBuilder}, Textbaustein, Formattext oder {@code null}.
 	 * @param args Textbausteine, Formatargumente oder {@code null}. */
-	public void customPrint(final Object text, final Object[] args) {
+	protected void customPrint(final Object text, final Object[] args) {
 		if (text instanceof LOGBuilder) {
 			this.printAll((LOGBuilder)text);
 		} else if (args == null) {
-			this.push(this.customString(text));
+			this.print(this.customText(text));
 		} else if (text == null) {
-			this.push(Strings.join(this.customObjects(args)));
+			this.print(Strings.join(this.customArgs(args)));
 		} else {
-			this.push(String.format(this.customString(text), this.customObjects(args)));
+			this.print(String.format(this.customText(text), this.customArgs(args)));
 		}
 	}
 
-	/** Diese Methode gibt die Zeichenkette zur Einrückung um die gegebene Anzahl an Protokollebenen zurück. Die ersten {@code 100} Zeichenketten werden zur
-	 * schnellen Wiederverwendung gepuffert. Eine negative Anzahl wird wie {@code 0} behandelt. Nachfahren können die Berechnung der Zeichenkette in
-	 * {@link #customIndent(int)} anpassen.
+	/** Diese Methode gibt die Zeichenkette zum gegebenen Objekt zurück. Sie wird in {@link #customPrint(Object, Object[])} zur Ermittlung des Textbausteins bzw.
+	 * Formattexts einer Protokollzeile verwendet. Nachfahren sollten diese Methode überschreiben, wenn bspw. für {@link Throwable} oder andere besondere Objekte
+	 * eine bessere Zeichenkette ermittelt werden soll, als deren {@link Object#toString() Textdarstellung}. Wenn das gegebene Objekt {@code null} ist, wird
+	 * {@code null} geliefert.
 	 *
-	 * @param count Anzahl der Protokollebenen.
-	 * @return Zeichenkette zur Einrückung. */
-	public String toIndent(final int count) {
-		if (count < 0) return this.toIndent(0);
-		final String[] indents = this.indents;
-		if (count >= indents.length) return this.customIndent(count);
-		String result = indents[count];
-		if (result != null) return result;
-		indents[count] = (result = this.customIndent(count));
+	 * @param object Objekt oder {@code null}.
+	 * @return Zeichenkette oder {@code null}. */
+	protected String customText(final Object object) {
+		return object != null ? object.toString() : null;
+	}
+
+	/** Diese Methode wird in {@link #customArgs(Object[])} zur Anpassung von Textbausteinen bzw. Formatargumenten eingesetzt.
+	 *
+	 * @param object Objekt.
+	 * @return Textbaustein bzw. Formatargument. */
+	protected Object customArg(final Object object) {
+		return object;
+	}
+
+	/** Diese Methode gibt die Textbausteine bzw. Formatargumente zur gegebenen Objektliste zurück. Sie wird von {@link #customPrint(Object, Object[])} zur
+	 * Anpassung der Textbausteine bzw. Formatargumente einer Protokollzeile verwendet. Dies kann notwendig werden, wenn für besondere Objekte ein bessere
+	 * Textbaustein verwendet werden soll, als seine {@link Object#toString() Textdarstellung}. Die gegebene Objektliste wird dazu elementweise über
+	 * {@link #customArg(Object)} umgewandelt.
+	 *
+	 * @param objects Objektliste.
+	 * @return Textbausteine bzw. Formatargumente.
+	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
+	protected Object[] customArgs(final Object[] objects) throws NullPointerException {
+		final int length = objects.length;
+		if (length == 0) return objects;
+		final Object[] result = new Object[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = this.customArg(objects[i]);
+		}
 		return result;
 	}
 
@@ -119,46 +134,8 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 * @return Zeichenkette zur Einrückung. */
 	protected String customIndent(final int count) {
 		final String space = "                                        "; // 40 x Space
-		if (count <= 20) return space.substring(0, count << 1);
+		if (count <= 20) return space.substring(0, count * 2);
 		return "(" + count + ")" + space.substring(0, 40 - Integers.stringSize(count));
-	}
-
-	/** Diese Methode gibt die Zeichenkette zum gegebenen Objekt zurück. Sie wird in {@link #push(Object)} und {@link #customPrint(Object, Object[])} zur
-	 * Ermittlung des Textbausteins bzw. Formattexts einer Protokollzeile verwendet. Nachfahren sollten diese Methode überschreiben, wenn bspw. für
-	 * {@link Throwable} oder andere besondere Objekte eine bessere Zeichenkette ermittelt werden soll, als deren {@link Object#toString() Textdarstellung}. Wenn
-	 * das gegebene Objekt {@code null} ist, wird {@code null} geliefert.
-	 *
-	 * @param object Objekt oder {@code null}.
-	 * @return Zeichenkette oder {@code null}. */
-	public String customString(final Object object) {
-		if (object == null) return null;
-		return object.toString();
-	}
-
-	/** Diese Methode gibt die Textbausteine bzw. Formatargumente zur gegebenen Objektliste zurück. Sie wird von {@link #customPrint(Object, Object[])} zur
-	 * Anpassung der Textbausteine bzw. Formatargumente einer Protokollzeile verwendet. Dies kann notwendig werden, wenn für besondere Objekte ein bessere
-	 * Textbaustein verwendet werden soll, als seine {@link Object#toString() Textdarstellung}. Die gegebene Objektliste wird dazu elementweise über
-	 * {@link #customObject(Object)} umgewandelt.
-	 *
-	 * @param objects Objektliste.
-	 * @return Textbausteine bzw. Formatargumente.
-	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
-	protected Object[] customObjects(final Object[] objects) throws NullPointerException {
-		final int length = objects.length;
-		if (length == 0) return objects;
-		final Object[] result = new Object[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = this.customObject(objects[i]);
-		}
-		return result;
-	}
-
-	/** Diese Methode wird in {@link #customObjects(Object[])} zur Anpassung von Textbausteinen bzw. Formatargumenten eingesetzt.
-	 *
-	 * @param object Objekt.
-	 * @return Textbaustein bzw. Formatargument. */
-	protected Object customObject(final Object object) {
-		return object;
 	}
 
 }

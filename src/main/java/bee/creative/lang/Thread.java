@@ -1,8 +1,8 @@
 package bee.creative.lang;
 
-/** Diese Klasse implementiert eine abstrakte {@link Runnable Berechnung}, die als leichtgewichtiger {@link Thread} über einen {@link ThreadPool} ausgeführt
- * wird.
- *
+/** Diese Klasse implementiert eine abstrakte {@link Runnable Berechnung}, die als leichtgewichtiger Thread über einen {@link ThreadPool} ausgeführt wird. Das
+ * Starten dieses leichtgewichtigen Thread benötigt ca. 100.000 Prozessortakte weniger, als ein nativer {@link java.lang.Thread} dafür benötigt.
+ * 
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class Thread implements Runnable {
 
