@@ -37,9 +37,8 @@ public class ThreadPool {
 
 		@Override
 		public void run() {
-			Runnable task;
 			while (true) {
-				task = this.node.pool.openTask(this);
+				Runnable task = this.node.pool.openTask(this);
 				if (task == null) return;
 				boolean error = true;
 				try {
@@ -207,7 +206,9 @@ public class ThreadPool {
 			while (true) {
 				try {
 					this.waitingList.wait(sleep);
-				} catch (final InterruptedException ignore) {}
+				} catch (final InterruptedException ignore) {
+					return null;
+				}
 				synchronized (this.activeMap) {
 					final Runnable task = item.task;
 					if (task != null) return task;
@@ -256,10 +257,13 @@ public class ThreadPool {
 	 * @param tasks Berechnungen.
 	 * @return Threads.
 	 * @throws NullPointerException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
-	private final ArrayList<ThreadItem> getThreads(final Iterable<? extends Runnable> tasks) throws NullPointerException {
+	private final ArrayList<ThreadItem> getThreads(final Iterator<? extends Runnable> tasks) throws NullPointerException {
 		final ArrayList<ThreadItem> items = new ArrayList<>(10);
-		for (final Runnable task: tasks) {
-			items.add(this.getThread(task));
+		while (tasks.hasNext()) {
+			final ThreadItem task = this.getThread(tasks.next());
+			if (task != null) {
+				items.add(task);
+			}
 		}
 		return items;
 	}
@@ -311,7 +315,7 @@ public class ThreadPool {
 		final int[] idle = {threads};
 		while (tasks.hasNext()) {
 			synchronized (idle) {
-				if (idle[0] > 0) {
+				if (idle[0] <= 0) {
 					idle.wait(1000);
 					continue;
 				}
@@ -407,7 +411,16 @@ public class ThreadPool {
 		this.joinAll(0, tasks);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #joinAll(long, Iterable) this.joinAll(0, Arrays.asList(tasks))}.
+	/** Diese Methode ist eine Abkürzung für {@link #joinAll(long, Iterator) this.joinAll(0, tasks)}.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void joinAll(final Iterator<? extends Runnable> tasks) throws NullPointerException, InterruptedException {
+		this.joinAll(0, tasks);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #joinAll(long, Iterable) this.joinAll(timeout, Arrays.asList(tasks))}.
 	 *
 	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
 	 * @param tasks Berechnungen.
@@ -415,7 +428,19 @@ public class ThreadPool {
 	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void joinAll(final long timeout, final Runnable... tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
-		this.joinAll(0, Arrays.asList(tasks));
+		this.joinAll(timeout, Arrays.asList(tasks));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #joinAll(long, Iterator) this.joinAll(timeout, tasks.iterator())}.
+	 *
+	 * @param timeout Wartezeit in Millisekungen oder {@code 0}.
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void joinAll(final long timeout, final Iterable<? extends Runnable> tasks)
+		throws NullPointerException, IllegalArgumentException, InterruptedException {
+		this.joinAll(timeout, tasks.iterator());
 	}
 
 	/** Diese Methode {@link #join(long, Runnable) wartet} auf den Abschluss der gegebenen Berechnungen, sofern diese aktuell {@link #isAlive(Runnable)
@@ -426,7 +451,7 @@ public class ThreadPool {
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code timeout} negativ ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
-	public void joinAll(final long timeout, final Iterable<? extends Runnable> tasks)
+	public void joinAll(final long timeout, final Iterator<? extends Runnable> tasks)
 		throws NullPointerException, IllegalArgumentException, InterruptedException {
 		if (timeout < 0) throw new IllegalArgumentException();
 		synchronized (this.activeMap) {
@@ -505,14 +530,22 @@ public class ThreadPool {
 		this.startAll(Arrays.asList(tasks));
 	}
 
-	/** Diese Methode {@link #start(Runnable) startet} die gegebenen Berechnungen in jeweils einem eigenen {@link Thread}.
+	/** Diese Methode ist eine Abkürzung für {@link #startAll(Iterator) this.startAll(tasks.iterator())}.
 	 *
 	 * @param tasks Berechnungen.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
 	public void startAll(final Iterable<? extends Runnable> tasks) throws NullPointerException {
+		this.startAll(tasks.iterator());
+	}
+
+	/** Diese Methode {@link #start(Runnable) startet} die gegebenen Berechnungen in jeweils einem eigenen {@link Thread}.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public void startAll(final Iterator<? extends Runnable> tasks) throws NullPointerException {
 		synchronized (this.activeMap) {
-			for (final Runnable task: tasks) {
-				this.startImpl(task);
+			while (tasks.hasNext()) {
+				this.startImpl(tasks.next());
 			}
 			this.checkActive();
 		}
@@ -548,8 +581,17 @@ public class ThreadPool {
 	 * @param tasks Berechnungen.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
 	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
-	public void interruptAll(final Runnable... tasks) throws NullPointerException, SecurityException { // ok
+	public void interruptAll(final Runnable... tasks) throws NullPointerException, SecurityException {
 		this.interruptAll(Arrays.asList(tasks));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #interruptAll(Iterator) this.interruptAll(tasks.iterator())}.
+	 *
+	 * @param tasks Berechnungen.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
+	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
+	public void interruptAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, SecurityException {
+		this.interruptAll(tasks.iterator());
 	}
 
 	/** Diese Methode {@link java.lang.Thread#interrupt() unterbricht} die gegebenen Berechnungen, sofern diese aktuell {@link #isAlive(Runnable) verarbeitet}
@@ -558,7 +600,7 @@ public class ThreadPool {
 	 * @param tasks Berechnungen.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
 	 * @throws SecurityException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
-	public void interruptAll(final Iterable<? extends Runnable> tasks) throws NullPointerException, SecurityException {
+	public void interruptAll(final Iterator<? extends Runnable> tasks) throws NullPointerException, SecurityException {
 		synchronized (this.activeMap) {
 			this.interruptAllImpl(this.getThreads(tasks));
 		}
@@ -574,6 +616,10 @@ public class ThreadPool {
 		}
 	}
 
+	private final boolean isAliveImpl(final Runnable task) {
+		return this.activeMap.containsKey(Objects.notNull(task));
+	}
+
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebene Berechnung {@link #start(Runnable) gestartet} und noch nicht abgeschlossen wurde.
 	 *
 	 * @param task Berechnung.
@@ -581,7 +627,73 @@ public class ThreadPool {
 	 * @throws NullPointerException Wenn {@code task} {@code null} ist. */
 	public boolean isAlive(final Runnable task) throws NullPointerException {
 		synchronized (this.activeMap) {
-			return this.activeMap.containsKey(Objects.notNull(task));
+			return this.isAliveImpl(task);
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #isAliveAll(Iterable) this.isAliveAll(Arrays.asList(tasks))}.
+	 * 
+	 * @param tasks Berechnungen.
+	 * @return {@code true}, wenn alle Berechnungen aktuell ausgeführt werden; sonst {@code false}.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public boolean isAliveAll(final Runnable... tasks) throws NullPointerException {
+		return this.isAliveAll(Arrays.asList(tasks));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #isAliveAll(Iterator) this.isAliveAll(tasks.iterator())}.
+	 * 
+	 * @param tasks Berechnungen.
+	 * @return {@code true}, wenn alle Berechnungen aktuell ausgeführt werden; sonst {@code false}.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public boolean isAliveAll(final Iterable<? extends Runnable> tasks) throws NullPointerException {
+		return this.isAliveAll(tasks.iterator());
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn alle gegebenen Berechnungen {@link #isAlive(Runnable) gestartet und noch nicht abgeschlossen
+	 * wurden}.
+	 * 
+	 * @param tasks Berechnungen.
+	 * @return {@code true}, wenn alle Berechnungen aktuell ausgeführt werden; sonst {@code false}.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public boolean isAliveAll(final Iterator<? extends Runnable> tasks) throws NullPointerException {
+		synchronized (this.activeMap) {
+			while (tasks.hasNext()) {
+				if (!this.isAliveImpl(tasks.next())) return false;
+			}
+			return true;
+		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #isAliveAny(Iterable) this.isAliveAny(Arrays.asList(tasks))}.
+	 * 
+	 * @param tasks Berechnungen.
+	 * @return {@code false}, wenn keine der Berechnungen aktuell ausgeführt werden; sonst {@code true}.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public boolean isAliveAny(final Runnable... tasks) throws NullPointerException {
+		return this.isAliveAny(Arrays.asList(tasks));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #isAliveAny(Iterator) this.isAliveAny(tasks.iterator())}.
+	 * 
+	 * @param tasks Berechnungen.
+	 * @return {@code false}, wenn keine der Berechnungen aktuell ausgeführt werden; sonst {@code true}.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public boolean isAliveAny(final Iterable<? extends Runnable> tasks) throws NullPointerException {
+		return this.isAliveAny(tasks.iterator());
+	}
+
+	/** Diese Methode gibt nur dann {@code false} zurück, wenn keine der gegebenen Berechnungen {@link #isAlive(Runnable) gestartet und noch nicht abgeschlossen
+	 * wurden}.
+	 * 
+	 * @param tasks Berechnungen.
+	 * @return {@code false}, wenn keine der Berechnungen aktuell ausgeführt werden; sonst {@code true}.
+	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
+	public boolean isAliveAny(final Iterator<? extends Runnable> tasks) throws NullPointerException {
+		synchronized (this.activeMap) {
+			while (tasks.hasNext()) {
+				if (this.isAliveImpl(tasks.next())) return true;
+			}
+			return false;
 		}
 	}
 
