@@ -979,7 +979,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		if ((offset < 0) || (length < 0) || ((offset + length) > items.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMString.EMPTY;
 		final short[] result = new short[length];
-		for (int i1 = 0, i2 = offset, l = length; 0 <= l; i1++, i2++, l--) {
+		for (int i1 = 0, i2 = offset, l = length; 0 < l; i1++, i2++, l--) {
 			result[i1] = (short)items[i2];
 		}
 		return FEMString.from(false, true, result, 0, length);
