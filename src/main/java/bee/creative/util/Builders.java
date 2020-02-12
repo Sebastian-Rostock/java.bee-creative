@@ -98,8 +98,8 @@ public class Builders {
 		 *
 		 * @param items Elemente.
 		 * @return {@code this}. */
-		@SuppressWarnings ("unchecked")
-		public GThis putAll(final GItem... items) {
+		@SafeVarargs
+		public final GThis putAll(final GItem... items) {
 			return this.putAll(Arrays.asList(items));
 		}
 
@@ -135,7 +135,8 @@ public class Builders {
 		 *
 		 * @param items Elemente.
 		 * @return {@code this}. */
-		public GThis popAll(final Object... items) {
+		@SafeVarargs
+		public final GThis popAll(final Object... items) {
 			return this.popAll(Arrays.asList(items));
 		}
 
@@ -212,12 +213,12 @@ public class Builders {
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected void putKeyImpl(final Getter<? super GKey, ? extends GValue> toValue, final GKey key) {
+		protected <GKey2 extends GKey> void putKeyImpl(final Getter<? super GKey2, ? extends GValue> toValue, final GKey2 key) {
 			this.result.put(key, toValue.get(key));
 		}
 
 		@SuppressWarnings ("javadoc")
-		protected void putValueImpl(final Getter<? super GValue, ? extends GKey> toKey, final GValue value) {
+		protected <GValue2 extends GValue> void putValueImpl(final Getter<? super GValue2, ? extends GKey> toKey, final GValue2 value) {
 			this.result.put(toKey.get(value), value);
 		}
 
@@ -262,7 +263,7 @@ public class Builders {
 		 * @param toValue {@link Getter} zur Ermittlung des Werts zum gegebenen Schlüssel des Eintrags.
 		 * @param key Schlüssel des Eintrags.
 		 * @return {@code this}. */
-		public GThis putKey(final Getter<? super GKey, ? extends GValue> toValue, final GKey key) {
+		public <GKey2 extends GKey> GThis putKey(final Getter<? super GKey2, ? extends GValue> toValue, final GKey2 key) {
 			this.putKeyImpl(toValue, key);
 			return this.customThis();
 		}
@@ -272,7 +273,7 @@ public class Builders {
 		 * @param toKey {@link Getter} zur Ermittlung des Schlüssels zum gegebenen Wert des Eintrags.
 		 * @param value Wert des Eintrags.
 		 * @return {@code this}. */
-		public GThis putValue(final Getter<? super GValue, ? extends GKey> toKey, final GValue value) {
+		public <GValue2 extends GValue> GThis putValue(final Getter<? super GValue2, ? extends GKey> toKey, final GValue2 value) {
 			this.putValueImpl(toKey, value);
 			return this.customThis();
 		}
@@ -349,8 +350,8 @@ public class Builders {
 		 * @param toValue {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
 		 * @param keys Schlüssel der Einträge.
 		 * @return {@code this}. */
-		@SuppressWarnings ("unchecked")
-		public GThis putAllKeys(final Getter<? super GKey, ? extends GValue> toValue, final GKey... keys) {
+		@SafeVarargs
+		public final <GKey2 extends GKey> GThis putAllKeys(final Getter<? super GKey2, ? extends GValue> toValue, final GKey2... keys) {
 			return this.putAllKeys(toValue, Arrays.asList(keys));
 		}
 
@@ -359,7 +360,7 @@ public class Builders {
 		 * @param toValue {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
 		 * @param keys Schlüssel der Einträge.
 		 * @return {@code this}. */
-		public GThis putAllKeys(final Getter<? super GKey, ? extends GValue> toValue, final Iterator<? extends GKey> keys) {
+		public <GKey2 extends GKey> GThis putAllKeys(final Getter<? super GKey2, ? extends GValue> toValue, final Iterator<? extends GKey2> keys) {
 			while (keys.hasNext()) {
 				this.putKeyImpl(toValue, keys.next());
 			}
@@ -371,7 +372,7 @@ public class Builders {
 		 * @param toValue {@link Getter} zur Ermittlung der Werte zu den gegebenen Schlüsseln der Einträge.
 		 * @param keys Schlüssel der Einträge.
 		 * @return {@code this}. */
-		public GThis putAllKeys(final Getter<? super GKey, ? extends GValue> toValue, final Iterable<? extends GKey> keys) {
+		public <GKey2 extends GKey> GThis putAllKeys(final Getter<? super GKey2, ? extends GValue> toValue, final Iterable<? extends GKey2> keys) {
 			return this.putAllKeys(toValue, keys.iterator());
 		}
 
@@ -380,8 +381,8 @@ public class Builders {
 		 * @param toKey {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
 		 * @param values Werte der Einträge.
 		 * @return {@code this}. */
-		@SuppressWarnings ("unchecked")
-		public GThis putAllValues(final Getter<? super GValue, ? extends GKey> toKey, final GValue... values) {
+		@SafeVarargs
+		public final <GValue2 extends GValue> GThis putAllValues(final Getter<? super GValue2, ? extends GKey> toKey, final GValue2... values) {
 			return this.putAllValues(toKey, Arrays.asList(values));
 		}
 
@@ -390,7 +391,7 @@ public class Builders {
 		 * @param toKey {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
 		 * @param values Werte der Einträge.
 		 * @return {@code this}. */
-		public GThis putAllValues(final Getter<? super GValue, ? extends GKey> toKey, final Iterator<? extends GValue> values) {
+		public <GValue2 extends GValue> GThis putAllValues(final Getter<? super GValue2, ? extends GKey> toKey, final Iterator<? extends GValue2> values) {
 			while (values.hasNext()) {
 				this.putValueImpl(toKey, values.next());
 			}
@@ -402,7 +403,7 @@ public class Builders {
 		 * @param toKey {@link Getter} zur Ermittlung der Schlüssel zu den gegebenen Werten der Einträge.
 		 * @param values Werte der Einträge.
 		 * @return {@code this}. */
-		public GThis putAllValues(final Getter<? super GValue, ? extends GKey> toKey, final Iterable<? extends GValue> values) {
+		public <GValue2 extends GValue> GThis putAllValues(final Getter<? super GValue2, ? extends GKey> toKey, final Iterable<? extends GValue2> values) {
 			return this.putAllValues(toKey, values.iterator());
 		}
 
@@ -446,7 +447,8 @@ public class Builders {
 		 *
 		 * @param keys Schlüssel der Einträge.
 		 * @return {@code this}. */
-		public GThis popAll(final Object... keys) {
+		@SafeVarargs
+		public final GThis popAll(final Object... keys) {
 			return this.popAll(Arrays.asList(keys));
 		}
 
