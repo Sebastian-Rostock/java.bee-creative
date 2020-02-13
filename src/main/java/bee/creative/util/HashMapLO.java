@@ -9,36 +9,36 @@ import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit {@link Integer}-Schlüsseln und beliebigen Wertobjekten.
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit {@link Long}-Schlüsseln und beliebigen Wertobjekten.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ der Werte. */
-public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implements Serializable, Cloneable {
+public class HashMapLO<GValue> extends AbstractHashMap<Long, GValue> implements Serializable, Cloneable {
 
 	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = -5082256600102090233L;
+	private static final long serialVersionUID = -6864886543365066180L;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */
-	transient int[] keys = AbstractHashData.EMPTY_INTEGERS;
+	transient long[] keys = AbstractHashData.EMPTY_LONGS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
-	public HashMapIO() {
+	public HashMapLO() {
 	}
 
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashMapIO(final int capacity) {
+	public HashMapLO(final int capacity) {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMapIO} mit dem Inhalt der gegebenen {@link Map}.
+	/** Dieser Konstruktor initialisiert die {@link HashMapLO} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashMapIO(final Map<? extends Integer, ? extends GValue> source) {
+	public HashMapLO(final Map<? extends Long, ? extends GValue> source) {
 		this(source.size());
 		this.putAll(source);
 	}
@@ -48,7 +48,7 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 		final int count = stream.readInt();
 		this.allocateImpl(count);
 		for (int i = 0; i < count; i++) {
-			final int key = stream.readInt();
+			final long key = stream.readLong();
 			final Object value = stream.readObject();
 			this.putImpl(key, (GValue)value);
 		}
@@ -56,14 +56,14 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
 		stream.writeInt(this.count);
-		for (final Entry<Integer, GValue> entry: this.newEntriesImpl()) {
-			stream.writeInt(entry.getKey());
+		for (final Entry<Long, GValue> entry: this.newEntriesImpl()) {
+			stream.writeLong(entry.getKey());
 			stream.writeObject(entry.getValue());
 		}
 	}
 
 	@Override
-	protected Integer customGetKey(final int entryIndex) {
+	protected Long customGetKey(final int entryIndex) {
 		return this.keys[entryIndex];
 	}
 
@@ -74,7 +74,7 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final Integer key, final int keyHash) {
+	protected void customSetKey(final int entryIndex, final Long key, final int keyHash) {
 		this.keys[entryIndex] = key;
 	}
 
@@ -94,7 +94,7 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 
 	@Override
 	protected int customHashKey(final int entryIndex) {
-		return this.keys[entryIndex];
+		return Objects.hash(this.keys[entryIndex]);
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return (key instanceof Integer) && (((Integer)key).intValue() == this.keys[entryIndex]);
+		return (key instanceof Long) && (((Long)key).intValue() == this.keys[entryIndex]);
 	}
 
 	@Override
@@ -124,34 +124,34 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 
 	@Override
 	protected HashAllocator customAllocator(final int capacity) {
-		final int[] keys2;
+		final long[] keys2;
 		final Object[] values2;
 		if (capacity == 0) {
-			keys2 = AbstractHashData.EMPTY_INTEGERS;
+			keys2 = AbstractHashData.EMPTY_LONGS;
 			values2 = AbstractHashData.EMPTY_OBJECTS;
 		} else {
-			keys2 = new int[capacity];
+			keys2 = new long[capacity];
 			values2 = new Object[capacity];
 		}
 		return new HashAllocator() {
 
 			@Override
 			public void copy(final int sourceIndex, final int targetIndex) {
-				keys2[targetIndex] = HashMapIO.this.keys[sourceIndex];
-				values2[targetIndex] = HashMapIO.this.values[sourceIndex];
+				keys2[targetIndex] = HashMapLO.this.keys[sourceIndex];
+				values2[targetIndex] = HashMapLO.this.values[sourceIndex];
 			}
 
 			@Override
 			public void apply() {
-				HashMapIO.this.keys = keys2;
-				HashMapIO.this.values = values2;
+				HashMapLO.this.keys = keys2;
+				HashMapLO.this.values = values2;
 			}
 
 		};
 	}
 
 	@Override
-	public GValue put(final Integer key, final GValue value) {
+	public GValue put(final Long key, final GValue value) {
 		return super.put(Objects.notNull(key), value);
 	}
 
@@ -161,9 +161,9 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	public HashMapIO<GValue> clone() throws CloneNotSupportedException {
+	public HashMapLO<GValue> clone() throws CloneNotSupportedException {
 		try {
-			final HashMapIO<GValue> result = (HashMapIO<GValue>)super.clone();
+			final HashMapLO<GValue> result = (HashMapLO<GValue>)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.keys = this.keys.clone();
 			result.values = this.values.clone();

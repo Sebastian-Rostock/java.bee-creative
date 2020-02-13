@@ -131,9 +131,9 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public HashSet2<GItem> clone() throws CloneNotSupportedException {
 		try {
-			final HashSet2<?> result = (HashSet2<?>)super.clone();
+			final HashSet2<GItem> result = (HashSet2<GItem>)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.hashes = this.hashes.clone();
 			return result;

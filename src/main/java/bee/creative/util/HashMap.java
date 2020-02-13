@@ -217,9 +217,9 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public HashMap<GKey, GValue> clone() throws CloneNotSupportedException {
 		try {
-			final HashMap<?, ?> result = (HashMap<?, ?>)super.clone();
+			final HashMap<GKey, GValue> result = (HashMap<GKey, GValue>)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.keys = this.keys.clone();
 			result.values = this.values.clone();

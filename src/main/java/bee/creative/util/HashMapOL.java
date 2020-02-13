@@ -9,17 +9,17 @@ import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüsselobjekten und {@link Integer}-Werten.
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüsselobjekten und {@link Long}-Werten.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel. */
-public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements Serializable, Cloneable {
+public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Serializable, Cloneable {
 
-	/** Diese Klasse implementiert {@link HashMapOI#from(Hasher)} */
+	/** Diese Klasse implementiert {@link HashMapOL#from(Hasher)} */
 	@SuppressWarnings ("javadoc")
-	public static final class HasherHashMap<GKey> extends HashMapOI<GKey> {
+	public static final class HasherHashMap<GKey> extends HashMapOL<GKey> {
 
-		private static final long serialVersionUID = 6526317910119486910L;
+		private static final long serialVersionUID = 5915519385854194907L;
 
 		public final Hasher hasher;
 
@@ -49,40 +49,40 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 
 	}
 
-	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = -467621651047396939L;
-
-	/** Diese Methode gibt eine neue {@link HashMapOI} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
+	/** Diese Methode gibt eine neue {@link HashMapOL} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
 	 *
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param hasher Methoden zum Abgleich der Schlüssel.
-	 * @return An {@link Hasher} gebundene {@link HashMapOI}.
+	 * @return An {@link Hasher} gebundene {@link HashMapOL}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
-	public static <GKey> HashMapOI<GKey> from(final Hasher hasher) throws NullPointerException {
+	public static <GKey> HashMapOL<GKey> from(final Hasher hasher) throws NullPointerException {
 		return new HasherHashMap<>(hasher);
 	}
+
+	/** Dieses Feld speichert das serialVersionUID. */
+	private static final long serialVersionUID = -3537880648284024766L;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. */
-	transient int[] values = AbstractHashData.EMPTY_INTEGERS;
+	transient long[] values = AbstractHashData.EMPTY_LONGS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
-	public HashMapOI() {
+	public HashMapOL() {
 	}
 
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashMapOI(final int capacity) {
+	public HashMapOL(final int capacity) {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMapOI} mit dem Inhalt der gegebenen {@link Map}.
+	/** Dieser Konstruktor initialisiert die {@link HashMapOL} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashMapOI(final Map<? extends GKey, ? extends Integer> source) {
+	public HashMapOL(final Map<? extends GKey, ? extends Long> source) {
 		this(source.size());
 		this.putAll(source);
 	}
@@ -93,16 +93,16 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 		this.allocateImpl(count);
 		for (int i = 0; i < count; i++) {
 			final Object key = stream.readObject();
-			final int value = stream.readInt();
+			final long value = stream.readLong();
 			this.putImpl((GKey)key, value);
 		}
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
 		stream.writeInt(this.count);
-		for (final Entry<GKey, Integer> entry: this.newEntriesImpl()) {
+		for (final Entry<GKey, Long> entry: this.newEntriesImpl()) {
 			stream.writeObject(entry.getKey());
-			stream.writeInt(entry.getValue());
+			stream.writeLong(entry.getValue());
 		}
 	}
 
@@ -113,7 +113,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	}
 
 	@Override
-	protected Integer customGetValue(final int entryIndex) {
+	protected Long customGetValue(final int entryIndex) {
 		return this.values[entryIndex];
 	}
 
@@ -123,9 +123,9 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	}
 
 	@Override
-	protected Integer customSetValue(final int entryIndex, final Integer value) {
-		final int[] values = this.values;
-		final int result = values[entryIndex];
+	protected Long customSetValue(final int entryIndex, final Long value) {
+		final long[] values = this.values;
+		final long result = values[entryIndex];
 		values[entryIndex] = value;
 		return result;
 	}
@@ -142,7 +142,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 
 	@Override
 	protected int customHashValue(final int entryIndex) {
-		return this.values[entryIndex];
+		return Objects.hash(this.values[entryIndex]);
 	}
 
 	@Override
@@ -173,35 +173,36 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	@Override
 	protected HashAllocator customAllocator(final int capacity) {
 		final Object[] keys2;
-		final int[] values2;
+		final long[] values2;
 		if (capacity == 0) {
 			keys2 = AbstractHashData.EMPTY_OBJECTS;
-			values2 = AbstractHashData.EMPTY_INTEGERS;
+			values2 = AbstractHashData.EMPTY_LONGS;
 		} else {
 			keys2 = new Object[capacity];
-			values2 = new int[capacity];
+			values2 = new long[capacity];
 		}
 		return new HashAllocator() {
 
 			@Override
 			public void copy(final int sourceIndex, final int targetIndex) {
-				keys2[targetIndex] = HashMapOI.this.keys[sourceIndex];
-				values2[targetIndex] = HashMapOI.this.values[sourceIndex];
+				keys2[targetIndex] = HashMapOL.this.keys[sourceIndex];
+				values2[targetIndex] = HashMapOL.this.values[sourceIndex];
 			}
 
 			@Override
 			public void apply() {
-				HashMapOI.this.keys = keys2;
-				HashMapOI.this.values = values2;
+				HashMapOL.this.keys = keys2;
+				HashMapOL.this.values = values2;
 			}
 
 		};
 	}
 
 	@Override
-	public Integer put(final GKey key, final Integer value) {
-		final int value2 = value.intValue(), count = this.count, index = this.putIndexImpl(key);
-		final Integer result = (count != this.count) ? null : this.values[index];
+	public Long put(final GKey key, final Long value) {
+		final long value2 = value.longValue();
+		int count = this.count, index = this.putIndexImpl(key);
+		final Long result = (count != this.count) ? null : this.values[index];
 		this.values[index] = value2;
 		return result;
 	}
@@ -211,8 +212,9 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	 * 
 	 * @param key Schlüssel.
 	 * @param value Inklement */
-	public void add(final GKey key, final int value) {
-		final int count = this.count, index = this.putIndexImpl(key), start = (count != this.count) ? 0 : this.values[index];
+	public void add(final GKey key, final long value) {
+		final int count = this.count, index = this.putIndexImpl(key);
+		long start = (count != this.count) ? 0 : this.values[index];
 		this.values[index] = start + value;
 	}
 
@@ -222,9 +224,9 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	}
 
 	@Override
-	public HashMapOI<GKey> clone() throws CloneNotSupportedException {
+	public HashMapOL<GKey> clone() throws CloneNotSupportedException {
 		try {
-			final HashMapOI<GKey> result = (HashMapOI<GKey>)super.clone();
+			final HashMapOL<GKey> result = (HashMapOL<GKey>)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.keys = this.keys.clone();
 			result.values = this.values.clone();

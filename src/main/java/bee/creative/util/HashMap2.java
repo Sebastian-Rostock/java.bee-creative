@@ -131,9 +131,9 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public HashMap2<GKey, GValue> clone() throws CloneNotSupportedException {
 		try {
-			final HashMap2<?, ?> result = (HashMap2<?, ?>)super.clone();
+			final HashMap2<GKey, GValue> result = (HashMap2<GKey, GValue>)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.hashes = this.hashes.clone();
 			return result;

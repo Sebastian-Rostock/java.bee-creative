@@ -331,6 +331,14 @@ public class Objects {
 		return result.append(format ? "\n]" : "]").toString();
 	}
 
+	/** Diese Methode gibt den Streuwert des gegebenen Zahl zurück.
+	 *
+	 * @param value Zahl.
+	 * @return {@link Object#hashCode() Streuwert}. */
+	public static int hash(final long value) {
+		return Integers.toIntH(value) ^ Integers.toIntL(value);
+	}
+
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück.
 	 *
 	 * @param object Objekt oder {@code null}.

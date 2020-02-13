@@ -527,6 +527,9 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	/** Dieses Feld speichert den initialwert für {@link #table}. */
 	private static final int[] EMPTY_TABLE = {-1};
 
+	/** Dieses Feld speichert den initialwert für eine leere Zahlenliste. */
+	protected static final long[] EMPTY_LONGS = {};
+
 	/** Dieses Feld speichert den initialwert für eine Objektliste. */
 	protected static final Object[] EMPTY_OBJECTS = {};
 
@@ -1053,9 +1056,10 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException {
+	protected AbstractHashData<GKey, GValue> clone() throws CloneNotSupportedException {
 		try {
-			final AbstractHashData<?, ?> result = (AbstractHashData<?, ?>)super.clone();
+			@SuppressWarnings ("unchecked")
+			final AbstractHashData<GKey, GValue> result = (AbstractHashData<GKey, GValue>)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.table = this.table.clone();
 			result.nexts = this.nexts.clone();

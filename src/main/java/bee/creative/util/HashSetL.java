@@ -9,40 +9,40 @@ import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit {@link Integer} Elementen.
+/** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit {@link Long} Elementen.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class HashSetI extends AbstractHashSet<Integer> implements Serializable, Cloneable {
+public class HashSetL extends AbstractHashSet<Long> implements Serializable, Cloneable {
 
 	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = 6862948924620051022L;
+	private static final long serialVersionUID = 4228392317821609623L;
 
 	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. */
-	transient int[] items = AbstractHashData.EMPTY_INTEGERS;
+	transient long[] items = AbstractHashData.EMPTY_LONGS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
-	public HashSetI() {
+	public HashSetL() {
 	}
 
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashSetI(final int capacity) {
+	public HashSetL(final int capacity) {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert das {@link HashSetI} mit dem Inhalt des gegebenen {@link Set}.
+	/** Dieser Konstruktor initialisiert das {@link HashSetL} mit dem Inhalt des gegebenen {@link Set}.
 	 *
 	 * @param source gegebene Elemente. */
-	public HashSetI(final Set<? extends Integer> source) {
+	public HashSetL(final Set<? extends Long> source) {
 		this(source.size());
 		this.addAll(source);
 	}
 
-	/** Dieser Konstruktor initialisiert das {@link HashSetI} mit dem Inhalt der gegebenen {@link Collection}.
+	/** Dieser Konstruktor initialisiert das {@link HashSetL} mit dem Inhalt der gegebenen {@link Collection}.
 	 *
 	 * @param source gegebene Elemente. */
-	public HashSetI(final Collection<? extends Integer> source) {
+	public HashSetL(final Collection<? extends Long> source) {
 		this.addAll(source);
 	}
 
@@ -50,24 +50,24 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 		final int count = stream.readInt();
 		this.allocateImpl(count);
 		for (int i = 0; i < count; i++) {
-			this.putKeyImpl(stream.readInt());
+			this.putKeyImpl(stream.readLong());
 		}
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
 		stream.writeInt(this.count);
-		for (final Integer item: this) {
-			stream.writeInt(item);
+		for (final Long item: this) {
+			stream.writeLong(item);
 		}
 	}
 
 	@Override
-	protected Integer customGetKey(final int entryIndex) {
+	protected Long customGetKey(final int entryIndex) {
 		return this.items[entryIndex];
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final Integer item, final int itemHash) {
+	protected void customSetKey(final int entryIndex, final Long item, final int itemHash) {
 		this.items[entryIndex] = item;
 	}
 
@@ -78,32 +78,32 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 
 	@Override
 	protected int customHashKey(final int entryIndex) {
-		return this.items[entryIndex];
+		return Objects.hash(this.items[entryIndex]);
 	}
 
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object item) {
-		return (item instanceof Integer) && (((Integer)item).intValue() == this.items[entryIndex]);
+		return (item instanceof Long) && (((Long)item).intValue() == this.items[entryIndex]);
 	}
 
 	@Override
 	protected HashAllocator customAllocator(final int capacity) {
-		final int[] items2;
+		final long[] items2;
 		if (capacity == 0) {
-			items2 = AbstractHashData.EMPTY_INTEGERS;
+			items2 = AbstractHashData.EMPTY_LONGS;
 		} else {
-			items2 = new int[capacity];
+			items2 = new long[capacity];
 		}
 		return new HashAllocator() {
 
 			@Override
 			public void copy(final int sourceIndex, final int targetIndex) {
-				items2[targetIndex] = HashSetI.this.items[sourceIndex];
+				items2[targetIndex] = HashSetL.this.items[sourceIndex];
 			}
 
 			@Override
 			public void apply() {
-				HashSetI.this.items = items2;
+				HashSetL.this.items = items2;
 			}
 
 		};
@@ -115,9 +115,9 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 	}
 
 	@Override
-	public HashSetI clone() throws CloneNotSupportedException {
+	public HashSetL clone() throws CloneNotSupportedException {
 		try {
-			final HashSetI result = (HashSetI)super.clone();
+			final HashSetL result = (HashSetL)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.items = this.items.clone();
 			return result;
