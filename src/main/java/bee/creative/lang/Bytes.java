@@ -636,8 +636,17 @@ public final class Bytes {
 		return value > 0xFFFFFFFFL ? Bytes.lengthOf((int)(value >> 32)) + 4 : Bytes.lengthOf((int)value);
 	}
 
-	/** Diese Methode gibt nur dann {@link ByteOrder#LITTLE_ENDIAN}, wenn die gegebene Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN} ist. Andernfalls wird
-	 * {@link ByteOrder#BIG_ENDIAN} geliefert.
+	/** Diese Methode gibt nur dann {@link #NATIVE_ORDER} zurück, wenn die gegebene Bytereihenfolge {@code true} ist. Andernfalls wird {@link #REVERSE_ORDER}
+	 * geliefert.
+	 *
+	 * @param isNative {@code true} bei nativer Bytereihenfolge.
+	 * @return Bytereihenfolge. */
+	public static ByteOrder nativeOrder(final boolean isNative) {
+		return isNative ? Bytes.NATIVE_ORDER : Bytes.REVERSE_ORDER;
+	}
+
+	/** Diese Methode gibt nur dann {@link ByteOrder#LITTLE_ENDIAN} zurück, wenn die gegebene Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN} ist. Andernfalls
+	 * wird {@link ByteOrder#BIG_ENDIAN} geliefert.
 	 *
 	 * @param order Bytereihenfolge oder {@code null}.
 	 * @return Bytereihenfolge. */
@@ -645,7 +654,7 @@ public final class Bytes {
 		return order == ByteOrder.LITTLE_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
 	}
 
-	/** Diese Methode gibt nur dann {@link ByteOrder#BIG_ENDIAN}, wenn die gegebene Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN} ist. Andernfalls wird
+	/** Diese Methode gibt nur dann {@link ByteOrder#BIG_ENDIAN} zurück, wenn die gegebene Bytereihenfolge {@link ByteOrder#LITTLE_ENDIAN} ist. Andernfalls wird
 	 * {@link ByteOrder#LITTLE_ENDIAN} geliefert.
 	 *
 	 * @param order Bytereihenfolge oder {@code null}.
