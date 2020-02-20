@@ -46,6 +46,14 @@ public class MappedBuffer {
 	/** Dieses Feld speichert die Größe der {@link MappedByteBuffer}, die vor dem letzten in {@link #buffers} verwaltet werden. */
 	private static final int BUFFER_LENGTH = MappedBuffer.BUFFER_GUARD + MappedBuffer.INDEX_MASK + 1;
 
+	/** Diese Methode gibt den Index eines {@link MappedByteBuffer} in {@link #buffers} zur gegebenen Adresse zurück.
+	 *
+	 * @param address Adresse.
+	 * @return höherwertiger Adressteil als Index eines Puffers. */
+	private static int bufferIndex(final long address) {
+		return (int)(address >> MappedBuffer.INDEX_SIZE);
+	}
+
 	/** Diese Methode gibt den Index eines Werts innerhalb eins {@link MappedByteBuffer} zur gegebenen Adresse zurück.
 	 *
 	 * @param address Adresse.
@@ -70,12 +78,17 @@ public class MappedBuffer {
 		return Math.min(length, (MappedBuffer.BUFFER_LENGTH - index) / 8);
 	}
 
-	/** Diese Methode gibt den Index eines {@link MappedByteBuffer} in {@link #buffers} zur gegebenen Adresse zurück.
-	 *
-	 * @param address Adresse.
-	 * @return höherwertiger Adressteil als Index eines Puffers. */
-	private static int bufferIndex(final long address) {
-		return (int)(address >> MappedBuffer.INDEX_SIZE);
+	private static void forceImpl(ByteBuffer buffer, final int minOffset, final int maxOffset) {
+		buffer = buffer.duplicate();
+		buffer.limit(maxOffset);
+		buffer.position(minOffset);
+		buffer = buffer.slice();
+		((MappedByteBuffer)buffer).force();
+	}
+
+	private static void copyImpl(final MappedByteBuffer[] targetBuffers, final long targetAddress, final MappedByteBuffer[] sourceBuffers,
+		final long sourceAddress, final long length) {
+		// TODO
 	}
 
 	public static void main(final String[] args) throws Exception {
@@ -203,7 +216,7 @@ public class MappedBuffer {
 	/** Diese Methode gibt die Größe des Puffers zurück.
 	 *
 	 * @return Puffergröße. */
-	public synchronized long size() {
+	public long size() {
 		return this.size;
 	}
 
@@ -211,10 +224,12 @@ public class MappedBuffer {
 	 *
 	 * @param minSize minimale Puffergröße.
 	 * @throws IOException Wenn die Puffergröße ungültig ist. */
-	public synchronized void grow(final long minSize) throws IOException {
+	public void grow(final long minSize) throws IOException {
 		if (minSize < 0) throw new IOException();
-		if (minSize <= this.size) return;
-		this.resizeImpl(minSize + (minSize / 2));
+		synchronized (this) {
+			if (minSize <= this.size) return;
+			this.resizeImpl(minSize + (minSize / 2));
+		}
 	}
 
 	/** Diese Methode setzt die Größe des Puffers auf die gegebene.<br>
@@ -223,11 +238,13 @@ public class MappedBuffer {
 	 *
 	 * @param newSize neue Puffergröße.
 	 * @throws IOException Wenn die Puffergröße ungültig ist. */
-	public synchronized void resize(final long newSize) throws IOException {
+	public void resize(final long newSize) throws IOException {
 		if (newSize < 0) throw new IOException();
-		final long oldSize = this.size;
-		if (oldSize == newSize) return;
-		this.resizeImpl(newSize);
+		synchronized (this) {
+			final long oldSize = this.size;
+			if (oldSize == newSize) return;
+			this.resizeImpl(newSize);
+		}
 	}
 
 	private void resizeImpl(final long newSize) throws IOException {
@@ -262,23 +279,27 @@ public class MappedBuffer {
 		}
 	}
 
-	/** Diese Methode versucht die Änderungen an der gegebenen Adresse auf den Festspeicher zu übertragen.
-	 *
-	 * @see MappedByteBuffer#force()
-	 * @param address Adresse, zu welcher die Speicherung versucht werden soll. */
-	public void force(final long address) {
-		this.buffers[MappedBuffer.bufferIndex(address)].force();
-	}
-
 	/** Diese Methode versucht die Änderungen im gegebenen Speicherbereich auf den Festspeicher zu übertragen.
 	 *
 	 * @see MappedByteBuffer#force()
-	 * @param minAddress minimale Adresse, ab welcher die Speicherung versucht werden soll.
-	 * @param maxAddress maximale Adresse, ab welcher die Speicherung nicht mehr versucht werden soll. */
-	public void force(final long minAddress, final long maxAddress) {
-		final int minIndex = MappedBuffer.bufferIndex(minAddress), maxIndex = MappedBuffer.bufferIndex(maxAddress - 1);
-		for (int i = minIndex; i <= maxIndex; i++) {
-			this.buffers[i].force();
+	 * @param address Adresse, ab welcher der Speicherbereich beginnt.
+	 * @param length Größe des Speicherbereichs. */
+	public void force(final long address, final long length) {
+		if (length == 0) return;
+		if (length < 0) throw new IllegalArgumentException();
+		final long address2 = address + length;
+		final int minIndex = MappedBuffer.bufferIndex(address);
+		final int minValue = MappedBuffer.valueIndex(address);
+		final int maxIndex = MappedBuffer.bufferIndex(address2);
+		final int maxValue = MappedBuffer.valueIndex(address2);
+		if (minIndex == maxIndex) {
+			MappedBuffer.forceImpl(this.buffers[minIndex], minValue, maxValue + 1);
+		} else {
+			MappedBuffer.forceImpl(this.buffers[minIndex], minValue, MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD);
+			for (int i = minIndex + 1; i < maxIndex; i++) {
+				MappedBuffer.forceImpl(this.buffers[i], 0, MappedBuffer.BUFFER_LENGTH - MappedBuffer.BUFFER_GUARD);
+			}
+			MappedBuffer.forceImpl(this.buffers[maxIndex], 0, maxValue + 1);
 		}
 	}
 
@@ -294,13 +315,15 @@ public class MappedBuffer {
 	 *
 	 * @see ByteBuffer#order(ByteOrder)
 	 * @param order Bytereihenfolge. */
-	public synchronized void order(final ByteOrder order) {
+	public void order(final ByteOrder order) {
 		final boolean isNaive = order != Bytes.REVERSE_ORDER;
-		if (this.isNaive == isNaive) return;
-		this.isNaive = isNaive;
-		final ByteOrder order2 = Bytes.nativeOrder(this.isNaive);
-		for (final MappedByteBuffer buffer: this.buffers) {
-			buffer.order(order2);
+		synchronized (this) {
+			if (this.isNaive == isNaive) return;
+			this.isNaive = isNaive;
+			final ByteOrder order2 = Bytes.nativeOrder(isNaive);
+			for (final MappedByteBuffer buffer: this.buffers) {
+				buffer.order(order2);
+			}
 		}
 	}
 
@@ -369,6 +392,16 @@ public class MappedBuffer {
 		}
 	}
 
+	/** Diese Methode füllt den gegebenen Pufferabschnitt mit den {@code byte}-Werten ab der gegebenen Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param target Puffer.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts. */
+	public void get(final long address, final MappedBuffer target, final long offset, final long length) {
+		MappedBuffer.copyImpl(target.buffers, offset, this.buffers, address, length);
+	}
+
 	/** Diese Methode schreibt den gegebenen {@code byte}-Wert an die gegebene Adresse.
 	 *
 	 * @see ByteBuffer#put(int, byte)
@@ -423,6 +456,16 @@ public class MappedBuffer {
 			length -= count;
 			address += count * 1;
 		}
+	}
+
+	/** Diese Methode schreibt die {@code byte}-Werte des gegebenen Pufferabschnitts an die gegebene Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param source Puffer.
+	 * @param offset Beginn des Abschnitts.
+	 * @param length Länge des Abschnitts. */
+	public void put(final long address, final MappedBuffer source, final long offset, final long length) {
+		MappedBuffer.copyImpl(this.buffers, address, source.buffers, offset, length);
 	}
 
 	/** Diese Methode gibt das {@code char} an der gegebenen Adresse zurück.
@@ -528,12 +571,12 @@ public class MappedBuffer {
 		while (length != 0) {
 			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
 			final int index = MappedBuffer.valueIndex(address);
-			final int count = MappedBuffer.valueCount1(index, length);
+			final int count = MappedBuffer.valueCount2(index, length);
 			source.limit(index + count);
 			target.position(index);
 			target.asCharBuffer().put(source);
 			length -= count;
-			address += count * 1;
+			address += count * 2;
 		}
 	}
 
@@ -571,6 +614,24 @@ public class MappedBuffer {
 			source.asShortBuffer().get(target, offset, count);
 			length -= count;
 			offset += count;
+			address += count * 2;
+		}
+	}
+
+	/** Diese Methode füllt den gegebenen Puffer mit den {@code short}-Werten ab der gegebenen Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param target {@code short}-Puffer. */
+	public void getShort(long address, final ShortBuffer target) {
+		int length = target.remaining();
+		while (length != 0) {
+			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount2(index, length);
+			source.limit(index + count);
+			source.position(index);
+			target.put(source.asShortBuffer());
+			length -= count;
 			address += count * 2;
 		}
 	}
@@ -613,6 +674,24 @@ public class MappedBuffer {
 		}
 	}
 
+	/** Diese Methode schreibt die {@code short}-Werte des gegebenen Puffers an die gegebene Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param source {@code short}-Puffer. */
+	public void putShort(long address, final ShortBuffer source) {
+		int length = source.remaining();
+		while (length != 0) {
+			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount2(index, length);
+			source.limit(index + count);
+			target.position(index);
+			target.asShortBuffer().put(source);
+			length -= count;
+			address += count * 2;
+		}
+	}
+
 	/** Diese Methode gibt das {@code int} an der gegebenen Adresse zurück.
 	 *
 	 * @see IntBuffer#get(int)
@@ -647,6 +726,24 @@ public class MappedBuffer {
 			source.asIntBuffer().get(target, offset, count);
 			length -= count;
 			offset += count;
+			address += count * 4;
+		}
+	}
+
+	/** Diese Methode füllt den gegebenen Puffer mit den {@code int}-Werten ab der gegebenen Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param target {@code int}-Puffer. */
+	public void getInt(long address, final IntBuffer target) {
+		int length = target.remaining();
+		while (length != 0) {
+			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount4(index, length);
+			source.limit(index + count);
+			source.position(index);
+			target.put(source.asIntBuffer());
+			length -= count;
 			address += count * 4;
 		}
 	}
@@ -689,6 +786,24 @@ public class MappedBuffer {
 		}
 	}
 
+	/** Diese Methode schreibt die {@code int}-Werte des gegebenen Puffers an die gegebene Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param source {@code int}-Puffer. */
+	public void putInt(long address, final IntBuffer source) {
+		int length = source.remaining();
+		while (length != 0) {
+			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount4(index, length);
+			source.limit(index + count);
+			target.position(index);
+			target.asIntBuffer().put(source);
+			length -= count;
+			address += count * 4;
+		}
+	}
+
 	/** Diese Methode gibt das {@code long} an der gegebenen Adresse zurück.
 	 *
 	 * @see LongBuffer#get(int)
@@ -723,6 +838,24 @@ public class MappedBuffer {
 			source.asLongBuffer().get(target, offset, count);
 			length -= count;
 			offset += count;
+			address += count * 8;
+		}
+	}
+
+	/** Diese Methode füllt den gegebenen Puffer mit den {@code long}-Werten ab der gegebenen Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param target {@code long}-Puffer. */
+	public void getLong(long address, final LongBuffer target) {
+		int length = target.remaining();
+		while (length != 0) {
+			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount8(index, length);
+			source.limit(index + count);
+			source.position(index);
+			target.put(source.asLongBuffer());
+			length -= count;
 			address += count * 8;
 		}
 	}
@@ -765,6 +898,24 @@ public class MappedBuffer {
 		}
 	}
 
+	/** Diese Methode schreibt die {@code long}-Werte des gegebenen Puffers an die gegebene Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param source {@code long}-Puffer. */
+	public void putLong(long address, final LongBuffer source) {
+		int length = source.remaining();
+		while (length != 0) {
+			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount8(index, length);
+			source.limit(index + count);
+			target.position(index);
+			target.asLongBuffer().put(source);
+			length -= count;
+			address += count * 8;
+		}
+	}
+
 	/** Diese Methode gibt das {@code float} an der gegebenen Adresse zurück.
 	 *
 	 * @see FloatBuffer#get(int)
@@ -803,6 +954,24 @@ public class MappedBuffer {
 		}
 	}
 
+	/** Diese Methode füllt den gegebenen Puffer mit den {@code float}-Werten ab der gegebenen Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param target {@code float}-Puffer. */
+	public void getFloat(long address, final FloatBuffer target) {
+		int length = target.remaining();
+		while (length != 0) {
+			final ByteBuffer source = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount4(index, length);
+			source.limit(index + count);
+			source.position(index);
+			target.put(source.asFloatBuffer());
+			length -= count;
+			address += count * 4;
+		}
+	}
+
 	/** Diese Methode schreibt den gegebenen {@code float}-Wert an die gegebene Adresse.
 	 *
 	 * @see FloatBuffer#put(int, float)
@@ -837,6 +1006,24 @@ public class MappedBuffer {
 			target.asFloatBuffer().put(source, offset, count);
 			length -= count;
 			offset += count;
+			address += count * 4;
+		}
+	}
+
+	/** Diese Methode schreibt die {@code float}-Werte des gegebenen Puffers an die gegebene Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param source {@code float}-Puffer. */
+	public void putFloat(long address, final FloatBuffer source) {
+		int length = source.remaining();
+		while (length != 0) {
+			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount4(index, length);
+			source.limit(index + count);
+			target.position(index);
+			target.asFloatBuffer().put(source);
+			length -= count;
 			address += count * 4;
 		}
 	}
@@ -913,6 +1100,24 @@ public class MappedBuffer {
 			target.asDoubleBuffer().put(source, offset, count);
 			length -= count;
 			offset += count;
+			address += count * 8;
+		}
+	}
+
+	/** Diese Methode schreibt die {@code double}-Werte des gegebenen Puffers an die gegebene Adresse.
+	 *
+	 * @param address Adresse.
+	 * @param source {@code double}-Puffer. */
+	public void putDouble(long address, final DoubleBuffer source) {
+		int length = source.remaining();
+		while (length != 0) {
+			final ByteBuffer target = this.buffers[MappedBuffer.bufferIndex(address)].duplicate();
+			final int index = MappedBuffer.valueIndex(address);
+			final int count = MappedBuffer.valueCount8(index, length);
+			source.limit(index + count);
+			target.position(index);
+			target.asDoubleBuffer().put(source);
+			length -= count;
 			address += count * 8;
 		}
 	}
