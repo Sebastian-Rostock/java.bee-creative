@@ -19,8 +19,6 @@ import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
 import bee.creative.mmi.MMIArray;
 import bee.creative.mmi.MMIArrayL;
-import bee.creative.util.Tester;
-import bee.creative.util.Tester.Method;
 
 /** Diese Klasse implementiert eine alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien per
  * momory-mapping zum Lesen und Schreiben zugänglich machen kann.
@@ -86,37 +84,22 @@ public class MappedBuffer {
 		((MappedByteBuffer)buffer).force();
 	}
 
-	private static void copyImpl(final MappedByteBuffer[] targetBuffers, final long targetAddress, final MappedByteBuffer[] sourceBuffers,
-		final long sourceAddress, final long length) {
-		// TODO
-	}
-
-	public static void main(final String[] args) throws Exception {
-
-		final ByteBuffer a = IO.inputBufferFrom(new byte[10400]);
-		final ByteBuffer b = IO.inputBufferFrom(new byte[10400]);
-		final Method m = new Method() {
-
-			@Override
-			public void run() throws Throwable {
-				for (int i = 0; i < 5000; i++) {
-					MappedBuffer.copy(a, 2 * i, b, 5000, 10);
-				}
-			}
-
-		};
-		for (int i = 0; i < 4; i++) {
-			System.out.println(new Tester(m));
+	private static void copyImpl(final ByteBuffer[] targetBuffers, long targetAddress, final ByteBuffer[] sourceBuffers, long sourceAddress, long length) {
+		if (length < 0) throw new IllegalArgumentException();
+		while (length != 0) {
+			final int targetIndex = MappedBuffer.valueIndex(targetAddress);
+			final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
+			final int count = (int)Math.min(length, MappedBuffer.BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
+			final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
+			final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
+			source.limit(sourceIndex + count);
+			source.position(sourceIndex);
+			target.position(targetIndex);
+			target.put(source);
+			length -= count;
+			targetAddress += count;
+			sourceAddress += count;
 		}
-	}
-
-	static void copy(ByteBuffer source, final int sourceIndex, ByteBuffer target, final int targetIndex, final int length) {
-		source = source.duplicate();
-		source.limit(sourceIndex + length);
-		source.position(sourceIndex);
-		target = target.duplicate();
-		target.position(targetIndex);
-		target.put(source);
 	}
 
 	/** Dieses Feld speichert die gebundene Datei. */
