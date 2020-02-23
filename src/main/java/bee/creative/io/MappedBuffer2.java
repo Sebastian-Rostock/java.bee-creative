@@ -2,8 +2,6 @@ package bee.creative.io;
 
 import java.io.File;
 import java.io.IOException;
-import bee.creative.emu.EMU;
-import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMArray;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
@@ -23,7 +21,7 @@ import bee.creative.util.HashMapOI;
  * und {@code ZERO} = Füllwert.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class MappedBuffer2 extends MappedBuffer implements Emuable {
+public class MappedBuffer2 extends MappedBuffer {
 
 	/** Diese Klasse implementiert eine auf 16 Byte ausgerichteten Speicherbereich innerhalb eines {@link MappedBuffer2} mit {@link #hashCode()} und
 	 * {@link #equals(Object)} zur Erkennung von Duplikaten. */
@@ -229,7 +227,7 @@ public class MappedBuffer2 extends MappedBuffer implements Emuable {
 
 	@Override
 	public long emu() {
-		return EMU.fromObject(this) + this.reuseMapping.emu();
+		return super.emu() + this.reuseMapping.emu();
 	}
 
 }

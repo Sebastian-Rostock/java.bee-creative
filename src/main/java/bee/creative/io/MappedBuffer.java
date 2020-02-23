@@ -14,6 +14,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import bee.creative.emu.EMU;
+import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMArray;
 import bee.creative.lang.Bytes;
 import bee.creative.lang.Objects;
@@ -28,7 +30,7 @@ import bee.creative.mmi.MMIArrayL;
  * wird auf negative Anzahlen mit einer {@link IllegalArgumentException} reagiert.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class MappedBuffer {
+public class MappedBuffer implements Emuable {
 
 	/** Dieses Feld speichert die Anzahl der niederwertigen Bit einer Adresse, die zur Positionsangabe innerhalb eines {@link MappedByteBuffer} eingesetzt
 	 * werden. */
@@ -86,19 +88,24 @@ public class MappedBuffer {
 
 	private static void copyImpl(final ByteBuffer[] targetBuffers, long targetAddress, final ByteBuffer[] sourceBuffers, long sourceAddress, long length) {
 		if (length < 0) throw new IllegalArgumentException();
-		while (length != 0) {
-			final int targetIndex = MappedBuffer.valueIndex(targetAddress);
-			final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
-			final int count = (int)Math.min(length, MappedBuffer.BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
-			final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
-			final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
-			source.limit(sourceIndex + count);
-			source.position(sourceIndex);
-			target.position(targetIndex);
-			target.put(source);
-			length -= count;
-			targetAddress += count;
-			sourceAddress += count;
+		if (targetBuffers != sourceBuffers || targetAddress < sourceAddress) {
+			while (length != 0) {
+				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
+				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
+				final int count = (int)Math.min(length, MappedBuffer.BUFFER_LENGTH - Math.max(targetIndex, sourceIndex));
+				final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
+				final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
+				source.limit(sourceIndex + count);
+				source.position(sourceIndex);
+				target.position(targetIndex);
+				target.put(source);
+				length -= count;
+				targetAddress += count;
+				sourceAddress += count;
+			}
+		}else{
+			// TODO reihenfolge
+			
 		}
 	}
 
@@ -1139,6 +1146,20 @@ public class MappedBuffer {
 		} else {
 			this.putInt(address, source.toInts());
 		}
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #put(long, MappedBuffer, long, long) this.put(target, this, source, length)}.
+	 * 
+	 * @param target Beginn des Zielabschnitts.
+	 * @param source Beginn des Quellabschnitts.
+	 * @param length Länge des Abschnitts. */
+	public void copy(final long target, final long source, final long length) {
+		MappedBuffer.copyImpl(this.buffers, target, this.buffers, source, length);
+	}
+
+	@Override
+	public long emu() {
+		return EMU.fromObject(this) + EMU.fromArray(this.buffers) + EMU.fromAll(this.buffers);
 	}
 
 	@Override
