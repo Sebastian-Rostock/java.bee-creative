@@ -88,7 +88,8 @@ public class MappedBuffer implements Emuable {
 
 	private static void copyImpl(final ByteBuffer[] targetBuffers, long targetAddress, final ByteBuffer[] sourceBuffers, long sourceAddress, long length) {
 		if (length < 0) throw new IllegalArgumentException();
-		if (targetBuffers != sourceBuffers || targetAddress < sourceAddress) {
+		if ((targetBuffers == sourceBuffers) && (targetAddress == sourceAddress)) return;
+		if (targetAddress < sourceAddress) {
 			while (length != 0) {
 				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
 				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
@@ -103,9 +104,23 @@ public class MappedBuffer implements Emuable {
 				targetAddress += count;
 				sourceAddress += count;
 			}
-		}else{
-			// TODO reihenfolge
-			
+		} else {
+			targetAddress += length;
+			sourceAddress += length;
+			while (length != 0) {
+				final int count = (int)Math.min(length, Math.min(MappedBuffer.valueIndex(targetAddress - 1), MappedBuffer.valueIndex(sourceAddress - 1)) + 1);
+				length -= count;
+				targetAddress -= count;
+				sourceAddress -= count;
+				final int targetIndex = MappedBuffer.valueIndex(targetAddress);
+				final int sourceIndex = MappedBuffer.valueIndex(sourceAddress);
+				final ByteBuffer target = targetBuffers[MappedBuffer.bufferIndex(targetAddress)].duplicate();
+				final ByteBuffer source = sourceBuffers[MappedBuffer.bufferIndex(sourceAddress)].duplicate();
+				source.limit(sourceIndex + count);
+				source.position(sourceIndex);
+				target.position(targetIndex);
+				target.put(source);
+			}
 		}
 	}
 
@@ -1149,7 +1164,7 @@ public class MappedBuffer implements Emuable {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #put(long, MappedBuffer, long, long) this.put(target, this, source, length)}.
-	 * 
+	 *
 	 * @param target Beginn des Zielabschnitts.
 	 * @param source Beginn des Quellabschnitts.
 	 * @param length Länge des Abschnitts. */
