@@ -3,22 +3,31 @@ package bee.creative.io;
 import java.io.File;
 import java.io.IOException;
 
-/** Diese Klasse ergänzt einen {@link MappedBuffer} um Methoden zur {@link #regionAlloc(long) Reservierung} und {@link #regionFree(long) Freigabe} von
+/** Diese Klasse ergänzt einen {@link MappedBuffer} um Methoden zur {@link #insertRegion(long) Reservierung} und {@link #deleteRegion(long) Freigabe} von
  * Speicherbereichen.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class MappedBuffer3 extends MappedBuffer {
 
 	public static void main(final String[] args) throws Exception {
-		final MappedBuffer3 b = new MappedBuffer3(new File("E:/DELETE-ME.mb3"), false);
-		long a1 = b.regionAlloc(16);
-		long a2 = b.regionAlloc(32);
-		long a3 = b.regionAlloc(64);
-		a3 = b.regionAlloc(a3, 16);
+		final File file = new File("E:/DELETE-ME.mb3");
+		//file.delete();
+		final MappedBuffer3 b = new MappedBuffer3(file, false);
+		  long a1 = b.insertRegion(16);
 		b.pr();
-		b.regionFree(a3);
-		b.regionFree(a2);
-		b.regionFree(a1);
+		final long a2 = b.insertRegion(32);
+		b.pr();
+		long a3 = b.insertRegion(64);
+		b.pr();
+
+		a1 = b.updateRegion(a1, 40);
+		b.pr();
+
+		b.deleteRegion(a2);
+		b.pr();
+		b.deleteRegion(a1);
+		b.pr();
+		b.deleteRegion(a3);
 		b.pr();
 	}
 
@@ -42,25 +51,25 @@ class MappedBuffer3 extends MappedBuffer {
 		}
 	}
 
-	private final long getNodePrev(final long node) {
-		return this.getLong(node + 0);
+	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. */
+	private final long getNodeSize(final long node) {
+		return this.getLong(node - 8);
 	}
 
-	private final void setNodePrev(final long node, final long prev) {
-		this.putLong(node + 0, prev);
+	private final long getNodePrev(final long node) {
+		return this.getLong(node + 0);
 	}
 
 	private final long getNodeNext(final long node) {
 		return this.getLong(node + 8);
 	}
 
-	private final void setNodeNext(final long node, final long next) {
-		this.putLong(node + 8, next);
+	private final void setNodePrev(final long node, final long prev) {
+		this.putLong(node + 0, prev);
 	}
 
-	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. */
-	private final long getNodeSize(final long node) {
-		return this.getLong(node - 8);
+	private final void setNodeNext(final long node, final long next) {
+		this.putLong(node + 8, next);
 	}
 
 	/** Diese Methode setzt die Größe des gegebenen unbenutzten Speicherbereichs. */
@@ -136,13 +145,13 @@ class MappedBuffer3 extends MappedBuffer {
 	 * @param address Adresse, an welcher der Speicherbereich beginnt.
 	 * @return Größe des Speicherbereichs.
 	 * @throws IllegalArgumentException Wenn die gegebene Adresse ungültig ist. */
-	public long regionSize(final long address) throws IllegalArgumentException {
+	public long getRegionSize(final long address) throws IllegalArgumentException {
 		synchronized (this) {
-			return this.regionSizeImpl(address);
+			return this.getRegionSizeImpl(address);
 		}
 	}
 
-	private final long regionSizeImpl(final long node) throws IllegalArgumentException {
+	private final long getRegionSizeImpl(final long node) throws IllegalArgumentException {
 		final long size = this.getNodeSize(node);
 		if (size < 0) throw new IllegalArgumentException(); // Fehler bei einem freigegebenen Speicherbereich
 		if ((size & 15) != 0) throw new IllegalArgumentException(); // Fehler bei einer nicht auf 16 ausgerichteten Größe
@@ -150,47 +159,16 @@ class MappedBuffer3 extends MappedBuffer {
 		return size;
 	}
 
-	/** Diese Methode gibt den gegebenen Speicherbereich zur Wiederverwendung frei.
-	 *
-	 * @param address Adresse, an welcher der Speicherbereich beginnt.
-	 * @throws IllegalArgumentException Wenn die gegebene Adresse ungültig ist. */
-	public void regionFree(final long address) throws IllegalArgumentException {
+	public long insertRegion(final long size) throws IOException, IllegalArgumentException {
+		final long newSize = this.alignSize(size);
+		if (newSize < 0) throw new IllegalArgumentException();
+		if (newSize == 0) return 0;
 		synchronized (this) {
-			this.regionFreeImpl(address, this.regionSizeImpl(address));
+			return this.insertRegionImpl(newSize);
 		}
 	}
 
-	private final void regionFreeImpl(final long node, final long nodeSize) {
-		final long prevSize = this.getLong(node - 16);
-		final long nextSize = this.getLong(node + nodeSize + 8);
-		if (prevSize < 0) {
-			if (nextSize < 0) { // die vor um den Speicherbereich liegenden Knoten anfügen
-				this.deleteNode(node + nodeSize + 16);
-				this.setNodeFreeSize(node - -prevSize - 16, -prevSize + nodeSize + -nextSize + 32);
-			} else { // den vor dem Speicherbereich liegenden Knoten anfügen
-				this.setNodeFreeSize(node - -prevSize - 16, -prevSize + nodeSize + 16);
-			}
-		} else {
-			if (nextSize < 0) { // den nach dem Speicherbereich liegenden Knoten anfügen
-				this.replaceNode(node + nodeSize + 16, node);
-				this.setNodeFreeSize(node, nodeSize + -nextSize + 16);
-			} else { // den Speicherbereich als neuen Knoten eintragen
-				this.setNodeFreeSize(node, nodeSize);
-				this.insertNode(node, 16);
-			}
-		}
-	}
-
-	public long regionAlloc(final long size) throws IOException, IllegalArgumentException {
-		if (size < 0) throw new IllegalArgumentException();
-		if (size == 0) return 0;
-		final long nodeSize = this.alignSize(size);
-		synchronized (this) {
-			return this.regionAllocImpl(nodeSize);
-		}
-	}
-
-	private final long regionAllocImpl(long nodeSize) throws IOException {
+	private final long insertRegionImpl(long nodeSize) throws IOException {
 		// über die doppelt verkettete Liste der freien Knoten iterieren
 		for (long node = this.getNodeNext(16); node != 16; node = this.getNodeNext(node)) {
 			// die negativ gespeicherte Größe des leerer Knoten um die benötigte verringern
@@ -217,22 +195,65 @@ class MappedBuffer3 extends MappedBuffer {
 		return node;
 	}
 
-	public long regionAlloc(final long address, final long size) throws IOException, IllegalArgumentException {
-		if (address == 0) return this.regionAlloc(size);
-		if (size == 0) {
-			this.regionFree(address);
+	/** Diese Methode gibt den gegebenen Speicherbereich zur Wiederverwendung frei.
+	 *
+	 * @param address Adresse, an welcher der Speicherbereich beginnt.
+	 * @throws IllegalArgumentException Wenn die gegebene Adresse ungültig ist. */
+	public void deleteRegion(final long address) throws IllegalArgumentException {
+		synchronized (this) {
+			this.deleteRegionImpl(address, this.getRegionSizeImpl(address));
+		}
+	}
+
+	private final void deleteRegionImpl(final long node, final long nodeSize) {
+		final long prevSize = this.getLong(node - 16);
+		final long nextSize = this.getLong(node + nodeSize + 8);
+		if (prevSize < 0) {
+			final long prev = node - -prevSize - 16;
+			if (nextSize == 0) { // davor LEER, danach ENDE
+				this.deleteNode(prev);
+				this.putLong(prev - 8, 0);
+				this.putLong(32, prev);
+			} else if (nextSize < 0) { // davor LEER, danach LEER
+				this.deleteNode(node + nodeSize + 16);
+				this.setNodeFreeSize(prev, -prevSize + nodeSize + -nextSize + 32);
+			} else { // davor LEER, danach VOLL
+				this.setNodeFreeSize(prev, -prevSize + nodeSize + 16);
+			}
+		} else {
+			if (nextSize == 0) { // davor VOLL, danach ENDE
+				this.putLong(node - 8, 0);
+				this.putLong(32, node);
+			} else if (nextSize < 0) { // davor VOLL, danach LEER
+				this.replaceNode(node + nodeSize + 16, node);
+				this.setNodeFreeSize(node, nodeSize + -nextSize + 16);
+			} else { // davor VOLL, danach VOLL
+				this.setNodeFreeSize(node, nodeSize);
+				this.insertNode(node, 16);
+			}
+		}
+	}
+
+	public long updateRegion(final long address, final long size) throws IOException, IllegalArgumentException {
+		final long newSize = this.alignSize(size);
+		if (newSize < 0) throw new IllegalArgumentException();
+		synchronized (this) {
+			if (address == 0) return newSize == 0 ? 0 : this.insertRegionImpl(newSize);
+			final long oldSize = this.getRegionSizeImpl(address);
+			if (oldSize == newSize) return address;
+			if (newSize != 0) return this.updateRegionImpl(address, oldSize, newSize);
+			this.deleteRegionImpl(address, oldSize);
 			return 0;
 		}
-		// TODO mit beim verkleinern aufspalten
-		synchronized (this) {
-			final long oldSize = this.getNodeSize(address);
-			final long newSize = this.alignSize(size);
-			if (oldSize == newSize) return address;
-			final long node = this.regionAllocImpl(newSize);
-			this.put(node, this, address, Math.min(oldSize, newSize));
-			this.regionFreeImpl(address, oldSize);
-			return node;
-		}
+	}
+
+	private long updateRegionImpl(final long nodeg, final long oldSize, final long newSize) throws IOException {
+		// TODO mit beim verkleinern aufspalten, immer defragmentieren
+
+		final long node = this.insertRegionImpl(newSize);
+		this.put(node, this, nodeg, Math.min(oldSize, newSize));
+		this.deleteRegionImpl(nodeg, oldSize);
+		return node;
 	}
 
 	private void pr() {
