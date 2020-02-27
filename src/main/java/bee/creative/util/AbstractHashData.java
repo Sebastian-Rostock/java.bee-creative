@@ -267,15 +267,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		}
 
 		@Override
-		public boolean removeAll(final Collection<?> items) {
-			final int size = this.size();
-			for (final Object item: items) {
-				this.remove(item);
-			}
-			return size != this.size();
-		}
-
-		@Override
 		public int hashCode() {
 			final AbstractHashData<GKey, ?> entryData = this.entryData;
 			int result = 0;
@@ -346,15 +337,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 			return this.entryData.popValueImpl(o);
 		}
 
-		@Override
-		public boolean removeAll(final Collection<?> items) {
-			final int size = this.size();
-			for (final Object item: items) {
-				this.remove(item);
-			}
-			return size != this.size();
-		}
-
 	}
 
 	/** Diese Klasse implementiert {@link AbstractHashData#newValuesIteratorImpl()}. */
@@ -402,15 +384,6 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 			if (!(object instanceof Entry)) return false;
 			final Entry<?, ?> entry = (Entry<?, ?>)object;
 			return this.entryData.popEntryImpl(entry.getKey(), entry.getValue());
-		}
-
-		@Override
-		public boolean removeAll(final Collection<?> items) {
-			final int size = this.size();
-			for (final Object item: items) {
-				this.remove(item);
-			}
-			return size != this.size();
 		}
 
 		@Override
