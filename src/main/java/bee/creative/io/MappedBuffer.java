@@ -22,8 +22,8 @@ import bee.creative.lang.Objects;
 import bee.creative.mmi.MMIArray;
 import bee.creative.mmi.MMIArrayL;
 
-/** Diese Klasse implementiert eine alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien per
- * momory-mapping zum Lesen und Schreiben zugänglich machen kann.
+/** Diese Klasse implementiert eine threadsichere alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien
+ * per momory-mapping zum Lesen und Schreiben zugänglich machen kann.
  * <p>
  * Die Anbindung der Datei erfolgt intern über einen {@link MappedByteBuffer} pro Gigabyte. Wenn eine der Methoden eine ungültige Adresse übergeben wird, welche
  * zu einer Zugriffsverletzung führt, wird grundsätzlich eine {@link IndexOutOfBoundsException} ausgelöst, auch wenn diese nicht deklariert ist. Analog dazu
@@ -233,7 +233,8 @@ public class MappedBuffer implements Emuable {
 		if (minSize < 0) throw new IOException();
 		synchronized (this) {
 			if (minSize <= this.size) return;
-			this.resizeImpl(minSize + (minSize / 2));
+			final long newSize = minSize + (minSize / 2);
+			this.resizeImpl(newSize < 0 ? Long.MAX_VALUE : newSize);
 		}
 	}
 
@@ -246,13 +247,13 @@ public class MappedBuffer implements Emuable {
 	public void resize(final long newSize) throws IOException {
 		if (newSize < 0) throw new IOException();
 		synchronized (this) {
-			final long oldSize = this.size;
-			if (oldSize == newSize) return;
+			if (this.size == newSize) return;
 			this.resizeImpl(newSize);
 		}
 	}
 
-	private void resizeImpl(final long newSize) throws IOException {
+	/** Diese Methode implementiert {@link #resize(long)} ohne {@code synchronized} und Parameterprüfung. */
+	protected final void resizeImpl(final long newSize) throws IOException {
 		final MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
 		final int oldLength = oldBuffers.length, newLength = Math.max(MappedBuffer.bufferIndex(newSize - 1) + 1, 1);
 		if (oldLength != newLength) {
