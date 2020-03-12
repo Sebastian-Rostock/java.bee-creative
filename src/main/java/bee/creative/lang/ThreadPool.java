@@ -248,7 +248,7 @@ public class ThreadPool {
 	 * @param task Berechnung.
 	 * @return Thread oder null.
 	 * @throws NullPointerException Wenn {@code task} {@code null} ist. */
-	private final ThreadItem getThread(final Runnable task) throws NullPointerException {
+	private ThreadItem getThread(final Runnable task) throws NullPointerException {
 		return this.activeMap.get(Objects.notNull(task));
 	}
 
@@ -257,7 +257,7 @@ public class ThreadPool {
 	 * @param tasks Berechnungen.
 	 * @return Threads.
 	 * @throws NullPointerException Wenn {@link java.lang.Thread#interrupt()} diese auslöst. */
-	private final ArrayList<ThreadItem> getThreads(final Iterator<? extends Runnable> tasks) throws NullPointerException {
+	private ArrayList<ThreadItem> getThreads(final Iterator<? extends Runnable> tasks) throws NullPointerException {
 		final ArrayList<ThreadItem> items = new ArrayList<>(10);
 		while (tasks.hasNext()) {
 			final ThreadItem task = this.getThread(tasks.next());
@@ -269,13 +269,13 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode halbiert die {@link HashMap3#capacity() Kapazität} der {@link #activeMap}, wenn diese Kapazität zu weniger als 25 % ausgenutzt wird. */
-	private final void checkActive() {
+	private void checkActive() {
 		if (this.activeMap.size() >= (this.activeMap.capacity() / 4)) return;
 		this.activeMap.allocate(this.activeMap.capacity() / 2);
 	}
 
 	/** Diese Methode {@link Object#notifyAll() benachrichtigt} alle auf {@link #waitingList} {@link Object#wait(long) wartenden} Threads. */
-	private final void checkWaiting() {
+	private void checkWaiting() {
 		synchronized (this.waitingList) {
 			this.waitingList.notifyAll();
 		}
@@ -332,7 +332,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #join(long, Runnable)} ohne Synchronisation. */
-	private final void joinImpl(final ThreadItem item, final long timeout) throws InterruptedException {
+	private void joinImpl(final ThreadItem item, final long timeout) throws InterruptedException {
 		if (item == null) return;
 		final Object run = item.run;
 		if (timeout == 0) {
@@ -377,7 +377,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #joinAll(long, Iterable)} ohne Synchronisation. */
-	private final void joinAllImpl(final Iterable<? extends ThreadItem> items, final long timeout) throws InterruptedException {
+	private void joinAllImpl(final Iterable<? extends ThreadItem> items, final long timeout) throws InterruptedException {
 		if (timeout == 0) {
 			for (final ThreadItem item: items) {
 				this.joinImpl(item, 0);
@@ -480,7 +480,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #start(Runnable)} ohne Synchronisation. */
-	private final boolean startImpl(final Runnable task) {
+	private boolean startImpl(final Runnable task) {
 		if (this.activeMap.containsKey(Objects.notNull(task))) return false;
 		final ThreadNode node = this.waitingList.next;
 		final ThreadItem item;
@@ -553,7 +553,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #interrupt(Runnable)} ohne Synchronisation. */
-	private final void interruptImpl(final ThreadItem item) throws SecurityException {
+	private void interruptImpl(final ThreadItem item) throws SecurityException {
 		if (item == null) return;
 		item.interrupt();
 	}
@@ -570,7 +570,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode implementiert {@link #interruptAll(Iterable)} ohne Synchronisation. */
-	private final void interruptAllImpl(final ArrayList<? extends ThreadItem> items) {
+	private void interruptAllImpl(final ArrayList<? extends ThreadItem> items) {
 		for (final ThreadItem item: items) {
 			this.interruptImpl(item);
 		}
@@ -616,7 +616,7 @@ public class ThreadPool {
 		}
 	}
 
-	private final boolean isAliveImpl(final Runnable task) {
+	private boolean isAliveImpl(final Runnable task) {
 		return this.activeMap.containsKey(Objects.notNull(task));
 	}
 

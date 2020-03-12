@@ -765,7 +765,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.getIndexImpl2(key, this.customHash(key));
 	}
 
-	private final int getIndexImpl2(final Object key, final int keyHash) {
+	private int getIndexImpl2(final Object key, final int keyHash) {
 		final int[] table = this.table, nexts = this.nexts;
 		final int index = keyHash & (table.length - 1), entry = table[index];
 		for (int result = entry; 0 <= result; result = nexts[result]) {
@@ -814,7 +814,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.putIndexImpl2(key, keyHash);
 	}
 
-	private final int putIndexImpl2(final GKey key, final int keyHash) {
+	private int putIndexImpl2(final GKey key, final int keyHash) {
 		final int[] table = this.table, nexts = this.nexts;
 		final int index = keyHash & (table.length - 1), result = this.empty;
 		this.empty = nexts[result];
@@ -942,7 +942,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return this.popIndexImpl2(key, this.customHash(key));
 	}
 
-	private final int popIndexImpl2(final Object key, final int keyHash) {
+	private int popIndexImpl2(final Object key, final int keyHash) {
 		final int[] table = this.table, nexts = this.nexts;
 		final int index = keyHash & (table.length - 1);
 		int prevIndex = table[index];

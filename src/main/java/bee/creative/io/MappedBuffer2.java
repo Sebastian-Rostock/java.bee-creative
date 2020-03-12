@@ -2,232 +2,362 @@ package bee.creative.io;
 
 import java.io.File;
 import java.io.IOException;
-import bee.creative.iam.IAMArray;
-import bee.creative.lang.Integers;
-import bee.creative.lang.Objects;
-import bee.creative.mmi.MMIArray;
-import bee.creative.mmi.MMIArrayL;
-import bee.creative.util.HashMapOI;
+import java.util.ArrayList;
+import bee.creative.fem.FEMCodec;
+import bee.creative.lang.Strings;
 
-/** Diese Klasse ergänzt einen {@link MappedBuffer} um Methoden zur Auslagerung typisierter Speicherbereiche in eine Datei mit der nachfolgend spezifizierten
- * Dateistruktur.
- * <p>
- * Die Dateistruktur besteht aus folgender Sequenz und kann ca. 33 GB groß werden:<br>
- * {@code MAGIC:4, COUNT:4, ROOT:4, ZERO:4, (TYPE:4, SIZE:4, DATA:SIZE, ZERO:0..15)*}
- * <p>
- * Die 16 Byte Kopfdaten bestehen aus den Komponenten: {@code MAGIC} = Dateikennung, {@code COUNT} = Anzahl belegter 16-Byte-Blöcke, {@code ROOT} = Referenz auf
- * den {@link #getRoot() Wurzelbereich} und {@code ZERO} = Füllwert zur Ausrichtung auf 16 Byte. Jeder typisierte Speicherbereich belegt stets ein Vielfaches
- * von 16 Byte und bestehen aus den Komponenten: {@code TYPE} = Typkennung, {@code SIZE} = Größe des Speicherbereichs, {@code DATA} Daten des Speicherbereichs
- * und {@code ZERO} = Füllwert.
+/** Diese Klasse ergänzt einen {@link MappedBuffer} um Methoden zur {@link #insertRegion(long) Reservierung} und {@link #deleteRegion(long) Freigabe} von
+ * Speicherbereichen.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MappedBuffer2 extends MappedBuffer {
 
-	/** Diese Klasse implementiert eine auf 16 Byte ausgerichteten Speicherbereich innerhalb eines {@link MappedBuffer2} mit {@link #hashCode()} und
-	 * {@link #equals(Object)} zur Erkennung von Duplikaten. */
-	private static final class Range {
+	public static void main(final String[] args) throws Exception {
 
-		/** Dieses Feld speichert die Größe des Speicherbereichs div 16. */
-		final int size;
+		final File file = new File("E:/DELETE-ME.mb3");
+		file.delete();
+		final MappedBuffer2 b = new MappedBuffer2(file, false);
 
-		/** Dieses Feld speichert die Adresse des Speicherbereichs div 16. */
-		final int addr;
+		final long a1 = b.insertRegion(16);
+		b.pr();
+		final long a2 = b.insertRegion(32);
+		b.pr();
+		b.deleteRegion(a1);
+		b.pr();
 
-		/** Dieses Feld speichert den Streuwert des Speicherbereichs. */
-		final int hash;
 
-		/** Dieses Feld speichert den Puffer, in dem der Speicherbereich liegt. */
-		final MappedBuffer2 store;
+		System.out.println(a2);
+		b.putLong(a2, 1324);
+		b.putLong(a2 + 8, 546546);
 
-		Range(final MappedBuffer2 store, final int addr, final int size) {
-			this.store = store;
-			this.addr = addr;
-			this.size = size;
-			int hash = Objects.hashInit();
-			long index = addr * 16L;
-			for (int count = size * 2; 0 < count; index += 8, count--) {
-				final long value = store.getLong(index);
-				hash = Objects.hashPush(hash, Integers.toIntH(value));
-				hash = Objects.hashPush(hash, Integers.toIntL(value));
-			}
-			this.hash = hash;
-		}
+		final long a4 = b.updateRegion(a2, 40);
+		b.pr();
 
-		@Override
-		public int hashCode() {
-			return this.hash;
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof MappedBuffer2.Range)) return false;
-			final MappedBuffer2.Range that = (MappedBuffer2.Range)object;
-			if (this.hash != that.hash) return false;
-			final MappedBuffer2 store = this.store;
-			if (store != that.store) return false;
-			final int thisSize = this.size;
-			if (thisSize != that.size) return false;
-			final long thisAddr = this.addr * 16L, thatAddr = that.addr * 16L;
-			if (thisAddr == thatAddr) return true;
-			for (int count = thisSize * 2; 0 < count; count--) {
-				if (store.getLong(thisAddr) != store.getLong(thatAddr)) return false;
-			}
-			return true;
-		}
+		System.out.println(a4);
+		System.out.println(b.getLong(a4));
+		System.out.println(b.getLong(a4 + 8));
 
 	}
 
-	/** Dieses Feld speichert die Referenz auf den Wurzelspeicherbereich oder {@code 0}. */
-	private int blockRoot;
-
-	/** Dieses Feld speichert nach den erfolgreichen Aufrufen von {@link #openRegion(int, int)} bzw. {@link #closeRegion()} {@code true} bzw. {@code false}. */
-	private boolean blockSetup;
-
-	/** Dieses Feld speichert die Anzahl der 16 Byte-Blöcke und damit die Referenz des nächsten {@link #closeRegion() angefügten} Speicherbereichs. Diese ist
-	 * mindestens {@code 2}. */
-	private int blockCount;
-
-	/** Dieses Feld speichert {@code true}, wenn Speicherbereiche bei {@link #closeRegion()} wiederverwendet werden sollen. */
-	private boolean reuseEnabled;
-
-	/** Dieses Feld bildet von einer Zahlenfolge auf deren Referenz ab und wird zusammen mit {@link #reuseEnabled} in {@link #closeRegion()} eingesetzt. */
-	private final HashMapOI<Object> reuseMapping;
-
-	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei. Wenn die Datei zum Schreiben angebunden wird und leer ist, werden ihre
-	 * Kopfdaten initialisiert. Andernfals werden ihre Kopfdaten ausgelesen und geprüft.
-	 *
-	 * @param file Datei.
-	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
-	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
-	public MappedBuffer2(final File file, final boolean readonly) throws IOException {
-		super(file, readonly);
-		if (!readonly) {
-			this.reuseEnabled = true;
-			this.reuseMapping = new HashMapOI<>();
-			if (this.size() == 0) {
-				this.grow(16);
-				this.putInt(0, 0xABAD1DEA);
-				this.putInt(4, 1);
-				this.putLong(8, 0);
-			}
-		} else {
-			this.reuseMapping = null;
-		}
-		if (this.size() < 16) throw new IOException();
-		if (this.getInt(0) != 0xABAD1DEA) throw new IOException();
-		this.blockCount = this.getInt(4);
-		if (this.blockCount == 0) throw new IOException();
-		this.blockRoot = this.getInt(8);
-		if ((this.blockRoot < 0) || (this.blockRoot > this.blockCount)) throw new IOException();
-	}
-
-	/** Diese Methode gibt die Referenz auf den Wurzelspeicherbereich zurück. Dieser Speicherbereich sollte für das Inhaltsverzeichnis der in den übrigen
-	 * Speicherbereichen abgelegten Datenstrukturen verwendet werden.
-	 *
-	 * @return Referenz auf den Wurzelspeicherbereich oder {@code 0}. */
-	public int getRoot() {
-		return this.blockRoot;
-	}
-
-	/** Diese Methode setzt die {@link #getRoot() Referenz auf den Wurzelspeicherbereich}.
-	 *
-	 * @param value Referenz oder {@code 0}.
-	 * @throws IllegalStateException Wenn die Datei nur zum {@link #isReadonly() Lesen} geöffnet wurde.
-	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public void setRoot(final int value) throws IllegalStateException, IllegalArgumentException {
-		if (this.isReadonly()) throw new IllegalStateException();
-		if ((value < 0) || (value > this.blockCount)) throw new IllegalArgumentException();
-		this.putInt(8, this.blockRoot = value);
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn bei den über {@link #closeRegion()} abgeschlossenen Speicherbereichen Duplikate elliminiert werden,
-	 * d.h. bereits abgeschlossene Speicherbereiche wiederverwendet werden sollen. Zur Erkennung der Duplikate werden je Speicherbereich ca. 40 Byte
-	 * Verwaltungsdaten benötigt.
-	 *
-	 * @return Aktivierung der Wiederverwendung. */
-	public boolean isReusing() {
-		return this.reuseEnabled;
-	}
-
-	/** Diese Methode setzt die {@link #isReusing() Aktivierung der Wiederverwendung} von Speicherbereichen.
-	 *
-	 * @param value Aktivierung der Wiederverwendung. */
-	public void setReusing(final boolean value) {
-		this.reuseEnabled = value;
-	}
-
-	/** Diese Methode gibt die Adresse der Kopfdaten des Speicherbereichs mit der gegebenen Referenz zurück. Die ersten vier Byte der Kopfdaten geben die
-	 * Typkennung an, die nächsten vier Byte nennen die Größe des danach folgenden Speicherbereichs.
-	 *
-	 * @param ref Referenz.
-	 * @return Adresse der Kopfdaten. */
-	public long getRegionAddr(final int ref) {
-		return ref * 16L;
-	}
-
-	/** Diese Methode gibt den Speicherbereich zur gegebenen Referenz als {@link MMIArray Zahlenfolge} zurück.
-	 *
-	 * @see #openRegion(int, int)
-	 * @see #closeRegion()
-	 * @param ref Referenz.
-	 * @return Zahlenfolge.
-	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public MMIArrayL getRegionArray(final int ref) throws IllegalArgumentException {
-		final long addr = ref * 16L;
-		return this.getArray(addr + 8, this.getInt(addr + 4), IAMArray.MODE_INT8);
-	}
-
-	/** Diese Methode reserviert einen Speicherbereich mit den gegebenen Merkmalen am Ende des Puffers und gibt die Adresse dieses Speicherbereichs zurück.
-	 * Mehrfache Aufrufe dieser Methode aktualisieren die Merkmale des Speicherbereichs und überschreiben seine letzten 8 Byte mit Null. <b>Abschließend angefügt
-	 * wird der Speicherbereich erst durch {@link #closeRegion()}.</b>
-	 *
-	 * @param dataType Typkennung des Speicherbereichs.
-	 * @param dataSize Größe des Speicherbereichs (0..0x3FFFFFFF).
-	 * @return Adresse des Speicherbereichs.
-	 * @throws IllegalStateException Wenn die Datei nur zum {@link #isReadonly() Lesen} geöffnet wurde.
-	 * @throws IllegalArgumentException Wenn die Größe ungültig ist. */
-	public long openRegion(final int dataType, final int dataSize) throws IllegalStateException, IllegalArgumentException {
-		if (this.isReadonly()) throw new IllegalStateException();
-		if ((dataSize & 0xC0000000) != 0) throw new IllegalArgumentException();
-		try {
-			final int dataRef = this.blockCount;
-			if (dataRef < 0) throw new IllegalStateException();
-			final long addr = dataRef * 16L, size = (addr + dataSize + 23) & -16L;
-			this.grow(size);
-			this.putLong(size - 8, 0);
-			this.putInt(addr + 0, dataType);
-			this.putInt(addr + 4, dataSize);
-			this.blockSetup = true;
-			return addr + 8;
-		} catch (final Exception cause) {
-			throw new IllegalStateException(cause);
-		}
-	}
-
-	/** Diese Methode schließt die Barbeitung des über {@link #openRegion(int, int)} reservierten Steicherbereichs ab, fügt diesen an das Dateiende an, hebt die
-	 * Reservierung auf und gibt die Referenz auf den Steicherbereich zurück. Die Referenz entspricht der Adresse des Steicherbereichs geteilt durch 16. Wenn
-	 * {@link #reuseEnabled}
-	 *
-	 * @return Referenz.
-	 * @throws IllegalStateException Wenn aktuell kein Steicherbereich reserviert ist. */
-	public int closeRegion() throws IllegalStateException {
-		if (!this.blockSetup) throw new IllegalStateException();
-		final int result = this.blockCount, length = (this.getInt((result * 16L) + 4) + 23) / 16;
-		if (this.reuseEnabled) {
-			final Object key = new Range(this, result, length);
-			final Integer value = this.reuseMapping.get(key);
-			if (value != null) return value.intValue();
-			this.reuseMapping.put(key, new Integer(result));
-		}
-		this.putInt(4, this.blockCount = result + length);
-		this.blockSetup = false;
+	private static long asAlignedSize(final long size) throws IllegalArgumentException {
+		if (size == 0) return 0;
+		if (size < 0) throw new IllegalArgumentException();
+		final long result = (size + 15) & -16;
+		if (result < 0) throw new IllegalArgumentException();
 		return result;
 	}
 
-	@Override
-	public long emu() {
-		return super.emu() + this.reuseMapping.emu();
+	private static boolean isAlingnedValue(final long value) {
+		return (value & 15) == 0;
+	}
+
+	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei. Wenn die Datei zum Schreiben angebunden wird und leer ist, werden ihre
+	 * Kopfdaten initialisiert. Andernfals werden ihre Kopfdaten geprüft.
+	 *
+	 * @param file Datei.
+	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
+	 * @throws IOException Wenn die Anbindung nicht möglich ist.
+	 * @throws IllegalArgumentException Wenn die Kopfdaten ungültig sind. */
+	public MappedBuffer2(final File file, final boolean readonly) throws IOException, IllegalArgumentException {
+		super(file, readonly);
+		final long MAGIC = 0x474F4F44464F4F44L;
+		final long size = this.size();
+		if (!readonly && (size == 0)) {
+			this.grow(48);
+			this.putLong(0, new long[]{MAGIC, 0, 16, 16, 48, 0});
+		} else {
+			if (size < 48) throw new IllegalArgumentException();
+			if (this.getLong(0) != MAGIC) throw new IllegalArgumentException();
+		}
+	}
+
+	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. */
+	private long getNodeSize(final long node) {
+		return this.getLong(node - 8);
+	}
+
+	private long getNodePrev(final long node) {
+		return this.getLong(node + 0);
+	}
+
+	private long getNodeNext(final long node) {
+		return this.getLong(node + 8);
+	}
+
+	private void setNodePrev(final long node, final long prev) {
+		this.putLong(node + 0, prev);
+	}
+
+	private void setNodeNext(final long node, final long next) {
+		this.putLong(node + 8, next);
+	}
+
+	/** Diese Methode setzt die Größe des gegebenen unbenutzten Speicherbereichs. */
+	private void setNodeFreeSize(final long node, final long size) {
+		this.putLong(node - 8, -size);
+		this.putLong(node + size, -size);
+	}
+
+	/** Diese Methode setzt die Größe des gegebenen benutzten Speicherbereichs. */
+	private void setNodeUsedSize(final long node, final long size) {
+		this.putLong(node - 8, size);
+		this.putLong(node + size, size);
+	}
+
+	/** Diese Methode fügt den gegebenen neuen Knoten vor dem gegebenen Nachfolger ein.
+	 *
+	 * @param node neuer Knoten.
+	 * @param next Nachfolger. */
+	private void insertNode(final long node, final long next) {
+		final long prev = this.getNodePrev(next);
+		this.setNodePrev(next, node);
+		this.setNodeNext(prev, node);
+		this.setNodePrev(node, prev);
+		this.setNodeNext(node, next);
+	}
+
+	/** Diese Methode entfernt den gegebenen Knoten aus der doppelt verketteten Liste. Sein Vorgänger zeigt danach auf seinen Nachfolger und umgekehrt.
+	 *
+	 * @param node Knoten. */
+	private void deleteNode(final long node) {
+		final long prev = this.getNodePrev(node), next = this.getNodeNext(node);
+		this.setNodeNext(prev, next);
+		this.setNodePrev(next, prev);
+	}
+
+	/** Diese Methode ersetzt den gegebenen alten Knoten durch den gegebenen neuen.
+	 *
+	 * @param oldNode alter Knoten.
+	 * @param newNode neuer Knoten */
+	private void replaceNode(final long oldNode, final long newNode) {
+		final long prev = this.getNodePrev(oldNode), next = this.getNodeNext(oldNode);
+		this.setNodePrev(newNode, prev);
+		this.setNodeNext(newNode, next);
+		this.setNodeNext(prev, newNode);
+		this.setNodePrev(next, newNode);
+	}
+
+	/** Diese Methode gibt die Adresse des Wurzelspeicherbereichs zurück, welcher als Inhaltsverzeichnis der in den übrigen Speicherbereichen abgelegten
+	 * Datenstrukturen verwendet werden sollte.
+	 *
+	 * @return Adresse, an welcher der Wurzelspeicherbereich beginnt, oder {@code 0}. */
+	public long getRoot() {
+		return this.getLong(8);
+	}
+
+	/** Diese Methode setzt die {@link #getRoot() Adresse des Wurzelspeicherbereichs}.
+	 *
+	 * @param address Adresse oder {@code 0}.
+	 * @throws IllegalArgumentException Wenn die Adresse negativ ist. */
+	public void putRoot(final long address) throws IllegalArgumentException {
+		if (address < 48) throw new IllegalArgumentException();
+		this.putLong(8, address);
+	}
+
+	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. Diese Größe ist stets ein Vielfaches von 16.
+	 *
+	 * @param address Adresse, an welcher der Speicherbereich beginnt.
+	 * @return Größe des Speicherbereichs.
+	 * @throws IllegalArgumentException Wenn die gegebene Adresse ungültig ist. */
+	public long regionSize(final long address) throws IllegalArgumentException {
+		synchronized (this) {
+			return this.regionSizeImpl(address);
+		}
+	}
+
+	private long regionSizeImpl(final long node) throws IllegalArgumentException {
+		if ((node < 48) || !MappedBuffer2.isAlingnedValue(node)) throw new IllegalArgumentException();
+		final long size = this.getNodeSize(node);
+		if ((size < 0) || !MappedBuffer2.isAlingnedValue(size)) throw new IllegalArgumentException();
+		if (this.getLong(node + size) != size) throw new IllegalArgumentException();
+		return size;
+	}
+
+	/** Diese Methode {@link #insertRegion(long) reserviert} einen neuen Speicherbereich mit der gegebenen Größe, kopiert die Daten des an der gegebenen Adresse
+	 * beginnenden Speicherbereichs dort hin und gibt die Adresse auf den Beginn des neuen Speicherbereichs zurück.
+	 *
+	 * @param address Adresse, an welcher der alte Speicherbereich beginnt.
+	 * @param size Größe des neuen Speicherbereichs.
+	 * @return Adresse, an welcher der neue Speicherbereich beginnt.
+	 * @throws IllegalStateException Wenn die Datei nicht ausreichend vergrößert werden kann.
+	 * @throws IllegalArgumentException Wenn {@code address} bzw. {@code size} ungültig ist. */
+	public long cloneRegion(final long address, final long size) throws IllegalStateException, IllegalArgumentException {
+		final long result, oldSize, newSize = MappedBuffer2.asAlignedSize(size);
+		synchronized (this) {
+			oldSize = this.regionSizeImpl(address);
+			result = this.insertRegionImpl(newSize);
+		}
+		this.copy(result, address, Math.min(oldSize, newSize));
+		return result;
+	}
+
+	/** Diese Methode reserviert einen neuen Speicherbereich mit der gegebenen Größe und gibt die Adresse auf dessen Beginn zurück. Diese Adresse ist stets ein
+	 * Vielfaches von 16. Der reservierte Speicherbereich kann dabei bis zu 31 Byte größer sein, als die gegebene Größe.
+	 *
+	 * @param size Mindestgröße des Speicherbereichs.
+	 * @return Adresse, an welcher der Speicherbereich beginnt.
+	 * @throws IllegalStateException Wenn die Datei nicht ausreichend vergrößert werden kann.
+	 * @throws IllegalArgumentException Wenn die gegebene Größe ungültig ist. */
+	public long insertRegion(final long size) throws IllegalStateException, IllegalArgumentException {
+		final long newSize = MappedBuffer2.asAlignedSize(size);
+		synchronized (this) {
+			return this.insertRegionImpl(newSize);
+		}
+	}
+
+	private long reuseRegionImpl(long newSize) {
+		for (long node = this.getNodeNext(16); node != 16; node = this.getNodeNext(node)) {
+			final long left = -this.getNodeSize(node) - newSize;
+			if (left >= 0) {
+				if (left < 32) {
+					newSize += left;
+					this.deleteNode(node);
+				} else {
+					final long free = node + newSize + 16;
+					this.replaceNode(node, free);
+					this.setNodeFreeSize(free, left - 16);
+				}
+				this.setNodeUsedSize(node, newSize);
+				return node;
+			}
+		}
+		return 0;
+	}
+
+	private long insertRegionImpl(final long newSize) throws IllegalStateException {
+		final long result = this.reuseRegionImpl(newSize);
+		return result != 0 ? result : this.createRegionImpl(newSize);
+	}
+
+	private long createRegionImpl(final long newSize) throws IllegalStateException {
+		final long node = this.getLong(32), free = node + newSize + 16;
+		this.grow(free);
+		this.putLong(32, free);
+		this.putLong(free - 8, 0);
+		this.setNodeUsedSize(node, newSize);
+		return node;
+	}
+
+	/** Diese Methode gibt nur dann den an der gegebenen Adresse beginnenden Speicherbereich zur Wiederverwendung frei, wenn diese Adresse gültig und nicht
+	 * {@code 0} ist.
+	 *
+	 * @param address Adresse, an welcher der Speicherbereich beginnt oder {@code 0}.
+	 * @throws IllegalArgumentException Wenn {@code address} ungültig ist. */
+	public void deleteRegion(final long address) throws IllegalArgumentException {
+		if (address == 0) return;
+		synchronized (this) {
+			this.deleteRegionImpl(address, this.regionSizeImpl(address));
+		}
+	}
+
+	private void deleteRegionImpl(final long node, final long oldSize) {
+		final long prevSize = this.getLong(node - 16), nextSize = this.getLong(node + oldSize + 8);
+		if (prevSize < 0) {
+			final long prev = node - -prevSize - 16;
+			if (nextSize == 0) { // davor LEER, danach ENDE
+				this.deleteNode(prev);
+				this.putLong(prev - 8, 0);
+				this.putLong(32, prev);
+			} else if (nextSize < 0) { // davor LEER, danach LEER
+				this.deleteNode(node + oldSize + 16);
+				this.setNodeFreeSize(prev, -prevSize + oldSize + -nextSize + 32);
+			} else { // davor LEER, danach VOLL
+				this.setNodeFreeSize(prev, -prevSize + oldSize + 16);
+			}
+		} else {
+			if (nextSize == 0) { // davor VOLL, danach ENDE
+				this.putLong(node - 8, 0);
+				this.putLong(32, node);
+			} else if (nextSize < 0) { // davor VOLL, danach LEER
+				this.replaceNode(node + oldSize + 16, node);
+				this.setNodeFreeSize(node, oldSize + -nextSize + 16);
+			} else { // davor VOLL, danach VOLL
+				this.setNodeFreeSize(node, oldSize);
+				this.insertNode(node, 16);
+			}
+		}
+	}
+
+	/** Diese Methode ändert die Größe des an der gegebenen Adresse beginnenden Speicherbereichs und gibt seine neue Adresse zurück. Wenn die Adresse {@code 0}
+	 * ist, wird ein neuer Speicherbereich {@link #insertRegion(long) reserviert}. Wenn die Größe {@code 0} ist, wird der Speicherbereich zur Wiederverwendung
+	 * {@link #deleteRegion(long) freigegeben}. Andernfals wird die Größe des Speicherbereichs angepasst, was zu seiner Verschiebung führen kann, wobei hier sien
+	 * Inhalt an die neue Position kopiert wird.
+	 *
+	 * @param address Adresse, an welcher der Speicherbereich beginnt oder {@code 0}.
+	 * @param size Größe des Speicherbereichs oder {@code 0}.
+	 * @return neue Adresse.
+	 * @throws IllegalStateException Wenn die Datei nicht ausreichend vergrößert werden kann.
+	 * @throws IllegalArgumentException Wenn {@code address} bzw. {@code size} ungültig ist. */
+	public long updateRegion(final long address, final long size) throws IllegalStateException, IllegalArgumentException {
+		final long reuse1, reuse2, result, oldSize, newSize = MappedBuffer2.asAlignedSize(size);
+		final boolean reusing;
+		synchronized (this) {
+			if (address == 0) return this.insertRegionImpl(newSize);
+			oldSize = this.regionSizeImpl(address);
+			if (newSize == 0) {
+				this.deleteRegionImpl(address, oldSize);
+				return 0;
+			}
+			reuse1 = this.reuseRegionImpl(newSize);
+			if (reuse1 == 0) {
+				result = this.createRegionImpl(newSize);
+				reusing = false;
+			} else {
+				result = reuse1;
+				reusing = true;
+			}
+		}
+		this.copy(result, address, Math.min(oldSize, newSize));
+		synchronized (this) {
+			this.deleteRegionImpl(address, oldSize);
+			if (reusing) return result;
+			reuse2 = this.reuseRegionImpl(newSize);
+		}
+		if (reuse2 == 0) return result;
+		this.copy(reuse2, result, Math.min(oldSize, newSize));
+		synchronized (this) {
+			this.deleteRegionImpl(result, newSize);
+		}
+		return reuse2;
+	}
+
+	/** Diese Methode gibt die Liste der Größen der wiederverwendbaren Speicherbereiche zurück. Diese werden bei der {@link #insertRegion(long) Reservierung}
+	 * eines neuen Speicherbereiches in der hier angegebenen Reihenfolge herangezogen, wobei der erste Speicherbereich mit ausreichender Größe wiederverwendet
+	 * wird.
+	 *
+	 * @param limit maximale Anzahl der gelieferten Größen.
+	 * @return Liste der Größen. */
+	public synchronized ArrayList<Long> reuseSizes(int limit) {
+		final ArrayList<Long> result = new ArrayList<>(16);
+		long node = this.getNodeNext(16);
+		while ((node != 16) && (limit > 0)) {
+			final long size = -this.getNodeSize(node), next = this.getNodeNext(node);
+			result.add(size);
+			node = next;
+			limit--;
+		}
+		return result;
+	}
+
+	/** Diese Methode gibt die Liste der Größen aller Speicherbereiche zurück, wobei die Größe wiederverwendbarer Speicherbereiche negativ angegeben ist.
+	 *
+	 * @param limit maximale Anzahl der gelieferten Größen.
+	 * @return Liste der Größen. */
+	public synchronized ArrayList<Long> regionSizes(int limit) {
+		final ArrayList<Long> result = new ArrayList<>(16);
+		final long free = this.getLong(32);
+		long node = 48;
+		while ((node < free) && (limit > 0)) {
+			final long size = this.getNodeSize(node), next = node + Math.abs(size) + 16;
+			result.add(size);
+			node = next;
+			limit--;
+		}
+		return result;
+	}
+
+	private void pr() {
+		System.out.append("REGION ").append(Strings.join(" ", this.regionSizes(50))).append(" FREE ").append(Strings.join(" ", this.reuseSizes(50))).println();
 	}
 
 }

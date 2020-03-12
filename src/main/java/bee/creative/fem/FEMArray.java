@@ -590,7 +590,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		/** Dieses Feld speichert die Streuwerttabelle zu den Werten in {@link #items}. Die Länge der Zahlenfolge entspricht stets einer um 1 sowie um die Länge der
 		 * Wertliste {@code length} erhöhten Potenz von {@code 2}. Diese Potenz verringerte um eins wird als Bitmaske für die Streuwerte der Elemente eingesetzt.
 		 * Die erste Zahl enthält die Anzahl der Streuwertbereiche und ist gleich der um {@code 2} erhöhten Bitmaske. Die Struktur ist damit
-		 * {@code (count[1], range[count], index[length])} mit {@code mask = count - 2}. */
+		 * {@code (count[1], range[count-1], index[length])} mit {@code mask = count - 2}. */
 		final int[] table;
 
 		CompactArray3(final FEMValue[] items) throws IllegalArgumentException {

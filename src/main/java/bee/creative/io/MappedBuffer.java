@@ -22,8 +22,8 @@ import bee.creative.lang.Objects;
 import bee.creative.mmi.MMIArray;
 import bee.creative.mmi.MMIArrayL;
 
-/** Diese Klasse implementiert eine threadsichere alternative zu {@link MappedByteBuffer}, welche auf {@code long}-Adressen arbeitet und beliebig große Dateien
- * per momory-mapping zum Lesen und Schreiben zugänglich machen kann.
+/** Diese Klasse implementiert eine threadsichere alternative zu {@link MappedByteBuffer}, der mit {@code long}-Adressen arbeitet und beliebig große Dateien per
+ * momory-mapping zum Lesen und Schreiben zugänglich machen kann.
  * <p>
  * Die Anbindung der Datei erfolgt intern über einen {@link MappedByteBuffer} pro Gigabyte. Wenn eine der Methoden eine ungültige Adresse übergeben wird, welche
  * zu einer Zugriffsverletzung führt, wird grundsätzlich eine {@link IndexOutOfBoundsException} ausgelöst, auch wenn diese nicht deklariert ist. Analog dazu
@@ -46,18 +46,12 @@ public class MappedBuffer implements Emuable {
 	/** Dieses Feld speichert die Größe der {@link MappedByteBuffer}, die vor dem letzten in {@link #buffers} verwaltet werden. */
 	private static final int BUFFER_LENGTH = MappedBuffer.BUFFER_GUARD + MappedBuffer.INDEX_MASK + 1;
 
-	/** Diese Methode gibt den Index eines {@link MappedByteBuffer} in {@link #buffers} zur gegebenen Adresse zurück.
-	 *
-	 * @param address Adresse.
-	 * @return höherwertiger Adressteil als Index eines Puffers. */
+	/** Diese Methode gibt den Index eines {@link MappedByteBuffer} in {@link #buffers} zur gegebenen Adresse zurück. */
 	private static int bufferIndex(final long address) {
 		return (int)(address >> MappedBuffer.INDEX_SIZE);
 	}
 
-	/** Diese Methode gibt den Index eines Werts innerhalb eins {@link MappedByteBuffer} zur gegebenen Adresse zurück.
-	 *
-	 * @param address Adresse.
-	 * @return niederwertiger Adressteil als Index eines Werts. */
+	/** Diese Methode gibt den Index eines Werts innerhalb eins {@link MappedByteBuffer} zur gegebenen Adresse zurück. */
 	private static int valueIndex(final long address) {
 		return (int)address & MappedBuffer.INDEX_MASK;
 	}
@@ -228,9 +222,9 @@ public class MappedBuffer implements Emuable {
 	/** Diese Methode vergrößert den Puffer auf das eineinhalbfache der gegebenen Puffergröße, wenn die Größe dieses Puffers kleiner als die gegebene ist.
 	 *
 	 * @param minSize minimale Puffergröße.
-	 * @throws IOException Wenn die Puffergröße ungültig ist. */
-	public void grow(final long minSize) throws IOException {
-		if (minSize < 0) throw new IOException();
+	 * @throws IllegalArgumentException Wenn die Puffergröße ungültig ist. */
+	public void grow(final long minSize) throws IllegalArgumentException, IllegalStateException {
+		if (minSize < 0) throw new IllegalArgumentException();
 		synchronized (this) {
 			if (minSize <= this.size) return;
 			final long newSize = minSize + (minSize / 2);
@@ -243,17 +237,17 @@ public class MappedBuffer implements Emuable {
 	 * vergrößert werden, aich wenn dieser Puffer nur einen Teil davon zugänglich macht!
 	 *
 	 * @param newSize neue Puffergröße.
-	 * @throws IOException Wenn die Puffergröße ungültig ist. */
-	public void resize(final long newSize) throws IOException {
-		if (newSize < 0) throw new IOException();
+	 * @throws IllegalArgumentException Wenn die Puffergröße ungültig ist. */
+	public void resize(final long newSize) throws IllegalArgumentException, IllegalStateException {
+		if (newSize < 0) throw new IllegalArgumentException();
 		synchronized (this) {
 			if (this.size == newSize) return;
 			this.resizeImpl(newSize);
 		}
 	}
 
-	/** Diese Methode implementiert {@link #resize(long)} ohne {@code synchronized} und Parameterprüfung. */
-	protected final void resizeImpl(final long newSize) throws IOException {
+	/** Diese Methode implementiert {@link #resize(long)} ohne {@code synchronized} und ohne Parameterprüfung. */
+	private final void resizeImpl(final long newSize) throws IllegalStateException {
 		final MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
 		final int oldLength = oldBuffers.length, newLength = Math.max(MappedBuffer.bufferIndex(newSize - 1) + 1, 1);
 		if (oldLength != newLength) {
@@ -271,6 +265,8 @@ public class MappedBuffer implements Emuable {
 			}
 			final long offset = (newLength - 1) * scale;
 			(newBuffers[newLength - 1] = channel.map(mode, offset, newSize - offset)).order(order);
+		} catch (final IOException cause) {
+			throw new IllegalStateException(cause);
 		}
 		this.size = newSize;
 		this.buffers = newBuffers;
