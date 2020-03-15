@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import bee.creative.array.CompactArray;
 import bee.creative.bind.Property;
 import bee.creative.emu.EMU;
@@ -16,68 +18,18 @@ import bee.creative.fem.FEMFunction.ConcatFunction;
 import bee.creative.fem.FEMString.CompactStringINT16;
 import bee.creative.fem.FEMString.CompactStringINT32;
 import bee.creative.fem.FEMString.CompactStringINT8;
-import bee.creative.iam.IAMArray;
 import bee.creative.io.MappedBuffer2;
 import bee.creative.lang.Objects;
 import bee.creative.util.HashMapLO;
 import bee.creative.util.HashMapOL;
 import bee.creative.util.HashSet;
 
-// ref: LONG
-//
-// immediate vs. pointer für integer, object, datetime, duration, param, void, true, false
-// p
-
-/** Diese Klasse implementiert ein Objekt zur Kodierung und Dekodierung von {@link FEMFunction Funktionen} in {@link IAMArray Zahlenlisten}, die in einen
- * {@link MappedBuffer2 Dateipuffer} ausgelagert sind.
+/** Diese Klasse implementiert ein Objekt zur Auslagerung von {@link FEMFunction Funktionen} in einen {@link MappedBuffer2 Dateipuffer}.
  * <p>
  * Achtung: {@link FEMFuture} und {@link FEMNative} werden bei der Kodierun zwar angeboten aber in dieser Implementation nicht unterstützt.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMCodec2 implements Property<FEMFunction>, Emuable {
-
-	protected static class ReuseMap extends HashMapOL<FEMFunction> {
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object key) {
-			// TODO indizierte arrys besonders
-			return super.customEqualsKey(entryIndex, key);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-			return this.customEqualsKey(entryIndex, key);
-		}
-
-	}
-
-	protected static class IdentSet extends HashSet<FEMFunction> {
-
-		public FEMFunction getByIdent(final long ident) throws IllegalArgumentException {
-			try {
-				return Objects.notNull(this.customGetKey((int)(ident >> 3)));
-			} catch (final Exception cause) {
-				throw new IllegalArgumentException(cause);
-			}
-		}
-
-		public long putByIdent(final FEMFunction item) throws NullPointerException {
-			final int result = this.getIndexImpl(Objects.notNull(item));
-			if (result < 0) return 0;
-			return (result << 3) | FEMCodec2.REF_IDENT;
-		}
-
-		public IdentSet putAll(final FEMFunction... items) throws NullPointerException {
-			return this.putAll(Arrays.asList(items));
-		}
-
-		public IdentSet putAll(final Collection<? extends FEMFunction> items) throws NullPointerException {
-			if (items.contains(null)) throw new NullPointerException();
-			this.addAll(items);
-			return this;
-		}
-
-	}
 
 	/** Diese Klasse implementiert eine Wertliste, deren Elemente als Referenzen gegeben sind und in {@link #customGet(int)} über einen gegebenen
 	 * {@link FEMCodec2} in Werte {@link FEMCodec2#get_DONE(long) übersetzt} werden. */
@@ -85,10 +37,8 @@ public class FEMCodec2 implements Property<FEMFunction>, Emuable {
 
 		final MappedBuffer2 store;
 
-		/** Dieses Feld speichert den {@link FEMCodec2} zur {@link FEMCodec2#get_DONE(long) Übersetzung} der Referenzen. */
 		final FEMCodec2 codec;
 
-		/** Dieses Feld speichert die Adresse der Zahlenfolge mit den Referenzen. */
 		final long addr;
 
 		MappedArrayA(final FEMCodec2 codec, final long addr, final int length, final int hash) throws IllegalArgumentException {
@@ -230,10 +180,57 @@ public class FEMCodec2 implements Property<FEMFunction>, Emuable {
 
 	}
 
-	/** Dieses Feld speichert die Typkennung für {@link #getAsAddr(long)}. */
+	protected static class IdentSet extends HashSet<FEMFunction> {
+
+		public FEMFunction getByIdent(final long ident) throws IllegalArgumentException {
+			try {
+				return Objects.notNull(this.customGetKey((int)(ident >> 3)));
+			} catch (final Exception cause) {
+				throw new IllegalArgumentException(cause);
+			}
+		}
+
+		public long putByIdent(final FEMFunction item) throws NullPointerException {
+			final int result = this.getIndexImpl(Objects.notNull(item));
+			if (result < 0) return 0;
+			return (result << 3) | FEMCodec2.REF_IDENT;
+		}
+
+		public IdentSet putAll(final FEMFunction... items) throws NullPointerException {
+			return this.putAll(Arrays.asList(items));
+		}
+
+		public IdentSet putAll(final Collection<? extends FEMFunction> items) throws NullPointerException {
+			if (items.contains(null)) throw new NullPointerException();
+			this.addAll(items);
+			return this;
+		}
+
+	}
+
+	protected static class CacheMap extends HashMapLO<FEMFunction> {
+
+	}
+
+	protected static class ReuseMap extends HashMapOL<FEMFunction> {
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object key) {
+			// TODO indizierte arrys besonders
+			return super.customEqualsKey(entryIndex, key);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
+			return this.customEqualsKey(entryIndex, key);
+		}
+
+	}
+
+	/** Dieses Feld speichert die Typkennung für {@link #getByAddr_DONE(long)}. */
 	protected static final byte REF_ADDR = 0;
 
-	/** Dieses Feld speichert die Typkennung für {@link FEMInteger}. */
+	/** Dieses Feld speichert die Typkennung für {@link #getByIdent_DONE(long)}. */
 	protected static final byte REF_IDENT = 7;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMObject}. */
@@ -311,25 +308,26 @@ public class FEMCodec2 implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld speichert die Typkennung für {@link CompositeFunction}. */
 	protected static final int TYPE_COMPOSITE = 22;
 
-	private static final IdentSet IDENT_CACHE =
+	private static final IdentSet FUNCTION_BY_IDENT =
 		new IdentSet().putAll(FEMVoid.INSTANCE, FEMBoolean.TRUE, FEMBoolean.FALSE, FEMArray.EMPTY, FEMString.EMPTY, FEMBinary.EMPTY).putAll(FEMParam.CACHE);
 
 	/** Dieses Feld speichert den Puffer, in dem die Yahlenfolgen abgelegt sind. */
-	private final MappedBuffer2 store;
+	protected final MappedBuffer2 store;
 
-	/** Dieses Feld speichert {@code true}, wenn Funktionen bei {@link #get_DONE(int)} wiederverwendet werden sollen. */
-	private boolean cacheEnabled = true;
+	/** Dieses Feld speichert {@code true}, wenn Funktionen bei {@link #get_DONE(long)} wiederverwendet werden sollen. */
+	protected boolean cacheEnabled = true;
 
-	/** Dieses Feld bildet von einer Referenz auf deren Funktion ab und wird zusammen mit {@link #cacheEnabled} in {@link #get_DONE(long)} eingesetzt. */
-	private final HashMapLO<FEMFunction> cacheMapping = new HashMapLO<>();
+	/** Dieses Feld bildet von einer Referenz auf eine Funktion ab und wird zusammen mit {@link #cacheEnabled} in {@link #get_DONE(long)} eingesetzt. */
+	protected final Map<Long, FEMFunction> cacheMapping = Collections.synchronizedMap(new CacheMap());
 
-	private final boolean reuseEnabled = true;
+	protected boolean reuseEnabled = true;
 
-	long rootAddr;
+	/** Dieses Feld bildet von einer Funktion auf eine Referenz ab und wird zusammen mit {@link #reuseEnabled} in {@link #put_DONE(FEMFunction)} eingesetzt. */
+	protected final Map<FEMFunction, Long> reuseMapping = Collections.synchronizedMap(new ReuseMap());
 
-	long pageLast;
+	private long pageLast;
 
-	long pageNext;
+	private long pageNext;
 
 	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei.
 	 *
@@ -339,79 +337,86 @@ public class FEMCodec2 implements Property<FEMFunction>, Emuable {
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public FEMCodec2(final File file, final boolean readonly) throws IOException {
 		this.store = new MappedBuffer2(file, readonly);
-		long root = this.store.getRoot();
-		if (root == 0) {
-			root = this.store.insertRegion(32);
-			// TODO magic, value
-			this.store.putLong(root, new long[]{0, 0, 0, 0});
-		}
-		this.rootAddr = root;
-		this.pageNext = this.store.getLong(root + 16);
-		this.pageLast = this.store.getLong(root + 24);
-
-	}
-
-	/** Diese Methode gibt den angebundenen {@link MappedBuffer2 Datenspeicher} zurück, in welchem die kodierten {@link FEMFunction Funktionen} abgelegt sind.
-	 *
-	 * @return Datenspeicher. */
-	public MappedBuffer2 getStore() {
-		return this.store;
-	}
-
-	/** Diese Methode gibt die {@link MappedBuffer2#isReusing() Aktivierung der Wiederverwendung von Speicherbereichen des Puffers} zurück.
-	 *
-	 * @return Aktivierung der Wiederverwendung. */
-	public boolean isReusing() {
-		return this.store.isReusing();
-	}
-
-	/** Diese Methode setzt die {@link MappedBuffer2#isReusing() Aktivierung der Wiederverwendung von Speicherbereichen des Puffers} und gibt {@code this} zurück.
-	 *
-	 * @param enabled Aktivierung der Wiederverwendung.
-	 * @return {@code this}. */
-	public FEMCodec2 useReusing(final boolean enabled) {
-		this.store.setReusing(enabled);
-		return this;
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die über {@link #get_DONE(int)} gelieferten Funktionen zur Wiederverwendng Zwischengespeichert
-	 * werden sollen. Dazu werden je Funktion ca. 16 Byte Verwaltungsdaten benötigt.
-	 *
-	 * @return Aktivierung der Wiederverwendung. */
-	public boolean isCaching() {
-		return this.cacheEnabled;
-	}
-
-	/** Diese Methode setzt die {@link #isCaching() Aktivierung der Zwischenspeicherung} von Speicherbereichen.
-	 *
-	 * @param value Aktivierung der Zwischenspeicherung. */
-	public FEMCodec2 useCaching(final boolean value) {
-		this.cacheEnabled = value;
-		return this;
 	}
 
 	@Override
 	public FEMFunction get() {
-		return this.get_DONE(this.store.getLong(this.rootAddr + 8));
+		final long addr = this.store.getRoot();
+		return addr != 0 ? this.get_DONE(addr) : null;
 	}
 
 	@Override
 	public void set(final FEMFunction value) {
-		this.store.putLong(this.rootAddr + 8, this.put(value));
+		this.store.putRoot(value != null ? this.put_DONE(value) : 0);
 	}
 
-	/** Diese Methode gibt die Funktion zur gegebenen Referenz zurück. Sofern {@link #useCaching(boolean) aktiviert}, wird das Ergebnis zur Wiederverwendung
+	/** Diese Methode gibt den {@link MappedBuffer2 Dateipuffer} zurück, in welchen die Funktionen abgelegt sind.
+	 *
+	 * @return Dateipuffer. */
+	public MappedBuffer2 getStore() {
+		return this.store;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn über {@link #put_DONE(FEMFunction)} keine Duplikate angefügt, sonder die Referenzen der angefügten
+	 * Funktionen wiederverwendet werden sollen. Dazu werden je Funktion ca. 16 Byte Verwaltungsdaten benötigt.
+	 *
+	 * @return Aktivierung der Wiederverwendung. */
+	public boolean isReuseEnabled() {
+		return this.reuseEnabled;
+	}
+
+	/** Diese Methode setzt die {@link #isCacheEnabled() Aktivierung der Wiederverwendung} von Referenzen und gibt {@code this} zurück.
+	 *
+	 * @param value Aktivierung der Wiederverwendung.
+	 * @return {@code this}. */
+	public FEMCodec2 useReuseEnabled(final boolean value) {
+		this.reuseEnabled = value;
+		return this;
+	}
+
+	/** Diese Methode gibt den in {@link #put_DONE(FEMFunction)} verwendeten Zwischenspeicher der Referenzen zurück.
+	 *
+	 * @return Zwischenspeicher der Referenen. */
+	public Map<FEMFunction, Long> getReuseMapping() {
+		return this.reuseMapping;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die über {@link #get_DONE(long)} gelieferten Funktionen zur Wiederverwendng zwischengespeichert
+	 * werden sollen. Dazu werden je Funktion ca. 16 Byte Verwaltungsdaten benötigt.
+	 *
+	 * @return Aktivierung der Zwischenspeicherung. */
+	public boolean isCacheEnabled() {
+		return this.cacheEnabled;
+	}
+
+	/** Diese Methode setzt die {@link #isCacheEnabled() Aktivierung der Zwischenspeicherung} von Funktionen und gibt {@code this} zurück.
+	 *
+	 * @param value Aktivierung der Zwischenspeicherung.
+	 * @return {@code this}. */
+	public FEMCodec2 useCacheEnabled(final boolean value) {
+		this.cacheEnabled = value;
+		return this;
+	}
+
+	/** Diese Methode gibt den in {@link #get_DONE(long)} verwendeten Zwischenspeicher der Funktionen zurück.
+	 *
+	 * @return Zwischenspeicher der Funktionen. */
+	public Map<Long, FEMFunction> getCacheMapping() {
+		return this.cacheMapping;
+	}
+
+	/** Diese Methode gibt die Funktion zur gegebenen Referenz zurück. Sofern {@link #useCacheEnabled(boolean) aktiviert}, wird das Ergebnis zur Wiederverwendung
 	 * zwichengespeichert.
 	 *
 	 * @param ref Referenz.
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public FEMFunction get_DONE(final long ref) throws IllegalArgumentException {
-		if (!this.cacheEnabled) return this.getAsRef_DONE(ref);
+		if (!this.cacheEnabled) return this.getByRef_DONE(ref);
 		final Long key = ref;
 		FEMFunction result = this.cacheMapping.get(key);
 		if (result != null) return result;
-		result = this.getAsRef_DONE(ref);
+		result = this.getByRef_DONE(ref);
 		this.cacheMapping.put(key, result);
 		return result;
 	}
@@ -426,27 +431,26 @@ public class FEMCodec2 implements Property<FEMFunction>, Emuable {
 	public <GResult> GResult get_DONE(final long ref, final Class<GResult> clazz) throws IllegalArgumentException {
 		try {
 			return clazz.cast(this.get_DONE(ref));
-		} catch (final ClassCastException cause) {
+		} catch (final IllegalArgumentException cause) {
+			throw cause;
+		} catch (final Exception cause) {
 			throw new IllegalArgumentException(cause);
 		}
 	}
 
 	/** Diese Methode gibt die Funktion zu der Referenz zurück, die an der gegebenen Adresse steht, und ist damit eine Abkürzung für {@link #get_DONE(long)
-	 * this.get(this.store.getLong(addr))}.
-	 *
-	 * @param addr Adresse der Referenz auf die Funktion.
-	 * @return Funktion. */
-	protected FEMFunction getAt_DONE(final long addr) {
+	 * this.get(this.getStore().getLong(addr))}. */
+	protected final FEMFunction getAt_DONE(final long addr) throws IllegalArgumentException {
 		return this.get_DONE(this.store.getLong(addr));
 	}
 
-	/** Diese Methode gibt die Funktionen zu den Referenzen zurück, die im gegebenen Speicherbereich stehen.
+	/** Diese Methode gibt die Funktionen zur gegebene Anzahl an Referenzen im gegebenen Speicherbereich zurück.
 	 *
 	 * @see #getAt_DONE(long)
 	 * @param addr Adresse des Speicherbereichs.
 	 * @param count Anzahl der Referenzen.
 	 * @return Funktionen. */
-	protected FEMFunction[] getAllAt_DONE(final long addr, final int count) {
+	protected final FEMFunction[] getAllAt_DONE(final long addr, final int count) throws IllegalArgumentException {
 		final FEMFunction[] result = new FEMFunction[count];
 		for (int i = 0; i < count; i++) {
 			result[i] = this.getAt_DONE(addr + (i * 8));
@@ -455,39 +459,36 @@ public class FEMCodec2 implements Property<FEMFunction>, Emuable {
 	}
 
 	/** Diese Methode gibt die Funktion zur gegebenen Referenz zurück. Abhängig von der Typkennung der Referenz kann diese Referenz auch als Adresse an
-	 * {@link #getAsAddr(long)} bzw. als Identifikator an {@link #getAsIdent(long)} weitergelietet werden.
+	 * {@link #getByAddr_DONE(long)} bzw. als Identifikator an {@link #getByIdent_DONE(long)} weitergelietet werden.
 	 *
 	 * @param ref Referenz.
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	protected FEMFunction getAsRef_DONE(final long ref) throws IllegalArgumentException {
+	protected FEMFunction getByRef_DONE(final long ref) throws IllegalArgumentException {
 		switch ((int)ref & 7) {
 			default:
 			case FEMCodec2.REF_ADDR:
-				return this.getAsAddr(ref);
+				return this.getByAddr_DONE(ref);
 			case FEMCodec2.REF_INTEGER:
-				return this.DONE_getIntegerValue(ref);
+				return this.getIntegerValue_DONE(ref & -8L);
 			case FEMCodec2.REF_DECIMAL:
-				return this.DONE_getDecimalValue(ref);
+				return this.getDecimalValue_DONE(ref & -8L);
 			case FEMCodec2.REF_DURATION:
-				return this.DONE_getDurationValue(ref);
+				return this.getDurationValue_DONE(ref & -8L);
 			case FEMCodec2.REF_DATETIME:
-				return this.DONE_getDatetimeValue(ref);
+				return this.getDatetimeValue_DONE(ref & -8L);
 			case FEMCodec2.REF_HANDLER:
-				return this.DONE_getHandlerValue(ref);
+				return this.getHandlerValue_DONE(ref & -8L);
 			case FEMCodec2.REF_OBJECT:
-				return this.DONE_getObjectValue(ref);
+				return this.getObjectValue_DONE(ref & -8L);
 			case FEMCodec2.REF_IDENT:
-				return this.getAsIdent(ref);
+				return this.getByIdent_DONE(ref);
 		}
 	}
 
-	/** Diese Methode gibt die Funktion zur gegebenen Adresse zurück.
-	 *
-	 * @param addr Adresse.
-	 * @return Funktion.
-	 * @throws IllegalArgumentException Wenn die Adresse ungültig ist. */
-	protected FEMFunction getAsAddr(final long addr) throws IllegalArgumentException {
+	/** Diese Methode gibt die Funktion zur gegebenen Adresse zurück. Dazu wird der an der gegebenen Adresse gespeicherte {@code int} als Typkennung interpretiert
+	 * und in einer Fallunterscheidung eingesetzt. */
+	protected FEMFunction getByAddr_DONE(final long addr) throws IllegalArgumentException {
 		final int type = this.store.getInt(addr);
 		switch (type) {
 			case TYPE_ARRAY_A:
@@ -497,85 +498,113 @@ public class FEMCodec2 implements Property<FEMFunction>, Emuable {
 			case TYPE_STRING_A:
 				return this.getStringValueA_DONE(addr);
 			case TYPE_STRING_B:
-				return this.getStringValueB_DONE(addr, size);
+				return this.getStringValueB_DONE(addr);
 			case TYPE_STRING_C:
-				return this.getStringValueC_DONE(addr, size);
+				return this.getStringValueC_DONE(addr);
 			case TYPE_BINARY:
-				return this.getBinaryValue(addr, size);
+				return this.getBinaryValue_DONE(addr);
 			case TYPE_FUTURE:
-				return this.getFutureValue(addr, size);
+				return this.getFutureValue_DONE(addr);
 			case TYPE_NATIVE:
-				return this.getNativeValue(addr, size);
+				return this.getNativeValue_DONE(addr);
 			case TYPE_PROXY:
-				return this.getProxyFunction(addr, size);
+				return this.getProxyFunction_DONE(addr);
 			case TYPE_PARAM:
-				return this.getParamFunction(addr, size);
+				return this.getParamFunction_DONE(addr);
 			case TYPE_CONCAT:
-				return this.getConcatFunction(addr, size);
+				return this.getConcatFunction_DONE(addr);
 			case TYPE_CLOSURE:
-				return this.getClosureFunction(addr, size);
+				return this.getClosureFunction_DONE(addr);
 			case TYPE_COMPOSITE:
-				return this.getCompositeFunction(addr, size);
+				return this.getCompositeFunction_DONE(addr);
+			default:
+				throw new IllegalArgumentException();
 		}
-		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Funktion zum gegebenen Identifikator zurück.
-	 *
-	 * @see IdentSet#getByIdent(long)
-	 * @param ident Identifikator.
-	 * @return Funktion.
-	 * @throws IllegalArgumentException Wenn der Identifikator ungültig ist. */
-	protected FEMFunction getAsIdent(final long ident) throws IllegalArgumentException {
-		return FEMCodec2.IDENT_CACHE.getByIdent(ident);
+	/** Diese Methode gibt die Funktion zum gegebenen Identifikator zurück bzw. löst eine {@link IllegalArgumentException}, wenn der Identifikator ungültig
+	 * ist. */
+	protected FEMFunction getByIdent_DONE(final long ident) throws IllegalArgumentException {
+		return FEMCodec2.FUNCTION_BY_IDENT.getByIdent(ident);
 	}
 
-	/** Diese Methode fügt die gegebene Funktion in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.<br>
-	 * Nachfahren sollten diese Methode zur weiteren Fallunterscheidungen überschreiben.
+	/** Diese Methode fügt die gegebene Funktion in den Puffer ein und gibt die Referenz darauf zurück.
 	 *
 	 * @param src Funktion.
 	 * @return Referenz auf die Funktion.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
 	 * @throws IllegalArgumentException Wenn die Funktion nicht angefügt werden kann. */
-	public long put(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		if (this.reuseEnabled) return this.putFunction(src);
-
+	public long put_DONE(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		if (this.reuseEnabled) return this.putByRef(src);
+		Long result = this.reuseMapping.get(Objects.notNull(src));
+		if (result != null) return result;
+		result = this.putByRef(src);
+		this.reuseMapping.put(src, result);
+		return result;
 	}
 
-	protected long putFunctionAsIdent(final FEMFunction function) {
-		final int result = FEMCodec2.IDENT_CACHE.putByIdent(function);
-		if (result < 0) return 0;
-		return (result << 3) | FEMCodec2.REF_IDENT;
+	/** Diese Methode {@link #put_DONE(FEMFunction) überführt} die gegebenen Funktionen in deren Referenzen und gibt die Liste dieser Referenzen zurück.
+	 *
+	 * @param src Funktionen.
+	 * @return Referenzen auf die Funktionen.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist oder enthält.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
+	 * @throws IllegalArgumentException Wenn mindestens eine der Funktionen nicht angefügt werden kann. */
+	public long[] putAll_DONE(final FEMFunction... src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		final int length = src.length;
+		final long[] result = new long[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = this.put_DONE(src[i]);
+		}
+		return result;
 	}
 
-	protected int putFunction(final FEMFunction src) {
-		if (src instanceof FEMVoid) return this.putVoidValue();
+	/** Diese Methode gibt das zurück. <br>
+	 * Nachfahren sollten diese Methode zur weiteren Fallunterscheidungen überschreiben.
+	 *
+	 * @param src
+	 * @return
+	 * @throws NullPointerException
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException */
+	protected long putByRef(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		final long result = this.putByIdent(src);
+		if (result != 0) return result;
+		if (src instanceof FEMInteger) return this.putIntegerValue_DONE((FEMInteger)src);
+		if (src instanceof FEMDecimal) return this.putDecimalValue_DONE((FEMDecimal)src);
+		if (src instanceof FEMHandler) return this.putHandlerValue_DONE((FEMHandler)src);
+		if (src instanceof FEMObject) return this.putObjectValue_DONE((FEMObject)src);
+		if (src instanceof FEMDuration) return this.putDurationValue_DONE((FEMDuration)src);
+		if (src instanceof FEMDatetime) return this.putDatetimeValue_DONE((FEMDatetime)src);
+		return this.putByAddr(src);
+	}
+
+	protected long putByAddr(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		if (src instanceof FEMArray) return this.putArrayValue((FEMArray)src);
-		if (src instanceof FEMHandler) return this.putHandlerValue((FEMHandler)src);
-		if (src instanceof FEMBoolean) return this.putBooleanValue((FEMBoolean)src);
-		if (src instanceof FEMString) return this.putStringValue((FEMString)src);
-		if (src instanceof FEMBinary) return this.putBinaryValue((FEMBinary)src);
-		if (src instanceof FEMInteger) return this.putIntegerValue((FEMInteger)src);
-		if (src instanceof FEMDecimal) return this.putDecimalValue((FEMDecimal)src);
-		if (src instanceof FEMDuration) return this.putDurationValue((FEMDuration)src);
-		if (src instanceof FEMDatetime) return this.putDatetimeValue((FEMDatetime)src);
-		if (src instanceof FEMObject) return this.putObjectValue((FEMObject)src);
-		if (src instanceof FEMFuture) return this.putFutureValue((FEMFuture)src);
-		if (src instanceof FEMNative) return this.putNativeValue((FEMNative)src);
-		if (src instanceof FEMProxy) return this.putProxyFunction((FEMProxy)src);
-		if (src instanceof FEMParam) return this.putParamFunction((FEMParam)src);
+		if (src instanceof FEMString) return this.putStringValue_DONE((FEMString)src);
+		if (src instanceof FEMBinary) return this.putBinaryValue_DONE((FEMBinary)src);
+		if (src instanceof FEMFuture) return this.putFutureValue_DONE((FEMFuture)src);
+		if (src instanceof FEMNative) return this.putNativeValue_DONE((FEMNative)src);
+		if (src instanceof FEMProxy) return this.putProxyFunction_DONE((FEMProxy)src);
+		if (src instanceof FEMParam) return this.putParamFunction_DONE((FEMParam)src);
 		if (src instanceof ConcatFunction) return this.putConcatFunction((ConcatFunction)src);
-		if (src instanceof ClosureFunction) return this.putClosureFunction((ClosureFunction)src);
-		if (src instanceof CompositeFunction) return this.putCompositeFunction((CompositeFunction)src);
+		if (src instanceof ClosureFunction) return this.putClosureFunction_DONE((ClosureFunction)src);
+		if (src instanceof CompositeFunction) return this.putCompositeFunction_DONE((CompositeFunction)src);
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Adresse des nächsten zurück das zurück.
-	 *
-	 * @return
-	 * @throws IOException */
-	protected synchronized long TODO_putLongByRef() throws IOException {
+	protected long putByIdent(final FEMFunction function) throws NullPointerException {
+		return FEMCodec2.FUNCTION_BY_IDENT.putByIdent(function);
+	}
+
+	long putByRef_DONE(final int type, final long value) throws IllegalStateException {
+		final long addr = this.TODO_putLongByRef();
+		this.store.putLong(addr, value);
+		return addr | type;
+	}
+
+	protected synchronized long TODO_putLongByRef() {
 		long result = this.pageNext;
 		if (result >= this.pageLast) {
 			final int size = 1 << 13;
@@ -586,459 +615,259 @@ public class FEMCodec2 implements Property<FEMFunction>, Emuable {
 		return result;
 	}
 
-	protected void setupPage() throws IOException {
-		final int size = 1 << 13;
-		this.pageLast = this.store.insertRegion(size);
-		this.pageNext = this.pageLast + size;
-	}
-
-	/** Diese Methode {@link #put(FEMFunction) überführt} die gegebenen Funktionen in deren Referenzen und gibt die Liste dieser Referenzen zurück.
-	 *
-	 * @param src Funktionen.
-	 * @return Referenzen auf die Funktionen.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
-	 * @throws IllegalArgumentException Wenn mindestens eine der Funktionen nicht angefügt werden kann. */
-	public int[] putAll(final FEMFunction... src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int length = src.length;
-		final int[] result = new int[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = this.put(src[i]);
-		}
-		return result;
-	}
-
-	/** Diese Methode fügt {@link FEMVoid#INSTANCE} in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @return Referenz auf {@link FEMVoid#INSTANCE}.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putVoidValue() throws IllegalStateException {
-		this.store.openRegion(FEMCodec2.TYPE_VOID, 0);
-		return this.store.closeRegion();
-	}
-
-	/** Diese Methode gibt die Wertliste zur gegebenen Referenz zurück.
-	 *
-	 * @param ref Referenz.
-	 * @return Wertliste.
-	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
-	public FEMArray getArrayValue(final int ref) throws IllegalArgumentException {
-		return this.get_DONE(ref, FEMArray.class);
-	}
-
 	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Wertliste zurück. Die Struktur des Speicherbereichs ist
-	 * {@code (type: int, hash: int, length: int, ignore: int, value: long[length])}. Sie beginnt mit dem {@link FEMArray#hashCode() Streuwert} und endet mit den
-	 * über {@link #putAll(FEMFunction...) Referenzen} der Elemente der Wertliste. */
-	protected FEMArray getArrayValueA_DONE(final long addr) {
+	 * {@code (type: int, hash: int, length: int, align: int, valueRef: long[length])}. Sie beginnt mit dem {@link FEMArray#hashCode() Streuwert} und endet mit
+	 * den über {@link #putAll_DONE(FEMFunction...) Referenzen} der Elemente der Wertliste. */
+	protected FEMArray getArrayValueA_DONE(final long addr) throws IllegalArgumentException {
 		return new MappedArrayA(this, addr + 16, this.store.getInt(addr + 8), this.store.getInt(addr + 4));
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Wertliste zurück. Die Struktur des Speicherbereichs ist
-	 * {@code (type: int, hash: int, length: int, ignore: int, value: long[length], count: int, range: int[count-1], index: int[length])}. Sie beginnt mit dem
-	 * {@link FEMArray#hashCode() Streuwert} und {@link FEMArray#length() Länge} der Wertliste, gefolgt von den {@link #putAll(FEMFunction...) Referenzen} der
-	 * Elemente der Wertliste sowie der {@link CompactArray3#table Streuwerttabelle} zur beschleunigten Einzelwertsuche. */
-	protected FEMArray getArrayValueB_DONE(final long addr) {
+	 * {@code (type: int, hash: int, length: int, align: int, valueRef: long[length], count: int, range: int[count-1], index: int[length])}. Sie beginnt mit dem
+	 * {@link FEMArray#hashCode() Streuwert} und {@link FEMArray#length() Länge} der Wertliste, gefolgt von den {@link #putAll_DONE(FEMFunction...) Referenzen}
+	 * der Elemente der Wertliste sowie der {@link CompactArray3#table Streuwerttabelle} zur beschleunigten Einzelwertsuche. */
+	protected FEMArray getArrayValueB_DONE(final long addr) throws IllegalArgumentException {
 		return new MappedArrayB(this, addr + 16, this.store.getInt(addr + 8), this.store.getInt(addr + 4));
 	}
 
-	/** Diese Methode fügt die gegebene Wertliste in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück. Eine über
-	 * {@link FEMArray#compact(boolean)} indizierte Wertliste wird mit der Indizierung kodiert.
+	/** Diese Methode fügt die gegebene Wertliste in den Puffer ein und gibt die Referenz darauf zurück. Eine über {@link FEMArray#compact(boolean)} indizierte
+	 * Wertliste wird mit der Indizierung kodiert.
 	 *
 	 * @param src Wertliste.
 	 * @return Referenz auf die Wertliste.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putArrayValue(final FEMArray src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int[] values = this.putAll(src.value());
+	protected long putArrayValue(final FEMArray src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		final int length = src.length();
 		if (src instanceof CompactArray3) {
-			// addr: hash[1], length[1], value[length], count[1], range[count], index[length]
 			final int[] table = ((CompactArray3)src).table;
-			final int length = src.length(), count = table[0];
-			final long addr = this.store.openRegion(FEMCodec2.TYPE_ARRAY_B, (length * 8) + (count * 4) + 12);
-			this.store.putInt(addr, src.hashCode());
-			this.store.putInt(addr + 4, length);
-			this.store.putInt(addr + 8, values);
-			this.store.putInt(addr + (length * 4) + 8, table);
-			return this.store.closeRegion();
+			final long addr = this.store.insertRegion((length * 8L) + (table.length * 4L) + 16);
+			this.store.putInt(addr, new int[]{FEMCodec2.TYPE_ARRAY_B, src.hashCode(), length, 0});
+			this.store.putLong(addr + 16, this.putAll_DONE(src.value()));
+			this.store.putInt(addr + (length * 8L) + 16, table);
+			return addr;
 		} else {
-			// hash[1], value[length]
-			final long addr = this.store.openRegion(FEMCodec2.TYPE_ARRAY_A, (src.length() * 4) + 4);
-			this.store.putInt(addr, src.hashCode());
-			this.store.putInt(addr + 4, values);
-			return this.store.closeRegion();
+			final long addr = this.store.insertRegion((length * 8L) + 16);
+			this.store.putInt(addr, new int[]{FEMCodec2.TYPE_ARRAY_A, src.hashCode(), length, 0});
+			this.store.putLong(addr + 16, this.putAll_DONE(src.value()));
+			return addr;
 		}
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene {@code byte}-Zeichenkette zurück. Die Struktur des Speicherbereichs ist
-	 * {@code (type: int, hash: int, length: int, value: byte[length])}. */
-	protected FEMString getStringValueA_DONE(final long addr) {
+	 * {@code (type: int, hash: int, length: int, item: byte[length])}. */
+	protected FEMString getStringValueA_DONE(final long addr) throws IllegalArgumentException {
 		return new MappedStringA(this.store, addr + 12, this.store.getInt(addr + 4), this.store.getInt(addr + 8));
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene {@code short}-Zeichenkette zurück. Die Struktur des Speicherbereichs ist
-	 * {@code (type: int, hash: int, length: int, value: short[length])}. */
-	protected FEMString getStringValueB_DONE(final long addr) {
+	 * {@code (type: int, hash: int, length: int, item: short[length])}. */
+	protected FEMString getStringValueB_DONE(final long addr) throws IllegalArgumentException {
 		return new MappedStringB(this.store, addr + 12, this.store.getInt(addr + 4), this.store.getInt(addr + 8));
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene {@code int}-Zeichenkette zurück.Die Struktur des Speicherbereichs ist
-	 * {@code (type: int, hash: int, length: int, value: int[length])}. */
-	protected FEMString getStringValueC_DONE(final long addr, final int size) {
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene {@code int}-Zeichenkette zurück. Die Struktur des Speicherbereichs ist
+	 * {@code (type: int, hash: int, length: int, item: int[length])}. */
+	protected FEMString getStringValueC_DONE(final long addr) throws IllegalArgumentException {
 		return new MappedStringC(this.store, addr + 12, this.store.getInt(addr + 4), this.store.getInt(addr + 8));
 	}
 
-	/** Diese Methode fügt die gegebene Zeichenkette in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück. Dazu werden die
-	 * {@link FEMString#compact() kompaktierten} Formen der Zeichenkette analysiert und entsprechend als {@code byte}, {@code short} oder {@code int}-Codepoints
-	 * gespeichert.
-	 *
-	 * @param src Zeichenkette.
-	 * @return Referenz auf die Zeichenkette.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putStringValue(final FEMString src) throws NullPointerException, IllegalStateException {
-		final FEMString str = src.compact();
-		if (str instanceof FEMString.CompactStringINT8) {
-
-			final long addr = this.putRegion(FEMCodec2.TYPE_STRING_A, str.length() + 12);
-			this.store.putInt(addr, str.hashCode());
-			this.store.put(addr, str.toBytes());
-			return this.store.closeRegion();
-		} else if (str instanceof FEMString.CompactStringINT16) {
-			final long addr = this.store.openRegion(FEMCodec2.TYPE_STRING_B, (str.length() * 2) + 2);
-			this.store.putInt(addr, str.hashCode());
-			this.store.putShort(addr, str.toShorts());
-			return this.store.closeRegion();
+	/** Diese Methode fügt die gegebene Zeichenkette in den Puffer ein und gibt die Referenz darauf zurück. Dazu werden die {@link FEMString#compact()
+	 * kompaktierten} Formen der Zeichenkette analysiert und entsprechend als {@code byte}, {@code short} oder {@code int}-Codepoints gespeichert. */
+	protected long putStringValue_DONE(FEMString src) throws NullPointerException, IllegalStateException {
+		src = src.compact();
+		final int length = src.length();
+		if (src instanceof FEMString.CompactStringINT8) {
+			final long addr = this.store.insertRegion(length + 12);
+			this.store.putInt(addr, new int[]{FEMCodec2.TYPE_STRING_A, src.hashCode(), length});
+			this.store.put(addr + 12, src.toBytes());
+			return addr;
+		} else if (src instanceof FEMString.CompactStringINT16) {
+			final long addr = this.store.insertRegion((length * 2L) + 12);
+			this.store.putInt(addr, new int[]{FEMCodec2.TYPE_STRING_B, src.hashCode(), length});
+			this.store.putShort(addr + 12, src.toShorts());
+			return addr;
 		} else {
-			final long addr = this.store.openRegion(FEMCodec2.TYPE_STRING_C, (str.length() * 4) + 1);
-			this.store.putInt(addr, str.hashCode());
-			this.store.putInt(addr, str.toInts());
-			return this.store.closeRegion();
+			final long addr = this.store.insertRegion((length * 4L) + 12);
+			this.store.putInt(addr, new int[]{FEMCodec2.TYPE_STRING_C, src.hashCode(), length});
+			this.store.putInt(addr + 12, src.toInts());
+			return addr;
 		}
 	}
 
-	private long putRegion(int type, long size) {
-		long result = store.insertRegion(size);
-		store.putInt(result, type);
-		return result;
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Bytefolge zurück. Die Struktur des Speicherbereichs ist
+	 * {@code (type: int, hash: int, length: int, item: byte[length])}. */
+	protected FEMBinary getBinaryValue_DONE(final long addr) throws IllegalArgumentException {
+		return new MappedBinary(this.store, addr + 12, this.store.getInt(addr + 8), this.store.getInt(addr + 4));
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Bytefolge zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param size Größe des Speicherbereichs.
-	 * @return Bytefolge. */
-	protected FEMBinary getBinaryValue(final long addr, final int size) {
-		return new MappedBinary(this.store, addr + 4, size - 4, this.store.getInt(addr));
+	/** Diese Methode fügt die gegebene Bytefolge in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putBinaryValue_DONE(final FEMBinary src) throws NullPointerException, IllegalStateException {
+		final int length = src.length();
+		final long addr = this.store.insertRegion(length + 12);
+		this.store.putInt(addr, new int[]{FEMCodec2.TYPE_BINARY, src.hashCode(), length});
+		this.store.put(addr + 12, src.value());
+		return addr;
 	}
 
-	/** Diese Methode fügt die gegebene Bytefolge in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Bytefolge.
-	 * @return Referenz auf die Bytefolge.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putBinaryValue(final FEMBinary src) throws NullPointerException, IllegalStateException {
-		final long addr = this.store.openRegion(FEMCodec2.TYPE_BINARY, src.length() + 4);
-		this.store.putInt(addr, src.hashCode());
-		this.store.put(addr, src.value());
-		return this.store.closeRegion();
-	}
-
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Dezimalzahl zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @return Dezimalzahl. */
-	protected FEMInteger DONE_getIntegerValue(final long addr) {
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Dezimalzahl zurück. Die Struktur des Speicherbereichs ist {@code (value: long)}. */
+	protected FEMInteger getIntegerValue_DONE(final long addr) throws IllegalArgumentException {
 		return new FEMInteger(this.store.getLong(addr));
 	}
 
-	/** Diese Methode fügt die gegebene Dezimalzahl in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Dezimalzahl.
-	 * @return Referenz auf die Dezimalzahl.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public long putIntegerValue(final FEMInteger src) throws NullPointerException, IllegalStateException {
-		final long value = src.value();
-		final long addr = this.TODO_putLongByRef();
-		this.store.putLong(addr, src.value());
-		return addr | FEMCodec2.REF_INTEGER;
+	/** Diese Methode fügt die gegebene Dezimalzahl in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putIntegerValue_DONE(final FEMInteger src) throws NullPointerException, IllegalStateException {
+		return this.putByRef_DONE(FEMCodec2.REF_INTEGER, src.value());
 	}
 
-	/** Diese Methode gibt den im gegebenen Speicherbereich enthaltenen Dezimalbruch zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @return Dezimalbruch. */
-	protected FEMDecimal DONE_getDecimalValue(final long addr) {
-		Double.
-		return new FEMDecimal(this.store.getDouble(addr));
+	/** Diese Methode gibt den im gegebenen Speicherbereich enthaltenen Dezimalbruch zurück. Die Struktur des Speicherbereichs ist {@code (value: double)}. */
+	protected FEMDecimal getDecimalValue_DONE(final long addr) throws IllegalArgumentException {
+		return new FEMDecimal(Double.longBitsToDouble(this.store.getLong(addr)));
 	}
 
-	/** Diese Methode fügt den gegebenen Dezimalbruch in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Dezimalbruch.
-	 * @return Referenz auf den Dezimalbruch.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putDecimalValue(final FEMDecimal src) throws NullPointerException, IllegalStateException {
-		this.store.putDouble(this.store.openRegion(FEMCodec2.TYPE_DECIMAL, 8), src.value());
-		return this.putlstore.closeRegion();
+	/** Diese Methode fügt den gegebenen Dezimalbruch in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putDecimalValue_DONE(final FEMDecimal src) throws NullPointerException, IllegalStateException {
+		return this.putByRef_DONE(FEMCodec2.REF_DECIMAL, Double.doubleToRawLongBits(src.value()));
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Zeitspanne zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @return Zeitspanne. */
-	protected FEMDuration DONE_getDurationValue(final long addr) {
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Zeitspanne zurück. Die Struktur des Speicherbereichs ist {@code (value: long)}. */
+	protected FEMDuration getDurationValue_DONE(final long addr) throws IllegalArgumentException {
 		return new FEMDuration(this.store.getLong(addr));
 	}
 
-	/** Diese Methode fügt den gegebenen Zeitspanne in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Zeitspanne.
-	 * @return Referenz auf den Zeitspanne.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putDurationValue(final FEMDuration src) throws NullPointerException, IllegalStateException {
-		this.store.putDouble(this.store.openRegion(FEMCodec2.REF_DURATION, 8), src.value());
-		return this.store.closeRegion();
+	/** Diese Methode fügt den gegebenen Zeitspanne in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putDurationValue_DONE(final FEMDuration src) throws NullPointerException, IllegalStateException {
+		return this.putByRef_DONE(FEMCodec2.REF_DURATION, src.value());
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Zeitangabe zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @return Zeitangabe. */
-	protected FEMDatetime DONE_getDatetimeValue(final long addr) {
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Zeitangabe zurück. Die Struktur des Speicherbereichs ist {@code (value: long)}. */
+	protected FEMDatetime getDatetimeValue_DONE(final long addr) throws IllegalArgumentException {
 		return new FEMDatetime(this.store.getLong(addr));
 	}
 
-	/** Diese Methode fügt die gegebene Zeitangabe in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Zeitangabe.
-	 * @return Referenz auf die Zeitangabe.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putDatetimeValue(final FEMDatetime src) throws NullPointerException, IllegalStateException {
-		this.store.putDouble(this.store.openRegion(FEMCodec2.REF_DATETIME, 8), src.value());
-		return this.store.closeRegion();
+	/** Diese Methode fügt die gegebene Zeitangabe in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putDatetimeValue_DONE(final FEMDatetime src) throws NullPointerException, IllegalStateException {
+		return this.putByRef_DONE(FEMCodec2.REF_DATETIME, src.value());
 	}
 
-	/** Diese Methode fügt den gegebenen Wahrheitswert in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Wahrheitswert.
-	 * @return Referenz auf den Wahrheitswert.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putBooleanValue(final FEMBoolean src) throws NullPointerException, IllegalStateException {
-		this.store.openRegion(src.value() ? FEMCodec2.TYPE_TRUE : FEMCodec2.TYPE_FALSE, 0);
-		return this.store.closeRegion();
-	}
-
-	/** Diese Methode gibt den im gegebenen Speicherbereich enthaltenen Funktionszeiger zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @return Funktionszeiger. */
-	protected FEMHandler DONE_getHandlerValue(final long addr) {
+	/** Diese Methode gibt den im gegebenen Speicherbereich enthaltenen Funktionszeiger zurück. Die Struktur des Speicherbereichs ist
+	 * {@code (functionRef: long)}. */
+	protected FEMHandler getHandlerValue_DONE(final long addr) throws IllegalArgumentException {
 		return new FEMHandler(this.getAt_DONE(addr));
 	}
 
-	/** Diese Methode fügt den gegebenen Funktionszeiger in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Funktionszeiger.
-	 * @return Referenz auf den Funktionszeiger.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
-	 * @throws IllegalArgumentException Wenn die Funktion des Funktionszeigers nicht angefügt werden kann. */
-	public int putHandlerValue(final FEMHandler src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int invokeRef = this.put(src.value());
-		this.store.putInt(this.store.openRegion(FEMCodec2.REF_HANDLER, 4), invokeRef);
-		return this.store.closeRegion();
+	/** Diese Methode fügt den gegebenen Funktionszeiger in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putHandlerValue_DONE(final FEMHandler src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		return this.putByRef_DONE(FEMCodec2.REF_HANDLER, this.put_DONE(src.value()));
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Objektreferenz zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @return Objektreferenz. */
-	protected FEMObject DONE_getObjectValue(final long addr) {
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Objektreferenz zurück. Die Struktur des Speicherbereichs ist {@code (value: long)}. */
+	protected FEMObject getObjectValue_DONE(final long addr) throws IllegalArgumentException {
 		return new FEMObject(this.store.getLong(addr));
 	}
 
-	/** Diese Methode fügt den gegebenen Objektreferenz in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Objektreferenz.
-	 * @return Referenz auf den Objektreferenz.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putObjectValue(final FEMObject src) throws NullPointerException, IllegalStateException {
-		this.store.putLong(this.store.openRegion(FEMCodec2.TYPE_OBJECT, 8), src.value());
-		return this.store.closeRegion();
+	/** Diese Methode fügt den gegebenen Objektreferenz in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putObjectValue_DONE(final FEMObject src) throws NullPointerException, IllegalStateException {
+		return this.putByRef_DONE(FEMCodec2.REF_OBJECT, src.value());
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltenen Ergebniswert zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param size Größe des Speicherbereichs.
-	 * @return Ergebniswert. */
-	protected FEMFuture getFutureValue(final long addr, final int size) {
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltenen Ergebniswert zurück. */
+	protected FEMFuture getFutureValue_DONE(final long addr) throws IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode fügt den gegebenen Ergebniswert in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Ergebniswert.
-	 * @return Referenz auf den Ergebniswert.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
-	 * @throws IllegalArgumentException Wenn die Funktion des Funktionszeigers nicht angefügt werden kann. */
-	public int putFutureValue(final FEMFuture src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	/** Diese Methode fügt den gegebenen Ergebniswert in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected int putFutureValue_DONE(final FEMFuture src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltenen Nativwert zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param size Größe des Speicherbereichs.
-	 * @return Nativwert. */
-	protected FEMNative getNativeValue(final long addr, final int size) {
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltenen Nativwert zurück. */
+	protected FEMNative getNativeValue_DONE(final long addr) throws IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode fügt den gegebenen Nativwert in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Nativwert.
-	 * @return Referenz auf den Ergebniswert.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
-	 * @throws IllegalArgumentException Wenn die Funktion des Funktionszeigers nicht angefügt werden kann. */
-	public int putNativeValue(final FEMNative src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	/** Diese Methode fügt den gegebenen Nativwert in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected int putNativeValue_DONE(final FEMNative src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt den im gegebenen Speicherbereich enthaltenen Platzhalter zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param size Größe des Speicherbereichs.
-	 * @return Platzhalter. */
-	protected FEMProxy getProxyFunction(final long addr, final int size) throws NullPointerException, IllegalArgumentException {
-		return new FEMProxy(this.get_DONE(this.store.getInt(addr), FEMValue.class), this.get_DONE(this.store.getInt(addr + 4), FEMString.class),
-			this.getAt_DONE(addr + 8));
+	/** Diese Methode gibt den im gegebenen Speicherbereich enthaltenen Platzhalter zurück. Die Struktur des Speicherbereichs ist
+	 * {@code (type: int, align: int, idRef: long, nameRef: long, functionRef: long)}. */
+	protected FEMProxy getProxyFunction_DONE(final long addr) throws IllegalArgumentException {
+		return new FEMProxy(this.get_DONE(this.store.getLong(addr + 8), FEMValue.class), this.get_DONE(this.store.getLong(addr + 16), FEMString.class),
+			this.getAt_DONE(addr + 24));
 	}
 
-	/** Diese Methode fügt den gegebenen Platzhalter in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Platzhalter.
-	 * @return Referenz auf den Platzhalter.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putProxyFunction(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
-		final int idRef = this.put(src.id()), nameRef = this.putStringValue(src.name()), invokeRef = this.put(src.get());
-		final long addr = this.store.openRegion(FEMCodec2.TYPE_PROXY, 12);
-		this.store.putInt(addr, idRef);
-		this.store.putInt(addr + 4, nameRef);
-		this.store.putInt(addr + 8, invokeRef);
-		return this.store.closeRegion();
+	/** Diese Methode fügt den gegebenen Platzhalter in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putProxyFunction_DONE(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
+		final long addr = this.store.insertRegion(32);
+		this.store.putInt(addr, new int[]{FEMCodec2.TYPE_PROXY, 0});
+		this.store.putLong(addr + 8, new long[]{this.put_DONE(src.id()), this.put_DONE(src.name()), this.put_DONE(src.get())});
+		return addr;
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Parameterfunktion zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param size Größe des Speicherbereichs.
-	 * @return Parameterfunktion. */
-	protected FEMParam getParamFunction(final long addr, final int size) {
-		return FEMParam.from(this.store.getInt(addr));
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Parameterfunktion zurück. Die Struktur des Speicherbereichs ist
+	 * {@code (type: int, param: int)}. */
+	protected FEMParam getParamFunction_DONE(final long addr) throws IllegalArgumentException {
+		return FEMParam.from(this.store.getInt(addr + 4));
 	}
 
-	/** Diese Methode fügt die gegebene Parameterfunktion in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Parameterfunktion.
-	 * @return Referenz auf die Parameterfunktion.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putParamFunction(final FEMParam src) throws NullPointerException, IllegalStateException {
-		this.store.putInt(this.store.openRegion(FEMCodec2.TYPE_PARAM, 4), src.index());
-		return this.store.closeRegion();
+	/** Diese Methode fügt die gegebene Parameterfunktion in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putParamFunction_DONE(final FEMParam src) throws NullPointerException, IllegalStateException {
+		final long addr = this.store.insertRegion(8);
+		this.store.putInt(addr, new int[]{FEMCodec2.TYPE_PARAM, src.index()});
+		return addr;
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Funktionkette zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param size Größe des Speicherbereichs.
-	 * @return Funktionkette. */
-	protected ConcatFunction getConcatFunction(final long addr, final int size) {
-		return new ConcatFunction(this.getAt_DONE(addr), this.getAllAt(addr + 4, size - 4));
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Funktionkette zurück. Die Struktur des Speicherbereichs ist
+	 * {@code (type: int, count: int, function: long, param: long[count])}. */
+	protected ConcatFunction getConcatFunction_DONE(final long addr) throws IllegalArgumentException {
+		return new ConcatFunction(this.getAt_DONE(addr + 8), this.getAllAt_DONE(addr + 16, this.store.getInt(addr + 4)));
 	}
 
-	/** Diese Methode fügt die gegebene Funktionkette in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Funktionkette.
-	 * @return Referenz auf die Funktionkette.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putConcatFunction(final ConcatFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int invokeRef = this.put(src.function);
-		final int[] paramRefs = this.putAll(src.params);
-		final long addr = this.store.openRegion(FEMCodec2.TYPE_CONCAT, (paramRefs.length * 4) + 4);
-		this.store.putInt(addr, invokeRef);
-		this.store.putInt(addr + 4, paramRefs);
-		return this.store.closeRegion();
+	/** Diese Methode fügt die gegebene Funktionkette in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putConcatFunction(final ConcatFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		final int length = src.params.length;
+		final long addr = this.store.insertRegion((length * 8L) + 16L);
+		this.store.putInt(addr, new int[]{FEMCodec2.TYPE_CONCAT, length});
+		this.store.putLong(addr + 8, this.put_DONE(src.function));
+		this.store.putLong(addr + 16, this.putAll_DONE(src.params));
+		return addr;
 	}
 
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Funktionsbindung zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param size Größe des Speicherbereichs.
-	 * @return Funktionsbindung. */
-	protected ClosureFunction getClosureFunction(final long addr, final int size) {
-		return new ClosureFunction(this.getAt_DONE(addr));
+	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene Funktionsbindung zurück. Die Struktur des Speicherbereichs ist
+	 * {@code (type: int, ignore: int, functionRef: long}. */
+	protected ClosureFunction getClosureFunction_DONE(final long addr) throws IllegalArgumentException {
+		return new ClosureFunction(this.getAt_DONE(addr + 8));
 	}
 
-	/** Diese Methode fügt die gegebene Funktionsbindung in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Funktionsbindung.
-	 * @return Referenz auf die Funktionsbindung.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
-	 * @throws IllegalArgumentException Wenn die Funktion des Funktionszeigers nicht angefügt werden kann. */
-	public int putClosureFunction(final ClosureFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int invokeRef = this.put(src.function);
-		this.store.putInt(this.store.openRegion(FEMCodec2.TYPE_CLOSURE, 4), invokeRef);
-		return this.store.closeRegion();
+	/** Diese Methode fügt die gegebene Funktionsbindung in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putClosureFunction_DONE(final ClosureFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		final long addr = this.store.insertRegion(16);
+		this.store.putInt(addr, new int[]{FEMCodec2.TYPE_CLOSURE, 0});
+		this.store.putLong(addr + 8, (int)this.put_DONE(src.function));
+		return addr;
 	}
 
-	/** Diese Methode gibt dden im gegebenen Speicherbereich enthaltenen Funktionsaufruf zurück.
-	 *
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param size Größe des Speicherbereichs.
-	 * @return Funktionsaufruf. */
-	protected CompositeFunction getCompositeFunction(final long addr, final int size) {
-		return new CompositeFunction(this.getAt_DONE(addr), this.getAllAt(addr + 4, size - 4));
+	/** Diese Methode gibt dden im gegebenen Speicherbereich enthaltenen Funktionsaufruf zurück. Die Struktur des Speicherbereichs ist
+	 * {@code (type: int, count: int, function: long, param: long[count])}. */
+	protected CompositeFunction getCompositeFunction_DONE(final long addr) throws IllegalArgumentException {
+		return new CompositeFunction(this.getAt_DONE(addr + 8), this.getAllAt_DONE(addr + 16, this.store.getInt(addr + 4)));
 	}
 
-	/** Diese Methode fügt den gegebenen Funktionsaufruf in den {@link #getStore() Puffer} ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Funktionsaufruf.
-	 * @return Referenz auf den Funktionsaufruf.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist. */
-	public int putCompositeFunction(final CompositeFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int invokeRef = this.put(src.function);
-		final int[] paramRefs = this.putAll(src.params);
-		final long addr = this.store.openRegion(FEMCodec2.TYPE_COMPOSITE, (paramRefs.length * 4) + 4);
-		this.store.putInt(addr, invokeRef);
-		this.store.putInt(addr + 4, paramRefs);
-		return this.store.closeRegion();
+	/** Diese Methode fügt den gegebenen Funktionsaufruf in den Puffer ein und gibt die Referenz darauf zurück. */
+	protected long putCompositeFunction_DONE(final CompositeFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		final int length = src.params.length;
+		final long addr = this.store.insertRegion((length * 8L) + 16L);
+		this.store.putInt(addr, new int[]{FEMCodec2.TYPE_COMPOSITE, length});
+		this.store.putLong(addr + 8, this.put_DONE(src.function));
+		this.store.putLong(addr + 16, this.putAll_DONE(src.params));
+		return addr;
 	}
 
 	@Override
 	public long emu() {
 		return EMU.fromObject(this) + this.store.emu() + this.cacheMapping.emu();
-	}
-
-	/** Diese Methode leert den Cache der {@link #get_DONE(int) gelesenen} Funktionen.
-	 *
-	 * @see #useCaching(boolean) */
-	public void cleanup() {
-		this.cacheMapping.clear();
 	}
 
 }

@@ -3,41 +3,12 @@ package bee.creative.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import bee.creative.fem.FEMCodec;
-import bee.creative.lang.Strings;
 
 /** Diese Klasse ergänzt einen {@link MappedBuffer} um Methoden zur {@link #insertRegion(long) Reservierung} und {@link #deleteRegion(long) Freigabe} von
  * Speicherbereichen.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MappedBuffer2 extends MappedBuffer {
-
-	public static void main(final String[] args) throws Exception {
-
-		final File file = new File("E:/DELETE-ME.mb3");
-		file.delete();
-		final MappedBuffer2 b = new MappedBuffer2(file, false);
-
-		final long a1 = b.insertRegion(16);
-		b.pr();
-		final long a2 = b.insertRegion(32);
-		b.pr();
-		b.deleteRegion(a1);
-		b.pr();
-
-
-		System.out.println(a2);
-		b.putLong(a2, 1324);
-		b.putLong(a2 + 8, 546546);
-
-		final long a4 = b.updateRegion(a2, 40);
-		b.pr();
-
-		System.out.println(a4);
-		System.out.println(b.getLong(a4));
-		System.out.println(b.getLong(a4 + 8));
-
-	}
 
 	private static long asAlignedSize(final long size) throws IllegalArgumentException {
 		if (size == 0) return 0;
@@ -354,10 +325,6 @@ public class MappedBuffer2 extends MappedBuffer {
 			limit--;
 		}
 		return result;
-	}
-
-	private void pr() {
-		System.out.append("REGION ").append(Strings.join(" ", this.regionSizes(50))).append(" FREE ").append(Strings.join(" ", this.reuseSizes(50))).println();
 	}
 
 }
