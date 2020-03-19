@@ -78,21 +78,17 @@ public class IAMBuffer implements Getter<IAMArray, IAMArray> {
 			final MMIArrayL array = (MMIArrayL)item;
 			if (array.buffer == this.buffer) return array;
 		}
-		try {
-			final int length = item.length();
-			if (length == 0) return IAMArray.EMPTY;
-			final int mode = item.mode();
-			final long addr;
-			synchronized (this) {
-				addr = this.addr;
-				final long size = (addr + (MMIArray.size(mode) * (long)length) + 3) & -4L;
-				this.buffer.grow(this.addr = size);
-			}
-			this.buffer.putArray(addr, item);
-			return this.buffer.getArray(addr, length, mode);
-		} catch (final IOException cause) {
-			throw new IllegalArgumentException(cause);
+		final int length = item.length();
+		if (length == 0) return IAMArray.EMPTY;
+		final int mode = item.mode();
+		final long addr;
+		synchronized (this) {
+			addr = this.addr;
+			final long size = (addr + (MMIArray.size(mode) * (long)length) + 3) & -4L;
+			this.buffer.grow(this.addr = size);
 		}
+		this.buffer.putArray(addr, item);
+		return this.buffer.getArray(addr, length, mode);
 	}
 
 	/** Diese Methode gibt die Datei des intern genutzten {@link MappedBuffer Puffers} oder {@code null} zurück.
