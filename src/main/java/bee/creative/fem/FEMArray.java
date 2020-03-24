@@ -155,7 +155,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		boolean containsEntry(final Entry<?, ?> entry) {
-			return (entry != null) && this.containsEntry(entry.getKey(), entry.getKey());
+			return (entry != null) && this.containsEntry(entry.getKey(), entry.getValue());
 		}
 
 		boolean containsEntry(final Object key, final Object value) {
@@ -841,7 +841,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @return Position des ersten Vorkommens des gegebenen Werts oder {@code -1}.
-	 * @param foreward {@code true}, wenn die Reihenfolge c ist, bzw. {@code false}, wenn sie rückwärts ist. */
+	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
 	protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
 		final ItemFinder finder = new ItemFinder(that);
 		if (this.customExtract(finder, offset, length, foreward)) return -1;
