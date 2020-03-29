@@ -7,7 +7,7 @@ import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert. Der Platzhalter wird zur erzeugung rekursiver Funktionsaufrufe eingesetz, weshalb {@link #hashCode() Streuwert} und
- * {@link #equals(Object) Äquivalenz} nicht auf diesem, sondern auf extra dafür bereit gestellten {@link #id() Kennung} aufbauen.
+ * {@link #equals(Object) Äquivalenz} nicht auf diesem, sondern auf einer extra hierfür bereitgestellten {@link #id() Kennung} beruhen.
  *
  * @see FEMCompiler#proxy(String)
  * @see FEMCompiler#proxies()
@@ -47,12 +47,12 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	 *
 	 * @param id {@link #id() Kennung}.
 	 * @param name {@link #name() Name}.
-	 * @param function {@link #get() Funktion} oder {@code null}.
+	 * @param target {@link #get() Funktion} oder {@code null}.
 	 * @throws NullPointerException Wenn {@code id} bzw. {@code name} {@code null} ist. */
-	public FEMProxy(final FEMValue id, final FEMString name, final FEMFunction function) throws NullPointerException {
+	public FEMProxy(final FEMValue id, final FEMString name, final FEMFunction target) throws NullPointerException {
 		this.id = Objects.notNull(id);
 		this.name = Objects.notNull(name);
-		this.set(function);
+		this.set(target);
 	}
 
 	/** Diese Methode gibt die Kennung des Platzhalters zurück. Diese Kennung wird im Konstruktor initialisiert und zur Berechnung von {@link #hashCode()

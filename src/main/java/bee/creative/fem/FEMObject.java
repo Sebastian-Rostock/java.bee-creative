@@ -119,8 +119,8 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * Die 64 Bit von MBS zum LSB sind:
 	 * <ul>
 	 * <li>refValue - 32 Bit</li>
-	 * <li>ownerValue - 16 Bit</li>
 	 * <li>typeValue - 16 Bit</li>
+	 * <li>ownerValue - 16 Bit</li>
 	 * </ul>
 	 *
 	 * @return interne Darstellung der Referenz. */
