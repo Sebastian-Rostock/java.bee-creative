@@ -786,7 +786,8 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @param that Bytefolge.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMBinary that) throws NullPointerException {
+	public boolean equals(final FEMBinary that) throws NullPointerException {
+		if (this == that) return true;
 		final int length = this.length;
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;

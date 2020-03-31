@@ -1193,7 +1193,7 @@ public class MappedBuffer implements Emuable {
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.file(), this.size(), this.isReadonly());
+		return Objects.toInvokeString(this, this.file().toString(), this.size(), this.isReadonly());
 	}
 
 }

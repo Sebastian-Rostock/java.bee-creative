@@ -27,16 +27,16 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * {@link FEMBuffer} in Werte {@link FEMBuffer#get(long) übersetzt} werden. */
 	public static class MappedArray1 extends FEMArray {
 
-		final MappedBuffer store;
-
-		final FEMBuffer codec;
-
 		final long addr;
 
-		MappedArray1(final FEMBuffer codec, final long addr, final int length, final int hash) throws IllegalArgumentException {
+		final MappedBuffer buffer;
+
+		final FEMBuffer getter;
+
+		MappedArray1(final FEMBuffer getter, final long addr, final int length, final int hash) throws IllegalArgumentException {
 			super(length);
-			this.store = codec.buffer();
-			this.codec = codec;
+			this.buffer = getter.buffer();
+			this.getter = getter;
 			this.addr = addr;
 			this.hash = hash;
 		}
@@ -44,7 +44,17 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		@Override
 		protected FEMValue customGet(final int index) {
 			/** this.addr: value[length] */
-			return this.codec.getAt(this.addr + (index * 8L), FEMValue.class);
+			return this.getter.getAt(this.addr + (index * 8L), FEMValue.class);
+		}
+
+		@Override
+		public boolean equals(final FEMArray that) throws NullPointerException {
+			if (this == that) return true;
+			if (that instanceof MappedArray1) {
+				final MappedArray1 that2 = (MappedArray1)that;
+				if ((this.addr == that2.addr) && (this.length == that2.length) && (this.buffer == that2.buffer)) return true;
+			}
+			return super.equals(that);
 		}
 
 	}
@@ -60,19 +70,19 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		protected int customFind(final FEMValue that, final int offset, int length, final boolean foreward) {
 			/** this.addr: value: long[length], count: int, range: int[count-1], index: int[length] */
 			final long addr = this.addr + (this.length * 8L);
-			final int count = this.store.getInt(addr), hash = that.hashCode() & (count - 2);
+			final int count = this.buffer.getInt(addr), hash = that.hashCode() & (count - 2);
 			final long addr2 = addr + (hash * 4L);
-			int l = this.store.getInt(addr2), r = this.store.getInt(addr2 + 4) - 1;
+			int l = this.buffer.getInt(addr2), r = this.buffer.getInt(addr2 + 4) - 1;
 			length += offset;
 			if (foreward) {
 				for (; l <= r; l++) {
-					final int result = this.store.getInt(addr + (l * 4L));
+					final int result = this.buffer.getInt(addr + (l * 4L));
 					if (length <= result) return -1;
 					if ((offset <= result) && that.equals(this.customGet(result))) return result;
 				}
 			} else {
 				for (; l <= r; r--) {
-					final int result = this.store.getInt(addr + (r * 4L));
+					final int result = this.buffer.getInt(addr + (r * 4L));
 					if (result < offset) return -1;
 					if ((result < length) && that.equals(this.customGet(result))) return result;
 				}
@@ -85,9 +95,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Klasse implementiert eine Bytefolge als Sicht auf eine Speicherbereich eines {@link MappedBuffer}. */
 	public static class MappedBinary1 extends FEMBinary {
 
-		final MappedBuffer buffer;
-
 		final long addr;
+
+		final MappedBuffer buffer;
 
 		MappedBinary1(final MappedBuffer buffer, final long addr, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
 			super(length);
@@ -106,14 +116,24 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 			return new MappedBinary1(this.buffer, this.addr + offset, length, 0);
 		}
 
+		@Override
+		public boolean equals(final FEMBinary that) throws NullPointerException {
+			if (this == that) return true;
+			if (that instanceof MappedBinary1) {
+				final MappedBinary1 that2 = (MappedBinary1)that;
+				if ((this.addr == that2.addr) && (this.length == that2.length) && (this.buffer == that2.buffer)) return true;
+			}
+			return super.equals(that);
+		}
+
 	}
 
 	/** Diese Klasse implementiert eine {@code byte}-Zeichenkette als Sicht auf eine Speicherbereich eines {@link MappedBuffer}. */
 	public static class MappedString1 extends FEMString {
 
-		final MappedBuffer buffer;
-
 		final long addr;
+
+		final MappedBuffer buffer;
 
 		MappedString1(final MappedBuffer buffer, final long addr, final int length, final int hash) throws NullPointerException, IllegalArgumentException {
 			super(length);
@@ -130,6 +150,16 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		@Override
 		protected FEMString customSection(final int offset, final int length) {
 			return new MappedString1(this.buffer, this.addr + offset, length, 0);
+		}
+
+		@Override
+		public boolean equals(final FEMString that) throws NullPointerException {
+			if (this == that) return true;
+			if (that instanceof MappedString1) {
+				final MappedString1 that2 = (MappedString1)that;
+				if ((this.addr == that2.addr) && (this.length == that2.length) && (this.buffer == that2.buffer)) return true;
+			}
+			return super.equals(that);
 		}
 
 	}
@@ -181,134 +211,110 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld speichert die Typkennung für {@link FEMBoolean#FALSE}. */
 	protected static final byte TYPE_FALSE = 2;
 
-	/** Dieses Feld speichert die Typkennung für {@link #getByIdent(long)}. */
-	protected static final byte TYPE_IDENT = 3;
-
-	/** Dieses Feld speichert die Typkennung für {@link FEMNative}. */
-	protected static final byte TYPE_NATIVE = 4;
-
-	/** Dieses Feld speichert die Typkennung für {@link FEMFuture}. */
-	protected static final byte TYPE_FUTURE = 5;
-
 	/** Dieses Feld speichert die Typkennung für {@link FEMArray#EMPTY}. */
-	protected static final byte TYPE_ARRAY_DATA1 = 6;
+	protected static final byte TYPE_ARRAY_DATA1 = 3;
 
 	/** Dieses Feld speichert die Typkennung für {@link MappedArray1}. */
-	protected static final byte TYPE_ARRAY_ADDR1 = 7;
+	protected static final byte TYPE_ARRAY_ADDR1 = 4;
 
 	/** Dieses Feld speichert die Typkennung für {@link MappedArray2}. */
-	protected static final byte TYPE_ARRAY_ADDR2 = 8;
+	protected static final byte TYPE_ARRAY_ADDR2 = 5;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMString#EMPTY}. */
-	protected static final byte TYPE_STRING_DATA1 = 9;
+	protected static final byte TYPE_STRING_DATA1 = 6;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMString.UniformString} mit einem Zeichen. */
-	protected static final byte TYPE_STRING_DATA2 = 10;
+	protected static final byte TYPE_STRING_DATA2 = 7;
 
 	/** Dieses Feld speichert die Typkennung für {@link MappedString1}. */
-	protected static final byte TYPE_STRING_ADDR1 = 11;
+	protected static final byte TYPE_STRING_ADDR1 = 8;
 
 	/** Dieses Feld speichert die Typkennung für {@link MappedString2}. */
-	protected static final byte TYPE_STRING_ADDR2 = 12;
+	protected static final byte TYPE_STRING_ADDR2 = 9;
 
 	/** Dieses Feld speichert die Typkennung für {@link MappedString3}. */
-	protected static final byte TYPE_STRING_ADDR3 = 13;
+	protected static final byte TYPE_STRING_ADDR3 = 10;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMBinary#EMPTY}. */
-	protected static final byte TYPE_BINARY_DATA1 = 14;
+	protected static final byte TYPE_BINARY_DATA1 = 11;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMBinary.UniformBinary}. */
-	protected static final byte TYPE_BINARY_DATA2 = 15;
+	protected static final byte TYPE_BINARY_DATA2 = 12;
 
 	/** Dieses Feld speichert die Typkennung für {@link MappedBinary1}. */
-	protected static final byte TYPE_BINARY_ADDR1 = 16;
+	protected static final byte TYPE_BINARY_ADDR1 = 13;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMObject} mit reduziertem {@link FEMObject#refValue()}. */
-	protected static final byte TYPE_OBJECT_DATA1 = 17;
+	protected static final byte TYPE_OBJECT_DATA1 = 14;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMObject} mit reduziertem {@link FEMObject#typeValue()}. */
-	protected static final byte TYPE_OBJECT_DATA2 = 18;
+	protected static final byte TYPE_OBJECT_DATA2 = 15;
 
 	/** Dieses Feld speichert die Typkennung für {@link #getObjectByAddr(long)}. */
-	protected static final byte TYPE_OBJECT_ADDR1 = 19;
+	protected static final byte TYPE_OBJECT_ADDR1 = 16;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMInteger} mit positivem reduziertem {@link FEMInteger#value()}. */
-	protected static final byte TYPE_INTEGER_DATA1 = 20;
+	protected static final byte TYPE_INTEGER_DATA1 = 17;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMInteger} mit negativem reduziertem {@link FEMInteger#value()}. */
-	protected static final byte TYPE_INTEGER_DATA2 = 21;
+	protected static final byte TYPE_INTEGER_DATA2 = 18;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMInteger}. */
-	protected static final byte TYPE_INTEGER_ADDR1 = 22;
+	protected static final byte TYPE_INTEGER_ADDR1 = 19;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMDecimal}. */
-	protected static final byte TYPE_DECIMAL_ADDR1 = 23;
+	protected static final byte TYPE_DECIMAL_ADDR1 = 20;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMHandler}. */
-	protected static final byte TYPE_HANDLER_ADDR1 = 24;
+	protected static final byte TYPE_HANDLER_ADDR1 = 21;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMDatetime} ohne {@link FEMDatetime#hasDate()}. */
-	protected static final byte TYPE_DATETIME_DATA1 = 25;
+	protected static final byte TYPE_DATETIME_DATA1 = 22;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMDatetime} ohne {@link FEMDatetime#hasTime()}. */
-	protected static final byte TYPE_DATETIME_DATA2 = 26;
+	protected static final byte TYPE_DATETIME_DATA2 = 23;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMDatetime}. */
-	protected static final byte TYPE_DATETIME_ADDR1 = 27;
+	protected static final byte TYPE_DATETIME_ADDR1 = 24;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMDuration} mit reduziertem {@link FEMDuration#durationmillisValue()}. */
-	protected static final byte TYPE_DURATION_DATA1 = 28;
+	protected static final byte TYPE_DURATION_DATA1 = 25;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMDuration} mit reduziertem {@link FEMDuration#durationmillisValue()}. */
-	protected static final byte TYPE_DURATION_DATA2 = 29;
+	protected static final byte TYPE_DURATION_DATA2 = 26;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMDuration}. */
-	protected static final byte TYPE_DURATION_ADDR1 = 30;
+	protected static final byte TYPE_DURATION_ADDR1 = 27;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMProxy}. */
-	protected static final byte TYPE_PROXY_ADDR1 = 31;
+	protected static final byte TYPE_PROXY_ADDR1 = 28;
 
 	/** Dieses Feld speichert die Typkennung für {@link FEMParam}. */
-	protected static final byte TYPE_PARAM_DATA1 = 32;
+	protected static final byte TYPE_PARAM_DATA1 = 29;
 
 	/** Dieses Feld speichert die Typkennung für {@link ConcatFunction}. */
-	protected static final byte TYPE_CONCAT_ADDR1 = 33;
+	protected static final byte TYPE_CONCAT_ADDR1 = 30;
 
 	/** Dieses Feld speichert die Typkennung für {@link ClosureFunction}. */
-	protected static final byte TYPE_CLOSURE_ADDR1 = 34;
+	protected static final byte TYPE_CLOSURE_ADDR1 = 31;
 
 	/** Dieses Feld speichert die Typkennung für {@link CompositeFunction}. */
-	protected static final byte TYPE_COMPOSITE_ADDR1 = 35;
-
-	static protected long toRef(final int head, final long body) {
-		return (body << 6) | head;
-	}
-
-	/** Diese Methode gibt die Kopfdaten der gegebenen Referenz zurück. */
-	static protected int toHead(final long ref) {
-		return (int)(ref & 63);
-	}
-
-	/** Diese Methode gibt die Rumpfdaten der gegebenen Referenz zurück. */
-	static protected long toBody(final long ref) {
-		return ref >>> 6;
-	}
+	protected static final byte TYPE_COMPOSITE_ADDR1 = 32;
 
 	/** Dieses Feld speichert die Adresse des nächsten Speicherbereichs. */
 	private long next;
 
-	/** Dieses Feld speichert die Größe des {@link #buffer}. */
-	private long limit;
+	/** Dieses Feld bildet von einer Funktion auf deren Referenz ab und wird in {@link #put(FEMFunction)} eingesetzt. */
+	private final HashMapOL<FEMFunction> reuseMap = new HashMapOL<>();
 
+	/** Dieses Feld bildet von einer Adresse auf einen Platzhalter ab und dient in {@link #getProxyByAddr(long)} de Behandlung der Rekursion. */
 	private final HashMapLO<FEMProxy> proxyGetMap = new HashMapLO<>();
 
+	/** Dieses Feld bildet von der Kennung eines Platzhalters auf dessen Adresse ab und dient in {@link #putProxyAsRef(FEMProxy)} de Behandlung der Rekursion. */
 	private final HashMapOL<FEMValue> proxyPutMap = new HashMapOL<>();
 
 	/** Dieses Feld speichert den Puffer, in dem die Zahlenfolgen abgelegt sind. */
 	protected final MappedBuffer buffer;
-
-	/** Dieses Feld bildet von einer Funktion auf eine Referenz ab und wird in {@link #put(FEMFunction)} eingesetzt. */
-	protected final HashMapOL<FEMFunction> reuseMap = new HashMapOL<>();
 
 	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei.
 	 *
@@ -319,13 +325,12 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	public FEMBuffer(final File file, final boolean readonly) throws IOException {
 		this.buffer = new MappedBuffer(file, readonly);
 		final long MAGIC = 0x31454c49464d4546L;
-		this.limit = this.buffer.size();
-		if (!readonly && (this.limit == 0)) {
+		if (!readonly && (this.buffer.size() == 0)) {
 			this.next = 24;
 			this.buffer.grow(this.next);
 			this.buffer.putLong(0, new long[]{MAGIC, 0, this.next});
 		} else {
-			if (this.limit < 24) throw new IllegalArgumentException();
+			if (this.buffer.size() < 24) throw new IllegalArgumentException();
 			if (this.buffer.getLong(0) != MAGIC) throw new IllegalArgumentException();
 			this.next = this.buffer.getLong(16);
 			if (this.next < 24) throw new IllegalArgumentException();
@@ -338,18 +343,13 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return addr != 0 ? this.get(addr) : null;
 	}
 
-	@Override
-	public void set(final FEMFunction value) {
-		this.buffer.putLong(8, value != null ? this.put(value) : 0);
-	}
-
 	/** Diese Methode gibt die Funktion zur gegebenen Referenz zurück.
 	 *
 	 * @param ref Referenz.
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public FEMFunction get(final long ref) throws IllegalArgumentException {
-		return this.getImpl(FEMBuffer.toHead(ref), FEMBuffer.toBody(ref));
+		return this.customGet(this.getRefHead(ref), this.getRefBody(ref));
 	}
 
 	/** Diese Methode gibt die Funktion zur gegebenen Referenz als Instanz der gegebenen Klasse zurück und ist eine Abkürzung für {@link Class#cast(Object)
@@ -367,6 +367,25 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		} catch (final Exception cause) {
 			throw new IllegalArgumentException(cause);
 		}
+	}
+
+	/** Diese Methode gibt die Referenz mit den gegebenen Merkmalen zurück.
+	 *
+	 * @param head Kopfdaten als Typkennung (6 Bit).
+	 * @param body Rumpfdaten als Adresse oder Nutzdaten (58 Bit).
+	 * @return Referenz. */
+	protected final long getRef(final int head, final long body) {
+		return (body << 6) | head;
+	}
+
+	/** Diese Methode gibt die Kopfdaten der gegebenen Referenz zurück. */
+	protected final int getRefHead(final long ref) {
+		return (int)(ref & 63);
+	}
+
+	/** Diese Methode gibt die Rumpfdaten der gegebenen Referenz zurück. */
+	protected final long getRefBody(final long ref) {
+		return ref >>> 6;
 	}
 
 	/** Diese Methode gibt die Funktion zu der Referenz zurück, die an der gegebenen Adresse steht, und ist eine Abkürzung für {@link #get(long)
@@ -395,13 +414,81 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return result;
 	}
 
+	@Override
+	public void set(final FEMFunction value) {
+		this.buffer.putLong(8, value != null ? this.put(value) : 0);
+	}
+
+	/** Diese Methode fügt die gegebene Funktion in den Puffer ein und gibt die Referenz darauf zurück.
+	 *
+	 * @param src Funktion.
+	 * @return Referenz auf die Funktion.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
+	 * @throws IllegalArgumentException Wenn die Funktion nicht angefügt werden kann. */
+	public long put(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		synchronized (this.buffer) {
+			final Long result = this.reuseMap.get(Objects.notNull(src));
+			if (result != null) return result.longValue();
+		}
+		return this.customPut(src);
+	}
+
+	/** Diese Methode {@link #put(FEMFunction) überführt} die gegebenen Funktionen in deren Referenzen und gibt die Liste dieser Referenzen zurück.
+	 *
+	 * @param src Funktionen.
+	 * @return Referenzen auf die Funktionen.
+	 * @throws NullPointerException Wenn {@code src} {@code null} ist oder enthält.
+	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
+	 * @throws IllegalArgumentException Wenn mindestens eine der Funktionen nicht angefügt werden kann. */
+	public long[] putAll(final FEMFunction... src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		final int length = src.length;
+		final long[] result = new long[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = this.put(src[i]);
+		}
+		return result;
+	}
+
+	/** Diese Methode gibt die {@link #getRef(int, long) Referenz mit den gegebenen Merkmalen} zurück und speichert diese zur {@link #cleanup() Wiederverwendung}.
+	 *
+	 * @param head Kopfdaten, bspw. Typkennung (6 Bit).
+	 * @param body Rumpfdaten, bspw. Adresse (58 Bit).
+	 * @return Referenz. */
+	protected final long putRef(final int head, final long body) {
+		final long ref = this.getRef(head, body);
+		synchronized (this.buffer) {
+			this.reuseMap.put(this.get(ref), new Long(ref));
+		}
+		return ref;
+	}
+
+	/** Diese Methode reserviert einen neuen Speicherbereich mit der gegebenen Größe und gibt seine Adresse zurück. Diese Adresse ist stets ein Vielfaches von
+	 * {@code 8}.
+	 *
+	 * @param size Größe des Speicherbereichs in Byte.
+	 * @return Adresse des Speicherbereichs.
+	 * @throws IllegalStateException Wenn der Puffer nicht zum schreiben angebunden ist.
+	 * @throws IllegalArgumentException Wenn {@code size} ungültig ist. */
+	protected final long putData(final long size) throws IllegalStateException, IllegalArgumentException {
+		final MappedBuffer buffer = this.buffer;
+		synchronized (buffer) {
+			final long addr = this.next, next = (addr + size + 7) & -8L;
+			if (next < addr) throw new IllegalArgumentException();
+			buffer.grow(next);
+			buffer.putLong(16, next);
+			this.next = next;
+			return addr;
+		}
+	}
+
 	/** Diese Methode gibt die Funktion zu den gegebenen Kopf- und Rumpfdaten zurück.
 	 *
-	 * @param head Kopfdaten mit der Typkennung.
-	 * @param body Rumpfdaten mit der Adresse oder den Nutzdaten.
+	 * @param head Kopfdaten als Typkennung.
+	 * @param body Rumpfdaten als Adresse oder Nutzdaten.
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn die gegebenen Daten ungültig sind. */
-	protected FEMFunction getImpl(final int head, final long body) {
+	protected FEMFunction customGet(final int head, final long body) {
 		switch (head) {
 			case TYPE_VOID:
 				return FEMVoid.INSTANCE;
@@ -409,12 +496,6 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 				return FEMBoolean.TRUE;
 			case TYPE_FALSE:
 				return FEMBoolean.FALSE;
-			case TYPE_IDENT:
-				return this.getByIdent(body);
-			case TYPE_NATIVE:
-				return this.getNativeByAddr(body);
-			case TYPE_FUTURE:
-				return this.getFutureByAddr(body);
 			case TYPE_ARRAY_DATA1:
 				return FEMArray.EMPTY;
 			case TYPE_ARRAY_ADDR1:
@@ -479,64 +560,16 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Funktion zur gegebenen Konstantenkennung zurück.
-	 *
-	 * @param ident Identifikator.
-	 * @return Funktion.
-	 * @throws IllegalArgumentException Wenn der Identifikator ungültig ist. */
-	protected FEMFunction getByIdent(final long ident) throws IllegalArgumentException {
-		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode fügt die gegebene Funktion in den Puffer ein und gibt die Referenz darauf zurück.
-	 *
-	 * @param src Funktion.
-	 * @return Referenz auf die Funktion.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
-	 * @throws IllegalArgumentException Wenn die Funktion nicht angefügt werden kann. */
-	public long put(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		synchronized (this.reuseMap) {
-			final FEMFunction key = Objects.notNull(src);
-			Long result = this.reuseMap.get(key);
-			if (result != null) return result.longValue();
-			result = new Long(this.putAsRef(key));
-			this.reuseMap.put(this.get(result.longValue()), result);
-			return result.longValue();
-		}
-	}
-
-	/** Diese Methode {@link #put(FEMFunction) überführt} die gegebenen Funktionen in deren Referenzen und gibt die Liste dieser Referenzen zurück.
-	 *
-	 * @param src Funktionen.
-	 * @return Referenzen auf die Funktionen.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
-	 * @throws IllegalArgumentException Wenn mindestens eine der Funktionen nicht angefügt werden kann. */
-	public long[] putAll(final FEMFunction... src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int length = src.length;
-		final long[] result = new long[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = this.put(src[i]);
-		}
-		return result;
-	}
-
-	/** Diese Methode gibt die Referenz zur gegebenen Funktion zurück und wird von {@link #put(FEMFunction)} aufgerufen. Die Funktion wird dazu zunächst an
-	 * {@link #putAsIdent(FEMFunction)} weitergeleitet, um dazu die Konstantenkennung zu ermiteln. Wenn diese existiert, wird sie als Referenz geliefert.
-	 * Andernfalls erfolgt eine Falluntersheidung auf dem Typ der Funktion.
+	/** Diese Methode gibt die Referenz zur gegebenen Funktion zurück. Dazu erfolgt auf dem Typ der Funktion eine Fallunterscheidung.
 	 *
 	 * @param src Funktion.
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@code src} {@code null} ist.
-	 * @throws IllegalStateException Wenn {@link #putAsAddr(long)} diese auslöst.
+	 * @throws IllegalStateException Wenn {@link #putData(long)} diese auslöst.
 	 * @throws IllegalArgumentException Wenn die Funktion nicht ausgelagert werden kann. */
-	protected long putAsRef(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final long result = this.putAsIdent(src);
-		if (result != 0) return FEMBuffer.toRef(FEMBuffer.TYPE_IDENT, result);
+	protected long customPut(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		if (src instanceof FEMVoid) return this.putVoidAsRef();
 		if (src instanceof FEMBoolean) return this.putBooleanAsRef((FEMBoolean)src);
-		if (src instanceof FEMNative) return this.putNativeAsRef((FEMNative)src);
 		if (src instanceof FEMFuture) return this.putFutureAsRef((FEMFuture)src);
 		if (src instanceof FEMArray) return this.putArrayAsRef((FEMArray)src);
 		if (src instanceof FEMString) return this.putStringAsRef((FEMString)src);
@@ -555,54 +588,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode reserviert einen neuen Speicherbereich mit der gegebenen Größe und gibt die Adresse seines Beginns zurück. Die Adresse ist stets ein
-	 * Vielfaches von {@code 8}.
-	 *
-	 * @param size Größe des Speicherbereichs in Byte.
-	 * @return Adresse des Beginns des Speicherbereichs.
-	 * @throws IllegalStateException Wenn der Puffer nicht zum schreiben angebunden ist.
-	 * @throws IllegalArgumentException Wenn {@code size} ungültig ist. */
-	protected long putAsAddr(final long size) throws IllegalStateException, IllegalArgumentException {
-		synchronized (this.buffer) {
-			final long addr = this.next, next = (addr + size + 7) & -8L;
-			if (next < addr) throw new IllegalArgumentException();
-			if (next > this.limit) {
-				this.buffer.grow(next);
-				this.limit = this.buffer.size();
-			}
-			this.buffer.putLong(16, next);
-			this.next = next;
-			return addr;
-		}
-	}
-
-	/** Diese Methode gibt die Konstantenkennung der gegebenen Funktion oder zurück, sofern eine solche existiert. Andernfalls wird {@code 0} geliefert.
-	 *
-	 * @param src Funktion.
-	 * @return Konstantenkennung oder {@code 0}.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist. */
-	protected long putAsIdent(final FEMFunction src) throws NullPointerException {
-		return 0;
-	}
-
 	/** Diese Methode gibt die Referenz auf {@link FEMVoid#INSTANCE} zurück. */
 	protected long putVoidAsRef() {
-		return FEMBuffer.toRef(FEMBuffer.TYPE_VOID, 0);
-	}
-
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltenen Nativwert zurück. */
-	protected FEMNative getNativeByAddr(final long addr) throws IllegalArgumentException {
-		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode fügt den gegebenen Nativwert in den Puffer ein und gibt die Referenz darauf zurück. */
-	protected long putNativeAsRef(final FEMNative src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltenen Ergebniswert zurück. */
-	protected FEMFuture getFutureByAddr(final long addr) throws IllegalArgumentException {
-		throw new IllegalArgumentException();
+		return this.getRef(FEMBuffer.TYPE_VOID, 0);
 	}
 
 	/** Diese Methode fügt den gegebenen Ergebniswert in den Puffer ein und gibt die Referenz darauf zurück. */
@@ -629,20 +617,20 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * Wertliste wird mit der Indizierung kodiert. */
 	protected long putArrayAsRef(final FEMArray src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		final int length = src.length();
-		if (length == 0) return FEMBuffer.toRef(FEMBuffer.TYPE_ARRAY_DATA1, 0);
+		if (length == 0) return this.getRef(FEMBuffer.TYPE_ARRAY_DATA1, 0);
 		final int hash = src.hashCode();
 		if (src instanceof CompactArray3) {
 			final int[] table = ((CompactArray3)src).table;
-			final long addr = this.putAsAddr((length * 8L) + (table.length * 4L) + 8);
+			final long addr = this.putData((length * 8L) + (table.length * 4L) + 8);
 			this.buffer.putInt(addr, new int[]{length, hash});
 			this.buffer.putLong(addr + 8, this.putAll(src.value()));
 			this.buffer.putInt(addr + (length * 8L) + 8, table);
-			return FEMBuffer.toRef(FEMBuffer.TYPE_ARRAY_ADDR2, addr);
+			return this.putRef(FEMBuffer.TYPE_ARRAY_ADDR2, addr);
 		} else {
-			final long addr = this.putAsAddr((length * 8L) + 8);
+			final long addr = this.putData((length * 8L) + 8);
 			this.buffer.putInt(addr, new int[]{length, hash});
 			this.buffer.putLong(addr + 8, this.putAll(src.value()));
-			return FEMBuffer.toRef(FEMBuffer.TYPE_ARRAY_ADDR1, addr);
+			return this.putRef(FEMBuffer.TYPE_ARRAY_ADDR1, addr);
 		}
 	}
 
@@ -674,24 +662,24 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	protected long putStringAsRef(FEMString src) throws NullPointerException, IllegalStateException {
 		src = src.compact();
 		final int length = src.length();
-		if (length == 0) return FEMBuffer.toRef(FEMBuffer.TYPE_STRING_DATA1, 0);
-		if (length == 1) return FEMBuffer.toRef(FEMBuffer.TYPE_STRING_DATA2, src.get(0));
+		if (length == 0) return this.getRef(FEMBuffer.TYPE_STRING_DATA1, 0);
+		if (length == 1) return this.getRef(FEMBuffer.TYPE_STRING_DATA2, src.get(0));
 		final int hash = src.hashCode();
 		if (src instanceof FEMString.CompactStringINT8) {
-			final long addr = this.putAsAddr(length + 8);
+			final long addr = this.putData(length + 8);
 			this.buffer.putInt(addr, new int[]{length, hash});
 			this.buffer.put(addr + 8, src.toBytes());
-			return FEMBuffer.toRef(FEMBuffer.TYPE_STRING_ADDR1, addr);
+			return this.putRef(FEMBuffer.TYPE_STRING_ADDR1, addr);
 		} else if (src instanceof FEMString.CompactStringINT16) {
-			final long addr = this.putAsAddr((length * 2L) + 8);
+			final long addr = this.putData((length * 2L) + 8);
 			this.buffer.putInt(addr, new int[]{length, hash});
 			this.buffer.putShort(addr + 8, src.toShorts());
-			return FEMBuffer.toRef(FEMBuffer.TYPE_STRING_ADDR2, addr);
+			return this.putRef(FEMBuffer.TYPE_STRING_ADDR2, addr);
 		} else {
-			final long addr = this.putAsAddr((length * 4L) + 8);
+			final long addr = this.putData((length * 4L) + 8);
 			this.buffer.putInt(addr, new int[]{length, hash});
 			this.buffer.putInt(addr + 8, src.toInts());
-			return FEMBuffer.toRef(FEMBuffer.TYPE_STRING_ADDR3, addr);
+			return this.putRef(FEMBuffer.TYPE_STRING_ADDR3, addr);
 		}
 	}
 
@@ -708,12 +696,12 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt die gegebene Bytefolge in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putBinaryAsRef(final FEMBinary src) throws NullPointerException, IllegalStateException {
 		final int length = src.length();
-		if (length == 0) return FEMBuffer.toRef(FEMBuffer.TYPE_BINARY_DATA1, 0);
-		if (length == 1) return FEMBuffer.toRef(FEMBuffer.TYPE_BINARY_DATA2, src.get(0) & 0xFF);
-		final long addr = this.putAsAddr(length + 8);
+		if (length == 0) return this.getRef(FEMBuffer.TYPE_BINARY_DATA1, 0);
+		if (length == 1) return this.getRef(FEMBuffer.TYPE_BINARY_DATA2, src.get(0) & 0xFF);
+		final long addr = this.putData(length + 8);
 		this.buffer.putInt(addr, new int[]{length, src.hashCode()});
 		this.buffer.put(addr + 8, src.value());
-		return FEMBuffer.toRef(FEMBuffer.TYPE_BINARY_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_BINARY_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt die Dezimalzahl mit den gegebenen Daten ({@code +value: 58}) zurück. */
@@ -734,16 +722,16 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt die gegebene Dezimalzahl in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putIntegerAsRef(final FEMInteger src) throws NullPointerException, IllegalStateException {
 		final long data1 = src.value(), data2 = -data1;
-		if ((0 <= data1) && (data1 <= 0x03FFFFFFFFFFFFFFL)) return FEMBuffer.toRef(FEMBuffer.TYPE_INTEGER_DATA1, data1);
-		if ((0 <= data2) && (data2 <= 0x03FFFFFFFFFFFFFFL)) return FEMBuffer.toRef(FEMBuffer.TYPE_INTEGER_DATA2, data2);
-		final long addr = this.putAsAddr(8);
+		if ((0 <= data1) && (data1 <= 0x03FFFFFFFFFFFFFFL)) return this.getRef(FEMBuffer.TYPE_INTEGER_DATA1, data1);
+		if ((0 <= data2) && (data2 <= 0x03FFFFFFFFFFFFFFL)) return this.getRef(FEMBuffer.TYPE_INTEGER_DATA2, data2);
+		final long addr = this.putData(8);
 		this.buffer.putLong(addr, data1);
-		return FEMBuffer.toRef(FEMBuffer.TYPE_INTEGER_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_INTEGER_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt die Referenz auf den gegebenen Wahrheitswert zurück. */
 	protected long putBooleanAsRef(final FEMBoolean src) {
-		return FEMBuffer.toRef(src.value() ? FEMBuffer.TYPE_TRUE : FEMBuffer.TYPE_FALSE, 0);
+		return this.getRef(src.value() ? FEMBuffer.TYPE_TRUE : FEMBuffer.TYPE_FALSE, 0);
 	}
 
 	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code value: double}) enthaltenen Dezimalbruch zurück. */
@@ -753,9 +741,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt den gegebenen Dezimalbruch in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putDecimalAsRef(final FEMDecimal src) throws NullPointerException, IllegalStateException {
-		final long addr = this.putAsAddr(8);
+		final long addr = this.putData(8);
 		this.buffer.putDouble(addr, src.value());
-		return FEMBuffer.toRef(FEMBuffer.TYPE_DECIMAL_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_DECIMAL_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code value: long}) enthaltene Zeitspanne zurück. */
@@ -763,10 +751,14 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return new FEMDuration(this.buffer.getLong(addr));
 	}
 
+	/** Diese Methode gibt die Zeitspanne mit den gegebenen Daten
+	 * ({@code years: 8, sign: 1, hours: 5, minutes: 6, seconds: 6, days: 18, months: 4, milliseconds: 10}) zurück. */
 	protected FEMDuration getDurationByData1(final long data) throws IllegalArgumentException {
 		return new FEMDuration(data);
 	}
 
+	/** Diese Methode gibt die Zeitspanne mit den gegebenen Daten
+	 * ({@code years: 14, sign: 1, hours: 5, minutes: 6, seconds: 6, days: 12, months: 4, milliseconds: 10}) zurück. */
 	protected FEMDuration getDurationByData2(final long data) throws IllegalArgumentException {
 		return new FEMDuration((data & 0x03FFFFFF) | ((data << 6) & 0xFFFFFFFF00000000L));
 	}
@@ -774,11 +766,11 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt den gegebenen Zeitspanne in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putDurationAsRef(final FEMDuration src) throws NullPointerException, IllegalStateException {
 		final long data = src.value();
-		if (src.yearsValue() <= 0xFF) return FEMBuffer.toRef(FEMBuffer.TYPE_DURATION_DATA1, data);
-		if (src.daysValue() <= 0x0FFF) return FEMBuffer.toRef(FEMBuffer.TYPE_DURATION_DATA2, (data & 0x03FFFFFF) | ((data & 0xFFFFFFFF00000000L) >>> 6));
-		final long addr = this.putAsAddr(8);
+		if (src.yearsValue() <= 0xFF) return this.getRef(FEMBuffer.TYPE_DURATION_DATA1, data);
+		if (src.daysValue() <= 0x0FFF) return this.getRef(FEMBuffer.TYPE_DURATION_DATA2, (data & 0x03FFFFFF) | ((data & 0xFFFFFFFF00000000L) >>> 6));
+		final long addr = this.putData(8);
 		this.buffer.putLong(addr, data);
-		return FEMBuffer.toRef(FEMBuffer.TYPE_DURATION_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_DURATION_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt die Zeitangabe mit den gegebenen Daten
@@ -801,11 +793,11 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt die gegebene Zeitangabe in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putDatetimeAsRef(final FEMDatetime src) throws NullPointerException, IllegalStateException {
 		final long data = src.value();
-		if (!src.hasDate()) return FEMBuffer.toRef(FEMBuffer.TYPE_DATETIME_DATA1, data);
-		if (!src.hasTime()) return FEMBuffer.toRef(FEMBuffer.TYPE_DATETIME_DATA2, data >>> 6);
-		final long addr = this.putAsAddr(8);
+		if (!src.hasDate()) return this.getRef(FEMBuffer.TYPE_DATETIME_DATA1, data);
+		if (!src.hasTime()) return this.getRef(FEMBuffer.TYPE_DATETIME_DATA2, data >>> 6);
+		final long addr = this.putData(8);
 		this.buffer.putLong(addr, data);
-		return FEMBuffer.toRef(FEMBuffer.TYPE_DATETIME_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_DATETIME_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code functionRef: long}) enthaltenen Funktionszeiger zurück. */
@@ -815,9 +807,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt den gegebenen Funktionszeiger in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putHandlerAsRef(final FEMHandler src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final long addr = this.putAsAddr(8);
+		final long addr = this.putData(8);
 		this.buffer.putLong(addr, this.put(src.value));
-		return FEMBuffer.toRef(FEMBuffer.TYPE_HANDLER_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_HANDLER_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt die Objektreferenz mit den gegebenen Daten ({@code ref: 26, type: 16, owner: 16}) zurück. */
@@ -838,17 +830,17 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt den gegebenen Objektreferenz in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putObjectAsRef(final FEMObject src) throws NullPointerException, IllegalStateException {
 		final long data = src.value();
-		if (src.refValue() <= 0x03FFFFFF) return FEMBuffer.toRef(FEMBuffer.TYPE_OBJECT_DATA1, data);
-		if (src.typeValue() <= 0x03FF) return FEMBuffer.toRef(FEMBuffer.TYPE_OBJECT_DATA2, (data & 0x03FFFFFFL) | ((data & 0xFFFFFFFF00000000L) >>> 6));
-		final long addr = this.putAsAddr(8);
+		if (src.refValue() <= 0x03FFFFFF) return this.getRef(FEMBuffer.TYPE_OBJECT_DATA1, data);
+		if (src.typeValue() <= 0x03FF) return this.getRef(FEMBuffer.TYPE_OBJECT_DATA2, (data & 0x03FFFFFFL) | ((data & 0xFFFFFFFF00000000L) >>> 6));
+		final long addr = this.putData(8);
 		this.buffer.putLong(addr, data);
-		return FEMBuffer.toRef(FEMBuffer.TYPE_OBJECT_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_OBJECT_ADDR1, addr);
 	}
 
-	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code idRef: long, nameRef: long, functionRef: long}) enthaltenen Platzhalter zurück. */
+	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code idRef: long, nameRef: long, targetRef: long}) enthaltenen Platzhalter zurück. */
 	protected FEMProxy getProxyByAddr(final long addr) throws IllegalArgumentException {
 		FEMProxy result;
-		synchronized (this.proxyGetMap) {
+		synchronized (this.buffer) {
 			final Long key = new Long(addr);
 			result = this.proxyGetMap.get(key);
 			if (result != null) return result;
@@ -862,16 +854,16 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt den gegebenen Platzhalter in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putProxyAsRef(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
 		Long addr;
-		synchronized (this.proxyPutMap) {
+		synchronized (this.buffer) {
 			addr = this.proxyPutMap.get(src.id());
-			if (addr != null) return FEMBuffer.toRef(FEMBuffer.TYPE_PROXY_ADDR1, addr.longValue());
+			if (addr != null) return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr.longValue());
 			final long ref = this.put(src.id());
-			addr = new Long(this.putAsAddr(24));
+			addr = new Long(this.putData(24));
 			this.buffer.putLong(addr.longValue(), ref);
 			this.proxyPutMap.put(this.get(ref, FEMValue.class), addr);
 		}
 		this.buffer.putLong(addr.longValue() + 8, this.putAll(src.name(), src.get()));
-		return FEMBuffer.toRef(FEMBuffer.TYPE_PROXY_ADDR1, addr.longValue());
+		return this.putRef(FEMBuffer.TYPE_PROXY_ADDR1, addr.longValue());
 	}
 
 	/** Diese Methode gibt die Parameterfunktion zum gegebenen Index zurück. */
@@ -881,7 +873,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt die gegebene Parameterfunktion in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putParamAsRef(final FEMParam src) throws NullPointerException, IllegalStateException {
-		return FEMBuffer.toRef(FEMBuffer.TYPE_PARAM_DATA1, src.index());
+		return this.getRef(FEMBuffer.TYPE_PARAM_DATA1, src.index());
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code count: int, align: int, callRef: long, paramRef: long[count]}) enthaltene Funktionkette
@@ -893,11 +885,11 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt die gegebene Funktionkette in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putConcatAsRef(final ConcatFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		final int count = src.params.length;
-		final long addr = this.putAsAddr((count * 8L) + 16L);
+		final long addr = this.putData((count * 8L) + 16L);
 		this.buffer.putInt(addr, new int[]{count, 0});
 		this.buffer.putLong(addr + 8, this.put(src.function));
 		this.buffer.putLong(addr + 16, this.putAll(src.params));
-		return FEMBuffer.toRef(FEMBuffer.TYPE_CONCAT_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_CONCAT_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code functionRef: long}) enthaltene Funktionsbindung zurück. */
@@ -907,9 +899,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt die gegebene Funktionsbindung in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putClosureAsRef(final ClosureFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final long addr = this.putAsAddr(8);
+		final long addr = this.putData(8);
 		this.buffer.putLong(addr, this.put(src.function));
-		return FEMBuffer.toRef(FEMBuffer.TYPE_CLOSURE_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_CLOSURE_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt dden im gegebenen Speicherbereich ({@code count: int, align: int, callRef: long, paramRef: long[count]}) enthaltenen Funktionsaufruf
@@ -921,30 +913,40 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt den gegebenen Funktionsaufruf in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putCompositeAsRef(final CompositeFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		final int count = src.params.length;
-		final long addr = this.putAsAddr((count * 8L) + 16L);
+		final long addr = this.putData((count * 8L) + 16L);
 		this.buffer.putInt(addr, new int[]{count, 0});
 		this.buffer.putLong(addr + 8, this.put(src.function));
 		this.buffer.putLong(addr + 16, this.putAll(src.params));
-		return FEMBuffer.toRef(FEMBuffer.TYPE_COMPOSITE_ADDR1, addr);
+		return this.putRef(FEMBuffer.TYPE_COMPOSITE_ADDR1, addr);
 	}
 
-	/** Diese Methode gibt den {@link MappedBuffer Dateipuffer} zurück, in welchen die Funktionen abgelegt sind.
+	@Override
+	public long emu() {
+		synchronized (this.buffer) {
+			return EMU.fromObject(this) + EMU.fromAll(this.buffer, this.reuseMap, this.proxyGetMap, this.proxyPutMap) + EMU.fromAll(this.reuseMap.keySet())
+				+ EMU.fromAll(this.proxyGetMap.values()) + EMU.fromAll(this.proxyPutMap.keySet());
+		}
+	}
+
+	/** Diese Methode gibt den {@link MappedBuffer Dateipuffer} zurück, in welchen die Funktionen ausgelagert sind.
 	 *
 	 * @return Dateipuffer. */
 	public MappedBuffer buffer() {
 		return this.buffer;
 	}
 
+	/** Diese Methode leert den Puffer zur Wiederverwendung der Referenzen der verwalteten Funktionen sowie die zur Behandlung der Rekursion bei Platzhaltern. */
 	public void cleanup() {
-		synchronized (this.reuseMap) {
+		synchronized (this.buffer) {
 			this.reuseMap.clear();
+			this.proxyGetMap.clear();
+			this.proxyPutMap.clear();
 		}
 	}
 
 	@Override
-	public long emu() {
-		return EMU.fromObject(this) + this.buffer.emu() + this.reuseMap.emu() + this.proxyGetMap.emu() + this.proxyPutMap.emu()
-			+ EMU.fromAll(this.proxyGetMap.values()) + EMU.fromAll(this.proxyPutMap.keySet());
+	public String toString() {
+		return Objects.toInvokeString(this, this.buffer);
 	}
 
 }

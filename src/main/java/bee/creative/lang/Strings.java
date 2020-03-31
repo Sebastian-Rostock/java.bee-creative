@@ -479,6 +479,50 @@ public class Strings {
 		return Strings.applyAll(pattern, string, true, true);
 	}
 
+	/** Diese Methode gibt den Abschnitt der gegebenen Zeichenkette nach dem ersten Vorkommen des gegebenen Trennzeichens zurück. Wenn das Trennzeichen nicht
+	 * gefunden wird, wird die gegebene Zeichenkette geliefert.
+	 *
+	 * @param string Zeichenkette.
+	 * @param token Trennzeichen.
+	 * @return Abschnitt oder Zeichenkette. */
+	public static String substringAfterFirst(final String string, final char token) {
+		final int index = string.indexOf(token);
+		return index < 0 ? string : string.substring(index + 1);
+	}
+
+	/** Diese Methode gibt den Abschnitt der gegebenen Zeichenkette nach dem letzten Vorkommen des gegebenen Trennzeichens zurück. Wenn das Trennzeichen nicht
+	 * gefunden wird, wird die gegebene Zeichenkette geliefert.
+	 *
+	 * @param string Zeichenkette.
+	 * @param token Trennzeichen.
+	 * @return Abschnitt oder Zeichenkette. */
+	public static String substringAfterLast(final String string, final char token) {
+		final int index = string.lastIndexOf(token);
+		return index < 0 ? string : string.substring(index + 1);
+	}
+
+	/** Diese Methode gibt den Abschnitt der gegebenen Zeichenkette vor dem ersten Vorkommen des gegebenen Trennzeichens zurück. Wenn das Trennzeichen nicht
+	 * gefunden wird, wird die gegebene Zeichenkette geliefert.
+	 *
+	 * @param string Zeichenkette.
+	 * @param token Trennzeichen.
+	 * @return Abschnitt oder Zeichenkette. */
+	public static String substringBeforeFirst(final String string, final char token) {
+		final int index = string.indexOf(token);
+		return index < 0 ? string : string.substring(0, index);
+	}
+
+	/** Diese Methode gibt den Abschnitt der gegebenen Zeichenkette vor dem letzten Vorkommen des gegebenen Trennzeichens zurück. Wenn das Trennzeichen nicht
+	 * gefunden wird, wird die gegebene Zeichenkette geliefert.
+	 *
+	 * @param string Zeichenkette.
+	 * @param token Trennzeichen.
+	 * @return Abschnitt oder Zeichenkette. */
+	public static String substringBeforeLast(final String string, final char token) {
+		final int index = string.lastIndexOf(token);
+		return index < 0 ? string : string.substring(0, index);
+	}
+
 	/** Diese Methode gibt einen {@link Getter} zurück, der seine Eingabe über {@link Pattern#compile(String, int)} in einen kompilierten regulären Ausdruck
 	 * umwandelt.
 	 *

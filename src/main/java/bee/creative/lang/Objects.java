@@ -650,15 +650,15 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@code Objects.toStringCall(false, false, object.getClass().getSimpleName(), args)}.
+	 * {@code Objects.toStringCall(false, false, object, args)}.
 	 *
-	 * @see #toFormatString(boolean, boolean, String, Object...)
+	 * @see #toFormatString(boolean, boolean, Object, Object...)
 	 * @param object {@link Object}.
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code object} bzw. {@code args} {@code null} ist. */
 	public static String toInvokeString(final Object object, final Object... args) throws NullPointerException {
-		return Objects.toFormatString(false, false, object.getClass().getSimpleName(), args);
+		return Objects.toFormatString(false, false, object, args);
 	}
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
@@ -697,7 +697,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@code Objects.toStringCall(format, label, object.getClass().getSimpleName(), args)}.
+	 * {@code Objects.toStringCall(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args)}.
 	 *
 	 * @see #toFormatString(boolean, boolean, String, Object...)
 	 * @param format Formatiermodus.
@@ -707,7 +707,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static String toFormatString(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
-		return Objects.toFormatString(format, label, object.getClass().getSimpleName(), args);
+		return Objects.toFormatString(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args);
 	}
 
 	/** Diese Methode gibt das gegebene Objekt zurück, wenn dieses nicht {@code null} ist.

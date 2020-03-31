@@ -242,15 +242,15 @@ public class Natives {
 		return Natives.formatClass(field.getDeclaringClass()) + "." + field.getName();
 	}
 
-	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Klasse} zurück. Diese wird über {@link Class#getCanonicalName()} ermittelt. Die Klassen
-	 * {@code Object.class} und {@code int[].class} liefert beispielsweise {@code "java.lang.Object"} bzw. {@code "int[]"}.
+	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Klasse} zurück. Diese wird über {@link Class#getName()} und {@link Class#isArray()}
+	 * ermittelt. Die Klassen {@code Object.class} und {@code int[].class} liefert beispielsweise {@code "java.lang.Object"} bzw. {@code "int[]"}.
 	 *
 	 * @see Class#getCanonicalName()
 	 * @param clazz Klasse.
 	 * @return Klassentext.
 	 * @throws NullPointerException Wenn {@code clazz} {@code null} ist. */
 	public static String formatClass(final Class<?> clazz) throws NullPointerException {
-		return clazz.getCanonicalName();
+		return clazz.isArray() ? Natives.formatClass(clazz.getComponentType()) + "[]" : clazz.getName();
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Parametertypen} zurück. Das Format der Textdarstellung ist

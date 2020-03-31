@@ -1033,7 +1033,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param that Wertliste.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMArray that) throws NullPointerException {
+	public boolean equals(final FEMArray that) throws NullPointerException {
+		if (this == that) return true;
 		final int length = this.length;
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;

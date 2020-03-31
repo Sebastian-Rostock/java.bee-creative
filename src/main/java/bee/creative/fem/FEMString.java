@@ -1447,6 +1447,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public boolean equals(final FEMString that) throws NullPointerException {
+		if (this == that) return true;
 		final int length = this.length;
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;

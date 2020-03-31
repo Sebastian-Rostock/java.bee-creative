@@ -255,7 +255,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public final int hashCode() {
-			return this.function.hashCode() ^ Objects.hash((Object[])this.params);
+			return Objects.hashPush(Objects.hashPush(Objects.hash((Object[])this.params), Objects.hash(this.function)), 1231);
 		}
 
 		@Override
@@ -298,7 +298,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public final int hashCode() {
-			return this.function.hashCode() ^ 789123456;
+			return Objects.hashPush(Objects.hash(this.function), 1233);
 		}
 
 		@Override
@@ -365,7 +365,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public final int hashCode() {
-			return this.function.hashCode() ^ Objects.hash((Object[])this.params);
+			return Objects.hashPush(Objects.hashPush(Objects.hash((Object[])this.params), Objects.hash(this.function)), 1235);
 		}
 
 		@Override
