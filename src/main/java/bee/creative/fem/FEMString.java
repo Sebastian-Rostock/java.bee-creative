@@ -717,11 +717,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	/** Diese Methode gibt eine uniforme Zeichenkette mit der gegebenen Länge zurück, deren Codepoints alle gleich dem gegebenen sind.
 	 *
-	 * @param item Codepoint.
 	 * @param length Länge.
+	 * @param item Codepoint.
 	 * @return Zeichenkette.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static FEMString from(final int item, final int length) throws IllegalArgumentException {
+	public static FEMString from(final int length, final int item) throws IllegalArgumentException {
 		if (length == 0) return FEMString.EMPTY;
 		return new UniformString(length, item);
 	}
