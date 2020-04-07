@@ -1,16 +1,13 @@
 package bee.creative.qs;
 
-/** Diese Schnittstelle definiert eine {@link QN Knotenmenge} mit Bezug zu einem{@link #store() Graphspeicher}.
+/** Diese Schnittstelle definiert eine {@link QXSet Menge} von {@link QN Hyperknoten}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-interface QNSet extends QXSet<QN> {
+public interface QNSet extends QXSet<QN, QNSet> {
 
-	@Override
-	QNSet clone();
-
-	/** Diese Methode gibt die Menge der nichtleeren {@link QN#value() Textwerte} aller in dieser Menge enthaltenen Knoten zurück.
-	 *
-	 * @return Menge der Textwerte. */
-	QVSet values();
+	/** Diese Methode ist eine Abkürzung für {@link QVSet#withNodes(QNSet) this.owner().values().withNodes(this)}.
+	 * 
+	 * @return Wertzuweisungen mit Hyperknoten in dieser Menge. */
+	public QVSet values();
 
 }
