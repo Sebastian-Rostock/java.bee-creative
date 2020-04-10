@@ -9,7 +9,8 @@ import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit {@link Integer}-Schlüsseln und beliebigen Wertobjekten.
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit {@link Integer}-Schlüsseln, beliebigen Wertobjekten und geringem
+ * {@link AbstractHashData Speicherverbrauch}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ der Werte. */

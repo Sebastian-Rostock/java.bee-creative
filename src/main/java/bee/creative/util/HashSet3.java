@@ -3,7 +3,8 @@ package bee.creative.util;
 import java.util.Collection;
 import java.util.Set;
 
-/** Diese Klasse erweitert ein {@link HashSet}, dessen Elemente über Reverenzvergleich und {@link System#identityHashCode(Object)} abgeglichen werden.
+/** Diese Klasse erweitert ein {@link HashSet} mit geringem {@link AbstractHashData Speicherverbrauch}, dessen Elemente über Reverenzvergleich und
+ * {@link System#identityHashCode(Object)} abgeglichen werden.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */

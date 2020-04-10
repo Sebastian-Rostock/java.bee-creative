@@ -9,7 +9,8 @@ import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüsselobjekten und {@link Integer}-Werten.
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüsselobjekten, {@link Integer}-Werten und geringem
+ * {@link AbstractHashData Speicherverbrauch}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel. */
@@ -208,7 +209,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 
 	/** Diese Methode erhöht den zum gegebenen Schlüssel hinterlegten Wert um das gegebene Inkrement. Wenn noch kein Wert hinterlegt ist, wird das Inkrement
 	 * hinterlegt.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @param value Inklement */
 	public void add(final GKey key, final int value) {

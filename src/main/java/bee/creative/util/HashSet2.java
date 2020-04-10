@@ -5,7 +5,8 @@ import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse erweitert ein {@link HashSet} um einen Streuwertpuffer, analog zu {@link java.util.HashSet}.
+/** Diese Klasse erweitert ein {@link HashSet} um einen Streuwertpuffer mit geringem {@link AbstractHashData Speicherverbrauch}, analog zu
+ * {@link java.util.HashSet}.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */

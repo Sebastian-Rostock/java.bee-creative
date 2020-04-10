@@ -45,10 +45,20 @@ import bee.creative.lang.Objects;
  * <td>34..36 x capacity + 64..112 ( 94..100 % )</td>
  * </tr>
  * <tr>
- * <td>{@link bee.creative.util.HashMap}</td>
+ * <td>{@link bee.creative.util.HashMap}<br>
+ * {@link bee.creative.util.HashMap3}<br>
+ * {@link bee.creative.util.HashMapIO}<br>
+ * {@link bee.creative.util.HashMapOI}</td>
  * <td>32</td>
  * <td>16 x capacity + 96 ( 44 % )</td>
  * <td colspan="2">13..16 x capacity + 96 ( 36..44 % )</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashMapLO}<br>
+ * {@link bee.creative.util.HashMapOL}</td>
+ * <td>32</td>
+ * <td>20 x capacity + 96 ( 56 % )</td>
+ * <td colspan="2">17..20 x capacity + 96 ( 47..56 %)</td>
  * </tr>
  * <tr>
  * <td>{@link bee.creative.util.HashMap2}</td>
@@ -65,10 +75,18 @@ import bee.creative.lang.Objects;
  * <td>34..36 x capacity + 80..128 ( 95..100 % )</td>
  * </tr>
  * <tr>
- * <td>{@link bee.creative.util.HashSet}</td>
+ * <td>{@link bee.creative.util.HashSet}<br>
+ * {@link bee.creative.util.HashSet3}<br>
+ * {@link bee.creative.util.HashSetI}</td>
  * <td>32</td>
- * <td>12 x capacity +80 ( 33 % )</td>
+ * <td>12 x capacity + 80 ( 33 % )</td>
  * <td colspan="2">9..12 x capacity + 80 ( 25..33 % )</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashSetL}</td>
+ * <td>32</td>
+ * <td>16 x capacity + 80 ( 44 % )</td>
+ * <td colspan="2">13..16 x capacity + 80 ( 36..44 % )</td>
  * </tr>
  * <tr>
  * <td>{@link bee.creative.util.HashSet2}</td>

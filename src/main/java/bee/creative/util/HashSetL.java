@@ -9,7 +9,8 @@ import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit {@link Long} Elementen.
+/** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit {@link Long} Elementen und geringem {@link AbstractHashData
+ * Speicherverbrauch}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class HashSetL extends AbstractHashSet<Long> implements Serializable, Cloneable {

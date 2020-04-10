@@ -10,9 +10,9 @@ import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit beliebigen Elementen. Das {@link #contains(Object) Finden} von
- * Elementen benötigt ca. 45 % der Rechenzeit, die ein {@link java.util.HashSet} benötigen würde. {@link #add(Object) Einfügen} und {@link #remove(Object)
- * Entfernen} von Elementen liegen dazu bei ca. 60 % bzw. 85 % der Rechenzeit.
+/** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit beliebigen Elementen und geringem {@link AbstractHashData
+ * Speicherverbrauch}. Das {@link #contains(Object) Finden} von Elementen benötigt ca. 45 % der Rechenzeit, die ein {@link java.util.HashSet} benötigen würde.
+ * {@link #add(Object) Einfügen} und {@link #remove(Object) Entfernen} von Elementen liegen dazu bei ca. 60 % bzw. 85 % der Rechenzeit.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */

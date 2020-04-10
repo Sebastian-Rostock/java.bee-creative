@@ -3,7 +3,8 @@ package bee.creative.util;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-/** Diese Klasse implementiert eine {@link HashMap}, deren Schlüssel über Reverenzvergleich und {@link System#identityHashCode(Object)} abgeglichen werden.
+/** Diese Klasse implementiert eine {@link HashMap} mit geringem {@link AbstractHashData Speicherverbrauch}, deren Schlüssel über Reverenzvergleich und
+ * {@link System#identityHashCode(Object)} abgeglichen werden.
  *
  * @see IdentityHashMap
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

@@ -9,7 +9,8 @@ import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüsselobjekten und {@link Long}-Werten.
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit beliebigen Schlüsselobjekten, {@link Long}-Werten und geringem
+ * {@link AbstractHashData Speicherverbrauch}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel. */
@@ -201,7 +202,7 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	@Override
 	public Long put(final GKey key, final Long value) {
 		final long value2 = value.longValue();
-		int count = this.count, index = this.putIndexImpl(key);
+		final int count = this.count, index = this.putIndexImpl(key);
 		final Long result = (count != this.count) ? null : this.values[index];
 		this.values[index] = value2;
 		return result;
@@ -209,12 +210,12 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 
 	/** Diese Methode erhöht den zum gegebenen Schlüssel hinterlegten Wert um das gegebene Inkrement. Wenn noch kein Wert hinterlegt ist, wird das Inkrement
 	 * hinterlegt.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @param value Inklement */
 	public void add(final GKey key, final long value) {
 		final int count = this.count, index = this.putIndexImpl(key);
-		long start = (count != this.count) ? 0 : this.values[index];
+		final long start = (count != this.count) ? 0 : this.values[index];
 		this.values[index] = start + value;
 	}
 
