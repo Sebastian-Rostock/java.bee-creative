@@ -36,6 +36,22 @@ public interface QESet extends QXSet<QE, QESet> {
 	 * @return Objektknoten der Hyperkanten dieser Menge. */
 	public QNSet objects();
 
+	/** Diese Methode speichert alle in dieser Menge enthaltenen Hyperkanten im {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn dadurch
+	 * der Inhalt des Graphspeichers verändert wurde.
+	 *
+	 * @see QE#put()
+	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst. */
+	public boolean putAll();
+
+	/** Diese Methode entfernt alle in dieser Menge enthaltenen Hyperkanten aus dem {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn
+	 * dadurch der Inhalt des Graphspeichers verändert wurde. Von den daraufhin nicht mehr in Hyperkanten verwendeten {QN Hyperknoten} bleiben nur die mit
+	 * {@link QN#value() Textwert} erhalten.
+	 *
+	 * @see QE#pop()
+	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst. */
+	@Override
+	public boolean popAll();
+
 	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten zurück, die sich aus denen dieser Menge durch Ersetzung ihres {@link QE#context() Kontextknoten}
 	 * mit dem gegebenen ergeben.
 	 *
@@ -151,7 +167,7 @@ public interface QESet extends QXSet<QE, QESet> {
 	public QESet havingSubjects(final QNSet subjects) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten mit dem gegebenen {@link QE#object() Objektknoten}.
-	 * 
+	 *
 	 * @see #havingObjects(QNSet)
 	 * @param object Objektknotenfilter.
 	 * @return Hyperkanten mit dem gegebenen Objektknoten. */
@@ -165,6 +181,6 @@ public interface QESet extends QXSet<QE, QESet> {
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newEdges(Iterable) this.owner().newEdges(this)}. */
 	@Override
-	public QESet toCopy();
+	public QESet copy();
 
 }

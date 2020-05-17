@@ -8,15 +8,21 @@ package bee.creative.qs;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QS {
 
-	/** Diese Methode ist eine Abkürzung für {@link #edges() this.edges().nodes())}.
-	 * 
+	/** Diese Methode gibt eine Mengensicht auf alle Hyperknoten zurück, die über einen {@link QN#value() Textwert} verfügen. Sie ist eine Abkürzung für
+	 * {@link #values() this.values().nodes())}.
+	 *
 	 * @return Hyperknoten. */
 	public QNSet nodes();
 
-	/** Diese Methode gibt eine Mengensicht auf alle die diesem Graphspeicher enthaltenen {@link QE Hyperkanten} zurück.
+	/** Diese Methode gibt eine Mengensicht auf alle gespeicherten {@link QE Hyperkanten} zurück.
 	 *
 	 * @return Hyperkanten. */
 	public QESet edges();
+
+	/** Diese Methode gibt eine Mengensicht auf alle gespeicherten Textwerte zurück.
+	 *
+	 * @return Textwerte. */
+	public QVSet values();
 
 	/** Diese Methode ist eine Abkürzung für {@link #newEdge(QN) this.newEdge(this.newNode())}.
 	 *
@@ -62,21 +68,23 @@ public interface QS {
 	public QESet newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt einen neuen temporären {@link QN Hyperknoten} zurück, der von diesem Graphspeicher {@link QN#owner() verwaltet} wird und dessen
-	 * {@link QN#ident() Kennung} in diesem Graphspeicher einzigartig ist. Der gelieferte Hyperknoten wird dabei nicht in den Graphspeicher {@link QNSet#putAll()
-	 * eingefügt} und kann darüber hinaus bereits im Graphspeicher {@link QNSet#hasAny() enthalten} sein.
+	 * {@link QN#key() Kennung} in diesem Graphspeicher einzigartig ist. Der gelieferte Hyperknoten wird dabei nicht in den Graphspeicher eingefügt, kann aber
+	 * bereits im Graphspeicher {@link QNSet#hasAny() enthalten} sein.
 	 *
 	 * @return Hyperknoten. */
 	public QN newNode();
 
-	/** Diese Methode gibt einen {@link QN Hyperknoten} mit dem gegebenen {@link QN#value() Textwert} zurück, der von diesem Graphspeicher {@link QN#owner()
-	 * verwaltet} wird und dessen Textwert in diesem Graphspeicher einzigartig ist. Der gelieferte Hyperknoten wird dabei nicht in den Graphspeicher
-	 * {@link QNSet#putAll() eingefügt} und kann darüber hinaus bereits im Graphspeicher {@link QNSet#hasAny() enthalten} sein.
+	/** Diese Methode gibt einen temporären {@link QN Hyperknoten} mit dem gegebenen {@link QN#value() Textwert} zurück, der von diesem Graphspeicher
+	 * {@link QN#owner() verwaltet} wird und dessen Textwert in diesem Graphspeicher einzigartig ist. Der gelieferte Hyperknoten wird dabei zum Textwert
+	 * ermittelt, wenn dieser bereits in den Graphspeicher eingefügt wurde. Andernfalls wird ein neuer Hyperknoten erzeugt und zusammen mit dem Textwert in den
+	 * Graphspeicher eingefügt.<br>
+	 * Die Textwert der in den Hyperkanten nicht mehr verwendten Hyperknoten zu entfernen
 	 *
 	 * @return Hyperknoten. */
 	public QN newNode(String text);
 
 	/** Diese Methode erzeigt die gegebene Anzahl {@link #newNode() neuer temporärer Hyperknoten} ung gibt diese in einer temporären Menge zurück.
-	 * 
+	 *
 	 * @param size Anzahl der Hyperknoten.
 	 * @return temporäre Hyperknotenmenge. */
 	public QNSet newNodes(final long size) throws IllegalArgumentException;

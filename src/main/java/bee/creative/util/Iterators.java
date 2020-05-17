@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -421,6 +422,194 @@ public class Iterators {
 
 	}
 
+	/** Diese Klasse implementiert {@link Iterators#unionIterator(Comparator, Iterator, Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class UnionIterator<GItem> extends BaseIterator<GItem> {
+
+		public final Iterator<? extends GItem> iterator1;
+
+		public final Iterator<? extends GItem> iterator2;
+
+		public final Comparator<? super GItem> comparator;
+
+		protected GItem item1;
+
+		protected GItem item2;
+
+		public UnionIterator(final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2, final Comparator<? super GItem> comparator) {
+			this.iterator1 = iterator1;
+			this.iterator2 = iterator2;
+			this.comparator = Objects.notNull(comparator);
+			this.item1 = this.next1();
+			this.item2 = this.next2();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return (this.item1 != null) || (this.item2 != null);
+		}
+
+		@Override
+		public GItem next() {
+			final GItem item1 = this.item1, item2 = this.item2;
+			if (item1 == null) {
+				if (item2 == null) throw new NoSuchElementException();
+				this.item2 = this.next2();
+				return item2;
+			}
+			if (item2 == null) {
+				if (item1 == null) throw new NoSuchElementException();
+				this.item1 = this.next1();
+				return item1;
+			}
+			final int order = this.comparator.compare(item1, item2);
+			if (order < 0) {
+				this.item1 = this.next1();
+				return item1;
+			}
+			if (order > 0) {
+				this.item2 = this.next2();
+				return item2;
+			}
+			this.item1 = this.next1();
+			this.item2 = this.next2();
+			return item1;
+		}
+
+		GItem next1() {
+			return this.iterator1.hasNext() ? this.iterator1.next() : null;
+		}
+
+		GItem next2() {
+			return this.iterator2.hasNext() ? this.iterator2.next() : null;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.comparator);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#exceptIterator(Comparator, Iterator, Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ExceptIterator<GItem> extends BaseIterator<GItem> {
+
+		public final Iterator<? extends GItem> iterator1;
+
+		public final Iterator<? extends GItem> iterator2;
+
+		public final Comparator<? super GItem> comparator;
+
+		protected GItem item1;
+
+		protected GItem item2;
+
+		public ExceptIterator(final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2, final Comparator<? super GItem> comparator) {
+			this.iterator1 = iterator1;
+			this.iterator2 = iterator2;
+			this.comparator = Objects.notNull(comparator);
+			this.item2 = this.next2();
+			this.item1 = this.next1();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.item1 != null;
+		}
+
+		@Override
+		public GItem next() {
+			final GItem item = this.item1;
+			if (item == null) throw new NoSuchElementException();
+			this.item1 = this.next1();
+			return item;
+		}
+
+		GItem next1() {
+			while (this.iterator1.hasNext()) {
+				final GItem item1 = this.iterator1.next();
+				if (this.item2 == null) return item1;
+				final int order = this.comparator.compare(item1, this.item2);
+				if (order < 0) return item1;
+				if (order == 0) {
+					this.item2 = this.next2();
+				}
+			}
+			return null;
+		}
+
+		GItem next2() {
+			return this.iterator2.hasNext() ? this.iterator2.next() : null;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.comparator);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterators#intersectIterator(Comparator, Iterator, Iterator)}. */
+	@SuppressWarnings ("javadoc")
+	public static class IntersectIterator<GItem> extends BaseIterator<GItem> {
+
+		public final Iterator<? extends GItem> iterator1;
+
+		public final Iterator<? extends GItem> iterator2;
+
+		public final Comparator<? super GItem> comparator;
+
+		protected GItem item;
+
+		public IntersectIterator(final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2, final Comparator<? super GItem> comparator) {
+			this.iterator1 = iterator1;
+			this.iterator2 = Objects.notNull(iterator2);
+			this.comparator = Objects.notNull(comparator);
+			this.item = this.next0();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.item != null;
+		}
+
+		@Override
+		public GItem next() {
+			final GItem item = this.item;
+			if (item == null) throw new NoSuchElementException();
+			this.item = this.next0();
+			return item;
+		}
+
+		GItem next0() {
+			if (!this.iterator1.hasNext()) return null;
+			GItem item1 = this.iterator1.next();
+			if (!this.iterator2.hasNext()) return null;
+			GItem item2 = this.iterator2.next();
+			int order = this.comparator.compare(item1, item2);
+			while (order != 0) {
+				while (order < 0) {
+					if (!this.iterator1.hasNext()) return null;
+					item1 = this.iterator1.next();
+					order = this.comparator.compare(item1, item2);
+				}
+				while (order > 0) {
+					if (!this.iterator2.hasNext()) return null;
+					item2 = this.iterator2.next();
+					order = this.comparator.compare(item1, item2);
+				}
+			}
+			return item1;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.comparator);
+		}
+
+	}
+
 	/** Diese Methode gibt das {@code index}-te Elemente des gegebenen {@link Iterator} zurück.
 	 *
 	 * @param <GItem> Typ des Elements.
@@ -793,6 +982,43 @@ public class Iterators {
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist. */
 	public static <GItem> Iterator<GItem> unmodifiableIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
 		return new UnmodifiableIterator<>(iterator);
+	}
+
+	public static <GItem> Iterator<GItem> unionIterator(final Comparator<? super GItem> comparator, final Iterator<? extends GItem> iterator1,
+		final Iterator<? extends GItem> iterator2) {
+		return new UnionIterator<>(iterator1, iterator2, comparator);
+	}
+
+	public static <GItem> Iterator<GItem> unionIterator(final Comparator<? super GItem> comparator,
+		final Iterator<? extends Iterator<? extends GItem>> iterator) {
+		if (!iterator.hasNext()) return Iterators.emptyIterator();
+		@SuppressWarnings ("unchecked")
+		Iterator<GItem> result = (Iterator<GItem>)iterator.next();
+		while (iterator.hasNext()) {
+			result = Iterators.unionIterator(comparator, result, iterator.next());
+		}
+		return result;
+	}
+
+	public static <GItem> Iterator<GItem> exceptIterator(final Comparator<? super GItem> comparator, final Iterator<? extends GItem> iterator1,
+		final Iterator<? extends GItem> iterator2) {
+		return new ExceptIterator<>(iterator1, iterator2, comparator);
+	}
+
+	public static <GItem> Iterator<GItem> intersectIterator(final Comparator<? super GItem> comparator, final Iterator<? extends GItem> iterator1,
+		final Iterator<? extends GItem> iterator2) {
+		return new IntersectIterator<>(iterator1, iterator2, comparator);
+	}
+
+	public static <GItem> Iterator<GItem> intersectIterator(final Comparator<? super GItem> comparator,
+		final Iterator<? extends Iterator<? extends GItem>> iterator) {
+		if (!iterator.hasNext()) return Iterators.emptyIterator();
+		@SuppressWarnings ("unchecked")
+		Iterator<GItem> result = (Iterator<GItem>)iterator.next();
+		while (iterator.hasNext()) {
+			result = Iterators.intersectIterator(comparator, result, iterator.next());
+		}
+		return result;
 	}
 
 }

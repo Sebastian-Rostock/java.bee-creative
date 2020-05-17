@@ -2,21 +2,31 @@ package bee.creative.qs;
 
 /** Diese Schnittstelle definiert einen Hyperknoten vierter Ordnung (Quad-Node). Er kann als {@link QE#context() Kontext}, {@link QE#predicate Prädikat},
  * {@link QE#subject() Subjekt} oder {@link QE#object() Objekt} einer {@link QE Hyperkante} eingesetzt werden und über einen {@link #value() Textwert} als
- * extere Kennung verfügen. {@link #compareTo(QN) Ordnung}, {@link #hashCode() Streuwert} und {@link #equals(Object) Äquivalenz} basieren auf {@link #ident()
- * Knotenkennung} und {@link #owner() Graphspeicher}.
+ * extere Kennung verfügen. {@link #hashCode() Streuwert} und {@link #equals(Object) Äquivalenz} basieren auf {@link #key() Knotenkennung} und {@link #owner()
+ * Graphspeicher}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface QN extends QX, Comparable<QN> {
+public interface QN extends QX {
 
 	/** Diese Methode gibt die Kennugn des Hyperknoten zurück.
 	 *
 	 * @return Knotenkennung. */
-	public long ident();
+	public long key();
 
 	/** Diese Methode gibt den Textwert des Hyperknoten zurück. Wenn der Hyperknoten keinen Textwert besitzt, wird {@code null} geliefert. Andernfalls kann dieser
 	 * zur {@link QS#newNode(String) Identifikation} des Hyperknoten im {@link #owner() Graphspeicher} eingesetzt werden.
-	 * 
+	 *
 	 * @return Textwert oder {@code null}. */
 	public String value();
+
+	/** {@inheritDoc} Damit werden auch der {@link QN#value() Textwert} dieses Hyperknoten sowie alle diese Hyperknoten verwendenden {@link QE Hyperkanten}
+	 * entfernt. */
+	@Override
+	boolean pop();
+
+	/** {@inheritDoc} Der Hyperknoten ist nur dann im Graphspeicher enthalten, wenn er einen Textwert besitzt oder in einer gespeicherten {@link QE Hyperkante}
+	 * verwendet wird. */
+	@Override
+	public boolean state();
 
 }

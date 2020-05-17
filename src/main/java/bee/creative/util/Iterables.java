@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -236,6 +237,84 @@ public class Iterables {
 		@Override
 		public Iterator<?> get(final Iterable<?> input) {
 			return input.iterator();
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#unionIterable(Comparator, Iterable, Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class UnionIterable<GItem> extends BaseIterable<GItem> {
+
+		public final Comparator<? super GItem> comparator;
+
+		public final Iterable<? extends Iterable<? extends GItem>> iterable;
+
+		public UnionIterable(final Comparator<? super GItem> comparator, final Iterable<? extends Iterable<? extends GItem>> iterable) {
+			this.iterable = Objects.notNull(iterable);
+			this.comparator = Objects.notNull(comparator);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.unionIterator(this.comparator, Iterators.translatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterable.iterator()));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.comparator, this.iterable);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#exceptIterable(Comparator, Iterable, Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ExceptIterable<GItem> extends BaseIterable<GItem> {
+
+		public final Comparator<? super GItem> comparator;
+
+		public final Iterable<? extends GItem> iterable1;
+
+		public final Iterable<? extends GItem> iterable2;
+
+		public ExceptIterable(final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2, final Comparator<? super GItem> comparator) {
+			this.iterable1 = Objects.notNull(iterable1);
+			this.iterable2 = Objects.notNull(iterable2);
+			this.comparator = Objects.notNull(comparator);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.exceptIterator(this.comparator, this.iterable1.iterator(), this.iterable2.iterator());
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.comparator, this.iterable1, this.iterable2);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Iterables#intersectIterable(Comparator, Iterable, Iterable)}. */
+	@SuppressWarnings ("javadoc")
+	public static class IntersectIterable<GItem> extends BaseIterable<GItem> {
+
+		public final Comparator<? super GItem> comparator;
+
+		public final Iterable<? extends Iterable<? extends GItem>> iterable;
+
+		public IntersectIterable(final Comparator<? super GItem> comparator, final Iterable<? extends Iterable<? extends GItem>> iterable) {
+			this.iterable = Objects.notNull(iterable);
+			this.comparator = Objects.notNull(comparator);
+		}
+
+		@Override
+		public Iterator<GItem> iterator() {
+			return Iterators.intersectIterator(this.comparator, Iterators.translatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterable.iterator()));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.comparator, this.iterable);
 		}
 
 	}
@@ -504,6 +583,39 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
 	public static <GItem> Iterable<GItem> unmodifiableIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
 		return new UnmodifiableIterable<>(iterable);
+	}
+
+	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem>... iterables) {
+		return new UnionIterable<>(comparator, Arrays.asList(iterables));
+	}
+
+	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> comparator,
+		final Iterable<? extends Iterable<? extends GItem>> iterable) {
+		return new UnionIterable<>(comparator, iterable);
+	}
+
+	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem> iterable1,
+		final Iterable<? extends GItem> iterable2) {
+		return Iterables.unionIterable(comparator, Arrays.asList(iterable1, iterable2));
+	}
+
+	public static <GItem> Iterable<GItem> exceptIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem> iterable1,
+		final Iterable<? extends GItem> iterable2) {
+		return new ExceptIterable<>(iterable1, iterable2, comparator);
+	}
+
+	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> comparator,
+		final Iterable<? extends Iterable<? extends GItem>> iterable) {
+		return new IntersectIterable<>(comparator, iterable);
+	}
+
+	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem>... iterables) {
+		return Iterables.intersectIterable(comparator, Arrays.asList(iterables));
+	}
+
+	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem> iterable1,
+		final Iterable<? extends GItem> iterable2) {
+		return Iterables.intersectIterable(comparator, Arrays.asList(iterable1, iterable2));
 	}
 
 	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück. Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses
