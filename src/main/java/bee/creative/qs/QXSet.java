@@ -32,6 +32,11 @@ public interface QXSet<GI, GISet extends Iterable<GI>> extends QO, Iterable<GI> 
 	 * @return Kopie dieser Menge. */
 	public GISet copy();
 
+	/** Diese Methode gibt die geordnete Mengensicht auf die Objekte dieser Menge zurück.
+	 *
+	 * @return Geordnete Objektmenge. */
+	public GISet order();
+
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die in dieser oder der gegebenen Menge enthalten sind.
 	 *
 	 * @param set Objektmegne.

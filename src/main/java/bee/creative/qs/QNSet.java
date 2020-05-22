@@ -13,7 +13,7 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	@Override
 	public boolean popAll();
 
-	/** Diese Methode gibt eine Mengensichtp auf alle Textwerte zurück, die in den Hyperknoten dieser Menge {@link QN#value() aufgeführten} sind.
+	/** Diese Methode gibt eine Mengensichtp auf alle Textwerte zurück, die in den Hyperknoten dieser Menge {@link QN#value() aufgeführt} sind.
 	 *
 	 * @return Textwerte der Hyperknoten dieser Menge. */
 	public QVSet values();

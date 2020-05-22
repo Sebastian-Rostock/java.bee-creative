@@ -8,16 +8,16 @@ package bee.creative.qs;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QS {
 
+	/** Diese Methode gibt eine Mengensicht auf alle gespeicherten {@link QE Hyperkanten} zurück.
+	 *
+	 * @return Hyperkanten. */
+	public QESet edges();
+
 	/** Diese Methode gibt eine Mengensicht auf alle Hyperknoten zurück, die über einen {@link QN#value() Textwert} verfügen. Sie ist eine Abkürzung für
 	 * {@link #values() this.values().nodes())}.
 	 *
 	 * @return Hyperknoten. */
 	public QNSet nodes();
-
-	/** Diese Methode gibt eine Mengensicht auf alle gespeicherten {@link QE Hyperkanten} zurück.
-	 *
-	 * @return Hyperkanten. */
-	public QESet edges();
 
 	/** Diese Methode gibt eine Mengensicht auf alle gespeicherten Textwerte zurück.
 	 *
@@ -48,17 +48,17 @@ public interface QS {
 	 * @return Hyperkante. */
 	public QE newEdge(final QN context, final QN predicate, final QN subject, final QN object) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode ist eine Abkürzung für {@link #newEdges(QE) this.newEdges(this.newEdge())}.
+	/** Diese Methode ist eine Abkürzung für {@link #newEdges(QE...) this.newEdges(this.newEdge())}.
 	 *
 	 * @see #newEdge()
 	 * @return temporäre Hyperkantenmenge. */
 	public QESet newEdges();
 
-	/** Diese Methode ist eine Abkürzung für {@link #newEdges(Iterable) this.newEdges(Iterables.itemIterable(edge))}.
+	/** Diese Methode ist eine Abkürzung für {@link #newEdges(Iterable) this.newEdges(Arrays.asList(edges))}.
 	 *
-	 * @param edge Hyperkante.
+	 * @param edges Hyperkanten.
 	 * @return temporäre Hyperkantenmenge. */
-	public QESet newEdges(final QE edge) throws NullPointerException, IllegalArgumentException;
+	public QESet newEdges(final QE... edges) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die gegebenen {@link QE Hyperkanten} in eine von diesem Graphspeicher {@link QESet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück.
@@ -83,17 +83,11 @@ public interface QS {
 	 * @return Hyperknoten. */
 	public QN newNode(String text);
 
-	/** Diese Methode erzeigt die gegebene Anzahl {@link #newNode() neuer temporärer Hyperknoten} ung gibt diese in einer temporären Menge zurück.
+	/** Diese Methode ist eine Abkürzung für {@link #newNodes(Iterable) this.newNodes(Arrays.asList(nodes))}.
 	 *
-	 * @param size Anzahl der Hyperknoten.
+	 * @param nodes Hyperknoten.
 	 * @return temporäre Hyperknotenmenge. */
-	public QNSet newNodes(final long size) throws IllegalArgumentException;
-
-	/** Diese Methode ist eine Abkürzung für {@link #newNodes(Iterable) this.newNodes(Iterables.itemIterable(node))}.
-	 *
-	 * @param node Hyperknoten.
-	 * @return temporäre Hyperknotenmenge. */
-	public QNSet newNodes(final QN node) throws NullPointerException, IllegalArgumentException;
+	public QNSet newNodes(final QN... nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die gegebenen {@link QE Hyperknoten} in eine von diesem Graphspeicher {@link QNSet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück.
@@ -102,11 +96,11 @@ public interface QS {
 	 * @return temporäre Hyperknotenmenge. */
 	public QNSet newNodes(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode ist eine Abkürzung für {@link #newValues(Iterable) this.newValues(Iterables.itemIterable(value))}.
+	/** Diese Methode ist eine Abkürzung für {@link #newValues(Iterable) this.newValues(Arrays.asList(value))}.
 	 *
-	 * @param value Textwert.
+	 * @param values Textwerte.
 	 * @return temporäre Textwertmenge. */
-	public QVSet newValues(final String value) throws NullPointerException, IllegalArgumentException;
+	public QVSet newValues(final String... values) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die gegebenen Textwert in eine von diesem Graphspeicher {@link QVSet#owner() verwaltete} temporäre Menge und gibt diese zurück.
 	 *
