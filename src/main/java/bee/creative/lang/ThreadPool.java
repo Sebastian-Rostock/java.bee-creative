@@ -30,6 +30,8 @@ public class ThreadPool {
 		/** Dieses Feld speichert die nächste von diesem Thread ausgeführte Berechnung. */
 		public Runnable task;
 
+		public String name;
+
 		public ThreadItem(final ThreadPool pool, final ThreadGroup group) {
 			super(group, "");
 			this.node = new ThreadNode(pool, this);
@@ -124,6 +126,8 @@ public class ThreadPool {
 	 * Threads}. */
 	private String activeName;
 
+	private int activeCount;
+
 	/** Dieses Feld speichert die {@link java.lang.Thread#setPriority(int) Priorität} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem
 	 * Threads}. */
 	private int activePriority;
@@ -159,7 +163,7 @@ public class ThreadPool {
 	/** Dieser Konstruktor ist eine Abkürzung für {@link #ThreadPool(ThreadGroup, boolean, String, int, int, int) new ThreadPool(group, daemon, "ThreadItem",
 	 * Thread.NORM_PRIORITY, waitingReserve, waitingTimeout)}. */
 	public ThreadPool(final ThreadGroup group, final boolean daemon, final int waitingReserve, final int waitingTimeout) {
-		this(group, daemon, "ThreadItem", java.lang.Thread.NORM_PRIORITY, waitingReserve, waitingTimeout);
+		this(group, daemon, "Thread", java.lang.Thread.NORM_PRIORITY, waitingReserve, waitingTimeout);
 	}
 
 	/** Dieser Konstruktor initialisiert den {@link ThreadPool} mit den gegebenen Merkmalen.
@@ -494,7 +498,11 @@ public class ThreadPool {
 			item.start();
 		}
 		item.run = new Object();
-		item.setName(this.activeName);
+		if (!this.activeName.equals(item.name)) {
+			++this.activeCount;
+			item.setName(this.activeName + "-" + this.activeCount);
+			item.name = this.activeName;
+		}
 		if (item.getPriority() != this.activePriority) {
 			item.setPriority(this.activePriority);
 		}
@@ -632,7 +640,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #isAliveAll(Iterable) this.isAliveAll(Arrays.asList(tasks))}.
-	 * 
+	 *
 	 * @param tasks Berechnungen.
 	 * @return {@code true}, wenn alle Berechnungen aktuell ausgeführt werden; sonst {@code false}.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
@@ -641,7 +649,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #isAliveAll(Iterator) this.isAliveAll(tasks.iterator())}.
-	 * 
+	 *
 	 * @param tasks Berechnungen.
 	 * @return {@code true}, wenn alle Berechnungen aktuell ausgeführt werden; sonst {@code false}.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
@@ -651,7 +659,7 @@ public class ThreadPool {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn alle gegebenen Berechnungen {@link #isAlive(Runnable) gestartet und noch nicht abgeschlossen
 	 * wurden}.
-	 * 
+	 *
 	 * @param tasks Berechnungen.
 	 * @return {@code true}, wenn alle Berechnungen aktuell ausgeführt werden; sonst {@code false}.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
@@ -665,7 +673,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #isAliveAny(Iterable) this.isAliveAny(Arrays.asList(tasks))}.
-	 * 
+	 *
 	 * @param tasks Berechnungen.
 	 * @return {@code false}, wenn keine der Berechnungen aktuell ausgeführt werden; sonst {@code true}.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
@@ -674,7 +682,7 @@ public class ThreadPool {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #isAliveAny(Iterator) this.isAliveAny(tasks.iterator())}.
-	 * 
+	 *
 	 * @param tasks Berechnungen.
 	 * @return {@code false}, wenn keine der Berechnungen aktuell ausgeführt werden; sonst {@code true}.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
@@ -684,7 +692,7 @@ public class ThreadPool {
 
 	/** Diese Methode gibt nur dann {@code false} zurück, wenn keine der gegebenen Berechnungen {@link #isAlive(Runnable) gestartet und noch nicht abgeschlossen
 	 * wurden}.
-	 * 
+	 *
 	 * @param tasks Berechnungen.
 	 * @return {@code false}, wenn keine der Berechnungen aktuell ausgeführt werden; sonst {@code true}.
 	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält. */
