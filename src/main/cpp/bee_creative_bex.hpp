@@ -1,6 +1,6 @@
 /* [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 
-#ifndef BEE_CREATIVE_BEX_HPP
+#ifdef BEE_CREATIVE_BEX_HPP
 
 #define BEE_CREATIVE_BEX_HPP
 
@@ -33,7 +33,7 @@ struct BEXFile {
 	public:
 
 	/** Diese Klasse definiert die referenzgezählten Nutzdaten eines @c BEXFile. */
-	struct OBJECT: public RCObject<OBJECT> {
+	struct OBJECT: public Obj<OBJECT> {
 
 		public:
 
@@ -137,7 +137,7 @@ struct BEXFile {
 	friend BEXList;
 
 	/** Dieses Feld speichert die referenzgezählten Nutzdaten. */
-	RCPointer<OBJECT> _object_;
+	Ref<OBJECT> _object_;
 
 };
 

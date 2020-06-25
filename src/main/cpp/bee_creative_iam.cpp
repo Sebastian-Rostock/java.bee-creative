@@ -1,1338 +1,1260 @@
-/* [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+/* [cc-by] 2014-2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 
 #include "bee_creative_iam.hpp"
 
-namespace bee {
+namespace bee_creative {
 
-namespace creative {
-
-namespace iam {
-
-using mmf::MMFArray;
-
-/**
- * Diese Methode gibt die Byteanzahl des gegebenen Datengrößentyps zurück.
- * @param _dataType Datengrößentyp (1 = @c INT8, 2 = @c INT16, 3 = @c INT32).
- * @return Byteanzahl (1, 2, 4).
- */
-inline UINT8 _iamByteCount_(UINT8 const _dataType) {
-	return 1 << (_dataType - 1);
+/** Diese Methode gibt die Byteanzahl des gegebenen Datengrößentyps zurück.
+ * @param data_type Datengrößentyp (1 = @c INT8, 2 = @c INT16, 3 = @c INT32).
+ * @return Byteanzahl (1, 2, 4). */
+inline UINT8 iam_byte_count_(UINT8 const data_type) {
+	return 1 << (data_type - 1);
 }
 
-/**
- * Diese Methode gibt die kleinste Länge eines @c INT32 Arrays zurück, in dessen Speicherbereich ein @c INT8 Array mit der gegebenen Länge passen.
- * @param _byteCount Länge eines @c INT8 Arrays.
- * @return Länge des @c INT32 Arrays.
- */
-inline UINT32 _iamByteAlign_(UINT32 _byteCount) {
-	return (_byteCount + 3) >> 2;
+/** Diese Methode gibt die kleinste Länge eines @c INT32 Arrays zurück, in dessen Speicherbereich ein @c INT8 Array mit der gegebenen Länge passen.
+ * @param byte_count Länge eines @c INT8 Arrays.
+ * @return Länge des @c INT32 Arrays. */
+inline UINT32 iam_byte_align_(UINT32 byte_count) {
+	return (byte_count + 3) >> 2;
 }
 
-/**
- * Diese Methode gibt die _index-te Zahl der gegebenen Zahlenfolge zurück.
- * @param _type Datengrößentyp zur Interpretation der Zahlenfolge (<code>[30:0][2:S]</code>).
- * @param _array Zahlenfolge.
- * @param _index Index.
- * @return _index-te Zahl.
- */
-inline UINT32 _iamDataGet_(UINT8 const _type, PCVOID const _array, INT32 _index) {
-	switch (_type) {
+/** Diese Methode gibt die index-te Zahl der gegebenen Zahlenfolge zurück.
+ * @param type Datengrößentyp zur Interpretation der Zahlenfolge (<code>[30:0][2:S]</code>).
+ * @param array Zahlenfolge.
+ * @param index Index.
+ * @return index-te Zahl. */
+inline UINT32 iam_data_get_(UINT8 const type, PCVOID const array, INT32 index) {
+	switch (type) {
 		case 0: // D0
-			return (UINT32) _array;
+			return (UINT64) array;
 		case 1: // D1
-			return ((UINT8 const*) _array)[_index];
+			return ((UINT8 const*) array)[index];
 		case 2: // D2
-			return ((UINT16 const*) _array)[_index];
+			return ((UINT16 const*) array)[index];
 		case 3: // D3
-			return ((UINT32 const*) _array)[_index];
+			return ((UINT32 const*) array)[index];
 	}
 	return 0;
 }
 
-/**
- * Diese Methode gibt die aus den gegebenen Größen zusammengesetzte Datentypkennung zurück.
- * @param _dataType Datengrößentyp (1 = INT8, 2 = INT16, 3 = INT32).
- * @param _sizeType Datenlängentyp (0 = statisch UINT32, 1 = dynamisch UINT8, 2 = dynamisch UINT16, 3 = dynamisch UINT32).
- * @return Datentypkennung (_dataType * 4 + _sizeType - 4).
- */
-inline UINT8 _iamDataType_(UINT8 const _dataType, UINT8 const _sizeType) {
-	return (_dataType << 2) + _sizeType - 4;
+/** Diese Methode gibt die aus den gegebenen Größen zusammengesetzte Datentypkennung zurück.
+ * @param data_type Datengrößentyp (1 = INT8, 2 = INT16, 3 = INT32).
+ * @param size_type Datenlängentyp (0 = statisch UINT32, 1 = dynamisch UINT8, 2 = dynamisch UINT16, 3 = dynamisch UINT32).
+ * @return Datentypkennung (data_type * 4 + size_type - 4). */
+inline UINT8 iam_data_type_(UINT8 const data_type, UINT8 const size_type) {
+	return (data_type << 2) + size_type - 4;
 }
 
-/**
- * Diese Methode gibt die _arrayIndex-te Zahlenfolge mit statischer Größe aus dem gegebenen Speicherbereich zurück.
- * @tparam PCDATA Datentyp zur Interpretation von _arrayData.
- * @param _arraySize Größe einer Zahlenfolge (@c UINT32).
- * @param _arrayData Speicherbereich mit den Daten der Zahlenfolgen.
- * @param _arrayIndex Index der Zahlenfolge.
- * @return _arrayIndex-te Zahlenfolge.
- */
+/** Diese Methode gibt die array_index-te Zahlenfolge mit statischer Größe aus dem gegebenen Speicherbereich zurück.
+ * @tparam PCDATA Datentyp zur Interpretation von array_data.
+ * @param array_size Größe einer Zahlenfolge (@c UINT32).
+ * @param array_data Speicherbereich mit den Daten der Zahlenfolgen.
+ * @param array_index Index der Zahlenfolge.
+ * @return array_index-te Zahlenfolge. */
 template<typename PCDATA>
-inline IAMArray _iamDataArray_S_(PCVOID const _arraySize, PCVOID const _arrayData, INT32 _arrayIndex) {
-	UINT32 _length = (UINT32) _arraySize;
-	PCDATA const _array = (PCDATA const) _arrayData;
-	return IAMArray(_array + _arrayIndex * _length, _length);
+inline IAMArray iam_data_array_s_(PCVOID const array_size, PCVOID const array_data, INT32 array_index) {
+	UINT32 length = (UINT64) array_size;
+	PCDATA const array = (PCDATA const) array_data;
+	return IAMArray(array + array_index * length, length);
 }
 
-/**
- * Diese Methode gibt die _arrayIndex-te Zahlenfolge mit dynamischer Größe aus dem gegebenen Speicherbereich zurück.
- * @tparam PCDATA Datentyp zur Interpretation von _arrayData.
- * @tparam PCSIZE Datentyp zur Interpretation von _arraySize.
- * @param _arraySize Speicherbereich mit den Längen der Zahlenfolgen.
- * @param _arrayData Speicherbereich mit den Daten der Zahlenfolgen.
- * @param _arrayIndex Index der Zahlenfolge.
- * @return _arrayIndex-te Zahlenfolge.
- */
+/** Diese Methode gibt die array_index-te Zahlenfolge mit dynamischer Größe aus dem gegebenen Speicherbereich zurück.
+ * @tparam PCDATA Datentyp zur Interpretation von array_data.
+ * @tparam PCSIZE Datentyp zur Interpretation von array_size.
+ * @param array_size Speicherbereich mit den Längen der Zahlenfolgen.
+ * @param array_data Speicherbereich mit den Daten der Zahlenfolgen.
+ * @param array_index Index der Zahlenfolge.
+ * @return array_index-te Zahlenfolge. */
 template<typename PCDATA, typename PCSIZE>
-inline IAMArray _iamDataArray_D_(PCVOID const _arraySize, PCVOID const _arrayData, INT32 _arrayIndex) {
-	PCSIZE const _size = (PCSIZE const) _arraySize;
-	UINT32 _offset = _size[_arrayIndex];
-	UINT32 _length = _size[_arrayIndex + 1] - _offset;
-	PCDATA const _array = (PCDATA const) _arrayData;
-	return IAMArray(_array + _offset, _length);
+inline IAMArray iam_data_array_d_(PCVOID const array_size, PCVOID const array_data, INT32 array_index) {
+	PCSIZE const size = (PCSIZE const) array_size;
+	UINT32 offset = size[array_index];
+	UINT32 length = size[array_index + 1] - offset;
+	PCDATA const array = (PCDATA const) array_data;
+	return IAMArray(array + offset, length);
 }
 
-/**
- * Diese Methode gibt die _arrayIndex-te Zahlenfolge aus dem gegebenen Speicherbereich zurück.
- * @param _type Datentypkennung zur Interpretation von _arraySize und _arrayData.
- * @param _arraySize Größe der Zahlenfolge bzw. Speicherbereich mit den Längen der Zahlenfolgen.
- * @param _arrayData Speicherbereich mit den Daten der Zahlenfolgen.
- * @param _arrayIndex Index der Zahlenfolge.
- * @return _arrayIndex-te Zahlenfolge.
- */
-inline IAMArray _iamDataArray_(UINT8 const _type, PCVOID const _arraySize, PCVOID const _arrayData, INT32 _arrayIndex) {
-	switch (_type) {
+/** Diese Methode gibt die array_index-te Zahlenfolge aus dem gegebenen Speicherbereich zurück.
+ * @param type Datentypkennung zur Interpretation von array_size und array_data.
+ * @param array_size Größe der Zahlenfolge bzw. Speicherbereich mit den Längen der Zahlenfolgen.
+ * @param array_data Speicherbereich mit den Daten der Zahlenfolgen.
+ * @param array_index Index der Zahlenfolge.
+ * @return array_index-te Zahlenfolge. */
+inline IAMArray iam_data_array_(UINT8 const type, PCVOID const array_size, PCVOID const array_data, INT32 array_index) {
+	switch (type) {
 		case 0: // D1, S0
-			return _iamDataArray_S_<INT8 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_s_<INT8 const*>(array_size, array_data, array_index);
 		case 1: // D1, S1
-			return _iamDataArray_D_<INT8 const*, UINT8 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT8 const*, UINT8 const*>(array_size, array_data, array_index);
 		case 2: // D1, S2
-			return _iamDataArray_D_<INT8 const*, UINT16 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT8 const*, UINT16 const*>(array_size, array_data, array_index);
 		case 3: // D1, S3
-			return _iamDataArray_D_<INT8 const*, UINT32 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT8 const*, UINT32 const*>(array_size, array_data, array_index);
 		case 4: // D2, S0
-			return _iamDataArray_S_<INT16 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_s_<INT16 const*>(array_size, array_data, array_index);
 		case 5: // D2, S1
-			return _iamDataArray_D_<INT16 const*, UINT8 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT16 const*, UINT8 const*>(array_size, array_data, array_index);
 		case 6: // D2, S2
-			return _iamDataArray_D_<INT16 const*, UINT16 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT16 const*, UINT16 const*>(array_size, array_data, array_index);
 		case 7: // D2, S3
-			return _iamDataArray_D_<INT16 const*, UINT32 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT16 const*, UINT32 const*>(array_size, array_data, array_index);
 		case 8: // D3, S0
-			return _iamDataArray_S_<INT32 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_s_<INT32 const*>(array_size, array_data, array_index);
 		case 9: // D3, S1
-			return _iamDataArray_D_<INT32 const*, UINT8 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT32 const*, UINT8 const*>(array_size, array_data, array_index);
 		case 10: // D3, S2
-			return _iamDataArray_D_<INT32 const*, UINT16 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT32 const*, UINT16 const*>(array_size, array_data, array_index);
 		case 11: // D3, S3
-			return _iamDataArray_D_<INT32 const*, UINT32 const*>(_arraySize, _arrayData, _arrayIndex);
+			return iam_data_array_d_<INT32 const*, UINT32 const*>(array_size, array_data, array_index);
 	}
 	return IAMArray();
 }
 
-/**
- * Diese Methode gibt die _valueIndex-te Zahl der _arrayIndex-ten Zahlenfolge mit statischer Größe aus dem gegebenen Speicherbereich zurück.
- * @tparam PCDATA Datentyp zur Interpretation von _arrayData.
- * @param _arraySize Größe einer Zahlenfolge (@c UINT32).
- * @param _arrayData Speicherbereich mit den Daten der Zahlenfolgen.
- * @param _arrayIndex Index der Zahlenfolge.
- * @param _valueIndex Index der Zahl.
- * @return _valueIndex-te Zahl der _arrayIndex-ten Zahlenfolge.
- */
+/** Diese Methode gibt die value_index-te Zahl der array_index-ten Zahlenfolge mit statischer Größe aus dem gegebenen Speicherbereich zurück.
+ * @tparam PCDATA Datentyp zur Interpretation von array_data.
+ * @param array_size Größe einer Zahlenfolge (@c UINT32).
+ * @param array_data Speicherbereich mit den Daten der Zahlenfolgen.
+ * @param array_index Index der Zahlenfolge.
+ * @param value_index Index der Zahl.
+ * @return value_index-te Zahl der array_index-ten Zahlenfolge. */
 template<typename PCDATA>
-inline INT32 _iamDataValue_S_(PCVOID const _arraySize, PCVOID const _arrayData, INT32 _arrayIndex, INT32 _valueIndex) {
-	UINT32 _length = (UINT32) _arraySize;
-	if ((UINT32) _valueIndex >= _length) return 0;
-	PCDATA const _array = (PCDATA const) _arrayData;
-	return _array[_arrayIndex * _length + _valueIndex];
+inline INT32 iam_data_value_s_(PCVOID const array_size, PCVOID const array_data, INT32 array_index, INT32 value_index) {
+	UINT32 length = (UINT64) array_size;
+	if ((UINT32) value_index >= length) return 0;
+	PCDATA const array = (PCDATA const) array_data;
+	return array[array_index * length + value_index];
 }
 
-/**
- * Diese Methode gibt die _valueIndex-te Zahl der _arrayIndex-ten Zahlenfolge mit dynamischer Größe aus dem gegebenen Speicherbereich zurück.
- * @tparam PCDATA Datentyp zur Interpretation von _arrayData.
- * @tparam PCSIZE Datentyp zur Interpretation von _arraySize.
- * @param _arraySize Speicherbereich mit den Längen der Zahlenfolgen.
- * @param _arrayData Speicherbereich mit den Daten der Zahlenfolgen.
- * @param _arrayIndex Index der Zahlenfolge.
- * @param _valueIndex Index der Zahl.
- * @return _valueIndex-te Zahl der _arrayIndex-ten Zahlenfolge.
- */
+/** Diese Methode gibt die value_index-te Zahl der array_index-ten Zahlenfolge mit dynamischer Größe aus dem gegebenen Speicherbereich zurück.
+ * @tparam PCDATA Datentyp zur Interpretation von array_data.
+ * @tparam PCSIZE Datentyp zur Interpretation von array_size.
+ * @param array_size Speicherbereich mit den Längen der Zahlenfolgen.
+ * @param array_data Speicherbereich mit den Daten der Zahlenfolgen.
+ * @param array_index Index der Zahlenfolge.
+ * @param value_index Index der Zahl.
+ * @return value_index-te Zahl der array_index-ten Zahlenfolge. */
 template<typename PCDATA, typename PCSIZE>
-inline INT32 _iamDataValue_D_(PCVOID const _arraySize, PCVOID const _arrayData, INT32 _arrayIndex, INT32 _valueIndex) {
-	PCSIZE const _size = (PCSIZE const) _arraySize;
-	UINT32 _index = _size[_arrayIndex] + _valueIndex;
-	if (_index >= _size[_arrayIndex + 1]) return 0;
-	PCDATA const _array = (PCDATA const) _arrayData;
-	return _array[_valueIndex];
+inline INT32 iam_data_value_d_(PCVOID const array_size, PCVOID const array_data, INT32 array_index, INT32 value_index) {
+	PCSIZE const size = (PCSIZE const) array_size;
+	UINT32 index = size[array_index] + value_index;
+	if (index >= size[array_index + 1]) return 0;
+	PCDATA const array = (PCDATA const) array_data;
+	return array[value_index];
 }
 
-/**
- * Diese Methode gibt die _valueIndex-te Zahl der _arrayIndex-ten Zahlenfolge aus dem gegebenen Speicherbereich zurück.
- * @param _type Datentypkennung zur Interpretation von _arraySize und _arrayData.
- * @param _arraySize Größe der Zahlenfolge bzw. Speicherbereich mit den Längen der Zahlenfolgen.
- * @param _arrayData Speicherbereich mit den Daten der Zahlenfolgen.
- * @param _arrayIndex Index der Zahlenfolge.
- * @param _valueIndex Index der Zahl.
- * @return _valueIndex-te Zahl der _arrayIndex-ten Zahlenfolge.
- */
-inline INT32 _iamDataValue_(UINT8 const _type, PCVOID const _arraySize, PCVOID const _arrayData, INT32 _arrayIndex, INT32 _valueIndex) {
-	switch (_type) {
+/** Diese Methode gibt die value_index-te Zahl der array_index-ten Zahlenfolge aus dem gegebenen Speicherbereich zurück.
+ * @param type Datentypkennung zur Interpretation von array_size und array_data.
+ * @param array_size Größe der Zahlenfolge bzw. Speicherbereich mit den Längen der Zahlenfolgen.
+ * @param array_data Speicherbereich mit den Daten der Zahlenfolgen.
+ * @param array_index Index der Zahlenfolge.
+ * @param value_index Index der Zahl.
+ * @return value_index-te Zahl der array_index-ten Zahlenfolge. */
+inline INT32 iam_data_value_(UINT8 const type, PCVOID const array_size, PCVOID const array_data, INT32 array_index, INT32 value_index) {
+	switch (type) {
 		case 0: // D1, S0
-			return _iamDataValue_S_<INT8 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_s_<INT8 const*>(array_size, array_data, array_index, value_index);
 		case 1: // D1, S1
-			return _iamDataValue_D_<INT8 const*, UINT8 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT8 const*, UINT8 const*>(array_size, array_data, array_index, value_index);
 		case 2: // D1, S2
-			return _iamDataValue_D_<INT8 const*, UINT16 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT8 const*, UINT16 const*>(array_size, array_data, array_index, value_index);
 		case 3: // D1, S3
-			return _iamDataValue_D_<INT8 const*, UINT32 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT8 const*, UINT32 const*>(array_size, array_data, array_index, value_index);
 		case 4: // D2, S0
-			return _iamDataValue_S_<INT16 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_s_<INT16 const*>(array_size, array_data, array_index, value_index);
 		case 5: // D2, S1
-			return _iamDataValue_D_<INT16 const*, UINT8 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT16 const*, UINT8 const*>(array_size, array_data, array_index, value_index);
 		case 6: // D2, S2
-			return _iamDataValue_D_<INT16 const*, UINT16 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT16 const*, UINT16 const*>(array_size, array_data, array_index, value_index);
 		case 7: // D2, S3
-			return _iamDataValue_D_<INT16 const*, UINT32 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT16 const*, UINT32 const*>(array_size, array_data, array_index, value_index);
 		case 8: // D3, S0
-			return _iamDataValue_S_<INT32 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_s_<INT32 const*>(array_size, array_data, array_index, value_index);
 		case 9: // D3, S1
-			return _iamDataValue_D_<INT32 const*, UINT8 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT32 const*, UINT8 const*>(array_size, array_data, array_index, value_index);
 		case 10: // D3, S2
-			return _iamDataValue_D_<INT32 const*, UINT16 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT32 const*, UINT16 const*>(array_size, array_data, array_index, value_index);
 		case 11: // D3, S3
-			return _iamDataValue_D_<INT32 const*, UINT32 const*>(_arraySize, _arrayData, _arrayIndex, _valueIndex);
+			return iam_data_value_d_<INT32 const*, UINT32 const*>(array_size, array_data, array_index, value_index);
 	}
 	return 0;
 }
 
-/**
- * Diese Methode gibt die Länge der _arrayIndex-ten Zahlenfolge aus dem gegebenen Speicherbereich zurück.
- * @tparam PCSIZE Datentyp zur Interpretation von _arraySize.
- * @param _arraySize Speicherbereich mit den Längen der Zahlenfolgen.
- * @param _arrayIndex Index der Zahlenfolge.
- * @return Länge der _arrayIndex-ten Zahlenfolge
- */
+/** Diese Methode gibt die Länge der array_index-ten Zahlenfolge aus dem gegebenen Speicherbereich zurück.
+ * @tparam PCSIZE Datentyp zur Interpretation von array_size.
+ * @param array_size Speicherbereich mit den Längen der Zahlenfolgen.
+ * @param array_index Index der Zahlenfolge.
+ * @return Länge der array_index-ten Zahlenfolge. */
 template<typename PCSIZE>
-inline UINT32 _iamDataLength_D_(PCVOID const _arraySize, INT32 _arrayIndex) {
-	PCSIZE const _size = (PCSIZE const) _arraySize;
-	return _size[_arrayIndex + 1] - _size[_arrayIndex];
+inline UINT32 iam_data_length_d_(PCVOID const array_size, INT32 array_index) {
+	PCSIZE const size = (PCSIZE const) array_size;
+	return size[array_index + 1] - size[array_index];
 }
 
-/**
- * Diese Methode gibt die Länge der _arrayIndex-ten Zahlenfolge aus dem gegebenen Speicherbereich zurück.
- * @param _type Datenlängentyp zur Interpretation von _arraySize.
- * @param _arraySize Größe der Zahlenfolge bzw. Speicherbereich mit den Längen der Zahlenfolgen.
- * @param _arrayIndex Index der Zahlenfolge.
- * @return Länge der _arrayIndex-ten Zahlenfolge
- */
-inline UINT32 _iamDataLength_(UINT8 const _type, PCVOID const _arraySize, INT32 _arrayIndex) {
-	switch (_type) {
+/** Diese Methode gibt die Länge der array_index-ten Zahlenfolge aus dem gegebenen Speicherbereich zurück.
+ * @param type Datenlängentyp zur Interpretation von array_size.
+ * @param array_size Größe der Zahlenfolge bzw. Speicherbereich mit den Längen der Zahlenfolgen.
+ * @param array_index Index der Zahlenfolge.
+ * @return Länge der array_index-ten Zahlenfolge. */
+inline UINT32 iam_data_length_(UINT8 const type, PCVOID const array_size, INT32 array_index) {
+	switch (type) {
 		case 0: // S0
-			return (UINT32) _arraySize;
+			return (UINT64) array_size;
 		case 1: // S1
-			return _iamDataLength_D_<UINT8 const*>(_arraySize, _arrayIndex);
+			return iam_data_length_d_<UINT8 const*>(array_size, array_index);
 		case 2: // S2
-			return _iamDataLength_D_<UINT16 const*>(_arraySize, _arrayIndex);
+			return iam_data_length_d_<UINT16 const*>(array_size, array_index);
 		case 3: // S3
-			return _iamDataLength_D_<UINT32 const*>(_arraySize, _arrayIndex);
+			return iam_data_length_d_<UINT32 const*>(array_size, array_index);
 	}
 	return 0;
 }
 
-/**
- * Diese Methode prüft die Monotonität der gegebenen Zahlenfolge.
- * @tparam PCSIZE Datentyp zur Interpretation von _arraySize.
- * @param _array Speicherbereich mit den Startpositionen der Zahlenfolgen.
- * @param _count Anzahl der Zahlenfolgen.
- * @throws IAMException Wenn die erste Zahl nicht 0 ist oder die Zahlen nicht monoton steigen.
- */
+/** Diese Methode prüft die Monotonität der gegebenen Zahlenfolge.
+ * @tparam PCSIZE Datentyp zur Interpretation von array_size.
+ * @param array Speicherbereich mit den Startpositionen der Zahlenfolgen.
+ * @param count Anzahl der Zahlenfolgen.
+ * @throws IAMException Wenn die erste Zahl nicht 0 ist oder die Zahlen nicht monoton steigen. */
 template<typename PCSIZE>
-inline void _iamDataCheck_S_(PCVOID const _array, INT32 _count) {
-	PCSIZE const _size = (PCSIZE const) _array;
-	UINT32 value = _size[0];
-	if (value) throw IAMException(IAMException::INVALID_OFFSET);
-	for (INT32 i = 0; i <= _count; ++i) {
-		UINT32 value2 = _size[i];
-		if (value > value2) throw IAMException(IAMException::INVALID_OFFSET);
-		value = value2;
+inline void iam_data_check_d_(PCVOID const array, INT32 count) {
+	PCSIZE const size = (PCSIZE const) array;
+	UINT32 prev = size[0];
+	if (prev) throw IAMException(IAMException::INVALID_OFFSET);
+	for (INT32 i = 0; i <= count; ++i) {
+		UINT32 next = size[i];
+		if (prev > next) throw IAMException(IAMException::INVALID_OFFSET);
+		prev = next;
 	}
 }
 
-/**
- * Diese Methode prüft die Monotonität der gegebenen Zahlenfolge.
- * @param _type Datenlängentyp zur Interpretation von _arraySize.
- * @param _array Speicherbereich mit den Startpositionen der Zahlenfolgen.
- * @param _count Anzahl der Zahlenfolgen.
- * @throws IAMException Wenn die erste Zahl nicht 0 ist oder die Zahlen nicht monoton steigen.
- */
-inline void _iamDataCheck_(UINT8 const _type, PCVOID const _array, INT32 _count) {
-	switch (_type) {
+/** Diese Methode prüft die Monotonität der gegebenen Zahlenfolge.
+ * @param type Datenlängentyp zur Interpretation von array_size.
+ * @param array Speicherbereich mit den Startpositionen der Zahlenfolgen.
+ * @param count Anzahl der Zahlenfolgen.
+ * @throws IAMException Wenn die erste Zahl nicht 0 ist oder die Zahlen nicht monoton steigen. */
+inline void iam_data_check_(UINT8 const type, PCVOID const array, INT32 count) {
+	switch (type & 3) {
 		case 1: // S1
-			_iamDataCheck_S_<UINT8 const*>(_array, _count);
+			iam_data_check_d_<UINT8 const*>(array, count);
 			return;
 		case 2: // S2
-			_iamDataCheck_S_<UINT16 const*>(_array, _count);
+			iam_data_check_d_<UINT16 const*>(array, count);
 			return;
 		case 3: // S3
-			_iamDataCheck_S_<UINT32 const*>(_array, _count);
+			iam_data_check_d_<UINT32 const*>(array, count);
 			return;
 	}
-}
-
-/**
- * Diese Methode gibt den Streuwert der gegebenen Zahlenfolge zurück
- * @tparam PCDATA Datentyp zur Interpretation von _array.
- * @param _array Zahlenfolge.
- * @param _length Länge der Zahlenfolge.
- * @return Streuwert.
- */
-template<typename PCDATA>
-inline INT32 _iamArrayHash_(PCVOID const _array, INT32 _length) {
-	PCDATA _data = (PCDATA) _array;
-	INT32 _result = 0x811C9DC5;
-	for (INT32 i = 0; i < _length; i++)
-		_result = (_result * 0x01000193) ^ (INT32) _data[i];
-	return _result;
-}
-
-/**
- * Diese Methode gibt nur dann @c true zurück, wenn die gegebenen Zahlenfolgen gleich sind.
- * @tparam PCDATA1 Datentyp zur Interpretation von _array1.
- * @tparam PCDATA2 Datentyp zur Interpretation von _array2.
- * @param _array1 Erste Zahlenfolge.
- * @param _array2 Zweite Zahlenfolge.
- * @param _length Länge der Zahlenfolgen.
- * @return @c true, wenn die Zahlenfolgen gleich sind.
- */
-template<typename PCDATA1, typename PCDATA2>
-inline bool _iamArrayEquals_(PCVOID const _array1, PCVOID const _array2, UINT32 _length) {
-	PCDATA1 const _data1 = (PCDATA1 const) _array1;
-	PCDATA2 const _data2 = (PCDATA2 const) _array2;
-	for (UINT32 i = 0; i < _length; i++)
-		if (_data1[i] != _data2[i]) return false;
-	return true;
-}
-
-/**
- * Diese Methode gibt eine Zahl kleiner, gleich oder größer als 0 zurück, wenn die Ordnung der ersten Zahlenfolge lexikografisch kleiner, gleich bzw. größer als die der zweiten Zahlenfolge ist.
- * @tparam PCDATA1 Datentyp zur Interpretation von _array1.
- * @tparam PCDATA2 Datentyp zur Interpretation von _array2.
- * @param _array1 Erste Zahlenfolge.
- * @param _array2 Zweite Zahlenfolge.
- * @param _length1 Länge der ersten Zahlenfolge.
- * @param _length2 Länge der zweiten Zahlenfolge.
- * @return Vergleichswert der Ordnungen.
- */
-template<typename PCDATA1, typename PCDATA2>
-inline INT32 _iamArrayCompare_(PCVOID const _array1, PCVOID const _array2, UINT32 _length1, UINT32 _length2) {
-	PCDATA1 const _data1 = (PCDATA1 const) _array1;
-	PCDATA2 const _data2 = (PCDATA2 const) _array2;
-	UINT32 _length = _length1 < _length2 ? _length1 : _length2;
-	for (INT32 i = 0; i < _length; i++) {
-		INT32 _result = _data1[i] - _data2[i];
-		if (_result != 0) return _result;
-	}
-	return _length1 - _length2;
 }
 
 /** Diese Methode initialisiert ein @c IAMArray mit den gegebenen Daten.
- * @tparam PCDATA Datentyp zur Interpretation von _array.
- * @param _data Daten der Zahlenfolge.
- * @param _size Länge der Zahlenfolge.
- * @param _type Datentyp.
- * @param _array Zeiger auf den Speicherbereich mit Zahlen.
- * @param _length Anzahl der Zahlen. */
+ * @tparam PCDATA Datentyp zur Interpretation von array.
+ * @param data Daten der Zahlenfolge.
+ * @param size Länge der Zahlenfolge.
+ * @param type Datentyp.
+ * @param array Zeiger auf den Speicherbereich mit Zahlen.
+ * @param length Anzahl der Zahlen. */
 template<typename PCDATA>
-inline void _iamArrayNew_(PCVOID & _data, UINT32 & _size, UINT8 const _type, PCDATA const _array, INT32 _length) {
-	if (!_array || _length <= 0) {
-		_size = 0;
-		_data = 0;
+inline void iamarray_new_(PCVOID& data, UINT32& size, UINT8 const type, PCDATA const array, INT32 length) {
+	if (!array || length <= 0) {
+		size = 0;
+		data = 0;
 	} else {
-		UINT32 _count = _length <= 0x3FFFFFFF ? _length : 0x3FFFFFFF;
-		if (_type) {
-			_data = _array;
-			_size = (_count << 2) | _type;
+		UINT32 count = length <= 0x3FFFFFFF ? length : 0x3FFFFFFF;
+		if (type) {
+			data = array;
+			size = (count << 2) | type;
 		} else {
-			INT32 * _copy = new INT32[_count + 1];
-			_copy[0] = 1;
-			_copy++;
-			for (INT32 i = 0; i < _count; i++)
-				_copy[i] = _array[i];
-			_data = _copy;
-			_size = _count << 2;
+			INT32* copy = new INT32[count + 1];
+			copy[0] = 1;
+			copy++;
+			for (UINT32 i = 0; i < count; i++)
+				copy[i] = array[i];
+			data = copy;
+			size = count << 2;
 		}
 	}
 }
 
+/** Diese Methode gibt den Streuwert der gegebenen Zahlenfolge zurück
+ * @tparam PCDATA Datentyp zur Interpretation von array.
+ * @param array Zahlenfolge.
+ * @param length Länge der Zahlenfolge.
+ * @return Streuwert. */
+template<typename PCDATA>
+inline INT32 iamarray_hash_(PCVOID const array, INT32 length) {
+	PCDATA data = (PCDATA) array;
+	INT32 result = 0x811C9DC5;
+	for (INT32 i = 0; i < length; i++)
+		result = (result * 0x01000193) ^ (INT32) data[i];
+	return result;
+}
+
+/** Diese Methode gibt nur dann @c true zurück, wenn die gegebenen Zahlenfolgen gleich sind.
+ * @tparam PCDATA1 Datentyp zur Interpretation von array1.
+ * @tparam PCDATA2 Datentyp zur Interpretation von array2.
+ * @param array1 Erste Zahlenfolge.
+ * @param array2 Zweite Zahlenfolge.
+ * @param length Länge der Zahlenfolgen.
+ * @return @c true, wenn die Zahlenfolgen gleich sind. */
+template<typename PCDATA1, typename PCDATA2>
+inline bool iamarray_equals_(PCVOID const array1, PCVOID const array2, UINT32 length) {
+	PCDATA1 const data1 = (PCDATA1 const) array1;
+	PCDATA2 const data2 = (PCDATA2 const) array2;
+	for (UINT32 i = 0; i < length; i++)
+		if (data1[i] != data2[i]) return false;
+	return true;
+}
+
+/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als 0 zurück, wenn die Ordnung der ersten Zahlenfolge lexikografisch kleiner, gleich bzw. größer als die der zweiten Zahlenfolge ist.
+ * @tparam PCDATA1 Datentyp zur Interpretation von array1.
+ * @tparam PCDATA2 Datentyp zur Interpretation von array2.
+ * @param array1 Erste Zahlenfolge.
+ * @param array2 Zweite Zahlenfolge.
+ * @param length1 Länge der ersten Zahlenfolge.
+ * @param length2 Länge der zweiten Zahlenfolge.
+ * @return Vergleichswert der Ordnungen. */
+template<typename PCDATA1, typename PCDATA2>
+inline INT32 iamarray_compare_(PCVOID const array1, PCVOID const array2, UINT32 length1, UINT32 length2) {
+	PCDATA1 const data1 = (PCDATA1 const) array1;
+	PCDATA2 const data2 = (PCDATA2 const) array2;
+	UINT32 length = length1 < length2 ? length1 : length2;
+	for (UINT32 i = 0; i < length; i++) {
+		INT32 result = data1[i] - data2[i];
+		if (result != 0) return result;
+	}
+	return length1 - length2;
+}
+
+typedef boost::detail::atomic_count iamarray_count;
+
 /** Diese Methode gibt die Zahlenfolge zurück, der im kopierenden Konstrukteur sowie im Zuweisungsoperator von @c IAMArray verwendet wird.
- * @param _data Daten der Zahlenfolge.
- * @param _size Länge der Zahlenfolge.
+ * @param data Daten der Zahlenfolge.
+ * @param size Länge der Zahlenfolge.
  * @return Zahlenfolge. */
-inline PCVOID _iamArrayDataUse_(PCVOID const _data, UINT32 _size) {
-	if ((_size & 3) || !_data) return _data;
-	INT32 const* _array = (INT32 const*) _data - 1;
-	RCCounter& counter = *(RCCounter*) _array;
-	counter.inc();
-	return _data;
+inline PCVOID iamarray_data_use_(PCVOID const data, UINT32 size) {
+	if ((size & 3) || !data) return data;
+	INT32 const* array = (INT32 const*) data - 1;
+	iamarray_count& count = *(iamarray_count*) array;
+	++count;
+	return data;
 }
 
 /** Diese Methode gibt den Speicher der gegebenen Zahlenfolge frei, wenn diese kopiert wurde.
- * @param _data Daten der Zahlenfolge.
- * @param _size Länge der Zahlenfolge. */
-inline void _iamArrayDataFree_(PCVOID const _data, INT32 _size) {
-	if ((_size & 3) || !_data) return;
-	INT32 const* _array = (INT32 const*) _data - 1;
-	RCCounter& counter = *(RCCounter*) _array;
-	if (counter.dec() != 0) return;
-	delete[] _array;
+ * @param data Daten der Zahlenfolge.
+ * @param size Länge der Zahlenfolge. */
+inline void iamarray_data_free_(PCVOID const data, INT32 size) {
+	if ((size & 3) || !data) return;
+	INT32 const* array = (INT32 const*) data - 1;
+	iamarray_count& count = *(iamarray_count*) array;
+	if (--count) return;
+	delete[] array;
 }
 
-/**
- * Diese Methode prüft die Größe des gegebenen Speicherbereichs zur Erzeugung eines neuen @c IAMIndex.
- * @param _fileData Speicherbereich.
- * @throws IAMException Wenn die Größe ungültig ist.
- */
-inline INT32 const* _iamIndexChecked_(MMFArray const& _fileData) {
-	if (_fileData.size() & 3) throw IAMException(IAMException::INVALID_LENGTH);
-	return (INT32 const*) _fileData.data();
+IAMArray::IAMArray() : size_(0), data_(0) {
 }
 
-/**
- * Diese Methode prüft die Größe des gegebenen Speicherbereichs zur Erzeugung eines neuen @c IAMIndex.
- * @param _heapData Speicherbereich.
- * @throws IAMException Wenn die Größe ungültig ist.
- */
-inline INT32 const* _iamIndexChecked_(IAMArray const& _heapData) {
-	if (_heapData.mode() != 4) throw IAMException(IAMException::INVALID_LENGTH);
-	return (INT32 const*) _heapData.data();
+IAMArray::IAMArray(IAMArray const& source) {
+	data_ = iamarray_data_use_(source.data_, size_ = source.size_);
 }
 
-// class IAMArray
-
-IAMArray const IAMArray::EMPTY = IAMArray();
-
-IAMArray::IAMArray()
-	: _size_(0), _data_(0) {
-}
-
-IAMArray::IAMArray(IAMArray const& _source) {
-	_data_ = _iamArrayDataUse_(_source._data_, _size_ = _source._size_);
-}
-
-IAMArray::IAMArray(IAMArray const& _source, bool _copy) {
-	if (_copy) {
-		UINT32 _size = _source._size_;
-		PCVOID const _data = _source._data_;
-		UINT32 _length = _size >> 2;
-		switch (_size & 3) {
+IAMArray::IAMArray(IAMArray const& source, bool copy) {
+	if (copy) {
+		UINT32 size = source.size_;
+		PCVOID data = source.data_;
+		UINT32 length = size >> 2;
+		switch (size & 3) {
 			case 0:
-				_iamArrayNew_<INT32 const*>(_data_, _size_, 0, (INT32 const*) _data, _length);
+				iamarray_new_<INT32 const*>(data_, size_, 0, (INT32 const*) data, length);
 				break;
 			case 1:
-				_iamArrayNew_<INT8 const*>(_data_, _size_, 0, (INT8 const*) _data, _length);
+				iamarray_new_<INT8 const*>(data_, size_, 0, (INT8 const*) data, length);
 				break;
 			case 2:
-				_iamArrayNew_<INT16 const*>(_data_, _size_, 0, (INT16 const*) _data, _length);
+				iamarray_new_<INT16 const*>(data_, size_, 0, (INT16 const*) data, length);
 				break;
 			case 3:
-				_iamArrayNew_<INT32 const*>(_data_, _size_, 0, (INT32 const*) _data, _length);
+				iamarray_new_<INT32 const*>(data_, size_, 0, (INT32 const*) data, length);
 				break;
 		}
 	} else {
-		_data_ = _iamArrayDataUse_(_source._data_, _size_ = _source._size_);
+		data_ = iamarray_data_use_(source.data_, size_ = source.size_);
 	}
 }
 
-IAMArray::IAMArray(INT8 const* _array, INT32 _length) {
-	_iamArrayNew_<INT8 const*>(_data_, _size_, 1, _array, _length);
+IAMArray::IAMArray(INT8 const* array, INT32 length) {
+	iamarray_new_<INT8 const*>(data_, size_, 1, array, length);
 }
 
-IAMArray::IAMArray(INT8 const* _array, INT32 _length, bool _copy) {
-	_iamArrayNew_<INT8 const*>(_data_, _size_, _copy ? 0 : 1, _array, _length);
+IAMArray::IAMArray(INT8 const* array, INT32 length, bool copy) {
+	iamarray_new_<INT8 const*>(data_, size_, copy ? 0 : 1, array, length);
 }
 
-IAMArray::IAMArray(INT16 const* _array, INT32 _length) {
-	_iamArrayNew_<INT16 const*>(_data_, _size_, 2, _array, _length);
+IAMArray::IAMArray(INT16 const* array, INT32 length) {
+	iamarray_new_<INT16 const*>(data_, size_, 2, array, length);
 }
 
-IAMArray::IAMArray(INT16 const* _array, INT32 _length, bool _copy) {
-	_iamArrayNew_<INT16 const*>(_data_, _size_, _copy ? 0 : 2, _array, _length);
+IAMArray::IAMArray(INT16 const* array, INT32 length, bool copy) {
+	iamarray_new_<INT16 const*>(data_, size_, copy ? 0 : 2, array, length);
 }
 
-IAMArray::IAMArray(INT32 const* _array, INT32 _length) {
-	_iamArrayNew_<INT32 const*>(_data_, _size_, 3, _array, _length);
+IAMArray::IAMArray(INT32 const* array, INT32 length) {
+	iamarray_new_<INT32 const*>(data_, size_, 3, array, length);
 }
 
-IAMArray::IAMArray(INT32 const* _array, INT32 _length, bool _copy) {
-	_iamArrayNew_<INT32 const*>(_data_, _size_, _copy ? 0 : 3, _array, _length);
+IAMArray::IAMArray(INT32 const* array, INT32 length, bool copy) {
+	iamarray_new_<INT32 const*>(data_, size_, copy ? 0 : 3, array, length);
 }
 
 IAMArray::~IAMArray() {
-	_iamArrayDataFree_(_data_, _size_);
+	iamarray_data_free_(data_, size_);
 }
 
-INT32 IAMArray::get(INT32 _index) const {
-	UINT32 _size = _size_;
-	if (((UINT32) _index) >= (_size >> 2)) return 0;
-	PCVOID const _data = _data_;
-	switch (_size & 3) {
+INT32 IAMArray::get(INT32 index) const {
+	UINT32 size = size_;
+	if (((UINT32) index) >= (size >> 2)) return 0;
+	PCVOID const data = data_;
+	switch (size & 3) {
 		case 0:
-			return ((INT32 const*) _data)[_index];
+			return ((INT32 const*) data)[index];
 		case 1:
-			return ((INT8 const*) _data)[_index];
+			return ((INT8 const*) data)[index];
 		case 2:
-			return ((INT16 const*) _data)[_index];
+			return ((INT16 const*) data)[index];
 		case 3:
-			return ((INT32 const*) _data)[_index];
+			return ((INT32 const*) data)[index];
 	}
 	return 0;
 }
 
 INT32 IAMArray::length() const {
-	INT32 _result = _size_ >> 2;
-	return _result;
+	INT32 result = size_ >> 2;
+	return result;
 }
 
 PCVOID IAMArray::data() const {
-	return _data_;
+	return data_;
 }
 
 UINT8 IAMArray::mode() const {
-	UINT8 _result = (0x4214 >> ((_size_ & 3) << 2)) & 7;
-	return _result;
+	UINT8 result = (0x4214 >> ((size_ & 3) << 2)) & 7;
+	return result;
 }
 
 INT32 IAMArray::hash() const {
-	UINT32 _size = _size_;
-	PCVOID const _data = _data_;
-	UINT32 _length = _size >> 2;
-	switch (_size & 3) {
+	UINT32 size = size_;
+	PCVOID const data = data_;
+	UINT32 length = size >> 2;
+	switch (size & 3) {
 		case 0:
-			return _iamArrayHash_<INT32 const*>(_data, _length);
+			return iamarray_hash_<INT32 const*>(data, length);
 		case 1:
-			return _iamArrayHash_<INT8 const*>(_data, _length);
+			return iamarray_hash_<INT8 const*>(data, length);
 		case 2:
-			return _iamArrayHash_<INT16 const*>(_data, _length);
+			return iamarray_hash_<INT16 const*>(data, length);
 		case 3:
-			return _iamArrayHash_<INT32 const*>(_data, _length);
+			return iamarray_hash_<INT32 const*>(data, length);
 	}
 	return 0;
 }
 
-bool IAMArray::equals(IAMArray const& _value) const {
-	UINT32 _size1 = _size_, _size2 = _value._size_, _length = _size1 >> 2;
-	if (_length != (_size2 >> 2)) return false;
-	PCVOID const _data1 = _data_, _data2 = _value._data_;
-	switch (((_size1 & 3) << 2) | (_size2 & 3)) {
+bool IAMArray::equals(IAMArray const& value) const {
+	UINT32 size1 = size_, size2 = value.size_, length = size1 >> 2;
+	if (length != (size2 >> 2)) return false;
+	PCVOID const data1 = data_, data2 = value.data_;
+	switch (((size1 & 3) << 2) | (size2 & 3)) {
 		case 0:
-			return _iamArrayEquals_<INT32 const*, INT32 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT32 const*, INT32 const*>(data1, data2, length);
 		case 1:
-			return _iamArrayEquals_<INT32 const*, INT8 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT32 const*, INT8 const*>(data1, data2, length);
 		case 2:
-			return _iamArrayEquals_<INT32 const*, INT16 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT32 const*, INT16 const*>(data1, data2, length);
 		case 3:
-			return _iamArrayEquals_<INT32 const*, INT32 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT32 const*, INT32 const*>(data1, data2, length);
 		case 4:
-			return _iamArrayEquals_<INT8 const*, INT32 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT8 const*, INT32 const*>(data1, data2, length);
 		case 5:
-			return _iamArrayEquals_<INT8 const*, INT8 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT8 const*, INT8 const*>(data1, data2, length);
 		case 6:
-			return _iamArrayEquals_<INT8 const*, INT16 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT8 const*, INT16 const*>(data1, data2, length);
 		case 7:
-			return _iamArrayEquals_<INT8 const*, INT32 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT8 const*, INT32 const*>(data1, data2, length);
 		case 8:
-			return _iamArrayEquals_<INT16 const*, INT32 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT16 const*, INT32 const*>(data1, data2, length);
 		case 9:
-			return _iamArrayEquals_<INT16 const*, INT8 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT16 const*, INT8 const*>(data1, data2, length);
 		case 10:
-			return _iamArrayEquals_<INT16 const*, INT16 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT16 const*, INT16 const*>(data1, data2, length);
 		case 11:
-			return _iamArrayEquals_<INT16 const*, INT32 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT16 const*, INT32 const*>(data1, data2, length);
 		case 12:
-			return _iamArrayEquals_<INT32 const*, INT32 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT32 const*, INT32 const*>(data1, data2, length);
 		case 13:
-			return _iamArrayEquals_<INT32 const*, INT8 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT32 const*, INT8 const*>(data1, data2, length);
 		case 14:
-			return _iamArrayEquals_<INT32 const*, INT16 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT32 const*, INT16 const*>(data1, data2, length);
 		case 15:
-			return _iamArrayEquals_<INT32 const*, INT32 const*>(_data1, _data2, _length);
+			return iamarray_equals_<INT32 const*, INT32 const*>(data1, data2, length);
 	}
 	return false;
 }
 
-INT32 IAMArray::compare(IAMArray const& _value) const {
-	UINT32 _size1 = _size_, _size2 = _value._size_;
-	PCVOID const _data1 = _data_, _data2 = _value._data_;
-	UINT32 _length1 = _size1 >> 2, _length2 = _size2 >> 2;
-	switch (((_size1 & 3) << 2) | (_size2 & 3)) {
+INT32 IAMArray::compare(IAMArray const& value) const {
+	UINT32 size1 = size_, size2 = value.size_;
+	PCVOID const data1 = data_, data2 = value.data_;
+	UINT32 length1 = size1 >> 2, length2 = size2 >> 2;
+	switch (((size1 & 3) << 2) | (size2 & 3)) {
 		case 0:
-			return _iamArrayCompare_<INT32 const*, INT32 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT32 const*, INT32 const*>(data1, data2, length1, length2);
 		case 1:
-			return _iamArrayCompare_<INT32 const*, INT8 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT32 const*, INT8 const*>(data1, data2, length1, length2);
 		case 2:
-			return _iamArrayCompare_<INT32 const*, INT16 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT32 const*, INT16 const*>(data1, data2, length1, length2);
 		case 3:
-			return _iamArrayCompare_<INT32 const*, INT32 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT32 const*, INT32 const*>(data1, data2, length1, length2);
 		case 4:
-			return _iamArrayCompare_<INT8 const*, INT32 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT8 const*, INT32 const*>(data1, data2, length1, length2);
 		case 5:
-			return _iamArrayCompare_<INT8 const*, INT8 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT8 const*, INT8 const*>(data1, data2, length1, length2);
 		case 6:
-			return _iamArrayCompare_<INT8 const*, INT16 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT8 const*, INT16 const*>(data1, data2, length1, length2);
 		case 7:
-			return _iamArrayCompare_<INT8 const*, INT32 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT8 const*, INT32 const*>(data1, data2, length1, length2);
 		case 8:
-			return _iamArrayCompare_<INT16 const*, INT32 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT16 const*, INT32 const*>(data1, data2, length1, length2);
 		case 9:
-			return _iamArrayCompare_<INT16 const*, INT8 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT16 const*, INT8 const*>(data1, data2, length1, length2);
 		case 10:
-			return _iamArrayCompare_<INT16 const*, INT16 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT16 const*, INT16 const*>(data1, data2, length1, length2);
 		case 11:
-			return _iamArrayCompare_<INT16 const*, INT32 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT16 const*, INT32 const*>(data1, data2, length1, length2);
 		case 12:
-			return _iamArrayCompare_<INT32 const*, INT32 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT32 const*, INT32 const*>(data1, data2, length1, length2);
 		case 13:
-			return _iamArrayCompare_<INT32 const*, INT8 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT32 const*, INT8 const*>(data1, data2, length1, length2);
 		case 14:
-			return _iamArrayCompare_<INT32 const*, INT16 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT32 const*, INT16 const*>(data1, data2, length1, length2);
 		case 15:
-			return _iamArrayCompare_<INT32 const*, INT32 const*>(_data1, _data2, _length1, _length2);
+			return iamarray_compare_<INT32 const*, INT32 const*>(data1, data2, length1, length2);
 	}
 	return 0;
 }
 
-IAMArray IAMArray::section(INT32 _offset, INT32 _length) const {
-	UINT32 _size = _size_;
-	if (_offset < 0 || _length <= 0 || (UINT32) (_offset + _length) > (_size >> 2)) return IAMArray();
-	switch (_size & 3) {
+IAMArray IAMArray::section(INT32 offset, INT32 length) const {
+	UINT32 size = size_;
+	if (offset < 0 || length <= 0 || (UINT32) (offset + length) > (size >> 2)) return IAMArray();
+	switch (size & 3) {
 		case 0:
-			return IAMArray(((INT32 const*) _data_) + _offset, _length, true);
+			return IAMArray(((INT32 const*) data_) + offset, length, true);
 		case 1:
-			return IAMArray(((INT8 const*) _data_) + _offset, _length);
+			return IAMArray(((INT8 const*) data_) + offset, length);
 		case 2:
-			return IAMArray(((INT16 const*) _data_) + _offset, _length);
+			return IAMArray(((INT16 const*) data_) + offset, length);
 		case 3:
-			return IAMArray(((INT32 const*) _data_) + _offset, _length);
+			return IAMArray(((INT32 const*) data_) + offset, length);
 	}
 	return IAMArray();
 }
 
-INT32 IAMArray::operator[](INT32 _index) const {
-	return get(_index);
+INT32 IAMArray::operator[](INT32 index) const {
+	return get(index);
 }
 
-IAMArray & IAMArray::operator=(IAMArray const& _source) {
-	_iamArrayDataFree_(_data_, _size_);
-	_data_ = _iamArrayDataUse_(_source._data_, _size_ = _source._size_);
+IAMArray& IAMArray::operator=(IAMArray const& source) {
+	iamarray_data_free_(data_, size_);
+	data_ = iamarray_data_use_(source.data_, size_ = source.size_);
 	return *this;
 }
 
-// class IAMEntry
-
-IAMEntry::IAMEntry()
-	: _key_(), _value_() {
+IAMEntry::IAMEntry() : key_(), value_() {
 }
 
-IAMEntry::IAMEntry(const IAMEntry & _source)
-	: _key_(_source._key_), _value_(_source._value_) {
+IAMEntry::IAMEntry(const IAMEntry& source) : key_(source.key_), value_(source.value_) {
 }
 
-IAMEntry::IAMEntry(IAMArray const& _key, IAMArray const& _value)
-	: _key_(_key), _value_(_value) {
+IAMEntry::IAMEntry(IAMArray const& key, IAMArray const& value) : key_(key), value_(value) {
 }
 
 IAMArray const IAMEntry::key() const {
-	return _key_;
+	return key_;
 }
 
-INT32 IAMEntry::key(INT32 _index) const {
-	return _key_.get(_index);
+INT32 IAMEntry::key(INT32 index) const {
+	return key_.get(index);
 }
 
 INT32 IAMEntry::keyLength() const {
-	return _key_.length();
+	return key_.length();
 }
 
 IAMArray const IAMEntry::value() const {
-	return _value_;
+	return value_;
 }
 
-INT32 IAMEntry::value(INT32 _index) const {
-	return _value_.get(_index);
+INT32 IAMEntry::value(INT32 index) const {
+	return value_.get(index);
 }
 
 INT32 IAMEntry::valueLength() const {
-	return _value_.length();
+	return value_.length();
 }
 
 // class IAMListing
 
-IAMListing::OBJECT::OBJECT()
-	: _type_(0), _itemSize_(0), _itemData_(0), _itemCount_(0) {
+IAMListing::Data::Data() : type_(0), item_size_(0), item_data_(0), item_count_(0) {
 }
 
-IAMListing::OBJECT::OBJECT(INT32 const* _array, INT32 _length) {
-	if (!_array || _length < 3) throw IAMException(IAMException::INVALID_LENGTH);
+IAMListing::Data::Data(INT32 const* array, INT32 length) {
+	if (!array || length < 3) throw IAMException(IAMException::INVALID_LENGTH);
 
-	INT32 _offset = 0;
-	UINT32 _header = _array[_offset];
-	_offset++;
-	if ((_header & 0xFFFFFFF0) != 0xF00D2000) throw IAMException(IAMException::INVALID_HEADER);
+	INT32 offset = 0;
+	UINT32 header = array[offset];
+	offset++;
+	if ((header & 0xFFFFFFF0) != 0xF00D2000) throw IAMException(IAMException::INVALID_HEADER);
 
-	UINT8 const _itemDataType = (_header >> 2) & 3;
-	UINT8 const _itemSizeType = (_header >> 0) & 3;
-	if (!_itemDataType) throw IAMException(IAMException::INVALID_HEADER);
+	UINT8 const item_data_type = (header >> 2) & 3;
+	UINT8 const item_size_type = (header >> 0) & 3;
+	if (!item_data_type) throw IAMException(IAMException::INVALID_HEADER);
 
-	INT32 _itemCount = _array[_offset];
-	_offset++;
-	if (_itemCount > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+	INT32 item_count = array[offset];
+	offset++;
+	if (item_count > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-	PCVOID _itemSize;
-	UINT32 _itemValue;
-	if (_itemSizeType) {
+	PCVOID item_size;
+	UINT32 item_value;
+	if (item_size_type) {
 
-		_itemSize = _array + _offset;
-		_itemValue = _iamByteAlign_((_itemCount + 1) * _iamByteCount_(_itemSizeType));
-		_offset += _itemValue;
-		if (_length < _offset) throw IAMException(IAMException::INVALID_LENGTH);
+		item_size = array + offset;
+		item_value = iam_byte_align_((item_count + 1) * iam_byte_count_(item_size_type));
+		offset += item_value;
+		if (length < offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-//		_iamDataCheck_(_itemSizeType, _itemSize, _itemCount);
-		_itemValue = _iamDataGet_(_itemSizeType, _itemSize, _itemCount);
+		item_value = iam_data_get_(item_size_type, item_size, item_count);
 
 	} else {
 
-		_itemValue = _array[_offset];
-		_offset++;
-		if (_itemValue > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+		item_value = array[offset];
+		offset++;
+		if (item_value > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-		_itemSize = (PCVOID) _itemValue;
-		_itemValue = _itemCount * _itemValue;
+		item_size = (PCVOID) (UINT64) item_value;
+		item_value = item_count * item_value;
 
 	}
 
-	PCVOID _itemData = _array + _offset;
-	_itemValue = _iamByteAlign_(_itemValue * _iamByteCount_(_itemDataType));
-	_offset += _itemValue;
-	if (_length != _offset) throw IAMException(IAMException::INVALID_LENGTH);
+	PCVOID item_data = array + offset;
+	item_value = iam_byte_align_(item_value * iam_byte_count_(item_data_type));
+	offset += item_value;
+	if (length != offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-	_type_ = _iamDataType_(_itemDataType, _itemSizeType);
-	_itemSize_ = _itemSize;
-	_itemData_ = _itemData;
-	_itemCount_ = _itemCount;
+	type_ = iam_data_type_(item_data_type, item_size_type);
+	item_size_ = item_size;
+	item_data_ = item_data;
+	item_count_ = item_count;
 }
 
-/* Dieses Feld speichert die leeren Nutzdaten eines @c IAMListing. */
-RCPointer<IAMListing::OBJECT> _IAM_LISTING_OBJECT_(new IAMListing::OBJECT());
+IAMListing::Data::Ptr iamlisting_data_empty_(new IAMListing::Data());
 
-IAMListing::IAMListing()
-	: _object_(_IAM_LISTING_OBJECT_) {
+IAMListing::IAMListing() : data_(iamlisting_data_empty_) {
 }
 
-IAMListing::IAMListing(INT32 const* _array, INT32 _length)
-	: _object_(new OBJECT(_array, _length)) {
+IAMListing::IAMListing(INT32 const* array, INT32 length) : data_(new Data(array, length)) {
 }
 
 void IAMListing::check() const {
-	OBJECT& _this = *_object_;
-	_iamDataCheck_(_this._type_ & 3, _this._itemSize_, _this._itemCount_);
+	Data& data = *data_;
+	iam_data_check_(data.type_ & 3, data.item_size_, data.item_count_);
 }
 
-IAMArray IAMListing::item(INT32 _itemIndex) const {
-	OBJECT& _this = *_object_;
-	if ((UINT32) _itemIndex >= _this._itemCount_) return IAMArray();
-	return _iamDataArray_(_this._type_, _this._itemSize_, _this._itemData_, _itemIndex);
+IAMArray IAMListing::item(INT32 item_index) const {
+	Data& data = *data_;
+	if ((UINT32) item_index >= data.item_count_) return IAMArray();
+	return iam_data_array_(data.type_, data.item_size_, data.item_data_, item_index);
 }
 
-INT32 IAMListing::item(INT32 _itemIndex, INT32 _index) const {
-	OBJECT& _this = *_object_;
-	if (_index < 0 || (UINT32) _itemIndex >= _this._itemCount_) return 0;
-	return _iamDataValue_(_this._type_, _this._itemSize_, _this._itemData_, _itemIndex, _index);
+INT32 IAMListing::item(INT32 item_index, INT32 index) const {
+	Data& data = *data_;
+	if (index < 0 || (UINT32) item_index >= data.item_count_) return 0;
+	return iam_data_value_(data.type_, data.item_size_, data.item_data_, item_index, index);
 }
 
-INT32 IAMListing::itemLength(INT32 _itemIndex) const {
-	OBJECT& _this = *_object_;
-	if ((UINT32) _itemIndex >= _this._itemCount_) return 0;
-	return _iamDataLength_(_this._type_ & 3, _this._itemSize_, _itemIndex);
+INT32 IAMListing::itemLength(INT32 item_index) const {
+	Data& data = *data_;
+	if ((UINT32) item_index >= data.item_count_) return 0;
+	return iam_data_length_(data.type_ & 3, data.item_size_, item_index);
 }
 
 INT32 IAMListing::itemCount() const {
-	OBJECT& _this = *_object_;
-	return _this._itemCount_;
+	Data& data = *data_;
+	return data.item_count_;
 }
 
-INT32 IAMListing::find(IAMArray const _item) const {
-	OBJECT& _this = *_object_;
-	UINT32 const _type = _this._type_;
-	PCVOID const _itemSize = _this._itemSize_;
-	PCVOID const _itemData = _this._itemData_;
-	UINT32 const _itemCount = _this._itemCount_;
-	for (UINT32 i = 0; i < _itemCount; i++) {
-		IAMArray _array = _iamDataArray_(_type, _itemSize, _itemData, i);
-		if (_array.equals(_item)) return (INT32) i;
+INT32 IAMListing::find(IAMArray const item) const {
+	Data& data = *data_;
+	UINT32 const type = data.type_;
+	PCVOID const item_size = data.item_size_;
+	PCVOID const item_data = data.item_data_;
+	UINT32 const item_count = data.item_count_;
+	for (UINT32 i = 0; i < item_count; i++) {
+		IAMArray array = iam_data_array_(type, item_size, item_data, i);
+		if (array.equals(item)) return (INT32) i;
 	}
 	return -1;
 }
 
-IAMArray IAMListing::operator[](INT32 _itemIndex) const {
-	return item(_itemIndex);
+IAMArray IAMListing::operator[](INT32 item_index) const {
+	return item(item_index);
 }
 
-INT32 IAMListing::operator[](IAMArray const _item) const {
-	return find(_item);
+INT32 IAMListing::operator[](IAMArray const item) const {
+	return find(item);
 }
-
-// class IAMMapping
 
 /** Diese Methode gibt den Index des Schlüssels mit statischer Größe zurück, der der gegebenen Zahlenfolge ist.
  * Bei erfolgloser, streuwertbasierter Suche wird <tt>-1</tt> geliefert.
- * @tparam PCDATA Datentyp zur Interpretation von _keyData.
- * @tparam PCRANGE Datentyp zur Interpretation von _rangeData.
- * @param _keySize Größe eines Schlüssels (@c UINT32).
- * @param _keyData Speicherbereich mit den Daten der Schlüssel.
- * @param _rangeMask Bitmaske für den Streuwert.
- * @param _rangeData Speicherbereich mit den Längen der Schlüsselbereiche.
- * @param _find Gesuchte Zahlenfolge.
+ * @tparam PCDATA Datentyp zur Interpretation von key_data.
+ * @tparam PCRANGE Datentyp zur Interpretation von range_data.
+ * @param key_size Größe eines Schlüssels (@c UINT32).
+ * @param key_data Speicherbereich mit den Daten der Schlüssel.
+ * @param range_mask Bitmaske für den Streuwert.
+ * @param range_data Speicherbereich mit den Längen der Schlüsselbereiche.
+ * @param find Gesuchte Zahlenfolge.
  * @return Index des Schlüssels oder <tt>-1</tt>. */
 template<typename PCDATA, typename PCRANGE>
-INT32 _iamFind_HS_(PCVOID _keySize, PCVOID _keyData, UINT32 _rangeMask, PCVOID _rangeData, IAMArray const _find) {
-	PCDATA const _data = (PCDATA) _keyData;
-	UINT32 const _size = (UINT32) _keySize;
-	PCRANGE const _range = (PCRANGE) _rangeData;
-	if (_size != _find.length()) return -1;
-	UINT32 _index = _find.hash() & _rangeMask;
-	for (INT32 _l = _range[_index], _r = _range[_index + 1]; _l < _r; _l++) {
-		UINT32 const _offset = _size * _l;
-		UINT32 const _length = _size;
-		IAMArray const _key(_data + _offset, _length);
-		if (_key.equals(_find)) return _l;
+INT32 iammapping_find_hs_(PCVOID key_size, PCVOID key_data, UINT32 range_mask, PCVOID range_data, IAMArray const find) {
+	PCDATA const data = (PCDATA) key_data;
+	INT32 const size = (UINT64) key_size;
+	PCRANGE const range = (PCRANGE) range_data;
+	if (size != find.length()) return -1;
+	UINT32 index = find.hash() & range_mask;
+	for (INT32 p = range[index], n = range[index + 1]; p < n; p++) {
+		UINT32 const offset = size * p;
+		UINT32 const length = size;
+		IAMArray const key(data + offset, length);
+		if (key.equals(find)) return p;
 	}
 	return -1;
 }
 
 /** Diese Methode gibt den Index des Schlüssels mit dynamischer Größe zurück, der der gegebenen Zahlenfolge ist.
  * Bei erfolgloser, streuwertbasierter Suche wird <tt>-1</tt> geliefert.
- * @tparam PCDATA Datentyp zur Interpretation von _keyData.
- * @tparam PCSIZE Datentyp zur Interpretation von _keySize.
- * @tparam PCRANGE Datentyp zur Interpretation von _rangeData.
- * @param _keySize Speicherbereich mit den Längen der Schlüssel.
- * @param _keyData Speicherbereich mit den Daten der Schlüssel.
- * @param _rangeMask Bitmaske für den Streuwert.
- * @param _rangeData Speicherbereich mit den Längen der Schlüsselbereiche.
- * @param _find Gesuchte Zahlenfolge.
+ * @tparam PCDATA Datentyp zur Interpretation von key_data.
+ * @tparam PCSIZE Datentyp zur Interpretation von key_size.
+ * @tparam PCRANGE Datentyp zur Interpretation von range_data.
+ * @param key_size Speicherbereich mit den Längen der Schlüssel.
+ * @param key_data Speicherbereich mit den Daten der Schlüssel.
+ * @param range_mask Bitmaske für den Streuwert.
+ * @param range_data Speicherbereich mit den Längen der Schlüsselbereiche.
+ * @param find Gesuchte Zahlenfolge.
  * @return Index des Schlüssels oder <tt>-1</tt>. */
 template<typename PCDATA, typename PCSIZE, typename PCRANGE>
-INT32 _iamFind_HD_(PCVOID _keySize, PCVOID _keyData, UINT32 _rangeMask, PCVOID _rangeData, IAMArray const _find) {
-	PCDATA const _data = (PCDATA) _keyData;
-	PCSIZE const _size = (PCSIZE) _keySize;
-	PCRANGE const _range = (PCRANGE) _rangeData;
-	UINT32 const _index = _find.hash() & _rangeMask;
-	for (INT32 _l = _range[_index], _r = _range[_index + 1]; _l < _r; _l++) {
-		UINT32 const _offset = _size[_l];
-		UINT32 const _length = _size[_l + 1] - _offset;
-		IAMArray const _key(_data + _offset, _length);
-		if (_key.equals(_find)) return _l;
+INT32 iammapping_find_hd_(PCVOID key_size, PCVOID key_data, UINT32 range_mask, PCVOID range_data, IAMArray const find) {
+	PCDATA const data = (PCDATA) key_data;
+	PCSIZE const size = (PCSIZE) key_size;
+	PCRANGE const range = (PCRANGE) range_data;
+	UINT32 const index = find.hash() & range_mask;
+	for (INT32 p = range[index], n = range[index + 1]; p < n; p++) {
+		UINT32 const offset = size[p];
+		UINT32 const length = size[p + 1] - offset;
+		IAMArray const key(data + offset, length);
+		if (key.equals(find)) return p;
 	}
 	return -1;
 }
 
 /** Diese Methode gibt den Index des Schlüssels mit statischer Größe zurück, der der gegebenen Zahlenfolge ist.
  * Bei erfolgloser, binärer Suche wird <tt>-1</tt> geliefert.
- * @tparam PCDATA Datentyp zur Interpretation von _keyData.
- * @param _keySize Größe eines Schlüssels (@c UINT32).
- * @param _keyData Speicherbereich mit den Daten der Schlüssel.
- * @param _keyCount Anzahl der Schlüssel.
- * @param _find Gesuchte Zahlenfolge.
+ * @tparam PCDATA Datentyp zur Interpretation von key_data.
+ * @param key_size Größe eines Schlüssels (@c UINT32).
+ * @param key_data Speicherbereich mit den Daten der Schlüssel.
+ * @param key_count Anzahl der Schlüssel.
+ * @param find Gesuchte Zahlenfolge.
  * @return Index des Schlüssels oder <tt>-1</tt>. */
 template<typename PCDATA>
-INT32 _iamFind_BS_(PCVOID _keySize, PCVOID _keyData, UINT32 _keyCount, IAMArray const _find) {
-	PCDATA const _data = (PCDATA) _keyData;
-	UINT32 const _size = (UINT32) _keySize;
-	if (_size != _find.length()) return -1;
-	for (UINT32 _l = 0, _r = _keyCount; _l < _r;) {
-		UINT32 const _c = (_l + _r) >> 1;
-		UINT32 const _offset = _size * _c;
-		UINT32 const _length = _size;
-		IAMArray const _key(_data + _offset, _length);
-		INT32 const _value = _key.compare(_find);
-		if (_value < 0) _r = _c;
-		else if (_value > 0) _l = _c + 1;
-		else return _c;
+INT32 iammapping_find_bs_(PCVOID key_size, PCVOID key_data, UINT32 key_count, IAMArray const find) {
+	PCDATA const data = (PCDATA) key_data;
+	INT32 const size = (UINT64) key_size;
+	if (size != find.length()) return -1;
+	for (UINT32 p = 0, n = key_count; p < n;) {
+		UINT32 const i = (p + n) >> 1;
+		UINT32 const offset = size * i;
+		UINT32 const length = size;
+		IAMArray const key(data + offset, length);
+		INT32 const order = key.compare(find);
+		if (order < 0) n = i;
+		else if (order > 0) p = i + 1;
+		else return i;
 	}
 	return -1;
 }
 
 /** Diese Methode gibt den Index des Schlüssels mit dynamischer Größe zurück, der äquivalent zur gegebenen Zahlenfolge ist.
  * Bei erfolgloser, binärer Suche wird <tt>-1</tt> geliefert.
- * @tparam PCDATA Datentyp zur Interpretation von _keyData.
- * @tparam PCSIZE Datentyp zur Interpretation von _keySize.
- * @param _keySize Speicherbereich mit den Längen der Schlüssel.
- * @param _keyData Speicherbereich mit den Daten der Schlüssel.
- * @param _keyCount Anzahl der Schlüssel.
- * @param _find Gesuchte Zahlenfolge.
+ * @tparam PCDATA Datentyp zur Interpretation von key_data.
+ * @tparam PCSIZE Datentyp zur Interpretation von key_size.
+ * @param key_size Speicherbereich mit den Längen der Schlüssel.
+ * @param key_data Speicherbereich mit den Daten der Schlüssel.
+ * @param key_count Anzahl der Schlüssel.
+ * @param find Gesuchte Zahlenfolge.
  * @return Index des Schlüssels oder <tt>-1</tt>. */
 template<typename PCDATA, typename PCSIZE>
-INT32 _iamFind_BD_(PCVOID _keySize, PCVOID _keyData, UINT32 _keyCount, IAMArray const _find) {
-	PCDATA const _data = (PCDATA) _keyData;
-	PCSIZE const _size = (PCSIZE) _keySize;
-	for (UINT32 _l = 0, _r = _keyCount; _l < _r;) {
-		UINT32 const _c = (_l + _r) >> 1;
-		UINT32 const _offset = _size[_c];
-		UINT32 const _length = _size[_c + 1] - _offset;
-		IAMArray const _key(_data + _offset, _length);
-		INT32 const _value = _key.compare(_find);
-		if (_value < 0) _r = _c;
-		else if (_value > 0) _l = _c + 1;
-		else return _c;
+INT32 iammapping_find_bd_(PCVOID key_size, PCVOID key_data, UINT32 key_count, IAMArray const find) {
+	PCDATA const data = (PCDATA) key_data;
+	PCSIZE const size = (PCSIZE) key_size;
+	for (UINT32 p = 0, n = key_count; p < n;) {
+		UINT32 const i = (p + n) >> 1;
+		UINT32 const offset = size[i];
+		UINT32 const length = size[i + 1] - offset;
+		IAMArray const key(data + offset, length);
+		INT32 const order = key.compare(find);
+		if (order < 0) n = i;
+		else if (order > 0) p = i + 1;
+		else return i;
 	}
 	return -1;
 }
 
-IAMMapping::OBJECT::OBJECT()
-	: _type_(0), _keySize_(0), _keyData_(0), _valueSize_(0), _valueData_(0), _rangeMask_(0), _rangeSize_(0), _entryCount_(0) {
+IAMMapping::Data::Data() : type_(0), key_size_(0), key_data_(0), value_size_(0), value_data_(0), range_mask_(0), range_size_(0), entry_count_(0) {
 }
 
-IAMMapping::OBJECT::OBJECT(INT32 const* _array, INT32 _length) {
-	if (!_array || _length < 4) throw IAMException(IAMException::INVALID_LENGTH);
+IAMMapping::Data::Data(INT32 const* array, INT32 length) {
+	if (!array || length < 4) throw IAMException(IAMException::INVALID_LENGTH);
 
-	INT32 _offset = 0;
-	UINT32 _header = _array[_offset];
-	_offset++;
-	if ((_header & 0xFFFFFC00) != 0xF00D1000) throw IAMException(IAMException::INVALID_HEADER);
+	INT32 offset = 0;
+	UINT32 header = array[offset];
+	offset++;
+	if ((header & 0xFFFFFC00) != 0xF00D1000) throw IAMException(IAMException::INVALID_HEADER);
 
-	UINT8 const _keyDataType = (_header >> 8) & 3;
-	UINT8 const _keySizeType = (_header >> 6) & 3;
-	UINT8 const _rangeSizeType = (_header >> 4) & 3;
-	UINT8 const _valueDataType = (_header >> 2) & 3;
-	UINT8 const _valueSizeType = (_header >> 0) & 3;
-	if (!_keyDataType || !_valueDataType) throw IAMException(IAMException::INVALID_HEADER);
+	UINT8 const key_data_type = (header >> 8) & 3;
+	UINT8 const key_size_type = (header >> 6) & 3;
+	UINT8 const range_size_type = (header >> 4) & 3;
+	UINT8 const value_data_type = (header >> 2) & 3;
+	UINT8 const value_size_type = (header >> 0) & 3;
+	if (!key_data_type || !value_data_type) throw IAMException(IAMException::INVALID_HEADER);
 
-	UINT32 _entryCount = _array[_offset];
-	_offset++;
-	if (_entryCount > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+	UINT32 entry_count = array[offset];
+	offset++;
+	if (entry_count > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-	UINT32 _rangeMask;
-	PCVOID _rangeSize;
-	UINT32 _rangeValue;
-	if (_rangeSizeType) {
+	UINT32 range_mask;
+	PCVOID range_size;
+	UINT32 range_value;
+	if (range_size_type) {
 
-		if (_length <= _offset) throw IAMException(IAMException::INVALID_LENGTH);
+		if (length <= offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-		_rangeMask = _array[_offset];
-		_offset++;
-		if ((_rangeMask < 1) || (_rangeMask > 0x1FFFFFFF) || ((_rangeMask + 1) & _rangeMask)) throw IAMException(IAMException::INVALID_VALUE);
+		range_mask = array[offset];
+		offset++;
+		if ((range_mask < 1) || (range_mask > 0x1FFFFFFF) || ((range_mask + 1) & range_mask)) throw IAMException(IAMException::INVALID_VALUE);
 
-		_rangeSize = _array + _offset;
-		_rangeValue = _iamByteAlign_((_rangeMask + 2) * _iamByteCount_(_rangeSizeType));
-		_offset += _rangeValue;
-		if (_length <= _offset) throw IAMException(IAMException::INVALID_LENGTH);
+		range_size = array + offset;
+		range_value = iam_byte_align_((range_mask + 2) * iam_byte_count_(range_size_type));
+		offset += range_value;
+		if (length <= offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-//		_iamDataCheck_(_rangeSizeType, _rangeSize, _rangeMask + 1);
-		_rangeValue = _iamDataGet_(_rangeSizeType, _rangeSize, _rangeMask + 1);
-		if (_rangeValue != _entryCount) throw new IAMException(IAMException::INVALID_OFFSET);
+		range_value = iam_data_get_(range_size_type, range_size, range_mask + 1);
+		if (range_value != entry_count) throw new IAMException(IAMException::INVALID_OFFSET);
 
 	} else {
 
-		_rangeMask = 0;
-		_rangeSize = 0;
+		range_mask = 0;
+		range_size = 0;
 
 	}
 
-	if (_length <= _offset) throw IAMException(IAMException::INVALID_LENGTH);
+	if (length <= offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-	PCVOID _keySize;
-	UINT32 _keyValue;
-	if (_keySizeType) {
+	PCVOID key_size;
+	UINT32 key_value;
+	if (key_size_type) {
 
-		_keySize = _array + _offset;
-		_keyValue = _iamByteAlign_((_entryCount + 1) * _iamByteCount_(_keySizeType));
-		_offset += _keyValue;
-		if (_length <= _offset) throw IAMException(IAMException::INVALID_LENGTH);
+		key_size = array + offset;
+		key_value = iam_byte_align_((entry_count + 1) * iam_byte_count_(key_size_type));
+		offset += key_value;
+		if (length <= offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-//		_iamDataCheck_(_keySizeType, _keySize, _entryCount);
-		_keyValue = _iamDataGet_(_keySizeType, _keySize, _entryCount);
+		key_value = iam_data_get_(key_size_type, key_size, entry_count);
 
 	} else {
 
-		_keyValue = _array[_offset];
-		_offset++;
-		if (_length <= _offset) throw IAMException(IAMException::INVALID_LENGTH);
+		key_value = array[offset];
+		offset++;
+		if (length <= offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-		_keySize = (PCVOID) _keyValue;
-		_keyValue = _entryCount * _keyValue;
+		key_size = (PCVOID) (UINT64) key_value;
+		key_value = entry_count * key_value;
 
 	}
-	if (_keyValue > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+	if (key_value > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-	PCVOID _keyData = _array + _offset;
-	_keyValue = _iamByteAlign_(_keyValue * _iamByteCount_(_keyDataType));
-	_offset += _keyValue;
-	if (_length < _offset) throw IAMException(IAMException::INVALID_LENGTH);
+	PCVOID key_data = array + offset;
+	key_value = iam_byte_align_(key_value * iam_byte_count_(key_data_type));
+	offset += key_value;
+	if (length < offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-	PCVOID _valueSize;
-	UINT32 _valueValue;
-	if (_valueSizeType) {
+	PCVOID value_size;
+	UINT32 value_value;
+	if (value_size_type) {
 
-		_valueSize = _array + _offset;
-		_valueValue = _iamByteAlign_((_entryCount + 1) * _iamByteCount_(_valueSizeType));
-		_offset += _valueValue;
-		if (_length < _offset) throw IAMException(IAMException::INVALID_LENGTH);
+		value_size = array + offset;
+		value_value = iam_byte_align_((entry_count + 1) * iam_byte_count_(value_size_type));
+		offset += value_value;
+		if (length < offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-//		_iamDataCheck_(_valueSizeType, _valueSize, _entryCount);
-		_valueValue = _iamDataGet_(_valueSizeType, _valueSize, _entryCount);
+		value_value = iam_data_get_(value_size_type, value_size, entry_count);
 
 	} else {
 
-		_valueValue = _array[_offset];
-		_offset++;
-		if (_length < _offset) throw IAMException(IAMException::INVALID_LENGTH);
+		value_value = array[offset];
+		offset++;
+		if (length < offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-		_valueSize = (PCVOID) _valueValue;
-		_valueValue = _entryCount * _valueValue;
+		value_size = (PCVOID) (UINT64) value_value;
+		value_value = entry_count * value_value;
 
 	}
-	if (_valueValue > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+	if (value_value > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-	PCVOID _valueData = _array + _offset;
-	_valueValue = _iamByteAlign_(_valueValue * _iamByteCount_(_valueDataType));
-	_offset += _valueValue;
-	if (_length != _offset) throw IAMException(IAMException::INVALID_LENGTH);
+	PCVOID value_data = array + offset;
+	value_value = iam_byte_align_(value_value * iam_byte_count_(value_data_type));
+	offset += value_value;
+	if (length != offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-	_type_ = (_iamDataType_(_keyDataType, _keySizeType) << 6) | (_rangeSizeType << 4) | _iamDataType_(_valueDataType, _valueSizeType);
-	_keySize_ = _keySize;
-	_keyData_ = _keyData;
-	_valueSize_ = _valueSize;
-	_valueData_ = _valueData;
-	_rangeMask_ = _rangeMask;
-	_rangeSize_ = _rangeSize;
-	_entryCount_ = _entryCount;
+	type_ = (iam_data_type_(key_data_type, key_size_type) << 6) | (range_size_type << 4) | iam_data_type_(value_data_type, value_size_type);
+	key_size_ = key_size;
+	key_data_ = key_data;
+	value_size_ = value_size;
+	value_data_ = value_data;
+	range_mask_ = range_mask;
+	range_size_ = range_size;
+	entry_count_ = entry_count;
 }
 
-RCPointer<IAMMapping::OBJECT> _IAM_MAPPING_OBJECT_(new IAMMapping::OBJECT());
+IAMMapping::Data::Ptr iammapping_data_empty_(new IAMMapping::Data());
 
-IAMMapping::IAMMapping()
-	: _object_(_IAM_MAPPING_OBJECT_) {
+IAMMapping::IAMMapping() : data_(iammapping_data_empty_) {
 }
 
-IAMMapping::IAMMapping(INT32 const* _array, INT32 _length)
-	: _object_(new OBJECT(_array, _length)) {
+IAMMapping::IAMMapping(INT32 const* array, INT32 length) : data_(new Data(array, length)) {
 }
 
 void IAMMapping::check() const {
-	OBJECT& _this = *_object_;
-	_iamDataCheck_((_this._type_ >> 4) & 3, _this._rangeSize_, _this._rangeMask_ + 1);
-	_iamDataCheck_((_this._type_ >> 6) & 3, _this._keySize_, _this._entryCount_);
-	_iamDataCheck_(_this._type_ & 3, _this._valueSize_, _this._entryCount_);
+	Data& data = *data_;
+	iam_data_check_(data.type_ >> 4, data.range_size_, data.range_mask_ + 1);
+	iam_data_check_(data.type_ >> 6, data.key_size_, data.entry_count_);
+	iam_data_check_(data.type_ >> 0, data.value_size_, data.entry_count_);
 }
 
-IAMArray IAMMapping::key(INT32 _entryIndex) const {
-	OBJECT& _this = *_object_;
-	if ((UINT32) _entryIndex >= _this._entryCount_) return IAMArray();
-	IAMArray _result = _iamDataArray_(_this._type_ >> 6, _this._keySize_, _this._keyData_, _entryIndex);
-	return _result;
+IAMArray IAMMapping::key(INT32 entry_index) const {
+	Data& data = *data_;
+	if ((UINT32) entry_index >= data.entry_count_) return IAMArray();
+	IAMArray result = iam_data_array_(data.type_ >> 6, data.key_size_, data.key_data_, entry_index);
+	return result;
 }
 
-INT32 IAMMapping::key(INT32 _entryIndex, INT32 _index) const {
-	OBJECT& _this = *_object_;
-	if (_index < 0 || (UINT32) _entryIndex >= _this._entryCount_) return 0;
-	INT32 _result = _iamDataValue_(_this._type_ >> 6, _this._keySize_, _this._keyData_, _entryIndex, _index);
-	return _result;
+INT32 IAMMapping::key(INT32 entry_index, INT32 index) const {
+	Data& data = *data_;
+	if (index < 0 || (UINT32) entry_index >= data.entry_count_) return 0;
+	INT32 result = iam_data_value_(data.type_ >> 6, data.key_size_, data.key_data_, entry_index, index);
+	return result;
 }
 
-INT32 IAMMapping::keyLength(INT32 _entryIndex) const {
-	OBJECT& _this = *_object_;
-	if ((UINT32) _entryIndex >= _this._entryCount_) return 0;
-	INT32 _result = _iamDataLength_((_this._type_ >> 6) & 3, _this._keySize_, _entryIndex);
-	return _result;
+INT32 IAMMapping::keyLength(INT32 entry_index) const {
+	Data& data = *data_;
+	if ((UINT32) entry_index >= data.entry_count_) return 0;
+	INT32 result = iam_data_length_((data.type_ >> 6) & 3, data.key_size_, entry_index);
+	return result;
 }
 
-IAMArray IAMMapping::value(INT32 _entryIndex) const {
-	OBJECT& _this = *_object_;
-	if ((UINT32) _entryIndex >= _this._entryCount_) return IAMArray();
-	IAMArray _result = _iamDataArray_(_this._type_ & 15, _this._valueSize_, _this._valueData_, _entryIndex);
-	return _result;
+IAMArray IAMMapping::value(INT32 entry_index) const {
+	Data& data = *data_;
+	if ((UINT32) entry_index >= data.entry_count_) return IAMArray();
+	IAMArray result = iam_data_array_(data.type_ & 15, data.value_size_, data.value_data_, entry_index);
+	return result;
 }
 
-INT32 IAMMapping::value(INT32 _entryIndex, INT32 _index) const {
-	OBJECT& _this = *_object_;
-	if (_index < 0 || (UINT32) _entryIndex >= _this._entryCount_) return 0;
-	INT32 _result = _iamDataValue_(_this._type_ & 15, _this._valueSize_, _this._valueData_, _entryIndex, _index);
-	return _result;
+INT32 IAMMapping::value(INT32 entry_index, INT32 index) const {
+	Data& data = *data_;
+	if (index < 0 || (UINT32) entry_index >= data.entry_count_) return 0;
+	INT32 result = iam_data_value_(data.type_ & 15, data.value_size_, data.value_data_, entry_index, index);
+	return result;
 }
 
-INT32 IAMMapping::valueLength(INT32 _entryIndex) const {
-	OBJECT& _this = *_object_;
-	if ((UINT32) _entryIndex >= _this._entryCount_) return 0;
-	return _iamDataLength_(_this._type_ & 3, _this._valueSize_, _entryIndex);
+INT32 IAMMapping::valueLength(INT32 entry_index) const {
+	Data& data = *data_;
+	if ((UINT32) entry_index >= data.entry_count_) return 0;
+	return iam_data_length_(data.type_ & 3, data.value_size_, entry_index);
 }
 
-IAMEntry IAMMapping::entry(INT32 _entryIndex) const {
-	OBJECT& _this = *_object_;
-	if ((UINT32) _entryIndex >= _this._entryCount_) return IAMEntry();
-	IAMArray _key = _iamDataArray_(_this._type_ >> 6, _this._keySize_, _this._keyData_, _entryIndex);
-	IAMArray _value = _iamDataArray_(_this._type_ & 15, _this._valueSize_, _this._valueData_, _entryIndex);
-	IAMEntry _result = IAMEntry(_key, _value);
-	return _result;
+IAMEntry IAMMapping::entry(INT32 entry_index) const {
+	Data& data = *data_;
+	if ((UINT32) entry_index >= data.entry_count_) return IAMEntry();
+	IAMArray key = iam_data_array_(data.type_ >> 6, data.key_size_, data.key_data_, entry_index);
+	IAMArray value = iam_data_array_(data.type_ & 15, data.value_size_, data.value_data_, entry_index);
+	IAMEntry result = IAMEntry(key, value);
+	return result;
 }
 
 INT32 IAMMapping::entryCount() const {
-	OBJECT& _this = *_object_;
-	return _this._entryCount_;
+	Data& data = *data_;
+	return data.entry_count_;
 }
 
-INT32 IAMMapping::find(IAMArray const _key) const {
-	OBJECT& _this = *_object_;
-	switch (_this._type_ >> 4) {
+INT32 IAMMapping::find(IAMArray const key) const {
+	Data& data = *data_;
+	switch (data.type_ >> 4) {
 		case 0: // D1, S0, R0
-			return _iamFind_BS_<INT8 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bs_<INT8 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 1: // D1, S0, R1
-			return _iamFind_HS_<INT8 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT8 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 2: // D1, S0, R2
-			return _iamFind_HS_<INT8 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT8 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 3: // D1, S0, R3
-			return _iamFind_HS_<INT8 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT8 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 4: // D1, S1, R0
-			return _iamFind_BD_<INT8 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT8 const*, UINT8 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 5: // D1, S1, R1
-			return _iamFind_HD_<INT8 const*, UINT8 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT8 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 6: // D1, S1, R2
-			return _iamFind_HD_<INT8 const*, UINT8 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT8 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 7: // D1, S1, R3
-			return _iamFind_HD_<INT8 const*, UINT8 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT8 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 8: // D1, S2, R0
-			return _iamFind_BD_<INT8 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT8 const*, UINT16 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 9: // D1, S2, R1
-			return _iamFind_HD_<INT8 const*, UINT16 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT16 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 10: // D1, S2, R2
-			return _iamFind_HD_<INT8 const*, UINT16 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT16 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 11: // D1, S2, R3
-			return _iamFind_HD_<INT8 const*, UINT16 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT16 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 12: // D1, S3, R0
-			return _iamFind_BD_<INT8 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT8 const*, UINT32 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 13: // D1, S3, R1
-			return _iamFind_HD_<INT8 const*, UINT32 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT32 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 14: // D1, S3, R2
-			return _iamFind_HD_<INT8 const*, UINT32 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT32 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 15: // D1, S3, R3
-			return _iamFind_HD_<INT8 const*, UINT32 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT8 const*, UINT32 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 16: // D2, S0, R0
-			return _iamFind_BS_<INT16 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bs_<INT16 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 17: // D2, S0, R1
-			return _iamFind_HS_<INT16 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT16 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 18: // D2, S0, R2
-			return _iamFind_HS_<INT16 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT16 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 19: // D2, S0, R3
-			return _iamFind_HS_<INT16 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT16 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 20: // D2, S1, R0
-			return _iamFind_BD_<INT16 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT16 const*, UINT8 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 21: // D2, S1, R1
-			return _iamFind_HD_<INT16 const*, UINT8 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT8 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 22: // D2, S1, R2
-			return _iamFind_HD_<INT16 const*, UINT8 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT8 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 23: // D2, S1, R3
-			return _iamFind_HD_<INT16 const*, UINT8 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT8 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 24: // D2, S2, R0
-			return _iamFind_BD_<INT16 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT16 const*, UINT16 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 25: // D2, S2, R1
-			return _iamFind_HD_<INT16 const*, UINT16 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT16 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 26: // D2, S2, R2
-			return _iamFind_HD_<INT16 const*, UINT16 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT16 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 27: // D2, S2, R3
-			return _iamFind_HD_<INT16 const*, UINT16 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT16 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 28: // D2, S3, R0
-			return _iamFind_BD_<INT16 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT16 const*, UINT32 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 29: // D2, S3, R1
-			return _iamFind_HD_<INT16 const*, UINT32 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT32 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 30: // D2, S3, R2
-			return _iamFind_HD_<INT16 const*, UINT32 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT32 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 31: // D2, S3, R3
-			return _iamFind_HD_<INT16 const*, UINT32 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT16 const*, UINT32 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 32: // D3, S0, R0
-			return _iamFind_BS_<INT32 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bs_<INT32 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 33: // D3, S0, R1
-			return _iamFind_HS_<INT32 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT32 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 34: // D3, S0, R2
-			return _iamFind_HS_<INT32 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT32 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 35: // D3, S0, R3
-			return _iamFind_HS_<INT32 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hs_<INT32 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 36: // D3, S1, R0
-			return _iamFind_BD_<INT32 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT32 const*, UINT8 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 37: // D3, S1, R1
-			return _iamFind_HD_<INT32 const*, UINT8 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT8 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 38: // D3, S1, R2
-			return _iamFind_HD_<INT32 const*, UINT8 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT8 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 39: // D3, S1, R3
-			return _iamFind_HD_<INT32 const*, UINT8 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT8 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 40: // D3, S2, R0
-			return _iamFind_BD_<INT32 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT32 const*, UINT16 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 41: // D3, S2, R1
-			return _iamFind_HD_<INT32 const*, UINT16 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT16 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 42: // D3, S2, R2
-			return _iamFind_HD_<INT32 const*, UINT16 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT16 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 43: // D3, S2, R3
-			return _iamFind_HD_<INT32 const*, UINT16 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT16 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 44: // D3, S3, R0
-			return _iamFind_BD_<INT32 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._entryCount_, _key);
+			return iammapping_find_bd_<INT32 const*, UINT32 const*>(data.key_size_, data.key_data_, data.entry_count_, key);
 		case 45: // D3, S3, R1
-			return _iamFind_HD_<INT32 const*, UINT32 const*, UINT8 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT32 const*, UINT8 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 46: // D3, S3, R2
-			return _iamFind_HD_<INT32 const*, UINT32 const*, UINT16 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT32 const*, UINT16 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 		case 47: // D3, S3, R3
-			return _iamFind_HD_<INT32 const*, UINT32 const*, UINT32 const*>(_this._keySize_, _this._keyData_, _this._rangeMask_, _this._rangeSize_, _key);
+			return iammapping_find_hd_<INT32 const*, UINT32 const*, UINT32 const*>(data.key_size_, data.key_data_, data.range_mask_, data.range_size_, key);
 	}
 	return -1;
 }
 
-IAMEntry IAMMapping::operator[](INT32 _entryIndex) const {
-	return entry(_entryIndex);
+IAMEntry IAMMapping::operator[](INT32 entry_index) const {
+	return entry(entry_index);
 }
 
-INT32 IAMMapping::operator[](IAMArray const _key) const {
-	return find(_key);
+INT32 IAMMapping::operator[](IAMArray const key) const {
+	return find(key);
 }
 
-// class IAMIndex
-
-IAMIndex::OBJECT::OBJECT()
-	: _listingArray_(0), _listingCount_(0), _mappingArray_(0), _mappingCount_(0) {
+IAMIndex::Data::Data() : listing_array_(0), listing_count_(0), mapping_array_(0), mapping_count_(0) {
 }
 
-IAMIndex::OBJECT::OBJECT(INT32 const* _array, INT32 _length) {
-	if (!_array || _length < 5) throw IAMException(IAMException::INVALID_LENGTH);
+IAMIndex::Data::Data(INT32 const* array, INT32 length) {
+	if (!array || length < 5) throw IAMException(IAMException::INVALID_LENGTH);
 
-	INT32 _offset = 0;
-	UINT32 _header = _array[_offset];
-	_offset++;
-	if (_header != 0xF00DBA5E) throw IAMException(IAMException::INVALID_HEADER);
+	INT32 offset = 0;
+	UINT32 header = array[offset];
+	offset++;
+	if (header != 0xF00DBA5E) throw IAMException(IAMException::INVALID_HEADER);
 
-	UINT32 _mappingCount = _array[_offset];
-	_offset++;
-	if (_mappingCount > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+	UINT32 mapping_count = array[offset];
+	offset++;
+	if (mapping_count > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-	UINT32 _listingCount = _array[_offset];
-	_offset++;
-	if (_listingCount > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+	UINT32 listing_count = array[offset];
+	offset++;
+	if (listing_count > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-	INT32 const* _mappingOffset = _array + _offset;
-	_offset += _mappingCount + 1;
-	if (_length < _offset) throw IAMException(IAMException::INVALID_LENGTH);
+	INT32 const* mapping_offset = array + offset;
+	offset += mapping_count + 1;
+	if (length < offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-	UINT32 _mapDataLength = _mappingOffset[_mappingCount];
-	if (_mapDataLength > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+	UINT32 mapping_data_length = mapping_offset[mapping_count];
+	if (mapping_data_length > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-	INT32 const* _listingOffset = _array + _offset;
-	_offset += _listingCount + 1;
-	if (_length < _offset) throw IAMException(IAMException::INVALID_LENGTH);
+	INT32 const* listing_offset = array + offset;
+	offset += listing_count + 1;
+	if (length < offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-	UINT32 _listDataLength = _listingOffset[_listingCount];
-	if (_listDataLength > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
+	UINT32 listing_data_length = listing_offset[listing_count];
+	if (listing_data_length > 0x3FFFFFFF) throw IAMException(IAMException::INVALID_VALUE);
 
-	INT32 const* _mappingData = _array + _offset;
-	_offset += _mapDataLength;
-	if (_length < _offset) throw IAMException(IAMException::INVALID_LENGTH);
+	INT32 const* mapping_data = array + offset;
+	offset += mapping_data_length;
+	if (length < offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-	INT32 const* _listingData = _array + _offset;
-	_offset += _listDataLength;
-	if (_length != _offset) throw IAMException(IAMException::INVALID_LENGTH);
+	INT32 const* listing_data = array + offset;
+	offset += listing_data_length;
+	if (length != offset) throw IAMException(IAMException::INVALID_LENGTH);
 
-	IAMMapping* _mappingArray = new IAMMapping[_mappingCount];
-	DELETE_ARRAY<IAMMapping> _mappingGuard(_mappingArray);
+	IAMMapping* mapping_array = new IAMMapping[mapping_count];
+	DeleteArrayGuard<IAMMapping> mapping_guard(mapping_array);
 
-	IAMListing* _listingArray = new IAMListing[_listingCount];
-	DELETE_ARRAY<IAMListing> _listingGuard(_listingArray);
+	IAMListing* listing_array = new IAMListing[listing_count];
+	DeleteArrayGuard<IAMListing> listing_guard(listing_array);
 
-	for (UINT32 i = 0; i < _mappingCount; i++) {
-		INT32 const* _sourceArray = _mappingData + _mappingOffset[i];
-		INT32 _sourceLength = _mappingOffset[i + 1] - _mappingOffset[i];
-		_mappingArray[i] = IAMMapping(_sourceArray, _sourceLength);
+	for (UINT32 i = 0; i < mapping_count; i++) {
+		INT32 const* source_array = mapping_data + mapping_offset[i];
+		INT32 source_length = mapping_offset[i + 1] - mapping_offset[i];
+		mapping_array[i] = IAMMapping(source_array, source_length);
 	}
 
-	for (UINT32 i = 0; i < _listingCount; i++) {
-		INT32 const* _sourceArray = _listingData + _listingOffset[i];
-		INT32 _sourceLength = _listingOffset[i + 1] - _listingOffset[i];
-		_listingArray[i] = IAMListing(_sourceArray, _sourceLength);
+	for (UINT32 i = 0; i < listing_count; i++) {
+		INT32 const* source_array = listing_data + listing_offset[i];
+		INT32 source_length = listing_offset[i + 1] - listing_offset[i];
+		listing_array[i] = IAMListing(source_array, source_length);
 	}
 
-	_listingArray_ = _listingArray;
-	_listingCount_ = _listingCount;
-	_mappingArray_ = _mappingArray;
-	_mappingCount_ = _mappingCount;
+	listing_array_ = listing_array;
+	listing_count_ = listing_count;
+	mapping_array_ = mapping_array;
+	mapping_count_ = mapping_count;
 
-	_mappingGuard.cancel();
-	_listingGuard.cancel();
+	mapping_guard.cancel();
+	listing_guard.cancel();
 
 }
 
-IAMIndex::OBJECT::~OBJECT() {
-	delete[] _listingArray_;
-	delete[] _mappingArray_;
+IAMIndex::Data::~Data() {
+	delete[] listing_array_;
+	delete[] mapping_array_;
 }
 
-RCPointer<IAMIndex::OBJECT> _IAM_INDEX_OBJECT_(new IAMIndex::OBJECT());
-
-IAMIndex::IAMIndex()
-	: _object_(_IAM_INDEX_OBJECT_) {
+/** Diese Methode prüft die Größe des gegebenen Speicherbereichs zur Erzeugung eines neuen @c IAMIndex.
+ * @param file_data Speicherbereich.
+ * @throws IAMException Wenn die Größe ungültig ist. */
+inline INT32 const* iamindex_checked_(MMFArray const& file_data) {
+	if (file_data.size() & 3) throw IAMException(IAMException::INVALID_LENGTH);
+	return (INT32 const*) file_data.addr();
 }
 
-IAMIndex::IAMIndex(IAMArray const& _heapData)
-	: _object_(new OBJECT(_iamIndexChecked_(_heapData), _heapData.length())) {
-	_object_->_heapData_ = _heapData;
+/** Diese Methode prüft die Größe des gegebenen Speicherbereichs zur Erzeugung eines neuen @c IAMIndex.
+ * @param heap_data Speicherbereich.
+ * @throws IAMException Wenn die Größe ungültig ist. */
+inline INT32 const* iamindex_checked_(IAMArray const& heap_data) {
+	if (heap_data.mode() != 4) throw IAMException(IAMException::INVALID_LENGTH);
+	return (INT32 const*) heap_data.data();
 }
 
-IAMIndex::IAMIndex(MMFArray const& _fileData)
-	: _object_(new OBJECT(_iamIndexChecked_(_fileData), _fileData.size() >> 2)) {
-	_object_->_fileData_ = _fileData;
+IAMIndex::Data::Ptr iamindex_data_empty_(new IAMIndex::Data());
+
+IAMIndex::IAMIndex() : data_(iamindex_data_empty_) {
 }
 
-IAMIndex::IAMIndex(INT32 const* _array, INT32 _length)
-	: _object_(new OBJECT(_array, _length)) {
+IAMIndex::IAMIndex(IAMArray const& heap_data) : data_(new Data(iamindex_checked_(heap_data), heap_data.length())) {
+	data_->heap_data_ = heap_data;
+}
+
+IAMIndex::IAMIndex(MMFArray const& file_data) : data_(new Data(iamindex_checked_(file_data), file_data.size() >> 2)) {
+	data_->file_data_ = file_data;
+}
+
+IAMIndex::IAMIndex(INT32 const* array, INT32 length) : data_(new Data(array, length)) {
 }
 
 void IAMIndex::check() const {
-	OBJECT _this = *_object_;
-	IAMListing* _listing = _this._listingArray_;
-	for (IAMListing* _cancel = _listing + _this._listingCount_; _listing < _cancel; ++_listing) {
-		_listing->check();
+	Data data = *data_;
+	IAMListing* listing = data.listing_array_;
+	for (IAMListing* stop = listing + data.listing_count_; listing < stop; ++listing) {
+		listing->check();
 	}
-	IAMMapping* _mapping = _this._mappingArray_;
-	for (IAMMapping* _cancel = _mapping + _this._mappingCount_; _mapping < _cancel; ++_mapping) {
-		_mapping->check();
+	IAMMapping* mapping = data.mapping_array_;
+	for (IAMMapping* stop = mapping + data.mapping_count_; mapping < stop; ++mapping) {
+		mapping->check();
 	}
 }
 
-IAMListing IAMIndex::listing(INT32 _index) const {
-	OBJECT _this = *_object_;
-	if ((UINT32) _index >= _this._listingCount_) return IAMListing();
-	return _this._listingArray_[_index];
+IAMListing IAMIndex::listing(INT32 index) const {
+	Data data = *data_;
+	if ((UINT32) index >= data.listing_count_) return IAMListing();
+	return data.listing_array_[index];
 }
 
 INT32 IAMIndex::listingCount() const {
-	OBJECT _this = *_object_;
-	return _this._listingCount_;
+	Data data = *data_;
+	return data.listing_count_;
 }
 
-IAMMapping IAMIndex::mapping(INT32 _index) const {
-	OBJECT _this = *_object_;
-	if ((UINT32) _index >= _this._mappingCount_) return IAMMapping();
-	return _this._mappingArray_[_index];
+IAMMapping IAMIndex::mapping(INT32 index) const {
+	Data data = *data_;
+	if ((UINT32) index >= data.mapping_count_) return IAMMapping();
+	return data.mapping_array_[index];
 }
 
 INT32 IAMIndex::mappingCount() const {
-	OBJECT _this = *_object_;
-	return _this._mappingCount_;
+	Data data = *data_;
+	return data.mapping_count_;
 }
 
-// class IAMException
-
-IAMException::IAMException(INT8 const _code)
-	: _code_(_code) {
+IAMException::IAMException(INT8 const code) : code_(code) {
 }
 
 INT8 IAMException::code() const {
-	return _code_;
+	return code_;
 }
 
 }
 
-}
-
-}

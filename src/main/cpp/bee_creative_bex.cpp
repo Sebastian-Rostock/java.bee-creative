@@ -1,5 +1,7 @@
 /* [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 
+#ifdef false
+
 #include "bee_creative_bex.hpp"
 
 namespace bee {
@@ -543,7 +545,7 @@ BEXNode BEXList::parent() const {
 	throw IAMException(IAMException::INVALID_HEADER);
 }
 
-RCPointer<BEXFile::OBJECT> _BEX_FILE_OBJECT_(new BEXFile::OBJECT());
+Ref<BEXFile::OBJECT> _BEX_FILE_OBJECT_(new BEXFile::OBJECT());
 
 BEXFile::BEXFile()
 	: _object_(_BEX_FILE_OBJECT_) {
@@ -607,3 +609,4 @@ BEXList BEXFile::list(UINT32 const _key) const {
 
 }
 
+#endif
