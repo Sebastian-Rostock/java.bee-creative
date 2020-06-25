@@ -6,6 +6,9 @@ import java.util.Iterator;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QVSet;
 
+/** Diese Klasse implementiert ein {@link QVSet} als Sicht auf das ergebnis einer SQL-Anfrage.
+ *
+ * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 
 	static final class Iter extends H2QXIter<String> {

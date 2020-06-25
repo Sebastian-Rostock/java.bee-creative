@@ -54,6 +54,6 @@ abstract class H2QXIter<GItem> extends BaseIterator<GItem> {
 		}
 	}
 
-	abstract GItem next(ResultSet next2) throws SQLException;
+	protected abstract GItem next(ResultSet next2) throws SQLException;
 
 }

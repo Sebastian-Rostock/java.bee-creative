@@ -10,7 +10,10 @@ import bee.creative.qs.QE;
 import bee.creative.qs.QN;
 import bee.creative.qs.QS;
 
-public final class H2QS implements QS {
+/** Diese Klasse implementiert einen {@link QS Graphspeicher}, dessen Hyperkanten und Textwerte in einer Datenbank (vorzugsweise embedded H2) gespeichert sind.
+ *
+ * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public class H2QS implements QS {
 
 	static String selectTop(final H2QXSet<?, ?> set) {
 		return "(select top 1 from " + set.select + ")";
@@ -261,7 +264,7 @@ public final class H2QS implements QS {
 	}
 
 	/** Dieses Feld speichert die Datenbankverbindung. */
-	final Connection conn;
+	protected final Connection conn;
 
 	/** Dieses Feld speichert die nächste Knotenkennung. */
 	int nextNodeKey = 1;
@@ -291,7 +294,11 @@ public final class H2QS implements QS {
 
 	PreparedStatement deleteValue;
 
-	public H2QS(final Connection conn, final boolean setup) throws SQLException {
+	/** Dieser Konstruktor initialisiert die Datenbankverbindung sowie ggf. das Tabellenschema.
+	 *
+	 * @param conn Datenbankverbindung.
+	 * @param setup {@code true}, die Tabellen des Graphspeichers angelegt werden sollen. */
+	public H2QS(final Connection conn, final boolean setup) throws SQLException, NullPointerException {
 		this.conn = conn;
 		if (setup) {
 			this.setupTableImpl();
@@ -468,7 +475,7 @@ public final class H2QS implements QS {
 	// entfernt alle QN-String, die nicht in QE vorkommen
 	/** Diese Methode entfernt alle Hyperknoten mit Textwert, die nich in Hyperkanten verwendet werden. */
 	public void compact() {
-		// TODO scnell
+		// TODO schnell
 		this.nodes().except(this.edges().nodes()).popAll();
 	}
 

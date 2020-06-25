@@ -3,7 +3,9 @@ package bee.creative.qs.h2;
 import bee.creative.qs.QE;
 import bee.creative.qs.QN;
 
-// DONE
+/** Diese Klasse implementiert ein {@link QE} mit Bezug zu einer Datenbank.
+ *
+ * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class H2QE implements QE {
 
 	final H2QS owner;

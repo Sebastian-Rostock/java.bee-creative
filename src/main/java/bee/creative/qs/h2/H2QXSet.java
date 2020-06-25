@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import bee.creative.qs.QS;
 import bee.creative.qs.QXSet;
 import bee.creative.util.Iterables;
 
+/** Diese Klasse implementiert ein {@link QXSet} als Sicht auf das ergebnis einer SQL-Anfrage.
+ *
+ * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @param <GI> Typ der Einträge.
+ * @param <GISet> Typ dieser Menge. */
 public abstract class H2QXSet<GI, GISet extends Iterable<GI>> implements QXSet<GI, GISet> {
 
-	protected final H2QS owner;
+	final H2QS owner;
 
 	/** Dieses Feld speichert die SQL-Anfrage zur Ermittlung der Tabelle. */
 	protected final String select;
@@ -26,7 +30,7 @@ public abstract class H2QXSet<GI, GISet extends Iterable<GI>> implements QXSet<G
 	}
 
 	@Override
-	public QS owner() {
+	public H2QS owner() {
 		return this.owner;
 	}
 
@@ -44,8 +48,9 @@ public abstract class H2QXSet<GI, GISet extends Iterable<GI>> implements QXSet<G
 
 	@Override
 	public List<GI> toList() {
-		final List<GI> result = new ArrayList<>();
+		final ArrayList<GI> result = new ArrayList<>();
 		Iterables.addAll(result, this.order());
+		result.trimToSize();
 		return result;
 	}
 

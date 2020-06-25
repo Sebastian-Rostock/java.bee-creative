@@ -8,6 +8,9 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 
+/** Diese Klasse implementiert ein {@link QESet} als Sicht auf das ergebnis einer SQL-Anfrage.
+ *
+ * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QESet extends H2QXSet<QE, QESet> implements QESet {
 
 	static class Iter extends H2QXIter<QE> {
