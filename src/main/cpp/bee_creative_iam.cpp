@@ -349,7 +349,7 @@ inline void iamarray_data_free_(PCVOID const data, INT32 size) {
 	delete[] array;
 }
 
-IAMArray::IAMArray() : size_(0), data_(0) {
+IAMArray::IAMArray() : data_(0), size_(0) {
 }
 
 IAMArray::IAMArray(IAMArray const& source) {
@@ -646,9 +646,9 @@ IAMListing::Data::Data(INT32 const* array, INT32 length) {
 	if (length != offset) throw IAMException(IAMException::INVALID_LENGTH);
 
 	type_ = iam_data_type_(item_data_type, item_size_type);
+	item_count_ = item_count;
 	item_size_ = item_size;
 	item_data_ = item_data;
-	item_count_ = item_count;
 }
 
 IAMListing::Data::Ptr iamlisting_data_empty_(new IAMListing::Data());

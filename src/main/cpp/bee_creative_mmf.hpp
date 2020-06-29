@@ -43,14 +43,14 @@ struct MMFArray {
 
 		Data(UINT8* addr, UINT32 size, Data* owner);
 
+		/** Dieses Feld speichert die originalen Nutzdaten, wenn diese Nutzdaten einen Abschnitte darstellen. */
+		Data::Ptr owner_;
+
 		/** Dieses Feld speichert den Beginn des Speicherbereichs. */
 		UINT8* addr_;
 
 		/** Dieses Feld speichert die Größe des Speicherbereichs. */
 		UINT32 size_;
-
-		/** Dieses Feld speichert die originalen Nutzdaten, wenn diese Nutzdaten einen Abschnitte darstellen. */
-		Data::Ptr owner_;
 
 	};
 

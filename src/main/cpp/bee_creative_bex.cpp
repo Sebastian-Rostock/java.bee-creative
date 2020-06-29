@@ -1,14 +1,8 @@
-/* [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-
-#ifdef false
+/* [cc-by] 2013-2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 
 #include "bee_creative_bex.hpp"
 
-namespace bee {
-
-namespace creative {
-
-namespace bex {
+namespace bee_creative {
 
 // Typkennung für den undefinierten Knoten bzw. die undefinierte Knotenliste.
 const UINT8 BEX_VOID_TYPE = 0;
@@ -35,165 +29,158 @@ const UINT8 BEX_CHLD_LIST = 6;
 const UINT8 BEX_CHTX_LIST = 7;
 
 /** Diese Methode gibt die Referenz des gegebenen Schlüssels zurück.
- * @param _key Schlüssel.
+ * @param key Schlüssel.
  * @return Referenz. */
-inline INT32 _bexRef_(UINT32 _key) {
-	return _key >> 3;
+inline INT32 bex_ref_(UINT32 key) {
+	return key >> 3;
 }
 
 /** Diese Methode gibt einen Schlüssel mit den gegebenen Eigenschaften zurück.
  * @param type Typkennung (0..7).
  * @param ref Referenz als Zeilennummer des Datensatzes.
  * @return Schlüssel. */
-inline UINT32 _bexKey_(UINT8 _type, UINT32 _ref) {
-	return (_ref << 3) | _type;
+inline UINT32 bex_key_(UINT8 type, UINT32 ref) {
+	return (ref << 3) | type;
 }
 
 /** Diese Methode gibt die Typkennung des gegebenen Schlüssels zurück.
  * @param key Schlüssel.
  * @return Typkennung. */
-inline UINT8 _bexType_(UINT32 _key) {
-	return _key & 7;
+inline UINT8 bex_type_(UINT32 key) {
+	return key & 7;
 }
 
 /** Diese Methode gibt die gegebenen Zahlenfolge als Zeichenkette zurück.
- * @param _array Zahlenfolge.
+ * @param array Zahlenfolge.
  * @return Zeichenkette. */
-inline string _bexString_(IAMArray const& _array) {
-	string result((PCCHAR) _array.data());
+inline std::string bex_string_(IAMArray const& array) {
+	std::string result((PCCHAR) array.data());
 	return result;
 }
 
 /** Diese Methode gibt die gegebenen Zeichenkette als Zahlenfolge zurück.
- * @param _string Zeichenkette.
+ * @param string Zeichenkette.
  * @return Zahlenfolge. */
-inline IAMArray _bexArray_(string const& _string) {
-	IAMArray result((INT8 const*) _string.data(), _string.length() + 1);
+inline IAMArray bex_array_(std::string const& string) {
+	IAMArray result((INT8 const*) string.data(), string.length() + 1);
 	return result;
 }
 
-BEXFile::OBJECT::OBJECT()
-	: _rootRef_(-1) {
+BEXFile::Data::Data() : root_ref_(-1) {
 }
 
-// class BEXNode
-
-BEXFile::OBJECT::OBJECT(IAMIndex const& _fileData)
-	: OBJECT() {
+BEXFile::Data::Data(IAMIndex const& file_data) : Data() {
 
 	if (false || //
-	    (_fileData.mappingCount() != 0) || //
-	    (_fileData.listingCount() != 18) //
+	    (file_data.mappingCount() != 0) || //
+	    (file_data.listingCount() != 18) //
 	    ) throw IAMException(IAMException::INVALID_VALUE);
 
-	IAMListing _headRootListing = _fileData.listing(0);
-	IAMListing _attrUriTextList = _fileData.listing(1);
-	IAMListing _attrNameTextList = _fileData.listing(2);
-	IAMListing _attrValueTextList = _fileData.listing(3);
-	IAMListing _chldUriTextList = _fileData.listing(4);
-	IAMListing _chldNameTextList = _fileData.listing(5);
-	IAMListing _chldValueTextList = _fileData.listing(6);
-	IAMListing _attrUriRefListing = _fileData.listing(7);
-	IAMListing _attrNameRefListing = _fileData.listing(8);
-	IAMListing _attrValueRefListing = _fileData.listing(9);
-	IAMListing _attrParentRefListing = _fileData.listing(10);
-	IAMListing _chldUriRefListing = _fileData.listing(11);
-	IAMListing _chldNameRefListing = _fileData.listing(12);
-	IAMListing _chldContentRefListing = _fileData.listing(13);
-	IAMListing _chldAttributesRefListing = _fileData.listing(14);
-	IAMListing _chldParentRefListing = _fileData.listing(15);
-	IAMListing _attrListRangeListing = _fileData.listing(16);
-	IAMListing _chldListRangeListing = _fileData.listing(17);
+	IAMListing head_root_listing = file_data.listing(0);
+	IAMListing attr_uri_text_list = file_data.listing(1);
+	IAMListing attr_name_text_list = file_data.listing(2);
+	IAMListing attr_value_text_list = file_data.listing(3);
+	IAMListing chld_uri_text_list = file_data.listing(4);
+	IAMListing chld_name_text_list = file_data.listing(5);
+	IAMListing chld_value_text_list = file_data.listing(6);
+	IAMListing attr_uri_ref_listing = file_data.listing(7);
+	IAMListing attr_name_ref_listing = file_data.listing(8);
+	IAMListing attr_value_ref_listing = file_data.listing(9);
+	IAMListing attr_parent_ref_listing = file_data.listing(10);
+	IAMListing chld_uri_ref_listing = file_data.listing(11);
+	IAMListing chld_name_ref_listing = file_data.listing(12);
+	IAMListing chld_content_ref_listing = file_data.listing(13);
+	IAMListing chld_attributes_ref_listing = file_data.listing(14);
+	IAMListing chld_parent_ref_listing = file_data.listing(15);
+	IAMListing attr_list_range_listing = file_data.listing(16);
+	IAMListing chld_list_range_listing = file_data.listing(17);
 
 	if (false || //
-	    (_headRootListing.itemCount() != 1) || //
-	    (_attrUriRefListing.itemCount() != 1) || //
-	    (_attrNameRefListing.itemCount() != 1) || //
-	    (_attrValueRefListing.itemCount() != 1) || //
-	    (_attrParentRefListing.itemCount() != 1) || //
-	    (_chldUriRefListing.itemCount() != 1) || //
-	    (_chldNameRefListing.itemCount() != 1) || //
-	    (_chldContentRefListing.itemCount() != 1) || //
-	    (_chldAttributesRefListing.itemCount() != 1) || //
-	    (_chldParentRefListing.itemCount() != 1) || //
-	    (_attrListRangeListing.itemCount() != 1) || //
-	    (_chldListRangeListing.itemCount() != 1) //
+	    (head_root_listing.itemCount() != 1) || //
+	    (attr_uri_ref_listing.itemCount() != 1) || //
+	    (attr_name_ref_listing.itemCount() != 1) || //
+	    (attr_value_ref_listing.itemCount() != 1) || //
+	    (attr_parent_ref_listing.itemCount() != 1) || //
+	    (chld_uri_ref_listing.itemCount() != 1) || //
+	    (chld_name_ref_listing.itemCount() != 1) || //
+	    (chld_content_ref_listing.itemCount() != 1) || //
+	    (chld_attributes_ref_listing.itemCount() != 1) || //
+	    (chld_parent_ref_listing.itemCount() != 1) || //
+	    (attr_list_range_listing.itemCount() != 1) || //
+	    (chld_list_range_listing.itemCount() != 1) //
 	    ) throw IAMException(IAMException::INVALID_VALUE);
 
-	IAMArray _headRoot = _headRootListing.item(0);
-	IAMArray _attrUriRef = _attrUriRefListing.item(0);
-	IAMArray _attrNameRef = _attrNameRefListing.item(0);
-	IAMArray _attrValueRef = _attrValueRefListing.item(0);
-	IAMArray _attrParentRef = _attrParentRefListing.item(0);
-	IAMArray _chldUriRef = _chldUriRefListing.item(0);
-	IAMArray _chldNameRef = _chldNameRefListing.item(0);
-	IAMArray _chldContentRef = _chldContentRefListing.item(0);
-	IAMArray _chldAttributesRef = _chldAttributesRefListing.item(0);
-	IAMArray _chldParentRef = _chldParentRefListing.item(0);
-	IAMArray _chldListRange = _chldListRangeListing.item(0);
-	IAMArray _attrListRange = _attrListRangeListing.item(0);
+	IAMArray head_root = head_root_listing.item(0);
+	IAMArray attr_uri_ref = attr_uri_ref_listing.item(0);
+	IAMArray attr_name_ref = attr_name_ref_listing.item(0);
+	IAMArray attr_value_ref = attr_value_ref_listing.item(0);
+	IAMArray attr_parent_ref = attr_parent_ref_listing.item(0);
+	IAMArray chld_uri_ref = chld_uri_ref_listing.item(0);
+	IAMArray chld_name_ref = chld_name_ref_listing.item(0);
+	IAMArray chld_content_ref = chld_content_ref_listing.item(0);
+	IAMArray chld_attributes_ref = chld_attributes_ref_listing.item(0);
+	IAMArray chld_parent_ref = chld_parent_ref_listing.item(0);
+	IAMArray chld_list_range = chld_list_range_listing.item(0);
+	IAMArray attr_list_range = attr_list_range_listing.item(0);
 
-	INT32 _headVal = _headRoot.get(0);
-	INT32 _rootRef = _headRoot.get(1);
-	INT32 _attrCount = _attrNameRef.length();
-	INT32 _chldCount = _chldNameRef.length();
+	INT32 root_mag = head_root.get(0);
+	INT32 root_ref = head_root.get(1);
+	INT32 attr_count = attr_name_ref.length();
+	INT32 chld_count = chld_name_ref.length();
 
 	if (false || //
-		(_headVal != (INT32)0xBE10BA5E) || //
-	    (_rootRef < 0) || //
-	    (_chldCount <= _rootRef) || //
-	    ((_attrUriRef.length() != _attrCount) && (_attrUriRef.length() != 0)) || //
-	    (_attrValueRef.length() != _attrCount) || //
-	    ((_attrParentRef.length() != _attrCount) && (_attrParentRef.length() != 0)) || //
-	    ((_chldUriRef.length() != _chldCount) && (_chldUriRef.length() != 0)) || //
-	    (_chldContentRef.length() != _chldCount) || //
-	    (_chldAttributesRef.length() != _chldCount) || //
-	    ((_chldParentRef.length() != _chldCount) && (_chldParentRef.length() != 0)) || //
-	    (_chldListRange.length() < 3) || //
-	    (_attrListRange.length() < 2) //
+	    (root_mag != (INT32) 0xBE10BA5E) || //
+	    (root_ref < 0) || //
+	    (chld_count <= root_ref) || //
+	    ((attr_uri_ref.length() != attr_count) && (attr_uri_ref.length() != 0)) || //
+	    (attr_value_ref.length() != attr_count) || //
+	    ((attr_parent_ref.length() != attr_count) && (attr_parent_ref.length() != 0)) || //
+	    ((chld_uri_ref.length() != chld_count) && (chld_uri_ref.length() != 0)) || //
+	    (chld_content_ref.length() != chld_count) || //
+	    (chld_attributes_ref.length() != chld_count) || //
+	    ((chld_parent_ref.length() != chld_count) && (chld_parent_ref.length() != 0)) || //
+	    (chld_list_range.length() < 3) || //
+	    (attr_list_range.length() < 2) //
 	    ) throw IAMException(IAMException::INVALID_VALUE);
 
-	_rootRef_ = _rootRef;
-	_fileData_ = _fileData;
-	_attrUriText_ = _attrUriTextList;
-	_attrNameText_ = _attrNameTextList;
-	_attrValueText_ = _attrValueTextList;
-	_chldUriText_ = _chldUriTextList;
-	_chldNameText_ = _chldNameTextList;
-	_chldValueText_ = _chldValueTextList;
-	_attrUriRef_ = _attrUriRef;
-	_attrNameRef_ = _attrNameRef;
-	_attrValueRef_ = _attrValueRef;
-	_attrParentRef_ = _attrParentRef;
-	_chldUriRef_ = _chldUriRef;
-	_chldNameRef_ = _chldNameRef;
-	_chldContentRef_ = _chldContentRef;
-	_chldAttributesRef_ = _chldAttributesRef;
-	_chldParentRef_ = _chldParentRef;
-	_chldListRange_ = _chldListRange;
-	_attrListRange_ = _attrListRange;
+	root_ref_ = root_ref;
+	file_data_ = file_data;
+	attr_uri_text_ = attr_uri_text_list;
+	attr_name_text_ = attr_name_text_list;
+	attr_value_text_ = attr_value_text_list;
+	chld_uri_text_ = chld_uri_text_list;
+	chld_name_text_ = chld_name_text_list;
+	chld_value_text_ = chld_value_text_list;
+	attr_uri_ref_ = attr_uri_ref;
+	attr_name_ref_ = attr_name_ref;
+	attr_value_ref_ = attr_value_ref;
+	attr_parent_ref_ = attr_parent_ref;
+	chld_uri_ref_ = chld_uri_ref;
+	chld_name_ref_ = chld_name_ref;
+	chld_content_ref_ = chld_content_ref;
+	chld_attributes_ref_ = chld_attributes_ref;
+	chld_rarent_ref_ = chld_parent_ref;
+	chld_list_range_ = chld_list_range;
+	attr_list_range_ = attr_list_range;
 
 }
 
-BEXNode::BEXNode()
-	: _key_(_bexKey_(BEX_VOID_TYPE, 0)), _owner_() {
+BEXNode::BEXNode() : owner_(), key_(bex_key_(BEX_VOID_TYPE, 0)) {
 }
 
-BEXNode::BEXNode(BEXFile const& _owner)
-	: _key_(_bexKey_(BEX_VOID_TYPE, 0)), _owner_(_owner) {
+BEXNode::BEXNode(BEXFile const& owner) : owner_(owner), key_(bex_key_(BEX_VOID_TYPE, 0)) {
 }
 
-BEXNode::BEXNode(UINT32 const _key, BEXFile const& _owner)
-	: _key_(_key), _owner_(_owner) {
+BEXNode::BEXNode(BEXFile const& owner, UINT32 const key) : owner_(owner), key_(key) {
 }
 
 UINT32 BEXNode::key() const {
-	return _key_;
+	return key_;
 }
 
 UINT8 BEXNode::type() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_VOID_TYPE:
 			return BEXNode::VOID_NODE;
 		case BEX_ATTR_NODE:
@@ -208,110 +195,110 @@ UINT8 BEXNode::type() const {
 }
 
 BEXFile BEXNode::owner() const {
-	return _owner_;
+	return owner_;
 }
 
-string BEXNode::uri() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+std::string BEXNode::uri() const {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_ATTR_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray _result = _object->_attrUriText_.item(_object->_attrUriRef_.get(_bexRef_(_key)));
-			return _bexString_(_result);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray result = data.attr_uri_text_.item(data.attr_uri_ref_.get(bex_ref_(key)));
+			return bex_string_(result);
 		}
 		case BEX_ELEM_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray _result = _object->_chldUriText_.item(_object->_chldUriRef_.get(_bexRef_(_key)));
-			return _bexString_(_result);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray result = data.chld_uri_text_.item(data.chld_uri_ref_.get(bex_ref_(key)));
+			return bex_string_(result);
 		}
 		case BEX_VOID_TYPE:
 		case BEX_TEXT_NODE:
 		case BEX_ELTX_NODE:
-			return string();
+			return std::string();
 	}
 	throw IAMException(IAMException::INVALID_HEADER);
 }
 
-string BEXNode::name() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+std::string BEXNode::name() const {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_ATTR_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray _result = _object->_attrNameText_.item(_object->_attrNameRef_.get(_bexRef_(_key)));
-			return _bexString_(_result);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray result = data.attr_name_text_.item(data.attr_name_ref_.get(bex_ref_(key)));
+			return bex_string_(result);
 		}
 		case BEX_ELEM_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray _result = _object->_chldNameText_.item(_object->_chldNameRef_.get(_bexRef_(_key)));
-			return _bexString_(_result);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray result = data.chld_name_text_.item(data.chld_name_ref_.get(bex_ref_(key)));
+			return bex_string_(result);
 		}
 		case BEX_VOID_TYPE:
 		case BEX_TEXT_NODE:
 		case BEX_ELTX_NODE:
-			return string();
+			return std::string();
 	}
 	throw IAMException(IAMException::INVALID_HEADER);
 }
 
-string BEXNode::value() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+std::string BEXNode::value() const {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_VOID_TYPE:
-			return string();
+			return std::string();
 		case BEX_ATTR_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray _result = _object->_attrValueText_.item(_object->_attrValueRef_.get(_bexRef_(_key)));
-			return _bexString_(_result);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray result = data.attr_value_text_.item(data.attr_value_ref_.get(bex_ref_(key)));
+			return bex_string_(result);
 		}
 		case BEX_ELEM_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			INT32 _index = _bexRef_(_key);
-			INT32 _content = _object->_chldContentRef_.get(_index);
-			if (_content >= 0) {
-				IAMArray _result = _object->_chldValueText_.item(_content);
-				return _bexString_(_result);
+			BEXFile::Data& data = *owner_.data_;
+			INT32 index = bex_ref_(key);
+			INT32 content = data.chld_content_ref_.get(index);
+			if (content >= 0) {
+				IAMArray result = data.chld_value_text_.item(content);
+				return bex_string_(result);
 			} else {
-				BEXList _children(_bexKey_(BEX_CHLD_LIST, _index), -_content, _owner_);
-				return _children.get(0).value();
+				BEXList children(owner_, bex_key_(BEX_CHLD_LIST, index), -content);
+				return children.get(0).value();
 			}
 		}
 		case BEX_TEXT_NODE:
 		case BEX_ELTX_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray _result = _object->_chldValueText_.item(_object->_chldContentRef_.get(_bexRef_(_key)));
-			return _bexString_(_result);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray result = data.chld_value_text_.item(data.chld_content_ref_.get(bex_ref_(key)));
+			return bex_string_(result);
 		}
 	}
 	throw IAMException(IAMException::INVALID_HEADER);
 }
 
 INT32 BEXNode::index() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_VOID_TYPE:
 			return -1;
 		case BEX_ATTR_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _array = _object->_attrParentRef_;
-			if (_array.length() == 0) return -1;
-			INT32 _index = _bexRef_(_key);
-			return _index - _object->_attrListRange_.get(_object->_chldAttributesRef_.get(_array.get(_index)));
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& array = data.attr_parent_ref_;
+			if (array.length() == 0) return -1;
+			INT32 index = bex_ref_(key);
+			return index - data.attr_list_range_.get(data.chld_attributes_ref_.get(array.get(index)));
 		}
 		case BEX_ELEM_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _array = _object->_chldParentRef_;
-			if (_array.length() == 0) return -1;
-			INT32 _index = _bexRef_(_key);
-			INT32 _parent = _array.get(_index);
-			if (_index == _parent) return -1;
-			return _index - _object->_chldListRange_.get(-_object->_chldContentRef_.get(_parent));
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& array = data.chld_rarent_ref_;
+			if (array.length() == 0) return -1;
+			INT32 index = bex_ref_(key);
+			INT32 parent = array.get(index);
+			if (index == parent) return -1;
+			return index - data.chld_list_range_.get(-data.chld_content_ref_.get(parent));
 		}
 		case BEX_TEXT_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _array = _object->_chldParentRef_;
-			if (_array.length() == 0) return -1;
-			INT32 _index = _bexRef_(_key);
-			return _index - _object->_chldListRange_.get(-_object->_chldContentRef_.get(_array.get(_index)));
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& array = data.chld_rarent_ref_;
+			if (array.length() == 0) return -1;
+			INT32 index = bex_ref_(key);
+			return index - data.chld_list_range_.get(-data.chld_content_ref_.get(array.get(index)));
 		}
 		case BEX_ELTX_NODE:
 			return 0;
@@ -320,94 +307,70 @@ INT32 BEXNode::index() const {
 }
 
 BEXNode BEXNode::parent() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_VOID_TYPE:
-			return BEXNode(_owner_);
+			return BEXNode(owner_);
 		case BEX_ATTR_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _array = _object->_attrParentRef_;
-			if (_array.length() == 0) return BEXNode(_owner_);
-			return BEXNode(_bexKey_(BEX_ELEM_NODE, _array.get(_bexRef_(_key))), _owner_);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& array = data.attr_parent_ref_;
+			if (array.length() == 0) return BEXNode(owner_);
+			return BEXNode(owner_, bex_key_(BEX_ELEM_NODE, array.get(bex_ref_(key))));
 		}
 		case BEX_ELEM_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _array = _object->_chldParentRef_;
-			if (_array.length() == 0) return BEXNode(_owner_);
-			INT32 _index = _bexRef_(_key);
-			INT32 _parent = _array.get(_index);
-			if (_index == _parent) return BEXNode(_owner_);
-			return BEXNode(_bexKey_(BEX_ELEM_NODE, _parent), _owner_);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& array = data.chld_rarent_ref_;
+			if (array.length() == 0) return BEXNode(owner_);
+			INT32 index = bex_ref_(key);
+			INT32 _parent = array.get(index);
+			if (index == _parent) return BEXNode(owner_);
+			return BEXNode(owner_, bex_key_(BEX_ELEM_NODE, _parent));
 		}
 		case BEX_TEXT_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _array = _object->_chldParentRef_;
-			if (_array.length() == 0) return BEXNode(_owner_);
-			return BEXNode(_bexKey_(BEX_ELEM_NODE, _array.get(_bexRef_(_key))), _owner_);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& array = data.chld_rarent_ref_;
+			if (array.length() == 0) return BEXNode(owner_);
+			return BEXNode(owner_, bex_key_(BEX_ELEM_NODE, array.get(bex_ref_(key))));
 		}
 		case BEX_ELTX_NODE:
-			return BEXNode(_bexKey_(BEX_ELEM_NODE, _bexRef_(_key)), _owner_);
-	}
-	throw IAMException(IAMException::INVALID_HEADER);
-}
-
-BEXList BEXNode::children() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
-		case BEX_ELEM_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			INT32 _index = _bexRef_(_key);
-			INT32 _content = _object->_chldContentRef_.get(_index);
-			if (_content >= 0) return BEXList(_bexKey_(BEX_CHTX_LIST, _index), 0, _owner_);
-			return BEXList(_bexKey_(BEX_CHLD_LIST, _index), -_content, _owner_);
-		}
-		case BEX_VOID_TYPE:
-		case BEX_ATTR_NODE:
-		case BEX_TEXT_NODE:
-		case BEX_ELTX_NODE:
-			return BEXList(_owner_);
+			return BEXNode(owner_, bex_key_(BEX_ELEM_NODE, bex_ref_(key)));
 	}
 	throw IAMException(IAMException::INVALID_HEADER);
 }
 
 BEXList BEXNode::attributes() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_ELEM_NODE: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			INT32 _index = _bexRef_(_key);
-			return BEXList(_bexKey_(BEX_ATTR_LIST, _index), _object->_chldAttributesRef_.get(_index), _owner_);
+			BEXFile::Data& data = *owner_.data_;
+			INT32 index = bex_ref_(key);
+			return BEXList(owner_, bex_key_(BEX_ATTR_LIST, index), data.chld_attributes_ref_.get(index));
 		}
 		case BEX_VOID_TYPE:
 		case BEX_ATTR_NODE:
 		case BEX_TEXT_NODE:
 		case BEX_ELTX_NODE:
-			return BEXList(_owner_);
+			return BEXList(owner_);
 	}
 	throw IAMException(IAMException::INVALID_HEADER);
 }
 
-// class BEXList
-
-BEXList::BEXList()
-	: _key_(_bexKey_(BEX_VOID_TYPE, 0)), _ref_(0), _owner_() {
+BEXList::BEXList() : owner_(), key_(bex_key_(BEX_VOID_TYPE, 0)), ref_(0) {
 }
 
-BEXList::BEXList(BEXFile const& _owner)
-	: _key_(_bexKey_(BEX_VOID_TYPE, 0)), _ref_(0), _owner_(_owner) {
+BEXList::BEXList(BEXFile const& owner) : owner_(owner), key_(bex_key_(BEX_VOID_TYPE, 0)), ref_(0) {
 }
 
-BEXList::BEXList(UINT32 const _key, UINT32 const _ref, BEXFile const& _owner)
-	: _key_(_key), _ref_(_ref), _owner_(_owner) {
+BEXList::BEXList(BEXFile const& owner, UINT32 const key, UINT32 const ref) : owner_(owner), key_(key), ref_(ref) {
 }
 
 UINT32 BEXList::key() const {
-	return _key_;
+	return key_;
 }
 
 UINT8 BEXList::type() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_VOID_TYPE:
 			return BEXList::VOID_LIST;
 		case BEX_ATTR_LIST:
@@ -420,85 +383,85 @@ UINT8 BEXList::type() const {
 }
 
 BEXFile BEXList::owner() const {
-	return _owner_;
+	return owner_;
 }
 
-BEXNode BEXList::get(INT32 const _index) const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+BEXNode BEXList::get(INT32 const index) const {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_VOID_TYPE:
-			return BEXNode(_owner_);
+			return BEXNode(owner_);
 		case BEX_ATTR_LIST: {
-			if (_index < 0) return BEXNode(_owner_);
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _ranges = _object->_attrListRange_;
-			INT32 _ref = _ref_;
-			INT32 _result = _ranges.get(_ref) + _index;
-			if (_result >= _ranges.get(_ref + 1)) return BEXNode(_owner_);
-			return BEXNode(_bexKey_(BEX_ATTR_NODE, _result), _owner_);
+			if (index < 0) return BEXNode(owner_);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& _ranges = data.attr_list_range_;
+			INT32 ref = ref_;
+			INT32 result = _ranges.get(ref) + index;
+			if (result >= _ranges.get(ref + 1)) return BEXNode(owner_);
+			return BEXNode(owner_, bex_key_(BEX_ATTR_NODE, result));
 		}
 		case BEX_CHLD_LIST: {
-			if (_index < 0) return BEXNode(_owner_);
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _ranges = _object->_chldListRange_;
-			INT32 _ref = _ref_;
-			INT32 _result = _ranges.get(_ref) + _index;
-			if (_result >= _ranges.get(_ref + 1)) return BEXNode(_owner_);
-			if (_object->_chldNameRef_.get(_result) == 0) return BEXNode(_bexKey_(BEX_TEXT_NODE, _result), _owner_);
-			return BEXNode(_bexKey_(BEX_ELEM_NODE, _result), _owner_);
+			if (index < 0) return BEXNode(owner_);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& _ranges = data.chld_list_range_;
+			INT32 ref = ref_;
+			INT32 result = _ranges.get(ref) + index;
+			if (result >= _ranges.get(ref + 1)) return BEXNode(owner_);
+			if (data.chld_name_ref_.get(result) == 0) return BEXNode(owner_, bex_key_(BEX_TEXT_NODE, result));
+			return BEXNode(owner_, bex_key_(BEX_ELEM_NODE, result));
 		}
 		case BEX_CHTX_LIST: {
-			if (_index != 0) return BEXNode(_owner_);
-			return BEXNode(_bexKey_(BEX_ELTX_NODE, _bexRef_(_key)), _owner_);
+			if (index != 0) return BEXNode(owner_);
+			return BEXNode(owner_, bex_key_(BEX_ELTX_NODE, bex_ref_(key)));
 		}
 	}
 	throw IAMException(IAMException::INVALID_HEADER);
 }
 
-INT32 BEXList::find(string const& _uri, string const& _name, INT32 const _start) const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+INT32 BEXList::find(std::string const& uri, std::string const& name, INT32 const start) const {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_ATTR_LIST: {
-			if (_start < 0) return -1;
-			bool _useUri = _uri.length() != 0, _useName = _name.length() != 0;
-			IAMArray _uriArray(_bexArray_(_uri)), _nameArray(_bexArray_(_name));
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _ranges = _object->_attrListRange_;
-			INT32 _ref = _ref_;
-			INT32 _startRef = _ranges.get(_ref), _finalRef = _ranges.get(_ref + 1);
-			for (_ref = _startRef + _start; _ref < _finalRef; _ref++) {
-				if (_useUri) {
-					IAMArray _attrUri = _object->_attrUriText_.item(_object->_attrUriRef_.get(_ref));
-					if (!_attrUri.equals(_uriArray)) continue;
+			if (start < 0) return -1;
+			bool use_uri = uri.length() != 0, use_name = name.length() != 0;
+			IAMArray uri_array(bex_array_(uri)), name_array(bex_array_(name));
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& ranges = data.attr_list_range_;
+			INT32 ref = ref_;
+			INT32 start_ref = ranges.get(ref), final_ref = ranges.get(ref + 1);
+			for (ref = start_ref + start; ref < final_ref; ref++) {
+				if (use_uri) {
+					IAMArray attr_uri = data.attr_uri_text_.item(data.attr_uri_ref_.get(ref));
+					if (!attr_uri.equals(uri_array)) continue;
 				}
-				if (_useName) {
-					IAMArray _nameUri = _object->_attrNameText_.item(_object->_attrNameRef_.get(_ref));
-					if (!_nameUri.equals(_nameArray)) continue;
+				if (use_name) {
+					IAMArray attr_name = data.attr_name_text_.item(data.attr_name_ref_.get(ref));
+					if (!attr_name.equals(name_array)) continue;
 				}
-				return _ref - _startRef;
+				return ref - start_ref;
 			}
 			return -1;
 		}
 		case BEX_CHLD_LIST: {
-			if (_start < 0) return -1;
-			bool _useUri = _uri.length() != 0, _useName = _name.length() != 0;
-			IAMArray _uriArray(_bexArray_(_uri)), _nameArray(_bexArray_(_name));
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _ranges = _object->_chldListRange_;
-			INT32 _ref = _ref_;
-			INT32 _startRef = _ranges.get(_ref), _finalRef = _ranges.get(_ref + 1);
-			for (_ref = _startRef + _start; _ref < _finalRef; _ref++) {
-				INT32 _nameRef = _object->_chldNameRef_.get(_ref);
-				if (_nameRef == 0) continue;
-				if (_useUri) {
-					IAMArray _attrUri = _object->_chldUriText_.item(_object->_chldUriRef_.get(_ref));
-					if (!_attrUri.equals(_uriArray)) continue;
+			if (start < 0) return -1;
+			bool use_uri = uri.length() != 0, use_name = name.length() != 0;
+			IAMArray uri_array(bex_array_(uri)), name_array(bex_array_(name));
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& ranges = data.chld_list_range_;
+			INT32 ref = ref_;
+			INT32 start_ref = ranges.get(ref), final_ref = ranges.get(ref + 1);
+			for (ref = start_ref + start; ref < final_ref; ref++) {
+				INT32 name_ref = data.chld_name_ref_.get(ref);
+				if (name_ref == 0) continue;
+				if (use_uri) {
+					IAMArray chld_uri = data.chld_uri_text_.item(data.chld_uri_ref_.get(ref));
+					if (!chld_uri.equals(uri_array)) continue;
 				}
-				if (_useName) {
-					IAMArray _nameUri = _object->_chldNameText_.item(_object->_chldNameRef_.get(_ref));
-					if (!_nameUri.equals(_nameArray)) continue;
+				if (use_name) {
+					IAMArray chld_name = data.chld_name_text_.item(data.chld_name_ref_.get(ref));
+					if (!chld_name.equals(name_array)) continue;
 				}
-				return _ref - _startRef;
+				return ref - start_ref;
 			}
 			return -1;
 		}
@@ -510,21 +473,21 @@ INT32 BEXList::find(string const& _uri, string const& _name, INT32 const _start)
 }
 
 INT32 BEXList::length() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_VOID_TYPE:
 			return 0;
 		case BEX_ATTR_LIST: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _ranges = _object->_attrListRange_;
-			INT32 _ref = _ref_;
-			return _ranges.get(_ref + 1) - _ranges.get(_ref);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& ranges = data.attr_list_range_;
+			INT32 ref = ref_;
+			return ranges.get(ref + 1) - ranges.get(ref);
 		}
 		case BEX_CHLD_LIST: {
-			BEXFile::OBJECT* _object = _owner_._object_.get();
-			IAMArray & _ranges = _object->_chldListRange_;
-			INT32 _ref = _ref_;
-			return _ranges.get(_ref + 1) - _ranges.get(_ref);
+			BEXFile::Data& data = *owner_.data_;
+			IAMArray& ranges = data.chld_list_range_;
+			INT32 ref = ref_;
+			return ranges.get(ref + 1) - ranges.get(ref);
 		}
 		case BEX_CHTX_LIST:
 			return 1;
@@ -533,80 +496,72 @@ INT32 BEXList::length() const {
 }
 
 BEXNode BEXList::parent() const {
-	UINT32 _key = _key_;
-	switch (_bexType_(_key)) {
+	UINT32 key = key_;
+	switch (bex_type_(key)) {
 		case BEX_VOID_TYPE:
-			return BEXNode(_owner_);
+			return BEXNode(owner_);
 		case BEX_ATTR_LIST:
 		case BEX_CHLD_LIST:
 		case BEX_CHTX_LIST:
-			return BEXNode(_bexKey_(BEX_ELEM_NODE, _bexRef_(_key)), _owner_);
+			return BEXNode(owner_, bex_key_(BEX_ELEM_NODE, bex_ref_(key)));
 	}
 	throw IAMException(IAMException::INVALID_HEADER);
 }
 
-Ref<BEXFile::OBJECT> _BEX_FILE_OBJECT_(new BEXFile::OBJECT());
+BEXFile::Data::Ptr bexfile_data_empty_(new BEXFile::Data());
 
-BEXFile::BEXFile()
-	: _object_(_BEX_FILE_OBJECT_) {
+BEXFile::BEXFile() : data_(bexfile_data_empty_) {
 }
 
-BEXFile::BEXFile(IAMIndex const& _fileData)
-	: _object_(new OBJECT(_fileData)) {
+BEXFile::BEXFile(IAMIndex const& base_data) : data_(new Data(base_data)) {
 }
 
 BEXNode BEXFile::root() const {
-	INT32 _ref = _object_.get()->_rootRef_;
-	if (_ref < 0) return BEXNode(*this);
-	return BEXNode(_bexKey_(BEX_ELEM_NODE, _ref), *this);
+	INT32 ref = data_->root_ref_;
+	if (ref < 0) return BEXNode(*this);
+	return BEXNode(*this, bex_key_(BEX_ELEM_NODE, ref));
 }
 
-BEXNode BEXFile::node(UINT32 const _key) const {
-	switch (_bexType_(_key)) {
+BEXNode BEXFile::node(UINT32 const key) const {
+	switch (bex_type_(key)) {
 		case BEX_ATTR_NODE: {
-			OBJECT* _object = _object_.get();
-			INT32 _index = _bexRef_(_key);
-			if (_index >= _object->_attrNameRef_.length()) return BEXNode(*this);
-			return BEXNode(_bexKey_(BEX_ATTR_NODE, _index), *this);
+			Data& data = *data_;
+			INT32 index = bex_ref_(key);
+			if (index >= data.attr_name_ref_.length()) return BEXNode(*this);
+			return BEXNode(*this, bex_key_(BEX_ATTR_NODE, index));
 		}
 		case BEX_ELEM_NODE: {
-			OBJECT* _object = _object_.get();
-			INT32 _index = _bexRef_(_key);
-			if (_object->_chldNameRef_.get(_index) == 0) return BEXNode(*this);
-			return BEXNode(_bexKey_(BEX_ELEM_NODE, _index), *this);
+			Data& data = *data_;
+			INT32 index = bex_ref_(key);
+			if (data.chld_name_ref_.get(index) == 0) return BEXNode(*this);
+			return BEXNode(*this, bex_key_(BEX_ELEM_NODE, index));
 		}
 		case BEX_TEXT_NODE: {
-			OBJECT* _object = _object_.get();
-			INT32 _index = _bexRef_(_key);
-			IAMArray & _names = _object->_chldNameRef_;
-			if ((_index >= _names.length()) || (_names.get(_index) != 0)) return BEXNode(*this);
-			return BEXNode(_bexKey_(BEX_TEXT_NODE, _index), *this);
+			Data& data = *data_;
+			INT32 index = bex_ref_(key);
+			IAMArray& names = data.chld_name_ref_;
+			if ((index >= names.length()) || (names.get(index) != 0)) return BEXNode(*this);
+			return BEXNode(*this, bex_key_(BEX_TEXT_NODE, index));
 		}
 		case BEX_ELTX_NODE: {
-			OBJECT* _object = _object_.get();
-			INT32 _index = _bexRef_(_key);
-			if ((_object->_chldNameRef_.get(_index) == 0) || (_object->_chldContentRef_.get(_index) < 0)) return BEXNode(*this);
-			return BEXNode(_bexKey_(BEX_ELTX_NODE, _index), *this);
+			Data& data = *data_;
+			INT32 index = bex_ref_(key);
+			if ((data.chld_name_ref_.get(index) == 0) || (data.chld_content_ref_.get(index) < 0)) return BEXNode(*this);
+			return BEXNode(*this, bex_key_(BEX_ELTX_NODE, index));
 		}
 	}
 	return BEXNode(*this);
 }
 
-BEXList BEXFile::list(UINT32 const _key) const {
-	switch (_bexType_(_key)) {
+BEXList BEXFile::list(UINT32 const key) const {
+	switch (bex_type_(key)) {
 		case BEX_ATTR_LIST:
-			return node(_bexKey_(BEX_ELEM_NODE, _bexRef_(_key))).attributes();
+			return node(bex_key_(BEX_ELEM_NODE, bex_ref_(key))).attributes();
 		case BEX_CHLD_LIST:
 		case BEX_CHTX_LIST:
-			return node(_bexKey_(BEX_ELEM_NODE, _bexRef_(_key))).children();
+			return node(bex_key_(BEX_ELEM_NODE, bex_ref_(key))).children();
 	}
 	return BEXList(*this);
 }
 
 }
-
-}
-
-}
-
-#endif

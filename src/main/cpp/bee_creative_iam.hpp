@@ -113,12 +113,12 @@ struct IAMArray {
 
 	private:
 
+	/** Dieses Feld verweist auf den Speicherbereich mit den Zahlen. */
+	PCVOID data_;
+
 	/** Dieses Feld speichert die Kombination aus Länge @c L und Datentyp @c D im Format <code>[30:L][2:D]</code>.<br>
 	 * Die Datentypen 0-3 stehn für @c COPY-INT32 const*, @c VIEW-INT8 const*, @c VIEW-INT16 const* und @c VIEW-INT32 const*. */
 	UINT32 size_;
-
-	/** Dieses Feld verweist auf den Speicherbereich mit den Zahlen. */
-	PCVOID data_;
 
 };
 
@@ -195,14 +195,14 @@ struct IAMListing {
 		 * Die Werte 0-3 des Elementlängentyps @c IL stehn für @c UINT32, @c UINT8 const*, @c UINT16 const* und @c UINT32 const* (siehe @c #_itemData_). */
 		UINT32 type_;
 
+		/** Dieses Feld speichert die Anzahl der Elemente. */
+		UINT32 item_count_;
+
 		/** Dieses Feld speichert die Längen der Elemente. Die Interpretation dieses Feldes wird durch den Elementlängentyp vorgegeben. */
 		PCVOID item_size_;
 
 		/** Dieses Feld speichert die Zahlen der Elemente. Die Interpretation dieses Feldes wird durch den Elementdatentypen vorgegeben. */
 		PCVOID item_data_;
-
-		/** Dieses Feld speichert die Anzahl der Elemente. */
-		UINT32 item_count_;
 
 	};
 
@@ -283,6 +283,9 @@ struct IAMMapping {
 		 * Die Werte 0-3 des Wertlängentyps @c VL stehn für @c UINT32, @c UINT8 const*, @c UINT16 const* und @c UINT32 const* (siehe @c #_valueData_). */
 		UINT32 type_;
 
+		/** Dieses Feld speichert die Anzahl der Einträge. */
+		UINT32 entry_count_;
+
 		/** Dieses Feld speichert die Anzahl der Zahlen in einem Schlüssel. Die Interpretation dieses Feldes wird durch den Schlüssellängentyp vorgegeben. */
 		PCVOID key_size_;
 
@@ -295,14 +298,11 @@ struct IAMMapping {
 		/** Dieses Feld speichert den Speicherbereich mit den Zahlen der Werte. Die Interpretation dieses Feldes wird durch den Wertdatentyp vorgegeben. */
 		PCVOID value_data_;
 
-		/** Dieses Feld speichert die Bitmaske zur Umrechnung des Streuwerts eines gesuchten Schlüssels in den Index des einzigen Schlüsselbereichs, in dem dieser Schlüssel enthalten sein kann. Die Streuwertsuche wird nur bei Bereichslängentyp 0 verwendet. */
-		UINT32 range_mask_;
-
 		/** Dieses Feld speichert die Startpositionen der Schlüsselbereiche. Die Interpretation dieses Feldes wird durch den Bereichslängentyp vorgegeben. */
 		PCVOID range_size_;
 
-		/** Dieses Feld speichert die Anzahl der Einträge. */
-		UINT32 entry_count_;
+		/** Dieses Feld speichert die Bitmaske zur Umrechnung des Streuwerts eines gesuchten Schlüssels in den Index des einzigen Schlüsselbereichs, in dem dieser Schlüssel enthalten sein kann. Die Streuwertsuche wird nur bei Bereichslängentyp 0 verwendet. */
+		UINT32 range_mask_;
 
 	};
 
@@ -405,23 +405,23 @@ struct IAMIndex {
 
 		Data(INT32 const* array, INT32 length);
 
+		/** Dieses Feld speichert die Auflistungen. */
+		IAMListing* listing_array_;
+
+		/** Dieses Feld speichert die Abbildungen. */
+		IAMMapping* mapping_array_;
+
+		/** Dieses Feld speichert die Anzahl der Auflistungen. */
+		UINT32 listing_count_;
+
+		/** Dieses Feld speichert die Anzahl der Abbildungen. */
+		UINT32 mapping_count_;
+
 		/** Dieses Feld speichert den Speicherbereich, aus dem diese Nutzdaten geladen wurden. */
 		MMFArray file_data_;
 
 		/** Dieses Feld speichert den Speicherbereich, aus dem diese Nutzdaten geladen wurden. */
 		IAMArray heap_data_;
-
-		/** Dieses Feld speichert die Auflistungen. */
-		IAMListing* listing_array_;
-
-		/** Dieses Feld speichert die Anzahl der Auflistungen. */
-		UINT32 listing_count_;
-
-		/** Dieses Feld speichert die Abbildungen. */
-		IAMMapping* mapping_array_;
-
-		/** Dieses Feld speichert die Anzahl der Abbildungen. */
-		UINT32 mapping_count_;
 
 	};
 
@@ -429,14 +429,14 @@ struct IAMIndex {
 	IAMIndex();
 
 	/** Dieser Kontrukteur initialisiert das Inhaltsverzeichnis als Sicht auf den gegebenen Speicherbereich.
-	 * @param heapData Speicherbereich.
+	 * @param heap_data Speicherbereich.
 	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird. */
-	IAMIndex(IAMArray const& heapData);
+	IAMIndex(IAMArray const& heap_data);
 
 	/** Dieser Kontrukteur initialisiert das Inhaltsverzeichnis als Sicht auf den gegebenen Speicherbereich.
-	 * @param fileData Speicherbereich.
+	 * @param file_data Speicherbereich.
 	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird. */
-	IAMIndex(MMFArray const& fileData);
+	IAMIndex(MMFArray const& file_data);
 
 	/** Dieser Kontrukteur initialisiert das Inhaltsverzeichnis als Sicht auf den gegebenen Speicherbereich.
 	 * @param array Zeiger auf den Speicherbereich mit @c INT32 Zahlen.

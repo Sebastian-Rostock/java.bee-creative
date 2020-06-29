@@ -93,7 +93,8 @@ union INT8S {
 };
 
 /** Diese Datenstruktur definiert die Datentypen für Paare aus zwei @c INT8S. */
-typedef INTXO<INT8S> INT16O;
+struct INT16O: public INTXO<INT8S> {
+};
 
 /** Diese Datenstruktur erlaubt die Interpretation eines zwei Byte großen Speicherbereichs als @c INT16, als @c UINT16 sowie als Paar aus zwei @c INT8S. */
 union INT16S {
@@ -130,7 +131,8 @@ union INT16S {
 };
 
 /** Diese Datenstruktur definiert die Datentypen für Paare aus zwei @c INT16S. */
-typedef INTXO<INT16S> INT32O;
+struct INT32O: public INTXO<INT16S> {
+};
 
 /** Diese Datenstruktur erlaubt die Interpretation eines vier Byte großen Speicherbereichs als @c INT32, als @c UINT32 sowie als Paar aus zwei @c INT16S. */
 union INT32S {
@@ -167,7 +169,8 @@ union INT32S {
 };
 
 /** Diese Datenstruktur definiert die Datentypen für Paare aus zwei @c INT32S. */
-typedef INTXO<INT32S> INT64O;
+struct INT64O: public INTXO<INT32S> {
+};
 
 /** Diese Datenstruktur erlaubt die Interpretation eines acht Byte großen Speicherbereichs als @c INT64, als @c UINT64 sowie als Paar aus zwei @c INT32S. */
 union INT64S {

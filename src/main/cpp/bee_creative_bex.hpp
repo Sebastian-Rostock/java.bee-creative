@@ -1,27 +1,14 @@
-/* [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+/*Dieses Modul realisiert eine nurlesbare Implementation des <i>BEX</i>.<p>
+ * Das <i>BEX – Binary Encoded XML</i> beschreibt eine nur lesbare Vereinfachung des <em>Document Object Model (DOM)</em> sowie ein binäres Datenformat zur redundanzarmen Abbildung der Daten eines <i>DOM</i> Dokuments. Ziel dieses Formats ist es, eine leichtgewichtige, nur lesende <i>DOM</i>-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch modifizierende Implementation einer Standard <em>XML</em> Bibliothek.
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+/* [cc-by] 2013-2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 
-#ifdef BEE_CREATIVE_BEX_HPP
-
+#ifndef BEE_CREATIVE_BEX_HPP
 #define BEE_CREATIVE_BEX_HPP
 
 #include "bee_creative_iam.hpp"
 
-namespace bee {
-
-namespace creative {
-
-/**Dieser Namensraum realisiert eine nurlesbare Implementation des <i>BEX</i>.<p>
- * Das <i>BEX – Binary Encoded XML</i> beschreibt eine nur lesbare Vereinfachung des <em>Document Object Model (DOM)</em> sowie ein binäres Datenformat zur redundanzarmen Abbildung der Daten eines <i>DOM</i> Dokuments. Ziel dieses Formats ist es, eine leichtgewichtige, nur lesende <i>DOM</i>-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch modifizierende Implementation einer Standard <em>XML</em> Bibliothek.
- * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-namespace bex {
-
-using std::string;
-
-using mmf::MMFArray;
-using iam::IAMListing;
-using iam::IAMArray;
-using iam::IAMIndex;
-using iam::IAMException;
+namespace bee_creative {
 
 struct BEXNode;
 
@@ -30,14 +17,12 @@ struct BEXList;
 /**Diese Klasse implementiert die Verwaltung aller Element-, Text- und Attributknoten sowie aller Kind- und Attributknotenlisten, die in einem XML Dokument enthalten sind. */
 struct BEXFile {
 
-	public:
-
 	/** Diese Klasse definiert die referenzgezählten Nutzdaten eines @c BEXFile. */
-	struct OBJECT: public Obj<OBJECT> {
+	struct Data: public Obj<Data> {
 
 		public:
 
-		OBJECT();
+		Data();
 
 		private:
 
@@ -47,64 +32,64 @@ struct BEXFile {
 
 		friend BEXList;
 
-		OBJECT(IAMIndex const& _fileData);
-
-		/** Dieses Feld speichert die Referenz des Wurzelelements. */
-		INT32 _rootRef_;
+		Data(IAMIndex const& base_data);
 
 		/** Dieses Feld speichert das die Zahlenfolgen verwaltende Inhaltsverzeichnis. */
-		IAMIndex _fileData_;
+		IAMIndex file_data_;
 
 		/** Dieses Feld speichert die URI der Attributknoten. */
-		IAMListing _attrUriText_;
+		IAMListing attr_uri_text_;
 
 		/** Dieses Feld speichert die Namen der Attributknoten. */
-		IAMListing _attrNameText_;
+		IAMListing attr_name_text_;
 
 		/** Dieses Feld speichert die Werte der Attributknoten. */
-		IAMListing _attrValueText_;
+		IAMListing attr_value_text_;
 
 		/** Dieses Feld speichert die URI der Elementknoten. */
-		IAMListing _chldUriText_;
+		IAMListing chld_uri_text_;
 
 		/** Dieses Feld speichert die Namen der Elementknoten. */
-		IAMListing _chldNameText_;
+		IAMListing chld_name_text_;
 
 		/** Dieses Feld speichert die Werte der Textknoten. */
-		IAMListing _chldValueText_;
+		IAMListing chld_value_text_;
 
 		/** Dieses Feld speichert die URI-Spalte der Attributknotentabelle. */
-		IAMArray _attrUriRef_;
+		IAMArray attr_uri_ref_;
 
 		/** Dieses Feld speichert die Name-Spalte der Attributknotentabelle. */
-		IAMArray _attrNameRef_;
+		IAMArray attr_name_ref_;
 
 		/** Dieses Feld speichert die Wert-Spalte der Attributknotentabelle. */
-		IAMArray _attrValueRef_;
+		IAMArray attr_value_ref_;
 
 		/** Dieses Feld speichert die Elternknoten-Spalte der Attributknotentabelle. */
-		IAMArray _attrParentRef_;
+		IAMArray attr_parent_ref_;
 
 		/** Dieses Feld speichert die URI-Spalte der Kindknotentabelle. */
-		IAMArray _chldUriRef_;
+		IAMArray chld_uri_ref_;
 
 		/** Dieses Feld speichert die Name-Spalte der Kindknotentabelle. */
-		IAMArray _chldNameRef_;
+		IAMArray chld_name_ref_;
 
 		/** Dieses Feld speichert die Inhalt-Spalte der Kindknotentabelle. */
-		IAMArray _chldContentRef_;
+		IAMArray chld_content_ref_;
 
 		/** Dieses Feld speichert die Attribut-Spalte der Kindknotentabelle. */
-		IAMArray _chldAttributesRef_;
+		IAMArray chld_attributes_ref_;
 
 		/** Dieses Feld speichert die Elternknoten-Spalte der Kindknotentabelle. */
-		IAMArray _chldParentRef_;
+		IAMArray chld_rarent_ref_;
 
 		/** Dieses Feld speichert Kindknotenlisten als Abschnitte der Kindknotentabelle. */
-		IAMArray _chldListRange_;
+		IAMArray chld_list_range_;
 
 		/** Dieses Feld speichert Attributknotenlisten als Abschnitte der Attributknotentabelle. */
-		IAMArray _attrListRange_;
+		IAMArray attr_list_range_;
+
+		/** Dieses Feld speichert die Referenz des Wurzelelements. */
+		INT32 root_ref_;
 
 	};
 
@@ -112,23 +97,23 @@ struct BEXFile {
 	BEXFile();
 
 	/** Dieser Kontrukteur initialisiert die Verwaltung als Sicht auf den gegebenen Auflistungen und Abbildungen.
-	 * @param _fileData Auflistungen und Abbildungen.
+	 * @param base_data Auflistungen und Abbildungen.
 	 * @throws IAMException Wenn beim dekodieren der Auflistungen und Abbildungen ein Fehler erkannt wird. */
-	BEXFile(IAMIndex const& _fileData);
+	BEXFile(IAMIndex const& base_data);
 
 	/** Diese Methode gibt das Wurzelelement des Dokuments zurück.
 	 * @return Wurzelelement. */
 	BEXNode root() const;
 
 	/** Diese Methode gibt die Knotenliste mit dem gegebenen Identifikator zurück. Wenn der Identifikator unbekannt ist, wird eine undefinierte Knotenliste geliefert. Der gegebene Identifikator kann von dem der gelieferten Knotenliste abweichen.
-	 * @param _key Identifikator.
+	 * @param key Identifikator.
 	 * @return Knotenliste. */
-	BEXList list(UINT32 const _key) const;
+	BEXList list(UINT32 const key) const;
 
 	/** Diese Methode gibt den Knoten mit dem gegebenen Identifikator zurück. Wenn der Identifikator unbekannt ist, wird ein undefinierter Knoten geliefert. Der gegebene Identifikator kann von dem des gelieferten Knoten abweichen.
-	 * @param _key Identifikator.
+	 * @param key Identifikator.
 	 * @return Knoten. */
-	BEXNode node(UINT32 const _key) const;
+	BEXNode node(UINT32 const key) const;
 
 	private:
 
@@ -137,14 +122,12 @@ struct BEXFile {
 	friend BEXList;
 
 	/** Dieses Feld speichert die referenzgezählten Nutzdaten. */
-	Ref<OBJECT> _object_;
+	Data::Ptr data_;
 
 };
 
 /** Diese Klasse implementiert die homogene Sicht auf Element-, Text- und Attributknoten. In besonderen Fällen wird sie auch zur Abbildung undefinierter Knoten verwendet. Die aufsteigende Navigation von einem Kind- bzw. Attributknoten zu dessen Elternknoten ist optional. */
 struct BEXNode {
-
-	public:
 
 	/** Dieses Feld speichert die Typkennung eines undefinierten Knoten. */
 	static UINT8 const VOID_NODE = 0;
@@ -162,8 +145,8 @@ struct BEXNode {
 	BEXNode();
 
 	/** Dieser Konstruktor initialisiert den undefinierten Knoten.
-	 * @param _owner Besitzer. */
-	BEXNode(BEXFile const& _owner);
+	 * @param owner Besitzer. */
+	BEXNode(BEXFile const& owner);
 
 	/** Diese Methode gibt den Identifikator dieses Knoten zurück.
 	 * @return Identifikator. */
@@ -179,15 +162,15 @@ struct BEXNode {
 
 	/** Diese Methode gibt den URI des Namensraums dieses Knoten als Zeichenkette zurück. Der URI eines Textknoten, eines Element- bzw. Attributknoten ohne Namensraum sowie eines undefinierten Knoten ist leer.
 	 * @return Uri. */
-	string uri() const;
+	std::string uri() const;
 
 	/**Diese Methode gibt den Namen dieses Knoten als Zeichenkette zurück. Der Name eines Textknoten sowie eines undefinierten Knoten ist leer.
 	 * @return Name. */
-	string name() const;
+	std::string name() const;
 
 	/** Diese Methode gibt den Wert dieses Knoten als Zeichenkette zurück. Der Wert eines Elementknoten ohne Kindknoten sowie eines undefinierten Knoten ist leer. Der Wert eines Elementknoten mit Kindknoten entspricht dem Wert seines ersten Kindknoten.
 	 * @return Wert. */
-	string value() const;
+	std::string value() const;
 
 	/** Diese Methode gibt die Position dieses Knoten in der Kind- bzw. Attributknotenliste des Elternknotens zurück (optional). Die Position eines undefinierten Knoten ist «-1». Wenn die Navigation zum Elternknoten deaktiviert ist, ist die Position jedes Knoten «-1».
 	 * @return Position. */
@@ -199,7 +182,25 @@ struct BEXNode {
 
 	/** Diese Methode gibt die Kindknotenliste dieses Knoten zurück. Die Kindknotenliste eines Text- bzw. Attributknoten sowie eines undefinierten Knoten ist eine undefinierte Knotenliste.
 	 * @return Kindknotenliste. */
-	BEXList children() const;
+	BEXList children() const {
+		UINT32 key = key_;
+		switch (bex_type_(key)) {
+			case BEX_ELEM_NODE: {
+				BEXFile::Data& data = *owner_.data_;
+				INT32 index = bex_ref_(key);
+				INT32 _content = data.chld_content_ref_.get(index);
+				if (_content >= 0) return BEXList(owner_, bex_key_(BEX_CHTX_LIST, index), 0);
+
+				return BEXList(owner_, bex_key_(BEX_CHLD_LIST, index), -_content);
+			}
+			case BEX_VOID_TYPE:
+			case BEX_ATTR_NODE:
+			case BEX_TEXT_NODE:
+			case BEX_ELTX_NODE:
+				return BEXList(owner_);
+		}
+		throw IAMException(IAMException::INVALID_HEADER);
+	}
 
 	/** Diese Methode gibt die Attributknotenliste dieses Knoten zurück. Die Kindknotenliste eines Text- bzw. Attributknoten sowie eines undefinierten Knoten ist eine undefinierte Knotenliste.
 	 * @return Attributknotenliste. */
@@ -211,20 +212,18 @@ struct BEXNode {
 
 	friend BEXList;
 
-	BEXNode(UINT32 const key, BEXFile const& owner);
-
-	/** Dieses Feld speichert den Schlüssel. */
-	UINT32 _key_;
+	BEXNode(BEXFile const& owner, UINT32 const key);
 
 	/** Dieses Feld speichert den Besitzer. */
-	BEXFile _owner_;
+	BEXFile owner_;
+
+	/** Dieses Feld speichert den Schlüssel. */
+	UINT32 key_;
 
 };
 
 /** Diese Klasse implementiert die homogene Sicht auf Kind- und Attributknotenlisten. Die aufsteigende Navigation von einer Knotenliste zu deren Elternknoten ist optional. */
 struct BEXList {
-
-	public:
 
 	/** Dieses Feld speichert die Typkennung einer undefinierten Knotenliste. */
 	static UINT8 const VOID_LIST = 0;
@@ -239,8 +238,8 @@ struct BEXList {
 	BEXList();
 
 	/** Dieser Konstruktor initialisiert die undefinierte Knotenliste.
-	 * @param _owner Besitzer. */
-	BEXList(BEXFile const& _owner);
+	 * @param owner Besitzer. */
+	BEXList(BEXFile const& owner);
 
 	/** Diese Methode gibt den Identifikator dieser Knotenliste zurück.
 	 * @return Identifikator. */
@@ -255,16 +254,16 @@ struct BEXList {
 	BEXFile owner() const;
 
 	/** Diese Methode gibt den <em>index-ten</em> Knoten dieser Knotenliste zurück. Bei einem ungültigen <em>index</em> wird ein undefinierter Knoten geliefert.
-	 * @param _index Index.
+	 * @param index Index.
 	 * @return <em>index-ter</em> Knoten. */
-	BEXNode get(INT32 const _index) const;
+	BEXNode get(INT32 const index) const;
 
 	/** Diese Methode sucht linear ab der gegebenen <em>start</em>-Position den ersten Element- bzw. Attributknoten mit der gegebenen «uri» sowie dem gegebenen <em>name</em> und gibt dessen Position zurück. Bei einer erfolglosen Suche wird <tt>-1</tt> geliefert. Ein leerer <em>uri</em> bzw. <em>name</em> wird bei der Suche ignoriert, d.h. der gesuchte Knoten hat einen beliebigen URI bzw. Namen. Bei einer negativen <em>start</em>-Position wird immer <tt>-1</tt> geliefert.
-	 * @param _uri URI.
-	 * @param _name Name.
-	 * @param _start Position, ab der die Suche beginnt.
+	 * @param uri URI.
+	 * @param name Name.
+	 * @param start Position, ab der die Suche beginnt.
 	 * @return Position des Treffers oder <tt>-1</tt>. */
-	INT32 find(string const& _uri, string const& _name, INT32 const _start = 0) const;
+	INT32 find(std::string const& uri, std::string const& name, INT32 const start = 0) const;
 
 	/** Diese Methode gibt die Länge dieser Knotenliste zurück. Die Länge ist bei einer undefinierten Knotenliste <tt>0</tt>.
 	 * @return Länge. */
@@ -280,24 +279,20 @@ struct BEXList {
 
 	friend BEXNode;
 
-	BEXList(UINT32 const key, UINT32 const ref, BEXFile const& owner);
-
-	/** Dieses Feld speichert den Schlüssel. */
-	UINT32 _key_;
-
-	/** Dieses Feld speichert die Referenz.
-	 * @see BEXFile#_attrListRange_
-	 * @see BEXFile#_chldListRange_ */
-	UINT32 _ref_;
+	BEXList(BEXFile const& owner, UINT32 const key, UINT32 const ref);
 
 	/** Dieses Feld speichert den Besitzer. */
-	BEXFile _owner_;
+	BEXFile owner_;
+
+	/** Dieses Feld speichert den Schlüssel. */
+	UINT32 key_;
+
+	/** Dieses Feld speichert die Referenz.
+	 * @see BEXFile#attr_list_range_
+	 * @see BEXFile#chld_list_range_ */
+	UINT32 ref_;
 
 };
-
-}
-
-}
 
 }
 
