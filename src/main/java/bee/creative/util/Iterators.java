@@ -426,20 +426,20 @@ public class Iterators {
 	@SuppressWarnings ("javadoc")
 	public static class UnionIterator<GItem> extends BaseIterator<GItem> {
 
+		public final Comparator<? super GItem> order;
+
 		public final Iterator<? extends GItem> iterator1;
 
 		public final Iterator<? extends GItem> iterator2;
-
-		public final Comparator<? super GItem> comparator;
 
 		protected GItem item1;
 
 		protected GItem item2;
 
-		public UnionIterator(final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2, final Comparator<? super GItem> comparator) {
+		public UnionIterator(final Comparator<? super GItem> order, final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2) {
+			this.order = Objects.notNull(order);
 			this.iterator1 = iterator1;
 			this.iterator2 = iterator2;
-			this.comparator = Objects.notNull(comparator);
 			this.item1 = this.next1();
 			this.item2 = this.next2();
 		}
@@ -462,7 +462,7 @@ public class Iterators {
 				this.item1 = this.next1();
 				return item1;
 			}
-			final int order = this.comparator.compare(item1, item2);
+			final int order = this.order.compare(item1, item2);
 			if (order < 0) {
 				this.item1 = this.next1();
 				return item1;
@@ -486,7 +486,7 @@ public class Iterators {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.comparator);
+			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.order);
 		}
 
 	}
@@ -495,20 +495,20 @@ public class Iterators {
 	@SuppressWarnings ("javadoc")
 	public static class ExceptIterator<GItem> extends BaseIterator<GItem> {
 
+		public final Comparator<? super GItem> order;
+
 		public final Iterator<? extends GItem> iterator1;
 
 		public final Iterator<? extends GItem> iterator2;
-
-		public final Comparator<? super GItem> comparator;
 
 		protected GItem item1;
 
 		protected GItem item2;
 
-		public ExceptIterator(final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2, final Comparator<? super GItem> comparator) {
+		public ExceptIterator(final Comparator<? super GItem> order, final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2) {
+			this.order = Objects.notNull(order);
 			this.iterator1 = iterator1;
 			this.iterator2 = iterator2;
-			this.comparator = Objects.notNull(comparator);
 			this.item2 = this.next2();
 			this.item1 = this.next1();
 		}
@@ -530,7 +530,7 @@ public class Iterators {
 			while (this.iterator1.hasNext()) {
 				final GItem item1 = this.iterator1.next();
 				if (this.item2 == null) return item1;
-				final int order = this.comparator.compare(item1, this.item2);
+				final int order = this.order.compare(item1, this.item2);
 				if (order < 0) return item1;
 				if (order == 0) {
 					this.item2 = this.next2();
@@ -545,7 +545,7 @@ public class Iterators {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.comparator);
+			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.order);
 		}
 
 	}
@@ -554,18 +554,18 @@ public class Iterators {
 	@SuppressWarnings ("javadoc")
 	public static class IntersectIterator<GItem> extends BaseIterator<GItem> {
 
+		public final Comparator<? super GItem> order;
+
 		public final Iterator<? extends GItem> iterator1;
 
 		public final Iterator<? extends GItem> iterator2;
 
-		public final Comparator<? super GItem> comparator;
-
 		protected GItem item;
 
-		public IntersectIterator(final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2, final Comparator<? super GItem> comparator) {
+		public IntersectIterator(final Comparator<? super GItem> order, final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2) {
 			this.iterator1 = iterator1;
 			this.iterator2 = Objects.notNull(iterator2);
-			this.comparator = Objects.notNull(comparator);
+			this.order = Objects.notNull(order);
 			this.item = this.next0();
 		}
 
@@ -587,17 +587,17 @@ public class Iterators {
 			GItem item1 = this.iterator1.next();
 			if (!this.iterator2.hasNext()) return null;
 			GItem item2 = this.iterator2.next();
-			int order = this.comparator.compare(item1, item2);
+			int order = this.order.compare(item1, item2);
 			while (order != 0) {
 				while (order < 0) {
 					if (!this.iterator1.hasNext()) return null;
 					item1 = this.iterator1.next();
-					order = this.comparator.compare(item1, item2);
+					order = this.order.compare(item1, item2);
 				}
 				while (order > 0) {
 					if (!this.iterator2.hasNext()) return null;
 					item2 = this.iterator2.next();
-					order = this.comparator.compare(item1, item2);
+					order = this.order.compare(item1, item2);
 				}
 			}
 			return item1;
@@ -605,7 +605,7 @@ public class Iterators {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.comparator);
+			return Objects.toInvokeString(this, this.iterator1, this.iterator2, this.order);
 		}
 
 	}
@@ -984,39 +984,86 @@ public class Iterators {
 		return new UnmodifiableIterator<>(iterator);
 	}
 
-	public static <GItem> Iterator<GItem> unionIterator(final Comparator<? super GItem> comparator, final Iterator<? extends GItem> iterator1,
+	/** Diese Methode gibt einen Vereinigung-{@link Iterator} zurück, der die aufsteigend geordnete Vereinigung der Elemente der gegebenen {@link Iterator}
+	 * liefert und dessen {@link Iterator#remove()}-Methode immer eine {@link UnsupportedOperationException} auslöst. Die gegebenen Iteratoren müssen ihre
+	 * Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterator1 erster {@link Iterator}.
+	 * @param iterator2 zweiter {@link Iterator}.
+	 * @return {@code union}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code order}, {@code iterator1} bzw. {@code iterator2} {@code null} ist. */
+	public static <GItem> Iterator<GItem> unionIterator(final Comparator<? super GItem> order, final Iterator<? extends GItem> iterator1,
 		final Iterator<? extends GItem> iterator2) {
-		return new UnionIterator<>(iterator1, iterator2, comparator);
+		return new UnionIterator<>(order, iterator1, iterator2);
 	}
 
-	public static <GItem> Iterator<GItem> unionIterator(final Comparator<? super GItem> comparator,
-		final Iterator<? extends Iterator<? extends GItem>> iterator) {
-		if (!iterator.hasNext()) return Iterators.emptyIterator();
-		@SuppressWarnings ("unchecked")
-		Iterator<GItem> result = (Iterator<GItem>)iterator.next();
-		while (iterator.hasNext()) {
-			result = Iterators.unionIterator(comparator, result, iterator.next());
+	/** Diese Methode gibt einen Vereinigung-{@link Iterator} zurück, der die aufsteigend geordnete Vereinigung der Elemente der gegebenen {@link Iterator}
+	 * liefert und dessen {@link Iterator#remove()}-Methode immer eine {@link UnsupportedOperationException} auslöst. Die gegebenen Iteratoren müssen ihre
+	 * Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @see #unionIterator(Comparator, Iterator, Iterator)
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterators {@link Iterator}, dessen Elemente ({@link Iterator}) vereinigt werden.
+	 * @return {@code union}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code order} bzw. {@code iterators} {@code null} ist. */
+	public static <GItem> Iterator<GItem> unionIterator(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iterators) {
+		if (!iterators.hasNext()) return Iterators.emptyIterator();
+		Iterator<GItem> result = Iterators.iterator(iterators.next());
+		while (iterators.hasNext()) {
+			result = Iterators.unionIterator(order, result, iterators.next());
 		}
 		return result;
 	}
 
-	public static <GItem> Iterator<GItem> exceptIterator(final Comparator<? super GItem> comparator, final Iterator<? extends GItem> iterator1,
+	/** Diese Methode gibt einen Ausschluss-{@link Iterator} zurück, der die Elemente des ersten gegebenen {@link Iterator} ohne denen des zweiten gegebenen
+	 * {@link Iterator} liefert und dessen {@link Iterator#remove()}-Methode immer eine {@link UnsupportedOperationException} auslöst. Beide Iteratoren müssen
+	 * ihre Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterator1 erster {@link Iterator}.
+	 * @param iterator2 zweiter {@link Iterator}.
+	 * @return {@code except}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code order}, {@code iterator1} bzw. {@code iterator2} {@code null} ist. */
+	public static <GItem> Iterator<GItem> exceptIterator(final Comparator<? super GItem> order, final Iterator<? extends GItem> iterator1,
 		final Iterator<? extends GItem> iterator2) {
-		return new ExceptIterator<>(iterator1, iterator2, comparator);
+		return new ExceptIterator<>(order, iterator1, iterator2);
 	}
 
-	public static <GItem> Iterator<GItem> intersectIterator(final Comparator<? super GItem> comparator, final Iterator<? extends GItem> iterator1,
+	/** Diese Methode gibt einen Schnitt-{@link Iterator} zurück, der den aufsteigend geordneten Schnitt der Elemente der gegebenen {@link Iterator} liefert und
+	 * dessen {@link Iterator#remove()}-Methode immer eine {@link UnsupportedOperationException} auslöst. Die gegebenen Iteratoren müssen ihre Elemente dazu
+	 * aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterator1 erster {@link Iterator}.
+	 * @param iterator2 zweiter {@link Iterator}.
+	 * @return {@code intersect}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code order}, {@code iterator1} bzw. {@code iterator2} {@code null} ist. */
+	public static <GItem> Iterator<GItem> intersectIterator(final Comparator<? super GItem> order, final Iterator<? extends GItem> iterator1,
 		final Iterator<? extends GItem> iterator2) {
-		return new IntersectIterator<>(iterator1, iterator2, comparator);
+		return new IntersectIterator<>(order, iterator1, iterator2);
 	}
 
-	public static <GItem> Iterator<GItem> intersectIterator(final Comparator<? super GItem> comparator,
-		final Iterator<? extends Iterator<? extends GItem>> iterator) {
-		if (!iterator.hasNext()) return Iterators.emptyIterator();
-		@SuppressWarnings ("unchecked")
-		Iterator<GItem> result = (Iterator<GItem>)iterator.next();
-		while (iterator.hasNext()) {
-			result = Iterators.intersectIterator(comparator, result, iterator.next());
+	/** Diese Methode gibt einen Schnitt-{@link Iterator} zurück, der den aufsteigend geordneten Schnitt der Elemente der gegebenen {@link Iterator} liefert und
+	 * dessen {@link Iterator#remove()}-Methode immer eine {@link UnsupportedOperationException} auslöst. Die gegebenen Iteratoren müssen ihre Elemente dazu
+	 * aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @see #unionIterator(Comparator, Iterator, Iterator)
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterators {@link Iterator}, dessen Elemente ({@link Iterator}) vereinigt werden.
+	 * @return {@code intersect}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code order} bzw. {@code iterators} {@code null} ist. */
+	public static <GItem> Iterator<GItem> intersectIterator(final Comparator<? super GItem> order,
+		final Iterator<? extends Iterator<? extends GItem>> iterators) {
+		if (!iterators.hasNext()) return Iterators.emptyIterator();
+		Iterator<GItem> result = Iterators.iterator(iterators.next());
+		while (iterators.hasNext()) {
+			result = Iterators.intersectIterator(order, result, iterators.next());
 		}
 		return result;
 	}

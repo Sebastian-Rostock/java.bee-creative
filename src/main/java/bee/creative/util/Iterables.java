@@ -245,23 +245,23 @@ public class Iterables {
 	@SuppressWarnings ("javadoc")
 	public static class UnionIterable<GItem> extends BaseIterable<GItem> {
 
-		public final Comparator<? super GItem> comparator;
+		public final Comparator<? super GItem> order;
 
 		public final Iterable<? extends Iterable<? extends GItem>> iterable;
 
-		public UnionIterable(final Comparator<? super GItem> comparator, final Iterable<? extends Iterable<? extends GItem>> iterable) {
+		public UnionIterable(final Comparator<? super GItem> order, final Iterable<? extends Iterable<? extends GItem>> iterable) {
+			this.order = Objects.notNull(order);
 			this.iterable = Objects.notNull(iterable);
-			this.comparator = Objects.notNull(comparator);
 		}
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.unionIterator(this.comparator, Iterators.translatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterable.iterator()));
+			return Iterators.unionIterator(this.order, Iterators.translatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterable.iterator()));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.comparator, this.iterable);
+			return Objects.toInvokeString(this, this.order, this.iterable);
 		}
 
 	}
@@ -270,26 +270,26 @@ public class Iterables {
 	@SuppressWarnings ("javadoc")
 	public static class ExceptIterable<GItem> extends BaseIterable<GItem> {
 
-		public final Comparator<? super GItem> comparator;
+		public final Comparator<? super GItem> order;
 
 		public final Iterable<? extends GItem> iterable1;
 
 		public final Iterable<? extends GItem> iterable2;
 
-		public ExceptIterable(final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2, final Comparator<? super GItem> comparator) {
+		public ExceptIterable(final Comparator<? super GItem> order, final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2) {
+			this.order = Objects.notNull(order);
 			this.iterable1 = Objects.notNull(iterable1);
 			this.iterable2 = Objects.notNull(iterable2);
-			this.comparator = Objects.notNull(comparator);
 		}
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.exceptIterator(this.comparator, this.iterable1.iterator(), this.iterable2.iterator());
+			return Iterators.exceptIterator(this.order, this.iterable1.iterator(), this.iterable2.iterator());
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.comparator, this.iterable1, this.iterable2);
+			return Objects.toInvokeString(this, this.order, this.iterable1, this.iterable2);
 		}
 
 	}
@@ -298,23 +298,23 @@ public class Iterables {
 	@SuppressWarnings ("javadoc")
 	public static class IntersectIterable<GItem> extends BaseIterable<GItem> {
 
-		public final Comparator<? super GItem> comparator;
+		public final Comparator<? super GItem> order;
 
 		public final Iterable<? extends Iterable<? extends GItem>> iterable;
 
-		public IntersectIterable(final Comparator<? super GItem> comparator, final Iterable<? extends Iterable<? extends GItem>> iterable) {
+		public IntersectIterable(final Comparator<? super GItem> order, final Iterable<? extends Iterable<? extends GItem>> iterable) {
+			this.order = Objects.notNull(order);
 			this.iterable = Objects.notNull(iterable);
-			this.comparator = Objects.notNull(comparator);
 		}
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.intersectIterator(this.comparator, Iterators.translatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterable.iterator()));
+			return Iterators.intersectIterator(this.order, Iterators.translatedIterator(Iterables.<GItem>toIteratorGetter(), this.iterable.iterator()));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.comparator, this.iterable);
+			return Objects.toInvokeString(this, this.order, this.iterable);
 		}
 
 	}
@@ -518,21 +518,19 @@ public class Iterables {
 		return new ChainedIterable<>(iterables);
 	}
 
-	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
-	 * in der gegebenen Reihenfolge liefert.
+	/** Diese Methode gibt ein verkettetes {@link Iterable} zurück, das alle Elemente der gegebenen {@link Iterable} in der gegebenen Reihenfolge liefert.
 	 *
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterables Array, dessen Elemente ({@link Iterator}) verkettet werden.
 	 * @return {@code chained}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist. */
-	@SuppressWarnings ("unchecked")
+	@SafeVarargs
 	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem>... iterables) throws NullPointerException {
 		return Iterables.chainedIterable(Arrays.asList(iterables));
 	}
 
-	/** Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Getter} konvertierten Elemente der gegebenen {@link Iterable}
-	 * in der gegebenen Reihenfolge liefert.
+	/** Diese Methode gibt ein verkettetes {@link Iterable} zurück, das alle Elemente der gegebenen {@link Iterable} in der gegebenen Reihenfolge liefert.
 	 *
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
@@ -574,7 +572,7 @@ public class Iterables {
 		return new TranslatedIterable<>(toTarget, iterable);
 	}
 
-	/** Diese Methode gibt eun unveränderliches {@link Iterable} zurück, das die Elemente des gegebenen {@link Iterable} liefert.
+	/** Diese Methode gibt ein unveränderliches {@link Iterable} zurück, das die Elemente des gegebenen {@link Iterable} liefert.
 	 *
 	 * @see Iterators#unmodifiableIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
@@ -585,37 +583,97 @@ public class Iterables {
 		return new UnmodifiableIterable<>(iterable);
 	}
 
-	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem>... iterables) {
-		return new UnionIterable<>(comparator, Arrays.asList(iterables));
+	/** Diese Methode gibt ein vereinigendes {@link Iterable} zurück, das die aufsteigend geordnete Vereinigung der gegebenen {@link Iterable} liefert. Die
+	 * gegebenen Iterable müssen ihre Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterables {@link Iterable}, deren Elemente ({@link Iterable}) vereinigt werden.
+	 * @return {@code union}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code order} bzw. {@code iterables} {@code null} ist. */
+	@SafeVarargs
+	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> order, final Iterable<? extends GItem>... iterables) {
+		return new UnionIterable<>(order, Arrays.asList(iterables));
 	}
 
-	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> comparator,
-		final Iterable<? extends Iterable<? extends GItem>> iterable) {
-		return new UnionIterable<>(comparator, iterable);
+	/** Diese Methode gibt ein vereinigendes {@link Iterable} zurück, das die aufsteigend geordnete Vereinigung der gegebenen {@link Iterable} liefert. Die
+	 * gegebenen Iterable müssen ihre Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterables {@link Iterable}, deren Elemente ({@link Iterable}) vereinigt werden.
+	 * @return {@code union}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code order} bzw. {@code iterables} {@code null} ist. */
+	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> order, final Iterable<? extends Iterable<? extends GItem>> iterables) {
+		return new UnionIterable<>(order, iterables);
 	}
 
-	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem> iterable1,
+	/** Diese Methode gibt ein vereinigendes {@link Iterable} zurück, das die aufsteigend geordnete Vereinigung der gegebenen {@link Iterable} liefert. Die
+	 * gegebenen Iterable müssen ihre Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterable1 erstes {@link Iterable}.
+	 * @param iterable2 zweites {@link Iterable}.
+	 * @return {@code union}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code order}, {@code iterable1} bzw. {@code iterable2} {@code null} ist. */
+	public static <GItem> Iterable<GItem> unionIterable(final Comparator<? super GItem> order, final Iterable<? extends GItem> iterable1,
 		final Iterable<? extends GItem> iterable2) {
-		return Iterables.unionIterable(comparator, Arrays.asList(iterable1, iterable2));
+		return Iterables.unionIterable(order, Arrays.asList(Objects.notNull(iterable1), Objects.notNull(iterable2)));
 	}
 
-	public static <GItem> Iterable<GItem> exceptIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem> iterable1,
+	/** Diese Methode gibt ein ausschließendes {@link Iterable} zurück, das aufsteigend geordnete die Elemente des ersten gegebenen {@link Iterable} ohne die des
+	 * zweiten liefert. Die gegebenen Iterable müssen ihre Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterable1 erstes {@link Iterable}.
+	 * @param iterable2 zweites {@link Iterable}.
+	 * @return {@code except}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code order}, {@code iterable1} bzw. {@code iterable2} {@code null} ist. */
+	public static <GItem> Iterable<GItem> exceptIterable(final Comparator<? super GItem> order, final Iterable<? extends GItem> iterable1,
 		final Iterable<? extends GItem> iterable2) {
-		return new ExceptIterable<>(iterable1, iterable2, comparator);
+		return new ExceptIterable<>(order, iterable1, iterable2);
 	}
 
-	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> comparator,
-		final Iterable<? extends Iterable<? extends GItem>> iterable) {
-		return new IntersectIterable<>(comparator, iterable);
+	/** Diese Methode gibt ein schneidendes {@link Iterable} zurück, das den aufsteigend geordneten Schnitt der gegebenen {@link Iterable} liefert. Die gegebenen
+	 * Iterable müssen ihre Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterables {@link Iterable}, deren Elemente ({@link Iterable}) geschnitten werden.
+	 * @return {@code intersect}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code order} bzw. {@code iterables} {@code null} ist. */
+	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> order,
+		final Iterable<? extends Iterable<? extends GItem>> iterables) {
+		return new IntersectIterable<>(order, iterables);
 	}
 
-	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem>... iterables) {
-		return Iterables.intersectIterable(comparator, Arrays.asList(iterables));
+	/** Diese Methode gibt ein schneidendes {@link Iterable} zurück, das den aufsteigend geordneten Schnitt der gegebenen {@link Iterable} liefert. Die gegebenen
+	 * Iterable müssen ihre Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterables {@link Iterable}, deren Elemente ({@link Iterable}) geschnitten werden.
+	 * @return {@code intersect}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code order} bzw. {@code iterables} {@code null} ist. */
+	@SafeVarargs
+	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> order, final Iterable<? extends GItem>... iterables) {
+		return Iterables.intersectIterable(order, Arrays.asList(iterables));
 	}
 
-	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> comparator, final Iterable<? extends GItem> iterable1,
+	/** Diese Methode gibt ein schneidendes {@link Iterable} zurück, das den aufsteigend geordneten Schnitt der gegebenen {@link Iterable} liefert. Die gegebenen
+	 * Iterable müssen ihre Elemente dazu aufsteigend in der gegebenen Ordnung liefern.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param order Ordnung der Elemente.
+	 * @param iterable1 erstes {@link Iterable}.
+	 * @param iterable2 zweites {@link Iterable}.
+	 * @return {@code intersect}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code order}, {@code iterable1} bzw. {@code iterable2} {@code null} ist. */
+	public static <GItem> Iterable<GItem> intersectIterable(final Comparator<? super GItem> order, final Iterable<? extends GItem> iterable1,
 		final Iterable<? extends GItem> iterable2) {
-		return Iterables.intersectIterable(comparator, Arrays.asList(iterable1, iterable2));
+		return Iterables.intersectIterable(order, Arrays.asList(Objects.notNull(iterable1), Objects.notNull(iterable2)));
 	}
 
 	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück. Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses
