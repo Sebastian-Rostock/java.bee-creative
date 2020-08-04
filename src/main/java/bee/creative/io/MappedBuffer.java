@@ -232,6 +232,12 @@ public class MappedBuffer implements Emuable {
 		}
 	}
 
+	/** Diese Methode setzt die {@link #resize(long) Größe} des Puffers auf die Größe der {@link #file() Datei}. Dies kann notwendig werden, wenn Inhalt und Größe
+	 * des Puffers durch einen anderen Prozess verändert werden. */
+	public void resize() {
+		this.resize(this.file.length());
+	}
+
 	/** Diese Methode setzt die Größe des Puffers auf die gegebene.<br>
 	 * <b>Achtung:</b> Wegen der Fehlenden Kontrolle über die Lebenszeit der {@link MappedByteBuffer} kann die angebundene {@link #file() Datei} kann nur
 	 * vergrößert werden, aich wenn dieser Puffer nur einen Teil davon zugänglich macht!

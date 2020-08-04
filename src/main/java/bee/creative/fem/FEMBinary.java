@@ -164,8 +164,33 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
+	/** Diese Klasse implementiert eine abstrakte {@link FEMBinary Bytefolge} mit {@link #hash Streuwertpuffer}.
+	 *
+	 * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static abstract class HashBinary extends FEMBinary {
+
+		/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
+		protected int hash;
+
+		/** Dieser Konstruktor initialisiert die Länge.
+		 *
+		 * @param length Länge.
+		 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
+		protected HashBinary(final int length) throws IllegalArgumentException {
+			super(length);
+		}
+
+		@Override
+		public int hashCode() {
+			final int result = this.hash;
+			if (result != 0) return result;
+			return this.hash = super.hashCode();
+		}
+
+	}
+
 	@SuppressWarnings ("javadoc")
-	public static class ConcatBinary extends FEMBinary implements Emuable {
+	public static class ConcatBinary extends HashBinary implements Emuable {
 
 		public final FEMBinary binary1;
 
@@ -213,7 +238,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class SectionBinary extends FEMBinary implements Emuable {
+	public static class SectionBinary extends HashBinary implements Emuable {
 
 		public final FEMBinary binary;
 
@@ -248,7 +273,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ReverseBinary extends FEMBinary implements Emuable {
+	public static class ReverseBinary extends HashBinary implements Emuable {
 
 		public final FEMBinary binary;
 
@@ -285,7 +310,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class UniformBinary extends FEMBinary {
+	public static class UniformBinary extends HashBinary {
 
 		public final byte item;
 
@@ -326,7 +351,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactBinary extends FEMBinary implements Emuable {
+	public static class CompactBinary extends HashBinary implements Emuable {
 
 		/** Dieses Feld speichert das Array der Bytes, das nicht verändert werden sollte. */
 		final byte[] array;
@@ -575,9 +600,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		throw new IllegalArgumentException("'F' < hexChar < 'a'");
 	}
 
-	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
-	protected int hash;
-
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;
 
@@ -708,9 +730,9 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @see #value()
 	 * @return performantere Bytefolge oder {@code this}. */
 	public FEMBinary compact() {
-		final FEMBinary result = this.length == 1 ? new UniformBinary(1, this.customGet(0)) : new CompactBinary(this.value());
-		result.hash = this.hash;
-		return result;
+		if (this.length == 0) return FEMBinary.EMPTY;
+		if (this.length == 1) return new UniformBinary(1, this.customGet(0));
+		return new CompactBinary(this.value());
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Bytewerts innerhalb dieser Bytefolge zurück. Die Suche beginnt an der gegebenen
@@ -888,13 +910,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	@Override
-	public final int hashCode() {
-		int result = this.hash;
-		if (result != 0) return result;
+	public int hashCode() {
 		final HashCollector hasher = new HashCollector();
 		this.extract(hasher);
-		result = hasher.hash;
-		return this.hash = result != 0 ? result : 1;
+		final int result = hasher.hash;
+		return result != 0 ? result : -11;
 	}
 
 	@Override

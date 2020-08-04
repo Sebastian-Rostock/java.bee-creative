@@ -45,12 +45,12 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		}
 
 		@Override
-		public GTarget customTarget(final GSource source) {
+		protected GTarget customTarget(final GSource source) {
 			return this.builder.get(source);
 		}
 
 		@Override
-		public void customReuse(final GSource source, final GTarget target) {
+		protected void customReuse(final GSource source, final GTarget target) {
 			this.reuser.set(source, target);
 		}
 
@@ -85,12 +85,12 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 		}
 
 		@Override
-		public void customReuse(final GSource source, final GTarget target) {
+		protected void customReuse(final GSource source, final GTarget target) {
 			this.reuser.set(source, target);
 		}
 
 		@Override
-		public GTarget customTarget(final GSource source) {
+		protected GTarget customTarget(final GSource source) {
 			return this.builder.get(source);
 		}
 

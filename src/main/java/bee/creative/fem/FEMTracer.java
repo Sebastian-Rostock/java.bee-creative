@@ -29,7 +29,7 @@ public final class FEMTracer {
 			}
 
 			@Override
-			public void onExecute(final FEMTracer tracer) {
+			public void onInvoke(final FEMTracer tracer) {
 			}
 
 			@Override
@@ -59,18 +59,18 @@ public final class FEMTracer {
 		 * @see FEMTracer#useFrame(FEMFrame)
 		 * @see FEMTracer#useFunction(FEMFunction)
 		 * @param tracer {@link FEMTracer}. */
-		public void onExecute(FEMTracer tracer);
+		public void onInvoke(FEMTracer tracer);
 
 	}
 
 	/** Dieses Feld speichert den {@link Listener}. */
 	Listener listener = Listener.EMPTY;
 
-	/** Dieses Feld speichert den Stapelrahmen der Funktion. Dieser kann in der Methode {@link Listener#onExecute(FEMTracer)} für den Aufruf angepasst werden. */
+	/** Dieses Feld speichert den Stapelrahmen der Funktion. Dieser kann in der Methode {@link Listener#onInvoke(FEMTracer)} für den Aufruf angepasst werden. */
 	FEMFrame frame;
 
-	/** Dieses Feld speichert die Function, die nach {@link Listener#onExecute(FEMTracer)} aufgerufen wird bzw. vor {@link Listener#onThrow(FEMTracer)} oder
-	 * {@link Listener#onReturn(FEMTracer)} aufgerufen wurde. Diese kann in der Methode {@link Listener#onExecute(FEMTracer)} für den Aufruf angepasst werden. */
+	/** Dieses Feld speichert die Function, die nach {@link Listener#onInvoke(FEMTracer)} aufgerufen wird bzw. vor {@link Listener#onThrow(FEMTracer)} oder
+	 * {@link Listener#onReturn(FEMTracer)} aufgerufen wurde. Diese kann in der Methode {@link Listener#onInvoke(FEMTracer)} für den Aufruf angepasst werden. */
 	FEMFunction function;
 
 	/** Dieses Feld speichert den Ergebniswert, der von der Funktion zurück gegeben wurde. Dieser kann in der Methode {@link Listener#onReturn(FEMTracer)}

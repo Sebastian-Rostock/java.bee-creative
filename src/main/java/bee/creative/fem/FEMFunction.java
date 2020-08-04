@@ -42,49 +42,48 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMTracer tracer() {
+		public FEMTracer tracer() {
 			return this.tracer;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
-			final FEMTracer tracer = this.tracer;
+		public FEMValue invoke(final FEMFrame frame) {
 			try {
-				final FEMTracer.Listener helper = tracer.getListener();
-				helper.onExecute(tracer.useFrame(frame).useFunction(this.function));
+				final FEMTracer.Listener helper = this.tracer.getListener();
+				helper.onInvoke(this.tracer.useFrame(frame).useFunction(this.function));
 				try {
-					helper.onReturn(tracer.useResult(tracer.getFunction().invoke(tracer.getFrame())));
-					return tracer.getResult();
+					helper.onReturn(this.tracer.useResult(this.tracer.getFunction().invoke(this.tracer.getFrame())));
+					return this.tracer.getResult();
 				} catch (final RuntimeException exception) {
-					helper.onThrow(tracer.useException(exception));
-					throw tracer.getException();
+					helper.onThrow(this.tracer.useException(exception));
+					throw this.tracer.getException();
 				}
 			} finally {
-				tracer.clear();
+				this.tracer.clear();
 			}
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			return this.function.withTracer(tracer);
 		}
 
 		@Override
-		public final FEMFunction withoutTracer() {
+		public FEMFunction withoutTracer() {
 			return this.function.withoutTracer();
 		}
 
 		@Override
-		public final int hashCode() {
-			return this.function.hashCode() ^ 123456789;
+		public int hashCode() {
+			return Objects.hashPush(Objects.hash(this.function), 1237);
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof TraceFunction)) return false;
 			final TraceFunction data = (TraceFunction)object;
@@ -105,36 +104,36 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMFrame frame() {
+		public FEMFrame frame() {
 			return this.frame;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			return this.function.invoke(this.frame.withParams(frame.params()));
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			return this.function.withTracer(tracer).toClosure(this.frame);
 		}
 
 		@Override
-		public final FEMFunction withoutTracer() {
+		public FEMFunction withoutTracer() {
 			return this.function.withoutTracer().toClosure(this.frame);
 		}
 
 		@Override
-		public final int hashCode() {
-			return this.frame.hashCode() ^ this.function.hashCode();
+		public int hashCode() {
+			return Objects.hash(this.frame, this.function);
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof FrameFunction)) return false;
 			final FrameFunction data = (FrameFunction)object;
@@ -142,7 +141,7 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
+		public FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
 			return this.function.toClosure(frame);
 		}
 
@@ -157,37 +156,37 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
+		public FEMValue invoke(final FEMFrame frame) {
 			return this.toFuture(frame);
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			return this.function.withTracer(tracer).toFuture();
 		}
 
 		@Override
-		public final FEMFunction toClosure(final FEMFrame params) {
+		public FEMFunction toClosure(final FEMFrame params) {
 			return this.function.toClosure(params).toFuture();
 		}
 
 		@Override
-		public final FEMFunction withoutTracer() {
+		public FEMFunction withoutTracer() {
 			return this.function.withoutTracer().toFuture();
 		}
 
 		@Override
-		public final int hashCode() {
-			return this.function.hashCode() ^ 456789123;
+		public int hashCode() {
+			return Objects.hashPush(Objects.hash(this.function), 1271);
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof FutureFunction)) return false;
 			final FutureFunction data = (FutureFunction)object;
@@ -195,7 +194,7 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final FEMFunction toFuture() {
+		public FEMFunction toFuture() {
 			return this;
 		}
 
@@ -203,6 +202,8 @@ public abstract class FEMFunction {
 
 	@SuppressWarnings ("javadoc")
 	public static final class ConcatFunction extends BaseFunction implements Emuable {
+
+		int hash;
 
 		final FEMFunction[] params;
 
@@ -213,30 +214,30 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMFunction[] params() {
+		public FEMFunction[] params() {
 			return this.params.clone();
 		}
 
-		public final int paramCount() {
+		public int paramCount() {
 			return this.params.length;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.params);
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			return this.function.invoke(frame).toFunction().invoke(frame.newFrame(this.params));
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withTracer(tracer);
@@ -245,7 +246,7 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final FEMFunction withoutTracer() {
+		public FEMFunction withoutTracer() {
 			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withoutTracer();
@@ -254,12 +255,15 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final int hashCode() {
-			return Objects.hashPush(Objects.hashPush(Objects.hash((Object[])this.params), Objects.hash(this.function)), 1231);
+		public int hashCode() {
+			int result = this.hash;
+			if (result != 0) return result;
+			result = Objects.hashPush(Objects.hashPush(Objects.hash((Object[])this.params), Objects.hash(this.function)), 1231);
+			return this.hash = result != 0 ? result : -1;
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof ConcatFunction)) return false;
 			final ConcatFunction data = (ConcatFunction)object;
@@ -277,17 +281,17 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
+		public FEMValue invoke(final FEMFrame frame) {
 			return this.function.toClosure(frame).toValue();
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			return this.function.withTracer(tracer).toClosure();
 		}
 
@@ -297,12 +301,12 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			return Objects.hashPush(Objects.hash(this.function), 1233);
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof ClosureFunction)) return false;
 			final ClosureFunction data = (ClosureFunction)object;
@@ -314,6 +318,8 @@ public abstract class FEMFunction {
 	@SuppressWarnings ("javadoc")
 	public static final class CompositeFunction extends BaseFunction implements Emuable {
 
+		int hash;
+
 		final FEMFunction[] params;
 
 		final FEMFunction function;
@@ -323,30 +329,30 @@ public abstract class FEMFunction {
 			this.function = function;
 		}
 
-		public final FEMFunction[] params() {
+		public FEMFunction[] params() {
 			return this.params.clone();
 		}
 
-		public final int paramCount() {
+		public int paramCount() {
 			return this.params.length;
 		}
 
-		public final FEMFunction function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
 		@Override
-		public final long emu() {
+		public long emu() {
 			return EMU.fromObject(this) + EMU.fromArray(this.params);
 		}
 
 		@Override
-		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			return this.function.invoke(frame.newFrame(this.params));
 		}
 
 		@Override
-		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		public FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withTracer(tracer);
@@ -355,7 +361,7 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final FEMFunction withoutTracer() {
+		public FEMFunction withoutTracer() {
 			final FEMFunction[] params = this.params.clone();
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = params[i].withoutTracer();
@@ -364,12 +370,15 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final int hashCode() {
-			return Objects.hashPush(Objects.hashPush(Objects.hash((Object[])this.params), Objects.hash(this.function)), 1235);
+		public int hashCode() {
+			int result = this.hash;
+			if (result != 0) return result;
+			result = Objects.hashPush(Objects.hashPush(Objects.hash((Object[])this.params), Objects.hash(this.function)), 1235);
+			return this.hash = result != 0 ? result : -1;
 		}
 
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof CompositeFunction)) return false;
 			final CompositeFunction data = (CompositeFunction)object;
@@ -440,12 +449,12 @@ public abstract class FEMFunction {
 
 	/** Diese Methode gibt diese Funktion mit Verfolgung bzw. Überwachung der Verarbeitung durch das gegebene {@link FEMTracer Überwachungsobjekt} zurück.
 	 * <p>
-	 * Sie sollte zur rekursiven Weiterverfolgung in {@link FEMTracer.Listener#onExecute(FEMTracer)} aufgerufen sowie zur Modifikation der
+	 * Sie sollte zur rekursiven Weiterverfolgung in {@link FEMTracer.Listener#onInvoke(FEMTracer)} aufgerufen sowie zur Modifikation der
 	 * {@link FEMTracer#getFunction() aktuellen Funktion} des {@link FEMTracer Überwachungsobjekts} verwendet werden. Wenn diese Funktion ein Wert ist, sollte
 	 * dieser sich unverändert liefern.
 	 * <p>
 	 * Der {@link #invoke(FEMFrame) Aufruf} der gelieferten Funktion startet folgenden Ablauf: Zuerst werden dem Überwachungsobjekt der gegebene Stapelrahmen
-	 * sowie die {@link FEMTracer#getFunction() aufzurufenden Funktion} bekannt gegeben und die Methode {@link FEMTracer.Listener#onExecute(FEMTracer)
+	 * sowie die {@link FEMTracer#getFunction() aufzurufenden Funktion} bekannt gegeben und die Methode {@link FEMTracer.Listener#onInvoke(FEMTracer)
 	 * tracer.getListener().onExecute(tracer)} aufgerufen. Anschließend wird die {@link FEMTracer#getFunction() aktuelle Funktion} des Überwachungsobjekts mit
 	 * seinem {@link FEMTracer#getFrame() aktuellen Stapelrahmen} ausgewertet und das Ergebnis im Überwachungsobjekt {@link FEMTracer#useResult(FEMValue)
 	 * gespeichert}. Abschließend wird {@link FEMTracer.Listener#onReturn(FEMTracer) tracer.getListener().onReturn(tracer)} aufgerufen und der

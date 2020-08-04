@@ -2,6 +2,7 @@ package bee.creative.fem;
 
 import java.util.Collection;
 import java.util.Iterator;
+import bee.creative.fem.FEMArray.HashArray;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.Comparables.Items;
@@ -114,7 +115,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class InvokeParams extends FEMArray {
+	public static class InvokeParams extends HashArray {
 
 		public final FEMFrame frame;
 

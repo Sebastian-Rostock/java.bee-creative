@@ -46,7 +46,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 			@Override
 			public boolean contains(final Object o) {
-				return ItemMap.this.keys.firstIndexOf(o) >= 0;
+				return ItemMap.this.containsKey(o);
 			}
 
 			@Override
@@ -65,7 +65,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 			@Override
 			public boolean contains(final Object o) {
-				return ItemMap.this.values.firstIndexOf(o) >= 0;
+				return ItemMap.this.containsValue(o);
 			}
 
 			@Override
@@ -96,6 +96,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			public int size() {
 				return ItemMap.this.keys.length;
 			}
+
 		}
 
 		class EntryMap extends AbstractMap<FEMValue, FEMValue> {
@@ -146,12 +147,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		@Override
 		public boolean containsKey(final Object key) {
-			return this.keys.firstIndexOf(key) >= 0;
+			return this.keys.findFirst(key) >= 0;
 		}
 
 		@Override
 		public boolean containsValue(final Object value) {
-			return this.values.firstIndexOf(value) >= 0;
+			return this.values.findFirst(value) >= 0;
 		}
 
 		boolean containsEntry(final Entry<?, ?> entry) {
@@ -160,13 +161,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		boolean containsEntry(final Object key, final Object value) {
 			if (!(value instanceof FEMValue)) return false;
-			final int index = this.keys.firstIndexOf(key);
+			final int index = this.keys.findFirst(key);
 			return (index >= 0) && this.values.get(index).equals(value);
 		}
 
 		@Override
 		public FEMValue get(final Object key) {
-			final int index = this.keys.firstIndexOf(key);
+			final int index = this.keys.findFirst(key);
 			return index >= 0 ? this.values.get(index) : null;
 		}
 
@@ -222,6 +223,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			return true;
 		}
 
+		public FEMArray toArray() {
+			return FEMArray.from(this.keys, this.values);
+		}
+
 		@Override
 		public String toString() {
 			return new EntryMap().toString();
@@ -259,12 +264,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		@Override
 		public int indexOf(final Object o) {
-			return this.items.firstIndexOf(o);
+			return this.items.findFirst(o);
 		}
 
 		@Override
 		public int lastIndexOf(final Object o) {
-			return this.items.lastIndexOf(o);
+			return this.items.findLast(o);
 		}
 
 		@Override
@@ -324,8 +329,33 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	}
 
+	/** Diese Klasse implementiert eine abstrakte {@link FEMArray Wertliste} mit {@link #hash Streuwertpuffer}.
+	 * 
+	 * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static abstract class HashArray extends FEMArray {
+
+		/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
+		protected int hash;
+
+		/** Dieser Konstruktor initialisiert die Länge.
+		 *
+		 * @param length Länge.
+		 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
+		protected HashArray(final int length) throws IllegalArgumentException {
+			super(length);
+		}
+
+		@Override
+		public int hashCode() {
+			final int result = this.hash;
+			if (result != 0) return result;
+			return this.hash = super.hashCode();
+		}
+
+	}
+
 	@SuppressWarnings ("javadoc")
-	public static class ConcatArray extends FEMArray implements Emuable {
+	public static class ConcatArray extends HashArray implements Emuable {
 
 		public final FEMArray array1;
 
@@ -391,7 +421,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class SectionArray extends FEMArray implements Emuable {
+	public static class SectionArray extends HashArray implements Emuable {
 
 		public final FEMArray array;
 
@@ -433,7 +463,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ReverseArray extends FEMArray implements Emuable {
+	public static class ReverseArray extends HashArray implements Emuable {
 
 		public final FEMArray array;
 
@@ -470,7 +500,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class UniformArray extends FEMArray {
+	public static class UniformArray extends HashArray {
 
 		public final FEMValue item;
 
@@ -526,7 +556,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactArray extends FEMArray implements Emuable {
+	public static class CompactArray extends HashArray implements Emuable {
 
 		/** Dieses Feld speichert das Array der Werte, das nicht verändert werden darf. */
 		final FEMValue[] items;
@@ -656,7 +686,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static final FEMType<FEMArray> TYPE = FEMType.from(FEMArray.ID);
 
 	/** Dieses Feld speichert die leere Wertliste. */
-	public static final FEMArray EMPTY = new UniformArray(0, null);
+	public static final FEMArray EMPTY = new UniformArray(0, FEMVoid.INSTANCE);
 
 	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
 	 *
@@ -734,6 +764,23 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return FEMArray.from(Iterables.toList(items));
 	}
 
+	/** Diese Methode überführt die {@link Entry Einträge} der gegebenen {@link Map Abbildung} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie
+	 * eine {@link #compact() kompaktierte Wertliste} und liefert eine neue Wertliste, die diese beiden Listen in dieser Reihenfolge enthält.
+	 *
+	 * @see #toMap()
+	 * @param entries Abbildung.
+	 * @return Wertliste mit Schlüsselliste und Wertliste.
+	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
+	public static FEMArray from(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
+		if (entries instanceof ItemMap) return ((ItemMap)entries).toArray();
+		final ArrayList<FEMValue> keys = new ArrayList<>(), values = new ArrayList<>();
+		for (final Entry<? extends FEMValue, ? extends FEMValue> entry: entries.entrySet()) {
+			keys.add(entry.getKey());
+			values.add(entry.getValue());
+		}
+		return FEMArray.from(FEMArray.from(keys).compact(true), FEMArray.from(values).compact());
+	}
+
 	/** Diese Methode gibt die Verkettung der gegebenen Wertlisten zurück.
 	 *
 	 * @see #concat(FEMArray)
@@ -752,52 +799,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		final int mid = (min + max) >> 1;
 		return FEMArray.concatAll(values, min, mid).concat(FEMArray.concatAll(values, mid + 1, max));
 	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #toMap(Iterable) FEMArray.toMap(entries.entrySet())}.
-	 *
-	 * @param entries Abbildung.
-	 * @return {@link Map}-Sicht.
-	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-	public static Map<FEMValue, FEMValue> toMap(final Map<? extends FEMValue, ? extends FEMValue> entries) throws NullPointerException {
-		return FEMArray.toMap(entries.entrySet());
-	}
-
-	/** Diese Methode überführt die gegebenen {@link Entry Einträge} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie eine {@link #compact()
-	 * kompaktierte Wertliste} und liefert dazu eine unveränderliche {@link Map} als Sicht auf diese Listen.
-	 *
-	 * @see #toMap(FEMArray, FEMArray)
-	 * @param entries Einträge einer Abbildung.
-	 * @return {@link Map}-Sicht auf die Schlüssel- und Wertliste.
-	 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-	public static Map<FEMValue, FEMValue> toMap(final Iterable<? extends Entry<? extends FEMValue, ? extends FEMValue>> entries) throws NullPointerException {
-		final ArrayList<FEMValue> keys = new ArrayList<>(), values = new ArrayList<>();
-		for (final Entry<? extends FEMValue, ? extends FEMValue> entry: entries) {
-			keys.add(entry.getKey());
-			values.add(entry.getValue());
-		}
-		return FEMArray.toMap(FEMArray.from(keys).compact(true), FEMArray.from(values).compact());
-	}
-
-	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die gegebenen Schlüssel- und Wertlisten zurück.<br>
-	 * Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an der Position, an der sich in {@code values} der
-	 * zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche {@link #compact(boolean) indiziert} sein.
-	 *
-	 * @see #get(int)
-	 * @see #find(FEMValue, int)
-	 * @see #length()
-	 * @see #iterator()
-	 * @param keys Schlüsselliste.
-	 * @param values Wertliste.
-	 * @return {@link Map}-Sicht.
-	 * @throws NullPointerException Wenn {@code keys} bzw. {@code values} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Längen der gegebenen Wertlisten ungleich sind. */
-	public static Map<FEMValue, FEMValue> toMap(final FEMArray keys, final FEMArray values) throws NullPointerException, IllegalArgumentException {
-		if (keys.length != values.length) throw new IllegalArgumentException();
-		return new ItemMap(keys, values);
-	}
-
-	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
-	protected int hash;
 
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;
@@ -996,12 +997,16 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this.customFind(that, offset);
 	}
 
-	int lastIndexOf(final Object key) {
-		return key instanceof FEMValue ? this.reverse().find((FEMValue)key, 0) : -1;
+	int findLast(final Object key) {
+		if (this.length == 0) return -1;
+		if (!(key instanceof FEMValue)) return -1;
+		return this.customFind((FEMValue)key, 0, this.length, false);
 	}
 
-	int firstIndexOf(final Object key) {
-		return key instanceof FEMValue ? this.find((FEMValue)key, 0) : -1;
+	int findFirst(final Object key) {
+		if (this.length == 0) return -1;
+		if (!(key instanceof FEMValue)) return -1;
+		return this.customFind((FEMValue)key, 0, this.length, true);
 	}
 
 	/** Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig
@@ -1068,6 +1073,23 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return new ItemList(this);
 	}
 
+	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die Schlüssel- und Wertlisten zurück, aus denen diese Wertliste besteht.<br>
+	 * Sie ist damit die Umkehroperation zu {@link #from(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in
+	 * {@code keys} an der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten
+	 * Suche {@link #compact(boolean) indiziert} sein.
+	 * 
+	 * @return {@link Map}-Sicht.
+	 * @throws IllegalArgumentException Wenn diese Wertliste nicth aus zwei Wertlisten besteht oder die Längen dieser Wertlisten ungleich sind. */
+	public final Map<FEMValue, FEMValue> toMap() throws IllegalArgumentException {
+		if (this.length != 2) throw new IllegalArgumentException();
+		final FEMValue keys1 = this.customGet(0), values1 = this.customGet(1);
+		if (!(keys1 instanceof FEMArray)) throw new IllegalArgumentException();
+		if (!(values1 instanceof FEMArray)) throw new IllegalArgumentException();
+		final FEMArray keys2 = (FEMArray)keys1, values2 = (FEMArray)values1;
+		if (keys2.length != values2.length) throw new IllegalArgumentException();
+		return new ItemMap(keys2, values2);
+	}
+
 	/** Diese Methode gibt den {@code index}-ten Wert zurück. */
 	@Override
 	public final FEMValue get(final int index) throws IndexOutOfBoundsException {
@@ -1082,13 +1104,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	@Override
-	public final int hashCode() {
-		int result = this.hash;
-		if (result != 0) return result;
+	public int hashCode() {
 		final HashCollector collector = new HashCollector();
 		this.extract(collector);
-		result = collector.hash;
-		return this.hash = result != 0 ? result : 1;
+		final int result = collector.hash;
+		return result != 0 ? result : -1;
 	}
 
 	@Override

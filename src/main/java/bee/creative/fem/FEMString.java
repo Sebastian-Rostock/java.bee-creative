@@ -335,8 +335,33 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
+	/** Diese Klasse implementiert ein abstrakte {@link FEMString Zeichenkette} mit {@link #hash Streuwertpuffer}.
+	 * 
+	 * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static abstract class HashString extends FEMString {
+
+		/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
+		protected int hash;
+
+		/** Dieser Konstruktor initialisiert die Länge.
+		 *
+		 * @param length Länge.
+		 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
+		protected HashString(final int length) throws IllegalArgumentException {
+			super(length);
+		}
+
+		@Override
+		public int hashCode() {
+			final int result = this.hash;
+			if (result != 0) return result;
+			return this.hash = super.hashCode();
+		}
+
+	}
+
 	@SuppressWarnings ("javadoc")
-	public static class ConcatString extends FEMString implements Emuable {
+	public static class ConcatString extends HashString implements Emuable {
 
 		public final FEMString string1;
 
@@ -384,7 +409,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class SectionString extends FEMString implements Emuable {
+	public static class SectionString extends HashString implements Emuable {
 
 		public final FEMString string;
 
@@ -419,7 +444,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class ReverseString extends FEMString implements Emuable {
+	public static class ReverseString extends HashString implements Emuable {
 
 		public final FEMString string;
 
@@ -456,7 +481,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class UniformString extends FEMString {
+	public static class UniformString extends HashString {
 
 		public final int item;
 
@@ -492,7 +517,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactStringINT8 extends FEMString implements Emuable {
+	public static class CompactStringINT8 extends HashString implements Emuable {
 
 		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
 		final byte[] items;
@@ -529,7 +554,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactStringINT16 extends FEMString implements Emuable {
+	public static class CompactStringINT16 extends HashString implements Emuable {
 
 		final short[] items;
 
@@ -569,7 +594,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactStringINT32 extends FEMString implements Emuable {
+	public static class CompactStringINT32 extends HashString implements Emuable {
 
 		final int[] items;
 
@@ -605,7 +630,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactStringUTF8 extends FEMString implements Emuable {
+	public static class CompactStringUTF8 extends HashString implements Emuable {
 
 		final byte[] items;
 
@@ -656,7 +681,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@SuppressWarnings ("javadoc")
-	public static class CompactStringUTF16 extends FEMString implements Emuable {
+	public static class CompactStringUTF16 extends HashString implements Emuable {
 
 		final short[] items;
 
@@ -1196,9 +1221,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return (item & 64512) != 56320;
 	}
 
-	/** Dieses Feld speichert den Streuwert oder {@code 0}. Es wird in {@link #hashCode()} initialisiert. */
-	protected int hash;
-
 	/** Dieses Feld speichert die Länge. */
 	protected final int length;
 
@@ -1544,13 +1566,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	@Override
-	public final int hashCode() {
-		int result = this.hash;
-		if (result != 0) return result;
+	public int hashCode() {
 		final HashCollector hasher = new HashCollector();
 		this.extract(hasher);
-		result = hasher.hash;
-		return this.hash = result != 0 ? result : 1;
+		int result = hasher.hash;
+		return result != 0 ? result : -1;
 	}
 
 	@Override
