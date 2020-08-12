@@ -17,6 +17,9 @@ public class Integers {
 		'5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5',
 		'6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
+	/** Dieses Feld speichert die Einerstelle der ersten 100 positiven Dezimanzahlen. */
+	final static String[] sizeUnitArray = {" B", " KB", " MB", " GB", " TB", " PB"};
+
 	/** Diese Methode liest die positiven Dezimalzahl aus dem gegebenen Bereich des gegebenen Puffers und gibt sie zurück.
 	 * <p>
 	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
@@ -163,6 +166,19 @@ public class Integers {
 			buffer[offset + fill] = '0';
 		}
 		Integers.formatLong(value, buffer, offset + length);
+	}
+
+	/** Diese Methode gibt die gegebene Speichergröße als Zeichenkette mit Maßeinheit {@code B}, {@code KB}, {@code MB}, {@code GB}, {@code TB} bzw. {@code PB}
+	 * zurück.
+	 * 
+	 * @param value Speichergröße in Byte (-922337203685477580..+922337203685477580).
+	 * @return formatierte Speichergröße. */
+	public static String formatSize(final long value) {
+		if (value < 0) return "-" + Integers.formatSize(-value);
+		if (value < 1024) return value + Integers.sizeUnitArray[0];
+		final int unit = (63 - Long.numberOfLeadingZeros(value)) / 10;
+		final int num = (int)((value * 10) >> (unit * 10)), div = num / 10, mod = num % 10;
+		return div + "." + mod + Integers.sizeUnitArray[unit];
 	}
 
 	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
