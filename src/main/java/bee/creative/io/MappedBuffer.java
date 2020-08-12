@@ -133,6 +133,12 @@ public class MappedBuffer implements Emuable {
 	/** Dieses Feld speichert {@code true} bei Schreibschutz. */
 	private final boolean isReadonly;
 
+	/** Dieses Feld speichert den Exponent der Wachstumsausrichtung, welche eine Potenz von 2 ist. */
+	private byte growAlign = 16;
+
+	/** Dieses Feld speichert den Wachstumsfaktor als Festkommazahl von 0 bis 64 für die Faktoren 0% bis 200%. */
+	private byte growScale = 16;
+
 	/** Dieser Konstruktor initialisiert den Puffer zum Lesen und Schreiben der gegebenen Datei.
 	 *
 	 * @see #MappedBuffer(File, boolean)
@@ -219,7 +225,9 @@ public class MappedBuffer implements Emuable {
 		return this.size;
 	}
 
-	/** Diese Methode vergrößert den Puffer auf das eineinhalbfache der gegebenen Puffergröße, wenn die Größe dieses Puffers kleiner als die gegebene ist.
+	/** Diese Methode vergrößert den Puffer, wenn seine Größe kleiner als die gegebene ist. Die neue Puffergröße ergibt sich aus der Summe der gegebenen minimalen
+	 * Puffergröße und dieser um den {@link #growScale() Wachstumsfaktor} vergrößerten Puffergröße, aufgerundet zum nächsten ganzzahligen Vielfachen der
+	 * {@link #growAlign() Wachstumsausrichtung}, d.h. aus {@code (minSize + minSize * growScale() / 100 + growAlign() - 1) / growAlign() * growAlign()}.
 	 *
 	 * @param minSize minimale Puffergröße.
 	 * @throws IllegalArgumentException Wenn die Puffergröße ungültig ist. */
@@ -227,9 +235,43 @@ public class MappedBuffer implements Emuable {
 		if (minSize < 0) throw new IllegalArgumentException();
 		synchronized (this) {
 			if (minSize <= this.size) return;
-			final long newSize = minSize + (minSize / 2);
+			final long scale = this.growScale, align = this.growAlign() - 1;
+			final long newSize = ((minSize + ((minSize * scale) / 32)) + align) & ~align;
 			this.resizeImpl(newSize < 0 ? Long.MAX_VALUE : newSize);
 		}
+	}
+
+	/** Diese Methode gibt die Wachstumsausrichtung zurück, die in {@link #grow(long)} zur Berechnung der neuen Puffergröße verwendet wird.
+	 *
+	 * @return Wachstumsausrichtung in Byte (8..1073741824). */
+	public int growAlign() {
+		return 1 << this.growAlign;
+	}
+
+	/** Diese Methode setzt die {@link #growAlign() Wachstumsausrichtung}. Diese wird stets auf die größte Potenz von 2 gesetzt, die nicht größer als der gegebene
+	 * Wert ist.
+	 *
+	 * @param align Wachstumsausrichtung in Byte (8..1073741824).
+	 * @throws IllegalArgumentException Wenn {@code scale} ungültig ist. */
+	public void growAlign(final int align) {
+		if ((align < 8) || (align > 1073741824)) throw new IllegalArgumentException();
+		this.growAlign = (byte)(31 - Integer.numberOfLeadingZeros(align));
+	}
+
+	/** Diese Methode gibt den Wachstumsfaktor zurück, der in {@link #grow(long)} zur Berechnung der neuen Puffergröße verwendet wird.
+	 *
+	 * @return Wachstumsfaktor in Prozent (0..200 Prozent). */
+	public int growScale() {
+		return (this.growScale * 100) / 32;
+	}
+
+	/** Diese Methode setzt den {@link #growScale() Wachstumsfaktor}.
+	 *
+	 * @param scale Wachstumsfaktor in Prozent (0..200).
+	 * @throws IllegalArgumentException Wenn {@code scale} ungültig ist. */
+	public void growScale(final int scale) throws IllegalArgumentException {
+		if ((scale < 0) || (scale > 200)) throw new IllegalArgumentException();
+		this.growScale = (byte)((scale * 32) / 100);
 	}
 
 	/** Diese Methode setzt die {@link #resize(long) Größe} des Puffers auf die Größe der {@link #file() Datei}. Dies kann notwendig werden, wenn Inhalt und Größe
