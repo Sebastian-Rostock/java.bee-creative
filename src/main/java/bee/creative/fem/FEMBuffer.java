@@ -10,6 +10,7 @@ import bee.creative.fem.FEMFunction.ClosureFunction;
 import bee.creative.fem.FEMFunction.CompositeFunction;
 import bee.creative.fem.FEMFunction.ConcatFunction;
 import bee.creative.io.MappedBuffer;
+import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
 import bee.creative.util.HashMapLO;
 import bee.creative.util.HashMapOL;
@@ -316,6 +317,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public FEMBuffer(final File file, final boolean readonly) throws IOException {
 		this.buffer = new MappedBuffer(file, readonly);
+		this.buffer.growScale(1);
 		final long MAGIC = 0x31454c49464d4546L;
 		if (!readonly && (this.buffer.size() == 0)) {
 			this.next = 24;
@@ -852,20 +854,27 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	protected long putProxyAsRef(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
 		final long addr;
 		synchronized (this.buffer) {
-			final Long value = this.proxyPutMap.get(src.id());
-			if (value != null) {
-				addr = value.longValue();
-				final long ref = this.buffer.getLong(addr + 16);
+			final Long key = this.proxyPutMap.get(src.id());
+			if (key != null) {
+				addr = key.longValue();
+				long ref = this.buffer.getLong(addr + 16);
 				final FEMFunction fun = src.get();
 				if (ref == FEMBuffer.TYPE_PROXY_ADDR1) {
 					if (fun != null) {
-						this.proxyGetMap.remove(value);
-						this.buffer.putLong(addr + 16, this.put(fun));
+						ref = this.put(fun);
+						this.buffer.putLong(addr + 16, ref);
+						final FEMProxy prx = this.proxyGetMap.get(key);
+						if (prx != null) {
+							prx.set(this.get(ref));
+						}
 					}
 				} else {
 					if (fun == null) {
-						this.proxyGetMap.remove(value);
 						this.buffer.putLong(addr + 16, FEMBuffer.TYPE_PROXY_ADDR1);
+						final FEMProxy prx = this.proxyGetMap.get(key);
+						if (prx != null) {
+							prx.set(null);
+						}
 					}
 				}
 				return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr);
@@ -974,7 +983,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.buffer);
+		return Objects.toInvokeString(this, this.buffer.file().toString(),
+			"file=" + Integers.formatSize(this.buffer.file().length()) + " used=" + Integers.formatSize(this.next) + " heap=" + Integers.formatSize(this.emu()));
 	}
 
 }
