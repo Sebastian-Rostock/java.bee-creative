@@ -305,6 +305,22 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 
 	}
 
+	/** Diese Methode liefert eine neue {@link Event Ereignisempfängerverwaltung}, die beim {@link Event#fire(Object, Object) Auslösen eines Ereignisses} zur
+	 * Benachrichtigung der Ereignisempfänger mit der Ereignisnachricht die gegebene Methode mit diesen Objekten aufruft.
+	 * 
+	 * @param customFire Methode zur Benachrichtigung eines Ereignisempfängers mit einer Ereignisnachricht.
+	 * @return Ereignisempfängerverwaltung. */
+	public static <GMessage, GObserver> Event<GMessage, GObserver> from(final Setter<? super GObserver, ? super GMessage> customFire) {
+		return new Event<GMessage, GObserver>() {
+
+			@Override
+			protected void customFire(final Object sender, final GMessage message, final GObserver observer) {
+				customFire.set(observer, message);
+			}
+
+		};
+	}
+
 	/** Dieses Feld speichert die {@link EventItem}. */
 	private final EventStore eventStore = new EventStore();
 
