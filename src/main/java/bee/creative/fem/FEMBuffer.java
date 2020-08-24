@@ -15,14 +15,13 @@ import bee.creative.lang.Objects;
 import bee.creative.util.HashMapLO;
 import bee.creative.util.HashMapOL;
 
-/** Diese Klasse implementiert einen Puffer zur Auslagerung von {@link FEMFunction Funktionen} und {@link FEMValue#result() Ergebniswerte} in einen
- * {@link MappedBuffer Dateipuffer}. Die darüber angebundene Datei besitz dafür eine entsprechende Datenstruktur, deren Kopfdaten beim Öffnen erzeugt bzw.
- * geprüft werden.
+/** Diese Klasse implementiert einen Puffer zur Auslagerung von {@link FEMFunction Funktionen} in einen {@link MappedBuffer Dateipuffer}. Die darüber
+ * angebundene Datei besitz dafür eine entsprechende Datenstruktur, deren Kopfdaten beim Öffnen erzeugt bzw. geprüft werden.
  * <p>
- * Beim {@link #put(FEMFunction) Einfügen} eines {@link FEMProxy Platzhalters} wird dessen {@link FEMProxy#get() Zielfunktion} beim Wechsel von bzw. auf
- * {@code null} aktualisiert.
+ * Beim {@link #put(FEMFunction) Einfügen} eines {@link FEMProxy Platzhalters} wird dessen {@link FEMProxy#get() Zielfunktion} aktualisiert, wenn sie dabei von
+ * bzw. auf {@code null} wechselt.
  * <p>
- * Achtung: {@link FEMNative Nativwerte} werden bei der Kodierun zwar angeboten aber in dieser Implementation nicht unterstützt.
+ * {@link FEMNative Nativwerte} werden bei der Kodierun zwar angeboten aber in dieser Implementation nicht unterstützt.
  *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMBuffer implements Property<FEMFunction>, Emuable {
@@ -363,6 +362,32 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 	}
 
+	/** Diese Methode gibt die Funktion zu der Referenz zurück, die an der gegebenen Adresse steht, und ist eine Abkürzung für {@link #get(long)
+	 * this.get(this.buffer().getLong(addr))}. */
+	public FEMFunction getAt(final long addr) throws IllegalArgumentException {
+		return this.get(this.buffer.getLong(addr));
+	}
+
+	/** Diese Methode gibt die Funktion zu der Referenz zurück, die an der gegebenen Adresse steht, und ist eine Abkürzung für {@link #get(long, Class)
+	 * this.get(this.buffer().getLong(addr), clazz)}. */
+	public <GResult> GResult getAt(final long addr, final Class<GResult> clazz) throws IllegalArgumentException {
+		return this.get(this.buffer.getLong(addr), clazz);
+	}
+
+	/** Diese Methode gibt die Funktionen zur gegebene Anzahl an Referenzen im gegebenen Speicherbereich zurück.
+	 *
+	 * @see #getAt(long)
+	 * @param addr Adresse des Speicherbereichs.
+	 * @param count Anzahl der Referenzen.
+	 * @return Funktionen. */
+	public FEMFunction[] getAllAt(final long addr, final int count) throws IllegalArgumentException {
+		final FEMFunction[] result = new FEMFunction[count];
+		for (int i = 0; i < count; i++) {
+			result[i] = this.getAt(addr + (i * 8));
+		}
+		return result;
+	}
+
 	/** Diese Methode gibt die Referenz mit den gegebenen Merkmalen zurück.
 	 *
 	 * @param head Kopfdaten als Typkennung (6 Bit).
@@ -380,32 +405,6 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode gibt die Rumpfdaten der gegebenen Referenz zurück. */
 	protected long getRefBody(final long ref) {
 		return ref >>> 6;
-	}
-
-	/** Diese Methode gibt die Funktion zu der Referenz zurück, die an der gegebenen Adresse steht, und ist eine Abkürzung für {@link #get(long)
-	 * this.get(this.buffer().getLong(addr))}. */
-	protected FEMFunction getAt(final long addr) throws IllegalArgumentException {
-		return this.get(this.buffer.getLong(addr));
-	}
-
-	/** Diese Methode gibt die Funktion zu der Referenz zurück, die an der gegebenen Adresse steht, und ist eine Abkürzung für {@link #get(long, Class)
-	 * this.get(this.buffer().getLong(addr), clazz)}. */
-	protected <GResult> GResult getAt(final long addr, final Class<GResult> clazz) throws IllegalArgumentException {
-		return this.get(this.buffer.getLong(addr), clazz);
-	}
-
-	/** Diese Methode gibt die Funktionen zur gegebene Anzahl an Referenzen im gegebenen Speicherbereich zurück.
-	 *
-	 * @see #getAt(long)
-	 * @param addr Adresse des Speicherbereichs.
-	 * @param count Anzahl der Referenzen.
-	 * @return Funktionen. */
-	protected FEMFunction[] getAllAt(final long addr, final int count) throws IllegalArgumentException {
-		final FEMFunction[] result = new FEMFunction[count];
-		for (int i = 0; i < count; i++) {
-			result[i] = this.getAt(addr + (i * 8));
-		}
-		return result;
 	}
 
 	@Override
@@ -960,7 +959,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	}
 
 	/** Diese Methode leert den {@link MappedBuffer Dateipuffer} und entfernt damit alle bisher ausgelagerten Funktionen. */
-	public void reset() {
+	public void reset() throws IllegalStateException {
 		if (this.buffer.isReadonly()) throw new IllegalStateException();
 		synchronized (this.buffer) {
 			this.cleanup();
