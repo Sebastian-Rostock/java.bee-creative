@@ -2,7 +2,7 @@ package bee.creative.bind;
 
 import java.lang.ref.WeakReference;
 
-/** Diese Schnittstelle definiert eine eeobachtbares Objekt als Ereignisquelle, bei welcher Ereignisempfänger jederzeit {@link #put(Object) angemeldet},
+/** Diese Schnittstelle definiert ein beobachtbares Objekt als Ereignisquelle, bei welcher Ereignisempfänger jederzeit {@link #put(Object) angemeldet},
  * {@link #pop(Object) abgemeldet} bzw. {@link #fire(Object) benachrichtigt} werden können.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
