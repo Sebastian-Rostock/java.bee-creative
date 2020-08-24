@@ -330,7 +330,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Klasse implementiert eine abstrakte {@link FEMArray Wertliste} mit {@link #hash Streuwertpuffer}.
-	 * 
+	 *
 	 * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class HashArray extends FEMArray {
 
@@ -406,16 +406,16 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.array1) + EMU.from(this.array2);
-		}
-
-		@Override
-		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
+		protected FEMArray customSection(final int offset, final int length) {
 			final int offset2 = offset - this.array1.length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.array2.section(offset2, length);
 			if (length2 <= 0) return this.array1.section(offset, length);
-			return this.array1.section(offset, -offset2).concat(this.array2.section(0, length2));
+			return this.array1.customSection(offset, -offset2).concat(this.array2.customSection(0, length2));
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.array1) + EMU.from(this.array2);
 		}
 
 	}
@@ -451,13 +451,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.array);
+		protected FEMArray customSection(final int offset2, final int length2) {
+			return this.array.customSection(this.offset + offset2, length2);
 		}
 
 		@Override
-		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
-			return this.array.section(offset + this.offset, length);
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.array);
 		}
 
 	}
@@ -483,13 +483,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.array);
+		protected FEMArray customSection(final int offset2, final int length2) {
+			return this.array.customSection(this.length - offset2 - length2, length2).reverse();
 		}
 
 		@Override
-		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
-			return this.array.section(this.length - offset - length, length).reverse();
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.array);
 		}
 
 		@Override
@@ -828,7 +828,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	protected int customFind(final FEMArray that, final int offset) {
 		final FEMValue value = that.customGet(0);
 		final int count = (this.length - that.length) + 1;
-		for (int result = offset; true;) {
+		for (int result = offset; true;result++) {
 			result = this.customFind(value, result, count - result, true);
 			if (result < 0) return -1;
 			if (this.customEquals(that, result)) return result;
@@ -880,6 +880,15 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return true;
 	}
 
+	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Wertliste zurück. Sie Implementiert {@link #section(int, int)} ohne Wertebereichsprüfung.
+	 *
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Werte im Abschnitt.
+	 * @return {@link FEMArray}-Sicht auf einen Abschnitt dieser Wertliste. */
+	protected FEMArray customSection(final int offset, final int length) {
+		return new SectionArray(this, offset, length);
+	}
+
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMArray data() {
@@ -921,7 +930,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.
 	 *
 	 * @see #length() */
-	public FEMArray section(final int offset) throws IllegalArgumentException {
+	public final FEMArray section(final int offset) throws IllegalArgumentException {
 		return this.section(offset, this.length - offset);
 	}
 
@@ -931,11 +940,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @return {@link FEMArray}-Sicht auf einen Abschnitt dieser Wertliste.
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte. */
-	public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
+	public final FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 		if ((offset == 0) && (length == this.length)) return this;
 		if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMArray.EMPTY;
-		return new SectionArray(this, offset, length);
+		return this.customSection(offset, length);
 	}
 
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Wertliste zurück.
@@ -1074,10 +1083,10 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die Schlüssel- und Wertlisten zurück, aus denen diese Wertliste besteht.<br>
-	 * Sie ist damit die Umkehroperation zu {@link #from(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in
-	 * {@code keys} an der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten
-	 * Suche {@link #compact(boolean) indiziert} sein.
-	 * 
+	 * Sie ist damit die Umkehroperation zu {@link #from(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an
+	 * der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche
+	 * {@link #compact(boolean) indiziert} sein.
+	 *
 	 * @return {@link Map}-Sicht.
 	 * @throws IllegalArgumentException Wenn diese Wertliste nicth aus zwei Wertlisten besteht oder die Längen dieser Wertlisten ungleich sind. */
 	public final Map<FEMValue, FEMValue> toMap() throws IllegalArgumentException {

@@ -61,46 +61,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	static class ValueFinder implements Collector {
-
-		public final int[] that;
-
-		public int index;
-
-		public int offset;
-
-		ValueFinder(final int[] that) {
-			this.that = that;
-			this.index = 1 - that.length;
-		}
-
-		@Override
-		public boolean push(final int value) {
-			int offset = this.offset;
-			final int[] array = this.that;
-			if (array[offset] == value) {
-				++offset;
-				if (offset == array.length) return false;
-			} else {
-				LOOP: for (int delta = 1; offset > 0; ++delta) {
-					--offset;
-					if (array[offset] == value) {
-						for (int i = 0; i < offset; i++) {
-							if (array[i] != array[i + delta]) {
-								continue LOOP;
-							}
-						}
-						break LOOP;
-					}
-				}
-			}
-			this.index++;
-			this.offset = offset;
-			return true;
-		}
-
-	}
-
 	static class HashCollector implements Collector {
 
 		public int hash = Objects.hashInit();
@@ -336,7 +296,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	/** Diese Klasse implementiert ein abstrakte {@link FEMString Zeichenkette} mit {@link #hash Streuwertpuffer}.
-	 * 
+	 *
 	 * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class HashString extends FEMString {
 
@@ -464,8 +424,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
-		protected FEMString customSection(final int offset, final int length2) throws IllegalArgumentException {
-			return this.string.section(this.length - offset - length2, length2).reverse();
+		protected FEMString customSection(final int offset2, final int length2) throws IllegalArgumentException {
+			return this.string.section(this.length - offset2 - length2, length2).reverse();
 		}
 
 		@Override
@@ -1233,17 +1193,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		this.length = length;
 	}
 
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMString data() {
-		return this;
-	}
-
-	@Override
-	public final FEMType<FEMString> type() {
-		return FEMString.TYPE;
-	}
-
 	/** Diese Methode gibt den {@code index}-ten Codepoint zurück. Sie Implementiert {@link #get(int)} ohne Wertebereichsprüfung.
 	 *
 	 * @param index Index.
@@ -1252,28 +1201,45 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return 0;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück. Sie Implementiert
-	 * {@link #find(int, int)} ohne Wertebereichsprüfung.
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück. Sie Implementiert
+	 * {@link #find(FEMString, int)} ohne Wertebereichsprüfung.
+	 *
+	 * @param that nicht leere gesuchte Zeichenkette.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens der gegebene Zeichenkette ({@code offset..this.length()-that.length()}) oder {@code -1}.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	protected int customFind(final FEMString that, final int offset) {
+		final int value = that.customGet(0);
+		final int count = (this.length - that.length) + 1;
+		for (int result = offset; true; result++) {
+			result = this.customFind(value, result, count - result, true);
+			if (result < 0) return -1;
+			if (this.customEquals(that, result)) return result;
+		}
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens im gegebenen Abschnitt zurück. Sie Implementiert {@link #find(int, int)} ohne
+	 * Wertebereichsprüfung.
 	 *
 	 * @param that gesuchtes Zeichen.
-	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
-	 * @return Position des ersten Vorkommens des gegebenen Zeichens ({@code offset..this.length()-1}) oder {@code -1}. */
-	protected int customFind(final int that, final int offset) {
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Zeichen im Abschnitt.
+	 * @return Position des ersten Vorkommens des gegebenen Zeichens oder {@code -1}.
+	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
+	protected int customFind(final int that, final int offset, final int length, final boolean foreward) {
 		final ItemFinder finder = new ItemFinder(that);
-		if (this.customExtract(finder, offset, this.length - offset, true)) return -1;
+		if (this.customExtract(finder, offset, length, foreward)) return -1;
 		return finder.index + offset;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück. *Sie Implementiert
-	 * {@link #find(FEMString, int)} ohne Wertebereichsprüfung.
-	 *
-	 * @param that gesuchte Zeichenkette.
-	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
-	 * @return Position des ersten Vorkommens der gegebene Zeichenkette ({@code offset..this.length()-that.length()}) oder {@code -1}. */
-	protected int customFind(final FEMString that, final int offset) {
-		final ValueFinder finder = new ValueFinder(that.value());
-		if (this.customExtract(finder, offset, this.length - offset, true)) return -1;
-		return finder.index + offset;
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Zeichenkette an der gegebenen Position in dieser Zeichenkette liegt. Sie Implementiert
+	 * {@link #equals(FEMString)} ohne Wertebereichsprüfung. */
+	protected boolean customEquals(final FEMString that, final int offset) {
+		final int length = that.length;
+		for (int i = 0; i < length; i++) {
+			if (this.customGet(offset + i) != that.customGet(i)) return false;
+		}
+		return true;
 	}
 
 	/** Diese Methode fügt alle Codepoints im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an. Das Anfügen wird
@@ -1300,10 +1266,21 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Zeichenkette zurück. Sie Implementiert {@link #section(int, int)} ohne Wertebereichsprüfung.
 	 *
 	 * @param offset Position, an welcher der Abschnitt beginnt.
-	 * @param length Anzahl der Bytes im Abschnitt.
+	 * @param length Anzahl der Zeichen im Abschnitt.
 	 * @return {@link FEMString}-Sicht auf einen Abschnitt dieser Zeichenkette. */
 	protected FEMString customSection(final int offset, final int length) {
 		return new SectionString(this, offset, length);
+	}
+
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMString data() {
+		return this;
+	}
+
+	@Override
+	public final FEMType<FEMString> type() {
+		return FEMString.TYPE;
 	}
 
 	/** Diese Methode gibt die Codepoint zurück.
@@ -1420,7 +1397,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	public final int find(final int that, final int offset) throws IllegalArgumentException {
 		if (offset == this.length) return -1;
 		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
-		return this.customFind(that, offset);
+		if (offset == this.length) return -1;
+		return this.customFind(that, offset, this.length - offset, true);
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück. Die Suche beginnt an der gegebenen
@@ -1432,9 +1410,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMString that, final int offset) throws NullPointerException, IllegalArgumentException {
+		if (that.length == 1) return this.find(that.customGet(0), offset);
 		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
 		if (that.length == 0) return offset;
-		if (that.length == 1) return this.customFind(that.customGet(0), offset);
 		if (that.length > (this.length - offset)) return -1;
 		return this.customFind(that, offset);
 	}
@@ -1473,10 +1451,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		final int length = this.length;
 		if (length != that.length) return false;
 		if (this.hashCode() != that.hashCode()) return false;
-		for (int i = 0; i < length; i++) { // TODO schneller
-			if (this.customGet(i) != that.customGet(i)) return false;
-		}
-		return true;
+		return this.customEquals(that, 0);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Zeichenkette kleiner, gleich oder größer als die
@@ -1569,7 +1544,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	public int hashCode() {
 		final HashCollector hasher = new HashCollector();
 		this.extract(hasher);
-		int result = hasher.hash;
+		final int result = hasher.hash;
 		return result != 0 ? result : -1;
 	}
 

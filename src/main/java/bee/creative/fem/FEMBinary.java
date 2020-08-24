@@ -612,29 +612,59 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		this.length = length;
 	}
 
-	/** Diese Methode gibt {@code this} zurück. */
-	@Override
-	public final FEMBinary data() {
-		return this;
-	}
-
-	@Override
-	public final FEMType<FEMBinary> type() {
-		return FEMBinary.TYPE;
-	}
-
 	/** Diese Methode gibt das {@code index}-te Byte zurück.
 	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Byte. */
 	protected abstract byte customGet(final int index);
 
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Bytefolge innerhalb dieser Bytefolge zurück. Sie Implementiert
+	 * {@link #find(FEMBinary, int)} ohne Wertebereichsprüfung.
+	 *
+	 * @param that nicht leere gesuchte Bytefolge.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens der gegebene Bytefolge ({@code offset..this.length()-that.length()}) oder {@code -1}.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	protected int customFind(final FEMBinary that, final int offset) {
+		final byte value = that.customGet(0);
+		final int count = (this.length - that.length) + 1;
+		for (int result = offset; true; result++) {
+			result = this.customFind(value, result, count - result, true);
+			if (result < 0) return -1;
+			if (this.customEquals(that, result)) return result;
+		}
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Bytes im gegebenen Abschnitt zurück. Sie Implementiert {@link #find(byte, int)} ohne
+	 * Wertebereichsprüfung.
+	 *
+	 * @param that gesuchtes Zeichen.
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Bytes im Abschnitt.
+	 * @return Position des ersten Vorkommens des gegebenen Bytes oder {@code -1}.
+	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist. */
+	protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
+		final ItemFinder finder = new ItemFinder(that);
+		if (this.customExtract(finder, offset, length, foreward)) return -1;
+		return finder.index + offset;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Bytefolge an der gegebenen Position in dieser Bytefolge liegt. Sie Implementiert
+	 * {@link #equals(FEMBinary)} ohne Wertebereichsprüfung. */
+	protected boolean customEquals(final FEMBinary that, final int offset) {
+		final int length = that.length;
+		for (int i = 0; i < length; i++) {
+			if (this.customGet(offset + i) != that.customGet(i)) return false;
+		}
+		return true;
+	}
+
 	/** Diese Methode fügt alle Bytes im gegebenen Abschnitt in der gegebenen Reihenfolge geordnet an den gegebenen {@link Collector} an. Das Anfügen wird
 	 * vorzeitig abgebrochen, wenn {@link Collector#push(byte)} {@code false} liefert.
 	 *
 	 * @param target {@link Collector}, an den die Bytes geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
-	 * @param length Anzahl der Werte im Abschnitt.
+	 * @param length Anzahl der Bytes im Abschnitt.
 	 * @param foreward {@code true}, wenn die Reihenfolge vorwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean customExtract(final Collector target, int offset, int length, final boolean foreward) {
@@ -657,6 +687,17 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @return {@link FEMBinary}-Sicht auf einen Abschnitt dieser Bytefolge. */
 	protected FEMBinary customSection(final int offset, final int length) {
 		return new SectionBinary(this, offset, length);
+	}
+
+	/** Diese Methode gibt {@code this} zurück. */
+	@Override
+	public final FEMBinary data() {
+		return this;
+	}
+
+	@Override
+	public final FEMType<FEMBinary> type() {
+		return FEMBinary.TYPE;
 	}
 
 	/** Diese Methode konvertiert diese Bytefolge in ein {@code byte[]} und gibt dieses zurück.
@@ -743,12 +784,10 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @return Position des ersten Vorkommens des gegebenen Bytewerts ({@code offset..this.length()-1}) oder {@code -1}.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final byte that, final int offset) throws IllegalArgumentException {
-		final int length = this.length - offset;
-		if (length == 0) return -1;
-		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
-		final ItemFinder finder = new ItemFinder(that);
-		if (this.customExtract(finder, offset, length, true)) return -1;
-		return finder.index + offset;
+		if (offset == this.length) return -1;
+		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
+		if (offset == this.length) return -1;
+		return this.customFind(that, offset, this.length - offset, true);
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Bytefolge innerhalb dieser Bytefolge zurück. Die Suche beginnt an der gegebenen
@@ -760,23 +799,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMBinary that, final int offset) throws NullPointerException, IllegalArgumentException {
-		final int count = that.length;
-		if (count == 1) return this.find(that.customGet(0), offset);
+		if (that.length == 1) return this.find(that.customGet(0), offset);
 		if ((offset < 0) || (offset > this.length)) throw new IllegalArgumentException();
-		if (count == 0) return offset;
-		final int value = that.customGet(0);
-		final int length = (this.length - count) + 1;
-		FIND: for (int i = offset; i < length; i++) {
-			if (value == this.customGet(i)) {
-				for (int i2 = 1; i2 < count; i2++) {
-					if (this.customGet(i + i2) != that.customGet(i2)) {
-						continue FIND;
-					}
-				}
-				return i;
-			}
-		}
-		return -1;
+		if (that.length == 0) return offset;
+		if (that.length > (this.length - offset)) return -1;
+		return this.customFind(that, offset);
 	}
 
 	/** Diese Methode fügt alle Bytes dieser Bytefolge vom ersten zum letzten geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig
