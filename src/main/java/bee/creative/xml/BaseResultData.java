@@ -1,8 +1,13 @@
 package bee.creative.xml;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -27,6 +32,16 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 
 	/** Dieses Feld speichert den System-Identifikator. */
 	String systemId;
+
+	public final GThis use(final Object object) {
+		if (object instanceof File) return useFile((File)object);
+		if (object instanceof Node) return useNode((Node)object);
+		if (object instanceof Writer) return useWriter((Writer)object);
+		if (object instanceof OutputStream) return useStream((OutputStream)object);
+		if (object instanceof Result) return useResult((Result)object);
+		if (object instanceof BaseResultData<?>) return use((BaseResultData<?>)object);
+		return this.customThis();
+	}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *

@@ -14,23 +14,23 @@ import bee.creative.lang.Objects;
 /** Diese Klasse implementiert einen Konfigurator zum {@link #unmarshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Unmarshaller}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class XMLUnmarshaller {
+public  class XMLUnmarshaller {
 
 	/** Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Unmarshaller}.
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class SourceData extends BaseSourceData<SourceData> {
+	public  class SourceData extends BaseSourceData<SourceData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
 		 * @return Besitzer. */
-		public final XMLUnmarshaller closeSourceData() {
+		public XMLUnmarshaller closeSourceData() {
 			return XMLUnmarshaller.this;
 		}
 
 		@Override
-		protected final SourceData customThis() {
+		protected SourceData customThis() {
 			return this;
 		}
 
@@ -39,17 +39,17 @@ public final class XMLUnmarshaller {
 	/** Diese Klasse implementiert den Konfigurator für den {@link Unmarshaller}.
 	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class UnmarshallerData extends BaseUnmarshallerData<UnmarshallerData> {
+	public  class UnmarshallerData extends BaseUnmarshallerData<UnmarshallerData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
 		 * @return Besitzer. */
-		public final XMLUnmarshaller closeUnmarshallerData() {
+		public XMLUnmarshaller closeUnmarshallerData() {
 			return XMLUnmarshaller.this;
 		}
 
 		@Override
-		protected final UnmarshallerData customThis() {
+		protected UnmarshallerData customThis() {
 			return this;
 		}
 
@@ -59,7 +59,7 @@ public final class XMLUnmarshaller {
 	 *
 	 * @param classes Klasse.
 	 * @return {@link XMLUnmarshaller}. */
-	public static XMLUnmarshaller from(final Class<?>... classes) {
+	public static XMLUnmarshaller from( Class<?>... classes) {
 		return new XMLUnmarshaller().openUnmarshallerData().openContextData().openClassData().putAll(Arrays.asList(classes)).closeClassesData().closeContextData()
 			.closeUnmarshallerData();
 	}
@@ -68,7 +68,7 @@ public final class XMLUnmarshaller {
 	 *
 	 * @see #from(Class...)
 	 * @see #unmarshalNode(Node) */
-	public static Object unmarshalNode(final Node source, final Class<?>... classes) throws SAXException, JAXBException {
+	public static Object unmarshalNode( Node source,  Class<?>... classes) throws SAXException, JAXBException {
 		return XMLUnmarshaller.from(classes).unmarshalNode(source);
 	}
 
@@ -76,7 +76,7 @@ public final class XMLUnmarshaller {
 	 *
 	 * @see #from(Class...)
 	 * @see #unmarshalString(String) */
-	public static Object unmarshalString(final String source, final Class<?>... classes) throws SAXException, JAXBException {
+	public static Object unmarshalString( String source,  Class<?>... classes) throws SAXException, JAXBException {
 		return XMLUnmarshaller.from(classes).unmarshalString(source);
 	}
 
@@ -90,7 +90,7 @@ public final class XMLUnmarshaller {
 	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public final XMLUnmarshaller use(final XMLUnmarshaller data) {
+	public XMLUnmarshaller use( XMLUnmarshaller data) {
 		if (data == null) return this;
 		this.sourceData.use(data.sourceData);
 		this.unmarshallerData.use(data.unmarshallerData);
@@ -104,10 +104,10 @@ public final class XMLUnmarshaller {
 	 * @return geparstes Objekt.
 	 * @throws SAXException Wenn {@link UnmarshallerData#getUnmarshaller()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link Unmarshaller#unmarshal(Source)} eine entsprechende Ausnahme auslöst. */
-	public final Object unmarshal() throws SAXException, JAXBException {
-		final Unmarshaller unmarshaller = this.unmarshallerData.getUnmarshaller();
+	public Object unmarshal() throws SAXException, JAXBException {
+		 Unmarshaller unmarshaller = this.unmarshallerData.getUnmarshaller();
 		synchronized (unmarshaller) {
-			final Source source = this.sourceData.getSource();
+			 Source source = this.sourceData.getSource();
 			return unmarshaller.unmarshal(source);
 		}
 	}
@@ -116,14 +116,14 @@ public final class XMLUnmarshaller {
 	 *
 	 * @see Unmarshaller#unmarshal(Source)
 	 * @return Konfigurator. */
-	public final SourceData openSourceData() {
+	public SourceData openSourceData() {
 		return this.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Unmarshaller} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
-	public final UnmarshallerData openUnmarshallerData() {
+	public UnmarshallerData openUnmarshallerData() {
 		return this.unmarshallerData;
 	}
 
@@ -135,8 +135,8 @@ public final class XMLUnmarshaller {
 	 * @return geparstes Objekt.
 	 * @throws SAXException Wenn {@link #unmarshal} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #unmarshal()} eine entsprechende Ausnahme auslöst. */
-	public final Object unmarshalNode(final Node source) throws SAXException, JAXBException {
-		final Object result = this.openSourceData().useNode(source).closeSourceData().unmarshal();
+	public Object unmarshalNode( Node source) throws SAXException, JAXBException {
+		 Object result = this.openSourceData().useNode(source).closeSourceData().unmarshal();
 		this.openSourceData().resetSource();
 		return result;
 	}
@@ -149,14 +149,14 @@ public final class XMLUnmarshaller {
 	 * @return geparstes Objekt.
 	 * @throws SAXException Wenn {@link #unmarshal} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #unmarshal()} eine entsprechende Ausnahme auslöst. */
-	public final Object unmarshalString(final String source) throws SAXException, JAXBException {
-		final Object result = this.openSourceData().useText(source).closeSourceData().unmarshal();
+	public Object unmarshalString( String source) throws SAXException, JAXBException {
+		 Object result = this.openSourceData().useText(source).closeSourceData().unmarshal();
 		this.openSourceData().resetSource();
 		return result;
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return Objects.toInvokeString(this, this.sourceData, this.unmarshallerData);
 	}
 

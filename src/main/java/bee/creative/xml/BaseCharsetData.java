@@ -36,7 +36,7 @@ public abstract class BaseCharsetData<GThis> extends BaseItemBuilder<Charset, GT
 	 *
 	 * @see #use(Object)
 	 * @return {@code this}. */
-	public GThis useUTF8() {
+	public GThis useUTF_8() {
 		return this.use(StandardCharsets.UTF_8);
 	}
 
@@ -44,7 +44,7 @@ public abstract class BaseCharsetData<GThis> extends BaseItemBuilder<Charset, GT
 	 *
 	 * @see #use(Object)
 	 * @return {@code this}. */
-	public GThis useUTF16() {
+	public GThis useUTF_16() {
 		return this.use(StandardCharsets.UTF_16);
 	}
 
@@ -52,7 +52,7 @@ public abstract class BaseCharsetData<GThis> extends BaseItemBuilder<Charset, GT
 	 *
 	 * @see #use(Object)
 	 * @return {@code this}. */
-	public GThis useUTF16BE() {
+	public GThis useUTF_16BE() {
 		return this.use(StandardCharsets.UTF_16BE);
 	}
 
@@ -60,7 +60,7 @@ public abstract class BaseCharsetData<GThis> extends BaseItemBuilder<Charset, GT
 	 *
 	 * @see #use(Object)
 	 * @return {@code this}. */
-	public GThis useUTF16LE() {
+	public GThis useUTF_16LE() {
 		return this.use(StandardCharsets.UTF_16LE);
 	}
 
@@ -68,7 +68,7 @@ public abstract class BaseCharsetData<GThis> extends BaseItemBuilder<Charset, GT
 	 *
 	 * @see #use(Object)
 	 * @return {@code this}. */
-	public GThis useUSASCII() {
+	public GThis useUS_ASCII() {
 		return this.use(StandardCharsets.US_ASCII);
 	}
 
@@ -76,7 +76,7 @@ public abstract class BaseCharsetData<GThis> extends BaseItemBuilder<Charset, GT
 	 *
 	 * @see #use(Object)
 	 * @return {@code this}. */
-	public GThis useISO88591() {
+	public GThis useISO_8859_1() {
 		return this.use(StandardCharsets.ISO_8859_1);
 	}
 

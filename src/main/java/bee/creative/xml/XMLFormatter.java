@@ -2,6 +2,7 @@ package bee.creative.xml;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -14,23 +15,23 @@ import bee.creative.lang.Objects;
 /** Diese Klasse implementiert einen Konfigurator zum {@link #transform() Transformieren} sowie {@link #transformToString() Formatieren} eines {@link Document}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class XMLFormatter {
+public  class XMLFormatter {
 
 	/** Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Transformer}.
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class SourceData extends BaseSourceData<SourceData> {
+	public  class SourceData extends BaseSourceData<SourceData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
 		 * @return Besitzer. */
-		public final XMLFormatter closeSourceData() {
+		public  XMLFormatter closeSourceData() {
 			return XMLFormatter.this;
 		}
 
 		@Override
-		protected final SourceData customThis() {
+		protected  SourceData customThis() {
 			return this;
 		}
 
@@ -40,17 +41,17 @@ public final class XMLFormatter {
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class ResultData extends BaseResultData<ResultData> {
+	public  class ResultData extends BaseResultData<ResultData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
 		 * @return Besitzer. */
-		public final XMLFormatter closeResultData() {
+		public  XMLFormatter closeResultData() {
 			return XMLFormatter.this;
 		}
 
 		@Override
-		protected final ResultData customThis() {
+		protected  ResultData customThis() {
 			return this;
 		}
 
@@ -59,24 +60,24 @@ public final class XMLFormatter {
 	/** Diese Klasse implementiert den Konfigurator für den {@link Transformer}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class TransformerData extends BaseTransformerData<TransformerData> {
+	public  class TransformerData extends BaseTransformerData<TransformerData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
 		 * @return Besitzer. */
-		public final XMLFormatter closeTransformerData() {
+		public  XMLFormatter closeTransformerData() {
 			return XMLFormatter.this;
 		}
 
 		@Override
-		protected final TransformerData customThis() {
+		protected  TransformerData customThis() {
 			return this;
 		}
 
 	}
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final SourceData sourceData = new SourceData();
+	final	 SourceData sourceData = new SourceData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openResultData()}. */
 	final ResultData resultData = new ResultData();
@@ -88,7 +89,7 @@ public final class XMLFormatter {
 	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public final XMLFormatter use(final XMLFormatter data) {
+	public  XMLFormatter use( XMLFormatter data) {
 		if (data == null) return this;
 		this.sourceData.use(data.sourceData);
 		this.resultData.use(data.resultData);
@@ -103,11 +104,11 @@ public final class XMLFormatter {
 	 * @see Transformer#transform(Source, Result)
 	 * @return {@code this}.
 	 * @throws TransformerException Wenn {@link Transformer#transform(Source, Result)} eine entsprechende Ausnahme auslöst. */
-	public final XMLFormatter transform() throws TransformerException {
-		final Transformer transformer = this.transformerData.getTransformer();
+	public  XMLFormatter transform() throws TransformerException {
+		 Transformer transformer = this.transformerData.getTransformer();
 		synchronized (transformer) {
-			final Source source = this.sourceData.getSource();
-			final Result result = this.resultData.getResult();
+			 Source source = this.sourceData.getSource();
+			 Result result = this.resultData.getResult();
 			transformer.transform(source, result);
 		}
 		return this;
@@ -120,10 +121,19 @@ public final class XMLFormatter {
 	 * @see #openResultData()
 	 * @return Dokumentknoten.
 	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst. */
-	public final Node transformToNode() throws TransformerException {
-		final DOMResult result = new DOMResult();
+	public  Node transformToNode() throws TransformerException {
+		 DOMResult result = new DOMResult();
 		this.openResultData().useResult(result).closeResultData().transform().openResultData().resetResult();
 		return result.getNode();
+	}
+	
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().transformToNode()}.
+	 * @see #transformToNode()
+	 * @see BaseSourceData#use(Object)
+	 */
+	public  Node transformToNode(Object source) throws TransformerException, MalformedURLException {
+		return openSourceData().use(source).closeSourceData().transformToNode();
 	}
 
 	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück. Dazu wird als {@link #openResultData()
@@ -134,17 +144,27 @@ public final class XMLFormatter {
 	 * @see #openResultData()
 	 * @return Zeichenkette.
 	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst. */
-	public final String transformToString() throws TransformerException {
-		final StringWriter result = new StringWriter();
+	public  String transformToString() throws TransformerException {
+		 StringWriter result = new StringWriter();
 		this.openResultData().useWriter(result).closeResultData().transform().openResultData().resetResult();
 		return result.toString();
 	}
 
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().transformToString()}.
+	 * @see #transformToString()
+	 * @see BaseSourceData#use(Object)
+	 */
+	public  String transformToString(Object source) throws TransformerException, MalformedURLException {
+		return openSourceData().use(source).closeSourceData().transformToString();
+	}
+
+	
 	/** Diese Methode öffnet den Konfigurator für die Eingabedaten und gibt ihn zurück.
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @return Konfigurator. */
-	public final SourceData openSourceData() {
+	public  SourceData openSourceData() {
 		return this.sourceData;
 	}
 
@@ -152,19 +172,19 @@ public final class XMLFormatter {
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @return Konfigurator. */
-	public final ResultData openResultData() {
+	public  ResultData openResultData() {
 		return this.resultData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Transformer} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
-	public final TransformerData openTransformerData() {
+	public  TransformerData openTransformerData() {
 		return this.transformerData;
 	}
 
 	@Override
-	public final String toString() {
+	public  String toString() {
 		return Objects.toInvokeString(this, this.sourceData, this.resultData, this.transformerData);
 	}
 

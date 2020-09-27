@@ -1,6 +1,8 @@
 package bee.creative.xml;
 
 import java.io.File;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import bee.creative.io.IO;
+import bee.creative.lang.Strings;
 
 /** Diese Klasse implementiert einen Konfigurator zum Bereinigen der über {@code JAXB} erzeugten {@code java}-Quelltextdateien.
  * <p>
@@ -76,47 +80,31 @@ public class XMLCleaner {
 
 	static final Pattern commentPattern = Pattern.compile("^\\s*[*/]");
 
-	/** Dieses Feld speichert den Konfigurator für {@link #openFileData()}. */
-	final FileData fileData = new FileData();
-
-	/** Dieses Feld speichert den Konfigurator für {@link #openCharsetData()}. */
-	final CharsetData charsetData = new CharsetData();
-
-	/** Diese Methode bereinigt die gewählten Quelltextdateien und gibt {@code this} zurück.
-	 *
-	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn {@link File} oder {@link Charset} unzulässig konfiguriert sind. */
-	public final XMLCleaner cleanup() throws IllegalStateException {
-		final File path = this.fileData.get();
-		final Charset charset = this.charsetData.get();
-		if ((path == null) || (charset == null)) throw new IllegalStateException();
-		if (path.isDirectory()) {
-			final File[] list = path.listFiles();
-			if (list == null) return this;
-			for (final File file: list) {
-				this.cleanup(file, charset);
-			}
-		} else {
-			this.cleanup(path, charset);
-		}
-		return this;
-	}
-
-	final void cleanup(final File file, final Charset charset) throws IllegalStateException {
+	public static void cleanup(final File file, final Charset charset) throws IllegalStateException {
 		try {
 			if (!file.isFile() || !file.getName().endsWith(".java")) return;
-			final List<String> sourceList = Files.readAllLines(file.toPath(), charset);
-			final int count = sourceList.size();
+			String s = IO.readChars(new InputStreamReader(IO.inputStreamFrom(file), charset));
+			String r = cleanup(s);
+			IO.writeChars(new OutputStreamWriter(IO.outputStreamFrom(file), charset), r);
+		} catch (final Exception cause) {
+			throw new IllegalStateException(cause);
+		}
+	}
+
+	public static String cleanup(final String code) throws IllegalStateException {
+		try {
+			final String[] sourceList = code.split("[\r\n]+");
+			final int count = sourceList.length;
 			final List<String> targetList = new ArrayList<>(count);
 			final StringBuffer target = new StringBuffer();
 			int index = 0;
 			Matcher matcher;
 			String space = null;
 			while (index < count) {
-				final String source = sourceList.get(index);
+				final String source = sourceList[index];
 				String value;
 				if (source.isEmpty()) {
-					value = null;
+					value = "";
 				} else if (space != null) {
 					space = source.startsWith(space) ? null : space;
 					value = null;
@@ -149,10 +137,37 @@ public class XMLCleaner {
 					targetList.add(source);
 				}
 			}
-			Files.write(file.toPath(), targetList, charset);
+			String result = Strings.join("\n", targetList);
+			return result;
 		} catch (final Exception cause) {
 			throw new IllegalStateException(cause);
 		}
+	}
+
+	/** Dieses Feld speichert den Konfigurator für {@link #openFileData()}. */
+	final FileData fileData = new FileData();
+
+	/** Dieses Feld speichert den Konfigurator für {@link #openCharsetData()}. */
+	final CharsetData charsetData = new CharsetData();
+
+	/** Diese Methode bereinigt die gewählten Quelltextdateien und gibt {@code this} zurück.
+	 *
+	 * @return {@code this}.
+	 * @throws IllegalStateException Wenn {@link File} oder {@link Charset} unzulässig konfiguriert sind. */
+	public final XMLCleaner cleanup() throws IllegalStateException {
+		final File path = this.fileData.get();
+		final Charset charset = this.charsetData.get();
+		if ((path == null) || (charset == null)) throw new IllegalStateException();
+		if (path.isDirectory()) {
+			final File[] list = path.listFiles();
+			if (list == null) return this;
+			for (final File file: list) {
+				this.cleanup(file, charset);
+			}
+		} else {
+			this.cleanup(path, charset);
+		}
+		return this;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link File} und gibt ihn zurück. Das {@link File} steht entweder für eine Quelltextdateien oder ein

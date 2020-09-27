@@ -40,6 +40,19 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	/** Dieses Feld speichert den System-Identifikator. */
 	String systemId;
 
+	public final GThis use(final Object object) throws MalformedURLException  {
+		if(object instanceof URI) return useUri((URI)object);
+		if(object instanceof URL) return useUrl((URL)object);
+		if(object instanceof File) return useFile((File)object);
+		if(object instanceof String) return useText((String)object);
+		if(object instanceof Node) return useNode((Node)object);
+		if(object instanceof Reader) return useReader((Reader)object);
+		if(object instanceof InputStream) return useStream((InputStream)object);
+		if(object instanceof Source) return useSource((Source)object);
+		if(object instanceof BaseSourceData<?>) return use((BaseSourceData<?>)object);
+		return this.customThis();
+	}
+	
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
 	 * @param data Konfigurator oder {@code null}.
