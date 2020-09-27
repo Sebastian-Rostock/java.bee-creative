@@ -14,7 +14,7 @@ public interface QN extends QX {
 	public long key();
 
 	/** Diese Methode gibt den Textwert des Hyperknoten zurück. Wenn der Hyperknoten keinen Textwert besitzt, wird {@code null} geliefert. Andernfalls kann dieser
-	 * zur {@link QS#newNode(String) Identifikation} des Hyperknoten im {@link #owner() Graphspeicher} eingesetzt werden.
+	 * zur {@link QS#newNode(Object) Identifikation} des Hyperknoten im {@link #owner() Graphspeicher} eingesetzt werden.
 	 *
 	 * @return Textwert oder {@code null}. */
 	public String value();

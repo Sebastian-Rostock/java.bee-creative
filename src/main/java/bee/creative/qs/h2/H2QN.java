@@ -1,5 +1,8 @@
 package bee.creative.qs.h2;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import bee.creative.lang.Objects;
 import bee.creative.qs.QN;
 
@@ -29,12 +32,20 @@ public final class H2QN implements QN {
 
 	@Override
 	public boolean state() {
-		return this.owner.stateImpl(this);
+		return this.value() != null;
 	}
 
 	@Override
 	public String value() {
-		return this.owner.valueImpl(this);
+		try {
+			final PreparedStatement stmt = this.owner.selectNodeValue;
+			stmt.setInt(1, this.key);
+			try (final ResultSet rset = stmt.executeQuery()) {
+				return rset.next() ? rset.getString(1) : null;
+			}
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override

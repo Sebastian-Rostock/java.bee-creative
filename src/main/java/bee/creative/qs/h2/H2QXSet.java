@@ -1,5 +1,8 @@
 package bee.creative.qs.h2;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +29,11 @@ public abstract class H2QXSet<GI, GISet extends Iterable<GI>> implements QXSet<G
 
 	@Override
 	public long size() {
-		return this.owner.sizeImpl(this);
+		try (final Statement stmt = this.owner.conn.createStatement(); final ResultSet rset = stmt.executeQuery(H2QQ.selectSize(this))) {
+			return rset.next() ? rset.getLong(1) : 0;
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override
@@ -36,7 +43,11 @@ public abstract class H2QXSet<GI, GISet extends Iterable<GI>> implements QXSet<G
 
 	@Override
 	public boolean hasAny() {
-		return this.owner.hasImpl(this);
+		try (final Statement stmt = this.owner.conn.createStatement(); final ResultSet rset = stmt.executeQuery(H2QQ.selectAny(this))) {
+			return rset.next();
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override

@@ -49,7 +49,7 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 	static class Save extends H2QVSet {
 
 		public Save(final H2QS owner) {
-			super(owner, H2QS.selectValues());
+			super(owner, H2QQ.selectValuesSave());
 		}
 
 		@Override
@@ -64,13 +64,13 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 		final int key;
 
 		public Copy(final H2QS owner, final int key) {
-			super(owner, H2QS.selectValuesCopy(key));
+			super(owner, H2QQ.selectCopyValues(key));
 			this.key = key;
 		}
 
 		@Override
 		protected void finalize() throws Throwable {
-			this.owner.updateImpl(H2QS.deleteValues(this.key));
+			this.owner.execImpl(H2QQ.deleteCopyValues(this.key));
 		}
 
 		@Override
@@ -83,7 +83,7 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 	static class Order extends Set1 {
 
 		public Order(final H2QVSet set) {
-			super(set.owner, H2QS.selectValuesOrder(set), set);
+			super(set.owner, H2QQ.selectValuesOrder(set), set);
 		}
 
 		@Override
@@ -99,12 +99,12 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 
 	@Override
 	public QNSet nodes() {
-		return new H2QNSet.Set1(this.owner, H2QS.selectValuesNodes(this), this);
+		return new H2QNSet.Set1(this.owner, H2QQ.selectValuesNodes(this), this);
 	}
 
 	@Override
 	public boolean popAll() {
-		return this.owner.popAllImpl(this);
+		return this.owner.execImpl(H2QQ.deleteNodesHavingValues(this));
 	}
 
 	@Override
@@ -124,17 +124,17 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QVSet union(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QS.selectUnion(this, this.owner.asQVSet(set)), this, set);
+		return new Set2(this.owner, H2QQ.selectUnion(this, this.owner.asQVSet(set)), this, set);
 	}
 
 	@Override
 	public H2QVSet except(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QS.selectExcept(this, this.owner.asQVSet(set)), this, set);
+		return new Set2(this.owner, H2QQ.selectExcept(this, this.owner.asQVSet(set)), this, set);
 	}
 
 	@Override
 	public H2QVSet intersect(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QS.selectIntersect(this, this.owner.asQVSet(set)), this, set);
+		return new Set2(this.owner, H2QQ.selectIntersect(this, this.owner.asQVSet(set)), this, set);
 	}
 
 	@Override

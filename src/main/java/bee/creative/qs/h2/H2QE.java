@@ -1,5 +1,8 @@
 package bee.creative.qs.h2;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import bee.creative.qs.QE;
 import bee.creative.qs.QN;
 
@@ -53,17 +56,46 @@ public final class H2QE implements QE {
 
 	@Override
 	public boolean put() {
-		return this.owner.putImpl(this);
+		try {
+			final PreparedStatement stmt = this.owner.insertEdgeSave;
+			stmt.setInt(1, this.context);
+			stmt.setInt(2, this.predicate);
+			stmt.setInt(3, this.subject);
+			stmt.setInt(4, this.object);
+			return stmt.executeUpdate() != 0;
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override
 	public boolean pop() {
-		return this.owner.popImpl(this);
+		try {
+			final PreparedStatement stmt = this.owner.deleteEdgeSave;
+			stmt.setInt(1, this.context);
+			stmt.setInt(2, this.predicate);
+			stmt.setInt(3, this.subject);
+			stmt.setInt(4, this.object);
+			return stmt.executeUpdate() != 0;
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override
 	public boolean state() {
-		return this.owner.stateImpl(this);
+		try {
+			final PreparedStatement stmt = this.owner.selectEdgeSave;
+			stmt.setInt(1, this.context);
+			stmt.setInt(2, this.predicate);
+			stmt.setInt(3, this.subject);
+			stmt.setInt(4, this.object);
+			try (final ResultSet rset = stmt.executeQuery()) {
+				return rset.next();
+			}
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override
