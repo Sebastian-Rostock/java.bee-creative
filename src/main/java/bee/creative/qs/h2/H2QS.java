@@ -17,7 +17,9 @@ import bee.creative.qs.QS;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QS implements QS {
 
-	public static H2QS from(final String file, final boolean setup) throws SQLException, NullPointerException, ClassNotFoundException {
+	/** Diese Methode liefert den Graphspeicher zu der Datenbankverbindung, die mit dem {@code jdbc:h2:}-Protokoll zum gegebenen Dateipfad erzeugt wurde. Dazu
+	 * wird das Laden der Klasse {@code org.h2.Driver} erzwungen. */
+	public static H2QS from(final String file) throws SQLException, NullPointerException, ClassNotFoundException {
 		Class.forName("org.h2.Driver");
 		return new H2QS(DriverManager.getConnection("jdbc:h2:" + file, "", ""));
 	}
@@ -25,69 +27,61 @@ public class H2QS implements QS {
 	/** Dieses Feld speichert die Datenbankverbindung. */
 	final Connection conn;
 
-	final PreparedStatement selectEdgeSave;
+	/** Dieses Feld speichert die in {@link #execImpl(String)} wiederverwendete Anweisung. */
+	final Statement exec;
+
+	final PreparedStatement selectSaveEdge;
 
 	final PreparedStatement selectSaveNode;
 
-	final PreparedStatement selectNodeValue;
+	final PreparedStatement selectSaveValue;
 
-	final PreparedStatement insertEdgeSave;
+	final PreparedStatement insertSaveEdge;
 
 	final PreparedStatement insertSaveNode;
 
-	final PreparedStatement insertCopyEdges;
+	final PreparedStatement insertTempEdges;
 
-	final PreparedStatement insertCopyNodes;
+	final PreparedStatement insertTempNodes;
 
-	final PreparedStatement insertCopyValues;
+	final PreparedStatement insertTempValues;
 
-	final PreparedStatement deleteEdgeSave;
+	final PreparedStatement deleteSaveEdge;
 
-	final PreparedStatement deleteEdgesHavingNode;
+	final PreparedStatement deleteSaveEdges;
 
-	final PreparedStatement deleteValueHavingNode;
+	final PreparedStatement deleteSaveNode;
 
 	final PreparedStatement createSaveNode;
 
-	final PreparedStatement createCopyEdges;
+	final PreparedStatement createTempEdges;
 
-	final PreparedStatement createCopyNodes;
+	final PreparedStatement createTempNodes;
 
-	final PreparedStatement createCopyValues;
+	final PreparedStatement createTempValues;
 
 	/** Dieser Konstruktor initialisiert die Datenbankverbindung und erstellt bei Bedarf das Tabellenschema.
 	 *
 	 * @param conn Datenbankverbindung. */
 	public H2QS(final Connection conn) throws SQLException, NullPointerException {
 		this.conn = conn;
+		this.exec = conn.createStatement();
 		this.execImpl(H2QQ.createAll());
-		this.selectEdgeSave = this.conn.prepareStatement(H2QQ.selectEdgeValue());
-		this.selectSaveNode = this.conn.prepareStatement(H2QQ.selectNode());
-		this.selectNodeValue = this.conn.prepareStatement(H2QQ.selectNodeValue());
-		this.insertEdgeSave = this.conn.prepareStatement(H2QQ.insertEdgeSave());
-		this.insertSaveNode = this.conn.prepareStatement(H2QQ.insertNode());
-		this.insertCopyNodes = this.conn.prepareStatement(H2QQ.insertCopyNodes());
-		this.insertCopyValues = this.conn.prepareStatement(H2QQ.insertCopyValues());
-		this.deleteEdgeSave = this.conn.prepareStatement(H2QQ.deleteEdgeSave());
-		this.deleteEdgesHavingNode = this.conn.prepareStatement(H2QQ.deleteEdgesHavingNode());
-		this.deleteValueHavingNode = this.conn.prepareStatement(H2QQ.deleteNodeSave());
-
-		this.createSaveNode = this.conn.prepareStatement(H2QQ.selectNextNode());
-		this.createCopyEdges = this.conn.prepareStatement(H2QQ.createCopyEdges());
-		this.createCopyNodes = this.conn.prepareStatement(H2QQ.createCopyNodes());
-		this.createCopyValues = this.conn.prepareStatement(H2QQ.createCopyValues());
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		this.selectEdgeSave.close();
-		this.selectSaveNode.close();
-		this.selectNodeValue.close();
-		this.insertEdgeSave.close();
-		this.insertSaveNode.close();
-		this.deleteEdgeSave.close();
-		this.deleteEdgesHavingNode.close();
-		this.deleteValueHavingNode.close();
+		this.selectSaveEdge = this.conn.prepareStatement(H2QQ.selectSaveEdge());
+		this.selectSaveNode = this.conn.prepareStatement(H2QQ.selectSaveNode());
+		this.selectSaveValue = this.conn.prepareStatement(H2QQ.selectSaveValue());
+		this.insertSaveEdge = this.conn.prepareStatement(H2QQ.insertSaveEdge());
+		this.insertSaveNode = this.conn.prepareStatement(H2QQ.insertSaveNode());
+		this.insertTempEdges = this.conn.prepareStatement(H2QQ.insertTempEdges());
+		this.insertTempNodes = this.conn.prepareStatement(H2QQ.insertTempNodes());
+		this.insertTempValues = this.conn.prepareStatement(H2QQ.insertTempValues());
+		this.deleteSaveEdge = this.conn.prepareStatement(H2QQ.deleteSaveEdge());
+		this.deleteSaveEdges = this.conn.prepareStatement(H2QQ.deleteSaveEdges());
+		this.deleteSaveNode = this.conn.prepareStatement(H2QQ.deleteSaveNode());
+		this.createSaveNode = this.conn.prepareStatement(H2QQ.createSaveNode());
+		this.createTempEdges = this.conn.prepareStatement(H2QQ.createTempEdges());
+		this.createTempNodes = this.conn.prepareStatement(H2QQ.createTempNodes());
+		this.createTempValues = this.conn.prepareStatement(H2QQ.createTempValues());
 	}
 
 	final H2QE asQE(final Object src) throws NullPointerException, IllegalArgumentException {
@@ -148,20 +142,8 @@ public class H2QS implements QS {
 	/** Diese Methode führt die gegebene Anfrage {@link Statement#executeUpdate(String) aus} und gibt nur dann {@code true} zurück, wenn dadurch Tabellenzeilen
 	 * verändert wurden. */
 	final boolean execImpl(final String query) {
-		try (final Statement stmt = this.conn.createStatement()) {
-			return stmt.executeUpdate(query) != 0;
-		} catch (final SQLException cause) {
-			throw new IllegalStateException(cause);
-		}
-	}
-
-	/** Diese Methode implementiert {@link H2QN#pop()}. */
-	final boolean popImpl(final H2QN node) {
 		try {
-			final PreparedStatement stmt1 = this.deleteEdgesHavingNode, stmt2 = this.deleteValueHavingNode;
-			stmt1.setInt(1, node.key);
-			stmt2.setInt(1, node.key);
-			return (stmt1.executeUpdate() | stmt2.executeUpdate()) != 0;
+			return this.exec.executeUpdate(query) != 0;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -169,12 +151,12 @@ public class H2QS implements QS {
 
 	/** Diese Methode leert den Graphspeicher. */
 	public void reset() throws SQLException {
-		this.execImpl(H2QQ.deleteAll());
+		this.execImpl(H2QQ.deleteSave());
 	}
 
 	/** Diese Methode entfernt alle temporären Textwerte, Hyperknoten und Hyperkanten. */
 	public void cleanup() {
-		this.execImpl(H2QQ.deleteCopy());
+		this.execImpl(H2QQ.deleteTemp());
 	}
 
 	/** Diese Methode entfernt alle Hyperknoten mit Textwert, die nich in Hyperkanten verwendet werden. */
@@ -232,24 +214,24 @@ public class H2QS implements QS {
 	@Override
 	public H2QESet newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		try {
-			final int key = this.keyImpl(this.createCopyEdges);
+			final int key = this.keyImpl(this.createTempEdges);
 			if (edges instanceof H2QESet) {
 				final H2QESet set = this.asQESet(edges);
-				this.execImpl(H2QQ.insertEdges(key, set));
-				return new H2QESet.Copy(this, key);
+				this.execImpl(H2QQ.insertTempEdges(key, set));
+				return new H2QESet.Temp(this, key);
 			}
-			try (final PreparedStatement stmt = this.conn.prepareStatement(H2QQ.insertEdges(key))) {
-				for (final Object item: edges) {
-					final H2QE edge = this.asQE(item);
-					stmt.setInt(1, edge.context);
-					stmt.setInt(2, edge.predicate);
-					stmt.setInt(3, edge.subject);
-					stmt.setInt(4, edge.object);
-					stmt.addBatch();
-				}
-				stmt.executeBatch();
+			final PreparedStatement stmt = this.insertTempEdges;
+			for (final Object item: edges) {
+				final H2QE edge = this.asQE(item);
+				stmt.setInt(1, key);
+				stmt.setInt(2, edge.context);
+				stmt.setInt(3, edge.predicate);
+				stmt.setInt(4, edge.subject);
+				stmt.setInt(5, edge.object);
+				stmt.addBatch();
 			}
-			return new H2QESet.Copy(this, key);
+			stmt.executeBatch();
+			return new H2QESet.Temp(this, key);
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -287,20 +269,20 @@ public class H2QS implements QS {
 	@Override
 	public H2QNSet newNodes(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
 		try {
-			final int key = this.keyImpl(this.createCopyNodes);
+			final int key = this.keyImpl(this.createTempNodes);
 			if (nodes instanceof H2QNSet) {
 				final H2QNSet set = this.asQNSet(nodes);
-				this.execImpl(H2QQ.insertCopyNodes(key, set));
-				return new H2QNSet.Copy(this, key);
+				this.execImpl(H2QQ.insertTempNodes(key, set));
+				return new H2QNSet.Temp(this, key);
 			}
-			final PreparedStatement stmt = this.insertCopyNodes;
+			final PreparedStatement stmt = this.insertTempNodes;
 			for (final Object item: nodes) {
 				stmt.setInt(1, key);
 				stmt.setInt(2, this.asQN(item).key);
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
-			return new H2QNSet.Copy(this, key);
+			return new H2QNSet.Temp(this, key);
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -314,22 +296,22 @@ public class H2QS implements QS {
 	@Override
 	public H2QVSet newValues(final Iterable<?> values) throws NullPointerException, IllegalArgumentException {
 		try {
-			final int key = this.keyImpl(this.createCopyValues);
+			final int key = this.keyImpl(this.createTempValues);
 			if (values instanceof H2QVSet) {
 				final H2QVSet set = (H2QVSet)values;
 				if (set.owner == this) {
-					this.execImpl(H2QQ.insertCopyValues(key, set));
-					return new H2QVSet.Copy(this, key);
+					this.execImpl(H2QQ.insertTempValues(key, set));
+					return new H2QVSet.Temp(this, key);
 				}
 			}
-			final PreparedStatement stmt = this.insertCopyValues;
+			final PreparedStatement stmt = this.insertTempValues;
 			for (final Object item: values) {
 				stmt.setInt(1, key);
 				stmt.setString(2, this.asQV(item));
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
-			return new H2QVSet.Copy(this, key);
+			return new H2QVSet.Temp(this, key);
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}

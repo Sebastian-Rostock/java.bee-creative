@@ -49,7 +49,7 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 	static class Save extends H2QVSet {
 
 		public Save(final H2QS owner) {
-			super(owner, H2QQ.selectValuesSave());
+			super(owner, H2QQ.selectSaveValues());
 		}
 
 		@Override
@@ -59,18 +59,18 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 
 	}
 
-	static class Copy extends H2QVSet {
+	static class Temp extends H2QVSet {
 
 		final int key;
 
-		public Copy(final H2QS owner, final int key) {
-			super(owner, H2QQ.selectCopyValues(key));
+		public Temp(final H2QS owner, final int key) {
+			super(owner, H2QQ.selectTempValues(key));
 			this.key = key;
 		}
 
 		@Override
 		protected void finalize() throws Throwable {
-			this.owner.execImpl(H2QQ.deleteCopyValues(this.key));
+			this.owner.execImpl(H2QQ.deleteTempValues(this.key));
 		}
 
 		@Override
@@ -99,12 +99,12 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 
 	@Override
 	public QNSet nodes() {
-		return new H2QNSet.Set1(this.owner, H2QQ.selectValuesNodes(this), this);
+		return new H2QNSet.Set1(this.owner, H2QQ.selectSaveNodesHavingValues(this), this);
 	}
 
 	@Override
 	public boolean popAll() {
-		return this.owner.execImpl(H2QQ.deleteNodesHavingValues(this));
+		return this.owner.execImpl(H2QQ.deleteSaveNodesHavingValues(this));
 	}
 
 	@Override

@@ -27,7 +27,14 @@ public final class H2QN implements QN {
 
 	@Override
 	public boolean pop() {
-		return this.owner.popImpl(this);
+		try {
+			final PreparedStatement stmt1 = this.owner.deleteSaveEdges, stmt2 = this.owner.deleteSaveNode;
+			stmt1.setInt(1, this.key);
+			stmt2.setInt(1, this.key);
+			return (stmt1.executeUpdate() | stmt2.executeUpdate()) != 0;
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override
@@ -38,7 +45,7 @@ public final class H2QN implements QN {
 	@Override
 	public String value() {
 		try {
-			final PreparedStatement stmt = this.owner.selectNodeValue;
+			final PreparedStatement stmt = this.owner.selectSaveValue;
 			stmt.setInt(1, this.key);
 			try (final ResultSet rset = stmt.executeQuery()) {
 				return rset.next() ? rset.getString(1) : null;

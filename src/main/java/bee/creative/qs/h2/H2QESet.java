@@ -51,23 +51,23 @@ public class H2QESet extends H2QXSet<QE, QESet> implements QESet {
 	static class Save extends H2QESet {
 
 		public Save(final H2QS owner) {
-			super(owner, H2QQ.selectEdgesSave());
+			super(owner, H2QQ.selectSaveEdges());
 		}
 
 	}
 
-	static class Copy extends H2QESet {
+	static class Temp extends H2QESet {
 
 		final int key;
 
-		public Copy(final H2QS owner, final int key) {
-			super(owner, H2QQ.selectEdgesCopy(key));
+		public Temp(final H2QS owner, final int key) {
+			super(owner, H2QQ.selectTempEdges(key));
 			this.key = key;
 		}
 
 		@Override
 		protected void finalize() throws Throwable {
-			this.owner.execImpl(H2QQ.deleteEdgesCopy(this.key));
+			this.owner.execImpl(H2QQ.deleteTempEdges(this.key));
 		}
 
 		@Override
@@ -96,12 +96,12 @@ public class H2QESet extends H2QXSet<QE, QESet> implements QESet {
 
 	@Override
 	public boolean putAll() {
-		return this.owner.execImpl(H2QQ.insertEdges(this));
+		return this.owner.execImpl(H2QQ.insertSaveEdges(this));
 	}
 
 	@Override
 	public boolean popAll() {
-		return this.owner.execImpl(H2QQ.deleteEdgeItems(this));
+		return this.owner.execImpl(H2QQ.deleteSaveEdges(this));
 	}
 
 	@Override

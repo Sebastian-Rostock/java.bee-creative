@@ -50,7 +50,7 @@ public class H2QNSet extends H2QXSet<QN, QNSet> implements QNSet {
 	static class Save extends H2QNSet {
 
 		public Save(final H2QS owner) {
-			super(owner, H2QQ.selectNodesSave());
+			super(owner, H2QQ.selectSaveNodes());
 		}
 
 		@Override
@@ -60,18 +60,18 @@ public class H2QNSet extends H2QXSet<QN, QNSet> implements QNSet {
 
 	}
 
-	static class Copy extends H2QNSet {
+	static class Temp extends H2QNSet {
 
 		final int key;
 
-		public Copy(final H2QS owner, final int key) {
-			super(owner, H2QQ.selectCopyNodes(key));
+		public Temp(final H2QS owner, final int key) {
+			super(owner, H2QQ.selectTempNodes(key));
 			this.key = key;
 		}
 
 		@Override
 		protected void finalize() throws Throwable {
-			this.owner.execImpl(H2QQ.deleteCopyNodes(this.key));
+			this.owner.execImpl(H2QQ.deleteTempNodes(this.key));
 		}
 
 		@Override
@@ -103,16 +103,16 @@ public class H2QNSet extends H2QXSet<QN, QNSet> implements QNSet {
 		final H2QS owner = this.owner;
 		final H2QNSet set = this.copy();
 		return false //
-			| owner.execImpl(H2QQ.deleteValuesHavingNodes(set)) //
-			| owner.execImpl(H2QQ.deleteEdgesHavingContexts(set)) //
-			| owner.execImpl(H2QQ.deleteEdgesHavingPredicates(set)) //
-			| owner.execImpl(H2QQ.deleteEdgesHavingSubjects(set)) //
-			| owner.execImpl(H2QQ.deleteEdgesHavingObjects(set));
+			| owner.execImpl(H2QQ.deleteSaveValuesHavingNodes(set)) //
+			| owner.execImpl(H2QQ.deleteSaveEdgesHavingContexts(set)) //
+			| owner.execImpl(H2QQ.deleteSaveEdgesHavingPredicates(set)) //
+			| owner.execImpl(H2QQ.deleteSaveEdgesHavingSubjects(set)) //
+			| owner.execImpl(H2QQ.deleteSaveEdgesHavingObjects(set));
 	}
 
 	@Override
 	public H2QVSet values() {
-		return new H2QVSet.Set1(this.owner, H2QQ.selectNodesValues(this), this);
+		return new H2QVSet.Set1(this.owner, H2QQ.selectSaveValuesHavingNodes(this), this);
 	}
 
 	@Override

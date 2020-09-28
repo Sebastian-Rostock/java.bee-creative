@@ -3,6 +3,7 @@ package bee.creative.qs.h2;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import bee.creative.lang.Objects;
 import bee.creative.qs.QE;
 import bee.creative.qs.QN;
 
@@ -57,7 +58,7 @@ public final class H2QE implements QE {
 	@Override
 	public boolean put() {
 		try {
-			final PreparedStatement stmt = this.owner.insertEdgeSave;
+			final PreparedStatement stmt = this.owner.insertSaveEdge;
 			stmt.setInt(1, this.context);
 			stmt.setInt(2, this.predicate);
 			stmt.setInt(3, this.subject);
@@ -71,7 +72,7 @@ public final class H2QE implements QE {
 	@Override
 	public boolean pop() {
 		try {
-			final PreparedStatement stmt = this.owner.deleteEdgeSave;
+			final PreparedStatement stmt = this.owner.deleteSaveEdge;
 			stmt.setInt(1, this.context);
 			stmt.setInt(2, this.predicate);
 			stmt.setInt(3, this.subject);
@@ -85,7 +86,7 @@ public final class H2QE implements QE {
 	@Override
 	public boolean state() {
 		try {
-			final PreparedStatement stmt = this.owner.selectEdgeSave;
+			final PreparedStatement stmt = this.owner.selectSaveEdge;
 			stmt.setInt(1, this.context);
 			stmt.setInt(2, this.predicate);
 			stmt.setInt(3, this.subject);
@@ -120,7 +121,12 @@ public final class H2QE implements QE {
 
 	@Override
 	public int hashCode() {
-		return this.context ^ this.predicate ^ this.subject ^ this.object;
+		int result = Objects.hashInit();
+		result = Objects.hashPush(result, this.context);
+		result = Objects.hashPush(result, this.predicate);
+		result = Objects.hashPush(result, this.subject);
+		result = Objects.hashPush(result, this.object);
+		return result;
 	}
 
 	@Override
