@@ -40,19 +40,25 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	/** Dieses Feld speichert den System-Identifikator. */
 	String systemId;
 
-	public final GThis use(final Object object) throws MalformedURLException  {
-		if(object instanceof URI) return useUri((URI)object);
-		if(object instanceof URL) return useUrl((URL)object);
-		if(object instanceof File) return useFile((File)object);
-		if(object instanceof String) return useText((String)object);
-		if(object instanceof Node) return useNode((Node)object);
-		if(object instanceof Reader) return useReader((Reader)object);
-		if(object instanceof InputStream) return useStream((InputStream)object);
-		if(object instanceof Source) return useSource((Source)object);
-		if(object instanceof BaseSourceData<?>) return use((BaseSourceData<?>)object);
+	/** Diese Methode delegiert das gegebene Objekt abhängig von seinem Datentyp an eine der spezifischen Methoden und gibt {@code this} zurück. Unbekannte
+	 * Datentypen werden ignoriert.
+	 * 
+	 * @param object Quelldaten als {@link URL}, {@link URI}, {@link File}, {@link String}, {@link Node}, {@link Reader}, {@link InputStream}, {@link Source} oder
+	 *        {@link BaseSourceData}.
+	 * @return {@code this}. */
+	public final GThis use(final Object object) throws MalformedURLException {
+		if (object instanceof URI) return this.useUri((URI)object);
+		if (object instanceof URL) return this.useUrl((URL)object);
+		if (object instanceof File) return this.useFile((File)object);
+		if (object instanceof String) return this.useText((String)object);
+		if (object instanceof Node) return this.useNode((Node)object);
+		if (object instanceof Reader) return this.useReader((Reader)object);
+		if (object instanceof InputStream) return this.useStream((InputStream)object);
+		if (object instanceof Source) return this.useSource((Source)object);
+		if (object instanceof BaseSourceData<?>) return this.use((BaseSourceData<?>)object);
 		return this.customThis();
 	}
-	
+
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
 	 * @param data Konfigurator oder {@code null}.
