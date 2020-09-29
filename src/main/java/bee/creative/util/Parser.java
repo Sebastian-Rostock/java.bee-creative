@@ -10,42 +10,41 @@ public class Parser {
 	/** Dieses Feld speichert die aktuelle Position. */
 	private int index;
 
+	/** Dieses Feld speichert das aktuelle Zeichen oder {@code -1}. */
+	private int symbol;
+
+	/** Dieses Feld speichert die Anzahl der Zeichen in der Eingabe. */
+	private final int length;
+
 	/** Dieses Feld speichert die Zeichen der Eingabe. */
-	private char[] chars;
+	private final char[] chars;
+
+	/** Dieses Feld speichert die Eingabe. */
+	private final String source;
 
 	/** Dieses Feld speichert die Ausgabe. */
 	private final StringBuilder target = new StringBuilder();
 
-	/** Dieses Feld speichert das aktuelle Zeichen oder {@code -1}. */
-	private int symbol;
-
-	/** Dieses Feld speichert die Eingabe. */
-	private String source;
-
-	/** Dieses Feld speichert die Anzahl der Zeichen in der Eingabe. */
-	private int length;
-
-	/** Dieser Konstruktor initialisiert die leere Eingabe. */
-	public Parser() {
-		this.source("");
-	}
-
 	/** Dieser Konstruktor initialisiert die Eingabe.
 	 *
-	 * @see #source(String)
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	public Parser(final String source) throws NullPointerException {
-		this.source(source);
+		this.chars = source.toCharArray();
+		this.length = source.length();
+		this.source = source;
+		this.reset();
 	}
 
 	/** Dieser Konstruktor initialisiert die Eingabe.
 	 *
-	 * @see #source(char[])
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	public Parser(final char[] source) throws NullPointerException {
-		this.source(source);
+		this.chars = source;
+		this.length = source.length;
+		this.source = new String(source);
+		this.reset();
 	}
 
 	/** Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück.
@@ -188,7 +187,7 @@ public class Parser {
 	 *
 	 * @param value Ausgabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
-	protected void target(final char[] value) throws NullPointerException {
+	public final void target(final char[] value) throws NullPointerException {
 		Objects.notNull(value);
 		this.clear();
 		this.target.append(value);
@@ -198,7 +197,7 @@ public class Parser {
 	 *
 	 * @param value Ausgabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
-	protected void target(final String value) throws NullPointerException {
+	public final void target(final String value) throws NullPointerException {
 		Objects.notNull(value);
 		this.clear();
 		this.target.append(value);
@@ -219,28 +218,6 @@ public class Parser {
 	 * @return Eingabe. */
 	public final String source() {
 		return this.source;
-	}
-
-	/** Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
-	 *
-	 * @param source Eingabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
-	protected void source(final String source) throws NullPointerException {
-		this.chars = source.toCharArray();
-		this.length = source.length();
-		this.source = source;
-		this.reset();
-	}
-
-	/** Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
-	 *
-	 * @param source Eingabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
-	protected void source(final char[] source) throws NullPointerException {
-		this.chars = source;
-		this.length = source.length;
-		this.source = new String(source);
-		this.reset();
 	}
 
 	@Override
