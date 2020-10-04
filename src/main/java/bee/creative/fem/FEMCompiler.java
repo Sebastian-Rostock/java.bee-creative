@@ -3,9 +3,9 @@ package bee.creative.fem;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import bee.creative.fem.FEMScript.Token;
 import bee.creative.lang.Objects;
 import bee.creative.util.Parser;
+import bee.creative.util.Parser.Token;
 
 /** Diese Klasse implementiert einen Kompiler, welcher als {@link Parser} auf den {@link FEMScript#types() Bereichstypen} eines {@link FEMScript aufbereiteten
  * Quelltexts} arbeitet.
@@ -18,6 +18,16 @@ public class FEMCompiler extends FEMParser {
 
 	/** Dieses Feld speichert die über {@link #proxy(String)} erzeugten Platzhalter. */
 	final Map<String, FEMProxy> proxies = new LinkedHashMap<>();
+
+	/** Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
+	 *
+	 * @param script Quelltext.
+	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
+	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
+	public FEMCompiler(final FEMScript script) throws NullPointerException {
+		super(script.types());
+		this.script = script;
+	}
 
 	/** Diese Methode gibt den zu kompilierenden Quelltext zurück.
 	 *
@@ -36,29 +46,29 @@ public class FEMCompiler extends FEMParser {
 		return this.token().start();
 	}
 
-	/** Diese Methode gibt die Zeichenkette des {@link #script() aufbereiteten Quelltexts} zurück.
+	/** Diese Methode gibt die Zeichenkette des {@link #source() aufbereiteten Quelltexts} zurück.
 	 *
-	 * @see #script()
-	 * @see FEMScript#source()
+	 * @see #source()
+	 * @see FEMScript#toString()
 	 * @return Zeichenkette des Quelltexts. */
 	public String scriptSource() {
-		return this.script().source();
+		return this.source().toString();
 	}
 
-	/** Diese Methode gibt die Länge der Zeichenkette des {@link #script() aufbereiteten Quelltexts} zurück.
+	/** Diese Methode gibt die Länge der Zeichenkette des {@link #source() aufbereiteten Quelltexts} zurück.
 	 *
-	 * @see #script()
-	 * @see FEMScript#source()
+	 * @see #source()
+	 * @see FEMScript#toString()
 	 * @return Länge des Quelltexts. */
 	public int scriptLength() {
-		return this.script().source().length();
+		return this.source().toString().length();
 	}
 
 	/** Diese Methode gibt die Spaltennummer zur {@link #scriptOffset() aktuellen Quelltextposition} zurück.
 	 *
 	 * @return aktuelle Spaltennummer. */
 	public int scriptColIndex() {
-		final String source = this.script().source();
+		final String source = this.source().toString();
 		final int offset = this.scriptOffset(), index = source.lastIndexOf('\n', offset);
 		return (offset + 1) - (index < 0 ? 0 : index);
 	}
@@ -67,24 +77,12 @@ public class FEMCompiler extends FEMParser {
 	 *
 	 * @return aktuelle Zeilennummer. */
 	public int scriptRowIndex() {
-		final String source = this.script().source();
+		final String source = this.source().toString();
 		int result = 0;
 		for (int index = this.scriptOffset() + 1; index >= 0; index = source.lastIndexOf('\n', index - 1)) {
 			result++;
 		}
 		return result;
-	}
-
-	/** Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
-	 *
-	 * @param script Quelltext.
-	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
-	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	public FEMCompiler useScript(final FEMScript script) throws NullPointerException {
-		this.source(script.types());
-		this.script = script;
-		return this;
 	}
 
 	/** Diese Methode gibt den Platzhalter der Funktion mit dem gegebenen Namen zurück.
@@ -112,7 +110,7 @@ public class FEMCompiler extends FEMParser {
 	 * @param proxies Platzhalter.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
-	public FEMParser putProxies(final FEMProxy... proxies) throws NullPointerException {
+	public Parser putProxies(final FEMProxy... proxies) throws NullPointerException {
 		return this.putProxies(Arrays.asList(proxies));
 	}
 
@@ -121,7 +119,7 @@ public class FEMCompiler extends FEMParser {
 	 * @param proxies Platzhalter.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist oder enthält. */
-	public FEMParser putProxies(final Iterable<FEMProxy> proxies) throws NullPointerException {
+	public Parser putProxies(final Iterable<FEMProxy> proxies) throws NullPointerException {
 		for (final FEMProxy proxy: proxies) {
 			this.proxies.put(proxy.name().toString(), proxy);
 		}
@@ -131,20 +129,20 @@ public class FEMCompiler extends FEMParser {
 	/** Diese Methode gibt den aktuellen Bereich zurück.
 	 *
 	 * @see #index()
-	 * @see #script()
+	 * @see #source()
 	 * @see FEMScript#get(int)
 	 * @return aktueller Bereich. */
-	public Token token() {
-		return this.isParsed() ? Token.EMPTY : this.script.get(this.index());
+	public Parser.Token token() {
+		return this.isParsed() ? Parser.Token.EMPTY : this.script.get(this.index());
 	}
 
-	/** Diese Methode gibt die Zeichenkette im {@link #token() aktuellen Abschnitt} des {@link #script() Quelltexts} zurück.
+	/** Diese Methode gibt die Zeichenkette im {@link #token() aktuellen Abschnitt} des {@link #source() Quelltexts} zurück.
 	 *
 	 * @see #token()
-	 * @see Token#extract(String)
+	 * @see Token#toString()
 	 * @return Aktuelle Zeichenkette. */
 	public String section() {
-		return this.token().extract(this.script.source());
+		return this.token().toString();
 	}
 
 	@Override

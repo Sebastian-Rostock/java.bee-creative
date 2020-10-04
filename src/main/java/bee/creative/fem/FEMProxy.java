@@ -24,7 +24,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 		return FEMProxy.from(id, id);
 	}
 
-	/** Diese Methode gibt einen neuen Platzhalter mit den gegebenen Merkmalen zurück.
+	/** Diese Methode gibt einen neuen Platzhalter mit den gegebenen Eigenschaften zurück.
 	 *
 	 * @param id Kennung.
 	 * @param name Name.

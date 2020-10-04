@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import bee.creative.bind.Getter;
 import bee.creative.bind.Setter;
@@ -14,22 +15,22 @@ import bee.creative.fem.FEMFunction.ConcatFunction;
 import bee.creative.fem.FEMFunction.FrameFunction;
 import bee.creative.fem.FEMFunction.FutureFunction;
 import bee.creative.fem.FEMFunction.TraceFunction;
-import bee.creative.fem.FEMScript.Token;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.lang.Strings;
 import bee.creative.util.Filter;
 import bee.creative.util.Parser;
+import bee.creative.util.Parser.Token;
 
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
  * Quelltexten und Funktionen ineinander dienen.
  * <p>
- * Die {@code parse*}-Methoden zum Parsen einer {@link FEMParser#source() Zeichenkette} erkennen darin Bedeutung tragende {@link FEMScript.Token Bereiche} und
- * {@link FEMParser#putToken(Token) erfassen} diese falls nötig im gegebenen {@link FEMParser}. Die {@code format*}-Methoden zum Formatieren eines gegebenen
- * Objekts erzeugen dagegen die Bedeutung tragenden Bereiche der Textdarstellung und {@link FEMFormatter#putToken(Object) erfassen} diese im gegebenen
- * {@link FEMFormatter}. Die {@code compile*}-Methoden zum Kompilieren {@link FEMScript aufbereiteter Quelltexte} übersetzen schließlich erkannte Bedeutung
- * tragende {@link FEMScript.Token Bereiche} in Funktionen.
+ * Die {@code parse*}-Methoden zum Parsen einer {@link FEMParser#source() Zeichenkette} erkennen die darin Bedeutung tragenden {@link Token Abschnitte} und
+ * {@link FEMParser#push(Token) erfassen} diese im gegebenen {@link FEMParser}. Die {@code format*}-Methoden zum Formatieren eines gegebenen Objekts erzeugen
+ * dagegen die Bedeutung tragenden Abschnitte der Textdarstellung und {@link FEMFormatter#putToken(Object) erfassen} diese im gegebenen {@link FEMFormatter}.
+ * Die {@code compile*}-Methoden zum Kompilieren {@link FEMScript aufbereiteter Quelltexte} übersetzen schließlich erkannte Bedeutung tragende {@link Token
+ * Abschnitte} in Funktionen.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMDomain extends BaseObject {
@@ -58,11 +59,11 @@ public class FEMDomain extends BaseObject {
 		protected FEMValue compileString(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 			final int symbol = source.symbol();
 			if (symbol == '\"') {
-				final FEMValue result = new FEMNative(Strings.parseSequence(source.section(), '\"').toString());
+				final FEMValue result = new FEMNative(Strings.parseSequence(source.section(), '\"', '\\', '\"').toString());
 				source.skip();
 				return result;
 			} else if (symbol == '\'') {
-				final FEMValue result = new FEMNative(new Character(Strings.parseSequence(source.section(), '\'').charAt(0)));
+				final FEMValue result = new FEMNative(new Character(Strings.parseSequence(source.section(), '\'', '\\', '\'').charAt(0)));
 				source.skip();
 				return result;
 			}
@@ -87,63 +88,31 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert die normale {@link FEMDomain}. */
 	public static final FEMDomain NORMAL = new FEMDomain();
 
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren eines Einzelwerts ({@code FEMValue}). */
-	public static final int PARSE_VALUE = 2;
-
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Wertliste ({@code List<FEMValue>}). */
-	public static final int PARSE_VALUE_LIST = 3;
-
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Funktion ({@code FEMFunction}). */
-	public static final int PARSE_FUNCTION = 4;
-
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Funktionsliste ({@code List<FEMFunction>}). */
-	public static final int PARSE_FUNCTION_LIST = 5;
-
-	/** Dieses Feld speichert den {@link FEMScript#mode() Sktiptmodus} zum Parsen und Kompilieren einer Wertliste ({@code Map<String, FEMProxy>}). */
-	public static final int PARSE_PROXY_MAP = 6;
-
-	/** Diese Methode überspringt alle Zeichen eines {@link #parseName(FEMParser) Parameternemen}. Dieser darf keine Steuerzeichen, insbesondere kein Leerzeichen,
-	 * Doppelpunkt, Semikolon, Schrägstrich oder Klammer.
-	 *
-	 * @param target Parser, der bis zum nächsten Steuerzeichen oder dem Ende seiner Eingabe navigiert wird.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void skipName(final Parser target) throws NullPointerException {
-		int symbol = target.symbol();
-		while (true) {
-			if (symbol <= ' ') return;
-			switch (symbol) {
+	/** Diese Methode {@link Parser#skip() überspringt} alle Zeichen eines Parameternemen. Dieser darf kein Steuerzeichen, kein Leerzeichen, keinen Doppelpunkt,
+	 * kein Semikolon, keinen Schrägstrich sowie keine runde bzw. geschweifte Klammern enthalten. */
+	protected void _skipName(final Parser parser) throws NullPointerException {
+		for (int sym = parser.symbol(); sym > ' '; sym = parser.skip()) {
+			// NAME{NAME; NAME: $NAME($NAME; {: $NAME}; $NAME)}
+			switch (sym) {
 				case ':':
 				case ';':
-				case '$':
 				case '/':
 				case '{':
 				case '}':
 				case '(':
 				case ')':
-				case '[':
-				case ']':
-				case '<':
-				case '>':
-				case '"':
-				case '\'':
 					return;
 			}
-			symbol = target.skip();
 		}
 	}
 
-	/** Diese Methode überspringt alle Zeichen einer {@link #parseConst(FEMParser) Konstanten}. Dieser darf keine Steuerzeichen, insbesondere kein Leerzeichen,
-	 * Semikolon, Schrägstrich oder Klammer.
-	 *
-	 * @param target Parser, der bis zum nächsten Steuerzeichen oder dem Ende seiner Eingabe navigiert wird.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void skipConst(final Parser target) throws NullPointerException {
-		int symbol = target.symbol();
-		while (true) {
-			if (symbol <= ' ') return;
-			switch (symbol) {
+	/** Diese Methode {@link Parser#skip() überspringt} alle Symbole einer Konstanten. Dieser darf kein Steuerzeichen, kein Leerzeichen, kein Semikolon, keinen
+	 * Schrägstrich sowie keine runde, echige bzw. geschweifte Klammern enthalten. */
+	protected void _skipConst(final Parser parser) throws NullPointerException {
+		for (int sym = parser.symbol(); sym > ' '; sym = parser.skip()) {
+			// (CONST; [CONST]; {: CONST}; CONST)
+			switch (sym) {
 				case ';':
-				case '$':
 				case '/':
 				case '{':
 				case '}':
@@ -151,117 +120,283 @@ public class FEMDomain extends BaseObject {
 				case ')':
 				case '[':
 				case ']':
-				case '<':
-				case '>':
-				case '"':
-				case '\'':
 					return;
 			}
-			symbol = target.skip();
 		}
 	}
 
-	/** Diese Methode parst Leerraum, erfasst diese jedoch nicht als {@link Token Bereich}. Zum Leerraum zählen alle Symbole kleiner oder gleich {@code ' '}.
-	 *
-	 * @param target Parser.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void skipSpace(final Parser target) throws NullPointerException {
-		for (int symbol = target.symbol(); (symbol >= 0) && (symbol <= ' '); symbol = target.skip()) {}
+	protected void _skipIndex(final Parser parser) throws NullPointerException {
+		for (int sym = parser.symbol(); ('0' <= sym) && (sym <= '9'); sym = parser.skip()) {}
 	}
 
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer mit Semikolon separierten Auflistung von über den gegebenen {@code itemParser} erkannten
-	 * Elementen und gibt nur dann {@code true} zurück, wenn diese Auflistung am ersten Element erkannt wurden. Das Symbol {@code ';'} wird direkt als Typ des
-	 * erfassten Bereichs eingesetzt. Zwischen all diesen Komponenten können beliebig viele {@link #parseComments(FEMParser) Kommentare/Leerraum} stehen.
+	/** Diese Methode {@link Parser#skip() überspringt} Leerraum und erfasst Kommentare gemäß folgender EBNF:
+	 * <pre>WSC = {{@link #_skipSpace(Parser) SPACE}|{@link #_parseComment(Parser) COMMENT}}</pre> */
+	protected void _skipInfos(final Parser parser) throws NullPointerException {
+		for (this._skipSpace(parser); this._parseComment(parser) != null; this._skipSpace(parser)) {}
+	}
+
+	/** Diese Methode {@link Parser#skip() überspringt} alle Symbole eiens Leerraums. Dazu zählen alle Symbole kleiner oder gleich dem Leerzeichen.
 	 *
-	 * @param target Parser.
-	 * @param itemLimit Maximale Anzahl der Elemente in der Auflistung, wobei Werte kleiner oder gleich {@code 0} für eine unbeschränkte Anzahl stehen.
-	 * @param itemParser {@link Filter} zum Erkennen, Parsen und Erfassen der {@link Token Bereiche} eines Elements.
-	 * @return {@code true}, wenn die Auflistung erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code itemParser} {@code null} ist. */
-	protected boolean parseItems(final FEMParser target, int itemLimit, final Filter<? super FEMParser> itemParser) throws NullPointerException {
-		this.parseComments(target);
-		if (!itemParser.accept(target)) return false;
+	 * @param parser Parser, der bis zum nächsten Steuerzeichen oder dem Ende seiner Eingabe navigiert wird. */
+	protected void _skipSpace(final Parser parser) throws NullPointerException {
+		for (int sym = parser.symbol(); (sym >= 0) && (sym <= ' '); sym = parser.skip()) {}
+	}
+
+	/** Diese Methode parst und erfasst den {@link Token Abschnitt} eines Parameternamen und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie
+	 * sucht dazu eine nicht leere {@link #_skipName(Parser) unmaskierte} Zeichenkette. Das Symbol {@code '~'} wird als Typ des erfassten Abschnitts eingesetzt.
+	 * <p>
+	 * TODO doku */
+	protected Token _parseName(final Parser parser) throws NullPointerException {
+		final Token result = this._parseSequence(parser, '<', '\\', '>');
+		if (result != null) return result;
+		final int offset = parser.index();
+		this._skipName(parser);
+		return offset != parser.index() ? parser.push('~', offset) : null;
+	}
+
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Konstanten und gibt diesen nur dann zurück, wenn er nicht leer ist.
+	 * Dazu wird das Ende des Abschnitts {@link #_skipConst(Parser) gesucht}. Als Abschnittstyp wird {@code '?'} verwendet. Wenn der Abschnitt leer ist, wird
+	 * {@code null} geliefet. */
+	protected Token _parseConst(final Parser parser) throws NullPointerException {
+		final int offset = parser.index();
+		this._skipConst(parser);
+		return offset != parser.index() ? parser.push('?', offset) : null;
+	}
+
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den verbleibenden {@link Token Abschnitt} der Eingabe als Fehler mit dem Abschnittstyp {@code '!'} und
+	 * gibt diesen zurück. */
+	protected Token _parseError(final Parser parser) throws NullPointerException {
+		final int index = parser.index(), length = parser.length();
+		final Token result = parser.make('!', index, length - index);
+		parser.seek(length);
+		return parser.push(result);
+	}
+
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Wertliste und gibt dazu den Wurzelknoten zurück, wenn die folgende
+	 * EBNF erkannt wurde:
+	 * <pre>ARRAY = "[" [ {@link #_skipInfos(Parser) WSC} {@link #_parseValue(FEMParser) VALUE} { {@link #_skipInfos(Parser) WSC} ";" {@link #_skipInfos(Parser) WSC} {@link #_parseValue(FEMParser) VALUE} } ] {@link #_skipInfos(Parser) WSC} "]"</pre>
+	 * Der gelieferte Abschnittsknoten trägt den Abschnittstyp '[' und enthält als {@link Token#tokens() Kindabschnitte} die der Werte (VALUE). */
+	protected Token _parseArray(final FEMParser parser) throws NullPointerException {
+		int sym = parser.symbol();
+		if (sym != '[') return null;
+		final int offset = parser.index();
+		final List<Token> tokens = new LinkedList<>();
+		parser.push('[');
+		parser.skip();
+		this._skipInfos(parser);
+		sym = parser.symbol();
+		if (sym == ']') {
+			parser.push(']');
+			parser.skip();
+		} else if (sym < 0) {
+			tokens.add(this._parseError(parser));
+		} else {
+			Token token = this._parseValue(parser);
+			if (token == null) {
+				tokens.add(this._parseError(parser));
+			} else {
+				tokens.add(token);
+				while (true) {
+					this._skipInfos(parser);
+					sym = parser.symbol();
+					if (sym == ']') {
+						parser.push(']');
+						parser.skip();
+						break;
+					} else if ((sym < 0) || (sym != ';')) {
+						tokens.add(this._parseError(parser));
+						break;
+					} else {
+						parser.push(';');
+						parser.skip();
+						this._skipInfos(parser);
+						token = this._parseValue(parser);
+						if (token == null) {
+							tokens.add(this._parseError(parser));
+							break;
+						} else {
+							tokens.add(token);
+						}
+					}
+				}
+			}
+		}
+		return parser.make('[', offset, tokens);
+	}
+
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} eines Werts gibt dazu den Wurzelknoten zurück, wenn die folgende EBNF
+	 * erkannt wurde:<br>
+	 * <pre>VALUE = ARRAY | STRING | HANDLER | CONST | NAME WSC HANDLER</pre> */
+	protected Token _parseValue(final FEMParser parser) throws NullPointerException {
+
+		Token result = this._parseArray(parser);
+		if (result != null) return result;
+		result = this._parseString(parser);
+		if (result != null) return result;
+		result = this._parseHandler(parser);
+		if (result != null) return result;
+		result = this._parseProxy(parser);
+		if (result != null) return result;
+		result = this._parseConst(parser);
+		return result;
+	}
+
+	/** TODO doku <pre>PROXY = NAME WSC HANDLER</pre> */
+	protected Token _parseProxy(final FEMParser parser) throws NullPointerException {
+		final int offset = parser.index();
+		final Token name = this._parseName(parser);
+		if (name != null) {
+			this._skipInfos(parser);
+			final Token handler = this._parseHandler(parser);
+			if (handler != null) return parser.make('=', offset, Arrays.asList(name, handler));
+		}
+		parser.seek(offset);
+		return null;
+	}
+
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Zeichenkette und gibt dessen Abschnitt zurück. Sie probiert hierfür
+	 * {@link #_parseSequence(Parser, char, char, char) this.parseSequence(parser, '\"', '\\', '\"')} und {@link #_parseSequence(Parser, char, char, char)
+	 * this.parseSequence(parser, '\'', '\\', '\'')}. */
+	protected Token _parseString(final Parser parser) throws NullPointerException {
+		Token result = this._parseSequence(parser, '\"', '\\', '\"');
+		if (result != null) return result;
+		result = this._parseSequence(parser, '\'', '\\', '\'');
+		return result;
+	}
+
+	/** Diese Methode parst und erfasst die {@link Token Abschnitte} eines Funktionszeigers und gibt nur dann {@code true} zurück, wenn dieser an der öffnenden
+	 * geschweiften Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #_parseName(Parser) Parameternamen}. Auf
+	 * diese folgen dann ein Doppelpunkt, die {@link #parseFunction(FEMParser) Funktion} sowie die schließenden geschweifte Klammer. Die Symbole <code>'{'</code>,
+	 * {@code ';'}, {@code ':'} und <code>'}'</code> werden direkt als Typ der erfassten Abschnitte eingesetzt. Wenn de Funktionszeiger fehlerhaft ist, wird für
+	 * die öffnende geschweifte Klammer sowie den Doppelpunkt der Abschnittstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können beliebig viele
+	 * {@link #_skipInfos(Parser) Kommentare/Leerraum} stehen.
+	 * <p>
+	 * TODO doku<br>
+	 * <pre>HANDLER = '{',[WSC,NAME,{WSC,";",WSC,NAME}],WSC,':',WSC,FUNCTION,WSC,'}'</pre> **/
+	protected Token _parseHandler(final FEMParser parser) throws NullPointerException {
+		int sym = parser.symbol();
+		if (sym != '{') return null;
+		final int offset = parser.index();
+		final LinkedList<Token> tokens = new LinkedList<>();
+		parser.push('{');
+		parser.skip();
+		this._skipInfos(parser);
+		sym = parser.symbol();
+		if (sym == ':') {
+			parser.push(':');
+			parser.skip();
+		} else if (sym < 0) {
+			tokens.add(this._parseError(parser));
+		} else {
+			Token token = this._parseName(parser);
+			if (token == null) {
+				tokens.add(this._parseError(parser));
+			} else {
+				tokens.add(token);
+				while (true) {
+					this._skipInfos(parser);
+					sym = parser.symbol();
+					if (sym == ':') {
+						parser.push(':');
+						parser.skip();
+						break;
+					} else if ((sym < 0) || (sym != ';')) {
+						tokens.add(this._parseError(parser));
+						break;
+					} else {
+						parser.push(';');
+						parser.skip();
+						this._skipInfos(parser);
+						token = this._parseName(parser);
+						if (token == null) {
+							tokens.add(this._parseError(parser));
+							break;
+						} else {
+							tokens.add(token);
+						}
+					}
+				}
+			}
+		}
+		final List<String> names = new ArrayList<>();
+		for (final Token token: tokens) {
+			names.add(token.toString());
+		}
+		parser.params.addAll(0, names);
+
+		this._skipInfos(parser);
+		final Token token = this.parseFunction(parser);
+		if (token == null) {
+			tokens.add(this._parseError(parser));
+		} else {
+			tokens.add(token);
+			this._skipInfos(parser);
+			sym = parser.symbol();
+			if ((sym < 0) || (sym != '}')) {
+				tokens.add(this._parseError(parser));
+			} else {
+				parser.push('}');
+				parser.skip();
+			}
+		}
+		parser.params.subList(0, names.size()).clear();
+		return parser.make('{', offset, tokens);
+	}
+
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Kommentars und gibt dessen Abschnitt zurück. Sie ist eine Abkürzung
+	 * für {@link #_parseSequence(Parser, char, char, char) this.parseSequence(parser, '/', '\\', '/')}. */
+	protected Token _parseComment(final Parser parser) throws NullPointerException {
+		return this._parseSequence(parser, '/', '\\', '/');
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #_parseSequence(Parser, char, char, char) this.parseSequence(parser, maskSymbol, maskSymbol, maskSymbol)}. */
+	protected Token _parseSequence(final Parser parser, final char maskSymbol) throws NullPointerException {
+		return this._parseSequence(parser, maskSymbol, maskSymbol, maskSymbol);
+	}
+
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette analog zu
+	 * {@link Strings#parseSequence(CharSequence, char, char, char)} und gibt diesen nur dann zurück, wenn er am {@code openSymbol} erkannt wurde. Andernfalls
+	 * liefert sie {@code null}. Als Abschnittstyp wird {@code openSymbol} eingesetzt, wenn die Sequenz nicht vorzeitig endet. Andernfalls wird die Zeichenkette
+	 * als {@link #_parseError(Parser) Fehlerbereich} mit dem Abschnittstyp '!' erfasst.
+	 *
+	 * @param openSymbol Erstes Symbol der Zeichenkette.
+	 * @param maskSymbol Symbol zur Maskierung von {@code maskSymbol} und {@code closeSymbol}.
+	 * @param closeSymbol Letztes Symbol der Zeichenkette. */
+	protected Token _parseSequence(final Parser parser, final char openSymbol, final char maskSymbol, final char closeSymbol) throws NullPointerException {
+		int sym = parser.symbol();
+		if (sym != openSymbol) return null;
+		final int offset = parser.index();
 		while (true) {
-			--itemLimit;
-			this.parseComments(target);
-			if (target.isParsed()) return true;
-			if ((itemLimit == 0) || (target.symbol() != ';')) return this.parseError(target);
-			target.putToken(';');
-			target.skip();
-			this.parseComments(target);
-			if (!itemParser.accept(target)) return this.parseError(target);
+			sym = parser.skip();
+			if (sym < 0) return parser.push('!', offset);
+			if (sym == maskSymbol) {
+				sym = parser.skip();
+				if (sym < 0) return maskSymbol == closeSymbol ? parser.push(openSymbol, offset) : parser.push('!', offset);
+				continue;
+			}
+			if (sym == closeSymbol) {
+				parser.skip();
+				return parser.push(openSymbol, offset);
+			}
 		}
-	}
-
-	/** Diese Methode erfassten die verbleibende Eingabe als {@link Token Fehlerbereich} mit dem Typ {@code '!'} und gibt {@code true} zurück.
-	 *
-	 * @param target Parser.
-	 * @return {@code true}.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseError(final FEMParser target) throws NullPointerException {
-		final int index = target.index(), length = target.length();
-		target.putToken('!', index, length - index);
-		target.seek(length);
-		return true;
-	}
-
-	/** Diese Methode sollte den {@link FEMParser#tokens() Bereich} an der gegebenen Position als {@link Token Fehlerbereich} mit dem Typ {@code '!'} markieren,
-	 * d.h. {@code target.setToken(index, '!')} aufrufe, wenn die Startbereiche unvollständiger {@link #parseArray(FEMParser) Wertlisten},
-	 * {@link #parseParams(FEMParser) Parameterlisten} bzw. {@link #parseHandler(FEMParser) Funktionszeiger} derart gekennzeichnet werden sollen.
-	 *
-	 * @param target Parser.
-	 * @param index Position des
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void parseError(final FEMParser target, final int index) {
-	}
-
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer {@link FEMProxy benannten Funktion} und gibt nur dann {@code true} zurück, wenn diese an
-	 * ihrer {@link #parseConst(FEMParser) Bezeichnung} erkannt wurde. Der Bezeichnung folg die als {@link #parseHandler(FEMParser) Funktionszeiger} angegebene
-	 * Funktion, wobei zwischen diesen beiden Komponenten beliebig viele {@link #parseComments(FEMParser) Kommentare/Leerraum} stehen können.
-	 *
-	 * @param target Parser.
-	 * @return {@code true}, wenn die benannten Funktion erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseProxy(final FEMParser target) throws NullPointerException {
-		if (!this.parseConst(target)) return false;
-		this.parseComments(target);
-		if (!this.parseHandler(target)) return this.parseError(target);
-		return true;
-	}
-
-	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Konstante und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert
-	 * hierfür in spitze Klammen eingeschlossene {@link #parseSequence(FEMParser, char, char, char) maskierte Zeichenketten} sowie {@link #skipConst(Parser)
-	 * unmaskierte Bezeichner} durch. Ein unmaskierter Bezeichner nutzen den Bereichstyp {@code '?'}.
-	 *
-	 * @param target Parser.
-	 * @return {@code true}, wenn die Konstante erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseConst(final FEMParser target) throws NullPointerException {
-		if (this.parseSequence(target, '<', '<', '>')) return true;
-		final int offset = target.index();
-		this.skipConst(target);
-		if (target.index() == offset) return false;
-		target.putToken('?', offset);
-		return true;
 	}
 
 	/** Diese Methode implementiert {@link #parseScript(String, int)} und ist eine Abkürzung für {@code this.parseItems(target, itemLimit, itemParser)}, wobei
 	 * {@code itemLimit} und {@code itemParser} abhängig vom gegebenen {@link FEMScript#mode() Skriptmodus} bestückt werden. Die Implementation in
-	 * {@link FEMDomain} erfasst für alle nicht unterstützten Skriptmodus einen {@link #parseError(FEMParser) Fehlerbereich}. Die maximale Elementanzahl
+	 * {@link FEMDomain} erfasst für alle nicht unterstützten Skriptmodus einen {@link #_parseError(FEMParser) Fehlerbereich}. Die maximale Elementanzahl
 	 * {@code itemLimit} ist für {@link #PARSE_VALUE} und {@link #PARSE_FUNCTION} gleich {@code 1} und sonst {@code 0}. Der {@code itemParser} delegiert für
-	 * {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #parseValue(FEMParser)}, für {@link #PARSE_PROXY_MAP} an {@link #parseProxy(FEMParser)} sowie
+	 * {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #_parseValue(FEMParser)}, für {@link #PARSE_PROXY_MAP} an {@link #parseProxy(FEMParser)} sowie
 	 * für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #parseFunction(FEMParser)}.
 	 *
-	 * @see #parseItems(FEMParser, int, Filter)
-	 * @param target Parser.
-	 * @param scriptMode Skriptmodus.
+	 * @see #parseItems(FEMParser, Filter)
+	 * @param target
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void parseScript(final FEMParser target, final int scriptMode) throws NullPointerException {
+	protected void parseScript(final Parser target) throws NullPointerException {
 		int itemLimit = 1;
 		Filter<FEMParser> itemParser;
 		switch (scriptMode) {
 			default:
-				this.parseError(target);
+				this._parseError(target);
 				return;
 			case PARSE_VALUE_LIST:
 				itemLimit = 0;
@@ -270,7 +405,7 @@ public class FEMDomain extends BaseObject {
 
 					@Override
 					public boolean accept(final FEMParser item) {
-						return FEMDomain.this.parseValue(item);
+						return FEMDomain.this._parseValue(item);
 					}
 
 				};
@@ -299,324 +434,121 @@ public class FEMDomain extends BaseObject {
 				};
 			break;
 		}
-		this.parseItems(target, itemLimit, itemParser);
+		this.parseItems(target, itemParser);
 	}
 
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Wertliste und gibt nur dann {@code true} zurück, wenn diese an der öffnenden eckigen
-	 * Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #parseValue(FEMParser) Werte}. Die Wertliste endet mit der
-	 * schließenden eckigen Klammer. Die Symbole {@code '['}, {@code ';'} und {@code ']'} werden direkt als Typ der erfassten Bereiche eingesetzt. Wenn die
-	 * Wertliste fehlerhaft ist, wird für die öffnende eckige Klammer der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können beliebig
-	 * viele {@link #parseComments(FEMParser) Kommentare/Leerraum} stehen.
+	/** Diese Methode parst und erfasst die {@link Token Abschnitte} einer Funktion und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert
+	 * hierfür {@link #_parseArray(FEMParser) Wertlisten}, {@link #_parseString(FEMParser) Zeichenketten}, {@link #parseLocale(FEMParser) Parameterverweise},
+	 * {@link #_parseHandler(FEMParser) Funktionszeiger} und {@link #_parseConst(FEMParser) Konstanten} durch, wobei die letzten drei noch von beliebig viel
+	 * {@link #_skipInfos(FEMParser) Leerraum/Kommentaren} und {@link #parseParams(FEMParser) Parameterlisten} gefolgt werden können.
+	 * <p>
+	 * TODO doku <br>
+	 * <pre>FUNCTION = ARRAY | STRING | (LOCALE | HANDLER | CONST [ HANDLER ] ) {'(' ')'}
 	 *
-	 * @param target Parser.
-	 * @return {@code true}, wenn die Wertliste erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseArray(final FEMParser target) throws NullPointerException {
-		if (target.symbol() != '[') return false;
-		final int openIndex = target.putToken('[');
-		target.skip();
-		this.parseComments(target);
-		if (target.symbol() == ']') {
-			target.putToken(']');
-			target.skip();
-			return true;
-		} else if (target.isParsed() || !this.parseValue(target)) {
-			this.parseError(target, openIndex);
-			return this.parseError(target);
-		} else {
-			while (true) {
-				this.parseComments(target);
-				if (target.symbol() == ']') {
-					target.putToken(']');
-					target.skip();
-					return true;
-				} else if (target.isParsed() || (target.symbol() != ';')) {
-					this.parseError(target, openIndex);
-					return this.parseError(target);
-				} else {
-					target.putToken(';');
-					target.skip();
-					this.parseComments(target);
-					if (!this.parseValue(target)) {
-						this.parseError(target, openIndex);
-						return this.parseError(target);
-					}
-				}
-			}
-		}
-	}
-
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Werts als Element einer {@link #parseArray(FEMParser) Wertliste} und gibt nur dann
-	 * {@code true} zurück, wenn dieser erkannt wurde. Sie probiert hierfür {@link #parseArray(FEMParser) Wertlisten}, {@link #parseString(FEMParser)
-	 * Zeichenketten}, {@link #parseHandler(FEMParser) Funktionszeiger} und {@link #parseConst(FEMParser) Konstanten} durch.
-	 *
-	 * @param target Parser.
-	 * @return {@code true}, wenn der Wert erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseValue(final FEMParser target) throws NullPointerException {
-		return this.parseArray(target) || this.parseString(target) || this.parseHandler(target) || this.parseConst(target);
-	}
-
-	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Zeichenkette und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert
-	 * hierfür mit einfachen und doppelten Anführungszeichen {@link #parseSequence(FEMParser, char) maskierte} Zeichenketten durch.
-	 *
-	 * @param target Parser.
-	 * @return {@code true}, wenn die Zeichenkette erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseString(final FEMParser target) throws NullPointerException {
-		return this.parseSequence(target, '\"') || this.parseSequence(target, '\'');
-	}
-
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Funktionszeigers und gibt nur dann {@code true} zurück, wenn dieser an der öffnenden
-	 * geschweiften Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #parseName(FEMParser) Parameternamen}. Auf
-	 * diese folgen dann ein Doppelpunkt, die {@link #parseFunction(FEMParser) Funktion} sowie die schließenden geschweifte Klammer. Die Symbole <code>'{'</code>,
-	 * {@code ';'}, {@code ':'} und <code>'}'</code> werden direkt als Typ der erfassten Bereiche eingesetzt. Wenn de Funktionszeiger fehlerhaft ist, wird für die
-	 * öffnende geschweifte Klammer sowie den Doppelpunkt der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten können beliebig viele
-	 * {@link #parseComments(FEMParser) Kommentare/Leerraum} stehen.
-	 *
-	 * @param target Parser.
-	 * @return {@code true}, wenn der Funktionszeiger erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseHandler(final FEMParser target) throws NullPointerException {
-		if (target.symbol() != '{') return false;
-		int count = 0;
-		final int openIndex = target.putToken('{'), closeIndex;
-		target.skip();
-		this.parseComments(target);
-		if (target.symbol() == ':') {
-			closeIndex = target.putToken(':');
-			target.skip();
-		} else if (target.isParsed() || !this.parseName(target)) {
-			this.parseError(target, openIndex);
-			return this.parseError(target);
-		} else {
-			target.putParam(count++, target.target());
-			while (true) {
-				this.parseComments(target);
-				if (target.symbol() == ':') {
-					closeIndex = target.putToken(':');
-					target.skip();
-					break;
-				} else if (target.isParsed() || (target.symbol() != ';')) {
-					this.parseError(target, openIndex);
-					return this.parseError(target);
-				} else {
-					target.putToken(';');
-					target.skip();
-					this.parseComments(target);
-					if (!this.parseName(target)) {
-						this.parseError(target, openIndex);
-						return this.parseError(target);
-					}
-				}
-				target.putParam(count++, target.target());
-			}
-		}
-		this.parseComments(target);
-		if (target.isParsed() || !this.parseFunction(target)) {
-			this.parseError(target, openIndex);
-			this.parseError(target, closeIndex);
-			return this.parseError(target);
-		}
-		this.parseComments(target);
-		if (target.isParsed() || (target.symbol() != '}')) {
-			this.parseError(target, openIndex);
-			this.parseError(target, closeIndex);
-			return this.parseError(target);
-		}
-		target.popParams(count);
-		target.putToken('}');
-		target.skip();
-		return true;
-	}
-
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Funktion und gibt nur dann {@code true} zurück, wenn diese erkannt wurde. Sie probiert
-	 * hierfür {@link #parseArray(FEMParser) Wertlisten}, {@link #parseString(FEMParser) Zeichenketten}, {@link #parseLocale(FEMParser) Parameterverweise},
-	 * {@link #parseHandler(FEMParser) Funktionszeiger} und {@link #parseConst(FEMParser) Konstanten} durch, wobei die letzten drei noch von beliebig viel
-	 * {@link #parseComments(FEMParser) Leerraum/Kommentaren} und {@link #parseParams(FEMParser) Parameterlisten} gefolgt werden können.
-	 *
-	 * @param target Parser.
+	 * @param target
 	 * @return {@code true}, wenn die Funktion erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseFunction(final FEMParser target) throws NullPointerException {
-		if (this.parseArray(target) || this.parseString(target)) return true;
-		if (!this.parseLocale(target) && !this.parseHandler(target) && !this.parseConst(target)) return false;
+	protected Token parseFunction(final FEMParser target) throws NullPointerException {
+		if (this._parseArray(target) || this._parseString(target)) return true;
+
+		if (!this.parseLocale(target) && !this._parseHandler(target) && !this._parseConst(target)) return false;
 		while (true) {
-			this.parseComments(target);
+			this._skipInfos(target);
 			if (!this.parseParams(target)) return true;
 		}
 	}
 
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} einer Parameterliste und gibt nur dann {@code true} zurück, wenn diese an der öffnenden runden
-	 * Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #parseFunction(FEMParser) Parameterfunktionen}. Die
-	 * Parameterliste endet mit der schließenden runden Klammer. Die Symbole {@code '('}, {@code ';'} und {@code ')'} werden direkt als Typ der erfassten Bereiche
-	 * eingesetzt. Wenn die Wertliste fehlerhaft ist, wird für die öffnende runde Klammer der Bereichstyp {@code '!'} eingesetzt. Zwischen all diesen Komponenten
-	 * können beliebig viele {@link #parseComments(FEMParser) Kommentare/Leerraum} stehen.
+	/** Diese Methode parst und erfasst die {@link Token Abschnitte} einer Parameterliste und gibt nur dann {@code true} zurück, wenn diese an der öffnenden
+	 * runden Klammer erkannt wurde. Dieser Klammer folgen die untereineander mit Semikolon separierten {@link #parseFunction(FEMParser) Parameterfunktionen}. Die
+	 * Parameterliste endet mit der schließenden runden Klammer. Die Symbole {@code '('}, {@code ';'} und {@code ')'} werden direkt als Typ der erfassten
+	 * Abschnitte eingesetzt. Wenn die Wertliste fehlerhaft ist, wird für die öffnende runde Klammer der Abschnittstyp {@code '!'} eingesetzt. Zwischen all diesen
+	 * Komponenten können beliebig viele {@link #_skipInfos(FEMParser) Kommentare/Leerraum} stehen.
 	 *
-	 * @param target Parser.
+	 * @param target
 	 * @return {@code true}, wenn die Parameterliste erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseParams(final FEMParser target) throws NullPointerException {
 		if (target.symbol() != '(') return false;
-		final int openIndex = target.putToken('(');
+		final int openIndex = target.push('(');
 		target.skip();
-		this.parseComments(target);
+		this._skipInfos(target);
 		if (target.symbol() == ')') {
-			target.putToken(')');
+			target.push(')');
 			target.skip();
 			return true;
 		} else if (target.isParsed() || !this.parseFunction(target)) {
 			this.parseError(target, openIndex);
-			return this.parseError(target);
+			return this._parseError(target);
 		} else {
 			while (true) {
-				this.parseComments(target);
+				this._skipInfos(target);
 				if (target.symbol() == ')') {
-					target.putToken(')');
+					target.push(')');
 					target.skip();
 					return true;
 				} else if (target.isParsed() || (target.symbol() != ';')) {
 					this.parseError(target, openIndex);
-					return this.parseError(target);
+					return this._parseError(target);
 				} else {
-					target.putToken(';');
+					target.push(';');
 					target.skip();
-					this.parseComments(target);
+					this._skipInfos(target);
 					if (!this.parseFunction(target)) {
 						this.parseError(target, openIndex);
-						return this.parseError(target);
+						return this._parseError(target);
 					}
 				}
 			}
 		}
 	}
 
-	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameterindexes und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie
-	 * sucht dazu eine nicht leere Zeichenkette aus dezimalen Ziffern und nutzt das Symbole {@code '#'} als Typ des erfassten Bereichs.
+	/** Diese Methode parst und erfasst den {@link Token Abschnitt} eines Parameterindexes und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie
+	 * sucht dazu eine nicht leere Zeichenkette aus dezimalen Ziffern und nutzt das Symbole {@code '#'} als Typ des erfassten Abschnitts.
 	 *
-	 * @param target Parser.
+	 * @param target
 	 * @return {@code true}, wenn der Parameterindex erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseIndex(final FEMParser target) throws NullPointerException {
+	protected boolean parseIndex(final Parser target) throws NullPointerException {
 		final int offset = target.index();
-		for (int symbol = target.symbol(); ('0' <= symbol) && (symbol <= '9'); symbol = target.skip()) {}
+		this._skipIndex(target);
 		if (target.index() == offset) return false;
-		target.putToken('#', offset);
+		target.push('#', offset);
 		return true;
 	}
 
-	/** Diese Methode parst und erfasst den {@link Token Bereich} eines Parameternamen und gibt nur dann {@code true} zurück, wenn dieser erkannt wurde. Sie sucht
-	 * dazu eine nicht leere {@link #skipName(Parser) unmaskierte} Zeichenkette. Das Symbol {@code '~'} wird als Typ des erfassten Bereichs eingesetzt.
+	/** Diese Methode parst und erfasst die {@link Token Abschnitte} eines Parameterverweises und gibt nur dann {@code true} zurück, wenn dieser am Dollarzeichen
+	 * erkannt wurde. Diesem Zeichen kann ein {@link #parseIndex(FEMParser) Parameterindex} oder ein {@link #_parseName(FEMParser) Parametername} folgen. Das
+	 * Symbol {@code '$'} wird direkt als Typ des erfassten Abschnitts eingesetzt.
 	 *
-	 * @param target Parser.
-	 * @return {@code true}, wenn der Parametername erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseName(final FEMParser target) throws NullPointerException {
-		final int offset = target.index();
-		this.skipName(target);
-		if (target.index() == offset) return false;
-		target.putToken('~', offset);
-		target.clear();
-		target.take(target.source().substring(offset, target.index()));
-		return true;
-	}
-
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} eines Parameterverweises und gibt nur dann {@code true} zurück, wenn dieser am Dollarzeichen
-	 * erkannt wurde. Diesem Zeichen kann ein {@link #parseIndex(FEMParser) Parameterindex} oder ein {@link #parseName(FEMParser) Parametername} folgen. Das
-	 * Symbol {@code '$'} wird direkt als Typ des erfassten Bereichs eingesetzt.
-	 *
-	 * @param target Parser.
+	 * @param target
 	 * @return {@code true}, wenn der Parameterverweis erkannt wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	protected boolean parseLocale(final FEMParser target) throws NullPointerException {
 		if (target.symbol() != '$') return false;
-		target.putToken('$');
+		target.push('$');
 		target.skip();
-		if (this.parseIndex(target) || !this.parseName(target)) return true;
-		if (target.getParam(target.target()) >= 0) return true;
+		if (this.parseIndex(target) || !this._parseName(target)) return true;
+		if (target.get(target.target()) >= 0) return true;
 		target.setToken(target.tokens().size() - 1, '!');
 		return true;
 	}
 
-	/** Diese Methode parst und erfasst die {@link Token Bereiche} von Kommentaren. Ein Kommentar wird als mit Schrägstrich
-	 * {@link #parseSequence(FEMParser, char)} maskierte} Zeichenkette erkannt und erfasst. Vor und nach einem Kommentar kann beliebig viel
-	 * {@link #skipSpace(Parser) Leerraum} stehen.
-	 *
-	 * @param target Parser.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected void parseComments(final FEMParser target) throws NullPointerException {
-		do {
-			this.skipSpace(target);
-		} while (this.parseSequence(target, '/'));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.parseSequence(source, maskSymbol, maskSymbol, maskSymbol)}.
-	 *
-	 * @see #parseSequence(FEMParser, char, char, char)
-	 * @param target Parser.
-	 * @param maskSymbol Maskierungszeichen.
-	 * @return {@code true}, wenn die Sequenz erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseSequence(final FEMParser target, final char maskSymbol) throws NullPointerException {
-		return this.parseSequence(target, maskSymbol, maskSymbol, maskSymbol);
-	}
-
-	/** Diese Methode parst und erfasst den {@link Token Bereich} einer Zeichenkette analog zu {@link Strings#parseSequence(CharSequence, char, char, char)} und
-	 * gibt nur dann {@code true} zurück, wenn diese am {@code openSymbol} erkannt wurde. Für eine fehlerfreie Sequenz wird {@code openSymbol} als Typ des
-	 * Bereichs eingesetzt. Eine fehlerhafte Sequenz geht dagegen bis zum Ende der Eingabe und wird mit dem Bereichstyp {@code '!'} erfasst.
-	 *
-	 * @param target Parser.
-	 * @param openSymbol Erstes Symbol der Zeichenkette.
-	 * @param maskSymbol Symbol zur Maskierungszeichen.
-	 * @param closeSymbol Letztes Symbol der Zeichenkette.
-	 * @return {@code true}, wenn die Sequenz erkannt wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	protected boolean parseSequence(final FEMParser target, final char openSymbol, final char maskSymbol, final char closeSymbol) throws NullPointerException {
-		if (target.symbol() != openSymbol) return false;
-		final int offset = target.index();
-		while (true) {
-			int symbol = target.skip();
-			if (symbol < 0) {
-				target.putToken('!', offset);
-				return true;
-			}
-			if (symbol == maskSymbol) {
-				symbol = target.skip();
-				if ((symbol == openSymbol) || (symbol == maskSymbol) || (symbol == closeSymbol)) {
-					continue;
-				} else if (maskSymbol == closeSymbol) {
-					target.putToken(openSymbol, offset);
-					return true;
-				}
-				target.putToken('!', offset);
-				return true;
-			} else if ((symbol == openSymbol) && (openSymbol != closeSymbol)) {
-				target.putToken('!', offset);
-				return true;
-			} else if (symbol == closeSymbol) {
-				target.skip();
-				target.putToken(openSymbol, offset);
-				return true;
-			}
-		}
-	}
-
 	/** Diese Methode überführt die gegebene Zeichenkette in einen {@link FEMScript aufbereiteten Quelltext} und gibt diesen zurück. Sie erzeugt dazu einen
-	 * {@link FEMParser} und delegiert diesen zusammen mit dem gegebenen Skriptmodus an {@link #parseScript(FEMParser, int)}.
+	 * {@link FEMParser} und delegiert diesen zusammen mit dem gegebenen Skriptmodus an {@link #parseScript(FEMParser)}.
 	 *
 	 * @see #PARSE_VALUE
 	 * @see #PARSE_VALUE_LIST
 	 * @see #PARSE_FUNCTION
 	 * @see #PARSE_FUNCTION_LIST
 	 * @see #PARSE_PROXY_MAP
-	 * @see #parseScript(FEMParser, int)
+	 * @see #parseScript(FEMParser)
 	 * @param source Zeichenkette, die geparst werden soll.
 	 * @param scriptMode Modus für {@link FEMScript#mode()}.
 	 * @return aufbereiteter Quelltext.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 	public FEMScript parseScript(final String source, final int scriptMode) throws NullPointerException {
-		final FEMParser parser = new FEMParser().useSource(source);
-		this.parseScript(parser, scriptMode);
+		final Parser parser = new FEMParser(source);
+		this.parseScript(parser);
 		return FEMScript.from(scriptMode, source, parser.tokens());
 	}
 
@@ -626,9 +558,8 @@ public class FEMDomain extends BaseObject {
 	 * @param string Zeichenkette.
 	 * @return gegebene bzw. geparste Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public String parseConst(final String string) throws NullPointerException {
-		final String result = Strings.parseSequence(string, '<', '<', '>');
-		return result != null ? result : string;
+	public String parseName(final String string) throws NullPointerException {
+		return Objects.notNull(Strings.parseSequence(string, '<', '\\', '>'), string);
 	}
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes.
@@ -638,7 +569,7 @@ public class FEMDomain extends BaseObject {
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code script} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
 	protected void formatScript(final FEMFormatter target, final FEMScript script) throws NullPointerException, IllegalArgumentException {
-		this.formatScript(target, new FEMCompiler().useScript(script));
+		this.formatScript(target, new FEMCompiler(script));
 	}
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltexts.
@@ -1096,7 +1027,7 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit Maskierung als formatierte Zeichenkette zurück. Die
-	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder wenn die Zeichenkette ein {@link #skipConst(Parser) zu maskierendes Zeichen enthält}.
+	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder wenn die Zeichenkette ein {@link #_skipConst(Parser) zu maskierendes Zeichen enthält}.
 	 * Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<', '<', '>')}. Wenn die
 	 * Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
 	 *
@@ -1107,7 +1038,7 @@ public class FEMDomain extends BaseObject {
 	public String formatConst(final String string, final boolean forceMask) throws NullPointerException {
 		if (forceMask) return Strings.formatSequence(string, '<', '<', '>');
 		final Parser parser = new Parser(string);
-		this.skipConst(parser);
+		this._skipConst(parser);
 		return !parser.isParsed() ? Strings.formatSequence(string, '<', '<', '>') : Objects.notNull(string);
 	}
 
@@ -1236,7 +1167,7 @@ public class FEMDomain extends BaseObject {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist oder einen Fehlerbereich vom Typ {@code '!'} enthält. */
 	public Object compileScript(final FEMScript source) throws NullPointerException, IllegalArgumentException {
-		return this.compileScript(new FEMCompiler().useScript(source));
+		return this.compileScript(new FEMCompiler(source));
 	}
 
 	/** Diese Methode implementiert {@link #compileScript(FEMScript)} und ist eine Abkürzung für {@code this.compileAsItems(source, itemLimit, itemCompiler)},
@@ -1245,7 +1176,7 @@ public class FEMDomain extends BaseObject {
 	 * {@link #PARSE_VALUE} und {@link #PARSE_VALUE_LIST} an {@link #compileValue(FEMCompiler)}, für {@link #PARSE_PROXY_MAP} an
 	 * {@link #compileProxy(FEMCompiler)} sowie für {@link #PARSE_FUNCTION} und {@link #PARSE_FUNCTION_LIST} an {@link #compileFunction(FEMCompiler)}.
 	 *
-	 * @see #parseScript(FEMParser, int)
+	 * @see #parseScript(FEMParser)
 	 * @param source Kompiler.
 	 * @return Kompiliertes Objekt abhängig vom Skriptmodus.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -1321,7 +1252,7 @@ public class FEMDomain extends BaseObject {
 		}
 	}
 
-	/** Diese Methode kompiliert eine benannte Funktion und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} keine
+	/** Diese Methode kompiliert eine benannte Funktion und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} keine
 	 * {@link #compileConst(FEMCompiler) Konstante} ist, wird {@code null} geliefert.
 	 *
 	 * @see #parseProxy(FEMParser)
@@ -1340,10 +1271,10 @@ public class FEMDomain extends BaseObject {
 		return result;
 	}
 
-	/** Diese Methode kompiliert eine Wertliste und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '['} ist, wird
-	 * {@code null} geliefert.
+	/** Diese Methode kompiliert eine Wertliste und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} nicht vom Typ {@code '['} ist,
+	 * wird {@code null} geliefert.
 	 *
-	 * @see #parseArray(FEMParser)
+	 * @see #_parseArray(FEMParser)
 	 * @param source Kompiler.
 	 * @return Wertliste oder {@code null}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -1380,7 +1311,7 @@ public class FEMDomain extends BaseObject {
 	 * {@link #compileString(FEMCompiler) Zeichenketten}, {@link #compileHandler(FEMCompiler) Funktionszeiger} und {@link #compileConst(FEMCompiler) Konstanten}
 	 * durch. Wenn hierbei kein Wert ermittelt werden konnte, wird {@code null} geliefert.
 	 *
-	 * @see #parseValue(FEMParser)
+	 * @see #_parseValue(FEMParser)
 	 * @param source Kompiler.
 	 * @return Wert oder {@code null}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -1403,7 +1334,7 @@ public class FEMDomain extends BaseObject {
 	 * {@link FEMVoid}, {@link FEMBoolean}, {@link FEMBinary}, {@link FEMDuration}, {@link FEMDatetime}, {@link FEMInteger} und {@link FEMDecimal} zu
 	 * interpretieren. Wenn hierbei keine Konstante ermittelt werden konnte, wird {@code null} geliefert.
 	 *
-	 * @see #parseValue(FEMParser)
+	 * @see #_parseValue(FEMParser)
 	 * @param source Kompiler.
 	 * @param string Zeichenkette, bspw. einer Konstanten oder eines Objektnamens.
 	 * @return Funktion.
@@ -1435,10 +1366,10 @@ public class FEMDomain extends BaseObject {
 		return null;
 	}
 
-	/** Diese Methode kompiliert eine Zeichenkette und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '\''} oder
-	 * {@code '\"'} ist, wird {@code null} geliefert.
+	/** Diese Methode kompiliert eine Zeichenkette und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} nicht vom Typ {@code '\''}
+	 * oder {@code '\"'} ist, wird {@code null} geliefert.
 	 *
-	 * @see #parseString(FEMParser)
+	 * @see #_parseString(FEMParser)
 	 * @param source Kompiler.
 	 * @return Zeichenkette oder {@code null}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -1446,17 +1377,17 @@ public class FEMDomain extends BaseObject {
 	protected FEMValue compileString(final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
 		final int symbol = source.symbol();
 		if ((symbol != '\"') && (symbol != '\'')) return null;
-		final String result = Strings.parseSequence(source.section(), (char)symbol);
+		final String result = Strings.parseSequence(source.section(), (char)symbol, '\\', (char)symbol);
 		if (result == null) throw new IllegalArgumentException("Zeichenkette '" + source.section() + "' ungültig.");
 		source.skip();
 		return FEMString.from(result);
 	}
 
-	/** Diese Methode kompiliert einen Parameterverweise und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '$'}
-	 * ist, wird {@code null} geliefert. Wenn diesem Bereich ein {@link #compileIndex(FEMCompiler) Parameterindex} bzw. {@link #compileName(FEMCompiler)
-	 * Parametername} folgt, wird ein {@link FEMParam} mit dem entsprechenden geliefert. Der Parameterindex für den ersten Parameter ist {@code 1}. Kleinere Werte
-	 * sind ungültig. Ein Parametername ist ungültig über {@link FEMCompiler#getParam(String)} dazu kein positiver Index ermittelt werden kann. Wenn dem ersten
-	 * Bereich weder ein Parameterindex noch ein Parametername folgt, wird {@link FEMFrame#FUNCTION} geliefert.
+	/** Diese Methode kompiliert einen Parameterverweise und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} nicht vom Typ
+	 * {@code '$'} ist, wird {@code null} geliefert. Wenn diesem Abschnitt ein {@link #compileIndex(FEMCompiler) Parameterindex} bzw.
+	 * {@link #compileName(FEMCompiler) Parametername} folgt, wird ein {@link FEMParam} mit dem entsprechenden geliefert. Der Parameterindex für den ersten
+	 * Parameter ist {@code 1}. Kleinere Werte sind ungültig. Ein Parametername ist ungültig über {@link FEMCompiler#get(String)} dazu kein positiver Index
+	 * ermittelt werden kann. Wenn dem ersten Abschnitt weder ein Parameterindex noch ein Parametername folgt, wird {@link FEMFrame#FUNCTION} geliefert.
 	 *
 	 * @see #parseLocale(FEMParser)
 	 * @see FEMFrame#FUNCTION
@@ -1470,7 +1401,7 @@ public class FEMDomain extends BaseObject {
 		source.skip();
 		final String name = this.compileName(source);
 		if (name != null) {
-			final int index = source.getParam(name);
+			final int index = source.get(name);
 			if (index < 0) throw new IllegalArgumentException("Parametername '" + name + "' ist unbekannt.");
 			return FEMParam.from(index);
 		}
@@ -1482,10 +1413,10 @@ public class FEMDomain extends BaseObject {
 		return FEMFrame.FUNCTION;
 	}
 
-	/** Diese Methode kompiliert einen Funktionszeiger und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ
+	/** Diese Methode kompiliert einen Funktionszeiger und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} nicht vom Typ
 	 * <code>'{'</code> ist, wird {@code null} geliefert.
 	 *
-	 * @see #parseHandler(FEMParser)
+	 * @see #_parseHandler(FEMParser)
 	 * @param source Kompiler.
 	 * @return Funktionszeiger oder {@code null}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -1499,7 +1430,7 @@ public class FEMDomain extends BaseObject {
 			if (source.symbol() < 0) throw new IllegalArgumentException();
 			final String name = this.compileName(source);
 			if (name != null) {
-				source.putParam(count++, name);
+				source.put(count++, name);
 				this.compileComments(source);
 			}
 			if (source.symbol() == ';') {
@@ -1513,7 +1444,7 @@ public class FEMDomain extends BaseObject {
 				this.compileComments(source);
 				if (source.symbol() != '}') throw new IllegalArgumentException();
 				source.skip();
-				source.popParams(count);
+				source.pop(count);
 				return FEMHandler.from(result);
 			} else throw new IllegalArgumentException();
 		}
@@ -1560,8 +1491,8 @@ public class FEMDomain extends BaseObject {
 		return result != null ? result : source.proxy(string);
 	}
 
-	/** Diese Methode kompiliert eine Parameterliste und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '('} ist,
-	 * wird {@code null} geliefert. Die Parameterfunktionen werden hierzu über {@link #compileClosure(FEMFunction)} aus den Funktionen abgeleitet, die über
+	/** Diese Methode kompiliert eine Parameterliste und gibt diese zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} nicht vom Typ {@code '('}
+	 * ist, wird {@code null} geliefert. Die Parameterfunktionen werden hierzu über {@link #compileClosure(FEMFunction)} aus den Funktionen abgeleitet, die über
 	 * {@link #compileFunction(FEMCompiler)} ermittelt wurden.
 	 *
 	 * @see #parseParams(FEMParser)
@@ -1646,10 +1577,10 @@ public class FEMDomain extends BaseObject {
 		}
 	}
 
-	/** Diese Methode kompiliert die Zeichenkette einer Konatenten und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ
+	/** Diese Methode kompiliert die Zeichenkette einer Konatenten und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} nicht vom Typ
 	 * {@code '?'} oder {@code '<'} ist, wird {@code null} geliefert.
 	 *
-	 * @see #parseConst(FEMParser)
+	 * @see #_parseConst(FEMParser)
 	 * @param source Kompiler.
 	 * @return Parametername oder {@code null}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -1661,17 +1592,17 @@ public class FEMDomain extends BaseObject {
 			source.skip();
 			return result;
 		} else if (symbol == '<') {
-			final String result = Strings.parseSequence(source.section(), '<', '/', '>');
+			final String result = Strings.parseSequence(source.section(), '<', '\\', '>');
 			if (result == null) throw new IllegalArgumentException("Konstante '" + source.section() + "' ungültig.");
 			source.skip();
 			return result;
 		} else return null;
 	}
 
-	/** Diese Methode kompiliert einen Parameternamen und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '~'}
+	/** Diese Methode kompiliert einen Parameternamen und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} nicht vom Typ {@code '~'}
 	 * ist, wird {@code null} geliefert.
 	 *
-	 * @see #parseName(FEMParser)
+	 * @see #_parseName(FEMParser)
 	 * @param source Kompiler.
 	 * @return Parametername oder {@code null}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -1683,7 +1614,7 @@ public class FEMDomain extends BaseObject {
 		return result;
 	}
 
-	/** Diese Methode kompiliert einen Parameterindex und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Bereich} nicht vom Typ {@code '#'}
+	/** Diese Methode kompiliert einen Parameterindex und gibt diesen zurück. Wenn der {@link FEMCompiler#section() aktuelle Abschnitt} nicht vom Typ {@code '#'}
 	 * ist, wird {@code null} geliefert.
 	 *
 	 * @see #parseIndex(FEMParser)
@@ -1700,7 +1631,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode überspringt Kommentare.
 	 *
-	 * @see #parseComments(FEMParser)
+	 * @see #_skipInfos(FEMParser)
 	 * @param source Kompiler.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 	protected void compileComments(final FEMCompiler source) throws NullPointerException {
