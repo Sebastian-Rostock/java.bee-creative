@@ -317,20 +317,26 @@ public class ThreadPool {
 	public void runAll(final int threads, final Iterator<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
 		if (threads < 1) throw new IllegalArgumentException();
 		final int[] idle = {threads};
-		while (tasks.hasNext()) {
-			synchronized (idle) {
-				if (idle[0] <= 0) {
-					idle.wait(1000);
-					continue;
+		try {
+			while (tasks.hasNext()) {
+				synchronized (idle) {
+					if (idle[0] <= 0) {
+						idle.wait(1000);
+						continue;
+					}
+					if (this.start(new ThreadWorker(idle, Objects.notNull(tasks.next())))) {
+						idle[0]--;
+					}
 				}
-				idle[0]--;
 			}
-			this.start(new ThreadWorker(idle, Objects.notNull(tasks.next())));
-		}
-		while (true) {
-			synchronized (idle) {
-				if (idle[0] >= threads) return;
-				idle.wait(1000);
+		} finally {
+			while (true) {
+				synchronized (idle) {
+					if (idle[0] >= threads) {
+						break;
+					}
+					idle.wait(1000);
+				}
 			}
 		}
 	}
