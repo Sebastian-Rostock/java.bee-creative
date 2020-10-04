@@ -166,7 +166,7 @@ public class ThreadPool {
 		this(group, daemon, "Thread", java.lang.Thread.NORM_PRIORITY, waitingReserve, waitingTimeout);
 	}
 
-	/** Dieser Konstruktor initialisiert den {@link ThreadPool} mit den gegebenen Merkmalen.
+	/** Dieser Konstruktor initialisiert den {@link ThreadPool} mit den gegebenen Eigenschaften.
 	 *
 	 * @see java.lang.Thread#setDaemon(boolean)
 	 * @see java.lang.Thread#getThreadGroup()

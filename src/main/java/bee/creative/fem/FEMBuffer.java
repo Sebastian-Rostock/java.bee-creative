@@ -388,7 +388,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return result;
 	}
 
-	/** Diese Methode gibt die Referenz mit den gegebenen Merkmalen zurück.
+	/** Diese Methode gibt die Referenz mit den gegebenen Eigenschaften zurück.
 	 *
 	 * @param head Kopfdaten als Typkennung (6 Bit).
 	 * @param body Rumpfdaten als Adresse oder Nutzdaten (58 Bit).
@@ -443,7 +443,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return result;
 	}
 
-	/** Diese Methode gibt die {@link #getRef(int, long) Referenz mit den gegebenen Merkmalen} zurück und speichert diese zur {@link #cleanup() Wiederverwendung}.
+	/** Diese Methode gibt die {@link #getRef(int, long) Referenz mit den gegebenen Eigenschaften} zurück und speichert diese zur {@link #cleanup() Wiederverwendung}.
 	 *
 	 * @param head Kopfdaten, bspw. Typkennung (6 Bit).
 	 * @param body Rumpfdaten, bspw. Adresse (58 Bit).

@@ -40,7 +40,7 @@ public class ObservableField<GItem, GValue> extends ObservableValue<GValue, Obse
 		/** Dieses Feld speichert den neuen Wert des {@link ObservableField#field Datenfelds}. */
 		public final Object newValue;
 
-		/** Dieser Konstruktor initialisiert die Merkmale des Ereignisses. */
+		/** Dieser Konstruktor initialisiert die Eigenschafte des Ereignisses. */
 		public <GItem, GValue> UpdateFieldMessage(final ObservableField<? super GItem, GValue> sender, final GItem item, final GValue oldValue,
 			final GValue newValue) {
 			this.sender = sender;

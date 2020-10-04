@@ -24,7 +24,7 @@ public class Parser {
 		/** Dieses Feld speichert den leeren Abschnitt. */
 		public static final Token EMPTY = new Token("", 0, 0, new Token[0]);
 
-		/** Diese Methode gibt einen neuen Abschnitt mit den gegebenen Merkmalen zurück.
+		/** Diese Methode gibt einen neuen Abschnitt mit den gegebenen Eigenschaften zurück.
 		 *
 		 * @param source Eingabe, deren Abschnitt beschrieben wird.
 		 * @param offset Abschnittsbeginn.
@@ -38,7 +38,7 @@ public class Parser {
 			return new Token(source, offset, length, tokens.clone());
 		}
 
-		/** Diese Methode gibt einen neuen Abschnitt mit den gegebenen Merkmalen zurück.
+		/** Diese Methode gibt einen neuen Abschnitt mit den gegebenen Eigenschaften zurück.
 		 *
 		 * @param source Eingabe, deren Abschnitt beschrieben wird.
 		 * @param offset Abschnittsbeginn.
@@ -51,7 +51,7 @@ public class Parser {
 			return Token.from(source, offset, length, Token.EMPTY.tokens).type(type);
 		}
 
-		/** Diese Methode gibt einen neuen Abschnitt mit den gegebenen Merkmalen zurück.
+		/** Diese Methode gibt einen neuen Abschnitt mit den gegebenen Eigenschaften zurück.
 		 *
 		 * @param source Eingabe, deren Abschnitt beschrieben wird.
 		 * @param offset Abschnittsbeginn.
@@ -66,7 +66,7 @@ public class Parser {
 			return Token.from(source, offset, length, tokens).type(type);
 		}
 
-		/** Diese Methode gibt einen neuen Abschnitt mit den gegebenen Merkmalen zurück.
+		/** Diese Methode gibt einen neuen Abschnitt mit den gegebenen Eigenschaften zurück.
 		 *
 		 * @param source Eingabe, deren Abschnitt beschrieben wird.
 		 * @param offset Abschnittsbeginn.
@@ -160,10 +160,10 @@ public class Parser {
 		/** Dieses Feld speichert den Abschnittstyp. */
 		private char type;
 
-		Token(final String source, final int offset, final int length, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
+		private Token(final String source, final int offset, final int length, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
 			if ((offset < 0) || (length < 0) || (source.length() < (offset + length))) throw new IllegalArgumentException();
 			if (Arrays.asList(tokens).contains(null)) throw new NullPointerException();
-			this.source = source;
+			this.source = Objects.notNull(source);
 			this.offset = offset;
 			this.length = length;
 			this.tokens = tokens;
@@ -210,11 +210,13 @@ public class Parser {
 			return this.value;
 		}
 
-		/** Diese Methode setzt den {@link #value() Abschnittswert}.
+		/** Diese Methode setzt den {@link #value() Abschnittswert} und gibt {@code this} zurück.
 		 *
-		 * @param value Abschnittswert. */
-		public void value(final Object value) {
+		 * @param value Abschnittswert.
+		 * @return {@code this}. */
+		public Token value(final Object value) {
 			this.value = value;
+			return this;
 		}
 
 		/** Diese Methode die Anzahl der {@link #tokens() Kindabschnitte} zurück.
@@ -243,7 +245,7 @@ public class Parser {
 		/** Diese Methode gibt die Zeichenkette zurück, die als Eingabe des Parsert eingesetzt wurde und auf welche sich die Positionsangaben dieses Abschnitts
 		 * beziehen.
 		 *
-		 * @return Eingabeeeichenkette. */
+		 * @return Eingabezeichenkette. */
 		public String source() {
 			return this.source;
 		}
@@ -457,7 +459,7 @@ public class Parser {
 		return this.make(type, offset, this.index() - offset);
 	}
 
-	/** Diese Methode erzeugt einen neuen Abschnitt mit den gegebenen Merkmalen und gibt diesen zurück.. Sie ist eine Abkürzung für
+	/** Diese Methode erzeugt einen neuen Abschnitt mit den gegebenen Eigenschaften und gibt diesen zurück.. Sie ist eine Abkürzung für
 	 * {@link Token#from(String, int, int, int) Token.from(this.source(), offset, length, type)}.
 	 *
 	 * @param type Abschnittstyp
@@ -479,7 +481,7 @@ public class Parser {
 		return this.make(type, offset, this.index() - offset, tokens);
 	}
 
-	/** Diese Methode erzeugt einen neuen Abschnitt mit den gegebenen Merkmalen. Sie ist eine Abkürzung für {@link Token#from(String, int, int, int, Iterable)
+	/** Diese Methode erzeugt einen neuen Abschnitt mit den gegebenen Eigenschaften. Sie ist eine Abkürzung für {@link Token#from(String, int, int, int, Iterable)
 	 * Token.from(this.source(), offset, length, type, tokens)}.
 	 *
 	 * @param type Abschnittstyp
@@ -506,7 +508,7 @@ public class Parser {
 	 * @see #make(int, int)
 	 * @param type Abschnittstyp.
 	 * @param offset Abschnittsbeginn.
-	 * @return Abschnitt. */
+	 * @return Abschnitt oder {@code null}. */
 	public final Token push(final int type, final int offset) throws IllegalArgumentException {
 		return this.push(this.make(type, offset));
 	}
@@ -517,7 +519,7 @@ public class Parser {
 	 * @param type Abschnittstyp.
 	 * @param offset Abschnittsbeginn.
 	 * @param length Abschnittslänge.
-	 * @return Abschnitt. */
+	 * @return Abschnitt oder {@code null}. */
 	public final Token push(final int type, final int offset, final int length) {
 		return this.push(this.make(type, offset, length));
 	}
@@ -525,8 +527,8 @@ public class Parser {
 	/** Diese Methode erfasst den gegebenen {@link Token Abschnitt} und gibt ihn zurück. Er wird nur dann an die {@link #tokens() Auflistung aller erfassten
 	 * Abschnitte} angefügt, wenn er nich {@code null} und nicht {@link Token#length() leer} ist.
 	 *
-	 * @param token Abschnitt.
-	 * @return Abschnitt. */
+	 * @param token Abschnitt oder {@code null}.
+	 * @return Abschnitt oder {@code null}. */
 	public final Token push(final Token token) {
 		if ((token == null) || (token.length() == 0)) return token;
 		this.tokens.add(token);

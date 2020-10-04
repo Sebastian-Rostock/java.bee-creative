@@ -36,7 +36,7 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 		/** Dieses Feld speichert den neuen Wert des {@link ObservableProperty#property Datenfelds}. */
 		public final Object newValue;
 
-		/** Dieser Konstruktor initialisiert die Merkmale des Ereignisses. */
+		/** Dieser Konstruktor initialisiert die Eigenschafte des Ereignisses. */
 		public <GValue> UpdatePropertyMessage(final ObservableProperty<GValue> sender, final GValue oldValue, final GValue newValue) {
 			this.sender = sender;
 			this.oldValue = oldValue;
