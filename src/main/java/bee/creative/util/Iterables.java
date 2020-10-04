@@ -705,6 +705,25 @@ public class Iterables {
 		return result;
 	}
 
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als Array zurück. Dazu wird das gegebene {@link Iterable} in eine {@link Collection}
+	 * überführt, deren Inhalt schließlich aks Array {@link Collection#toArray(Object[]) geliefert} wird.
+	 *
+	 * @param result Ergebnis für {@link Collection#toArray(Object[])}.
+	 * @param iterable {@link Iterable}.
+	 * @param <GItem> Typ der Elemente.
+	 * @return Array der Elemente.
+	 * @throws NullPointerException Wenn {@code result} bzw. {@code iterable} {@code null} ist. */
+	public static <GItem> GItem[] toArray(final GItem[] result, final Iterable<GItem> iterable) throws NullPointerException {
+		final Collection<GItem> buffer;
+		if (iterable instanceof Collection<?>) {
+			buffer = (Collection<GItem>)iterable;
+		} else {
+			buffer = new ArrayList<>();
+			Iterables.addAll(buffer, iterable);
+		}
+		return buffer.toArray(result);
+	}
+
 	/** Diese Methode gibt den {@link Getter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.
 	 *
 	 * @see Iterable#iterator()
