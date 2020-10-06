@@ -54,12 +54,12 @@ public final class FEMVariable extends FEMValue implements Property<FEMValue> {
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
-	public final FEMVariable data() {
+	public FEMVariable data() {
 		return this;
 	}
 
 	@Override
-	public final FEMType<FEMVariable> type() {
+	public FEMType<FEMVariable> type() {
 		return FEMVariable.TYPE;
 	}
 

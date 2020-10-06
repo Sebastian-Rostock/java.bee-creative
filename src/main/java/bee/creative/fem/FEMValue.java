@@ -61,18 +61,21 @@ public abstract class FEMValue extends FEMFunction {
 		return this;
 	}
 
-	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück. Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen
-	 * {@link FEMHandler#value() referenzierte Funktion}. Jeder andere Wert liefert sich selbst.
-	 *
-	 * @see FEMHandler
-	 * @return Funktion des Werts. */
-	public FEMFunction toFunction() {
-		return this;
-	}
-
 	@Override
 	public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 		Objects.notNull(frame);
+		return this;
+	}
+	
+	@Override
+	public FEMFunction concat(FEMFunction... params) throws NullPointerException {
+		Objects.notNull(params);
+		return this;
+	}
+	
+	@Override
+	public final FEMFunction compose(FEMFunction... params) throws NullPointerException {
+		Objects.notNull(params);
 		return this;
 	}
 
@@ -93,8 +96,22 @@ public abstract class FEMValue extends FEMFunction {
 	}
 
 	@Override
+	public final FEMFunction toClosure() {
+		return this;
+	}
+
+	@Override
 	public final FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
 		Objects.notNull(frame);
+		return this;
+	}
+
+	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück. Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen
+	 * {@link FEMHandler#value() referenzierte Funktion}. Jeder andere Wert liefert sich selbst.
+	 *
+	 * @see FEMHandler
+	 * @return Funktion des Werts. */
+	public FEMFunction toFunction() {
 		return this;
 	}
 

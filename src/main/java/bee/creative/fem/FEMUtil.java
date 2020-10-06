@@ -1,11 +1,12 @@
 package bee.creative.fem;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
-import bee.creative.util.Builders;
+import bee.creative.util.HashMap;
 
-/** Diese Klasse implementiert mit {@link #INSTANCES} eine statische Abbildung zur Verwaltung benannter Funktionen sowie einige generische Funktionen zur
- * Steuerung von Kontrollfluss und Variablen.
+/** Diese Klasse implementiert mit {@link #FUNCTIONS} eine statische Abbildung zur Verwaltung benannter Funktionen sowie einige generische Funktionen zur
+ * Steuerung von Kontrollfluss und Handhabung von Variablen.
  *
  * @see FEMFunction
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -13,7 +14,7 @@ public abstract class FEMUtil {
 
 	/** Dieses Feld bildet von Namen auf Funktionen ab, die auch bequem über {@link #put(FEMFunction, String...)} modifiziert und über {@link #get(String)}
 	 * gelesen werden können. */
-	public static final Map<String, FEMFunction> INSTANCES = Builders.MapBuilder.<String, FEMFunction>forHashMap().toSynchronized().get();
+	public static final Map<String, FEMFunction> FUNCTIONS = Collections.synchronizedMap(new HashMap<String, FEMFunction>());
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (condition: FEMBoolean; trueResult: FEMValue; falseResult: FEMValue): FEMValue}, deren
 	 * Ergebniswert über {@code (condition ? trueResult : falseResult)} ermittelt wird. */
@@ -131,7 +132,7 @@ public abstract class FEMUtil {
 			FEMUtil.assertSize(frame, 1, 1);
 			final FEMContext context = frame.context();
 			final FEMFunction method = frame.get(0).toFunction();
-			for (int count = 0; true; count++) {
+			for (int count = 1; true; count++) {
 				final FEMBoolean repeat = context.dataFrom(method.invoke(frame.withoutParams()), FEMBoolean.TYPE);
 				if (!repeat.value()) return FEMInteger.from(count);
 			}
@@ -145,10 +146,10 @@ public abstract class FEMUtil {
 	 * @param name Name.
 	 * @return Funktion oder {@code null}. */
 	public static FEMFunction get(final String name) {
-		return FEMUtil.INSTANCES.get(name);
+		return FEMUtil.FUNCTIONS.get(name);
 	}
 
-	/** Diese Methode registriert die gegebene Funktion unter den gegebenen Namen in {@link #INSTANCES} und gibt die Funktion zurück.
+	/** Diese Methode registriert die gegebene Funktion unter den gegebenen Namen in {@link #FUNCTIONS} und gibt die Funktion zurück.
 	 *
 	 * @param function Funktion.
 	 * @param names Namen.
@@ -156,7 +157,7 @@ public abstract class FEMUtil {
 	 * @throws NullPointerException Wenn {@code names} {@code null} ist. */
 	public static FEMFunction put(final FEMFunction function, final String... names) throws NullPointerException {
 		for (final String name: names) {
-			FEMUtil.INSTANCES.put(name, function);
+			FEMUtil.FUNCTIONS.put(name, function);
 		}
 		return function;
 	}

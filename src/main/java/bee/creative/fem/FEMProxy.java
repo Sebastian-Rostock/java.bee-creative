@@ -9,10 +9,14 @@ import bee.creative.lang.Objects;
  * Funktion} delegiert. Der Platzhalter wird zur erzeugung rekursiver Funktionsaufrufe eingesetz, weshalb {@link #hashCode() Streuwert} und
  * {@link #equals(Object) Äquivalenz} nicht auf diesem, sondern auf einer extra hierfür bereitgestellten {@link #id() Kennung} beruhen.
  *
- * @see FEMCompiler#proxy(String)
+ * @see FEMParser#proxies()
  * @see FEMCompiler#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMProxy extends FEMFunction implements Property<FEMFunction>, Emuable {
+
+	/** Dieses Feld speichert den leeren Platzhalter mit {@link FEMVoid#INSTANCE undefinierter Kennung}, {@link FEMString#EMPTY leerem Namen} und
+	 * {@link FEMVoid#INSTANCE undefinierter Funktion.}. */
+	public static final FEMProxy EMPTY = new FEMProxy(FEMVoid.INSTANCE, FEMString.EMPTY, FEMVoid.INSTANCE);
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(FEMString) FEMProxy.from(FEMString.from(id))}. */
 	public static FEMProxy from(final String id) throws NullPointerException {
@@ -120,7 +124,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 
 	@Override
 	public String toString() {
-		return FEMDomain.NORMAL.formatConst(this.name.toString());
+		return FEMDomain.NORMAL.formatIdent(this.name.toString());
 	}
 
 }

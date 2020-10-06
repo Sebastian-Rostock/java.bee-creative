@@ -3,8 +3,9 @@ package bee.creative.fem;
 /** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
  * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann. Der Wert kapselt dazu eine gegebene {@link #function() Funktion} sowie einen gegebenen
  * {@link #frame() Stapelrahmen} und wertet diese Funktion erst dann mit diesem Stapelrahmen einmalig aus, wenn auf {@link #type() Datentyp} oder {@link #data()
- * Nutzdaten} {@link #result(boolean) zugegriffen} wird, d.h. bei einem Aufruf von {@link #result(boolean)}. Der von der Funktion berechnete Ergebniswert wird
- * zur Wiederverwendung zwischengespeichert. Nach der einmaligen Auswertung der Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
+ * Nutzdaten} {@link #result(boolean) zugegriffen} wird, d.h. bei einem Aufruf von {@link #result(boolean)}, {@link #hashCode()}, {@link #equals(Object)} und
+ * {@link #toFunction()}. Der von der Funktion berechnete Ergebniswert wird zur Wiederverwendung zwischengespeichert. Nach der einmaligen Auswertung der
+ * Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFuture extends FEMValue {
@@ -22,7 +23,7 @@ public final class FEMFuture extends FEMValue {
 	 * {@link FEMValue} liefert.
 	 *
 	 * @return Auswertungsstatus. */
-	public final synchronized boolean ready() {
+	public synchronized boolean ready() {
 		return this.function instanceof FEMValue;
 	}
 
@@ -30,26 +31,26 @@ public final class FEMFuture extends FEMValue {
 	 * Stapelrahmen}.
 	 *
 	 * @return Stapelrahmen . */
-	public final synchronized FEMFrame frame() {
+	public synchronized FEMFrame frame() {
 		return this.frame;
 	}
 
 	/** Diese Methode gibt die Funktion zurück. Der erste Aufruf von {@link #result(boolean)} setzt die Funktion auf den Ergebniswert.
 	 *
 	 * @return Funktion. */
-	public final synchronized FEMFunction function() {
+	public synchronized FEMFunction function() {
 		return this.function;
 	}
 
 	/** Diese Methode gibt {@code this.result().data()} zurück. */
 	@Override
-	public final Object data() {
+	public Object data() {
 		return this.result().data();
 	}
 
 	/** Diese Methode gibt {@code this.result().type()} zurück. */
 	@Override
-	public final FEMType<?> type() {
+	public FEMType<?> type() {
 		return this.result().type();
 	}
 
@@ -63,7 +64,7 @@ public final class FEMFuture extends FEMValue {
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist. */
 	@Override
-	public final synchronized FEMValue result(final boolean deep) throws NullPointerException {
+	public synchronized FEMValue result(final boolean deep) throws NullPointerException {
 		final FEMValue result = this.function.invoke(this.frame).result(deep);
 		this.function = result;
 		this.frame = FEMFrame.EMPTY;
@@ -71,12 +72,17 @@ public final class FEMFuture extends FEMValue {
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return this.result().hashCode();
 	}
 
 	@Override
-	public final boolean equals(final Object object) {
+	public FEMFunction concat(final FEMFunction... params) throws NullPointerException {
+		return super.concat(params);
+	}
+
+	@Override
+	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMValue)) return false;
 		return this.result().equals(object);
@@ -86,6 +92,11 @@ public final class FEMFuture extends FEMValue {
 	public synchronized String toString() {
 		if (this.function instanceof FEMValue) return this.function.toString();
 		return this.function.toString() + this.frame.toString();
+	}
+
+	@Override
+	public FEMFunction toFunction() {
+		return this.result().toFunction();
 	}
 
 }

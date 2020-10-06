@@ -52,6 +52,11 @@ public final class FEMHandler extends FEMValue {
 		return this.value;
 	}
 
+	@Override
+	public FEMFunction concat(final FEMFunction... params) throws NullPointerException {
+		return this.value.compose(params);
+	}
+
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Funktionszeiger gleich der gegebenen ist.
 	 *
 	 * @param that Methode.

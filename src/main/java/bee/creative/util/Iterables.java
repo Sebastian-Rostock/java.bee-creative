@@ -701,7 +701,6 @@ public class Iterables {
 		if (iterable instanceof List<?>) return (List<GItem>)iterable;
 		final ArrayList<GItem> result = new ArrayList<>();
 		Iterables.addAll(result, iterable);
-		result.trimToSize();
 		return result;
 	}
 
@@ -713,15 +712,8 @@ public class Iterables {
 	 * @param <GItem> Typ der Elemente.
 	 * @return Array der Elemente.
 	 * @throws NullPointerException Wenn {@code result} bzw. {@code iterable} {@code null} ist. */
-	public static <GItem> GItem[] toArray(final GItem[] result, final Iterable<GItem> iterable) throws NullPointerException {
-		final Collection<GItem> buffer;
-		if (iterable instanceof Collection<?>) {
-			buffer = (Collection<GItem>)iterable;
-		} else {
-			buffer = new ArrayList<>();
-			Iterables.addAll(buffer, iterable);
-		}
-		return buffer.toArray(result);
+	public static <GItem> GItem[] toArray(final GItem[] result, final Iterable<? extends GItem> iterable) throws NullPointerException {
+		return (iterable instanceof Collection<?> ? (Collection<? extends GItem>)iterable : Iterables.toList(iterable)).toArray(result);
 	}
 
 	/** Diese Methode gibt den {@link Getter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.

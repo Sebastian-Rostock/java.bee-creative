@@ -30,22 +30,22 @@ public final class FEMVoid extends FEMValue {
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
-	public final FEMVoid data() {
+	public FEMVoid data() {
 		return this;
 	}
 
 	@Override
-	public final FEMType<FEMVoid> type() {
+	public FEMType<FEMVoid> type() {
 		return FEMVoid.TYPE;
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return 0;
 	}
 
 	@Override
-	public final boolean equals(Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (object instanceof FEMVoid) return true;
 		if (!(object instanceof FEMValue)) return false;
@@ -55,7 +55,7 @@ public final class FEMVoid extends FEMValue {
 
 	/** Diese Methode gibt {@code "void"} zurück. */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "void";
 	}
 

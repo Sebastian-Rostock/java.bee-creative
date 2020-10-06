@@ -84,35 +84,35 @@ public final class FEMTracer {
 	/** Diese Methode gibt die Überwachungsmethoden zurück.
 	 *
 	 * @return Überwachungsmethoden. */
-	public final Listener getListener() {
+	public Listener getListener() {
 		return this.listener;
 	}
 
 	/** Diese Methode gibt den aktuellen Ergebniswert der {@link #getFunction() aktuellen Funktion} zurück.
 	 *
 	 * @return Ergebniswert oder {@code null}. */
-	public final FEMValue getResult() {
+	public FEMValue getResult() {
 		return this.result;
 	}
 
 	/** Diese Methode gibt den aktuellen Stapelrahmen zurück, der zur Auswertung der {@link #getFunction() aktuellen Funktion} verwendet wird.
 	 *
 	 * @return Stapelrahmen oder {@code null}. */
-	public final FEMFrame getFrame() {
+	public FEMFrame getFrame() {
 		return this.frame;
 	}
 
 	/** Diese Methode gibt die aktuelle Funktion zurück, die mit dem {@link #getFrame() aktuellen Stapelrahmen} ausgewertet wird.
 	 *
 	 * @return Funktion oder {@code null}. */
-	public final FEMFunction getFunction() {
+	public FEMFunction getFunction() {
 		return this.function;
 	}
 
 	/** Diese Methode gibt die aktuelle Ausnahme der {@link #getFunction() aktuellen Funktion} zurück.
 	 *
 	 * @return Ausnahme oder {@code null}. */
-	public final RuntimeException getException() {
+	public RuntimeException getException() {
 		return this.exception;
 	}
 
@@ -121,7 +121,7 @@ public final class FEMTracer {
 	 * @param value Überwachungsmethoden.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final FEMTracer useListener(final Listener value) throws NullPointerException {
+	public FEMTracer useListener(final Listener value) throws NullPointerException {
 		this.listener = Objects.notNull(value);
 		return this;
 	}
@@ -132,7 +132,7 @@ public final class FEMTracer {
 	 * @param value Ergebniswert.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final FEMTracer useResult(final FEMValue value) throws NullPointerException {
+	public FEMTracer useResult(final FEMValue value) throws NullPointerException {
 		this.result = Objects.notNull(value);
 		this.exception = null;
 		return this;
@@ -144,7 +144,7 @@ public final class FEMTracer {
 	 * @param value Stapelrahmen.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final FEMTracer useFrame(final FEMFrame value) throws NullPointerException {
+	public FEMTracer useFrame(final FEMFrame value) throws NullPointerException {
 		this.frame = Objects.notNull(value);
 		return this;
 	}
@@ -154,7 +154,7 @@ public final class FEMTracer {
 	 * @param value Funktion.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final FEMTracer useFunction(final FEMFunction value) throws NullPointerException {
+	public FEMTracer useFunction(final FEMFunction value) throws NullPointerException {
 		this.function = Objects.notNull(value);
 		return this;
 	}
@@ -165,7 +165,7 @@ public final class FEMTracer {
 	 * @param value Ausnahme.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final FEMTracer useException(final RuntimeException value) throws NullPointerException {
+	public FEMTracer useException(final RuntimeException value) throws NullPointerException {
 		this.exception = Objects.notNull(value);
 		this.result = null;
 		return this;
@@ -178,7 +178,7 @@ public final class FEMTracer {
 	 * @see #getResult()
 	 * @see #getException()
 	 * @return {@code this}. */
-	public final FEMTracer clear() {
+	public FEMTracer clear() {
 		this.frame = null;
 		this.function = null;
 		this.result = null;
@@ -187,7 +187,7 @@ public final class FEMTracer {
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return Objects.toFormatString(true, true, this, "listener", this.listener, "frame", this.frame, "function", this.function, "result", this.result,
 			"exception", this.exception);
 	}
