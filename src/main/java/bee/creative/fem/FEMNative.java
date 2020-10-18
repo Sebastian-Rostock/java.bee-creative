@@ -44,46 +44,36 @@ public final class FEMNative extends FEMValue {
 		this.data = data;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wert gleich dem gegebenen ist. Dies ist nur dann der Fall, wenn die {@link #data() Nutzdaten}
-	 * einander gleichen, d.h. {@code Objects.equals(this.data(), that.data())}.
-	 *
-	 * @param that Wert.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMNative that) throws NullPointerException {
-		if (this == that) return true;
-		return Objects.equals(this.data, that.data);
-	}
-
 	/** Diese Methode gibt das native Objekt zurück. */
 	@Override
-	public final Object data() {
+	public Object data() {
 		return this.data;
 	}
 
 	@Override
-	public final FEMType<Object> type() {
+	public FEMType<Object> type() {
 		return FEMNative.TYPE;
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return Objects.hash(this.data);
 	}
 
 	@Override
-	public final boolean equals(Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMNative)) {
 			if (!(object instanceof FEMValue)) return false;
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMNative)) return false;
 		}
-		return this.equals((FEMNative)object);
+		final FEMNative that = (FEMNative)object;
+		return Objects.equals(this.data, that.data);
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return Objects.toString(this.data);
 	}
 

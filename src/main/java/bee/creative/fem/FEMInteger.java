@@ -69,28 +69,36 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
-	public final FEMInteger data() {
+	public FEMInteger data() {
 		return this;
 	}
 
 	@Override
-	public final FEMType<FEMInteger> type() {
+	public FEMType<FEMInteger> type() {
 		return FEMInteger.TYPE;
 	}
 
 	/** Diese Methode gibt die interne Darstellung der Dezimalzahl zurück.
 	 *
 	 * @return interne Darstellung der Dezimalzahl. */
-	public final long value() {
+	public long value() {
 		return this.value;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Dezimalzahl gleich der gegebenen ist.
-	 *
-	 * @param that Dezimalzahl.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMInteger that) throws NullPointerException {
+	@Override
+	public int hashCode() {
+		return Integers.toIntL(this.value) ^ Integers.toIntH(this.value);
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMInteger)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMInteger)) return false;
+		}
+		final FEMInteger that = (FEMInteger)object;
 		return this.value == that.value;
 	}
 
@@ -99,29 +107,9 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	 * @param that Dezimalzahl.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final int compare(final FEMInteger that) throws NullPointerException {
+	@Override
+	public int compareTo(final FEMInteger that) throws NullPointerException {
 		return Comparators.compare(this.value, that.value);
-	}
-
-	@Override
-	public final int hashCode() {
-		return Integers.toIntL(this.value) ^ Integers.toIntH(this.value);
-	}
-
-	@Override
-	public final boolean equals(Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMInteger)) {
-			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).data();
-			if (!(object instanceof FEMInteger)) return false;
-		}
-		return this.equals((FEMInteger)object);
-	}
-
-	@Override
-	public final int compareTo(final FEMInteger value) {
-		return this.compare(value);
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Dezimalzahl zurück.
@@ -129,14 +117,14 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	 * @see Long#toString()
 	 * @return Textdarstellung. */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return Long.toString(this.value);
 	}
 
 	/** Diese Methode gibt diese Dezimalzahl als {@link Long} zurück.
 	 *
 	 * @return {@link Long}. */
-	public final Long toNumber() {
+	public Long toNumber() {
 		return new Long(this.value);
 	}
 

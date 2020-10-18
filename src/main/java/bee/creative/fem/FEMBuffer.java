@@ -6,8 +6,7 @@ import bee.creative.bind.Property;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMArray.CompactArray3;
-import bee.creative.fem.FEMFunction.ClosureFunction;
-import bee.creative.fem.FEMFunction.CompositeFunction;
+import bee.creative.fem.FEMFunction.CompositeFunction1;
 import bee.creative.fem.FEMFunction.ConcatFunction;
 import bee.creative.io.MappedBuffer;
 import bee.creative.lang.Integers;
@@ -287,10 +286,10 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld speichert die Typkennung für {@link ConcatFunction}. */
 	protected static final byte TYPE_CONCAT_ADDR1 = 30;
 
-	/** Dieses Feld speichert die Typkennung für {@link ClosureFunction}. */
+	/** Dieses Feld speichert die Typkennung für {@link FEMClosure}. */
 	protected static final byte TYPE_CLOSURE_ADDR1 = 31;
 
-	/** Dieses Feld speichert die Typkennung für {@link CompositeFunction}. */
+	/** Dieses Feld speichert die Typkennung für {@link CompositeFunction1}. */
 	protected static final byte TYPE_COMPOSITE_ADDR1 = 32;
 
 	/** Dieses Feld speichert die Adresse des nächsten Speicherbereichs. */
@@ -443,7 +442,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return result;
 	}
 
-	/** Diese Methode gibt die {@link #getRef(int, long) Referenz mit den gegebenen Eigenschaften} zurück und speichert diese zur {@link #cleanup() Wiederverwendung}.
+	/** Diese Methode gibt die {@link #getRef(int, long) Referenz mit den gegebenen Eigenschaften} zurück und speichert diese zur {@link #cleanup()
+	 * Wiederverwendung}.
 	 *
 	 * @param head Kopfdaten, bspw. Typkennung (6 Bit).
 	 * @param body Rumpfdaten, bspw. Adresse (58 Bit).
@@ -576,8 +576,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		if (src instanceof FEMProxy) return this.putProxyAsRef((FEMProxy)src);
 		if (src instanceof FEMParam) return this.putParamAsRef((FEMParam)src);
 		if (src instanceof ConcatFunction) return this.putConcatAsRef((ConcatFunction)src);
-		if (src instanceof ClosureFunction) return this.putClosureAsRef((ClosureFunction)src);
-		if (src instanceof CompositeFunction) return this.putCompositeAsRef((CompositeFunction)src);
+		if (src instanceof FEMClosure) return this.putClosureAsRef((FEMClosure)src);
+		if (src instanceof CompositeFunction1) return this.putCompositeAsRef((CompositeFunction1)src);
 		throw new IllegalArgumentException();
 	}
 
@@ -916,29 +916,29 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code functionRef: long}) enthaltene Funktionsbindung zurück. */
-	protected ClosureFunction getClosureByAddr(final long addr) throws IllegalArgumentException {
-		return new ClosureFunction(this.getAt(addr));
+	protected FEMClosure getClosureByAddr(final long addr) throws IllegalArgumentException {
+		return new FEMClosure(this.getAt(addr));
 	}
 
 	/** Diese Methode fügt die gegebene Funktionsbindung in den Puffer ein und gibt die Referenz darauf zurück. */
-	protected long putClosureAsRef(final ClosureFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	protected long putClosureAsRef(final FEMClosure src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		final long addr = this.putData(8);
-		this.buffer.putLong(addr, this.put(src.function));
+		this.buffer.putLong(addr, this.put(src.target));
 		return this.putRef(FEMBuffer.TYPE_CLOSURE_ADDR1, addr);
 	}
 
 	/** Diese Methode gibt dden im gegebenen Speicherbereich ({@code count: int, align: int, callRef: long, paramRef: long[count]}) enthaltenen Funktionsaufruf
 	 * zurück. */
-	protected CompositeFunction getCompositeByAddr(final long addr) throws IllegalArgumentException {
-		return new CompositeFunction(this.getAt(addr + 8), this.getAllAt(addr + 16, this.buffer.getInt(addr)));
+	protected CompositeFunction1 getCompositeByAddr(final long addr) throws IllegalArgumentException {
+		return new CompositeFunction1(this.getAt(addr + 8), this.getAllAt(addr + 16, this.buffer.getInt(addr)));
 	}
 
 	/** Diese Methode fügt den gegebenen Funktionsaufruf in den Puffer ein und gibt die Referenz darauf zurück. */
-	protected long putCompositeAsRef(final CompositeFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	protected long putCompositeAsRef(final CompositeFunction1 src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		final int count = src.params.length;
 		final long addr = this.putData((count * 8L) + 16L);
 		this.buffer.putInt(addr, new int[]{count, 0});
-		this.buffer.putLong(addr + 8, this.put(src.function));
+		this.buffer.putLong(addr + 8, this.put(src.target));
 		this.buffer.putLong(addr + 16, this.putAll(src.params));
 		return this.putRef(FEMBuffer.TYPE_COMPOSITE_ADDR1, addr);
 	}

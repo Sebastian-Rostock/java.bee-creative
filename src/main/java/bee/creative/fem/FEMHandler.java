@@ -2,8 +2,8 @@ package bee.creative.fem;
 
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. ein als {@link FEMValue} verpackter Verweis auf eine {@link FEMFunction Funktion}.
- * Intern wird der Funktionszeiger als {@link FEMFunction} dargestellt.
+/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, als einen als {@link FEMValue} verpackten Verweis auf eine {@link FEMFunction Funktion}.
+ * Das {@link #compose(FEMFunction...) Komponieren} eines Funktionszeigers entspricht dem Komponieren der referenzierten {@link #value() Funktion}.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMHandler extends FEMValue {
@@ -27,7 +27,6 @@ public final class FEMHandler extends FEMValue {
 		return new FEMHandler(Objects.notNull(function));
 	}
 
-	/** Dieses Feld speichert die Nutzdaten. */
 	final FEMFunction value;
 
 	FEMHandler(final FEMFunction value) {
@@ -36,43 +35,34 @@ public final class FEMHandler extends FEMValue {
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
-	public final FEMHandler data() {
+	public FEMHandler data() {
 		return this;
 	}
 
 	@Override
-	public final FEMType<FEMHandler> type() {
+	public FEMType<FEMHandler> type() {
 		return FEMHandler.TYPE;
 	}
 
 	/** Diese Methode gibt die Funktion zurück.
 	 *
 	 * @return Funktion. */
-	public final FEMFunction value() {
+	public FEMFunction value() {
 		return this.value;
 	}
 
 	@Override
-	public FEMFunction concat(final FEMFunction... params) throws NullPointerException {
-		return this.value.compose(params);
-	}
-
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Funktionszeiger gleich der gegebenen ist.
-	 *
-	 * @param that Methode.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMHandler that) throws NullPointerException {
-		return this.value.equals(that.value);
+	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
+		return new CompositeFunction2(this, params.clone());
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return this.value.hashCode();
 	}
 
 	@Override
-	public final boolean equals(Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMHandler)) {
 			if (!(object instanceof FEMValue)) return false;
@@ -80,23 +70,24 @@ public final class FEMHandler extends FEMValue {
 			if (!(object instanceof FEMHandler)) return false;
 		}
 		if (object == null) return false;
-		return this.equals((FEMHandler)object);
+		final FEMHandler that = (FEMHandler)object;
+		return Objects.equals(this.value, that.value);
 	}
 
 	@Override
-	public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-		return FEMHandler.from(this.value.withTracer(tracer));
+	public FEMFunction trace(final FEMTracer tracer) throws NullPointerException {
+		return FEMHandler.from(this.value.trace(tracer));
 	}
 
 	@Override
-	public final String toString() {
-		final FEMFormatter target = new FEMFormatter();
-		FEMDomain.NORMAL.formatHandler(target, this);
-		return target.format();
+	public String toString() {
+		final FEMFormatter res = new FEMFormatter();
+		FEMDomain.DEFAULT.formatHandler(res, this);
+		return res.format();
 	}
 
 	@Override
-	public final FEMFunction toFunction() {
+	public FEMFunction toFunction() { // DONE
 		return this.value;
 	}
 

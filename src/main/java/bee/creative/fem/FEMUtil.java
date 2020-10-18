@@ -23,9 +23,9 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 3, 3);
-			final FEMBoolean condition = frame.context().dataFrom(frame.get(0), FEMBoolean.TYPE);
-			final FEMValue result = frame.get(condition.value() ? 1 : 2).result();
-			return result;
+			final FEMBoolean con = frame.context().dataFrom(frame.get(0), FEMBoolean.TYPE);
+			final FEMValue res = frame.get(con.value() ? 1 : 2).result();
+			return res;
 		}
 
 	}, "if", "IF");
@@ -37,10 +37,10 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 2, 2);
-			final FEMVariable variable = frame.context().dataFrom(frame.get(0), FEMVariable.TYPE);
-			final FEMValue value = frame.get(1);
-			variable.set(value);
-			return value;
+			final FEMVariable var = frame.context().dataFrom(frame.get(0), FEMVariable.TYPE);
+			final FEMValue res = frame.get(1);
+			var.set(res);
+			return res;
 		}
 
 	}, "set", "SET");
@@ -52,8 +52,9 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 1, 1);
-			final FEMVariable variable = frame.context().dataFrom(frame.get(0), FEMVariable.TYPE);
-			return variable.get();
+			final FEMVariable var = frame.context().dataFrom(frame.get(0), FEMVariable.TYPE);
+			final FEMValue res = var.get();
+			return res;
 		}
 
 	}, "get", "GET");
@@ -65,9 +66,9 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 1, 1);
-			final FEMValue value = frame.get(0);
-			final FEMVariable result = FEMVariable.from(value);
-			return result;
+			final FEMValue val = frame.get(0);
+			final FEMVariable res = FEMVariable.from(val);
+			return res;
 		}
 
 	}, "var", "VAR");
@@ -83,8 +84,8 @@ public abstract class FEMUtil {
 			for (int i = 0; i < size; i++) {
 				frame.get(i).result();
 			}
-			final FEMValue result = frame.get(size).result();
-			return result;
+			final FEMValue res = frame.get(size).result();
+			return res;
 		}
 
 	}, "eval", "EVAL");
@@ -97,10 +98,10 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
 			FEMUtil.assertSize(frame, 2, 2);
-			final FEMArray array = frame.context().dataFrom(frame.get(1), FEMArray.TYPE);
-			final FEMFunction method = frame.get(0).toFunction();
-			final FEMFrame params = frame.withParams(array);
-			return method.invoke(params);
+			final FEMArray arr = frame.context().dataFrom(frame.get(1), FEMArray.TYPE);
+			final FEMFunction fun = frame.get(0).toFunction();
+			final FEMValue res = fun.invoke(frame.withParams(arr));
+			return res;
 		}
 
 	}, "call", "CALL");
@@ -112,11 +113,11 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
 			FEMUtil.assertSize(frame, 1, Integer.MAX_VALUE);
-			final int index = frame.size() - 1;
-			final FEMArray array = frame.params().section(0, index);
-			final FEMFunction method = frame.get(index).toFunction();
-			final FEMFrame params = frame.withParams(array);
-			return method.invoke(params);
+			final int idx = frame.size() - 1;
+			final FEMArray arr = frame.params().section(0, idx);
+			final FEMFunction fun = frame.get(idx).toFunction();
+			final FEMValue res = fun.invoke(frame.withParams(arr));
+			return res;
 		}
 
 	}, "apply", "APPLY");
@@ -130,11 +131,11 @@ public abstract class FEMUtil {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			FEMUtil.assertSize(frame, 1, 1);
-			final FEMContext context = frame.context();
-			final FEMFunction method = frame.get(0).toFunction();
+			final FEMContext ctx = frame.context();
+			final FEMFunction fun = frame.get(0).toFunction();
 			for (int count = 1; true; count++) {
-				final FEMBoolean repeat = context.dataFrom(method.invoke(frame.withoutParams()), FEMBoolean.TYPE);
-				if (!repeat.value()) return FEMInteger.from(count);
+				final FEMBoolean rep = ctx.dataFrom(fun.invoke(frame.withoutParams()), FEMBoolean.TYPE);
+				if (!rep.value()) return FEMInteger.from(count);
 			}
 		}
 

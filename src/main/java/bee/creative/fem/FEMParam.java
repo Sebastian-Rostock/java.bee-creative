@@ -69,15 +69,22 @@ public final class FEMParam extends FEMFunction {
 	}
 
 	@Override
-	public final int hashCode() {
+	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
+		if (this.index < params.length) return params[this.index];
+		return FEMParam.from(this.index - params.length);
+	}
+
+	@Override
+	public int hashCode() {
 		return this.index;
 	}
 
 	@Override
-	public final boolean equals(final Object object) {
+	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMParam)) return false;
-		return this.index == ((FEMParam)object).index;
+		final FEMParam that = (FEMParam)object;
+		return this.index == that.index;
 	}
 
 	@Override

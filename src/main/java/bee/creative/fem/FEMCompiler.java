@@ -1,71 +1,68 @@
 package bee.creative.fem;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import bee.creative.lang.Objects;
+import bee.creative.util.HashMap;
 import bee.creative.util.Parser.Token;
 
-/** Diese Klasse implementiert einen Kompiler, welcher als {@link FEMParser} auf den {@link FEMScript#types() Abscnittstypen} eines {@link FEMScript
- * aufbereiteten Quelltexts} arbeitet.
+/** Diese Klasse implementiert ein Objekt zur Bereitstellung eines {@link #token() typisierten Abschnitt} eines {@link FEMScript aufbereiteten Quelltexts}, um
+ * diesen Abschnitt in {@link FEMFunction Funktionen} überführen zu können. Dazu wird auch eine {@link #proxies() Abbildung von Namen auf Platzhalter} zur
+ * {@link #proxy(String) Bestückung bzw. Wiederverwendung} derselben bereitgestellt.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMCompiler {
 
-	private final FEMScript script;
+	private final Token token;
 
-	private final Map<String, FEMProxy> proxies = new LinkedHashMap<>();
+	private final Map<String, FEMProxy> proxies;
 
-	private Token token;
-
-	/** Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
-	 *
-	 * @param script Quelltext.
-	 * @throws NullPointerException Wenn {@code script} {@code null} ist.
-	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-	public FEMCompiler(final FEMScript script) throws NullPointerException {
-
-		this.script = script;
+	private FEMCompiler(final FEMCompiler parent, final Token token) throws NullPointerException {
+		this.token = token;
+		this.proxies = parent.proxies;
 	}
 
-	/** Diese Methode gibt den zu kompilierenden aufbereiteten Quelltext zurück. */
-	public FEMScript script() {
-		return this.script;
+	/** Dieser Konstruktor initialisiert den Kompiler mit dem {@link Token#EMPTY leeren Abschnitt} sowie eine leere Plazhalterabbildung. */
+	public FEMCompiler() {
+		this.token = Token.EMPTY;
+		this.proxies = new HashMap<>();
 	}
 
-	/** Diese Methode gibt die {@link Token#start() Startposition} des {@link #token() aktuellen Abscnitts} zurück. Sie ist eine Abkürzung für
-	 * {@link Token#start() this.token().start()}. */
-	public int scriptIndex() {
-		return this.token().start();
+	/** Diese Methode gibt einen neuen Kompiller mit dem gegebenen typisierten Abschnitt zurück. Der gelieferte Kompiler verwendet die {@link #proxies() Abbildung
+	 * von Namen auf Platzhalter} dieses Kompilers. */
+	public FEMCompiler with(final Token token) throws NullPointerException {
+		return new FEMCompiler(this, Objects.notNull(token));
 	}
 
-	/** Diese Methode gibt den Quelltexts zurück. Sie ist eine Abkürzung für {@link FEMScript#source() this.script().source()}. */
-	public String scriptSource() {
-		return this.script().source();
-	}
-
-	/** Diese Methode gibt die Spaltennummer zur {@link #scriptIndex() aktuellen Quelltextposition} zurück. */
-	public int scriptColIndex() {
-		final String src = this.scriptSource();
-		final int pos = this.scriptIndex(), add = src.lastIndexOf('\n', pos);
-		return (pos + 1) - (add < 0 ? 0 : add);
-	}
-
-	/** Diese Methode gibt die Zeilennummer zur {@link #scriptIndex() aktuellen Quelltextposition} zurück. */
-	public int scriptRowIndex() {
-		final String src = this.scriptSource();
-		int res = 0;
-		for (int pos = this.scriptIndex() + 1; pos >= 0; pos = src.lastIndexOf('\n', pos - 1), res++) {}
-		return res;
-	}
-
-	/** Diese Methode gibt den aktuellen Abscnitt zurück. */
+	/** Diese Methode gibt den aktuellen Abschnitt zurück. */
 	public Token token() {
 		return this.token;
 	}
 
-	public FEMCompiler token(final Token token) throws NullPointerException {
-		this.token = Objects.notNull(token);
-		return this;
+	/** Diese Methode gibt die Zeichenkette zurück, auf die sich die Positionsangaben dieses Abschnitts beziehen. Sie ist eine Abkürzung für {@link Token#source()
+	 * this.token().source()}. */
+	public String source() {
+		return this.token.source();
+	}
+
+	/** Diese Methode gibt die {@link Token#start() Startposition} des {@link #token() aktuellen Abschnitts} zurück. Sie ist eine Abkürzung für
+	 * {@link Token#start() this.token().start()}. */
+	public int srcIndex() {
+		return this.token.start();
+	}
+
+	/** Diese Methode gibt die Spaltennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
+	public int colIndex() {
+		final String src = this.source();
+		final int pos = this.srcIndex(), add = src.lastIndexOf('\n', pos);
+		return (pos + 1) - (add < 0 ? 0 : add);
+	}
+
+	/** Diese Methode gibt die Zeilennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
+	public int rowIndex() {
+		final String src = this.source();
+		int res = 0;
+		for (int pos = this.srcIndex() + 1; pos >= 0; pos = src.lastIndexOf('\n', pos - 1), res++) {}
+		return res;
 	}
 
 	/** Diese Methode gibt den Platzhalter mit dem gegebenen {@link FEMProxy#name() Namen} zurück.
@@ -88,7 +85,7 @@ public class FEMCompiler {
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.script(), this.proxies());
+		return Objects.toInvokeString(this, this.token(), this.proxies());
 	}
 
 }

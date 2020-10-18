@@ -828,7 +828,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	protected int customFind(final FEMArray that, final int offset) {
 		final FEMValue value = that.customGet(0);
 		final int count = (this.length - that.length) + 1;
-		for (int result = offset; true;result++) {
+		for (int result = offset; true; result++) {
 			result = this.customFind(value, result, count - result, true);
 			if (result < 0) return -1;
 			if (this.customEquals(that, result)) return result;
@@ -1141,7 +1141,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	@Override
 	public String toString() {
 		final FEMFormatter target = new FEMFormatter();
-		FEMDomain.NORMAL.formatArray(target, this);
+		FEMDomain.DEFAULT.formatArray(target, this);
 		return target.format();
 	}
 

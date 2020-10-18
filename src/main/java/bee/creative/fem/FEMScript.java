@@ -56,6 +56,16 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		return this.root;
 	}
 
+	/** Diese Methode gibt die Anzahl der Abschnitte zurück.
+	 *
+	 * @see #get(int)
+	 * @see #tokens()
+	 * @see #iterator()
+	 * @return Anzahl der Abschnitte. */
+	public int size() {
+		return this.tokens.length;
+	}
+
 	/** Diese Methode gibt die Verkettung der {@link Token#type() Abschnittstypen} der {@link #tokens() Abschnitte} als Zeichenkette zurück.
 	 *
 	 * @see Token#type()
@@ -70,31 +80,21 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 		return new String(result);
 	}
 
-	/** Diese Methode gibt die Anzahl der Abschnitte zurück.
-	 *
-	 * @see #get(int)
-	 * @see #tokens()
-	 * @see #iterator()
-	 * @return Anzahl der Abschnitte. */
-	public int count() {
-		return this.tokens.length;
-	}
-
-	/** Diese Methode gibt eine Kopie der Abschnitte zurück.
-	 *
-	 * @see #get(int)
-	 * @see #count()
-	 * @see #iterator()
-	 * @return Abschnitte. */
-	public Token[] tokens() {
-		return this.tokens.clone();
-	}
-
 	/** Diese Methode liefert die {@link Token#source() Eingabe} des {@link #root() Wurzelknoten}.
 	 *
 	 * @return Eingabezeichenkette. */
 	public String source() {
 		return this.root.source();
+	}
+
+	/** Diese Methode gibt eine Kopie der Abschnitte zurück.
+	 *
+	 * @see #get(int)
+	 * @see #size()
+	 * @see #iterator()
+	 * @return Abschnitte. */
+	public Token[] tokens() {
+		return this.tokens.clone();
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public final class FEMScript implements Items<Token>, Iterable<Token> {
 
 	@Override
 	public Iterator<Token> iterator() {
-		return Iterators.itemsIterator(this, 0, this.count());
+		return Iterators.itemsIterator(this, 0, this.size());
 	}
 
 	@Override

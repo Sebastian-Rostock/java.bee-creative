@@ -53,7 +53,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @see #getValue()
 	 * @param value Wert oder {@code null}.
 	 * @return {@code this}. */
-	public final FEMException useValue(final FEMValue value) {
+	public FEMException useValue(final FEMValue value) {
 		this.value = value;
 		return this;
 	}
@@ -63,7 +63,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @see #getCause()
 	 * @param cause Ursache des Ausnahmefalls.
 	 * @return {@code this}. */
-	public final FEMException useCause(final Throwable cause) {
+	public FEMException useCause(final Throwable cause) {
 		this.cause = cause;
 		return this;
 	}
@@ -73,7 +73,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @see #getContext()
 	 * @param context Kontextobjekt oder {@code null}.
 	 * @return {@code this}. */
-	public final FEMException useContext(final FEMContext context) {
+	public FEMException useContext(final FEMContext context) {
 		this.context = context;
 		return this;
 	}
@@ -81,7 +81,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	/** Diese Methode gibt den Wert zurück, der die {@link #getCause() Ursache} des Ausnahmefalls genauer beschreibt.
 	 *
 	 * @return Wert oder {@code null}. */
-	public final FEMValue getValue() {
+	public FEMValue getValue() {
 		return this.value;
 	}
 
@@ -89,7 +89,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * {@link #getValue() Werts} eingesetzt werden kann.
 	 *
 	 * @return Kontextobjekt oder {@code null}. */
-	public final FEMContext getContext() {
+	public FEMContext getContext() {
 		return this.context;
 	}
 
@@ -98,7 +98,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @see #push(String)
 	 * @see #clearMessages()
 	 * @return Nachrichten. */
-	public final List<String> getMessages() {
+	public List<String> getMessages() {
 		return Collections.unmodifiableList(this.messages);
 	}
 
@@ -106,7 +106,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 *
 	 * @see #getMessages()
 	 * @return {@code this}. */
-	public final FEMException clearMessages() {
+	public FEMException clearMessages() {
 		this.messages.clear();
 		return this;
 	}
@@ -117,7 +117,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @see List#add(Object)
 	 * @param message Nachricht oder {@code null}.
 	 * @return {@code this}. */
-	public final FEMException push(final String message) {
+	public FEMException push(final String message) {
 		if (message == null) return this;
 		this.messages.add(message);
 		return this;
@@ -133,7 +133,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@link String#format(String, Object...)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalFormatException Wenn {@link String#format(String, Object...)} eine entsprechende Ausnahme auslöst. */
-	public final FEMException push(final String format, final Object... args) throws NullPointerException, IllegalFormatException {
+	public FEMException push(final String format, final Object... args) throws NullPointerException, IllegalFormatException {
 		if (format == null) return this;
 		return this.push(String.format(format, args));
 	}
@@ -146,7 +146,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @param messages Nachrichten oder {@code null}.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code messages} {@code null} ist. */
-	public final FEMException pushAll(final String... messages) {
+	public FEMException pushAll(final String... messages) {
 		if (messages == null) return this;
 		return this.pushAll(Arrays.asList(messages));
 	}
@@ -158,24 +158,24 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @see Iterables#addAll(Collection, Iterable)
 	 * @param messages Nachrichten oder {@code null}.
 	 * @return {@code this}. */
-	public final FEMException pushAll(final Iterable<String> messages) {
+	public FEMException pushAll(final Iterable<String> messages) {
 		if (messages == null) return this;
 		Iterables.addAll(this.messages, Iterables.filteredIterable(Filters.nullFilter(), messages));
 		return this;
 	}
 
 	@Override
-	public final Iterator<String> iterator() {
+	public Iterator<String> iterator() {
 		return this.messages.iterator();
 	}
 
 	@Override
-	public final synchronized Throwable getCause() {
+	public synchronized Throwable getCause() {
 		return this.cause;
 	}
 
 	@Override
-	public final String getMessage() {
+	public String getMessage() {
 		return Strings.join("\n", this.messages);
 	}
 

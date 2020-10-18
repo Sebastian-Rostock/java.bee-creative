@@ -620,12 +620,12 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
-	public final FEMDuration data() {
+	public FEMDuration data() {
 		return this;
 	}
 
 	@Override
-	public final FEMType<FEMDuration> type() {
+	public FEMType<FEMDuration> type() {
 		return FEMDuration.TYPE;
 	}
 
@@ -644,7 +644,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * </ul>
 	 *
 	 * @return interne Darstellung der Zeitspanne. */
-	public final long value() {
+	public long value() {
 		return Integers.toLong(this.valueH, this.valueL);
 	}
 
@@ -652,7 +652,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * kleiner als, gleich bzw. größer als {@code 0} sind.
 	 *
 	 * @return Vorzeichen. */
-	public final int signValue() {
+	public int signValue() {
 		if ((this.valueH | this.valueL) == 0) return 0;
 		return (this.valueH & 0x020000) != 0 ? -1 : +1;
 	}
@@ -660,49 +660,49 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	/** Diese Methode gibt die Anzahl der Jahre zurück.
 	 *
 	 * @return Anzahl der Jahre ({@code 0..9999}). */
-	public final int yearsValue() {
+	public int yearsValue() {
 		return (this.valueH >> 18) & 0x3FFF;
 	}
 
 	/** Diese Methode gibt die Anzahl der Monate zurück.
 	 *
 	 * @return Anzahl der Monate ({@code 0..11}). */
-	public final int monthsValue() {
+	public int monthsValue() {
 		return (this.valueL >> 10) & 0x0F;
 	}
 
 	/** Diese Methode gibt die Anzahl der Tage zurück.
 	 *
 	 * @return Anzahl der Tage ({@code 0..146096}). */
-	public final int daysValue() {
+	public int daysValue() {
 		return (this.valueL >> 14) & 0x03FFFF;
 	}
 
 	/** Diese Methode gibt die Anzahl der Stunden zurück.
 	 *
 	 * @return Anzahl der Stunde ({@code 0..23}). */
-	public final int hoursValue() {
+	public int hoursValue() {
 		return (this.valueH >> 12) & 0x1F;
 	}
 
 	/** Diese Methode gibt die Anzahl der Minuten zurück.
 	 *
 	 * @return Anzahl der Minuten ({@code 0..59}). */
-	public final int minutesValue() {
+	public int minutesValue() {
 		return (this.valueH >> 6) & 0x3F;
 	}
 
 	/** Diese Methode gibt die Anzahl der Sekunden zurück.
 	 *
 	 * @return Anzahl der Sekunden ({@code 0..59}). */
-	public final int secondsValue() {
+	public int secondsValue() {
 		return (this.valueH >> 0) & 0x3F;
 	}
 
 	/** Diese Methode gibt die Anzahl der Millisekunden zurück.
 	 *
 	 * @return Anzahl der Millisekunden ({@code 0..999}). */
-	public final int millisecondsValue() {
+	public int millisecondsValue() {
 		return (this.valueL >> 0) & 0x03FF;
 	}
 
@@ -710,14 +710,14 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * {@link #secondsValue()} und {@link #millisecondsValue()} zusammen.
 	 *
 	 * @return Gesamtanzahl der Millisekunden ({@code 0..315569519999999}). */
-	public final long durationmillisValue() {
+	public long durationmillisValue() {
 		return FEMDuration.durationmillisOfImpl(this.daysValue(), this.hoursValue(), this.minutesValue(), this.secondsValue(), this.millisecondsValue());
 	}
 
 	/** Diese Methode gibt die Gesamtanzahl der Monate zurück. Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
 	 *
 	 * @return Gesamtanzahl der Monate ({@code 0..119999}). */
-	public final int durationmonthsValue() {
+	public int durationmonthsValue() {
 		return FEMDuration.durationmonthsOfImpl(this.yearsValue(), this.monthsValue());
 	}
 
@@ -725,7 +725,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 *
 	 * @see #signValue()
 	 * @return Zeitspanne mit umgekehrten Vorzeichen. */
-	public final FEMDuration negate() {
+	public FEMDuration negate() {
 		if (this.signValue() == 0) return this;
 		return new FEMDuration(this.valueH ^ 0x020000, this.valueL);
 	}
@@ -736,7 +736,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param durationmillis Gesamtanzahl der Millisekunden.
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public final FEMDuration move(final int durationmonths, final int durationmillis) throws IllegalArgumentException {
+	public FEMDuration move(final int durationmonths, final int durationmillis) throws IllegalArgumentException {
 		FEMDuration.checkMonths(-durationmonths);
 		FEMDuration.checkMonths(+durationmonths);
 		return this.moveImpl(durationmonths, durationmillis);
@@ -748,7 +748,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -315569519999999..315569519999999}).
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public final FEMDuration move(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
+	public FEMDuration move(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
 		FEMDuration.checkMonths(-durationmonths);
 		FEMDuration.checkMonths(+durationmonths);
 		FEMDuration.checkMilliseconds(+durationmillis);
@@ -770,8 +770,8 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param milliseconds Anzahl der Millisekunden.
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public final FEMDuration move(final int years, final int months, final int days, final int hours, final int minutes, final int seconds,
-		final int milliseconds) throws IllegalArgumentException {
+	public FEMDuration move(final int years, final int months, final int days, final int hours, final int minutes, final int seconds, final int milliseconds)
+		throws IllegalArgumentException {
 		return this.moveImpl(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, minutes, seconds, milliseconds));
 	}
 
@@ -789,8 +789,8 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param milliseconds Anzahl der Millisekunden ({@code -315569519999999..315569519999999}).
 	 * @return verschobene Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public final FEMDuration move(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
-		final long milliseconds) throws IllegalArgumentException {
+	public FEMDuration move(final int years, final int months, final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
+		throws IllegalArgumentException {
 		return this.moveImpl(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, minutes, seconds, milliseconds));
 	}
 
@@ -801,12 +801,12 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @return verschobene Zeitspanne.
 	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public final FEMDuration move(final FEMDuration duration, final boolean negate) throws NullPointerException, IllegalArgumentException {
+	public FEMDuration move(final FEMDuration duration, final boolean negate) throws NullPointerException, IllegalArgumentException {
 		if ((duration.signValue() > 0) == negate) return this.move(-duration.durationmonthsValue(), -duration.durationmillisValue());
 		return this.move(duration.durationmonthsValue(), duration.durationmillisValue());
 	}
 
-	final FEMDuration moveImpl(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
+	FEMDuration moveImpl(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
 		if (this.signValue() < 0) return FEMDuration.from(durationmonths - this.durationmonthsValue(), durationmillis - this.durationmillisValue());
 		return FEMDuration.from(durationmonths + this.durationmonthsValue(), durationmillis + this.durationmillisValue());
 	}
@@ -817,7 +817,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param factor Faktor.
 	 * @return Multiplizierte Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public final FEMDuration multiply(final int factor) throws IllegalArgumentException {
+	public FEMDuration multiply(final int factor) throws IllegalArgumentException {
 		return FEMDuration.from(this.durationmonthsValue() * factor, this.durationmillisValue() * factor);
 	}
 
@@ -828,19 +828,31 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param denominator Nenner.
 	 * @return Multiplizierte Zeitspanne.
 	 * @throws IllegalArgumentException Wenn der Nenner {@code 0} ist oder die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public final FEMDuration multiply(final int numerator, final int denominator) throws IllegalArgumentException {
+	public FEMDuration multiply(final int numerator, final int denominator) throws IllegalArgumentException {
 		if (denominator == 0) throw new IllegalArgumentException();
 		return FEMDuration.from((this.durationmonthsValue() * numerator) / denominator, (this.durationmillisValue() * numerator) / denominator);
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitspanne effektiv gleich der gegebenen ist.
-	 *
-	 * @see #compare(FEMDuration, int)
-	 * @param that Zeitspannen.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMDuration that) throws NullPointerException {
-		return ((this.valueL == that.valueL) && (this.valueH == that.valueH)) || (this.compare(that, 1) == 0);
+	@Override
+	public int hashCode() {
+		return this.valueH ^ this.valueL;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMDuration)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMDuration)) return false;
+		}
+		final FEMDuration that = (FEMDuration)object;
+		return ((this.valueL == that.valueL) && (this.valueH == that.valueH)) || (this.compareTo(that, 1) == 0);
+	}
+
+	@Override
+	public int compareTo(final FEMDuration that) {
+		return this.compareTo(that, 0);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Zeitspanne kürzer, gleich bzw. länger als die gegebene Zeitspanne ist. Wenn
@@ -850,14 +862,14 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @param undefined Rückgabewert für nicht vergleichbare Zeitspannen.
 	 * @return Vergleichswert oder {@code undefined}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final int compare(final FEMDuration that, final int undefined) {
+	public int compareTo(final FEMDuration that, final int undefined) {
 		final int thisSign = this.signValue(), thatSign = that.signValue();
 		if (thatSign > 0) return thisSign > 0 ? this.compareImpl(that, undefined) : -1;
 		if (thatSign < 0) return thisSign < 0 ? that.compareImpl(this, undefined) : +1;
 		return thisSign;
 	}
 
-	final int compareImpl(final FEMDuration that, final int undefined) {
+	int compareImpl(final FEMDuration that, final int undefined) {
 		final int thisMonths = this.durationmonthsValue(), thatMonths = that.durationmonthsValue();
 		final long thisMillis = this.durationmillisValue(), thatMillis = that.durationmillisValue();
 		if (thisMonths == thatMonths) return Comparators.compare(thisMillis, thatMillis);
@@ -875,34 +887,13 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return undefined;
 	}
 
-	@Override
-	public final int hashCode() {
-		return this.valueH ^ this.valueL;
-	}
-
-	@Override
-	public final boolean equals(Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMDuration)) {
-			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).data();
-			if (!(object instanceof FEMDuration)) return false;
-		}
-		return this.equals((FEMDuration)object);
-	}
-
-	@Override
-	public final int compareTo(final FEMDuration that) {
-		return this.compare(that, 0);
-	}
-
 	/** Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück. Diese Textdarstellung entspricht der des Datentyps
 	 * <a href="http://www.w3.org/TR/xmlschema-2/#duration-lexical-repr">xsd:duration</a> aus <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes
 	 * Second Edition</a>, beschränkt auf genau drei optionale Nachkommastellen für die Sekunden.
 	 *
 	 * @return Textdarstellung. */
 	@Override
-	public final String toString() {
+	public String toString() {
 		final int sing = this.signValue();
 		if (sing == 0) return "P0Y";
 		final char[] buffer = new char[31];

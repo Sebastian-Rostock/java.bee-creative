@@ -14,23 +14,6 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMValue extends FEMFunction {
 
-	/** Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextsensitiv konvertierten {@link #data() Nutzdaten} dieses Werts zurück. Der
-	 * Rückgabewert entspricht {@code context.dataFrom(this, type)}.
-	 *
-	 * @see FEMContext#dataFrom(FEMValue, FEMType)
-	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
-	 * @param type Datentyp.
-	 * @param context Kontext.
-	 * @return Nutzdaten.
-	 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
-	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können. */
-
-	public final <GData> GData data(final FEMType<GData> type, final FEMContext context)
-		throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return context.dataFrom(this, type);
-	}
-
 	/** Diese Methode gibt den Datentyp der {@link #data() Nutzdaten} zurück.
 	 *
 	 * @return Datentyp. */
@@ -66,42 +49,25 @@ public abstract class FEMValue extends FEMFunction {
 		Objects.notNull(frame);
 		return this;
 	}
-	
+
 	@Override
-	public FEMFunction concat(FEMFunction... params) throws NullPointerException {
-		Objects.notNull(params);
-		return this;
-	}
-	
-	@Override
-	public final FEMFunction compose(FEMFunction... params) throws NullPointerException {
+	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
 		Objects.notNull(params);
 		return this;
 	}
 
 	@Override
-	public final FEMValue toValue() {
+	public final FEMValue toValue() { // DONE
 		return this;
 	}
 
 	@Override
-	public final FEMFunction toFuture() {
+	public final FEMFunction toFuture() { // DONE
 		return this;
 	}
 
 	@Override
-	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
-		Objects.notNull(frame);
-		return this;
-	}
-
-	@Override
-	public final FEMFunction toClosure() {
-		return this;
-	}
-
-	@Override
-	public final FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
+	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException { // DONE
 		Objects.notNull(frame);
 		return this;
 	}
@@ -111,7 +77,7 @@ public abstract class FEMValue extends FEMFunction {
 	 *
 	 * @see FEMHandler
 	 * @return Funktion des Werts. */
-	public FEMFunction toFunction() {
+	public FEMFunction toFunction() { // DONE
 		return this;
 	}
 

@@ -124,7 +124,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 
 	@Override
 	public String toString() {
-		return FEMDomain.NORMAL.formatIdent(this.name.toString());
+		return FEMDomain.DEFAULT.formatIdent(this.name.toString());
 	}
 
 }

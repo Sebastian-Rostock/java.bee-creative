@@ -60,28 +60,36 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
-	public final FEMBoolean data() {
+	public FEMBoolean data() {
 		return this;
 	}
 
 	@Override
-	public final FEMType<FEMBoolean> type() {
+	public FEMType<FEMBoolean> type() {
 		return FEMBoolean.TYPE;
 	}
 
 	/** Diese Methode gibt die interne Darstellung des Wahrheitswerts zurück. Diese ist ein {@code boolean}.
 	 *
 	 * @return interne Darstellung des Wahrheitswerts. */
-	public final boolean value() {
+	public boolean value() {
 		return this.value;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wahrheitswert gleich dem gegebenen ist.
-	 *
-	 * @param that Wahrheitswert.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMBoolean that) throws NullPointerException {
+	@Override
+	public int hashCode() {
+		return this.value ? 1231 : 1237;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMBoolean)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).result().data();
+			if (!(object instanceof FEMBoolean)) return false;
+		}
+		final FEMBoolean that = (FEMBoolean)object;
 		return this.value == that.value;
 	}
 
@@ -90,29 +98,9 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	 * @param that Wahrheitswert.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final int compare(final FEMBoolean that) throws NullPointerException {
+	@Override
+	public int compareTo(final FEMBoolean that) throws NullPointerException {
 		return Boolean.compare(this.value, that.value);
-	}
-
-	@Override
-	public final int hashCode() {
-		return this.value ? 1231 : 1237;
-	}
-
-	@Override
-	public final boolean equals(Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMBoolean)) {
-			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).result().data();
-			if (!(object instanceof FEMBoolean)) return false;
-		}
-		return this.equals((FEMBoolean)object);
-	}
-
-	@Override
-	public final int compareTo(final FEMBoolean value) {
-		return this.compare(value);
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieses Wahrheitswerts zurück. Für die Wahrheitswerte {@code true} und {@code false} sind die Textdarstellungen
@@ -120,14 +108,14 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	 *
 	 * @return Textdarstellung. */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return this.value ? "true" : "false";
 	}
 
 	/** Diese Methode gibt diesen Wahrheitswert als {@link Boolean} zurück.
 	 *
 	 * @return {@link Boolean}. */
-	public final Boolean toBoolean() {
+	public Boolean toBoolean() {
 		return Boolean.valueOf(this.value);
 	}
 

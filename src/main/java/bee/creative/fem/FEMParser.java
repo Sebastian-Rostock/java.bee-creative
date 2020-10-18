@@ -44,6 +44,9 @@ public class FEMParser extends Parser {
 		return this;
 	}
 
+	/** Diese Methode gibt die Menge der aktuell erfassten Platzhalternamen zurück.
+	 *
+	 * @return Platzhalternamen. */
 	public final HashSet<String> proxies() {
 		return this.proxies;
 	}

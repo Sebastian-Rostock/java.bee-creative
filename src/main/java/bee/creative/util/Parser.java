@@ -16,7 +16,7 @@ public class Parser {
 	 * Abschnitten folgt aus ihrer {@link #start() Startposition}. Abschnitte können zudem über {@link #tokens() untergeordnete Kindabschnitte} einen
 	 * syntaktischen Baum bilden und dazu einen beliebigen {@link #value() Wert} besitzen.
 	 * <p>
-	 * Die Methoden {@link #get(int)}, {@link #count()}, {@link #tokens()} und {@link #iterator()} beziehen sich auf die Kindabschnitte. Die Methoden
+	 * Die Methoden {@link #get(int)}, {@link #size()}, {@link #tokens()} und {@link #iterator()} beziehen sich auf die Kindabschnitte. Die Methoden
 	 * {@link #start()}, {@link #end()}, {@link #length()}, {@link #hashCode()} und {@link #equals(Object)} beziehen sich dagegen nur auf Lage und Größe des
 	 * Abschnitts. */
 	public static final class Token implements Items<Token>, Iterable<Token>, Comparable<Token> {
@@ -185,6 +185,13 @@ public class Parser {
 			return this;
 		}
 
+		/** Diese Methode die Anzahl der {@link #tokens() Kindabschnitte} zurück.
+		 *
+		 * @return Kindabschnittanzahl. */
+		public int size() {
+			return this.tokens.length;
+		}
+
 		/** Diese Methode liefet die Position des ersten Zeichens nach dem Abschnitt.
 		 *
 		 * @see #start()
@@ -219,13 +226,6 @@ public class Parser {
 			return this;
 		}
 
-		/** Diese Methode die Anzahl der {@link #tokens() Kindabschnitte} zurück.
-		 *
-		 * @return Kindabschnittanzahl. */
-		public int count() {
-			return this.tokens.length;
-		}
-
 		/** Diese Methode gibt die Kindabschnitte zurück.
 		 *
 		 * @return Kindabschnitte. */
@@ -242,7 +242,7 @@ public class Parser {
 			return this.length;
 		}
 
-		/** Diese Methode gibt die Zeichenkette zurück, die als Eingabe des Parsert eingesetzt wurde und auf welche sich die Positionsangaben dieses Abschnitts
+		/** Diese Methode gibt die Zeichenkette zurück, die als Eingabe des Parsert eingesetzt wurde und auf welche sich die Positionsangaben dieses Abschnitts 
 		 * beziehen.
 		 *
 		 * @return Eingabezeichenkette. */
@@ -257,7 +257,7 @@ public class Parser {
 
 		@Override
 		public Iterator<Token> iterator() {
-			return Iterators.itemsIterator(this, 0, this.count());
+			return Iterators.itemsIterator(this, 0, this.size());
 		}
 
 		@Override

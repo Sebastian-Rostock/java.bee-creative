@@ -705,6 +705,16 @@ public class Iterables {
 	}
 
 	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als Array zurück. Dazu wird das gegebene {@link Iterable} in eine {@link Collection}
+	 * überführt, deren Inhalt schließlich aks Array {@link Collection#toArray() geliefert} wird.
+	 *
+	 * @param iterable {@link Iterable}.
+	 * @return Array der Elemente.
+	 * @throws NullPointerException Wenn {@code result} bzw. {@code iterable} {@code null} ist. */
+	public static Object[] toArray(final Iterable<?> iterable) throws NullPointerException {
+		return (iterable instanceof Collection<?> ? (Collection<?>)iterable : Iterables.toList(iterable)).toArray();
+	}
+
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als Array zurück. Dazu wird das gegebene {@link Iterable} in eine {@link Collection}
 	 * überführt, deren Inhalt schließlich aks Array {@link Collection#toArray(Object[]) geliefert} wird.
 	 *
 	 * @param result Ergebnis für {@link Collection#toArray(Object[])}.

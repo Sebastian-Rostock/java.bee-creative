@@ -86,7 +86,7 @@ public final class FEMFormatter {
 	/** Diese Methode setzt den Formatieren zurück und gibt {@code this} zurück.
 	 *
 	 * @return {@code this}. */
-	public final FEMFormatter reset() {
+	public FEMFormatter reset() {
 		this.items.clear();
 		this.indents.clear();
 		this.indents.addLast(Boolean.FALSE);
@@ -99,7 +99,7 @@ public final class FEMFormatter {
 	 * @param token Objekt oder {@code null}.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn {@code part} nicht formatiert werden kann. */
-	public final FEMFormatter putToken(final Object token) throws IllegalArgumentException {
+	public FEMFormatter putToken(final Object token) throws IllegalArgumentException {
 		if (token == null) return this;
 		this.items.add(token.toString());
 		return this;
@@ -113,7 +113,7 @@ public final class FEMFormatter {
 	 * @see #putBreakSpace()
 	 * @see #putIndent()
 	 * @return {@code this}. */
-	public final FEMFormatter putBreakInc() {
+	public FEMFormatter putBreakInc() {
 		final LinkedList<Boolean> indents = this.indents;
 		indents.addLast(Boolean.FALSE);
 		this.items.add(new Token(indents.size(), false, false, false));
@@ -128,7 +128,7 @@ public final class FEMFormatter {
 	 * @see #putBreakSpace()
 	 * @see #putIndent()
 	 * @return {@code this}. */
-	public final FEMFormatter putBreakDec() {
+	public FEMFormatter putBreakDec() {
 		final LinkedList<Boolean> indents = this.indents;
 		final int value = indents.size();
 		this.items.add(new Token(value, true, false, indents.removeLast().booleanValue()));
@@ -142,7 +142,7 @@ public final class FEMFormatter {
 	 * @see #putBreakDec()
 	 * @see #putIndent()
 	 * @return {@code this}. */
-	public final FEMFormatter putBreakSpace() {
+	public FEMFormatter putBreakSpace() {
 		final LinkedList<Boolean> indents = this.indents;
 		this.items.add(new Token(indents.size(), false, true, indents.getLast().booleanValue()));
 		return this;
@@ -155,7 +155,7 @@ public final class FEMFormatter {
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
 	 * @return {@code this}. */
-	public final FEMFormatter putIndent() {
+	public FEMFormatter putIndent() {
 		final LinkedList<Boolean> indents = this.indents;
 		if (this.indents.getLast().booleanValue()) return this;
 		int value = indents.size();
@@ -182,7 +182,7 @@ public final class FEMFormatter {
 	/** Diese Methode gibt die Zeichenkette zur Einrückung einer Hierarchieebene zurück. Diese ist {@code null}, wenn nicht eingerückt wird.
 	 *
 	 * @return Zeichenkette zur Einrückung oder {@code null}. */
-	public final String getIndent() {
+	public String getIndent() {
 		return this.indent;
 	}
 
@@ -191,7 +191,7 @@ public final class FEMFormatter {
 	 *
 	 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
 	 * @return {@code this}. */
-	public final FEMFormatter useIndent(final String indent) {
+	public FEMFormatter useIndent(final String indent) {
 		this.indent = indent;
 		return this;
 	}
@@ -200,7 +200,7 @@ public final class FEMFormatter {
 	 *
 	 * @see #putToken(Object)
 	 * @return Quelltext. */
-	public final String format() {
+	public String format() {
 		final String indent = this.indent;
 		final List<Object> items = this.items;
 		final StringBuilder result = new StringBuilder();
@@ -225,7 +225,7 @@ public final class FEMFormatter {
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return Objects.toInvokeString(this, this.indent, this.items);
 	}
 

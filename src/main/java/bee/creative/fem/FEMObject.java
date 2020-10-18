@@ -105,12 +105,12 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 
 	/** Diese Methode gibt {@code this} zurück. */
 	@Override
-	public final FEMObject data() {
+	public FEMObject data() {
 		return this;
 	}
 
 	@Override
-	public final FEMType<FEMObject> type() {
+	public FEMType<FEMObject> type() {
 		return FEMObject.TYPE;
 	}
 
@@ -124,14 +124,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * </ul>
 	 *
 	 * @return interne Darstellung der Referenz. */
-	public final long value() {
+	public long value() {
 		return Integers.toLong(this.valueH, this.valueL);
 	}
 
 	/** Diese Methode gibt den Objektschlüssel zurück.
 	 *
 	 * @return Objektschlüssel ({@code 0..2147483647}). */
-	public final int refValue() {
+	public int refValue() {
 		return this.valueH;
 	}
 
@@ -139,7 +139,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 *
 	 * @see #withType(int)
 	 * @return Typkennung ({@code 0..65535}). */
-	public final int typeValue() {
+	public int typeValue() {
 		return Integers.toShortH(this.valueL);
 	}
 
@@ -147,7 +147,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 *
 	 * @see #withOwner(int)
 	 * @return Besitzerkennung ({@code 0..65535}). */
-	public final int ownerValue() {
+	public int ownerValue() {
 		return Integers.toShortL(this.valueL);
 	}
 
@@ -157,7 +157,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @param ref Objektschlüssel ({@code 0..2147483647}).
 	 * @return Referenz mit Objektschlüssel.
 	 * @throws IllegalArgumentException Wenn {@code ref} ungültig ist. */
-	public final FEMObject withRef(final int ref) throws IllegalArgumentException {
+	public FEMObject withRef(final int ref) throws IllegalArgumentException {
 		FEMObject.checkMin(ref);
 		return new FEMObject(ref, this.valueL);
 	}
@@ -168,7 +168,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @param type Typkennung ({@code 0..65535}).
 	 * @return Referenz mit Typkennung.
 	 * @throws IllegalArgumentException Wenn {@code type} ungültig ist. */
-	public final FEMObject withType(final int type) throws IllegalArgumentException {
+	public FEMObject withType(final int type) throws IllegalArgumentException {
 		FEMObject.checkMax(type);
 		return new FEMObject(this.valueH, Integers.toInt(type, this.ownerValue()));
 	}
@@ -179,17 +179,25 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @param owner Besitzerkennung ({@code 0..65535}).
 	 * @return Referenz mit Besitzerkennung.
 	 * @throws IllegalArgumentException Wenn {@code owner} ungültig ist. */
-	public final FEMObject withOwner(final int owner) throws IllegalArgumentException {
+	public FEMObject withOwner(final int owner) throws IllegalArgumentException {
 		FEMObject.checkMax(owner);
 		return new FEMObject(this.valueH, Integers.toInt(this.typeValue(), owner));
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Referenz gleich der gegebenen ist.
-	 *
-	 * @param that Referenz.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMObject that) throws NullPointerException {
+	@Override
+	public int hashCode() {
+		return this.valueH ^ this.valueL;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMObject)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMObject)) return false;
+		}
+		final FEMObject that = (FEMObject)object;
 		return (this.valueL == that.valueL) && (this.valueH == that.valueH);
 	}
 
@@ -199,7 +207,8 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @param that Referenz.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final int compare(final FEMObject that) throws NullPointerException {
+	@Override
+	public int compareTo(final FEMObject that) throws NullPointerException {
 		int result = Comparators.compare(this.refValue(), that.refValue());
 		if (result != 0) return result;
 		result = Comparators.compare(this.ownerValue(), that.ownerValue());
@@ -207,33 +216,12 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return Comparators.compare(this.typeValue(), that.typeValue());
 	}
 
-	@Override
-	public final int hashCode() {
-		return this.valueH ^ this.valueL;
-	}
-
-	@Override
-	public final boolean equals(Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMObject)) {
-			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).data();
-			if (!(object instanceof FEMObject)) return false;
-		}
-		return this.equals((FEMObject)object);
-	}
-
-	@Override
-	public final int compareTo(final FEMObject that) {
-		return this.compare(that);
-	}
-
 	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück. Das Format der Textdarstellung ist {@code @}{@link #refValue()
 	 * REF}{@code .}{@link #ownerValue() OWNER}{@code :}{@link #typeValue() TYPE}.
 	 *
 	 * @return Textdarstellung. */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "@" + this.refValue() + "." + this.ownerValue() + ":" + this.typeValue();
 	}
 

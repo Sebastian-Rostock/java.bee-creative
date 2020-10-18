@@ -77,11 +77,6 @@ public final class FEMFuture extends FEMValue {
 	}
 
 	@Override
-	public FEMFunction concat(final FEMFunction... params) throws NullPointerException {
-		return super.concat(params);
-	}
-
-	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMValue)) return false;
@@ -95,7 +90,7 @@ public final class FEMFuture extends FEMValue {
 	}
 
 	@Override
-	public FEMFunction toFunction() {
+	public FEMFunction toFunction() { // DONE
 		return this.result().toFunction();
 	}
 

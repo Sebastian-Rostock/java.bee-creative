@@ -6,8 +6,7 @@ import bee.creative.lang.Objects;
  * Dieses Objekt wird dazu das Argument für die Methoden des {@link Listener} genutzt, welcher auf die Ereignisse der Überwachung reagieren kann.
  *
  * @see Listener
- * @see FEMFunction#withTracer(FEMTracer)
- * @see FEMFunction#withoutTracer()
+ * @see FEMFunction#trace(FEMTracer)
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMTracer {
 
