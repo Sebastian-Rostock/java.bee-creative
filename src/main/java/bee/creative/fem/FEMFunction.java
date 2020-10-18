@@ -1,10 +1,7 @@
 package bee.creative.fem;
 
-import bee.creative.emu.EMU;
-import bee.creative.emu.Emuable;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
-import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert eine abstrakte Funktion, deren {@link #invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen
@@ -130,112 +127,12 @@ public abstract class FEMFunction {
 
 	}
 
-	@SuppressWarnings ("javadoc")
-	public static class CompositeFunction1 extends BaseFunction implements Emuable, Items<FEMFunction> {
-
-		int hash;
-
-		final FEMFunction target;
-
-		final FEMFunction[] params;
-
-		CompositeFunction1(final FEMFunction function, final FEMFunction[] params) {
-			this.params = params;
-			this.target = function;
-		}
-
-		@Override
-		public FEMFunction get(final int index) throws IndexOutOfBoundsException {
-			return this.params[index];
-		}
-
-		public int size() {
-			return this.params.length;
-		}
-
-		public FEMFunction target() {
-			return this.target;
-		}
-
-		public FEMFunction[] params() {
-			return this.params.clone();
-		}
-
-		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.fromArray(this.params);
-		}
-
-		@Override
-		public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
-			return new CompositeFunction2(this, params.clone());
-		}
-
-		@Override
-		public CompositeFunction1 trace(final FEMTracer tracer) throws NullPointerException {
-			final FEMFunction[] params = this.params.clone();
-			for (int i = 0, size = params.length; i < size; i++) {
-				params[i] = params[i].trace(tracer);
-			}
-			return new CompositeFunction1(this.target.trace(tracer), params);
-		}
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			return this.target.invoke(frame.newFrame(this.params));
-		}
-
-		@Override
-		public int hashCode() {
-			int result = this.hash;
-			if (result != 0) return result;
-			result = Objects.hashPush(Objects.hash((Object[])this.params), Objects.hash(this.target));
-			return this.hash = result != 0 ? result : -1;
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof CompositeFunction1)) return false;
-			final CompositeFunction1 that = (CompositeFunction1)object;
-			return (this.hashCode() == that.hashCode()) && Objects.equals(this.target, that.target) && Objects.equals(this.params, that.params);
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	public static class CompositeFunction2 extends CompositeFunction1 {
-
-		CompositeFunction2(final FEMFunction function, final FEMFunction[] params) {
-			super(function, params);
-		}
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			return this.target.invoke(frame).toFunction().invoke(frame.newFrame(this.params));
-		}
-
-		@Override
-		public CompositeFunction1 trace(final FEMTracer tracer) throws NullPointerException {
-			final CompositeFunction1 res = super.trace(tracer);
-			return new CompositeFunction2(res.target, res.params);
-		}
-
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof CompositeFunction2)) return false;
-			return super.equals(object);
-		}
-
-	}
-
 	/** Dieses Feld speichert die leere Parameterliste. */
 	public static final FEMFunction[] PARAMS = new FEMFunction[0];
 
 	/** Diese Methode führt Berechnungen mit dem gegebenen Stapelrahmen durch und gibt den ermittelten Ergebniswert zurück.
 	 *
-	 * @param frame Stapelrahmen.
+	 * @param frame Stapelrahmen.u
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
 	public abstract FEMValue invoke(FEMFrame frame) throws NullPointerException;
@@ -249,14 +146,13 @@ public abstract class FEMFunction {
 	 * Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht dann:
 	 * <pre>this.invoke(frame).toFunction().invoke(frame.newFrame(params)</pre>
 	 *
-	 * @see CompositeFunction1
-	 * @see CompositeFunction2
+	 * @see FEMComposite
 	 * @see FEMFrame#withParams(FEMFunction[])
 	 * @param params Parameterfunktionen.
 	 * @return komponierte Funktion.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
-		return new CompositeFunction1(this, params.clone());
+		return FEMComposite.from(false, this, params.clone());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #compose(FEMFunction...) this.compose(Iterables.toArray(FEMFunction.PARAMS, params))}.

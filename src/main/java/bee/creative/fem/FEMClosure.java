@@ -27,8 +27,8 @@ public final class FEMClosure extends BaseFunction {
 	}
 
 	@Override
-	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
-		return new CompositeFunction2(this, params.clone());
+	public FEMFunction trace(final FEMTracer tracer) throws NullPointerException {
+		return FEMClosure.from(this.target.trace(tracer));
 	}
 
 	@Override
@@ -37,8 +37,8 @@ public final class FEMClosure extends BaseFunction {
 	}
 
 	@Override
-	public FEMFunction trace(final FEMTracer tracer) throws NullPointerException {
-		return FEMClosure.from(this.target.trace(tracer));
+	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
+		return FEMComposite.from(true, this, params);
 	}
 
 	@Override

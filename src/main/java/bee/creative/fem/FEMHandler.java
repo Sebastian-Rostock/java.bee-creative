@@ -53,7 +53,7 @@ public final class FEMHandler extends FEMValue {
 
 	@Override
 	public FEMFunction compose(final FEMFunction... params) throws NullPointerException {
-		return new CompositeFunction2(this, params.clone());
+		return FEMComposite.from(true, this, params.clone());
 	}
 
 	@Override
@@ -81,13 +81,11 @@ public final class FEMHandler extends FEMValue {
 
 	@Override
 	public String toString() {
-		final FEMFormatter res = new FEMFormatter();
-		FEMDomain.DEFAULT.formatHandler(res, this);
-		return res.format();
+		return FEMDomain.DEFAULT.formatFunction(this);
 	}
 
 	@Override
-	public FEMFunction toFunction() { // DONE
+	public FEMFunction toFunction() {
 		return this.value;
 	}
 

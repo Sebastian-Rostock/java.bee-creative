@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import bee.creative.bind.Setter;
-import bee.creative.fem.FEMFunction.CompositeFunction1;
 import bee.creative.fem.FEMFunction.FutureFunction;
 import bee.creative.fem.FEMFunction.TraceFunction;
 import bee.creative.lang.Integers;
@@ -396,7 +395,7 @@ public class FEMDomain extends BaseObject {
 	 * EBNF:<br>
 	 * <pre>FUNCTION = ( {@link #parseParam(FEMParser) PARAM} | {@link #parseValue(FEMParser) VALUE} ) { {@link #parseInfos(Parser) SC} "(" {@link #parseGroup(FEMParser) GROUP} ")" }</pre>
 	 * Wenn ein Parameter (PARAM) bzw. dem Wert (VALUE) von einer in runden Klammern eingeschlossenen Funktionsliste (GROUP) gefolgt wird, führt dies zur
-	 * Erkennung einer {@link FEMFunction.CompositeFunction1 Funktionsverkettung}, deren Elternabschnitt geliefert wird. Als Abschnittstyp wird dann {@code '.'}
+	 * Erkennung einer {@link FEMComposite Funktionsverkettung}, deren Elternabschnitt geliefert wird. Als Abschnittstyp wird dann {@code '.'}
 	 * verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der aufgerufenen Funktion und die der Parameterfunktionsliste, letztere mit dem Abschnittstyp
 	 * {@code '('}. */
 	protected Token parseFunction(final FEMParser src) throws NullPointerException {
@@ -628,7 +627,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung der gegebene Funktion. Für eine {@link TraceFunction}, eine {@link FEMBinding}, eine
 	 * {@link FutureFunction} oder eine {@link FEMClosure} wird die Textdarstellung ihrer referenzierten Funktion mit dieser Methode erfasst. Bei einer
-	 * {@link CompositeFunction1} werden die Textdarstellungen der aufzurufenden Funktion mit dieser Methode sowie die der Parameterliste mit
+	 * {@link FEMComposite} werden die Textdarstellungen der aufzurufenden Funktion mit dieser Methode sowie die der Parameterliste mit
 	 * {@link #formatParams(FEMFormatter, Iterable)} erfasst. Bei einem {@link FEMProxy} wird dessen {@link FEMProxy#name() Name} über
 	 * {@link #formatConst(FEMFormatter, String)} erfasst. Jeder andere {@link FEMValue} würd über {@link #formatValue(FEMFormatter, FEMValue)} erfasst. Jede
 	 * andere {@link FEMFunction} wird über {@link FEMFunction#toString()} in eine Zeichenkette überführt, welche anschließend über
@@ -645,8 +644,8 @@ public class FEMDomain extends BaseObject {
 		} else if (source instanceof FEMProxy) {
 			final FEMProxy value = (FEMProxy)source;
 			this.formatConst(target, value.name.toString());
-		} else if (source instanceof CompositeFunction1) {
-			final CompositeFunction1 value = (CompositeFunction1)source;
+		} else if (source instanceof FEMComposite) {
+			final FEMComposite value = (FEMComposite)source;
 			this.formatFunction(target, value.target);
 			this.formatParams(target, Arrays.asList(value.params));
 		} else if (source instanceof FEMClosure) {
