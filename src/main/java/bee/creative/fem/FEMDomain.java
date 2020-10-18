@@ -450,21 +450,11 @@ public class FEMDomain extends BaseObject {
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code script} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
 	protected void formatScript(final FEMFormatter target, final FEMScript script) throws NullPointerException, IllegalArgumentException {
-		this.formatScript(target, new FEMCompiler(script));
-	}
-
-	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltexts.
-	 *
-	 * @param target Formatierer.
-	 * @param source Parser zum aufbereiteten Quelltext.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatScript(final FEMFormatter target, final FEMCompiler source) throws NullPointerException, IllegalArgumentException {
+		Iterator<Token> source = script.iterator();
 		while (true) {
 			this.formatScript(target, source, false);
-			if (source.symbol() < 0) return;
-			target.putToken(source.token().toString()).putBreakSpace();
-			source.skip();
+			if (!source.hasNext() ) return;
+			target.putToken(source.next()).putBreakSpace();
 		}
 	}
 
@@ -475,13 +465,13 @@ public class FEMDomain extends BaseObject {
 	 * @param simpleSpace {@code true}, wenn hinter Kommentaren und Semikola ein einfaches Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll.
 	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatScript(final FEMFormatter target, final FEMCompiler source, final boolean simpleSpace)
+	protected void formatScript(final FEMFormatter target, final Iterator<Token> source, final boolean simpleSpace)
 		throws NullPointerException, IllegalArgumentException {
 		boolean indent = false;
-		while (true) {
-			final String string = source.token().toString();
-			final int symbol = source.symbol();
-			source.skip();
+		while (source.hasNext()) {
+			Token tok = source.next();
+			final String string = tok.toString();
+			final int symbol = tok.type();
 			switch (symbol) {
 				case '/':
 					target.putToken(string).putToken(" ");
