@@ -5,7 +5,9 @@ import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine Parameterfunktion, welche bei ihrer {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapelrahmen}
  * {@code frame} einen {@link FEMHandler Funktionszeiger} liefert, der diesen Stapelrahmen an eine {@link #target() gegebene Funktion} {@link FEMBinding
- * bindet}. Sie liefert damit {@code FEMHandler.from(FEMBinding.from(this.target(), frame))}.
+ * bindet}. Sie liefert damit {@code FEMHandler.from(FEMBinding.from(this.target(), frame))}. Eine solche Parameterfunktion kann an der Stelle eines
+ * {@link FEMHandler Funktionszeigers} verwendet werden, wenn die darin angegebene Funktion auf die zusätzlichen Parameterwerte des Stapelrahmen zugreifen
+ * können soll.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMClosure extends BaseFunction {

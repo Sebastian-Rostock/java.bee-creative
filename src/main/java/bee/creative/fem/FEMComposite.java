@@ -8,9 +8,11 @@ import bee.creative.util.Comparables.Items;
 
 /** Diese Klasse implementiert eine komponierte Funktion, welche eine {@link #target() gegebene Funktion} mit den {@link #params() gegebenen
  * Parameterfunktionen} aufruft. Der Ergebniswert der komponierten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} ist dazu von der
- * {@link #concat() Verkettung} abhängig. Ohne Verkettung entspricht der Ergebniswert: {@code this.target().invoke(frame.newFrame(this.params())}. Mit
- * Verkettung ist er dagegen {@code this.target().invoke(frame).toFunction().invoke(frame.newFrame(this.params())}. Die Verkettung ist damit dann anzuwenden,
- * wenn die aufzurufende Funktion einen {@link FEMHandler Funktionszeiger} liefert.
+ * {@link #concat() Verkettung} abhängig.
+ * <p>
+ * Ohne Verkettung entspricht der Ergebniswert: <pre>this.target().invoke(frame.newFrame(this.params())</pre><br>
+ * Mit Verkettung ist er dagegen <pre>this.target().invoke(frame).toFunction().invoke(frame.newFrame(this.params())</pre><br>
+ * Die Verkettung ist damit dann anzuwenden, wenn die aufzurufende Funktion einen {@link FEMHandler Funktionszeiger} liefert.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMComposite extends BaseFunction implements Emuable, Items<FEMFunction> {
@@ -53,7 +55,13 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Item
 
 	}
 
-	public static FEMComposite from(final boolean concat, final FEMFunction target, final FEMFunction[] params) {
+	/** Diese Methode gibt eine neue komponierte Funktion mit den gegebenen Eigenschaften zurück.
+	 *
+	 * @param concat Verkettung.
+	 * @param target aufzurufende Funktion.
+	 * @param params Parameterfunktionen.
+	 * @return komponierte Funktion. */
+	public static FEMComposite from(final boolean concat, final FEMFunction target, final FEMFunction[] params) throws NullPointerException {
 		return concat ? new FEMCompositeT(target, params) : new FEMCompositeF(target, params);
 	}
 
@@ -68,23 +76,36 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Item
 		this.params = params.clone();
 	}
 
+	/** Diese Methode gibt den {@code index}-ten Kindabschnitt zurück. */
 	@Override
 	public FEMFunction get(final int index) throws IndexOutOfBoundsException {
 		return this.params[index];
 	}
 
+	/** Diese Methode gibt die Anzahl der Parameterfunktionen zurück.
+	 *
+	 * @return Parameteranzahl. */
 	public int size() {
 		return this.params.length;
 	}
 
+	/** Diese Methode gibt die aufzurufende Funktion zurück.
+	 *
+	 * @return Aufrufziel. */
 	public FEMFunction target() {
 		return this.target;
 	}
 
+	/** Diese Methode gibt die Parameterfunktionen zurück.
+	 *
+	 * @return Parameterfunktionen. */
 	public FEMFunction[] params() {
 		return this.params.clone();
 	}
 
+	/** Diese Methode die {@link FEMComposite Verkettung} zurück.
+	 *
+	 * @return Verkettung. */
 	public abstract boolean concat();
 
 	@Override
@@ -121,11 +142,6 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Item
 		final FEMComposite that = (FEMComposite)object;
 		return (this.concat() == that.concat()) && (this.hashCode() == that.hashCode()) && Objects.equals(this.target, that.target)
 			&& Objects.equals(this.params, that.params);
-	}
-
-	@Override
-	public String toString() {
-		return FEMDomain.DEFAULT.formatFunction(this);
 	}
 
 }

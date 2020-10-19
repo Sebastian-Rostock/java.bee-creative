@@ -19,14 +19,15 @@ import bee.creative.util.Parser.Token;
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
  * Quelltexten und Funktionen ineinander dienen.
  * <p>
- * Die {@code parse*}-Methoden zum Parsen einer {@link FEMParser#source() Zeichenkette} erkennen die darin Bedeutung tragenden {@link Token Abschnitte} und
- * {@link FEMParser#push(Token) erfassen} diese im gegebenen {@link FEMParser}. Die {@code format*}-Methoden zum Formatieren eines gegebenen Objekts erzeugen
- * dagegen die Bedeutung tragenden Abschnitte der Textdarstellung und {@link FEMFormatter#putToken(Object) erfassen} diese im gegebenen {@link FEMFormatter}.
- * Die {@code parse*}-Methoden zum Kompilieren {@link FEMScript aufbereiteter Quelltexte} übersetzen schließlich erkannte Bedeutung tragende {@link Token
- * Abschnitte} in Funktionen.
+ * Die auf {@link FEMParser Zeichenketten} operierenden {@code parse}-Methoden erkennen die darin Bedeutung tragenden {@link Token Abschnitte},
+ * {@link FEMParser#push(Token) erfassen} diese und versehen sie mit entsprechender {@link Token#type() Typkennung} und {@link Token#tokens() Struktur}. Die auf
+ * diesen typisierten und strukturierten {@link FEMToken Abschnitten} operierenden {@code parse}-Methoden übersetzen diese schließlich in Werte und Funktionen.
+ * Die auf {@link FEMFunction Funktionen} operierenden {@code format}-Methoden erzeugen dazu wieder deren Textdarstellung.
  * <p>
- * Nachfahren sollten die Methoden {@link #compileValue(FEMCompiler, String)} und {@link #compileFunction(FEMCompiler, String)} überschreiben, um
- * anwendungsspezifisch die Kennung bzw. Textdarstellung von Konstanten un deren Werte bez. Funktionen zu überführen.
+ * Nachfahren sollten die Methoden {@link #parseValue(FEMToken, String)} und {@link #parseFunction(FEMToken, String)} überschreiben, um anwendungsspezifisch die
+ * Kennung bzw. Textdarstellung von Konstanten un deren Werte bez. Funktionen zu überführen. Wenn an Stelle von {@link FEMClosure bindenden Parameterfuktionen}
+ * einfache {@link FEMHandler Funktionszeiger} verwendet werden sollen, muss die Methode {@link #parseClosure(FEMToken)} überschriben werden und das Ergebnis
+ * von {@link #parseHandler(FEMToken)} liefern.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMDomain extends BaseObject {
@@ -46,15 +47,15 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Kennung und gibt ihn zurück. Die Erkennung erfolgt über
-	 * {@link #parseSequence(Parser, char, char, char) this.parseSequence(parser, '<', '\\', '>')}. Als Abschnittstyp wird {@code '<'} verwendet. Wenn keine
+	 * {@link #parseSequence(FEMParser, char, char, char) this.parseSequence(parser, '<', '\\', '>')}. Als Abschnittstyp wird {@code '<'} verwendet. Wenn keine
 	 * maskierte Kennung gefunden wurden, wird {@code null} geliefert. */
-	protected Token parseIdent(final Parser src) throws NullPointerException {
+	protected Token parseIdent(final FEMParser src) throws NullPointerException {
 		return this.parseSequence(src, '<', '\\', '>');
 	}
 
-	/** Diese Methode überführt den von {@link #parseIdent(Parser)} ermittelten Abschnitt in eine Kennung und gibt diese zurück. Für andere Abschnitte liefert sie
-	 * {@code null}. */
-	protected String parseIdent(final FEMCompiler src) throws NullPointerException, FEMException {
+	/** Diese Methode überführt den von {@link #parseIdent(FEMParser)} ermittelten Abschnitt in eine Kennung und gibt diese zurück. Für andere Abschnitte liefert
+	 * sie {@code null}. */
+	protected String parseIdent(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '<') return null;
 		final String res = this.parseIdent(tok.toString());
@@ -88,9 +89,32 @@ public class FEMDomain extends BaseObject {
 		return src.make('*', pos, funs).value(new HashSet<>(src.proxies()));
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #parseModule(FEMScript) this.parseModule(this.parseScript(source))}. */
+	public List<FEMFunction> parseModule(final String source) throws NullPointerException, IllegalArgumentException {
+		return this.parseModule(this.parseScript(source));
+	}
+
+	public List<FEMFunction> parseModule(final FEMScript source) throws NullPointerException, IllegalArgumentException {
+		return this.parseModule(new FEMToken().with(source.root()));
+	}
+
+	/** Diese Methode überführt den von {@link #parseScript(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
+	protected List<FEMFunction> parseModule(final FEMToken src) throws NullPointerException, FEMException {
+		final Token tok = src.token();
+		if (tok.type() != '*') throw this.parseError(src, null);
+		try {
+			for (final Object name: (Set<?>)tok.value()) {
+				src.proxy(name.toString());
+			}
+		} catch (final Exception cause) {
+			throw this.parseError(src, cause);
+		}
+		return this.parseGroup(src);
+	}
+
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den verbleibenden {@link Token Abschnitt} der Eingabe als Fehler und gibt ihn zurück. Als
 	 * Abschnittstyp wird {@code '!'} verwendet. */
-	protected Token parseError(final Parser src) throws NullPointerException {
+	protected Token parseError(final FEMParser src) throws NullPointerException {
 		final int pos = src.index(), len = src.length();
 		final Token res = src.make('!', pos, len - pos);
 		src.seek(len);
@@ -98,21 +122,21 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode liefert die Fehlermeldung zum gegebeen Abschnitt und seine Positionsangaben. */
-	protected String parseError(final FEMCompiler src) throws NullPointerException {
+	protected String parseError(final FEMToken src) throws NullPointerException {
 		String str = src.token().toString();
 		str = str.length() > 40 ? str.substring(0, 39) + "…" : str;
 		return String.format("Fehler an Position %s:%s gefunden: %s", src.rowIndex(), src.colIndex(), str);
 	}
 
 	/** Diese Methode liefert die beschriftete {@link FEMException Ausnahme} zum gegebeen Abschnitt. */
-	protected FEMException parseError(final FEMCompiler src, final Throwable cause) throws NullPointerException {
+	protected FEMException parseError(final FEMToken src, final Throwable cause) throws NullPointerException {
 		return FEMException.from(cause).push(this.parseError(src));
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer direkten Konstanten und gibt ihn zurück. Als Abschnittstyp wird
 	 * {@code '?'} verwendet. Wenn keine direkte Konstante gefunden wurde, wird {@code null} geliefet. Direkte Konstanten können grundsätzlich an folgenden
 	 * Stellen vorkommen: <pre>(CONST; [CONST]; CONST{: CONST}; CONST/.../; CONST)</pre> */
-	protected Token parseConst(final Parser src) throws NullPointerException {
+	protected Token parseConst(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
 		LOOP: for (int sym = src.symbol(); sym > ' '; sym = src.skip()) {
 			switch (sym) {
@@ -130,24 +154,24 @@ public class FEMDomain extends BaseObject {
 		return pos != src.index() ? src.push('?', pos) : null;
 	}
 
-	/** Diese Methode überführt den von {@link #parseConst(Parser)} ermittelten Abschnitt in eine Kennung und gibt diese zurück. Für andere Abschnitte liefert sie
-	 * {@code null}. */
-	protected String parseConst(final FEMCompiler src) throws NullPointerException {
+	/** Diese Methode überführt den von {@link #parseConst(FEMParser)} ermittelten Abschnitt in eine Kennung und gibt diese zurück. Für andere Abschnitte liefert
+	 * sie {@code null}. */
+	protected String parseConst(final FEMToken src) throws NullPointerException {
 		final Token tok = src.token();
 		if (tok.type() != '?') return null;
 		return tok.toString();
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette und gibt ihn zurück. Die Erkennung erfolgt
-	 * über {@link #parseSequence(Parser, char, char, char) this.parseSequence(parser, '\"', '\\', '\"')}. Als Abschnittstyp wird {@code '\"'} verwendet. Wenn
+	 * über {@link #parseSequence(FEMParser, char, char, char) this.parseSequence(parser, '\"', '\\', '\"')}. Als Abschnittstyp wird {@code '\"'} verwendet. Wenn
 	 * keine maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
-	protected Token parseString1(final Parser src) throws NullPointerException {
+	protected Token parseString1(final FEMParser src) throws NullPointerException {
 		return this.parseSequence(src, '\"', '\\', '\"');
 	}
 
-	/** Diese Methode überführt den von {@link #parseString1(Parser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
+	/** Diese Methode überführt den von {@link #parseString1(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
 	 * liefert sie {@code null}. */
-	protected FEMString parseString1(final FEMCompiler src) throws NullPointerException, FEMException {
+	protected FEMString parseString1(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '\"') return null;
 		final String res = Strings.parseSequence(tok.toString(), '\"', '\\', '\"');
@@ -156,15 +180,15 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette und gibt ihn zurück. Die Erkennung erfolgt
-	 * über {@link #parseSequence(Parser, char, char, char) this.parseSequence(parser, '\'', '\\', '\'')}. Als Abschnittstyp wird {@code '\''} verwendet. Wenn
+	 * über {@link #parseSequence(FEMParser, char, char, char) this.parseSequence(parser, '\'', '\\', '\'')}. Als Abschnittstyp wird {@code '\''} verwendet. Wenn
 	 * keine maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
-	protected Token parseString2(final Parser src) throws NullPointerException {
+	protected Token parseString2(final FEMParser src) throws NullPointerException {
 		return this.parseSequence(src, '\'', '\\', '\'');
 	}
 
-	/** Diese Methode überführt den von {@link #parseString2(Parser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
+	/** Diese Methode überführt den von {@link #parseString2(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
 	 * liefert sie {@code null}. */
-	protected FEMValue compileString2(final FEMCompiler src) throws NullPointerException, FEMException {
+	protected FEMString parseString2(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '\'') return null;
 		final String res = Strings.parseSequence(tok.toString(), '\'', '\\', '\'');
@@ -174,7 +198,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Wertliste und gibt deren Elternabschnitt zurück. Die Erkennung
 	 * erfolgt gemäß folgender EBNF:<br>
-	 * <pre>ARRAY = "[" [ {@link #parseInfo(Parser) SC} {@link #parseValue(FEMParser) VALUE} { {@link #parseInfo(Parser) SC} ";" {@link #parseInfo(Parser) SC} {@link #parseValue(FEMParser) VALUE} } ] {@link #parseInfo(Parser) SC} "]"</pre>
+	 * <pre>ARRAY = "[" [ {@link #parseInfo(FEMParser) SC} {@link #parseValue(FEMParser) VALUE} { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} {@link #parseValue(FEMParser) VALUE} } ] {@link #parseInfo(FEMParser) SC} "]"</pre>
 	 * Als Abschnittstyp des Elternabschnitts wird {@code '['} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der Werte (VALUE). */
 	protected Token parseArray(final FEMParser src) throws NullPointerException {
 		int sym = src.symbol();
@@ -224,20 +248,21 @@ public class FEMDomain extends BaseObject {
 		return src.make('[', pos, toks);
 	}
 
-	/** Diese Methode überführt den von {@link #parseArray(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
-	protected FEMArray compileArray(final FEMCompiler src) throws NullPointerException, FEMException {
+	/** Diese Methode überführt den von {@link #parseArray(FEMParser)} ermittelten Abschnitt in eine Wertliste und gibt diese zurück. Für andere Abschnitte
+	 * liefert sie {@code null}. */
+	protected FEMArray parseArray(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '[') return null;
 		final List<FEMValue> res = new ArrayList<>();
 		for (final Token item: tok) {
-			res.add(this.compileValue(src.with(item)));
+			res.add(this.parseValue(src.with(item)));
 		}
 		return FEMArray.from(res);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Werts gibt ihn zurück. Die Erkennung erfolgt gemäß folgender
 	 * EBNF:<br>
-	 * <pre>VALUE = {@link #parseArray(FEMParser) ARRAY} | {@link #parseString1(Parser) STRING1} | {@link #parseString2(Parser) STRING2} | {@link #parseHandler(FEMParser) HANDLER} | ({@link #parseIdent(Parser) IDENT} | {@link #parseConst(Parser) CONST}) {@link #parseInfo(Parser) SC} [ {@link #parseHandler(FEMParser) HANDLER} ]</pre>
+	 * <pre>VALUE = {@link #parseArray(FEMParser) ARRAY} | {@link #parseString1(FEMParser) STRING1} | {@link #parseString2(FEMParser) STRING2} | {@link #parseHandler(FEMParser) HANDLER} | ({@link #parseIdent(FEMParser) IDENT} | {@link #parseConst(FEMParser) CONST}) {@link #parseInfo(FEMParser) SC} [ {@link #parseHandler(FEMParser) HANDLER} ]</pre>
 	 * Wenn eine Kennung (IDENT) oder eine Konstante (CONST) von einem Funktionszeiger (HANDLER) gefolgt wird, führt dies zur Erkennung einer {@link FEMProxy
 	 * Platzhalterfunktion}, deren Elternabschnitt geliefert wird. Als deren Abschnittstyp wird dann {@code '='} verwendet. Die {@link Token#tokens()
 	 * Kindabschnitte} sind die von Kennung bzw. Konstate und Funktionszeiger. */
@@ -265,20 +290,20 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode überführt den von {@link #parseValue(FEMParser)} ermittelten Abschnitt in einen Wert und gibt diesen zurück. */
-	protected FEMValue compileValue(final FEMCompiler src) throws NullPointerException, FEMException {
-		FEMValue res = this.compileArray(src);
+	protected FEMValue parseValue(final FEMToken src) throws NullPointerException, FEMException {
+		FEMValue res = this.parseArray(src);
 		if (res != null) return res;
 		res = this.parseString1(src);
 		if (res != null) return res;
-		res = this.compileString2(src);
+		res = this.parseString2(src);
 		if (res != null) return res;
-		res = this.compileHandler(src);
+		res = this.parseHandler(src);
 		if (res != null) return res;
 		final String str = this.parseIdent(src);
 		final String ref = str != null ? str : this.parseConst(src);
 		if (ref == null) throw this.parseError(src, null);
 		try {
-			res = this.compileValue(src, ref);
+			res = this.parseValue(src, ref);
 			if (res != null) return res;
 		} catch (final Exception cause) {
 			throw this.parseError(src, cause);
@@ -286,13 +311,12 @@ public class FEMDomain extends BaseObject {
 		throw this.parseError(src, null);
 	}
 
-	/** Diese Methode kompiliert die gegebene Kennung bzw. Textdarstellung einer Konstanten in deren Wert und gibt dieses zurück. Wenn hierbei keine Konstante
-	 * ermittelt werden konnte, wird {@code null} geliefert.
+	/** Diese Methode überführt die gegebene Kennung bzw. Textdarstellung einer Konstanten in deren Wert und gibt diesen zurück. Wenn dies nicht möglich ist, wird
+	 * {@code null} geliefert.
 	 *
-	 * @param src Kompiler.
 	 * @param ref Kennung bzw. Textdarstellung einer Konstanten.
-	 * @return Wert der Konstante oder {@code null}. */
-	protected FEMValue compileValue(final FEMCompiler src, final String ref) throws NullPointerException {
+	 * @return Wert der Konstanten oder {@code null}. */
+	protected FEMValue parseValue(final FEMToken src, final String ref) throws NullPointerException {
 		if (ref.equals("void")) return FEMVoid.INSTANCE;
 		if (ref.equals("true")) return FEMBoolean.TRUE;
 		if (ref.equals("false")) return FEMBoolean.FALSE;
@@ -312,7 +336,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Funktionsliste und gibt die Abschnitte der Funktionen (FUNCTION)
 	 * zurück. Die Erkennung erfolgt gemäß folgender EBNF:<br>
-	 * <pre>GROUP = {@link #parseInfo(Parser) SC} [ {@link #parseFunction(FEMParser) FUNCTION} { {@link #parseInfo(Parser) SC} ";" {@link #parseInfo(Parser) SC} {@link #parseFunction(FEMParser) FUNCTION} } {@link #parseInfo(Parser) SC} ]</pre> */
+	 * <pre>GROUP = {@link #parseInfo(FEMParser) SC} [ {@link #parseFunction(FEMParser) FUNCTION} { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} {@link #parseFunction(FEMParser) FUNCTION} } {@link #parseInfo(FEMParser) SC} ]</pre> */
 	protected List<Token> parseGroup(final FEMParser src) throws NullPointerException {
 		final List<Token> res = new ArrayList<>();
 		this.parseInfo(src);
@@ -335,17 +359,17 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode überführt den von {@link #parseGroup(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
-	protected List<FEMFunction> compileGroup(final FEMCompiler src) throws NullPointerException, FEMException {
+	protected List<FEMFunction> parseGroup(final FEMToken src) throws NullPointerException, FEMException {
 		final List<FEMFunction> res = new ArrayList<>();
 		for (final Token tok: src.token()) {
-			res.add(this.compileFunction(src.with(tok)));
+			res.add(this.parseFunction(src.with(tok)));
 		}
 		return res;
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Parameterfunktion und gibt deren Elternabschnitt zurück. Die
 	 * Erkennung erfolgt gemäß folgender EBNF:<br>
-	 * <pre>PARAM = "$" [ {@link #parseIdent(Parser) IDENT} | {@link #parseIndex(Parser) INDEX} | {@link #parseName(Parser) NAME} ]</pre><br>
+	 * <pre>PARAM = "$" [ {@link #parseIdent(FEMParser) IDENT} | {@link #parseIndex(FEMParser) INDEX} | {@link #parseName(FEMParser) NAME} ]</pre><br>
 	 * Als Abschnittstyp des Elternabschnitts wird {@code '$'} verwendet. Sein Abschnittswert ist die {@link FEMParam#index() Position} des referenzierten
 	 * Parameters bzw. {@code null}, wenn kein {@link Token#tokens() Kindabschnitt} vorliegen. Als Kindabschnitt wird der Abschnitt der Kennung (IDENT), der
 	 * Position (INDEX) bzw. des Namen (NAME) verwendet. Wenn Kennung, Position bzw. Name ungültig sind, wird als deren Abschnittstyp {@code '!'} verwendet. */
@@ -374,9 +398,30 @@ public class FEMDomain extends BaseObject {
 		return src.make('$', res.start(), Arrays.asList(ref)).value(val);
 	}
 
+	/** Diese Methode überführt den von {@link #parseParam(FEMParser)} ermittelten Abschnitt in eine Parameterwerte liefernde Funktion und gibt diese zurück. Für
+	 * andere Abschnitte liefert sie {@code null}. */
+	protected FEMFunction parseParam(final FEMToken src) throws NullPointerException, FEMException {
+		final Token tok = src.token();
+		if (tok.type() != '$') return null;
+		if (tok.size() == 0) return FEMFrame.FUNCTION;
+		try {
+			return FEMParam.from((Integer)tok.value());
+		} catch (final Exception cause) {
+			throw this.parseError(src, cause);
+		}
+	}
+
+	/** Diese Methode überführt den von {@link #parseHandler(FEMParser)} ermittelten Abschnitt in eine Parameterfunktion und gibt diese zurück. Für andere
+	 * Abschnitte liefert sie {@code null}. */
+	protected FEMClosure parseClosure(final FEMToken src) {
+		final FEMHandler res = this.parseHandler(src);
+		if (res == null) return null;
+		return FEMClosure.from(res.value());
+	}
+
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} eines Funktionszeigers und gibt dessen Elternabschnitt zurück. Die
 	 * Erkennung erfolgt gemäß folgender EBNF:<br>
-	 * <pre>HANDLER = "{" [ {@link #parseInfo(Parser) SC} ( {@link #parseName(Parser) NAME} | {@link #parseIdent(Parser) IDENT} ) { {@link #parseInfo(Parser) SC} ";" {@link #parseInfo(Parser) SC} ( {@link #parseName(Parser) NAME} | {@link #parseIdent(Parser) IDENT} ) } ] {@link #parseInfo(Parser) SC} ":" {@link #parseInfo(Parser) SC} {@link #parseFunction(FEMParser) FUNCTION} {@link #parseInfo(Parser) SC} "}"</pre>
+	 * <pre>HANDLER = "{" [ {@link #parseInfo(FEMParser) SC} ( {@link #parseName(FEMParser) NAME} | {@link #parseIdent(FEMParser) IDENT} ) { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} ( {@link #parseName(FEMParser) NAME} | {@link #parseIdent(FEMParser) IDENT} ) } ] {@link #parseInfo(FEMParser) SC} ":" {@link #parseInfo(FEMParser) SC} {@link #parseFunction(FEMParser) FUNCTION} {@link #parseInfo(FEMParser) SC} "}"</pre>
 	 * Als Abschnittstyp des Elternabschnitts wird <code>'{'</code> verwendet. Sein Abschnittswert ist die {@link List Liste} des Parameternamen. Als
 	 * Kindabschnitte werden die Abschnitte der Namen (NAME), Kennungen (IDENT) sowei der der Funktion (FUNCTION) verwendet. Wenn Namen bzw. Kennungen ungültig
 	 * sind, wird als deren Abschnittstyp {@code '!'} verwendet. */
@@ -459,9 +504,34 @@ public class FEMDomain extends BaseObject {
 		return src.make('{', pos, toks).value(names);
 	}
 
+	/** Diese Methode überführt den von {@link #parseHandler(FEMParser)} ermittelten Abschnitt in einen Funktionszeiger und gibt diese zurück. Für andere
+	 * Abschnitte liefert sie {@code null}. */
+	protected FEMHandler parseHandler(FEMToken src) throws NullPointerException, FEMException {
+		final Token tok = src.token();
+		if (tok.type() == '{') {
+			final int idx = tok.size() - 1;
+			if (idx < 0) throw this.parseError(src, null);
+			final FEMFunction fun = this.parseFunction(src.with(tok.get(idx)));
+			return FEMHandler.from(fun);
+		} else if (tok.type() == '=') {
+			if (tok.size() != 2) throw this.parseError(src, null);
+			src = src.with(tok.get(0));
+			final String str = this.parseIdent(src);
+			final String ref = str != null ? str : this.parseConst(src);
+			if (ref == null) throw this.parseError(src, null);
+			src = src.with(tok.get(1));
+			final FEMHandler han = this.parseHandler(src);
+			if (han == null) throw this.parseError(src, null);
+			final FEMProxy res = src.proxy(ref);
+			res.set(han.toFunction());
+			return FEMHandler.from(res);
+		}
+		return null;
+	}
+
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Funktion und gibt ihn zurück. Die Erkennung erfolgt gemäß folgender
 	 * EBNF:<br>
-	 * <pre>FUNCTION = ( {@link #parseParam(FEMParser) PARAM} | {@link #parseValue(FEMParser) VALUE} ) { {@link #parseInfo(Parser) SC} "(" {@link #parseGroup(FEMParser) GROUP} ")" }</pre>
+	 * <pre>FUNCTION = ( {@link #parseParam(FEMParser) PARAM} | {@link #parseValue(FEMParser) VALUE} ) { {@link #parseInfo(FEMParser) SC} "(" {@link #parseGroup(FEMParser) GROUP} ")" }</pre>
 	 * Wenn ein Parameter (PARAM) bzw. dem Wert (VALUE) von einer in runden Klammern eingeschlossenen Funktionsliste (GROUP) gefolgt wird, führt dies zur
 	 * Erkennung einer {@link FEMComposite Funktionsverkettung}, deren Elternabschnitt geliefert wird. Als Abschnittstyp wird dann {@code '.'} verwendet. Die
 	 * {@link Token#tokens() Kindabschnitte} sind die der aufgerufenen Funktion und die der Parameterfunktionsliste, letztere mit dem Abschnittstyp
@@ -489,79 +559,36 @@ public class FEMDomain extends BaseObject {
 		}
 	}
 
-	/** TODO doku */
-	protected FEMFunction compileParam(final FEMCompiler src) throws NullPointerException, FEMException {
-		final Token tok = src.token();
-		if (tok.type() != '$') return null;
-		if (tok.size() == 0) return FEMFrame.FUNCTION;
-		try {
-			return FEMParam.from((Integer)tok.value());
-		} catch (final Exception cause) {
-			throw this.parseError(src, cause);
+	/** Diese Methode überführt den von {@link #parseFunction(FEMParser)} ermittelten Abschnitt in eine Funktion und gibt diese zurück. */
+	protected FEMFunction parseFunction(FEMToken src) throws NullPointerException, FEMException {
+		FEMFunction res;
+		Token tok = src.token();
+		if (tok.type() == '.') {
+			if (tok.size() != 2) throw this.parseError(src, null);
+			res = this.parseFunction(src.with(tok.get(0)));
+			tok = tok.get(1);
+			src = src.with(tok);
+			if (tok.type() != '(') throw this.parseError(src, null);
+			final List<FEMFunction> pars = this.parseGroup(src);
+			return res.compose(pars);
 		}
-	}
-
-	/** TODO doku */
-	protected FEMHandler compileHandler(final FEMCompiler src) throws NullPointerException, FEMException {
-		final FEMHandler res = this.compileHandler1(src);
+		res = this.parseParam(src);
 		if (res != null) return res;
-		return this.compileHandler2(src);
-	}
-
-	/** TODO doku */
-	protected FEMHandler compileHandler1(final FEMCompiler src) throws NullPointerException, FEMException {
-		final Token tok = src.token();
-		if (tok.type() != '{') return null;
-		final int idx = tok.size() - 1;
-		if (idx < 0) throw this.parseError(src, null);
-		final FEMFunction fun = this.compileFunction(src.with(tok.get(idx)));
-		return FEMHandler.from(fun);
-	}
-
-	/** TODO doku */
-	protected FEMHandler compileHandler2(FEMCompiler src) throws FEMException {
-		final Token tok = src.token();
-		if (tok.type() != '=') return null;
-		if (tok.size() != 2) throw this.parseError(src, null);
-		src = src.with(tok.get(0));
-		final String id = this.parseIdent(src);
-		final String ref = id != null ? id : this.parseConst(src);
-		if (ref == null) throw this.parseError(src, null);
-		src = src.with(tok.get(1));
-		final FEMHandler han = this.compileHandler1(src);
-		if (han == null) throw this.parseError(src, null);
-		final FEMProxy res = src.proxy(ref);
-		res.set(han.toFunction());
-		return FEMHandler.from(res);
-	}
-
-	protected FEMClosure compileClosure(final FEMCompiler src) {
-		final FEMHandler res = this.compileHandler(src);
-		if (res == null) return null;
-		return FEMClosure.from(res.value());
-	}
-
-	/** TODO doku */
-	protected FEMFunction compileFunction(final FEMCompiler src) throws NullPointerException, FEMException {
-		FEMFunction res = this.compileComposite(src);
-		if (res != null) return res;
-		res = this.compileParam(src);
-		if (res != null) return res;
-		res = this.compileArray(src);
+		res = this.parseArray(src);
 		if (res != null) return res;
 		res = this.parseString1(src);
 		if (res != null) return res;
-		res = this.compileString2(src);
+		res = this.parseString2(src);
 		if (res != null) return res;
-		res = this.compileClosure(src);
+		res = this.parseClosure(src);
 		if (res != null) return res;
 		final String str = this.parseIdent(src);
 		final String ref = str != null ? str : this.parseConst(src);
 		if (ref == null) throw this.parseError(src, null);
 		try {
-			res = this.compileFunction(src, ref);
+			res = this.parseFunction(src, ref);
 			if (res != null) return res;
-			res = this.compileValue(src, ref);
+			res = this.parseValue(src, ref);
 			if (res != null) return res;
 		} catch (final Exception cause) {
 			throw this.parseError(src, cause);
@@ -569,34 +596,26 @@ public class FEMDomain extends BaseObject {
 		throw this.parseError(src, null);
 	}
 
-	/** TODO doku */
-	protected FEMFunction compileFunction(final FEMCompiler src, final String ref) {
+	/** Diese Methode überführt die gegebene Kennung bzw. Textdarstellung einer Konstanten in deren Funktion und gibt diese zurück. Wenn dies nicht möglich ist,
+	 * wird {@code null} geliefert.
+	 *
+	 * @param ref Kennung bzw. Textdarstellung einer Konstanten.
+	 * @return Funktion der Konstanten oder {@code null}. */
+	protected FEMFunction parseFunction(final FEMToken src, final String ref) {
 		final FEMFunction res = src.proxies().get(ref);
 		if (res != null) return res;
 		return FEMUtil.get(ref);
 	}
 
-	/** TODO doku */
-	protected FEMFunction compileComposite(final FEMCompiler src) throws NullPointerException, FEMException {
-		Token tok = src.token();
-		if (tok.type() != '.') return null;
-		if (tok.size() != 2) throw this.parseError(src, null);
-		final FEMFunction fun = this.compileFunction(src.with(tok.get(0)));
-		tok = tok.get(1);
-		if (tok.type() != '(') throw this.parseError(src, null);
-		final List<FEMFunction> pars = this.compileGroup(src.with(tok));
-		return fun.compose(pars);
-	}
-
 	/** Diese Methode {@link Parser#skip() überspringt} Leerraum und erfasst Kommentare gemäß folgender EBNF:
-	 * <pre>SC = { {@link #parseSpace(Parser) SPACE} | {@link #parseComment(Parser) COMMENT} }</pre> */
-	protected void parseInfo(final Parser src) throws NullPointerException {
+	 * <pre>SC = { {@link #parseSpace(FEMParser) SPACE} | {@link #parseComment(FEMParser) COMMENT} }</pre> */
+	protected void parseInfo(final FEMParser src) throws NullPointerException {
 		for (this.parseSpace(src); this.parseComment(src) != null; this.parseSpace(src)) {}
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Parameterposition und gibt ihn zurück. Als Abschnittstyp wird
 	 * {@code '#'} verwendet. Wenn keine Parameterposition gefunden wurden, wird {@code null} geliefert. */
-	protected Token parseIndex(final Parser src) throws NullPointerException {
+	protected Token parseIndex(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
 		for (int sym = src.symbol(); ('0' <= sym) && (sym <= '9'); sym = src.skip()) {}
 		if (pos != src.index()) return src.push('#', pos);
@@ -604,14 +623,14 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link Parser#skip() überspringt} alle Symbole eiens Leerraums. Dazu zählen alle Symbole kleiner oder gleich dem Leerzeichen. */
-	protected void parseSpace(final Parser src) throws NullPointerException {
+	protected void parseSpace(final FEMParser src) throws NullPointerException {
 		for (int sym = src.symbol(); (sym >= 0) && (sym <= ' '); sym = src.skip()) {}
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Parameternamen und gibt ihn zurück. Als Abschnittstyp wird
 	 * {@code '~'} verwendet. Wenn kein Parameternamen gefunden wurden, wird {@code null} geliefert. Parameternamen können grundsätzlich an folgenden Stellen
 	 * vorkommen: <pre>{NAME; NAME: $NAME({: $NAME}; $NAME /.../ $NAME)}</pre> */
-	protected Token parseName(final Parser src) throws NullPointerException {
+	protected Token parseName(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
 		LOOP: for (int sym = src.symbol(); sym > ' '; sym = src.skip()) {
 			switch (sym) {
@@ -631,12 +650,12 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette analog zu
 	 * {@link Strings#parseSequence(CharSequence, char, char, char)} und gibt diesen nur dann zurück, wenn er am {@code openSymbol} erkannt wurde. Andernfalls
 	 * liefert sie {@code null}. Als Abschnittstyp wird {@code openSymbol} eingesetzt, wenn die Sequenz nicht vorzeitig endet. Andernfalls wird die Zeichenkette
-	 * als {@link #parseError(Parser) Fehlerbereich} mit dem Abschnittstyp '!' erfasst.
+	 * als {@link #parseError(FEMParser) Fehlerbereich} mit dem Abschnittstyp '!' erfasst.
 	 *
 	 * @param openSym Erstes Symbol der Zeichenkette.
 	 * @param maskSym Symbol zur Maskierung von {@code maskSymbol} und {@code closeSymbol}.
 	 * @param closeSym Letztes Symbol der Zeichenkette. */
-	protected Token parseSequence(final Parser src, final char openSym, final char maskSym, final char closeSym) throws NullPointerException {
+	protected Token parseSequence(final FEMParser src, final char openSym, final char maskSym, final char closeSym) throws NullPointerException {
 		int sym = src.symbol();
 		if (sym != openSym) return null;
 		final int pos = src.index();
@@ -656,10 +675,133 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines maskierten Kommentars und gibt ihn Abschnitt zurück. Die Erkennung
-	 * erfolgt über {@link #parseSequence(Parser, char, char, char) this.parseSequence(parser, '/', '\\', '/')}. Als Abschnittstyp wird {@code '/'} verwendet.
+	 * erfolgt über {@link #parseSequence(FEMParser, char, char, char) this.parseSequence(parser, '/', '\\', '/')}. Als Abschnittstyp wird {@code '/'} verwendet.
 	 * Wenn kein maskierter Kommentar gefunden wurden, wird {@code null} geliefert. */
-	protected Token parseComment(final Parser src) throws NullPointerException {
+	protected Token parseComment(final FEMParser src) throws NullPointerException {
 		return this.parseSequence(src, '/', '\\', '/');
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #formatIdent(String, boolean) this.formatConst(name, false)}.
+	 *
+	 * @param string Zeichenkette.
+	 * @return gegebene bzw. formateirte Zeichenkette.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public String formatIdent(final String string) throws NullPointerException {
+		return this.formatIdent(string, false);
+	}
+
+	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit Maskierung als formatierte Zeichenkette zurück. Die
+	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder wenn die Zeichenkette ein {@link #parseName(FEMParser) zu maskierendes Zeichen enthält}.
+	 * Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<', '<', '>')}. Wenn die
+	 * Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
+	 *
+	 * @param string Zeichenkette.
+	 * @param forceMask {@code true}, wenn die Maskierung notwendig ist.
+	 * @return gegebene bzw. formateirte Zeichenkette.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public String formatIdent(final String string, final boolean forceMask) throws NullPointerException {
+		if (forceMask) return Strings.formatSequence(string, '<', '\\', '>');
+		final FEMParser parser = new FEMParser(string);
+		this.parseName(parser);
+		return !parser.isParsed() ? this.formatIdent(string, true) : Objects.notNull(string);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatScript(source, null)}.
+	 *
+	 * @see #formatScript(FEMScript, String)
+	 * @param source aufbereiteter Quelltext.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatScript(final FEMScript source) throws NullPointerException, IllegalArgumentException {
+		return this.formatScript(source, null);
+	}
+
+	/** Diese Methode gibt die Textdarstellung des gegebenen aufbereiteten Quelltextes zurück.
+	 *
+	 * @see #formatScript(FEMFormatter, FEMScript)
+	 * @param source aufbereiteter Quelltext.
+	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatScript(final FEMScript source, final String indent) throws NullPointerException, IllegalArgumentException {
+		final FEMFormatter target = new FEMFormatter().useIndent(indent);
+		this.formatScript(target, source);
+		return target.format();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source, null)}.
+	 *
+	 * @see #formatFrame(FEMFrame, String)
+	 * @param source Stapelrahmen.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFrame(final FEMFrame source) throws NullPointerException, IllegalArgumentException {
+		return this.formatFrame(source, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source.params(), indent)}.
+	 *
+	 * @see #formatFrame(FEMArray, String)
+	 * @param source Stapelrahmen.
+	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFrame(final FEMFrame source, final String indent) throws NullPointerException, IllegalArgumentException {
+		return this.formatFrame(source.params(), indent);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source, null)}.
+	 *
+	 * @see #formatFrame(FEMArray, String)
+	 * @param source Stapelrahmen.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFrame(final FEMArray source) throws NullPointerException, IllegalArgumentException {
+		return this.formatFrame(source, null);
+	}
+
+	/** Diese Methode gibt die Textdarstellung des gegebenen Stapelrahmen zurück.
+	 *
+	 * @see #formatFrame(FEMFormatter, Iterable)
+	 * @param source Stapelrahmen.
+	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFrame(final FEMArray source, final String indent) throws NullPointerException, IllegalArgumentException {
+		final FEMFormatter target = new FEMFormatter().useIndent(indent);
+		this.formatFrame(target, source);
+		return target.format();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code this.formatFunction(source, null)}.
+	 *
+	 * @see #formatFunction(FEMFunction, String)
+	 * @param source Stapelrahmen.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFunction(final FEMFunction source) throws NullPointerException, IllegalArgumentException {
+		return this.formatFunction(source, null);
+	}
+
+	/** Diese Methode gibt die Textdarstellung der gegebenen Funktion zurück.
+	 *
+	 * @see #formatFunction(FEMFormatter, FEMFunction)
+	 * @param source Funktion.
+	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
+	public String formatFunction(final FEMFunction source, final String indent) throws NullPointerException, IllegalArgumentException {
+		final FEMFormatter target = new FEMFormatter().useIndent(indent);
+		this.formatFunction(target, source);
+		return target.format();
 	}
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes.
@@ -1103,153 +1245,6 @@ public class FEMDomain extends BaseObject {
 	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
 	protected void formatObject(final FEMFormatter target, final FEMObject source) throws NullPointerException, IllegalArgumentException {
 		target.putToken(source.toString());
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #formatIdent(String, boolean) this.formatConst(name, false)}.
-	 *
-	 * @param string Zeichenkette.
-	 * @return gegebene bzw. formateirte Zeichenkette.
-	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public String formatIdent(final String string) throws NullPointerException {
-		return this.formatIdent(string, false);
-	}
-
-	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit Maskierung als formatierte Zeichenkette zurück. Die
-	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder wenn die Zeichenkette ein {@link #parseName(Parser) zu maskierendes Zeichen enthält}.
-	 * Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<', '<', '>')}. Wenn die
-	 * Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
-	 *
-	 * @param string Zeichenkette.
-	 * @param forceMask {@code true}, wenn die Maskierung notwendig ist.
-	 * @return gegebene bzw. formateirte Zeichenkette.
-	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public String formatIdent(final String string, final boolean forceMask) throws NullPointerException {
-		if (forceMask) return Strings.formatSequence(string, '<', '\\', '>');
-		final Parser parser = new Parser(string);
-		this.parseName(parser);
-		return !parser.isParsed() ? this.formatIdent(string, true) : Objects.notNull(string);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatScript(source, null)}.
-	 *
-	 * @see #formatScript(FEMScript, String)
-	 * @param source aufbereiteter Quelltext.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatScript(final FEMScript source) throws NullPointerException, IllegalArgumentException {
-		return this.formatScript(source, null);
-	}
-
-	/** Diese Methode gibt die Textdarstellung des gegebenen aufbereiteten Quelltextes zurück.
-	 *
-	 * @see #formatScript(FEMFormatter, FEMScript)
-	 * @param source aufbereiteter Quelltext.
-	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatScript(final FEMScript source, final String indent) throws NullPointerException, IllegalArgumentException {
-		final FEMFormatter target = new FEMFormatter().useIndent(indent);
-		this.formatScript(target, source);
-		return target.format();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source, null)}.
-	 *
-	 * @see #formatFrame(FEMFrame, String)
-	 * @param source Stapelrahmen.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFrame(final FEMFrame source) throws NullPointerException, IllegalArgumentException {
-		return this.formatFrame(source, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source.params(), indent)}.
-	 *
-	 * @see #formatFrame(FEMArray, String)
-	 * @param source Stapelrahmen.
-	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFrame(final FEMFrame source, final String indent) throws NullPointerException, IllegalArgumentException {
-		return this.formatFrame(source.params(), indent);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source, null)}.
-	 *
-	 * @see #formatFrame(FEMArray, String)
-	 * @param source Stapelrahmen.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFrame(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-		return this.formatFrame(source, null);
-	}
-
-	/** Diese Methode gibt die Textdarstellung des gegebenen Stapelrahmen zurück.
-	 *
-	 * @see #formatFrame(FEMFormatter, Iterable)
-	 * @param source Stapelrahmen.
-	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFrame(final FEMArray source, final String indent) throws NullPointerException, IllegalArgumentException {
-		final FEMFormatter target = new FEMFormatter().useIndent(indent);
-		this.formatFrame(target, source);
-		return target.format();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatFunction(source, null)}.
-	 *
-	 * @see #formatFunction(FEMFunction, String)
-	 * @param source Stapelrahmen.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFunction(final FEMFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.formatFunction(source, null);
-	}
-
-	/** Diese Methode gibt die Textdarstellung der gegebenen Funktion zurück.
-	 *
-	 * @see #formatFunction(FEMFormatter, FEMFunction)
-	 * @param source Funktion.
-	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFunction(final FEMFunction source, final String indent) throws NullPointerException, IllegalArgumentException {
-		final FEMFormatter target = new FEMFormatter().useIndent(indent);
-		this.formatFunction(target, source);
-		return target.format();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #parseModule(FEMScript) this.parseModule(this.parseScript(source))}. */
-	public List<FEMFunction> parseModule(final String source) throws NullPointerException, IllegalArgumentException {
-		return this.parseModule(this.parseScript(source));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #parseModule(FEMCompiler) this.parseModule(new FEMCompiler(source))}. */
-	public List<FEMFunction> parseModule(final FEMScript source) throws NullPointerException, IllegalArgumentException {
-		return this.parseModule(new FEMCompiler().with(source.root()));
-	}
-
-	/*    doku */
-	public List<FEMFunction> parseModule(final FEMCompiler src) throws NullPointerException, IllegalArgumentException {
-		final Token tok = src.token();
-		if (tok.type() != '*') throw this.parseError(src, null);
-		try {
-			for (final Object name: (Set<?>)tok.value()) {
-				src.proxy(name.toString());
-			}
-		} catch (final Exception cause) {
-			throw this.parseError(src, cause);
-		}
-		return this.compileGroup(src);
 	}
 
 }

@@ -20,9 +20,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public String toString() {
-			final FEMFormatter target = new FEMFormatter();
-			FEMDomain.DEFAULT.formatFunction(target, this);
-			return target.format();
+			return FEMDomain.DEFAULT.formatFunction(this);
 		}
 
 	}

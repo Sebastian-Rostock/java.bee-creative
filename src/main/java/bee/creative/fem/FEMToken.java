@@ -10,27 +10,27 @@ import bee.creative.util.Parser.Token;
  * {@link #proxy(String) Bestückung bzw. Wiederverwendung} derselben bereitgestellt.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class FEMCompiler {
+public class FEMToken {
 
 	private final Token token;
 
 	private final Map<String, FEMProxy> proxies;
 
-	private FEMCompiler(final FEMCompiler parent, final Token token) throws NullPointerException {
+	private FEMToken(final FEMToken parent, final Token token) throws NullPointerException {
 		this.token = token;
 		this.proxies = parent.proxies;
 	}
 
 	/** Dieser Konstruktor initialisiert den Kompiler mit dem {@link Token#EMPTY leeren Abschnitt} sowie eine leere Plazhalterabbildung. */
-	public FEMCompiler() {
+	public FEMToken() {
 		this.token = Token.EMPTY;
 		this.proxies = new HashMap<>();
 	}
 
 	/** Diese Methode gibt einen neuen Kompiller mit dem gegebenen typisierten Abschnitt zurück. Der gelieferte Kompiler verwendet die {@link #proxies() Abbildung
 	 * von Namen auf Platzhalter} dieses Kompilers. */
-	public FEMCompiler with(final Token token) throws NullPointerException {
-		return new FEMCompiler(this, Objects.notNull(token));
+	public FEMToken with(final Token token) throws NullPointerException {
+		return new FEMToken(this, Objects.notNull(token));
 	}
 
 	/** Diese Methode gibt den aktuellen Abschnitt zurück. */

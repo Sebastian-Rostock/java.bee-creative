@@ -6,7 +6,7 @@ import java.util.List;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen Formatierer, der Daten, Werten und Funktionen in eine Zeichenkette überführen kann. Er realisiert damit die
- * entgegengesetzte Operation zur Kombination von {@link FEMParser} und {@link FEMCompiler}.
+ * entgegengesetzte Operation zur Kombination von {@link FEMParser} und {@link FEMToken}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFormatter {

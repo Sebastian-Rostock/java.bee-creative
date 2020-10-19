@@ -10,7 +10,7 @@ import bee.creative.lang.Objects;
  * {@link #equals(Object) Äquivalenz} nicht auf diesem, sondern auf einer extra hierfür bereitgestellten {@link #id() Kennung} beruhen.
  *
  * @see FEMParser#proxies()
- * @see FEMCompiler#proxies()
+ * @see FEMToken#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMProxy extends FEMFunction implements Property<FEMFunction>, Emuable {
 

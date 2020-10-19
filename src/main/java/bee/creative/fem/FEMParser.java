@@ -1,8 +1,8 @@
 package bee.creative.fem;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import bee.creative.util.HashSet;
 import bee.creative.util.Parser;
 
 /** Diese Klasse implementiert den Parser zur Zerlegung einer Zeichenkette in Abschnitte eines {@link FEMScript aufbereiteten Quelltexts} im Rahmen gegebener

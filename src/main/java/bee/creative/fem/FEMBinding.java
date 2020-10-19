@@ -3,33 +3,57 @@ package bee.creative.fem;
 import bee.creative.fem.FEMFunction.BaseFunction;
 import bee.creative.lang.Objects;
 
+/** Diese Klasse implementiert eine bindende Funktion, welche eine {@link #target() gegebene Funktion} an die zusätzlichen Parameterwerten eines
+ * {@link #params() gebundenen Stapelrahmen} bindet. Die zugesicherten Parameterwerte sowie das Kontextobjekt für den {@link #invoke(FEMFrame) Aufruf} der
+ * gegebenen Funktion entsprechen hierbei denen des in der Methode {@link #invoke(FEMFrame)} übergeben Stapelrahmen {@code frame}. Die zusätzlichen
+ * Parameterwerte stammen dagegen aus dem {@link #params() gebundenen Stapelrahmen}, sodass sich der Ergebniswert der bindenden Funktion aus
+ * {@code this.target().invoke(this.params().withParams(frame.params()).withContext(frame.context()))} ergibt.
+ * 
+ * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMBinding extends BaseFunction {
 
-	final FEMFrame frame;
+	/** Diese Methode gibt diese Funktion mit Bindung an den gegebenen {@link FEMFrame Stapelrahmen} zurück.
+	 * <p>
+	 *
+	 * @see FEMBinding
+	 * @param params {@link FEMFrame Stapelrahmen} mit den zusätzlichen Parameterwerten.
+	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame Stapelrahmen}.
+	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
+	public static FEMFunction from(final FEMFunction target, final FEMFrame params) throws NullPointerException {
+		return new FEMBinding(Objects.notNull(target), Objects.notNull(params));
+	}
 
 	final FEMFunction target;
 
-	FEMBinding(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
-		this.frame = Objects.notNull(frame);
-		this.target = function;
+	final FEMFrame params;
+
+	FEMBinding(final FEMFunction target, final FEMFrame params) {
+		this.target = target;
+		this.params = params;
 	}
 
-	public FEMFrame frame() {
-		return this.frame;
-	}
-
-	public FEMFunction function() {
+	/** Diese Methode gibt die gebundene Funktion zurück, welche mit den gebundenen zusätzlichen Parameterwerten aufgerufen wird.
+	 * 
+	 * @return gebundene Funktion. */
+	public FEMFunction target() {
 		return this.target;
+	}
+
+	/** Diese Methode gibt den gebundenen Stapelrahmen zurück, welcher die zusätzlichen Parameterwerte bereitstellt.
+	 * 
+	 * @return Stapelrahmen. */
+	public FEMFrame params() {
+		return this.params;
 	}
 
 	@Override
 	public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-		return this.target.invoke(this.frame.withParams(frame.params()).withContext(frame.context()));
+		return this.target.invoke(this.params.withParams(frame.params()).withContext(frame.context()));
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.frame, this.target);
+		return Objects.hash(this.params, this.target);
 	}
 
 	@Override
@@ -37,21 +61,7 @@ public final class FEMBinding extends BaseFunction {
 		if (object == this) return true;
 		if (!(object instanceof FEMBinding)) return false;
 		final FEMBinding that = (FEMBinding)object;
-		return this.frame.equals(that.frame) && this.target.equals(that.target);
-	}
-
-	/** Diese Methode gibt diese Funktion mit Bindung an den gegebenen {@link FEMFrame Stapelrahmen} zurück.
-	 * <p>
-	 * Die zugesicherten Parameterwerte sowie das Kontextobjekt für den {@link #invoke(FEMFrame) Aufruf} der gelieferten Funktion entsprechen hierbei denen des in
-	 * der Methode {@link #invoke(FEMFrame)} übergeben Stapelrahmen {@code frame}. Die zusätzlichen Parameterwerte stammen dagegen aus dem gegebenen Stapelrahmen
-	 * {@code params}, d.h. {@code this.invoke(params.withParams(frame.params()).withContext(frame.context()))}.
-	 *
-	 * @see FEMBinding
-	 * @param params {@link FEMFrame Stapelrahmen} mit den zusätzlichen Parameterwerten.
-	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame Stapelrahmen}.
-	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
-	public static FEMFunction from(final FEMFunction f, final FEMFrame params) throws NullPointerException {
-		return new FEMBinding(params, f);
+		return this.params.equals(that.params) && this.target.equals(that.target);
 	}
 
 }
