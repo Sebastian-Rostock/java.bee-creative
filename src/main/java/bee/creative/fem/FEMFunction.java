@@ -20,7 +20,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public String toString() {
-			return FEMDomain.DEFAULT.formatFunction(this);
+			return FEMDomain.DEFAULT.printGroup(this);
 		}
 
 	}
@@ -91,7 +91,7 @@ public abstract class FEMFunction {
 			this.target = function;
 		}
 
-		public FEMFunction function() {
+		public FEMFunction target() {
 			return this.target;
 		}
 
@@ -214,7 +214,7 @@ public abstract class FEMFunction {
 
 	@Override
 	public String toString() {
-		return Natives.formatClass(this.getClass());
+		return Natives.printClass(this.getClass());
 	}
 
 }

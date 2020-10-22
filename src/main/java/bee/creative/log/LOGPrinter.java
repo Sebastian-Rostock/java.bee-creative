@@ -8,7 +8,9 @@ import bee.creative.lang.Integers;
 import bee.creative.lang.Strings;
 
 /** Diese Klasse implementiert den Generator der {@link LOGBuilder#toStrings() Textdarstellungen} eines {@link LOGBuilder}.
- *
+ * 
+ * @see #get()
+ * @see #get(Iterable)
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends LOGEntry>, String[]> {
 
@@ -135,7 +137,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	protected String customIndent(final int count) {
 		final String space = "                                        "; // 40 x Space
 		if (count <= 20) return space.substring(0, count * 2);
-		return "(" + count + ")" + space.substring(0, 40 - Integers.stringSize(count));
+		return "(" + count + ")" + space.substring(0, 40 - Integers.getSize(count));
 	}
 
 }

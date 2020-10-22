@@ -42,7 +42,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 
 	/** Diese Methode delegiert das gegebene Objekt abhängig von seinem Datentyp an eine der spezifischen Methoden und gibt {@code this} zurück. Unbekannte
 	 * Datentypen werden ignoriert.
-	 * 
+	 *
 	 * @param object Quelldaten als {@link URL}, {@link URI}, {@link File}, {@link String}, {@link Node}, {@link Reader}, {@link InputStream}, {@link Source} oder
 	 *        {@link BaseSourceData}.
 	 * @return {@code this}. */

@@ -76,7 +76,7 @@ public final class H2QN implements QN {
 	@Override
 	public String toString() {
 		final String value = this.value();
-		return value == null ? Integer.toString(this.key) : Objects.toString(value);
+		return value == null ? Integer.toString(this.key) : Objects.print(value);
 	}
 
 }

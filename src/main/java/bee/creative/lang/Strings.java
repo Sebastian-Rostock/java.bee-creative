@@ -545,7 +545,7 @@ public class Strings {
 	}
 
 	/** Diese Methode parst die gegebene Zeichenkette mit den gegebenen Symbolen und gibt die geparste Zeichenkette zurück. Sie realisiert dazu die
-	 * Umkehroperation zu {@link #formatSequence(CharSequence, char, char, char)} und liefert {@code null}, wenn das Format ungültig ist. Das Parsen erwartet,
+	 * Umkehroperation zu {@link #printSequence(CharSequence, char, char, char)} und liefert {@code null}, wenn das Format ungültig ist. Das Parsen erwartet,
 	 * dass die gegebene Zeichenkette mit {@code openSymbol} beginnt, mit {@code closeSymbol} endet und dass vor allen Vorkommen von {@code openSymbol},
 	 * {@code maskSymbol} und {@code closeSymbol} zwischen dem ersten und letzten Symbol der Zeichenkette ein {@code maskSymbol} steht.
 	 *
@@ -580,14 +580,14 @@ public class Strings {
 		return null;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code formatSequence(string, maskSymbol, maskSymbol, maskSymbol)}.
+	/** Diese Methode ist eine Abkürzung für {@link #printSequence(CharSequence, char, char, char) printSequence(string, maskSymbol, maskSymbol, maskSymbol)}.
 	 *
 	 * @param string Zeichenkette.
 	 * @param maskSymbol Maskierungszeichen.
 	 * @return formatierte Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public static String formatSequence(final CharSequence string, final char maskSymbol) throws NullPointerException {
-		return Strings.formatSequence(string, maskSymbol, maskSymbol, maskSymbol);
+	public static String printSequence(final CharSequence string, final char maskSymbol) throws NullPointerException {
+		return Strings.printSequence(string, maskSymbol, maskSymbol, maskSymbol);
 	}
 
 	/** Diese Methode formatiert die gegebene Zeichenkette mit den gegebenen Symbolen und gibt die formatierte Zeichenkette zurück. Beim Formatieren werden das
@@ -601,7 +601,7 @@ public class Strings {
 	 * @param closeSymbol Letztes Symbol der formatierten Zeichenkette.
 	 * @return formatierte Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public static String formatSequence(final CharSequence string, final char openSymbol, final char maskSymbol, final char closeSymbol)
+	public static String printSequence(final CharSequence string, final char openSymbol, final char maskSymbol, final char closeSymbol)
 		throws NullPointerException {
 		final int length = string.length();
 		int offset = length + 2;

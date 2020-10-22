@@ -181,7 +181,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	static int fromI2(final char[] buffer, final int offset) {
-		if (Integers.integerSize(buffer, offset, 2) != 2) throw new IllegalArgumentException();
+		if (Integers.getSize(buffer, offset, 2) != 2) throw new IllegalArgumentException();
 		return Integers.parseInt(buffer, offset, 2);
 	}
 
@@ -206,7 +206,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	static FEMDatetime fromT12(final FEMDatetime result, final char[] buffer, final int offset) {
 		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.')) throw new IllegalArgumentException();
-		if (Integers.integerSize(buffer, offset + 9, 3) != 3) throw new IllegalArgumentException();
+		if (Integers.getSize(buffer, offset + 9, 3) != 3) throw new IllegalArgumentException();
 		final int hour = FEMDatetime.fromI2(buffer, offset + 0), minute = FEMDatetime.fromI2(buffer, offset + 3), second = FEMDatetime.fromI2(buffer, offset + 6),
 			millisecond = Integers.parseInt(buffer, offset + 9, 3);
 		return result.withTime(hour, minute, second, millisecond);
@@ -214,7 +214,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	static FEMDatetime fromD10(final FEMDatetime result, final char[] buffer, final int offset) {
 		if ((buffer[offset + 4] != '-') || (buffer[offset + 7] != '-')) throw new IllegalArgumentException();
-		if (Integers.integerSize(buffer, offset, 4) != 4) throw new IllegalArgumentException();
+		if (Integers.getSize(buffer, offset, 4) != 4) throw new IllegalArgumentException();
 		final int year = Integers.parseInt(buffer, offset, 4), month = FEMDatetime.fromI2(buffer, offset + 5), date = FEMDatetime.fromI2(buffer, offset + 8);
 		return result.withDate(year, month, date);
 	}
@@ -1391,15 +1391,15 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		final boolean hasDate = this.hasDate();
 		int offset = 0;
 		if (hasDate) {
-			Integers.formatInt(this.yearValueImpl(), buffer, offset, 4);
+			Integers.printInt(this.yearValueImpl(), buffer, offset, 4);
 			offset += 4;
 			buffer[offset] = '-';
 			offset += 1;
-			Integers.formatInt(this.monthValueImpl(), buffer, offset, 2);
+			Integers.printInt(this.monthValueImpl(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = '-';
 			offset += 1;
-			Integers.formatInt(this.dateValueImpl(), buffer, offset, 2);
+			Integers.printInt(this.dateValueImpl(), buffer, offset, 2);
 			offset += 2;
 		}
 		if (this.hasTime()) {
@@ -1408,21 +1408,21 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 				offset += 1;
 			}
 			buffer[7] = '-';
-			Integers.formatInt(this.hourValueImpl(), buffer, offset, 2);
+			Integers.printInt(this.hourValueImpl(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = ':';
 			offset += 1;
-			Integers.formatInt(this.minuteValueImpl(), buffer, offset, 2);
+			Integers.printInt(this.minuteValueImpl(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = ':';
 			offset += 1;
-			Integers.formatInt(this.secondValueImpl(), buffer, offset, 2);
+			Integers.printInt(this.secondValueImpl(), buffer, offset, 2);
 			offset += 2;
 			final int millisecond = this.millisecondValueImpl();
 			if (millisecond != 0) {
 				buffer[offset] = '.';
 				offset += 1;
-				Integers.formatInt(millisecond, buffer, offset, 3);
+				Integers.printInt(millisecond, buffer, offset, 3);
 				offset += 3;
 			}
 		}
@@ -1435,11 +1435,11 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 				final int zoneAbs = Math.abs(zone);
 				buffer[offset] = zone < 0 ? '-' : '+';
 				offset += 1;
-				Integers.formatInt(zoneAbs / 60, buffer, offset, 2);
+				Integers.printInt(zoneAbs / 60, buffer, offset, 2);
 				offset += 2;
 				buffer[offset] = ':';
 				offset += 1;
-				Integers.formatInt(zoneAbs % 60, buffer, offset, 2);
+				Integers.printInt(zoneAbs % 60, buffer, offset, 2);
 				offset += 2;
 			}
 		}

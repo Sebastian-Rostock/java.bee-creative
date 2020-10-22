@@ -27,12 +27,12 @@ public class Natives {
 
 	}, byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class).get();
 
-	/** Dieses Feld speichert den {@link Getter} zu {@link #formatClass(Class)}. */
-	static final Getter<Class<?>, Object> formatClass = new Getter<Class<?>, Object>() {
+	/** Dieses Feld speichert den {@link Getter} zu {@link #printClass(Class)}. */
+	static final Getter<Class<?>, Object> printClass = new Getter<Class<?>, Object>() {
 
 		@Override
 		public Object get(final Class<?> input) {
-			return Natives.formatClass(input);
+			return Natives.printClass(input);
 		}
 
 	};
@@ -66,11 +66,11 @@ public class Natives {
 		return Natives.parseField(memberPath);
 	}
 
-	/** Diese Methode gibt das {@link Field Datenfeld} mit der gegebenen {@link #formatField(Field) Textdarstellung} zurück. Das gelieferte Datenfeld entspricht
+	/** Diese Methode gibt das {@link Field Datenfeld} mit der gegebenen {@link #printField(Field) Textdarstellung} zurück. Das gelieferte Datenfeld entspricht
 	 * {@code parseField(parseClass("CLASS_PATH"), "FIELD_NAME")}.
 	 *
 	 * @see #parseClass(String)
-	 * @see #formatField(Field)
+	 * @see #printField(Field)
 	 * @see Class#getDeclaredField(String)
 	 * @param fieldText Datenfeldtext.
 	 * @return Datenfeld.
@@ -78,8 +78,8 @@ public class Natives {
 	 * @throws IllegalArgumentException Wenn {@code fieldPath} ungültig ist bzw. das Datenfeld nicht gefunden wurde. */
 	public static Field parseField(final String fieldText) throws NullPointerException, IllegalArgumentException {
 		try {
-			final int offset = fieldText.lastIndexOf('.');
-			return Natives.parseField(Natives.parseClass(fieldText.substring(0, offset)), fieldText.substring(offset + 1));
+			final int pos = fieldText.lastIndexOf('.');
+			return Natives.parseField(Natives.parseClass(fieldText.substring(0, pos)), fieldText.substring(pos + 1));
 		} catch (NullPointerException | IllegalArgumentException cause) {
 			throw cause;
 		} catch (final Exception cause) {
@@ -105,10 +105,10 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt die {@link Class Klasse} mit der gegebenen {@link #formatClass(Class) Textdarstellung} zurück. Die Klassentexte
+	/** Diese Methode gibt die {@link Class Klasse} mit der gegebenen {@link #printClass(Class) Textdarstellung} zurück. Die Klassentexte
 	 * {@code "java.lang.Object"} und {@code "int[]"} liefert beispielsweise die Klassen {@code Object.class} bzw. {@code int[].class}.
 	 *
-	 * @see #formatClass(Class)
+	 * @see #printClass(Class)
 	 * @param classText Klassentext.
 	 * @return Klasse.
 	 * @throws NullPointerException Wenn {@code classText} {@code null} ist.
@@ -116,10 +116,10 @@ public class Natives {
 	public static Class<?> parseClass(final String classText) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (classText.endsWith("[]")) return Array.newInstance(Natives.parseClass(classText.substring(0, classText.length() - 2)), 0).getClass();
-			Class<?> result = Natives.parseClass.get(classText);
-			if (result != null) return result;
-			result = Class.forName(classText);
-			return result;
+			Class<?> res = Natives.parseClass.get(classText);
+			if (res != null) return res;
+			res = Class.forName(classText);
+			return res;
 		} catch (NullPointerException | IllegalArgumentException cause) {
 			throw cause;
 		} catch (final Exception cause) {
@@ -127,25 +127,25 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt die {@link Class Parametertypen} mit der gegebenen {@link #formatParams(Class...) Textdarstellung} zurück.
+	/** Diese Methode gibt die {@link Class Parametertypen} mit der gegebenen {@link #printParams(Class...) Textdarstellung} zurück.
 	 *
-	 * @see #formatParams(Class...)
+	 * @see #printParams(Class...)
 	 * @param paramsText Parametertypentext.
 	 * @return Parametertypen.
 	 * @throws NullPointerException Wenn {@code paramsText} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code paramsText} ungültig ist bzw. eine der Klassen nicht gefunden wurde. */
 	public static Class<?>[] parseParams(final String paramsText) throws NullPointerException, IllegalArgumentException {
 		try {
-			int i = paramsText.length() - 1;
-			if ((paramsText.charAt(0) != '(') || (paramsText.charAt(i) != ')')) throw new IllegalArgumentException();
-			if (i == 1) return new Class<?>[0];
-			final String[] classTexts = paramsText.substring(1, i).split(",", -1);
-			i = classTexts.length;
-			final Class<?>[] result = new Class<?>[i];
-			for (int j = 0; j < i; j++) {
-				result[j] = Natives.parseClass(classTexts[j]);
+			int pos = paramsText.length() - 1;
+			if ((paramsText.charAt(0) != '(') || (paramsText.charAt(pos) != ')')) throw new IllegalArgumentException();
+			if (pos == 1) return new Class<?>[0];
+			final String[] classTexts = paramsText.substring(1, pos).split(",", -1);
+			pos = classTexts.length;
+			final Class<?>[] res = new Class<?>[pos];
+			for (int j = 0; j < pos; j++) {
+				res[j] = Natives.parseClass(classTexts[j]);
 			}
-			return result;
+			return res;
 		} catch (NullPointerException | IllegalArgumentException cause) {
 			throw cause;
 		} catch (final Exception cause) {
@@ -153,18 +153,19 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt die {@link Method Methode} mit der gegebenen {@link #formatMethod(Method) Textdarstellung} zurück. Das gelieferte Datenfeld entspricht
+	/** Diese Methode gibt die {@link Method Methode} mit der gegebenen {@link #printMethod(Method) Textdarstellung} zurück. Das gelieferte Datenfeld entspricht
 	 * {@code parseMethod(parseClass(CLASS_PATH), "METHOD_NAME", parseParams("PARAM_TYPE_1,...,PARAM_TYPE_N"))}.
 	 *
-	 * @see #formatMethod(Method)
+	 * @see #printMethod(Method)
 	 * @param methodText Methodentext.
 	 * @return Methoden.
 	 * @throws NullPointerException Wenn {@code methodText} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code methodText} ungültig ist bzw. die Methode nicht gefunden wurde. */
 	public static Method parseMethod(final String methodText) throws NullPointerException, IllegalArgumentException {
 		try {
-			final int i = methodText.indexOf('('), j = methodText.lastIndexOf('.', i);
-			return Natives.parseMethod(Natives.parseClass(methodText.substring(0, j)), methodText.substring(j + 1, i), Natives.parseParams(methodText.substring(i)));
+			final int pos1 = methodText.indexOf('('), pos2 = methodText.lastIndexOf('.', pos1);
+			return Natives.parseMethod(Natives.parseClass(methodText.substring(0, pos2)), methodText.substring(pos2 + 1, pos1),
+				Natives.parseParams(methodText.substring(pos1)));
 		} catch (NullPointerException | IllegalArgumentException cause) {
 			throw cause;
 		} catch (final Exception cause) {
@@ -192,18 +193,18 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt den {@link Constructor Konstruktor} mit der gegebenen {@link #formatConstructor(Constructor) Textdarstellung} zurück. Das gelieferte
+	/** Diese Methode gibt den {@link Constructor Konstruktor} mit der gegebenen {@link #printConstructor(Constructor) Textdarstellung} zurück. Das gelieferte
 	 * Datenfeld entspricht {@code parseConstructor(parseClass(CLASS_PATH), parseParams("PARAM_TYPE_1,...,PARAM_TYPE_N"))}.
 	 *
-	 * @see #formatConstructor(Constructor)
+	 * @see #printConstructor(Constructor)
 	 * @param constructorText Konstruktortext.
 	 * @return Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructorText} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code constructorText} ungültig ist bzw. der Konstruktor nicht gefunden wurde. */
 	public static Constructor<?> parseConstructor(final String constructorText) throws NullPointerException, IllegalArgumentException {
 		try {
-			final int i = constructorText.indexOf(".new(");
-			return Natives.parseConstructor(Natives.parseClass(constructorText.substring(0, i)), Natives.parseParams(constructorText.substring(i + 4)));
+			final int pos = constructorText.indexOf(".new(");
+			return Natives.parseConstructor(Natives.parseClass(constructorText.substring(0, pos)), Natives.parseParams(constructorText.substring(pos + 4)));
 		} catch (NullPointerException | IllegalArgumentException cause) {
 			throw cause;
 		} catch (final Exception cause) {
@@ -231,67 +232,66 @@ public class Natives {
 	}
 
 	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Field Datenfelds} zurück. Das Format der Textdarstellung ist
-	 * {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .}{@link Field#getName() FIELD_NAME}{@code "}.
+	 * {@code "}{@link #printClass(Class) CLASS_PATH}{@code .}{@link Field#getName() FIELD_NAME}{@code "}.
 	 *
 	 * @see Field#getName()
-	 * @see #formatClass(Class)
+	 * @see #printClass(Class)
 	 * @param field Datenfeld.
 	 * @return Datenfeldtext.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static String formatField(final Field field) throws NullPointerException {
-		return Natives.formatClass(field.getDeclaringClass()) + "." + field.getName();
+	public static String printField(final Field field) throws NullPointerException {
+		return Natives.printClass(field.getDeclaringClass()) + "." + field.getName();
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Klasse} zurück. Diese wird über {@link Class#getName()} und {@link Class#isArray()}
 	 * ermittelt. Die Klassen {@code Object.class} und {@code int[].class} liefert beispielsweise {@code "java.lang.Object"} bzw. {@code "int[]"}.
 	 *
-	 * @see Class#getCanonicalName()
 	 * @param clazz Klasse.
 	 * @return Klassentext.
 	 * @throws NullPointerException Wenn {@code clazz} {@code null} ist. */
-	public static String formatClass(final Class<?> clazz) throws NullPointerException {
-		return clazz.isArray() ? Natives.formatClass(clazz.getComponentType()) + "[]" : clazz.getName();
+	public static String printClass(final Class<?> clazz) throws NullPointerException {
+		return clazz.isArray() ? Natives.printClass(clazz.getComponentType()) + "[]" : clazz.getName();
 	}
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Parametertypen} zurück. Das Format der Textdarstellung ist
-	 * {@code "(}{@link #formatClass(Class) PARAM_TYPE_1}{@code ,...,}{@link #formatClass(Class) PARAM_TYPE_N}{@code )"}.
+	 * {@code "(}{@link #printClass(Class) PARAM_TYPE_1}{@code ,...,}{@link #printClass(Class) PARAM_TYPE_N}{@code )"}.
 	 *
 	 * @see Method#getParameterTypes()
 	 * @see Constructor#getParameterTypes()
 	 * @param types Parametertypen.
 	 * @return Parametertypentext.
 	 * @throws NullPointerException Wenn {@code types} {@code null} ist oder enthält. */
-	public static String formatParams(final Class<?>... types) throws NullPointerException {
-		final StringBuilder result = new StringBuilder().append('(');
-		Strings.join(result, ",", Iterables.translatedIterable(Natives.formatClass, Arrays.asList(types)));
-		return result.append(')').toString();
+	public static String printParams(final Class<?>... types) throws NullPointerException {
+		final StringBuilder res = new StringBuilder().append('(');
+		Strings.join(res, ",", Iterables.translatedIterable(Natives.printClass, Arrays.asList(types)));
+		return res.append(')').toString();
 	}
 
-	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Method Methode} zurück. Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class)
-	 * CLASS_PATH}{@code .}{@link Method#getName() METHOD_NAME} {@link #formatParams(Class...) (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
+	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Method Methode} zurück. Das Format der Textdarstellung ist {@code "}{@link #printClass(Class)
+	 * CLASS_PATH}{@code .}{@link Method#getName() METHOD_NAME} {@link #printParams(Class...) (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
 	 *
 	 * @see Method#getName()
-	 * @see #formatClass(Class)
-	 * @see #formatParams(Class...)
+	 * @see #printClass(Class)
+	 * @see #printParams(Class...)
 	 * @param method Methode.
 	 * @return Methodentext.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public static String formatMethod(final Method method) throws NullPointerException {
-		return Natives.formatMethod(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
+	public static String printMethod(final Method method) throws NullPointerException {
+		return Natives.printMethod(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
 	}
 
 	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Constructor Konstruktors} zurück. Das Format der Textdarstellung ist
-	 * {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .new}{@link #formatParams(Class...) (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
+	 * {@code "}{@link #printClass(Class) CLASS_PATH}{@code .new}{@link #printParams(Class...) (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
 	 *
 	 * @param constructor Konstruktor.
 	 * @return Konstruktortext.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
-	public static String formatConstructor(final Constructor<?> constructor) throws NullPointerException {
-		return Natives.formatMethod(constructor.getDeclaringClass(), "new", constructor.getParameterTypes());
+	public static String printConstructor(final Constructor<?> constructor) throws NullPointerException {
+		return Natives.printMethod(constructor.getDeclaringClass(), "new", constructor.getParameterTypes());
 	}
 
-	static String formatMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
-		return Natives.formatClass(methodOwner) + "." + methodName + Natives.formatParams(methodParams);
+	static String printMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
+		return Natives.printClass(methodOwner) + "." + methodName + Natives.printParams(methodParams);
 	}
 
 	/** Diese Methode erzwingt die {@link AccessibleObject#setAccessible(boolean) Zugreifbarkeit} des gegebenen Objekts und gibt es zurück.

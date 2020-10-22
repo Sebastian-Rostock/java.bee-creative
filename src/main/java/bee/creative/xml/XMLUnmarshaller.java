@@ -11,16 +11,16 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert einen Konfigurator zum {@link #unmarshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Unmarshaller}.
+/** Diese Klasse implementiert einen Konfigurator zum {@link #unmarshal() Ausgeben} eines Objekts mit Hilfe eines {@link Unmarshaller}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public  class XMLUnmarshaller {
+public class XMLUnmarshaller {
 
 	/** Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Unmarshaller}.
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public  class SourceData extends BaseSourceData<SourceData> {
+	public class SourceData extends BaseSourceData<SourceData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -39,7 +39,7 @@ public  class XMLUnmarshaller {
 	/** Diese Klasse implementiert den Konfigurator für den {@link Unmarshaller}.
 	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public  class UnmarshallerData extends BaseUnmarshallerData<UnmarshallerData> {
+	public class UnmarshallerData extends BaseUnmarshallerData<UnmarshallerData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -59,7 +59,7 @@ public  class XMLUnmarshaller {
 	 *
 	 * @param classes Klasse.
 	 * @return {@link XMLUnmarshaller}. */
-	public static XMLUnmarshaller from( Class<?>... classes) {
+	public static XMLUnmarshaller from(final Class<?>... classes) {
 		return new XMLUnmarshaller().openUnmarshallerData().openContextData().openClassData().putAll(Arrays.asList(classes)).closeClassesData().closeContextData()
 			.closeUnmarshallerData();
 	}
@@ -68,7 +68,7 @@ public  class XMLUnmarshaller {
 	 *
 	 * @see #from(Class...)
 	 * @see #unmarshalNode(Node) */
-	public static Object unmarshalNode( Node source,  Class<?>... classes) throws SAXException, JAXBException {
+	public static Object unmarshalNode(final Node source, final Class<?>... classes) throws SAXException, JAXBException {
 		return XMLUnmarshaller.from(classes).unmarshalNode(source);
 	}
 
@@ -76,7 +76,7 @@ public  class XMLUnmarshaller {
 	 *
 	 * @see #from(Class...)
 	 * @see #unmarshalString(String) */
-	public static Object unmarshalString( String source,  Class<?>... classes) throws SAXException, JAXBException {
+	public static Object unmarshalString(final String source, final Class<?>... classes) throws SAXException, JAXBException {
 		return XMLUnmarshaller.from(classes).unmarshalString(source);
 	}
 
@@ -90,14 +90,14 @@ public  class XMLUnmarshaller {
 	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public XMLUnmarshaller use( XMLUnmarshaller data) {
+	public XMLUnmarshaller use(final XMLUnmarshaller data) {
 		if (data == null) return this;
 		this.sourceData.use(data.sourceData);
 		this.unmarshallerData.use(data.unmarshallerData);
 		return this;
 	}
 
-	/** Diese Methode parst die {@link #openSourceData() Eingabedaten} in ein Objekt und gibt dieses zurück.
+	/** Diese Methode überführt die {@link #openSourceData() Eingabedaten} in ein Objekt und gibt dieses zurück.
 	 *
 	 * @see #openSourceData()
 	 * @see Unmarshaller#unmarshal(Source)
@@ -105,11 +105,39 @@ public  class XMLUnmarshaller {
 	 * @throws SAXException Wenn {@link UnmarshallerData#getUnmarshaller()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link Unmarshaller#unmarshal(Source)} eine entsprechende Ausnahme auslöst. */
 	public Object unmarshal() throws SAXException, JAXBException {
-		 Unmarshaller unmarshaller = this.unmarshallerData.getUnmarshaller();
+		final Unmarshaller unmarshaller = this.unmarshallerData.getUnmarshaller();
 		synchronized (unmarshaller) {
-			 Source source = this.sourceData.getSource();
+			final Source source = this.sourceData.getSource();
 			return unmarshaller.unmarshal(source);
 		}
+	}
+
+	/** Diese Methode überführt den gegebenen Dokumentknoten in ein Objekt und gibt dieses zurück.
+	 *
+	 * @see SourceData#useNode(Node)
+	 * @see #openSourceData()
+	 * @param source Dokumentknoten.
+	 * @return geparstes Objekt.
+	 * @throws SAXException Wenn {@link #unmarshal} eine entsprechende Ausnahme auslöst.
+	 * @throws JAXBException Wenn {@link #unmarshal()} eine entsprechende Ausnahme auslöst. */
+	public Object unmarshalNode(final Node source) throws SAXException, JAXBException {
+		final Object result = this.openSourceData().useNode(source).closeSourceData().unmarshal();
+		this.openSourceData().resetSource();
+		return result;
+	}
+
+	/** Diese Methode überführt die gegebene Zeichenkette in ein Objekt und gibt dieses zurück.
+	 *
+	 * @see SourceData#useText(String)
+	 * @see #openSourceData()
+	 * @param source Zeichenkette.
+	 * @return geparstes Objekt.
+	 * @throws SAXException Wenn {@link #unmarshal} eine entsprechende Ausnahme auslöst.
+	 * @throws JAXBException Wenn {@link #unmarshal()} eine entsprechende Ausnahme auslöst. */
+	public Object unmarshalString(final String source) throws SAXException, JAXBException {
+		final Object result = this.openSourceData().useText(source).closeSourceData().unmarshal();
+		this.openSourceData().resetSource();
+		return result;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Eingabedaten und gibt ihn zurück.
@@ -125,34 +153,6 @@ public  class XMLUnmarshaller {
 	 * @return Konfigurator. */
 	public UnmarshallerData openUnmarshallerData() {
 		return this.unmarshallerData;
-	}
-
-	/** Diese Methode parst den gegebenen Dokumentknoten in ein Objekt und gibt dieses zurück.
-	 *
-	 * @see SourceData#useNode(Node)
-	 * @see #openSourceData()
-	 * @param source Dokumentknoten.
-	 * @return geparstes Objekt.
-	 * @throws SAXException Wenn {@link #unmarshal} eine entsprechende Ausnahme auslöst.
-	 * @throws JAXBException Wenn {@link #unmarshal()} eine entsprechende Ausnahme auslöst. */
-	public Object unmarshalNode( Node source) throws SAXException, JAXBException {
-		 Object result = this.openSourceData().useNode(source).closeSourceData().unmarshal();
-		this.openSourceData().resetSource();
-		return result;
-	}
-
-	/** Diese Methode parst die gegebene Zeichenkette in ein Objekt und gibt dieses zurück.
-	 *
-	 * @see SourceData#useText(String)
-	 * @see #openSourceData()
-	 * @param source Zeichenkette.
-	 * @return geparstes Objekt.
-	 * @throws SAXException Wenn {@link #unmarshal} eine entsprechende Ausnahme auslöst.
-	 * @throws JAXBException Wenn {@link #unmarshal()} eine entsprechende Ausnahme auslöst. */
-	public Object unmarshalString( String source) throws SAXException, JAXBException {
-		 Object result = this.openSourceData().useText(source).closeSourceData().unmarshal();
-		this.openSourceData().resetSource();
-		return result;
 	}
 
 	@Override

@@ -70,7 +70,7 @@ public abstract class FEMReflection extends FEMFunction {
 
 		@Override
 		public final String toString() {
-			return Natives.formatField(this.field);
+			return Natives.printField(this.field);
 		}
 
 	}
@@ -102,7 +102,7 @@ public abstract class FEMReflection extends FEMFunction {
 
 		@Override
 		public final String toString() {
-			return Natives.formatMethod(this.method);
+			return Natives.printMethod(this.method);
 		}
 
 	}
@@ -134,7 +134,7 @@ public abstract class FEMReflection extends FEMFunction {
 
 		@Override
 		public final String toString() {
-			return Natives.formatConstructor(this.constructor);
+			return Natives.printConstructor(this.constructor);
 		}
 
 	}
@@ -175,7 +175,7 @@ public abstract class FEMReflection extends FEMFunction {
 
 		@Override
 		public final String toString() {
-			return Natives.formatField(this.field);
+			return Natives.printField(this.field);
 		}
 
 	}
@@ -208,7 +208,7 @@ public abstract class FEMReflection extends FEMFunction {
 
 		@Override
 		public final String toString() {
-			return Natives.formatMethod(this.method);
+			return Natives.printMethod(this.method);
 		}
 
 	}

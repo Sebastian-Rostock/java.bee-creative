@@ -6,11 +6,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import bee.creative.bind.Setter;
 import bee.creative.fem.FEMFunction.FutureFunction;
 import bee.creative.fem.FEMFunction.TraceFunction;
 import bee.creative.lang.Integers;
-import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.lang.Strings;
 import bee.creative.util.Parser;
@@ -28,7 +26,7 @@ import bee.creative.util.Parser.Token;
  * Kennung bzw. Textdarstellung von Konstanten un deren Werte bez. Funktionen zu überführen. Wenn an Stelle von {@link FEMClosure bindenden Parameterfuktionen}
  * einfache {@link FEMHandler Funktionszeiger} verwendet werden sollen, muss die Methode {@link #parseClosure(FEMToken)} überschriben werden und das Ergebnis
  * von {@link #parseHandler(FEMToken)} liefern.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMDomain extends BaseObject {
 
@@ -36,12 +34,11 @@ public class FEMDomain extends BaseObject {
 	public static final FEMDomain DEFAULT = new FEMDomain();
 
 	/** Diese Methode parst die ggf. als maskierte Zeichenkette gegebene Kennung und gibt diese ohne Maskierung zurück. Sie realisiert damit die Umkehroperation
-	 * zu {@link #formatIdent(String)}. Die Maskierung liegt vor, wenn die Zeichenkette mit {@code '<'} beginnt. Wenn die Maskierung ungültig ist, wird
-	 * {@code null} geliefert.
+	 * zu {@link #printConst(String)}. Die Maskierung liegt vor, wenn die Zeichenkette mit {@code '<'} beginnt. Wenn die Maskierung vorliegt und ungültig ist,
+	 * wird {@code null} geliefert.
 	 *
 	 * @param src Zeichenkette.
-	 * @return Kennung oder {@code null}.
-	 * @throws NullPointerException Wenn {@code src} {@code null} ist. */
+	 * @return Kennung oder {@code null}. */
 	public String parseIdent(final String src) throws NullPointerException {
 		return src.charAt(0) != '<' ? src : Strings.parseSequence(src, '<', '\\', '>');
 	}
@@ -67,8 +64,7 @@ public class FEMDomain extends BaseObject {
 	 *
 	 * @see #parseScript(FEMParser)
 	 * @param src Zeichenkette, die geparst werden soll.
-	 * @return aufbereiteter Quelltext.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
+	 * @return aufbereiteter Quelltext. */
 	public FEMScript parseScript(final String src) throws NullPointerException {
 		final FEMParser parser = new FEMParser(src);
 		final Token root = this.parseScript(parser);
@@ -89,17 +85,8 @@ public class FEMDomain extends BaseObject {
 		return src.make('*', pos, funs).value(new HashSet<>(src.proxies()));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #parseModule(FEMScript) this.parseModule(this.parseScript(source))}. */
-	public List<FEMFunction> parseModule(final String source) throws NullPointerException, IllegalArgumentException {
-		return this.parseModule(this.parseScript(source));
-	}
-
-	public List<FEMFunction> parseModule(final FEMScript source) throws NullPointerException, IllegalArgumentException {
-		return this.parseModule(new FEMToken().with(source.root()));
-	}
-
 	/** Diese Methode überführt den von {@link #parseScript(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
-	protected List<FEMFunction> parseModule(final FEMToken src) throws NullPointerException, FEMException {
+	protected List<FEMFunction> parseScript(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '*') throw this.parseError(src, null);
 		try {
@@ -110,6 +97,52 @@ public class FEMDomain extends BaseObject {
 			throw this.parseError(src, cause);
 		}
 		return this.parseGroup(src);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #parseGroup(FEMScript) this.parseGroup(this.parseScript(source))}. */
+	public List<FEMFunction> parseGroup(final String source) throws NullPointerException, IllegalArgumentException {
+		return this.parseGroup(this.parseScript(source));
+	}
+
+	/** Diese Methode überführt den gegebenen {@link FEMScript Quelltext} in eine {@link List Liste} von {@link FEMFunction Funktionen} und gibt diese zurück.
+	 *
+	 * @param src Quelltext, der bspw. über {@link #parseScript(String)} erzeugt wurde.
+	 * @return Funktionsliste. */
+	public List<FEMFunction> parseGroup(final FEMScript src) throws NullPointerException, IllegalArgumentException {
+		return this.parseScript(new FEMToken().with(src.root()));
+	}
+
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Funktionsliste und gibt die Abschnitte der Funktionen (FUNCTION)
+	 * zurück. Die Erkennung erfolgt gemäß folgender EBNF:<br>
+	 * <pre>GROUP = {@link #parseInfo(FEMParser) SC} [ {@link #parseFunction(FEMParser) FUNCTION} { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} {@link #parseFunction(FEMParser) FUNCTION} } {@link #parseInfo(FEMParser) SC} ]</pre> */
+	protected List<Token> parseGroup(final FEMParser src) throws NullPointerException {
+		final List<Token> res = new ArrayList<>();
+		this.parseInfo(src);
+		Token fun = this.parseFunction(src);
+		if (fun == null) return res;
+		res.add(fun);
+		while (true) {
+			this.parseInfo(src);
+			if (src.symbol() != ';') return res;
+			src.push(';');
+			src.skip();
+			this.parseInfo(src);
+			fun = this.parseFunction(src);
+			if (fun != null) {
+				res.add(fun);
+			} else {
+				res.add(this.parseError(src));
+			}
+		}
+	}
+
+	/** Diese Methode überführt den von {@link #parseGroup(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
+	protected List<FEMFunction> parseGroup(final FEMToken src) throws NullPointerException, FEMException {
+		final List<FEMFunction> res = new ArrayList<>();
+		for (final Token tok: src.token()) {
+			res.add(this.parseFunction(src.with(tok)));
+		}
+		return res;
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den verbleibenden {@link Token Abschnitt} der Eingabe als Fehler und gibt ihn zurück. Als
@@ -160,40 +193,6 @@ public class FEMDomain extends BaseObject {
 		final Token tok = src.token();
 		if (tok.type() != '?') return null;
 		return tok.toString();
-	}
-
-	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette und gibt ihn zurück. Die Erkennung erfolgt
-	 * über {@link #parseSequence(FEMParser, char, char, char) this.parseSequence(parser, '\"', '\\', '\"')}. Als Abschnittstyp wird {@code '\"'} verwendet. Wenn
-	 * keine maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
-	protected Token parseString1(final FEMParser src) throws NullPointerException {
-		return this.parseSequence(src, '\"', '\\', '\"');
-	}
-
-	/** Diese Methode überführt den von {@link #parseString1(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
-	 * liefert sie {@code null}. */
-	protected FEMString parseString1(final FEMToken src) throws NullPointerException, FEMException {
-		final Token tok = src.token();
-		if (tok.type() != '\"') return null;
-		final String res = Strings.parseSequence(tok.toString(), '\"', '\\', '\"');
-		if (res != null) return FEMString.from(res);
-		throw this.parseError(src, null);
-	}
-
-	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette und gibt ihn zurück. Die Erkennung erfolgt
-	 * über {@link #parseSequence(FEMParser, char, char, char) this.parseSequence(parser, '\'', '\\', '\'')}. Als Abschnittstyp wird {@code '\''} verwendet. Wenn
-	 * keine maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
-	protected Token parseString2(final FEMParser src) throws NullPointerException {
-		return this.parseSequence(src, '\'', '\\', '\'');
-	}
-
-	/** Diese Methode überführt den von {@link #parseString2(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
-	 * liefert sie {@code null}. */
-	protected FEMString parseString2(final FEMToken src) throws NullPointerException, FEMException {
-		final Token tok = src.token();
-		if (tok.type() != '\'') return null;
-		final String res = Strings.parseSequence(tok.toString(), '\'', '\\', '\'');
-		if (res != null) return FEMString.from(res);
-		throw this.parseError(src, null);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Wertliste und gibt deren Elternabschnitt zurück. Die Erkennung
@@ -260,111 +259,38 @@ public class FEMDomain extends BaseObject {
 		return FEMArray.from(res);
 	}
 
-	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Werts gibt ihn zurück. Die Erkennung erfolgt gemäß folgender
-	 * EBNF:<br>
-	 * <pre>VALUE = {@link #parseArray(FEMParser) ARRAY} | {@link #parseString1(FEMParser) STRING1} | {@link #parseString2(FEMParser) STRING2} | {@link #parseHandler(FEMParser) HANDLER} | ({@link #parseIdent(FEMParser) IDENT} | {@link #parseConst(FEMParser) CONST}) {@link #parseInfo(FEMParser) SC} [ {@link #parseHandler(FEMParser) HANDLER} ]</pre>
-	 * Wenn eine Kennung (IDENT) oder eine Konstante (CONST) von einem Funktionszeiger (HANDLER) gefolgt wird, führt dies zur Erkennung einer {@link FEMProxy
-	 * Platzhalterfunktion}, deren Elternabschnitt geliefert wird. Als deren Abschnittstyp wird dann {@code '='} verwendet. Die {@link Token#tokens()
-	 * Kindabschnitte} sind die von Kennung bzw. Konstate und Funktionszeiger. */
-	protected Token parseValue(final FEMParser src) throws NullPointerException {
-		Token res = this.parseArray(src);
-		if (res != null) return res;
-		res = this.parseString1(src);
-		if (res != null) return res;
-		res = this.parseString2(src);
-		if (res != null) return res;
-		res = this.parseHandler(src);
-		if (res != null) return res;
-		res = this.parseIdent(src);
-		if (res == null) {
-			res = this.parseConst(src);
-			if (res == null) return null;
-		}
-		this.parseInfo(src);
-		final Token han = this.parseHandler(src);
-		if (han == null) return res;
-		if (!src.proxies().add(res.toString())) {
-			res.type('!');
-		}
-		return src.make('=', res.start(), Arrays.asList(res, han));
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette und gibt ihn zurück. Die Erkennung erfolgt
+	 * über {@link #parseSequence(FEMParser, char, char, char) this.parseSequence(parser, '\"', '\\', '\"')}. Als Abschnittstyp wird {@code '\"'} verwendet. Wenn
+	 * keine maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
+	protected Token parseString1(final FEMParser src) throws NullPointerException {
+		return this.parseSequence(src, '\"', '\\', '\"');
 	}
 
-	/** Diese Methode überführt den von {@link #parseValue(FEMParser)} ermittelten Abschnitt in einen Wert und gibt diesen zurück. */
-	protected FEMValue parseValue(final FEMToken src) throws NullPointerException, FEMException {
-		FEMValue res = this.parseArray(src);
-		if (res != null) return res;
-		res = this.parseString1(src);
-		if (res != null) return res;
-		res = this.parseString2(src);
-		if (res != null) return res;
-		res = this.parseHandler(src);
-		if (res != null) return res;
-		final String str = this.parseIdent(src);
-		final String ref = str != null ? str : this.parseConst(src);
-		if (ref == null) throw this.parseError(src, null);
-		try {
-			res = this.parseValue(src, ref);
-			if (res != null) return res;
-		} catch (final Exception cause) {
-			throw this.parseError(src, cause);
-		}
+	/** Diese Methode überführt den von {@link #parseString1(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
+	 * liefert sie {@code null}. */
+	protected FEMString parseString1(final FEMToken src) throws NullPointerException, FEMException {
+		final Token tok = src.token();
+		if (tok.type() != '\"') return null;
+		final String res = Strings.parseSequence(tok.toString(), '\"', '\\', '\"');
+		if (res != null) return FEMString.from(res);
 		throw this.parseError(src, null);
 	}
 
-	/** Diese Methode überführt die gegebene Kennung bzw. Textdarstellung einer Konstanten in deren Wert und gibt diesen zurück. Wenn dies nicht möglich ist, wird
-	 * {@code null} geliefert.
-	 *
-	 * @param ref Kennung bzw. Textdarstellung einer Konstanten.
-	 * @return Wert der Konstanten oder {@code null}. */
-	protected FEMValue parseValue(final FEMToken src, final String ref) throws NullPointerException {
-		if (ref.equals("void")) return FEMVoid.INSTANCE;
-		if (ref.equals("true")) return FEMBoolean.TRUE;
-		if (ref.equals("false")) return FEMBoolean.FALSE;
-		if (ref.startsWith("0x")) return FEMBinary.from(ref);
-		if (ref.startsWith("P") || ref.startsWith("-P")) return FEMDuration.from(ref);
-		try {
-			return FEMInteger.from(ref);
-		} catch (final IllegalArgumentException cause) {}
-		try {
-			return FEMDecimal.from(ref);
-		} catch (final IllegalArgumentException cause) {}
-		try {
-			return FEMDatetime.from(ref);
-		} catch (final IllegalArgumentException cause) {}
-		return null;
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette und gibt ihn zurück. Die Erkennung erfolgt
+	 * über {@link #parseSequence(FEMParser, char, char, char) this.parseSequence(parser, '\'', '\\', '\'')}. Als Abschnittstyp wird {@code '\''} verwendet. Wenn
+	 * keine maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
+	protected Token parseString2(final FEMParser src) throws NullPointerException {
+		return this.parseSequence(src, '\'', '\\', '\'');
 	}
 
-	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Funktionsliste und gibt die Abschnitte der Funktionen (FUNCTION)
-	 * zurück. Die Erkennung erfolgt gemäß folgender EBNF:<br>
-	 * <pre>GROUP = {@link #parseInfo(FEMParser) SC} [ {@link #parseFunction(FEMParser) FUNCTION} { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} {@link #parseFunction(FEMParser) FUNCTION} } {@link #parseInfo(FEMParser) SC} ]</pre> */
-	protected List<Token> parseGroup(final FEMParser src) throws NullPointerException {
-		final List<Token> res = new ArrayList<>();
-		this.parseInfo(src);
-		Token fun = this.parseFunction(src);
-		if (fun == null) return res;
-		res.add(fun);
-		while (true) {
-			this.parseInfo(src);
-			if (src.symbol() != ';') return res;
-			src.push(';');
-			src.skip();
-			this.parseInfo(src);
-			fun = this.parseFunction(src);
-			if (fun != null) {
-				res.add(fun);
-			} else {
-				res.add(this.parseError(src));
-			}
-		}
-	}
-
-	/** Diese Methode überführt den von {@link #parseGroup(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
-	protected List<FEMFunction> parseGroup(final FEMToken src) throws NullPointerException, FEMException {
-		final List<FEMFunction> res = new ArrayList<>();
-		for (final Token tok: src.token()) {
-			res.add(this.parseFunction(src.with(tok)));
-		}
-		return res;
+	/** Diese Methode überführt den von {@link #parseString2(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
+	 * liefert sie {@code null}. */
+	protected FEMString parseString2(final FEMToken src) throws NullPointerException, FEMException {
+		final Token tok = src.token();
+		if (tok.type() != '\'') return null;
+		final String res = Strings.parseSequence(tok.toString(), '\'', '\\', '\'');
+		if (res != null) return FEMString.from(res);
+		throw this.parseError(src, null);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Parameterfunktion und gibt deren Elternabschnitt zurück. Die
@@ -529,6 +455,80 @@ public class FEMDomain extends BaseObject {
 		return null;
 	}
 
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Werts gibt ihn zurück. Die Erkennung erfolgt gemäß folgender
+	 * EBNF:<br>
+	 * <pre>VALUE = {@link #parseArray(FEMParser) ARRAY} | {@link #parseString1(FEMParser) STRING1} | {@link #parseString2(FEMParser) STRING2} | {@link #parseHandler(FEMParser) HANDLER} | ({@link #parseIdent(FEMParser) IDENT} | {@link #parseConst(FEMParser) CONST}) {@link #parseInfo(FEMParser) SC} [ {@link #parseHandler(FEMParser) HANDLER} ]</pre>
+	 * Wenn eine Kennung (IDENT) oder eine Konstante (CONST) von einem Funktionszeiger (HANDLER) gefolgt wird, führt dies zur Erkennung einer {@link FEMProxy
+	 * Platzhalterfunktion}, deren Elternabschnitt geliefert wird. Als deren Abschnittstyp wird dann {@code '='} verwendet. Die {@link Token#tokens()
+	 * Kindabschnitte} sind die von Kennung bzw. Konstate und Funktionszeiger. */
+	protected Token parseValue(final FEMParser src) throws NullPointerException {
+		Token res = this.parseArray(src);
+		if (res != null) return res;
+		res = this.parseString1(src);
+		if (res != null) return res;
+		res = this.parseString2(src);
+		if (res != null) return res;
+		res = this.parseHandler(src);
+		if (res != null) return res;
+		res = this.parseIdent(src);
+		if (res == null) {
+			res = this.parseConst(src);
+			if (res == null) return null;
+		}
+		this.parseInfo(src);
+		final Token han = this.parseHandler(src);
+		if (han == null) return res;
+		if (!src.proxies().add(res.toString())) {
+			res.type('!');
+		}
+		return src.make('=', res.start(), Arrays.asList(res, han));
+	}
+
+	/** Diese Methode überführt den von {@link #parseValue(FEMParser)} ermittelten Abschnitt in einen Wert und gibt diesen zurück. */
+	protected FEMValue parseValue(final FEMToken src) throws NullPointerException, FEMException {
+		FEMValue res = this.parseArray(src);
+		if (res != null) return res;
+		res = this.parseString1(src);
+		if (res != null) return res;
+		res = this.parseString2(src);
+		if (res != null) return res;
+		res = this.parseHandler(src);
+		if (res != null) return res;
+		final String str = this.parseIdent(src);
+		final String ref = str != null ? str : this.parseConst(src);
+		if (ref == null) throw this.parseError(src, null);
+		try {
+			res = this.parseValue(src, ref);
+			if (res != null) return res;
+		} catch (final Exception cause) {
+			throw this.parseError(src, cause);
+		}
+		throw this.parseError(src, null);
+	}
+
+	/** Diese Methode überführt die gegebene Kennung bzw. Textdarstellung einer Konstanten in deren Wert und gibt diesen zurück. Wenn dies nicht möglich ist, wird
+	 * {@code null} geliefert.
+	 *
+	 * @param ref Kennung bzw. Textdarstellung einer Konstanten.
+	 * @return Wert der Konstanten oder {@code null}. */
+	protected FEMValue parseValue(final FEMToken src, final String ref) throws NullPointerException {
+		if (ref.equals("void")) return FEMVoid.INSTANCE;
+		if (ref.equals("true")) return FEMBoolean.TRUE;
+		if (ref.equals("false")) return FEMBoolean.FALSE;
+		if (ref.startsWith("0x")) return FEMBinary.from(ref);
+		if (ref.startsWith("P") || ref.startsWith("-P")) return FEMDuration.from(ref);
+		try {
+			return FEMInteger.from(ref);
+		} catch (final IllegalArgumentException cause) {}
+		try {
+			return FEMDecimal.from(ref);
+		} catch (final IllegalArgumentException cause) {}
+		try {
+			return FEMDatetime.from(ref);
+		} catch (final IllegalArgumentException cause) {}
+		return null;
+	}
+
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Funktion und gibt ihn zurück. Die Erkennung erfolgt gemäß folgender
 	 * EBNF:<br>
 	 * <pre>FUNCTION = ( {@link #parseParam(FEMParser) PARAM} | {@link #parseValue(FEMParser) VALUE} ) { {@link #parseInfo(FEMParser) SC} "(" {@link #parseGroup(FEMParser) GROUP} ")" }</pre>
@@ -622,18 +622,19 @@ public class FEMDomain extends BaseObject {
 		return null;
 	}
 
-	/** Diese Methode {@link Parser#skip() überspringt} alle Symbole eiens Leerraums. Dazu zählen alle Symbole kleiner oder gleich dem Leerzeichen. */
+	/** Diese Methode {@link Parser#skip() überspringt} alle Symbole eiens {@link Parser#isWhitespace(int) Leerraums}. */
 	protected void parseSpace(final FEMParser src) throws NullPointerException {
-		for (int sym = src.symbol(); (sym >= 0) && (sym <= ' '); sym = src.skip()) {}
+		for (int sym = src.symbol(); Parser.isWhitespace(sym); sym = src.skip()) {}
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Parameternamen und gibt ihn zurück. Als Abschnittstyp wird
 	 * {@code '~'} verwendet. Wenn kein Parameternamen gefunden wurden, wird {@code null} geliefert. Parameternamen können grundsätzlich an folgenden Stellen
-	 * vorkommen: <pre>{NAME; NAME: $NAME({: $NAME}; $NAME /.../ $NAME)}</pre> */
+	 * vorkommen: <pre>{NAME; NAME: $NAME({: $NAME}; $NAME /.../ $NAME)}; NAME</pre> */
 	protected Token parseName(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
-		LOOP: for (int sym = src.symbol(); sym > ' '; sym = src.skip()) {
+		LOOP: for (int sym = src.symbol(); !Parser.isWhitespace(sym); sym = src.skip()) {
 			switch (sym) {
+				case -1:
 				case ';':
 				case ':':
 				case '/':
@@ -681,570 +682,333 @@ public class FEMDomain extends BaseObject {
 		return this.parseSequence(src, '/', '\\', '/');
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #formatIdent(String, boolean) this.formatConst(name, false)}.
+	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie mit Maskierung zurück. Die Maskierung erfolgt über
+	 * {@link Strings#printSequence(CharSequence, char, char, char) Strings.printSequence(string, '<', '\\', '>')}.
 	 *
-	 * @param string Zeichenkette.
-	 * @return gegebene bzw. formateirte Zeichenkette.
-	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public String formatIdent(final String string) throws NullPointerException {
-		return this.formatIdent(string, false);
+	 * @param src Zeichenkette.
+	 * @return formateirte Zeichenkette. */
+	public String printIdent(final String src) throws NullPointerException {
+		return Strings.printSequence(src, '<', '\\', '>');
 	}
 
-	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit Maskierung als formatierte Zeichenkette zurück. Die
-	 * Maskierung ist notwendig, wenn {@code forceMask} dies anzeigt oder wenn die Zeichenkette ein {@link #parseName(FEMParser) zu maskierendes Zeichen enthält}.
-	 * Die Maskierung erfolgt über {@link Strings#formatSequence(CharSequence, char, char, char) Strings.formatSequence(string, '<', '<', '>')}. Wenn die
-	 * Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
+	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit {@link #printIdent(String) Maskierung} zurück. Die
+	 * Maskierung ist notwendig, wenn die Zeichenkette ein {@link #parseName(FEMParser) zu maskierendes Zeichen enthält}. Wenn die Maskierung unnötig ist, wird
+	 * die gegebene Zeichenkette geliefert.
 	 *
-	 * @param string Zeichenkette.
-	 * @param forceMask {@code true}, wenn die Maskierung notwendig ist.
-	 * @return gegebene bzw. formateirte Zeichenkette.
-	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
-	public String formatIdent(final String string, final boolean forceMask) throws NullPointerException {
-		if (forceMask) return Strings.formatSequence(string, '<', '\\', '>');
-		final FEMParser parser = new FEMParser(string);
+	 * @param src Zeichenkette.
+	 * @return gegebene bzw. formateirte Zeichenkette. */
+	public String printConst(final String src) throws NullPointerException {
+		final FEMParser parser = new FEMParser(src);
 		this.parseName(parser);
-		return !parser.isParsed() ? this.formatIdent(string, true) : Objects.notNull(string);
+		return !parser.isParsed() ? this.printIdent(src) : src;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.formatScript(source, null)}.
-	 *
-	 * @see #formatScript(FEMScript, String)
-	 * @param source aufbereiteter Quelltext.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatScript(final FEMScript source) throws NullPointerException, IllegalArgumentException {
-		return this.formatScript(source, null);
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link #printConst(String) Textdarstellung} der gegebenen Konstanten. */
+	protected void printConst(final FEMPrinter res, final String src) throws NullPointerException, IllegalArgumentException {
+		res.push(this.printConst(src));
 	}
 
-	/** Diese Methode gibt die Textdarstellung des gegebenen aufbereiteten Quelltextes zurück.
-	 *
-	 * @see #formatScript(FEMFormatter, FEMScript)
-	 * @param source aufbereiteter Quelltext.
-	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatScript(final FEMScript source, final String indent) throws NullPointerException, IllegalArgumentException {
-		final FEMFormatter target = new FEMFormatter().useIndent(indent);
-		this.formatScript(target, source);
-		return target.format();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source, null)}.
-	 *
-	 * @see #formatFrame(FEMFrame, String)
-	 * @param source Stapelrahmen.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFrame(final FEMFrame source) throws NullPointerException, IllegalArgumentException {
-		return this.formatFrame(source, null);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source.params(), indent)}.
-	 *
-	 * @see #formatFrame(FEMArray, String)
-	 * @param source Stapelrahmen.
-	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFrame(final FEMFrame source, final String indent) throws NullPointerException, IllegalArgumentException {
-		return this.formatFrame(source.params(), indent);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatFrame(source, null)}.
-	 *
-	 * @see #formatFrame(FEMArray, String)
-	 * @param source Stapelrahmen.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFrame(final FEMArray source) throws NullPointerException, IllegalArgumentException {
-		return this.formatFrame(source, null);
-	}
-
-	/** Diese Methode gibt die Textdarstellung des gegebenen Stapelrahmen zurück.
-	 *
-	 * @see #formatFrame(FEMFormatter, Iterable)
-	 * @param source Stapelrahmen.
-	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFrame(final FEMArray source, final String indent) throws NullPointerException, IllegalArgumentException {
-		final FEMFormatter target = new FEMFormatter().useIndent(indent);
-		this.formatFrame(target, source);
-		return target.format();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code this.formatFunction(source, null)}.
-	 *
-	 * @see #formatFunction(FEMFunction, String)
-	 * @param source Stapelrahmen.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFunction(final FEMFunction source) throws NullPointerException, IllegalArgumentException {
-		return this.formatFunction(source, null);
-	}
-
-	/** Diese Methode gibt die Textdarstellung der gegebenen Funktion zurück.
-	 *
-	 * @see #formatFunction(FEMFormatter, FEMFunction)
-	 * @param source Funktion.
-	 * @param indent Zeichenkette zur Einrückung einer Hierarchieebene oder {@code null}.
-	 * @return Textdarstellung.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	public String formatFunction(final FEMFunction source, final String indent) throws NullPointerException, IllegalArgumentException {
-		final FEMFormatter target = new FEMFormatter().useIndent(indent);
-		this.formatFunction(target, source);
-		return target.format();
+	/** Diese Methode ist eine Abkürzung für {@link #toPrinter(FEMScript) this.toPrinter(src).print()}. */
+	public String printScript(final FEMScript src) throws NullPointerException, IllegalArgumentException {
+		return this.toPrinter(src).print();
 	}
 
 	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes.
 	 *
-	 * @param target Formatierer.
-	 * @param script aufbereiteter Quelltext.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code script} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code script} nicht formatiert werden kann. */
-	protected void formatScript(final FEMFormatter target, final FEMScript script) throws NullPointerException, IllegalArgumentException {
-		Iterator<Token> source = script.iterator();
-		while (true) {
-			this.formatScript(target, source, false);
-			if (!source.hasNext()) return;
-			target.putToken(source.next()).putBreakSpace();
-		}
-	}
-
-	/** Diese Methode formatiert und erfasst die Textdarstellung der im aufbereiteten Quelltext gegebenen Sequenz von Namen, Werten und Funktionen.
-	 *
-	 * @param target Formatierer.
-	 * @param source Parser zum aufbereiteten Quelltext.
-	 * @param simpleSpace {@code true}, wenn hinter Kommentaren und Semikola ein einfaches Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatScript(final FEMFormatter target, final Iterator<Token> source, final boolean simpleSpace)
-		throws NullPointerException, IllegalArgumentException {
-		boolean indent = false;
-		while (source.hasNext()) {
-			Token tok = source.next();
-			final String string = tok.toString();
-			final int symbol = tok.type();
-			switch (symbol) {
+	 * @param res Formatierer.
+	 * @param src aufbereiteter Quelltext. */
+	protected void printScript(final FEMPrinter res, final FEMScript src) throws NullPointerException {
+		boolean inline = false;
+		for (final Token tok: src) {
+			switch (tok.type()) {
+				case '{':
+					inline = true;
+					res.push(tok);
+				break;
+				case ':':
+					inline = false;
 				case '/':
-					target.putToken(string).putToken(" ");
+					res.push(tok).push(" ");
 				break;
 				case '(':
 				case '[':
-					target.putToken(string).putBreakInc();
-					this.formatScript(target, source, false);
-				break;
-				case '{':
-					target.putToken(string);
-					this.formatScript(target, source, true);
-					target.putToken(" ");
-					this.formatScript(target, source, false);
+					res.push(tok).pushBreakInc();
 				break;
 				case ']':
 				case ')':
-					target.putBreakDec().putToken(string);
-				case -1:
-					if (!indent) return;
-					target.putIndent();
-					return;
-				case ':':
-				case '}':
-					target.putToken(string);
-					return;
+					res.pushBreakDec().push(tok);
+				break;
 				case ';':
-					indent = true;
-					target.putToken(string);
-					if (simpleSpace) {
-						target.putToken(" ");
+					if (inline) {
+						res.push(tok).push(" ");
 					} else {
-						target.putBreakSpace();
+						res.push(tok).pushBreakSpc().pushIndent();
 					}
 				break;
 				default:
-					target.putToken(string);
-				break;
+					res.push(tok);
 			}
 		}
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der Konstanten mit der gegebenen Bezeichnung. Die Formatierung der Bezeichnung erfolgt dazu über
-	 * {@link #formatIdent(String)}.
-	 *
-	 * @param target Formatierer.
-	 * @param source Bezeichnung.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
-	protected void formatConst(final FEMFormatter target, final String source) throws NullPointerException {
-		target.putToken(this.formatIdent(source));
+	/** Diese Methode ist eine Abkürzung für {@link #printGroup(Iterable) this.printGroup(Arrays.asList(src))}. */
+	public String printGroup(final FEMFunction... src) throws NullPointerException, IllegalArgumentException {
+		return this.printGroup(Arrays.asList(src));
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der Liste der gegebenen Elemente. Die Elemente werden über den gegebenen {@link Setter}
-	 * {@link Setter#set(Object, Object) formatiert} und mit {@code commaSymbol} separiert sowie in {@code openSymbol} und {@code closeSymbol} eingeschlossen. Bei
-	 * einer licht leeren Liste {@link FEMFormatter#putBreakInc() beginnt} nach {@code openSymbol} eine neue Hierarchieebene, die vor {@code closeSymbol}
-	 * {@link FEMFormatter#putBreakDec() endet}. Nach jedem {@code commaSymbol} wird ein {@link FEMFormatter#putBreakSpace() bedingtes Leerzeichen} eingefügt. Die
-	 * aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Liste mehr als ein Element enthält.
-	 *
-	 * @see FEMFormatter#putBreakInc()
-	 * @see FEMFormatter#putBreakDec()
-	 * @see FEMFormatter#putBreakSpace()
-	 * @see FEMFormatter#putIndent()
-	 * @param <GItem> Typ der Elemente.
-	 * @param target Formatierer.
-	 * @param source Elementliste.
-	 * @param openSymbol {@code null} oder Symbol, das vor der Liste angefügt wird.
-	 * @param commaSymbol {@code null} oder Symbol, das zwischen die Elemente eingefügt wird.
-	 * @param closeSymbol {@code null} oder Symbol, das nach der Liste angefügt wird.
-	 * @param itemFormatter {@link Setter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann. */
-	protected <GItem> void formatItems(final FEMFormatter target, final Iterable<? extends GItem> source, final Object openSymbol, final Object commaSymbol,
-		final Object closeSymbol, final Setter<? super FEMFormatter, ? super GItem> itemFormatter) throws NullPointerException, IllegalArgumentException {
-		final Iterator<? extends GItem> iterator = source.iterator();
-		if (iterator.hasNext()) {
-			GItem value = iterator.next();
-			if (iterator.hasNext()) {
-				target.putIndent().putToken(openSymbol).putBreakInc();
-				itemFormatter.set(target, value);
-				do {
-					value = iterator.next();
-					target.putToken(commaSymbol).putBreakSpace();
-					itemFormatter.set(target, value);
-				} while (iterator.hasNext());
-				target.putBreakDec().putToken(closeSymbol);
+	/** Diese Methode ist eine Abkürzung für {@link #toPrinter(Iterable) this.toPrinter(src).print()}. */
+	public String printGroup(final Iterable<? extends FEMFunction> src) throws NullPointerException, IllegalArgumentException {
+		return this.toPrinter(src).print();
+	}
+
+	/** Diese Methode erfast die Textdarstellung der gegebenen Funktionen. Die Funktionen werden dazu einzeln {@link #printFunction(FEMPrinter, FEMFunction)
+	 * erfasst} und mit Semikolon sowie einem {@link FEMPrinter#pushBreakSpc() bedingten Leerzeichen} getrennt. */
+	protected void printGroup(final FEMPrinter res, final Iterable<? extends FEMFunction> src) throws NullPointerException, IllegalArgumentException {
+		final Iterator<? extends FEMFunction> iter = src.iterator();
+		if (!iter.hasNext()) return;
+		this.printFunction(res, iter.next());
+		if (!iter.hasNext()) return;
+		res.pushIndent();
+		do {
+			res.push(";").pushBreakSpc();
+			this.printFunction(res, iter.next());
+		} while (iter.hasNext());
+	}
+
+	/** Diese Methode erfasst die Textdarstellung des gegebenen Ergebniswerts. Die Formatierung erfolgt dazu für eine bereits ausgewertete {@link FEMFuture} mit
+	 * deren {@link FEMFuture#result(boolean) Ergebniswert} über {@link #printValue(FEMPrinter, FEMValue)}. Andernfalls werden deren {@link FEMFuture#function()
+	 * Funktion} über {@link #printFunction(FEMPrinter, FEMFunction)} und deren {@link FEMFuture#frame() Stapelrahmen} über
+	 * {@link #printFrame(FEMPrinter, Iterable)} erfasst. */
+	protected void printFuture(final FEMPrinter res, final FEMFuture src) throws NullPointerException, IllegalArgumentException {
+		synchronized (src) {
+			if (src.ready()) {
+				this.printValue(res, src.result());
 			} else {
-				target.putToken(openSymbol).putBreakInc();
-				itemFormatter.set(target, value);
-				target.putBreakDec().putToken(closeSymbol);
+				this.printFunction(res, src.function());
+				this.printFrame(res, src.frame().params());
 			}
+		}
+	}
+
+	/** Diese Methode {@link #printConst(FEMPrinter, String) erfasst} die {@link String#valueOf(Object) Textdarstellung} des gegebenen Objekts. */
+	protected void printNative(final FEMPrinter res, final Object src) throws NullPointerException, IllegalArgumentException {
+		this.printConst(res, String.valueOf(src));
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} des gegebenen Leerwerts. */
+	protected void printVoid(final FEMPrinter target, final FEMVoid source) throws NullPointerException {
+		target.push(source.toString());
+	}
+
+	/** Diese Methode {@link #printGroup(FEMPrinter, Iterable) erfasst} die Textdarstellung der gegebenen Wertliste. Deren Werte werden dazu in eckige Klammern
+	 * eingeschlossen und auf einer {@link FEMPrinter#pushBreakInc() neuen Ebene} erfasst. */
+	protected void printArray(final FEMPrinter res, final FEMArray src) throws NullPointerException, IllegalArgumentException {
+		res.push("[").pushBreakInc();
+		this.printGroup(res, src);
+		res.pushBreakDec().push("]");
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die Textdarstellung der gegebenen Zeichenkette. Diese wird über
+	 * {@link Strings#printSequence(CharSequence, char, char, char) Strings.printSequence(string, '"', '\\', '"')} ermittelt. */
+	protected void printString(final FEMPrinter res, final FEMString src) throws NullPointerException {
+		res.push(Strings.printSequence(src.toString(), '"', '\\', '"'));
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Bytefolge. */
+	protected void printBinary(final FEMPrinter target, final FEMBinary source) throws NullPointerException {
+		target.push(source.toString());
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Dezimalzahl. */
+	protected void printInteger(final FEMPrinter target, final FEMInteger source) throws NullPointerException {
+		target.push(source.toString());
+	}
+
+	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung des gegebenen Funktionszeigers. Deren Funktion wird dabei in
+	 * <code>"{:"</code> und <code>"}"</code> eingeschlossen. */
+	protected void printHandler(final FEMPrinter res, final FEMHandler src) throws NullPointerException, IllegalArgumentException {
+		res.push("{:");
+		this.printFunction(res, src.value());
+		res.push("}");
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} des gegebenen Wahrheitswerts. */
+	protected void printBoolean(final FEMPrinter target, final FEMBoolean source) throws NullPointerException {
+		target.push(source.toString());
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} des gegebenen Dezimalbruchs. */
+	protected void printDecimal(final FEMPrinter target, final FEMDecimal source) throws NullPointerException {
+		target.push(source.toString());
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Zeitspanne. */
+	protected void printDuration(final FEMPrinter target, final FEMDuration source) throws NullPointerException, IllegalArgumentException {
+		target.push(source.toString());
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Zeitangabe. */
+	protected void printDatetime(final FEMPrinter target, final FEMDatetime source) throws NullPointerException, IllegalArgumentException {
+		target.push(source.toString());
+	}
+
+	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Referenz. */
+	protected void printObject(final FEMPrinter target, final FEMObject source) throws NullPointerException, IllegalArgumentException {
+		target.push(source.toString());
+	}
+
+	/** Diese Methode erfasst die Textdarstellung des gegebenen Werts. Werte bekannter Datentypen werden dazu an spezifische Methoden delegiert. Alle anderen
+	 * Werte werden über deren {@link Object#toString() Textdarstellung} als Konstante {@link #printConst(FEMPrinter, String) erfasst}.
+	 *
+	 * @see #printFuture(FEMPrinter, FEMFuture)
+	 * @see #printNative(FEMPrinter, Object)
+	 * @see #printVoid(FEMPrinter, FEMVoid)
+	 * @see #printArray(FEMPrinter, FEMArray)
+	 * @see #printString(FEMPrinter, FEMString)
+	 * @see #printBinary(FEMPrinter, FEMBinary)
+	 * @see #printInteger(FEMPrinter, FEMInteger)
+	 * @see #printHandler(FEMPrinter, FEMHandler)
+	 * @see #printBoolean(FEMPrinter, FEMBoolean)
+	 * @see #printDecimal(FEMPrinter, FEMDecimal)
+	 * @see #printDuration(FEMPrinter, FEMDuration)
+	 * @see #printDatetime(FEMPrinter, FEMDatetime)
+	 * @see #printObject(FEMPrinter, FEMObject)
+	 * @see #printConst(FEMPrinter, String) */
+	protected void printValue(final FEMPrinter res, final FEMValue src) throws NullPointerException, IllegalArgumentException {
+		if (src instanceof FEMFuture) {
+			this.printFuture(res, (FEMFuture)src);
+			return;
+		}
+		switch (src.type().id()) {
+			case FEMNative.ID:
+				this.printNative(res, src.data());
+				return;
+			case FEMVoid.ID:
+				this.printVoid(res, (FEMVoid)src.data());
+				return;
+			case FEMArray.ID:
+				this.printArray(res, (FEMArray)src.data());
+				return;
+			case FEMHandler.ID:
+				this.printHandler(res, (FEMHandler)src.data());
+				return;
+			case FEMBoolean.ID:
+				this.printBoolean(res, (FEMBoolean)src.data());
+				return;
+			case FEMString.ID:
+				this.printString(res, (FEMString)src.data());
+				return;
+			case FEMBinary.ID:
+				this.printBinary(res, (FEMBinary)src.data());
+				return;
+			case FEMInteger.ID:
+				this.printInteger(res, (FEMInteger)src.data());
+				return;
+			case FEMDecimal.ID:
+				this.printDecimal(res, (FEMDecimal)src.data());
+				return;
+			case FEMDuration.ID:
+				this.printDuration(res, (FEMDuration)src.data());
+				return;
+			case FEMDatetime.ID:
+				this.printDatetime(res, (FEMDatetime)src.data());
+				return;
+			case FEMObject.ID:
+				this.printObject(res, (FEMObject)src.data());
+				return;
+		}
+		this.printConst(res, src.toString());
+	}
+
+	/** Diese Methode erfasst die Textdarstellung der gegebene Funktion. Bekannte Funktionen werden dazu an spezifische Methoden delegiert. Alle anderen
+	 * Funktionen werden über deren {@link Object#toString() Textdarstellung} als Konstante {@link #printConst(FEMPrinter, String) erfasst}.
+	 *
+	 * @see #printValue(FEMPrinter, FEMValue)
+	 * @see #printProxy(FEMPrinter, FEMProxy)
+	 * @see #printClosure(FEMPrinter, FEMClosure)
+	 * @see #printBinding(FEMPrinter, FEMBinding)
+	 * @see #printComposite(FEMPrinter, FEMComposite)
+	 * @see #printTrace(FEMPrinter, TraceFunction)
+	 * @see #printFuture(FEMPrinter, FutureFunction) */
+	protected void printFunction(final FEMPrinter res, final FEMFunction src) throws NullPointerException, IllegalArgumentException {
+		if (src instanceof FEMValue) {
+			this.printValue(res, (FEMValue)src);
+		} else if (src instanceof FEMProxy) {
+			this.printProxy(res, (FEMProxy)src);
+		} else if (src instanceof FEMComposite) {
+			this.printComposite(res, (FEMComposite)src);
+		} else if (src instanceof FEMClosure) {
+			this.printClosure(res, (FEMClosure)src);
+		} else if (src instanceof FEMBinding) {
+			this.printBinding(res, (FEMBinding)src);
+		} else if (src instanceof FutureFunction) {
+			this.printFuture(res, (FutureFunction)src);
+		} else if (src instanceof TraceFunction) {
+			this.printTrace(res, (TraceFunction)src);
 		} else {
-			target.putToken(openSymbol).putToken(closeSymbol);
+			this.printConst(res, src.toString());
 		}
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Parameterfunktionsliste. Hierbei werden die
-	 * {@link #formatFunction(FEMFormatter, FEMFunction) formatierten} Parameterfunktionen mit {@code ";"} separiert sowie in {@code "("} und {@code ")"}
-	 * eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Funktionsliste mehr
-	 * als ein Element enthält.
-	 *
-	 * @see #formatItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #formatFunction(FEMFormatter, FEMFunction)
-	 * @param target Formatierer.
-	 * @param source Parameterfunktionen.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatParams(final FEMFormatter target, final Iterable<? extends FEMFunction> source) throws NullPointerException, IllegalArgumentException {
-		this.formatItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMFunction>() {
-
-			@Override
-			public void set(final FEMFormatter input, final FEMFunction value) {
-				FEMDomain.this.formatFunction(input, value);
-			}
-
-		});
+	protected void printProxy(final FEMPrinter res, final FEMProxy src) throws NullPointerException, IllegalArgumentException {
+		this.printConst(res, src.name().toString());
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Stapelrahmen. Hierbei werden die nummerierten und
-	 * {@link #formatFunction(FEMFormatter, FEMFunction) formatierten} Parameterwerte mit {@code ";"} separiert sowie in {@code "("} und {@code ")"}
-	 * eingeschlossen erfasst. Die Nummerierung wird vor jedem Parameterwert als Ordnungsposition {@code i} im Format {@code "$i: "} angefügt. Die aktuelle
-	 * Hierarchieebene wird als einzurücken {@link FEMFormatter#putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
-	 *
-	 * @see #formatItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #formatFunction(FEMFormatter, FEMFunction)
-	 * @param target Formatierer.
-	 * @param source Stapelrahmen.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatFrame(final FEMFormatter target, final Iterable<? extends FEMValue> source) throws NullPointerException, IllegalArgumentException {
-		this.formatItems(target, source, "(", ";", ")", new Setter<FEMFormatter, FEMValue>() {
-
-			int index = 1;
-
-			@Override
-			public void set(final FEMFormatter input, final FEMValue value) {
-				input.putToken("$").putToken(new Integer(this.index)).putToken(": ");
-				FEMDomain.this.formatValue(input, value);
-				this.index++;
-			}
-
-		});
+	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung der gegebenen Parameterfunktion. Deren Funktion wird dabei in
+	 * <code>"{:"</code> und <code>"}"</code> eingeschlossen. */
+	protected void printClosure(final FEMPrinter res, final FEMClosure src) throws NullPointerException, IllegalArgumentException {
+		res.push("{:");
+		this.printFunction(res, src.target());
+		res.push("}");
 	}
 
-	/** Diese Methode formatiert und erfasst die Textdarstellung der gegebene Funktion. Für eine {@link TraceFunction}, eine {@link FEMBinding}, eine
-	 * {@link FutureFunction} oder eine {@link FEMClosure} wird die Textdarstellung ihrer referenzierten Funktion mit dieser Methode erfasst. Bei einer
-	 * {@link FEMComposite} werden die Textdarstellungen der aufzurufenden Funktion mit dieser Methode sowie die der Parameterliste mit
-	 * {@link #formatParams(FEMFormatter, Iterable)} erfasst. Bei einem {@link FEMProxy} wird dessen {@link FEMProxy#name() Name} über
-	 * {@link #formatConst(FEMFormatter, String)} erfasst. Jeder andere {@link FEMValue} würd über {@link #formatValue(FEMFormatter, FEMValue)} erfasst. Jede
-	 * andere {@link FEMFunction} wird über {@link FEMFunction#toString()} in eine Zeichenkette überführt, welche anschließend über
-	 * {@link #formatConst(FEMFormatter, String)} erfasst wird.
-	 *
-	 * @param target Formatierer.
-	 * @param source Funktion.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatFunction(final FEMFormatter target, final FEMFunction source) throws NullPointerException, IllegalArgumentException {
-		if (source instanceof FEMValue) {
-			final FEMValue value = (FEMValue)source;
-			this.formatValue(target, value);
-		} else if (source instanceof FEMProxy) {
-			final FEMProxy value = (FEMProxy)source;
-			this.formatConst(target, value.name.toString());
-		} else if (source instanceof FEMComposite) {
-			final FEMComposite value = (FEMComposite)source;
-			this.formatFunction(target, value.target);
-			this.formatParams(target, Arrays.asList(value.params));
-		} else if (source instanceof FEMClosure) {
-			final FEMClosure closureFunction = (FEMClosure)source;
-			target.putToken("{:");
-			this.formatFunction(target, closureFunction.target);
-			target.putToken("}");
-		} else if (source instanceof FEMBinding) {
-			final FEMBinding frameFunction = (FEMBinding)source;
-			this.formatFunction(target, frameFunction.target);
-		} else if (source instanceof FutureFunction) {
-			final FutureFunction futureFunction = (FutureFunction)source;
-			this.formatFunction(target, futureFunction.target);
-		} else if (source instanceof TraceFunction) {
-			final TraceFunction traceFunction = (TraceFunction)source;
-			this.formatFunction(target, traceFunction.target);
-		} else {
-			this.formatConst(target, source.toString());
-		}
+	protected void printBinding(final FEMPrinter res, final FEMBinding src) throws NullPointerException, IllegalArgumentException {
+		this.printFunction(res, src.target());
 	}
 
-	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Werts. Dazu delegiert sie den gegebenen Wert an die spezifischen
-	 * Formatierungsmethoden. Werte unbekannter Datentypen werden über {@link FEMValue#toString()} in eine Zeichenkette überführt, welche anschließend über
-	 * {@link #formatConst(FEMFormatter, String)} erfasst wird.
-	 *
-	 * @see #formatFuture(FEMFormatter, FEMFuture)
-	 * @see #formatNative(FEMFormatter, FEMNative)
-	 * @see #formatVoid(FEMFormatter, FEMVoid)
-	 * @see #formatArray(FEMFormatter, FEMArray)
-	 * @see #formatHandler(FEMFormatter, FEMHandler)
-	 * @see #formatBoolean(FEMFormatter, FEMBoolean)
-	 * @see #formatString(FEMFormatter, FEMString)
-	 * @see #formatBinary(FEMFormatter, FEMBinary)
-	 * @see #formatInteger(FEMFormatter, FEMInteger)
-	 * @see #formatDecimal(FEMFormatter, FEMDecimal)
-	 * @see #formatDuration(FEMFormatter, FEMDuration)
-	 * @see #formatDatetime(FEMFormatter, FEMDatetime)
-	 * @see #formatObject(FEMFormatter, FEMObject)
-	 * @see #formatConst(FEMFormatter, String)
-	 * @param target Formatierer.
-	 * @param source Wert.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatValue(final FEMFormatter target, final FEMValue source) throws NullPointerException, IllegalArgumentException {
-		if (source instanceof FEMFuture) {
-			this.formatFuture(target, (FEMFuture)source);
-		} else {
-			switch (source.type().id()) {
-				case FEMNative.ID:
-					this.formatNative(target, (FEMNative)source.result());
-				break;
-				case FEMVoid.ID:
-					this.formatVoid(target, (FEMVoid)source.data());
-				break;
-				case FEMArray.ID:
-					this.formatArray(target, (FEMArray)source.data());
-				break;
-				case FEMHandler.ID:
-					this.formatHandler(target, (FEMHandler)source.data());
-				break;
-				case FEMBoolean.ID:
-					this.formatBoolean(target, (FEMBoolean)source.data());
-				break;
-				case FEMString.ID:
-					this.formatString(target, (FEMString)source.data());
-				break;
-				case FEMBinary.ID:
-					this.formatBinary(target, (FEMBinary)source.data());
-				break;
-				case FEMInteger.ID:
-					this.formatInteger(target, (FEMInteger)source.data());
-				break;
-				case FEMDecimal.ID:
-					this.formatDecimal(target, (FEMDecimal)source.data());
-				break;
-				case FEMDuration.ID:
-					this.formatDuration(target, (FEMDuration)source.data());
-				break;
-				case FEMDatetime.ID:
-					this.formatDatetime(target, (FEMDatetime)source.data());
-				break;
-				case FEMObject.ID:
-					this.formatObject(target, (FEMObject)source.data());
-				break;
-				default:
-					this.formatConst(target, source.toString());
-				break;
-			}
-		}
+	protected void printComposite(final FEMPrinter res, final FEMComposite src) throws NullPointerException, IllegalArgumentException {
+		this.printFunction(res, src.target());
+		this.printFrame(res, src);
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Ergebniswerts. Die Formatierung erfolgt dazu für eine bereits ausgewertete
-	 * {@link FEMFuture} mit deren {@link FEMFuture#result(boolean) Ergebniswert} über {@link #formatValue(FEMFormatter, FEMValue)}. Andernfalls werden deren
-	 * {@link FEMFuture#function() Funktion} über {@link #formatFunction(FEMFormatter, FEMFunction)} und deren {@link FEMFuture#frame() Stapelrahmen} über
-	 * {@link #formatFrame(FEMFormatter, Iterable)} erfasst.
-	 *
-	 * @param target Formatierer.
-	 * @param source Ergebniswert.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatFuture(final FEMFormatter target, final FEMFuture source) throws NullPointerException, IllegalArgumentException {
-		synchronized (source) {
-			if (source.ready()) {
-				this.formatValue(target, source.result());
-			} else {
-				this.formatFunction(target, source.function());
-				this.formatFrame(target, source.frame().params());
-			}
-		}
+	protected void printTrace(final FEMPrinter res, final TraceFunction src) throws NullPointerException, IllegalArgumentException {
+		this.printFunction(res, src.target());
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen nativen Objekts. Die Formatierung erfolgt dazu für Nutzdaten vom Typ {@link String}
-	 * und {@link Character} {@link Strings#formatSequence(CharSequence, char) maskiert} mit doppelten bzw. einfachen Anführungszeichen. Alle anderen Nutzdaten
-	 * werden als Konstante {@link #formatConst(FEMFormatter, String) maskiert}.
-	 *
-	 * @param target Formatierer.
-	 * @param source natives Objekt.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatNative(final FEMFormatter target, final FEMNative source) throws NullPointerException, IllegalArgumentException {
-		final Object data = source.data();
-		if (data instanceof String) {
-			target.putToken(Strings.formatSequence(data.toString(), '\"'));
-		} else if (data instanceof Character) {
-			target.putToken(Strings.formatSequence(data.toString(), '\''));
-		} else {
-			this.formatConst(target, source.toString());
-		}
+	protected void printFuture(final FEMPrinter res, final FutureFunction src) throws NullPointerException, IllegalArgumentException {
+		this.printFunction(res, src.target());
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Leerwerts.
-	 *
-	 * @param target Formatierer.
-	 * @param source Leerwerts.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
-	protected void formatVoid(final FEMFormatter target, final FEMVoid source) throws NullPointerException {
-		target.putToken(source.toString());
+	/** Diese Methode {@link #printGroup(FEMPrinter, Iterable) erfasst} die Textdarstellung der gegebenen Parameterfunktionen. Diese werden dazu in runde Klammern
+	 * eingeschlossen und auf einer {@link FEMPrinter#pushBreakInc() neuen Ebene} erfasst. */
+	protected void printFrame(final FEMPrinter res, final Iterable<? extends FEMFunction> src) throws NullPointerException, IllegalArgumentException {
+		res.push("(").pushBreakInc();
+		this.printGroup(res, src);
+		res.pushBreakDec().push(")");
 	}
 
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Wertliste. Hierbei werden die {@link #formatValue(FEMFormatter, FEMValue)
-	 * formatierten} Werte mit {@code ";"} separiert sowie in {@code "["} und {@code "]"} eingeschlossen erfasst. Die aktuelle Hierarchieebene wird als
-	 * einzurücken {@link FEMFormatter#putIndent() markiert}, wenn mehrere die Wertliste mehr als ein Element enthält.
+	/** Diese Methode erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes in einem {@link FEMPrinter} und gibt diesen zurück.
 	 *
-	 * @see #formatItems(FEMFormatter, Iterable, Object, Object, Object, Setter)
-	 * @see #formatValue(FEMFormatter, FEMValue)
-	 * @param target Formatierer.
-	 * @param source Wertliste.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatArray(final FEMFormatter target, final FEMArray source) throws NullPointerException, IllegalArgumentException {
-		this.formatItems(target, source, "[", ";", "]", new Setter<FEMFormatter, FEMValue>() {
-
-			@Override
-			public void set(final FEMFormatter input, final FEMValue value) {
-				FEMDomain.this.formatValue(input, value);
-			}
-
-		});
+	 * @param src aufbereiteter Quelltext.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code src} nicht formatiert werden kann. */
+	public FEMPrinter toPrinter(final FEMScript src) throws NullPointerException, IllegalArgumentException {
+		final FEMPrinter res = new FEMPrinter();
+		this.printScript(res, src);
+		return res;
 	}
 
-	/** Diese Methode formatiert und erfasst die Textdarstellung des gegebenen Funktionszeigers. Die {@link #formatFunction(FEMFormatter, FEMFunction)
-	 * formatierte} Funktion wird dabei in <code>"{:"</code> und <code>"}"</code> eingeschlossen.
+	/** Diese Methode erfasst die Textdarstellung der gegebenen Funktionen in einem {@link FEMPrinter} und gibt diesen zurück.
 	 *
-	 * @see #formatFunction(FEMFormatter, FEMFunction)
-	 * @param target Formatierer.
-	 * @param source Funktion.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatHandler(final FEMFormatter target, final FEMHandler source) throws NullPointerException, IllegalArgumentException {
-		target.putToken("{: ");
-		this.formatFunction(target, source.value());
-		target.putToken("}");
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung des gegebenen Wahrheitswerts.
-	 *
-	 * @param target Formatierer.
-	 * @param source Wahrheitswert.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
-	protected void formatBoolean(final FEMFormatter target, final FEMBoolean source) throws NullPointerException {
-		target.putToken(source.toString());
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Zeichenkette. Die Formatierung erfolgt dazu über
-	 * {@link Strings#formatSequence(CharSequence, char)} mit dem einfachen Anführungszeichen zur Maskierung.
-	 *
-	 * @param target Formatierer.
-	 * @param source Zeichenkette.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
-	protected void formatString(final FEMFormatter target, final FEMString source) throws NullPointerException {
-		target.putToken(Strings.formatSequence(source.toString(), '"'));
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Bytefolge.
-	 *
-	 * @param target Formatierer.
-	 * @param source Bytefolge.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
-	protected void formatBinary(final FEMFormatter target, final FEMBinary source) throws NullPointerException {
-		target.putToken(source.toString());
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Dezimalzahl.
-	 *
-	 * @param target Formatierer.
-	 * @param source Dezimalzahl.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
-	protected void formatInteger(final FEMFormatter target, final FEMInteger source) throws NullPointerException {
-		target.putToken(source.toString());
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Dezimalbruch.
-	 *
-	 * @param target Formatierer.
-	 * @param source Dezimalbruch.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist. */
-	protected void formatDecimal(final FEMFormatter target, final FEMDecimal source) throws NullPointerException {
-		target.putToken(source.toString());
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Zeitspanne.
-	 *
-	 * @param target Formatierer.
-	 * @param source Zeitspanne.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatDuration(final FEMFormatter target, final FEMDuration source) throws NullPointerException, IllegalArgumentException {
-		target.putToken(source.toString());
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Zeitangabe.
-	 *
-	 * @param target Formatierer.
-	 * @param source Zeitangabe.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatDatetime(final FEMFormatter target, final FEMDatetime source) throws NullPointerException, IllegalArgumentException {
-		target.putToken(source.toString());
-	}
-
-	/** Diese Methode formateirt und erfasst die Textdarstellung der gegebenen Referenz.
-	 *
-	 * @param target Formatierer.
-	 * @param source Referenz.
-	 * @throws NullPointerException Wenn {@code target} bzw. {@code source} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code source} nicht formatiert werden kann. */
-	protected void formatObject(final FEMFormatter target, final FEMObject source) throws NullPointerException, IllegalArgumentException {
-		target.putToken(source.toString());
+	 * @param src Funktionen.
+	 * @return Textdarstellung.
+	 * @throws NullPointerException NullPointerException Wenn {@code src} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code src} nicht formatiert werden kann. */
+	public FEMPrinter toPrinter(final Iterable<? extends FEMFunction> src) throws NullPointerException, IllegalArgumentException {
+		final FEMPrinter res = new FEMPrinter();
+		this.printGroup(res, src);
+		return res;
 	}
 
 }

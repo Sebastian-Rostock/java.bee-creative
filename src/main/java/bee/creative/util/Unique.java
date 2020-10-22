@@ -283,7 +283,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 
 	@Override
 	public String toString() {
-		return Objects.toString(true, this.mapping);
+		return Objects.print(true, this.mapping);
 	}
 
 }

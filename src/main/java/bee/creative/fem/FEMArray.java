@@ -1140,9 +1140,9 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * der Elemente. */
 	@Override
 	public String toString() {
-		final FEMFormatter target = new FEMFormatter();
-		FEMDomain.DEFAULT.formatArray(target, this);
-		return target.format();
+		final FEMPrinter target = new FEMPrinter();
+		FEMDomain.DEFAULT.printArray(target, this);
+		return target.print();
 	}
 
 }

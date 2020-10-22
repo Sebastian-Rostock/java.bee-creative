@@ -145,7 +145,7 @@ public class BEXAdapter {
 
 		@Override
 		public String toString() {
-			return this.getNodeName() + "=" + Objects.toString(this.getNodeValue());
+			return this.getNodeName() + "=" + Objects.print(this.getNodeValue());
 		}
 
 	}

@@ -74,7 +74,7 @@ public final class FEMNative extends FEMValue {
 
 	@Override
 	public String toString() {
-		return Objects.toString(this.data);
+		return Objects.print(this.data);
 	}
 
 }

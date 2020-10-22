@@ -242,7 +242,7 @@ public class Parser {
 			return this.length;
 		}
 
-		/** Diese Methode gibt die Zeichenkette zurück, die als Eingabe des Parsert eingesetzt wurde und auf welche sich die Positionsangaben dieses Abschnitts 
+		/** Diese Methode gibt die Zeichenkette zurück, die als Eingabe des Parsert eingesetzt wurde und auf welche sich die Positionsangaben dieses Abschnitts
 		 * beziehen.
 		 *
 		 * @return Eingabezeichenkette. */
@@ -289,6 +289,68 @@ public class Parser {
 			return this.source.substring(this.start(), this.end());
 		}
 
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Zeichen für einen Zeilenumbruch steht.
+	 *
+	 * @param sym Zeichen.
+	 * @return {@code true} bei einem Zeilenumbruch-Zeichen (line feed, line tabulation, form feed, carriage return, next line, line separator, paragraph
+	 *         separator) ; {@code false} sonst. */
+	public static boolean isLinebreak(final int sym) {
+		switch (sym) {
+			case 0x000A: // line feed
+			case 0x000B: // line tabulation
+			case 0x000C: // form feed
+			case 0x000D: // carriage return
+			case 0x0085: // next line
+			case 0x2028: // line separator
+			case 0x2029: // paragraph separator
+				return true;
+		}
+		return false;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Zeichen für Leerraum steht.
+	 *
+	 * @param sym Zeichen.
+	 * @return {@code true} bei einem Leerraum-Zeichen (character tabulation, line feed, line tabulation, form feed, carriage return, space, next line, no-break
+	 *         space, ogham space mark, en quad, em quad, en space, em space, three-per-em space, four-per-em space, six-per-em space, figure space, punctuation
+	 *         space, thin space, hair space, line separator, paragraph separator, narrow no-break space, medium mathematical space, zero width space, zero width
+	 *         non-joiner, zero width joiner, word joiner, ideographic space) ; {@code false} sonst. */
+	public static boolean isWhitespace(final int sym) {
+		switch (sym) {
+			case 0x0009: // character tabulation
+			case 0x000A: // line feed
+			case 0x000B: // line tabulation
+			case 0x000C: // form feed
+			case 0x000D: // carriage return
+			case 0x0020: // space
+			case 0x0085: // next line
+			case 0x00A0: // no-break space
+			case 0x1680: // ogham space mark
+			case 0x2000: // en quad
+			case 0x2001: // em quad
+			case 0x2002: // en space
+			case 0x2003: // em space
+			case 0x2004: // three-per-em space
+			case 0x2005: // four-per-em space
+			case 0x2006: // six-per-em space
+			case 0x2007: // figure space
+			case 0x2008: // punctuation space
+			case 0x2009: // thin space
+			case 0x200A: // hair space
+			case 0x2028: // line separator
+			case 0x2029: // paragraph separator
+			case 0x202F: // narrow no-break space
+			case 0x205F: // medium mathematical space
+			case 0x200B: // zero width space
+			case 0x200C: // zero width non-joiner
+			case 0x200D: // zero width joiner
+			case 0x2060: // word joiner
+			case 0x3000: // ideographic space
+				return true;
+		}
+		return false;
 	}
 
 	/** Dieses Feld speichert die aktuelle Position. */

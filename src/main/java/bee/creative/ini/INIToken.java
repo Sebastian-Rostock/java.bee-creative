@@ -150,9 +150,9 @@ public final class INIToken {
 
 	@Override
 	public final String toString() {
-		if (this.string1 == null) return ";" + Objects.toString(this.string2);
-		if (this.string2 == null) return "[" + Objects.toString(this.string1) + "]";
-		return Objects.toString(this.string1) + "=" + Objects.toString(this.string2);
+		if (this.string1 == null) return ";" + Objects.print(this.string2);
+		if (this.string2 == null) return "[" + Objects.print(this.string1) + "]";
+		return Objects.print(this.string1) + "=" + Objects.print(this.string2);
 	}
 
 }

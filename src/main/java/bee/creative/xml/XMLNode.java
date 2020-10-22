@@ -9,20 +9,20 @@ import org.w3c.dom.Text;
 /** Diese Klasse implementiert den Konfigurator für {@link Document}-, {@link Attr}-, {@link Text}- und {@link Element}-Knoten.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public  class XMLNode extends BaseNodeData<XMLNode> {
+public class XMLNode extends BaseNodeData<XMLNode> {
 
 	@Override
-	public  XMLNode use( BaseNodeData<?> data) {
+	public XMLNode use(final BaseNodeData<?> data) {
 		return super.use(data);
 	}
 
 	@Override
-	public  XMLNode useNode( Node node) {
+	public XMLNode useNode(final Node node) {
 		return super.useNode(node);
 	}
 
 	@Override
-	protected  XMLNode customThis() {
+	protected XMLNode customThis() {
 		return this;
 	}
 

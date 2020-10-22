@@ -11,23 +11,23 @@ import bee.creative.lang.Objects;
 /** Diese Klasse implementiert einen Konfigurator zum {@link #parse() Parsen} sowie {@link #create() Erstellen} eines {@link Document}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public  class XMLParser {
+public class XMLParser {
 
 	/** Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link DocumentBuilder}.
 	 *
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public  class SourceData extends BaseSourceData<SourceData> {
+	public class SourceData extends BaseSourceData<SourceData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
 		 * @return Besitzer. */
-		public  XMLParser closeSourceData() {
+		public XMLParser closeSourceData() {
 			return XMLParser.this;
 		}
 
 		@Override
-		protected  SourceData customThis() {
+		protected SourceData customThis() {
 			return this;
 		}
 
@@ -36,24 +36,24 @@ public  class XMLParser {
 	/** Diese Klasse implementiert den Konfigurator für den {@link DocumentBuilder} zur Erzeugung eines {@link Document}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public  class BuilderData extends BaseDocumentBuilderData<BuilderData> {
+	public class BuilderData extends BaseDocumentBuilderData<BuilderData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
 		 * @return Besitzer. */
-		public  XMLParser closeBuilderData() {
+		public XMLParser closeBuilderData() {
 			return XMLParser.this;
 		}
 
 		@Override
-		protected  BuilderData customThis() {
+		protected BuilderData customThis() {
 			return this;
 		}
 
 	}
 
 	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final	 SourceData sourceData = new SourceData();
+	final SourceData sourceData = new SourceData();
 
 	/** Dieses Feld speichert den Konfigurator {@link #openBuilderData()}. */
 	final BuilderData builderData = new BuilderData();
@@ -62,7 +62,7 @@ public  class XMLParser {
 	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public  XMLParser use( XMLParser data) {
+	public XMLParser use(final XMLParser data) {
 		if (data == null) return this;
 		this.sourceData.use(data.sourceData);
 		this.builderData.use(data.builderData);
@@ -75,18 +75,18 @@ public  class XMLParser {
 	 * @throws IOException Wenn {@link DocumentBuilder#parse(InputSource)} eine entsprechende Ausnahme auslöst.
 	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst. */
-	public  Document parse() throws IOException, SAXException, ParserConfigurationException {
-		 InputSource source = this.sourceData.getInputSource();
-		 DocumentBuilder builder = this.builderData.getBuilder();
-		 Document result = builder.parse(source);
+	public Document parse() throws IOException, SAXException, ParserConfigurationException {
+		final InputSource source = this.sourceData.getInputSource();
+		final DocumentBuilder builder = this.builderData.getBuilder();
+		final Document result = builder.parse(source);
 		return result;
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().parse()}.
-	 * 
+	 *
 	 * @see #parse()
 	 * @see BaseSourceData#use(Object) */
-	public  Document parse( Object source) throws IOException, SAXException, ParserConfigurationException {
+	public Document parse(final Object source) throws IOException, SAXException, ParserConfigurationException {
 		return this.openSourceData().use(source).closeSourceData().parse();
 	}
 
@@ -95,9 +95,9 @@ public  class XMLParser {
 	 * @return {@link Document}.
 	 * @throws SAXException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilder#newDocument()} eine entsprechende Ausnahme auslöst. */
-	public  Document create() throws SAXException, ParserConfigurationException {
-		 DocumentBuilder builder = this.builderData.getBuilder();
-		 Document result = builder.newDocument();
+	public Document create() throws SAXException, ParserConfigurationException {
+		final DocumentBuilder builder = this.builderData.getBuilder();
+		final Document result = builder.newDocument();
 		return result;
 	}
 
@@ -105,19 +105,19 @@ public  class XMLParser {
 	 *
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @return Konfigurator. */
-	public  SourceData openSourceData() {
+	public SourceData openSourceData() {
 		return this.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link DocumentBuilder} zurück.
 	 *
 	 * @return Konfigurator. */
-	public  BuilderData openBuilderData() {
+	public BuilderData openBuilderData() {
 		return this.builderData;
 	}
 
 	@Override
-	public  String toString() {
+	public String toString() {
 		return Objects.toInvokeString(this, this.sourceData, this.builderData);
 	}
 

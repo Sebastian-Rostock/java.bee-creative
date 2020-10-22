@@ -189,7 +189,7 @@ final class IAMCodec_INI {
 		this.writeProperty("itemFormat", IAMArrayFormat.ARRAY);
 
 		for (int i = 0; i < itemCount; i++) {
-			this.writeProperty(i, IAMArrayFormat.ARRAY.format(source.item(i)));
+			this.writeProperty(i, IAMArrayFormat.ARRAY.print(source.item(i)));
 		}
 
 	}
@@ -206,7 +206,7 @@ final class IAMCodec_INI {
 		this.writeProperty("valueFormat", IAMArrayFormat.ARRAY);
 
 		for (int i = 0; i < entryCount; i++) {
-			this.writeProperty(IAMArrayFormat.ARRAY.format(source.key(i)), IAMArrayFormat.ARRAY.format(source.value(i)));
+			this.writeProperty(IAMArrayFormat.ARRAY.print(source.key(i)), IAMArrayFormat.ARRAY.print(source.value(i)));
 		}
 
 	}

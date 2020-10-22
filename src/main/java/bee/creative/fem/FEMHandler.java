@@ -81,7 +81,7 @@ public final class FEMHandler extends FEMValue {
 
 	@Override
 	public String toString() {
-		return FEMDomain.DEFAULT.formatFunction(this);
+		return FEMDomain.DEFAULT.printGroup(this);
 	}
 
 	@Override

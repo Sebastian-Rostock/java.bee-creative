@@ -300,7 +300,7 @@ final class IAMCodec {
 			}
 
 			@Override
-			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			public String print(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				final int length = array.length();
 				if (length == 0) return "";
 				final StringBuilder result = new StringBuilder().append(array.get(0));
@@ -322,7 +322,7 @@ final class IAMCodec {
 			}
 
 			@Override
-			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			public String print(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				return FEMBinary.from(false, array.toBytes()).toString(false);
 			}
 
@@ -340,7 +340,7 @@ final class IAMCodec {
 			}
 
 			@Override
-			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			public String print(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				return new String(array.toBytes(), this.charset);
 			}
 
@@ -356,7 +356,7 @@ final class IAMCodec {
 			}
 
 			@Override
-			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			public String print(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				return FEMString.from(array.toShorts()).toString();
 			}
 
@@ -372,7 +372,7 @@ final class IAMCodec {
 			}
 
 			@Override
-			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			public String print(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				return FEMString.from(array.toInts()).toString();
 			}
 
@@ -390,7 +390,7 @@ final class IAMCodec {
 			}
 
 			@Override
-			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			public String print(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				return new String(array.toBytes(), this.charset);
 			}
 
@@ -408,7 +408,7 @@ final class IAMCodec {
 			}
 
 			@Override
-			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			public String print(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				return new String(array.toBytes(), this.charset);
 			}
 
@@ -426,7 +426,7 @@ final class IAMCodec {
 			}
 
 			@Override
-			public String format(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+			public String print(final IAMArray array) throws NullPointerException, IllegalArgumentException {
 				return new String(array.toBytes(), this.charset);
 			}
 
@@ -491,7 +491,7 @@ final class IAMCodec {
 		 * @return Zeichenkette.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die Zahlenfolge ungültig ist. */
-		public abstract String format(final IAMArray source) throws NullPointerException, IllegalArgumentException;
+		public abstract String print(final IAMArray source) throws NullPointerException, IllegalArgumentException;
 
 		@Override
 		public String toString() {

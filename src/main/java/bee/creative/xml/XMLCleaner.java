@@ -83,8 +83,8 @@ public class XMLCleaner {
 	public static void cleanup(final File file, final Charset charset) throws IllegalStateException {
 		try {
 			if (!file.isFile() || !file.getName().endsWith(".java")) return;
-			String s = IO.readChars(new InputStreamReader(IO.inputStreamFrom(file), charset));
-			String r = cleanup(s);
+			final String s = IO.readChars(new InputStreamReader(IO.inputStreamFrom(file), charset));
+			final String r = XMLCleaner.cleanup(s);
 			IO.writeChars(new OutputStreamWriter(IO.outputStreamFrom(file), charset), r);
 		} catch (final Exception cause) {
 			throw new IllegalStateException(cause);
@@ -137,7 +137,7 @@ public class XMLCleaner {
 					targetList.add(source);
 				}
 			}
-			String result = Strings.join("\n", targetList);
+			final String result = Strings.join("\n", targetList);
 			return result;
 		} catch (final Exception cause) {
 			throw new IllegalStateException(cause);
@@ -162,10 +162,10 @@ public class XMLCleaner {
 			final File[] list = path.listFiles();
 			if (list == null) return this;
 			for (final File file: list) {
-				this.cleanup(file, charset);
+				XMLCleaner.cleanup(file, charset);
 			}
 		} else {
-			this.cleanup(path, charset);
+			XMLCleaner.cleanup(path, charset);
 		}
 		return this;
 	}

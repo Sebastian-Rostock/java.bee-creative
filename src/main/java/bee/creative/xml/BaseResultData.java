@@ -30,16 +30,16 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 
 	/** Diese Methode delegiert das gegebene Objekt abhängig von seinem Datentyp an eine der spezifischen Methoden und gibt {@code this} zurück. Unbekannte
 	 * Datentypen werden ignoriert.
-	 * 
+	 *
 	 * @param object Quelldaten als { {@link File}, {@link Node}, {@link Writer}, {@link OutputStream}, {@link Result} oder {@link BaseResultData}.
 	 * @return {@code this}. */
 	public final GThis use(final Object object) {
-		if (object instanceof File) return useFile((File)object);
-		if (object instanceof Node) return useNode((Node)object);
-		if (object instanceof Writer) return useWriter((Writer)object);
-		if (object instanceof OutputStream) return useStream((OutputStream)object);
-		if (object instanceof Result) return useResult((Result)object);
-		if (object instanceof BaseResultData<?>) return use((BaseResultData<?>)object);
+		if (object instanceof File) return this.useFile((File)object);
+		if (object instanceof Node) return this.useNode((Node)object);
+		if (object instanceof Writer) return this.useWriter((Writer)object);
+		if (object instanceof OutputStream) return this.useStream((OutputStream)object);
+		if (object instanceof Result) return this.useResult((Result)object);
+		if (object instanceof BaseResultData<?>) return this.use((BaseResultData<?>)object);
 		return this.customThis();
 	}
 

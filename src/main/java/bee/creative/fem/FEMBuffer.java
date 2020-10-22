@@ -959,7 +959,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.buffer.file().toString(),
-			"file=" + Integers.formatSize(this.buffer.file().length()) + " used=" + Integers.formatSize(this.next) + " heap=" + Integers.formatSize(this.emu()));
+			"file=" + Integers.printSize(this.buffer.file().length()) + " used=" + Integers.printSize(this.next) + " heap=" + Integers.printSize(this.emu()));
 	}
 
 }

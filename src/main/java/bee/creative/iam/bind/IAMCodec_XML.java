@@ -180,8 +180,8 @@ final class IAMCodec_XML {
 				for (int i = 0; i < entryCount; i++) {
 					final IAMENTRYTYPE xmlEntry = new IAMENTRYTYPE();
 					xmlMapping.entry.add(xmlEntry);
-					xmlEntry.key = IAMArrayFormat.ARRAY.format(mapping.key(i));
-					xmlEntry.value = IAMArrayFormat.ARRAY.format(mapping.value(i));
+					xmlEntry.key = IAMArrayFormat.ARRAY.print(mapping.key(i));
+					xmlEntry.value = IAMArrayFormat.ARRAY.print(mapping.value(i));
 				}
 
 			}
@@ -199,7 +199,7 @@ final class IAMCodec_XML {
 				for (int i = 0; i < itemCount; i++) {
 					final IAMITEMTYPE xmlItem = new IAMITEMTYPE();
 					xmlListing.item.add(xmlItem);
-					xmlItem.data = IAMArrayFormat.ARRAY.format(listing.item(i));
+					xmlItem.data = IAMArrayFormat.ARRAY.print(listing.item(i));
 				}
 
 			}

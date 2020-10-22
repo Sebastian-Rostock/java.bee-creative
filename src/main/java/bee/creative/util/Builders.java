@@ -52,7 +52,7 @@ public class Builders {
 
 		@Override
 		public String toString() {
-			return Objects.toString(true, this.result);
+			return Objects.print(true, this.result);
 		}
 
 	}

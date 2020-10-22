@@ -1,6 +1,6 @@
 package bee.creative.xml;
 
-/** Diese Klasse implementiert Hilfsmethoden zur zur Erzeugung von Konfiguratoren für das Parsen, Formatieren, Transformieren, Modifizieren, Evaluieren und
+/** Diese Klasse implementiert Hilfsmethoden zur zur Erzeugung von Konfiguratoren für das Parsen, Ausgeben, Transformieren, Modifizieren, Evaluieren und
  * Validieren von XML Dokumenten und Knoten.
  *
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

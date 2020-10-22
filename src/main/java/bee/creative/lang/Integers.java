@@ -20,6 +20,75 @@ public class Integers {
 	/** Dieses Feld speichert die Einerstelle der ersten 100 positiven Dezimanzahlen. */
 	final static String[] sizeUnitArray = {" B", " KB", " MB", " GB", " TB", " PB"};
 
+	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
+	 * <p>
+	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
+	 *
+	 * @param value positive Dezimalzahl.
+	 * @return Zeichenanzahl. */
+	public static int getSize(final int value) {
+		return (value > 99999 //
+			? (value > 9999999 //
+				? (value > 999999999//
+					? 10 //
+					: (value > 99999999 ? 9 : 8)) //
+				: (value > 999999 ? 7 : 6)) //
+			: (value > 99 //
+				? (value > 9999 //
+					? 5 //
+					: (value > 999 ? 4 : 3)) //
+				: (value > 9 ? 2 : 1)));
+	}
+
+	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
+	 * <p>
+	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
+	 *
+	 * @param value positive Dezimalzahl.
+	 * @return Zeichenanzahl. */
+	public static int getSize(final long value) {
+		final long div = value / 1000000000, mod = value % 1000000000;
+		return div != 0 ? Integers.getSize(div) + 9 : Integers.getSize((int)mod);
+	}
+
+	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position des gegebenen Puffers zurück.
+	 * <p>
+	 * Ungültige Eingaben werden nicht geprüft!
+	 *
+	 * @param buffer Puffer mit Dezimalziffern.
+	 * @param offset Position des ersten untersuchten Zeichens.
+	 * @param length Anzahl der zu untersuchenden Zeichen.
+	 * @return Anzahl der Dezimalziffern. */
+	public static int getSize(final char[] buffer, final int offset, final int length) {
+		final int limit = offset + length;
+		int index = offset;
+		while (index < limit) {
+			final char digit = buffer[index];
+			if ((digit < '0') || (digit > '9')) return index - offset;
+			index++;
+		}
+		return length;
+	}
+
+	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position der gegebenen Zeichenkette zurück.
+	 * <p>
+	 * Ungültige Eingaben werden nicht geprüft!
+	 *
+	 * @param buffer Zeichenkette mit Dezimalziffern.
+	 * @param offset Position des ersten untersuchten Zeichens.
+	 * @param length Anzahl der zu untersuchenden Zeichen.
+	 * @return Anzahl der Dezimalziffern. */
+	public static int getSize(final String buffer, final int offset, final int length) {
+		final int limit = offset + length;
+		int index = offset;
+		while (index < limit) {
+			final char digit = buffer.charAt(index);
+			if ((digit < '0') || (digit > '9')) return index - offset;
+			index++;
+		}
+		return length;
+	}
+
 	/** Diese Methode liest die positiven Dezimalzahl aus dem gegebenen Bereich des gegebenen Puffers und gibt sie zurück.
 	 * <p>
 	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
@@ -93,7 +162,7 @@ public class Integers {
 	 * @param value positiven Dezimalzahl.
 	 * @param buffer Puffer für die Zeichenkette.
 	 * @param offset Position des ersten Zeichens hinter der geschriebenen Dezimalzahl. */
-	public static void formatInt(int value, final char[] buffer, int offset) {
+	public static void printInt(int value, final char[] buffer, int offset) {
 		int div, mod;
 		while (true) {
 			div = value / 100;
@@ -120,12 +189,12 @@ public class Integers {
 	 * @param buffer Puffer für die Zeichenkette.
 	 * @param offset Position des ersten zu schreibenden Zeichens.
 	 * @param length Anzahl der zu schreibenden Zeichen, welche mindestend der für die gegebene Dezimalzahl neötigten Anzahl an Zeichen entsprechen muss. */
-	public static void formatInt(final int value, final char[] buffer, final int offset, final int length) {
-		int fill = length - Integers.stringSize(value);
+	public static void printInt(final int value, final char[] buffer, final int offset, final int length) {
+		int fill = length - Integers.getSize(value);
 		while (--fill >= 0) {
 			buffer[offset + fill] = '0';
 		}
-		Integers.formatInt(value, buffer, offset + length);
+		Integers.printInt(value, buffer, offset + length);
 	}
 
 	/** Diese Methode schreibt die Zeichenkette der gegebene positiven Dezimalzahl vor der gegebenen Position in den gegebenen Puffer.
@@ -135,17 +204,17 @@ public class Integers {
 	 * @param value positiven Dezimalzahl.
 	 * @param buffer Puffer für die Zeichenkette.
 	 * @param offset Position des ersten Zeichens hinter der geschriebenen Dezimalzahl. */
-	public static void formatLong(long value, final char[] buffer, int offset) {
+	public static void printLong(long value, final char[] buffer, int offset) {
 		long div, mod;
 		while (true) {
 			div = value / 1000000000;
 			mod = value % 1000000000;
 			if (div != 0) {
 				offset -= 9;
-				Integers.formatInt((int)mod, buffer, offset, 9);
+				Integers.printInt((int)mod, buffer, offset, 9);
 				value = div;
 			} else {
-				Integers.formatInt((int)mod, buffer, offset);
+				Integers.printInt((int)mod, buffer, offset);
 				return;
 			}
 		}
@@ -160,12 +229,12 @@ public class Integers {
 	 * @param buffer Puffer für die Zeichenkette.
 	 * @param offset Position des ersten zu schreibenden Zeichens.
 	 * @param length Anzahl der zu schreibenden Zeichen, welche mindestend der für die gegebene Dezimalzahl neötigten Anzahl an Zeichen entsprechen muss. */
-	public static void formatLong(final long value, final char[] buffer, final int offset, final int length) {
-		int fill = length - Integers.stringSize(value);
+	public static void printLong(final long value, final char[] buffer, final int offset, final int length) {
+		int fill = length - Integers.getSize(value);
 		while (--fill >= 0) {
 			buffer[offset + fill] = '0';
 		}
-		Integers.formatLong(value, buffer, offset + length);
+		Integers.printLong(value, buffer, offset + length);
 	}
 
 	/** Diese Methode gibt die gegebene Speichergröße als Zeichenkette mit Maßeinheit {@code B}, {@code KB}, {@code MB}, {@code GB}, {@code TB} bzw. {@code PB}
@@ -173,81 +242,12 @@ public class Integers {
 	 * 
 	 * @param value Speichergröße in Byte (-922337203685477580..+922337203685477580).
 	 * @return formatierte Speichergröße. */
-	public static String formatSize(final long value) {
-		if (value < 0) return "-" + Integers.formatSize(-value);
+	public static String printSize(final long value) {
+		if (value < 0) return "-" + Integers.printSize(-value);
 		if (value < 1024) return value + Integers.sizeUnitArray[0];
 		final int unit = (63 - Long.numberOfLeadingZeros(value)) / 10;
 		final int num = (int)((value * 10) >> (unit * 10)), div = num / 10, mod = num % 10;
 		return div + "." + mod + Integers.sizeUnitArray[unit];
-	}
-
-	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
-	 * <p>
-	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
-	 *
-	 * @param value positive Dezimalzahl.
-	 * @return Zeichenanzahl. */
-	public static int stringSize(final int value) {
-		return (value > 99999 //
-			? (value > 9999999 //
-				? (value > 999999999//
-					? 10 //
-					: (value > 99999999 ? 9 : 8)) //
-				: (value > 999999 ? 7 : 6)) //
-			: (value > 99 //
-				? (value > 9999 //
-					? 5 //
-					: (value > 999 ? 4 : 3)) //
-				: (value > 9 ? 2 : 1)));
-	}
-
-	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
-	 * <p>
-	 * <b>Ungültige Eingaben werden nicht geprüft!</b>
-	 *
-	 * @param value positive Dezimalzahl.
-	 * @return Zeichenanzahl. */
-	public static int stringSize(final long value) {
-		final long div = value / 1000000000, mod = value % 1000000000;
-		return div != 0 ? Integers.stringSize(div) + 9 : Integers.stringSize((int)mod);
-	}
-
-	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position des gegebenen Puffers zurück.
-	 * <p>
-	 * Ungültige Eingaben werden nicht geprüft!
-	 *
-	 * @param buffer Puffer mit Dezimalziffern.
-	 * @param offset Position des ersten untersuchten Zeichens.
-	 * @param length Anzahl der zu untersuchenden Zeichen.
-	 * @return Anzahl der Dezimalziffern. */
-	public static int integerSize(final char[] buffer, final int offset, final int length) {
-		final int limit = offset + length;
-		int index = offset;
-		while (index < limit) {
-			final char digit = buffer[index];
-			if ((digit < '0') || (digit > '9')) return index - offset;
-			index++;
-		}
-		return length;
-	}
-
-	/** Diese Methode gibt die Anzahl der Dezimalziffern ab der gegebenen Position der gegebenen Zeichenkette zurück.
-	 * <p>
-	 * Ungültige Eingaben werden nicht geprüft!
-	 *
-	 * @param buffer Zeichenkette mit Dezimalziffern.
-	 * @param offset Position des ersten untersuchten Zeichens.
-	 * @param length Anzahl der zu untersuchenden Zeichen.
-	 * @return Anzahl der Dezimalziffern. */
-	public static int integerSize(final String buffer, final int offset, final int length) {
-		final int limit = offset + length;
-		int index = offset;
-		while (index < limit) {
-			final char digit = buffer.charAt(index);
-			if ((digit < '0') || (digit > '9')) return index - offset;
-			index++;
-		}
-		return length;
 	}
 
 	/** Diese Methode gibt die gegebennen 16-Bit-Werte als 32-Bit-Wert zurück.

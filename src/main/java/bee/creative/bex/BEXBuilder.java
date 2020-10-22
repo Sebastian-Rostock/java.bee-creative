@@ -86,7 +86,7 @@ public class BEXBuilder {
 
 		@Override
 		public String toString() {
-			return "@" + this.key + ":" + Objects.toString(this.text);
+			return "@" + this.key + ":" + Objects.print(this.text);
 		}
 
 	}
@@ -139,7 +139,7 @@ public class BEXBuilder {
 
 		@Override
 		public String toString() {
-			return "@" + this.key + ":" + Objects.toString(this.items);
+			return "@" + this.key + ":" + Objects.print(this.items);
 		}
 
 	}
@@ -205,7 +205,7 @@ public class BEXBuilder {
 
 		@Override
 		public String toString() {
-			return Objects.toString(true, this.items);
+			return Objects.print(true, this.items);
 		}
 
 	}
