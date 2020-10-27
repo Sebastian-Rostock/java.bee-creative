@@ -90,7 +90,7 @@ public final class FEMFuture extends FEMValue {
 	}
 
 	@Override
-	public FEMFunction toFunction() { // DONE
+	public FEMFunction toFunction() {
 		return this.result().toFunction();
 	}
 

@@ -189,7 +189,7 @@ public abstract class FEMFunction {
 	 * {@link FEMHandler Funktionszeiger} auf sich selbst.
 	 *
 	 * @return Wert. */
-	public FEMValue toValue() { // DONE
+	public FEMValue toValue() {
 		return new FEMHandler(this);
 	}
 
@@ -198,7 +198,7 @@ public abstract class FEMFunction {
 	 *
 	 * @see FutureFunction
 	 * @return {@link FEMFuture}-Funktion. */
-	public FEMFunction toFuture() { // DONE
+	public FEMFunction toFuture() {
 		return new FutureFunction(this);
 	}
 

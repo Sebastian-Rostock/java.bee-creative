@@ -57,17 +57,17 @@ public abstract class FEMValue extends FEMFunction {
 	}
 
 	@Override
-	public final FEMValue toValue() { // DONE
+	public final FEMValue toValue() {
 		return this;
 	}
 
 	@Override
-	public final FEMFunction toFuture() { // DONE
+	public final FEMFunction toFuture() {
 		return this;
 	}
 
 	@Override
-	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException { // DONE
+	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
 		Objects.notNull(frame);
 		return this;
 	}

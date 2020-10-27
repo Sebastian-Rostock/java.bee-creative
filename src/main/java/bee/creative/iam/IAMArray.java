@@ -8,7 +8,6 @@ import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators.BaseIterator;
-// TODO equals und compare
 
 /** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Auflistung ({@link IAMListing}) für die Elemente sowie einer Abbildung
  * ({@link IAMMapping}) für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
@@ -616,8 +615,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 *
 	 * @param index Beginn des Bereichs in {@code this}.
 	 * @param that Zahlenfolge, mit welcher diese vergleichen wird.
-	 * @param offset Beginn des Bereichs in {@code array}.
-	 * @param length Länge des Bereichs in {@code array}.
+	 * @param offset Beginn des Bereichs in {@code that}.
+	 * @param length Länge des Bereichs in {@code that}.
 	 * @return Vergleichswert. */
 	protected boolean customEquals(final int index, final IAMArray that, final int offset, final int length) {
 		for (int i1 = index, i2 = offset, l = length; 0 < l; i2++, i1++, l--) {
@@ -630,8 +629,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 *
 	 * @param index Beginn des Bereichs in {@code this}.
 	 * @param that Zahlenfolge, mit welcher diese vergleichen wird.
-	 * @param offset Beginn des Bereichs in {@code array}.
-	 * @param length Länge des Bereichs in {@code array}.
+	 * @param offset Beginn des Bereichs in {@code that}.
+	 * @param length Länge des Bereichs in {@code that}.
 	 * @return Vergleichswert. */
 	protected int customCompare(final int index, final IAMArray that, final int offset, final int length) {
 		for (int i1 = index, i2 = offset, l = length; 0 < l; i2++, i1++, l--) {

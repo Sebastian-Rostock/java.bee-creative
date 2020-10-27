@@ -9,6 +9,7 @@ import java.util.Set;
 import bee.creative.fem.FEMFunction.FutureFunction;
 import bee.creative.fem.FEMFunction.TraceFunction;
 import bee.creative.lang.Integers;
+import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.lang.Strings;
 import bee.creative.util.Parser;
@@ -33,14 +34,23 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert die normale {@link FEMDomain}. */
 	public static final FEMDomain DEFAULT = new FEMDomain();
 
-	/** Diese Methode parst die ggf. als maskierte Zeichenkette gegebene Kennung und gibt diese ohne Maskierung zurück. Sie realisiert damit die Umkehroperation
-	 * zu {@link #printConst(String)}. Die Maskierung liegt vor, wenn die Zeichenkette mit {@code '<'} beginnt. Wenn die Maskierung vorliegt und ungültig ist,
-	 * wird {@code null} geliefert.
+	/** Diese Methode parst die als maskierte Zeichenkette gegebene Konstente und gibt diese zurück. Sie realisiert damit die Umkehroperation zu
+	 * {@link #printIdent(String)}. Das Parsen erfolgt über {@link Strings#parseSequence(CharSequence, char, char, char) Strings.parseSequence(string, '<', '\\',
+	 * '>')}.
+	 *
+	 * @param src maskierte Zeichenkette.
+	 * @return Zeichenkette oder {@code null}. */
+	public String parseIdent(final String src) throws NullPointerException {
+		return Strings.parseSequence(src, '<', '\\', '>');
+	}
+
+	/** Diese Methode parst die ggf. als {@link #parseIdent(String) maskierte} Zeichenkette gegebene Kennung und gibt diese zurück. Sie realisiert damit die
+	 * Umkehroperation zu {@link #printConst(String)}.
 	 *
 	 * @param src Zeichenkette.
-	 * @return Kennung oder {@code null}. */
-	public String parseIdent(final String src) throws NullPointerException {
-		return src.charAt(0) != '<' ? src : Strings.parseSequence(src, '<', '\\', '>');
+	 * @return Zeichenkette oder {@code null}. */
+	public String parseConst(final String src) throws NullPointerException {
+		return src.charAt(0) != '<' ? src : this.parseIdent(src);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Kennung und gibt ihn zurück. Die Erkennung erfolgt über
@@ -55,7 +65,7 @@ public class FEMDomain extends BaseObject {
 	protected String parseIdent(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '<') return null;
-		final String res = this.parseIdent(tok.toString());
+		final String res = this.parseConst(tok.toString());
 		if (res != null) return res;
 		throw this.parseError(src, null);
 	}
@@ -682,30 +692,39 @@ public class FEMDomain extends BaseObject {
 		return this.parseSequence(src, '/', '\\', '/');
 	}
 
-	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie mit Maskierung zurück. Die Maskierung erfolgt über
-	 * {@link Strings#printSequence(CharSequence, char, char, char) Strings.printSequence(string, '<', '\\', '>')}.
+	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt diese maskiert zurück. Sie realisiert damit die Umkehroperation zu
+	 * {@link #parseIdent(String)}. Das Formatieren erfolgt über {@link Strings#printSequence(CharSequence, char, char, char) Strings.printSequence(string, '<',
+	 * '\\', '>')}.
 	 *
 	 * @param src Zeichenkette.
-	 * @return formateirte Zeichenkette. */
+	 * @return maskierte Zeichenkette. */
 	public String printIdent(final String src) throws NullPointerException {
 		return Strings.printSequence(src, '<', '\\', '>');
 	}
 
-	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig mit {@link #printIdent(String) Maskierung} zurück. Die
-	 * Maskierung ist notwendig, wenn die Zeichenkette ein {@link #parseName(FEMParser) zu maskierendes Zeichen enthält}. Wenn die Maskierung unnötig ist, wird
-	 * die gegebene Zeichenkette geliefert.
+	/** Diese Methode formatiert die als Zeichenkette gegebene Konstante und gibt sie falls nötig {@link #printIdent(String) maskiert} zurück. Sie realisiert
+	 * damit die Umkehroperation zu {@link #parseConst(String)}. Die Maskierung ist notwendig, wenn die Zeichenkette ein {@link #parseName(FEMParser) zu
+	 * maskierendes Zeichen enthält}. Wenn die Maskierung unnötig ist, wird die gegebene Zeichenkette geliefert.
 	 *
 	 * @param src Zeichenkette.
-	 * @return gegebene bzw. formateirte Zeichenkette. */
+	 * @return gegebene bzw. maskierte Zeichenkette. */
 	public String printConst(final String src) throws NullPointerException {
-		final FEMParser parser = new FEMParser(src);
-		this.parseName(parser);
-		return !parser.isParsed() ? this.printIdent(src) : src;
+		final FEMParser par = new FEMParser(src);
+		this.parseName(par);
+		return !par.isParsed() ? this.printIdent(src) : src;
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link #printConst(String) Textdarstellung} der gegebenen Konstanten. */
-	protected void printConst(final FEMPrinter res, final String src) throws NullPointerException, IllegalArgumentException {
-		res.push(this.printConst(src));
+	protected void printConst(final FEMPrinter res, final Object src) throws NullPointerException, IllegalArgumentException {
+		Objects.notNull(src);
+		res.push(new Object() {
+
+			@Override
+			public String toString() {
+				return FEMDomain.this.printConst(src.toString());
+			}
+
+		});
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toPrinter(FEMScript) this.toPrinter(src).print()}. */
@@ -790,14 +809,20 @@ public class FEMDomain extends BaseObject {
 		}
 	}
 
-	/** Diese Methode {@link #printConst(FEMPrinter, String) erfasst} die {@link String#valueOf(Object) Textdarstellung} des gegebenen Objekts. */
+	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung der {@link FutureFunction#target() Zielfunktion} der gegebenen
+	 * Ergebnisfunktion. */
+	protected void printFuture(final FEMPrinter res, final FutureFunction src) throws NullPointerException, IllegalArgumentException {
+		this.printFunction(res, src.target());
+	}
+
+	/** Diese Methode {@link #printConst(FEMPrinter, Object) erfasst} die {@link Object#toString() Textdarstellung} des gegebenen Objekts. */
 	protected void printNative(final FEMPrinter res, final Object src) throws NullPointerException, IllegalArgumentException {
-		this.printConst(res, String.valueOf(src));
+		this.printConst(res, src);
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} des gegebenen Leerwerts. */
-	protected void printVoid(final FEMPrinter target, final FEMVoid source) throws NullPointerException {
-		target.push(source.toString());
+	protected void printVoid(final FEMPrinter res, final FEMVoid src) throws NullPointerException {
+		res.push(src);
 	}
 
 	/** Diese Methode {@link #printGroup(FEMPrinter, Iterable) erfasst} die Textdarstellung der gegebenen Wertliste. Deren Werte werden dazu in eckige Klammern
@@ -815,13 +840,13 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Bytefolge. */
-	protected void printBinary(final FEMPrinter target, final FEMBinary source) throws NullPointerException {
-		target.push(source.toString());
+	protected void printBinary(final FEMPrinter res, final FEMBinary src) throws NullPointerException {
+		res.push(src);
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Dezimalzahl. */
-	protected void printInteger(final FEMPrinter target, final FEMInteger source) throws NullPointerException {
-		target.push(source.toString());
+	protected void printInteger(final FEMPrinter res, final FEMInteger src) throws NullPointerException {
+		res.push(src);
 	}
 
 	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung des gegebenen Funktionszeigers. Deren Funktion wird dabei in
@@ -833,32 +858,32 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} des gegebenen Wahrheitswerts. */
-	protected void printBoolean(final FEMPrinter target, final FEMBoolean source) throws NullPointerException {
-		target.push(source.toString());
+	protected void printBoolean(final FEMPrinter res, final FEMBoolean src) throws NullPointerException {
+		res.push(src);
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} des gegebenen Dezimalbruchs. */
-	protected void printDecimal(final FEMPrinter target, final FEMDecimal source) throws NullPointerException {
-		target.push(source.toString());
+	protected void printDecimal(final FEMPrinter res, final FEMDecimal src) throws NullPointerException {
+		res.push(src);
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Zeitspanne. */
-	protected void printDuration(final FEMPrinter target, final FEMDuration source) throws NullPointerException, IllegalArgumentException {
-		target.push(source.toString());
+	protected void printDuration(final FEMPrinter res, final FEMDuration src) throws NullPointerException, IllegalArgumentException {
+		res.push(src);
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Zeitangabe. */
-	protected void printDatetime(final FEMPrinter target, final FEMDatetime source) throws NullPointerException, IllegalArgumentException {
-		target.push(source.toString());
+	protected void printDatetime(final FEMPrinter res, final FEMDatetime src) throws NullPointerException, IllegalArgumentException {
+		res.push(src);
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Referenz. */
-	protected void printObject(final FEMPrinter target, final FEMObject source) throws NullPointerException, IllegalArgumentException {
-		target.push(source.toString());
+	protected void printObject(final FEMPrinter res, final FEMObject src) throws NullPointerException, IllegalArgumentException {
+		res.push(src);
 	}
 
 	/** Diese Methode erfasst die Textdarstellung des gegebenen Werts. Werte bekannter Datentypen werden dazu an spezifische Methoden delegiert. Alle anderen
-	 * Werte werden über deren {@link Object#toString() Textdarstellung} als Konstante {@link #printConst(FEMPrinter, String) erfasst}.
+	 * Werte werden über deren {@link Object#toString() Textdarstellung} als Konstante {@link #printConst(FEMPrinter, Object) erfasst}.
 	 *
 	 * @see #printFuture(FEMPrinter, FEMFuture)
 	 * @see #printNative(FEMPrinter, Object)
@@ -873,7 +898,7 @@ public class FEMDomain extends BaseObject {
 	 * @see #printDuration(FEMPrinter, FEMDuration)
 	 * @see #printDatetime(FEMPrinter, FEMDatetime)
 	 * @see #printObject(FEMPrinter, FEMObject)
-	 * @see #printConst(FEMPrinter, String) */
+	 * @see #printConst(FEMPrinter, Object) */
 	protected void printValue(final FEMPrinter res, final FEMValue src) throws NullPointerException, IllegalArgumentException {
 		if (src instanceof FEMFuture) {
 			this.printFuture(res, (FEMFuture)src);
@@ -917,11 +942,11 @@ public class FEMDomain extends BaseObject {
 				this.printObject(res, (FEMObject)src.data());
 				return;
 		}
-		this.printConst(res, src.toString());
+		this.printConst(res, src);
 	}
 
 	/** Diese Methode erfasst die Textdarstellung der gegebene Funktion. Bekannte Funktionen werden dazu an spezifische Methoden delegiert. Alle anderen
-	 * Funktionen werden über deren {@link Object#toString() Textdarstellung} als Konstante {@link #printConst(FEMPrinter, String) erfasst}.
+	 * Funktionen werden über deren {@link Object#toString() Textdarstellung} als Konstante {@link #printConst(FEMPrinter, Object) erfasst}.
 	 *
 	 * @see #printValue(FEMPrinter, FEMValue)
 	 * @see #printProxy(FEMPrinter, FEMProxy)
@@ -946,37 +971,34 @@ public class FEMDomain extends BaseObject {
 		} else if (src instanceof TraceFunction) {
 			this.printTrace(res, (TraceFunction)src);
 		} else {
-			this.printConst(res, src.toString());
+			this.printConst(res, src);
 		}
 	}
 
+	/** Diese Methode {@link #printConst(FEMPrinter, Object) erfasst} die Textdarstellung des Namens des gegebenen Platzhalters. */
 	protected void printProxy(final FEMPrinter res, final FEMProxy src) throws NullPointerException, IllegalArgumentException {
-		this.printConst(res, src.name().toString());
+		this.printConst(res, src.name());
 	}
 
-	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung der gegebenen Parameterfunktion. Deren Funktion wird dabei in
-	 * <code>"{:"</code> und <code>"}"</code> eingeschlossen. */
+	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung der {@link FEMClosure#target() Zielfunktion} der gegebenen
+	 * Parameterfunktion. Diese wird dabei in <code>"{:"</code> und <code>"}"</code> eingeschlossen. */
 	protected void printClosure(final FEMPrinter res, final FEMClosure src) throws NullPointerException, IllegalArgumentException {
 		res.push("{:");
 		this.printFunction(res, src.target());
 		res.push("}");
 	}
 
+	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung der {@link FEMBinding#target() Zielfunktion} der gegebenen
+	 * Funktionsbindung. */
 	protected void printBinding(final FEMPrinter res, final FEMBinding src) throws NullPointerException, IllegalArgumentException {
 		this.printFunction(res, src.target());
 	}
 
+	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung der {@link FEMComposite#target() Zielfunktion} der gegebenen
+	 * Funktionskomposition. */
 	protected void printComposite(final FEMPrinter res, final FEMComposite src) throws NullPointerException, IllegalArgumentException {
 		this.printFunction(res, src.target());
 		this.printFrame(res, src);
-	}
-
-	protected void printTrace(final FEMPrinter res, final TraceFunction src) throws NullPointerException, IllegalArgumentException {
-		this.printFunction(res, src.target());
-	}
-
-	protected void printFuture(final FEMPrinter res, final FutureFunction src) throws NullPointerException, IllegalArgumentException {
-		this.printFunction(res, src.target());
 	}
 
 	/** Diese Methode {@link #printGroup(FEMPrinter, Iterable) erfasst} die Textdarstellung der gegebenen Parameterfunktionen. Diese werden dazu in runde Klammern
@@ -985,6 +1007,12 @@ public class FEMDomain extends BaseObject {
 		res.push("(").pushBreakInc();
 		this.printGroup(res, src);
 		res.pushBreakDec().push(")");
+	}
+
+	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung der {@link TraceFunction#target() Zielfunktion} der gegebenen
+	 * Funktionsüberwachung. */
+	protected void printTrace(final FEMPrinter res, final TraceFunction src) throws NullPointerException, IllegalArgumentException {
+		this.printFunction(res, src.target());
 	}
 
 	/** Diese Methode erfasst die Textdarstellung des gegebenen aufbereiteten Quelltextes in einem {@link FEMPrinter} und gibt diesen zurück.

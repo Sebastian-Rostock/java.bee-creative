@@ -128,7 +128,7 @@ public final class FEMPrinter {
 	}
 
 	/** Dieses Feld speichert die erfassten Objekte. */
-	private final ArrayList<Object> list = new ArrayList<>();
+	private ArrayList<Object> list;
 
 	/** Dieses Feld speichert die aktuelle Einrückebene. */
 	private Level level;
@@ -166,8 +166,7 @@ public final class FEMPrinter {
 	 *
 	 * @return {@code this}. */
 	public FEMPrinter reset() {
-		this.list.clear();
-		this.list.trimToSize();
+		this.list = new ArrayList<>();
 		this.level = new Level(this, null);
 		this.depth = 2;
 		return this;
@@ -176,26 +175,11 @@ public final class FEMPrinter {
 	/** Diese Methode erfasst das gegebene Objekt und gibt {@code this} zurück. Wenn das Objekt {@code null} ist, wird es nicht erfasst. Andernfalls wird seine
 	 * {@link Object#toString() Textdarstellung} {@link #print(Appendable) ausgegeben}.
 	 *
-	 * @param token Objekt oder {@code null}.
+	 * @param src Objekt oder {@code null}.
 	 * @return {@code this}. */
-	public FEMPrinter push(final Object token) {
-		if (token == null) return this;
-		this.list.add(token);
-		return this;
-	}
-
-	/** Diese Methode markiert alle übergeordneten Ebenen als einzurücken und gibt {@code this} zurück. Beginn und Ende einer Ebene werden über
-	 * {@link #pushBreakInc()} und {@link #pushBreakDec()} markiert.
-	 *
-	 * @see #pushBreakSpc()
-	 * @see #pushBreakInc()
-	 * @see #pushBreakDec()
-	 * @return {@code this}. */
-	public FEMPrinter pushIndent() {
-		final Level level = this.level;
-		for (Level parent = level.parent; (parent != null) && !parent.enabled; parent = parent.parent) {
-			parent.enabled = true;
-		}
+	public FEMPrinter push(final Object src) {
+		if (src == null) return this;
+		this.list.add(src);
 		return this;
 	}
 
@@ -242,6 +226,21 @@ public final class FEMPrinter {
 		return this;
 	}
 
+	/** Diese Methode markiert alle übergeordneten Ebenen als einzurücken und gibt {@code this} zurück. Beginn und Ende einer Ebene werden über
+	 * {@link #pushBreakInc()} und {@link #pushBreakDec()} markiert.
+	 *
+	 * @see #pushBreakSpc()
+	 * @see #pushBreakInc()
+	 * @see #pushBreakDec()
+	 * @return {@code this}. */
+	public FEMPrinter pushIndent() {
+		final Level level = this.level;
+		for (Level parent = level.parent; (parent != null) && !parent.enabled; parent = parent.parent) {
+			parent.enabled = true;
+		}
+		return this;
+	}
+
 	/** Diese Methode gibt die Verkettung der bisher gesammelten Zeichenketten als Quelltext zurück.
 	 *
 	 * @see #push(Object)
@@ -258,14 +257,16 @@ public final class FEMPrinter {
 		return res.toString();
 	}
 
+	/** Diese Methode {@link Appendable#append(CharSequence) fügt} die {@link Object#toString() Textdarstellungen} der {@link #push(Object) erfastten} Objekte und
+	 * Einrückungen an den gegebenen Puffer an. */
 	public void print(final Appendable res) throws IOException {
-		final int depth = this.depth + 2;
+		final int length = this.depth + 1;
 		final String indent = this.indent;
-		final Indent[] caches = new Indent[depth];
+		final Indent[] caches = new Indent[length];
 		caches[0] = Indent.DISABLED;
 		caches[1] = Indent.from(indent);
 		Indent parent = null;
-		for (int i = 2; i < depth; i++) {
+		for (int i = 2; i < length; i++) {
 			parent = Indent.from(indent, parent);
 			caches[i] = parent;
 		}
