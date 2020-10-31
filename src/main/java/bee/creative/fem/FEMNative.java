@@ -63,18 +63,14 @@ public final class FEMNative extends FEMValue {
 	@Override
 	public boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof FEMNative)) {
-			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).data();
-			if (!(object instanceof FEMNative)) return false;
-		}
-		final FEMNative that = (FEMNative)object;
-		return Objects.equals(this.data, that.data);
+		if (!(object instanceof FEMValue)) return false;
+		final FEMValue that = (FEMValue)object;
+		return Objects.equals(this.data(), that.data());
 	}
 
 	@Override
 	public String toString() {
-		return Objects.print(this.data);
+		return Objects.toString(this.data);
 	}
 
 }

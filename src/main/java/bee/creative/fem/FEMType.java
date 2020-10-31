@@ -26,7 +26,7 @@ public class FEMType<GData> {
 	/** Dieser Konstruktor initialisiert den Identifikator.
 	 *
 	 * @param id Identifikator. */
-	FEMType(final int id) {
+	protected FEMType(final int id) {
 		this.id = id;
 	}
 

@@ -44,13 +44,12 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 
 		@Override
-		public boolean equals(final FEMArray that) throws NullPointerException {
-			if (this == that) return true;
+		protected boolean customEquals(final FEMArray that) throws NullPointerException {
 			if (that instanceof MappedArray1) {
 				final MappedArray1 that2 = (MappedArray1)that;
 				if ((this.addr == that2.addr) && (this.buffer.buffer == that2.buffer.buffer)) return true;
 			}
-			return super.equals(that);
+			return super.customEquals(that);
 		}
 
 		@Override
@@ -112,13 +111,12 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 
 		@Override
-		public boolean equals(final FEMBinary that) throws NullPointerException {
-			if (this == that) return true;
+		protected boolean customEquals(final FEMBinary that) throws NullPointerException {
 			if (that instanceof MappedBinary1) {
 				final MappedBinary1 that2 = (MappedBinary1)that;
 				if ((this.addr == that2.addr) && (this.buffer == that2.buffer)) return true;
 			}
-			return super.equals(that);
+			return super.customEquals(that);
 		}
 
 		@Override
@@ -147,13 +145,12 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 
 		@Override
-		public boolean equals(final FEMString that) throws NullPointerException {
-			if (this == that) return true;
+		protected boolean customEquals(final FEMString that) throws NullPointerException {
 			if (that instanceof MappedString1) {
 				final MappedString1 that2 = (MappedString1)that;
 				if ((this.addr == that2.addr) && (this.buffer == that2.buffer)) return true;
 			}
-			return super.equals(that);
+			return super.customEquals(that);
 		}
 
 		@Override

@@ -10,7 +10,7 @@ import bee.creative.lang.Objects;
  * @see FEMDomain#toPrinter(Iterable)
  * @see FEMDomain#toPrinter(FEMScript)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMPrinter {
+public class FEMPrinter {
 
 	static final class Level extends Indent {
 
@@ -165,7 +165,7 @@ public final class FEMPrinter {
 	/** Diese Methode entfernt alle bisher geöffneten Ebenen sowie erfassten Objekte und gibt {@code this} zurück.
 	 *
 	 * @return {@code this}. */
-	public FEMPrinter reset() {
+	public final FEMPrinter reset() {
 		this.list = new ArrayList<>();
 		this.level = new Level(this, null);
 		this.depth = 2;
@@ -177,7 +177,7 @@ public final class FEMPrinter {
 	 *
 	 * @param src Objekt oder {@code null}.
 	 * @return {@code this}. */
-	public FEMPrinter push(final Object src) {
+	public final FEMPrinter push(final Object src) {
 		if (src == null) return this;
 		this.list.add(src);
 		return this;
@@ -190,7 +190,7 @@ public final class FEMPrinter {
 	 * @see #pushBreakDec()
 	 * @see #pushBreakSpc()
 	 * @return {@code this}. */
-	public FEMPrinter pushBreakInc() {
+	public final FEMPrinter pushBreakInc() {
 		final Level level = new Level(this, this.level);
 		this.depth = Math.max(this.depth, level.depth);
 		this.list.add(level.inc);
@@ -205,7 +205,7 @@ public final class FEMPrinter {
 	 * @see #pushBreakInc()
 	 * @see #pushBreakSpc()
 	 * @return {@code this}. */
-	public FEMPrinter pushBreakDec() {
+	public final FEMPrinter pushBreakDec() {
 		Level level = this.level;
 		this.list.add(level.dec);
 		level = level.parent;
@@ -221,7 +221,7 @@ public final class FEMPrinter {
 	 * @see #pushBreakInc()
 	 * @see #pushBreakDec()
 	 * @return {@code this}. */
-	public FEMPrinter pushBreakSpc() {
+	public final FEMPrinter pushBreakSpc() {
 		this.list.add(this.level.spc);
 		return this;
 	}
@@ -233,7 +233,7 @@ public final class FEMPrinter {
 	 * @see #pushBreakInc()
 	 * @see #pushBreakDec()
 	 * @return {@code this}. */
-	public FEMPrinter pushIndent() {
+	public final FEMPrinter pushIndent() {
 		final Level level = this.level;
 		for (Level parent = level.parent; (parent != null) && !parent.enabled; parent = parent.parent) {
 			parent.enabled = true;
@@ -245,7 +245,7 @@ public final class FEMPrinter {
 	 *
 	 * @see #push(Object)
 	 * @return Quelltext. */
-	public String print() throws IllegalArgumentException {
+	public final String print() throws IllegalArgumentException {
 		final StringBuilder res = new StringBuilder();
 		try {
 			this.print(res);
@@ -259,7 +259,7 @@ public final class FEMPrinter {
 
 	/** Diese Methode {@link Appendable#append(CharSequence) fügt} die {@link Object#toString() Textdarstellungen} der {@link #push(Object) erfastten} Objekte und
 	 * Einrückungen an den gegebenen Puffer an. */
-	public void print(final Appendable res) throws IOException {
+	public final void print(final Appendable res) throws IOException {
 		final int length = this.depth + 1;
 		final String indent = this.indent;
 		final Indent[] caches = new Indent[length];

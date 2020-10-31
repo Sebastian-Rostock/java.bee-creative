@@ -319,7 +319,7 @@ public class H2QS implements QS {
 
 	@Override
 	public String toString() {
-		return Objects.printCall(false, true, this, "edges", this.edges().size(), "values", this.values().size());
+		return Objects.toStringCall(false, true, this, "edges", this.edges().size(), "values", this.values().size());
 	}
 
 }

@@ -125,11 +125,6 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Item
 	}
 
 	@Override
-	public final Iterator<FEMFunction> iterator() {
-		return Iterators.itemsIterator(this, 0, this.size());
-	}
-
-	@Override
 	public final FEMFunction compose(final FEMFunction... params) throws NullPointerException {
 		return FEMComposite.from(true, this, params.clone());
 	}
@@ -149,6 +144,11 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Item
 		final FEMComposite that = (FEMComposite)object;
 		return (this.concat() == that.concat()) && (this.hashCode() == that.hashCode()) && Objects.equals(this.target, that.target)
 			&& Objects.equals(this.params, that.params);
+	}
+
+	@Override
+	public final Iterator<FEMFunction> iterator() {
+		return Iterators.itemsIterator(this, 0, this.size());
 	}
 
 }

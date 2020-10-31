@@ -7,6 +7,7 @@ import java.util.Collection;
 import bee.creative.bind.Getter;
 import bee.creative.bind.Getters.BaseGetter;
 import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.BaseObject;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert ein abstraktes Kontextobjekt, das über einen {@link FEMFrame Stapelrahmen} der Auswertung von Funktionen bereitgestellt wird und
@@ -15,7 +16,7 @@ import bee.creative.util.Iterables;
  *
  * @see FEMFrame#context()
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class FEMContext {
+public class FEMContext extends BaseObject {
 
 	/** Dieses Feld speichert das leere Kontextobjekt.
 	 * <p>
@@ -208,11 +209,6 @@ public class FEMContext {
 			result[i] = this.objectFrom(array.get(i));
 		}
 		return result;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toInvokeString(this);
 	}
 
 }

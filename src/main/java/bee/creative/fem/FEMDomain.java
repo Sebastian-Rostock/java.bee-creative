@@ -259,7 +259,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode überführt den von {@link #parseArray(FEMParser)} ermittelten Abschnitt in eine Wertliste und gibt diese zurück. Für andere Abschnitte
 	 * liefert sie {@code null}. */
-	protected FEMArray parseArray(final FEMToken src) throws NullPointerException, FEMException {
+	protected FEMValue parseArray(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '[') return null;
 		final List<FEMValue> res = new ArrayList<>();
@@ -278,7 +278,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode überführt den von {@link #parseString1(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
 	 * liefert sie {@code null}. */
-	protected FEMString parseString1(final FEMToken src) throws NullPointerException, FEMException {
+	protected FEMValue parseString1(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '\"') return null;
 		final String res = Strings.parseSequence(tok.toString(), '\"', '\\', '\"');
@@ -295,7 +295,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode überführt den von {@link #parseString2(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere Abschnitte
 	 * liefert sie {@code null}. */
-	protected FEMString parseString2(final FEMToken src) throws NullPointerException, FEMException {
+	protected FEMValue parseString2(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != '\'') return null;
 		final String res = Strings.parseSequence(tok.toString(), '\'', '\\', '\'');
@@ -349,10 +349,10 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode überführt den von {@link #parseHandler(FEMParser)} ermittelten Abschnitt in eine Parameterfunktion und gibt diese zurück. Für andere
 	 * Abschnitte liefert sie {@code null}. */
-	protected FEMClosure parseClosure(final FEMToken src) {
-		final FEMHandler res = this.parseHandler(src);
+	protected FEMFunction parseClosure(final FEMToken src) {
+		final FEMValue res = this.parseHandler(src);
 		if (res == null) return null;
-		return FEMClosure.from(res.value());
+		return FEMClosure.from(res.toFunction());
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} eines Funktionszeigers und gibt dessen Elternabschnitt zurück. Die
@@ -442,7 +442,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode überführt den von {@link #parseHandler(FEMParser)} ermittelten Abschnitt in einen Funktionszeiger und gibt diese zurück. Für andere
 	 * Abschnitte liefert sie {@code null}. */
-	protected FEMHandler parseHandler(FEMToken src) throws NullPointerException, FEMException {
+	protected FEMValue parseHandler(FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() == '{') {
 			final int idx = tok.size() - 1;
@@ -456,7 +456,7 @@ public class FEMDomain extends BaseObject {
 			final String ref = str != null ? str : this.parseConst(src);
 			if (ref == null) throw this.parseError(src, null);
 			src = src.with(tok.get(1));
-			final FEMHandler han = this.parseHandler(src);
+			final FEMValue han = this.parseHandler(src);
 			if (han == null) throw this.parseError(src, null);
 			final FEMProxy res = src.proxy(ref);
 			res.set(han.toFunction());
@@ -770,9 +770,9 @@ public class FEMDomain extends BaseObject {
 		}
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #printGroup(Iterable) this.printGroup(Arrays.asList(src))}. */
+	/** Diese Methode ist eine Abkürzung für {@link #toPrinter(FEMFunction...) this.toPrinter(src).print()}. */
 	public String printGroup(final FEMFunction... src) throws NullPointerException, IllegalArgumentException {
-		return this.printGroup(Arrays.asList(src));
+		return this.toPrinter(src).print();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toPrinter(Iterable) this.toPrinter(src).print()}. */
@@ -795,7 +795,7 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode erfasst die Textdarstellung des gegebenen Ergebniswerts. Die Formatierung erfolgt dazu für eine bereits ausgewertete {@link FEMFuture} mit
-	 * deren {@link FEMFuture#result(boolean) Ergebniswert} über {@link #printValue(FEMPrinter, FEMValue)}. Andernfalls werden deren {@link FEMFuture#function()
+	 * deren {@link FEMFuture#result(boolean) Ergebniswert} über {@link #printValue(FEMPrinter, FEMValue)}. Andernfalls werden deren {@link FEMFuture#target()
 	 * Funktion} über {@link #printFunction(FEMPrinter, FEMFunction)} und deren {@link FEMFuture#frame() Stapelrahmen} über
 	 * {@link #printFrame(FEMPrinter, Iterable)} erfasst. */
 	protected void printFuture(final FEMPrinter res, final FEMFuture src) throws NullPointerException, IllegalArgumentException {
@@ -803,7 +803,7 @@ public class FEMDomain extends BaseObject {
 			if (src.ready()) {
 				this.printValue(res, src.result());
 			} else {
-				this.printFunction(res, src.function());
+				this.printFunction(res, src.target());
 				this.printFrame(res, src.frame().params());
 			}
 		}
@@ -1025,6 +1025,11 @@ public class FEMDomain extends BaseObject {
 		final FEMPrinter res = new FEMPrinter();
 		this.printScript(res, src);
 		return res;
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #toPrinter(Iterable) this.toPrinter(Arrays.asList(src))}. */
+	public FEMPrinter toPrinter(final FEMFunction... src) throws NullPointerException, IllegalArgumentException {
+		return this.toPrinter(Arrays.asList(src));
 	}
 
 	/** Diese Methode erfasst die Textdarstellung der gegebenen Funktionen in einem {@link FEMPrinter} und gibt diesen zurück.

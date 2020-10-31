@@ -74,15 +74,6 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 		return this.name;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #id() Kennung} dieses Platzhalters gleich der des gegebenen ist.
-	 *
-	 * @param that Platzhalter.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public boolean equals(final FEMProxy that) throws NullPointerException {
-		return this.id.equals(that.id);
-	}
-
 	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird. Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch
 	 * nicht aufgerufen wurde.
 	 *
@@ -115,11 +106,14 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 		return this.id.hashCode();
 	}
 
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #id() Kennung} dieses Platzhalters gleich der des gegebenen ist. */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMProxy)) return false;
-		return this.equals((FEMProxy)object);
+		FEMProxy object2 = (FEMProxy)object;
+		final FEMProxy that = object2;
+		return this.id.equals(that.id);
 	}
 
 	@Override

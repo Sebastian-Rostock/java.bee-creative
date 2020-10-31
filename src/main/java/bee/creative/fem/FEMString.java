@@ -1232,8 +1232,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return finder.index + offset;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Zeichenkette an der gegebenen Position in dieser Zeichenkette liegt. Sie Implementiert
-	 * {@link #equals(FEMString)} ohne Wertebereichsprüfung. */
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
+	protected boolean customEquals(final FEMString that) throws NullPointerException {
+		final int length = this.length;
+		if (length != that.length) return false;
+		if (this.hashCode() != that.hashCode()) return false;
+		return this.customEquals(that, 0);
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Zeichenkette an der gegebenen Position in dieser Zeichenkette liegt. */
 	protected boolean customEquals(final FEMString that, final int offset) {
 		final int length = that.length;
 		for (int i = 0; i < length; i++) {
@@ -1441,17 +1448,56 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		this.extract(new INT32Encoder(result, offset));
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeichenkette gleich der gegebenen ist.
+	/** Diese Methode gibt die 32-Bit-einzelwertkodierten Codepoint zurück.
 	 *
-	 * @param that Zeichenkette.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public boolean equals(final FEMString that) throws NullPointerException {
-		if (this == that) return true;
-		final int length = this.length;
-		if (length != that.length) return false;
-		if (this.hashCode() != that.hashCode()) return false;
-		return this.customEquals(that, 0);
+	 * @return Array mit den Codepoints in 32-Bit-Kodierung. */
+	public int[] toInts() {
+		final INT32Encoder encoder = new INT32Encoder(new int[this.length], 0);
+		this.extract(encoder);
+		return encoder.array;
+	}
+
+	@Override
+	public final FEMString result(final boolean deep) {
+		return deep ? this.compact() : this;
+	}
+
+	@Override
+	public int hashCode() {
+		final HashCollector hasher = new HashCollector();
+		this.extract(hasher);
+		final int result = hasher.hash;
+		return result != 0 ? result : -1;
+	}
+
+	@Override
+	public final boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMString)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMString)) return false;
+		}
+		return this.customEquals((FEMString)object);
+	}
+
+	@Override
+	public final Iterator<Integer> iterator() {
+		return new BaseIterator<Integer>() {
+
+			int index = 0;
+
+			@Override
+			public Integer next() {
+				return new Integer(FEMString.this.customGet(this.index++));
+			}
+
+			@Override
+			public boolean hasNext() {
+				return this.index < FEMString.this.length;
+			}
+
+		};
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Zeichenkette kleiner, gleich oder größer als die
@@ -1460,7 +1506,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	 * @param that Zeichenkette.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public int compare(final FEMString that) throws NullPointerException {
+	@Override
+	public int compareTo(final FEMString that) throws NullPointerException {
 		final int length = Math.min(this.length, that.length);
 		for (int i = 0; i < length; i++) { // TODO schneller, ggf. über ectract int[32] und IAMArray.from(...).compare
 			final int result = Comparators.compare(this.customGet(i), that.customGet(i));
@@ -1469,13 +1516,25 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return Comparators.compare(this.length, that.length);
 	}
 
-	/** Diese Methode gibt die 32-Bit-einzelwertkodierten Codepoint zurück.
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Codepoints dieser Zeichenkette zurück.
 	 *
-	 * @return Array mit den Codepoints in 32-Bit-Kodierung. */
-	public int[] toInts() {
-		final INT32Encoder encoder = new INT32Encoder(new int[this.length], 0);
-		this.extract(encoder);
-		return encoder.array;
+	 * @see #get(int)
+	 * @see #length()
+	 * @return {@link List}-Sicht. */
+	public final List<Integer> toList() {
+		return new AbstractList<Integer>() {
+
+			@Override
+			public Integer get(final int index) {
+				return new Integer(FEMString.this.get(index));
+			}
+
+			@Override
+			public int size() {
+				return FEMString.this.length;
+			}
+
+		};
 	}
 
 	/** Diese Methode gibt die 8-Bit-einzelwertkodierten Codepoint zurück.
@@ -1533,75 +1592,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		final UTF16Encoder2 encoder = new UTF16Encoder2(new char[counter.count], 0);
 		this.extract(encoder);
 		return encoder.array;
-	}
-
-	@Override
-	public final FEMString result(final boolean deep) {
-		return deep ? this.compact() : this;
-	}
-
-	@Override
-	public int hashCode() {
-		final HashCollector hasher = new HashCollector();
-		this.extract(hasher);
-		final int result = hasher.hash;
-		return result != 0 ? result : -1;
-	}
-
-	@Override
-	public final boolean equals(Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMString)) {
-			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).data();
-			if (!(object instanceof FEMString)) return false;
-		}
-		return this.equals((FEMString)object);
-	}
-
-	@Override
-	public final Iterator<Integer> iterator() {
-		return new BaseIterator<Integer>() {
-
-			int index = 0;
-
-			@Override
-			public Integer next() {
-				return new Integer(FEMString.this.customGet(this.index++));
-			}
-
-			@Override
-			public boolean hasNext() {
-				return this.index < FEMString.this.length;
-			}
-
-		};
-	}
-
-	@Override
-	public final int compareTo(final FEMString that) {
-		return this.compare(that);
-	}
-
-	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Codepoints dieser Zeichenkette zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @return {@link List}-Sicht. */
-	public final List<Integer> toList() {
-		return new AbstractList<Integer>() {
-
-			@Override
-			public Integer get(final int index) {
-				return new Integer(FEMString.this.get(index));
-			}
-
-			@Override
-			public int size() {
-				return FEMString.this.length;
-			}
-
-		};
 	}
 
 	/** Diese Methode gibt diesen Zeichenkette als {@link String} zurück.

@@ -688,6 +688,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	/** Dieses Feld speichert die leere Wertliste. */
 	public static final FEMArray EMPTY = new UniformArray(0, FEMVoid.INSTANCE);
 
+	private static final FEMValue[] VALUES = new FEMValue[0]; 
+	
 	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
 	 *
 	 * @param length Länge.
@@ -739,29 +741,18 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		System.arraycopy(items, offset, result, 0, length);
 		return new CompactArray(result);
 	}
+ 
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 *
-	 * @see Collection#toArray(Object[])
 	 * @see #from(FEMValue...)
-	 * @param items Werte.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static FEMArray from(final List<? extends FEMValue> items) throws NullPointerException {
-		if (items.size() == 0) return FEMArray.EMPTY;
-		return FEMArray.from(items.toArray(new FEMValue[items.size()]));
-	}
-
-	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
-	 *
-	 * @see #from(List)
-	 * @see Iterables#toList(Iterable)
+	 * @see Iterables#toArray(Object[], Iterable)
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
 		if (items instanceof FEMArray) return (FEMArray)items;
-		return FEMArray.from(Iterables.toList(items));
+		return FEMArray.from(Iterables.toArray(VALUES,items));
 	}
 
 	/** Diese Methode überführt die {@link Entry Einträge} der gegebenen {@link Map Abbildung} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie
@@ -849,8 +840,15 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return finder.index + offset;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Wertliste an der gegebenen Position in dieser Wertliste liegt. Sie Implementiert
-	 * {@link #equals(FEMArray)} ohne Wertebereichsprüfung. */
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. **/
+	protected boolean customEquals(final FEMArray that) throws NullPointerException {
+		if (this == that) return true;
+		if (this.length != that.length) return false;
+		if (this.hashCode() != that.hashCode()) return false;
+		return this.customEquals(that, 0);
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Wertliste an der gegebenen Position in dieser Wertliste liegt. */
 	protected boolean customEquals(final FEMArray that, final int offset) {
 		final int length = that.length;
 		for (int i = 0; i < length; i++) {
@@ -1042,63 +1040,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		this.extract(new ValueCollector(result, offset));
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist.
-	 *
-	 * @param that Wertliste.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public boolean equals(final FEMArray that) throws NullPointerException {
-		if (this == that) return true;
-		final int length = this.length;
-		if (length != that.length) return false;
-		if (this.hashCode() != that.hashCode()) return false;
-		return this.customEquals(that, 0);
-	}
-
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Wertliste kleiner, gleich oder größer als die
-	 * der gegebenen Wertliste ist. Die Werte werden über den gegebenen {@link Comparator} verglichen.
-	 *
-	 * @param that Wertliste.
-	 * @param order {@link Comparator} zum Vergleichen der Werte.
-	 * @return Vergleichswert.
-	 * @throws NullPointerException Wenn {@code that} bzw. {@code order} {@code null} ist. */
-	public int compare(final FEMArray that, final Comparator<FEMValue> order) throws NullPointerException {
-		final int length = Math.min(this.length, that.length);
-		for (int i = 0; i < length; i++) {
-			final int result = order.compare(this.customGet(i), that.customGet(i));
-			if (result < 0) return -1;
-			if (result > 0) return +1;
-		}
-		return Comparators.compare(this.length, that.length);
-	}
-
-	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf diese Wertliste zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @see #iterator()
-	 * @return {@link List}-Sicht. */
-	public final List<FEMValue> toList() {
-		return new ItemList(this);
-	}
-
-	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die Schlüssel- und Wertlisten zurück, aus denen diese Wertliste besteht.<br>
-	 * Sie ist damit die Umkehroperation zu {@link #from(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an
-	 * der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche
-	 * {@link #compact(boolean) indiziert} sein.
-	 *
-	 * @return {@link Map}-Sicht.
-	 * @throws IllegalArgumentException Wenn diese Wertliste nicth aus zwei Wertlisten besteht oder die Längen dieser Wertlisten ungleich sind. */
-	public final Map<FEMValue, FEMValue> toMap() throws IllegalArgumentException {
-		if (this.length != 2) throw new IllegalArgumentException();
-		final FEMValue keys1 = this.customGet(0), values1 = this.customGet(1);
-		if (!(keys1 instanceof FEMArray)) throw new IllegalArgumentException();
-		if (!(values1 instanceof FEMArray)) throw new IllegalArgumentException();
-		final FEMArray keys2 = (FEMArray)keys1, values2 = (FEMArray)values1;
-		if (keys2.length != values2.length) throw new IllegalArgumentException();
-		return new ItemMap(keys2, values2);
-	}
-
 	/** Diese Methode gibt den {@code index}-ten Wert zurück. */
 	@Override
 	public final FEMValue get(final int index) throws IndexOutOfBoundsException {
@@ -1128,12 +1069,29 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMArray)) return false;
 		}
-		return this.equals((FEMArray)object);
+		return this.customEquals((FEMArray)object);
 	}
 
 	@Override
 	public Iterator<FEMValue> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length);
+	}
+
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Wertliste kleiner, gleich oder größer als die
+	 * der gegebenen Wertliste ist. Die Werte werden über den gegebenen {@link Comparator} verglichen.
+	 *
+	 * @param that Wertliste.
+	 * @param order {@link Comparator} zum Vergleichen der Werte.
+	 * @return Vergleichswert.
+	 * @throws NullPointerException Wenn {@code that} bzw. {@code order} {@code null} ist. */
+	public int compareTo(final FEMArray that, final Comparator<FEMValue> order) throws NullPointerException {
+		final int length = Math.min(this.length, that.length);
+		for (int i = 0; i < length; i++) {
+			final int result = order.compare(this.customGet(i), that.customGet(i));
+			if (result < 0) return -1;
+			if (result > 0) return +1;
+		}
+		return Comparators.compare(this.length, that.length);
 	}
 
 	/** Diese Methode gibt die Textdarstellung zurück. Diese Besteht aus den in eckige Klammern eingeschlossenen und mit Semikolon separierten Textdarstellungen
@@ -1143,6 +1101,33 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		final FEMPrinter target = new FEMPrinter();
 		FEMDomain.DEFAULT.printArray(target, this);
 		return target.print();
+	}
+
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf diese Wertliste zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @see #iterator()
+	 * @return {@link List}-Sicht. */
+	public final List<FEMValue> toList() {
+		return new ItemList(this);
+	}
+
+	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die Schlüssel- und Wertlisten zurück, aus denen diese Wertliste besteht.<br>
+	 * Sie ist damit die Umkehroperation zu {@link #from(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an
+	 * der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche
+	 * {@link #compact(boolean) indiziert} sein.
+	 *
+	 * @return {@link Map}-Sicht.
+	 * @throws IllegalArgumentException Wenn diese Wertliste nicth aus zwei Wertlisten besteht oder die Längen dieser Wertlisten ungleich sind. */
+	public final Map<FEMValue, FEMValue> toMap() throws IllegalArgumentException {
+		if (this.length != 2) throw new IllegalArgumentException();
+		final FEMValue keys1 = this.customGet(0), values1 = this.customGet(1);
+		if (!(keys1 instanceof FEMArray)) throw new IllegalArgumentException();
+		if (!(values1 instanceof FEMArray)) throw new IllegalArgumentException();
+		final FEMArray keys2 = (FEMArray)keys1, values2 = (FEMArray)values1;
+		if (keys2.length != values2.length) throw new IllegalArgumentException();
+		return new ItemMap(keys2, values2);
 	}
 
 }

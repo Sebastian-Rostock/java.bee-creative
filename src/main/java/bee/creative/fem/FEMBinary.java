@@ -649,8 +649,15 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return finder.index + offset;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Bytefolge an der gegebenen Position in dieser Bytefolge liegt. Sie Implementiert
-	 * {@link #equals(FEMBinary)} ohne Wertebereichsprüfung. */
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
+	protected boolean customEquals(final FEMBinary that) throws NullPointerException {
+		final int length = this.length;
+		if (length != that.length) return false;
+		if (this.hashCode() != that.hashCode()) return false;
+		return this.customEquals(that, 0);
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Bytefolge an der gegebenen Position in dieser Bytefolge liegt. */
 	protected boolean customEquals(final FEMBinary that, final int offset) {
 		final int length = that.length;
 		for (int i = 0; i < length; i++) {
@@ -830,20 +837,47 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		this.extract(new ValueCollector(result, offset));
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist.
-	 *
-	 * @param that Bytefolge.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public boolean equals(final FEMBinary that) throws NullPointerException {
-		if (this == that) return true;
-		final int length = this.length;
-		if (length != that.length) return false;
-		if (this.hashCode() != that.hashCode()) return false;
-		for (int i = 0; i < length; i++) {
-			if (this.customGet(i) != that.customGet(i)) return false;
+	@Override
+	public final FEMBinary result(final boolean deep) {
+		return deep ? this.compact() : this;
+	}
+
+	@Override
+	public int hashCode() {
+		final HashCollector hasher = new HashCollector();
+		this.extract(hasher);
+		final int result = hasher.hash;
+		return result != 0 ? result : -11;
+	}
+
+	@Override
+	public final boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMBinary)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMBinary)) return false;
 		}
-		return true;
+		return this.customEquals((FEMBinary)object);
+	}
+
+	@Override
+	public final Iterator<Byte> iterator() {
+		return new BaseIterator<Byte>() {
+
+			int index = 0;
+
+			@Override
+			public Byte next() {
+				return new Byte(FEMBinary.this.customGet(this.index++));
+			}
+
+			@Override
+			public boolean hasNext() {
+				return this.index < FEMBinary.this.length;
+			}
+
+		};
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich oder größer als die
@@ -852,13 +886,40 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	 * @param that Bytefolge.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final int compare(final FEMBinary that) throws NullPointerException {
+	@Override
+	public final int compareTo(final FEMBinary that) throws NullPointerException {
 		final int length = Math.min(this.length, that.length);
 		for (int i = 0; i < length; i++) {
 			final int result = Comparators.compare(this.customGet(i) & 255, that.customGet(i) & 255);
 			if (result != 0) return result;
 		}
 		return Comparators.compare(this.length, that.length);
+	}
+
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Bytes dieser Bytefolge zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @return {@link List}-Sicht. */
+	public final List<Byte> toList() {
+		return new AbstractList<Byte>() {
+
+			@Override
+			public Byte get(final int index) {
+				return new Byte(FEMBinary.this.get(index));
+			}
+
+			@Override
+			public int size() {
+				return FEMBinary.this.length;
+			}
+
+		};
+	}
+
+	@Override
+	public final String toString() {
+		return this.toString(true);
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück. Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} (header) und den Bytes
@@ -929,80 +990,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			}
 		}
 		throw new IllegalStateException();
-	}
-
-	@Override
-	public final FEMBinary result(final boolean deep) {
-		return deep ? this.compact() : this;
-	}
-
-	@Override
-	public int hashCode() {
-		final HashCollector hasher = new HashCollector();
-		this.extract(hasher);
-		final int result = hasher.hash;
-		return result != 0 ? result : -11;
-	}
-
-	@Override
-	public final boolean equals(Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMBinary)) {
-			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).result().data();
-			if (!(object instanceof FEMBinary)) return false;
-		}
-		return this.equals((FEMBinary)object);
-	}
-
-	@Override
-	public final Iterator<Byte> iterator() {
-		return new BaseIterator<Byte>() {
-
-			int index = 0;
-
-			@Override
-			public Byte next() {
-				return new Byte(FEMBinary.this.customGet(this.index++));
-			}
-
-			@Override
-			public boolean hasNext() {
-				return this.index < FEMBinary.this.length;
-			}
-
-		};
-	}
-
-	@Override
-	public final int compareTo(final FEMBinary that) {
-		return this.compare(that);
-	}
-
-	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Bytes dieser Bytefolge zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @return {@link List}-Sicht. */
-	public final List<Byte> toList() {
-		return new AbstractList<Byte>() {
-
-			@Override
-			public Byte get(final int index) {
-				return new Byte(FEMBinary.this.get(index));
-			}
-
-			@Override
-			public int size() {
-				return FEMBinary.this.length;
-			}
-
-		};
-	}
-
-	@Override
-	public final String toString() {
-		return this.toString(true);
 	}
 
 }

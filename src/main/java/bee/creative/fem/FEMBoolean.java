@@ -86,7 +86,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 		if (object == this) return true;
 		if (!(object instanceof FEMBoolean)) {
 			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).result().data();
+			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMBoolean)) return false;
 		}
 		final FEMBoolean that = (FEMBoolean)object;

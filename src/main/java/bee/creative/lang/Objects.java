@@ -11,14 +11,11 @@ import bee.creative.util.Hasher;
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Berechnung von {@link Object#hashCode() Streuwerten}, {@link Object#equals(Object)
  * Äquivalenzen} und {@link Object#toString() Textdarstelungen}.
  *
- * @see Object#hashCode()
- * @see Object#equals(Object)
- * @see Object#toString()
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Objects {
 
-	/** Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#print(boolean, Object)}. Sie ist nur sinnvoll für eigene Implementationen von
-	 * {@link Map}, {@link Iterable} und {@link CharSequence}, für welche nicht die in {@link Objects#print(boolean, Object)} realisierten, gesonderten
+	/** Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, Object)}. Sie ist nur sinnvoll für eigene Implementationen
+	 * von {@link Map}, {@link Iterable} und {@link CharSequence}, für welche nicht die in {@link Objects#toString(boolean, Object)} realisierten, gesonderten
 	 * Textdarstellungen verwendet werden sollen.
 	 *
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -144,7 +141,7 @@ public class Objects {
 
 		@Override
 		public String toString() {
-			return Objects.print(this.format, this.object);
+			return Objects.toString(this.format, this.object);
 		}
 
 	}
@@ -157,73 +154,6 @@ public class Objects {
 
 	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#identityHash(Object)} und {@link Objects#identityEquals(Object, Object)} delegiert. */
 	public static final Hasher IDENTITY_HASHER = new IdentityHasher();
-
-	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht {@link #print(boolean, Object)
-	 * Objects.print(false, object)}.
-	 *
-	 * @see Objects#print(boolean, Object)
-	 * @param object Objekt oder {@code null}.
-	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String print(final Object object) {
-		return Objects.print(false, object);
-	}
-
-	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@link #print(boolean, boolean, Object) Objects.print(format, false, object)}.
-	 *
-	 * @see Objects#print(boolean, boolean, Object)
-	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param object Objekt oder {@code null}.
-	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String print(final boolean format, final Object object) {
-		return Objects.print(format, false, object);
-	}
-
-	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette können deren
-	 * hierarchische Formatierung sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis
-	 * der {@link Object#toString()}-Methode geliefert.
-	 * 
-	 * @see Objects#printMap(boolean, Map)
-	 * @see Objects#printChar(Character)
-	 * @see Objects#printArray(boolean, Object)
-	 * @see Objects#printString(boolean, CharSequence)
-	 * @see Objects#printIterable(boolean, Iterable)
-	 * @see Natives#printClass(Class)
-	 * @see Natives#printField(java.lang.reflect.Field)
-	 * @see Natives#printMethod(java.lang.reflect.Method)
-	 * @see Natives#printConstructor(java.lang.reflect.Constructor)
-	 * @param object Objekt oder {@code null}.
-	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param indent Aktivierung der Erhöhung des Einzugs.
-	 * @return {@link Object#toString() Textdarstelung}. */
-	public static String print(final boolean format, final boolean indent, final Object object) {
-		if (object == null) return "null";
-		final String result;
-		if (object.getClass().isArray()) {
-			result = Objects.printArray(format, object);
-		} else if (object instanceof Class<?>) {
-			result = Natives.printClass((Class<?>)object);
-		} else if (object instanceof java.lang.reflect.Field) {
-			result = Natives.printField((java.lang.reflect.Field)object);
-		} else if (object instanceof java.lang.reflect.Method) {
-			result = Natives.printMethod((java.lang.reflect.Method)object);
-		} else if (object instanceof java.lang.reflect.Constructor<?>) {
-			result = Natives.printConstructor((java.lang.reflect.Constructor<?>)object);
-		} else if (object instanceof Character) {
-			result = Objects.printChar((Character)object);
-		} else if (object instanceof UseToString) {
-			result = String.valueOf(object);
-		} else if (object instanceof CharSequence) {
-			result = Objects.printString(format, (CharSequence)object);
-		} else if (object instanceof Map<?, ?>) {
-			result = Objects.printMap(format, (Map<?, ?>)object);
-		} else if (object instanceof Iterable<?>) {
-			result = Objects.printIterable(format, (Iterable<?>)object);
-		} else {
-			result = String.valueOf(object);
-		}
-		return (indent ? Objects.indent(result) : result);
-	}
 
 	/** Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
 	 * hierarchische Formatierung aktiviert werden.
@@ -238,7 +168,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (final Entry<?, ?> entry: object.entrySet()) {
-			result.append(space).append(Objects.print(format, format, entry.getKey())).append(" = ").append(Objects.print(format, format, entry.getValue()));
+			result.append(space).append(Objects.toString(format, format, entry.getKey())).append(" = ").append(Objects.toString(format, format, entry.getValue()));
 			space = comma;
 		}
 		return result.append((format ? "\n}" : "}")).toString();
@@ -285,7 +215,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (int i = 0; i < size; i++) {
-			result.append(space).append(Objects.print(format, format, Array.get(object, i)));
+			result.append(space).append(Objects.toString(format, format, Array.get(object, i)));
 			space = comma;
 		}
 		return result.append((format ? "\n]" : "]")).toString();
@@ -335,62 +265,13 @@ public class Objects {
 		if (!iter.hasNext()) return "[]";
 		final StringBuilder result = new StringBuilder();
 		Object next = iter.next();
-		if (!iter.hasNext()) return result.append("[").append(Objects.print(format, format, next)).append("]").toString();
-		result.append(format ? "[\n  " : "[").append(Objects.print(format, format, next));
+		if (!iter.hasNext()) return result.append("[").append(Objects.toString(format, format, next)).append("]").toString();
+		result.append(format ? "[\n  " : "[").append(Objects.toString(format, format, next));
 		while (iter.hasNext()) {
 			next = iter.next();
-			result.append(format ? ",\n  " : ", ").append(Objects.print(format, format, next));
+			result.append(format ? ",\n  " : ", ").append(Objects.toString(format, format, next));
 		}
 		return result.append(format ? "\n]" : "]").toString();
-	}
-
-	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
-	 * hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung aktiviert wird, werden die Argumente als beschriftete Parameter interpretiert.
-	 * Ein beschrifteter Parameter besteht hierbei aus einem Namen {@code args[i]} und dem darauf folgenden Wert {@code args[i+1]} für jede gerade Position
-	 * {@code i}.
-	 *
-	 * @param name Funktionsname.
-	 * @param format Formatiermodus.
-	 * @param label Aktivierung der Argumentbeschriftung.
-	 * @param args Argumente bzw. Parameter.
-	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
-	public static String printCall(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
-		final StringBuilder result = new StringBuilder(name.length() + 128);
-		result.append(name);
-		if (args.length != 0) {
-			String join = (format ? "(\n  " : "(");
-			final String comma = (format ? ",\n  " : ", ");
-			if (label) {
-				for (int i = 0, size = args.length - 1; i < size; i += 2) {
-					result.append(join).append(Objects.print(format, format, args[i])).append(": ").append(Objects.print(format, format, args[i + 1]));
-					join = comma;
-				}
-			} else {
-				for (int i = 0, size = args.length; i < size; i++) {
-					result.append(join).append(Objects.print(format, format, args[i]));
-					join = comma;
-				}
-			}
-			result.append((format ? "\n)" : ")"));
-		} else {
-			result.append("()");
-		}
-		return result.toString();
-	}
-
-	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@link #printCall(boolean, boolean, String, Object...) printCall(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args)}.
-	 *
-	 * @see #printCall(boolean, boolean, String, Object...)
-	 * @param format Formatiermodus.
-	 * @param label Aktivierung der Argumentbeschriftung.
-	 * @param object {@link Object}.
-	 * @param args Argumente bzw. Parameter.
-	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static String printCall(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
-		return Objects.printCall(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args);
 	}
 
 	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
@@ -674,25 +555,140 @@ public class Objects {
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toStringCall(false, false, name, args)}.
 	 *
-	 * @see Objects#printCall(boolean, boolean, String, Object...)
+	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
 	 * @param name Funktionsname.
 	 * @param args Argumente.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
 	public static String toInvokeString(final String name, final Object... args) throws NullPointerException {
-		return Objects.printCall(false, false, name, args);
+		return Objects.toStringCall(false, false, name, args);
 	}
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toStringCall(false, false, object, args)}.
 	 *
-	 * @see #printCall(boolean, boolean, Object, Object...)
+	 * @see #toStringCall(boolean, boolean, Object, Object...)
 	 * @param object {@link Object}.
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code object} bzw. {@code args} {@code null} ist. */
 	public static String toInvokeString(final Object object, final Object... args) throws NullPointerException {
-		return Objects.printCall(false, false, object, args);
+		return Objects.toStringCall(false, false, object, args);
+	}
+
+	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht {@link #toString(boolean, Object)
+	 * Objects.toString(false, object)}.
+	 *
+	 * @see Objects#toString(boolean, Object)
+	 * @param object Objekt oder {@code null}.
+	 * @return {@link Object#toString() Textdarstelung}. */
+	public static String toString(final Object object) {
+		return Objects.toString(false, object);
+	}
+
+	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
+	 * {@link #toString(boolean, boolean, Object) Objects.toString(format, false, object)}.
+	 *
+	 * @see Objects#toString(boolean, boolean, Object)
+	 * @param format Aktivierung der hierarchische Formatierung.
+	 * @param object Objekt oder {@code null}.
+	 * @return {@link Object#toString() Textdarstelung}. */
+	public static String toString(final boolean format, final Object object) {
+		return Objects.toString(format, false, object);
+	}
+
+	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette können deren
+	 * hierarchische Formatierung sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis
+	 * der {@link Object#toString()}-Methode geliefert.
+	 *
+	 * @see Objects#printMap(boolean, Map)
+	 * @see Objects#printChar(Character)
+	 * @see Objects#printArray(boolean, Object)
+	 * @see Objects#printString(boolean, CharSequence)
+	 * @see Objects#printIterable(boolean, Iterable)
+	 * @see Natives#printClass(Class)
+	 * @see Natives#printField(java.lang.reflect.Field)
+	 * @see Natives#printMethod(java.lang.reflect.Method)
+	 * @see Natives#printConstructor(java.lang.reflect.Constructor)
+	 * @param object Objekt oder {@code null}.
+	 * @param format Aktivierung der hierarchische Formatierung.
+	 * @param indent Aktivierung der Erhöhung des Einzugs.
+	 * @return {@link Object#toString() Textdarstelung}. */
+	public static String toString(final boolean format, final boolean indent, final Object object) {
+		if (object == null) return "null";
+		final String result;
+		if (object.getClass().isArray()) {
+			result = Objects.printArray(format, object);
+		} else if (object instanceof Class<?>) {
+			result = Natives.printClass((Class<?>)object);
+		} else if (object instanceof java.lang.reflect.Field) {
+			result = Natives.printField((java.lang.reflect.Field)object);
+		} else if (object instanceof java.lang.reflect.Method) {
+			result = Natives.printMethod((java.lang.reflect.Method)object);
+		} else if (object instanceof java.lang.reflect.Constructor<?>) {
+			result = Natives.printConstructor((java.lang.reflect.Constructor<?>)object);
+		} else if (object instanceof Character) {
+			result = Objects.printChar((Character)object);
+		} else if (object instanceof UseToString) {
+			result = object.toString();
+		} else if (object instanceof CharSequence) {
+			result = Objects.printString(format, (CharSequence)object);
+		} else if (object instanceof Map<?, ?>) {
+			result = Objects.printMap(format, (Map<?, ?>)object);
+		} else if (object instanceof Iterable<?>) {
+			result = Objects.printIterable(format, (Iterable<?>)object);
+		} else {
+			result = String.valueOf(object);
+		}
+		return (indent ? Objects.indent(result) : result);
+	}
+
+	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
+	 * hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung aktiviert wird, werden die Argumente als beschriftete Parameter interpretiert.
+	 * Ein beschrifteter Parameter besteht hierbei aus einem Namen {@code args[i]} und dem darauf folgenden Wert {@code args[i+1]} für jede gerade Position
+	 * {@code i}.
+	 *
+	 * @param name Funktionsname.
+	 * @param format Formatiermodus.
+	 * @param label Aktivierung der Argumentbeschriftung.
+	 * @param args Argumente bzw. Parameter.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
+	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
+		final StringBuilder result = new StringBuilder(name.length() + 128);
+		result.append(name);
+		if (args.length != 0) {
+			String join = (format ? "(\n  " : "(");
+			final String comma = (format ? ",\n  " : ", ");
+			if (label) {
+				for (int i = 0, size = args.length - 1; i < size; i += 2) {
+					result.append(join).append(Objects.toString(format, format, args[i])).append(": ").append(Objects.toString(format, format, args[i + 1]));
+					join = comma;
+				}
+			} else {
+				for (int i = 0, size = args.length; i < size; i++) {
+					result.append(join).append(Objects.toString(format, format, args[i]));
+					join = comma;
+				}
+			}
+			result.append((format ? "\n)" : ")"));
+		} else {
+			result.append("()");
+		}
+		return result.toString();
+	}
+
+	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
+	 * {@link #toStringCall(boolean, boolean, String, Object...) toStringCall(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args)}.
+	 *
+	 * @param format Formatiermodus.
+	 * @param label Aktivierung der Argumentbeschriftung.
+	 * @param object {@link Object}.
+	 * @param args Argumente bzw. Parameter.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
+	public static String toStringCall(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
+		return Objects.toStringCall(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args);
 	}
 
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der gegebene Zeichenkette entspricht.
@@ -700,17 +696,16 @@ public class Objects {
 	 * @param string Textdarstelung.
 	 * @return Textdarstelung-Objekt. */
 	public static Object toStringObject(final String string) {
-		if (string == null) return "null";
-		return new StringObject(string);
+		return string == null ? "null" : new StringObject(string);
 	}
 
-	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der über {@link Objects#print(boolean, Object)} ermittelten
+	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der über {@link Objects#toString(boolean, Object)} ermittelten
 	 * Textdarstelung des gegebenen Objekts entspricht.
 	 *
-	 * @see Objects#print(boolean, Object)
+	 * @see Objects#toString(boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
-	 * @return {@link Objects#print(boolean, Object)}-Objekt. */
+	 * @return {@link Objects#toString(boolean, Object)}-Objekt. */
 	public static Object toStringObject(final boolean format, final Object object) {
 		return new FormatObject(format, object);
 	}
@@ -733,8 +728,7 @@ public class Objects {
 	 * @param result2 Objekt oder {@code null}.
 	 * @return Objekt. */
 	public static <GResult> GResult notNull(final GResult result, final GResult result2) {
-		if (result != null) return result;
-		return result2;
+		return result != null ? result : result2;
 	}
 
 	/** Diese Methode gibt einen navigierten {@link Hasher} zurück. Der erzeugte {@link Hasher} liefert für eine Eingabe {@code input} den Streuwert
