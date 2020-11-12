@@ -19,7 +19,7 @@ public final class FEMBinding extends BaseFunction {
 	 * @param params {@link FEMFrame Stapelrahmen} mit den zusätzlichen Parameterwerten.
 	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame Stapelrahmen}.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
-	public static FEMFunction from(final FEMFunction target, final FEMFrame params) throws NullPointerException {
+	public static FEMBinding from(final FEMFunction target, final FEMFrame params) throws NullPointerException {
 		return new FEMBinding(Objects.notNull(target), Objects.notNull(params));
 	}
 

@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.fem.FEMArray.HashArray;
 import bee.creative.lang.Objects;
@@ -268,13 +267,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return this.newFrame(FEMArray.from(params));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #newFrame(FEMArray) this.newFrame(FEMArray.from(params))}.
-	 *
-	 * @see FEMArray#from(Iterable) */
-	public final FEMFrame newFrame(final Collection<? extends FEMValue> params) throws NullPointerException {
-		return this.newFrame(FEMArray.from(params));
-	}
-
 	/** Diese Methode gibt einen neuen Stapelrahmen zurück, welcher die gegebenen Parameterfunktionen zur Berechnung der {@link #params() zugesicherten
 	 * Parameterwerte} verwendet, das {@link #context() Kontextobjekt} dieses Stapelrahmens übernimmt und diesen als {@link #parent() übergeordneten Stapelrahmen}
 	 * nutzt.
@@ -315,13 +307,6 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 *
 	 * @see FEMArray#from(Iterable) */
 	public final FEMFrame withParams(final Iterable<? extends FEMValue> params) throws NullPointerException {
-		return this.withParams(FEMArray.from(params));
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #withParams(FEMArray) this.withParams(FEMArray.from(params))}.
-	 *
-	 * @see FEMArray#from(Iterable) */
-	public final FEMFrame withParams(final Collection<? extends FEMValue> params) throws NullPointerException {
 		return this.withParams(FEMArray.from(params));
 	}
 
