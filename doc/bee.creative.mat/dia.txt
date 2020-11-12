@@ -1,0 +1,150 @@
+@startuml
+
+Lebewesen:		Menschen sind materielle Lebewesen.
+
+Lebewesen -d-> Verbrauch1
+Lebewesen -d-> Fortpflanzung
+
+Verbrauch1:		Zum Leben verbrauchen Menschen materielle Lebensmittel,
+Verbrauch1:		bspw. Atemluft, Trinkwasser, Nahrung, Kleidung, Wohnung, 
+Verbrauch1:		Wärme und Elektrizität. Solche Mittel zum Leben werden auch
+Verbrauch1:		als nützliche materielle Gebrauchsgegenstände, materielle 
+Verbrauch1:		Güter oder materielle Gebrauchswerte bezeichnet.
+Verbrauch1 -d-> Bedrohung1
+Verbrauch1 -r-> Verbrauch2
+
+Verbrauch2:		Der Verbrauch materieller Gebrauchsgegenstände überführt
+Verbrauch2:		diese in nicht weiter zum Leben gebrauchbare Formen der
+Verbrauch2:		Materie, bspw. Abgas, Abwasser, Abwärme und Altlasten.
+Verbrauch2:		Solche Formen der Materie werden algemein als materieller
+Verbrauch2:		Abfall oder materieller Müll bezeichnet.
+Verbrauch2 -d-> Bedrohung2
+
+Bedrohung1:		Das Aufbrauchen von materiellen Mitteln zum Leben bedroht
+Bedrohung1:		das Überleben der Menschen, bspw. Ersticken, Verdursten,
+Bedrohung1:		Verhungern und Erfrieren.
+Bedrohung1 -d-> Arbeiter
+
+Bedrohung2:		Das Aufhäufen von Abfall bedroht das Überleben der Menschen,
+Bedrohung2:		bspw. wegen Vergiftung von Wasser, Boden oder Luft.
+Bedrohung2 -d-> Arbeiter
+
+Arbeiter:		In einer lebensfähigen Gesellschaft muss es daher  
+Arbeiter:		Menschen geben, die materielle Gebrauchsgegenstände 
+Arbeiter:		unmittelbar wieder-/herstellen (Güterproduktion) bzw.  
+Arbeiter:		materielle Abfälle in nützliche bzw. unschädlichen Formen
+Arbeiter:		der Materie unmittelbar überführen (Abfallbeseitigung), 
+Arbeiter:		die unmittelbar materiell arbeiten - es muss also Arbeiter
+Arbeiter:		geben, materiell arbeitende, die diese objektiv für das
+Arbeiter:		Überleben der Gesellschaft notwendige Aufgabe der erfüllen.
+Arbeiter:		----
+Arbeiter:		Diese Aufgabe wird auch als Wertschaffung bezeichnet.
+Arbeiter -d-> Gesellschaft
+
+Verteiler:		In einer lebensfähigen Gesellschaft muss es daher
+Verteiler:		Menschen geben, welche die noch nicht unmittelbar
+Verteiler:		materiell arbeitsfähigen Menschen, insbesondere
+Verteiler:		Neugeborene und Kleinkinder entsprechend mit der
+Verteiler:		materiellen Lebensgrundlage versorgen und erziehen.
+Verteiler:		----
+Verteiler:		Diese Aufgabe wird auch als Wertverteilung bezeichnet.
+Verteiler -d-> Gesellschaft
+
+Gesellschaft:	„In der gesellschaftlichen Produktion ihres Lebens gehen die
+Gesellschaft:	Menschen bestimmte, notwendige, von ihrem Willen unabhängige
+Gesellschaft:	Verhältnisse ein, Produktionsverhältnisse, die einer bestimmten
+Gesellschaft:	Entwicklungsstufe ihrer materiellen Produktivkräfte entsprechen.
+Gesellschaft:	Die Gesamtheit dieser Produktionsverhältnisse bildet die
+Gesellschaft:	ökonomische Struktur der Gesellschaft, die reale Basis, worauf
+Gesellschaft:	sich ein juristischer und politischer überbau erhebt, und welcher
+Gesellschaft:	bestimmte gesellschaftliche Bewusstseinsformen entsprechen.
+Gesellschaft:	Die Produktionsweise des materiellen Lebens bedingt den
+Gesellschaft:	sozialen, politischen und geistigen Lebensprozess überhaupt.“
+Gesellschaft -d-> Verschleiß1
+
+Verschleiß1:	Materielle Arbeit bedeutet unmittelbare materielle Einwirkung
+Verschleiß1:	auf Produktionsmittel und daraus folgender Verbrauch der  
+Verschleiß1:	materiellen Arbeitsfähigkeit des menschlichen Körpers, d.h.
+Verschleiß1:	körperliche Abnutzung und Schädigung.
+Verschleiß1:	Der unmittelbare Verbrauch materieller Lebensmittel schädigt
+Verschleiß1:	den menschlichen Körper zwar ebenfalls, dies aber mit weitaus
+Verschleiß1:	geringerer Intensität.
+Verschleiß1 -r-> Entwicklung2
+Verschleiß1 -d-> Verschleiß2
+
+Verschleiß2: 	Wegen dieser Schädigung des menschlichen Körpers durch die
+Verschleiß2: 	unmittelbare materielle Arbeit, kann das materielle Arbeiten, auch
+Verschleiß2: 	wenn es objektiv notwendig ist, subjektiv als nicht erstrebenswert
+Verschleiß2: 	angesehen werden. Dies gilt insbesondere dann, wenn die eigene 
+Verschleiß2: 	Versorgung mit Lebensmitteln gesichert ist, ohne dafür selbst 
+Verschleiß2: 	materiell arbeiten zu müssen. 
+Verschleiß2 --> Fortschritt
+
+Fortschritt:	Die Entwicklung besserer Werkzeuge steigert die Effizienz der
+Fortschritt:	materiellen Produktion und senken damit die gesellschaftlich
+Fortschritt:	notwendige Arbeitszeit zur Produktion der objektiv notwendigen
+Fortschritt:	materiellen Lebensgrundlage. Motiviert ist diese Entwicklung
+Fortschritt:	primär durch das Streben der unmittelbar materiell Arbeitenden 
+Fortschritt:	nach Senkung der individuellen Schädigung und Gefährdung 
+Fortschritt:	durch Kürzung ihrer individuell notwendigen Arbeitszeit.
+Fortschritt -d-> Freistellung
+Fortschritt -r-> Entwicklung3
+
+Fortpflanzung:	Das menschliche Leben wird durch Fortpflanzung erhalten, also
+Fortpflanzung:	durch Schwangerschaft und Erziehung.
+Fortpflanzung -d-> Entwicklung1
+
+Entwicklung1:	Menschen beginnen ihr Leben sowohl unfähig zur unmitelbaren
+Entwicklung1:	materiellen Arbeit, als auch aüßerst hilfsbedürftig beim Verbrauch
+Entwicklung1:	ihrer materiellen Lebensgrundlage, benötigen also bspw. Hilfe
+Entwicklung1:	bei Nahrungsaufnahme, Körperpflege und Fortbewegung. Erst
+Entwicklung1:	nach entsprechender Entwicklung und Erziehung können sie die
+Entwicklung1:	Fähigkeit zur unmitelbaren materiellen Arbeit erlangen, um damit
+Entwicklung1:	ihr eigenes Überleben und das ihrer Nachfahren sichern zu können.
+Entwicklung1 -d-> Verteiler
+Entwicklung1 -d-> Entwicklung2
+
+Entwicklung2:	Infolge körperlicher Beeinträchtigungen können Menschen die
+Entwicklung2:	spezifische Fähigkeit zur mareiellen Arbeit vorübergehend oder
+Entwicklung2:	dauerhaft verlieren, bspw. wegen Schwangerschaft oder Krank-
+Entwicklung2:	heit.
+Entwicklung2 -> Entwicklung3
+
+Entwicklung3:	Darüber hinaus entscheidet der technische Entwicklungsstand
+Entwicklung3:	darüber, was genau die spezifische Fähigkeit zur materiellen
+Entwicklung3:	Arbeit ausmacht.
+
+
+
+ 
+
+
+
+
+Freistellung: 		
+
+
+Freistellung -d-> Arbeitsteilung
+
+ 
+
+Arbeitsteilung -d-> Aufhebnung
+
+@enduml
+ 
+
+
+
+
+
+Alle Menschen teilen sich damit materiell in die drei Gruppen - materiell Arbeitsunfähige, materiell Arbeitende und materiell Arbeitsscheue.
+
+Die materiell Arbeitsunfähigen können sich an der Wieder-/Herstellung der Lebensgrundlage der Menschen nicht beteiligen, also daran, worum es in der Wirtschaft letztendlich geht. Die materiell Arbeitenden tun dies allein und unterhalten damit die materiell Arbeitsunfähigen sowie die materiell Arbeitsscheuen.
+
+Die Instabilität der Wirtschaft erwächst hier aus der Arbeitsteilung - der Teilung der Aufgaben der materiell Arbeitenden in solche, die auch von materiell Arbeitsscheuen durchgeführt werden können und werden. Damit verlieren die materiell Arbeitenden an Kontrolle über die Wirtschaft, über den Prozess, den nur sie am Laufen halten und der sie körperlich schädigt.
+
+Inzwischen erfolgt die kindlich naive Lenkung der Wirtschaft nahezu vollständig durch die Arbeitsscheuen, ohne Rücksicht auf die Interessen der materiell Arbeitenden, also deren Interesse an Arbeits- und Lebensbedingungen, durch welche sie weniger geschädigt werden.
+
+Die einfache Forderung der materiell Arbeitenden ist daher die absolute Kürzung ihres Arbeitstages, was die Einbeziehung der materiell Arbeitsscheuen in die materielle Produktion und damit die Aufhebung dieser Gruppe bedeutet. Die materiell notwendige körperliche Schädigung wegen des Verbrauchs der Arbeitsfähigkeit würde dann auf sehr viel mehr materiell Arbeitende verteilt und für jeden individuell minimiert werden.
+
+
