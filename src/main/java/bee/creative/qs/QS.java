@@ -67,9 +67,9 @@ public interface QS {
 	 * @return temporäre Hyperkantenmenge. */
 	public QESet newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode liefert einen neuen temporären {@link QN Hyperknoten}, der von diesem Graphspeicher {@link QN#owner() verwaltet} wird und dessen
-	 * {@link QN#key() Kennung} in diesem Graphspeicher einzigartig ist. Der gelieferte Hyperknoten wird dabei nicht in den Graphspeicher eingefügt. Dies kann nur
-	 * {@link QE#put() indirekt} über eine {@link QE Hyperkante} erfolgen.
+	/** Diese Methode liefert einen neuen temporären {@link QN Hyperknoten}, der von diesem Graphspeicher {@link QN#owner() verwaltet} wird und dessen interne
+	 * Kennung in diesem Graphspeicher einzigartig ist. Der gelieferte Hyperknoten wird dabei nicht in den Graphspeicher eingefügt. Dies kann nur {@link QE#put()
+	 * indirekt} über eine {@link QE Hyperkante} erfolgen.
 	 *
 	 * @return Hyperknoten. */
 	public QN newNode();

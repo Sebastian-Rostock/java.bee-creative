@@ -21,11 +21,6 @@ public final class H2QN implements QN {
 	}
 
 	@Override
-	public long key() {
-		return this.key;
-	}
-
-	@Override
 	public boolean pop() {
 		try {
 			final PreparedStatement stmt1 = this.owner.deleteSaveEdges, stmt2 = this.owner.deleteSaveNode;
