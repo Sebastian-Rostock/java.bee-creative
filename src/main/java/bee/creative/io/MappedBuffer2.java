@@ -3,6 +3,7 @@ package bee.creative.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import bee.creative.array.CompactLongArray;
 
 /** Diese Klasse ergänzt einen {@link MappedBuffer} um Methoden zur {@link #insertRegion(long) Reservierung} und {@link #deleteRegion(long) Freigabe} von
  * Speicherbereichen. Die darüber angebundene Datei besitz dafür eine entsprechende Datenstruktur, deren Kopfdaten beim Öffnen erzeugt bzw. geprüft werden.
@@ -11,13 +12,12 @@ import java.util.ArrayList;
 public class MappedBuffer2 extends MappedBuffer {
 
 	private static long asAlignedSize(final long size) throws IllegalArgumentException {
-		if (size == 0) return 0;
-		if (size < 0) throw new IllegalArgumentException();
 		final long result = (size + 15) & -16;
-		if (result < 0) throw new IllegalArgumentException();
-		return result;
+		if (result > 0) return result;
+		if (size == 0) return 0;
+		throw new IllegalArgumentException();
 	}
-
+ 
 	private static boolean isAlingnedValue(final long value) {
 		return (value & 15) == 0;
 	}
@@ -121,14 +121,14 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * @param address Adresse oder {@code 0}.
 	 * @throws IllegalArgumentException Wenn die Adresse negativ ist. */
 	public void putRoot(final long address) throws IllegalArgumentException {
-		if (address < 48) throw new IllegalArgumentException();
+		if (address < 0) throw new IllegalArgumentException();
 		this.putLong(8, address);
 	}
 
-	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. Diese Größe ist stets ein Vielfaches von 16.
+	/** Diese Methode gibt die Größe des gegebenen Speicherbereichs zurück. Diese Größe ist stets ein Vielfaches von 16 Byte.
 	 *
 	 * @param address Adresse, an welcher der Speicherbereich beginnt.
-	 * @return Größe des Speicherbereichs.
+	 * @return Größe des Speicherbereichs in Byte.
 	 * @throws IllegalArgumentException Wenn die gegebene Adresse ungültig ist. */
 	public long regionSize(final long address) throws IllegalArgumentException {
 		synchronized (this) {
@@ -163,9 +163,9 @@ public class MappedBuffer2 extends MappedBuffer {
 	}
 
 	/** Diese Methode reserviert einen neuen Speicherbereich mit der gegebenen Größe und gibt die Adresse auf dessen Beginn zurück. Diese Adresse ist stets ein
-	 * Vielfaches von 16. Der reservierte Speicherbereich kann dabei bis zu 31 Byte größer sein, als die gegebene Größe.
+	 * Vielfaches von 16 Byte. Der reservierte Speicherbereich kann dazu bis zu 31 Byte größer sein, als die gegebene Größe.
 	 *
-	 * @param size Mindestgröße des Speicherbereichs.
+	 * @param size Mindestgröße des Speicherbereichs in Byte.
 	 * @return Adresse, an welcher der Speicherbereich beginnt.
 	 * @throws IllegalStateException Wenn die Datei nicht ausreichend vergrößert werden kann.
 	 * @throws IllegalArgumentException Wenn die gegebene Größe ungültig ist. */
@@ -255,7 +255,7 @@ public class MappedBuffer2 extends MappedBuffer {
 	 * Inhalt an die neue Position kopiert wird.
 	 *
 	 * @param address Adresse, an welcher der Speicherbereich beginnt oder {@code 0}.
-	 * @param size Größe des Speicherbereichs oder {@code 0}.
+	 * @param size Größe des Speicherbereichs in Byte oder {@code 0}.
 	 * @return neue Adresse.
 	 * @throws IllegalStateException Wenn die Datei nicht ausreichend vergrößert werden kann.
 	 * @throws IllegalArgumentException Wenn {@code address} bzw. {@code size} ungültig ist. */
@@ -298,8 +298,8 @@ public class MappedBuffer2 extends MappedBuffer {
 	 *
 	 * @param limit maximale Anzahl der gelieferten Größen.
 	 * @return Liste der Größen. */
-	public synchronized ArrayList<Long> reuseSizes(int limit) {
-		final ArrayList<Long> result = new ArrayList<>(16);
+	public synchronized CompactLongArray reuseSizes(int limit) {
+		final CompactLongArray result = new CompactLongArray(16);
 		long node = this.getNodeNext(16);
 		while ((node != 16) && (limit > 0)) {
 			final long size = -this.getNodeSize(node), next = this.getNodeNext(node);
@@ -314,8 +314,8 @@ public class MappedBuffer2 extends MappedBuffer {
 	 *
 	 * @param limit maximale Anzahl der gelieferten Größen.
 	 * @return Liste der Größen. */
-	public synchronized ArrayList<Long> regionSizes(int limit) {
-		final ArrayList<Long> result = new ArrayList<>(16);
+	public synchronized CompactLongArray regionSizes(int limit) {
+		final CompactLongArray result = new CompactLongArray(16);
 		final long free = this.getLong(32);
 		long node = 48;
 		while ((node < free) && (limit > 0)) {
