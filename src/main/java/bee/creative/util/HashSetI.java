@@ -56,7 +56,7 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.count);
+		stream.writeInt(this.countImpl());
 		for (final Integer item: this) {
 			stream.writeInt(item);
 		}

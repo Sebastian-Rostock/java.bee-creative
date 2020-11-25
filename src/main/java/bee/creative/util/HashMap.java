@@ -104,7 +104,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.count);
+		stream.writeInt(this.countImpl());
 		for (final Entry<GKey, GValue> entry: this.newEntriesImpl()) {
 			stream.writeObject(entry.getKey());
 			stream.writeObject(entry.getValue());

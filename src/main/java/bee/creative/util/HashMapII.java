@@ -4,62 +4,59 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit {@link Integer}-Schlüsseln, beliebigen Wertobjekten und geringem
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit {@link Integer}-Schlüsseln und -Werten sowie geringem
  * {@link AbstractHashData Speicherverbrauch}.
  *
- * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ der Werte. */
-public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implements Serializable, Cloneable {
+ * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public class HashMapII extends AbstractHashMap<Integer, Integer> implements Serializable, Cloneable {
 
 	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = -5082256600102090233L;
+	private static final long serialVersionUID = -5580543670395051911L;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */
 	transient int[] keys = AbstractHashData.EMPTY_INTEGERS;
 
-	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab oder ist {@code null}. Für alle anderen Indizes bildet es auf {@code null} ab. */
-	transient Object[] values = AbstractHashData.EMPTY_OBJECTS;
+	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. */
+	transient int[] values = AbstractHashData.EMPTY_INTEGERS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
-	public HashMapIO() {
+	public HashMapII() {
 	}
 
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashMapIO(final int capacity) {
+	public HashMapII(final int capacity) {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMapIO} mit dem Inhalt der gegebenen {@link Map}.
+	/** Dieser Konstruktor initialisiert die {@link HashMapII} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashMapIO(final Map<? extends Integer, ? extends GValue> source) {
+	public HashMapII(final Map<? extends Integer, ? extends Integer> source) {
 		this(source.size());
 		this.putAll(source);
 	}
 
-	@SuppressWarnings ("unchecked")
 	private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		final int count = stream.readInt();
 		this.allocateImpl(count);
 		for (int i = 0; i < count; i++) {
 			final int key = stream.readInt();
-			final Object value = stream.readObject();
-			this.putImpl(key, (GValue)value);
+			final int value = stream.readInt();
+			this.putImpl(key, value);
 		}
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
 		stream.writeInt(this.countImpl());
-		for (final Entry<Integer, GValue> entry: this.newEntriesImpl()) {
+		for (final Entry<Integer, Integer> entry: this.newEntriesImpl()) {
 			stream.writeInt(entry.getKey());
-			stream.writeObject(entry.getValue());
+			stream.writeInt(entry.getValue());
 		}
 	}
 
@@ -69,9 +66,8 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	@SuppressWarnings ("unchecked")
-	protected GValue customGetValue(final int entryIndex) {
-		return (GValue)this.values[entryIndex];
+	protected Integer customGetValue(final int entryIndex) {
+		return this.values[entryIndex];
 	}
 
 	@Override
@@ -80,12 +76,11 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	@SuppressWarnings ("unchecked")
-	protected GValue customSetValue(final int entryIndex, final GValue value) {
-		final Object[] values = this.values;
-		final Object result = values[entryIndex];
+	protected Integer customSetValue(final int entryIndex, final Integer value) {
+		final int[] values = this.values;
+		final Integer result = values[entryIndex];
 		values[entryIndex] = value;
-		return (GValue)result;
+		return result;
 	}
 
 	@Override
@@ -114,46 +109,46 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	protected void customClear() {
-		Arrays.fill(this.values, null);
-	}
-
-	@Override
-	protected void customClearValue(final int entryIndex) {
-		this.values[entryIndex] = null;
-	}
-
-	@Override
 	protected HashAllocator customAllocator(final int capacity) {
 		final int[] keys2;
-		final Object[] values2;
+		final int[] values2;
 		if (capacity == 0) {
 			keys2 = AbstractHashData.EMPTY_INTEGERS;
-			values2 = AbstractHashData.EMPTY_OBJECTS;
+			values2 = AbstractHashData.EMPTY_INTEGERS;
 		} else {
 			keys2 = new int[capacity];
-			values2 = new Object[capacity];
+			values2 = new int[capacity];
 		}
 		return new HashAllocator() {
 
 			@Override
 			public void copy(final int sourceIndex, final int targetIndex) {
-				keys2[targetIndex] = HashMapIO.this.keys[sourceIndex];
-				values2[targetIndex] = HashMapIO.this.values[sourceIndex];
+				keys2[targetIndex] = HashMapII.this.keys[sourceIndex];
+				values2[targetIndex] = HashMapII.this.values[sourceIndex];
 			}
 
 			@Override
 			public void apply() {
-				HashMapIO.this.keys = keys2;
-				HashMapIO.this.values = values2;
+				HashMapII.this.keys = keys2;
+				HashMapII.this.values = values2;
 			}
 
 		};
 	}
 
 	@Override
-	public GValue put(final Integer key, final GValue value) {
-		return super.put(Objects.notNull(key), value);
+	public Integer put(final Integer key, final Integer value) {
+		return super.put(Objects.notNull(key), Objects.notNull(value));
+	}
+
+	/** Diese Methode erhöht den zum gegebenen Schlüssel hinterlegten Wert um das gegebene Inkrement. Wenn noch kein Wert hinterlegt ist, wird das Inkrement
+	 * hinterlegt.
+	 *
+	 * @param key Schlüssel.
+	 * @param value Inklement */
+	public void add(final Integer key, final int value) {
+		final int count = this.countImpl(), index = this.putIndexImpl(key), start = (count != this.countImpl()) ? 0 : this.values[index];
+		this.values[index] = start + value;
 	}
 
 	@Override
@@ -162,9 +157,9 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	public HashMapIO<GValue> clone() throws CloneNotSupportedException {
+	public HashMapII clone() throws CloneNotSupportedException {
 		try {
-			final HashMapIO<GValue> result = (HashMapIO<GValue>)super.clone();
+			final HashMapII result = (HashMapII)super.clone();
 			if (this.capacityImpl() == 0) return result;
 			result.keys = this.keys.clone();
 			result.values = this.values.clone();

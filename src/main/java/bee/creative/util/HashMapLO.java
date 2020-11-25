@@ -56,7 +56,7 @@ public class HashMapLO<GValue> extends AbstractHashMap<Long, GValue> implements 
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.count);
+		stream.writeInt(this.countImpl());
 		for (final Entry<Long, GValue> entry: this.newEntriesImpl()) {
 			stream.writeLong(entry.getKey());
 			stream.writeObject(entry.getValue());

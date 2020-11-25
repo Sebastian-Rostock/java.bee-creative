@@ -56,7 +56,7 @@ public class HashSetL extends AbstractHashSet<Long> implements Serializable, Clo
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.count);
+		stream.writeInt(this.countImpl());
 		for (final Long item: this) {
 			stream.writeLong(item);
 		}

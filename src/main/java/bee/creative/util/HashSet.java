@@ -99,7 +99,7 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.count);
+		stream.writeInt(this.countImpl());
 		for (final GItem item: this) {
 			stream.writeObject(item);
 		}

@@ -100,7 +100,7 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.count);
+		stream.writeInt(this.countImpl());
 		for (final Entry<GKey, Long> entry: this.newEntriesImpl()) {
 			stream.writeObject(entry.getKey());
 			stream.writeLong(entry.getValue());
@@ -202,8 +202,8 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	@Override
 	public Long put(final GKey key, final Long value) {
 		final long value2 = value.longValue();
-		final int count = this.count, index = this.putIndexImpl(key);
-		final Long result = (count != this.count) ? null : this.values[index];
+		final int count = this.countImpl(), index = this.putIndexImpl(key);
+		final Long result = (count != this.countImpl()) ? null : this.values[index];
 		this.values[index] = value2;
 		return result;
 	}
@@ -214,8 +214,8 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	 * @param key Schlüssel.
 	 * @param value Inklement */
 	public void add(final GKey key, final long value) {
-		final int count = this.count, index = this.putIndexImpl(key);
-		final long start = (count != this.count) ? 0 : this.values[index];
+		final int count = this.countImpl(), index = this.putIndexImpl(key);
+		final long start = (count != this.countImpl()) ? 0 : this.values[index];
 		this.values[index] = start + value;
 	}
 

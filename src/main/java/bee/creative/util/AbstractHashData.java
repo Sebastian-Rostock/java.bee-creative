@@ -47,6 +47,7 @@ import bee.creative.lang.Objects;
  * <tr>
  * <td>{@link bee.creative.util.HashMap}<br>
  * {@link bee.creative.util.HashMap3}<br>
+ * {@link bee.creative.util.HashMapII}<br>
  * {@link bee.creative.util.HashMapIO}<br>
  * {@link bee.creative.util.HashMapOI}</td>
  * <td>32</td>
@@ -536,11 +537,11 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Dieses Feld bildet vom maskierten Streuwert eines Schlüssels auf den Index des Eintrags ab, dessen Schlüssel den gleichen maskierten Streuwert besitzt.
-	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. */
+	 * Die Länge dieser Liste entspricht stets einer Potenz von 2. Ungenutzte Elemente sind {@code -1}. */
 	transient int[] table;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf den Index des nächsten Eintrags ab. Für alle anderen Indizes bildet es auf den Index des nächsten
-	 * reservierten Speicherbereiches ab. */
+	 * reservierten Speicherbereiches ab. Ungenutzte Elemente sind {@code -1}. */
 	transient int[] nexts;
 
 	/** Dieses Feld speichert die Anzahl der Einträge. */
@@ -680,7 +681,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
 	 *
 	 * @return Anzahl der Einträge. */
-	protected int countImpl() {
+	protected final int countImpl() {
 		return this.count;
 	}
 
@@ -1063,6 +1064,33 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	@Override
 	public long emu() {
 		return EMU.fromObject(this) + EMU.fromArray(this.table) + EMU.fromArray(this.nexts);
+	}
+
+	/** Diese Methode liefert eine Abbildung, die jeder in diesem Objekt vorkommenden Anzahl von Streuwertkollissionen die Anzahl der betroffenen Datensätze
+	 * zuordnet.
+	 *
+	 * @param permille {@code true}, wenn die Datensatzanzahl relativ in aufgerundeten Promille angegeben werden soll; {@code false}, wenn die Datensatzanzahl
+	 *        absolut angegeben werden soll.
+	 * @return Abbildung von Kollissionsanzahl auf Datensatzanzahl. */
+	public Map<Integer, Integer> collisions(final boolean permille) {
+		final HashMapII result = new HashMapII();
+		final int[] table = this.table, nexts = this.nexts;
+		final int length = table.length;
+		for (int index = 0; index < length; ++index) {
+			int count = 0;
+			for (int entry = table[index]; entry >= 0; entry = nexts[entry]) {
+				count++;
+			}
+			if (count != 0) {
+				result.add(count, count);
+			}
+		}
+		final int count = this.count;
+		if (!permille || (count == 0)) return result;
+		for (final Entry<?, Integer> entry: result.entrySet()) {
+			entry.setValue((entry.getValue() * 1000) / count);
+		}
+		return result;
 	}
 
 }

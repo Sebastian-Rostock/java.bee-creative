@@ -100,7 +100,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
-		stream.writeInt(this.count);
+		stream.writeInt(this.countImpl());
 		for (final Entry<GKey, Integer> entry: this.newEntriesImpl()) {
 			stream.writeObject(entry.getKey());
 			stream.writeInt(entry.getValue());
@@ -201,8 +201,8 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 
 	@Override
 	public Integer put(final GKey key, final Integer value) {
-		final int value2 = value.intValue(), count = this.count, index = this.putIndexImpl(key);
-		final Integer result = (count != this.count) ? null : this.values[index];
+		final int value2 = value.intValue(), count = this.countImpl(), index = this.putIndexImpl(key);
+		final Integer result = (count != this.countImpl()) ? null : this.values[index];
 		this.values[index] = value2;
 		return result;
 	}
@@ -213,7 +213,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	 * @param key Schlüssel.
 	 * @param value Inklement */
 	public void add(final GKey key, final int value) {
-		final int count = this.count, index = this.putIndexImpl(key), start = (count != this.count) ? 0 : this.values[index];
+		final int count = this.countImpl(), index = this.putIndexImpl(key), start = (count != this.countImpl()) ? 0 : this.values[index];
 		this.values[index] = start + value;
 	}
 
