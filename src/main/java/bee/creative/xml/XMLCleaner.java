@@ -1,18 +1,16 @@
 package bee.creative.xml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import bee.creative.io.IO;
-import bee.creative.lang.Strings;
 
 /** Diese Klasse implementiert einen Konfigurator zum Bereinigen der über {@code JAXB} erzeugten {@code java}-Quelltextdateien.
  * <p>
@@ -66,82 +64,39 @@ public class XMLCleaner {
 
 	}
 
-	static final Pattern listFieldPattern = Pattern.compile("^(\\s+)protected (List<\\S+)( [^;]+);");
+	private static final Pattern A = Pattern.compile("\\s*//[^\\r\\n]*[\\r\\n]*");
 
-	static final String listFieldReplace = "$1 public Array$2$3 = new Array$2();";
+	private static final Pattern B = Pattern.compile("\\s*(/\\*)([^\\*]*|\\*[^/])*\\*/");
 
-	static final Pattern listMethodPattern = Pattern.compile("^(\\s+)public List<");
+	private static final Pattern C = Pattern.compile("if \\([^}]+\\}");
 
-	static final Pattern itemFieldPattern = Pattern.compile("^(\\s+)(?:protected|private) (.*)");
+	private static final Pattern D = Pattern.compile("\\s*public[^({]*[(][^}]*[}]");
 
-	static final String itemFieldReplace = "$1public $2";
+	private static final Pattern E = Pattern.compile("protected|private");
 
-	static final Pattern itemMethodPattern = Pattern.compile("^(\\s+)public \\S+ (value\\(\\)|([gs]et|is)\\S+)");
+	private static final Pattern F = Pattern.compile(" (List<[^;]+);");
 
-	static final Pattern commentPattern = Pattern.compile("^\\s*[*/]");
-
-	public static void cleanup(final File file, final Charset charset) throws IllegalStateException {
-		try {
-			if (!file.isFile() || !file.getName().endsWith(".java")) return;
-			final String s = IO.readChars(new InputStreamReader(IO.inputStreamFrom(file), charset));
-			final String r = XMLCleaner.cleanup(s);
-			IO.writeChars(new OutputStreamWriter(IO.outputStreamFrom(file), charset), r);
-		} catch (final Exception cause) {
-			throw new IllegalStateException(cause);
-		}
+	/** Diese Methode bereinigt den Quelltext in der gegebenen Datei und beachtung des gegebenen Zeichensatzes. */
+	public static void cleanup(final File file, final Charset charset) throws IOException {
+		final String src = IO.readChars(new InputStreamReader(new FileInputStream(file), charset));
+		final String res = XMLCleaner.cleanup(src);
+		IO.writeChars(new OutputStreamWriter(new FileOutputStream(file), charset), res);
 	}
 
-	public static String cleanup(final String code) throws IllegalStateException {
-		try {
-			final String[] sourceList = code.split("[\r\n]+");
-			final int count = sourceList.length;
-			final List<String> targetList = new ArrayList<>(count);
-			final StringBuffer target = new StringBuffer();
-			int index = 0;
-			Matcher matcher;
-			String space = null;
-			while (index < count) {
-				final String source = sourceList[index];
-				String value;
-				if (source.isEmpty()) {
-					value = "";
-				} else if (space != null) {
-					space = source.startsWith(space) ? null : space;
-					value = null;
-				} else if ((matcher = XMLCleaner.commentPattern.matcher(source)).find()) {
-					value = source;
-				} else if ((matcher = XMLCleaner.listMethodPattern.matcher(source)).find()) {
-					space = matcher.group(1) + "}";
-					value = null;
-				} else if ((matcher = XMLCleaner.itemMethodPattern.matcher(source)).find()) {
-					space = matcher.group(1) + "}";
-					value = null;
-				} else if ((matcher = XMLCleaner.listFieldPattern.matcher(source)).find()) {
-					target.setLength(0);
-					matcher.appendReplacement(target, XMLCleaner.listFieldReplace);
-					value = target.toString();
-				} else if ((matcher = XMLCleaner.itemFieldPattern.matcher(source)).find()) {
-					target.setLength(0);
-					matcher.appendReplacement(target, XMLCleaner.itemFieldReplace);
-					value = target.toString();
-				} else {
-					value = source;
-				}
-				index += 1;
-				if (!source.equals(value)) {
-					targetList.add("//" + source);
-					if (value != null) {
-						targetList.add(value);
-					}
-				} else {
-					targetList.add(source);
-				}
-			}
-			final String result = Strings.join("\n", targetList);
-			return result;
-		} catch (final Exception cause) {
-			throw new IllegalStateException(cause);
-		}
+	/** Diese Methode gibt den gegebenen Quelltext bereinigt zurück. Bei der Bereinigung werden Kommentare und Methode entfernt, {@code protected} und
+	 * {@code private} Datenfelder auf {@code public} gesetzt und {@link List} Datenfelder mit {@link ArrayList} initialisiert.
+	 *
+	 * @param code gegebener Quelltext.
+	 * @return bereinigter Quelltext. */
+	public static String cleanup(final String code) {
+		String res = code;
+		res = XMLCleaner.A.matcher(res).replaceAll("");
+		res = XMLCleaner.B.matcher(res).replaceAll("");
+		res = XMLCleaner.C.matcher(res).replaceAll("");
+		res = XMLCleaner.D.matcher(res).replaceAll("");
+		res = XMLCleaner.E.matcher(res).replaceAll("public");
+		res = XMLCleaner.F.matcher(res).replaceAll(" Array$1 = new ArrayList<>();");
+		return res;
 	}
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFileData()}. */
@@ -154,7 +109,7 @@ public class XMLCleaner {
 	 *
 	 * @return {@code this}.
 	 * @throws IllegalStateException Wenn {@link File} oder {@link Charset} unzulässig konfiguriert sind. */
-	public final XMLCleaner cleanup() throws IllegalStateException {
+	public final XMLCleaner cleanup() throws IllegalStateException, IOException {
 		final File path = this.fileData.get();
 		final Charset charset = this.charsetData.get();
 		if ((path == null) || (charset == null)) throw new IllegalStateException();
@@ -162,7 +117,9 @@ public class XMLCleaner {
 			final File[] list = path.listFiles();
 			if (list == null) return this;
 			for (final File file: list) {
-				XMLCleaner.cleanup(file, charset);
+				if (file.isFile() && file.getName().endsWith(".java")) {
+					XMLCleaner.cleanup(file, charset);
+				}
 			}
 		} else {
 			XMLCleaner.cleanup(path, charset);
@@ -172,18 +129,18 @@ public class XMLCleaner {
 
 	/** Diese Methode öffnet den Konfigurator für das {@link File} und gibt ihn zurück. Das {@link File} steht entweder für eine Quelltextdateien oder ein
 	 * Verzeichnis mit Quelltextdateien.
-	 *
-	 * @see Files#readAllLines(Path, Charset)
-	 * @see Files#write(Path, Iterable, Charset, OpenOption...)
+	 * 
+	 * @see FileInputStream
+	 * @see FileOutputStream
 	 * @return Konfigurator. */
 	public final FileData openFileData() {
 		return this.fileData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link Charset} zum Laden und Speichern der Quelltextdateien und gibt ihn zurück.
-	 *
-	 * @see Files#readAllLines(Path, Charset)
-	 * @see Files#write(Path, Iterable, Charset, OpenOption...)
+	 * 
+	 * @see InputStreamReader#InputStreamReader(java.io.InputStream, Charset)
+	 * @see OutputStreamWriter#OutputStreamWriter(java.io.OutputStream, Charset)
 	 * @return Konfigurator. */
 	public final CharsetData openCharsetData() {
 		return this.charsetData;

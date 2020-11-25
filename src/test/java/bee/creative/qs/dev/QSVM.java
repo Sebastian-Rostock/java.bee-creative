@@ -22,47 +22,75 @@ public class QSVM {
 
 	private QN activeVersion;
 
-	/** Dieses Feld speichert den {@link QE#context() Kontextknoten} der {@link QE Hyperkanten} in der {@link #activeVersion aktuellen Version}. Diese beinhaltet
-	 * die Hyperkanten der vorherigen Version mit den darin {@link #insertKnowledge eingefügten} und ohne den daraus {@link #deleteKnowledge entfernten}. */
-	QN mergedKnowledge;
-
 	/** Dieses Feld speichert den {@link QE#context() Kontextknoten} der {@link QE Hyperkanten}, die gegenüber der vorherigen in der {@link #activeVersion
 	 * aktuellen Version} eingefügt wurden. */
-	QN insertKnowledge;
+	QN insertContext;
 
 	/** Dieses Feld speichert den {@link QE#context() Kontextknoten} der {@link QE Hyperkanten}, die gegenüber der vorherigen in der {@link #activeVersion
 	 * aktuellen Version} entfernt wurden. */
-	QN deleteKnowledge;
+	QN deleteContext;
+
+	/** Dieses Feld speichert den {@link QE#context() Kontextknoten} der {@link QE Hyperkanten} in der {@link #activeVersion aktuellen Version}. Diese beinhaltet
+	 * die Hyperkanten der vorherigen Version mit den darin {@link #insertContext eingefügten} und ohne den daraus {@link #deleteContext entfernten}. */
+	QN mergedContext;
 
 	private final QN activePredicate;
 
-	private final 	QN insertPredicate;
+	private final QN insertPredicate;
 
-	private final 	QN deletePredicate;
+	private final QN deletePredicate;
 
-	private final 	QN sourcePredicate;
+	private final QN sourcePredicate;
 
-	private final 	QN mergedPredicate;
+	private final QN mergedPredicate;
 
 	private final QN qsvmContext;
 
 	public QSVM(final QS qs) throws SQLException {
 		this.qs = qs;
 		this.qsvmContext = qs.newNode("QSVM:CORE");
-		activePredicate = qs.newNode("QSVM:ACTIVE");
-		insertPredicate = qs.newNode("QSVM:INSERT");
-		deletePredicate = qs.newNode("QSVM:DELETE");
-		sourcePredicate = qs.newNode("QSVM:SOURCE");
-		mergedPredicate = qs.newNode("QSVM:MERGED");
+		this.activePredicate = qs.newNode("QSVM:ACTIVE");
+		this.insertPredicate = qs.newNode("QSVM:INSERT");
+		this.deletePredicate = qs.newNode("QSVM:DELETE");
+		this.sourcePredicate = qs.newNode("QSVM:SOURCE");
+		this.mergedPredicate = qs.newNode("QSVM:MERGED");
 
-		List<QN> activeList = qs.edges().havingContext(qsvmContext).havingPredicate(activePredicate).havingSubject(qsvmContext).objects().toList();
-		if(activeList.isEmpty()){
-			
-		}else if (activeList.size()==1){
-			
-		}else throw new SQLException();
-		
-		
+		final List<QN> activeList =
+			qs.edges().havingContext(this.qsvmContext).havingPredicate(this.activePredicate).havingSubject(this.qsvmContext).objects().toList();
+		if (activeList.isEmpty()) {
+
+		} else if (activeList.size() == 1) {
+
+		} else throw new SQLException();
+
+	}
+
+	public void putEdges(final QE... edges) {
+		this.putEdges(this.qs.newEdges(edges));
+	}
+
+	public void putEdges(final Iterable<? extends QE> edges) {
+		this.putEdges(this.mergedContext, this.insertContext, this.deleteContext, this.qs.newEdges(edges));
+	}
+
+	void putEdges(final QN mergedContext, final QN insertContext_or_null, final QN deleteContext_or_null, final QESet edges) {
+		final QESet oldEdges = this.qs.edges().havingContext(mergedContext);
+		final QESet newEdges = edges.withContext(mergedContext);
+		final QESet putEdges = newEdges.except(oldEdges).copy();
+		putEdges.putAll();
+		if ((insertContext_or_null == null) || (deleteContext_or_null == null)) return;
+		putEdges.withContext(deleteContext_or_null).popAll();
+		putEdges.withContext(insertContext_or_null).putAll();
+	}
+
+	void popEdges(final QN mergedContext, final QN insertContext_or_null, final QN deleteContext_or_null, final QESet edges) {
+		final QESet oldEdges = this.qs.edges().havingContext(mergedContext);
+		final QESet newEdges = edges.withContext(mergedContext);
+		final QESet popEdges = oldEdges.except(newEdges).copy();
+		popEdges.popAll();
+		if ((insertContext_or_null == null) || (deleteContext_or_null == null)) return;
+		popEdges.withContext(insertContext_or_null).popAll();
+		popEdges.withContext(deleteContext_or_null).putAll();
 	}
 
 	public void updateProperties() {
@@ -72,10 +100,10 @@ public class QSVM {
 
 	public void revert() {
 		// insert/delete rückgängig machen und verwerfen
-		final QESet popEdges1 = this.qs.edges().havingContext(this.deleteKnowledge);
-		final QESet popEdges2 = this.qs.edges().havingContext(this.insertKnowledge);
-		final QESet popEdges3 = popEdges2.withContext(this.mergedKnowledge);
-		final QESet putEdges1 = popEdges1.withContext(this.mergedKnowledge);
+		final QESet popEdges1 = this.qs.edges().havingContext(this.deleteContext);
+		final QESet popEdges2 = this.qs.edges().havingContext(this.insertContext);
+		final QESet popEdges3 = popEdges2.withContext(this.mergedContext);
+		final QESet putEdges1 = popEdges1.withContext(this.mergedContext);
 		putEdges1.putAll();
 		popEdges3.union(popEdges2).union(putEdges1).popAll();
 	}
@@ -102,21 +130,21 @@ public class QSVM {
 			this.newEdgeImpl(this.insertPredicate, activeVersion, insertKnowledge), //
 			this.newEdgeImpl(this.deletePredicate, activeVersion, deleteKnowledge), //
 			this.newEdgeImpl(this.mergedPredicate, activeVersion, mergedKnowledge));
-		final QESet putEdges2 = this.qs.edges().havingContext(this.mergedKnowledge).withContext(mergedKnowledge);
+		final QESet putEdges2 = this.qs.edges().havingContext(this.mergedContext).withContext(mergedKnowledge);
 		final QE popEdge = this.newEdgeImpl(this.activePredicate, this.qsvmContext, sourceVersion);
 		putEdges1.putAll();
 		putEdges2.putAll();
 		popEdge.pop();
 		this.activeVersion = activeVersion;
-		this.insertKnowledge = insertKnowledge;
-		this.deleteKnowledge = deleteKnowledge;
-		this.mergedKnowledge = mergedKnowledge;
+		this.insertContext = insertKnowledge;
+		this.deleteContext = deleteKnowledge;
+		this.mergedContext = mergedKnowledge;
 	}
 
 	final void commitImpl_MOVE() {
 		// schließt akteulle version ab, erzeugt neue, wählt diese als aktuell und verschiebt die das merged wissen
 		final QN sourceVersion = this.activeVersion, activeVersion = this.qs.newNode();
-		final QN insertKnowledge = this.qs.newNode(), deleteKnowledge = this.qs.newNode(), mergedKnowledge = this.mergedKnowledge;
+		final QN insertKnowledge = this.qs.newNode(), deleteKnowledge = this.qs.newNode(), mergedKnowledge = this.mergedContext;
 		final QESet putEdges = this.qs.newEdges( //
 			this.newEdgeImpl(this.activePredicate, this.qsvmContext, activeVersion), //
 			this.newEdgeImpl(this.sourcePredicate, activeVersion, sourceVersion), //
@@ -129,8 +157,8 @@ public class QSVM {
 		putEdges.putAll();
 		popEdges.popAll();
 		this.activeVersion = activeVersion;
-		this.insertKnowledge = insertKnowledge;
-		this.deleteKnowledge = deleteKnowledge;
+		this.insertContext = insertKnowledge;
+		this.deleteContext = deleteKnowledge;
 	}
 
 	final QE newEdgeImpl(final QN predicate, final QN subject, final QN object) {
@@ -138,7 +166,7 @@ public class QSVM {
 	}
 
 	/** Diese Methode gibt den {@link QE#subject() Subjektknoten} der aktuellen Version, welcher auf die {@link QE#context() Kontextknoten} des
-	 * {@link #mergedKnowledge effektiven}, {@link #insertKnowledge eingefügten} und {@link #deleteKnowledge entfernten} Wissens verweist. */
+	 * {@link #mergedContext effektiven}, {@link #insertContext eingefügten} und {@link #deleteContext entfernten} Wissens verweist. */
 	public QN getActiveVersion() {
 		return this.activeVersion;
 	}
@@ -148,8 +176,19 @@ public class QSVM {
 		this.activeVersion = activeVersion;
 	}
 
+	public QN getInsertKnowledge() {
+		return this.insertContext;
+	}
+
+	public QN getDeleteKnowledge() {
+		return this.deleteContext;
+	}
+
+	/** Diese Methode liefert den {@link QE#context() Kontextknoten} der {@link QE Hyperkanten} in der {@link #activeVersion aktuellen Version}. Diese Version
+	 * beinhaltet die Hyperkanten der vorherigen Version mit den darin {@link #getInsertKnowledge() eingefügten} und ohne den daraus {@link #getDeleteKnowledge()
+	 * entfernten}. */
 	public QN getMergedKnowledge() {
-		return this.mergedKnowledge;
+		return this.mergedContext;
 	}
 
 	public Set<QN> getPredicatesFromObjects(final QN... objects) {
@@ -163,7 +202,7 @@ public class QSVM {
 	 * @param objects Objektknoten.
 	 * @return Prädikatknoten. */
 	public Set<QN> getPredicatesFromObjects(final Iterable<? extends QN> objects) {
-		return this.getPredicatesFromObjectsImpl(this.mergedKnowledge, this.qs.newNodes(objects));
+		return this.getPredicatesFromObjectsImpl(this.mergedContext, this.qs.newNodes(objects));
 	}
 
 	Set<QN> getPredicatesFromObjectsImpl(final QN mergedContext, final QNSet objects) {
@@ -171,7 +210,7 @@ public class QSVM {
 	}
 
 	public Set<QN> getPredicatesFromSubjects(final QNSet subjects) {
-		return this.getPredicatesFromSubjects(this.mergedKnowledge, subjects);
+		return this.getPredicatesFromSubjects(this.mergedContext, subjects);
 	}
 
 	Set<QN> getPredicatesFromSubjects(final QN mergedContext, final QNSet subjects) {
@@ -209,7 +248,7 @@ public class QSVM {
 	}
 
 	void setObjectsFromSubjects(final QN predicate, final QNSet subjectSet, final QNSet objectSet) {
-		this.setObjectsFromSubjectsImpl(this.mergedKnowledge, this.insertKnowledge, this.deleteKnowledge, predicate, subjectSet, objectSet);
+		this.setObjectsFromSubjectsImpl(this.mergedContext, this.insertContext, this.deleteContext, predicate, subjectSet, objectSet);
 	}
 
 	void setObjectsFromSubjectsImpl(final QN mergedContext, final QN insertContext_or_null, final QN deleteContext_or_null, final QN predicate,
@@ -244,7 +283,7 @@ public class QSVM {
 	}
 
 	public void popSubjectsFromObjects(final QN predicate, final QNSet subjects, final QNSet objects) {
-		this.popSubjectsFromObjects(this.mergedKnowledge, this.insertKnowledge, this.deleteKnowledge, predicate, subjects, objects);
+		this.popSubjectsFromObjects(this.mergedContext, this.insertContext, this.deleteContext, predicate, subjects, objects);
 	}
 
 	void popSubjectsFromObjects(final QN mergedContext, final QN insertContext_or_null, final QN deleteContext_or_null, final QN predicate, final QNSet subjects,

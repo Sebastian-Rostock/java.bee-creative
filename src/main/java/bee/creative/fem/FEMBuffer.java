@@ -570,6 +570,11 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		throw new IllegalArgumentException();
 	}
 
+	/** Diese Methode liefert die gegebene Funktion als {@link FEMProxy#set(FEMFunction) Zielfunktion} eines {@link FEMProxy Funktionsplatzhalters}. */
+	protected FEMFunction customProxy(final FEMFunction src) {
+		return src;
+	}
+
 	/** Diese Methode gibt die Referenz auf {@link FEMVoid#INSTANCE} zurück. */
 	protected long putVoidAsRef() {
 		return this.getRef(FEMBuffer.TYPE_VOID, 0);
@@ -833,7 +838,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 		final long ref = this.buffer.getLong(addr + 16);
 		if (ref == FEMBuffer.TYPE_PROXY_ADDR1) return result;
-		result.set(this.get(ref));
+		result.set(this.customProxy(this.get(ref)));
 		return result;
 	}
 
@@ -853,7 +858,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 						this.buffer.putLong(addr + 16, ref);
 						final FEMProxy prx = this.proxyGetMap.get(key);
 						if (prx != null) {
-							prx.set(this.get(ref));
+							prx.set(this.customProxy(this.get(ref)));
 						}
 					}
 				} else {
