@@ -3,6 +3,7 @@ package bee.creative.fem;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.RandomAccess;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
@@ -42,19 +43,64 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
+	static class ItemList extends AbstractList<Integer> implements RandomAccess {
+
+		public final FEMString items;
+
+		public ItemList(final FEMString items) {
+			this.items = items;
+		}
+
+		@Override
+		public Integer get(final int index) {
+			return this.items.get(index);
+		}
+
+		@Override
+		public int size() {
+			return this.items.length;
+		}
+
+		@Override
+		public Iterator<Integer> iterator() {
+			return this.items.iterator();
+		}
+
+		@Override
+		public boolean contains(final Object o) {
+			return this.indexOf(o) >= 0;
+		}
+
+		@Override
+		public int indexOf(final Object o) {
+			return this.items.findFirst(o);
+		}
+
+		@Override
+		public int lastIndexOf(final Object o) {
+			return this.items.findLast(o);
+		}
+
+		@Override
+		public List<Integer> subList(final int fromIndex, final int toIndex) {
+			return this.items.section(fromIndex, toIndex - fromIndex).toList();
+		}
+
+	}
+	
 	static class ItemFinder implements Collector {
 
-		public final int that;
+		public final int value;
 
 		public int index;
 
-		ItemFinder(final int that) {
-			this.that = that;
+		ItemFinder(final int value) {
+			this.value = value;
 		}
 
 		@Override
 		public boolean push(final int value) {
-			if (value == this.that) return false;
+			if (this.value == value) return false;
 			this.index++;
 			return true;
 		}
@@ -81,6 +127,21 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		public boolean push(final int value) {
 			this.range |= value;
 			return true;
+		}
+
+	}
+
+	static class UniformCollector implements Collector {
+
+		public int value;
+
+		public UniformCollector(final int value) {
+			this.value = value;
+		}
+
+		@Override
+		public boolean push(final int value) {
+			return this.value == value;
 		}
 
 	}
@@ -387,6 +448,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
+		protected int customFind(final int that, final int offset, final int length, final boolean foreward) {
+			final int result = this.string.customFind(that, offset + this.offset, length, foreward);
+			return result >= 0 ? result - this.offset : -1;
+		}
+
+		@Override
 		protected boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
 			return this.string.customExtract(target, this.offset + offset2, length2, foreward);
 		}
@@ -419,6 +486,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 		@Override
+		protected int customFind(final int that, final int offset, final int length, final boolean foreward) {
+			final int result = this.string.customFind(that, this.length - offset - length, length, !foreward);
+			return result >= 0 ? this.length - result - 1 : -1;
+		}
+
+		@Override
 		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.string.customExtract(target, offset, length, !foreward);
 		}
@@ -438,27 +511,37 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			return this.string;
 		}
 
+		@Override
+		public boolean isUniform() {
+			return this.string.isUniform();
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
 	public static class UniformString extends HashString {
 
-		public final int item;
+		public final int value;
 
-		UniformString(final int length, final int item) throws IllegalArgumentException {
+		UniformString(final int length, final int value) throws IllegalArgumentException {
 			super(length);
-			this.item = item;
+			this.value = value;
 		}
 
 		@Override
 		protected int customGet(final int index) throws IndexOutOfBoundsException {
-			return this.item;
+			return this.value;
+		}
+
+		@Override
+		protected int customFind(final int that, final int offset, final int length, final boolean foreward) {
+			return this.value == that ? offset : -1;
 		}
 
 		@Override
 		protected boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
-				if (!target.push(this.item)) return false;
+				if (!target.push(this.value)) return false;
 				length--;
 			}
 			return true;
@@ -472,6 +555,16 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		@Override
 		public FEMString compact() {
 			return this;
+		}
+
+		@Override
+		public boolean isUniform() {
+			return true;
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
 		}
 
 	}
@@ -509,6 +602,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		public FEMString compactINT8() {
 			if ((this.offset == 0) && (this.length == this.items.length)) return this;
 			return super.compactINT8();
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
 		}
 
 	}
@@ -551,6 +649,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			return super.compactINT16();
 		}
 
+		@Override
+		public boolean isCompacted() {
+			return true;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -585,6 +688,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		public FEMString compactINT32() {
 			if ((this.offset == 0) && (this.length == this.items.length)) return this;
 			return super.compactINT32();
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
 		}
 
 	}
@@ -1229,7 +1337,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	protected int customFind(final int that, final int offset, final int length, final boolean foreward) {
 		final ItemFinder finder = new ItemFinder(that);
 		if (this.customExtract(finder, offset, length, foreward)) return -1;
-		return finder.index + offset;
+		return foreward ? (finder.index + offset) : (length - finder.index);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
@@ -1354,12 +1462,14 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return new ReverseString(this);
 	}
 
-	/** Diese Methode gibt die {@link #value() Codepoints dieser Zeichenkette} in einer performanteren oder zumindest gleichwertigen Zeichenkette mit möglichst
-	 * geringerem Speicherverbrauch zurück. Abhängig vom Wertebereich der Codepoints kann hierfür eine {@link #compactINT8() 8-Bit}-, {@link #compactINT16()
-	 * 16-Bit}- oder {@link #compactINT32() 32-Bit}-Einzelwertkodierung zum Einsatz kommen.
+	/** * Diese Methode gibt diese Zeichenkette mit optimierter Leistungsfähigkeit des {@link #get(int) Codepointzugriffs} zurück. Abhängig vom Wertebereich der
+	 * Codepoints kann hierfür eine {@link #compactINT8() 8-Bit}-, {@link #compactINT16() 16-Bit}- oder {@link #compactINT32() 32-Bit}-Einzelwertkodierung zum
+	 * Einsatz kommen.
 	 *
 	 * @return performantere Zeichenkette oder {@code this}. */
 	public FEMString compact() {
+		if (this.isEmpty()) return FEMString.EMPTY;
+		if (this.isUniform()) return new UniformString(this.length, this.customGet(0));
 		final RangeCollector collector = new RangeCollector();
 		this.extract(collector);
 		if (collector.range < 256) return this.compactINT8();
@@ -1422,6 +1532,19 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		if (that.length == 0) return offset;
 		if (that.length > (this.length - offset)) return -1;
 		return this.customFind(that, offset);
+	}
+	
+
+	int findLast(final Object key) {
+		if (this.length == 0) return -1;
+		if (!(key instanceof Integer)) return -1;
+		return this.customFind((Integer)key, 0, this.length, false);
+	}
+
+	int findFirst(final Object key) {
+		if (this.length == 0) return -1;
+		if (!(key instanceof Integer)) return -1;
+		return this.customFind((Integer)key, 0, this.length, true);
 	}
 
 	/** Diese Methode fügt alle Codepoints dieser Zeichenkette vom ersten zum letzten geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig
@@ -1489,7 +1612,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 			@Override
 			public Integer next() {
-				return new Integer(FEMString.this.customGet(this.index++));
+				return FEMString.this.customGet(this.index++);
 			}
 
 			@Override
@@ -1516,25 +1639,35 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return Comparators.compare(this.length, that.length);
 	}
 
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeichenkette leer ist.
+	 *
+	 * @return {@code true} bei Leerheit. */
+	public final boolean isEmpty() {
+		return this.length == 0;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeichenkette keine sich unterscheidenden Zeichen enthält.
+	 *
+	 * @return {@code true} bei Uniformität. */
+	public boolean isUniform() {
+		return this.isEmpty() || this.extract(new UniformCollector(this.customGet(0)));
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die Kompaktierung aktiviert, d.h die Leistungsfähigkeit des {@link #get(int) Codepointzugriffs}
+	 * optimiert ist.
+	 *
+	 * @return {@code true} bei Kompaktierung. */
+	public boolean isCompacted() {
+		return false;
+	}
+
 	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Codepoints dieser Zeichenkette zurück.
 	 *
 	 * @see #get(int)
 	 * @see #length()
 	 * @return {@link List}-Sicht. */
 	public final List<Integer> toList() {
-		return new AbstractList<Integer>() {
-
-			@Override
-			public Integer get(final int index) {
-				return new Integer(FEMString.this.get(index));
-			}
-
-			@Override
-			public int size() {
-				return FEMString.this.length;
-			}
-
-		};
+		return new ItemList(this);
 	}
 
 	/** Diese Methode gibt die 8-Bit-einzelwertkodierten Codepoint zurück.

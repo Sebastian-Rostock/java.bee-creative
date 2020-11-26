@@ -281,17 +281,17 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	static class ItemFinder implements Collector {
 
-		public final FEMValue that;
+		public final FEMValue value;
 
 		public int index;
 
-		ItemFinder(final FEMValue that) {
-			this.that = that;
+		ItemFinder(final FEMValue value) {
+			this.value = value;
 		}
 
 		@Override
 		public boolean push(final FEMValue value) {
-			if (value.equals(this.that)) return false;
+			if (this.value.equals(value)) return false;
 			this.index++;
 			return true;
 		}
@@ -325,6 +325,21 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		public boolean push(final FEMValue value) {
 			this.array[this.index++] = value;
 			return true;
+		}
+
+	}
+
+	static class UniformCollector implements Collector {
+
+		public FEMValue value;
+
+		public UniformCollector(final FEMValue value) {
+			this.value = value;
+		}
+
+		@Override
+		public boolean push(final FEMValue value) {
+			return this.value.equals(value);
 		}
 
 	}
@@ -418,6 +433,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			return EMU.fromObject(this) + EMU.from(this.array1) + EMU.from(this.array2);
 		}
 
+		@Override
+		public boolean isUniform() {
+			return this.array1.isUniform() && this.array2.isUniform();
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -441,8 +461,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		@Override
 		protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
 			final int result = this.array.customFind(that, offset + this.offset, length, foreward);
-			if (result < 0) return -1;
-			return result - this.offset;
+			return result >= 0 ? result - this.offset : -1;
 		}
 
 		@Override
@@ -478,6 +497,12 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		}
 
 		@Override
+		protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
+			final int result = this.array.customFind(that, this.length - offset - length, length, !foreward);
+			return result >= 0 ? this.length - result - 1 : -1;
+		}
+
+		@Override
 		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.array.customExtract(target, this.length - offset - length, length, !foreward);
 		}
@@ -497,27 +522,42 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			return this.array;
 		}
 
+		@Override
+		public boolean isIndexed() {
+			return this.array.isIndexed();
+		}
+
+		@Override
+		public boolean isUniform() {
+			return this.array.isUniform();
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
 	public static class UniformArray extends HashArray {
 
-		public final FEMValue item;
+		public final FEMValue value;
 
-		UniformArray(final int length, final FEMValue item) throws IllegalArgumentException {
+		UniformArray(final int length, final FEMValue value) throws IllegalArgumentException {
 			super(length);
-			this.item = item;
+			this.value = value;
 		}
 
 		@Override
 		protected FEMValue customGet(final int index) throws IndexOutOfBoundsException {
-			return this.item;
+			return this.value;
+		}
+
+		@Override
+		protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
+			return this.value.equals(that) ? offset : -1;
 		}
 
 		@Override
 		protected boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
-				if (!target.push(this.item)) return false;
+				if (!target.push(this.value)) return false;
 				length--;
 			}
 			return true;
@@ -531,12 +571,27 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		@Override
 		public FEMArray result(final boolean deep) {
 			if (!deep) return this;
-			return new UniformArray2(this.length, this.item);
+			return new UniformArray2(this.length, this.value);
 		}
 
 		@Override
 		public FEMArray compact(final boolean index) {
 			return this.result(index);
+		}
+
+		@Override
+		public boolean isIndexed() {
+			return true;
+		}
+
+		@Override
+		public boolean isUniform() {
+			return true;
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
 		}
 
 	}
@@ -591,7 +646,15 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		@Override
 		public FEMArray compact(final boolean index) {
-			return index ? super.compact(true) : this;
+			if (index) return super.compact(true);
+			if (this.isEmpty()) return FEMArray.EMPTY;
+			if (this.isUniform()) return new UniformArray(this.length, this.customGet(0));
+			return this;
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
 		}
 
 	}
@@ -677,6 +740,11 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 			return this;
 		}
 
+		@Override
+		public boolean isIndexed() {
+			return true;
+		}
+
 	}
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
@@ -688,8 +756,8 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	/** Dieses Feld speichert die leere Wertliste. */
 	public static final FEMArray EMPTY = new UniformArray(0, FEMVoid.INSTANCE);
 
-	private static final FEMValue[] VALUES = new FEMValue[0]; 
-	
+	private static final FEMValue[] VALUES = new FEMValue[0];
+
 	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
 	 *
 	 * @param length Länge.
@@ -741,7 +809,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		System.arraycopy(items, offset, result, 0, length);
 		return new CompactArray(result);
 	}
- 
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 *
@@ -752,7 +819,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
 		if (items instanceof FEMArray) return (FEMArray)items;
-		return FEMArray.from(Iterables.toArray(VALUES,items));
+		return FEMArray.from(Iterables.toArray(FEMArray.VALUES, items));
 	}
 
 	/** Diese Methode überführt die {@link Entry Einträge} der gegebenen {@link Map Abbildung} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie
@@ -837,7 +904,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	protected int customFind(final FEMValue that, final int offset, final int length, final boolean foreward) {
 		final ItemFinder finder = new ItemFinder(that);
 		if (this.customExtract(finder, offset, length, foreward)) return -1;
-		return finder.index + offset;
+		return foreward ? (finder.index + offset) : (length - finder.index);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. **/
@@ -960,16 +1027,16 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return this.compact(false);
 	}
 
-	/** Diese Methode gibt die {@link #value() Werte dieser Wertliste} in einer performanteren oder zumindest gleichwertigen Wertliste zurück. Wenn diese
-	 * Wertliste diesbezüglich optimiert werden kann, wird grundsätzlich eine Abschrift der {@link #value() Werte} dieser Wertliste analog zu
-	 * {@link #from(FEMValue...) from(values())} geliefert. Wenn die Indizierung aktiviert ist, wird auch die Leistungsfähigkeit der {@link #find(FEMValue, int)
-	 * Einzelwertsuche} optimiert. Hierbei wird grundsätzlich eine Streuwerttabelle angelegt, welche den Speicherverbrauch der Wertliste vervierfachen kann.
+	/** Diese Methode gibt diese Wertliste mit optimierter Leistungsfähigkeit des {@link #get(int) Wertzugriffs} zurück. Wenn die Wertliste diesbezüglich
+	 * optimiert werden kann, wird grundsätzlich eine Abschrift der {@link #value() Werte} dieser Wertliste analog zu {@link #from(FEMValue...) from(values())}
+	 * geliefert. Wenn die Indizierung aktiviert ist, wird auch die Leistungsfähigkeit der {@link #find(FEMValue, int) Wertsuche} optimiert. Hierbei wird
+	 * grundsätzlich eine Streuwerttabelle angelegt, welche den Speicherverbrauch der Wertliste vervierfachen kann.
 	 *
 	 * @param index {@code true}, wenn die Einzelwertsuche beschleunigt werden sollen.
 	 * @return performantere Wertliste oder {@code this}. */
 	public FEMArray compact(final boolean index) {
-		if (this.length == 0) return FEMArray.EMPTY;
-		if (this.length == 1) return index ? new UniformArray2(1, this.customGet(0)) : new UniformArray(1, this.customGet(0));
+		if (this.isEmpty()) return FEMArray.EMPTY;
+		if (this.isUniform()) return index ? new UniformArray2(this.length, this.customGet(0)) : new UniformArray(this.length, this.customGet(0));
 		return index ? new CompactArray3(this.value()) : new CompactArray(this.value());
 	}
 
@@ -1094,25 +1161,6 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return Comparators.compare(this.length, that.length);
 	}
 
-	/** Diese Methode gibt die Textdarstellung zurück. Diese Besteht aus den in eckige Klammern eingeschlossenen und mit Semikolon separierten Textdarstellungen
-	 * der Elemente. */
-	@Override
-	public String toString() {
-		final FEMPrinter target = new FEMPrinter();
-		FEMDomain.DEFAULT.printArray(target, this);
-		return target.print();
-	}
-
-	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf diese Wertliste zurück.
-	 *
-	 * @see #get(int)
-	 * @see #length()
-	 * @see #iterator()
-	 * @return {@link List}-Sicht. */
-	public final List<FEMValue> toList() {
-		return new ItemList(this);
-	}
-
 	/** Diese Methode gibt eine unveränderliche {@link Map} als Sicht auf die Schlüssel- und Wertlisten zurück, aus denen diese Wertliste besteht.<br>
 	 * Sie ist damit die Umkehroperation zu {@link #from(Map)}. Der {@link Entry#getKey() Schlüssel} eines {@link Entry Eintrags} befindet sich in {@code keys} an
 	 * der Position, an der sich in {@code values} der zugeordnete {@link Entry#getValue() Wert} befindet. Die Schlüssel sollten zur effizienten Suche
@@ -1128,6 +1176,55 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		final FEMArray keys2 = (FEMArray)keys1, values2 = (FEMArray)values1;
 		if (keys2.length != values2.length) throw new IllegalArgumentException();
 		return new ItemMap(keys2, values2);
+	}
+
+	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf diese Wertliste zurück.
+	 *
+	 * @see #get(int)
+	 * @see #length()
+	 * @see #iterator()
+	 * @return {@link List}-Sicht. */
+	public final List<FEMValue> toList() {
+		return new ItemList(this);
+	}
+
+	/** Diese Methode gibt die Textdarstellung zurück. Diese Besteht aus den in eckige Klammern eingeschlossenen und mit Semikolon separierten Textdarstellungen
+	 * der Elemente. */
+	@Override
+	public String toString() {
+		final FEMPrinter target = new FEMPrinter();
+		FEMDomain.DEFAULT.printArray(target, this);
+		return target.print();
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste leer ist.
+	 *
+	 * @return {@code true} bei Leerheit. */
+	public final boolean isEmpty() {
+		return this.length == 0;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die Indizierung aktiviert, d.h die Leistungsfähigkeit der {@link #find(FEMValue, int) Wertsuche}
+	 * optimiert ist.
+	 *
+	 * @return {@code true} bei Indizierung. */
+	public boolean isIndexed() {
+		return false;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste keine sich unterscheidenden Werte enthält.
+	 *
+	 * @return {@code true} bei Uniformität. */
+	public boolean isUniform() {
+		return this.isEmpty() || this.extract(new UniformCollector(this.customGet(0)));
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die Kompaktierung aktiviert, d.h die Leistungsfähigkeit des {@link #get(int) Wertzugriffs} optimiert
+	 * ist.
+	 *
+	 * @return {@code true} bei Kompaktierung. */
+	public boolean isCompacted() {
+		return false;
 	}
 
 }

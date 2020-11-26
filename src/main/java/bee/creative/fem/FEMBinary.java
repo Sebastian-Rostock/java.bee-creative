@@ -5,6 +5,7 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.RandomAccess;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Integers;
@@ -30,19 +31,64 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	}
 
+	static class ItemList extends AbstractList<Byte> implements RandomAccess {
+
+		public final FEMBinary items;
+
+		public ItemList(final FEMBinary items) {
+			this.items = items;
+		}
+
+		@Override
+		public Byte get(final int index) {
+			return this.items.get(index);
+		}
+
+		@Override
+		public int size() {
+			return this.items.length;
+		}
+
+		@Override
+		public Iterator<Byte> iterator() {
+			return this.items.iterator();
+		}
+
+		@Override
+		public boolean contains(final Object o) {
+			return this.indexOf(o) >= 0;
+		}
+
+		@Override
+		public int indexOf(final Object o) {
+			return this.items.findFirst(o);
+		}
+
+		@Override
+		public int lastIndexOf(final Object o) {
+			return this.items.findLast(o);
+		}
+
+		@Override
+		public List<Byte> subList(final int fromIndex, final int toIndex) {
+			return this.items.section(fromIndex, toIndex - fromIndex).toList();
+		}
+
+	}
+
 	static class ItemFinder implements Collector {
 
-		public final byte that;
+		public final byte value;
 
 		public int index;
 
-		ItemFinder(final byte that) {
-			this.that = that;
+		ItemFinder(final byte value) {
+			this.value = value;
 		}
 
 		@Override
 		public boolean push(final byte value) {
-			if (value == this.that) return false;
+			if (this.value == value) return false;
 			this.index++;
 			return true;
 		}
@@ -106,6 +152,21 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			++index;
 			this.index = index;
 			return true;
+		}
+
+	}
+
+	static class UniformCollector implements Collector {
+
+		public byte value;
+
+		public UniformCollector(final byte value) {
+			this.value = value;
+		}
+
+		@Override
+		public boolean push(final byte value) {
+			return this.value == value;
 		}
 
 	}
@@ -256,6 +317,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
+		protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
+			final int result = this.binary.customFind(that, offset + this.offset, length, foreward);
+			return result >= 0 ? result - this.offset : -1;
+		}
+
+		@Override
 		protected boolean customExtract(final Collector target, final int offset2, final int length2, final boolean foreward) {
 			return this.binary.customExtract(target, this.offset + offset2, length2, foreward);
 		}
@@ -288,6 +355,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		}
 
 		@Override
+		protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
+			final int result = this.binary.customFind(that, this.length - offset - length, length, !foreward);
+			return result >= 0 ? this.length - result - 1 : -1;
+		}
+
+		@Override
 		protected boolean customExtract(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this.binary.customExtract(target, this.length - offset - length, length, !foreward);
 		}
@@ -307,27 +380,37 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			return this.binary;
 		}
 
+		@Override
+		public boolean isUniform() {
+			return this.binary.isUniform();
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
 	public static class UniformBinary extends HashBinary {
 
-		public final byte item;
+		public final byte value;
 
-		UniformBinary(final int length, final byte item) throws IllegalArgumentException {
+		UniformBinary(final int length, final byte value) throws IllegalArgumentException {
 			super(length);
-			this.item = item;
+			this.value = value;
 		}
 
 		@Override
 		protected byte customGet(final int index) throws IndexOutOfBoundsException {
-			return this.item;
+			return this.value;
+		}
+
+		@Override
+		protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
+			return this.value == that ? offset : -1;
 		}
 
 		@Override
 		protected boolean customExtract(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
-				if (!target.push(this.item)) return false;
+				if (!target.push(this.value)) return false;
 				length--;
 			}
 			return true;
@@ -335,7 +418,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 		@Override
 		protected FEMBinary customSection(final int offset, final int length) {
-			return new UniformBinary(length, this.item);
+			return new UniformBinary(length, this.value);
 		}
 
 		@Override
@@ -346,6 +429,16 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		@Override
 		public FEMBinary compact() {
 			return this;
+		}
+
+		@Override
+		public boolean isUniform() {
+			return true;
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
 		}
 
 	}
@@ -392,6 +485,11 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		public FEMBinary compact() {
 			if ((this.offset == 0) && (this.length == this.array.length)) return this;
 			return super.compact();
+		}
+
+		@Override
+		public boolean isCompacted() {
+			return true;
 		}
 
 	}
@@ -646,7 +744,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
 		final ItemFinder finder = new ItemFinder(that);
 		if (this.customExtract(finder, offset, length, foreward)) return -1;
-		return finder.index + offset;
+		return foreward ? (finder.index + offset) : (length - finder.index);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
@@ -772,14 +870,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return new ReverseBinary(this);
 	}
 
-	/** Diese Methode gibt die {@link #value() Bytes dieser Bytefolge} in einer performanteren oder zumindest gleichwertigen Bytefolge zurück.
+	/** Diese Methode gibt diese Bytefolge mit optimierter Leistungsfähigkeit des {@link #get(int) Bytezugriffs} zurück. Wenn die Bytefolge diesbezüglich
+	 * optimiert werden kann, wird grundsätzlich eine Abschrift der {@link #value() Bytes} dieser Bytefolge analog zu {@link #from(byte[]) from(values())}
+	 * geliefert.
 	 *
-	 * @see #from(byte[])
-	 * @see #value()
 	 * @return performantere Bytefolge oder {@code this}. */
 	public FEMBinary compact() {
-		if (this.length == 0) return FEMBinary.EMPTY;
-		if (this.length == 1) return new UniformBinary(1, this.customGet(0));
+		if (this.isEmpty()) return FEMBinary.EMPTY;
+		if (this.isUniform()) return new UniformBinary(this.length, this.customGet(0));
 		return new CompactBinary(this.value());
 	}
 
@@ -811,6 +909,18 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		if (that.length == 0) return offset;
 		if (that.length > (this.length - offset)) return -1;
 		return this.customFind(that, offset);
+	}
+
+	int findLast(final Object key) {
+		if (this.length == 0) return -1;
+		if (!(key instanceof Byte)) return -1;
+		return this.customFind((Byte)key, 0, this.length, false);
+	}
+
+	int findFirst(final Object key) {
+		if (this.length == 0) return -1;
+		if (!(key instanceof Byte)) return -1;
+		return this.customFind((Byte)key, 0, this.length, true);
 	}
 
 	/** Diese Methode fügt alle Bytes dieser Bytefolge vom ersten zum letzten geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig
@@ -869,7 +979,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 			@Override
 			public Byte next() {
-				return new Byte(FEMBinary.this.customGet(this.index++));
+				return FEMBinary.this.customGet(this.index++);
 			}
 
 			@Override
@@ -896,25 +1006,35 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 		return Comparators.compare(this.length, that.length);
 	}
 
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge leer ist.
+	 *
+	 * @return {@code true} bei Leerheit. */
+	public final boolean isEmpty() {
+		return this.length == 0;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge keine sich unterscheidenden Bytewerte enthält.
+	 *
+	 * @return {@code true} bei Uniformität. */
+	public boolean isUniform() {
+		return this.isEmpty() || this.extract(new UniformCollector(this.customGet(0)));
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die Kompaktierung aktiviert, d.h die Leistungsfähigkeit des {@link #get(int) Bytezugriffs} optimiert
+	 * ist.
+	 *
+	 * @return {@code true} bei Kompaktierung. */
+	public boolean isCompacted() {
+		return false;
+	}
+
 	/** Diese Methode gibt eine unveränderliche {@link List} als Sicht auf die Bytes dieser Bytefolge zurück.
 	 *
 	 * @see #get(int)
 	 * @see #length()
 	 * @return {@link List}-Sicht. */
 	public final List<Byte> toList() {
-		return new AbstractList<Byte>() {
-
-			@Override
-			public Byte get(final int index) {
-				return new Byte(FEMBinary.this.get(index));
-			}
-
-			@Override
-			public int size() {
-				return FEMBinary.this.length;
-			}
-
-		};
+		return new ItemList(this);
 	}
 
 	@Override
