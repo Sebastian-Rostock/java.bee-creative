@@ -23,6 +23,27 @@ import bee.creative.util.HashMapOL;
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
+	static class ReuseMap extends HashMapOL<FEMFunction> {
+
+		private static final long serialVersionUID = -2450131509348449133L;
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, Object key) {
+			if (!super.customEqualsKey(entryIndex, key)) return false;
+			if (!(key instanceof FEMArray)) return true;
+			if (!((FEMArray)key).isIndexed()) return true;
+			key = this.customGetKey(entryIndex);
+			if (!(key instanceof FEMArray)) return true;
+			return ((FEMArray)key).isIndexed();
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
+			return this.customEqualsKey(entryIndex, key);
+		}
+
+	}
+
 	/** Diese Klasse implementiert eine Wertliste, deren Elemente als Referenzen gegeben sind und in {@link #customGet(int)} über einen gegebenen
 	 * {@link FEMBuffer} in Werte {@link FEMBuffer#get(long) übersetzt} werden. */
 	public static class MappedArray1 extends FEMArray {
@@ -209,7 +230,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld speichert die Typkennung für {@link FEMString#EMPTY}. */
 	protected static final byte TYPE_STRING_DATA1 = 6;
 
-	/** Dieses Feld speichert die Typkennung für {@link FEMString.UniformString} mit einem Zeichen. */
+	/** Dieses Feld speichert die Typkennung für {@link FEMString.UniformString}. */
 	protected static final byte TYPE_STRING_DATA2 = 7;
 
 	/** Dieses Feld speichert die Typkennung für {@link MappedString1}. */
@@ -288,7 +309,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	private long next;
 
 	/** Dieses Feld bildet von einer Funktion auf deren Referenz ab und wird in {@link #put(FEMFunction)} eingesetzt. */
-	private final HashMapOL<FEMFunction> reuseMap = new HashMapOL<>();
+	private final HashMapOL<FEMFunction> reuseMap = new ReuseMap();
 
 	/** Dieses Feld bildet von einer Adresse auf einen Platzhalter ab und dient in {@link #getProxyByAddr(long)} de Behandlung der Rekursion. */
 	private final HashMapLO<FEMProxy> proxyGetMap = new HashMapLO<>();
@@ -603,9 +624,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt die gegebene Wertliste in den Puffer ein und gibt die Adresse darauf zurück. Eine über {@link FEMArray#compact(boolean)} indizierte
 	 * Wertliste wird mit der Indizierung kodiert. */
 	protected long putArrayAsRef(final FEMArray src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		final int length = src.length();
-		if (length == 0) return this.getRef(FEMBuffer.TYPE_ARRAY_DATA1, 0);
+		if (src.isEmpty()) return this.getRef(FEMBuffer.TYPE_ARRAY_DATA1, 0);
 		final int hash = src.hashCode();
+		final int length = src.length();
 		if (src instanceof CompactArray3) {
 			final int[] table = ((CompactArray3)src).table;
 			final long addr = this.putData((length * 8L) + (table.length * 4L) + 8);
@@ -621,9 +642,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 	}
 
-	/** Diese Methode gibt die Zeichenkette mit den gegebenen Daten ({@code item: 31}) zurück. */
+	/** Diese Methode gibt die Zeichenkette mit den gegebenen Daten ({@code length: 32, value: 32}) zurück. */
 	protected FEMString getStringByData(final long data) {
-		return FEMString.from(1, (int)data);
+		return FEMString.from(Integers.toIntH(data), Integers.toIntL(data));
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich enthaltene {@code byte}-Zeichenkette zurück. Die Struktur des Speicherbereichs ist
@@ -649,8 +670,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	protected long putStringAsRef(FEMString src) throws NullPointerException, IllegalStateException {
 		src = src.compact();
 		final int length = src.length();
-		if (length == 0) return this.getRef(FEMBuffer.TYPE_STRING_DATA1, 0);
-		if (length == 1) return this.getRef(FEMBuffer.TYPE_STRING_DATA2, src.get(0));
+		if (src.isEmpty()) return this.getRef(FEMBuffer.TYPE_STRING_DATA1, 0);
+		if (src.isUniform()) return this.getRef(FEMBuffer.TYPE_STRING_DATA2, Integers.toLong(length, src.get(0)));
 		final int hash = src.hashCode();
 		if (src instanceof FEMString.CompactStringINT8) {
 			final long addr = this.putData(length + 8);
@@ -672,7 +693,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt die Bytefolge mit den gegebenen Daten ({@code item: 8}) zurück. */
 	protected FEMBinary getBinaryByData(final long data) {
-		return FEMBinary.from(1, (byte)data);
+		return FEMBinary.from(Integers.toIntH(data), (byte)Integers.toIntL(data));
 	}
 
 	/** Diese Methode gibt die im gegebenen Speicherbereich ({@code length: int, hash: int, item: byte[length]}) enthaltene Bytefolge zurück. */
@@ -683,8 +704,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Diese Methode fügt die gegebene Bytefolge in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putBinaryAsRef(final FEMBinary src) throws NullPointerException, IllegalStateException {
 		final int length = src.length();
-		if (length == 0) return this.getRef(FEMBuffer.TYPE_BINARY_DATA1, 0);
-		if (length == 1) return this.getRef(FEMBuffer.TYPE_BINARY_DATA2, src.get(0) & 0xFF);
+		if (src.isEmpty()) return this.getRef(FEMBuffer.TYPE_BINARY_DATA1, 0);
+		if (src.isUniform()) return this.getRef(FEMBuffer.TYPE_BINARY_DATA2, Integers.toLong(length, src.get(0) & 0xFF));
 		final long addr = this.putData(length + 8);
 		this.buffer.putInt(addr, new int[]{length, src.hashCode()});
 		this.buffer.put(addr + 8, src.value());
