@@ -5,20 +5,19 @@ package bee.creative.lang;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Integers {
 
-	/** Dieses Feld speichert die Zehnerstelle der ersten 100 positiven Dezimanzahlen. */
 	final static byte[] digitTenArray = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2',
 		'2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '5', '5', '5', '5', '5',
 		'5', '5', '5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7', '7', '7', '8', '8', '8', '8', '8', '8',
 		'8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'};
 
-	/** Dieses Feld speichert die Einerstelle der ersten 100 positiven Dezimanzahlen. */
 	final static byte[] digitOneArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
 		'4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4',
 		'5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5',
 		'6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-	/** Dieses Feld speichert die Einerstelle der ersten 100 positiven Dezimanzahlen. */
-	final static String[] sizeUnitArray = {" B", " KB", " MB", " GB", " TB", " PB"};
+	final static String[] sizeUnitArray = {" B", " KB", " MB", " GB", " TB", " PB", " EB"};
+
+	final static String[] timeUnitArray = {" ns", " µs", " ms", " s", " ks", " MS", " GS"};
 
 	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
 	 * <p>
@@ -237,17 +236,85 @@ public class Integers {
 		Integers.printLong(value, buffer, offset + length);
 	}
 
-	/** Diese Methode gibt die gegebene Speichergröße als Zeichenkette mit Maßeinheit {@code B}, {@code KB}, {@code MB}, {@code GB}, {@code TB} bzw. {@code PB}
-	 * zurück.
-	 * 
-	 * @param value Speichergröße in Byte (-922337203685477580..+922337203685477580).
+	/** Diese Methode gibt die gegebene Speichergröße als Zeichenkette mit Maßeinheit {@code B}, {@code KB}, {@code MB}, {@code GB}, {@code TB}, {@code PB} bzw.
+	 * {@code EB} zurück.
+	 *
+	 * @param value Speichergröße in Byte.
 	 * @return formatierte Speichergröße. */
 	public static String printSize(final long value) {
-		if (value < 0) return "-" + Integers.printSize(-value);
-		if (value < 1024) return value + Integers.sizeUnitArray[0];
-		final int unit = (63 - Long.numberOfLeadingZeros(value)) / 10;
-		final int num = (int)((value * 10) >> (unit * 10)), div = num / 10, mod = num % 10;
-		return div + "." + mod + Integers.sizeUnitArray[unit];
+		final StringBuilder res = new StringBuilder();
+		Integers.printSize(res, value);
+		return res.toString();
+	}
+
+	/** Diese Methode fügt die gegebene Speichergröße mit {@link #printSize(long) Maßeinheit formatiert} an den gegebenen Puffer an.
+	 * 
+	 * @param res Speichergröße in Byte.
+	 * @param value Puffer. */
+	public static void printSize(final StringBuilder res, final long value) {
+		if (value < 0) {
+			Integers.appendSizeImpl(res.append('-'), value < -1024 ? ~value : -value);
+		} else {
+			Integers.appendSizeImpl(res, value);
+		}
+	}
+
+	/** Diese Methode gibt die gegebene Zeitspanne als Zeichenkette mit Maßeinheit {@code ns}, {@code µs}, {@code ms}, {@code s}, {@code ks}, {@code Ms} bzw.
+	 * {@code Gs} zurück.
+	 *
+	 * @param value Zeitspanne in Nanosekunden.
+	 * @return formatierte Zeitspanne. */
+	public static String printTime(final long value) {
+		final StringBuilder res = new StringBuilder();
+		Integers.printTime(res, value);
+		return res.toString();
+	}
+
+	/** Diese Methode fügt die gegebene Zeitspanne mit {@link #printTime(long) Maßeinheit formatiert} an den gegebenen Puffer an.
+	 * 
+	 * @param res Zeitspanne in Nanosekunden.
+	 * @param value Puffer. */
+	public static void printTime(final StringBuilder res, final long value) {
+		if (value < 0) {
+			Integers.appendTimeImpl(res.append('-'), value < -1000 ? ~value : -value);
+		} else {
+			Integers.appendTimeImpl(res, value);
+		}
+	}
+
+	static StringBuilder appendSizeImpl(final StringBuilder res, long value) {
+		if (value < 1024) return res.append((int)value).append(Integers.sizeUnitArray[0]);
+		int unit = 1;
+		if (value < 102400) {
+			value = (value * 100) / 1024;
+		} else {
+			value = (value / 1024) * 100;
+		}
+		while (value >= 102400) {
+			unit++;
+			value /= 1024;
+		}
+		return Integers.appendPercentImpl(res, (int)value).append(Integers.sizeUnitArray[unit]);
+	}
+
+	static StringBuilder appendTimeImpl(final StringBuilder res, long value) {
+		if (value < 1000) return res.append((int)value).append(Integers.timeUnitArray[0]);
+		value /= 10;
+		int unit = 1;
+		while (value >= 100000) {
+			unit++;
+			value /= 1000;
+		}
+		return Integers.appendPercentImpl(res, (int)value).append(Integers.timeUnitArray[unit]);
+	}
+
+	static StringBuilder appendPercentImpl(final StringBuilder res, final int value) {
+		final int div = value / 100, mod = value % 100;
+		res.append(div);
+		if ((div >= 100) || (mod == 0) || ((div >= 10) && (mod < 10))) return res;
+		res.append('.').append((char)Integers.digitTenArray[mod]);
+		if ((div >= 10) || ((mod % 10) == 0)) return res;
+		return res.append((char)Integers.digitOneArray[mod]);
 	}
 
 	/** Diese Methode gibt die gegebennen 16-Bit-Werte als 32-Bit-Wert zurück.

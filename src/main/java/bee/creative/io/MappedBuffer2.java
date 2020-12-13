@@ -2,10 +2,13 @@ package bee.creative.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteOrder;
 import bee.creative.array.CompactLongArray;
+import bee.creative.lang.Bytes;
 
 /** Diese Klasse ergänzt einen {@link MappedBuffer} um Methoden zur {@link #insertRegion(long) Reservierung} und {@link #deleteRegion(long) Freigabe} von
- * Speicherbereichen. Die darüber angebundene Datei besitz dafür eine entsprechende Datenstruktur, deren Kopfdaten beim Öffnen erzeugt bzw. geprüft werden.
+ * Speicherbereichen. Die darüber angebundene Datei besitz dafür eine entsprechende Datenstruktur, deren Kopfdaten beim Öffnen erzeugt bzw. geprüft werden. Nur
+ * wenn die Datei zum Schreiben angebunden wird und leer ist, werden ihre Kopfdaten initialisiert.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MappedBuffer2 extends MappedBuffer {
@@ -16,20 +19,31 @@ public class MappedBuffer2 extends MappedBuffer {
 		if (size == 0) return 0;
 		throw new IllegalArgumentException();
 	}
- 
+
 	private static boolean isAlingnedValue(final long value) {
 		return (value & 15) == 0;
 	}
 
-	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei. Wenn die Datei zum Schreiben angebunden wird und leer ist, werden ihre
-	 * Kopfdaten initialisiert. Andernfals werden ihre Kopfdaten geprüft.
+	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei in nativer Bytereihenfolge.
 	 *
 	 * @param file Datei.
 	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist.
 	 * @throws IllegalArgumentException Wenn die Kopfdaten ungültig sind. */
 	public MappedBuffer2(final File file, final boolean readonly) throws IOException, IllegalArgumentException {
+		this(file, readonly, Bytes.NATIVE_ORDER);
+	}
+
+	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei.
+	 *
+	 * @param file Datei.
+	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
+	 * @param order Bytereihenfolge.
+	 * @throws IOException Wenn die Anbindung nicht möglich ist.
+	 * @throws IllegalArgumentException Wenn die Kopfdaten ungültig sind. */
+	public MappedBuffer2(final File file, final boolean readonly, final ByteOrder order) throws IOException, IllegalArgumentException {
 		super(file, readonly);
+		this.order(order);
 		final long MAGIC = 0x474F4F44464F4F44L;
 		final long size = this.size();
 		if (!readonly && (size == 0)) {

@@ -2,11 +2,14 @@ package bee.creative.fem;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import bee.creative.bind.Property;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMArray.CompactArray3;
 import bee.creative.io.MappedBuffer;
+import bee.creative.lang.Bytes;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
 import bee.creative.util.HashMapLO;
@@ -320,14 +323,27 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld speichert den Puffer, in dem die Zahlenfolgen abgelegt sind. */
 	protected final MappedBuffer buffer;
 
-	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei.
+	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei in nativer Bytereihenfolge.
 	 *
 	 * @see MappedBuffer#MappedBuffer(File, boolean)
 	 * @param file Datei.
 	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public FEMBuffer(final File file, final boolean readonly) throws IOException {
+		this(file, readonly, Bytes.NATIVE_ORDER);
+	}
+
+	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei.
+	 *
+	 * @see ByteBuffer#order()
+	 * @see MappedBuffer#MappedBuffer(File, boolean)
+	 * @param file Datei.
+	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
+	 * @param order Bytereihenfolge.
+	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
+	public FEMBuffer(final File file, final boolean readonly, final ByteOrder order) throws IOException {
 		this.buffer = new MappedBuffer(file, readonly);
+		this.buffer.order(order);
 		this.buffer.growScale(1);
 		final long MAGIC = 0x31454c49464d4546L;
 		if (!readonly && (this.buffer.size() == 0)) {
@@ -744,13 +760,13 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code value: double}) enthaltenen Dezimalbruch zurück. */
 	protected FEMDecimal getDecimalByAddr(final long addr) throws IllegalArgumentException {
-		return new FEMDecimal(this.buffer.getDouble(addr));
+		return new FEMDecimal(Double.longBitsToDouble(this.buffer.getLong(addr)));
 	}
 
 	/** Diese Methode fügt den gegebenen Dezimalbruch in den Puffer ein und gibt die Referenz darauf zurück. */
 	protected long putDecimalAsRef(final FEMDecimal src) throws NullPointerException, IllegalStateException {
 		final long addr = this.putData(8);
-		this.buffer.putDouble(addr, src.value());
+		this.buffer.putLong(addr, Double.doubleToRawLongBits(src.value()));
 		return this.putRef(FEMBuffer.TYPE_DECIMAL_ADDR1, addr);
 	}
 
