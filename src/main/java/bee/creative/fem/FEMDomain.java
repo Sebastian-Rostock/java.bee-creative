@@ -83,12 +83,12 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Funktionsliste und gibt deren Elternabschnitt zurück. Die Erkennung
 	 * erfolgt gemäß folgender EBNF:<br>
-	 * <pre>SCRIPT = {@link #parseGroup(FEMParser) GROUP}</pre> Als Abschnittstyp des Elternabschnitts wird {@code '*'} verwendet. Sein Abschnittswert ist die
-	 * {@link Set Menge} der {@link String Namen} aller als {@link #parseValue(FEMParser) Wert} angegebenen {@link FEMParser#proxies() Platzhalter}. Die
-	 * {@link Token#tokens() Kindabschnitte} sind die Abschnitte der Funktionen (FUNCTION). */
+	 * <pre>SCRIPT = {@link #parseGroup(FEMParser, boolean) GROUP}</pre> Als Abschnittstyp des Elternabschnitts wird {@code '*'} verwendet. Sein Abschnittswert
+	 * ist die {@link Set Menge} der {@link String Namen} aller als {@link #parseValue(FEMParser, boolean) Wert} angegebenen {@link FEMParser#proxies()
+	 * Platzhalter}. Die {@link Token#tokens() Kindabschnitte} sind die Abschnitte der Funktionen (FUNCTION). */
 	protected Token parseScript(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
-		final List<Token> funs = this.parseGroup(src);
+		final List<Token> funs = this.parseGroup(src, true);
 		if (src.symbol() >= 0) {
 			funs.add(this.parseError(src));
 		}
@@ -124,11 +124,11 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Funktionsliste und gibt die Abschnitte der Funktionen (FUNCTION)
 	 * zurück. Die Erkennung erfolgt gemäß folgender EBNF:<br>
-	 * <pre>GROUP = {@link #parseInfo(FEMParser) SC} [ {@link #parseFunction(FEMParser) FUNCTION} { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} {@link #parseFunction(FEMParser) FUNCTION} } {@link #parseInfo(FEMParser) SC} ]</pre> */
-	protected List<Token> parseGroup(final FEMParser src) throws NullPointerException {
+	 * <pre>GROUP = {@link #parseInfo(FEMParser) SC} [ {@link #parseFunction(FEMParser, boolean) FUNCTION} { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} {@link #parseFunction(FEMParser, boolean) FUNCTION} } {@link #parseInfo(FEMParser) SC} ]</pre> */
+	protected List<Token> parseGroup(final FEMParser src, final boolean allowProxy) throws NullPointerException {
 		final List<Token> res = new ArrayList<>();
 		this.parseInfo(src);
-		Token fun = this.parseFunction(src);
+		Token fun = this.parseFunction(src, allowProxy);
 		if (fun == null) return res;
 		res.add(fun);
 		while (true) {
@@ -137,7 +137,7 @@ public class FEMDomain extends BaseObject {
 			src.push(';');
 			src.skip();
 			this.parseInfo(src);
-			fun = this.parseFunction(src);
+			fun = this.parseFunction(src, allowProxy);
 			if (fun != null) {
 				res.add(fun);
 			} else {
@@ -146,7 +146,7 @@ public class FEMDomain extends BaseObject {
 		}
 	}
 
-	/** Diese Methode überführt den von {@link #parseGroup(FEMParser)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
+	/** Diese Methode überführt den von {@link #parseGroup(FEMParser, boolean)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
 	protected List<FEMFunction> parseGroup(final FEMToken src) throws NullPointerException, FEMException {
 		final List<FEMFunction> res = new ArrayList<>();
 		for (final Token tok: src.token()) {
@@ -207,7 +207,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Wertliste und gibt deren Elternabschnitt zurück. Die Erkennung
 	 * erfolgt gemäß folgender EBNF:<br>
-	 * <pre>ARRAY = "[" [ {@link #parseInfo(FEMParser) SC} {@link #parseValue(FEMParser) VALUE} { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} {@link #parseValue(FEMParser) VALUE} } ] {@link #parseInfo(FEMParser) SC} "]"</pre>
+	 * <pre>ARRAY = "[" [ {@link #parseInfo(FEMParser) SC} {@link #parseValue(FEMParser, boolean) VALUE} { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} {@link #parseValue(FEMParser, boolean) VALUE} } ] {@link #parseInfo(FEMParser) SC} "]"</pre>
 	 * Als Abschnittstyp des Elternabschnitts wird {@code '['} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der Werte (VALUE). */
 	protected Token parseArray(final FEMParser src) throws NullPointerException {
 		int sym = src.symbol();
@@ -224,7 +224,7 @@ public class FEMDomain extends BaseObject {
 		} else if (sym < 0) {
 			toks.add(this.parseError(src));
 		} else {
-			Token tok = this.parseValue(src);
+			Token tok = this.parseValue(src, false);
 			if (tok == null) {
 				toks.add(this.parseError(src));
 			} else {
@@ -243,7 +243,7 @@ public class FEMDomain extends BaseObject {
 						src.push(';');
 						src.skip();
 						this.parseInfo(src);
-						tok = this.parseValue(src);
+						tok = this.parseValue(src, false);
 						if (tok == null) {
 							toks.add(this.parseError(src));
 							break;
@@ -357,7 +357,7 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} eines Funktionszeigers und gibt dessen Elternabschnitt zurück. Die
 	 * Erkennung erfolgt gemäß folgender EBNF:<br>
-	 * <pre>HANDLER = "{" [ {@link #parseInfo(FEMParser) SC} ( {@link #parseName(FEMParser) NAME} | {@link #parseIdent(FEMParser) IDENT} ) { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} ( {@link #parseName(FEMParser) NAME} | {@link #parseIdent(FEMParser) IDENT} ) } ] {@link #parseInfo(FEMParser) SC} ":" {@link #parseInfo(FEMParser) SC} {@link #parseFunction(FEMParser) FUNCTION} {@link #parseInfo(FEMParser) SC} "}"</pre>
+	 * <pre>HANDLER = "{" [ {@link #parseInfo(FEMParser) SC} ( {@link #parseName(FEMParser) NAME} | {@link #parseIdent(FEMParser) IDENT} ) { {@link #parseInfo(FEMParser) SC} ";" {@link #parseInfo(FEMParser) SC} ( {@link #parseName(FEMParser) NAME} | {@link #parseIdent(FEMParser) IDENT} ) } ] {@link #parseInfo(FEMParser) SC} ":" {@link #parseInfo(FEMParser) SC} {@link #parseFunction(FEMParser, boolean) FUNCTION} {@link #parseInfo(FEMParser) SC} "}"</pre>
 	 * Als Abschnittstyp des Elternabschnitts wird <code>'{'</code> verwendet. Sein Abschnittswert ist die {@link List Liste} des Parameternamen. Als
 	 * Kindabschnitte werden die Abschnitte der Namen (NAME), Kennungen (IDENT) sowei der der Funktion (FUNCTION) verwendet. Wenn Namen bzw. Kennungen ungültig
 	 * sind, wird als deren Abschnittstyp {@code '!'} verwendet. */
@@ -422,7 +422,7 @@ public class FEMDomain extends BaseObject {
 		}
 		src.params().addAll(0, names);
 		this.parseInfo(src);
-		final Token tok = this.parseFunction(src);
+		final Token tok = this.parseFunction(src, false);
 		if (tok == null) {
 			toks.add(this.parseError(src));
 		} else {
@@ -468,10 +468,10 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Werts gibt ihn zurück. Die Erkennung erfolgt gemäß folgender
 	 * EBNF:<br>
 	 * <pre>VALUE = {@link #parseArray(FEMParser) ARRAY} | {@link #parseString1(FEMParser) STRING1} | {@link #parseString2(FEMParser) STRING2} | {@link #parseHandler(FEMParser) HANDLER} | ({@link #parseIdent(FEMParser) IDENT} | {@link #parseConst(FEMParser) CONST}) {@link #parseInfo(FEMParser) SC} [ {@link #parseHandler(FEMParser) HANDLER} ]</pre>
-	 * Wenn eine Kennung (IDENT) oder eine Konstante (CONST) von einem Funktionszeiger (HANDLER) gefolgt wird, führt dies zur Erkennung einer {@link FEMProxy
-	 * Platzhalterfunktion}, deren Elternabschnitt geliefert wird. Als deren Abschnittstyp wird dann {@code '='} verwendet. Die {@link Token#tokens()
-	 * Kindabschnitte} sind die von Kennung bzw. Konstate und Funktionszeiger. */
-	protected Token parseValue(final FEMParser src) throws NullPointerException {
+	 * Wenn eine Kennung (IDENT) oder eine Konstante (CONST) von einem Funktionszeiger (HANDLER) gefolgt wird und der {@code allowProxy}-Schalter aktiviert ist,
+	 * führt dies zur Erkennung einer {@link FEMProxy Platzhalterfunktion}, deren Elternabschnitt geliefert wird. Als deren Abschnittstyp wird dann {@code '='}
+	 * verwendet. Die {@link Token#tokens() Kindabschnitte} sind die von Kennung bzw. Konstate und Funktionszeiger. */
+	protected Token parseValue(final FEMParser src, final boolean allowProxy) throws NullPointerException {
 		Token res = this.parseArray(src);
 		if (res != null) return res;
 		res = this.parseString1(src);
@@ -486,6 +486,7 @@ public class FEMDomain extends BaseObject {
 			if (res == null) return null;
 		}
 		this.parseInfo(src);
+		if (!allowProxy) return res;
 		final Token han = this.parseHandler(src);
 		if (han == null) return res;
 		if (!src.proxies().add(res.toString())) {
@@ -494,7 +495,7 @@ public class FEMDomain extends BaseObject {
 		return src.make('=', res.start(), Arrays.asList(res, han));
 	}
 
-	/** Diese Methode überführt den von {@link #parseValue(FEMParser)} ermittelten Abschnitt in einen Wert und gibt diesen zurück. */
+	/** Diese Methode überführt den von {@link #parseValue(FEMParser, boolean)} ermittelten Abschnitt in einen Wert und gibt diesen zurück. */
 	protected FEMValue parseValue(final FEMToken src) throws NullPointerException, FEMException {
 		FEMValue res = this.parseArray(src);
 		if (res != null) return res;
@@ -541,15 +542,15 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Funktion und gibt ihn zurück. Die Erkennung erfolgt gemäß folgender
 	 * EBNF:<br>
-	 * <pre>FUNCTION = ( {@link #parseParam(FEMParser) PARAM} | {@link #parseValue(FEMParser) VALUE} ) { {@link #parseInfo(FEMParser) SC} "(" {@link #parseGroup(FEMParser) GROUP} ")" }</pre>
+	 * <pre>FUNCTION = ( {@link #parseParam(FEMParser) PARAM} | {@link #parseValue(FEMParser, boolean) VALUE} ) { {@link #parseInfo(FEMParser) SC} "(" {@link #parseGroup(FEMParser, boolean) GROUP} ")" }</pre>
 	 * Wenn ein Parameter (PARAM) bzw. dem Wert (VALUE) von einer in runden Klammern eingeschlossenen Funktionsliste (GROUP) gefolgt wird, führt dies zur
 	 * Erkennung einer {@link FEMComposite Funktionsverkettung}, deren Elternabschnitt geliefert wird. Als Abschnittstyp wird dann {@code '.'} verwendet. Die
 	 * {@link Token#tokens() Kindabschnitte} sind die der aufgerufenen Funktion und die der Parameterfunktionsliste, letztere mit dem Abschnittstyp
 	 * {@code '('}. */
-	protected Token parseFunction(final FEMParser src) throws NullPointerException {
+	protected Token parseFunction(final FEMParser src, final boolean allowProxy) throws NullPointerException {
 		Token res = this.parseParam(src);
 		if (res == null) {
-			res = this.parseValue(src);
+			res = this.parseValue(src, allowProxy);
 			if (res == null) return null;
 		}
 		while (true) {
@@ -558,7 +559,7 @@ public class FEMDomain extends BaseObject {
 			final int pos = src.index();
 			src.push('(');
 			src.skip();
-			final List<Token> toks = this.parseGroup(src);
+			final List<Token> toks = this.parseGroup(src, false);
 			if (src.symbol() == ')') {
 				src.push(')');
 				src.skip();
@@ -569,7 +570,7 @@ public class FEMDomain extends BaseObject {
 		}
 	}
 
-	/** Diese Methode überführt den von {@link #parseFunction(FEMParser)} ermittelten Abschnitt in eine Funktion und gibt diese zurück. */
+	/** Diese Methode überführt den von {@link #parseFunction(FEMParser, boolean)} ermittelten Abschnitt in eine Funktion und gibt diese zurück. */
 	protected FEMFunction parseFunction(FEMToken src) throws NullPointerException, FEMException {
 		FEMFunction res;
 		Token tok = src.token();
