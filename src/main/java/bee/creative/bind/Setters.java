@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.Map;
-import bee.creative.bind.Consumers.BaseConsumer;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
@@ -18,8 +17,60 @@ import bee.creative.util.Filter;
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
-	/** Diese Klasse implementiert einen abstrakten {@link Setter} als {@link BaseObject}. */
-	public static abstract class BaseSetter<GItem, GValue> extends BaseObject implements Setter<GItem, GValue> {
+	/** Diese Klasse implementiert einen abstrakten {@link Setter3} als {@link BaseObject}. */
+	public static abstract class BaseSetter<GItem, GValue> extends BaseObject implements Setter3<GItem, GValue> {
+
+		@Override
+		public Field2<GItem, GValue> toField(Getter<? super GItem, ? extends GValue> getter) {
+			return null;
+		}
+
+		@Override
+		public Consumer3<GValue> toConsumer() {
+			return null;
+		}
+
+		@Override
+		public Consumer3<GValue> toConsumer(GItem item) {
+			return null;
+		}
+
+		@Override
+		public Field2<GItem, GValue> toField() {
+			return null;
+		}
+
+		@Override
+		public Setter3<GItem, GValue> toDefault() {
+			return null;
+		}
+
+		@Override
+		public Setter3<Iterable<? extends GItem>, GValue> toAggregated() {
+			return null;
+		}
+
+		@Override
+		public <GValue2> Setter3<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue2, ? extends GValue> toValue) {
+			return null;
+		}
+
+		@Override
+		public <GItem2, GValue2> Setter3<GItem2, GValue2> toTranslated(Getter<? super GItem, ? extends GItem2> toItem,
+			Getter<? super GValue2, ? extends GValue> toValue) {
+			return null;
+		}
+
+		@Override
+		public Setter3<GItem, GValue> toSynchronized() {
+			return null;
+		}
+
+		@Override
+		public Setter3<GItem, GValue> toSynchronized(Object mutex) {
+			return null;
+		}
+
 	}
 
 	/** Diese Klasse implementiert {@link Setters#nativeSetter(Method)} */
@@ -126,39 +177,6 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert {@link Setters#conditionalSetter(Filter, Setter, Setter)} */
-	@SuppressWarnings ("javadoc")
-	public static class ConditionalSetter<GItem, GValue> extends BaseSetter<GItem, GValue> {
-
-		public final Filter<? super GItem> condition;
-
-		public final Setter<? super GItem, ? super GValue> accept;
-
-		public final Setter<? super GItem, ? super GValue> reject;
-
-		public ConditionalSetter(final Filter<? super GItem> condition, final Setter<? super GItem, ? super GValue> acceptSetter,
-			final Setter<? super GItem, ? super GValue> rejectSetter) {
-			this.condition = Objects.notNull(condition);
-			this.accept = Objects.notNull(acceptSetter);
-			this.reject = Objects.notNull(rejectSetter);
-		}
-
-		@Override
-		public void set(final GItem item, final GValue value) {
-			if (this.condition.accept(item)) {
-				this.accept.set(item, value);
-			} else {
-				this.reject.set(item, value);
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.condition, this.accept, this.reject);
-		}
-
-	}
-
 	/** Diese Klasse implementiert {@link Setters#aggregatedSetter(Getter, Setter)} */
 	@SuppressWarnings ("javadoc")
 	public static class AggregatedSetter<GItem, GSource, GTarget> extends BaseSetter<Iterable<? extends GItem>, GTarget> {
@@ -218,7 +236,7 @@ public class Setters {
 	}
 
 	/** Diese Klasse implementiert {@link Setters#toConsumer(Object, Setter)} */
-	static class SetterConsumer<GValue, GItem> extends BaseConsumer<GValue> {
+	static class SetterConsumer<GValue, GItem> extends AbstractConsumer<GValue> {
 
 		public final GItem item;
 
@@ -241,9 +259,40 @@ public class Setters {
 
 	}
 
+	/** Diese Klasse implementiert {@link #from} */
+	static class ConsumerSetter<GValue> extends BaseSetter<Object, GValue> {
+
+		public final Consumer<? super GValue> target;
+
+		public ConsumerSetter(final Consumer<? super GValue> consumer) {
+			this.target = Objects.notNull(consumer);
+		}
+
+		@Override
+		public void set(final Object input, final GValue value) {
+			this.target.set(value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.target);
+		}
+
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Fields#emptyField() Fields.emptyField()}. */
-	public static Setter<Object, Object> emptySetter() {
+	public static Setter<Object, Object> empty() {
 		return Fields.emptyField();
+	}
+
+	/** Diese Methode gibt einen {@link Setter} zurück, der seinen Datensatz ignoriert und den Wert des gegebenen {@link Consumer} setzt.
+	 *
+	 * @param <GValue> Typ des Werts.
+	 * @param consumer {@link Consumer}.
+	 * @return {@link Consumer}-{@link Setter}.
+	 * @throws NullPointerException Wenn {@code consumer} {@code null} ist. */
+	public static <GValue> Setter3<Object, GValue> from(final Consumer<? super GValue> consumer) {
+		return new Setters.ConsumerSetter<>(consumer);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Setters#nativeSetter(String, boolean) Setters.nativeSetter(memberPath, true)}. */
@@ -325,7 +374,7 @@ public class Setters {
 	 * @param setter {@link Setter} zum Schreiben der Eigenschaft.
 	 * @return {@code default}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
-	public static <GItem, GValue> Setter<GItem, GValue> defaultSetter(final Setter<? super GItem, GValue> setter) throws NullPointerException {
+	public static <GItem, GValue> BaseSetter<GItem, GValue> defaultSetter(final Setter<? super GItem, GValue> setter) throws NullPointerException {
 		return new DefaultSetter<>(setter);
 	}
 
@@ -345,7 +394,7 @@ public class Setters {
 	 * @param setter {@link Setter} zur Manipulation.
 	 * @return {@code navigated}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code setter} {@code null} ist. */
-	public static <GTarget, GSource, GValue> Setter<GTarget, GValue> navigatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
+	public static <GTarget, GSource, GValue> BaseSetter<GTarget, GValue> navigatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Setter<? super GSource, ? super GValue> setter) throws NullPointerException {
 		return new NavigatedSetter<>(toSource, setter);
 	}
@@ -360,32 +409,15 @@ public class Setters {
 	 * @param setter {@link Setter} zur Manipulation.
 	 * @return {@code translated}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code setter} {@code null} ist. */
-	public static <GItem, GSource, GTarget> Setter<GItem, GTarget> translatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
+	public static <GItem, GSource, GTarget> BaseSetter<GItem, GTarget> translatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Setter<? super GItem, ? super GSource> setter) throws NullPointerException {
 		return new TranslatedSetter<>(toSource, setter);
 	}
 
-	/** Diese Methode gibt einen {@link Setter} zurück, der über die Weiterleitug eines Datensatzes an einen der gegebenen {@link Setter} mit Hilfe des gegebenen
-	 * {@link Filter} entscheiden. Wenn der {@link Filter} einen Datensatz akzeptiert, setzt der erzeugte {@link Setter} den Wert der Eigenschaft dieses
-	 * Datensatzes über {@code acceptSetter}. Andernfalls setzt er ihn über {@code rejectSetter}. Der erzeugte {@link Setter} setzt den Wert {@code value} für
-	 * einen Datensatz {@code item} damit über {@code (condition.accept(item) ? acceptSetter : rejectSetter).set(item, value)}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 * @param condition Bedingung.
-	 * @param acceptSetter Eigenschaft zum Setzen des Werts akzeptierter Datensätze.
-	 * @param rejectSetter Eigenschaft zum Setzen des Werts abgelehnter Datensätze.
-	 * @return {@code conditional}-{@link Setter}.
-	 * @throws NullPointerException Wenn {@code condition}, {@code acceptSetter} bzw. {@code rejectSetter} {@code null} ist. */
-	public static <GItem, GValue> Setter<GItem, GValue> conditionalSetter(final Filter<? super GItem> condition,
-		final Setter<? super GItem, ? super GValue> acceptSetter, final Setter<? super GItem, ? super GValue> rejectSetter) throws NullPointerException {
-		return new ConditionalSetter<>(condition, acceptSetter, rejectSetter);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link #aggregatedSetter(Getter, Setter) Setters.aggregatedSetter(Getters.neutralGetter(), setter)}. **/
-	public static <GItem, GValue> Setter<Iterable<? extends GItem>, GValue> aggregatedSetter(final Setter<? super GItem, GValue> setter)
+	public static <GItem, GValue> BaseSetter<Iterable<? extends GItem>, GValue> aggregatedSetter(final Setter<? super GItem, GValue> setter)
 		throws NullPointerException {
-		return Setters.aggregatedSetter(Getters.<GValue>neutralGetter(), setter);
+		return Setters.aggregatedSetter(Getters.<GValue>neutral(), setter);
 	}
 
 	/** Diese Methode gibt einen aggregierten {@link Setter} zurück, welcher den formatierten Wert der Eigenschaften der Elemente des iterierbaren Datensatzes
@@ -399,13 +431,13 @@ public class Setters {
 	 * @param setter Eigenschaft der Elemente des iterierbaren Datensatzes.
 	 * @return {@code aggregated}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code setter} {@code null} ist. */
-	public static <GItem, GSource, GTarget> Setter<Iterable<? extends GItem>, GTarget> aggregatedSetter(final Getter<? super GTarget, ? extends GSource> toSource,
-		final Setter<? super GItem, GSource> setter) throws NullPointerException {
+	public static <GItem, GSource, GTarget> BaseSetter<Iterable<? extends GItem>, GTarget> aggregatedSetter(
+		final Getter<? super GTarget, ? extends GSource> toSource, final Setter<? super GItem, GSource> setter) throws NullPointerException {
 		return new AggregatedSetter<>(toSource, setter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronizedSetter(Object, Setter) Setters.synchronizedSetter(setter, setter)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> synchronizedSetter(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
+	public static <GItem, GValue> BaseSetter<GItem, GValue> synchronizedSetter(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
 		return Setters.synchronizedSetter(setter, setter);
 	}
 
@@ -418,14 +450,14 @@ public class Setters {
 	 * @param setter {@link Setter}.
 	 * @return {@code synchronized}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
-	public static <GItem, GValue> Setter<GItem, GValue> synchronizedSetter(final Object mutex, final Setter<? super GItem, ? super GValue> setter)
+	public static <GItem, GValue> BaseSetter<GItem, GValue> synchronizedSetter(final Object mutex, final Setter<? super GItem, ? super GValue> setter)
 		throws NullPointerException {
 		return new SynchronizedSetter<>(mutex, setter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#compositeField(Getter, Setter) Fields.compositeField(Getters.emptyGetter(), setter)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter, Setter) Fields.compositeField(Getters.emptyGetter(), setter)}. */
 	public static <GItem, GValue> Field<GItem, GValue> toField(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
-		return Fields.compositeField(Getters.<GValue>emptyGetter(), setter);
+		return Fields.from(Getters.<GValue>empty(), setter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toConsumer(Object, Setter) Setters.toConsumer(null, setter)}. */

@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import bee.creative.bind.Getter;
 import bee.creative.bind.Producer;
+import bee.creative.bind.Property;
 import bee.creative.bind.Translator;
 import bee.creative.lang.Objects;
 
@@ -36,9 +37,9 @@ public class Builders {
 
 	}
 
-	/** Diese Klasse implementiert einen abstrakten Konfigurator das auf Feld {@link #result} gespeicherte Objekt.
+	/** Diese Klasse implementiert einen abstrakten Konfigurator zur Erzeugung eines Datensatzes, der auf Feld {@link #result} gespeichert wird.
 	 *
-	 * @param <GResult> Typ des Werts.
+	 * @param <GResult> Typ des Datensatzes.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 	public static abstract class BaseBuilder2<GResult, GThis> extends BaseBuilder<GResult, GThis> {
 
@@ -544,15 +545,20 @@ public class Builders {
 	 *
 	 * @param <GResult> Typ des Werts.
 	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-	public static abstract class BaseItemBuilder<GResult, GThis> extends BaseBuilder2<GResult, GThis> implements Iterable<GResult> {
+	public static abstract class BaseItemBuilder<GResult, GThis> extends BaseBuilder2<GResult, GThis> implements Property<GResult>, Iterable<GResult> {
 
-		/** Diese Methode setzt den Wert und gibt {@code this} zurück.
+		@Override
+		public void set(GResult value) {
+			this.result = value;
+		}
+
+		/** Diese Methode {@link #set(Object) setzt} den Wert und gibt {@code this} zurück.
 		 *
 		 * @see #get()
 		 * @param value Wert.
 		 * @return {@code this}. */
-		public GThis use(final GResult value) {
-			this.result = value;
+		public final GThis use(final GResult value) {
+			this.set(value);
 			return this.customThis();
 		}
 
@@ -566,12 +572,11 @@ public class Builders {
 			return this.use(source.result);
 		}
 
-		/** Diese Methode setzt den Wert auf {@code null} und gibt {@code this} zurück.
+		/** Diese Methode {@link #use(Object) setzt} den Wert auf {@code null} und gibt {@code this} zurück.
 		 *
 		 * @return {@code this}. */
 		public GThis clear() {
-			this.result = null;
-			return this.customThis();
+			return this.use((GResult)null);
 		}
 
 		@Override

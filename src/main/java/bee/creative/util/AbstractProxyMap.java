@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import bee.creative.bind.Property;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link Map} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden
  * über {@link #setData(Map)} geschrieben.
@@ -169,6 +171,27 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
+	/** Diese Klasse implementiert {@link AbstractProxyMap#toMap(Property)}. */
+	static class PropertyMap<GKey, GValue> extends AbstractProxyMap<GKey, GValue, Map<GKey, GValue>> {
+	
+		public final Property<Map<GKey, GValue>> property;
+	
+		public PropertyMap(final Property<Map<GKey, GValue>> property) {
+			this.property = Objects.notNull(property);
+		}
+	
+		@Override
+		public Map<GKey, GValue> getData(final boolean readonly) {
+			return this.property.get();
+		}
+	
+		@Override
+		protected void setData(final Map<GKey, GValue> items) {
+			this.property.set(items);
+		}
+	
+	}
+
 	/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück. Zum Lesen wird er nur in {@link #size()}, {@link #isEmpty()}, {@link #get(Object)},
 	 * {@link #containsKey(Object)}, {@link #containsValue(Object)}, {@link #equals(Object)}, {@link #hashCode()} und {@link #toString()} angefordert.
 	 *
@@ -265,6 +288,16 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
+	}
+
+	/** Diese Methode gibt eine {@link Map} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
+	 *
+	 * @see AbstractProxyMap
+	 * @param property {@link Property}.
+	 * @return {@link Map}-{@code Proxy}.
+	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
+	public static <GKey, GValue> Map<GKey, GValue> toMap(final Property<Map<GKey, GValue>> property) throws NullPointerException {
+		return new PropertyMap<>(property);
 	}
 
 }

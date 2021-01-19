@@ -1,7 +1,7 @@
 package bee.creative.util;
 
+import bee.creative.bind.AbstractGetter;
 import bee.creative.bind.Getter;
-import bee.creative.bind.Getters.BaseGetter;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 
@@ -117,7 +117,7 @@ public class Conversions {
 	}
 
 	/** Diese Klasse implementiert {@link Conversions#inputGetter()} */
-	static class InputGetter extends BaseGetter<Conversion<?, ?>, Object> {
+	static class InputGetter extends AbstractGetter<Conversion<?, ?>, Object> {
 
 		static final Getter<?, ?> INSTANCE = new InputGetter();
 
@@ -129,7 +129,7 @@ public class Conversions {
 	}
 
 	/** Diese Klasse implementiert {@link Conversions#outputGetter()} */
-	static class OutputGetter extends BaseGetter<Conversion<?, ?>, Object> {
+	static class OutputGetter extends AbstractGetter<Conversion<?, ?>, Object> {
 
 		static final Getter<?, ?> INSTANCE = new OutputGetter();
 

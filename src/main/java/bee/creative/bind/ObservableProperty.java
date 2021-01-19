@@ -6,8 +6,8 @@ import bee.creative.lang.Objects;
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ des Werts der Eigenschaft. */
-public class ObservableProperty<GValue> extends ObservableValue<GValue, ObservableProperty.UpdatePropertyMessage, ObservableProperty.UpdatePropertyObserver>
-	implements Property<GValue> {
+public class ObservableProperty<GValue> extends AbstractProperty<GValue>
+	implements Observable<ObservableProperty.UpdatePropertyMessage, ObservableProperty.UpdatePropertyObserver> {
 
 	/** Diese Klasse implementiert das Ereignis, dass bei Aktualisierung des Werts eines {@link ObservableProperty} ausgelöst werden kann. */
 	protected static class UpdatePropertyEvent extends Event<UpdatePropertyMessage, UpdatePropertyObserver> {
@@ -27,13 +27,13 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 
 		/** Dieses Feld speichert den Sender des Ereignisses.
 		 *
-		 * @see ObservableProperty#property */
+		 * @see ObservableProperty#target */
 		public final ObservableProperty<?> sender;
 
-		/** Dieses Feld speichert den alten Wert des {@link ObservableProperty#property Datenfelds}. */
+		/** Dieses Feld speichert den alten Wert des {@link ObservableProperty#target Datenfelds}. */
 		public final Object oldValue;
 
-		/** Dieses Feld speichert den neuen Wert des {@link ObservableProperty#property Datenfelds}. */
+		/** Dieses Feld speichert den neuen Wert des {@link ObservableProperty#target Datenfelds}. */
 		public final Object newValue;
 
 		/** Dieser Konstruktor initialisiert die Eigenschafte des Ereignisses. */
@@ -68,7 +68,7 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 	/** Diese Schnittstelle definiert den Empfänger des {@link UpdatePropertyEvent}. */
 	public static interface UpdatePropertyObserver {
 
-		/** Diese Methode wird bei Aktualisierung des Werts eiens {@link ObservableProperty#property Datenfeldes} aufgerufen.
+		/** Diese Methode wird bei Aktualisierung des Werts eiens {@link ObservableProperty#target Datenfeldes} aufgerufen.
 		 *
 		 * @param message Nachricht des Ereignisses. */
 		public void onUpdateProperty(UpdatePropertyMessage message);
@@ -76,26 +76,46 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 	}
 
 	/** Dieses Feld speichert die Eigenschaft, an die in {@link #get()} und {@link #set(Object)} delegiert wird. */
-	public final Property<GValue> property;
+	public final Property<GValue> target;
 
 	/** Dieser Konstruktor initialisiert die überwachte Eigenschaft.
 	 *
-	 * @param property überwachte Eigenschaft. */
-	public ObservableProperty(final Property<GValue> property) {
-		this.property = Objects.notNull(property);
+	 * @param target überwachte Eigenschaft. */
+	public ObservableProperty(final Property<GValue> target) {
+		this.target = Objects.notNull(target);
+	}
+
+	/** Diese Methode gibt eine Kopie des gegebenen Werts oder diesen unverändert zurück. Vor dem Schreiben des neuen Werts wird vom alten Wert über diese Methode
+	 * eine Kopie erzeugt, welche nach dem Schreiben beim auslösen des Ereignisses zur Aktualisierung eingesetzt wird. Eine Kopie ist hierbei nur dann nötig, wenn
+	 * der alte Wert sich durch das Schreiben des neuen ändert.
+	 *
+	 * @param value alter Wert.
+	 * @return gegebener oder kopierter Wert. */
+	protected GValue customClone(final GValue value) {
+		return value;
+	}
+
+	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Werte zurück. Sie wird beim Setzen des Werts zur Erkennung einer
+	 * Wertänderung eingesetzt.
+	 *
+	 * @param value1 alter Wert.
+	 * @param value2 neuer Wert.
+	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
+	protected boolean customEquals(final GValue value1, final GValue value2) {
+		return Objects.deepEquals(value1, value2);
 	}
 
 	@Override
 	public GValue get() {
-		return this.property.get();
+		return this.target.get();
 	}
 
 	@Override
 	public void set(final GValue newValue) {
-		GValue oldValue = this.property.get();
+		GValue oldValue = this.target.get();
 		if (this.customEquals(oldValue, newValue)) return;
 		oldValue = this.customClone(oldValue);
-		this.property.set(newValue);
+		this.target.set(newValue);
 		this.fire(new UpdatePropertyMessage(this, oldValue, newValue));
 	}
 
@@ -121,7 +141,7 @@ public class ObservableProperty<GValue> extends ObservableValue<GValue, Observab
 
 	@Override
 	public String toString() {
-		return this.property.toString();
+		return this.target.toString();
 	}
 
 }

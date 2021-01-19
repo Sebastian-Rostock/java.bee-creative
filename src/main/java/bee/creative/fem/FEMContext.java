@@ -4,8 +4,8 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collection;
+import bee.creative.bind.AbstractGetter;
 import bee.creative.bind.Getter;
-import bee.creative.bind.Getters.BaseGetter;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.util.Iterables;
@@ -45,7 +45,7 @@ public class FEMContext extends BaseObject {
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist. */
 	public <GData> Getter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
 		Objects.notNull(type);
-		return new BaseGetter<FEMValue, GData>() {
+		return new AbstractGetter<FEMValue, GData>() {
 
 			@Override
 			public GData get(final FEMValue value) {
@@ -77,7 +77,7 @@ public class FEMContext extends BaseObject {
 	 *
 	 * @return {@code arrayFrom}-{@link Getter}. */
 	public Getter<Object, FEMArray> arrayFrom() {
-		return new BaseGetter<Object, FEMArray>() {
+		return new AbstractGetter<Object, FEMArray>() {
 
 			@Override
 			public FEMArray get(final Object object) {
@@ -125,7 +125,7 @@ public class FEMContext extends BaseObject {
 	 *
 	 * @return {@code valueFrom}-{@link Getter}. */
 	public Getter<Object, FEMValue> valueFrom() {
-		return new BaseGetter<Object, FEMValue>() {
+		return new AbstractGetter<Object, FEMValue>() {
 
 			@Override
 			public FEMValue get(final Object object) {
@@ -162,7 +162,7 @@ public class FEMContext extends BaseObject {
 	 *
 	 * @return {@code objectFrom}-{@link Getter}. */
 	public Getter<FEMValue, Object> objectFrom() {
-		return new BaseGetter<FEMValue, Object>() {
+		return new AbstractGetter<FEMValue, Object>() {
 
 			@Override
 			public Object get(final FEMValue value) {

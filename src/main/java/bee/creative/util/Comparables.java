@@ -293,6 +293,28 @@ public class Comparables {
 
 	}
 
+	/** Diese Klasse implementiert {@link Comparables#toComparable(Getter)}. */
+	static class GetterComparable<GItem> implements Comparable<GItem> {
+	
+		public final Getter<? super GItem, ? extends Number> getter;
+	
+		public GetterComparable(final Getter<? super GItem, ? extends Number> getter) {
+			this.getter = Objects.notNull(getter);
+		}
+	
+		@Override
+		public int compareTo(final GItem item) {
+			final Number result = this.getter.get(item);
+			return result != null ? result.intValue() : 0;
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.getter);
+		}
+	
+	}
+
 	static void check(final int fromIndex, final int toIndex) throws IllegalArgumentException {
 		if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
 	}
@@ -805,6 +827,17 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
 	public static <GInput> Filter<GInput> toHigherFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
 		return new HigherFilter<>(comparable);
+	}
+
+	/** Diese Methode gibt ein {@link Comparable} als Adapter zu einem {@link Number}-{@link Getter} zurück. Der Vergleichswert eines Datensatzes {@code item}
+	 * entspricht {@code getter.get(item).intValue()}, wenn diese nicht {@code null} ist. Andernfalls ist der Vergleichswert {@code 0}.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param getter Eigenschaft mit {@link Number}-Wert.
+	 * @return {@link Comparable} als {@link Getter}-Adapter.
+	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
+	public static <GItem> Comparable<GItem> toComparable(final Getter<? super GItem, ? extends Number> getter) throws NullPointerException {
+		return new GetterComparable<>(getter);
 	}
 
 }

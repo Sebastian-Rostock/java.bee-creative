@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
-import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
 import bee.creative.util.Filter;
@@ -22,15 +21,19 @@ import bee.creative.util.Filters;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
 
-	/** Diese Klasse implementiert einen abstrakten {@link Getter} als {@link BaseObject}. */
-	public static abstract class BaseGetter<GItem, GValue> extends BaseObject implements Getter<GItem, GValue> {
+	/** Diese Klasse implementiert {@link Getters#empty()}. */
+	@SuppressWarnings ("javadoc")
+	public static class EmptyGetter extends AbstractGetter<Object, Object> {
+
+		public static final Getter3<?, ?> INSTANCE = new EmptyGetter();
+
 	}
 
-	/** Diese Klasse implementiert {@link Getters#neutralGetter()}. */
+	/** Diese Klasse implementiert {@link Getters#neutral()}. */
 	@SuppressWarnings ("javadoc")
-	public static class NeutralGetter extends BaseGetter<Object, Object> {
+	public static class NeutralGetter extends AbstractGetter<Object, Object> {
 
-		public static final Getter<?, ?> INSTANCE = new NeutralGetter();
+		public static final Getter3<?, ?> INSTANCE = new NeutralGetter();
 
 		@Override
 		public Object get(final Object item) {
@@ -39,26 +42,26 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert {@link Getters#nativeGetter(Method)}. */
+	/** Diese Klasse implementiert {@link Getters#fromNative(Method)}. */
 	@SuppressWarnings ("javadoc")
-	public static class MethodGetter<GItem, GOutput> implements Getter<GItem, GOutput> {
+	public static class MethodGetter<GItem, GValue> implements Getter<GItem, GValue> {
 
-		public final Method method;
+		public final Method target;
 
-		public MethodGetter(final Method method, final boolean forceAccessible) {
-			if (method.getParameterTypes().length != (Modifier.isStatic(method.getModifiers()) ? 1 : 0)) throw new IllegalArgumentException();
-			this.method = forceAccessible ? Natives.forceAccessible(method) : Objects.notNull(method);
+		public MethodGetter(final Method target, final boolean forceAccessible) {
+			if (target.getParameterTypes().length != (Modifier.isStatic(target.getModifiers()) ? 1 : 0)) throw new IllegalArgumentException();
+			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public GOutput get(final GItem item) {
+		public GValue get(final GItem item) {
 			try {
-				final GOutput result;
-				if (Modifier.isStatic(this.method.getModifiers())) {
-					result = (GOutput)this.method.invoke(null, item);
+				final GValue result;
+				if (Modifier.isStatic(this.target.getModifiers())) {
+					result = (GValue)this.target.invoke(null, item);
 				} else {
-					result = (GOutput)this.method.invoke(item);
+					result = (GValue)this.target.invoke(item);
 				}
 				return result;
 			} catch (final IllegalAccessException | InvocationTargetException cause) {
@@ -68,7 +71,7 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.method, this.method.isAccessible());
+			return Objects.toInvokeString(this, this.target, this.target.isAccessible());
 		}
 
 	}
@@ -77,18 +80,18 @@ public class Getters {
 	@SuppressWarnings ("javadoc")
 	public static class ConstructorGetter<GItem, GOutput> implements Getter<GItem, GOutput> {
 
-		public final Constructor<?> constructor;
+		public final Constructor<?> target;
 
-		public ConstructorGetter(final Constructor<?> constructor, final boolean forceAccessible) {
-			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 1)) throw new IllegalArgumentException();
-			this.constructor = forceAccessible ? Natives.forceAccessible(constructor) : Objects.notNull(constructor);
+		public ConstructorGetter(final Constructor<?> target, final boolean forceAccessible) {
+			if (!Modifier.isStatic(target.getModifiers()) || (target.getParameterTypes().length != 1)) throw new IllegalArgumentException();
+			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
 		}
 
 		@Override
 		public GOutput get(final GItem item) {
 			try {
 				@SuppressWarnings ("unchecked")
-				final GOutput result = (GOutput)this.constructor.newInstance(item);
+				final GOutput result = (GOutput)this.target.newInstance(item);
 				return result;
 			} catch (final IllegalAccessException | InstantiationException | InvocationTargetException cause) {
 				throw new IllegalArgumentException(cause);
@@ -97,33 +100,33 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.constructor, this.constructor.isAccessible());
+			return Objects.toInvokeString(this, this.target, this.target.isAccessible());
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Getters#defaultGetter(Object, Getter)}. */
+	/** Diese Klasse implementiert {@link Getters#toDefault(Getter, Object)}. */
 	@SuppressWarnings ("javadoc")
 	public static class DefaultGetter<GItem, GValue> implements Getter<GItem, GValue> {
 
-		public final Getter<? super GItem, GValue> getter;
+		public final Getter<? super GItem, GValue> target;
 
 		public final GValue value;
 
-		public DefaultGetter(final Getter<? super GItem, GValue> getter, final GValue value) {
-			this.getter = Objects.notNull(getter);
+		public DefaultGetter(final Getter<? super GItem, GValue> target, final GValue value) {
+			this.target = Objects.notNull(target);
 			this.value = value;
 		}
 
 		@Override
 		public GValue get(final GItem item) {
 			if (item == null) return this.value;
-			return this.getter.get(item);
+			return this.target.get(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.getter, this.value);
+			return Objects.toInvokeString(this, this.target, this.value);
 		}
 
 	}
@@ -140,7 +143,7 @@ public class Getters {
 
 		public final Getter<? super GItem, ? extends GValue> getter;
 
-		Map<Pointer<GItem>, Pointer<GValue>> map = new LinkedHashMap<>(0, 0.75f, true);
+		Map<Pointer<GItem>, Pointer<GValue>> buffer = new LinkedHashMap<>(0, 0.75f, true);
 
 		int capacity = 0;
 
@@ -155,13 +158,13 @@ public class Getters {
 
 		@Override
 		public GValue get(final GItem item) {
-			final Pointer<GValue> pointer = this.map.get(Pointers.hardPointer(item));
+			final Pointer<GValue> pointer = this.buffer.get(Pointers.hardPointer(item));
 			if (pointer != null) {
 				final GValue output = pointer.get();
 				if (output != null) return output;
 				if (Pointers.isValid(pointer)) return null;
 				int valid = this.limit - 1;
-				for (final Iterator<Entry<Pointer<GItem>, Pointer<GValue>>> iterator = this.map.entrySet().iterator(); iterator.hasNext();) {
+				for (final Iterator<Entry<Pointer<GItem>, Pointer<GValue>>> iterator = this.buffer.entrySet().iterator(); iterator.hasNext();) {
 					final Entry<Pointer<GItem>, Pointer<GValue>> entry = iterator.next();
 					final Pointer<?> key = entry.getKey(), value = entry.getValue();
 					if (valid != 0) {
@@ -176,12 +179,12 @@ public class Getters {
 				}
 			}
 			final GValue output = this.getter.get(item);
-			this.map.put(Pointers.pointer(this.inputMode, item), Pointers.pointer(this.outputMode, output));
-			final int size = this.map.size(), capacity = this.capacity;
+			this.buffer.put(Pointers.pointer(this.inputMode, item), Pointers.pointer(this.outputMode, output));
+			final int size = this.buffer.size(), capacity = this.capacity;
 			if (size >= capacity) {
 				this.capacity = size;
 			} else if ((size << 2) <= capacity) {
-				(this.map = new LinkedHashMap<>(0, 0.75f, true)).putAll(this.map);
+				(this.buffer = new LinkedHashMap<>(0, 0.75f, true)).putAll(this.buffer);
 				this.capacity = size;
 			}
 			return output;
@@ -194,27 +197,27 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert {@link Getters#translatedGetter(Getter, Getter)}. */
+	/** Diese Klasse implementiert {@link Getters#toTranslated(Getter, Getter)}. */
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedGetter<GItem, GSource, GTarget> implements Getter<GItem, GTarget> {
 
-		public final Getter<? super GItem, ? extends GSource> getter;
+		public final Getter<? super GItem, ? extends GSource> target;
 
-		public final Getter<? super GSource, ? extends GTarget> toTarget;
+		public final Getter<? super GSource, ? extends GTarget> trans;
 
-		public TranslatedGetter(final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GItem, ? extends GSource> getter) {
-			this.getter = Objects.notNull(getter);
-			this.toTarget = Objects.notNull(toTarget);
+		public TranslatedGetter(final Getter<? super GItem, ? extends GSource> target, final Getter<? super GSource, ? extends GTarget> trans) {
+			this.target = Objects.notNull(target);
+			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
 		public GTarget get(final GItem item) {
-			return this.toTarget.get(this.getter.get(item));
+			return this.trans.get(this.target.get(item));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.getter, this.toTarget);
+			return Objects.toInvokeString(this, this.target, this.trans);
 		}
 
 	}
@@ -261,134 +264,75 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert {@link Getters#conditionalGetter(Filter, Getter, Getter)}. */
-	@SuppressWarnings ("javadoc")
-	public static class ConditionalGetter<GItem, GOutput> implements Getter<GItem, GOutput> {
-
-		public final Filter<? super GItem> condition;
-
-		public final Getter<? super GItem, ? extends GOutput> acceptGetter;
-
-		public final Getter<? super GItem, ? extends GOutput> rejectGetter;
-
-		public ConditionalGetter(final Filter<? super GItem> condition, final Getter<? super GItem, ? extends GOutput> acceptGetter,
-			final Getter<? super GItem, ? extends GOutput> rejectGetter) {
-			this.acceptGetter = acceptGetter;
-			this.rejectGetter = rejectGetter;
-			this.condition = condition;
-		}
-
-		@Override
-		public GOutput get(final GItem item) {
-			if (this.condition.accept(item)) return this.acceptGetter.get(item);
-			return this.rejectGetter.get(item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.condition, this.acceptGetter, this.rejectGetter);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Getters#synchronizedGetter(Object, Getter)}. */
+	/** Diese Klasse implementiert {@link Getters#toSynchronized(Getter, Object)}. */
 	@SuppressWarnings ("javadoc")
 	public static class SynchronizedGetter<GItem, GValue> implements Getter<GItem, GValue> {
 
+		public final Getter<? super GItem, ? extends GValue> target;
+
 		public final Object mutex;
 
-		public final Getter<? super GItem, ? extends GValue> getter;
-
-		public SynchronizedGetter(final Object mutex, final Getter<? super GItem, ? extends GValue> getter) {
+		public SynchronizedGetter(final Getter<? super GItem, ? extends GValue> getter, final Object mutex) {
+			this.target = Objects.notNull(getter);
 			this.mutex = Objects.notNull(mutex, this);
-			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
 		public GValue get(final GItem item) {
 			synchronized (this.mutex) {
-				return this.getter.get(item);
+				return this.target.get(item);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.getter);
+			return Objects.toInvokeString(this, this.target, mutex == this ? null : mutex);
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Getters#toFilter(Getter)}. */
-	static class GetterFilter<GItem> implements Filter<GItem> {
+	/** Diese Klasse implementiert {@link Getters#from(Producer)}. */
+	static class ProducerGetter<GValue> extends AbstractGetter<Object, GValue> {
 
-		public final Getter<? super GItem, Boolean> getter;
+		public final Producer<? extends GValue> target;
 
-		public GetterFilter(final Getter<? super GItem, Boolean> getter) {
-			this.getter = Objects.notNull(getter);
+		public ProducerGetter(final Producer<? extends GValue> target) {
+			this.target = Objects.notNull(target);
 		}
 
 		@Override
-		public boolean accept(final GItem entry) {
-			final Boolean result = this.getter.get(entry);
-			return (result != null) && result.booleanValue();
+		public GValue get(final Object input) {
+			return this.target.get();
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.getter);
+			return Objects.toInvokeString(this, this.target);
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Getters#toProducer(Object, Getter)}. */
-	static class GetterProducer<GItem, GValue> implements Producer<GValue> {
-
-		public final GItem item;
-
-		public final Getter<? super GItem, ? extends GValue> getter;
-
-		public GetterProducer(final GItem item, final Getter<? super GItem, ? extends GValue> getter) {
-			this.item = item;
-			this.getter = Objects.notNull(getter);
-		}
-
-		@Override
-		public GValue get() {
-			return this.getter.get(this.item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.item, this.getter);
-		}
-
+	public static <GValue> Getter<Object, GValue> empty() {
+		return (Getter<Object, GValue>)EmptyGetter.INSTANCE;
 	}
 
-	/** Diese Klasse implementiert {@link Getters#toComparable(Getter)}. */
-	static class GetterComparable<GItem> implements Comparable<GItem> {
-
-		public final Getter<? super GItem, ? extends Number> getter;
-
-		public GetterComparable(final Getter<? super GItem, ? extends Number> getter) {
-			this.getter = Objects.notNull(getter);
-		}
-
-		@Override
-		public int compareTo(final GItem item) {
-			final Number result = this.getter.get(item);
-			return result != null ? result.intValue() : 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.getter);
-		}
-
+	/** Diese Methode gibt den neutralen {@link Getter} zurück, der den gegebenen Datensatz als Wert liefert.
+	 *
+	 * @param <GItem> Typ des Datensatzes bzw. Werts.
+	 * @return {@code neutral}-{@link Getter}. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem> Getter<GItem, GItem> neutral() {
+		return (Getter<GItem, GItem>)NeutralGetter.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#valueGetter(Object) Getters.valueGetter(null)}. */
-	public static <GValue> Getter<Object, GValue> emptyGetter() {
-		return Getters.valueGetter(null);
+	/** Diese Methode gibt einen {@link Getter} zurück, der seinen Datensatz ignoriert und den Wert des gegebenen {@link Producer} liefert.
+	 *
+	 * @param <GValue> Typ des Werts.
+	 * @param producer {@link Producer}.
+	 * @return {@link Producer}-{@link Getter}.
+	 * @throws NullPointerException Wenn {@code producer} {@code null} ist. */
+	public static <GValue> Getter3<Object, GValue> from(final Producer<? extends GValue> producer) throws NullPointerException {
+		return new ProducerGetter<>(producer);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#valueField(Object) Fields.valueField(value)}. */
@@ -435,8 +379,8 @@ public class Getters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#nativeGetter(Method, boolean) Getters.nativeGetter(method, true)}. */
-	public static <GItem, GOutput> Getter<GItem, GOutput> nativeGetter(final Method method) throws NullPointerException, IllegalArgumentException {
-		return Getters.nativeGetter(method, true);
+	public static <GItem, GOutput> Getter<GItem, GOutput> fromNative(final Method target) throws NullPointerException, IllegalArgumentException {
+		return Getters.nativeGetter(target, true);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link Method nativen Methode} zurück. Bei einer Klassenmethode liefert der erzeugte {@link Getter}
@@ -487,33 +431,23 @@ public class Getters {
 		return Fields.nativeField(fieldOwner, fieldName, forceAccessible);
 	}
 
-	/** Diese Methode gibt den neutralen {@link Getter} zurück, der den gegebenen Datensatz als Wert liefert.
-	 *
-	 * @param <GItem> Typ des Datensatzes bzw. Werts.
-	 * @return {@code neutral}-{@link Getter}. */
-	@SuppressWarnings ("unchecked")
-	public static <GItem> Getter<GItem, GItem> neutralGetter() {
-		return (Getter<GItem, GItem>)NeutralGetter.INSTANCE;
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Getters#defaultGetter(Object, Getter) Getters.defaultGetter(null, getter)}. **/
-	public static <GItem, GValue> Getter<GItem, GValue> defaultGetter(final Getter<? super GItem, GValue> getter) throws NullPointerException {
-		return Getters.defaultGetter(null, getter);
+	/** Diese Methode ist eine Abkürzung für {@link Getters#toDefault(Getter, Object) Getters.defaultGetter(null, getter)}. **/
+	public static <GItem, GValue> Getter<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target) throws NullPointerException {
+		return Getters.toDefault(target, null);
 	}
 
 	/** Diese Methode einen {@link Getter} zurück, der einen Datensatz zum Lesen des Werts ihrer Eigenschaft nur dann dann an den gegebenen {@link Getter}
 	 * delegiert, wenn der Datensatz nicht {@code null} ist. Andernfalls wird der gegebene Rückfallwert geliefert. Sie ist damit eine effiziente Alternative zu
-	 * {@link #conditionalGetter(Filter, Getter, Getter) Getters.conditionalGetter(Filters.nullFilter(), getter, Getters.valueGetter(value))}.
-	 *
+	 * {@code Getters.conditionalGetter(Filters.nullFilter(), getter, Getters.valueGetter(value))}.
+	 * 
+	 * @param target {@link Getter} zum Lesen des Werts der Eigenschaft.
+	 * @param value Rückfallwert, wenn das Datensatz {@code null} ist.
 	 * @see Filters#nullFilter()
 	 * @see Getters#valueGetter(Object)
-	 * @param value Rückfallwert, wenn das Datensatz {@code null} ist.
-	 * @param getter {@link Getter} zum Lesen des Werts der Eigenschaft.
 	 * @return {@code default}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GItem, GValue> Getter<GItem, GValue> defaultGetter(final GValue value, final Getter<? super GItem, GValue> getter)
-		throws NullPointerException {
-		return new DefaultGetter<>(getter, value);
+	public static <GItem, GValue> Getter<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target, final GValue value) throws NullPointerException {
+		return new DefaultGetter<>(target, value);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #bufferedGetter(int, int, int, Getter) Getters.bufferedGetter(-1, Pointers.SOFT, Pointers.SOFT, getter)}. */
@@ -560,22 +494,22 @@ public class Getters {
 	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code getter} {@code null} ist. */
 	public static <GSource, GTarget, GValue> Getter<GTarget, GValue> navigatedGetter(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Getter<? super GSource, ? extends GValue> getter) throws NullPointerException {
-		return Getters.translatedGetter(getter, toSource);
+		return Getters.toTranslated(toSource, getter);
 	}
 
 	/** Diese Methode gibt einen navigierten {@link Getter} zurück. Der erzeugte {@link Getter} liefert für einen Datensatz {@code item} den Wert
 	 * {@code toTarget.get(getter.get(item))}.
-	 *
+	 * 
+	 * @param target {@link Getter} zum Lesen.
+	 * @param trans {@link Getter} zur Übersetzung des Werts.
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GSource> Typ des zu übersetzenden Werts.
 	 * @param <GTarget> Typ des übersetzten Werts.
-	 * @param toTarget {@link Getter} zur Übersetzung des Werts.
-	 * @param getter {@link Getter} zum Lesen.
 	 * @return {@code translated}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code toTarget} bzw. {@code getter} {@code null} ist. */
-	public static <GItem, GSource, GTarget> Getter<GItem, GTarget> translatedGetter(final Getter<? super GSource, ? extends GTarget> toTarget,
-		final Getter<? super GItem, ? extends GSource> getter) throws NullPointerException {
-		return new TranslatedGetter<>(toTarget, getter);
+	public static <GItem, GSource, GTarget> Getter<GItem, GTarget> toTranslated(final Getter<? super GItem, ? extends GSource> target,
+		final Getter<? super GSource, ? extends GTarget> trans) throws NullPointerException {
+		return new TranslatedGetter<>(target, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregatedGetter(Object, Object, Getter) Getters.aggregatedGetter(null, null, getter)}. */
@@ -587,10 +521,10 @@ public class Getters {
 	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregatedGetter(Getter, Object, Object, Getter) Getters.aggregatedGetter(Getters.neutralGetter(),
 	 * emptyTarget, mixedTarget, getter)}.
 	 *
-	 * @see #neutralGetter() */
+	 * @see #neutral() */
 	public static <GItem, GValue> Getter<Iterable<? extends GItem>, GValue> aggregatedGetter(final GValue emptyTarget, final GValue mixedTarget,
 		final Getter<? super GItem, GValue> getter) throws NullPointerException {
-		return Getters.aggregatedGetter(Getters.<GValue>neutralGetter(), emptyTarget, mixedTarget, getter);
+		return Getters.aggregatedGetter(Getters.<GValue>neutral(), emptyTarget, mixedTarget, getter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregatedGetter(Getter, Object, Object, Getter) Getters.aggregatedGetter(toTarget, null, null,
@@ -620,87 +554,23 @@ public class Getters {
 		return new AggregatedGetter<>(toTarget, emptyTarget, mixedTarget, getter);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zurück, der über die Weiterleitug eines Datensatzes an einen der gegebenen {@link Getter} mit Hilfe des gegebenen
-	 * {@link Filter} entscheiden. Wenn der {@link Filter} einen Datensatz akzeptiert, liefert der erzeugte {@link Getter} den Wert der Eigenschaft dieses
-	 * Datensatzes über {@code acceptGetter}. Andernfalls liefert er ihn über {@code rejectGetter}. Der erzeugte {@link Getter} liefert für einen Datensatz
-	 * {@code item} damit {@code (condition.accept(item) ? acceptGetter : rejectGetter).get(item)}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 * @param condition Bedingung.
-	 * @param acceptGetter Eigenschaft zum Lesen des Werts akzeptierter Datensätze.
-	 * @param rejectGetter Eigenschaft zum lesen des Werts abgelehnter Datensätze.
-	 * @return {@code conditional}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@code condition}, {@code acceptGetter} bzw. {@code rejectGetter} {@code null} ist. */
-	public static <GItem, GValue> Getter<GItem, GValue> conditionalGetter(final Filter<? super GItem> condition,
-		final Getter<? super GItem, ? extends GValue> acceptGetter, final Getter<? super GItem, ? extends GValue> rejectGetter) throws NullPointerException {
-		return new ConditionalGetter<>(condition, acceptGetter, rejectGetter);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #synchronizedGetter(Object, Getter) Getters.synchronizedGetter(getter, getter)}. */
-	public static <GItem, GValue> Getter<GItem, GValue> synchronizedGetter(final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException {
-		return Getters.synchronizedGetter(getter, getter);
+	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Getter, Object) Getters.synchronizedGetter(getter, getter)}. */
+	public static <GItem, GValue> Getter<GItem, GValue> toSynchronized(final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException {
+		return Getters.toSynchronized(getter, getter);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zurück, der den gegebenen {@link Getter} über {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Getter} als Synchronisationsobjekt verwendet.
-	 *
+	 * 
+	 * @param target {@link Getter}.
+	 * @param mutex Synchronisationsobjekt oder {@code null}.
 	 * @param <GItem> Typ des Eingabe.
 	 * @param <GValue> Typ des Werts.
-	 * @param mutex Synchronisationsobjekt oder {@code null}.
-	 * @param getter {@link Getter}.
 	 * @return {@code synchronized}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code getter} bzw. {@code mutex} {@code null} ist. */
-	public static <GItem, GValue> Getter<GItem, GValue> synchronizedGetter(final Object mutex, final Getter<? super GItem, ? extends GValue> getter)
+	public static <GItem, GValue> Getter<GItem, GValue> toSynchronized(final Getter<? super GItem, ? extends GValue> target, final Object mutex)
 		throws NullPointerException {
-		return new SynchronizedGetter<>(mutex, getter);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Fields#compositeField(Getter, Setter) Fields.compositeField(getter, Setters.emptySetter())}.
-	 *
-	 * @see Setters#emptySetter() */
-	public static <GItem, GValue> Field<GItem, GValue> toField(final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException {
-		return Fields.compositeField(getter, Setters.emptySetter());
-	}
-
-	/** Diese Methode gibt einen {@link Filter} als Adapter zu einem {@link Boolean}-{@link Getter} zurück. Die Akzeptanz einer Eingabe {@code item} entspricht
-	 * {@code Boolean.TRUE.equals(getter.get(item))}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param getter Eigenschaft mit {@link Boolean}-Wert.
-	 * @return {@link Filter} als {@link Getter}-Adapter.
-	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GItem> Filter<GItem> toFilter(final Getter<? super GItem, Boolean> getter) throws NullPointerException {
-		return new GetterFilter<>(getter);
-	}
-
-	/** Diese Methode gibt ein {@link Comparable} als Adapter zu einem {@link Number}-{@link Getter} zurück. Der Vergleichswert eines Datensatzes {@code item}
-	 * entspricht {@code getter.get(item).intValue()}, wenn diese nicht {@code null} ist. Andernfalls ist der Vergleichswert {@code 0}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param getter Eigenschaft mit {@link Number}-Wert.
-	 * @return {@link Comparable} als {@link Getter}-Adapter.
-	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GItem> Comparable<GItem> toComparable(final Getter<? super GItem, ? extends Number> getter) throws NullPointerException {
-		return new GetterComparable<>(getter);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link Getters#toProducer(Object, Getter) Getters.toProducer(null, getter)}. */
-	public static <GItem, GValue> Producer<GValue> toProducer(final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException {
-		return Getters.toProducer(null, getter);
-	}
-
-	/** Diese Methode gibt einen {@link Producer} zurück, der mit dem gegebenen Datensatz an den gegebenen {@link Getter} delegiert.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 * @param item Datensatz.
-	 * @param getter {@link Getter}.
-	 * @return {@link Getter}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GItem, GValue> Producer<GValue> toProducer(final GItem item, final Getter<? super GItem, ? extends GValue> getter)
-		throws NullPointerException {
-		return new GetterProducer<>(item, getter);
+		return new SynchronizedGetter<>(target, mutex);
 	}
 
 }

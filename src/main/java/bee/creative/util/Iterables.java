@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import bee.creative.array.Array;
+import bee.creative.bind.AbstractGetter;
 import bee.creative.bind.Getter;
-import bee.creative.bind.Getters.BaseGetter;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.lang.Objects.UseToString;
@@ -230,7 +230,7 @@ public class Iterables {
 	}
 
 	/** Diese Klasse implementiert {@link Iterables#toIteratorGetter()}. */
-	static class IteratorGetter extends BaseGetter<Iterable<?>, Iterator<?>> {
+	static class IteratorGetter extends AbstractGetter<Iterable<?>, Iterator<?>> {
 
 		public static final Getter<?, ?> INSTANCE = new IteratorGetter();
 

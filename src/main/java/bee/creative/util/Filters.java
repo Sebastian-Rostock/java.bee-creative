@@ -251,6 +251,28 @@ public class Filters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Filters#toFilter(Getter)}. */
+	public static class GetterFilter<GItem> implements Filter<GItem> {
+	
+		public final Getter<? super GItem, Boolean> getter;
+	
+		public GetterFilter(final Getter<? super GItem, Boolean> getter) {
+			this.getter = Objects.notNull(getter);
+		}
+	
+		@Override
+		public boolean accept(final GItem entry) {
+			final Boolean result = this.getter.get(entry);
+			return (result != null) && result.booleanValue();
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.getter);
+		}
+	
+	}
+
 	/** Diese Methode gibt den {@link Filter} zurück, der alle Elemente akzeptiert, die nicht {@code null} sind. Die Akzeptanz eines Elements {@code item} ist
 	 * {@code item != null}.
 	 *
@@ -295,7 +317,7 @@ public class Filters {
 	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
 	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link Pointer} auf Elemente bestückt.
 	 *
-	 * @see Getters#toFilter(Getter)
+	 * @see Filters#toFilter(Getter)
 	 * @see Filters#toGetter(Filter)
 	 * @see Getters#bufferedGetter(int, int, int, Getter)
 	 * @param <GItem> Typ der Elemente.
@@ -308,7 +330,7 @@ public class Filters {
 	 * @throws IllegalArgumentException Wenn {@link Getters#bufferedGetter(int, int, int, Getter)} eine entsprechende Ausnahme auslöst. */
 	public static <GItem> Filter<GItem> bufferedFilter(final int limit, final int mode, final Filter<? super GItem> filter)
 		throws NullPointerException, IllegalArgumentException {
-		return Getters.toFilter(Getters.bufferedGetter(limit, mode, Pointers.HARD, Filters.toGetter(filter)));
+		return Filters.toFilter(Getters.bufferedGetter(limit, mode, Pointers.HARD, Filters.toGetter(filter)));
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden. Die Akzeptanz eines
@@ -393,6 +415,17 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
 	public static <GItem> Getter<GItem, Boolean> toGetter(final Filter<? super GItem> filter) throws NullPointerException {
 		return new FilterGetter<>(filter);
+	}
+
+	/** Diese Methode gibt einen {@link Filter} als Adapter zu einem {@link Boolean}-{@link Getter} zurück. Die Akzeptanz einer Eingabe {@code item} entspricht
+	 * {@code Boolean.TRUE.equals(getter.get(item))}.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param getter Eigenschaft mit {@link Boolean}-Wert.
+	 * @return {@link Filter} als {@link Getter}-Adapter.
+	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
+	public static <GItem> Filter<GItem> toFilter(final Getter<? super GItem, Boolean> getter) throws NullPointerException {
+		return new GetterFilter<>(getter);
 	}
 
 }

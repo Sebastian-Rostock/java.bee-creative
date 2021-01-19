@@ -268,9 +268,9 @@ public class Translators {
 	 * {@link Translators#compositeTranslator(Class, Class, Getter, Getter) Translators.compositeTranslator(valueClass, valueClass,
 	 * Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter())}.
 	 *
-	 * @see Getters#neutralGetter() */
+	 * @see Getters#neutral() */
 	public static <GValue> Translator<GValue, GValue> neutralTranslator(final Class<GValue> valueClass) throws NullPointerException {
-		return Translators.compositeTranslator(valueClass, valueClass, Getters.<GValue>neutralGetter(), Getters.<GValue>neutralGetter());
+		return Translators.compositeTranslator(valueClass, valueClass, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode gibt einen {@link Translator} zurück, der die Übersetzung des gegebenen {@link Translator} umkehrt, d.h. dessen Quellobjekte gleich den

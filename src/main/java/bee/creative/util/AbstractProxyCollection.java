@@ -2,6 +2,8 @@ package bee.creative.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import bee.creative.bind.Property;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link Collection} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt
  * werden über {@link #setData(Collection)} geschrieben.
@@ -37,6 +39,27 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 			AbstractProxyCollection.this.setData(this.data);
 		}
 
+	}
+
+	/** Diese Klasse implementiert {@link AbstractProxyCollection#toCollection(Property)}. */
+	static class PropertyCollection<GItem> extends AbstractProxyCollection<GItem, Collection<GItem>> {
+	
+		public final Property<Collection<GItem>> property;
+	
+		public PropertyCollection(final Property<Collection<GItem>> property) {
+			this.property = Objects.notNull(property);
+		}
+	
+		@Override
+		public Collection<GItem> getData(final boolean readonly) {
+			return this.property.get();
+		}
+	
+		@Override
+		protected void setData(final Collection<GItem> items) {
+			this.property.set(items);
+		}
+	
 	}
 
 	/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück. Zum Lesen wird er nur in {@link #size()}, {@link #isEmpty()}, {@link #contains(Object)},
@@ -148,6 +171,16 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
+	}
+
+	/** Diese Methode gibt eine {@link Collection} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
+	 *
+	 * @see AbstractProxyCollection
+	 * @param property {@link Property}.
+	 * @return {@link Collection}-{@code Proxy}.
+	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
+	public static <GItem> Collection<GItem> toCollection(final Property<Collection<GItem>> property) {
+		return new PropertyCollection<>(property);
 	}
 
 }
