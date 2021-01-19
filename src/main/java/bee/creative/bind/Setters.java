@@ -10,7 +10,6 @@ import java.util.Map;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
-import bee.creative.util.Filter;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Setter}-Konstruktion und -Verarbeitung.
  *

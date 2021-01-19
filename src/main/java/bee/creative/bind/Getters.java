@@ -13,7 +13,6 @@ import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 import bee.creative.ref.Pointer;
 import bee.creative.ref.Pointers;
-import bee.creative.util.Filter;
 import bee.creative.util.Filters;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Getter}-Konstruktion und -Verarbeitung.
@@ -148,8 +147,8 @@ public class Getters {
 		int capacity = 0;
 
 		public BufferedGetter(final int limit, final int inputMode, final int outputMode, final Getter<? super GItem, ? extends GValue> getter) {
-			Pointers.pointer(inputMode, null);
-			Pointers.pointer(outputMode, null);
+			Pointers.from(inputMode, null);
+			Pointers.from(outputMode, null);
 			this.limit = limit;
 			this.inputMode = (byte)inputMode;
 			this.outputMode = (byte)outputMode;
@@ -158,7 +157,7 @@ public class Getters {
 
 		@Override
 		public GValue get(final GItem item) {
-			final Pointer<GValue> pointer = this.buffer.get(Pointers.hardPointer(item));
+			final Pointer<GValue> pointer = this.buffer.get(Pointers.fromHard(item));
 			if (pointer != null) {
 				final GValue output = pointer.get();
 				if (output != null) return output;
@@ -179,7 +178,7 @@ public class Getters {
 				}
 			}
 			final GValue output = this.getter.get(item);
-			this.buffer.put(Pointers.pointer(this.inputMode, item), Pointers.pointer(this.outputMode, output));
+			this.buffer.put(Pointers.from(this.inputMode, item), Pointers.from(this.outputMode, output));
 			final int size = this.buffer.size(), capacity = this.capacity;
 			if (size >= capacity) {
 				this.capacity = size;
@@ -459,7 +458,7 @@ public class Getters {
 	 * intern in einer {@link LinkedHashMap} zur Wiederverwendung vorhält. Die Schlüssel der {@link LinkedHashMap} werden dabei als {@link Pointer} auf Eingaben
 	 * und die Werte als {@link Pointer} auf die Werte bestückt.
 	 *
-	 * @see Pointers#pointer(int, Object)
+	 * @see Pointers#from(int, Object)
 	 * @param <GItem> Typ des Datensatzes sowie der Datensätze in den Schlüsseln der internen {@link LinkedHashMap}.
 	 * @param <GValue> Typ der Werte sowie der Datensätze in den Werten der internen {@link LinkedHashMap}.
 	 * @param limit Maximum für die Anzahl der Einträge in der internen {@link LinkedHashMap}.
@@ -470,7 +469,7 @@ public class Getters {
 	 * @param getter Eigenschaft, die gepuffert werden soll.
 	 * @return {@code buffered}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Pointers#pointer(int, Object)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IllegalArgumentException Wenn {@link Pointers#from(int, Object)} eine entsprechende Ausnahme auslöst. */
 	public static <GItem, GValue> Getter<GItem, GValue> bufferedGetter(final int limit, final int inputMode, final int outputMode,
 		final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException, IllegalArgumentException {
 		return new BufferedGetter<>(limit, inputMode, outputMode, getter);

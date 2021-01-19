@@ -16,6 +16,7 @@ import bee.creative.util.HashSet;
 import bee.creative.util.Iterables;
 import bee.creative.util.Unique;
 
+@SuppressWarnings ("javadoc")
 public class QSVM {
 
 	final QS qs;

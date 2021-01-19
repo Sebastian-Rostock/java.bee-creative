@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import bee.creative.bind.Field;
+import bee.creative.bind.Properties;
 import bee.creative.bind.Property;
 import bee.creative.lang.Objects;
 
@@ -269,6 +271,11 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link AbstractProxyList#toList(Property) Properties.toList(Fields.toProperty(item, field))}. */
+	public static <GItem, GEntry> List<GEntry> toList(final GItem item, final Field<? super GItem, List<GEntry>> field) throws NullPointerException {
+		return AbstractProxyList.toList(Properties.from(field, item));
 	}
 
 	/** Diese Methode gibt eine {@link List} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.

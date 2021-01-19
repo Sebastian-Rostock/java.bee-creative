@@ -6,20 +6,16 @@ package bee.creative.bind;
  * @param <GValue> Typ des Werts. */
 public interface Producer3<GValue> extends Producer2<GValue> {
 
-	@Override
-	Producer3<GValue> toBuffered();
+	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Producer) Properties.from(this)}. */
+	public Property2<GValue> toProperty();
 
 	@Override
-	Producer3<GValue> toBuffered(int mode);
-
-	Property2<GValue> toProperty();
+	public Producer3<GValue> toSynchronized();
 
 	@Override
-	Producer3<GValue> toSynchronized();
+	public Producer3<GValue> toSynchronized(Object mutex);
 
-	@Override
-	Producer3<GValue> toSynchronized(Object mutex);
-
-	<GValue2> Producer3<GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> trans);
+	/** Diese Methode ist eine Abkürtung für {@link Producers#toTranslated(Producer, Getter) Producers.toTranslated(this, trans)}. */
+	public <GValue2> Producer3<GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> trans);
 
 }

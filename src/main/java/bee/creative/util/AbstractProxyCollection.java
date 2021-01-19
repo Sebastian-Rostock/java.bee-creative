@@ -2,6 +2,8 @@ package bee.creative.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import bee.creative.bind.Field;
+import bee.creative.bind.Properties;
 import bee.creative.bind.Property;
 import bee.creative.lang.Objects;
 
@@ -171,6 +173,12 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link AbstractProxyCollection#toCollection(Property) Properties.toCollection(Fields.toProperty(item, field))}. */
+	public static <GItem, GEntry> Collection<GEntry> toCollection(final GItem item, final Field<? super GItem, Collection<GEntry>> field)
+		throws NullPointerException {
+		return AbstractProxyCollection.toCollection(Properties.from(field, item));
 	}
 
 	/** Diese Methode gibt eine {@link Collection} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.

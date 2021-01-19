@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import bee.creative.bind.Field;
+import bee.creative.bind.Properties;
 import bee.creative.bind.Property;
 import bee.creative.lang.Objects;
 
@@ -288,6 +290,12 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link AbstractProxyMap#toMap(Property) Properties.toMap(Fields.toProperty(item, field))}. */
+	public static <GItem, GKey, GValue> Map<GKey, GValue> toMap(final GItem item, final Field<? super GItem, Map<GKey, GValue>> field)
+		throws NullPointerException {
+		return AbstractProxyMap.toMap(Properties.from(field, item));
 	}
 
 	/** Diese Methode gibt eine {@link Map} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.

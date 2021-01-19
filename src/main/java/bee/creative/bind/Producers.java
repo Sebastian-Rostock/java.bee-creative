@@ -13,18 +13,19 @@ import bee.creative.ref.Pointers;
 /** Diese Klasse implementiert grundlegende {@link Producer}.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+@SuppressWarnings ("javadoc")
 public class Producers {
 
-	/** Diese Klasse implementiert {@link Producers#empty()}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Klasse implementiert einen {@link Producer3}, der stets {@code null} liefert. */
 	public static class EmptyProducer extends AbstractProducer<Object> {
 
 		public static final Producer3<?> INSTANCE = new EmptyProducer();
 
 	}
 
-	/** Diese Klasse implementiert {@link Producers#fromValue(Object)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Klasse implementiert einen {@link Producer3}, der beim {@link #get() Lesen} stets einen gegebenen Wert liefert.
+	 *
+	 * @param <GValue> Typ des Werts. */
 	public static class ValueProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final GValue target;
@@ -45,15 +46,23 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Producers#fromNative(Method)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Klasse implementiert einen {@link Producer3}, der das {@link #get() Lesen} an eine gegebene {@link Method nativen statische Methode} delegiert. Das
+	 * Lesen erfolgt über {@code this.target.invoke(null)}.
+	 *
+	 * @param <GValue> Typ des Werts. */
 	public static class MethodProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Method target;
 
-		public MethodProducer(final Method method, final boolean forceAccessible) {
-			if (!Modifier.isStatic(method.getModifiers()) || (method.getParameterTypes().length != 0)) throw new IllegalArgumentException();
-			this.target = forceAccessible ? Natives.forceAccessible(method) : Objects.notNull(method);
+		/** Dieser Konstruktor initialisiert Methode und Zugreifbarkeit.
+		 *
+		 * @param target native statische Methode.
+		 * @param forceAccessible {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}.
+		 * @throws NullPointerException Wenn {@code target} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Methode nicht statisch bzw. nicht zugreifbar ist oder keine passende Parameteranzahl besitzt. */
+		public MethodProducer(final Method target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			if (!Modifier.isStatic(target.getModifiers()) || (target.getParameterTypes().length != 0)) throw new IllegalArgumentException();
+			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
 		}
 
 		@Override
@@ -73,15 +82,23 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Producers#fromNative(Constructor)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Klasse implementiert einen {@link Producer3}, der das {@link #get() Lesen} an einen gegebenen {@link Method nativen statischen Konstruktor}
+	 * delegiert. Das Lesen erfolgt über {@code this.target.newInstance(null)}.
+	 *
+	 * @param <GValue> Typ des Werts. */
 	public static class ConstructorProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Constructor<?> target;
 
-		public ConstructorProducer(final Constructor<?> constructor, final boolean forceAccessible) {
-			if (!Modifier.isStatic(constructor.getModifiers()) || (constructor.getParameterTypes().length != 0)) throw new IllegalArgumentException();
-			this.target = forceAccessible ? Natives.forceAccessible(constructor) : Objects.notNull(constructor);
+		/** Dieser Konstruktor initialisiert Konstruktor und Zugreifbarkeit.
+		 *
+		 * @param target nativer statischer Konstruktor.
+		 * @param forceAccessible {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}.
+		 * @throws NullPointerException Wenn {@code target} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn der Konstruktor nicht statisch bzw. nicht zugreifbar ist oder keine passende Parameteranzahl besitzt. */
+		public ConstructorProducer(final Constructor<?> target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			if (!Modifier.isStatic(target.getModifiers()) || (target.getParameterTypes().length != 0)) throw new IllegalArgumentException();
+			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
 		}
 
 		@Override
@@ -101,8 +118,10 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Producers#toBuffered(Producer, int)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Klasse implementiert einen puffernden {@link Producer3}, welcher den von einem gegebenen {@link Producer} gelieferten Wert mit Hilfe eines
+	 * {@link Pointer} im gegebenenen Modus zwischenspeichert.
+	 *
+	 * @param <GValue> Typ des Werts. */
 	public static class BufferedProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Producer<? extends GValue> target;
@@ -111,8 +130,9 @@ public class Producers {
 
 		protected Pointer<GValue> buffer;
 
-		public BufferedProducer(final Producer<? extends GValue> target, final int mode) {
-			Pointers.pointer(mode, null);
+		/** Dieser Konstruktor initialisiert das {@link Producer} und Zeigerstärke ({@link Pointers#HARD}, {@link Pointers#WEAK} oder {@link Pointers#SOFT}). */
+		public BufferedProducer(final Producer<? extends GValue> target, final int mode) throws NullPointerException, IllegalArgumentException {
+			Pointers.from(mode, null);
 			this.mode = mode;
 			this.target = Objects.notNull(target);
 		}
@@ -126,7 +146,7 @@ public class Producers {
 				if (pointer == Pointers.NULL) return null;
 			}
 			final GValue data = this.target.get();
-			this.buffer = Pointers.pointer(this.mode, data);
+			this.buffer = Pointers.from(this.mode, data);
 			return data;
 		}
 
@@ -137,8 +157,11 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Producers#toTranslated(Producer, Getter)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Klasse implementiert übersetzten {@link Producer3}, dessen Wert mit Hilfe eines gegebenen {@link Getter} aus dem Wert eines gegebenen
+	 * {@link Producer} ermittelt wird.
+	 *
+	 * @param <GValue> Typ des Werts dieses {@link Producer3}.
+	 * @param <GValue2> Typ des Werts des gegebenen {@link Producer}. */
 	public static class TranslatedProducer<GValue, GValue2> extends AbstractProducer<GValue> {
 
 		public final Producer<? extends GValue2> target;
@@ -162,14 +185,21 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Producers#toSynchronized(Producer, Object)}. */
-	@SuppressWarnings ("javadoc")
+	/** Diese Klasse implementiert einen {@link Producer3}, welcher einen gegebenen {@link Producer} über {@code synchronized(this.mutex)} synchronisiert.
+	 *
+	 * @param <GValue> Typ des Werts. */
 	public static class SynchronizedProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Producer<? extends GValue> target;
 
 		public final Object mutex;
 
+		/** Dieser Konstruktor initialisiert {@link Producer} und Synchronisationsobjekt. Wenn das Synchronisationsobjekt {@code null} ist, wird {@code this} als
+		 * Synchronisationsobjekt verwendet.
+		 *
+		 * @param target {@link Producer}.
+		 * @param mutex Synchronisationsobjekt oder {@code null}.
+		 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 		public SynchronizedProducer(final Producer<? extends GValue> target, final Object mutex) throws NullPointerException {
 			this.target = Objects.notNull(target);
 			this.mutex = Objects.notNull(mutex, this);
@@ -189,45 +219,46 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Producers#from(Getter, Object)}. */
 	static class GetterProducer<GItem, GValue> extends AbstractProducer<GValue> {
+
+		public final Getter<? super GItem, ? extends GValue> target;
 
 		public final GItem item;
 
-		public final Getter<? super GItem, ? extends GValue> getter;
-
-		public GetterProducer(final GItem item, final Getter<? super GItem, ? extends GValue> getter) {
+		public GetterProducer(final Getter<? super GItem, ? extends GValue> target, final GItem item) throws NullPointerException {
+			this.target = Objects.notNull(target);
 			this.item = item;
-			this.getter = Objects.notNull(getter);
 		}
 
 		@Override
 		public GValue get() {
-			return this.getter.get(this.item);
+			return this.target.get(this.item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.item, this.getter);
+			return Objects.toInvokeString(this, this.target, this.item);
 		}
 
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromValue(Object) Producers.valueProducer(null)}. */
+	/** Diese Methode liefert {@link EmptyProducer#INSTANCE}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> empty() {
 		return (Producer3<GValue>)EmptyProducer.INSTANCE;
 	}
 
+	/** Diese Methode gibt den gegebenen {@link Producer} als {@link Producer3} zurück. Wenn er {@code null} ist, wird {@link #empty()} geliefert. */
+	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> from(final Producer<? extends GValue> target) {
 		if (target == null) return Producers.empty();
 		if (target instanceof Producer3) return (Producer3<GValue>)target;
 		return Producers.toTranslated(target, Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#from(Getter, Object) Getters.toProducer(null, getter)}. */
-	public static <GItem, GValue> Producer2<GValue> from(final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException {
-		return Producers.from(getter, null);
+	/** Diese Methode ist eine Abkürzung für {@link Producers#from(Getter, Object) Producers.from(target, null)}. */
+	public static <GItem, GValue> Producer2<GValue> from(final Getter<? super GItem, ? extends GValue> target) throws NullPointerException {
+		return Producers.from(target, null);
 	}
 
 	/** Diese Methode gibt einen {@link Producer} zurück, der mit dem gegebenen Datensatz an den gegebenen {@link Getter} delegiert.
@@ -239,32 +270,26 @@ public class Producers {
 	 * @return {@link Getter}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GItem, GValue> Producer2<GValue> from(final Getter<? super GItem, ? extends GValue> getter, final GItem item) throws NullPointerException {
-		return new GetterProducer<>(item, getter);
+		return new GetterProducer<>(getter, item);
 	}
 
-	public static <GValue> Producer3<GValue> fromValue(final GValue value) {
-		if (value == null) return Producers.empty();
-		return new ValueProducer<>(value);
+	/** Diese Methode ist eine Abkürzung für {@link ValueProducer new ValueProducer<>(target)}. */
+	public static <GValue> Producer3<GValue> fromValue(final GValue target) {
+		return new ValueProducer<>(target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(String, boolean) Producers.nativeProducer(memberPath, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(String, boolean) Producers.fromNative(memberPath, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final String memberPath) throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(memberPath, true);
 	}
 
-	/** Diese Methode ist effektiv eine Abkürzung für {@code Producers.nativeProducer(Natives.parse(memberPath), forceAccessible)}.
+	/** Diese Methode ist effektiv eine Abkürzung für {@code Producers.fromNative(Natives.parse(memberPath), forceAccessible)}.
 	 *
 	 * @see Natives#parse(String)
 	 * @see #fromNative(Class, boolean)
 	 * @see #fromNative(java.lang.reflect.Field, boolean)
 	 * @see #fromNative(Method, boolean)
-	 * @see #fromNative(Constructor, boolean)
-	 * @param <GValue> Typ des Werts.
-	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktors oder eines Datenfelds.
-	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
-	 * @return {@code native}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Pfad ungültig bzw. sein Ziel nicht zugreifbar ist. */
+	 * @see #fromNative(Constructor, boolean) */
 	public static <GValue> Producer3<GValue> fromNative(final String memberPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberPath);
@@ -275,128 +300,86 @@ public class Producers {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(java.lang.reflect.Field, boolean) Producers.nativeProducer(field, true)}. */
-	public static <GValue> Producer3<GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException {
-		return Producers.fromNative(field, true);
+	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(java.lang.reflect.Field, boolean) Producers.fromNative(target, true)}. */
+	public static <GValue> Producer3<GValue> fromNative(final java.lang.reflect.Field target) throws NullPointerException {
+		return Producers.fromNative(target, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field, boolean) Properties.nativeProperty(field,
-	 * forceAccessible)}. */
-	public static <GValue> Producer3<GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible) throws NullPointerException {
-		return Producers.from(Properties.<GValue>fromNative(field, forceAccessible));
+	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field, boolean) Producers.from(Properties.fromNative(target,
+	 * forceAccessible))}. */
+	public static <GValue> Producer3<GValue> fromNative(final java.lang.reflect.Field target, final boolean forceAccessible) throws NullPointerException {
+		return Producers.from(Properties.<GValue>fromNative(target, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Method, boolean) Producers.nativeProducer(method, true)}. */
-	public static <GValue> Producer3<GValue> fromNative(final Method method) throws NullPointerException, IllegalArgumentException {
-		return Producers.fromNative(method, true);
+	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Method, boolean) Producers.fromNative(target, true)}. */
+	public static <GValue> Producer3<GValue> fromNative(final Method target) throws NullPointerException, IllegalArgumentException {
+		return Producers.fromNative(target, true);
 	}
 
-	/** Diese Methode gibt einen {@link Producer} zur gegebenen {@link Method nativen statischen Methode} zurück. Der vom gelieferten {@link Producer} erzeugte
-	 * Wert entspricht {@code method.invoke(null)}.
-	 *
-	 * @see Method#invoke(Object, Object...)
-	 * @param <GValue> Typ des Datensatzes.
-	 * @param method Native statische Methode.
-	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
-	 * @return {@code native}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Methode nicht statisch, nicht parameterlos oder nicht zugreifbar ist. */
-	public static <GValue> Producer3<GValue> fromNative(final Method method, final boolean forceAccessible)
+	/** Diese Methode ist eine Abkürzung für {@link MethodProducer new MethodProducer<>(target, forceAccessible)}. */
+	public static <GValue> Producer3<GValue> fromNative(final Method target, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return new MethodProducer<>(method, forceAccessible);
+		return new MethodProducer<>(target, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Class, boolean) Producers.nativeProducer(valueClass, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Class, boolean) Producers.fromNative(valueClass, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<? extends GValue> valueClass) throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(valueClass, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Constructor, boolean) Producers.nativeProducer(Natives.parseConstructor(valueClass),
-	 * forceAccessible)}.
-	 *
-	 * @see Natives#parseConstructor(Class, Class...) */
+	/** Diese Methode ist eine Abkürzung für {@link Natives#parseConstructor(Class, Class...) Producers.fromNative(Natives.parseConstructor(valueClass),
+	 * forceAccessible)}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<? extends GValue> valueClass, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(Natives.parseConstructor(valueClass), forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Constructor, boolean) Producers.nativeProducer(constructor, true)}. */
-	public static <GValue> Producer3<GValue> fromNative(final Constructor<?> constructor) throws NullPointerException, IllegalArgumentException {
-		return Producers.fromNative(constructor, true);
+	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Constructor, boolean) Producers.fromNative(target, true)}. */
+	public static <GValue> Producer3<GValue> fromNative(final Constructor<?> target) throws NullPointerException, IllegalArgumentException {
+		return Producers.fromNative(target, true);
 	}
 
-	/** Diese Methode gibt einen {@link Producer} zum gegebenen {@link Constructor nativen statischen parameterlosen Kontruktor} zurück. Der vom gelieferten
-	 * {@link Producer} erzeugte Datensatz entspricht {@link Constructor#newInstance(Object...) constructor.newInstance()}.
-	 *
-	 * @param <GValue> Typ des Werts.
-	 * @param constructor Nativer Kontruktor.
-	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
-	 * @return {@code native}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Kontruktor nicht statisch, nicht parameterlos oder nicht zugreifbar ist. */
-	public static <GValue> Producer3<GValue> fromNative(final Constructor<?> constructor, final boolean forceAccessible)
+	/** Diese Methode ist eine Abkürzung für {@link ConstructorProducer new ConstructorProducer<>(target, forceAccessible)}. */
+	public static <GValue> Producer3<GValue> fromNative(final Constructor<?> target, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return new ConstructorProducer<>(constructor, forceAccessible);
+		return new ConstructorProducer<>(target, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Class, String, boolean) Producers.nativeProducer(fieldOwner, fieldName, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Class, String, boolean) Producers.fromNative(fieldOwner, fieldName, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(Class, String, boolean) Properties.nativeProperty(fieldOwner, fieldName,
-	 * forceAccessible)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(Class, String, boolean) Producers.from(Properties.fromNative(fieldOwner, fieldName,
+	 * forceAccessible))}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Producers.from(Properties.<GValue>fromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#toBuffered(Producer, int) Producers.bufferedProducer(Pointers.SOFT, producer)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Producers#toBuffered(Producer, int) Producers.toBuffered(target, Pointers.SOFT)}. */
 	public static <GValue> Producer3<GValue> toBuffered(final Producer<? extends GValue> target) throws NullPointerException {
 		return Producers.toBuffered(target, Pointers.SOFT);
 	}
 
-	/** Diese Methode gibt einen gepufferten {@link Producer} zurück, der den vom gegebenen {@link Producer} erzeugten Wert mit Hilfe eines {@link Pointer} im
-	 * gegebenenen Modus verwaltet.
-	 *
-	 * @param target {@link Producer}.
-	 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
-	 * @param <GValue> Typ des Datensatzes.
-	 * @return {@code buffered}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code producer} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code mode} ungültig ist. */
+	/** Diese Methode ist eine Abkürzung für {@link BufferedProducer new BufferedProducer<>(target, mode)}. */
 	public static <GValue> Producer3<GValue> toBuffered(final Producer<? extends GValue> target, final int mode)
 		throws NullPointerException, IllegalArgumentException {
 		return new BufferedProducer<>(target, mode);
 	}
 
-	/** Diese Methode gibt einen übersetzten {@link Producer} zurück, dessen Wert mit Hilfe des gegebenen {@link Getter} aus dem Wert des gegebenen
-	 * {@link Producer} erzeugt wird.
-	 *
-	 * @param target {@link Producer}.
-	 * @param trans {@link Getter} zum Übersetzen des Wert.
-	 * @param <GValue> Typ des Werts des gegebenen {@link Producer} sowie des Datensatzs des gegebenen {@link Getter}.
-	 * @param <GValue2> Typ des Werts des gegebenen {@link Getter} sowie des erzeugten {@link Producer}.
-	 * @return {@code translated}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code toTarget} bzw. {@code producer} {@code null} ist. */
+	/** Diese Methode ist eine Abkürzung für {@link TranslatedProducer new TranslatedProducer<>(target, trans)}. */
 	public static <GValue, GValue2> Producer3<GValue2> toTranslated(final Producer<? extends GValue> target,
 		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
 		return new TranslatedProducer<>(target, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Producer, Object) Producers.synchronizedProducer(producer, producer)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Producers#toSynchronized(Producer, Object) Producers.toSynchronized(target, target)}. */
 	public static <GValue> Producer3<GValue> toSynchronized(final Producer<? extends GValue> target) throws NullPointerException {
 		return Producers.toSynchronized(target, target);
 	}
 
-	/** Diese Methode gibt einen synchronisierten {@link Producer} zurück, der den gegebenen {@link Producer} über {@code synchronized(mutex)} synchronisiert.
-	 * Wenn das Synchronisationsobjekt {@code null} ist, wird das erzeugte {@link Property} als Synchronisationsobjekt verwendet.
-	 *
-	 * @param target {@link Producer}.
-	 * @param mutex Synchronisationsobjekt oder {@code null}.
-	 * @param <GValue> Typ des Werts.
-	 * @return {@code synchronized}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code producer} {@code null} ist. */
+	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProducer new SynchronizedProducer<>(target, mutex)}. */
 	public static <GValue> Producer3<GValue> toSynchronized(final Producer<? extends GValue> target, final Object mutex) throws NullPointerException {
 		return new SynchronizedProducer<>(target, mutex);
 	}

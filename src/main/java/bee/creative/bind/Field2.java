@@ -17,7 +17,10 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 		GValue2 mixedTarget);
 
 	
- 
+	public Property2<GValue> toProperty();
+
+	public Property2<GValue> toProperty(final GItem item);
+
 
 	@Override
 	Field2<GItem, GValue> toDefault();

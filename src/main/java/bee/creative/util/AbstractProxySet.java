@@ -1,6 +1,8 @@
 package bee.creative.util;
 
 import java.util.Set;
+import bee.creative.bind.Field;
+import bee.creative.bind.Properties;
 import bee.creative.bind.Property;
 import bee.creative.lang.Objects;
 
@@ -37,6 +39,11 @@ public abstract class AbstractProxySet<GItem, GData extends Set<GItem>> extends 
 
 	@Override
 	protected abstract void setData(GData items);
+
+	/** Diese Methode ist eine Abkürzung für {@link AbstractProxySet#toSet(Property) Properties.toSet(Fields.toProperty(item, field))}. */
+	public static <GItem, GEntry> Set<GEntry> toSet(final GItem item, final Field<? super GItem, Set<GEntry>> field) throws NullPointerException {
+		return AbstractProxySet.toSet(Properties.from(field, item));
+	}
 
 	/** Diese Methode gibt ein {@link Set} zurück, dessen Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
 	 *

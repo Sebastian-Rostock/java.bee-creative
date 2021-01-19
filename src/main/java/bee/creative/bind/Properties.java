@@ -52,8 +52,8 @@ public class Properties {
 	}
 
 	/** Diese Klasse implementiert ein initialisierendes {@link Property2}, welches das {@link #set(Object) Schreiben} an ein gegebenes {@link Property} delegiert
-	 * und den Wert beim {@link #get() Lesen} zuerst über das gegebene {@link Property} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h.
-	 * mit Hilfe eines gegebenen {@link Producer} ermittelt und über das gegebene {@link Property} geschrieben.
+	 * und den Wert beim {@link #get() Lesen} über das gegebene {@link Property} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. mit
+	 * Hilfe eines gegebenen {@link Producer} ermittelt und über das gegebene {@link Property} geschrieben.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	public static class SetupProperty<GValue> extends AbstractProperty<GValue> {
@@ -209,6 +209,82 @@ public class Properties {
 
 	}
 
+	/** Diese Klasse implementiert eine {@link Observable} {@link Property2}.
+	 *
+	 * @param <GValue> Typ des Werts der Eigenschaft. */
+	public static class ObservableProperty<GValue> extends AbstractProperty<GValue> implements Observable<UpdatePropertyMessage, UpdatePropertyObserver> {
+
+		/** Dieses Feld speichert die Eigenschaft, an die in {@link #get()} und {@link #set(Object)} delegiert wird. */
+		public final Property<GValue> target;
+
+		/** Dieser Konstruktor initialisiert die überwachte Eigenschaft.
+		 *
+		 * @param target überwachte Eigenschaft. */
+		public ObservableProperty(final Property<GValue> target) {
+			this.target = Objects.notNull(target);
+		}
+
+		/** Diese Methode gibt eine Kopie des gegebenen Werts oder diesen unverändert zurück. Vor dem Schreiben des neuen Werts wird vom alten Wert über diese
+		 * Methode eine Kopie erzeugt, welche nach dem Schreiben beim auslösen des Ereignisses zur Aktualisierung eingesetzt wird. Eine Kopie ist hierbei nur dann
+		 * nötig, wenn der alte Wert sich durch das Schreiben des neuen ändert.
+		 *
+		 * @param value alter Wert.
+		 * @return gegebener oder kopierter Wert. */
+		protected GValue customClone(final GValue value) {
+			return value;
+		}
+
+		/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Werte zurück. Sie wird beim Setzen des Werts zur Erkennung einer
+		 * Wertänderung eingesetzt.
+		 *
+		 * @param value1 alter Wert.
+		 * @param value2 neuer Wert.
+		 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
+		protected boolean customEquals(final GValue value1, final GValue value2) {
+			return Objects.deepEquals(value1, value2);
+		}
+
+		@Override
+		public GValue get() {
+			return this.target.get();
+		}
+
+		@Override
+		public void set(final GValue newValue) {
+			GValue oldValue = this.target.get();
+			if (this.customEquals(oldValue, newValue)) return;
+			oldValue = this.customClone(oldValue);
+			this.target.set(newValue);
+			this.fire(new UpdatePropertyMessage(this, oldValue, newValue));
+		}
+
+		@Override
+		public UpdatePropertyObserver put(final UpdatePropertyObserver listener) throws IllegalArgumentException {
+			return UpdatePropertyEvent.INSTANCE.put(this, listener);
+		}
+
+		@Override
+		public UpdatePropertyObserver putWeak(final UpdatePropertyObserver listener) throws IllegalArgumentException {
+			return UpdatePropertyEvent.INSTANCE.putWeak(this, listener);
+		}
+
+		@Override
+		public void pop(final UpdatePropertyObserver listener) throws IllegalArgumentException {
+			UpdatePropertyEvent.INSTANCE.pop(this, listener);
+		}
+
+		@Override
+		public UpdatePropertyMessage fire(final UpdatePropertyMessage event) throws NullPointerException {
+			return UpdatePropertyEvent.INSTANCE.fire(this, event);
+		}
+
+		@Override
+		public String toString() {
+			return this.target.toString();
+		}
+
+	}
+
 	/** Diese Klasse implementiert ein {@link Property2}, welches ein gegebenes {@link Property} über {@code synchronized(this.mutex)} synchronisiert.
 	 *
 	 * @param <GValue> Typ des Werts. */
@@ -250,18 +326,60 @@ public class Properties {
 
 	}
 
+	static class FieldProperty<GValue, GItem> extends AbstractProperty<GValue> {
+
+		public final Field<? super GItem, GValue> target;
+
+		public final GItem item;
+
+		public FieldProperty(final Field<? super GItem, GValue> target, final GItem item) {
+			this.target = Objects.notNull(target);
+			this.item = item;
+		}
+
+		@Override
+		public GValue get() {
+			return this.target.get(this.item);
+		}
+
+		@Override
+		public void set(final GValue value) {
+			this.target.set(this.item, value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.target, this.item);
+		}
+
+	}
+
 	/** Diese Methode liefert {@link EmptyProperty#INSTANCE}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Property2<GValue> empty() {
 		return (Property2<GValue>)EmptyProperty.INSTANCE;
 	}
 
-	/** Diese Methode gibt das zurück.
+	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field, Object) Fields.toProperty(null, field)}. */
+	@SuppressWarnings ("unchecked")
+	public static <GValue> Property2<GValue> from(final Field<?, GValue> target) throws NullPointerException {
+		return Properties.from((Field<Object, GValue>)target, null);
+	}
+
+	/** Diese Methode gibt ein {@link Property} zurück, dessen Methoden mit dem gegebenen Datensatz an das gegebene {@link Field} delegieren.
+	 * @param target {@link Field}.
+	 * @param item Datensatz.
 	 *
-	 * @param target
-	 * @return
-	 * @throws NullPointerException */
-	public static <GValue> Property2<GValue> from(final Property<GValue> target) throws NullPointerException {
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Werts.
+	 * @return {@link Field}-{@link Property}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target, final GItem item) throws NullPointerException {
+		return new FieldProperty<>(target, item);
+	}
+
+	/** Diese Methode gibt das gegebene {@link Property} als {@link Property2} zurück. Wenn es {@code null} ist, wird {@link #empty()} geliefert. */
+	public static <GValue> Property2<GValue> from(final Property<GValue> target) {
 		if (target == null) return Properties.empty();
 		if (target instanceof Consumer3) return (Property2<GValue>)target;
 		return Properties.toTranslated(target, Getters.<GValue>neutral(), Getters.<GValue>neutral());
@@ -352,19 +470,11 @@ public class Properties {
 		return new TranslatedProperty<>(target, trans);
 	}
 
-	int TODO;
-
-	/** Diese Methode gibt ein
+	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Consumer) Properties.from(Producers.toTranslated(target, transGet),
+	 * Consumers.toTranslated(target, transSet))}.
 	 *
-	 * @param target Eigenschaft.
-	 * @param transGet {@link Getter} zum Übersetzen des Wert beim Lesen.
-	 * @param transSet {@link Getter} zum Übersetzen des Wert beim Schreiben.
 	 * @see Producers#toTranslated(Producer, Getter)
-	 * @see Consumers#toTranslated(Consumer, Getter)
-	 * @param <GTarget> Typ des Werts der erzeugten Eigenschaft.
-	 * @param <GSource> Typ des Werts der gegebenen Eigenschaft.
-	 * @return {@code translated}-{@link Property}.
-	 * @throws NullPointerException Wenn {@code property}, {@code toTarget} bzw. {@code toSource} {@code null} ist. */
+	 * @see Consumers#toTranslated(Consumer, Getter) */
 	public static <GSource, GTarget> Property2<GTarget> toTranslated(final Property<GSource> target, final Getter<? super GSource, ? extends GTarget> transGet,
 		final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
 		return Properties.from(Producers.toTranslated(target, transGet), Consumers.toTranslated(target, transSet));

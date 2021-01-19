@@ -1,5 +1,6 @@
 package bee.creative.bind;
 
+import bee.creative.bind.Properties.ObservableProperty;
 import bee.creative.lang.Objects.BaseObject;
 
 /** Diese Klasse implementiert ein abstraktes {@link Property2} als {@link BaseObject}. */
@@ -15,12 +16,12 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public Producer2<GValue> toBuffered() {
+	public Producer3<GValue> toBuffered() {
 		return Producers.toBuffered(this);
 	}
 
 	@Override
-	public Producer2<GValue> toBuffered(final int mode) {
+	public Producer3<GValue> toBuffered(final int mode) {
 		return Producers.toBuffered(this, mode);
 	}
 

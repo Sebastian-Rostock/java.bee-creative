@@ -9,15 +9,15 @@ import java.lang.ref.WeakReference;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Pointers {
 
-	/** Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link HardPointer}. Die Referenz auf den Datensatz
+	/** Dieses Feld speichert den Modus der Methode {@link Pointers#from(int, Object)} zur Erzeugung eines {@link HardPointer}. Die Referenz auf den Datensatz
 	 * eines solcher {@link Pointer} wird nicht automatisch aufgelöst. */
 	public static final int HARD = 0;
 
-	/** Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link WeakPointer}. Die Referenz auf den Datensatz
+	/** Dieses Feld speichert den Modus der Methode {@link Pointers#from(int, Object)} zur Erzeugung eines {@link WeakPointer}. Die Referenz auf den Datensatz
 	 * eines solcher {@link Pointer} wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist. */
 	public static final int WEAK = 1;
 
-	/** Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link SoftPointer}. Die Referenz auf den Datensatz
+	/** Dieses Feld speichert den Modus der Methode {@link Pointers#from(int, Object)} zur Erzeugung eines {@link SoftPointer}. Die Referenz auf den Datensatz
 	 * eines solcher {@link Pointer} wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und der Garbage
 	 * Collector dies entscheidet. */
 	public static final int SOFT = 2;
@@ -36,33 +36,33 @@ public class Pointers {
 
 	/** Diese Methode gibt den gegebenen {@link Pointer} oder {@link #NULL} zurück.
 	 *
-	 * @see #nullPointer()
+	 * @see #fromNull()
 	 * @param <GData> Typ des Datensatzes.
 	 * @param pointer {@link Pointer} oder {@code null}.
 	 * @return gegebener {@link Pointer} oder {@link #NULL}. */
-	public static <GData> Pointer<GData> pointer(final Pointer<GData> pointer) {
-		if (pointer == null) return Pointers.nullPointer();
+	public static <GData> Pointer<GData> from(final Pointer<GData> pointer) {
+		if (pointer == null) return Pointers.fromNull();
 		return pointer;
 	}
 
 	/** Diese Methode gibt einen {@link Pointer} auf den gegebenen Datensatz im gegebenen Modus zurück.
 	 *
-	 * @see #hardPointer(Object)
-	 * @see #weakPointer(Object)
-	 * @see #softPointer(Object)
+	 * @see #fromHard(Object)
+	 * @see #fromWeak(Object)
+	 * @see #fromSoft(Object)
 	 * @param <GData> Typ des Datensatzes.
 	 * @param mode Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
 	 * @param data Datensatz.
 	 * @return {@link Pointer} auf den Datensatz.
 	 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist. */
-	public static <GData> Pointer<GData> pointer(final int mode, final GData data) throws IllegalArgumentException {
+	public static <GData> Pointer<GData> from(final int mode, final GData data) throws IllegalArgumentException {
 		switch (mode) {
 			case HARD:
-				return Pointers.hardPointer(data);
+				return Pointers.fromHard(data);
 			case WEAK:
-				return Pointers.weakPointer(data);
+				return Pointers.fromWeak(data);
 			case SOFT:
-				return Pointers.softPointer(data);
+				return Pointers.fromSoft(data);
 		}
 		throw new IllegalArgumentException();
 	}
@@ -72,7 +72,7 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @return {@link #NULL}. */
 	@SuppressWarnings ("unchecked")
-	public static <GData> Pointer<GData> nullPointer() {
+	public static <GData> Pointer<GData> fromNull() {
 		return (Pointer<GData>)Pointers.NULL;
 	}
 
@@ -83,8 +83,8 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link HardPointer} oder {@link #NULL}. */
-	public static <GData> Pointer<GData> hardPointer(final GData data) {
-		if (data == null) return Pointers.nullPointer();
+	public static <GData> Pointer<GData> fromHard(final GData data) {
+		if (data == null) return Pointers.fromNull();
 		return new HardPointer<>(data);
 	}
 
@@ -95,8 +95,8 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link WeakPointer} oder {@link #NULL}. */
-	public static <GData> Pointer<GData> weakPointer(final GData data) {
-		if (data == null) return Pointers.nullPointer();
+	public static <GData> Pointer<GData> fromWeak(final GData data) {
+		if (data == null) return Pointers.fromNull();
 		return new WeakPointer<>(data);
 	}
 
@@ -107,8 +107,8 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link SoftPointer} oder {@link #NULL}. */
-	public static <GData> Pointer<GData> softPointer(final GData data) {
-		if (data == null) return Pointers.nullPointer();
+	public static <GData> Pointer<GData> fromSoft(final GData data) {
+		if (data == null) return Pointers.fromNull();
 		return new SoftPointer<>(data);
 	}
 

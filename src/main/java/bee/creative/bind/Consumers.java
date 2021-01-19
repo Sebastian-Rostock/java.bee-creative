@@ -14,7 +14,7 @@ import bee.creative.lang.Objects;
 @SuppressWarnings ("javadoc")
 public class Consumers {
 
-	/** Diese Klasse implementiert einen {@link Consumers}, der das {@link #set Setzen} ignoriert. */
+	/** Diese Klasse implementiert einen {@link Consumer3}, der das {@link #set Setzen} ignoriert. */
 	public static class EmptyConsumer extends AbstractConsumer<Object> {
 
 		public static final Consumer3<?> INSTANCE = new EmptyConsumer();
@@ -25,7 +25,7 @@ public class Consumers {
 	 * delegiert. Das Schreiben des Werts {@code value} erfolgt über {@code this.target.invoke(null, value)}.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	public static class NativeConsumer<GValue> extends AbstractConsumer<GValue> {
+	public static class MethodConsumer<GValue> extends AbstractConsumer<GValue> {
 
 		public final Method target;
 
@@ -35,7 +35,7 @@ public class Consumers {
 		 * @param forceAccessible {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}.
 		 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die Methode nicht statisch bzw. nicht zugreifbar ist oder keine passende Parameteranzahl besitzt. */
-		public NativeConsumer(final Method target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		public MethodConsumer(final Method target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			if (!Modifier.isStatic(target.getModifiers()) || (target.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
 		}
@@ -56,21 +56,24 @@ public class Consumers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Consumers#toTranslated(Consumer, Getter)} */
-	@SuppressWarnings ("javadoc")
-	public static class TranslatedConsumer<GValue, GValue2> extends AbstractConsumer<GValue2> {
+	/** Diese Klasse implementiert übersetzten {@link Consumer3}, dessen Wert mit Hilfe eines gegebenen {@link Getter} in den Wert eines gegebenen
+	 * {@link Consumer} überführt wird.
+	 *
+	 * @param <GValue> Typ des Werts dieses {@link Consumer3}.
+	 * @param <GValue2> Typ des Werts des gegebenen {@link Consumer}. */
+	public static class TranslatedConsumer<GValue, GValue2> extends AbstractConsumer<GValue> {
 
-		public final Consumer<? super GValue> target;
+		public final Consumer<? super GValue2> target;
 
-		public final Getter<? super GValue2, ? extends GValue> trans;
+		public final Getter<? super GValue, ? extends GValue2> trans;
 
-		public TranslatedConsumer(final Consumer<? super GValue> target, final Getter<? super GValue2, ? extends GValue> trans) {
+		public TranslatedConsumer(final Consumer<? super GValue2> target, final Getter<? super GValue, ? extends GValue2> trans) {
 			this.target = Objects.notNull(target);
 			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
-		public void set(final GValue2 value) {
+		public void set(final GValue value) {
 			this.target.set(this.trans.get(value));
 		}
 
@@ -81,15 +84,22 @@ public class Consumers {
 
 	}
 
-	/** Diese Klasse implementiert {@link Consumers#toSynchronized(Consumer, Object)} */
-	@SuppressWarnings ("javadoc")
+	/** Diese Klasse implementiert einen {@link Consumer3}, welcher einen gegebenen {@link Consumer} über {@code synchronized(this.mutex)} synchronisiert.
+	 *
+	 * @param <GValue> Typ des Werts. */
 	public static class SynchronizedConsumer<GValue> extends AbstractConsumer<GValue> {
 
 		public final Consumer<? super GValue> target;
 
 		public final Object mutex;
 
-		public SynchronizedConsumer(final Consumer<? super GValue> target, final Object mutex) {
+		/** Dieser Konstruktor initialisiert {@link Consumer} und Synchronisationsobjekt. Wenn das Synchronisationsobjekt {@code null} ist, wird {@code this} als
+		 * Synchronisationsobjekt verwendet.
+		 *
+		 * @param target {@link Consumer}.
+		 * @param mutex Synchronisationsobjekt oder {@code null}.
+		 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+		public SynchronizedConsumer(final Consumer<? super GValue> target, final Object mutex) throws NullPointerException {
 			this.target = Objects.notNull(target);
 			this.mutex = Objects.notNull(mutex, this);
 		}
@@ -114,6 +124,8 @@ public class Consumers {
 		return (Consumer3<GValue>)EmptyConsumer.INSTANCE;
 	}
 
+	/** Diese Methode gibt den gegebenen {@link Consumer} als {@link Consumer3} zurück. Wenn er {@code null} ist, wird {@link #empty()} geliefert. */
+	@SuppressWarnings ("unchecked")
 	public static <GValue> Consumer3<GValue> from(final Consumer<? super GValue> target) {
 		if (target == null) return Consumers.empty();
 		if (target instanceof Consumer3) return (Consumer3<GValue>)target;
@@ -149,8 +161,7 @@ public class Consumers {
 		return Consumers.fromNative(field, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field, boolean) Properties.nativeProperty(field,
-	 * forceAccessible)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field, boolean) Properties.nativeProperty(field, forceAccessible)}. */
 	public static <GValue> Consumer3<GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible) {
 		return Consumers.from(Properties.fromNative(field, forceAccessible));
 	}
@@ -160,10 +171,10 @@ public class Consumers {
 		return Consumers.fromNative(method, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link NativeConsumer#NativeConsumer(Method, boolean) new NativeConsumer<>(target, forceAccessible)}. */
+	/** Diese Methode ist eine Abkürzung für {@link MethodConsumer new NativeConsumer<>(target, forceAccessible)}. */
 	public static <GValue> Consumer3<GValue> fromNative(final Method target, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return new NativeConsumer<>(target, forceAccessible);
+		return new MethodConsumer<>(target, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(Class, String, boolean) Consumers.fromNative(fieldOwner, fieldName, true)}. */
@@ -178,33 +189,18 @@ public class Consumers {
 		return Consumers.from(Properties.fromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
-	/** Diese Methode gibt einen übersetzten {@link Consumer} zurück, dessen Wert mit Hilfe des gegebenen {@link Getter} in den Wert des gegebenen
-	 * {@link Consumer} überführt wird.
-	 *
-	 * @param target {@link Consumer}.
-	 * @param trans {@link Getter}.
-	 * @param <GValue> Typ des Werts des gegebenen {@link Consumer} sowie des Werts gegebenen {@link Getter}.
-	 * @param <GValue2> Typ des Datensatzes des gegebenen {@link Getter} sowie des Werts des gelieferten {@link Consumer}.
-	 * @return {@code translated}-{@link Consumer}.
-	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code consumer} {@code null} ist. */
-	public static <GValue, GValue2> Consumer3<GValue2> toTranslated(final Consumer<? super GValue> target,
-		final Getter<? super GValue2, ? extends GValue> trans) {
+	/** Diese Methode ist eine Abkürzung für {@link TranslatedConsumer new TranslatedConsumer<>(target, trans)}. */
+	public static <GValue, GValue2> Consumer3<GValue2> toTranslated(final Consumer<? super GValue> target, final Getter<? super GValue2, ? extends GValue> trans)
+		throws NullPointerException {
 		return new TranslatedConsumer<>(target, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Consumer, Object) Consumers.toSynchronized(consumer, consumer)}. */
-	public static <GValue> Consumer3<GValue> toSynchronized(final Consumer<? super GValue> consumer) {
-		return Consumers.toSynchronized(consumer, consumer);
+	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Consumer, Object) Consumers.toSynchronized(target, target)}. */
+	public static <GValue> Consumer3<GValue> toSynchronized(final Consumer<? super GValue> target) {
+		return Consumers.toSynchronized(target, target);
 	}
 
-	/** Diese Methode gibt einen {@link Consumer} zurück, welcher den gegebenen {@link Consumer} über {@code synchronized(mutex)} synchronisiert. Wenn das
-	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Consumer} als Synchronisationsobjekt verwendet.
-	 *
-	 * @param target {@link Consumer}.
-	 * @param mutex Synchronisationsobjekt oder {@code null}.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @return {@code synchronized}-{@link Consumer}.
-	 * @throws NullPointerException Wenn {@code consumer} {@code null} ist. */
+	/** Diese Methode ist eine Abkürzung für {@link SynchronizedConsumer new SynchronizedConsumer<>(target, mutex)}. */
 	public static <GValue> Consumer3<GValue> toSynchronized(final Consumer<? super GValue> target, final Object mutex) {
 		return new SynchronizedConsumer<>(target, mutex);
 	}
