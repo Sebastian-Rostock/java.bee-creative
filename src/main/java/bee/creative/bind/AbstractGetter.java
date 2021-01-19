@@ -11,32 +11,6 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public Field2<GItem, GValue> toField(Setter<? super GItem, ? super GValue> setter) {
-		return null;
-	}
-
-	@Override
-	public Field2<GItem, GValue> toField() {
-		return null;
-	}
-
-	@Override
-	public Getter3<GItem, GValue> toDefault() {
-		return null;
-	}
-
-	@Override
-	public Getter3<GItem, GValue> toDefault(GValue value) {
-		return null;
-	}
-
-	@Override
-	public <GItem2, GValue2> Getter3<GItem2, GValue2> toTranslated(Getter<? super GItem2, ? extends GItem> toItem,
-		Getter<? super GValue, ? extends GValue2> toValue) throws NullPointerException {
-		return null;
-	}
-
-	@Override
 	public Getter3<Iterable<? extends GItem>, GValue> toAggregated() {
 		return null;
 	}
@@ -58,12 +32,22 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public Getter3<GItem, GValue> toSynchronized() {
+	public Getter3<GItem, GValue> toDefault() {
 		return null;
 	}
 
 	@Override
-	public Getter3<GItem, GValue> toSynchronized(Object mutex) {
+	public Getter3<GItem, GValue> toDefault(GValue value) {
+		return null;
+	}
+
+	@Override
+	public Field2<GItem, GValue> toField() {
+		return null;
+	}
+
+	@Override
+	public Field2<GItem, GValue> toField(Setter<? super GItem, ? super GValue> setter) {
 		return null;
 	}
 
@@ -75,6 +59,22 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	@Override
 	public Producer2<GValue> toProducer(GItem item) {
 		return Producers.from(this, item);
+	}
+
+	@Override
+	public Getter3<GItem, GValue> toSynchronized() {
+		return null;
+	}
+
+	@Override
+	public Getter3<GItem, GValue> toSynchronized(Object mutex) {
+		return null;
+	}
+
+	@Override
+	public <GItem2, GValue2> Getter3<GItem2, GValue2> toTranslated(Getter<? super GItem2, ? extends GItem> toItem,
+		Getter<? super GValue, ? extends GValue2> toValue) throws NullPointerException {
+		return null;
 	}
 
 }
