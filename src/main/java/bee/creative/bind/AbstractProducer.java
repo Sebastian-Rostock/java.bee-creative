@@ -11,6 +11,21 @@ public abstract class AbstractProducer<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
+	public <GValue2> Property2<GValue2> concat(final Field<? super GValue, GValue2> target) {
+		return Properties.concat(this, target);
+	}
+
+	@Override
+	public <GValue2> Producer3<GValue2> concat(final Getter<? super GValue, GValue2> target) {
+		return Producers.concat(this, target);
+	}
+
+	@Override
+	public <GValue2> Consumer3<GValue2> concat(final Setter<? super GValue, GValue2> target) {
+		return Consumers.concat(this, target);
+	}
+
+	@Override
 	public Producer3<GValue> toBuffered() {
 		return Producers.toBuffered(this);
 	}
@@ -43,11 +58,6 @@ public abstract class AbstractProducer<GValue> extends BaseObject implements Pro
 	@Override
 	public Producer3<GValue> toSynchronized(final Object mutex) {
 		return Producers.toSynchronized(this, mutex);
-	}
-
-	@Override
-	public <GValue2> Producer3<GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
-		return Producers.concat(this, trans);
 	}
 
 }

@@ -21,10 +21,13 @@ public class Consumers {
 
 	}
 
-	/** Diese Klasse implementiert . der mit dem gegebenen Datensatz an den gegebenen {@link Setter} delegiert.
-	 *
+	/** Diese Klasse implementiert einen verketteten {@link Consumer3}, welcher den gegebenen Wert beim {@link #set(Object) Schreiben} an einen gegebenen
+	 * {@link Setter} delegiert und dazu den von einem gegebenen {@link Producer} bereitgestellten Datensatz verwendet. Das Schreiben des Werts {@code value}
+	 * erfolgt über {@code this.target.set(this.source.get(), value)}.
+	 * 
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class ConcatConsumer<GItem, GValue> extends AbstractConsumer<GValue> {
 
 		public final Producer<? extends GItem> source;

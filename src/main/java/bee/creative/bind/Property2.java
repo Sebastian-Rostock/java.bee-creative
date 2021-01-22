@@ -35,6 +35,6 @@ public interface Property2<GValue> extends Property<GValue>, Producer2<GValue>, 
 	<GValue2> Property2<GValue2> toTranslated(Getter<? super GValue, ? extends GValue2> transGet, Getter<? super GValue2, ? extends GValue> transSet);
 
 	/** Diese Methode ist eine Abkürtung für {@link Properties#toTranslated(Property, Translator) Properties.toTranslated(this, trans)}. */
-	<GValue2> Property2<GValue2> toTranslated(Translator<GValue2, GValue> trans);
+	<GValue2> Property2<GValue2> toTranslated(Translator<GValue, GValue2> trans);
 
 }

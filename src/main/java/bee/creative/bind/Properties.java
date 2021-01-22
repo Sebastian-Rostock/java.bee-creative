@@ -9,7 +9,6 @@ import bee.creative.lang.Objects;
 /** Diese Klasse implementiert gundlegende {@link Property}.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
 public class Properties {
 
 	/** Diese Klasse implementiert ein {@link Property2}, welches das {@link #set(Object) Schreiben} ignoriert und beim {@link #get() Lesen} stets {@code null}
@@ -326,34 +325,6 @@ public class Properties {
 
 	}
 
-	static class FieldProperty<GValue, GItem> extends AbstractProperty<GValue> {
-
-		public final Field<? super GItem, GValue> target;
-
-		public final GItem item;
-
-		public FieldProperty(final Field<? super GItem, GValue> target, final GItem item) {
-			this.target = Objects.notNull(target);
-			this.item = item;
-		}
-
-		@Override
-		public GValue get() {
-			return this.target.get(this.item);
-		}
-
-		@Override
-		public void set(final GValue value) {
-			this.target.set(this.item, value);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.item);
-		}
-
-	}
-
 	/** Diese Methode liefert {@link EmptyProperty#INSTANCE}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Property2<GValue> empty() {
@@ -361,21 +332,12 @@ public class Properties {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field, Object) Fields.toProperty(null, field)}. */
-	@SuppressWarnings ("unchecked")
-	public static <GValue> Property2<GValue> from(final Field<?, GValue> target) throws NullPointerException {
-		return Properties.from((Field<Object, GValue>)target, null);
+	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target) throws NullPointerException {
+		return Properties.from(target, null);
 	}
 
-	/** Diese Methode gibt ein {@link Property} zurück, dessen Methoden mit dem gegebenen Datensatz an das gegebene {@link Field} delegieren.
-	 * @param target {@link Field}.
-	 * @param item Datensatz.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 * @return {@link Field}-{@link Property}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target, final GItem item) throws NullPointerException {
-		return new FieldProperty<>(target, item);
+		return Properties.concat(Producers.fromValue(item), target);
 	}
 
 	/** Diese Methode gibt das gegebene {@link Property} als {@link Property2} zurück. Wenn es {@code null} ist, wird {@link #empty()} geliefert. */
@@ -459,15 +421,19 @@ public class Properties {
 		return Properties.fromNative(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
+	public static <GItem, GValue> Property2<GValue> concat(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
+		throws NullPointerException {
+		return Properties.from(Producers.concat(source, target), Consumers.concat(source, target));
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link SetupProperty new SetupProperty<>(target, setup)}. */
 	public static <GValue> Property2<GValue> toSetup(final Property<GValue> target, final Producer<? extends GValue> setup) throws NullPointerException {
 		return new SetupProperty<>(target, setup);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link TranslatedProperty new TranslatedProperty<>(target, trans)}. */
-	public static <GValue, GValue2> Property2<GValue> toTranslated(final Property<GValue2> target, final Translator<GValue, GValue2> trans)
+	public static <GValue, GValue2> Property2<GValue> toTranslated(final Property<GValue2> target, final Translator<GValue2, GValue> trans)
 		throws NullPointerException {
-		return new TranslatedProperty<>(target, trans);
+		return toTranslated(target, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Consumer) Properties.from(Producers.toTranslated(target, transGet),

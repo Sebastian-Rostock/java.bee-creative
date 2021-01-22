@@ -8,15 +8,15 @@ package bee.creative.bind;
 public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GItem, GValue>, Setter2<GItem, GValue> {
 
 	@Override
-	Field2<Iterable<? extends GItem>, GValue> toAggregated();
+	public Field2<Iterable<? extends GItem>, GValue> toAggregated();
 
-	<GValue2> Field2<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> toValue,
+	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> toValue,
 		Getter<? super GValue2, ? extends GValue> toValue2);
 
-	<GValue2> Getter2<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> toTarget, GValue2 emptyTarget,
+	public <GValue2> Getter2<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> toTarget, GValue2 emptyTarget,
 		GValue2 mixedTarget);
 
-	Field2<Iterable<? extends GItem>, GValue> toAggregated(GValue emptyTarget, GValue mixedTarget);
+	public Field2<Iterable<? extends GItem>, GValue> toAggregated(GValue emptyTarget, GValue mixedTarget);
 
 	@Override
 	public Field2<GItem, GValue> toDefault();
@@ -35,7 +35,7 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 	public Field2<GItem, GValue> toSynchronized(Object mutex);
 
 	public <GValue2> Field2<GItem, GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> transGet,
-	final Getter<? super GValue2, ? extends GValue> transSet);
+		final Getter<? super GValue2, ? extends GValue> transSet);
 
 	public <GValue2> Field2<GItem, GValue2> toTranslated(final Translator<GValue, GValue2> trans);
 

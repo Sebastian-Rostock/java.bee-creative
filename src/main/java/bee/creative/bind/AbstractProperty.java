@@ -16,6 +16,21 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
+	public <GValue2> Property2<GValue2> concat(Field<? super GValue, GValue2> target) {
+		return Properties.concat(this, target);
+	}
+
+	@Override
+	public <GValue2> Producer3<GValue2> concat(Getter<? super GValue, GValue2> target) {
+		return Producers.concat(this, target);
+	}
+
+	@Override
+	public <GValue2> Consumer3<GValue2> concat(Setter<? super GValue, GValue2> target) {
+		return Consumers.concat(this, target);
+	}
+
+	@Override
 	public Producer3<GValue> toBuffered() {
 		return Producers.toBuffered(this);
 	}
@@ -32,7 +47,7 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 
 	@Override
 	public Field2<Object, GValue> toField() {
-		return null; // TODO Fields.toField(this);
+		return Fields.from(this);
 	}
 
 	@Override
@@ -87,7 +102,7 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public <GValue2> Property2<GValue2> toTranslated(final Translator<GValue2, GValue> trans) {
+	public <GValue2> Property2<GValue2> toTranslated(final Translator<GValue, GValue2> trans) {
 		return Properties.toTranslated(this, trans);
 	}
 

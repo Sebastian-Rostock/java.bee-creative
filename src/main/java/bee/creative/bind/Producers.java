@@ -261,21 +261,13 @@ public class Producers {
 		return Producers.from(target, null);
 	}
 
-	/** Diese Methode gibt einen {@link Producer} zurück, der mit dem gegebenen Datensatz an den gegebenen {@link Getter} delegiert.
-	 *
-	 * @param getter {@link Getter}.
-	 * @param item Datensatz.
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 * @return {@link Getter}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> getter, final GItem item) throws NullPointerException {
-		return new GetterProducer<>(getter, item);
+		return concat(Producers.fromValue(item), getter);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProducer new ValueProducer<>(target)}. */
 	public static <GValue> Producer3<GValue> fromValue(final GValue target) {
-		if(target==null)return empty();
+		if (target == null) return empty();
 		return new ValueProducer<>(target);
 	}
 
@@ -369,19 +361,9 @@ public class Producers {
 		return new BufferedProducer<>(target, mode);
 	}
 
-	public static <GValue, GValue2> Property2<GValue2> concat(final Producer<? extends GValue> target,
-		final Field<? super GValue, ? extends GValue2> trans) throws NullPointerException {
+	public static <GValue, GValue2> Producer3<GValue2> concat(final Producer<? extends GValue> target, final Getter<? super GValue, ? extends GValue2> trans)
+		throws NullPointerException {
 		return new TranslatedProducer<>(target, trans);
-	}
-	
-	public static <GValue, GValue2> Producer3<GValue2> concat(final Producer<? extends GValue> target,
-		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
-		return new TranslatedProducer<>(target, trans);
-	}
-	
-	public static <GValue, GValue2> Consumer3<GValue2> concat(final Producer<? extends GValue> target,
-		final Setter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
-		return new ConcatConsumer<>(trans, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#toSynchronized(Producer, Object) Producers.toSynchronized(target, target)}. */
