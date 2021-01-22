@@ -15,7 +15,4 @@ public interface Producer3<GValue> extends Producer2<GValue> {
 	@Override
 	public Producer3<GValue> toSynchronized(Object mutex);
 
-	/** Diese Methode ist eine Abkürtung für {@link Producers#toTranslated(Producer, Getter) Producers.toTranslated(this, trans)}. */
-	public <GValue2> Producer3<GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> trans);
-
 }

@@ -329,7 +329,7 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparators#translatedComparator(Getter, Comparator)} */
+	/** Diese Klasse implementiert {@link Comparators#concat(Getter, Comparator)} */
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedComparator<GSource, GTarget> implements Comparator<GTarget> {
 
@@ -675,7 +675,7 @@ public class Comparators {
 	 * @param comparator {@link Comparator}.
 	 * @return {@code translated}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparator} {@code null} ist. */
-	public static <GTarget, GSource> Comparator<GTarget> translatedComparator(final Getter<? super GTarget, ? extends GSource> toSource,
+	public static <GTarget, GSource> Comparator<GTarget> concat(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Comparator<? super GSource> comparator) throws NullPointerException {
 		return new TranslatedComparator<>(toSource, comparator);
 	}

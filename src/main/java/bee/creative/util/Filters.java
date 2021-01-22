@@ -103,7 +103,7 @@ public class Filters {
 
 	}
 
-	/** Diese Klasse implementiert {@link Filters#translatedFilter(Getter, Filter)} */
+	/** Diese Klasse implementiert {@link Filters#concat(Getter, Filter)} */
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedFilter<GSource, GTarget> implements Filter<GTarget> {
 
@@ -319,7 +319,7 @@ public class Filters {
 	 *
 	 * @see Filters#toFilter(Getter)
 	 * @see Filters#toGetter(Filter)
-	 * @see Getters#bufferedGetter(int, int, int, Getter)
+	 * @see Getters#toBuffered(int, int, int, Getter)
 	 * @param <GItem> Typ der Elemente.
 	 * @param limit Maximum für die Anzahl der Einträge in der internen {@link Map}.
 	 * @param mode Modus der {@link Pointer}, die auf die Elemente als Schlüssel der {@link Map} erzeugt werden ({@link Pointers#HARD}, {@link Pointers#SOFT},
@@ -327,10 +327,10 @@ public class Filters {
 	 * @param filter {@link Filter}.
 	 * @return {@code buffered}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Getters#bufferedGetter(int, int, int, Getter)} eine entsprechende Ausnahme auslöst. */
+	 * @throws IllegalArgumentException Wenn {@link Getters#toBuffered(int, int, int, Getter)} eine entsprechende Ausnahme auslöst. */
 	public static <GItem> Filter<GItem> bufferedFilter(final int limit, final int mode, final Filter<? super GItem> filter)
 		throws NullPointerException, IllegalArgumentException {
-		return Filters.toFilter(Getters.bufferedGetter(limit, mode, Pointers.HARD, Filters.toGetter(filter)));
+		return Filters.toFilter(Getters.toBuffered(limit, mode, Pointers.HARD, Filters.toGetter(filter)));
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden. Die Akzeptanz eines
@@ -353,7 +353,7 @@ public class Filters {
 	 * @param filter {@link Field}.
 	 * @return {@code translated}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code filter} {@code null} ist. */
-	public static <GSource, GTarget> Filter<GTarget> translatedFilter(final Getter<? super GTarget, ? extends GSource> toSource,
+	public static <GSource, GTarget> Filter<GTarget> concat(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Filter<? super GSource> filter) throws NullPointerException {
 		return new TranslatedFilter<>(toSource, filter);
 	}

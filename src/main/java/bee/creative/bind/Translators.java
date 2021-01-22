@@ -201,27 +201,6 @@ public class Translators {
 
 	}
 
-	/** Diese Klasse implementiert {@link Translators#toSourceGetter(Translator)}. */
-	static class SourceGetter<GSource, GTarget> implements Getter<GTarget, GSource> {
-
-		public final Translator<? extends GSource, ? super GTarget> translator;
-
-		public SourceGetter(final Translator<? extends GSource, ? super GTarget> translator) throws NullPointerException {
-			this.translator = Objects.notNull(translator);
-		}
-
-		@Override
-		public GSource get(final Object input) {
-			return this.translator.toSource(input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator);
-		}
-
-	}
-
 	/** Diese Klasse implementiert {@link Translators#toTargetFilter(Translator)}. */
 	static class TargetFilter implements Filter<Object> {
 
@@ -234,27 +213,6 @@ public class Translators {
 		@Override
 		public boolean accept(final Object item) {
 			return this.translator.isTarget(item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.translator);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Translators#toTargetGetter(Translator)}. */
-	static class TargetGetter<GSource, GTarget> implements Getter<GSource, GTarget> {
-
-		public final Translator<? super GSource, ? extends GTarget> translator;
-
-		public TargetGetter(final Translator<? super GSource, ? extends GTarget> translator) {
-			this.translator = Objects.notNull(translator);
-		}
-
-		@Override
-		public GTarget get(final Object input) {
-			return this.translator.toTarget(input);
 		}
 
 		@Override
@@ -349,19 +307,6 @@ public class Translators {
 		return new SourceFilter(translator);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
-	 * liefert er den Wert {@code translator.toSource(item)}.
-	 *
-	 * @param <GSource> Typ der Quellobjekte des {@link Translator} sowie des Werts des erzeugten {@link Getter}.
-	 * @param <GTarget> Typ der Zielobjekte des {@link Translator} sowie des Datensatzes des erzeugten {@link Getter}.
-	 * @param translator {@link Translator}.
-	 * @return {@link Getter}, der Zielobjekte in Quellobjekte des {@code translator} umwandelt.
-	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static <GSource, GTarget> Getter<GTarget, GSource> toSourceGetter(final Translator<? extends GSource, ? super GTarget> translator)
-		throws NullPointerException {
-		return new SourceGetter<>(translator);
-	}
-
 	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isTarget(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
 	 * {@code item} ist {@code translator.isTarget(item)}.
 	 *
@@ -370,19 +315,6 @@ public class Translators {
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
 	public static Filter<Object> toTargetFilter(final Translator<?, ?> translator) throws NullPointerException {
 		return new TargetFilter(translator);
-	}
-
-	/** Diese Methode gibt einen {@link Getter} zu {@link Translator#toTarget(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
-	 * liefert er den Wert {@code translator.toTarget(item)}.
-	 *
-	 * @param <GSource> Typ der Quellobjekte des {@link Translator} sowie des Datensatzes des erzeugten {@link Getter}.
-	 * @param <GTarget> Typ der Zielobjekte des {@link Translator} sowie des Werts des erzeugten {@link Getter}.
-	 * @param translator {@link Translator}.
-	 * @return {@link Getter}, der Quellobjekte in Zielobjekte des {@code translator} umwandelt.
-	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static <GSource, GTarget> Getter<GSource, GTarget> toTargetGetter(final Translator<? super GSource, ? extends GTarget> translator)
-		throws NullPointerException {
-		return new TargetGetter<>(translator);
 	}
 
 }

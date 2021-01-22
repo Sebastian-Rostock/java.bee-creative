@@ -253,11 +253,11 @@ public class Producers {
 	public static <GValue> Producer3<GValue> from(final Producer<? extends GValue> target) {
 		if (target == null) return Producers.empty();
 		if (target instanceof Producer3) return (Producer3<GValue>)target;
-		return Producers.toTranslated(target, Getters.<GValue>neutral());
+		return Producers.concat(target, Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#from(Getter, Object) Producers.from(target, null)}. */
-	public static <GItem, GValue> Producer2<GValue> from(final Getter<? super GItem, ? extends GValue> target) throws NullPointerException {
+	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> target) throws NullPointerException {
 		return Producers.from(target, null);
 	}
 
@@ -269,12 +269,13 @@ public class Producers {
 	 * @param <GValue> Typ des Werts.
 	 * @return {@link Getter}-{@link Producer}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GItem, GValue> Producer2<GValue> from(final Getter<? super GItem, ? extends GValue> getter, final GItem item) throws NullPointerException {
+	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> getter, final GItem item) throws NullPointerException {
 		return new GetterProducer<>(getter, item);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProducer new ValueProducer<>(target)}. */
 	public static <GValue> Producer3<GValue> fromValue(final GValue target) {
+		if(target==null)return empty();
 		return new ValueProducer<>(target);
 	}
 
@@ -368,10 +369,19 @@ public class Producers {
 		return new BufferedProducer<>(target, mode);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link TranslatedProducer new TranslatedProducer<>(target, trans)}. */
-	public static <GValue, GValue2> Producer3<GValue2> toTranslated(final Producer<? extends GValue> target,
+	public static <GValue, GValue2> Property2<GValue2> concat(final Producer<? extends GValue> target,
+		final Field<? super GValue, ? extends GValue2> trans) throws NullPointerException {
+		return new TranslatedProducer<>(target, trans);
+	}
+	
+	public static <GValue, GValue2> Producer3<GValue2> concat(final Producer<? extends GValue> target,
 		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
 		return new TranslatedProducer<>(target, trans);
+	}
+	
+	public static <GValue, GValue2> Consumer3<GValue2> concat(final Producer<? extends GValue> target,
+		final Setter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
+		return new ConcatConsumer<>(trans, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#toSynchronized(Producer, Object) Producers.toSynchronized(target, target)}. */

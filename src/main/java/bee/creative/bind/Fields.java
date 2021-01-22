@@ -11,46 +11,25 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
 
- 
-	public static class ValueField<GValue> extends AbstractField<Object, GValue> {
+	public static class EmptyField extends AbstractField<Object, Object> {
 
-		public static final ValueField<?> EMPTY = new ValueField<>(null);
-
-		public final GValue value;
-
-		public ValueField(final GValue value) {
-			this.value = value;
-		}
-
-		@Override
-		public GValue get(final Object item) {
-			return this.value;
-		}
-
-		@Override
-		public void set(final Object item, final GValue value) {
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.value);
-		}
+		public static final Field2<?, ?> INSTANCE = new EmptyField();
 
 	}
- 
+
 	public static class NativeField<GItem, GValue> extends AbstractField<GItem, GValue> {
 
-		public final java.lang.reflect.Field field;
+		public final java.lang.reflect.Field target;
 
-		public NativeField(final java.lang.reflect.Field field, final boolean forceAccessible) {
-			this.field = forceAccessible ? Natives.forceAccessible(field) : Objects.notNull(field);
+		public NativeField(final java.lang.reflect.Field target, final boolean forceAccessible) {
+			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public GValue get(final GItem item) {
 			try {
-				return (GValue)this.field.get(item);
+				return (GValue)this.target.get(item);
 			} catch (final IllegalAccessException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -59,7 +38,7 @@ public final class Fields {
 		@Override
 		public void set(final GItem item, final GValue value) {
 			try {
-				this.field.set(item, value);
+				this.target.set(item, value);
 			} catch (final IllegalAccessException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -67,80 +46,249 @@ public final class Fields {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.field);
+			return Objects.toInvokeString(this, this.target, target.isAccessible());
 		}
 
 	}
- 
+
 	public static class SetupField<GItem, GValue> extends AbstractField<GItem, GValue> {
 
 		public final Getter<? super GItem, ? extends GValue> setup;
 
-		public final Field<? super GItem, GValue> field;
+		public final Field<? super GItem, GValue> target;
 
-		public SetupField(final Getter<? super GItem, ? extends GValue> setup, final Field<? super GItem, GValue> field) {
+		public SetupField(final Field<? super GItem, GValue> target, final Getter<? super GItem, ? extends GValue> setup) {
+			this.target = Objects.notNull(target);
 			this.setup = Objects.notNull(setup);
-			this.field = Objects.notNull(field);
 		}
 
 		@Override
 		public GValue get(final GItem item) {
-			GValue result = this.field.get(item);
+			GValue result = this.target.get(item);
 			if (result != null) return result;
 			result = this.setup.get(item);
-			this.field.set(item, result);
+			this.target.set(item, result);
 			return result;
 		}
 
 		@Override
 		public void set(final GItem item, final GValue value) {
-			this.field.set(item, value);
+			this.target.set(item, value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.setup, this.field);
+			return Objects.toInvokeString(this, this.target, this.setup);
 		}
 
 	}
 
- 
 	public static class DefaultField<GItem, GValue> extends AbstractField<GItem, GValue> {
 
-		public final Field<? super GItem, GValue> field;
+		public final Field<? super GItem, GValue> target;
 
 		public final GValue value;
 
-		public DefaultField(final Field<? super GItem, GValue> field, final GValue value) {
-			this.field = Objects.notNull(field);
+		public DefaultField(final Field<? super GItem, GValue> target, final GValue value) {
+			this.target = Objects.notNull(target);
 			this.value = value;
 		}
 
 		@Override
 		public GValue get(final GItem item) {
 			if (item == null) return this.value;
-			return this.field.get(item);
+			return this.target.get(item);
 		}
 
 		@Override
 		public void set(final GItem item, final GValue value) {
 			if (item == null) return;
-			this.field.set(item, value);
+			this.target.set(item, value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.field, this.value);
+			return Objects.toInvokeString(this, this.target, this.value);
 		}
 
 	}
 
- 
-	public static class MappingField<GItem, GValue> extends AbstractField<GItem, GValue> {
+	/** Diese Klasse implementiert ein zusammengesetztes {@link Field2}, welches das {@link #get(Object) Lesen} an einen gegebenen {@link Getter} und das
+	 * {@link #set(Object, Object) Schreiben} an einen gegebenen {@link Setter} delegiert.
+	 *
+	 * @param <GItem> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft. */
+	@SuppressWarnings ("javadoc")
+	public static class CompositeField<GItem, GValue> extends AbstractField<GItem, GValue> {
+
+		public final Getter<? super GItem, ? extends GValue> get;
+
+		public final Setter<? super GItem, ? super GValue> set;
+
+		public CompositeField(final Getter<? super GItem, ? extends GValue> get, final Setter<? super GItem, ? super GValue> set) {
+			this.get = Objects.notNull(get);
+			this.set = Objects.notNull(set);
+		}
+
+		@Override
+		public GValue get(final GItem item) {
+			return this.get.get(item);
+		}
+
+		@Override
+		public void set(final GItem item, final GValue value) {
+			this.set.set(item, value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.get, this.set);
+		}
+
+	}
+
+	public static class ConcatField<GItem, GItem2, GValue> extends AbstractField<GItem, GValue> {
+
+		public final Getter<? super GItem, ? extends GItem2> source;
+
+		public final Field<? super GItem2, GValue> target;
+
+		public ConcatField(final Getter<? super GItem, ? extends GItem2> source, final Field<? super GItem2, GValue> target) {
+			this.source = Objects.notNull(source);
+			this.target = Objects.notNull(target);
+		}
+
+		@Override
+		public GValue get(final GItem item) {
+			return this.target.get(this.source.get(item));
+		}
+
+		@Override
+		public void set(final GItem item, final GValue value) {
+			this.target.set(this.source.get(item), value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.source, this.target);
+		}
+
+	}
+
+	/** Diese Klasse implementiert ein {@link Observable überwachbares} {@link Field Datenfeld}.
+	 *
+	 * @param <GItem> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft. */
+	public static class ObservableField<GItem, GValue> extends AbstractField<GItem, GValue> implements Observable<UpdateFieldMessage, UpdateFieldObserver> {
+
+		/** Dieses Feld speichert das Datenfel, an das in {@link #get(Object)} und {@link #set(Object, Object)} delegiert wird. */
+		public final Field<? super GItem, GValue> target;
+
+		/** Dieser Konstruktor initialisiert das überwachte Datenfeld.
+		 *
+		 * @param target überwachtes Datenfeld. */
+		public ObservableField(final Field<? super GItem, GValue> target) {
+			this.target = Objects.notNull(target);
+		}
+
+		@Override
+		public GValue get(final GItem input) {
+			return this.target.get(input);
+		}
+
+		@Override
+		public void set(final GItem item, final GValue newValue) {
+			GValue oldValue = this.target.get(item);
+			if (this.customEquals(oldValue, newValue)) return;
+			oldValue = this.customClone(oldValue);
+			this.target.set(item, newValue);
+			this.fire(new UpdateFieldMessage(this, item, oldValue, newValue));
+		}
+
+		@Override
+		public UpdateFieldObserver put(final UpdateFieldObserver listener) throws IllegalArgumentException {
+			return UpdateFieldEvent.INSTANCE.put(this, listener);
+		}
+
+		@Override
+		public UpdateFieldObserver putWeak(final UpdateFieldObserver listener) throws IllegalArgumentException {
+			return UpdateFieldEvent.INSTANCE.putWeak(this, listener);
+		}
+
+		@Override
+		public void pop(final UpdateFieldObserver listener) throws IllegalArgumentException {
+			UpdateFieldEvent.INSTANCE.pop(this, listener);
+		}
+
+		@Override
+		public UpdateFieldMessage fire(final UpdateFieldMessage event) throws NullPointerException {
+			return UpdateFieldEvent.INSTANCE.fire(this, event);
+		}
+
+		@Override
+		public String toString() {
+			return this.target.toString();
+		}
+
+		/** Diese Methode gibt eine Kopie des gegebenen Werts oder diesen unverändert zurück. Vor dem Schreiben des neuen Werts wird vom alten Wert über diese
+		 * Methode eine Kopie erzeugt, welche nach dem Schreiben beim auslösen des Ereignisses zur Aktualisierung eingesetzt wird. Eine Kopie ist hierbei nur dann
+		 * nötig, wenn der alte Wert sich durch das Schreiben des neuen ändert.
+		 *
+		 * @param value alter Wert.
+		 * @return gegebener oder kopierter Wert. */
+		protected GValue customClone(final GValue value) {
+			return value;
+		}
+
+		/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Werte zurück. Sie wird beim Setzen des Werts zur Erkennung einer
+		 * Wertänderung eingesetzt.
+		 *
+		 * @param value1 alter Wert.
+		 * @param value2 neuer Wert.
+		 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
+		protected boolean customEquals(final GValue value1, final GValue value2) {
+			return Objects.deepEquals(value1, value2);
+		}
+
+	}
+
+	public static class SynchronizedField<GItem, GValue> extends AbstractField<GItem, GValue> {
+
+		public final Object mutex;
+
+		public final Field<? super GItem, GValue> target;
+
+		public SynchronizedField(final Field<? super GItem, GValue> target, final Object mutex) {
+			this.target = Objects.notNull(target);
+			this.mutex = Objects.notNull(mutex, this);
+		}
+
+		@Override
+		public GValue get(final GItem item) {
+			synchronized (this.mutex) {
+				return this.target.get(item);
+			}
+		}
+
+		@Override
+		public void set(final GItem item, final GValue value) {
+			synchronized (this.mutex) {
+				this.target.set(item, value);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.target, this.mutex == this ? null : this.mutex);
+		}
+
+	}
+
+	static class MapField<GItem, GValue> extends AbstractField<GItem, GValue> {
 
 		public final Map<GItem, GValue> mapping;
 
-		public MappingField(final Map<GItem, GValue> mapping) {
+		public MapField(final Map<GItem, GValue> mapping) {
 			this.mapping = Objects.notNull(mapping);
 		}
 
@@ -161,203 +309,81 @@ public final class Fields {
 
 	}
 
- 
-	public static class NavigatedField<GSource, GTarget, GValue> extends AbstractField<GSource, GValue> {
-
-		public final Getter<? super GSource, ? extends GTarget> toTarget;
-
-		public final Field<? super GTarget, GValue> field;
-
-		public NavigatedField(final Getter<? super GSource, ? extends GTarget> toTarget, final Field<? super GTarget, GValue> field) {
-			this.toTarget = Objects.notNull(toTarget);
-			this.field = Objects.notNull(field);
-		}
-
-		@Override
-		public GValue get(final GSource item) {
-			return this.field.get(this.toTarget.get(item));
-		}
-
-		@Override
-		public void set(final GSource item, final GValue value) {
-			this.field.set(this.toTarget.get(item), value);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.toTarget, this.field);
-		}
-
-	}
-
- 
-	public static class CompositeField<GItem, GValue> extends AbstractField<GItem, GValue> {
-
-		public final Getter<? super GItem, ? extends GValue> getter;
-
-		public final Setter<? super GItem, ? super GValue> setter;
-
-		public CompositeField(final Getter<? super GItem, ? extends GValue> getter, final Setter<? super GItem, ? super GValue> setter) {
-			this.getter = Objects.notNull(getter);
-			this.setter = Objects.notNull(setter);
-		}
-
-		@Override
-		public GValue get(final GItem item) {
-			return this.getter.get(item);
-		}
-
-		@Override
-		public void set(final GItem item, final GValue value) {
-			this.setter.set(item, value);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.getter, this.setter);
-		}
-
-	}
-
- 
-	public static class TranslatedField<GItem, GTarget, GSource> extends AbstractField<GItem, GTarget> {
-
-		public final Field<? super GItem, GSource> field;
-
-		public final Translator<GSource, GTarget> translator;
-
-		public TranslatedField(final Field<? super GItem, GSource> field, final Translator<GSource, GTarget> translator) {
-			this.field = Objects.notNull(field);
-			this.translator = Objects.notNull(translator);
-		}
-
-		@Override
-		public GTarget get(final GItem item) {
-			return this.translator.toTarget(this.field.get(item));
-		}
-
-		@Override
-		public void set(final GItem item, final GTarget value) {
-			this.field.set(item, this.translator.toSource(value));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.field, this.translator);
-		}
-
-	}
-
- 
-	public static class SynchronizedField<GItem, GValue> extends AbstractField<GItem, GValue> {
-
-		public final Object mutex;
-
-		public final Field<? super GItem, GValue> field;
-
-		public SynchronizedField(final Object mutex, final Field<? super GItem, GValue> field) {
-			this.mutex = Objects.notNull(mutex, this);
-			this.field = Objects.notNull(field);
-		}
-
-		@Override
-		public GValue get(final GItem item) {
-			synchronized (this.mutex) {
-				return this.field.get(item);
-			}
-		}
-
-		@Override
-		public void set(final GItem item, final GValue value) {
-			synchronized (this.mutex) {
-				this.field.set(item, value);
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.field);
-		}
-
-	}
-
 	static class PropertyField<GValue> extends AbstractField<Object, GValue> {
-	
+
 		public final Property<GValue> property;
-	
+
 		public PropertyField(final Property<GValue> property) {
 			this.property = Objects.notNull(property);
 		}
-	
+
 		@Override
 		public GValue get(final Object input) {
 			return this.property.get();
 		}
-	
+
 		@Override
 		public void set(final Object input, final GValue value) {
 			this.property.set(value);
 		}
-	
+
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.property);
 		}
-	
+
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#valueField(Object) Fields.valueField(null)}. */
 	@SuppressWarnings ("unchecked")
-	public static <GValue> AbstractField<Object, GValue> emptyField() {
-		return (AbstractField<Object, GValue>)ValueField.EMPTY;
+	public static <GItem, GValue> Field2<GItem, GValue> empty() {
+		return (Field2<GItem, GValue>)EmptyField.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.compositeField(getter, Setters.emptySetter())}.
+	/** Diese Methode gibt ein {@link Field} zurück, das seinen Datensatz ignoriert und den Wert des gegebenen {@link Property} manipuliert. */
+	public static <GValue> Field2<Object, GValue> from(final Property<GValue> target) throws NullPointerException {
+		return new PropertyField<>(target);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Fields.empty(), target)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> from(final Setter<? super GItem, ? super GValue> target) throws NullPointerException {
+		return from(Fields.<GItem, GValue>empty(), target);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(target, Fields.empty())}.
 	 *
 	 * @see Setters#empty() */
-	public static <GItem, GValue> Field<GItem, GValue> toField(final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException {
-		return from(getter, Setters.<GValue>empty());
+	public static <GItem, GValue> Field<GItem, GValue> from(final Getter<? super GItem, ? extends GValue> target) throws NullPointerException {
+		return Fields.from(target, Fields.<GItem, GValue>empty());
 	}
 
-	/** Diese Methode gibt ein {@link Field} zurück, das seinen Datensatz ignoriert und den Wert des gegebenen {@link Property} manipuliert.
-	 *
-	 * @param <GValue> Typ des Werts.
-	 * @param property {@link Property}.
-	 * @return {@link Property}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
-	public static <GValue> Field2<Object, GValue> toField(final Property<GValue> property) {
-		return new PropertyField<>(property);
-	}
-
-	/** Diese Methode gibt ein {@link Field} zurück, das stets den gegebenen Wert liefert und das Schreiben ignoriert.
-	 *
-	 * @param <GValue> Typ des Werts.
-	 * @param value Wert.
-	 * @return {@code value}-{@link Field}. */
-	public static <GValue> AbstractField<Object, GValue> valueField(final GValue value) {
-		if (value == null) return Fields.emptyField();
-		return new ValueField<>(value);
-	}
-
-	/** Diese Methode gibt ein initialisierendes {@link Field} zurück. Das Schreiben wird direkt an das gegebene {@link Field} {@code field} delegiert. Beim Lesen
-	 * wird der Wert zuerst über das gegebene {@link Field} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. üner den gegebenen
-	 * {@link Getter} {@code setup} ermittelt und über das {@link Field} {@code field} geschrieben.
-	 * @param target Datenfeld zur Manipulation.
-	 * @param setup Methode zur Initialisierung.
+	/** Diese Methode gibt ein zusammengesetztes {@link Field} zurück, dessen Methoden an die des gegebenen {@link Getter} und {@link Setter} delegieren.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 * @return {@code setup}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} bzw. {@code setup} {@code null} ist. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> toSetup(final Field<? super GItem, GValue> target,
-		final Getter<? super GItem, ? extends GValue> setup) throws NullPointerException {
-		return new SetupField<>(setup, target);
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param get {@link Getter} für {@link Field#get(Object)}.
+	 * @param set {@link Setter} für {@link Field#set(Object, Object)}.
+	 * @return {@code composite}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code getter} bzw. {@code setter} {@code null} ist. */
+	public static <GItem, GValue> Field2<GItem, GValue> from(final Getter<? super GItem, ? extends GValue> get, final Setter<? super GItem, ? super GValue> set)
+		throws NullPointerException {
+		return new CompositeField<>(get, set);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(java.lang.reflect.Field, boolean) Fields.nativeField(field, true)}. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> nativeField(final java.lang.reflect.Field field)
-		throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(field, true);
+	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen am {@link Map#get(Object)} sowie beim Schreiben an {@link Map#put(Object, Object)}
+	 * delegiert.
+	 *
+	 * @param <GItem> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 * @param target {@link Map} zur Abbildung von einer Eingabe auf einen Wert.
+	 * @return {@code mapping}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
+	public static <GItem, GValue> Field2<GItem, GValue> fromMap(final Map<GItem, GValue> target) throws NullPointerException {
+		return new MapField<>(target);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(java.lang.reflect.Field, boolean) Fields.nativeField(field, true)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+		return Fields.fromNative(field, true);
 	}
 
 	/** Diese Methode gibt ein {@link Field} zum gegebenen {@link java.lang.reflect.Field nativen Datenfeld} zurück. Für eine Eingabe {@code item} erfolgt das
@@ -373,45 +399,54 @@ public final class Fields {
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das Datenfeld nicht zugrifbar ist. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> nativeField(final java.lang.reflect.Field field, final boolean forceAccessible)
+	public static <GItem, GValue> Field2<GItem, GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new NativeField<>(field, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Method, Method, boolean) Fields.nativeField(getMethod, setMethod, true)}. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> nativeField(final Method getMethod, final Method setMethod)
+	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(Method, Method, boolean) Fields.nativeField(getMethod, setMethod, true)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> fromNative(final Method getMethod, final Method setMethod)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(getMethod, setMethod, true);
+		return Fields.fromNative(getMethod, setMethod, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.compositeField(Getters.nativeGetter(getMethod, forceAccessible),
 	 * Setters.nativeSetter(setMethod, forceAccessible))}.
 	 *
-	 * @see Getters#nativeGetter(Method, boolean)
-	 * @see Setters#nativeSetter(Method, boolean) */
-	public static <GItem, GValue> AbstractField<GItem, GValue> nativeField(final Method getMethod, final Method setMethod, final boolean forceAccessible)
+	 * @see Getters#fromNative(Method, boolean)
+	 * @see Setters#fromNative(Method, boolean) */
+	public static <GItem, GValue> Field2<GItem, GValue> fromNative(final Method getMethod, final Method setMethod, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.from(Getters.<GItem, GValue>nativeGetter(getMethod, forceAccessible),
-			Setters.<GItem, GValue>nativeSetter(setMethod, forceAccessible));
+		return Fields.from(Getters.<GItem, GValue>fromNative(getMethod, forceAccessible), Setters.<GItem, GValue>fromNative(setMethod, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#nativeField(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, true)}. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName)
+	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, true)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(fieldOwner, fieldName, true);
+		return Fields.fromNative(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #nativeField(java.lang.reflect.Field, boolean) Fields.nativeField(Natives.parseField(fieldOwner, fieldName),
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Fields.nativeField(Natives.parseField(fieldOwner, fieldName),
 	 * forceAccessible)}.
 	 *
 	 * @see Natives#parseField(Class, String) */
-	public static <GItem, GValue> AbstractField<GItem, GValue> nativeField(final Class<? extends GItem> fieldOwner, final String fieldName,
+	public static <GItem, GValue> Field2<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName,
 		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(Natives.parseField(fieldOwner, fieldName), forceAccessible);
+		return Fields.fromNative(Natives.parseField(fieldOwner, fieldName), forceAccessible);
+	}
+
+	/** Diese Methode ist eine effiziente Alternative zu {@link #from(Getter, Setter) Fields.from(Getters.concat(source, target), Setters.concat(source,
+	 * target))}.
+	 *
+	 * @see Getters#concat(Getter, Getter)
+	 * @see Setters#concat(Getter, Setter) */
+	public static <GSource, GTarget, GValue> Field2<GSource, GValue> concat(final Getter<? super GSource, ? extends GTarget> source,
+		final Field<? super GTarget, GValue> target) throws NullPointerException {
+		return new ConcatField<>(source, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toDefault(Field, Object) Fields.defaultField(null, field)}. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> toDefault(final Field<? super GItem, GValue> field) throws NullPointerException {
+	public static <GItem, GValue> Field2<GItem, GValue> toDefault(final Field<? super GItem, GValue> field) throws NullPointerException {
 		return Fields.toDefault(field, null);
 	}
 
@@ -419,42 +454,24 @@ public final class Fields {
 	 * Fields.defaultSetter(field))}.
 	 *
 	 * @see Getters#toDefault(Getter, Object)
-	 * @see Setters#defaultSetter(Setter) */
-	public static <GItem, GValue> AbstractField<GItem, GValue> toDefault(final Field<? super GItem, GValue> target, final GValue value)
-		throws NullPointerException {
+	 * @see Setters#toDefault(Setter) */
+	public static <GItem, GValue> Field2<GItem, GValue> toDefault(final Field<? super GItem, GValue> target, final GValue value) throws NullPointerException {
 		return new DefaultField<>(target, value);
 	}
 
-	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen am {@link Map#get(Object)} sowie beim Schreiben an {@link Map#put(Object, Object)}
-	 * delegiert.
+	/** Diese Methode gibt ein initialisierendes {@link Field} zurück. Das Schreiben wird direkt an das gegebene {@link Field} {@code field} delegiert. Beim Lesen
+	 * wird der Wert zuerst über das gegebene {@link Field} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. üner den gegebenen
+	 * {@link Getter} {@code setup} ermittelt und über das {@link Field} {@code field} geschrieben.
 	 *
-	 * @param <GEntry> Typ der Eingabe.
+	 * @param target Datenfeld zur Manipulation.
+	 * @param setup Methode zur Initialisierung.
+	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts.
-	 * @param mapping {@link Map} zur Abbildung von einer Eingabe auf einen Wert.
-	 * @return {@code mapping}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
-	public static <GEntry, GValue> AbstractField<GEntry, GValue> mappingField(final Map<GEntry, GValue> mapping) throws NullPointerException {
-		return new MappingField<>(mapping);
-	}
-
-	/** Diese Methode ist eine effiziente Alternative zu {@link #from(Getter, Setter) Fields.compositeField(Getters.navigatedGetter(toTarget, field),
-	 * Setters.navigatedSetter(toTarget, field))}.
-	 *
-	 * @see Getters#navigatedGetter(Getter, Getter)
-	 * @see Setters#navigatedSetter(Getter, Setter) */
-	public static <GSource, GTarget, GValue> AbstractField<GSource, GValue> navigatedField(final Getter<? super GSource, ? extends GTarget> toTarget,
-		final Field<? super GTarget, GValue> field) throws NullPointerException {
-		return new NavigatedField<>(toTarget, field);
-	}
-
-	/** Diese Methode ist eine effiziente Alternative zu {@link #translatedField(Getter, Getter, Field)
-	 * Fields.translatedField(Translators.toTargetGetter(translator), Translators.toSourceGetter(translator), field)}.
-	 *
-	 * @see Translators#toTargetGetter(Translator)
-	 * @see Translators#toSourceGetter(Translator) */
-	public static <GItem, GSource, GTarget> AbstractField<GItem, GTarget> translatedField(final Translator<GSource, GTarget> translator,
-		final Field<? super GItem, GSource> field) throws NullPointerException {
-		return new TranslatedField<>(field, translator);
+	 * @return {@code setup}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code field} bzw. {@code setup} {@code null} ist. */
+	public static <GItem, GValue> Field2<GItem, GValue> toSetup(final Field<? super GItem, GValue> target, final Getter<? super GItem, ? extends GValue> setup)
+		throws NullPointerException {
+		return new SetupField<>(target, setup);
 	}
 
 	/** Diese Methode gibt ein übersetztes {@link Field} zurück. Das erzeugte {@link Field} liefert beim Lesen den Wert, der über den gegebenen {@link Getter}
@@ -464,85 +481,73 @@ public final class Fields {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GTarget> Typ des Werts des erzeugten {@link Field}.
 	 * @param <GSource> Typ des Werts des gegebenen {@link Field}.
-	 * @param field {@link Field} zur Modifikation.
-	 * @param toTarget {@link Getter} zum Umwandeln des Wert beim Lesen.
-	 * @param toSource {@link Getter} zum Umwandeln des Wert beim Schreiben.
+	 * @param target {@link Field} zur Modifikation.
+	 * @param transGet {@link Getter} zum Umwandeln des Wert beim Lesen.
+	 * @param transSet {@link Getter} zum Umwandeln des Wert beim Schreiben.
 	 * @return {@code translated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field}, {@code toTarget} bzw. {@code toSource} {@code null} ist. */
-	public static <GItem, GSource, GTarget> AbstractField<GItem, GTarget> translatedField(final Getter<? super GSource, ? extends GTarget> toTarget,
-		final Getter<? super GTarget, ? extends GSource> toSource, final Field<? super GItem, GSource> field) throws NullPointerException {
-		return Fields.from(Getters.toTranslated(field, toTarget), Setters.translatedSetter(toSource, field));
+	public static <GItem, GSource, GTarget> Field2<GItem, GTarget> toTranslated(final Field<? super GItem, GSource> target,
+		final Getter<? super GSource, ? extends GTarget> transGet, final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
+		return Fields.from(Getters.concat(target, transGet), Setters.toTranslated(target, transSet));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ObservableField new ObservableField<>(field)}. */
-	public static <GItem, GValue> ObservableField<GItem, GValue> observableField(final Field<? super GItem, GValue> field) throws NullPointerException {
-		return new ObservableField<>(field);
-	}
- 
-	/** Diese Methode gibt ein zusammengesetztes {@link Field} zurück, dessen Methoden an die des gegebenen {@link Getter} und {@link Setter} delegieren.
+	/** Diese Methode ist eine effiziente Alternative zu {@link #toTranslated(Field, Getter, Getter)
+	 * Fields.translatedField(Translators.toTargetGetter(translator), Translators.toSourceGetter(translator), field)}.
 	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param getter {@link Getter} für {@link Field#get(Object)}.
-	 * @param setter {@link Setter} für {@link Field#set(Object, Object)}.
-	 * @return {@code composite}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code getter} bzw. {@code setter} {@code null} ist. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> from(final Getter<? super GItem, ? extends GValue> getter,
-		final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
-		return new CompositeField<>(getter, setter);
+	 * @see Getters#fromTarget(Translator)
+	 * @see Getters#fromSource(Translator) */
+	public static <GItem, GSource, GTarget> Field2<GItem, GTarget> toTranslated(final Field<? super GItem, GSource> target,
+		final Translator<GSource, GTarget> trans) throws NullPointerException {
+		return Fields.toTranslated(target, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #aggregatedField(Getter, Getter, Field) Fields.aggregatedField(Getters.neutralGetter(),
+	/** Diese Methode ist eine Abkürzung für {@link ObservableField new ObservableField<>(target)}. */
+	public static <GItem, GValue> ObservableField<GItem, GValue> toObservable(final Field<? super GItem, GValue> target) throws NullPointerException {
+		return new ObservableField<>(target);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Getter, Getter, Field) Fields.aggregatedField(Getters.neutralGetter(),
 	 * Getters.neutralGetter(), field)}. */
-	public static <GItem, GValue> AbstractField<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field)
+	public static <GItem, GValue> Field2<Iterable<? extends GItem>, GValue> toAggregated(final Field<? super GItem, GValue> field)
 		throws NullPointerException {
-		return Fields.aggregatedField(Getters.<GValue>neutral(), Getters.<GValue>neutral(), field);
+		return Fields.toAggregated(Getters.<GValue>neutral(), Getters.<GValue>neutral(), field);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #aggregatedField(Getter, Getter, Object, Object, Field) Fields.aggregatedField(Getters.neutralGetter(),
+	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Getter, Getter, Object, Object, Field) Fields.aggregatedField(Getters.neutralGetter(),
 	 * Getters.neutralGetter(), emptyTarget, mixedTarget, field)}. */
-	public static <GEntry, GValue> AbstractField<Iterable<? extends GEntry>, GValue> aggregatedField(final GValue emptyTarget, final GValue mixedTarget,
+	public static <GEntry, GValue> Field2<Iterable<? extends GEntry>, GValue> toAggregated(final GValue emptyTarget, final GValue mixedTarget,
 		final Field<? super GEntry, GValue> field) throws NullPointerException {
-		return Fields.aggregatedField(Getters.<GValue>neutral(), Getters.<GValue>neutral(), emptyTarget, mixedTarget, field);
+		return Fields.toAggregated(Getters.<GValue>neutral(), Getters.<GValue>neutral(), emptyTarget, mixedTarget, field);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #aggregatedField(Getter, Getter, Object, Object, Field) Fields.aggregatedField(toTarget, toSource, null, null,
+	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Getter, Getter, Object, Object, Field) Fields.aggregatedField(toTarget, toSource, null, null,
 	 * field)}. */
-	public static <GEntry, GSource, GTarget> AbstractField<Iterable<? extends GEntry>, GTarget> aggregatedField(
+	public static <GEntry, GSource, GTarget> Field2<Iterable<? extends GEntry>, GTarget> toAggregated(
 		final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GTarget, ? extends GSource> toSource,
 		final Field<? super GEntry, GSource> field) throws NullPointerException {
-		return Fields.aggregatedField(toTarget, toSource, null, null, field);
+		return Fields.toAggregated(toTarget, toSource, null, null, field);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.compositeField(Getters.aggregatedGetter(toTarget, emptyTarget,
-	 * mixedTarget, field), Setters.aggregatedSetter(toSource, field))}. Mit einem aggregierten {@link Field} können die Elemente des iterierbaren Datensatzes
-	 * parallel modifiziert werden.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.compositeField(Getters.aggregatedGetter(toTarget, emptyTarget, mixedTarget,
+	 * field), Setters.aggregatedSetter(toSource, field))}. Mit einem aggregierten {@link Field} können die Elemente des iterierbaren Datensatzes parallel
+	 * modifiziert werden.
 	 *
-	 * @see Getters#aggregatedGetter(Getter, Object, Object, Getter)
-	 * @see Setters#aggregatedSetter(Getter, Setter) */
-	public static <GEntry, GSource, GTarget> AbstractField<Iterable<? extends GEntry>, GTarget> aggregatedField(
+	 * @see Getters#toAggregated(Getter, Getter, Object, Object)
+	 * @see Setters#toAggregated(Setter, Getter) */
+	public static <GEntry, GSource, GTarget> Field2<Iterable<? extends GEntry>, GTarget> toAggregated(
 		final Getter<? super GSource, ? extends GTarget> toTarget, final Getter<? super GTarget, ? extends GSource> toSource, final GTarget emptyTarget,
 		final GTarget mixedTarget, final Field<? super GEntry, GSource> field) throws NullPointerException {
-		return Fields.from(Getters.aggregatedGetter(toTarget, emptyTarget, mixedTarget, field), Setters.aggregatedSetter(toSource, field));
+		return Fields.from(Getters.toAggregated(field, toTarget, emptyTarget, mixedTarget), Setters.toAggregated(field, toSource));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Field, Object) Fields.synchronizedField(field, field)}. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> toSynchronized(final Field<? super GItem, GValue> target) throws NullPointerException {
+	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Field, Object) Fields.toSynchronized(target, target)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> toSynchronized(final Field<? super GItem, GValue> target) throws NullPointerException {
 		return Fields.toSynchronized(target, target);
 	}
 
-	/** Diese Methode gibt einen {@link Field} zurück, welcher das gegebenen {@link Field} über {@code synchronized(mutex)} synchronisiert. Wenn das
-	 * Synchronisationsobjekt {@code null} ist, wird das erzeugte {@link Field} als Synchronisationsobjekt verwendet.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 * @param target {@link Field}.
-	 * @param mutex Synchronisationsobjekt oder {@code null}.
-	 * @return {@code synchronized}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GItem, GValue> AbstractField<GItem, GValue> toSynchronized(final Field<? super GItem, GValue> target, final Object mutex)
+	public static <GItem, GValue> Field2<GItem, GValue> toSynchronized(final Field<? super GItem, GValue> target, final Object mutex)
 		throws NullPointerException {
-		return new SynchronizedField<>(mutex, target);
+		return new SynchronizedField<>(target, mutex);
 	}
 
 }

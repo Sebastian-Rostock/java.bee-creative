@@ -1,5 +1,6 @@
 package bee.creative.bind;
 
+import bee.creative.bind.Fields.ObservableField;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert die Nachricht des {@link UpdateFieldEvent} */
@@ -7,16 +8,16 @@ public class UpdateFieldMessage {
 
 	/** Dieses Feld speichert den Sender des Ereignisses.
 	 *
-	 * @see ObservableField#field */
+	 * @see ObservableField#target */
 	public final ObservableField<?, ?> sender;
 
-	/** Dieses Feld speichert die Eingabe, dessen {@link ObservableField#field Datenfeld} geändert wurde. */
+	/** Dieses Feld speichert die Eingabe, dessen {@link ObservableField#target Datenfeld} geändert wurde. */
 	public final Object item;
 
-	/** Dieses Feld speichert den alten Wert des {@link ObservableField#field Datenfelds}. */
+	/** Dieses Feld speichert den alten Wert des {@link ObservableField#target Datenfelds}. */
 	public final Object oldValue;
 
-	/** Dieses Feld speichert den neuen Wert des {@link ObservableField#field Datenfelds}. */
+	/** Dieses Feld speichert den neuen Wert des {@link ObservableField#target Datenfelds}. */
 	public final Object newValue;
 
 	/** Dieser Konstruktor initialisiert die Eigenschafte des Ereignisses. */

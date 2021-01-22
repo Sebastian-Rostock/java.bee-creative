@@ -205,7 +205,7 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#translatedComparable(Getter, Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#concat(Getter, Comparable)} */
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedComparable<GSource, GTarget> implements Comparable<GSource> {
 
@@ -791,7 +791,7 @@ public class Comparables {
 	 * @param comparable {@link Comparable}.
 	 * @return {@code translated}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparable} {@code null} ist. */
-	public static <GSource, GTarget> Comparable<GTarget> translatedComparable(final Getter<? super GTarget, ? extends GSource> toSource,
+	public static <GSource, GTarget> Comparable<GTarget> concat(final Getter<? super GTarget, ? extends GSource> toSource,
 		final Comparable<? super GSource> comparable) throws NullPointerException {
 		return new TranslatedComparable<>(toSource, comparable);
 	}

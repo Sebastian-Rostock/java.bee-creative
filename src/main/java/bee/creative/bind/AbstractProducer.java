@@ -47,7 +47,7 @@ public abstract class AbstractProducer<GValue> extends BaseObject implements Pro
 
 	@Override
 	public <GValue2> Producer3<GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
-		return Producers.toTranslated(this, trans);
+		return Producers.concat(this, trans);
 	}
 
 }

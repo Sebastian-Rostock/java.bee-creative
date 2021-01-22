@@ -12,6 +12,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import bee.creative.bind.Getters;
 import bee.creative.bind.Translator;
 import bee.creative.bind.Translators;
 import bee.creative.lang.Objects;
@@ -849,7 +850,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.translatedIterator(Translators.toTargetGetter(this.translator), this.items.iterator());
+			return Iterators.translatedIterator(Getters.fromTarget(this.translator), this.items.iterator());
 		}
 
 		@Override
@@ -930,7 +931,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.translatedIterator(Translators.toTargetGetter(this.translator), this.items.iterator());
+			return Iterators.translatedIterator(Getters.fromTarget(this.translator), this.items.iterator());
 		}
 
 	}
@@ -1000,7 +1001,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.translatedIterator(Translators.toTargetGetter(this.translator), this.items.iterator());
+			return Iterators.translatedIterator(Getters.fromTarget(this.translator), this.items.iterator());
 		}
 
 	}

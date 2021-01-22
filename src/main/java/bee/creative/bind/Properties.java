@@ -473,11 +473,11 @@ public class Properties {
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Consumer) Properties.from(Producers.toTranslated(target, transGet),
 	 * Consumers.toTranslated(target, transSet))}.
 	 *
-	 * @see Producers#toTranslated(Producer, Getter)
+	 * @see Producers#concat(Producer, Getter)
 	 * @see Consumers#toTranslated(Consumer, Getter) */
 	public static <GSource, GTarget> Property2<GTarget> toTranslated(final Property<GSource> target, final Getter<? super GSource, ? extends GTarget> transGet,
 		final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
-		return Properties.from(Producers.toTranslated(target, transGet), Consumers.toTranslated(target, transSet));
+		return Properties.from(Producers.concat(target, transGet), Consumers.toTranslated(target, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ObservableProperty new ObservableProperty<>(property)}. */

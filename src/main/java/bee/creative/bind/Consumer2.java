@@ -1,6 +1,6 @@
 package bee.creative.bind;
 
-/** Diese Schnittstelle ergänzt einen {@link Consumer} um eine Anbindung an Methoden von {@link Consumers} und {@link Setters}.
+/** Diese Schnittstelle ergänzt einen {@link Consumer} insb. um eine Anbindung an Methoden von {@link Consumers}.
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ des Werts. */

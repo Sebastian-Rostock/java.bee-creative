@@ -11,30 +11,53 @@ import bee.creative.lang.Objects;
  *
  * @see Consumer
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
 public class Consumers {
 
-	/** Diese Klasse implementiert einen {@link Consumer3}, der das {@link #set Setzen} ignoriert. */
+	/** Diese Klasse implementiert einen {@link Consumer3}, welcher das {@link #set(Object) Schreiben} ignoriert. */
+	@SuppressWarnings ("javadoc")
 	public static class EmptyConsumer extends AbstractConsumer<Object> {
 
 		public static final Consumer3<?> INSTANCE = new EmptyConsumer();
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Consumer3}, der das {@link #set(Object) Schreiben} an eine gegebene {@link Method nativen statische Methode}
+	/** Diese Klasse implementiert . der mit dem gegebenen Datensatz an den gegebenen {@link Setter} delegiert.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Werts. */
+	public static class ConcatConsumer<GItem, GValue> extends AbstractConsumer<GValue> {
+
+		public final Producer<? extends GItem> source;
+
+		public final Setter<? super GItem, ? super GValue> target;
+
+		public ConcatConsumer(final Producer<? extends GItem> source, final Setter<? super GItem, ? super GValue> target) {
+			this.source = Objects.notNull(source);
+			this.target = Objects.notNull(target);
+		}
+
+		@Override
+		public void set(final GValue value) {
+			this.target.set(this.source.get(), value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.source, this.target);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Consumer3}, welcher das {@link #set(Object) Schreiben} an eine gegebene {@link Method nativen statische Methode}
 	 * delegiert. Das Schreiben des Werts {@code value} erfolgt über {@code this.target.invoke(null, value)}.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class MethodConsumer<GValue> extends AbstractConsumer<GValue> {
 
 		public final Method target;
 
-		/** Dieser Konstruktor initialisiert Methode und Zugreifbarkeit.
-		 *
-		 * @param target native statische Methode.
-		 * @param forceAccessible {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}.
-		 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die Methode nicht statisch bzw. nicht zugreifbar ist oder keine passende Parameteranzahl besitzt. */
+		/** Dieser Konstruktor initialisiert Methode und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
 		public MethodConsumer(final Method target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			if (!Modifier.isStatic(target.getModifiers()) || (target.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
@@ -56,11 +79,12 @@ public class Consumers {
 
 	}
 
-	/** Diese Klasse implementiert übersetzten {@link Consumer3}, dessen Wert mit Hilfe eines gegebenen {@link Getter} in den Wert eines gegebenen
-	 * {@link Consumer} überführt wird.
+	/** Diese Klasse implementiert übersetzten {@link Consumer3}, welcher den Wert beim {@link #set(Object) Schreiben} über einen gegebenen {@link Getter} in den
+	 * Wert eines gegebenen {@link Consumer} überführt. Das Schreiben des Werts {@code value} erfolgt über {@code this.target.set(this.trans.get(value))}.
 	 *
 	 * @param <GValue> Typ des Werts dieses {@link Consumer3}.
 	 * @param <GValue2> Typ des Werts des gegebenen {@link Consumer}. */
+	@SuppressWarnings ("javadoc")
 	public static class TranslatedConsumer<GValue, GValue2> extends AbstractConsumer<GValue> {
 
 		public final Consumer<? super GValue2> target;
@@ -87,6 +111,7 @@ public class Consumers {
 	/** Diese Klasse implementiert einen {@link Consumer3}, welcher einen gegebenen {@link Consumer} über {@code synchronized(this.mutex)} synchronisiert.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class SynchronizedConsumer<GValue> extends AbstractConsumer<GValue> {
 
 		public final Consumer<? super GValue> target;
@@ -94,11 +119,7 @@ public class Consumers {
 		public final Object mutex;
 
 		/** Dieser Konstruktor initialisiert {@link Consumer} und Synchronisationsobjekt. Wenn das Synchronisationsobjekt {@code null} ist, wird {@code this} als
-		 * Synchronisationsobjekt verwendet.
-		 *
-		 * @param target {@link Consumer}.
-		 * @param mutex Synchronisationsobjekt oder {@code null}.
-		 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
+		 * Synchronisationsobjekt verwendet. */
 		public SynchronizedConsumer(final Consumer<? super GValue> target, final Object mutex) throws NullPointerException {
 			this.target = Objects.notNull(target);
 			this.mutex = Objects.notNull(mutex, this);
@@ -132,22 +153,32 @@ public class Consumers {
 		return Consumers.toTranslated(target, Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(String, boolean) onsumers.fromNative(memberText, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Setter, Object) Consumers.from(target, null)}. */
+	public static <GItem, GValue> Consumer3<GValue> from(final Setter<? super GItem, ? super GValue> target) throws NullPointerException {
+		return Consumers.from(target, null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Setter) Consumers.concat(Producers.fromValue(item), target)}. */
+	public static <GItem, GValue> Consumer3<GValue> from(final Setter<? super GItem, ? super GValue> target, final GItem item) throws NullPointerException {
+		return Consumers.concat(Producers.fromValue(item), target);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ConcatConsumer new ConcatConsumer<>(source, target)}. */
+	public static <GItem, GValue> Consumer3<GValue> concat(final Producer<? extends GItem> source, final Setter<? super GItem, ? super GValue> target)
+		throws NullPointerException {
+		return new ConcatConsumer<>(source, target);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(String, boolean) Consumers.fromNative(memberText, true)}. */
 	public static <GValue> Consumer3<GValue> fromNative(final String memberText) throws NullPointerException, IllegalArgumentException {
 		return Consumers.fromNative(memberText, true);
 	}
 
-	/** Diese Methode ist effektiv eine Abkürzung für {@code fromNative(Natives.parse(memberText), forceAccessible)}.
+	/** Diese Methode ist effektiv eine Abkürzung für {@code Consumers.fromNative(Natives.parse(memberText), forceAccessible)}.
 	 *
 	 * @see Natives#parse(String)
 	 * @see #fromNative(java.lang.reflect.Field, boolean)
-	 * @see #fromNative(java.lang.reflect.Method, boolean)
-	 * @param <GValue> Typ des Werts.
-	 * @param memberText Pfad einer Methode oder eines Datenfelds.
-	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
-	 * @return {@code native}-{@link Producer}.
-	 * @throws NullPointerException Wenn {@code memberText} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Pfad ungültig bzw. sein Ziel nicht zugreifbar ist. */
+	 * @see #fromNative(java.lang.reflect.Method, boolean) */
 	public static <GValue> Consumer3<GValue> fromNative(final String memberText, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberText);
@@ -156,22 +187,23 @@ public class Consumers {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(java.lang.reflect.Field, boolean) Consumers.nativeConsumer(field, true)}. */
-	public static <GValue> Consumer3<GValue> fromNative(final java.lang.reflect.Field field) {
-		return Consumers.fromNative(field, true);
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(java.lang.reflect.Field, boolean) Consumers.fromNative(target, true)}. */
+	public static <GValue> Consumer3<GValue> fromNative(final java.lang.reflect.Field target) {
+		return Consumers.fromNative(target, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field, boolean) Properties.nativeProperty(field, forceAccessible)}. */
-	public static <GValue> Consumer3<GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible) {
-		return Consumers.from(Properties.fromNative(field, forceAccessible));
+	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field, boolean) Consumers.from(Properties.fromNative(target,
+	 * forceAccessible))}. */
+	public static <GValue> Consumer3<GValue> fromNative(final java.lang.reflect.Field target, final boolean forceAccessible) {
+		return Consumers.from(Properties.fromNative(target, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(Method, boolean) Consumers.nativeConsumer(method, true)}. */
-	public static <GValue> Consumer3<GValue> fromNative(final Method method) {
-		return Consumers.fromNative(method, true);
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(Method, boolean) Consumers.fromNative(target, true)}. */
+	public static <GValue> Consumer3<GValue> fromNative(final Method target) {
+		return Consumers.fromNative(target, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link MethodConsumer new NativeConsumer<>(target, forceAccessible)}. */
+	/** Diese Methode ist eine Abkürzung für {@link MethodConsumer new MethodConsumer<>(target, forceAccessible)}. */
 	public static <GValue> Consumer3<GValue> fromNative(final Method target, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new MethodConsumer<>(target, forceAccessible);
