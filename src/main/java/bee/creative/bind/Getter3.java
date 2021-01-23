@@ -18,12 +18,11 @@ public interface Getter3<GItem, GValue> extends Getter2<GItem, GValue> {
 	@Override
 	public Getter3<Iterable<? extends GItem>, GValue> toAggregated();
 
-	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> toTarget);
+	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> trans);
 
-	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> toTarget, GValue2 emptyTarget,
-		GValue2 mixedTarget, Getter<? super GItem, GValue> getter);
+	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> trans, GValue2 empty, GValue2 mixed);
 
-	public Getter3<Iterable<? extends GItem>, GValue> toAggregated(GValue emptyTarget, GValue mixedTarget);
+	public Getter3<Iterable<? extends GItem>, GValue> toAggregated(GValue empty, GValue mixed);
 
 	@Override
 	public Getter3<GItem, GValue> toSynchronized();

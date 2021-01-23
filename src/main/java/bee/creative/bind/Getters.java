@@ -20,8 +20,6 @@ import bee.creative.util.Filters;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
 
- 
-
 	public static class NeutralGetter extends AbstractGetter<Object, Object> {
 
 		public static final Getter3<?, ?> INSTANCE = new NeutralGetter();
@@ -92,7 +90,7 @@ public class Getters {
 
 	}
 
-	public static class DefaultGetter<GItem, GValue> implements Getter<GItem, GValue> {
+	public static class DefaultGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		public final Getter<? super GItem, GValue> target;
 
@@ -203,7 +201,7 @@ public class Getters {
 
 	}
 
-	public static class AggregatedGetter<GItem, GSource, GTarget> implements Getter<Iterable<? extends GItem>, GTarget> {
+	public static class AggregatedGetter<GItem, GSource, GTarget> extends AbstractGetter<Iterable<? extends GItem>, GTarget> {
 
 		public final Getter<? super GSource, ? extends GTarget> toTarget;
 
@@ -464,13 +462,13 @@ public class Getters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, forceAccessible)}. */
-	public static <GItem, GValue> Getter<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName,
-		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+	public static <GItem, GValue> Getter<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName, final boolean forceAccessible)
+		throws NullPointerException, IllegalArgumentException {
 		return Fields.fromNative(fieldOwner, fieldName, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#toDefault(Getter, Object) Getters.toDefault(target, null)}. **/
-	public static <GItem, GValue> Getter<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target) throws NullPointerException {
+	public static <GItem, GValue> Getter3<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target) throws NullPointerException {
 		return Getters.toDefault(target, null);
 	}
 
@@ -483,7 +481,7 @@ public class Getters {
 	 * @see Filters#nullFilter()
 	 * @return {@code default}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GItem, GValue> Getter<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target, final GValue value) throws NullPointerException {
+	public static <GItem, GValue> Getter3<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target, final GValue value) throws NullPointerException {
 		return new DefaultGetter<>(target, value);
 	}
 
@@ -513,9 +511,6 @@ public class Getters {
 		return new BufferedGetter<>(limit, inputMode, outputMode, getter);
 	}
 
- 
- 
-
 	/** Diese Methode gibt einen navigierten {@link Getter} zurück. Der erzeugte {@link Getter} liefert für einen Datensatz {@code item} den Wert
 	 * {@code toTarget.get(getter.get(item))}.
 	 * 
@@ -532,7 +527,7 @@ public class Getters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#toAggregated(Getter, Object, Object) Getters.aggregatedGetter(null, null, getter)}. */
-	public static <GItem, GValue> Getter<Iterable<? extends GItem>, GValue> toAggregated(final Getter<? super GItem, GValue> target)
+	public static <GItem, GValue> Getter3<Iterable<? extends GItem>, GValue> toAggregated(final Getter<? super GItem, GValue> target)
 		throws NullPointerException {
 		return Getters.toAggregated(target, null, null);
 	}
@@ -541,14 +536,14 @@ public class Getters {
 	 * emptyTarget, mixedTarget, getter)}.
 	 *
 	 * @see #neutral() */
-	public static <GItem, GValue> Getter<Iterable<? extends GItem>, GValue> toAggregated(final Getter<? super GItem, GValue> target, final GValue empty,
+	public static <GItem, GValue> Getter3<Iterable<? extends GItem>, GValue> toAggregated(final Getter<? super GItem, GValue> target, final GValue empty,
 		final GValue mixed) throws NullPointerException {
 		return Getters.toAggregated(target, Getters.<GValue>neutral(), empty, mixed);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#toAggregated(Getter, Getter, Object, Object) Getters.aggregatedGetter(toTarget, null, null,
 	 * getter)}. */
-	public static <GItem, GTarget, GSource> Getter<Iterable<? extends GItem>, GTarget> toAggregated(final Getter<? super GItem, GSource> target,
+	public static <GItem, GTarget, GSource> Getter3<Iterable<? extends GItem>, GTarget> toAggregated(final Getter<? super GItem, GSource> target,
 		final Getter<? super GSource, ? extends GTarget> trans) throws NullPointerException {
 		return Getters.toAggregated(target, trans, null, null);
 	}
@@ -558,17 +553,17 @@ public class Getters {
 	 * liefert dieser den Leerwert {@code emptyTarget}. Wenn die über die gegebene {@link Getter Eigenschaft} {@code getter} ermittelten Werte nicht unter allen
 	 * Elementen der iterierbaren Eingabe {@link Objects#equals(Object) äquivalent} sind, liefert der zeugte {@link Getter} den Mischwert {@code mixedTarget}.
 	 * Andernfalls liefert er diesen äquivalenten, gemäß dem gegebenen {@link Getter Leseformat} {@code format} umgewandelten, Wert.
+	 * 
 	 * @param target Eigenschaft der Elemente in der iterierbaren Eingabe.
 	 * @param trans Leseformat zur Umwandlung des Werts der Eigenschaft der Elemente in den Wert des gelieferten {@link Getter}.
 	 * @param empty Leerwert.
 	 * @param mixed Mischwert.
-	 *
 	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
 	 * @param <GSource> Typ des Werts der Eigenschaft der Elemente in der iterierbaren Eingabe.
 	 * @param <GTarget> Typ des Werts des gelieferten {@link Getter}.
 	 * @return {@code aggregated}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code property} bzw. {@code getFormat} {@code null} ist. */
-	public static <GItem, GSource, GTarget> Getter<Iterable<? extends GItem>, GTarget> toAggregated(final Getter<? super GItem, GSource> target,
+	public static <GItem, GSource, GTarget> Getter3<Iterable<? extends GItem>, GTarget> toAggregated(final Getter<? super GItem, GSource> target,
 		final Getter<? super GSource, ? extends GTarget> trans, final GTarget empty, final GTarget mixed) throws NullPointerException {
 		return new AggregatedGetter<>(trans, empty, mixed, target);
 	}

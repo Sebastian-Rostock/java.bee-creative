@@ -8,7 +8,7 @@ import bee.creative.util.Filter;
 import bee.creative.util.Filters;
 
 /** Diese Klasse implementiert ein abstraktes {@link Field2} als {@link BaseObject}.
- * 
+ *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Eingabe.
  * @param <GValue> Typ des Werts der Eigenschaft. */
@@ -24,67 +24,68 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public Filter<GItem> concat(Filter<? super GValue> target) {
+	public Filter<GItem> concat(final Filter<? super GValue> target) {
 		return Filters.concat(this, target);
 	}
 
 	@Override
-	public <GValue2> Field2<GItem, GValue2> concat(Field<? super GValue, GValue2> target) {
+	public <GValue2> Field2<GItem, GValue2> concat(final Field<? super GValue, GValue2> target) {
 		return Fields.concat(this, target);
 	}
 
 	@Override
-	public <GValue2> Getter3<GItem, GValue2> concat(Getter<? super GValue, ? extends GValue2> target) {
+	public <GValue2> Getter3<GItem, GValue2> concat(final Getter<? super GValue, ? extends GValue2> target) {
 		return Getters.concat(this, target);
 	}
 
 	@Override
-	public <GValue2> Setter3<GItem, GValue2> concat(Setter<? super GValue, ? super GValue2> target) {
+	public <GValue2> Setter3<GItem, GValue2> concat(final Setter<? super GValue, ? super GValue2> target) {
 		return Setters.concat(this, target);
 	}
 
 	@Override
-	public Comparable<GItem> concat(Comparable<? super GValue> target) {
+	public Comparable<GItem> concat(final Comparable<? super GValue> target) {
 		return Comparables.concat(this, target);
 	}
 
 	@Override
-	public Comparator<GItem> concat(Comparator<? super GValue> target) {
+	public Comparator<GItem> concat(final Comparator<? super GValue> target) {
 		return Comparators.concat(this, target);
 	}
 
 	@Override
 	public Field2<Iterable<? extends GItem>, GValue> toAggregated() {
-		return null;
+		return Fields.toAggregated(this);
 	}
 
 	@Override
-	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> toValue,
-		final Getter<? super GValue2, ? extends GValue> toValue2) {
-		return null;
+	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> transGet,
+		final Getter<? super GValue2, ? extends GValue> transSet) {
+		return Fields.toAggregated(this, transGet, transSet);
 	}
 
 	@Override
-	public <GValue2> Getter2<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> toTarget, final GValue2 emptyTarget,
-		final GValue2 mixedTarget) {
-		return null;
+	public <GValue2> Getter2<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> transGet,
+		final Getter<? super GValue2, ? extends GValue> transSet, final GValue2 empty, final GValue2 mixed) {
+		return Fields.toAggregated(this, transGet, transSet, empty, mixed);
 	}
 
 	@Override
-	public Field2<Iterable<? extends GItem>, GValue> toAggregated(final GValue emptyTarget, final GValue mixedTarget) {
-		return null;
+	public Field2<Iterable<? extends GItem>, GValue> toAggregated(final GValue empty, final GValue mixed) {
+		return Fields.toAggregated(this, empty, mixed);
 	}
 
 	@Override
 	public Consumer3<GValue> toConsumer() {
-		return null;
+		return Consumers.from(this);
 	}
 
 	@Override
 	public Consumer3<GValue> toConsumer(final GItem item) {
-		return null;
+		return Consumers.from(this, item);
 	}
 
+	@Override
 	public Field2<GItem, GValue> toSetup(final Getter<? super GItem, ? extends GValue> setup) {
 		return Fields.toSetup(this, setup);
 	}
@@ -132,22 +133,22 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 
 	@Override
 	public Producer3<GValue> toProducer() {
-		return null;
+		return Producers.from(this);
 	}
 
 	@Override
 	public Producer3<GValue> toProducer(final GItem item) {
-		return null;
+		return Producers.from(this, item);
 	}
 
 	@Override
-	public Field2<GItem, GValue> toField(final Setter<? super GItem, ? super GValue> setter) {
-		return null;
+	public Field2<GItem, GValue> toField(final Setter<? super GItem, ? super GValue> set) {
+		return Fields.from(this, set);
 	}
 
 	@Override
-	public Field2<GItem, GValue> toField(final Getter<? super GItem, ? extends GValue> getter) {
-		return null;
+	public Field2<GItem, GValue> toField(final Getter<? super GItem, ? extends GValue> get) {
+		return Fields.from(get, this);
 	}
 
 }

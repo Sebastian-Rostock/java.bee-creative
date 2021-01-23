@@ -7,11 +7,11 @@ import bee.creative.util.Comparators;
 import bee.creative.util.Filter;
 import bee.creative.util.Filters;
 
-/** Diese Klasse implementiert einen abstrakten {@link Getter3} als {@link BaseObject}. 
-@author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]  
+/** Diese Klasse implementiert einen abstrakten {@link Getter3} als {@link BaseObject}.
+ * 
+ * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Eingabe.
- * @param <GValue> Typ des Werts der Eigenschaft.
- */
+ * @param <GValue> Typ des Werts der Eigenschaft. */
 public abstract class AbstractGetter<GItem, GValue> extends BaseObject implements Getter3<GItem, GValue> {
 
 	@Override
@@ -21,43 +21,43 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 
 	@Override
 	public Getter3<Iterable<? extends GItem>, GValue> toAggregated() {
-		return null;
+		return Getters.toAggregated(this);
 	}
 
 	@Override
-	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> toTarget) {
-		return null;
+	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> trans) {
+		return Getters.toAggregated(this, trans);
 	}
 
 	@Override
-	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> toTarget, final GValue2 emptyTarget,
-		final GValue2 mixedTarget, final Getter<? super GItem, GValue> getter) {
-		return null;
+	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> trans, final GValue2 empty,
+		final GValue2 mixed) {
+		return Getters.toAggregated(this, trans, empty, mixed);
 	}
 
 	@Override
-	public Getter3<Iterable<? extends GItem>, GValue> toAggregated(final GValue emptyTarget, final GValue mixedTarget) {
-		return null;
+	public Getter3<Iterable<? extends GItem>, GValue> toAggregated(final GValue empty, final GValue mixed) {
+		return Getters.toAggregated(this, empty, mixed);
 	}
 
 	@Override
 	public Getter3<GItem, GValue> toDefault() {
-		return null;
+		return Getters.toDefault(this);
 	}
 
 	@Override
 	public Getter3<GItem, GValue> toDefault(final GValue value) {
-		return null;
+		return Getters.toDefault(this, value);
 	}
 
 	@Override
 	public Field2<GItem, GValue> toField() {
-		return null;
+		return Fields.from(this);
 	}
 
 	@Override
-	public Field2<GItem, GValue> toField(final Setter<? super GItem, ? super GValue> setter) {
-		return null;
+	public Field2<GItem, GValue> toField(final Setter<? super GItem, ? super GValue> set) {
+		return Fields.from(this, set);
 	}
 
 	@Override
