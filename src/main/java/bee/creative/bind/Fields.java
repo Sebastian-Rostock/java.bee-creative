@@ -46,7 +46,7 @@ public final class Fields {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, target.isAccessible());
+			return Objects.toInvokeString(this, this.target, this.target.isAccessible());
 		}
 
 	}
@@ -339,6 +339,16 @@ public final class Fields {
 		return (Field2<GItem, GValue>)EmptyField.INSTANCE;
 	}
 
+	/** Diese Methode ist eine effiziente Alternative zu {@link #from(Getter, Setter) Fields.from(Getters.concat(source, target), Setters.concat(source,
+	 * target))}.
+	 *
+	 * @see Getters#concat(Getter, Getter)
+	 * @see Setters#concat(Getter, Setter) */
+	public static <GSource, GTarget, GValue> Field2<GSource, GValue> concat(final Getter<? super GSource, ? extends GTarget> source,
+		final Field<? super GTarget, GValue> target) throws NullPointerException {
+		return new ConcatField<>(source, target);
+	}
+
 	/** Diese Methode gibt ein {@link Field} zurück, das seinen Datensatz ignoriert und den Wert des gegebenen {@link Property} manipuliert. */
 	public static <GValue> Field2<Object, GValue> from(final Property<GValue> target) throws NullPointerException {
 		return new PropertyField<>(target);
@@ -346,7 +356,7 @@ public final class Fields {
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(Fields.empty(), target)}. */
 	public static <GItem, GValue> Field2<GItem, GValue> from(final Setter<? super GItem, ? super GValue> target) throws NullPointerException {
-		return from(Fields.<GItem, GValue>empty(), target);
+		return Fields.from(Fields.<GItem, GValue>empty(), target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.from(target, Fields.empty())}.
@@ -435,16 +445,6 @@ public final class Fields {
 		return Fields.fromNative(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@link #from(Getter, Setter) Fields.from(Getters.concat(source, target), Setters.concat(source,
-	 * target))}.
-	 *
-	 * @see Getters#concat(Getter, Getter)
-	 * @see Setters#concat(Getter, Setter) */
-	public static <GSource, GTarget, GValue> Field2<GSource, GValue> concat(final Getter<? super GSource, ? extends GTarget> source,
-		final Field<? super GTarget, GValue> target) throws NullPointerException {
-		return new ConcatField<>(source, target);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link #toDefault(Field, Object) Fields.defaultField(null, field)}. */
 	public static <GItem, GValue> Field2<GItem, GValue> toDefault(final Field<? super GItem, GValue> field) throws NullPointerException {
 		return Fields.toDefault(field, null);
@@ -509,33 +509,27 @@ public final class Fields {
 	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Field, Getter, Getter) Fields.aggregatedField(Getters.neutralGetter(), Getters.neutralGetter(),
 	 * field)}. */
 	public static <GItem, GValue> Field2<Iterable<? extends GItem>, GValue> toAggregated(final Field<? super GItem, GValue> target) throws NullPointerException {
-		return Fields.toAggregated(target, Getters.<GValue>neutral(), Getters.<GValue>neutral());
+		return Fields.from(Getters.toAggregated(target), Setters.toAggregated(target));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Field, Getter, Getter, Object, Object) Fields.aggregatedField(Getters.neutralGetter(),
-	 * Getters.neutralGetter(), emptyTarget, mixedTarget, field)}. */
-	public static <GEntry, GValue> Field2<Iterable<? extends GEntry>, GValue> toAggregated(final Field<? super GEntry, GValue> target, final GValue empty,
-		final GValue mixed) throws NullPointerException {
-		return Fields.toAggregated(target, Getters.<GValue>neutral(), Getters.<GValue>neutral(), empty, mixed);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Field, Getter, Getter, Object, Object) Fields.aggregatedField(toTarget, toSource, null, null,
+	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Field, Getter, Getter, Getter, Getter) Fields.aggregatedField(toTarget, toSource, null, null,
 	 * field)}. */
 	public static <GEntry, GSource, GTarget> Field2<Iterable<? extends GEntry>, GTarget> toAggregated(final Field<? super GEntry, GSource> target,
 		final Getter<? super GSource, ? extends GTarget> transGet, final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
-		return Fields.toAggregated(target, transGet, transSet, null, null);
+		return Fields.from(Getters.toAggregated(target, transGet), Setters.toAggregated(target, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.compositeField(Getters.aggregatedGetter(toTarget, emptyTarget, mixedTarget,
 	 * field), Setters.aggregatedSetter(toSource, field))}. Mit einem aggregierten {@link Field} können die Elemente des iterierbaren Datensatzes parallel
 	 * modifiziert werden.
 	 *
-	 * @see Getters#toAggregated(Getter, Getter, Object, Object)
+	 * @see Getters#toAggregated(Getter, Getter, Getter, Getter)
 	 * @see Setters#toAggregated(Setter, Getter) */
-	public static <GEntry, GSource, GTarget> Field2<Iterable<? extends GEntry>, GTarget> toAggregated(final Field<? super GEntry, GSource> target,
-		final Getter<? super GSource, ? extends GTarget> transGet, final Getter<? super GTarget, ? extends GSource> transSet, final GTarget empty,
-		final GTarget mixed) throws NullPointerException {
-		return Fields.from(Getters.toAggregated(target, transGet, empty, mixed), Setters.toAggregated(target, transSet));
+	public static <GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> Field2<GItem, GValue> toAggregated(
+		final Field<? super GItem2, GValue2> target, final Getter<? super GValue2, ? extends GValue> transGet,
+		final Getter<? super GValue, ? extends GValue2> transSet, final Getter<? super GItem, ? extends GValue> empty,
+		final Getter<? super GItem, ? extends GValue> mixed) throws NullPointerException {
+		return Fields.from(Getters.<GItem, GValue, GItem2, GValue2>toAggregated(target, transGet, empty, mixed), Setters.toAggregated(target, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Field, Object) Fields.toSynchronized(target, target)}. */

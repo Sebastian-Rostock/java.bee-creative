@@ -65,14 +65,10 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public <GValue2> Getter2<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> transGet,
-		final Getter<? super GValue2, ? extends GValue> transSet, final GValue2 empty, final GValue2 mixed) {
+	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> transGet,
+		final Getter<? super GValue2, ? extends GValue> transSet, final Getter<? super GItem2, ? extends GValue2> empty,
+		final Getter<? super GItem2, ? extends GValue2> mixed) {
 		return Fields.toAggregated(this, transGet, transSet, empty, mixed);
-	}
-
-	@Override
-	public Field2<Iterable<? extends GItem>, GValue> toAggregated(final GValue empty, final GValue mixed) {
-		return Fields.toAggregated(this, empty, mixed);
 	}
 
 	@Override

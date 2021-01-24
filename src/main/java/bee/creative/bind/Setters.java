@@ -203,6 +203,11 @@ public class Setters {
 		return (Setter3<GItem, GValue>)EmptySetter.INSTANCE;
 	}
 
+	public static <GTarget, GSource, GValue> Setter3<GTarget, GValue> concat(final Getter<? super GTarget, ? extends GSource> source,
+		final Setter<? super GSource, ? super GValue> target) throws NullPointerException {
+		return new ConcatSetter<>(source, target);
+	}
+
 	/** Diese Methode gibt den gegebenen {@link Consumer} als {@link Consumer3} zurück. Wenn er {@code null} ist, wird {@link #empty()} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem, GValue> Setter3<GItem, GValue> from(final Setter<? super GItem, ? super GValue> target) {
@@ -221,13 +226,8 @@ public class Setters {
 		return new Setters.ConsumerSetter<>(consumer);
 	}
 
-	public static <GTarget, GSource, GValue> Setter3<GTarget, GValue> concat(final Getter<? super GTarget, ? extends GSource> source,
-		final Setter<? super GSource, ? super GValue> target) throws NullPointerException {
-		return new ConcatSetter<>(source, target);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link Setters#fromNative(String, boolean) Setters.nativeSetter(memberPath, true)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> fromNative(final String memberPath) throws NullPointerException, IllegalArgumentException {
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final String memberPath) throws NullPointerException, IllegalArgumentException {
 		return Setters.fromNative(memberPath, true);
 	}
 
@@ -244,7 +244,7 @@ public class Setters {
 	 * @return {@code native}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Pfad ungültig bzw. sein Ziel nicht zugreifbar ist. */
-	public static <GItem, GValue> Setter<GItem, GValue> fromNative(final String memberPath, final boolean forceAccessible)
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final String memberPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberPath);
 		if (object instanceof java.lang.reflect.Field) return Setters.fromNative((java.lang.reflect.Field)object, forceAccessible);
@@ -253,18 +253,18 @@ public class Setters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(java.lang.reflect.Field) Fields.nativeField(field)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
-		return Fields.fromNative(field);
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+		return fromNative(field, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(java.lang.reflect.Field, boolean) Fields.nativeField(field, forceAccessible)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible)
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return from(Fields.fromNative(field, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Setters#fromNative(Method, boolean) Setters.nativeSetter(method, true)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> fromNative(final Method method) throws NullPointerException, IllegalArgumentException {
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method method) throws NullPointerException, IllegalArgumentException {
 		return Setters.fromNative(method, true);
 	}
 
@@ -280,21 +280,21 @@ public class Setters {
 	 * @return {@code native}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
-	public static <GItem, GValue> Setter<GItem, GValue> fromNative(final Method method, final boolean forceAccessible)
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method method, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new MethodSetter<>(method, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(Class, String) Fields.nativeField(fieldOwner, fieldName)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName)
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.fromNative(fieldOwner, fieldName);
+		return fromNative(fieldOwner, fieldName, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, forceAccessible)}. */
-	public static <GItem, GValue> Setter<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName, final boolean forceAccessible)
-		throws NullPointerException, IllegalArgumentException {
-		return Fields.fromNative(fieldOwner, fieldName, forceAccessible);
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName,
+		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+		return from(Fields.fromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
 	/** Diese Methode einen {@link Setter} zurück, der Datensatz und Wert nur dann dann an den gegebenen {@link Setter} delegiert, wenn der Datensatz nicht
@@ -319,13 +319,13 @@ public class Setters {
 	 * @param <GTarget> Typ des Werts der Eigenschaft.
 	 * @return {@code translated}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code setter} {@code null} ist. */
-	public static <GItem, GSource, GTarget> AbstractSetter<GItem, GTarget> toTranslated(final Setter<? super GItem, ? super GSource> target,
+	public static <GItem, GSource, GTarget> Setter3<GItem, GTarget> toTranslated(final Setter<? super GItem, ? super GSource> target,
 		final Getter<? super GTarget, ? extends GSource> trans) throws NullPointerException {
 		return new TranslatedSetter<>(trans, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Setter, Getter) Setters.aggregatedSetter(Getters.neutralGetter(), setter)}. **/
-	public static <GItem, GValue> AbstractSetter<Iterable<? extends GItem>, GValue> toAggregated(final Setter<? super GItem, GValue> setter)
+	public static <GItem, GValue> Setter3<Iterable<? extends GItem>, GValue> toAggregated(final Setter<? super GItem, ? super GValue> setter)
 		throws NullPointerException {
 		return Setters.toAggregated(setter, Getters.<GValue>neutral());
 	}
@@ -333,34 +333,34 @@ public class Setters {
 	/** Diese Methode gibt einen aggregierten {@link Setter} zurück, welcher den formatierten Wert der Eigenschaften der Elemente des iterierbaren Datensatzes
 	 * setzt. Wenn der iterierbare Datensatz des erzeugten {@link Setter} {@code null} oder leer ist, wird das Setzen ignoriert. Andernfalls wird der gemäß dem
 	 * gegebenen {@link Getter} {@code toSource} umgewandelte Wert über die gegebene {@link Setter} an jedem Element des iterierbaren Datensatzes gesetzt.
+	 * 
 	 * @param target Eigenschaft der Elemente des iterierbaren Datensatzes.
 	 * @param trans {@link Getter} zur Umwandlung des Werts der Eigenschaft der Elemente in den Wert des gelieferten {@link Setter}.
-	 *
 	 * @param <GItem> Typ der Elemente des iterierbaren Datensatzes.
-	 * @param <GSource> Typ des Werts der Eigenschaft der Elemente.
-	 * @param <GTarget> Typ des Werts des gelieferten {@link Setter}.
+	 * @param <GValue2> Typ des Werts der Eigenschaft der Elemente.
+	 * @param <GValue> Typ des Werts des gelieferten {@link Setter}.
 	 * @return {@code aggregated}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code setter} {@code null} ist. */
-	public static <GItem, GSource, GTarget> AbstractSetter<Iterable<? extends GItem>, GTarget> toAggregated(
-		final Setter<? super GItem, GSource> target, final Getter<? super GTarget, ? extends GSource> trans) throws NullPointerException {
+	public static <GItem, GValue, GValue2> Setter3<Iterable<? extends GItem>, GValue> toAggregated(final Setter<? super GItem, ? super GValue2> target,
+		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
 		return new AggregatedSetter<>(trans, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Setter, Object) Setters.synchronizedSetter(setter, setter)}. */
-	public static <GItem, GValue> AbstractSetter<GItem, GValue> toSynchronized(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
+	public static <GItem, GValue> Setter3<GItem, GValue> toSynchronized(final Setter<? super GItem, ? super GValue> setter) throws NullPointerException {
 		return Setters.toSynchronized(setter, setter);
 	}
 
 	/** Diese Methode gibt einen {@link Setter} zurück, welcher den gegebenen {@link Setter} über {@code synchronized(mutex)} synchronisiert. Wenn das
 	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Setter} als Synchronisationsobjekt verwendet.
+	 * 
 	 * @param target {@link Setter}.
 	 * @param mutex Synchronisationsobjekt oder {@code null}.
-	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @return {@code synchronized}-{@link Setter}.
 	 * @throws NullPointerException Wenn {@code setter} {@code null} ist. */
-	public static <GItem, GValue> AbstractSetter<GItem, GValue> toSynchronized(final Setter<? super GItem, ? super GValue> target, final Object mutex)
+	public static <GItem, GValue> Setter3<GItem, GValue> toSynchronized(final Setter<? super GItem, ? super GValue> target, final Object mutex)
 		throws NullPointerException {
 		return new SynchronizedSetter<>(mutex, target);
 	}

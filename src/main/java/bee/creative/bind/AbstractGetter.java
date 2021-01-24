@@ -8,7 +8,7 @@ import bee.creative.util.Filter;
 import bee.creative.util.Filters;
 
 /** Diese Klasse implementiert einen abstrakten {@link Getter3} als {@link BaseObject}.
- * 
+ *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Eingabe.
  * @param <GValue> Typ des Werts der Eigenschaft. */
@@ -30,14 +30,9 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> trans, final GValue2 empty,
-		final GValue2 mixed) {
+	public <GItem2 extends Iterable<? extends GItem>, GValue2> Getter3<GItem2, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> trans,
+		final Getter<? super GItem2, ? extends GValue2> empty, final Getter<? super GItem2, ? extends GValue2> mixed) {
 		return Getters.toAggregated(this, trans, empty, mixed);
-	}
-
-	@Override
-	public Getter3<Iterable<? extends GItem>, GValue> toAggregated(final GValue empty, final GValue mixed) {
-		return Getters.toAggregated(this, empty, mixed);
 	}
 
 	@Override
@@ -81,32 +76,32 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public Filter<GItem> concat(Filter<? super GValue> target) {
+	public Filter<GItem> concat(final Filter<? super GValue> target) {
 		return Filters.concat(this, target);
 	}
 
 	@Override
-	public <GValue2> Field2<GItem, GValue2> concat(Field<? super GValue, GValue2> target) {
+	public <GValue2> Field2<GItem, GValue2> concat(final Field<? super GValue, GValue2> target) {
 		return Fields.concat(this, target);
 	}
 
 	@Override
-	public <GValue2> Getter3<GItem, GValue2> concat(Getter<? super GValue, ? extends GValue2> target) {
+	public <GValue2> Getter3<GItem, GValue2> concat(final Getter<? super GValue, ? extends GValue2> target) {
 		return Getters.concat(this, target);
 	}
 
 	@Override
-	public <GValue2> Setter3<GItem, GValue2> concat(Setter<? super GValue, ? super GValue2> target) {
+	public <GValue2> Setter3<GItem, GValue2> concat(final Setter<? super GValue, ? super GValue2> target) {
 		return Setters.concat(this, target);
 	}
 
 	@Override
-	public Comparable<GItem> concat(Comparable<? super GValue> target) {
+	public Comparable<GItem> concat(final Comparable<? super GValue> target) {
 		return Comparables.concat(this, target);
 	}
 
 	@Override
-	public Comparator<GItem> concat(Comparator<? super GValue> target) {
+	public Comparator<GItem> concat(final Comparator<? super GValue> target) {
 		return Comparators.concat(this, target);
 	}
 

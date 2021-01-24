@@ -111,7 +111,8 @@ public class Consumers {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Consumer3}, welcher einen gegebenen {@link Consumer} über {@code synchronized(this.mutex)} synchronisiert.
+	/** Diese Klasse implementiert einen {@link Consumer3}, welcher einen gegebenen {@link Consumer} über {@code synchronized(this.mutex)} synchronisiert. Wenn
+	 * dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
@@ -121,8 +122,6 @@ public class Consumers {
 
 		public final Object mutex;
 
-		/** Dieser Konstruktor initialisiert {@link Consumer} und Synchronisationsobjekt. Wenn das Synchronisationsobjekt {@code null} ist, wird {@code this} als
-		 * Synchronisationsobjekt verwendet. */
 		public SynchronizedConsumer(final Consumer<? super GValue> target, final Object mutex) throws NullPointerException {
 			this.target = Objects.notNull(target);
 			this.mutex = Objects.notNull(mutex, this);
@@ -142,13 +141,20 @@ public class Consumers {
 
 	}
 
-	/** Diese Methode liefert {@link EmptyConsumer#INSTANCE}. */
+	/** Diese Methode liefert einen {@link EmptyConsumer}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Consumer3<GValue> empty() {
 		return (Consumer3<GValue>)EmptyConsumer.INSTANCE;
 	}
 
-	/** Diese Methode gibt den gegebenen {@link Consumer} als {@link Consumer3} zurück. Wenn er {@code null} ist, wird {@link #empty()} geliefert. */
+	/** Diese Methode ist eine Abkürzung für {@link ConcatConsumer new ConcatConsumer<>(source, target)}. */
+	public static <GItem, GValue> Consumer3<GValue> concat(final Producer<? extends GItem> source, final Setter<? super GItem, ? super GValue> target)
+		throws NullPointerException {
+		return new ConcatConsumer<>(source, target);
+	}
+
+	/** Diese Methode gibt den gegebenen {@link Consumer} als {@link Consumer3} zurück. Wenn er {@code null} ist, wird {@link Consumers#empty() Consumers.empty()}
+	 * geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Consumer3<GValue> from(final Consumer<? super GValue> target) {
 		if (target == null) return Consumers.empty();
@@ -164,12 +170,6 @@ public class Consumers {
 	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Setter) Consumers.concat(Producers.fromValue(item), target)}. */
 	public static <GItem, GValue> Consumer3<GValue> from(final Setter<? super GItem, ? super GValue> target, final GItem item) throws NullPointerException {
 		return Consumers.concat(Producers.fromValue(item), target);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link ConcatConsumer new ConcatConsumer<>(source, target)}. */
-	public static <GItem, GValue> Consumer3<GValue> concat(final Producer<? extends GItem> source, final Setter<? super GItem, ? super GValue> target)
-		throws NullPointerException {
-		return new ConcatConsumer<>(source, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(String, boolean) Consumers.fromNative(memberText, true)}. */

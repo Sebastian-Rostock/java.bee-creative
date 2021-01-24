@@ -4,6 +4,7 @@ import java.util.Map;
 import bee.creative.bind.Field;
 import bee.creative.bind.Getter;
 import bee.creative.bind.Getters;
+import bee.creative.bind.Translator;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.Pointer;
@@ -273,6 +274,48 @@ public class Filters {
 	
 	}
 
+	/** Diese Klasse implementiert {@link Filters#toSourceFilter(Translator)}. */
+	static class SourceFilter implements Filter<Object> {
+	
+		public final Translator<?, ?> translator;
+	
+		public SourceFilter(final Translator<?, ?> translator) throws NullPointerException {
+			this.translator = Objects.notNull(translator);
+		}
+	
+		@Override
+		public boolean accept(final Object item) {
+			return this.translator.isSource(item);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator);
+		}
+	
+	}
+
+	/** Diese Klasse implementiert {@link Filters#toTargetFilter(Translator)}. */
+	static class TargetFilter implements Filter<Object> {
+	
+		public final Translator<?, ?> translator;
+	
+		public TargetFilter(final Translator<?, ?> translator) throws NullPointerException {
+			this.translator = Objects.notNull(translator);
+		}
+	
+		@Override
+		public boolean accept(final Object item) {
+			return this.translator.isTarget(item);
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.translator);
+		}
+	
+	}
+
 	/** Diese Methode gibt den {@link Filter} zurück, der alle Elemente akzeptiert, die nicht {@code null} sind. Die Akzeptanz eines Elements {@code item} ist
 	 * {@code item != null}.
 	 *
@@ -426,6 +469,26 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GItem> Filter<GItem> toFilter(final Getter<? super GItem, Boolean> getter) throws NullPointerException {
 		return new GetterFilter<>(getter);
+	}
+
+	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isSource(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
+	 * {@code item} ist {@code translator.isSource(item)}.
+	 *
+	 * @param translator {@link Translator}.
+	 * @return {@link Filter}, der nur Quellobjekte des {@code translator} akzeptiert.
+	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
+	public static Filter<Object> toSourceFilter(final Translator<?, ?> translator) throws NullPointerException {
+		return new SourceFilter(translator);
+	}
+
+	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isTarget(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
+	 * {@code item} ist {@code translator.isTarget(item)}.
+	 *
+	 * @param translator {@link Translator}.
+	 * @return {@link Filter}, der nur Zielobjekte des {@code translator} akzeptiert.
+	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
+	public static Filter<Object> toTargetFilter(final Translator<?, ?> translator) throws NullPointerException {
+		return new TargetFilter(translator);
 	}
 
 }

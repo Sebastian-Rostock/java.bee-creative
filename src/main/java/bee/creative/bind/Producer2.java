@@ -9,11 +9,11 @@ public interface Producer2<GValue> extends Producer<GValue> {
 	/** Diese Methode ist eine Abkürtung für {@link Properties#concat(Producer, Field) Properties.concat(this, target)}. */
 	public <GValue2> Property2<GValue2> concat(final Field<? super GValue, GValue2> target);
 
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#concat(Producer, Setter) Consumers.concat(this, target)}. */
-	public <GValue2> Consumer3<GValue2> concat(final Setter<? super GValue, GValue2> target);
-
 	/** Diese Methode ist eine Abkürtung für {@link Producers#concat(Producer, Getter) Producers.concat(this, target)}. */
 	public <GValue2> Producer3<GValue2> concat(final Getter<? super GValue, GValue2> target);
+
+	/** Diese Methode ist eine Abkürtung für {@link Consumers#concat(Producer, Setter) Consumers.concat(this, target)}. */
+	public <GValue2> Consumer3<GValue2> concat(final Setter<? super GValue, GValue2> target);
 
 	/** Diese Methode ist eine Abkürtung für {@link Producers#toBuffered(Producer) Producers.toBuffered(this)}. */
 	public Producer3<GValue> toBuffered();

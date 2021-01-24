@@ -7,6 +7,7 @@ import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.PointerQueue;
 import bee.creative.util.HashSet;
+// TODO bessere benennung
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
  * {@link #pop(Object, Object) abgemeldet} bzw. {@link #fire(Object, Object) benachrichtigt} werden können und bezüglich eines {@link WeakReference schwach}
@@ -408,10 +409,10 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 		this.customFire(sender, message, observer2);
 	}
 
-	/** Diese Methode gibt das an den gegebenen Sender gebundene Ereignis zurück.
+	/** Diese Methode gibt das an den gegebenen Sender gebundene Ereignisquelle zurück.
 	 *
 	 * @param sender Ereignissender.
-	 * @return Ereignis. */
+	 * @return Ereignisquelle. */
 	public Observable<GMessage, GObserver> toObservable(final Object sender) {
 		return new EventObservable(sender);
 	}

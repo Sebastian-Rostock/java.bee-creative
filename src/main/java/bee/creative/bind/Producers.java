@@ -13,10 +13,10 @@ import bee.creative.ref.Pointers;
 /** Diese Klasse implementiert grundlegende {@link Producer}.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-@SuppressWarnings ("javadoc")
 public class Producers {
 
-	/** Diese Klasse implementiert einen {@link Producer3}, der stets {@code null} liefert. */
+	/** Diese Klasse implementiert den {@link Producer3}, der stets {@code null} liefert. */
+	@SuppressWarnings ("javadoc")
 	public static class EmptyProducer extends AbstractProducer<Object> {
 
 		public static final Producer3<?> INSTANCE = new EmptyProducer();
@@ -162,30 +162,31 @@ public class Producers {
 	 *
 	 * @param <GValue> Typ des Werts dieses {@link Producer3}.
 	 * @param <GValue2> Typ des Werts des gegebenen {@link Producer}. */
-	public static class TranslatedProducer<GValue, GValue2> extends AbstractProducer<GValue> {
+	public static class ConcatProducer<GValue, GValue2> extends AbstractProducer<GValue> {
 
-		public final Producer<? extends GValue2> target;
+		public final Producer<? extends GValue2> source;
 
-		public final Getter<? super GValue2, ? extends GValue> trans;
+		public final Getter<? super GValue2, ? extends GValue> target;
 
-		public TranslatedProducer(final Producer<? extends GValue2> target, final Getter<? super GValue2, ? extends GValue> trans) {
+		public ConcatProducer(final Producer<? extends GValue2> source, final Getter<? super GValue2, ? extends GValue> target) {
+			this.source = Objects.notNull(source);
 			this.target = Objects.notNull(target);
-			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
 		public GValue get() {
-			return this.trans.get(this.target.get());
+			return this.target.get(this.source.get());
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.trans);
+			return Objects.toInvokeString(this, this.source, this.target);
 		}
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Producer3}, welcher einen gegebenen {@link Producer} über {@code synchronized(this.mutex)} synchronisiert.
+	/** Diese Klasse implementiert einen {@link Producer3}, welcher einen gegebenen {@link Producer} über {@code synchronized(this.mutex)} synchronisiert. Wenn
+	 * dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	public static class SynchronizedProducer<GValue> extends AbstractProducer<GValue> {
@@ -194,12 +195,6 @@ public class Producers {
 
 		public final Object mutex;
 
-		/** Dieser Konstruktor initialisiert {@link Producer} und Synchronisationsobjekt. Wenn das Synchronisationsobjekt {@code null} ist, wird {@code this} als
-		 * Synchronisationsobjekt verwendet.
-		 *
-		 * @param target {@link Producer}.
-		 * @param mutex Synchronisationsobjekt oder {@code null}.
-		 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 		public SynchronizedProducer(final Producer<? extends GValue> target, final Object mutex) throws NullPointerException {
 			this.target = Objects.notNull(target);
 			this.mutex = Objects.notNull(mutex, this);
@@ -246,6 +241,11 @@ public class Producers {
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> empty() {
 		return (Producer3<GValue>)EmptyProducer.INSTANCE;
+	}
+
+	public static <GValue, GValue2> Producer3<GValue2> concat(final Producer<? extends GValue> source, final Getter<? super GValue, ? extends GValue2> target)
+		throws NullPointerException {
+		return new ConcatProducer<>(source, target);
 	}
 
 	/** Diese Methode gibt den gegebenen {@link Producer} als {@link Producer3} zurück. Wenn er {@code null} ist, wird {@link #empty()} geliefert. */
@@ -359,11 +359,6 @@ public class Producers {
 	public static <GValue> Producer3<GValue> toBuffered(final Producer<? extends GValue> target, final int mode)
 		throws NullPointerException, IllegalArgumentException {
 		return new BufferedProducer<>(target, mode);
-	}
-
-	public static <GValue, GValue2> Producer3<GValue2> concat(final Producer<? extends GValue> target, final Getter<? super GValue, ? extends GValue2> trans)
-		throws NullPointerException {
-		return new TranslatedProducer<>(target, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#toSynchronized(Producer, Object) Producers.toSynchronized(target, target)}. */

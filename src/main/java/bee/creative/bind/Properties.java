@@ -284,7 +284,8 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, welches ein gegebenes {@link Property} über {@code synchronized(this.mutex)} synchronisiert.
+	/** Diese Klasse implementiert ein {@link Property2}, welches ein gegebenes {@link Property} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	public static class SynchronizedProperty<GValue> extends AbstractProperty<GValue> {
@@ -293,12 +294,6 @@ public class Properties {
 
 		public final Object mutex;
 
-		/** Dieser Konstruktor initialisiert Eigenschaft und Synchronisationsobjekt. Wenn das Synchronisationsobjekt {@code null} ist, wird {@code this} als
-		 * Synchronisationsobjekt verwendet.
-		 *
-		 * @param target Eigenschaft.
-		 * @param mutex Synchronisationsobjekt oder {@code null}.
-		 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 		public SynchronizedProperty(final Property<GValue> target, final Object mutex) throws NullPointerException {
 			this.target = Objects.notNull(target);
 			this.mutex = Objects.notNull(mutex, this);
@@ -331,6 +326,11 @@ public class Properties {
 		return (Property2<GValue>)EmptyProperty.INSTANCE;
 	}
 
+	public static <GItem, GValue> Property2<GValue> concat(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
+		throws NullPointerException {
+		return Properties.from(Producers.concat(source, target), Consumers.concat(source, target));
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field, Object) Fields.toProperty(null, field)}. */
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target) throws NullPointerException {
 		return Properties.from(target, null);
@@ -338,13 +338,6 @@ public class Properties {
 
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target, final GItem item) throws NullPointerException {
 		return Properties.concat(Producers.fromValue(item), target);
-	}
-
-	/** Diese Methode gibt das gegebene {@link Property} als {@link Property2} zurück. Wenn es {@code null} ist, wird {@link #empty()} geliefert. */
-	public static <GValue> Property2<GValue> from(final Property<GValue> target) {
-		if (target == null) return Properties.empty();
-		if (target instanceof Consumer3) return (Property2<GValue>)target;
-		return Properties.toTranslated(target, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Properties.empty(), set)}. */
@@ -360,6 +353,13 @@ public class Properties {
 	/** Diese Methode ist eine Abkürzung für {@link CompositeProperty new CompositeProperty<>(get, set)}. */
 	public static <GValue> Property2<GValue> from(final Producer<? extends GValue> get, final Consumer<? super GValue> set) throws NullPointerException {
 		return new CompositeProperty<>(get, set);
+	}
+
+	/** Diese Methode gibt das gegebene {@link Property} als {@link Property2} zurück. Wenn es {@code null} ist, wird {@link #empty()} geliefert. */
+	public static <GValue> Property2<GValue> from(final Property<GValue> target) {
+		if (target == null) return Properties.empty();
+		if (target instanceof Consumer3) return (Property2<GValue>)target;
+		return Properties.toTranslated(target, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */
@@ -419,11 +419,6 @@ public class Properties {
 	public static <GValue> Property<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(Natives.parseField(fieldOwner, fieldName), forceAccessible);
-	}
-
-	public static <GItem, GValue> Property2<GValue> concat(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
-		throws NullPointerException {
-		return Properties.from(Producers.concat(source, target), Consumers.concat(source, target));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SetupProperty new SetupProperty<>(target, setup)}. */
