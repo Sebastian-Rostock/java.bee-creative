@@ -14,7 +14,7 @@ public interface Observable<GMessage, GObserver> {
 	 * ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object) Auslösen} des Ereignisses informiert. Das mehrfache Anmelden des gleichen Empfängers
 	 * sollte vermieden werden.
 	 *
-	 * @see Event#put(Object, Object)
+	 * @see Observables#put(Object, Object)
 	 * @param listener Ereignisempfänger oder {@code null}.
 	 * @return {@code listener}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
@@ -24,7 +24,7 @@ public interface Observable<GMessage, GObserver> {
 	 * ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object) Auslösen} des Ereignisses informiert. Das mehrfache Anmelden des gleichen
 	 * Ereignisempfängers sollte vermieden werden. Der Ereignisempfänger wird über eine {@link WeakReference} referenziert.
 	 *
-	 * @see Event#putWeak(Object, Object)
+	 * @see Observables#putWeak(Object, Object)
 	 * @param listener Ereignisempfänger oder {@code null}.
 	 * @return {@code listener}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
@@ -40,7 +40,7 @@ public interface Observable<GMessage, GObserver> {
 	/** Diese Methode löst das Ereignis aus, benachrichtigt alle zu diesem Zeitpunkt angemeldeten Ereignisempfänger mit der gegebenen Ereignisnachricht und gibt
 	 * letztere zurück.
 	 *
-	 * @see Event#fire(Object, Object)
+	 * @see Observables#fire(Object, Object)
 	 * @param message Ereignisnachricht oder {@code null}.
 	 * @return Ereignisnachricht.
 	 * @throws NullPointerException Wenn {@code message} {@code null} ist und die Empfänger dies nicht unterstützten.

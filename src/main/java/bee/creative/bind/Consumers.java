@@ -21,7 +21,7 @@ public class Consumers {
 
 	}
 
-	/** Diese Klasse implementiert einen verketteten {@link Consumer3}, welcher den gegebenen Wert beim {@link #set(Object) Schreiben} an einen gegebenen
+	/** Diese Klasse implementiert einen verketteten {@link Consumer3}, welcher beim {@link #set(Object) Schreiben} den gegebenen Wert an einen gegebenen
 	 * {@link Setter} delegiert und dazu den von einem gegebenen {@link Producer} bereitgestellten Datensatz verwendet. Das Schreiben des Werts {@code value}
 	 * erfolgt über {@code this.target.set(this.source.get(), value)}.
 	 * 
@@ -153,7 +153,7 @@ public class Consumers {
 		return new ConcatConsumer<>(source, target);
 	}
 
-	/** Diese Methode gibt den gegebenen {@link Consumer} als {@link Consumer3} zurück. Wenn er {@code null} ist, wird {@link Consumers#empty() Consumers.empty()}
+	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird {@link Consumers#empty() Consumers.empty()}
 	 * geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Consumer3<GValue> from(final Consumer<? super GValue> target) {

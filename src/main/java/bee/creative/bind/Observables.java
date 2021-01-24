@@ -7,46 +7,40 @@ import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.PointerQueue;
 import bee.creative.util.HashSet;
-// TODO bessere benennung
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
  * {@link #pop(Object, Object) abgemeldet} bzw. {@link #fire(Object, Object) benachrichtigt} werden können und bezüglich eines {@link WeakReference schwach}
- * referenzierten Ereignissenders gespeichert werden.
+ * referenzierten Ereignissenders gespeichert werden. Die Ereignisempfänger können ebenfalls {@link WeakReference schwach} {@link #putWeak(Object, Object)
+ * angemeldet} werden.
  * <p>
- * Die Empfänger können direkt oder {@link WeakReference schwach} referenziert werden, sodass für jeden angemeldeten Empfänger {@code 4} bzw. {@code 36} Byte
- * Verwaltungsdaten anfallen. Die Verwaltungsdaten je Sender betragen dagegen {@code 0}, {@code 48} oder {@code 60} Byte, wenn dafür keine, ein bzw. mehrere
- * Empfänger angemeldet sind.
- * <p>
- * Beim {@link #fire(Object, Object) Auslösen} eines Ereignisses wird eine gegebene Nachricht an alle zu diesem Zeitpunkt für einen gegebenen Sender
- * {@link #put(Object, Object) angemeldeten} Empfänger {@link #customFire(Object, Object, Object) gesendet}. Die Reihenfolge der Benachrichtigung der Empfänger
- * entsprichtz der Reihenfolge ihrer Anmeldung.
+ * Beim {@link #fire(Object, Object) Benachrichtigen} der Ereignisempfänger wird eine gegebene Nachricht an alle zu diesem Zeitpunkt für einen gegebenen
+ * Ereignissender angemeldeten Empfänger {@link #customFire(Object, Object, Object) gesendet}. Die Reihenfolge der Benachrichtigung der Empfänger entsprichtz
+ * der Reihenfolge ihrer Anmeldung.
  * <p>
  * <pre>
  *
- * public class MyMessage { ... }
- * public interface MyObserver {
- * 	public void onMyEvent(MyMessage message);
- * }
- *
  * public class MySender {
- *
- * 	public static final Event&lt;MyMessage, MyObserver> MyEvent = new Event&lt;>(){
- * 		protected void customFire(Object sender, MyMessage message, MyListener observer) {
- * 			observer.onMyEvent(message);
- *		}
- * 	};
- *
- * 	public Observable&lt;MyMessage, MyObserver> getMyEvent() {
- * 		return MyEvent.toObservable(this);
- * 	}
- *
+ * 
+ * public static class MyEvent {
+ * }
+ * 
+ * public	static interface MyListener {
+ * 	public void onMyEvent(MyEvent event);
+ * }
+ * 
+ * static final Observables<MyEvent, MyListener> onMyEventListeners = Observables.from(MyListener::onMyEvent);
+ * 
+ * public Observable<MyEvent, MyListener> onMyEvent() {
+ * 	return onMyEventListeners.toObservable(this);
+ * }
+ * 
  * }
  * </pre>
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GMessage> Typ der Nachricht.
  * @param <GObserver> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
-public abstract class Event<GMessage, GObserver> extends BaseObject {
+public abstract class Observables<GMessage, GObserver> extends BaseObject {
 
 	/** Diese Klasse implementiert die Verwaltung der Ereignissender und ihrer Ereignisempfänger. */
 	private static final class EventStore extends HashSet<Object> {
@@ -271,22 +265,22 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 
 		@Override
 		public GObserver put(final GObserver observer) {
-			return Event.this.put(this.sender, observer);
+			return Observables.this.put(this.sender, observer);
 		}
 
 		@Override
 		public GObserver putWeak(final GObserver observer) {
-			return Event.this.putWeak(this.sender, observer);
+			return Observables.this.putWeak(this.sender, observer);
 		}
 
 		@Override
 		public void pop(final GObserver observer) {
-			Event.this.pop(this.sender, observer);
+			Observables.this.pop(this.sender, observer);
 		}
 
 		@Override
 		public GMessage fire(final GMessage message) {
-			return Event.this.fire(this.sender, message);
+			return Observables.this.fire(this.sender, message);
 		}
 
 		@Override
@@ -296,13 +290,13 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 
 	}
 
-	/** Diese Methode liefert eine neue {@link Event Ereignisempfängerverwaltung}, die beim {@link Event#fire(Object, Object) Auslösen eines Ereignisses} zur
-	 * Benachrichtigung der Ereignisempfänger mit der Ereignisnachricht die gegebene Methode mit diesen Objekten aufruft.
+	/** Diese Methode liefert eine neue {@link Observables Ereignisempfängerverwaltung}, die beim {@link Observables#fire(Object, Object) Auslösen eines
+	 * Ereignisses} zur Benachrichtigung der Ereignisempfänger mit der Ereignisnachricht die gegebene Methode mit diesen Objekten aufruft.
 	 *
 	 * @param customFire Methode zur Benachrichtigung eines Ereignisempfängers mit einer Ereignisnachricht.
 	 * @return Ereignisempfängerverwaltung. */
-	public static <GMessage, GObserver> Event<GMessage, GObserver> from(final Setter<? super GObserver, ? super GMessage> customFire) {
-		return new Event<GMessage, GObserver>() {
+	public static <GMessage, GObserver> Observables<GMessage, GObserver> from(final Setter<? super GObserver, ? super GMessage> customFire) {
+		return new Observables<GMessage, GObserver>() {
 
 			@Override
 			protected void customFire(final Object sender, final GMessage message, final GObserver observer) {
@@ -319,7 +313,7 @@ public abstract class Event<GMessage, GObserver> extends BaseObject {
 	 * ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object, Object) Auslösen} von Ereignissen informiert. Das mehrfache Anmelden des gleichen
 	 * Empfängers sollte vermieden werden.
 	 *
-	 * @see Event#putWeak(Object, Object)
+	 * @see Observables#putWeak(Object, Object)
 	 * @param sender Ereignissender oder {@code null}.
 	 * @param observer Ereignisempfänger oder {@code null}.
 	 * @return {@code observer}.

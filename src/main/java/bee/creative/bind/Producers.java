@@ -15,7 +15,7 @@ import bee.creative.ref.Pointers;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Producers {
 
-	/** Diese Klasse implementiert den {@link Producer3}, der stets {@code null} liefert. */
+	/** Diese Klasse implementiert einen {@link Producer3}, welcher beim {@link #get() Lesen} stets {@code null} liefert. */
 	@SuppressWarnings ("javadoc")
 	public static class EmptyProducer extends AbstractProducer<Object> {
 
@@ -23,9 +23,10 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Producer3}, der beim {@link #get() Lesen} stets einen gegebenen Wert liefert.
+	/** Diese Klasse implementiert einen {@link Producer3}, welcher beim {@link #get() Lesen} stets einen gegebenen Wert liefert.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class ValueProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final GValue target;
@@ -46,20 +47,16 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Producer3}, der das {@link #get() Lesen} an eine gegebene {@link Method nativen statische Methode} delegiert. Das
-	 * Lesen erfolgt über {@code this.target.invoke(null)}.
+	/** Diese Klasse implementiert einen {@link Producer3}, welcher das {@link #get() Lesen} an eine gegebene {@link Method nativen statische Methode} delegiert.
+	 * Das Lesen erfolgt über {@code this.target.invoke(null)}.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class MethodProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Method target;
 
-		/** Dieser Konstruktor initialisiert Methode und Zugreifbarkeit.
-		 *
-		 * @param target native statische Methode.
-		 * @param forceAccessible {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}.
-		 * @throws NullPointerException Wenn {@code target} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die Methode nicht statisch bzw. nicht zugreifbar ist oder keine passende Parameteranzahl besitzt. */
+		/** Dieser Konstruktor initialisiert Methode und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
 		public MethodProducer(final Method target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			if (!Modifier.isStatic(target.getModifiers()) || (target.getParameterTypes().length != 0)) throw new IllegalArgumentException();
 			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
@@ -82,20 +79,16 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Producer3}, der das {@link #get() Lesen} an einen gegebenen {@link Method nativen statischen Konstruktor}
-	 * delegiert. Das Lesen erfolgt über {@code this.target.newInstance(null)}.
+	/** Diese Klasse implementiert einen {@link Producer3}, welcher das {@link #get() Lesen} an einen gegebenen {@link Method nativen statischen Konstruktor}
+	 * delegiert. Das Lesen erfolgt über {@code this.target.newInstance()}.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class ConstructorProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Constructor<?> target;
 
-		/** Dieser Konstruktor initialisiert Konstruktor und Zugreifbarkeit.
-		 *
-		 * @param target nativer statischer Konstruktor.
-		 * @param forceAccessible {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}.
-		 * @throws NullPointerException Wenn {@code target} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn der Konstruktor nicht statisch bzw. nicht zugreifbar ist oder keine passende Parameteranzahl besitzt. */
+		/** Dieser Konstruktor initialisiert Konstruktor und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
 		public ConstructorProducer(final Constructor<?> target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			if (!Modifier.isStatic(target.getModifiers()) || (target.getParameterTypes().length != 0)) throw new IllegalArgumentException();
 			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
@@ -118,10 +111,11 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen puffernden {@link Producer3}, welcher den von einem gegebenen {@link Producer} gelieferten Wert mit Hilfe eines
-	 * {@link Pointer} im gegebenenen Modus zwischenspeichert.
+	/** Diese Klasse implementiert einen puffernden {@link Producer3}, welcher den beim {@link #get() Lesen} einen Wert liefert, der von einem gegebenen
+	 * {@link Producer} gelieferten und mit einem {@link Pointer} im gegebenenen Modus zwischenspeichert wird.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class BufferedProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Producer<? extends GValue> target;
@@ -157,18 +151,19 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert übersetzten {@link Producer3}, dessen Wert mit Hilfe eines gegebenen {@link Getter} aus dem Wert eines gegebenen
-	 * {@link Producer} ermittelt wird.
+	/** Diese Klasse implementiert einen verketteten {@link Producer3}, welcher den beim {@link #get() Lesen} einen Wert liefert, der über einen gegebenen
+	 * {@link Getter} aus dem Wert eines gegebenen {@link Producer} ermittelt wird. Das Lesen erfolgt über {@code this.target.get(this.source.get())}.
 	 *
 	 * @param <GValue> Typ des Werts dieses {@link Producer3}.
 	 * @param <GValue2> Typ des Werts des gegebenen {@link Producer}. */
+	@SuppressWarnings ("javadoc")
 	public static class ConcatProducer<GValue, GValue2> extends AbstractProducer<GValue> {
 
 		public final Producer<? extends GValue2> source;
 
 		public final Getter<? super GValue2, ? extends GValue> target;
 
-		public ConcatProducer(final Producer<? extends GValue2> source, final Getter<? super GValue2, ? extends GValue> target) {
+		public ConcatProducer(final Producer<? extends GValue2> source, final Getter<? super GValue2, ? extends GValue> target) throws NullPointerException {
 			this.source = Objects.notNull(source);
 			this.target = Objects.notNull(target);
 		}
@@ -189,6 +184,7 @@ public class Producers {
 	 * dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class SynchronizedProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Producer<? extends GValue> target;
@@ -237,18 +233,20 @@ public class Producers {
 
 	}
 
-	/** Diese Methode liefert {@link EmptyProducer#INSTANCE}. */
+	/** Diese Methode liefert {@link EmptyProducer EmptyProducer.INSTANCE}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> empty() {
 		return (Producer3<GValue>)EmptyProducer.INSTANCE;
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link ConcatProducer new ConcatProducer<>(source, target)}. */
 	public static <GValue, GValue2> Producer3<GValue2> concat(final Producer<? extends GValue> source, final Getter<? super GValue, ? extends GValue2> target)
 		throws NullPointerException {
 		return new ConcatProducer<>(source, target);
 	}
 
-	/** Diese Methode gibt den gegebenen {@link Producer} als {@link Producer3} zurück. Wenn er {@code null} ist, wird {@link #empty()} geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. Wenn er {@code null} ist, wird {@link Producers#empty() Producers.empty()}
+	 * geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> from(final Producer<? extends GValue> target) {
 		if (target == null) return Producers.empty();
@@ -261,13 +259,15 @@ public class Producers {
 		return Producers.from(target, null);
 	}
 
-	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> getter, final GItem item) throws NullPointerException {
-		return concat(Producers.fromValue(item), getter);
+	/** Diese Methode ist eine Abkürzung für {@link Producers#concat(Producer, Getter) Producers.concat(Producers.fromValue(item), target)}. */
+	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> target, final GItem item) throws NullPointerException {
+		return Producers.concat(Producers.fromValue(item), target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ValueProducer new ValueProducer<>(target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link ValueProducer new ValueProducer<>(target)}. Wenn {@code target} {@code null} ist, wird
+	 * {@link Producers#empty() Producers.empty()} geliefert. */
 	public static <GValue> Producer3<GValue> fromValue(final GValue target) {
-		if (target == null) return empty();
+		if (target == null) return Producers.empty();
 		return new ValueProducer<>(target);
 	}
 
