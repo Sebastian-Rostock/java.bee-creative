@@ -167,7 +167,9 @@ public class Consumers {
 		return Consumers.from(target, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Setter) Consumers.concat(Producers.fromValue(item), target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Setter) Consumers.concat(Producers.fromValue(item), target)}.
+	 * 
+	 * @see Producers#fromValue(Object) */
 	public static <GItem, GValue> Consumer3<GValue> from(final Setter<? super GItem, ? super GValue> target, final GItem item) throws NullPointerException {
 		return Consumers.concat(Producers.fromValue(item), target);
 	}
@@ -195,8 +197,9 @@ public class Consumers {
 		return Consumers.fromNative(target, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field, boolean) Consumers.from(Properties.fromNative(target,
-	 * forceAccessible))}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Consumer) Consumers.from(Properties.fromNative(target, forceAccessible))}.
+	 * 
+	 * @see Properties#fromNative(java.lang.reflect.Field, boolean) */
 	public static <GValue> Consumer3<GValue> fromNative(final java.lang.reflect.Field target, final boolean forceAccessible) {
 		return Consumers.from(Properties.fromNative(target, forceAccessible));
 	}
@@ -217,8 +220,9 @@ public class Consumers {
 		return Consumers.fromNative(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(Class, String, boolean) Consumers.from(Properties.fromNative(fieldOwner, fieldName,
-	 * forceAccessible))}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Consumer) Consumers.from(Properties.fromNative(fieldOwner, fieldName, forceAccessible))}.
+	 * 
+	 * @see Properties#fromNative(Class, String, boolean) */
 	public static <GValue> Consumer3<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Consumers.from(Properties.fromNative(fieldOwner, fieldName, forceAccessible));

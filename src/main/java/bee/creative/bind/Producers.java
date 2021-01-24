@@ -250,7 +250,7 @@ public class Producers {
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> from(final Producer<? extends GValue> target) {
 		if (target == null) return Producers.empty();
-		if (target instanceof Producer3) return (Producer3<GValue>)target;
+		if (target instanceof Producer3<?>) return (Producer3<GValue>)target;
 		return Producers.concat(target, Getters.<GValue>neutral());
 	}
 

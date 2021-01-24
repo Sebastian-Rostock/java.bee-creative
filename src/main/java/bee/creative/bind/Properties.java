@@ -162,44 +162,9 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein übersetztes {@link Property2}, welches das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
-	 * {@link Property} delegiert, wobei der Wert hierbei über einen gegebnenen {@link Translator} übersetzt wird. Beim Lesen wird
-	 * {@code this.trans.toSource(this.target.get())} geliefert. Das Schreiben erfolgt über {@code this.target.set(this.trans.toTarget(value))}.
-	 *
-	 * @param <GValue> Typ des Werts dieser Eigenschaft.
-	 * @param <GValue2> Typ des Werts der gegebenen Eigenschaft. */
-	@SuppressWarnings ("javadoc")
-	public static class TranslatedProperty<GValue, GValue2> extends AbstractProperty<GValue> {
-
-		public final Property<GValue2> target;
-
-		public final Translator<GValue, GValue2> trans;
-
-		public TranslatedProperty(final Property<GValue2> target, final Translator<GValue, GValue2> trans) {
-			this.target = Objects.notNull(target);
-			this.trans = Objects.notNull(trans);
-		}
-
-		@Override
-		public GValue get() {
-			return this.trans.toSource(this.target.get());
-		}
-
-		@Override
-		public void set(final GValue value) {
-			this.target.set(this.trans.toTarget(value));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.trans);
-		}
-
-	}
-
 	/** Diese Klasse implementiert eine {@link Observable} {@link Property2},welches {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
 	 * {@link Property} delegiert und beim ändernden Schreiben ein Änderungsereignis auslöst.
-	 * 
+	 *
 	 * @see UpdatePropertyEvent
 	 * @see UpdatePropertyListener
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
@@ -319,29 +284,38 @@ public class Properties {
 		return (Property2<GValue>)EmptyProperty.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Consumer) Properties.from(Producers.concat(source, target), Consumers.concat(source,
-	 * target))}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.concat(source, target), Consumers.concat(source,
+	 * target))}.
+	 *
+	 * @see Producers#concat(Producer, Getter)
+	 * @see Consumers#concat(Producer, Setter) */
 	public static <GItem, GValue> Property2<GValue> concat(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
 		throws NullPointerException {
 		return Properties.from(Producers.concat(source, target), Consumers.concat(source, target));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field, Object) Fields.from(target, null)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Field, Object) Fields.from(target, null)}. */
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target) throws NullPointerException {
 		return Properties.from(target, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#concat(Producer, Field) Properties.concat(Producers.fromValue(item), target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Field) Properties.concat(Producers.fromValue(item), target)}.
+	 *
+	 * @see Producers#fromValue(Object) */
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target, final GItem item) throws NullPointerException {
 		return Properties.concat(Producers.fromValue(item), target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Properties.empty(), target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Properties.empty(), target)}.
+	 *
+	 * @see #empty() */
 	public static <GValue> Property2<GValue> from(final Consumer<? super GValue> target) throws NullPointerException {
 		return Properties.from(Properties.<GValue>empty(), target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(target, Properties.empty())}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(target, Properties.empty())}.
+	 *
+	 * @see #empty() */
 	public static <GValue> Property2<GValue> from(final Producer<? extends GValue> target) throws NullPointerException {
 		return Properties.from(target, Properties.<GValue>empty());
 	}
@@ -408,7 +382,7 @@ public class Properties {
 		return Properties.fromNative(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field) Properties.fromNative(Natives.parseField(fieldOwner, fieldName),
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Properties.fromNative(Natives.parseField(fieldOwner, fieldName),
 	 * forceAccessible)}.
 	 *
 	 * @see Natives#parseField(Class, String) */
@@ -422,13 +396,17 @@ public class Properties {
 		return new SetupProperty<>(target, setup);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #toTranslated(Property, Getter, Getter) Properties.toTranslated(target, Getters.fromTarget(trans),
+	 * Getters.fromSource(trans))}.
+	 *
+	 * @see Getters#fromTarget(Translator)
+	 * @see Getters#fromSource(Translator) */
 	public static <GValue, GValue2> Property2<GValue> toTranslated(final Property<GValue2> target, final Translator<GValue2, GValue> trans)
 		throws NullPointerException {
-		return toTranslated(target, Getters.fromTarget(trans), Getters.fromSource(trans));
+		return Properties.toTranslated(target, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.toTranslated(target, transGet),
-	 * Consumers.toTranslated(target, transSet))}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.concat(target, transGet), Consumers.toTranslated(target, transSet))}.
 	 *
 	 * @see Producers#concat(Producer, Getter)
 	 * @see Consumers#toTranslated(Consumer, Getter) */
