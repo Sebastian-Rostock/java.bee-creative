@@ -3,17 +3,17 @@ package bee.creative.bind;
 import bee.creative.bind.Properties.ObservableProperty;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert die von eomem {@link UpdatePropertyListener} empfangene Nachricht zur Aktualisierung des Werts eiens
+/** Diese Klasse implementiert die von einem {@link UpdatePropertyListener} empfangene Nachricht zur Aktualisierung des Werts eines
  * {@link ObservableProperty}. */
 public class UpdatePropertyEvent {
 
 	/** Dieses Feld speichert den Sender des Ereignisses. */
 	public final ObservableProperty<?> sender;
 
-	/** Dieses Feld speichert den alten Wert des Datenfelds. */
+	/** Dieses Feld speichert den alten Wert des {@link ObservableProperty}. */
 	public final Object oldValue;
 
-	/** Dieses Feld speichert den neuen Wert des Datenfelds. */
+	/** Dieses Feld speichert den neuen Wert des {@link ObservableProperty}. */
 	public final Object newValue;
 
 	/** Dieser Konstruktor initialisiert die Eigenschafte des Ereignisses. */

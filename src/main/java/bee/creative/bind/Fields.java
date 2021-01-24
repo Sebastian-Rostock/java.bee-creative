@@ -179,7 +179,7 @@ public final class Fields {
 	 *
 	 * @param <GItem> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	public static class ObservableField<GItem, GValue> extends AbstractField<GItem, GValue> implements Observable<UpdateFieldMessage, UpdateFieldObserver> {
+	public static class ObservableField<GItem, GValue> extends AbstractField<GItem, GValue> implements Observable<UpdateFieldEvent, UpdateFieldListener> {
 
 		/** Dieses Feld speichert das Datenfel, an das in {@link #get(Object)} und {@link #set(Object, Object)} delegiert wird. */
 		public final Field<? super GItem, GValue> target;
@@ -202,27 +202,27 @@ public final class Fields {
 			if (this.customEquals(oldValue, newValue)) return;
 			oldValue = this.customClone(oldValue);
 			this.target.set(item, newValue);
-			this.fire(new UpdateFieldMessage(this, item, oldValue, newValue));
+			this.fire(new UpdateFieldEvent(this, item, oldValue, newValue));
 		}
 
 		@Override
-		public UpdateFieldObserver put(final UpdateFieldObserver listener) throws IllegalArgumentException {
-			return UpdateFieldEvent.INSTANCE.put(this, listener);
+		public UpdateFieldListener put(final UpdateFieldListener listener) throws IllegalArgumentException {
+			return UpdateFieldObservables.INSTANCE.put(this, listener);
 		}
 
 		@Override
-		public UpdateFieldObserver putWeak(final UpdateFieldObserver listener) throws IllegalArgumentException {
-			return UpdateFieldEvent.INSTANCE.putWeak(this, listener);
+		public UpdateFieldListener putWeak(final UpdateFieldListener listener) throws IllegalArgumentException {
+			return UpdateFieldObservables.INSTANCE.putWeak(this, listener);
 		}
 
 		@Override
-		public void pop(final UpdateFieldObserver listener) throws IllegalArgumentException {
-			UpdateFieldEvent.INSTANCE.pop(this, listener);
+		public void pop(final UpdateFieldListener listener) throws IllegalArgumentException {
+			UpdateFieldObservables.INSTANCE.pop(this, listener);
 		}
 
 		@Override
-		public UpdateFieldMessage fire(final UpdateFieldMessage event) throws NullPointerException {
-			return UpdateFieldEvent.INSTANCE.fire(this, event);
+		public UpdateFieldEvent fire(final UpdateFieldEvent event) throws NullPointerException {
+			return UpdateFieldObservables.INSTANCE.fire(this, event);
 		}
 
 		@Override
