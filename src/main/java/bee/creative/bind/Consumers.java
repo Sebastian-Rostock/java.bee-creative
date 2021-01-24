@@ -153,12 +153,12 @@ public class Consumers {
 		return new ConcatConsumer<>(source, target);
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird {@link Consumers#empty() Consumers.empty()}
+	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird {@link #empty() Consumers.empty()}
 	 * geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Consumer3<GValue> from(final Consumer<? super GValue> target) {
 		if (target == null) return Consumers.empty();
-		if (target instanceof Consumer3) return (Consumer3<GValue>)target;
+		if (target instanceof Consumer3<?>) return (Consumer3<GValue>)target;
 		return Consumers.toTranslated(target, Getters.<GValue>neutral());
 	}
 
@@ -172,7 +172,7 @@ public class Consumers {
 		return Consumers.concat(Producers.fromValue(item), target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(String, boolean) Consumers.fromNative(memberText, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Consumers.fromNative(memberText, true)}. */
 	public static <GValue> Consumer3<GValue> fromNative(final String memberText) throws NullPointerException, IllegalArgumentException {
 		return Consumers.fromNative(memberText, true);
 	}
@@ -190,7 +190,7 @@ public class Consumers {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(java.lang.reflect.Field, boolean) Consumers.fromNative(target, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Consumers.fromNative(target, true)}. */
 	public static <GValue> Consumer3<GValue> fromNative(final java.lang.reflect.Field target) {
 		return Consumers.fromNative(target, true);
 	}
@@ -201,7 +201,7 @@ public class Consumers {
 		return Consumers.from(Properties.fromNative(target, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(Method, boolean) Consumers.fromNative(target, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Consumers.fromNative(target, true)}. */
 	public static <GValue> Consumer3<GValue> fromNative(final Method target) {
 		return Consumers.fromNative(target, true);
 	}
@@ -212,7 +212,7 @@ public class Consumers {
 		return new MethodConsumer<>(target, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#fromNative(Class, String, boolean) Consumers.fromNative(fieldOwner, fieldName, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Consumers.fromNative(fieldOwner, fieldName, true)}. */
 	public static <GValue> Consumer3<GValue> fromNative(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
 		return Consumers.fromNative(fieldOwner, fieldName, true);
 	}

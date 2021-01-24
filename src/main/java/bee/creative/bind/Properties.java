@@ -13,22 +13,22 @@ public class Properties {
 
 	/** Diese Klasse implementiert ein {@link Property2}, welches das {@link #set(Object) Schreiben} ignoriert und beim {@link #get() Lesen} stets {@code null}
 	 * liefert. */
+	@SuppressWarnings ("javadoc")
 	public static class EmptyProperty extends AbstractProperty<Object> {
 
 		public static final Property2<?> INSTANCE = new EmptyProperty();
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, dessen {@link #value Wert} {@link #get() gelesen} und {@link #set(Object) geschrieben} werden kann.
+	/** Diese Klasse implementiert ein {@link Property2}, welches einen {@link #value Wert} verwaltet, der {@link #get() gelesen} und {@link #set(Object)
+	 * geschrieben} werden kann.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class ValueProperty<GValue> extends AbstractProperty<GValue> {
 
 		public GValue value;
 
-		/** Dieser Konstruktor initialisiert den Wert.
-		 *
-		 * @param value Wert. */
 		public ValueProperty(final GValue value) {
 			this.value = value;
 		}
@@ -51,21 +51,17 @@ public class Properties {
 	}
 
 	/** Diese Klasse implementiert ein initialisierendes {@link Property2}, welches das {@link #set(Object) Schreiben} an ein gegebenes {@link Property} delegiert
-	 * und den Wert beim {@link #get() Lesen} über das gegebene {@link Property} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert, d.h. mit
-	 * Hilfe eines gegebenen {@link Producer} ermittelt und über das gegebene {@link Property} geschrieben.
+	 * und welches beim {@link #get() Lesen} den Wert über dieses gegebene {@link Property} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert,
+	 * d.h. mit Hilfe eines gegebenen {@link Producer} ermittelt und über das gegebene {@link Property} geschrieben.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class SetupProperty<GValue> extends AbstractProperty<GValue> {
 
 		public final Property<GValue> target;
 
 		public final Producer<? extends GValue> setup;
 
-		/** Dieser Konstruktor initialisiert Eigenschaft und Initialisierung.
-		 *
-		 * @param target Eigenschaft.
-		 * @param setup Initialisierung.
-		 * @throws NullPointerException Wenn {@code target} bzw. {@code setup} {@code null} ist. */
 		public SetupProperty(final Property<GValue> target, final Producer<? extends GValue> setup) throws NullPointerException {
 			this.target = Objects.notNull(target);
 			this.setup = Objects.notNull(setup);
@@ -96,16 +92,12 @@ public class Properties {
 	 * {@link java.lang.reflect.Field natives statisches Datenfeld} delegiert. *
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class NativeProperty<GValue> extends AbstractProperty<GValue> {
 
 		public final java.lang.reflect.Field target;
 
-		/** Dieser Konstruktor initialisiert das Datenfeld und Zugreifbarkeit.
-		 *
-		 * @param target natives statisches Datenfeld.
-		 * @param forceAccessible {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}.
-		 * @throws NullPointerException Wenn {@code target} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn das native Datenfeld nicht statisch bzw. nicht zugrifbar ist. */
+		/** Dieser Konstruktor initialisiert das Datenfeld und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
 		public NativeProperty(final java.lang.reflect.Field target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			if (!Modifier.isStatic(target.getModifiers())) throw new IllegalArgumentException();
 			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
@@ -141,17 +133,13 @@ public class Properties {
 	 * {@link #set(Object) Schreiben} an einen gegebenen {@link Consumer} delegiert.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class CompositeProperty<GValue> extends AbstractProperty<GValue> {
 
 		public final Producer<? extends GValue> get;
 
 		public final Consumer<? super GValue> set;
 
-		/** Dieser Konstruktor initialisiert Lesen- und Schreibmethode.
-		 *
-		 * @param get Lesenmethode.
-		 * @param set Schreibmethode.
-		 * @throws NullPointerException Wenn {@code get} bzw. {@code set} {@code null} ist. */
 		public CompositeProperty(final Producer<? extends GValue> get, final Consumer<? super GValue> set) throws NullPointerException {
 			this.get = Objects.notNull(get);
 			this.set = Objects.notNull(set);
@@ -174,12 +162,13 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein übersetztes {@link Property2}, welches einen gegebnenen {@link Translator} zur Übersetzung des Werts beim {@link #get()
-	 * Lesen} bzw. {@link #set(Object) Schreiben} nutzt. Beim Lesen wird {@code this.trans.toSource(this.target.get())} geliefert. Das Schreiben erfolgt über
-	 * {@code this.target.set(this.trans.toTarget(value))}.
+	/** Diese Klasse implementiert ein übersetztes {@link Property2}, welches das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	 * {@link Property} delegiert, wobei der Wert hierbei über einen gegebnenen {@link Translator} übersetzt wird. Beim Lesen wird
+	 * {@code this.trans.toSource(this.target.get())} geliefert. Das Schreiben erfolgt über {@code this.target.set(this.trans.toTarget(value))}.
 	 *
 	 * @param <GValue> Typ des Werts dieser Eigenschaft.
 	 * @param <GValue2> Typ des Werts der gegebenen Eigenschaft. */
+	@SuppressWarnings ("javadoc")
 	public static class TranslatedProperty<GValue, GValue2> extends AbstractProperty<GValue> {
 
 		public final Property<GValue2> target;
@@ -208,10 +197,13 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link Observable} {@link Property2}.
-	 *
+	/** Diese Klasse implementiert eine {@link Observable} {@link Property2},welches {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	 * {@link Property} delegiert und beim ändernden Schreiben ein Änderungsereignis auslöst.
+	 * 
+	 * @see UpdatePropertyEvent
+	 * @see UpdatePropertyListener
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	public static class ObservableProperty<GValue> extends AbstractProperty<GValue> implements Observable<UpdatePropertyMessage, UpdatePropertyObserver> {
+	public static class ObservableProperty<GValue> extends AbstractProperty<GValue> implements Observable<UpdatePropertyEvent, UpdatePropertyListener> {
 
 		/** Dieses Feld speichert die Eigenschaft, an die in {@link #get()} und {@link #set(Object)} delegiert wird. */
 		public final Property<GValue> target;
@@ -254,27 +246,27 @@ public class Properties {
 			if (this.customEquals(oldValue, newValue)) return;
 			oldValue = this.customClone(oldValue);
 			this.target.set(newValue);
-			this.fire(new UpdatePropertyMessage(this, oldValue, newValue));
+			this.fire(new UpdatePropertyEvent(this, oldValue, newValue));
 		}
 
 		@Override
-		public UpdatePropertyObserver put(final UpdatePropertyObserver listener) throws IllegalArgumentException {
-			return UpdatePropertyEvent.INSTANCE.put(this, listener);
+		public UpdatePropertyListener put(final UpdatePropertyListener listener) throws IllegalArgumentException {
+			return UpdatePropertyObservables.INSTANCE.put(this, listener);
 		}
 
 		@Override
-		public UpdatePropertyObserver putWeak(final UpdatePropertyObserver listener) throws IllegalArgumentException {
-			return UpdatePropertyEvent.INSTANCE.putWeak(this, listener);
+		public UpdatePropertyListener putWeak(final UpdatePropertyListener listener) throws IllegalArgumentException {
+			return UpdatePropertyObservables.INSTANCE.putWeak(this, listener);
 		}
 
 		@Override
-		public void pop(final UpdatePropertyObserver listener) throws IllegalArgumentException {
-			UpdatePropertyEvent.INSTANCE.pop(this, listener);
+		public void pop(final UpdatePropertyListener listener) throws IllegalArgumentException {
+			UpdatePropertyObservables.INSTANCE.pop(this, listener);
 		}
 
 		@Override
-		public UpdatePropertyMessage fire(final UpdatePropertyMessage event) throws NullPointerException {
-			return UpdatePropertyEvent.INSTANCE.fire(this, event);
+		public UpdatePropertyEvent fire(final UpdatePropertyEvent event) throws NullPointerException {
+			return UpdatePropertyObservables.INSTANCE.fire(this, event);
 		}
 
 		@Override
@@ -288,6 +280,7 @@ public class Properties {
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class SynchronizedProperty<GValue> extends AbstractProperty<GValue> {
 
 		public final Property<GValue> target;
@@ -320,34 +313,37 @@ public class Properties {
 
 	}
 
-	/** Diese Methode liefert {@link EmptyProperty#INSTANCE}. */
+	/** Diese Methode liefert {@link EmptyProperty EmptyProperty.INSTANCE}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Property2<GValue> empty() {
 		return (Property2<GValue>)EmptyProperty.INSTANCE;
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Consumer) Properties.from(Producers.concat(source, target), Consumers.concat(source,
+	 * target))}. */
 	public static <GItem, GValue> Property2<GValue> concat(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
 		throws NullPointerException {
 		return Properties.from(Producers.concat(source, target), Consumers.concat(source, target));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field, Object) Fields.toProperty(null, field)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field, Object) Fields.from(target, null)}. */
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target) throws NullPointerException {
 		return Properties.from(target, null);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Properties#concat(Producer, Field) Properties.concat(Producers.fromValue(item), target)}. */
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target, final GItem item) throws NullPointerException {
 		return Properties.concat(Producers.fromValue(item), target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Properties.empty(), set)}. */
-	public static <GValue> Property2<GValue> from(final Consumer<? super GValue> set) throws NullPointerException {
-		return Properties.from(Properties.<GValue>empty(), set);
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Properties.empty(), target)}. */
+	public static <GValue> Property2<GValue> from(final Consumer<? super GValue> target) throws NullPointerException {
+		return Properties.from(Properties.<GValue>empty(), target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(get, Properties.empty())}. */
-	public static <GValue> Property2<GValue> from(final Producer<? extends GValue> get) throws NullPointerException {
-		return Properties.from(get, Properties.<GValue>empty());
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(target, Properties.empty())}. */
+	public static <GValue> Property2<GValue> from(final Producer<? extends GValue> target) throws NullPointerException {
+		return Properties.from(target, Properties.<GValue>empty());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeProperty new CompositeProperty<>(get, set)}. */
@@ -355,10 +351,11 @@ public class Properties {
 		return new CompositeProperty<>(get, set);
 	}
 
-	/** Diese Methode gibt das gegebene {@link Property} als {@link Property2} zurück. Wenn es {@code null} ist, wird {@link #empty()} geliefert. */
+	/** Diese Methode liefert das gegebene {@link Property} als {@link Property2}. Wenn es {@code null} ist, wird {@link Properties#empty() Properties.empty()}
+	 * geliefert. */
 	public static <GValue> Property2<GValue> from(final Property<GValue> target) {
 		if (target == null) return Properties.empty();
-		if (target instanceof Consumer3) return (Property2<GValue>)target;
+		if (target instanceof Property2<?>) return (Property2<GValue>)target;
 		return Properties.toTranslated(target, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
@@ -367,13 +364,12 @@ public class Properties {
 		return new ValueProperty<>(value);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(String, boolean) Properties.fromNative(fieldPath, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Properties.fromNative(fieldPath, true)}. */
 	public static <GValue> Property<GValue> fromNative(final String fieldPath) throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(fieldPath, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field) Properties.fromNative(Natives.parseField(fieldPath),
-	 * forceAccessible)}.
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field) Properties.fromNative(Natives.parseField(fieldPath), forceAccessible)}.
 	 *
 	 * @see Natives#parseField(String) */
 	public static <GValue> Property<GValue> fromNative(final String fieldPath, final boolean forceAccessible)
@@ -381,7 +377,7 @@ public class Properties {
 		return Properties.fromNative(Natives.parseField(fieldPath), forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field, boolean) Properties.fromNative(field, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Properties.fromNative(field, true)}. */
 	public static <GValue> Property<GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(field, true);
 	}
@@ -392,12 +388,12 @@ public class Properties {
 		return new NativeProperty<>(field, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(Method, Method, boolean) Properties.fromNative(get, set, true)}. **/
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, Method, boolean) Properties.fromNative(get, set, true)}. **/
 	public static <GValue> Property<GValue> fromNative(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(get, set, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Consumer) Properties.from(Producers.fromNative(get, forceAccessible),
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.fromNative(get, forceAccessible),
 	 * Consumers.fromNative(set, forceAccessible))}.
 	 *
 	 * @see Producers#fromNative(Method, boolean)
@@ -407,13 +403,13 @@ public class Properties {
 		return Properties.from(Producers.<GValue>fromNative(get, forceAccessible), Consumers.<GValue>fromNative(set, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(Class, String, boolean) Properties.fromNative(fieldOwner, fieldName, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Properties.fromNative(fieldOwner, fieldName, true)}. */
 	public static <GValue> Property<GValue> fromNative(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(java.lang.reflect.Field) Properties.fromNative(Natives.parseField(fieldOwner,
-	 * fieldName), forceAccessible)}.
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field) Properties.fromNative(Natives.parseField(fieldOwner, fieldName),
+	 * forceAccessible)}.
 	 *
 	 * @see Natives#parseField(Class, String) */
 	public static <GValue> Property<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
@@ -431,7 +427,7 @@ public class Properties {
 		return toTranslated(target, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Consumer) Properties.from(Producers.toTranslated(target, transGet),
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.toTranslated(target, transGet),
 	 * Consumers.toTranslated(target, transSet))}.
 	 *
 	 * @see Producers#concat(Producer, Getter)
@@ -446,7 +442,7 @@ public class Properties {
 		return new ObservableProperty<>(property);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#toSynchronized(Property, Object) Properties.toSynchronized(target, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Property, Object) Properties.toSynchronized(target, target)}. */
 	public static <GValue> Property2<GValue> toSynchronized(final Property<GValue> target) throws NullPointerException {
 		return Properties.toSynchronized(target, target);
 	}

@@ -245,7 +245,7 @@ public class Producers {
 		return new ConcatProducer<>(source, target);
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. Wenn er {@code null} ist, wird {@link Producers#empty() Producers.empty()}
+	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. Wenn er {@code null} ist, wird {@link #empty() Producers.empty()}
 	 * geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> from(final Producer<? extends GValue> target) {
@@ -254,12 +254,12 @@ public class Producers {
 		return Producers.concat(target, Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#from(Getter, Object) Producers.from(target, null)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Object) Producers.from(target, null)}. */
 	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> target) throws NullPointerException {
 		return Producers.from(target, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#concat(Producer, Getter) Producers.concat(Producers.fromValue(item), target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Getter) Producers.concat(Producers.fromValue(item), target)}. */
 	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> target, final GItem item) throws NullPointerException {
 		return Producers.concat(Producers.fromValue(item), target);
 	}
@@ -271,7 +271,7 @@ public class Producers {
 		return new ValueProducer<>(target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(String, boolean) Producers.fromNative(memberPath, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Producers.fromNative(memberPath, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final String memberPath) throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(memberPath, true);
 	}
@@ -293,7 +293,7 @@ public class Producers {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(java.lang.reflect.Field, boolean) Producers.fromNative(target, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Producers.fromNative(target, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final java.lang.reflect.Field target) throws NullPointerException {
 		return Producers.fromNative(target, true);
 	}
@@ -304,7 +304,7 @@ public class Producers {
 		return Producers.from(Properties.<GValue>fromNative(target, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Method, boolean) Producers.fromNative(target, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Producers.fromNative(target, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final Method target) throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(target, true);
 	}
@@ -315,19 +315,19 @@ public class Producers {
 		return new MethodProducer<>(target, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Class, boolean) Producers.fromNative(valueClass, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, boolean) Producers.fromNative(valueClass, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<? extends GValue> valueClass) throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(valueClass, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Natives#parseConstructor(Class, Class...) Producers.fromNative(Natives.parseConstructor(valueClass),
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Constructor, boolean) Producers.fromNative(Natives.parseConstructor(valueClass),
 	 * forceAccessible)}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<? extends GValue> valueClass, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(Natives.parseConstructor(valueClass), forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Constructor, boolean) Producers.fromNative(target, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Constructor, boolean) Producers.fromNative(target, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final Constructor<?> target) throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(target, true);
 	}
@@ -338,19 +338,19 @@ public class Producers {
 		return new ConstructorProducer<>(target, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#fromNative(Class, String, boolean) Producers.fromNative(fieldOwner, fieldName, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Producers.fromNative(fieldOwner, fieldName, true)}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
 		return Producers.fromNative(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Properties#fromNative(Class, String, boolean) Producers.from(Properties.fromNative(fieldOwner, fieldName,
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Producers.from(Properties.fromNative(fieldOwner, fieldName,
 	 * forceAccessible))}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Producers.from(Properties.<GValue>fromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#toBuffered(Producer, int) Producers.toBuffered(target, Pointers.SOFT)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #toBuffered(Producer, int) Producers.toBuffered(target, Pointers.SOFT)}. */
 	public static <GValue> Producer3<GValue> toBuffered(final Producer<? extends GValue> target) throws NullPointerException {
 		return Producers.toBuffered(target, Pointers.SOFT);
 	}
@@ -361,7 +361,7 @@ public class Producers {
 		return new BufferedProducer<>(target, mode);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Producers#toSynchronized(Producer, Object) Producers.toSynchronized(target, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Producer, Object) Producers.toSynchronized(target, target)}. */
 	public static <GValue> Producer3<GValue> toSynchronized(final Producer<? extends GValue> target) throws NullPointerException {
 		return Producers.toSynchronized(target, target);
 	}
