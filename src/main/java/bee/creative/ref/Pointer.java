@@ -1,8 +1,8 @@
 package bee.creative.ref;
 
 import java.lang.ref.Reference;
-import bee.creative.bind.Producer;
 import bee.creative.lang.Objects;
+import bee.creative.util.Producer;
 
 /** Diese Schnittstelle definiert einen Zeiger bzw. Verweis auf einen Datensatz. Sie wird zur verbindung von {@link Reference} mit {@link Producer} verwendet.
  *

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import bee.creative.bind.Getter;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert mehrere Hilfsfunktionen zur stabilen binären Suche mit {@link Comparable} als Suchkriterium sowie zur Erzeugung von

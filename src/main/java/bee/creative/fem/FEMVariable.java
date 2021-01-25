@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
-import bee.creative.bind.Property;
 import bee.creative.lang.Objects;
+import bee.creative.util.Property;
 
 /** Diese Klasse implementiert eine Variable als veränderlichen Verweis auf einen Wert.
  *

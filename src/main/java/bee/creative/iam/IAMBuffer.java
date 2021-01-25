@@ -2,10 +2,10 @@ package bee.creative.iam;
 
 import java.io.File;
 import java.io.IOException;
-import bee.creative.bind.Getter;
 import bee.creative.io.MappedBuffer;
 import bee.creative.mmi.MMIArray;
 import bee.creative.mmi.MMIArrayL;
+import bee.creative.util.Getter;
 
 /** Diese Klasse implementiert einen Puffer für {@link IAMArray Zahlenfolgen}, welcher diese mindestens {@link IAMArray#compact() kompaktiert}, und darüber
  * hinaus in einen {@link MappedBuffer Dateipuffer} auslagern kann.

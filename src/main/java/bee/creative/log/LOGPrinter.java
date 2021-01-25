@@ -2,10 +2,10 @@ package bee.creative.log;
 
 import java.util.ArrayList;
 import java.util.List;
-import bee.creative.bind.Getter;
-import bee.creative.bind.Producer;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Strings;
+import bee.creative.util.Getter;
+import bee.creative.util.Producer;
 
 /** Diese Klasse implementiert den Generator der {@link LOGBuilder#toStrings() Textdarstellungen} eines {@link LOGBuilder}.
  * 

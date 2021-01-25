@@ -5,9 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import bee.creative.bind.Field;
-import bee.creative.bind.Properties;
-import bee.creative.bind.Property;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link List} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden

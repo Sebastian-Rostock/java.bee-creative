@@ -4,10 +4,10 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collection;
-import bee.creative.bind.AbstractGetter;
-import bee.creative.bind.Getter;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
+import bee.creative.util.AbstractGetter;
+import bee.creative.util.Getter;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert ein abstraktes Kontextobjekt, das über einen {@link FEMFrame Stapelrahmen} der Auswertung von Funktionen bereitgestellt wird und

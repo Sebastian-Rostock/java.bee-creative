@@ -6,8 +6,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import bee.creative.bind.Getter;
 import bee.creative.util.Builders.MapBuilder;
+import bee.creative.util.Getter;
 import bee.creative.util.HashMap;
 import bee.creative.util.Iterables;
 

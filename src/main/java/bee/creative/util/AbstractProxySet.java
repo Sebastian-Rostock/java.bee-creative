@@ -1,9 +1,6 @@
 package bee.creative.util;
 
 import java.util.Set;
-import bee.creative.bind.Field;
-import bee.creative.bind.Properties;
-import bee.creative.bind.Property;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein abstraktes {@link Set} als Platzhalter. Seinen Inhalt liest es über {@link #getData(boolean)}. Änderungen am Inhalt werden

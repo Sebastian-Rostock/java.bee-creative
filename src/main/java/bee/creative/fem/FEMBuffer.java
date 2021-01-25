@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import bee.creative.bind.Property;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMArray.CompactArray3;
@@ -14,6 +13,7 @@ import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
 import bee.creative.util.HashMapLO;
 import bee.creative.util.HashMapOL;
+import bee.creative.util.Property;
 
 /** Diese Klasse implementiert einen Puffer zur Auslagerung von {@link FEMFunction Funktionen} in einen {@link MappedBuffer Dateipuffer}. Die darüber
  * angebundene Datei besitz dafür eine entsprechende Datenstruktur, deren Kopfdaten beim Öffnen erzeugt bzw. geprüft werden.
