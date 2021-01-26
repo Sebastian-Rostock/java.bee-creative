@@ -107,9 +107,9 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#defaultComparable(Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#toDefault(Comparable)} */
 	@SuppressWarnings ("javadoc")
-	public static class DefaultComparable<GItem> implements Comparable<GItem> {
+	public static class DefaultComparable<GItem> extends AbstractComparable<GItem> {
 
 		public final Comparable<? super GItem> comparable;
 
@@ -129,9 +129,9 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#reverseComparable(Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#toReverse(Comparable)} */
 	@SuppressWarnings ("javadoc")
-	public static class ReverseComparable<GItem> implements Comparable<GItem> {
+	public static class ReverseComparable<GItem> extends AbstractComparable<GItem> {
 
 		public final Comparable<? super GItem> comparable;
 
@@ -151,9 +151,9 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#iterableComparable(Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#toIterable(Comparable)} */
 	@SuppressWarnings ("javadoc")
-	public static class IterableComparable<GItem> implements Comparable<Iterable<? extends GItem>> {
+	public static class IterableComparable<GItem> extends AbstractComparable<Iterable<? extends GItem>> {
 
 		public final Comparable<? super GItem> comparable;
 
@@ -177,15 +177,15 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#chainedComparable(Comparable, Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#from(Comparable, Comparable)} */
 	@SuppressWarnings ("javadoc")
-	public static class ChainedComparable<GItem> implements Comparable<GItem> {
+	public static class ConcatComparable<GItem> extends AbstractComparable<GItem> {
 
 		public final Comparable<? super GItem> comparable1;
 
 		public final Comparable<? super GItem> comparable2;
 
-		public ChainedComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2) {
+		public ConcatComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2) {
 			this.comparable1 = Objects.notNull(comparable1);
 			this.comparable2 = Objects.notNull(comparable2);
 		}
@@ -204,15 +204,15 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#concat(Getter, Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#toTranslated(Comparable, Getter)} */
 	@SuppressWarnings ("javadoc")
-	public static class TranslatedComparable<GSource, GTarget> implements Comparable<GSource> {
+	public static class TranslatedComparable<GSource, GTarget> extends AbstractComparable<GSource> {
 
 		public final Getter<? super GSource, ? extends GTarget> toSource;
 
 		public final Comparable<? super GTarget> comparable;
 
-		public TranslatedComparable(final Getter<? super GSource, ? extends GTarget> toSource, final Comparable<? super GTarget> comparable) {
+		public TranslatedComparable(final Comparable<? super GTarget> comparable, final Getter<? super GSource, ? extends GTarget> toSource) {
 			this.toSource = Objects.notNull(toSource);
 			this.comparable = Objects.notNull(comparable);
 		}
@@ -229,89 +229,50 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#toLowerFilter(Comparable)} */
-	static class LowerFilter<GItem> implements Filter<GItem> {
-
-		public final Comparable<? super GItem> comparable;
-
-		public LowerFilter(final Comparable<? super GItem> comparable) {
-			this.comparable = Objects.notNull(comparable);
-		}
-
-		@Override
-		public boolean accept(final GItem item) {
-			return this.comparable.compareTo(item) >= 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.comparable);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Comparables#toHigherFilter(Comparable)} */
-	static class HigherFilter<GItem> implements Filter<GItem> {
-
-		public final Comparable<? super GItem> comparable;
-
-		public HigherFilter(final Comparable<? super GItem> comparable) {
-			this.comparable = Objects.notNull(comparable);
-		}
-
-		@Override
-		public boolean accept(final GItem item) {
-			return this.comparable.compareTo(item) <= 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.comparable);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Comparables#toEqualFilter(Comparable)} */
-	static class EqualFilter<GItem> implements Filter<GItem> {
-
-		public final Comparable<? super GItem> comparable;
-
-		public EqualFilter(final Comparable<? super GItem> comparable) {
-			this.comparable = Objects.notNull(comparable);
-		}
-
-		@Override
-		public boolean accept(final GItem item) {
-			return this.comparable.compareTo(item) == 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.comparable);
-		}
-
-	}
-
 	/** Diese Klasse implementiert {@link Comparables#toComparable(Getter)}. */
-	static class GetterComparable<GItem> implements Comparable<GItem> {
-	
+	static class GetterComparable<GItem> extends AbstractComparable<GItem> {
+
 		public final Getter<? super GItem, ? extends Number> getter;
-	
+
 		public GetterComparable(final Getter<? super GItem, ? extends Number> getter) {
 			this.getter = Objects.notNull(getter);
 		}
-	
+
 		@Override
 		public int compareTo(final GItem item) {
 			final Number result = this.getter.get(item);
 			return result != null ? result.intValue() : 0;
 		}
-	
+
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.getter);
 		}
-	
+
+	}
+
+	/** Diese Klasse implementiert {@link Comparables#toComparable(Object, Comparator)} */
+	static class ComparatorComparable<GItem> extends AbstractComparable<GItem> {
+
+		public final GItem item;
+
+		public final Comparator<? super GItem> comparator;
+
+		public ComparatorComparable(final Comparator<? super GItem> comparator, final GItem input) {
+			this.item = input;
+			this.comparator = Objects.notNull(comparator);
+		}
+
+		@Override
+		public int compareTo(final GItem item) {
+			return this.comparator.compare(this.item, item);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.item, this.comparator);
+		}
+
 	}
 
 	static void check(final int fromIndex, final int toIndex) throws IllegalArgumentException {
@@ -706,6 +667,20 @@ public class Comparables {
 		return -from - 2;
 	}
 
+	/** Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert einer Eingabe zuerst über den ersten {@link Comparable} berechnet
+	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste den Navigationswert {@code 0} ermittelt hat. Der Navigationswert für eine Eingabe
+	 * {@code item} ist {@code (comparable1.compareTo(item) != 0 ? comparable1 : comparable2).compareTo(item)}.
+	 *
+	 * @param <GItem> Typ der Eingabe.
+	 * @param comparable1 erster {@link Comparable}.
+	 * @param comparable2 zweiter {@link Comparable}.
+	 * @return {@code chained}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable1} bzw. {@code comparable2} {@code null} ist. */
+	public static <GItem> Comparable<GItem> from(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2)
+		throws NullPointerException {
+		return new ConcatComparable<>(comparable1, comparable2);
+	}
+
 	/** Diese Methode gibt einen Abschnitt der gegebenen Elemente zurück. Die Methode {@link Items#get(int)} liefert hierbei {@code items.get(index + fromIndex)}
 	 * für alle gültigen Indizes.
 	 *
@@ -740,7 +715,7 @@ public class Comparables {
 	 * @param comparable {@link Comparable}.
 	 * @return {@code default}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<GItem> defaultComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
+	public static <GItem> Comparable<GItem> toDefault(final Comparable<? super GItem> comparable) throws NullPointerException {
 		return new DefaultComparable<>(comparable);
 	}
 
@@ -751,7 +726,7 @@ public class Comparables {
 	 * @param comparable {@link Comparable}.
 	 * @return {@code reverse}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<GItem> reverseComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
+	public static <GItem> Comparable<GItem> toReverse(final Comparable<? super GItem> comparable) throws NullPointerException {
 		return new ReverseComparable<>(comparable);
 	}
 
@@ -762,70 +737,23 @@ public class Comparables {
 	 * @param comparable {@link Comparable}.
 	 * @return {@code iterable}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<Iterable<? extends GItem>> iterableComparable(final Comparable<? super GItem> comparable) {
+	public static <GItem> Comparable<Iterable<? extends GItem>> toIterable(final Comparable<? super GItem> comparable) {
 		return new IterableComparable<>(comparable);
-	}
-
-	/** Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert einer Eingabe zuerst über den ersten {@link Comparable} berechnet
-	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste den Navigationswert {@code 0} ermittelt hat. Der Navigationswert für eine Eingabe
-	 * {@code item} ist {@code (comparable1.compareTo(item) != 0 ? comparable1 : comparable2).compareTo(item)}.
-	 *
-	 * @param <GItem> Typ der Eingabe.
-	 * @param comparable1 erster {@link Comparable}.
-	 * @param comparable2 zweiter {@link Comparable}.
-	 * @return {@code chained}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code comparable1} bzw. {@code comparable2} {@code null} ist. */
-	public static <GItem> Comparable<GItem> chainedComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2)
-		throws NullPointerException {
-		return new ChainedComparable<>(comparable1, comparable2);
 	}
 
 	/** Diese Methode gint einen navigierten {@link Comparable} zurück, der von seiner Eingabe mit dem gegebenen {@link Getter} zur Eingabe des gegebenen
 	 * {@link Comparable} navigiert. Der Navigationswert für eine Eingabe {@code item} ist {@code comparable.compareTo(navigator.get(item))}.
-	 *
+	 * 
+	 * @param comparable {@link Comparable}.
+	 * @param toSource {@link Getter}.
 	 * @see Getter
 	 * @param <GSource> Typ der Ausgabe des {@link Getter} sowie der Eingabe des gegebenen {@link Comparable}.
 	 * @param <GTarget> Typ der Eingabe des {@link Getter}.
-	 * @param toSource {@link Getter}.
-	 * @param comparable {@link Comparable}.
 	 * @return {@code translated}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparable} {@code null} ist. */
-	public static <GSource, GTarget> Comparable<GTarget> concat(final Getter<? super GTarget, ? extends GSource> toSource,
-		final Comparable<? super GSource> comparable) throws NullPointerException {
-		return new TranslatedComparable<>(toSource, comparable);
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) == 0}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code equal}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Filter<GItem> toEqualFilter(final Comparable<? super GItem> comparable) throws NullPointerException {
-		return new EqualFilter<>(comparable);
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) >= 0}.
-	 *
-	 * @param <GInput> Typ der Elemente.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code lower}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GInput> Filter<GInput> toLowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		return new LowerFilter<>(comparable);
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) <= 0}.
-	 *
-	 * @param <GInput> Typ der Elemente.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code higher}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GInput> Filter<GInput> toHigherFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
-		return new HigherFilter<>(comparable);
+	public static <GSource, GTarget> Comparable2<GTarget> toTranslated(final Comparable<? super GSource> comparable,
+		final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
+		return new TranslatedComparable<>(comparable, toSource);
 	}
 
 	/** Diese Methode gibt ein {@link Comparable} als Adapter zu einem {@link Number}-{@link Getter} zurück. Der Vergleichswert eines Datensatzes {@code item}
@@ -837,6 +765,19 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GItem> Comparable<GItem> toComparable(final Getter<? super GItem, ? extends Number> getter) throws NullPointerException {
 		return new GetterComparable<>(getter);
+	}
+
+	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie die gegebene Eingabe zur Berechnung des Navigationswert
+	 * verwendet. Die gegebene Eingabe wird als erstes Argument des {@link Comparator} verwendet. Der Navigationswert für ein Element {@code item} ist
+	 * {@code comparator.compare(input, item)}.
+	 *
+	 * @param <GItem> Typ der Eingabe.
+	 * @param input erstes Argument des {@link Comparator}.
+	 * @param comparator {@link Comparator}.
+	 * @return {@code entry}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
+	public static <GItem> Comparable<GItem> toComparable(final GItem input, final Comparator<? super GItem> comparator) throws NullPointerException {
+		return new ComparatorComparable<>(comparator, input);
 	}
 
 }

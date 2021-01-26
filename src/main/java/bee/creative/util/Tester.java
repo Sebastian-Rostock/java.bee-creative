@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import bee.creative.lang.Objects;
-import bee.creative.util.Comparators.BaseComparator;
 
 /** Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Test Testmethode} benötigt werden.
  * <p>
@@ -98,7 +97,7 @@ public class Tester {
 	}
 
 	/** Diese Klasse implementiert {@link Tester#USED_TIME_ORDER}. */
-	static class UsedTimeComparator extends BaseComparator<Tester> {
+	static class UsedTimeComparator extends AbstractComparator<Tester> {
 
 		@Override
 		public int compare(final Tester tester1, final Tester tester2) {
@@ -108,7 +107,7 @@ public class Tester {
 	}
 
 	/** Diese Klasse implementiert {@link Tester#USED_MEMORY_ORDER}. */
-	static class UsedMemoryComparator extends BaseComparator<Tester> {
+	static class UsedMemoryComparator extends AbstractComparator<Tester> {
 
 		@Override
 		public int compare(final Tester tester1, final Tester tester2) {

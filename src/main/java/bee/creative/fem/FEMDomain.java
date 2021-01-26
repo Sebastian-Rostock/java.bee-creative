@@ -13,6 +13,7 @@ import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.lang.Strings;
 import bee.creative.util.Parser;
+import bee.creative.util.Parser.Result;
 import bee.creative.util.Parser.Token;
 
 /** Diese Klasse implementiert domänenspezifische Parse-, Formatierungs- und Kompilationsmethoden, welche der Übersetzung von Zeichenketten, aufbereitete
@@ -70,15 +71,15 @@ public class FEMDomain extends BaseObject {
 		throw this.parseError(src, null);
 	}
 
-	/** Diese Methode überführt die gegebene Zeichenkette in einen {@link FEMScript aufbereiteten Quelltext} und gibt diesen zurück.
+	/** Diese Methode überführt die gegebene Zeichenkette in einen {@link Result aufbereiteten Quelltext} und gibt diesen zurück.
 	 *
 	 * @see #parseScript(FEMParser)
 	 * @param src Zeichenkette, die geparst werden soll.
 	 * @return aufbereiteter Quelltext. */
-	public FEMScript parseScript(final String src) throws NullPointerException {
+	public Result parseScript(final String src) throws NullPointerException {
 		final FEMParser parser = new FEMParser(src);
 		final Token root = this.parseScript(parser);
-		return FEMScript.from(root, parser.tokens());
+		return Result.from(root, parser.tokens());
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Funktionsliste und gibt deren Elternabschnitt zurück. Die Erkennung
@@ -109,16 +110,16 @@ public class FEMDomain extends BaseObject {
 		return this.parseGroup(src);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #parseGroup(FEMScript) this.parseGroup(this.parseScript(source))}. */
+	/** Diese Methode ist eine Abkürzung für {@link #parseGroup(Result) this.parseGroup(this.parseScript(source))}. */
 	public List<FEMFunction> parseGroup(final String source) throws NullPointerException, IllegalArgumentException {
 		return this.parseGroup(this.parseScript(source));
 	}
 
-	/** Diese Methode überführt den gegebenen {@link FEMScript Quelltext} in eine {@link List Liste} von {@link FEMFunction Funktionen} und gibt diese zurück.
+	/** Diese Methode überführt den gegebenen {@link Result Quelltext} in eine {@link List Liste} von {@link FEMFunction Funktionen} und gibt diese zurück.
 	 *
 	 * @param src Quelltext, der bspw. über {@link #parseScript(String)} erzeugt wurde.
 	 * @return Funktionsliste. */
-	public List<FEMFunction> parseGroup(final FEMScript src) throws NullPointerException, IllegalArgumentException {
+	public List<FEMFunction> parseGroup(final Result src) throws NullPointerException, IllegalArgumentException {
 		return this.parseScript(new FEMToken().with(src.root()));
 	}
 
@@ -728,8 +729,8 @@ public class FEMDomain extends BaseObject {
 		});
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toPrinter(FEMScript) this.toPrinter(src).print()}. */
-	public String printScript(final FEMScript src) throws NullPointerException, IllegalArgumentException {
+	/** Diese Methode ist eine Abkürzung für {@link #toPrinter(Result) this.toPrinter(src).print()}. */
+	public String printScript(final Result src) throws NullPointerException, IllegalArgumentException {
 		return this.toPrinter(src).print();
 	}
 
@@ -737,7 +738,7 @@ public class FEMDomain extends BaseObject {
 	 *
 	 * @param res Formatierer.
 	 * @param src aufbereiteter Quelltext. */
-	protected void printScript(final FEMPrinter res, final FEMScript src) throws NullPointerException {
+	protected void printScript(final FEMPrinter res, final Result src) throws NullPointerException {
 		boolean inline = false;
 		for (final Token tok: src) {
 			switch (tok.type()) {
@@ -1022,7 +1023,7 @@ public class FEMDomain extends BaseObject {
 	 * @return Textdarstellung.
 	 * @throws NullPointerException NullPointerException Wenn {@code src} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code src} nicht formatiert werden kann. */
-	public FEMPrinter toPrinter(final FEMScript src) throws NullPointerException, IllegalArgumentException {
+	public FEMPrinter toPrinter(final Result src) throws NullPointerException, IllegalArgumentException {
 		final FEMPrinter res = new FEMPrinter();
 		this.printScript(res, src);
 		return res;

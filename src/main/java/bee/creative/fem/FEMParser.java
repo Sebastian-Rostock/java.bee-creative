@@ -5,7 +5,7 @@ import java.util.List;
 import bee.creative.util.HashSet;
 import bee.creative.util.Parser;
 
-/** Diese Klasse implementiert den Parser zur Zerlegung einer Zeichenkette in Abschnitte eines {@link FEMScript aufbereiteten Quelltexts} im Rahmen gegebener
+/** Diese Klasse implementiert den Parser zur Zerlegung einer Zeichenkette in Abschnitte eines {@link bee.creative.util.Parser.Result aufbereiteten Quelltexts} im Rahmen gegebener
  * {@link #params() Parameternamen}.
  *
  * @see FEMDomain#parseScript(FEMParser)

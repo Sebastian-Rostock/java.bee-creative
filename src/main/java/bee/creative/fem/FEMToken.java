@@ -3,9 +3,10 @@ package bee.creative.fem;
 import java.util.Map;
 import bee.creative.lang.Objects;
 import bee.creative.util.HashMap;
+import bee.creative.util.Parser.Result;
 import bee.creative.util.Parser.Token;
 
-/** Diese Klasse implementiert ein Objekt zur Bereitstellung eines {@link #token() typisierten Abschnitt} eines {@link FEMScript aufbereiteten Quelltexts}, um
+/** Diese Klasse implementiert ein Objekt zur Bereitstellung eines {@link #token() typisierten Abschnitt} eines {@link Result aufbereiteten Quelltexts}, um
  * diesen Abschnitt in {@link FEMFunction Funktionen} überführen zu können. Dazu wird auch eine {@link #proxies() Abbildung von Namen auf Platzhalter} zur
  * {@link #proxy(String) Bestückung bzw. Wiederverwendung} derselben bereitgestellt.
  *

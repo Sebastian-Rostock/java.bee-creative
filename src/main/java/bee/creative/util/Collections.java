@@ -4,7 +4,6 @@ import java.util.AbstractCollection;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -58,9 +57,9 @@ public class Collections {
 		@Override
 		public Iterator<GItem> iterator() {
 			return Iterators.unmodifiableIterator(this.items1.size() < this.items2.size()
-				? Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Collections.toContainsFilter(this.items2)), this.items1.iterator()),
+				? Iterators.chainedIterator(Iterators.filteredIterator(Filters.negate(Filters.toContainsFilter(this.items2)), this.items1.iterator()),
 					this.items2.iterator())
-				: Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Collections.toContainsFilter(this.items1)), this.items2.iterator()),
+				: Iterators.chainedIterator(Iterators.filteredIterator(Filters.negate(Filters.toContainsFilter(this.items1)), this.items2.iterator()),
 					this.items1.iterator()));
 		}
 
@@ -178,8 +177,8 @@ public class Collections {
 		@Override
 		public Iterator<GItem> iterator() {
 			return Iterators.unmodifiableIterator(this.items1.size() < this.items2.size() //
-				? Iterators.filteredIterator(Collections.toContainsFilter(this.items2), this.items1.iterator()) //
-				: Iterators.filteredIterator(Collections.toContainsFilter(this.items1), this.items2.iterator()) //
+				? Iterators.filteredIterator(Filters.toContainsFilter(this.items2), this.items1.iterator()) //
+				: Iterators.filteredIterator(Filters.toContainsFilter(this.items1), this.items2.iterator()) //
 			);
 		}
 
@@ -1003,27 +1002,6 @@ public class Collections {
 
 	}
 
-	/** Diese Klasse implementiert {@link Collections#toContainsFilter(Collection)} */
-	static class ContainsFilter implements Filter<Object> {
-
-		public final Collection<?> collection;
-
-		public ContainsFilter(final Collection<?> collection) {
-			this.collection = Objects.notNull(collection);
-		}
-
-		@Override
-		public boolean accept(final Object item) {
-			return this.collection.contains(item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.collection);
-		}
-
-	}
-
 	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Vereinigungsmenge der gegebenen {@link Set} zurück.
 	 *
 	 * @param <GItem> Typ der Elemente der Vereinigungsmenge.
@@ -1178,28 +1156,6 @@ public class Collections {
 	public static <GSource, GTarget> Collection<GTarget> translatedCollection(final Collection<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
 		return new TranslatedCollection<>(items, translator);
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
-	 *
-	 * @see #toContainsFilter(Collection)
-	 * @param items akzeptierte Eingaben.
-	 * @return {@code contains}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static Filter<Object> toContainsFilter(final Object... items) throws NullPointerException {
-		if (items.length == 0) return Filters.valueFilter(false);
-		if (items.length == 1) return Collections.toContainsFilter(java.util.Collections.singleton(items[0]));
-		return Collections.toContainsFilter(new HashSet2<>(Arrays.asList(items)));
-	}
-
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind. Die Akzeptanz
-	 * einer Eingabe {@code input} ist {@code collection.contains(input)}.
-	 *
-	 * @param collection {@link Collection} der akzeptierten Eingaben.
-	 * @return {@code contains}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code collection} {@code null} ist. */
-	public static Filter<Object> toContainsFilter(final Collection<?> collection) throws NullPointerException {
-		return new ContainsFilter(collection);
 	}
 
 }

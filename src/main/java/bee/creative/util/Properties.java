@@ -287,11 +287,11 @@ public class Properties {
 	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.concat(source, target), Consumers.concat(source,
 	 * target))}.
 	 *
-	 * @see Producers#concat(Producer, Getter)
-	 * @see Consumers#concat(Producer, Setter) */
-	public static <GItem, GValue> Property2<GValue> concat(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
+	 * @see Producers#toTranslated(Producer, Getter)
+	 * @see Consumers#from(Producer, Setter) */
+	public static <GItem, GValue> Property2<GValue> from(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
 		throws NullPointerException {
-		return Properties.from(Producers.concat(source, target), Consumers.concat(source, target));
+		return Properties.from(Producers.toTranslated(source, target), Consumers.from(source, target));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Field, Object) Fields.from(target, null)}. */
@@ -299,11 +299,11 @@ public class Properties {
 		return Properties.from(target, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Field) Properties.concat(Producers.fromValue(item), target)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Field) Properties.concat(Producers.fromValue(item), target)}.
 	 *
 	 * @see Producers#fromValue(Object) */
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target, final GItem item) throws NullPointerException {
-		return Properties.concat(Producers.fromValue(item), target);
+		return Properties.from(Producers.fromValue(item), target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Properties.empty(), target)}.
@@ -408,11 +408,11 @@ public class Properties {
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.concat(target, transGet), Consumers.toTranslated(target, transSet))}.
 	 *
-	 * @see Producers#concat(Producer, Getter)
+	 * @see Producers#toTranslated(Producer, Getter)
 	 * @see Consumers#toTranslated(Consumer, Getter) */
 	public static <GSource, GTarget> Property2<GTarget> toTranslated(final Property<GSource> target, final Getter<? super GSource, ? extends GTarget> transGet,
 		final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
-		return Properties.from(Producers.concat(target, transGet), Consumers.toTranslated(target, transSet));
+		return Properties.from(Producers.toTranslated(target, transGet), Consumers.toTranslated(target, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ObservableProperty new ObservableProperty<>(property)}. */

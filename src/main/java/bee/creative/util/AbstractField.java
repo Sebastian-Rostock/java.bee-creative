@@ -20,7 +20,7 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public Filter<GItem> concat(final Filter<? super GValue> target) {
+	public Filter2<GItem> concat(final Filter<? super GValue> target) {
 		return Filters.concat(this, target);
 	}
 
@@ -40,13 +40,13 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public Comparable<GItem> concat(final Comparable<? super GValue> target) {
-		return Comparables.concat(this, target);
+	public Comparable2<GItem> concat(final Comparable<? super GValue> target) {
+		return Comparables.toTranslated(target, this);
 	}
 
 	@Override
-	public Comparator<GItem> concat(final Comparator<? super GValue> target) {
-		return Comparators.concat(this, target);
+	public Comparator2<GItem> concat(final Comparator<? super GValue> target) {
+		return Comparators.toTranslated(target, this);
 	}
 
 	@Override

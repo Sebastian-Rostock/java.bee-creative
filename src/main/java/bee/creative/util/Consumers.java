@@ -28,13 +28,13 @@ public class Consumers {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
-	public static class ConcatConsumer<GItem, GValue> extends AbstractConsumer<GValue> {
+	public static class SetterConsumer<GItem, GValue> extends AbstractConsumer<GValue> {
 
 		public final Producer<? extends GItem> source;
 
 		public final Setter<? super GItem, ? super GValue> target;
 
-		public ConcatConsumer(final Producer<? extends GItem> source, final Setter<? super GItem, ? super GValue> target) {
+		public SetterConsumer(final Producer<? extends GItem> source, final Setter<? super GItem, ? super GValue> target) {
 			this.source = Objects.notNull(source);
 			this.target = Objects.notNull(target);
 		}
@@ -147,12 +147,6 @@ public class Consumers {
 		return (Consumer3<GValue>)EmptyConsumer.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ConcatConsumer new ConcatConsumer<>(source, target)}. */
-	public static <GItem, GValue> Consumer3<GValue> concat(final Producer<? extends GItem> source, final Setter<? super GItem, ? super GValue> target)
-		throws NullPointerException {
-		return new ConcatConsumer<>(source, target);
-	}
-
 	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird {@link #empty() Consumers.empty()}
 	 * geliefert. */
 	@SuppressWarnings ("unchecked")
@@ -167,11 +161,17 @@ public class Consumers {
 		return Consumers.from(target, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Setter) Consumers.concat(Producers.fromValue(item), target)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Setter) Consumers.concat(Producers.fromValue(item), target)}.
 	 * 
 	 * @see Producers#fromValue(Object) */
 	public static <GItem, GValue> Consumer3<GValue> from(final Setter<? super GItem, ? super GValue> target, final GItem item) throws NullPointerException {
-		return Consumers.concat(Producers.fromValue(item), target);
+		return Consumers.from(Producers.fromValue(item), target);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link SetterConsumer new SetterConsumer<>(source, target)}. */
+	public static <GItem, GValue> Consumer3<GValue> from(final Producer<? extends GItem> source, final Setter<? super GItem, ? super GValue> target)
+		throws NullPointerException {
+		return new SetterConsumer<>(source, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Consumers.fromNative(memberText, true)}. */

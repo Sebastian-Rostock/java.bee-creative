@@ -151,31 +151,31 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen verketteten {@link Producer3}, welcher den beim {@link #get() Lesen} einen Wert liefert, der über einen gegebenen
-	 * {@link Getter} aus dem Wert eines gegebenen {@link Producer} ermittelt wird. Das Lesen erfolgt über {@code this.target.get(this.source.get())}.
+	/** Diese Klasse implementiert einen übersetzten {@link Producer3}, welcher den beim {@link #get() Lesen} einen Wert liefert, der über einen gegebenen
+	 * {@link Getter} aus dem Wert eines gegebenen {@link Producer} ermittelt wird. Das Lesen erfolgt über {@code this.trans.get(this.target.get())}.
 	 *
 	 * @param <GValue> Typ des Werts dieses {@link Producer3}.
 	 * @param <GValue2> Typ des Werts des gegebenen {@link Producer}. */
 	@SuppressWarnings ("javadoc")
-	public static class ConcatProducer<GValue, GValue2> extends AbstractProducer<GValue> {
+	public static class TranslatedProducer<GValue, GValue2> extends AbstractProducer<GValue> {
 
-		public final Producer<? extends GValue2> source;
+		public final Producer<? extends GValue2> target;
 
-		public final Getter<? super GValue2, ? extends GValue> target;
+		public final Getter<? super GValue2, ? extends GValue> trans;
 
-		public ConcatProducer(final Producer<? extends GValue2> source, final Getter<? super GValue2, ? extends GValue> target) throws NullPointerException {
-			this.source = Objects.notNull(source);
+		public TranslatedProducer(final Producer<? extends GValue2> target, final Getter<? super GValue2, ? extends GValue> trans) throws NullPointerException {
 			this.target = Objects.notNull(target);
+			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
 		public GValue get() {
-			return this.target.get(this.source.get());
+			return this.trans.get(this.target.get());
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.source, this.target);
+			return Objects.toInvokeString(this, this.target, this.trans);
 		}
 
 	}
@@ -239,19 +239,13 @@ public class Producers {
 		return (Producer3<GValue>)EmptyProducer.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ConcatProducer new ConcatProducer<>(source, target)}. */
-	public static <GValue, GValue2> Producer3<GValue2> concat(final Producer<? extends GValue> source, final Getter<? super GValue, ? extends GValue2> target)
-		throws NullPointerException {
-		return new ConcatProducer<>(source, target);
-	}
-
 	/** Diese Methode liefert den gegebenen {@link Producer} als {@link Producer3}. Wenn er {@code null} ist, wird {@link #empty() Producers.empty()}
 	 * geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> from(final Producer<? extends GValue> target) {
 		if (target == null) return Producers.empty();
 		if (target instanceof Producer3<?>) return (Producer3<GValue>)target;
-		return Producers.concat(target, Getters.<GValue>neutral());
+		return Producers.toTranslated(target, Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Object) Producers.from(target, null)}. */
@@ -259,9 +253,9 @@ public class Producers {
 		return Producers.from(target, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #concat(Producer, Getter) Producers.concat(Producers.fromValue(item), target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #toTranslated(Producer, Getter) Producers.concat(Producers.fromValue(item), target)}. */
 	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> target, final GItem item) throws NullPointerException {
-		return Producers.concat(Producers.fromValue(item), target);
+		return Producers.toTranslated(Producers.fromValue(item), target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProducer new ValueProducer<>(target)}. Wenn {@code target} {@code null} ist, wird
@@ -359,6 +353,12 @@ public class Producers {
 	public static <GValue> Producer3<GValue> toBuffered(final Producer<? extends GValue> target, final int mode)
 		throws NullPointerException, IllegalArgumentException {
 		return new BufferedProducer<>(target, mode);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link TranslatedProducer new TranslatedProducer<>(target, trans)}. */
+	public static <GValue, GValue2> Producer3<GValue2> toTranslated(final Producer<? extends GValue> target,
+		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
+		return new TranslatedProducer<>(target, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Producer, Object) Producers.toSynchronized(target, target)}. */

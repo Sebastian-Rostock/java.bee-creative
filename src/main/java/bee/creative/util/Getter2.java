@@ -9,17 +9,17 @@ import java.util.Comparator;
  * @param <GValue> Typ des Werts der Eigenschaft. */
 public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 
-	/** Diese Methode ist eine Abkürtung für {@link Comparables#concat(Getter, Comparable) Comparables.from(this, target)}. */
-	public Comparable<GItem> concat(final Comparable<? super GValue> target);
+	/** Diese Methode ist eine Abkürtung für {@link Comparables#toTranslated(Comparable, Getter) Comparables.from(this, target)}. */
+	public Comparable2<GItem> concat(final Comparable<? super GValue> target);
 
-	/** Diese Methode ist eine Abkürtung für {@link Comparators#concat(Getter, Comparator) Comparators.from(this, target)}. */
-	public Comparator<GItem> concat(final Comparator<? super GValue> target);
+	/** Diese Methode ist eine Abkürtung für {@link Comparators#toTranslated(Comparator, Getter) Comparators.from(this, target)}. */
+	public Comparator2<GItem> concat(final Comparator<? super GValue> target);
 
 	/** Diese Methode ist eine Abkürtung für {@link Fields#concat(Getter, Field) Fields.concat(this, target)}. */
 	public <GValue2> Field2<GItem, GValue2> concat(final Field<? super GValue, GValue2> target);
 
 	/** Diese Methode ist eine Abkürtung für {@link Filters#concat(Getter, Filter) Filters.from(this, target)}. */
-	public Filter<GItem> concat(final Filter<? super GValue> target);
+	public Filter2<GItem> concat(final Filter<? super GValue> target);
 
 	/** Diese Methode ist eine Abkürtung für {@link Getters#concat(Getter, Getter) Getters.concat(this, target)}. */
 	public <GValue2> Getter3<GItem, GValue2> concat(final Getter<? super GValue, ? extends GValue2> target);

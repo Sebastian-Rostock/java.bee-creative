@@ -3,12 +3,13 @@ package bee.creative.fem;
 import java.io.IOException;
 import java.util.ArrayList;
 import bee.creative.lang.Objects;
+import bee.creative.util.Parser.Result;
 
 /** Diese Klasse implementiert ein Objekt zur {@link #push(Object) Erfassung} und {@link #print(Appendable) Ausgabe} der Textdarstellung von {@link FEMFunction
  * Funktionen}.
  *
  * @see FEMDomain#toPrinter(Iterable)
- * @see FEMDomain#toPrinter(FEMScript)
+ * @see FEMDomain#toPrinter(Result)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMPrinter {
 

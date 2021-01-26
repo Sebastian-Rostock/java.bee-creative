@@ -19,20 +19,20 @@ import bee.creative.ref.PointerQueue;
  * <pre>
  *
  * public class MySender {
- * 
+ *
  * public static class MyEvent {
  * }
- * 
+ *
  * public	static interface MyListener {
  * 	public void onMyEvent(MyEvent event);
  * }
- * 
+ *
  * static final Observables<MyEvent, MyListener> onMyEventListeners = Observables.from(MyListener::onMyEvent);
- * 
+ *
  * public Observable<MyEvent, MyListener> onMyEvent() {
  * 	return onMyEventListeners.toObservable(this);
  * }
- * 
+ *
  * }
  * </pre>
  *
@@ -41,98 +41,23 @@ import bee.creative.ref.PointerQueue;
  * @param <GObserver> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
 public abstract class Observables<GMessage, GObserver> extends BaseObject {
 
-	/** Diese Klasse implementiert die Verwaltung der Ereignissender und ihrer Ereignisempfänger. */
-	private static final class EventStore extends HashSet<Object> {
+	/** Diese Klasse implementiert den {@link ReferenceQueue} für {@link WeakSender} und {@link WeakObserver}. */
+	private static final class WeakQueue extends PointerQueue<Object> {
 
-		/** Dieses Feld speichert das serialVersionUID. */
-		private static final long serialVersionUID = -427892278890180125L;
-
-		/** Dieses Feld speichert den Ereignissender für {@code null}. */
-		private static final Object NULL = new Object();
-
-		public EventStore() {
-			super(10);
-		}
-
-		private Object toKey(final Object sender) {
-			return sender != null ? sender : EventStore.NULL;
-		}
-
-		/** Diese Methode gibt die Verwaltungsdaten zum gegebenen Ereignissender zurück. Wenn keine hinterlegt sind, wird {@code null} geliefert.
-		 *
-		 * @param sender Ereignissender oder {@code null}.
-		 * @return Verwaltungsdaten oder {@code null}. */
-		public EventSender get(final Object sender) {
-			final int entryIndex = this.getIndexImpl(this.toKey(sender));
-			return entryIndex < 0 ? null : this.customGetKey(entryIndex);
-		}
-
-		/** Diese Methode gibt die Verwaltungsdaten zum gegebenen Ereignissender zurück. Wenn keine hinterlegt sind, werden sie angelegt.
-		 *
-		 * @param sender Ereignissender oder {@code null}.
-		 * @return Verwaltungsdaten. */
-		public EventSender put(final Object sender) {
-			return this.customGetKey(this.putIndexImpl(this.toKey(sender)));
-		}
-
-		/** Diese Methode entfernt die Verwaltungsdaten zum gegebenen Ereignissender.
-		 *
-		 * @param sender Ereignissender, {@link EventSender Verwaltungsdaten} oder {@code null}. */
-		public void pop(final Object sender) {
-			this.popIndexImpl(this.toKey(sender));
-		}
-
-		@Override
-		protected EventSender customGetKey(final int entryIndex) {
-			return (EventSender)super.customGetKey(entryIndex);
-		}
-
-		@Override
-		protected void customSetKey(final int entryIndex, final Object item, final int itemHash) {
-			super.customSetKey(entryIndex, item instanceof EventSender ? item : new EventSender(item, this), itemHash);
-		}
-
-		@Override
-		protected int customHash(final Object item) {
-			return item instanceof EventSender ? ((EventSender)item).hash : System.identityHashCode(item);
-		}
-
-		@Override
-		protected int customHashKey(final int entryIndex) {
-			return this.customGetKey(entryIndex).hash;
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object item) {
-			final EventSender key = this.customGetKey(entryIndex);
-			return (key == item) || (key.get() == item);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object item, final int keyHash) {
-			final EventSender key = this.customGetKey(entryIndex);
-			return (key.hash == keyHash) && ((key == item) || (key.get() == item));
-		}
-
-	}
-
-	/** Diese Klasse implementiert den {@link ReferenceQueue} für {@link EventSender} und {@link EventObserver}. */
-	private static final class EventQueue extends PointerQueue<Object> {
-
-		public static final EventQueue IINSTANCE = new EventQueue();
+		public static final WeakQueue INSTANCE = new WeakQueue();
 
 		@Override
 		protected void customRemove(final Reference<? extends Object> reference) {
-			if (reference instanceof EventSender) {
-				final EventSender source = (EventSender)reference;
-				final EventStore store = source.store;
+			if (reference instanceof WeakSender) {
+				final WeakSender source = (WeakSender)reference;
+				final SenderStore store = source.store;
 				synchronized (store) {
 					store.pop(source);
 				}
-			} else if (reference instanceof EventObserver) {
-				final EventObserver target = (EventObserver)reference;
-				final EventSender sender = target.sender;
-				final EventStore store = sender.store;
+			} else if (reference instanceof WeakObserver) {
+				final WeakObserver target = (WeakObserver)reference;
+				final WeakSender sender = target.sender;
+				final SenderStore store = sender.store;
 				synchronized (store) {
 					synchronized (sender) {
 						sender.pop(target);
@@ -146,18 +71,18 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	}
 
 	/** Diese Klasse implementiert die Verwaltungsdaten eines Ereignissenders. */
-	private static final class EventSender extends WeakReference<Object> {
+	private static final class WeakSender extends WeakReference<Object> {
 
 		/** Dieses Feld speichert den Streuwert des Senders. */
 		public final int hash;
 
-		public final EventStore store;
+		public final SenderStore store;
 
-		/** Dieses Feld speichert die angemeldeten Empfänger als {@link EventObserver}, {@code GObserver} oder {@code Object[]} solcher Empfänger. */
+		/** Dieses Feld speichert die angemeldeten Empfänger als {@link WeakObserver}, {@code GObserver} oder {@code Object[]} solcher Empfänger. */
 		public volatile Object observer;
 
-		public EventSender(final Object sender, final EventStore store) {
-			super(sender, EventQueue.IINSTANCE);
+		public WeakSender(final Object sender, final SenderStore store) {
+			super(sender, WeakQueue.INSTANCE);
 			this.hash = System.identityHashCode(sender);
 			this.store = store;
 		}
@@ -174,7 +99,7 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 				System.arraycopy(array, 0, array2, 0, length);
 				array2[length] = observer;
 				this.observer = array2;
-			} else if (EventObserver.get(observer2) != null) {
+			} else if (WeakObserver.get(observer2) != null) {
 				this.observer = new Object[]{observer2, observer};
 			} else {
 				this.observer = observer;
@@ -191,7 +116,7 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 				final int length = array.length;
 				int length2 = 0;
 				for (int i = 0; i < length; i++) {
-					final Object item = EventObserver.get(array[i]);
+					final Object item = WeakObserver.get(array[i]);
 					if ((item == null) || (item == observer)) {
 						array[i] = null;
 					} else {
@@ -220,7 +145,7 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 					this.observer = array2;
 				}
 			} else {
-				final Object item = EventObserver.get(observer2);
+				final Object item = WeakObserver.get(observer2);
 				if ((item == null) || (item == observer)) {
 					this.observer = null;
 				}
@@ -234,16 +159,16 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 
 	}
 
-	private static final class EventObserver extends WeakReference<Object> {
+	private static final class WeakObserver extends WeakReference<Object> {
 
 		public static Object get(final Object object) {
-			return object instanceof EventObserver ? ((EventObserver)object).get() : object;
+			return object instanceof WeakObserver ? ((WeakObserver)object).get() : object;
 		}
 
-		public final EventSender sender;
+		public final WeakSender sender;
 
-		public EventObserver(final Object referent, final EventSender sender) {
-			super(referent, EventQueue.IINSTANCE);
+		public WeakObserver(final Object observer, final WeakSender sender) {
+			super(observer, WeakQueue.INSTANCE);
 			this.sender = sender;
 		}
 
@@ -254,11 +179,89 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 
 	}
 
-	private final class EventObservable implements Observable<GMessage, GObserver> {
+	/** Diese Klasse implementiert die Verwaltung der Ereignissender und ihrer Ereignisempfänger. */
+	private static final class SenderStore extends HashSet<Object> {
+
+		/** Dieses Feld speichert das serialVersionUID. */
+		private static final long serialVersionUID = -427892278890180125L;
+
+		/** Dieses Feld speichert den Ereignissender für {@code null}. */
+		private static final Object NULL = new Object();
+
+		public SenderStore() {
+			super(10);
+		}
+
+		private Object toKey(final Object sender) {
+			return sender != null ? sender : SenderStore.NULL;
+		}
+
+		/** Diese Methode gibt die Verwaltungsdaten zum gegebenen Ereignissender zurück. Wenn keine hinterlegt sind, wird {@code null} geliefert.
+		 *
+		 * @param sender Ereignissender oder {@code null}.
+		 * @return Verwaltungsdaten oder {@code null}. */
+		public WeakSender get(final Object sender) {
+			final int entryIndex = this.getIndexImpl(this.toKey(sender));
+			return entryIndex < 0 ? null : this.customGetKey(entryIndex);
+		}
+
+		/** Diese Methode gibt die Verwaltungsdaten zum gegebenen Ereignissender zurück. Wenn keine hinterlegt sind, werden sie angelegt.
+		 *
+		 * @param sender Ereignissender oder {@code null}.
+		 * @return Verwaltungsdaten. */
+		public WeakSender put(final Object sender) {
+			return this.customGetKey(this.putIndexImpl(this.toKey(sender)));
+		}
+
+		/** Diese Methode entfernt die Verwaltungsdaten zum gegebenen Ereignissender.
+		 *
+		 * @param sender Ereignissender, {@link WeakSender Verwaltungsdaten} oder {@code null}. */
+		public void pop(final Object sender) {
+			this.popIndexImpl(this.toKey(sender));
+			final int capacity = this.capacity() / 2;
+			if (capacity <= this.size()) return;
+			this.allocate(capacity);
+		}
+
+		@Override
+		protected WeakSender customGetKey(final int entryIndex) {
+			return (WeakSender)super.customGetKey(entryIndex);
+		}
+
+		@Override
+		protected void customSetKey(final int entryIndex, final Object item, final int itemHash) {
+			super.customSetKey(entryIndex, item instanceof WeakSender ? item : new WeakSender(item, this), itemHash);
+		}
+
+		@Override
+		protected int customHash(final Object item) {
+			return item instanceof WeakSender ? ((WeakSender)item).hash : System.identityHashCode(item);
+		}
+
+		@Override
+		protected int customHashKey(final int entryIndex) {
+			return this.customGetKey(entryIndex).hash;
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object item) {
+			final WeakSender key = this.customGetKey(entryIndex);
+			return (key == item) || (key.get() == item);
+		}
+
+		@Override
+		protected boolean customEqualsKey(final int entryIndex, final Object item, final int keyHash) {
+			final WeakSender key = this.customGetKey(entryIndex);
+			return (key.hash == keyHash) && ((key == item) || (key.get() == item));
+		}
+
+	}
+
+	private final class SenderObservable implements Observable<GMessage, GObserver> {
 
 		public final Object sender;
 
-		public EventObservable(final Object sender) {
+		public SenderObservable(final Object sender) {
 			this.sender = sender;
 		}
 
@@ -305,8 +308,8 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 		};
 	}
 
-	/** Dieses Feld speichert die {@link EventSender}. */
-	private final EventStore store = new EventStore();
+	/** Dieses Feld speichert die {@link WeakSender}. */
+	private final SenderStore store = new SenderStore();
 
 	/** Diese Methode meldet den gegebenen Ereignisempfänger für den gegebenen Ereignissender an und gibt ihn zurück. Wenn der Empfänger {@code null} ist, wird er
 	 * ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object, Object) Auslösen} von Ereignissen informiert. Das mehrfache Anmelden des gleichen
@@ -320,9 +323,9 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	public GObserver put(final Object sender, final GObserver observer) throws IllegalArgumentException {
 		if (observer == null) return null;
 		if (observer instanceof Object[]) throw new IllegalArgumentException();
-		final EventStore store = this.store;
+		final SenderStore store = this.store;
 		synchronized (store) {
-			final EventSender source = store.put(sender);
+			final WeakSender source = store.put(sender);
 			synchronized (source) {
 				source.put(observer);
 			}
@@ -341,11 +344,11 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	public GObserver putWeak(final Object sender, final GObserver observer) throws IllegalArgumentException {
 		if (observer == null) return null;
 		if (observer instanceof Object[]) throw new IllegalArgumentException();
-		final EventStore store = this.store;
+		final SenderStore store = this.store;
 		synchronized (store) {
-			final EventSender source = store.put(sender);
+			final WeakSender source = store.put(sender);
 			synchronized (source) {
-				source.put(new EventObserver(observer, source));
+				source.put(new WeakObserver(observer, source));
 			}
 		}
 		return observer;
@@ -360,9 +363,9 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	public void pop(final Object sender, final GObserver observer) throws IllegalArgumentException {
 		if (observer == null) return;
 		if (observer instanceof Object[]) throw new IllegalArgumentException();
-		final EventStore store = this.store;
+		final SenderStore store = this.store;
 		synchronized (store) {
-			final EventSender source = store.get(sender);
+			final WeakSender source = store.get(sender);
 			if (source == null) return;
 			synchronized (source) {
 				source.pop(observer);
@@ -379,9 +382,9 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	 * @throws NullPointerException Wenn {@code event} {@code null} ist und die Empfänger dies nicht unterstützten. */
 	public GMessage fire(final Object sender, final GMessage message) throws NullPointerException {
 		final Object observer;
-		final EventStore eventStore = this.store;
+		final SenderStore eventStore = this.store;
 		synchronized (eventStore) {
-			final EventSender eventItem = eventStore.get(sender);
+			final WeakSender eventItem = eventStore.get(sender);
 			if (eventItem == null) return message;
 			observer = eventItem.observer;
 		}
@@ -397,7 +400,7 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 
 	private void fireImpl(final Object sender, final Object observer, final GMessage message) {
 		@SuppressWarnings ("unchecked")
-		final GObserver observer2 = (GObserver)EventObserver.get(observer);
+		final GObserver observer2 = (GObserver)WeakObserver.get(observer);
 		if (observer2 == null) return;
 		this.customFire(sender, message, observer2);
 	}
@@ -407,7 +410,7 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	 * @param sender Ereignissender.
 	 * @return Ereignisquelle. */
 	public Observable<GMessage, GObserver> toObservable(final Object sender) {
-		return new EventObservable(sender);
+		return new SenderObservable(sender);
 	}
 
 	/** Diese Methode wird durch {@link #fire(Object, Object)} aufgerufen und soll dem gegebenen Empfänger die gegebene Nachricht senden.

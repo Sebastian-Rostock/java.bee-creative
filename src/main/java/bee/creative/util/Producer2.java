@@ -6,14 +6,14 @@ package bee.creative.util;
  * @param <GValue> Typ des Werts. */
 public interface Producer2<GValue> extends Producer<GValue> {
 
-	/** Diese Methode ist eine Abkürtung für {@link Properties#concat(Producer, Field) Properties.concat(this, target)}. */
+	/** Diese Methode ist eine Abkürtung für {@link Consumers#from(Producer, Setter) Consumers.from(this, target)}. */
+	public <GValue2> Consumer3<GValue2> concat(final Setter<? super GValue, GValue2> target);
+
+	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Producer, Field) Properties.from(this, target)}. */
 	public <GValue2> Property2<GValue2> concat(final Field<? super GValue, GValue2> target);
 
-	/** Diese Methode ist eine Abkürtung für {@link Producers#concat(Producer, Getter) Producers.concat(this, target)}. */
-	public <GValue2> Producer3<GValue2> concat(final Getter<? super GValue, GValue2> target);
-
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#concat(Producer, Setter) Consumers.concat(this, target)}. */
-	public <GValue2> Consumer3<GValue2> concat(final Setter<? super GValue, GValue2> target);
+	/** Diese Methode ist eine Abkürtung für {@link Producers#toTranslated(Producer, Getter) Producers.toTranslated(this, trans)}. */
+	public <GValue2> Producer3<GValue2> concat(final Getter<? super GValue, GValue2> trans);
 
 	/** Diese Methode ist eine Abkürtung für {@link Producers#toBuffered(Producer) Producers.toBuffered(this)}. */
 	public Producer3<GValue> toBuffered();

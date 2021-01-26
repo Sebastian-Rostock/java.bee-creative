@@ -3,7 +3,6 @@ package bee.creative.util;
 import java.util.Comparator;
 import java.util.Iterator;
 import bee.creative.lang.Objects;
-import bee.creative.lang.Objects.BaseObject;
 
 /** Diese Klasse implementiert grundlegende {@link Comparator}.
  *
@@ -11,17 +10,13 @@ import bee.creative.lang.Objects.BaseObject;
  * @author Sebastian Rostock 2011. */
 public class Comparators {
 
-	/** Diese Klasse implementiert einen abstrakten {@link Comparator} als {@link BaseObject}. */
-	public static abstract class BaseComparator<GItem> extends BaseObject implements Comparator<GItem> {
-	}
-
-	/** Diese Klasse implementiert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#intValue()} vergleicht.
+	/** Diese Klasse implementiert einen {@link Comparator2}, welcher Zahlen über ihren {@link Number#intValue()} vergleicht.
 	 *
 	 * @see Comparators#compare(int, int) */
 	@SuppressWarnings ("javadoc")
-	public static class IntComparator extends BaseComparator<Number> {
+	public static class IntComparator extends AbstractComparator<Number> {
 
-		public static final IntComparator INSTANCE = new IntComparator();
+		public static final Comparator2<Number> INSTANCE = new IntComparator();
 
 		@Override
 		public int compare(final Number item1, final Number item2) {
@@ -30,13 +25,13 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#longValue()} vergleicht. *
+	/** Diese Klasse implementiert einen {@link Comparator2}, welcher Zahlen über ihren {@link Number#longValue()} vergleicht. *
 	 *
 	 * @see Comparators#compare(long, long) */
 	@SuppressWarnings ("javadoc")
-	public static class LongComparator extends BaseComparator<Number> {
+	public static class LongComparator extends AbstractComparator<Number> {
 
-		public static final LongComparator INSTANCE = new LongComparator();
+		public static final Comparator2<Number> INSTANCE = new LongComparator();
 
 		@Override
 		public int compare(final Number item1, final Number item2) {
@@ -45,13 +40,13 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#floatValue()} vergleicht. *
+	/** Diese Klasse implementiert einen {@link Comparator2}, welcher Zahlen über ihren {@link Number#floatValue()} vergleicht. *
 	 *
 	 * @see Comparators#compare(float, float) */
 	@SuppressWarnings ("javadoc")
-	public static class FloatComparator extends BaseComparator<Number> {
+	public static class FloatComparator extends AbstractComparator<Number> {
 
-		public static final FloatComparator INSTANCE = new FloatComparator();
+		public static final Comparator2<Number> INSTANCE = new FloatComparator();
 
 		@Override
 		public int compare(final Number item1, final Number item2) {
@@ -60,13 +55,13 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#doubleValue()} vergleicht.
+	/** Diese Klasse implementiert einen {@link Comparator}, welcher Zahlen über ihren {@link Number#doubleValue()} vergleicht.
 	 *
 	 * @see Comparators#compare(double, double) */
 	@SuppressWarnings ("javadoc")
-	public static class DoubleComparator extends BaseComparator<Number> {
+	public static class DoubleComparator extends AbstractComparator<Number> {
 
-		public static final DoubleComparator INSTANCE = new DoubleComparator();
+		public static final Comparator2<Number> INSTANCE = new DoubleComparator();
 
 		@Override
 		public int compare(final Number item1, final Number item2) {
@@ -75,11 +70,11 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert den {@link String}-{@link Comparator}, der als Zeichenkette kodierte Dezimalzahlen vergleicht. */
+	/** Diese Klasse implementiert einen {@link Comparator2}, welcher als Zeichenkette kodierte Dezimalzahlen vergleicht. */
 	@SuppressWarnings ("javadoc")
-	public static class NumericalComparator extends BaseComparator<String> {
+	public static class NumericalComparator extends AbstractComparator<String> {
 
-		public static final Comparator<String> INSTANCE = new NumericalComparator();
+		public static final Comparator2<String> INSTANCE = new NumericalComparator();
 
 		@Override
 		public int compare(final String item1, final String item2) {
@@ -131,11 +126,11 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert den {@link String}-{@link Comparator}, der Groß-/Kleinschreibung ignoriert. */
+	/** Diese Klasse implementiert einen {@link Comparator2}, welcher Zeichenketten in vergleicht und die Groß-/Kleinschreibung ignoriert. */
 	@SuppressWarnings ("javadoc")
-	public static class AlphabeticalComparator extends BaseComparator<String> {
+	public static class AlphabeticalComparator extends AbstractComparator<String> {
 
-		public static final AlphabeticalComparator INSTANCE = new AlphabeticalComparator();
+		public static final Comparator2<String> INSTANCE = new AlphabeticalComparator();
 
 		@Override
 		public int compare(final String item1, final String item2) {
@@ -144,12 +139,12 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert den {@link String}-{@link Comparator}, gemischte Zeichenkette aus kodierten Dezimalzahlen und normalem Text vergleicht und
-	 * dabei Groß-/Kleinschreibung ignoriert. */
+	/** Diese Klasse implementiert einen {@link Comparator2}, welcher Zeichenkette aus kodierten Dezimalzahlen und normalem Text vergleicht und dabei
+	 * Groß-/Kleinschreibung ignoriert. */
 	@SuppressWarnings ("javadoc")
-	public static class AlphanumericalComparator extends BaseComparator<String> {
+	public static class AlphanumericalComparator extends AbstractComparator<String> {
 
-		public static final AlphanumericalComparator INSTANCE = new AlphanumericalComparator();
+		public static final Comparator2<String> INSTANCE = new AlphanumericalComparator();
 
 		@Override
 		public int compare(final String item1, final String item2) {
@@ -222,11 +217,15 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparators#naturalComparator()} */
-	@SuppressWarnings ("javadoc")
-	public static class NaturalComparator extends BaseComparator<Comparable<Object>> {
+	public static class EmptyComparator extends AbstractComparator<Comparable<Object>> {
 
-		public static final Comparator<?> INSTANCE = new NaturalComparator();
+		public static final Comparator2<?> INSTANCE = new EmptyComparator();
+
+	}
+
+	public static class NaturalComparator extends AbstractComparator<Comparable<Object>> {
+
+		public static final Comparator2<?> INSTANCE = new NaturalComparator();
 
 		@Override
 		public int compare(final Comparable<Object> item1, final Comparable<Object> item2) {
@@ -235,144 +234,110 @@ public class Comparators {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparators#reverseComparator(Comparator)} */
-	@SuppressWarnings ("javadoc")
-	public static class ReverseComparator<GItem> implements Comparator<GItem> {
+	public static class ReverseComparator<GItem> extends AbstractComparator<GItem> {
 
-		public final Comparator<? super GItem> comparator;
+		public final Comparator<? super GItem> target;
 
-		public ReverseComparator(final Comparator<? super GItem> comparator) {
-			this.comparator = Objects.notNull(comparator);
+		public ReverseComparator(final Comparator<? super GItem> target) throws NullPointerException {
+			this.target = Objects.notNull(target);
 		}
 
 		@Override
 		public int compare(final GItem item1, final GItem item2) {
-			return this.comparator.compare(item2, item1);
+			return this.target.compare(item2, item1);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.comparator);
+			return Objects.toInvokeString(this, this.target);
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparators#defaultComparator(Comparator)} */
-	@SuppressWarnings ("javadoc")
-	public static class DefaultComparator<GItem> implements Comparator<GItem> {
+	public static class DefaultComparator<GItem> extends AbstractComparator<GItem> {
 
-		public final Comparator<? super GItem> comparator;
+		public final Comparator<? super GItem> target;
 
-		public DefaultComparator(final Comparator<? super GItem> comparator) {
-			this.comparator = Objects.notNull(comparator);
+		public DefaultComparator(final Comparator<? super GItem> target) throws NullPointerException {
+			this.target = Objects.notNull(target);
 		}
 
 		@Override
 		public int compare(final GItem item1, final GItem item2) {
-			return Comparators.compare(item1, item2, this.comparator);
+			return Comparators.compare(item1, item2, this.target);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.comparator);
+			return Objects.toInvokeString(this, this.target);
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparators#iterableComparator(Comparator)} */
-	@SuppressWarnings ("javadoc")
-	public static class IterableComparator<GItem> implements Comparator<Iterable<? extends GItem>> {
+	public static class IterableComparator<GItem> extends AbstractComparator<Iterable<? extends GItem>> {
 
-		public final Comparator<? super GItem> comparator;
+		public final Comparator<? super GItem> target;
 
-		public IterableComparator(final Comparator<? super GItem> comparator) {
-			this.comparator = Objects.notNull(comparator);
+		public IterableComparator(final Comparator<? super GItem> target) throws NullPointerException {
+			this.target = Objects.notNull(target);
 		}
 
 		@Override
 		public int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2) {
-			return Comparators.compare(item1, item2, this.comparator);
+			return Comparators.compare(item1, item2, this.target);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.comparator);
+			return Objects.toInvokeString(this, this.target);
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparators#chainedComparator(Comparator, Comparator)} */
-	@SuppressWarnings ("javadoc")
-	public static class ChainedComparator<GItem> implements Comparator<GItem> {
+	public static class ChainedComparator<GItem> extends AbstractComparator<GItem> {
 
-		public final Comparator<? super GItem> comparator1;
+		public final Comparator<? super GItem> target1;
 
-		public final Comparator<? super GItem> comparator2;
+		public final Comparator<? super GItem> target2;
 
-		public ChainedComparator(final Comparator<? super GItem> comparator1, final Comparator<? super GItem> comparator2) {
-			this.comparator1 = Objects.notNull(comparator1);
-			this.comparator2 = Objects.notNull(comparator2);
+		public ChainedComparator(final Comparator<? super GItem> target1, final Comparator<? super GItem> target2) throws NullPointerException {
+			this.target1 = Objects.notNull(target1);
+			this.target2 = Objects.notNull(target2);
 		}
 
 		@Override
 		public int compare(final GItem item1, final GItem item2) {
-			final int result = this.comparator1.compare(item1, item2);
+			final int result = this.target1.compare(item1, item2);
 			if (result != 0) return result;
-			return this.comparator2.compare(item1, item2);
+			return this.target2.compare(item1, item2);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.comparator1, this.comparator2);
+			return Objects.toInvokeString(this, this.target1, this.target2);
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparators#concat(Getter, Comparator)} */
-	@SuppressWarnings ("javadoc")
-	public static class TranslatedComparator<GSource, GTarget> implements Comparator<GTarget> {
+	public static class TranslatedComparator<GSource, GTarget> extends AbstractComparator<GTarget> {
 
-		public final Getter<? super GTarget, ? extends GSource> toSource;
+		public final Getter<? super GTarget, ? extends GSource> trans;
 
-		public final Comparator<? super GSource> comparator;
+		public final Comparator<? super GSource> target;
 
-		public TranslatedComparator(final Getter<? super GTarget, ? extends GSource> toSource, final Comparator<? super GSource> comparator) {
-			this.toSource = Objects.notNull(toSource);
-			this.comparator = Objects.notNull(comparator);
+		public TranslatedComparator(final Comparator<? super GSource> target, final Getter<? super GTarget, ? extends GSource> trans) {
+			this.target = Objects.notNull(target);
+			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
 		public int compare(final GTarget item1, final GTarget item2) {
-			return this.comparator.compare(this.toSource.get(item1), this.toSource.get(item2));
+			return this.target.compare(this.trans.get(item1), this.trans.get(item2));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.toSource, this.comparator);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Comparators#toComparable(Object, Comparator)} */
-	static class ComparatorComparable<GItem> implements Comparable<GItem> {
-
-		public final GItem item;
-
-		public final Comparator<? super GItem> comparator;
-
-		public ComparatorComparable(final GItem input, final Comparator<? super GItem> comparator) {
-			this.item = input;
-			this.comparator = Objects.notNull(comparator);
-		}
-
-		@Override
-		public int compareTo(final GItem item) {
-			return this.comparator.compare(this.item, item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.item, this.comparator);
+			return Objects.toInvokeString(this, this.trans, this.target);
 		}
 
 	}
@@ -572,13 +537,13 @@ public class Comparators {
 	 * zweite {@link Iterable} ist.
 	 *
 	 * @see #compare(Iterable, Iterable, Comparator)
-	 * @see #naturalComparator()
+	 * @see #natural()
 	 * @param <GItem> Typ der Elemente der {@link Iterable}.
 	 * @param item1 erster {@link Iterable}.
 	 * @param item2 zweiter {@link Iterable}.
 	 * @return Vergleichswert. */
 	public static <GItem extends Comparable<? super GItem>> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2) {
-		return Comparators.compare(item1, item2, Comparators.<GItem>naturalComparator());
+		return Comparators.compare(item1, item2, Comparators.<GItem>natural());
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste {@link Iterable} kleienr als, gleich bzw. größer als das
@@ -606,48 +571,28 @@ public class Comparators {
 		}
 	}
 
+	@SuppressWarnings ("unchecked")
+	public static <GEntry> Comparator2<GEntry> empty() {
+		return (Comparator2<GEntry>)EmptyComparator.INSTANCE;
+	}
+
 	/** Diese Methode gibt den {@link Comparator} für die {@link Comparable natürliche Ordnung} zurück.
 	 *
 	 * @see Comparable
-	 * @param <GEntry> Typ der Elemente.
+	 * @param <GItem> Typ der Elemente.
 	 * @return {@code natuaral}-{@link Comparable}. */
 	@SuppressWarnings ("unchecked")
-	public static <GEntry extends Comparable<? super GEntry>> Comparator<GEntry> naturalComparator() {
-		return (Comparator<GEntry>)NaturalComparator.INSTANCE;
+	public static <GItem extends Comparable<? super GItem>> Comparator2<GItem> natural() {
+		return (Comparator2<GItem>)NaturalComparator.INSTANCE;
 	}
 
-	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der {@code null}-Eingaben {@link #compare(Object, Object, Comparator) selbst vergleicht} und
-	 * alle anderen Eingaben an den gegebenen {@link Comparator} weiterleitet.
-	 *
-	 * @see #compare(Object, Object, Comparator)
-	 * @param <GItem> Typ der Elemente.
-	 * @param comparator {@link Comparator}.
-	 * @return {@code default}-{@link Comparator}.
-	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparator<GItem> defaultComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
-		return new DefaultComparator<>(comparator);
-	}
-
-	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der den Vergleichswert des gegebenen {@link Comparator} umkehrt.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param comparator {@link Comparator}.
-	 * @return {@code reverse}-{@link Comparator}.
-	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparator<GItem> reverseComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
-		return new ReverseComparator<>(comparator);
-	}
-
-	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der zwei {@link Iterable} mit Hilfe des gegebenen {@link Comparator} analog zu Zeichenketten
-	 * (d.h. lexikographisch) vergleicht.
-	 *
-	 * @see #compare(Iterable, Iterable, Comparator)
-	 * @param <GItem> Typ der in den {@link Iterable} enthaltenen sowie vom gegebenen {@link Comparator} zu vergleichenden Elemente.
-	 * @param comparator {@link Comparator}.
-	 * @return {@link Iterable}-{@link Comparator}.
-	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparator<Iterable<? extends GItem>> iterableComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
-		return new IterableComparator<>(comparator);
+	/** Diese Methode liefert den gegebenen {@link Comparator} als {@link Comparator2}. Wenn er {@code null} ist, wird {@link #empty() Comparators.empty()}
+	 * geliefert. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem> Comparator2<GItem> from(final Comparator<? super GItem> target) {
+		if (target == null) return empty();
+		if (target instanceof Comparator2<?>) return (Comparator2<GItem>)target;
+		return toTranslated(target, Getters.<GItem>neutral());
 	}
 
 	/** Diese Methode gibt einen verketteten {@link Comparator} zurück, der seine Eingaben zuerst über den ersten {@link Comparator} vergleich und den zweiten
@@ -658,38 +603,59 @@ public class Comparators {
 	 * @param comparator2 zweiter {@link Comparator}.
 	 * @return {@code chained}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator1} bzw. {@code comparator2} {@code null} ist. */
-	public static <GItem> Comparator<GItem> chainedComparator(final Comparator<? super GItem> comparator1, final Comparator<? super GItem> comparator2)
+	public static <GItem> Comparator2<GItem> from(final Comparator<? super GItem> comparator1, final Comparator<? super GItem> comparator2)
 		throws NullPointerException {
 		return new ChainedComparator<>(comparator1, comparator2);
+	}
+
+	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der {@code null}-Eingaben {@link #compare(Object, Object, Comparator) selbst vergleicht} und
+	 * alle anderen Eingaben an den gegebenen {@link Comparator} weiterleitet.
+	 *
+	 * @see #compare(Object, Object, Comparator)
+	 * @param <GItem> Typ der Elemente.
+	 * @param comparator {@link Comparator}.
+	 * @return {@code default}-{@link Comparator}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
+	public static <GItem> Comparator2<GItem> toDefault(final Comparator<? super GItem> comparator) throws NullPointerException {
+		return new DefaultComparator<>(comparator);
+	}
+
+	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der zwei {@link Iterable} mit Hilfe des gegebenen {@link Comparator} analog zu Zeichenketten
+	 * (d.h. lexikographisch) vergleicht.
+	 *
+	 * @see #compare(Iterable, Iterable, Comparator)
+	 * @param <GItem> Typ der in den {@link Iterable} enthaltenen sowie vom gegebenen {@link Comparator} zu vergleichenden Elemente.
+	 * @param comparator {@link Comparator}.
+	 * @return {@link Iterable}-{@link Comparator}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
+	public static <GItem> Comparator2<Iterable<? extends GItem>> toIterable(final Comparator<? super GItem> comparator) throws NullPointerException {
+		return new IterableComparator<>(comparator);
+	}
+
+	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der den Vergleichswert des gegebenen {@link Comparator} umkehrt.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param comparator {@link Comparator}.
+	 * @return {@code reverse}-{@link Comparator}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
+	public static <GItem> Comparator2<GItem> toReverse(final Comparator<? super GItem> comparator) throws NullPointerException {
+		return new ReverseComparator<>(comparator);
 	}
 
 	/** Diese Methode gibt einen navigierten {@link Comparator} zurück, der von seinen Eingaben mit dem gegebenen {@link Getter} zu den Eingaben des gegebenen
 	 * {@link Comparator} navigiert. Der Vergleichswert zweier Elemente {@code item1} und {@code item2} ergibt sich aus
 	 * {@code comparator.compare(navigator.get(item1), navigator.get(item2))}.
-	 *
+	 * 
+	 * @param target {@link Comparator}.
+	 * @param trans {@link Getter} zur Navigation.
 	 * @see Getter
-	 * @param <GTarget> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparator}.
-	 * @param <GSource> Typ der Ausgabe des {@link Getter} sowie der Elemente des gegebenen {@link Comparator}.
-	 * @param toSource {@link Getter} zur Navigation.
-	 * @param comparator {@link Comparator}.
+	 * @param <GItem> Typ der Eingabe des {@link Getter} sowie der Elemente des erzeugten {@link Comparator}.
+	 * @param <GItem2> Typ der Ausgabe des {@link Getter} sowie der Elemente des gegebenen {@link Comparator}.
 	 * @return {@code translated}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparator} {@code null} ist. */
-	public static <GTarget, GSource> Comparator<GTarget> concat(final Getter<? super GTarget, ? extends GSource> toSource,
-		final Comparator<? super GSource> comparator) throws NullPointerException {
-		return new TranslatedComparator<>(toSource, comparator);
-	}
-
-	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie die gegebene Eingabe zur Berechnung des Navigationswert
-	 * verwendet. Die gegebene Eingabe wird als erstes Argument des {@link Comparator} verwendet. Der Navigationswert für ein Element {@code item} ist
-	 * {@code comparator.compare(input, item)}.
-	 *
-	 * @param <GItem> Typ der Eingabe.
-	 * @param input erstes Argument des {@link Comparator}.
-	 * @param comparator {@link Comparator}.
-	 * @return {@code entry}-{@link Comparable}.
-	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparable<GItem> toComparable(final GItem input, final Comparator<? super GItem> comparator) throws NullPointerException {
-		return new ComparatorComparable<>(input, comparator);
+	public static <GItem, GItem2> Comparator2<GItem> toTranslated(final Comparator<? super GItem2> target, final Getter<? super GItem, ? extends GItem2> trans)
+		throws NullPointerException {
+		return new TranslatedComparator<>(target, trans);
 	}
 
 }

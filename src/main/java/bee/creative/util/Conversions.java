@@ -27,7 +27,7 @@ public class Conversions {
 
 	}
 
-	/** Diese Klasse implementiert {@link Conversions#virtualConversion(Object, Getter)} */
+	/** Diese Klasse implementiert {@link Conversions#from(Object, Getter)} */
 	@SuppressWarnings ("javadoc")
 	public static class VirtualConversion<GSource, GTarget> extends BaseConversion<GSource, GTarget> {
 
@@ -57,7 +57,7 @@ public class Conversions {
 
 	}
 
-	/** Diese Klasse implementiert {@link Conversions#reverseConversion(Conversion)} */
+	/** Diese Klasse implementiert {@link Conversions#toReverse(Conversion)} */
 	@SuppressWarnings ("javadoc")
 	public static class ReverseConversion<GSource, GTarget> extends BaseConversion<GSource, GTarget> {
 
@@ -84,7 +84,7 @@ public class Conversions {
 
 	}
 
-	/** Diese Klasse implementiert {@link Conversions#compositeConversion(Object, Object)} */
+	/** Diese Klasse implementiert {@link Conversions#from(Object, Object)} */
 	@SuppressWarnings ("javadoc")
 	public static class CompositeConversion<GSource, GTarget> extends BaseConversion<GSource, GTarget> {
 
@@ -138,6 +138,17 @@ public class Conversions {
 
 	}
 
+	/** Diese Methode gibt eine statische {@link Conversion} zurück, deren Eingabe und Ausgabe konstant sind.
+	 *
+	 * @param <GSource> Typ des Eingabe.
+	 * @param <GTarget> Typ der Ausgabe.
+	 * @param source Eingabe.
+	 * @param target Ausgabe.
+	 * @return {@code static}-{@link Conversion}. */
+	public static <GSource, GTarget> Conversion<GSource, GTarget> from(final GSource source, final GTarget target) {
+		return new CompositeConversion<>(source, target);
+	}
+
 	/** Diese Methode gibt eine dynamische {@link Conversion} zurück, deren Ausgabe stats mit Hilfe des gegebenen {@link Getter} aus der gegebenen Eingabe
 	 * ermittelt wird.
 	 *
@@ -147,7 +158,7 @@ public class Conversions {
 	 * @param getter {@link Getter}.
 	 * @return {@code dynamic}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GSource, GTarget> Conversion<GSource, GTarget> virtualConversion(final GSource input, final Getter<? super GSource, ? extends GTarget> getter)
+	public static <GSource, GTarget> Conversion<GSource, GTarget> from(final GSource input, final Getter<? super GSource, ? extends GTarget> getter)
 		throws NullPointerException {
 		return new VirtualConversion<>(input, getter);
 	}
@@ -160,19 +171,8 @@ public class Conversions {
 	 * @param conversion {@link Conversion}.
 	 * @return {@code inverse}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code conversion} {@code null} ist. */
-	public static <GSource, GTarget> Conversion<GSource, GTarget> reverseConversion(final Conversion<? extends GTarget, ? extends GSource> conversion) {
+	public static <GSource, GTarget> Conversion<GSource, GTarget> toReverse(final Conversion<? extends GTarget, ? extends GSource> conversion) {
 		return new ReverseConversion<>(conversion);
-	}
-
-	/** Diese Methode gibt eine statische {@link Conversion} zurück, deren Eingabe und Ausgabe konstant sind.
-	 *
-	 * @param <GSource> Typ des Eingabe.
-	 * @param <GTarget> Typ der Ausgabe.
-	 * @param source Eingabe.
-	 * @param target Ausgabe.
-	 * @return {@code static}-{@link Conversion}. */
-	public static <GSource, GTarget> Conversion<GSource, GTarget> compositeConversion(final GSource source, final GTarget target) {
-		return new CompositeConversion<>(source, target);
 	}
 
 	/** Diese Methode gibt den {@link Getter} zurück, der die Eingabe einer {@link Conversion} ermittelt.

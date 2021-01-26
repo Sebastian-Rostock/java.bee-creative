@@ -94,7 +94,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
 	 * fromTreeMap(Comparators.naturalComparator(), Getters.neutralGetter(), Setters.emptySetter())}. */
 	public static <GSource extends Comparable<? super GSource>> Unique<GSource, GSource> fromTreeMap() {
-		return Unique.fromTreeMap(Comparators.<GSource>naturalComparator(), Getters.<GSource>neutral(), Setters.empty());
+		return Unique.fromTreeMap(Comparators.<GSource>natural(), Getters.<GSource>neutral(), Setters.empty());
 	}
 
 	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)
@@ -107,7 +107,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	 * fromTreeMap(Comparators.naturalComparator(), builder, Setters.emptySetter())}. */
 	public static <GSource extends Comparable<? super GSource>, GTarget> Unique<GSource, GTarget> fromTreeMap(
 		final Getter<? super GSource, ? extends GTarget> builder) throws NullPointerException {
-		return Unique.fromTreeMap(Comparators.<GSource>naturalComparator(), builder, Setters.empty());
+		return Unique.fromTreeMap(Comparators.<GSource>natural(), builder, Setters.empty());
 	}
 
 	/** Diese Methode gibt ein neues ordnungsbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromTreeMap(Comparator, Getter, Setter)

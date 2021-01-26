@@ -239,7 +239,7 @@ public class Iterators {
 
 		public UniqueIterator(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) {
 			this.collection = collection;
-			this.iterator = Iterators.filteredIterator(Filters.negationFilter(Collections.toContainsFilter(collection)), iterator);
+			this.iterator = Iterators.filteredIterator(Filters.negate(Filters.toContainsFilter(collection)), iterator);
 		}
 
 		@Override

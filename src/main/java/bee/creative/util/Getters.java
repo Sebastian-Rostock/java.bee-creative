@@ -341,6 +341,27 @@ public class Getters {
 
 	}
 
+	/** Diese Klasse implementiert {@link Getters#from(Filter)} */
+	static class FilterGetter<GItem> extends AbstractGetter<GItem, Boolean> {
+	
+		public final Filter<? super GItem> filter;
+	
+		public FilterGetter(final Filter<? super GItem> filter) {
+			this.filter = filter;
+		}
+	
+		@Override
+		public Boolean get(final GItem item) {
+			return Boolean.valueOf(this.filter.accept(item));
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.filter);
+		}
+	
+	}
+
 	@SuppressWarnings ("unchecked")
 	public static <GItem, GValue> Getter3<GItem, GValue> empty() {
 		return (Getter3<GItem, GValue>)EmptyGetter.INSTANCE;
@@ -373,6 +394,17 @@ public class Getters {
 		if (target == null) return empty();
 		if (target instanceof Getter3) return (Getter3<GItem, GValue>)target;
 		return concat(target, Getters.<GValue>neutral());
+	}
+
+	/** Diese Methode gibt einen {@link Getter} als Adapter zu einem {@link Filter} zurück. Für eine Eingabe {@code item} liefert er die Ausgabe
+	 * {@code Boolean.valueOf(filter.accept(item))}.
+	 *
+	 * @param <GItem> Typ der Elemente.
+	 * @param filter {@link Filter}.
+	 * @return {@link Filter}-Adapter.
+	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
+	public static <GItem> Getter3<GItem, Boolean> from(final Filter<? super GItem> filter) throws NullPointerException {
+		return new FilterGetter<>(filter);
 	}
 
 	/** Diese Methode gibt einen {@link Getter} zurück, der seinen Datensatz ignoriert und den Wert des gegebenen {@link Producer} liefert.

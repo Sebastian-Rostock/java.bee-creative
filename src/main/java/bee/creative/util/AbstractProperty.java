@@ -17,17 +17,17 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 
 	@Override
 	public <GValue2> Property2<GValue2> concat(Field<? super GValue, GValue2> target) {
-		return Properties.concat(this, target);
+		return Properties.from(this, target);
 	}
 
 	@Override
 	public <GValue2> Producer3<GValue2> concat(Getter<? super GValue, GValue2> target) {
-		return Producers.concat(this, target);
+		return Producers.toTranslated(this, target);
 	}
 
 	@Override
 	public <GValue2> Consumer3<GValue2> concat(Setter<? super GValue, GValue2> target) {
-		return Consumers.concat(this, target);
+		return Consumers.from(this, target);
 	}
 
 	@Override
