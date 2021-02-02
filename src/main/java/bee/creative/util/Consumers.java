@@ -141,14 +141,13 @@ public class Consumers {
 
 	}
 
-	/** Diese Methode liefert einen {@link EmptyConsumer}. */
+	/** Diese Methode liefert den {@link EmptyConsumer}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Consumer3<GValue> empty() {
 		return (Consumer3<GValue>)EmptyConsumer.INSTANCE;
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird {@link #empty() Consumers.empty()}
-	 * geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird der {@link EmptyConsumer} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Consumer3<GValue> from(final Consumer<? super GValue> target) {
 		if (target == null) return Consumers.empty();

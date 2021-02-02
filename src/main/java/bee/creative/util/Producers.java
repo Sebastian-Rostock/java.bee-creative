@@ -210,28 +210,7 @@ public class Producers {
 
 	}
 
-	static class GetterProducer<GItem, GValue> extends AbstractProducer<GValue> {
 
-		public final Getter<? super GItem, ? extends GValue> target;
-
-		public final GItem item;
-
-		public GetterProducer(final Getter<? super GItem, ? extends GValue> target, final GItem item) throws NullPointerException {
-			this.target = Objects.notNull(target);
-			this.item = item;
-		}
-
-		@Override
-		public GValue get() {
-			return this.target.get(this.item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.item);
-		}
-
-	}
 
 	/** Diese Methode liefert {@link EmptyProducer EmptyProducer.INSTANCE}. */
 	@SuppressWarnings ("unchecked")

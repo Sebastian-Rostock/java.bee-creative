@@ -24,7 +24,7 @@ public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 	/** Diese Methode ist eine Abkürtung für {@link Getters#concat(Getter, Getter) Getters.concat(this, target)}. */
 	public <GValue2> Getter3<GItem, GValue2> concat(final Getter<? super GValue, ? extends GValue2> target);
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#concat(Getter, Setter) Setters.concat(this, target)}. */
+	/** Diese Methode ist eine Abkürtung für {@link Setters#toTranslated(Getter, Setter) Setters.toTranslated(this, target)}. */
 	public <GValue2> Setter3<GItem, GValue2> concat(final Setter<? super GValue, ? super GValue2> target);
 
 	/** Diese Methode ist eine Abkürtung für {@link Getters#toAggregated(Getter) Getters.toAggregated(this)}. */

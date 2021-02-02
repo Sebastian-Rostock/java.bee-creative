@@ -578,8 +578,8 @@ public class Builders {
 		@Override
 		public Iterator<GResult> iterator() {
 			final GResult result = this.result;
-			if (result == null) return Iterators.emptyIterator();
-			return Iterators.itemIterator(result);
+			if (result == null) return Iterators.empty();
+			return Iterators.fromItem(result);
 		}
 
 	}

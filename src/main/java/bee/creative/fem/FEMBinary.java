@@ -11,9 +11,9 @@ import bee.creative.emu.Emuable;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
+import bee.creative.util.AbstractIterator;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
-import bee.creative.util.Iterators.BaseIterator;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
@@ -973,7 +973,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	@Override
 	public final Iterator<Byte> iterator() {
-		return new BaseIterator<Byte>() {
+		return new AbstractIterator<Byte>() {
 
 			int index = 0;
 

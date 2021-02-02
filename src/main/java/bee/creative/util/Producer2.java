@@ -1,6 +1,6 @@
 package bee.creative.util;
 
-/** Diese Schnittstelle ergänzt einen {@link Producer} um eine Anbindung an Methoden von {@link Producers} und {@link Getters}.
+/** Diese Schnittstelle ergänzt einen {@link Producer} insb. um eine Anbindung an Methoden von {@link Producers}.
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ des Werts. */

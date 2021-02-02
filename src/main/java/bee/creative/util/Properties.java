@@ -284,7 +284,7 @@ public class Properties {
 		return (Property2<GValue>)EmptyProperty.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.concat(source, target), Consumers.concat(source,
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.toTranslated(source, target), Consumers.from(source,
 	 * target))}.
 	 *
 	 * @see Producers#toTranslated(Producer, Getter)
@@ -325,8 +325,7 @@ public class Properties {
 		return new CompositeProperty<>(get, set);
 	}
 
-	/** Diese Methode liefert das gegebene {@link Property} als {@link Property2}. Wenn es {@code null} ist, wird {@link Properties#empty() Properties.empty()}
-	 * geliefert. */
+	/** Diese Methode liefert das gegebene {@link Property} als {@link Property2}. Wenn es {@code null} ist, wird das {@link EmptyProperty} geliefert. */
 	public static <GValue> Property2<GValue> from(final Property<GValue> target) {
 		if (target == null) return Properties.empty();
 		if (target instanceof Property2<?>) return (Property2<GValue>)target;
@@ -406,7 +405,8 @@ public class Properties {
 		return Properties.toTranslated(target, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.concat(target, transGet), Consumers.toTranslated(target, transSet))}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.toTranslated(target, transGet),
+	 * Consumers.toTranslated(target, transSet))}.
 	 *
 	 * @see Producers#toTranslated(Producer, Getter)
 	 * @see Consumers#toTranslated(Consumer, Getter) */

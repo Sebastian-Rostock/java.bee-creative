@@ -6,8 +6,8 @@ import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
+import bee.creative.util.AbstractIterator;
 import bee.creative.util.Iterables;
-import bee.creative.util.Iterators.BaseIterator;
 
 /** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Auflistung ({@link IAMListing}) für die Elemente sowie einer Abbildung
  * ({@link IAMMapping}) für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
@@ -879,7 +879,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	@Override
 	public final Iterator<Integer> iterator() {
-		return new BaseIterator<Integer>() {
+		return new AbstractIterator<Integer>() {
 
 			int index = 0;
 
@@ -918,7 +918,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@Override
 	public String toString() {
 		return this.length > 30 ? //
-			Objects.printIterable(false, Iterables.chainedIterable(this.section(0, 15), Iterables.itemIterable(Objects.toStringObject("...")))) : //
+			Objects.printIterable(false, Iterables.concat(this.section(0, 15), Iterables.fromItem(Objects.toStringObject("...")))) : //
 			Objects.printIterable(false, this);
 	}
 

@@ -80,7 +80,7 @@ public class Parser {
 		 * @throws IllegalArgumentException Wenn der Abschnitt außerhalb der Eingabe liegt oder seine Länge negativ ist. */
 		public static Token from(final String source, final int offset, final int length, final int type, final Iterable<Token> tokens)
 			throws NullPointerException, IllegalArgumentException {
-			return Token.from(source, offset, length, Iterables.toArray(Token.EMPTY.tokens, tokens)).type(type);
+			return Token.from(source, offset, length, Iterables.toArray(tokens, Token.EMPTY.tokens)).type(type);
 		}
 
 		/** Diese Methode gibt ein {@link Comparable} für Abschnitt zurück, welches deren {@link Token#end() Endposition} mit der gegebenen Position vergleicht. Der

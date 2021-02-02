@@ -18,11 +18,11 @@ import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMMapping;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
+import bee.creative.util.AbstractIterator;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
-import bee.creative.util.Iterators.BaseIterator;
 
 /** Diese Klasse implementiert eine unveränderliche Auflistung von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
  *
@@ -108,7 +108,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 		}
 
-		class EntryIterator extends BaseIterator<Entry<FEMValue, FEMValue>> {
+		class EntryIterator extends AbstractIterator<Entry<FEMValue, FEMValue>> {
 
 			final Iterator<FEMValue> keys = ItemMap.this.keys.iterator();
 
@@ -813,13 +813,13 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 *
 	 * @see #from(FEMValue...)
-	 * @see Iterables#toArray(Object[], Iterable)
+	 * @see Iterables#toArray(Iterable, Object[])
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
 		if (items instanceof FEMArray) return (FEMArray)items;
-		return FEMArray.from(Iterables.toArray(FEMArray.VALUES, items));
+		return FEMArray.from(Iterables.toArray(items, FEMArray.VALUES));
 	}
 
 	/** Diese Methode überführt die {@link Entry Einträge} der gegebenen {@link Map Abbildung} in eine {@link #compact(boolean) indizierte Schlüsselliste} sowie

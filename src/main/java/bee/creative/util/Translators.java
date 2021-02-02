@@ -216,12 +216,6 @@ public class Translators {
 		return Translators.from(valueClass, valueClass, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(target, trans)}. */
-	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> concat(final Translator<GSource, GCenter> target,
-		final Translator<GCenter, GTarget> trans) throws NullPointerException {
-		return new ConcatTranslator<>(target, trans);
-	}
-
 	/** Diese Methode gibt den gegebenen {@link Translator} als {@link Translator2} zurück. Wenn er {@code null} ist, wird {@link Translators#empty()
 	 * Translators.empty()} geliefert. */
 	public static <GSource, GTarget> Translator2<GSource, GTarget> from(final Translator<GSource, GTarget> target) {
@@ -234,6 +228,12 @@ public class Translators {
 	public static <GSource, GTarget> Translator2<GSource, GTarget> from(final Class<GSource> sourceClass, final Class<GTarget> targetClass,
 		final Getter<? super GSource, ? extends GTarget> sourceTrans, final Getter<? super GTarget, ? extends GSource> targetTrans) throws NullPointerException {
 		return new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(target, trans)}. */
+	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> toConcat(final Translator<GSource, GCenter> target,
+		final Translator<GCenter, GTarget> trans) throws NullPointerException {
+		return new ConcatTranslator<>(target, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ReverseTranslator new ReverseTranslator<>(target)}. */

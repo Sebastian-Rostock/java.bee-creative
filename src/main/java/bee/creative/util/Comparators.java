@@ -371,12 +371,13 @@ public class Comparators {
 	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der kleinsten Ordnung zurück.
 	 *
 	 * @see #min(Comparable, Comparable)
-	 * @see Iterators#iterator(Iterator)
+	 * @see Iterators#from(Iterator)
 	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte oder {@code null}.
 	 * @return Objekt mit der kleinsten Ordnung oder {@code null}. */
 	public static <GItem extends Comparable<? super GItem>> GItem min(final Iterable<? extends GItem> items) {
-		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
+		if (items == null) return null;
+		final Iterator<? extends GItem> iterator = items.iterator();
 		if (!iterator.hasNext()) return null;
 		GItem result = iterator.next();
 		while (iterator.hasNext()) {
@@ -388,14 +389,15 @@ public class Comparators {
 	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der kleinsten Ordnung zurück.
 	 *
 	 * @see #min(Object, Object, Comparator)
-	 * @see Iterators#iterator(Iterator)
+	 * @see Iterators#from(Iterator)
 	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte oder {@code null}.
 	 * @param comparator {@link Comparator}.
 	 * @return Objekt mit der kleinsten Ordnung oder {@code null}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
 	public static <GItem> GItem min(final Iterable<? extends GItem> items, final Comparator<? super GItem> comparator) {
-		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
+		if (items == null) return null;
+		final Iterator<? extends GItem> iterator = items.iterator();
 		if (!iterator.hasNext()) return null;
 		GItem result = iterator.next();
 		while (iterator.hasNext()) {
@@ -433,12 +435,13 @@ public class Comparators {
 	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der größten Ordnung zurück.
 	 *
 	 * @see #max(Comparable, Comparable)
-	 * @see Iterators#iterator(Iterator)
+	 * @see Iterators#from(Iterator)
 	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte oder {@code null}.
 	 * @return Objekt mit der größten Ordnung oder {@code null}. */
 	public static <GItem extends Comparable<? super GItem>> GItem max(final Iterable<? extends GItem> items) {
-		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
+		if (items == null) return null;
+		final Iterator<? extends GItem> iterator = items.iterator();
 		if (!iterator.hasNext()) return null;
 		GItem result = iterator.next();
 		while (iterator.hasNext()) {
@@ -450,14 +453,15 @@ public class Comparators {
 	/** Diese Methode gibt aus den gegebenen Objekten das Objekt mit der größten Ordnung zurück.
 	 *
 	 * @see #max(Object, Object, Comparator)
-	 * @see Iterators#iterator(Iterator)
+	 * @see Iterators#from(Iterator)
 	 * @param <GItem> Typ der Objekte.
 	 * @param items Objekte oder {@code null}.
 	 * @param comparator {@link Comparator}.
 	 * @return Objekt mit der größten Ordnung oder {@code null}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
 	public static <GItem> GItem max(final Iterable<? extends GItem> items, final Comparator<? super GItem> comparator) {
-		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
+		if (items == null) return null;
+		final Iterator<? extends GItem> iterator = items.iterator();
 		if (!iterator.hasNext()) return null;
 		GItem result = iterator.next();
 		while (iterator.hasNext()) {
@@ -562,7 +566,8 @@ public class Comparators {
 	public static <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2, final Comparator<? super GItem> comparator)
 		throws NullPointerException {
 		Objects.notNull(comparator);
-		final Iterator<? extends GItem> iter1 = Iterators.iterator(item1), iter2 = Iterators.iterator(item2);
+		final Iterator<? extends GItem> iter1 = Objects.notNull(item1, Iterables.<GItem>empty()).iterator();
+		final Iterator<? extends GItem> iter2 = Objects.notNull(item2, Iterables.<GItem>empty()).iterator();
 		while (true) {
 			if (!iter1.hasNext()) return (iter2.hasNext() ? -1 : 0);
 			if (!iter2.hasNext()) return 1;

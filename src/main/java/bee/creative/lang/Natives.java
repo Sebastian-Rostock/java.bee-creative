@@ -263,7 +263,7 @@ public class Natives {
 	 * @throws NullPointerException Wenn {@code types} {@code null} ist oder enthält. */
 	public static String printParams(final Class<?>... types) throws NullPointerException {
 		final StringBuilder res = new StringBuilder().append('(');
-		Strings.join(res, ",", Iterables.translatedIterable(Natives.printClass, Arrays.asList(types)));
+		Strings.join(res, ",", Iterables.toTranslated(Arrays.asList(types), Natives.printClass));
 		return res.append(')').toString();
 	}
 

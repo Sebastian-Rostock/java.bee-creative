@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Strings;
+import bee.creative.util.AbstractIterator;
 import bee.creative.util.Iterators;
-import bee.creative.util.Iterators.BaseIterator;
 
 /** Diese Klasse dient der Erfassung hierarchischer Protokollzeilen. Diese werden in der {@link #toStrings() Textdarstellung} innerhalb von Protokollebenen
  * entsprechend eingerückt dargestellt.
@@ -13,13 +13,13 @@ import bee.creative.util.Iterators.BaseIterator;
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class LOGBuilder implements Iterable<LOGEntry> {
 
-	private static final class Iter extends BaseIterator<LOGEntry> {
+	private static final class Iter extends AbstractIterator<LOGEntry> {
 
 		final LOGEntry head;
 
 		LOGEntry next;
 
-		Iterator<LOGEntry> iter = Iterators.emptyIterator();
+		Iterator<LOGEntry> iter = Iterators.empty();
 
 		public Iter(final LOGEntry head) {
 			this.next = this.head = head;

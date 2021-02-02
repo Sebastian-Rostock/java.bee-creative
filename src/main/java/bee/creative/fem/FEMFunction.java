@@ -155,9 +155,9 @@ public abstract class FEMFunction {
 
 	/** Diese Methode ist eine Abkürzung für {@link #compose(FEMFunction...) this.compose(Iterables.toArray(FEMFunction.PARAMS, params))}.
 	 *
-	 * @see Iterables#toArray(Object[], Iterable) */
+	 * @see Iterables#toArray(Iterable, Object[]) */
 	public final FEMFunction compose(final Iterable<? extends FEMFunction> params) throws NullPointerException {
-		return this.compose(Iterables.toArray(FEMFunction.PARAMS, params));
+		return this.compose(Iterables.toArray(params, FEMFunction.PARAMS));
 	}
 
 	/** Diese Methode gibt diese Funktion mit Verfolgung bzw. Überwachung der Verarbeitung durch das gegebene {@link FEMTracer Überwachungsobjekt} zurück.

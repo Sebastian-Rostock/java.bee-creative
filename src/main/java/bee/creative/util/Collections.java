@@ -56,10 +56,10 @@ public class Collections {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.unmodifiableIterator(this.items1.size() < this.items2.size()
-				? Iterators.chainedIterator(Iterators.filteredIterator(Filters.negate(Filters.toContainsFilter(this.items2)), this.items1.iterator()),
+			return Iterators.toUnmodifiable(this.items1.size() < this.items2.size()
+				? Iterators.concat(Iterators.toFiltered(this.items1.iterator(), Filters.negate(Filters.fromItems(this.items2))),
 					this.items2.iterator())
-				: Iterators.chainedIterator(Iterators.filteredIterator(Filters.negate(Filters.toContainsFilter(this.items1)), this.items2.iterator()),
+				: Iterators.concat(Iterators.toFiltered(this.items2.iterator(), Filters.negate(Filters.fromItems(this.items1))),
 					this.items1.iterator()));
 		}
 
@@ -80,7 +80,7 @@ public class Collections {
 
 			Iterator<? extends GKey> keyIter = CartesianSet.this.keys.iterator();
 
-			Iterator<? extends GValue> valueIter = Iterators.emptyIterator();
+			Iterator<? extends GValue> valueIter = Iterators.empty();
 
 			@Override
 			public boolean hasNext() {
@@ -125,7 +125,7 @@ public class Collections {
 
 		@Override
 		public Iterator<Entry<GKey, GValue>> iterator() {
-			if (this.keys.isEmpty() || this.values.isEmpty()) return Iterators.emptyIterator();
+			if (this.keys.isEmpty() || this.values.isEmpty()) return Iterators.empty();
 			return new EntryIterator();
 		}
 
@@ -176,9 +176,9 @@ public class Collections {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.unmodifiableIterator(this.items1.size() < this.items2.size() //
-				? Iterators.filteredIterator(Filters.toContainsFilter(this.items2), this.items1.iterator()) //
-				: Iterators.filteredIterator(Filters.toContainsFilter(this.items1), this.items2.iterator()) //
+			return Iterators.toUnmodifiable(this.items1.size() < this.items2.size() //
+				? Iterators.toFiltered(this.items1.iterator(), Filters.fromItems(this.items2)) //
+				: Iterators.toFiltered(this.items2.iterator(), Filters.fromItems(this.items1)) //
 			);
 		}
 
@@ -450,7 +450,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.chainedIterator(this.items1.iterator(), this.items2.iterator());
+			return Iterators.concat(this.items1.iterator(), this.items2.iterator());
 		}
 
 		@Override
@@ -592,7 +592,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.chainedIterator(this.items1.iterator(), this.items2.iterator());
+			return Iterators.concat(this.items1.iterator(), this.items2.iterator());
 		}
 
 	}
@@ -846,7 +846,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.translatedIterator(Getters.fromTarget(this.translator), this.items.iterator());
+			return Iterators.toTranslated(this.items.iterator(), Getters.fromTarget(this.translator));
 		}
 
 		@Override
@@ -927,7 +927,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.translatedIterator(Getters.fromTarget(this.translator), this.items.iterator());
+			return Iterators.toTranslated(this.items.iterator(), Getters.fromTarget(this.translator));
 		}
 
 	}
@@ -997,7 +997,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.translatedIterator(Getters.fromTarget(this.translator), this.items.iterator());
+			return Iterators.toTranslated(this.items.iterator(), Getters.fromTarget(this.translator));
 		}
 
 	}

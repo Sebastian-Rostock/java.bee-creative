@@ -487,7 +487,7 @@ public class IO {
 	 * @param files Dateien und Verzeichnisse oder {@code null}.
 	 * @return {@link Iterable} über {@link File}. */
 	public static Iterable<File> listFiles(final int maxDepth, final File... files) {
-		if (files == null) return Iterables.emptyIterable();
+		if (files == null) return Iterables.empty();
 		return IO.listFiles(maxDepth, Arrays.asList(files));
 	}
 
@@ -499,18 +499,18 @@ public class IO {
 	 * @param files Dateien und Verzeichnisse oder {@code null}.
 	 * @return {@link Iterable} über {@link File}. */
 	public static Iterable<File> listFiles(final int maxDepth, final Iterable<File> files) {
-		if (files == null) return Iterables.emptyIterable();
+		if (files == null) return Iterables.empty();
 		if (maxDepth == 0) return files;
-		return Iterables.chainedIterable(Iterables.translatedIterable(new Getter<File, Iterable<File>>() {
+		return Iterables.concatAll(Iterables.toTranslated(files, new Getter<File, Iterable<File>>() {
 
 			@Override
 			public Iterable<File> get(final File file) {
 				final File[] list = file.listFiles();
-				if (list == null) return Iterables.itemIterable(file);
-				return Iterables.chainedIterable(Iterables.itemIterable(file), IO.listFiles(maxDepth - 1, list));
+				if (list == null) return Iterables.fromItem(file);
+				return Iterables.concat(Iterables.fromItem(file), IO.listFiles(maxDepth - 1, list));
 			}
 
-		}, files));
+		}));
 	}
 
 }

@@ -327,7 +327,7 @@ public class Filters {
 	
 	}
 
-	/** Diese Klasse implementiert {@link Filters#toContainsFilter(Collection)} */
+	/** Diese Klasse implementiert {@link Filters#fromItems(Collection)} */
 	static class ContainsFilter extends AbstractFilter<Object> {
 	
 		public final Collection<?> collection;
@@ -535,14 +535,14 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
 	 *
-	 * @see #toContainsFilter(Collection)
+	 * @see #fromItems(Collection)
 	 * @param items akzeptierte Eingaben.
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static Filter<Object> toContainsFilter(final Object... items) throws NullPointerException {
+	public static Filter<Object> fromItems(final Object... items) throws NullPointerException {
 		if (items.length == 0) return from(false);
-		if (items.length == 1) return Filters.toContainsFilter(java.util.Collections.singleton(items[0]));
-		return Filters.toContainsFilter(new HashSet2<>(Arrays.asList(items)));
+		if (items.length == 1) return Filters.fromItems(java.util.Collections.singleton(items[0]));
+		return Filters.fromItems(new HashSet2<>(Arrays.asList(items)));
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind. Die Akzeptanz
@@ -551,7 +551,7 @@ public class Filters {
 	 * @param collection {@link Collection} der akzeptierten Eingaben.
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code collection} {@code null} ist. */
-	public static Filter<Object> toContainsFilter(final Collection<?> collection) throws NullPointerException {
+	public static Filter<Object> fromItems(final Collection<?> collection) throws NullPointerException {
 		return new ContainsFilter(collection);
 	}
 

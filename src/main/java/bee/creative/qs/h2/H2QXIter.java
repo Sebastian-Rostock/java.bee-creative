@@ -4,13 +4,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
-import bee.creative.util.Iterators.BaseIterator;
+import bee.creative.util.AbstractIterator;
 
 /** Diese Klasse implementiert den {@link Iterator} für die Nachfahren von {@link H2QXSet}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-abstract class H2QXIter<GItem> extends BaseIterator<GItem> {
+abstract class H2QXIter<GItem> extends AbstractIterator<GItem> {
 
 	final H2QXSet<GItem, ?> owner;
 

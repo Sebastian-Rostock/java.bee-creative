@@ -36,7 +36,7 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 
 	@Override
 	public <GValue2> Setter3<GItem, GValue2> concat(final Setter<? super GValue, ? super GValue2> target) {
-		return Setters.concat(this, target);
+		return Setters.toTranslated(this, target);
 	}
 
 	@Override

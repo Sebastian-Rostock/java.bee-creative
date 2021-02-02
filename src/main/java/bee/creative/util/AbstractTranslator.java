@@ -30,8 +30,8 @@ public abstract class AbstractTranslator<GSource, GTarget> extends BaseObject im
 	}
 
 	@Override
-	public <GTarget2> Translator2<GSource, GTarget2> concat(Translator<GTarget, GTarget2> trans) throws NullPointerException {
-		return Translators.concat(this, trans);
+	public <GTarget2> Translator2<GSource, GTarget2> toConcat(Translator<GTarget, GTarget2> trans) throws NullPointerException {
+		return Translators.toConcat(this, trans);
 	}
 
 	@Override

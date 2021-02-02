@@ -8,9 +8,9 @@ import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
+import bee.creative.util.AbstractIterator;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
-import bee.creative.util.Iterators.BaseIterator;
 
 /** Diese Klasse implementiert eine unveränderliche Zeichenkette sowie Methoden zur Erzeugung solcher Zeichenketten.
  * <p>
@@ -1606,7 +1606,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	@Override
 	public final Iterator<Integer> iterator() {
-		return new BaseIterator<Integer>() {
+		return new AbstractIterator<Integer>() {
 
 			int index = 0;
 
