@@ -351,7 +351,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 	@Override
 	public final Iterator<FEMValue> iterator() {
-		return Iterators.itemsIterator(this, 0, this.size());
+		return Iterators.fromItems(this, 0, this.size());
 	}
 
 	@Override

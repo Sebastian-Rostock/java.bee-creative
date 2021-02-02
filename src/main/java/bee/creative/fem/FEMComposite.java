@@ -148,7 +148,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Item
 
 	@Override
 	public final Iterator<FEMFunction> iterator() {
-		return Iterators.itemsIterator(this, 0, this.size());
+		return Iterators.fromItems(this, 0, this.size());
 	}
 
 }
