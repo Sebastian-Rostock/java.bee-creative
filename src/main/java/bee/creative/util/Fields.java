@@ -448,17 +448,17 @@ public final class Fields {
 		return Fields.fromNative(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toDefault(Field, Object) Fields.defaultField(null, field)}. */
-	public static <GItem, GValue> Field2<GItem, GValue> toDefault(final Field<? super GItem, GValue> field) throws NullPointerException {
-		return Fields.toDefault(field, null);
+	/** Diese Methode ist eine Abkürzung für {@link #optionalize(Field, Object) Fields.defaultField(null, field)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> optionalize(final Field<? super GItem, GValue> field) throws NullPointerException {
+		return Fields.optionalize(field, null);
 	}
 
 	/** Diese Methode ist eine effiziente Alternative zu {@link #from(Getter, Setter) Fields.compositeField(Fields.defaultGetter(value, field),
 	 * Fields.defaultSetter(field))}.
 	 *
-	 * @see Getters#toDefault(Getter, Object)
-	 * @see Setters#toDefault(Setter) */
-	public static <GItem, GValue> Field2<GItem, GValue> toDefault(final Field<? super GItem, GValue> target, final GValue value) throws NullPointerException {
+	 * @see Getters#optionalize(Getter, Object)
+	 * @see Setters#optionalize(Setter) */
+	public static <GItem, GValue> Field2<GItem, GValue> optionalize(final Field<? super GItem, GValue> target, final GValue value) throws NullPointerException {
 		return new DefaultField<>(target, value);
 	}
 
@@ -472,7 +472,7 @@ public final class Fields {
 	 * @param <GValue> Typ des Werts.
 	 * @return {@code setup}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} bzw. {@code setup} {@code null} ist. */
-	public static <GItem, GValue> Field2<GItem, GValue> toSetup(final Field<? super GItem, GValue> target, final Getter<? super GItem, ? extends GValue> setup)
+	public static <GItem, GValue> Field2<GItem, GValue> setup(final Field<? super GItem, GValue> target, final Getter<? super GItem, ? extends GValue> setup)
 		throws NullPointerException {
 		return new SetupField<>(target, setup);
 	}
@@ -505,34 +505,34 @@ public final class Fields {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ObservableField new ObservableField<>(target)}. */
-	public static <GItem, GValue> ObservableField<GItem, GValue> toObservable(final Field<? super GItem, GValue> target) throws NullPointerException {
+	public static <GItem, GValue> ObservableField<GItem, GValue> observe(final Field<? super GItem, GValue> target) throws NullPointerException {
 		return new ObservableField<>(target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Field, Getter, Getter) Fields.aggregatedField(Getters.neutralGetter(), Getters.neutralGetter(),
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Field, Getter, Getter) Fields.aggregatedField(Getters.neutralGetter(), Getters.neutralGetter(),
 	 * field)}. */
-	public static <GItem, GValue> Field2<Iterable<? extends GItem>, GValue> toAggregated(final Field<? super GItem, GValue> target) throws NullPointerException {
-		return Fields.from(Getters.toAggregated(target), Setters.toAggregated(target));
+	public static <GItem, GValue> Field2<Iterable<? extends GItem>, GValue> aggregate(final Field<? super GItem, GValue> target) throws NullPointerException {
+		return Fields.from(Getters.aggregate(target), Setters.aggregate(target));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Field, Getter, Getter, Getter, Getter) Fields.aggregatedField(toTarget, toSource, null, null,
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Field, Getter, Getter, Getter, Getter) Fields.aggregatedField(toTarget, toSource, null, null,
 	 * field)}. */
-	public static <GEntry, GSource, GTarget> Field2<Iterable<? extends GEntry>, GTarget> toAggregated(final Field<? super GEntry, GSource> target,
+	public static <GEntry, GSource, GTarget> Field2<Iterable<? extends GEntry>, GTarget> aggregate(final Field<? super GEntry, GSource> target,
 		final Getter<? super GSource, ? extends GTarget> transGet, final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
-		return Fields.from(Getters.toAggregated(target, transGet), Setters.toAggregated(target, transSet));
+		return Fields.from(Getters.aggregate(target, transGet), Setters.aggregate(target, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Setter) Fields.compositeField(Getters.aggregatedGetter(toTarget, emptyTarget, mixedTarget,
 	 * field), Setters.aggregatedSetter(toSource, field))}. Mit einem aggregierten {@link Field} können die Elemente des iterierbaren Datensatzes parallel
 	 * modifiziert werden.
 	 *
-	 * @see Getters#toAggregated(Getter, Getter, Getter, Getter)
-	 * @see Setters#toAggregated(Setter, Getter) */
-	public static <GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> Field2<GItem, GValue> toAggregated(
+	 * @see Getters#aggregate(Getter, Getter, Getter, Getter)
+	 * @see Setters#aggregate(Setter, Getter) */
+	public static <GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> Field2<GItem, GValue> aggregate(
 		final Field<? super GItem2, GValue2> target, final Getter<? super GValue2, ? extends GValue> transGet,
 		final Getter<? super GValue, ? extends GValue2> transSet, final Getter<? super GItem, ? extends GValue> empty,
 		final Getter<? super GItem, ? extends GValue> mixed) throws NullPointerException {
-		return Fields.from(Getters.<GItem, GValue, GItem2, GValue2>toAggregated(target, transGet, empty, mixed), Setters.toAggregated(target, transSet));
+		return Fields.from(Getters.<GItem, GValue, GItem2, GValue2>aggregate(target, transGet, empty, mixed), Setters.aggregate(target, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Field, Object) Fields.synchronize(target, target)}. */

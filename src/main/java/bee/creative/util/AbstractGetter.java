@@ -46,29 +46,29 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public Getter3<Iterable<? extends GItem>, GValue> toAggregated() {
-		return Getters.toAggregated(this);
+	public Getter3<Iterable<? extends GItem>, GValue> aggregate() {
+		return Getters.aggregate(this);
 	}
 
 	@Override
-	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> trans) {
-		return Getters.toAggregated(this, trans);
+	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> aggregate(final Getter<? super GValue, ? extends GValue2> trans) {
+		return Getters.aggregate(this, trans);
 	}
 
 	@Override
-	public <GItem2 extends Iterable<? extends GItem>, GValue2> Getter3<GItem2, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> trans,
+	public <GItem2 extends Iterable<? extends GItem>, GValue2> Getter3<GItem2, GValue2> aggregate(final Getter<? super GValue, ? extends GValue2> trans,
 		final Getter<? super GItem2, ? extends GValue2> empty, final Getter<? super GItem2, ? extends GValue2> mixed) {
-		return Getters.toAggregated(this, trans, empty, mixed);
+		return Getters.aggregate(this, trans, empty, mixed);
 	}
 
 	@Override
-	public Getter3<GItem, GValue> toDefault() {
-		return Getters.toDefault(this);
+	public Getter3<GItem, GValue> optionalize() {
+		return Getters.optionalize(this);
 	}
 
 	@Override
-	public Getter3<GItem, GValue> toDefault(final GValue value) {
-		return Getters.toDefault(this, value);
+	public Getter3<GItem, GValue> optionalize(final GValue value) {
+		return Getters.optionalize(this, value);
 	}
 
 	@Override

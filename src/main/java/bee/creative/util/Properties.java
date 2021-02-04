@@ -58,32 +58,32 @@ public class Properties {
 	@SuppressWarnings ("javadoc")
 	public static class SetupProperty<GValue> extends AbstractProperty<GValue> {
 
-		public final Property<GValue> target;
+		public final Property<GValue> that;
 
 		public final Producer<? extends GValue> setup;
 
-		public SetupProperty(final Property<GValue> target, final Producer<? extends GValue> setup) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public SetupProperty(final Property<GValue> that, final Producer<? extends GValue> setup) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.setup = Objects.notNull(setup);
 		}
 
 		@Override
 		public GValue get() {
-			GValue result = this.target.get();
+			GValue result = this.that.get();
 			if (result != null) return result;
 			result = this.setup.get();
-			this.target.set(result);
+			this.that.set(result);
 			return result;
 		}
 
 		@Override
 		public void set(final GValue value) {
-			this.target.set(value);
+			this.that.set(value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.setup);
+			return Objects.toInvokeString(this, this.that, this.setup);
 		}
 
 	}
@@ -95,19 +95,19 @@ public class Properties {
 	@SuppressWarnings ("javadoc")
 	public static class NativeProperty<GValue> extends AbstractProperty<GValue> {
 
-		public final java.lang.reflect.Field target;
+		public final java.lang.reflect.Field that;
 
 		/** Dieser Konstruktor initialisiert das Datenfeld und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
-		public NativeProperty(final java.lang.reflect.Field target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
-			if (!Modifier.isStatic(target.getModifiers())) throw new IllegalArgumentException();
-			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
+		public NativeProperty(final java.lang.reflect.Field that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			if (!Modifier.isStatic(that.getModifiers())) throw new IllegalArgumentException();
+			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public GValue get() {
 			try {
-				return (GValue)this.target.get(null);
+				return (GValue)this.that.get(null);
 			} catch (final IllegalAccessException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -116,7 +116,7 @@ public class Properties {
 		@Override
 		public void set(final GValue value) {
 			try {
-				this.target.set(null, value);
+				this.that.set(null, value);
 			} catch (final IllegalAccessException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -124,7 +124,7 @@ public class Properties {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.target.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
 		}
 
 	}
@@ -171,13 +171,11 @@ public class Properties {
 	public static class ObservableProperty<GValue> extends AbstractProperty<GValue> implements Observable<UpdatePropertyEvent, UpdatePropertyListener> {
 
 		/** Dieses Feld speichert die Eigenschaft, an die in {@link #get()} und {@link #set(Object)} delegiert wird. */
-		public final Property<GValue> target;
+		public final Property<GValue> that;
 
-		/** Dieser Konstruktor initialisiert die überwachte Eigenschaft.
-		 *
-		 * @param target überwachte Eigenschaft. */
-		public ObservableProperty(final Property<GValue> target) {
-			this.target = Objects.notNull(target);
+		/** Dieser Konstruktor initialisiert die überwachte Eigenschaft. */
+		public ObservableProperty(final Property<GValue> that) {
+			this.that = Objects.notNull(that);
 		}
 
 		/** Diese Methode gibt eine Kopie des gegebenen Werts oder diesen unverändert zurück. Vor dem Schreiben des neuen Werts wird vom alten Wert über diese
@@ -202,15 +200,15 @@ public class Properties {
 
 		@Override
 		public GValue get() {
-			return this.target.get();
+			return this.that.get();
 		}
 
 		@Override
 		public void set(final GValue newValue) {
-			GValue oldValue = this.target.get();
+			GValue oldValue = this.that.get();
 			if (this.customEquals(oldValue, newValue)) return;
 			oldValue = this.customClone(oldValue);
-			this.target.set(newValue);
+			this.that.set(newValue);
 			this.fire(new UpdatePropertyEvent(this, oldValue, newValue));
 		}
 
@@ -236,7 +234,7 @@ public class Properties {
 
 		@Override
 		public String toString() {
-			return this.target.toString();
+			return this.that.toString();
 		}
 
 	}
@@ -248,32 +246,32 @@ public class Properties {
 	@SuppressWarnings ("javadoc")
 	public static class SynchronizedProperty<GValue> extends AbstractProperty<GValue> {
 
-		public final Property<GValue> target;
+		public final Property<GValue> that;
 
 		public final Object mutex;
 
-		public SynchronizedProperty(final Property<GValue> target, final Object mutex) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public SynchronizedProperty(final Property<GValue> that, final Object mutex) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.mutex = Objects.notNull(mutex, this);
 		}
 
 		@Override
 		public GValue get() {
 			synchronized (this.mutex) {
-				return this.target.get();
+				return this.that.get();
 			}
 		}
 
 		@Override
 		public void set(final GValue value) {
 			synchronized (this.mutex) {
-				this.target.set(value);
+				this.that.set(value);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.mutex == this ? null : this.mutex);
+			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
 		}
 
 	}
@@ -326,10 +324,10 @@ public class Properties {
 	}
 
 	/** Diese Methode liefert das gegebene {@link Property} als {@link Property2}. Wenn es {@code null} ist, wird das {@link EmptyProperty} geliefert. */
-	public static <GValue> Property2<GValue> from(final Property<GValue> target) {
-		if (target == null) return Properties.empty();
-		if (target instanceof Property2<?>) return (Property2<GValue>)target;
-		return Properties.translate(target, Getters.<GValue>neutral(), Getters.<GValue>neutral());
+	public static <GValue> Property2<GValue> from(final Property<GValue> that) {
+		if (that == null) return Properties.empty();
+		if (that instanceof Property2<?>) return (Property2<GValue>)that;
+		return Properties.translate(that, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */
@@ -390,44 +388,44 @@ public class Properties {
 		return Properties.fromNative(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link SetupProperty new SetupProperty<>(target, setup)}. */
-	public static <GValue> Property2<GValue> toSetup(final Property<GValue> target, final Producer<? extends GValue> setup) throws NullPointerException {
-		return new SetupProperty<>(target, setup);
+	/** Diese Methode ist eine Abkürzung für {@link SetupProperty new SetupProperty<>(that, setup)}. */
+	public static <GValue> Property2<GValue> setup(final Property<GValue> that, final Producer<? extends GValue> setup) throws NullPointerException {
+		return new SetupProperty<>(that, setup);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #translate(Property, Getter, Getter) Properties.translate(target, Getters.fromTarget(trans),
+	/** Diese Methode ist eine Abkürzung für {@link #translate(Property, Getter, Getter) Properties.translate(that, Getters.fromTarget(trans),
 	 * Getters.fromSource(trans))}.
 	 *
 	 * @see Getters#fromTarget(Translator)
 	 * @see Getters#fromSource(Translator) */
-	public static <GValue, GValue2> Property2<GValue> translate(final Property<GValue2> target, final Translator<GValue2, GValue> trans)
+	public static <GValue, GValue2> Property2<GValue> translate(final Property<GValue2> that, final Translator<GValue2, GValue> trans)
 		throws NullPointerException {
-		return Properties.translate(target, Getters.fromTarget(trans), Getters.fromSource(trans));
+		return Properties.translate(that, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.translate(target, transGet),
-	 * Consumers.translate(target, transSet))}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.translate(that, transGet), Consumers.translate(that,
+	 * transSet))}.
 	 *
 	 * @see Producers#translate(Producer, Getter)
 	 * @see Consumers#translate(Consumer, Getter) */
-	public static <GSource, GTarget> Property2<GTarget> translate(final Property<GSource> target, final Getter<? super GSource, ? extends GTarget> transGet,
+	public static <GSource, GTarget> Property2<GTarget> translate(final Property<GSource> that, final Getter<? super GSource, ? extends GTarget> transGet,
 		final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
-		return Properties.from(Producers.translate(target, transGet), Consumers.translate(target, transSet));
+		return Properties.from(Producers.translate(that, transGet), Consumers.translate(that, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ObservableProperty new ObservableProperty<>(property)}. */
-	public static <GValue> ObservableProperty<GValue> toObservable(final Property<GValue> property) throws NullPointerException {
+	public static <GValue> ObservableProperty<GValue> observe(final Property<GValue> property) throws NullPointerException {
 		return new ObservableProperty<>(property);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Property, Object) Properties.synchronize(target, target)}. */
-	public static <GValue> Property2<GValue> synchronize(final Property<GValue> target) throws NullPointerException {
-		return Properties.synchronize(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Property, Object) Properties.synchronize(that, that)}. */
+	public static <GValue> Property2<GValue> synchronize(final Property<GValue> that) throws NullPointerException {
+		return Properties.synchronize(that, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProperty new SynchronizedProperty<>(target, mutex)}. */
-	public static <GValue> Property2<GValue> synchronize(final Property<GValue> target, final Object mutex) throws NullPointerException {
-		return new SynchronizedProperty<>(target, mutex);
+	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProperty new SynchronizedProperty<>(that, mutex)}. */
+	public static <GValue> Property2<GValue> synchronize(final Property<GValue> that, final Object mutex) throws NullPointerException {
+		return new SynchronizedProperty<>(that, mutex);
 	}
 
 }

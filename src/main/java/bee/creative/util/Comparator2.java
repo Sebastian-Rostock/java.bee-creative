@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public interface Comparator2<GItem> extends Comparator<GItem> {
 
-	public Comparator2<GItem> toDefault();
+	public Comparator2<GItem> optionalize();
 
 	public Comparator2<Iterable<? extends GItem>> toIterable();
 

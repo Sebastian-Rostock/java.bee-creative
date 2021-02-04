@@ -20,57 +20,30 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} nur dann an einen gegebenen {@link Setter} delegiert,
-	 * wenn die Eingabe nicht {@code null} ist.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
-	public static class DefaultSetter<GItem, GValue> extends AbstractSetter<GItem, GValue> {
-
-		public final Setter<? super GItem, ? super GValue> target;
-
-		public DefaultSetter(final Setter<? super GItem, ? super GValue> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
-		}
-
-		@Override
-		public void set(final GItem item, final GValue value) {
-			if (item == null) return;
-			this.target.set(item, value);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target);
-		}
-
-	}
-
 	/** Diese Klasse implementiert einen {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} an eine gegebene {@link Method nativen Methode}
 	 * delegiert. Bei einer Klassenmethode erfolgt das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item} über
-	 * {@link Method#invoke(Object, Object...) method.invoke(null, item, value)}, bei einer Objektmethode hingegen über {@link Method#invoke(Object, Object...)
-	 * method.invoke(item, value)}.
+	 * {@link Method#invoke(Object, Object...) this.that.invoke(null, item, value)}, bei einer Objektmethode hingegen über {@link Method#invoke(Object, Object...)
+	 * this.that.invoke(item, value)}.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
 	@SuppressWarnings ("javadoc")
 	public static class MethodSetter<GItem, GValue> extends AbstractSetter<GItem, GValue> {
 
-		public final Method target;
+		public final Method that;
 
 		public MethodSetter(final Method method, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			if (method.getParameterTypes().length != (Modifier.isStatic(method.getModifiers()) ? 2 : 1)) throw new IllegalArgumentException();
-			this.target = forceAccessible ? Natives.forceAccessible(method) : Objects.notNull(method);
+			this.that = forceAccessible ? Natives.forceAccessible(method) : Objects.notNull(method);
 		}
 
 		@Override
 		public void set(final GItem item, final GValue value) {
 			try {
-				if (Modifier.isStatic(this.target.getModifiers())) {
-					this.target.invoke(null, item, value);
+				if (Modifier.isStatic(this.that.getModifiers())) {
+					this.that.invoke(null, item, value);
 				} else {
-					this.target.invoke(item, value);
+					this.that.invoke(item, value);
 				}
 			} catch (IllegalAccessException | InvocationTargetException cause) {
 				throw new IllegalArgumentException(cause);
@@ -79,14 +52,14 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.target.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
 		}
 
 	}
 
 	/** Diese Klasse implementiert einen übersetzten {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} mit dem über einen gegebenen
 	 * {@link Getter} übersetzten Datensatz an einen gegebenen {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes
-	 * {@code item} erfolgt über {@code this.target.set(this.trans.get(item), value)}.
+	 * {@code item} erfolgt über {@code this.that.set(this.trans.get(item), value)}.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GItem2> Typ des Datensatzes des gegebenen {@link Setter}.
@@ -94,31 +67,31 @@ public class Setters {
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedSetter1<GItem, GItem2, GValue> extends AbstractSetter<GItem, GValue> {
 
-		public final Setter<? super GItem2, ? super GValue> target;
+		public final Setter<? super GItem2, ? super GValue> that;
 
 		public final Getter<? super GItem, ? extends GItem2> trans;
 
-		public TranslatedSetter1(final Setter<? super GItem2, ? super GValue> target, final Getter<? super GItem, ? extends GItem2> trans)
+		public TranslatedSetter1(final Setter<? super GItem2, ? super GValue> that, final Getter<? super GItem, ? extends GItem2> trans)
 			throws NullPointerException {
-			this.target = Objects.notNull(target);
+			this.that = Objects.notNull(that);
 			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
 		public void set(final GItem item, final GValue value) {
-			this.target.set(this.trans.get(item), value);
+			this.that.set(this.trans.get(item), value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.trans);
+			return Objects.toInvokeString(this, this.that, this.trans);
 		}
 
 	}
 
 	/** Diese Klasse implementiert einen übersetzten {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} mit dem über einen gegebenen
 	 * {@link Getter} übersetzten Wert an einen gegebenen {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes
-	 * {@code item} erfolgt über {@code this.target.set(item, this.trans.get(value))}.
+	 * {@code item} erfolgt über {@code this.that.set(item, this.trans.get(value))}.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
@@ -126,23 +99,23 @@ public class Setters {
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedSetter2<GItem, GValue, GValue2> extends AbstractSetter<GItem, GValue> {
 
-		public final Setter<? super GItem, ? super GValue2> target;
+		public final Setter<? super GItem, ? super GValue2> that;
 
 		public final Getter<? super GValue, ? extends GValue2> trans;
 
-		public TranslatedSetter2(final Setter<? super GItem, ? super GValue2> target, final Getter<? super GValue, ? extends GValue2> trans) {
-			this.target = Objects.notNull(target);
+		public TranslatedSetter2(final Setter<? super GItem, ? super GValue2> that, final Getter<? super GValue, ? extends GValue2> trans) {
+			this.that = Objects.notNull(that);
 			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
 		public void set(final GItem item, final GValue value) {
-			this.target.set(item, this.trans.get(value));
+			this.that.set(item, this.trans.get(value));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.trans);
+			return Objects.toInvokeString(this, this.that, this.trans);
 		}
 
 	}
@@ -157,12 +130,12 @@ public class Setters {
 	@SuppressWarnings ("javadoc")
 	public static class AggregatedSetter<GItem, GValue, GValue2> extends AbstractSetter<Iterable<? extends GItem>, GValue> {
 
-		public final Setter<? super GItem, GValue2> target;
+		public final Setter<? super GItem, GValue2> that;
 
 		public final Getter<? super GValue, ? extends GValue2> trans;
 
-		public AggregatedSetter(final Setter<? super GItem, GValue2> target, final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public AggregatedSetter(final Setter<? super GItem, GValue2> that, final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.trans = Objects.notNull(trans);
 		}
 
@@ -173,13 +146,40 @@ public class Setters {
 			if (!iterator.hasNext()) return;
 			final GValue2 value2 = this.trans.get(value);
 			do {
-				this.target.set(iterator.next(), value2);
+				this.that.set(iterator.next(), value2);
 			} while (iterator.hasNext());
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.trans);
+			return Objects.toInvokeString(this, this.that, this.trans);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} nur dann an einen gegebenen {@link Setter} delegiert,
+	 * wenn die Eingabe nicht {@code null} ist.
+	 *
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Werts der Eigenschaft. */
+	@SuppressWarnings ("javadoc")
+	public static class OptionalizedSetter<GItem, GValue> extends AbstractSetter<GItem, GValue> {
+
+		public final Setter<? super GItem, ? super GValue> that;
+
+		public OptionalizedSetter(final Setter<? super GItem, ? super GValue> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public void set(final GItem item, final GValue value) {
+			if (item == null) return;
+			this.that.set(item, value);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
@@ -192,45 +192,45 @@ public class Setters {
 	@SuppressWarnings ("javadoc")
 	public static class SynchronizedSetter<GItem, GValue> extends AbstractSetter<GItem, GValue> {
 
-		public final Setter<? super GItem, ? super GValue> target;
+		public final Setter<? super GItem, ? super GValue> that;
 
 		public final Object mutex;
 
-		public SynchronizedSetter(final Setter<? super GItem, ? super GValue> target, final Object mutex) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public SynchronizedSetter(final Setter<? super GItem, ? super GValue> that, final Object mutex) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.mutex = Objects.notNull(mutex, this);
 		}
 
 		@Override
 		public void set(final GItem item, final GValue value) {
 			synchronized (this.mutex) {
-				this.target.set(item, value);
+				this.that.set(item, value);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.mutex == this ? null : this.mutex);
+			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
 		}
 
 	}
 
 	static class ConsumerSetter<GItem, GValue> extends AbstractSetter<GItem, GValue> {
 
-		public final Consumer<? super GValue> target;
+		public final Consumer<? super GValue> that;
 
-		public ConsumerSetter(final Consumer<? super GValue> target) {
-			this.target = Objects.notNull(target);
+		public ConsumerSetter(final Consumer<? super GValue> that) {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public void set(final GItem input, final GValue value) {
-			this.target.set(value);
+			this.that.set(value);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
@@ -243,16 +243,16 @@ public class Setters {
 
 	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird der {@link EmptySetter} geliefert. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem, GValue> Setter3<GItem, GValue> from(final Setter<? super GItem, ? super GValue> target) {
-		if (target == null) return Setters.empty();
-		if (target instanceof Setter3) return (Setter3<GItem, GValue>)target;
-		return Setters.translate(Getters.<GItem>neutral(), target);
+	public static <GItem, GValue> Setter3<GItem, GValue> from(final Setter<? super GItem, ? super GValue> that) {
+		if (that == null) return Setters.empty();
+		if (that instanceof Setter3) return (Setter3<GItem, GValue>)that;
+		return Setters.translate(Getters.<GItem>neutral(), that);
 	}
 
 	/** Diese Methode liefert einen {@link Setter3}, welcher beim {@link Setter#set(Object, Object)} den Datensatz ignoriert und den Wert an den gegebenen
 	 * {@link Consumer} delegiert. */
-	public static <GItem, GValue> Setter3<GItem, GValue> from(final Consumer<? super GValue> target) throws NullPointerException {
-		return new ConsumerSetter<>(target);
+	public static <GItem, GValue> Setter3<GItem, GValue> from(final Consumer<? super GValue> that) throws NullPointerException {
+		return new ConsumerSetter<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Setters.fromNative(memberPath, true)}. */
@@ -273,28 +273,28 @@ public class Setters {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field) fromNative.nativeField(target, true)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field target) throws NullPointerException, IllegalArgumentException {
-		return Setters.fromNative(target, true);
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field) fromNative.nativeField(field, true)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+		return Setters.fromNative(field, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Setter) Setters.from(Fields.fromNative(target, forceAccessible))}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Setter) Setters.from(Fields.fromNative(field, forceAccessible))}.
 	 *
 	 * @see Fields#fromNative(java.lang.reflect.Field, boolean) */
-	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field target, final boolean forceAccessible)
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Setters.from(Fields.fromNative(target, forceAccessible));
+		return Setters.from(Fields.fromNative(field, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Setters.fromNative(target, true)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method target) throws NullPointerException, IllegalArgumentException {
-		return Setters.fromNative(target, true);
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Setters.fromNative(method, true)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method method) throws NullPointerException, IllegalArgumentException {
+		return Setters.fromNative(method, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link MethodSetter new MethodSetter<>(target, forceAccessible)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method target, final boolean forceAccessible)
+	/** Diese Methode ist eine Abkürzung für {@link MethodSetter new MethodSetter<>(method, forceAccessible)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method method, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return new MethodSetter<>(target, forceAccessible);
+		return new MethodSetter<>(method, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Setters.fromNative(fieldOwner, fieldName, true)}. */
@@ -311,44 +311,44 @@ public class Setters {
 		return Setters.from(Fields.fromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link DefaultSetter new DefaultSetter<>(target)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> toDefault(final Setter<? super GItem, GValue> target) throws NullPointerException {
-		return new DefaultSetter<>(target);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link TranslatedSetter1 new TranslatedSetter1<>(target, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link TranslatedSetter1 new TranslatedSetter1<>(that, trans)}. */
 	public static <GTarget, GSource, GValue> Setter3<GTarget, GValue> translate(final Getter<? super GTarget, ? extends GSource> trans,
-		final Setter<? super GSource, ? super GValue> target) throws NullPointerException {
-		return new TranslatedSetter1<>(target, trans);
+		final Setter<? super GSource, ? super GValue> that) throws NullPointerException {
+		return new TranslatedSetter1<>(that, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link TranslatedSetter2 new TranslatedSetter2<>(target, trans)}. */
-	public static <GItem, GValue, GValue2> Setter3<GItem, GValue> translate(final Setter<? super GItem, ? super GValue2> target,
+	/** Diese Methode ist eine Abkürzung für {@link TranslatedSetter2 new TranslatedSetter2<>(that, trans)}. */
+	public static <GItem, GValue, GValue2> Setter3<GItem, GValue> translate(final Setter<? super GItem, ? super GValue2> that,
 		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
-		return new TranslatedSetter2<>(target, trans);
+		return new TranslatedSetter2<>(that, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toAggregated(Setter, Getter) Setters.toAggregated(target, Getters.neutral())}. */
-	public static <GItem, GValue> Setter3<Iterable<? extends GItem>, GValue> toAggregated(final Setter<? super GItem, ? super GValue> target)
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Setter, Getter) Setters.aggregate(that, Getters.neutral())}. */
+	public static <GItem, GValue> Setter3<Iterable<? extends GItem>, GValue> aggregate(final Setter<? super GItem, ? super GValue> that)
 		throws NullPointerException {
-		return Setters.toAggregated(target, Getters.<GValue>neutral());
+		return Setters.aggregate(that, Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link AggregatedSetter new AggregatedSetter<>(target, trans)}. */
-	public static <GItem, GValue, GValue2> Setter3<Iterable<? extends GItem>, GValue> toAggregated(final Setter<? super GItem, ? super GValue2> target,
+	/** Diese Methode ist eine Abkürzung für {@link AggregatedSetter new AggregatedSetter<>(that, trans)}. */
+	public static <GItem, GValue, GValue2> Setter3<Iterable<? extends GItem>, GValue> aggregate(final Setter<? super GItem, ? super GValue2> that,
 		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
-		return new AggregatedSetter<>(target, trans);
+		return new AggregatedSetter<>(that, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Setter, Object) Setters.synchronize(target, target)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> synchronize(final Setter<? super GItem, ? super GValue> target) throws NullPointerException {
-		return Setters.synchronize(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link OptionalizedSetter new OptionalizedSetter<>(that)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> optionalize(final Setter<? super GItem, GValue> that) throws NullPointerException {
+		return new OptionalizedSetter<>(that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link SynchronizedSetter new SynchronizedSetter<>(target, mutex)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> synchronize(final Setter<? super GItem, ? super GValue> target, final Object mutex)
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Setter, Object) Setters.synchronize(that, that)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> synchronize(final Setter<? super GItem, ? super GValue> that) throws NullPointerException {
+		return Setters.synchronize(that, that);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link SynchronizedSetter new SynchronizedSetter<>(that, mutex)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> synchronize(final Setter<? super GItem, ? super GValue> that, final Object mutex)
 		throws NullPointerException {
-		return new SynchronizedSetter<>(target, mutex);
+		return new SynchronizedSetter<>(that, mutex);
 	}
 
 }

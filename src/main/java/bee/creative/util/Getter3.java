@@ -8,20 +8,20 @@ package bee.creative.util;
 public interface Getter3<GItem, GValue> extends Getter2<GItem, GValue> {
 
 	@Override
-	public Getter3<Iterable<? extends GItem>, GValue> toAggregated();
+	public Getter3<Iterable<? extends GItem>, GValue> aggregate();
 
-	/** Diese Methode ist eine Abkürtung für {@link Getters#toAggregated(Getter, Getter) Getters.toAggregated(this, trans)}. */
-	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> trans);
+	/** Diese Methode ist eine Abkürtung für {@link Getters#aggregate(Getter, Getter) Getters.aggregate(this, trans)}. */
+	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> trans);
 
-	/** Diese Methode ist eine Abkürtung für {@link Getters#toAggregated(Getter, Getter, Getter, Getter) Getters.toAggregated(this, trans, empty, mixed)}. */
-	public <GItem2 extends Iterable<? extends GItem>, GValue2> Getter3<GItem2, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> trans,
+	/** Diese Methode ist eine Abkürtung für {@link Getters#aggregate(Getter, Getter, Getter, Getter) Getters.aggregate(this, trans, empty, mixed)}. */
+	public <GItem2 extends Iterable<? extends GItem>, GValue2> Getter3<GItem2, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> trans,
 		Getter<? super GItem2, ? extends GValue2> empty, Getter<? super GItem2, ? extends GValue2> mixed);
 
 	@Override
-	public Getter3<GItem, GValue> toDefault();
+	public Getter3<GItem, GValue> optionalize();
 
 	@Override
-	public Getter3<GItem, GValue> toDefault(GValue value);
+	public Getter3<GItem, GValue> optionalize(GValue value);
 
 	/** Diese Methode ist eine Abkürtung für {@link Fields#from(Getter) Fields.from(this)}. */
 	public Field2<GItem, GValue> toField();

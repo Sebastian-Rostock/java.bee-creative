@@ -8,13 +8,13 @@ package bee.creative.util;
 public interface Setter3<GItem, GValue> extends Setter2<GItem, GValue> {
 
 	@Override
-	public Setter3<Iterable<? extends GItem>, GValue> toAggregated();
+	public Setter3<Iterable<? extends GItem>, GValue> aggregate();
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#toAggregated(Setter, Getter) Setters.toAggregated(this, trans)}. */
-	public <GValue2> Setter3<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue2, ? extends GValue> trans);
+	/** Diese Methode ist eine Abkürtung für {@link Setters#aggregate(Setter, Getter) Setters.aggregate(this, trans)}. */
+	public <GValue2> Setter3<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue2, ? extends GValue> trans);
 
 	@Override
-	public Setter3<GItem, GValue> toDefault();
+	public Setter3<GItem, GValue> optionalize();
 
 	/** Diese Methode ist eine Abkürtung für {@link Fields#from(Setter) Fields.from(this)}. */
 	public Field2<GItem, GValue> toField();

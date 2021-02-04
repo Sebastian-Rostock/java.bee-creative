@@ -14,8 +14,8 @@ public abstract class AbstractComparator<GItem> extends BaseObject implements Co
 	}
 
 	@Override
-	public Comparator2<GItem> toDefault() {
-		return Comparators.toDefault(this);
+	public Comparator2<GItem> optionalize() {
+		return Comparators.optionalize(this);
 	}
 
 	@Override

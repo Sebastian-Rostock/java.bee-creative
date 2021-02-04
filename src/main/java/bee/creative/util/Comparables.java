@@ -107,7 +107,7 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#toDefault(Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#optionalize(Comparable)} */
 	@SuppressWarnings ("javadoc")
 	public static class DefaultComparable<GItem> extends AbstractComparable<GItem> {
 
@@ -715,7 +715,7 @@ public class Comparables {
 	 * @param comparable {@link Comparable}.
 	 * @return {@code default}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<GItem> toDefault(final Comparable<? super GItem> comparable) throws NullPointerException {
+	public static <GItem> Comparable<GItem> optionalize(final Comparable<? super GItem> comparable) throws NullPointerException {
 		return new DefaultComparable<>(comparable);
 	}
 

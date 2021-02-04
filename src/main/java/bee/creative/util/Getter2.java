@@ -27,14 +27,14 @@ public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 	/** Diese Methode ist eine Abkürtung für {@link Setters#translate(Getter, Setter) Setters.translate(this, target)}. */
 	public <GValue2> Setter3<GItem, GValue2> concat(final Setter<? super GValue, ? super GValue2> target);
 
-	/** Diese Methode ist eine Abkürtung für {@link Getters#toAggregated(Getter) Getters.toAggregated(this)}. */
-	public Getter2<Iterable<? extends GItem>, GValue> toAggregated();
+	/** Diese Methode ist eine Abkürtung für {@link Getters#aggregate(Getter) Getters.aggregate(this)}. */
+	public Getter2<Iterable<? extends GItem>, GValue> aggregate();
 
-	/** Diese Methode ist eine Abkürtung für {@link Getters#toDefault(Getter) Getters.toDefault(this)}. */
-	public Getter2<GItem, GValue> toDefault();
+	/** Diese Methode ist eine Abkürtung für {@link Getters#optionalize(Getter) Getters.optionalize(this)}. */
+	public Getter2<GItem, GValue> optionalize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Getters#toDefault(Getter, Object) Getters.toDefault(this, value)}. */
-	public Getter2<GItem, GValue> toDefault(final GValue value);
+	/** Diese Methode ist eine Abkürtung für {@link Getters#optionalize(Getter, Object) Getters.optionalize(this, value)}. */
+	public Getter2<GItem, GValue> optionalize(final GValue value);
 
 	/** Diese Methode ist eine Abkürtung für {@link Fields#from(Getter, Setter) Fields.from(this, target)}. */
 	public Field2<GItem, GValue> toField(Setter<? super GItem, ? super GValue> target);

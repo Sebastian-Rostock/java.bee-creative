@@ -7,26 +7,26 @@ package bee.creative.util;
  * @param <GValue> Typ des Werts der Eigenschaft. */
 public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GItem, GValue>, Setter2<GItem, GValue> {
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toAggregated(Field) Fields.toAggregated(this)}. */
+	/** Diese Methode ist eine Abkürtung für {@link Fields#aggregate(Field) Fields.aggregate(this)}. */
 	@Override
-	public Field2<Iterable<? extends GItem>, GValue> toAggregated();
+	public Field2<Iterable<? extends GItem>, GValue> aggregate();
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toAggregated(Field, Getter, Getter) Fields.toAggregated(this, transGet, transSet)}. */
-	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> transGet,
+	/** Diese Methode ist eine Abkürtung für {@link Fields#aggregate(Field, Getter, Getter) Fields.aggregate(this, transGet, transSet)}. */
+	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> transGet,
 		Getter<? super GValue2, ? extends GValue> transSet);
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toAggregated(Field, Getter, Getter, Getter, Getter) Fields.toAggregated(this, transGet, transSet,
+	/** Diese Methode ist eine Abkürtung für {@link Fields#aggregate(Field, Getter, Getter, Getter, Getter) Fields.aggregate(this, transGet, transSet,
 	 * empty, mixed)}. */
-	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> toAggregated(Getter<? super GValue, ? extends GValue2> transGet,
+	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> transGet,
 		Getter<? super GValue2, ? extends GValue> transSet, Getter<? super GItem2, ? extends GValue2> empty, Getter<? super GItem2, ? extends GValue2> mixed);
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toDefault(Field) Fields.toDefault(this)}. */
+	/** Diese Methode ist eine Abkürtung für {@link Fields#optionalize(Field) Fields.optionalize(this)}. */
 	@Override
-	public Field2<GItem, GValue> toDefault();
+	public Field2<GItem, GValue> optionalize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toDefault(Field, Object) Fields.toDefault(this, value)}. */
+	/** Diese Methode ist eine Abkürtung für {@link Fields#optionalize(Field, Object) Fields.optionalize(this, value)}. */
 	@Override
-	public Field2<GItem, GValue> toDefault(GValue value);
+	public Field2<GItem, GValue> optionalize(GValue value);
 
 	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Field) Properties.from(this)}. */
 	public Property2<GValue> toProperty();
@@ -34,8 +34,8 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Field, Object) Properties.from(this, this)}. */
 	public Property2<GValue> toProperty(final GItem item);
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toSetup(Field, Getter) Fields.toSetup(this, setup)}. */
-	public Field2<GItem, GValue> toSetup(final Getter<? super GItem, ? extends GValue> setup);
+	/** Diese Methode ist eine Abkürtung für {@link Fields#setup(Field, Getter) Fields.setup(this, setup)}. */
+	public Field2<GItem, GValue> setup(final Getter<? super GItem, ? extends GValue> setup);
 
 	/** Diese Methode ist eine Abkürtung für {@link Fields#synchronize(Field) Fields.synchronize(this)}. */
 	@Override

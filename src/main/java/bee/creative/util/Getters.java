@@ -539,9 +539,9 @@ public class Getters {
 		return new TargetGetter<>(translator);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#toDefault(Getter, Object) Getters.toDefault(target, null)}. **/
-	public static <GItem, GValue> Getter3<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target) throws NullPointerException {
-		return Getters.toDefault(target, null);
+	/** Diese Methode ist eine Abkürzung für {@link Getters#optionalize(Getter, Object) Getters.optionalize(target, null)}. **/
+	public static <GItem, GValue> Getter3<GItem, GValue> optionalize(final Getter<? super GItem, GValue> target) throws NullPointerException {
+		return Getters.optionalize(target, null);
 	}
 
 	/** Diese Methode einen {@link Getter} zurück, der einen Datensatz zum Lesen des Werts ihrer Eigenschaft nur dann dann an den gegebenen {@link Getter}
@@ -553,7 +553,7 @@ public class Getters {
 	 * @see Filters#empty()
 	 * @return {@code default}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GItem, GValue> Getter3<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target, final GValue value) throws NullPointerException {
+	public static <GItem, GValue> Getter3<GItem, GValue> optionalize(final Getter<? super GItem, GValue> target, final GValue value) throws NullPointerException {
 		return new DefaultGetter<>(target, value);
 	}
 
@@ -583,20 +583,20 @@ public class Getters {
 		return new BufferedGetter<>(limit, inputMode, outputMode, getter);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#toAggregated(Getter, Getter) Getters.toAggregated(target, Getters.neutral())}. */
-	public static <GItem, GValue> Getter3<Iterable<? extends GItem>, GValue> toAggregated(final Getter<? super GItem, ? extends GValue> target)
+	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregate(Getter, Getter) Getters.aggregate(target, Getters.neutral())}. */
+	public static <GItem, GValue> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue> target)
 		throws NullPointerException {
-		return Getters.toAggregated(target, Getters.<GValue>neutral());
+		return Getters.aggregate(target, Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#toAggregated(Getter, Getter, Getter, Getter) Getters.toAggregated(target, trans, Getters.empty(),
+	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregate(Getter, Getter, Getter, Getter) Getters.aggregate(target, trans, Getters.empty(),
 	 * Getters.empty())}. */
-	public static <GItem, GValue, GValue2> Getter3<Iterable<? extends GItem>, GValue> toAggregated(final Getter<? super GItem, ? extends GValue2> target,
+	public static <GItem, GValue, GValue2> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue2> target,
 		final Getter<? super GValue2, ? extends GValue> trans) throws NullPointerException {
-		return Getters.toAggregated(target, trans, Getters.<Object, GValue>empty(), Getters.<Object, GValue>empty());
+		return Getters.aggregate(target, trans, Getters.<Object, GValue>empty(), Getters.<Object, GValue>empty());
 	}
 
-	public static <GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> Getter3<GItem, GValue> toAggregated(
+	public static <GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> Getter3<GItem, GValue> aggregate(
 		final Getter<? super GItem2, ? extends GValue2> target, final Getter<? super GValue2, ? extends GValue> trans,
 		final Getter<? super GItem, ? extends GValue> empty, final Getter<? super GItem, ? extends GValue> mixed) throws NullPointerException {
 		return new AggregatedGetter<>(target, trans, empty, mixed);

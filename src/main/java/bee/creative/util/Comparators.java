@@ -621,7 +621,7 @@ public class Comparators {
 	 * @param comparator {@link Comparator}.
 	 * @return {@code default}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparator2<GItem> toDefault(final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static <GItem> Comparator2<GItem> optionalize(final Comparator<? super GItem> comparator) throws NullPointerException {
 		return new DefaultComparator<>(comparator);
 	}
 

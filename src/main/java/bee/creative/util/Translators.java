@@ -68,35 +68,35 @@ public class Translators {
 	@SuppressWarnings ("javadoc")
 	public static class ReverseTranslator<GSource, GTarget> extends AbstractTranslator<GSource, GTarget> {
 
-		public final Translator<GTarget, GSource> target;
+		public final Translator<GTarget, GSource> that;
 
-		public ReverseTranslator(final Translator<GTarget, GSource> translator) throws NullPointerException {
-			this.target = Objects.notNull(translator);
+		public ReverseTranslator(final Translator<GTarget, GSource> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public boolean isTarget(final Object object) {
-			return this.target.isSource(object);
+			return this.that.isSource(object);
 		}
 
 		@Override
 		public boolean isSource(final Object object) {
-			return this.target.isTarget(object);
+			return this.that.isTarget(object);
 		}
 
 		@Override
 		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.target.toSource(object);
+			return this.that.toSource(object);
 		}
 
 		@Override
 		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.target.toTarget(object);
+			return this.that.toTarget(object);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
@@ -160,46 +160,46 @@ public class Translators {
 	@SuppressWarnings ("javadoc")
 	public static class SynchronizedTranslator<GSource, GTarget> extends AbstractTranslator<GSource, GTarget> {
 
-		public final Translator<GSource, GTarget> target;
+		public final Translator<GSource, GTarget> that;
 
 		public final Object mutex;
 
-		public SynchronizedTranslator(final Translator<GSource, GTarget> target, final Object mutex) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public SynchronizedTranslator(final Translator<GSource, GTarget> that, final Object mutex) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.mutex = Objects.notNull(mutex, this);
 		}
 
 		@Override
 		public boolean isTarget(final Object object) {
 			synchronized (this.mutex) {
-				return this.target.isSource(object);
+				return this.that.isSource(object);
 			}
 		}
 
 		@Override
 		public boolean isSource(final Object object) {
 			synchronized (this.mutex) {
-				return this.target.isTarget(object);
+				return this.that.isTarget(object);
 			}
 		}
 
 		@Override
 		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
 			synchronized (this.mutex) {
-				return this.target.toTarget(object);
+				return this.that.toTarget(object);
 			}
 		}
 
 		@Override
 		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
 			synchronized (this.mutex) {
-				return this.target.toSource(object);
+				return this.that.toSource(object);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.mutex == this ? null : this.mutex);
+			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
 		}
 
 	}
@@ -225,10 +225,10 @@ public class Translators {
 
 	/** Diese Methode gibt den gegebenen {@link Translator} als {@link Translator2} zurück. Wenn er {@code null} ist, wird {@link Translators#empty()
 	 * Translators.empty()} geliefert. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> from(final Translator<GSource, GTarget> target) {
-		if (target == null) return Translators.empty();
-		if (target instanceof Translator2) return (Translator2<GSource, GTarget>)target;
-		return Translators.reverse(Translators.reverse(target));
+	public static <GSource, GTarget> Translator2<GSource, GTarget> from(final Translator<GSource, GTarget> that) {
+		if (that == null) return Translators.empty();
+		if (that instanceof Translator2) return (Translator2<GSource, GTarget>)that;
+		return Translators.reverse(Translators.reverse(that));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeTranslator new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans)}. */
@@ -237,26 +237,26 @@ public class Translators {
 		return new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(target, trans)}. */
-	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> concat(final Translator<GSource, GCenter> target,
+	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(that, trans)}. */
+	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> concat(final Translator<GSource, GCenter> that,
 		final Translator<GCenter, GTarget> trans) throws NullPointerException {
-		return new ConcatTranslator<>(target, trans);
+		return new ConcatTranslator<>(that, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ReverseTranslator new ReverseTranslator<>(target)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> reverse(final Translator<GTarget, GSource> target) throws NullPointerException {
-		return new ReverseTranslator<>(target);
+	/** Diese Methode ist eine Abkürzung für {@link ReverseTranslator new ReverseTranslator<>(that)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> reverse(final Translator<GTarget, GSource> that) throws NullPointerException {
+		return new ReverseTranslator<>(that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Translator, Object) Translators.synchronize(target, target)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(final Translator<GSource, GTarget> target) throws NullPointerException {
-		return Translators.synchronize(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Translator, Object) Translators.synchronize(that, that)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(final Translator<GSource, GTarget> that) throws NullPointerException {
+		return Translators.synchronize(that, that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(target, mutex)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(final Translator<GSource, GTarget> target, final Object mutex)
+	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(that, mutex)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(final Translator<GSource, GTarget> that, final Object mutex)
 		throws NullPointerException {
-		return new SynchronizedTranslator<>(target, mutex);
+		return new SynchronizedTranslator<>(that, mutex);
 	}
 
 }

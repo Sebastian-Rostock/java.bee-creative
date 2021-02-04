@@ -30,7 +30,7 @@ import bee.creative.ref.PointerQueue;
  * static final Observables<MyEvent, MyListener> onMyEventListeners = Observables.from(MyListener::onMyEvent);
  *
  * public Observable<MyEvent, MyListener> onMyEvent() {
- * 	return onMyEventListeners.toObservable(this);
+ * 	return onMyEventListeners.observe(this);
  * }
  *
  * }
@@ -409,7 +409,7 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	 *
 	 * @param sender Ereignissender.
 	 * @return Ereignisquelle. */
-	public Observable<GMessage, GObserver> toObservable(final Object sender) {
+	public Observable<GMessage, GObserver> observe(final Object sender) {
 		return new SenderObservable(sender);
 	}
 

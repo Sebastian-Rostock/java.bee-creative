@@ -50,21 +50,21 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public Field2<Iterable<? extends GItem>, GValue> toAggregated() {
-		return Fields.toAggregated(this);
+	public Field2<Iterable<? extends GItem>, GValue> aggregate() {
+		return Fields.aggregate(this);
 	}
 
 	@Override
-	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> transGet,
+	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> aggregate(final Getter<? super GValue, ? extends GValue2> transGet,
 		final Getter<? super GValue2, ? extends GValue> transSet) {
-		return Fields.toAggregated(this, transGet, transSet);
+		return Fields.aggregate(this, transGet, transSet);
 	}
 
 	@Override
-	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> toAggregated(final Getter<? super GValue, ? extends GValue2> transGet,
+	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> aggregate(final Getter<? super GValue, ? extends GValue2> transGet,
 		final Getter<? super GValue2, ? extends GValue> transSet, final Getter<? super GItem2, ? extends GValue2> empty,
 		final Getter<? super GItem2, ? extends GValue2> mixed) {
-		return Fields.toAggregated(this, transGet, transSet, empty, mixed);
+		return Fields.aggregate(this, transGet, transSet, empty, mixed);
 	}
 
 	@Override
@@ -78,18 +78,18 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public Field2<GItem, GValue> toSetup(final Getter<? super GItem, ? extends GValue> setup) {
-		return Fields.toSetup(this, setup);
+	public Field2<GItem, GValue> setup(final Getter<? super GItem, ? extends GValue> setup) {
+		return Fields.setup(this, setup);
 	}
 
 	@Override
-	public Field2<GItem, GValue> toDefault() {
-		return Fields.toDefault(this);
+	public Field2<GItem, GValue> optionalize() {
+		return Fields.optionalize(this);
 	}
 
 	@Override
-	public Field2<GItem, GValue> toDefault(final GValue value) {
-		return Fields.toDefault(this, value);
+	public Field2<GItem, GValue> optionalize(final GValue value) {
+		return Fields.optionalize(this, value);
 	}
 
 	@Override

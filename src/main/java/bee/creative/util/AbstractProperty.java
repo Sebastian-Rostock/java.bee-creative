@@ -56,8 +56,8 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public ObservableProperty<GValue> toObservable() {
-		return Properties.toObservable(this);
+	public ObservableProperty<GValue> observe() {
+		return Properties.observe(this);
 	}
 
 	@Override
@@ -81,8 +81,8 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public Property2<GValue> toSetup(final Producer<? extends GValue> setup) {
-		return Properties.toSetup(this, setup);
+	public Property2<GValue> setup(final Producer<? extends GValue> setup) {
+		return Properties.setup(this, setup);
 	}
 
 	@Override

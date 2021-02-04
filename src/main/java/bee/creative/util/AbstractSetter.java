@@ -14,13 +14,13 @@ public abstract class AbstractSetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public Setter3<Iterable<? extends GItem>, GValue> toAggregated() {
-		return Setters.toAggregated(this);
+	public Setter3<Iterable<? extends GItem>, GValue> aggregate() {
+		return Setters.aggregate(this);
 	}
 
 	@Override
-	public <GValue2> Setter3<Iterable<? extends GItem>, GValue2> toAggregated(final Getter<? super GValue2, ? extends GValue> trans) {
-		return Setters.toAggregated(this, trans);
+	public <GValue2> Setter3<Iterable<? extends GItem>, GValue2> aggregate(final Getter<? super GValue2, ? extends GValue> trans) {
+		return Setters.aggregate(this, trans);
 	}
 
 	@Override
@@ -34,8 +34,8 @@ public abstract class AbstractSetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public Setter3<GItem, GValue> toDefault() {
-		return Setters.toDefault(this);
+	public Setter3<GItem, GValue> optionalize() {
+		return Setters.optionalize(this);
 	}
 
 	@Override
