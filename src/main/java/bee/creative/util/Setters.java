@@ -246,7 +246,7 @@ public class Setters {
 	public static <GItem, GValue> Setter3<GItem, GValue> from(final Setter<? super GItem, ? super GValue> target) {
 		if (target == null) return Setters.empty();
 		if (target instanceof Setter3) return (Setter3<GItem, GValue>)target;
-		return Setters.toTranslated(Getters.<GItem>neutral(), target);
+		return Setters.translate(Getters.<GItem>neutral(), target);
 	}
 
 	/** Diese Methode liefert einen {@link Setter3}, welcher beim {@link Setter#set(Object, Object)} den Datensatz ignoriert und den Wert an den gegebenen
@@ -317,13 +317,13 @@ public class Setters {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedSetter1 new TranslatedSetter1<>(target, trans)}. */
-	public static <GTarget, GSource, GValue> Setter3<GTarget, GValue> toTranslated(final Getter<? super GTarget, ? extends GSource> trans,
+	public static <GTarget, GSource, GValue> Setter3<GTarget, GValue> translate(final Getter<? super GTarget, ? extends GSource> trans,
 		final Setter<? super GSource, ? super GValue> target) throws NullPointerException {
 		return new TranslatedSetter1<>(target, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedSetter2 new TranslatedSetter2<>(target, trans)}. */
-	public static <GItem, GValue, GValue2> Setter3<GItem, GValue> toTranslated(final Setter<? super GItem, ? super GValue2> target,
+	public static <GItem, GValue, GValue2> Setter3<GItem, GValue> translate(final Setter<? super GItem, ? super GValue2> target,
 		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
 		return new TranslatedSetter2<>(target, trans);
 	}
@@ -340,13 +340,13 @@ public class Setters {
 		return new AggregatedSetter<>(target, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Setter, Object) Setters.toSynchronized(target, target)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> toSynchronized(final Setter<? super GItem, ? super GValue> target) throws NullPointerException {
-		return Setters.toSynchronized(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Setter, Object) Setters.synchronize(target, target)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> synchronize(final Setter<? super GItem, ? super GValue> target) throws NullPointerException {
+		return Setters.synchronize(target, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedSetter new SynchronizedSetter<>(target, mutex)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> toSynchronized(final Setter<? super GItem, ? super GValue> target, final Object mutex)
+	public static <GItem, GValue> Setter3<GItem, GValue> synchronize(final Setter<? super GItem, ? super GValue> target, final Object mutex)
 		throws NullPointerException {
 		return new SynchronizedSetter<>(target, mutex);
 	}

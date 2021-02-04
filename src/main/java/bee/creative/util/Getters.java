@@ -550,7 +550,7 @@ public class Getters {
 	 *
 	 * @param target {@link Getter} zum Lesen des Werts der Eigenschaft.
 	 * @param value Rückfallwert, wenn das Datensatz {@code null} ist.
-	 * @see Filters#nullFilter()
+	 * @see Filters#empty()
 	 * @return {@code default}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GItem, GValue> Getter3<GItem, GValue> toDefault(final Getter<? super GItem, GValue> target, final GValue value) throws NullPointerException {
@@ -602,12 +602,12 @@ public class Getters {
 		return new AggregatedGetter<>(target, trans, empty, mixed);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Getter, Object) Getters.toSynchronized(target, target)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> toSynchronized(final Getter<? super GItem, ? extends GValue> target) throws NullPointerException {
-		return Getters.toSynchronized(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Getter, Object) Getters.synchronize(target, target)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> synchronize(final Getter<? super GItem, ? extends GValue> target) throws NullPointerException {
+		return Getters.synchronize(target, target);
 	}
 
-	public static <GItem, GValue> Getter3<GItem, GValue> toSynchronized(final Getter<? super GItem, ? extends GValue> target, final Object mutex)
+	public static <GItem, GValue> Getter3<GItem, GValue> synchronize(final Getter<? super GItem, ? extends GValue> target, final Object mutex)
 		throws NullPointerException {
 		return new SynchronizedGetter<>(target, mutex);
 	}

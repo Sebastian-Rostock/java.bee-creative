@@ -12,10 +12,10 @@ public interface Consumer2<GValue> extends Consumer<GValue> {
 	/** Diese Methode ist eine Abkürtung für {@link Setters#from(Consumer) Setter.from(this)}. */
 	public Setter3<Object, GValue> toSetter();
 
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#toSynchronized(Consumer) Consumers.toSynchronized(this)}. */
-	public Consumer2<GValue> toSynchronized();
+	/** Diese Methode ist eine Abkürtung für {@link Consumers#synchronize(Consumer) Consumers.synchronize(this)}. */
+	public Consumer2<GValue> synchronize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#toSynchronized(Consumer, Object) Consumers.toSynchronized(this, mutex)}. */
-	public Consumer2<GValue> toSynchronized(final Object mutex);
+	/** Diese Methode ist eine Abkürtung für {@link Consumers#synchronize(Consumer, Object) Consumers.synchronize(this, mutex)}. */
+	public Consumer2<GValue> synchronize(final Object mutex);
 
 }

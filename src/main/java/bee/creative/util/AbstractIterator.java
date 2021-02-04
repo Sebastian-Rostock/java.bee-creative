@@ -28,6 +28,16 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
+	public boolean retainAll(Collection<?> filter) throws NullPointerException {
+		return false;
+	}
+
+	@Override
+	public boolean removeAll() {
+		return false;
+	}
+
+	@Override
 	public Iterator2<GItem> concat(final Iterator<? extends GItem> second) throws NullPointerException {
 		return Iterators.concat(this, second);
 	}
@@ -48,8 +58,8 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
-	public <GTarget> Iterator2<GTarget> toTranslated(final Getter<? super GItem, ? extends GTarget> trans) throws NullPointerException {
-		return Iterators.toTranslated(this, trans);
+	public <GTarget> Iterator2<GTarget> translate(final Getter<? super GItem, ? extends GTarget> trans) throws NullPointerException {
+		return Iterators.translate(this, trans);
 	}
 
 	@Override

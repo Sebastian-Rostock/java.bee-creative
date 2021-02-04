@@ -17,7 +17,7 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 
 	@Override
 	public Filter2<GItem> concat(final Filter<? super GValue> target) {
-		return Filters.concat(this, target);
+		return Filters.translate(this, target);
 	}
 
 	@Override
@@ -32,17 +32,17 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 
 	@Override
 	public <GValue2> Setter3<GItem, GValue2> concat(final Setter<? super GValue, ? super GValue2> target) {
-		return Setters.toTranslated(this, target);
+		return Setters.translate(this, target);
 	}
 
 	@Override
 	public Comparable2<GItem> concat(final Comparable<? super GValue> target) {
-		return Comparables.toTranslated(target, this);
+		return Comparables.translate(target, this);
 	}
 
 	@Override
 	public Comparator2<GItem> concat(final Comparator<? super GValue> target) {
-		return Comparators.toTranslated(target, this);
+		return Comparators.translate(target, this);
 	}
 
 	@Override
@@ -92,13 +92,13 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public Getter3<GItem, GValue> toSynchronized() {
-		return Getters.toSynchronized(this);
+	public Getter3<GItem, GValue> synchronize() {
+		return Getters.synchronize(this);
 	}
 
 	@Override
-	public Getter3<GItem, GValue> toSynchronized(final Object mutex) {
-		return Getters.toSynchronized(this, mutex);
+	public Getter3<GItem, GValue> synchronize(final Object mutex) {
+		return Getters.synchronize(this, mutex);
 	}
 
 }

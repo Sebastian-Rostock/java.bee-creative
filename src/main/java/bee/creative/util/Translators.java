@@ -210,6 +210,13 @@ public class Translators {
 		return (Translator2<GSource, GTarget>)EmptyTranslator.INSTANCE;
 	}
 
+	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#neutral(Class)
+	 * Translators.neutral(Object.class)}. */
+	@SuppressWarnings ("unchecked")
+	public static <GValue> Translator2<GValue, GValue> neutral() {
+		return (Translator2<GValue, GValue>)neutral(Object.class);
+	}
+
 	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#from(Class, Class, Getter, Getter)
 	 * Translators.from(valueClass, valueClass, Getters.neutral(), Getters.neutral())}. */
 	public static <GValue> Translator2<GValue, GValue> neutral(final Class<GValue> valueClass) throws NullPointerException {
@@ -221,7 +228,7 @@ public class Translators {
 	public static <GSource, GTarget> Translator2<GSource, GTarget> from(final Translator<GSource, GTarget> target) {
 		if (target == null) return Translators.empty();
 		if (target instanceof Translator2) return (Translator2<GSource, GTarget>)target;
-		return Translators.toReverse(Translators.toReverse(target));
+		return Translators.reverse(Translators.reverse(target));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeTranslator new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans)}. */
@@ -231,23 +238,23 @@ public class Translators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(target, trans)}. */
-	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> toConcat(final Translator<GSource, GCenter> target,
+	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> concat(final Translator<GSource, GCenter> target,
 		final Translator<GCenter, GTarget> trans) throws NullPointerException {
 		return new ConcatTranslator<>(target, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ReverseTranslator new ReverseTranslator<>(target)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> toReverse(final Translator<GTarget, GSource> target) throws NullPointerException {
+	public static <GSource, GTarget> Translator2<GSource, GTarget> reverse(final Translator<GTarget, GSource> target) throws NullPointerException {
 		return new ReverseTranslator<>(target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Translator, Object) Translators.toSynchronized(target, target)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> toSynchronized(final Translator<GSource, GTarget> target) throws NullPointerException {
-		return Translators.toSynchronized(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Translator, Object) Translators.synchronize(target, target)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(final Translator<GSource, GTarget> target) throws NullPointerException {
+		return Translators.synchronize(target, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(target, mutex)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> toSynchronized(final Translator<GSource, GTarget> target, final Object mutex)
+	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(final Translator<GSource, GTarget> target, final Object mutex)
 		throws NullPointerException {
 		return new SynchronizedTranslator<>(target, mutex);
 	}

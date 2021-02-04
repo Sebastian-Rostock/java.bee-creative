@@ -28,18 +28,18 @@ public abstract class AbstractConsumer<GValue> extends BaseObject implements Con
 	}
 
 	@Override
-	public Consumer3<GValue> toSynchronized() {
-		return Consumers.toSynchronized(this);
+	public Consumer3<GValue> synchronize() {
+		return Consumers.synchronize(this);
 	}
 
 	@Override
-	public Consumer3<GValue> toSynchronized(final Object mutex) {
-		return Consumers.toSynchronized(this, mutex);
+	public Consumer3<GValue> synchronize(final Object mutex) {
+		return Consumers.synchronize(this, mutex);
 	}
 
 	@Override
-	public <GValue2> Consumer3<GValue2> toTranslated(final Getter<? super GValue2, ? extends GValue> trans) {
-		return Consumers.toTranslated(this, trans);
+	public <GValue2> Consumer3<GValue2> translate(final Getter<? super GValue2, ? extends GValue> trans) {
+		return Consumers.translate(this, trans);
 	}
 
 }

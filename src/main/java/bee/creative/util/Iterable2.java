@@ -36,8 +36,8 @@ public interface Iterable2<GItem> extends Iterable<GItem> {
 	/** Diese Methode ist eine Abkürtung für {@link Iterables#toSet(Iterable) Iterables.toSet(this)}. */
 	public Set<GItem> toSet();
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#toTranslated(Iterable, Getter) Iterables.toTranslated(this, trans)}. */
-	public <GItem2> Iterable2<GItem2> toTranslated(final Getter<? super GItem, ? extends GItem2> trans) throws NullPointerException;
+	/** Diese Methode ist eine Abkürtung für {@link Iterables#translate(Iterable, Getter) Iterables.translate(this, trans)}. */
+	public <GItem2> Iterable2<GItem2> translate(final Getter<? super GItem, ? extends GItem2> trans) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürtung für {@link Iterables#toUnique(Iterable) Iterables.toUnique(this)}. */
 	public Iterable2<GItem> toUnique();

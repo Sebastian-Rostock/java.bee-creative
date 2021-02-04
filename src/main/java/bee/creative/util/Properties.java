@@ -284,14 +284,14 @@ public class Properties {
 		return (Property2<GValue>)EmptyProperty.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.toTranslated(source, target), Consumers.from(source,
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.translate(source, target), Consumers.from(source,
 	 * target))}.
 	 *
-	 * @see Producers#toTranslated(Producer, Getter)
+	 * @see Producers#translate(Producer, Getter)
 	 * @see Consumers#from(Producer, Setter) */
 	public static <GItem, GValue> Property2<GValue> from(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
 		throws NullPointerException {
-		return Properties.from(Producers.toTranslated(source, target), Consumers.from(source, target));
+		return Properties.from(Producers.translate(source, target), Consumers.from(source, target));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Field, Object) Fields.from(target, null)}. */
@@ -329,7 +329,7 @@ public class Properties {
 	public static <GValue> Property2<GValue> from(final Property<GValue> target) {
 		if (target == null) return Properties.empty();
 		if (target instanceof Property2<?>) return (Property2<GValue>)target;
-		return Properties.toTranslated(target, Getters.<GValue>neutral(), Getters.<GValue>neutral());
+		return Properties.translate(target, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */
@@ -395,24 +395,24 @@ public class Properties {
 		return new SetupProperty<>(target, setup);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toTranslated(Property, Getter, Getter) Properties.toTranslated(target, Getters.fromTarget(trans),
+	/** Diese Methode ist eine Abkürzung für {@link #translate(Property, Getter, Getter) Properties.translate(target, Getters.fromTarget(trans),
 	 * Getters.fromSource(trans))}.
 	 *
 	 * @see Getters#fromTarget(Translator)
 	 * @see Getters#fromSource(Translator) */
-	public static <GValue, GValue2> Property2<GValue> toTranslated(final Property<GValue2> target, final Translator<GValue2, GValue> trans)
+	public static <GValue, GValue2> Property2<GValue> translate(final Property<GValue2> target, final Translator<GValue2, GValue> trans)
 		throws NullPointerException {
-		return Properties.toTranslated(target, Getters.fromTarget(trans), Getters.fromSource(trans));
+		return Properties.translate(target, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.toTranslated(target, transGet),
-	 * Consumers.toTranslated(target, transSet))}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.translate(target, transGet),
+	 * Consumers.translate(target, transSet))}.
 	 *
-	 * @see Producers#toTranslated(Producer, Getter)
-	 * @see Consumers#toTranslated(Consumer, Getter) */
-	public static <GSource, GTarget> Property2<GTarget> toTranslated(final Property<GSource> target, final Getter<? super GSource, ? extends GTarget> transGet,
+	 * @see Producers#translate(Producer, Getter)
+	 * @see Consumers#translate(Consumer, Getter) */
+	public static <GSource, GTarget> Property2<GTarget> translate(final Property<GSource> target, final Getter<? super GSource, ? extends GTarget> transGet,
 		final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
-		return Properties.from(Producers.toTranslated(target, transGet), Consumers.toTranslated(target, transSet));
+		return Properties.from(Producers.translate(target, transGet), Consumers.translate(target, transSet));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ObservableProperty new ObservableProperty<>(property)}. */
@@ -420,13 +420,13 @@ public class Properties {
 		return new ObservableProperty<>(property);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Property, Object) Properties.toSynchronized(target, target)}. */
-	public static <GValue> Property2<GValue> toSynchronized(final Property<GValue> target) throws NullPointerException {
-		return Properties.toSynchronized(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Property, Object) Properties.synchronize(target, target)}. */
+	public static <GValue> Property2<GValue> synchronize(final Property<GValue> target) throws NullPointerException {
+		return Properties.synchronize(target, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProperty new SynchronizedProperty<>(target, mutex)}. */
-	public static <GValue> Property2<GValue> toSynchronized(final Property<GValue> target, final Object mutex) throws NullPointerException {
+	public static <GValue> Property2<GValue> synchronize(final Property<GValue> target, final Object mutex) throws NullPointerException {
 		return new SynchronizedProperty<>(target, mutex);
 	}
 

@@ -129,7 +129,7 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#toReverse(Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#reverse(Comparable)} */
 	@SuppressWarnings ("javadoc")
 	public static class ReverseComparable<GItem> extends AbstractComparable<GItem> {
 
@@ -204,7 +204,7 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#toTranslated(Comparable, Getter)} */
+	/** Diese Klasse implementiert {@link Comparables#translate(Comparable, Getter)} */
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedComparable<GSource, GTarget> extends AbstractComparable<GSource> {
 
@@ -726,7 +726,7 @@ public class Comparables {
 	 * @param comparable {@link Comparable}.
 	 * @return {@code reverse}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<GItem> toReverse(final Comparable<? super GItem> comparable) throws NullPointerException {
+	public static <GItem> Comparable<GItem> reverse(final Comparable<? super GItem> comparable) throws NullPointerException {
 		return new ReverseComparable<>(comparable);
 	}
 
@@ -751,7 +751,7 @@ public class Comparables {
 	 * @param <GTarget> Typ der Eingabe des {@link Getter}.
 	 * @return {@code translated}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparable} {@code null} ist. */
-	public static <GSource, GTarget> Comparable2<GTarget> toTranslated(final Comparable<? super GSource> comparable,
+	public static <GSource, GTarget> Comparable2<GTarget> translate(final Comparable<? super GSource> comparable,
 		final Getter<? super GTarget, ? extends GSource> toSource) throws NullPointerException {
 		return new TranslatedComparable<>(comparable, toSource);
 	}

@@ -37,19 +37,19 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 	/** Diese Methode ist eine Abkürtung für {@link Fields#toSetup(Field, Getter) Fields.toSetup(this, setup)}. */
 	public Field2<GItem, GValue> toSetup(final Getter<? super GItem, ? extends GValue> setup);
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toSynchronized(Field) Fields.toSynchronized(this)}. */
+	/** Diese Methode ist eine Abkürtung für {@link Fields#synchronize(Field) Fields.synchronize(this)}. */
 	@Override
-	public Field2<GItem, GValue> toSynchronized();
+	public Field2<GItem, GValue> synchronize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toSynchronized(Field) Fields.toSynchronized(this, mutex)}. */
+	/** Diese Methode ist eine Abkürtung für {@link Fields#synchronize(Field) Fields.synchronize(this, mutex)}. */
 	@Override
-	public Field2<GItem, GValue> toSynchronized(Object mutex);
+	public Field2<GItem, GValue> synchronize(Object mutex);
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toTranslated(Field, Getter, Getter) Fields.toTranslated(this, transGet, transSet)}. */
-	public <GValue2> Field2<GItem, GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> transGet,
+	/** Diese Methode ist eine Abkürtung für {@link Fields#translate(Field, Getter, Getter) Fields.translate(this, transGet, transSet)}. */
+	public <GValue2> Field2<GItem, GValue2> translate(final Getter<? super GValue, ? extends GValue2> transGet,
 		final Getter<? super GValue2, ? extends GValue> transSet);
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#toTranslated(Field, Translator) Fields.toTranslated(this, trans)}. */
-	public <GValue2> Field2<GItem, GValue2> toTranslated(final Translator<GValue, GValue2> trans);
+	/** Diese Methode ist eine Abkürtung für {@link Fields#translate(Field, Translator) Fields.translate(this, trans)}. */
+	public <GValue2> Field2<GItem, GValue2> translate(final Translator<GValue, GValue2> trans);
 
 }

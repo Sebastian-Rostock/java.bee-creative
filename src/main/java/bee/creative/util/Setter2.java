@@ -22,10 +22,10 @@ public interface Setter2<GItem, GValue> extends Setter<GItem, GValue> {
 	/** Diese Methode ist eine Abkürtung für {@link Fields#from(Getter, Setter) Fields.from(get, this)}. */
 	public Field2<GItem, GValue> toField(final Getter<? super GItem, ? extends GValue> get);
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#toSynchronized(Setter) Setters.toSynchronized(this)}. */
-	public Setter2<GItem, GValue> toSynchronized();
+	/** Diese Methode ist eine Abkürtung für {@link Setters#synchronize(Setter) Setters.synchronize(this)}. */
+	public Setter2<GItem, GValue> synchronize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#toSynchronized(Setter, Object) Setters.toSynchronized(this)}. */
-	public Setter2<GItem, GValue> toSynchronized(final Object mutex);
+	/** Diese Methode ist eine Abkürtung für {@link Setters#synchronize(Setter, Object) Setters.synchronize(this)}. */
+	public Setter2<GItem, GValue> synchronize(final Object mutex);
 
 }

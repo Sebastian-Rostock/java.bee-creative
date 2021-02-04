@@ -24,13 +24,13 @@ public abstract class AbstractComparator<GItem> extends BaseObject implements Co
 	}
 
 	@Override
-	public Comparator2<GItem> toReverse() {
-		return Comparators.toReverse(this);
+	public Comparator2<GItem> reverse() {
+		return Comparators.reverse(this);
 	}
 
 	@Override
-	public <GItem2> Comparator2<GItem2> toTranslated(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
-		return Comparators.toTranslated(this, trans);
+	public <GItem2> Comparator2<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
+		return Comparators.translate(this, trans);
 	}
 
 }

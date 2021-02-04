@@ -11,6 +11,9 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
 
+	/** Diese Klasse implementiert ein {@link Field2}, welches beim {@link #get(Object) Lesen} stets {@code null} liefert und das {@link #set(Object, Object)
+	 * Schreiben} ignoriert. */
+	@SuppressWarnings ("javadoc")
 	public static class EmptyField extends AbstractField<Object, Object> {
 
 		public static final Field2<?, ?> INSTANCE = new EmptyField();
@@ -343,7 +346,7 @@ public final class Fields {
 	 * target))}.
 	 *
 	 * @see Getters#concat(Getter, Getter)
-	 * @see Setters#toTranslated(Getter, Setter) */
+	 * @see Setters#translate(Getter, Setter) */
 	public static <GSource, GTarget, GValue> Field2<GSource, GValue> concat(final Getter<? super GSource, ? extends GTarget> source,
 		final Field<? super GTarget, GValue> target) throws NullPointerException {
 		return new ConcatField<>(source, target);
@@ -486,19 +489,19 @@ public final class Fields {
 	 * @param transSet {@link Getter} zum Umwandeln des Wert beim Schreiben.
 	 * @return {@code translated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field}, {@code toTarget} bzw. {@code toSource} {@code null} ist. */
-	public static <GItem, GSource, GTarget> Field2<GItem, GTarget> toTranslated(final Field<? super GItem, GSource> target,
+	public static <GItem, GSource, GTarget> Field2<GItem, GTarget> translate(final Field<? super GItem, GSource> target,
 		final Getter<? super GSource, ? extends GTarget> transGet, final Getter<? super GTarget, ? extends GSource> transSet) throws NullPointerException {
-		return Fields.from(Getters.concat(target, transGet), Setters.toTranslated(target, transSet));
+		return Fields.from(Getters.concat(target, transGet), Setters.translate(target, transSet));
 	}
 
-	/** Diese Methode ist eine effiziente Alternative zu {@link #toTranslated(Field, Getter, Getter)
+	/** Diese Methode ist eine effiziente Alternative zu {@link #translate(Field, Getter, Getter)
 	 * Fields.translatedField(Translators.toTargetGetter(translator), Translators.toSourceGetter(translator), field)}.
 	 *
 	 * @see Getters#fromTarget(Translator)
 	 * @see Getters#fromSource(Translator) */
-	public static <GItem, GSource, GTarget> Field2<GItem, GTarget> toTranslated(final Field<? super GItem, GSource> target,
+	public static <GItem, GSource, GTarget> Field2<GItem, GTarget> translate(final Field<? super GItem, GSource> target,
 		final Translator<GSource, GTarget> trans) throws NullPointerException {
-		return Fields.toTranslated(target, Getters.fromTarget(trans), Getters.fromSource(trans));
+		return Fields.translate(target, Getters.fromTarget(trans), Getters.fromSource(trans));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ObservableField new ObservableField<>(target)}. */
@@ -532,12 +535,12 @@ public final class Fields {
 		return Fields.from(Getters.<GItem, GValue, GItem2, GValue2>toAggregated(target, transGet, empty, mixed), Setters.toAggregated(target, transSet));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Field, Object) Fields.toSynchronized(target, target)}. */
-	public static <GItem, GValue> Field2<GItem, GValue> toSynchronized(final Field<? super GItem, GValue> target) throws NullPointerException {
-		return Fields.toSynchronized(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Field, Object) Fields.synchronize(target, target)}. */
+	public static <GItem, GValue> Field2<GItem, GValue> synchronize(final Field<? super GItem, GValue> target) throws NullPointerException {
+		return Fields.synchronize(target, target);
 	}
 
-	public static <GItem, GValue> Field2<GItem, GValue> toSynchronized(final Field<? super GItem, GValue> target, final Object mutex)
+	public static <GItem, GValue> Field2<GItem, GValue> synchronize(final Field<? super GItem, GValue> target, final Object mutex)
 		throws NullPointerException {
 		return new SynchronizedField<>(target, mutex);
 	}

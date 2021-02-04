@@ -12,6 +12,12 @@ public interface Iterator2<GItem> extends Iterator<GItem> {
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#concat(Iterator, Iterator) Iterators.concat(this, that)}. */
 	public Iterator2<GItem> concat(final Iterator<? extends GItem> that) throws NullPointerException;
 
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#retainAll(Iterator, Collection) Iterators.retainAll(this, filter)}. */
+	public boolean retainAll(final Collection<?> filter) throws NullPointerException;
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#removeAll(Iterator) Iterators.removeAll(this)}. */
+	public boolean removeAll();
+
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#skip(Iterator, int) Iterators.skip(this, count)}. */
 	public int skip(int count);
 
@@ -21,8 +27,8 @@ public interface Iterator2<GItem> extends Iterator<GItem> {
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#toLimited(Iterator, int) Iterators.toLimited(this, count)}. */
 	public Iterator2<GItem> toLimited(final int count) throws IllegalArgumentException;
 
-	/** Diese Methode ist eine Abkürzung für {@link Iterators#toTranslated(Iterator, Getter) Iterators.toTranslated(this, trans)}. */
-	public <GTarget> Iterator2<GTarget> toTranslated(final Getter<? super GItem, ? extends GTarget> trans) throws NullPointerException;
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#translate(Iterator, Getter) Iterators.translate(this, trans)}. */
+	public <GTarget> Iterator2<GTarget> translate(final Getter<? super GItem, ? extends GTarget> trans) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#toUnique(Iterator) Iterators.toUnique(this)}. */
 	public Iterator2<GItem> toUnique();

@@ -224,7 +224,7 @@ public class Producers {
 	public static <GValue> Producer3<GValue> from(final Producer<? extends GValue> target) {
 		if (target == null) return Producers.empty();
 		if (target instanceof Producer3<?>) return (Producer3<GValue>)target;
-		return Producers.toTranslated(target, Getters.<GValue>neutral());
+		return Producers.translate(target, Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Getter, Object) Producers.from(target, null)}. */
@@ -232,9 +232,9 @@ public class Producers {
 		return Producers.from(target, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toTranslated(Producer, Getter) Producers.concat(Producers.fromValue(item), target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #translate(Producer, Getter) Producers.concat(Producers.fromValue(item), target)}. */
 	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> target, final GItem item) throws NullPointerException {
-		return Producers.toTranslated(Producers.fromValue(item), target);
+		return Producers.translate(Producers.fromValue(item), target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProducer new ValueProducer<>(target)}. Wenn {@code target} {@code null} ist, wird
@@ -335,18 +335,18 @@ public class Producers {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedProducer new TranslatedProducer<>(target, trans)}. */
-	public static <GValue, GValue2> Producer3<GValue2> toTranslated(final Producer<? extends GValue> target,
+	public static <GValue, GValue2> Producer3<GValue2> translate(final Producer<? extends GValue> target,
 		final Getter<? super GValue, ? extends GValue2> trans) throws NullPointerException {
 		return new TranslatedProducer<>(target, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Producer, Object) Producers.toSynchronized(target, target)}. */
-	public static <GValue> Producer3<GValue> toSynchronized(final Producer<? extends GValue> target) throws NullPointerException {
-		return Producers.toSynchronized(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Producer, Object) Producers.synchronize(target, target)}. */
+	public static <GValue> Producer3<GValue> synchronize(final Producer<? extends GValue> target) throws NullPointerException {
+		return Producers.synchronize(target, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProducer new SynchronizedProducer<>(target, mutex)}. */
-	public static <GValue> Producer3<GValue> toSynchronized(final Producer<? extends GValue> target, final Object mutex) throws NullPointerException {
+	public static <GValue> Producer3<GValue> synchronize(final Producer<? extends GValue> target, final Object mutex) throws NullPointerException {
 		return new SynchronizedProducer<>(target, mutex);
 	}
 

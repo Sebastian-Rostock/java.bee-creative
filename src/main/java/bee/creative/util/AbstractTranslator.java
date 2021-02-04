@@ -30,23 +30,23 @@ public abstract class AbstractTranslator<GSource, GTarget> extends BaseObject im
 	}
 
 	@Override
-	public <GTarget2> Translator2<GSource, GTarget2> toConcat(Translator<GTarget, GTarget2> trans) throws NullPointerException {
-		return Translators.toConcat(this, trans);
+	public <GTarget2> Translator2<GSource, GTarget2> concat(Translator<GTarget, GTarget2> trans) throws NullPointerException {
+		return Translators.concat(this, trans);
 	}
 
 	@Override
-	public Translator2<GTarget, GSource> toReverse() {
-		return Translators.toReverse(this);
+	public Translator2<GTarget, GSource> reverse() {
+		return Translators.reverse(this);
 	}
 
 	@Override
-	public Translator2<GSource, GTarget> toSynchronized() {
-		return Translators.toSynchronized(this);
+	public Translator2<GSource, GTarget> synchronize() {
+		return Translators.synchronize(this);
 	}
 
 	@Override
-	public Translator2<GSource, GTarget> toSynchronized(Object mutex) {
-		return Translators.toSynchronized(this, mutex);
+	public Translator2<GSource, GTarget> synchronize(Object mutex) {
+		return Translators.synchronize(this, mutex);
 	}
 
 }

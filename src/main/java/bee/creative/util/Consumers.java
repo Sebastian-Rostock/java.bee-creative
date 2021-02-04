@@ -9,7 +9,6 @@ import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Consumer}.
  *
- * @see Consumer
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Consumers {
 
@@ -152,7 +151,7 @@ public class Consumers {
 	public static <GValue> Consumer3<GValue> from(final Consumer<? super GValue> target) {
 		if (target == null) return Consumers.empty();
 		if (target instanceof Consumer3<?>) return (Consumer3<GValue>)target;
-		return Consumers.toTranslated(target, Getters.<GValue>neutral());
+		return Consumers.translate(target, Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Setter, Object) Consumers.from(target, null)}. */
@@ -228,18 +227,18 @@ public class Consumers {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedConsumer new TranslatedConsumer<>(target, trans)}. */
-	public static <GValue, GValue2> Consumer3<GValue2> toTranslated(final Consumer<? super GValue> target, final Getter<? super GValue2, ? extends GValue> trans)
+	public static <GValue, GValue2> Consumer3<GValue2> translate(final Consumer<? super GValue> target, final Getter<? super GValue2, ? extends GValue> trans)
 		throws NullPointerException {
 		return new TranslatedConsumer<>(target, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toSynchronized(Consumer, Object) Consumers.toSynchronized(target, target)}. */
-	public static <GValue> Consumer3<GValue> toSynchronized(final Consumer<? super GValue> target) {
-		return Consumers.toSynchronized(target, target);
+	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Consumer, Object) Consumers.synchronize(target, target)}. */
+	public static <GValue> Consumer3<GValue> synchronize(final Consumer<? super GValue> target) {
+		return Consumers.synchronize(target, target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedConsumer new SynchronizedConsumer<>(target, mutex)}. */
-	public static <GValue> Consumer3<GValue> toSynchronized(final Consumer<? super GValue> target, final Object mutex) {
+	public static <GValue> Consumer3<GValue> synchronize(final Consumer<? super GValue> target, final Object mutex) {
 		return new SynchronizedConsumer<>(target, mutex);
 	}
 

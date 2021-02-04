@@ -49,18 +49,18 @@ public abstract class AbstractSetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
-	public Setter3<GItem, GValue> toSynchronized() {
-		return Setters.toSynchronized(this);
+	public Setter3<GItem, GValue> synchronize() {
+		return Setters.synchronize(this);
 	}
 
 	@Override
-	public Setter3<GItem, GValue> toSynchronized(final Object mutex) {
-		return Setters.toSynchronized(this, mutex);
+	public Setter3<GItem, GValue> synchronize(final Object mutex) {
+		return Setters.synchronize(this, mutex);
 	}
 
 	@Override
-	public <GValue2> Setter3<GItem, GValue2> toTranslated(final Getter<? super GValue2, ? extends GValue> trans) {
-		return Setters.toTranslated(this, trans);
+	public <GValue2> Setter3<GItem, GValue2> translate(final Getter<? super GValue2, ? extends GValue> trans) {
+		return Setters.translate(this, trans);
 	}
 
 }

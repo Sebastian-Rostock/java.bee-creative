@@ -723,8 +723,8 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public void putAll(final Map<? extends GTargetKey, ? extends GTargetValue> entries2) {
-			this.entries.putAll(Collections.translatedMap((Map<GTargetKey, GTargetValue>)entries2, Translators.toReverse(this.keyTranslator),
-				Translators.toReverse(this.valueTranslator)));
+			this.entries.putAll(Collections.translatedMap((Map<GTargetKey, GTargetValue>)entries2, Translators.reverse(this.keyTranslator),
+				Translators.reverse(this.valueTranslator)));
 		}
 
 		@Override
@@ -791,13 +791,13 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(final Collection<? extends GTarget> items2) {
-			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(final int index, final Collection<? extends GTarget> items2) {
-			return this.items.addAll(index, Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.addAll(index, Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
@@ -814,13 +814,13 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean removeAll(final Collection<?> items2) {
-			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean retainAll(final Collection<?> items2) {
-			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
@@ -846,7 +846,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.toTranslated(this.items.iterator(), Getters.fromTarget(this.translator));
+			return Iterators.translate(this.items.iterator(), Getters.fromTarget(this.translator));
 		}
 
 		@Override
@@ -883,7 +883,7 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(final Collection<? extends GTarget> items2) {
-			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
@@ -895,13 +895,13 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean removeAll(final Collection<?> items2) {
-			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean retainAll(final Collection<?> items2) {
-			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
@@ -927,7 +927,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.toTranslated(this.items.iterator(), Getters.fromTarget(this.translator));
+			return Iterators.translate(this.items.iterator(), Getters.fromTarget(this.translator));
 		}
 
 	}
@@ -953,7 +953,7 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean addAll(final Collection<? extends GTarget> items2) {
-			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.addAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
@@ -965,13 +965,13 @@ public class Collections {
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean removeAll(final Collection<?> items2) {
-			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.removeAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public boolean retainAll(final Collection<?> items2) {
-			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.toReverse(this.translator)));
+			return this.items.retainAll(Collections.translatedCollection((Collection<GTarget>)items2, Translators.reverse(this.translator)));
 		}
 
 		@Override
@@ -997,7 +997,7 @@ public class Collections {
 
 		@Override
 		public Iterator<GTarget> iterator() {
-			return Iterators.toTranslated(this.items.iterator(), Getters.fromTarget(this.translator));
+			return Iterators.translate(this.items.iterator(), Getters.fromTarget(this.translator));
 		}
 
 	}

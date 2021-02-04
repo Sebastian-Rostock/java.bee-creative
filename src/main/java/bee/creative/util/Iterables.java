@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import bee.creative.array.Array;
 import bee.creative.lang.Objects;
+import bee.creative.util.Iterators.TranslatedIterator;
 
 /** Diese Klasse implementiert grundlegende {@link Iterable}.
  *
@@ -24,13 +25,13 @@ public class Iterables {
 
 	}
 
-	public static class ItemIterable<GItem> extends AbstractIterable<GItem> {
+	public static class UniformIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final GItem item;
 
 		public final int count;
 
-		public ItemIterable(final GItem item, final int count) {
+		public UniformIterable(final GItem item, final int count) {
 			if (count < 0) throw new IllegalArgumentException();
 			this.count = count;
 			this.item = item;
@@ -146,7 +147,7 @@ public class Iterables {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.concatAll(Iterators.toTranslated(this.iterables.iterator(), Iterables.<GItem>iteratorGetter()));
+			return Iterators.concatAll(Iterators.translate(this.iterables.iterator(), Iterables.<GItem>iterator()));
 		}
 
 		@Override
@@ -156,20 +157,22 @@ public class Iterables {
 
 	}
 
-	public static class TranslatedIterable<GSource, GTarget> extends AbstractIterable<GTarget> {
+	/** Diese Klasse implementiert das {@link Iterable2} zu {@link TranslatedIterator}. */
+	@SuppressWarnings ("javadoc")
+	public static class TranslatedIterable<GItem, GItem2> extends AbstractIterable<GItem> {
 
-		public final Iterable<? extends GSource> iterable;
+		public final Iterable<? extends GItem2> iterable;
 
-		public final Getter<? super GSource, ? extends GTarget> toTarget;
+		public final Getter<? super GItem2, ? extends GItem> toTarget;
 
-		public TranslatedIterable(final Iterable<? extends GSource> target, final Getter<? super GSource, ? extends GTarget> trans) {
+		public TranslatedIterable(final Iterable<? extends GItem2> target, final Getter<? super GItem2, ? extends GItem> trans) {
 			this.iterable = Objects.notNull(target);
 			this.toTarget = Objects.notNull(trans);
 		}
 
 		@Override
-		public Iterator<GTarget> iterator() {
-			return Iterators.toTranslated(this.iterable.iterator(), this.toTarget);
+		public Iterator<GItem> iterator() {
+			return Iterators.translate(this.iterable.iterator(), this.toTarget);
 		}
 
 		@Override
@@ -179,28 +182,31 @@ public class Iterables {
 
 	}
 
- 
+	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#toUnmodifiable(Iterator)}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	@SuppressWarnings ("javadoc")
 	public static class UnmodifiableIterable<GItem> extends AbstractIterable<GItem> {
 
-		public final Iterable<? extends GItem> iterable;
+		public final Iterable<? extends GItem> source;
 
-		public UnmodifiableIterable(final Iterable<? extends GItem> iterable) {
-			this.iterable = Objects.notNull(iterable);
+		public UnmodifiableIterable(final Iterable<? extends GItem> source) throws NullPointerException {
+			this.source = Objects.notNull(source);
 		}
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.toUnmodifiable(this.iterable.iterator());
+			return Iterators.toUnmodifiable(this.source.iterator());
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.iterable);
+			return Objects.toInvokeString(this, this.source);
 		}
 
 	}
 
-	/** Diese Klasse implementiert {@link Iterables#iteratorGetter()}. */
+	/** Diese Klasse implementiert {@link Iterables#iterator()}. */
 	static class IteratorGetter extends AbstractGetter<Iterable<?>, Iterator<?>> {
 
 		public static final Getter<?, ?> INSTANCE = new IteratorGetter();
@@ -212,7 +218,6 @@ public class Iterables {
 
 	}
 
- 
 	public static class UnionIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Comparator<? super GItem> order;
@@ -226,7 +231,7 @@ public class Iterables {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.unionAll(this.order, Iterators.toTranslated(this.iterable.iterator(), Iterables.<GItem>iteratorGetter()));
+			return Iterators.unionAll(this.order, Iterators.translate(this.iterable.iterator(), Iterables.<GItem>iterator()));
 		}
 
 		@Override
@@ -236,7 +241,6 @@ public class Iterables {
 
 	}
 
- 
 	public static class ExceptIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Comparator<? super GItem> order;
@@ -263,7 +267,6 @@ public class Iterables {
 
 	}
 
- 
 	public static class IntersectIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Comparator<? super GItem> order;
@@ -277,7 +280,7 @@ public class Iterables {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.intersectAll(this.order, Iterators.toTranslated(this.iterable.iterator(), Iterables.<GItem>iteratorGetter()));
+			return Iterators.intersectAll(this.order, Iterators.translate(this.iterable.iterator(), Iterables.<GItem>iterator()));
 		}
 
 		@Override
@@ -328,7 +331,7 @@ public class Iterables {
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
 	public static <GItem> Iterable<GItem> fromItem(final GItem item, final int count) throws IllegalArgumentException {
 		if (count == 0) return Iterables.empty();
-		return new ItemIterable<>(item, count);
+		return new UniformIterable<>(item, count);
 	}
 
 	/** Diese Methode gibt ein {@link Iterable} zurück, das die gegebene Anzahl an {@link Integer} ab dem Wert {@code 0} liefert, d.h {@code 0}, {@code 1}, ...,
@@ -584,12 +587,12 @@ public class Iterables {
 	 * 
 	 * @param target {@link Iterable}.
 	 * @param trans {@link Getter} zur Navigation.
-	 * @see Iterators#toTranslated(Iterator, Getter)
+	 * @see Iterators#translate(Iterator, Getter)
 	 * @param <GSource> Typ der Eingabe des gegebenen {@link Getter} sowie der Elemente des gegebenen {@link Iterable}.
 	 * @param <GTarget> Typ der Ausgabe des gegebenen {@link Getter} sowie der Elemente des erzeugten {@link Iterable}.
 	 * @return {@code translated}-{@link Iterable}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static <GSource, GTarget> Iterable2<GTarget> toTranslated(final Iterable<? extends GSource> target,
+	public static <GSource, GTarget> Iterable2<GTarget> translate(final Iterable<? extends GSource> target,
 		final Getter<? super GSource, ? extends GTarget> trans) throws NullPointerException {
 		return new TranslatedIterable<>(target, trans);
 	}
@@ -605,13 +608,8 @@ public class Iterables {
 		return new UnmodifiableIterable<>(iterable);
 	}
 
-	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link Set} zurück. Wenn das gegebene {@link Iterable} ein {@link Set} ist, wird dieses
-	 * geliefert. Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes {@link HashSet2} geliefert.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param source {@link Iterable}.
-	 * @return {@link Set} der Elemente.
-	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
+	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als {@link Set}. Wenn das Iterable ein {@link Set} ist, wird dieses geliefert.
+	 * Andernfalls wird ein über {@link #addAll(Collection, Iterable)} befülltes {@link HashSet2} geliefert. */
 	public static <GItem> Set<GItem> toSet(final Iterable<GItem> source) throws NullPointerException {
 		if (source instanceof Set<?>) return (Set<GItem>)source;
 		final HashSet2<GItem> result = new HashSet2<>();
@@ -619,13 +617,8 @@ public class Iterables {
 		return result;
 	}
 
-	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link List} zurück. Wenn das gegebene {@link Iterable} eine {@link List} ist, wird
-	 * diese geliefert. Andernfalls wird eine über {@link #addAll(Collection, Iterable)} befüllte {@link ArrayList} geliefert.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param source {@link Iterable}.
-	 * @return {@link List} der Elemente.
-	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist. */
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als {@link List} zurück. Wenn das Iterable eine {@link List} ist, wird diese geliefert.
+	 * Andernfalls wird eine über {@link #addAll(Collection, Iterable)} befüllte {@link ArrayList} geliefert. */
 	public static <GItem> List<GItem> toList(final Iterable<GItem> source) throws NullPointerException {
 		if (source instanceof List<?>) return (List<GItem>)source;
 		final ArrayList<GItem> result = new ArrayList<>();
@@ -633,35 +626,21 @@ public class Iterables {
 		return result;
 	}
 
-	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als Array zurück. Dazu wird das gegebene {@link Iterable} in eine {@link Collection}
-	 * überführt, deren Inhalt schließlich aks Array {@link Collection#toArray() geliefert} wird.
-	 *
-	 * @param source {@link Iterable}.
-	 * @return Array der Elemente.
-	 * @throws NullPointerException Wenn {@code result} bzw. {@code iterable} {@code null} ist. */
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als Array zurück. Dazu wird das Iterable in eine {@link Collection} überführt, deren Inhalt
+	 * schließlich als Array {@link Collection#toArray() geliefert} wird. */
 	public static Object[] toArray(final Iterable<?> source) throws NullPointerException {
 		return (source instanceof Collection<?> ? (Collection<?>)source : Iterables.toList(source)).toArray();
 	}
 
-	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als Array zurück. Dazu wird das gegebene {@link Iterable} in eine {@link Collection}
-	 * überführt, deren Inhalt schließlich aks Array {@link Collection#toArray(Object[]) geliefert} wird.
-	 * 
-	 * @param source {@link Iterable}.
-	 * @param array Ergebnis für {@link Collection#toArray(Object[])}.
-	 * @param <GItem> Typ der Elemente.
-	 * @return Array der Elemente.
-	 * @throws NullPointerException Wenn {@code result} bzw. {@code iterable} {@code null} ist. */
+	/** Diese Methode gibt die Elemente des gegebenen {@link Iterable} als Array zurück. Dazu wird das Iterable in eine {@link Collection} überführt, deren Inhalt
+	 * schließlich als Array {@link Collection#toArray(Object[]) geliefert} wird. */
 	public static <GItem> GItem[] toArray(final Iterable<? extends GItem> source, final GItem[] array) throws NullPointerException {
 		return (source instanceof Collection<?> ? (Collection<? extends GItem>)source : Iterables.toList(source)).toArray(array);
 	}
 
-	/** Diese Methode gibt den {@link Getter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.
-	 *
-	 * @see Iterable#iterator()
-	 * @param <GItem> Typ der Elemente.
-	 * @return {@code iterator}-{@link Getter}. */
+	/** Diese Methode liefert den {@link Getter3} zu {@link Iterable#iterator()}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> iteratorGetter() {
+	public static <GItem> Getter<Iterable<? extends GItem>, Iterator<GItem>> iterator() {
 		return (Getter<Iterable<? extends GItem>, Iterator<GItem>>)IteratorGetter.INSTANCE;
 	}
 

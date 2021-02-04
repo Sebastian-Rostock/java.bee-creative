@@ -782,7 +782,7 @@ public class BEXLoader {
 
 		@Override
 		public String toString() {
-			return Objects.toString(true, Iterables.toFiltered(Arrays.asList(this.cache), Filters.nullFilter()));
+			return Objects.toString(true, Iterables.toFiltered(Arrays.asList(this.cache), Filters.empty()));
 		}
 
 	}

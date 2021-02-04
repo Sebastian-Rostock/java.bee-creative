@@ -48,8 +48,8 @@ public abstract class AbstractIterable<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
-	public <GItem2> Iterable2<GItem2> toTranslated(Getter<? super GItem, ? extends GItem2> trans) throws NullPointerException {
-		return Iterables.toTranslated(this, trans);
+	public <GItem2> Iterable2<GItem2> translate(Getter<? super GItem, ? extends GItem2> trans) throws NullPointerException {
+		return Iterables.translate(this, trans);
 	}
 
 	@Override

@@ -21,7 +21,7 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 
 	@Override
 	public Filter2<GItem> concat(final Filter<? super GValue> target) {
-		return Filters.concat(this, target);
+		return Filters.translate(this, target);
 	}
 
 	@Override
@@ -36,17 +36,17 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 
 	@Override
 	public <GValue2> Setter3<GItem, GValue2> concat(final Setter<? super GValue, ? super GValue2> target) {
-		return Setters.toTranslated(this, target);
+		return Setters.translate(this, target);
 	}
 
 	@Override
 	public Comparable2<GItem> concat(final Comparable<? super GValue> target) {
-		return Comparables.toTranslated(target, this);
+		return Comparables.translate(target, this);
 	}
 
 	@Override
 	public Comparator2<GItem> concat(final Comparator<? super GValue> target) {
-		return Comparators.toTranslated(target, this);
+		return Comparators.translate(target, this);
 	}
 
 	@Override
@@ -103,24 +103,24 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public <GValue2> Field2<GItem, GValue2> toTranslated(final Translator<GValue, GValue2> trans) {
-		return Fields.toTranslated(this, trans);
+	public <GValue2> Field2<GItem, GValue2> translate(final Translator<GValue, GValue2> trans) {
+		return Fields.translate(this, trans);
 	}
 
 	@Override
-	public <GValue2> Field2<GItem, GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> transGet,
+	public <GValue2> Field2<GItem, GValue2> translate(final Getter<? super GValue, ? extends GValue2> transGet,
 		final Getter<? super GValue2, ? extends GValue> transSet) {
-		return Fields.toTranslated(this, transGet, transSet);
+		return Fields.translate(this, transGet, transSet);
 	}
 
 	@Override
-	public Field2<GItem, GValue> toSynchronized() {
-		return Fields.toSynchronized(this);
+	public Field2<GItem, GValue> synchronize() {
+		return Fields.synchronize(this);
 	}
 
 	@Override
-	public Field2<GItem, GValue> toSynchronized(final Object mutex) {
-		return Fields.toSynchronized(this, mutex);
+	public Field2<GItem, GValue> synchronize(final Object mutex) {
+		return Fields.synchronize(this, mutex);
 	}
 
 	@Override

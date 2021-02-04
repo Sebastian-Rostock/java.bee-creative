@@ -160,7 +160,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @return {@code this}. */
 	public FEMException pushAll(final Iterable<String> messages) {
 		if (messages == null) return this;
-		Iterables.addAll(this.messages, Iterables.toFiltered(messages, Filters.nullFilter()));
+		Iterables.addAll(this.messages, Iterables.toFiltered(messages, Filters.empty()));
 		return this;
 	}
 

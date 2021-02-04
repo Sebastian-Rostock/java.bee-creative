@@ -597,7 +597,7 @@ public class Comparators {
 	public static <GItem> Comparator2<GItem> from(final Comparator<? super GItem> target) {
 		if (target == null) return empty();
 		if (target instanceof Comparator2<?>) return (Comparator2<GItem>)target;
-		return toTranslated(target, Getters.<GItem>neutral());
+		return translate(target, Getters.<GItem>neutral());
 	}
 
 	/** Diese Methode gibt einen verketteten {@link Comparator} zurück, der seine Eingaben zuerst über den ersten {@link Comparator} vergleich und den zweiten
@@ -643,7 +643,7 @@ public class Comparators {
 	 * @param comparator {@link Comparator}.
 	 * @return {@code reverse}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> Comparator2<GItem> toReverse(final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static <GItem> Comparator2<GItem> reverse(final Comparator<? super GItem> comparator) throws NullPointerException {
 		return new ReverseComparator<>(comparator);
 	}
 
@@ -658,7 +658,7 @@ public class Comparators {
 	 * @param <GItem2> Typ der Ausgabe des {@link Getter} sowie der Elemente des gegebenen {@link Comparator}.
 	 * @return {@code translated}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code comparator} {@code null} ist. */
-	public static <GItem, GItem2> Comparator2<GItem> toTranslated(final Comparator<? super GItem2> target, final Getter<? super GItem, ? extends GItem2> trans)
+	public static <GItem, GItem2> Comparator2<GItem> translate(final Comparator<? super GItem2> target, final Getter<? super GItem, ? extends GItem2> trans)
 		throws NullPointerException {
 		return new TranslatedComparator<>(target, trans);
 	}

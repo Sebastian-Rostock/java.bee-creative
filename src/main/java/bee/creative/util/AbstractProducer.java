@@ -46,18 +46,18 @@ public abstract class AbstractProducer<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public Producer3<GValue> toSynchronized() {
-		return Producers.toSynchronized(this);
+	public Producer3<GValue> synchronize() {
+		return Producers.synchronize(this);
 	}
 
 	@Override
-	public Producer3<GValue> toSynchronized(final Object mutex) {
-		return Producers.toSynchronized(this, mutex);
+	public Producer3<GValue> synchronize(final Object mutex) {
+		return Producers.synchronize(this, mutex);
 	}
 
 	@Override
 	public <GValue2> Producer3<GValue2> concat(final Getter<? super GValue, GValue2> target) {
-		return Producers.toTranslated(this, target);
+		return Producers.translate(this, target);
 	}
 
 }

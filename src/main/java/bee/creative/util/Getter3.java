@@ -27,9 +27,9 @@ public interface Getter3<GItem, GValue> extends Getter2<GItem, GValue> {
 	public Field2<GItem, GValue> toField();
 
 	@Override
-	public Getter3<GItem, GValue> toSynchronized();
+	public Getter3<GItem, GValue> synchronize();
 
 	@Override
-	public Getter3<GItem, GValue> toSynchronized(Object mutex);
+	public Getter3<GItem, GValue> synchronize(Object mutex);
 
 }

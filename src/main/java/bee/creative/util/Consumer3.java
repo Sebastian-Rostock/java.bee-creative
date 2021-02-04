@@ -10,12 +10,12 @@ public interface Consumer3<GValue> extends Consumer2<GValue> {
 	public Property2<GValue> toProperty();
 
 	@Override
-	public Consumer3<GValue> toSynchronized();
+	public Consumer3<GValue> synchronize();
 
 	@Override
-	public Consumer3<GValue> toSynchronized(Object mutex);
+	public Consumer3<GValue> synchronize(Object mutex);
 
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#toTranslated(Consumer, Getter) Consumers.toTranslated(this, trans)}. */
-	public <GValue2> Consumer3<GValue2> toTranslated(final Getter<? super GValue2, ? extends GValue> trans);
+	/** Diese Methode ist eine Abkürtung für {@link Consumers#translate(Consumer, Getter) Consumers.translate(this, trans)}. */
+	public <GValue2> Consumer3<GValue2> translate(final Getter<? super GValue2, ? extends GValue> trans);
 
 }

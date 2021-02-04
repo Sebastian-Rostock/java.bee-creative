@@ -20,12 +20,12 @@ public interface Setter3<GItem, GValue> extends Setter2<GItem, GValue> {
 	public Field2<GItem, GValue> toField();
 
 	@Override
-	public Setter3<GItem, GValue> toSynchronized();
+	public Setter3<GItem, GValue> synchronize();
 
 	@Override
-	public Setter3<GItem, GValue> toSynchronized(Object mutex);
+	public Setter3<GItem, GValue> synchronize(Object mutex);
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#toTranslated(Setter, Getter) Setters.toTranslated(this, trans)}. */
-	public <GValue2> Setter3<GItem, GValue2> toTranslated(final Getter<? super GValue2, ? extends GValue> trans);
+	/** Diese Methode ist eine Abkürtung für {@link Setters#translate(Setter, Getter) Setters.translate(this, trans)}. */
+	public <GValue2> Setter3<GItem, GValue2> translate(final Getter<? super GValue2, ? extends GValue> trans);
 
 }

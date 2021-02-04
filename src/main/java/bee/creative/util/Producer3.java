@@ -10,9 +10,9 @@ public interface Producer3<GValue> extends Producer2<GValue> {
 	public Property2<GValue> toProperty();
 
 	@Override
-	public Producer3<GValue> toSynchronized();
+	public Producer3<GValue> synchronize();
 
 	@Override
-	public Producer3<GValue> toSynchronized(Object mutex);
+	public Producer3<GValue> synchronize(Object mutex);
 
 }

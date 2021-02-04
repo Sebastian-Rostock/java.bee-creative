@@ -22,7 +22,7 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 
 	@Override
 	public <GValue2> Producer3<GValue2> concat(Getter<? super GValue, GValue2> target) {
-		return Producers.toTranslated(this, target);
+		return Producers.translate(this, target);
 	}
 
 	@Override
@@ -86,24 +86,24 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public Property2<GValue> toSynchronized() {
-		return Properties.toSynchronized(this);
+	public Property2<GValue> synchronize() {
+		return Properties.synchronize(this);
 	}
 
 	@Override
-	public Property2<GValue> toSynchronized(final Object mutex) {
-		return Properties.toSynchronized(this, mutex);
+	public Property2<GValue> synchronize(final Object mutex) {
+		return Properties.synchronize(this, mutex);
 	}
 
 	@Override
-	public <GValue2> Property2<GValue2> toTranslated(final Getter<? super GValue, ? extends GValue2> transGet,
+	public <GValue2> Property2<GValue2> translate(final Getter<? super GValue, ? extends GValue2> transGet,
 		final Getter<? super GValue2, ? extends GValue> transSet) {
-		return Properties.toTranslated(this, transGet, transSet);
+		return Properties.translate(this, transGet, transSet);
 	}
 
 	@Override
-	public <GValue2> Property2<GValue2> toTranslated(final Translator<GValue, GValue2> trans) {
-		return Properties.toTranslated(this, trans);
+	public <GValue2> Property2<GValue2> translate(final Translator<GValue, GValue2> trans) {
+		return Properties.translate(this, trans);
 	}
 
 }

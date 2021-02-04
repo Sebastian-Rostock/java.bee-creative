@@ -591,7 +591,7 @@ public class Iterators {
 	public static <GItem> Iterator2<GItem> from(final Iterator<? extends GItem> target) {
 		if (target == null) return Iterators.empty();
 		if (target instanceof Iterator2<?>) return (Iterator2<GItem>)target;
-		return Iterators.toTranslated(target, Getters.<GItem>neutral());
+		return Iterators.translate(target, Getters.<GItem>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterators.fromItem(item, 1)}. */
@@ -735,7 +735,7 @@ public class Iterators {
 	 *
 	 * @see Collection#retainAll(Collection) */
 	public static boolean retainAll(final Iterator<?> target, final Collection<?> filter) throws NullPointerException {
-		return Iterators.removeAll(Iterators.toFiltered(target, Filters.negate(Filters.fromItems(filter)))); // TODO
+		return Iterators.removeAll(Iterators.toFiltered(target, Filters.fromItems(filter).negate()));
 	}
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur dann {@code true}
@@ -818,7 +818,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedIterator new TranslatedIterator<>(source, trans)}. */
-	public static <GItem, GItem2> Iterator2<GItem> toTranslated(final Iterator<? extends GItem2> source, final Getter<? super GItem2, ? extends GItem> trans)
+	public static <GItem, GItem2> Iterator2<GItem> translate(final Iterator<? extends GItem2> source, final Getter<? super GItem2, ? extends GItem> trans)
 		throws NullPointerException {
 		return new TranslatedIterator<>(source, trans);
 	}
