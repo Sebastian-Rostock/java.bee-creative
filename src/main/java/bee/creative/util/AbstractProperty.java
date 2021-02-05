@@ -31,13 +31,13 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public Producer3<GValue> toBuffered() {
-		return Producers.toBuffered(this);
+	public Producer3<GValue> buffer() {
+		return Producers.buffer(this);
 	}
 
 	@Override
-	public Producer3<GValue> toBuffered(final int mode) {
-		return Producers.toBuffered(this, mode);
+	public Producer3<GValue> buffer(final int mode) {
+		return Producers.buffer(this, mode);
 	}
 
 	@Override

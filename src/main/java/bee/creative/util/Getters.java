@@ -557,9 +557,9 @@ public class Getters {
 		return new DefaultGetter<>(target, value);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toBuffered(int, int, int, Getter) Getters.bufferedGetter(-1, Pointers.SOFT, Pointers.SOFT, getter)}. */
-	public static <GItem, GValue> Getter3<GItem, GValue> toBuffered(final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException {
-		return Getters.toBuffered(-1, Pointers.SOFT, Pointers.SOFT, getter);
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, int, int, Getter) Getters.bufferedGetter(-1, Pointers.SOFT, Pointers.SOFT, getter)}. */
+	public static <GItem, GValue> Getter3<GItem, GValue> buffer(final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException {
+		return Getters.buffer(-1, Pointers.SOFT, Pointers.SOFT, getter);
 	}
 
 	/** Diese Methode gibt einen gepufferten {@link Getter} zurück, der die zu seinen Eingaben über die gegebene {@link Getter Eigenschaft} ermittelten Werte
@@ -578,7 +578,7 @@ public class Getters {
 	 * @return {@code buffered}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link Pointers#from(int, Object)} eine entsprechende Ausnahme auslöst. */
-	public static <GItem, GValue> Getter3<GItem, GValue> toBuffered(final int limit, final int inputMode, final int outputMode,
+	public static <GItem, GValue> Getter3<GItem, GValue> buffer(final int limit, final int inputMode, final int outputMode,
 		final Getter<? super GItem, ? extends GValue> getter) throws NullPointerException, IllegalArgumentException {
 		return new BufferedGetter<>(limit, inputMode, outputMode, getter);
 	}

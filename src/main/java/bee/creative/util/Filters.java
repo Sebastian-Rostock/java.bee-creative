@@ -473,13 +473,13 @@ public class Filters {
 	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
 	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link SoftPointer} auf Elemente bestückt.
 	 *
-	 * @see #toBuffered(Filter)
+	 * @see #buffer(Filter)
 	 * @param <GItem> Typ der Elemente.
 	 * @param filter {@link Filter}.
 	 * @return {@code buffered}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
-	public static <GItem> Filter<GItem> toBuffered(final Filter<? super GItem> filter) throws NullPointerException {
-		return Filters.toBuffered(Integer.MAX_VALUE, Pointers.SOFT, filter);
+	public static <GItem> Filter<GItem> buffer(final Filter<? super GItem> filter) throws NullPointerException {
+		return Filters.buffer(Integer.MAX_VALUE, Pointers.SOFT, filter);
 	}
 
 	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
@@ -487,7 +487,7 @@ public class Filters {
 	 *
 	 * @see Filters#from(Getter)
 	 * @see Getters#from(Filter)
-	 * @see Getters#toBuffered(int, int, int, Getter)
+	 * @see Getters#buffer(int, int, int, Getter)
 	 * @param <GItem> Typ der Elemente.
 	 * @param limit Maximum für die Anzahl der Einträge in der internen {@link Map}.
 	 * @param mode Modus der {@link Pointer}, die auf die Elemente als Schlüssel der {@link Map} erzeugt werden ({@link Pointers#HARD}, {@link Pointers#SOFT},
@@ -495,10 +495,10 @@ public class Filters {
 	 * @param filter {@link Filter}.
 	 * @return {@code buffered}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Getters#toBuffered(int, int, int, Getter)} eine entsprechende Ausnahme auslöst. */
-	public static <GItem> Filter<GItem> toBuffered(final int limit, final int mode, final Filter<? super GItem> filter)
+	 * @throws IllegalArgumentException Wenn {@link Getters#buffer(int, int, int, Getter)} eine entsprechende Ausnahme auslöst. */
+	public static <GItem> Filter<GItem> buffer(final int limit, final int mode, final Filter<? super GItem> filter)
 		throws NullPointerException, IllegalArgumentException {
-		return Filters.from(Getters.toBuffered(limit, mode, Pointers.HARD, Getters.from(filter)));
+		return Filters.from(Getters.buffer(limit, mode, Pointers.HARD, Getters.from(filter)));
 	}
 
 	/** Diese Methode gibt einen übersetzten {@link Filter} zurück, welcher von seinen Elementen mit dem gegebenen {@link Getter} zu den Elementen des gegebenen

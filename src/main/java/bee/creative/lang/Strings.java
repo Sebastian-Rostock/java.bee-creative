@@ -39,7 +39,7 @@ public class Strings {
 
 	/** Dieses Feld speichert einen synchronisierten, gepufferten {@link #patternCompiler(int)} mit Flag {@code 0}. Dieser wird von den Methoden in
 	 * {@link #Strings()} genutzt, die einen regulärer Ausdruck kompilieren müssen. */
-	public static final Getter<String, Pattern> PATTERN_COMPILER = Getters.synchronize(Getters.toBuffered(Strings.patternCompiler(0)));
+	public static final Getter<String, Pattern> PATTERN_COMPILER = Getters.synchronize(Getters.buffer(Strings.patternCompiler(0)));
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden
 	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette

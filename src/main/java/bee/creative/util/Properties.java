@@ -276,46 +276,45 @@ public class Properties {
 
 	}
 
-	/** Diese Methode liefert {@link EmptyProperty EmptyProperty.INSTANCE}. */
+	/** Diese Methode liefert das {@link EmptyProperty}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Property2<GValue> empty() {
 		return (Property2<GValue>)EmptyProperty.INSTANCE;
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.translate(source, target), Consumers.from(source,
-	 * target))}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Producers.translate(item, that), Consumers.from(item, that))}.
 	 *
 	 * @see Producers#translate(Producer, Getter)
 	 * @see Consumers#from(Producer, Setter) */
-	public static <GItem, GValue> Property2<GValue> from(final Producer<? extends GItem> source, final Field<? super GItem, GValue> target)
+	public static <GItem, GValue> Property2<GValue> from(final Producer<? extends GItem> item, final Field<? super GItem, GValue> that)
 		throws NullPointerException {
-		return Properties.from(Producers.translate(source, target), Consumers.from(source, target));
+		return Properties.from(Producers.translate(item, that), Consumers.from(item, that));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Field, Object) Fields.from(target, null)}. */
-	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target) throws NullPointerException {
-		return Properties.from(target, null);
+	/** Diese Methode ist eine Abkürzung für {@link #from(Field, Object) Fields.from(that, null)}. */
+	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> that) throws NullPointerException {
+		return Properties.from(that, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Field) Properties.concat(Producers.fromValue(item), target)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Field) Properties.concat(Producers.fromValue(item), that)}.
 	 *
 	 * @see Producers#fromValue(Object) */
-	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> target, final GItem item) throws NullPointerException {
-		return Properties.from(Producers.fromValue(item), target);
+	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> that, final GItem item) throws NullPointerException {
+		return Properties.from(Producers.fromValue(item), that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Properties.empty(), target)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(Properties.empty(), set)}.
 	 *
 	 * @see #empty() */
-	public static <GValue> Property2<GValue> from(final Consumer<? super GValue> target) throws NullPointerException {
-		return Properties.from(Properties.<GValue>empty(), target);
+	public static <GValue> Property2<GValue> from(final Consumer<? super GValue> set) throws NullPointerException {
+		return Properties.from(Properties.<GValue>empty(), set);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(target, Properties.empty())}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Consumer) Properties.from(get, Properties.empty())}.
 	 *
 	 * @see #empty() */
-	public static <GValue> Property2<GValue> from(final Producer<? extends GValue> target) throws NullPointerException {
-		return Properties.from(target, Properties.<GValue>empty());
+	public static <GValue> Property2<GValue> from(final Producer<? extends GValue> get) throws NullPointerException {
+		return Properties.from(get, Properties.<GValue>empty());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeProperty new CompositeProperty<>(get, set)}. */

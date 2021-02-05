@@ -6,6 +6,12 @@ package bee.creative.util;
  * @param <GValue> Typ des Werts. */
 public interface Producer2<GValue> extends Producer<GValue> {
 
+	/** Diese Methode ist eine Abkürtung für {@link Producers#buffer(Producer) Producers.buffer(this)}. */
+	public Producer3<GValue> buffer();
+
+	/** Diese Methode ist eine Abkürtung für {@link Producers#buffer(Producer, int) Producers.buffer(this, mode)}. */
+	public Producer3<GValue> buffer(int mode);
+
 	/** Diese Methode ist eine Abkürtung für {@link Consumers#from(Producer, Setter) Consumers.from(this, target)}. */
 	public <GValue2> Consumer3<GValue2> concat(final Setter<? super GValue, GValue2> target);
 
@@ -15,22 +21,16 @@ public interface Producer2<GValue> extends Producer<GValue> {
 	/** Diese Methode ist eine Abkürtung für {@link Producers#translate(Producer, Getter) Producers.translate(this, trans)}. */
 	public <GValue2> Producer3<GValue2> concat(final Getter<? super GValue, GValue2> trans);
 
-	/** Diese Methode ist eine Abkürtung für {@link Producers#toBuffered(Producer) Producers.toBuffered(this)}. */
-	public Producer3<GValue> toBuffered();
+	/** Diese Methode ist eine Abkürtung für {@link Producers#synchronize(Producer) Producers.synchronize(this)}. */
+	public Producer2<GValue> synchronize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Producers#toBuffered(Producer, int) Producers.toBuffered(this, mode)}. */
-	public Producer3<GValue> toBuffered(int mode);
+	/** Diese Methode ist eine Abkürtung für {@link Producers#synchronize(Producer, Object) Producers.synchronize(this, mutex)}. */
+	public Producer2<GValue> synchronize(final Object mutex);
 
 	/** Diese Methode ist eine Abkürtung für {@link Getters#from(Producer) Getter.from(this)}. */
 	public Getter3<Object, GValue> toGetter();
 
 	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Producer) Properties.from(this, set)}. */
 	public Property2<GValue> toProperty(Consumer<? super GValue> set);
-
-	/** Diese Methode ist eine Abkürtung für {@link Producers#synchronize(Producer) Producers.synchronize(this)}. */
-	public Producer2<GValue> synchronize();
-
-	/** Diese Methode ist eine Abkürtung für {@link Producers#synchronize(Producer, Object) Producers.synchronize(this, mutex)}. */
-	public Producer2<GValue> synchronize(final Object mutex);
 
 }

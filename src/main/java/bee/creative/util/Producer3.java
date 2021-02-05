@@ -6,13 +6,13 @@ package bee.creative.util;
  * @param <GValue> Typ des Werts. */
 public interface Producer3<GValue> extends Producer2<GValue> {
 
-	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Producer) Properties.from(this)}. */
-	public Property2<GValue> toProperty();
-
 	@Override
 	public Producer3<GValue> synchronize();
 
 	@Override
 	public Producer3<GValue> synchronize(Object mutex);
+
+	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Producer) Properties.from(this)}. */
+	public Property2<GValue> toProperty();
 
 }

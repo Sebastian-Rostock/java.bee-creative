@@ -26,12 +26,12 @@ public abstract class AbstractFilter<GItem> extends BaseObject implements Filter
 	}
 
 	@Override
-	public Filter2<GItem> toBuffered() {
+	public Filter2<GItem> buffer() {
 		return null;
 	}
 
 	@Override
-	public Filter2<GItem> toBuffered(int limit, int mode) throws IllegalArgumentException {
+	public Filter2<GItem> buffer(int limit, int mode) throws IllegalArgumentException {
 		return null;
 	}
 

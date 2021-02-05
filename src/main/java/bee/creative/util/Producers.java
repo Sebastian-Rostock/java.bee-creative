@@ -323,13 +323,13 @@ public class Producers {
 		return Producers.from(Properties.<GValue>fromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #toBuffered(Producer, int) Producers.toBuffered(target, Pointers.SOFT)}. */
-	public static <GValue> Producer3<GValue> toBuffered(final Producer<? extends GValue> target) throws NullPointerException {
-		return Producers.toBuffered(target, Pointers.SOFT);
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(Producer, int) Producers.buffer(target, Pointers.SOFT)}. */
+	public static <GValue> Producer3<GValue> buffer(final Producer<? extends GValue> target) throws NullPointerException {
+		return Producers.buffer(target, Pointers.SOFT);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link BufferedProducer new BufferedProducer<>(target, mode)}. */
-	public static <GValue> Producer3<GValue> toBuffered(final Producer<? extends GValue> target, final int mode)
+	public static <GValue> Producer3<GValue> buffer(final Producer<? extends GValue> target, final int mode)
 		throws NullPointerException, IllegalArgumentException {
 		return new BufferedProducer<>(target, mode);
 	}
