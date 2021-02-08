@@ -728,7 +728,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableSet(Set)
 		 * @return neuer {@link SetBuilder} zum {@code unmodifiableSet}. */
-		public SetBuilder<GItem, Set<GItem>> toUnmodifiable() {
+		public SetBuilder<GItem, Set<GItem>> unmodifiable() {
 			return SetBuilder.from(Collections.unmodifiableSet(this.result));
 		}
 
@@ -838,7 +838,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableList(List)
 		 * @return neuer {@link ListBuilder} zur {@code unmodifiableList}. */
-		public ListBuilder<GItem, List<GItem>> toUnmodifiable() {
+		public ListBuilder<GItem, List<GItem>> unmodifiable() {
 			return ListBuilder.from(java.util.Collections.unmodifiableList(this.result));
 		}
 
@@ -949,7 +949,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableMap(Map)
 		 * @return neuer {@link MapBuilder} zur {@code unmodifiableMap}. */
-		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toUnmodifiable() {
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> unmodifiable() {
 			return MapBuilder.from(Collections.unmodifiableMap(this.result));
 		}
 

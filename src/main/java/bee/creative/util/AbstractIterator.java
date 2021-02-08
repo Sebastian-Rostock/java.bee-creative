@@ -28,7 +28,7 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> filter) throws NullPointerException {
+	public boolean retainAll(final Collection<?> filter) throws NullPointerException {
 		return false;
 	}
 
@@ -48,13 +48,13 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
-	public Iterator2<GItem> toFiltered(final Filter<? super GItem> filter) throws NullPointerException {
-		return Iterators.toFiltered(this, filter);
+	public Iterator2<GItem> filter(final Filter<? super GItem> filter) throws NullPointerException {
+		return Iterators.filter(this, filter);
 	}
 
 	@Override
-	public Iterator2<GItem> toLimited(final int count) throws IllegalArgumentException {
-		return Iterators.toLimited(this, count);
+	public Iterator2<GItem> limit(final int count) throws IllegalArgumentException {
+		return Iterators.limit(this, count);
 	}
 
 	@Override
@@ -63,18 +63,23 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
-	public Iterator2<GItem> toUnique() {
-		return Iterators.toUnique(this);
+	public Iterator2<GItem> unique() {
+		return Iterators.unique(this);
 	}
 
 	@Override
-	public Iterator2<GItem> toUnique(final Collection<GItem> buffer) throws NullPointerException {
-		return Iterators.toUnique(this, buffer);
+	public Iterator2<GItem> unique(final Hasher hasher) throws NullPointerException {
+		return Iterators.unique(this, hasher);
 	}
 
 	@Override
-	public Iterator2<GItem> toUnmodifiable() {
-		return Iterators.toUnmodifiable(this);
+	public Iterator2<GItem> unique(final Collection<GItem> buffer) throws NullPointerException {
+		return Iterators.unique(this, buffer);
+	}
+
+	@Override
+	public Iterator2<GItem> unmodifiable() {
+		return Iterators.unmodifiable(this);
 	}
 
 }

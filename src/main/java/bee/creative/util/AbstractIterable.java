@@ -28,23 +28,23 @@ public abstract class AbstractIterable<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
-	public Iterable2<GItem> toLimited(int count) throws IllegalArgumentException {
-		return Iterables.toLimited(this, count);
+	public Iterable2<GItem> limit(int count) throws IllegalArgumentException {
+		return Iterables.limit(this, count);
 	}
 
 	@Override
-	public Iterable2<GItem> toFiltered(Filter<? super GItem> filter) throws NullPointerException {
-		return Iterables.toFiltered(this, filter);
+	public Iterable2<GItem> filter(Filter<? super GItem> filter) throws NullPointerException {
+		return Iterables.filter(this, filter);
 	}
 
 	@Override
-	public Iterable2<GItem> toUnique() {
-		return Iterables.toUnique(this);
+	public Iterable2<GItem> unique() {
+		return Iterables.unique(this);
 	}
 
 	@Override
-	public Iterable2<GItem> toRepeated(int count) throws IllegalArgumentException {
-		return Iterables.toRepeated(this, count);
+	public Iterable2<GItem> repeat(int count) throws IllegalArgumentException {
+		return Iterables.repeat(this, count);
 	}
 
 	@Override
@@ -53,8 +53,8 @@ public abstract class AbstractIterable<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
-	public Iterable2<GItem> toUnmodifiable() {
-		return Iterables.toUnmodifiable(this);
+	public Iterable2<GItem> unmodifiable() {
+		return Iterables.unmodifiable(this);
 	}
 
 	@Override

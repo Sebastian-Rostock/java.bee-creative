@@ -56,10 +56,10 @@ public class Collections {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.toUnmodifiable(this.items1.size() < this.items2.size()
-				? Iterators.concat(Iterators.toFiltered(this.items1.iterator(), Filters.negate(Filters.fromItems(this.items2))),
+			return Iterators.unmodifiable(this.items1.size() < this.items2.size()
+				? Iterators.concat(Iterators.filter(this.items1.iterator(), Filters.negate(Filters.fromItems(this.items2))),
 					this.items2.iterator())
-				: Iterators.concat(Iterators.toFiltered(this.items2.iterator(), Filters.negate(Filters.fromItems(this.items1))),
+				: Iterators.concat(Iterators.filter(this.items2.iterator(), Filters.negate(Filters.fromItems(this.items1))),
 					this.items1.iterator()));
 		}
 
@@ -176,9 +176,9 @@ public class Collections {
 
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.toUnmodifiable(this.items1.size() < this.items2.size() //
-				? Iterators.toFiltered(this.items1.iterator(), Filters.fromItems(this.items2)) //
-				: Iterators.toFiltered(this.items2.iterator(), Filters.fromItems(this.items1)) //
+			return Iterators.unmodifiable(this.items1.size() < this.items2.size() //
+				? Iterators.filter(this.items1.iterator(), Filters.fromItems(this.items2)) //
+				: Iterators.filter(this.items2.iterator(), Filters.fromItems(this.items1)) //
 			);
 		}
 
