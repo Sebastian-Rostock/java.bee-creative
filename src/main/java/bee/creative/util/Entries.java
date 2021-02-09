@@ -68,41 +68,41 @@ public class Entries {
 	@SuppressWarnings ("javadoc")
 	public static class ReverseEntry<GKey, GValue> extends AbstractEntry<GKey, GValue> {
 
-		public final Entry<GValue, GKey> source;
+		public final Entry<GValue, GKey> that;
 
-		public final Entry2<GValue, GKey> source2;
+		final Entry2<GValue, GKey> that2;
 
-		public ReverseEntry(final Entry<GValue, GKey> source) throws NullPointerException {
-			this.source = Objects.notNull(source);
-			this.source2 = source instanceof Entry2<?, ?> ? (Entry2<GValue, GKey>)source : null;
+		public ReverseEntry(final Entry<GValue, GKey> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
+			this.that2 = that instanceof Entry2<?, ?> ? (Entry2<GValue, GKey>)that : null;
 		}
 
 		@Override
 		public GKey getKey() {
-			return this.source.getValue();
+			return this.that.getValue();
 		}
 
 		@Override
 		public GValue getValue() {
-			return this.source.getKey();
+			return this.that.getKey();
 		}
 
 		@Override
 		public Entry2<GKey, GValue> useKey(final GKey key) throws UnsupportedOperationException {
-			this.source.setValue(key);
+			this.that.setValue(key);
 			return this;
 		}
 
 		@Override
 		public Entry2<GKey, GValue> useValue(final GValue value) throws UnsupportedOperationException {
-			if (this.source2 == null) throw new UnsupportedOperationException();
-			this.source2.setKey(value);
+			if (this.that2 == null) throw new UnsupportedOperationException();
+			this.that2.setKey(value);
 			return this;
 		}
 
 		@Override
 		public Entry2<GValue, GKey> reverse() {
-			if (this.source2 != null) return this.source2;
+			if (this.that2 != null) return this.that2;
 			return new ReverseEntry<>(this);
 		}
 
@@ -137,10 +137,10 @@ public class Entries {
 	}
 
 	/** Diese Methode liefert das gegebene {@link Entry} als {@link Entry2}. Wenn es {@code null} ist, wird das {@link EmptyEntry} geliefert. */
-	public static <GKey, GValue> Entry2<GKey, GValue> from(final Entry<GKey, GValue> source) throws NullPointerException {
-		if (source == null) return Entries.empty();
-		if (source instanceof Entry2<?, ?>) return (Entry2<GKey, GValue>)source;
-		return Entries.reverse(source).reverse();
+	public static <GKey, GValue> Entry2<GKey, GValue> from(final Entry<GKey, GValue> that) throws NullPointerException {
+		if (that == null) return Entries.empty();
+		if (that instanceof Entry2<?, ?>) return (Entry2<GKey, GValue>)that;
+		return Entries.reverse(that).reverse();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueEnrty new ValueEnrty<>(key, value)}. */
@@ -159,9 +159,9 @@ public class Entries {
 		return Entries.<GKey, GValue>from(key.get(value), value);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ReverseEntry new ReverseEntry<>(source)}. */
-	public static <GKey, GValue> Entry2<GKey, GValue> reverse(final Entry<GValue, GKey> source) {
-		return new ReverseEntry<>(source);
+	/** Diese Methode ist eine Abkürzung für {@link ReverseEntry new ReverseEntry<>(that)}. */
+	public static <GKey, GValue> Entry2<GKey, GValue> reverse(final Entry<GValue, GKey> that) {
+		return new ReverseEntry<>(that);
 	}
 
 	/** Diese Methode liefert den {@link Getter3} zu {@link Entry#getKey()}. */

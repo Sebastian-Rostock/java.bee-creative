@@ -87,7 +87,7 @@ public class XMLMarshaller {
 			.closeMarshallerData();
 	}
 
-	/** Diese Methode ist eine Abkürtung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode()}.
+	/** Diese Methode ist eine Abkürzung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode()}.
 	 *
 	 * @see #from(Class...)
 	 * @see #marshalString() */
@@ -95,7 +95,7 @@ public class XMLMarshaller {
 		return XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode();
 	}
 
-	/** Diese Methode ist eine Abkürtung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString()}.
+	/** Diese Methode ist eine Abkürzung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString()}.
 	 *
 	 * @see #from(Class...)
 	 * @see #marshalString() */

@@ -746,7 +746,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link UnionIterator new UnionIterator<>(order, iter1, iter2)}. */
-	public static <GItem> Iterator<GItem> union(final Comparator<? super GItem> order, final Iterator<? extends GItem> iter1,
+	public static <GItem> Iterator2<GItem> union(final Comparator<? super GItem> order, final Iterator<? extends GItem> iter1,
 		final Iterator<? extends GItem> iter2) throws NullPointerException {
 		return new UnionIterator<>(order, iter1, iter2);
 	}
@@ -756,11 +756,10 @@ public class Iterators {
 	 *
 	 * @see #empty()
 	 * @see #union(Comparator, Iterator, Iterator) */
-	public static <GItem> Iterator<GItem> unionAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
+	public static <GItem> Iterator2<GItem> unionAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
 		throws NullPointerException {
 		if (!iters.hasNext()) return Iterators.empty();
-		@SuppressWarnings ("unchecked")
-		Iterator<GItem> result = (Iterator<GItem>)iters.next();
+		Iterator2<GItem> result = from(iters.next());
 		while (iters.hasNext()) {
 			result = Iterators.union(order, result, iters.next());
 		}
@@ -768,13 +767,13 @@ public class Iterators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ExceptIterator new ExceptIterator<>(order, iter1, iter2)}. */
-	public static <GItem> Iterator<GItem> except(final Comparator<? super GItem> order, final Iterator<? extends GItem> iter1,
+	public static <GItem> Iterator2<GItem> except(final Comparator<? super GItem> order, final Iterator<? extends GItem> iter1,
 		final Iterator<? extends GItem> iter2) throws NullPointerException {
 		return new ExceptIterator<>(order, iter1, iter2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link IntersectIterator new IntersectIterator<>(order, iter1, iter2)}. */
-	public static <GItem> Iterator<GItem> intersect(final Comparator<? super GItem> order, final Iterator<? extends GItem> iter1,
+	public static <GItem> Iterator2<GItem> intersect(final Comparator<? super GItem> order, final Iterator<? extends GItem> iter1,
 		final Iterator<? extends GItem> iter2) throws NullPointerException {
 		return new IntersectIterator<>(order, iter1, iter2);
 	}
@@ -784,10 +783,10 @@ public class Iterators {
 	 *
 	 * @see #empty()
 	 * @see #intersect(Comparator, Iterator, Iterator) */
-	public static <GItem> Iterator<GItem> intersectAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
+	public static <GItem> Iterator2<GItem> intersectAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
 		throws NullPointerException {
 		if (!iters.hasNext()) return Iterators.empty();
-		Iterator<GItem> result = Iterators.from(iters.next());
+		Iterator2<GItem> result = Iterators.from(iters.next());
 		while (iters.hasNext()) {
 			result = Iterators.intersect(order, result, iters.next());
 		}

@@ -64,7 +64,7 @@ public class XMLUnmarshaller {
 			.closeUnmarshallerData();
 	}
 
-	/** Diese Methode ist eine Abkürtung für {@code XMLUnmarshaller.from(classes).unmarshalNode(source)}.
+	/** Diese Methode ist eine Abkürzung für {@code XMLUnmarshaller.from(classes).unmarshalNode(source)}.
 	 *
 	 * @see #from(Class...)
 	 * @see #unmarshalNode(Node) */
@@ -72,7 +72,7 @@ public class XMLUnmarshaller {
 		return XMLUnmarshaller.from(classes).unmarshalNode(source);
 	}
 
-	/** Diese Methode ist eine Abkürtung für {@code XMLUnmarshaller.from(classes).unmarshalString(source)}.
+	/** Diese Methode ist eine Abkürzung für {@code XMLUnmarshaller.from(classes).unmarshalString(source)}.
 	 *
 	 * @see #from(Class...)
 	 * @see #unmarshalString(String) */

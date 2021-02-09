@@ -7,25 +7,25 @@ package bee.creative.util;
  * @param <GValue> Typ des Werts der Eigenschaft. */
 public interface Setter2<GItem, GValue> extends Setter<GItem, GValue> {
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#aggregate(Setter) Setters.aggregate(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#aggregate(Setter) Setters.aggregate(this)}. */
 	public Setter2<Iterable<? extends GItem>, GValue> aggregate();
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#optionalize(Setter) Setters.optionalize(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#optionalize(Setter) Setters.optionalize(this)}. */
 	public Setter2<GItem, GValue> optionalize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#synchronize(Setter) Setters.synchronize(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronize(Setter) Setters.synchronize(this)}. */
 	public Setter2<GItem, GValue> synchronize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#synchronize(Setter, Object) Setters.synchronize(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronize(Setter, Object) Setters.synchronize(this)}. */
 	public Setter2<GItem, GValue> synchronize(final Object mutex);
 
-	/** Diese Methode ist eine Abkürtung für {@link Fields#from(Getter, Setter) Fields.from(get, this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter, Setter) Fields.from(get, this)}. */
 	public Field2<GItem, GValue> toField(final Getter<? super GItem, ? extends GValue> get);
 
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#from(Setter) Consumer.from(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#from(Setter) Consumer.from(this)}. */
 	public Consumer3<GValue> toConsumer();
 
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#from(Setter, Object) Consumer.from(this, item)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#from(Setter, Object) Consumer.from(this, item)}. */
 	public Consumer3<GValue> toConsumer(final GItem item);
 
 }

@@ -6,16 +6,16 @@ package bee.creative.util;
  * @param <GValue> Typ des Werts. */
 public interface Consumer2<GValue> extends Consumer<GValue> {
 
-	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Producer) Properties.from(get, this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer) Properties.from(get, this)}. */
 	public Property2<GValue> toProperty(Producer<? extends GValue> get);
 
-	/** Diese Methode ist eine Abkürtung für {@link Setters#from(Consumer) Setter.from(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Setters#from(Consumer) Setter.from(this)}. */
 	public Setter3<Object, GValue> toSetter();
 
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#synchronize(Consumer) Consumers.synchronize(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronize(Consumer) Consumers.synchronize(this)}. */
 	public Consumer2<GValue> synchronize();
 
-	/** Diese Methode ist eine Abkürtung für {@link Consumers#synchronize(Consumer, Object) Consumers.synchronize(this, mutex)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronize(Consumer, Object) Consumers.synchronize(this, mutex)}. */
 	public Consumer2<GValue> synchronize(final Object mutex);
 
 }

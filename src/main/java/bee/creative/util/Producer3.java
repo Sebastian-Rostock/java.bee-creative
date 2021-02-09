@@ -12,7 +12,7 @@ public interface Producer3<GValue> extends Producer2<GValue> {
 	@Override
 	public Producer3<GValue> synchronize(Object mutex);
 
-	/** Diese Methode ist eine Abkürtung für {@link Properties#from(Producer) Properties.from(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer) Properties.from(this)}. */
 	public Property2<GValue> toProperty();
 
 }

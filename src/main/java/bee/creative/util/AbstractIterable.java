@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import bee.creative.lang.Objects.BaseObject;
@@ -13,7 +12,7 @@ import bee.creative.lang.Objects.UseToString;
 public abstract class AbstractIterable<GItem> extends BaseObject implements Iterable2<GItem>, UseToString {
 
 	@Override
-	public Iterator<GItem> iterator() {
+	public Iterator2<GItem> iterator() {
 		return Iterators.empty();
 	}
 

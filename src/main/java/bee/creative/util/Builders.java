@@ -165,8 +165,8 @@ public class Builders {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
-			return this.result.iterator();
+		public Iterator2<GItem> iterator() {
+			return Iterators.from(this.result.iterator());
 		}
 
 	}
@@ -517,8 +517,8 @@ public class Builders {
 		}
 
 		@Override
-		public Iterator<Entry<GKey, GValue>> iterator() {
-			return this.result.entrySet().iterator();
+		public Iterator2<Entry<GKey, GValue>> iterator() {
+			return Iterators.from(this.result.entrySet().iterator());
 		}
 
 	}
@@ -544,7 +544,7 @@ public class Builders {
 	public static abstract class BaseItemBuilder<GResult, GThis> extends BaseBuilder2<GResult, GThis> implements Property<GResult>, Iterable<GResult> {
 
 		@Override
-		public void set(GResult value) {
+		public void set(final GResult value) {
 			this.result = value;
 		}
 
@@ -576,7 +576,7 @@ public class Builders {
 		}
 
 		@Override
-		public Iterator<GResult> iterator() {
+		public Iterator2<GResult> iterator() {
 			final GResult result = this.result;
 			if (result == null) return Iterators.empty();
 			return Iterators.fromItem(result);
@@ -712,7 +712,7 @@ public class Builders {
 		 * @param <GItem2> Typ der übersetzten Elemente.
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
 		 * @return neuer {@link SetBuilder} zum {@code translatedSet}. */
-		public <GItem2> SetBuilder<GItem2, Set<GItem2>> translate(final Translator<GItem, GItem2> itemTranslator) {
+		public <GItem2> SetBuilder<GItem2, Set<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
 			return SetBuilder.from(bee.creative.util.Collections.translatedSet(this.result, itemTranslator));
 		}
 
@@ -720,7 +720,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#synchronizedSet(Set)
 		 * @return neuer {@link SetBuilder} zum {@code synchronizedSet}. */
-		public SetBuilder<GItem, Set<GItem>> synchronize() {
+		public SetBuilder<GItem, Set<GItem>> toSynchronized() {
 			return SetBuilder.from(Collections.synchronizedSet(this.result));
 		}
 
@@ -728,7 +728,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableSet(Set)
 		 * @return neuer {@link SetBuilder} zum {@code unmodifiableSet}. */
-		public SetBuilder<GItem, Set<GItem>> unmodifiable() {
+		public SetBuilder<GItem, Set<GItem>> toUnmodifiable() {
 			return SetBuilder.from(Collections.unmodifiableSet(this.result));
 		}
 
@@ -822,7 +822,7 @@ public class Builders {
 		 * @param <GItem2> Typ der übersetzten Elemente.
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
 		 * @return neuer {@link ListBuilder} zur {@code translatedList}. */
-		public <GItem2> ListBuilder<GItem2, List<GItem2>> translate(final Translator<GItem, GItem2> itemTranslator) {
+		public <GItem2> ListBuilder<GItem2, List<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
 			return ListBuilder.from(bee.creative.util.Collections.translatedList(this.result, itemTranslator));
 		}
 
@@ -830,7 +830,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#synchronizedList(List)
 		 * @return neuer {@link ListBuilder} zur {@code synchronizedList}. */
-		public ListBuilder<GItem, List<GItem>> synchronize() {
+		public ListBuilder<GItem, List<GItem>> toSynchronized() {
 			return ListBuilder.from(java.util.Collections.synchronizedList(this.result));
 		}
 
@@ -838,7 +838,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableList(List)
 		 * @return neuer {@link ListBuilder} zur {@code unmodifiableList}. */
-		public ListBuilder<GItem, List<GItem>> unmodifiable() {
+		public ListBuilder<GItem, List<GItem>> toUnmodifiable() {
 			return ListBuilder.from(java.util.Collections.unmodifiableList(this.result));
 		}
 
@@ -932,7 +932,7 @@ public class Builders {
 		 * @param keyTranslator {@link Translator} zur Übersetzung der Schlüssel.
 		 * @param valueTranslator {@link Translator} zur Übersetzung der Werte.
 		 * @return neuer {@link MapBuilder} zur {@code translatedMap}. */
-		public <GKey2, GValue2> MapBuilder<GKey2, GValue2, Map<GKey2, GValue2>> translate(final Translator<GKey, GKey2> keyTranslator,
+		public <GKey2, GValue2> MapBuilder<GKey2, GValue2, Map<GKey2, GValue2>> toTranslated(final Translator<GKey, GKey2> keyTranslator,
 			final Translator<GValue, GValue2> valueTranslator) {
 			return MapBuilder.from(bee.creative.util.Collections.translatedMap(this.result, keyTranslator, valueTranslator));
 		}
@@ -941,7 +941,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#synchronizedMap(Map)
 		 * @return neuer {@link MapBuilder} zur {@code synchronizedMap}. */
-		public MapBuilder<GKey, GValue, Map<GKey, GValue>> synchronize() {
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toSynchronized() {
 			return MapBuilder.from(Collections.synchronizedMap(this.result));
 		}
 
@@ -949,7 +949,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableMap(Map)
 		 * @return neuer {@link MapBuilder} zur {@code unmodifiableMap}. */
-		public MapBuilder<GKey, GValue, Map<GKey, GValue>> unmodifiable() {
+		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toUnmodifiable() {
 			return MapBuilder.from(Collections.unmodifiableMap(this.result));
 		}
 

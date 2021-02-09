@@ -9,40 +9,43 @@ import java.util.Set;
  * @param <GItem> Typ der Elemente. */
 public interface Iterable2<GItem> extends Iterable<GItem> {
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#concat(Iterable, Iterable) Iterables.concat(this, second)}. */
+	@Override
+	public Iterator2<GItem> iterator();
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#concat(Iterable, Iterable) Iterables.concat(this, second)}. */
 	public Iterable<GItem> concat(final Iterable<? extends GItem> second) throws NullPointerException;
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#size(Iterable) Iterables.size(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#size(Iterable) Iterables.size(this)}. */
 	public int size();
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#toArray(Iterable) Iterables.toArray(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#toArray(Iterable) Iterables.toArray(this)}. */
 	public Object[] toArray();
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#toArray(Iterable, Object[]) Iterables.toArray(this, array)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#toArray(Iterable, Object[]) Iterables.toArray(this, array)}. */
 	public GItem[] toArray(final GItem[] array) throws NullPointerException;
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#filter(Iterable, Filter) Iterables.filter(this, filter)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#filter(Iterable, Filter) Iterables.filter(this, filter)}. */
 	public Iterable2<GItem> filter(final Filter<? super GItem> filter) throws NullPointerException;
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#limit(Iterable, int) Iterables.limit(this, count)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#limit(Iterable, int) Iterables.limit(this, count)}. */
 	public Iterable2<GItem> limit(final int count) throws IllegalArgumentException;
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#toList(Iterable) Iterables.toList(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#toList(Iterable) Iterables.toList(this)}. */
 	public List<GItem> toList();
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#repeat(Iterable, int) Iterables.repeat(this, count)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#repeat(Iterable, int) Iterables.repeat(this, count)}. */
 	public Iterable2<GItem> repeat(final int count) throws IllegalArgumentException;
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#toSet(Iterable) Iterables.toSet(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#toSet(Iterable) Iterables.toSet(this)}. */
 	public Set<GItem> toSet();
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#translate(Iterable, Getter) Iterables.translate(this, trans)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#translate(Iterable, Getter) Iterables.translate(this, trans)}. */
 	public <GItem2> Iterable2<GItem2> translate(final Getter<? super GItem, ? extends GItem2> trans) throws NullPointerException;
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#unique(Iterable) Iterables.unique(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#unique(Iterable) Iterables.unique(this)}. */
 	public Iterable2<GItem> unique();
 
-	/** Diese Methode ist eine Abkürtung für {@link Iterables#unmodifiable(Iterable) Iterables.unmodifiable(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#unmodifiable(Iterable) Iterables.unmodifiable(this)}. */
 	public Iterable2<GItem> unmodifiable();
 
 }

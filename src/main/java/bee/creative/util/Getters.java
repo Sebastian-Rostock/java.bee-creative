@@ -42,11 +42,11 @@ public class Getters {
 
 	public static class MethodGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
-		public final Method target;
+		public final Method that;
 
 		public MethodGetter(final Method target, final boolean forceAccessible) {
 			if (target.getParameterTypes().length != (Modifier.isStatic(target.getModifiers()) ? 1 : 0)) throw new IllegalArgumentException();
-			this.target = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
+			this.that = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
 		}
 
 		@Override
@@ -54,10 +54,10 @@ public class Getters {
 		public GValue get(final GItem item) {
 			try {
 				final GValue result;
-				if (Modifier.isStatic(this.target.getModifiers())) {
-					result = (GValue)this.target.invoke(null, item);
+				if (Modifier.isStatic(this.that.getModifiers())) {
+					result = (GValue)this.that.invoke(null, item);
 				} else {
-					result = (GValue)this.target.invoke(item);
+					result = (GValue)this.that.invoke(item);
 				}
 				return result;
 			} catch (final IllegalAccessException | InvocationTargetException cause) {
@@ -67,7 +67,7 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.target.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
 		}
 
 	}
@@ -99,39 +99,39 @@ public class Getters {
 
 	}
 
-	public static class DefaultGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
+	public static class ConcatGetter<GItem, GSource, GTarget> extends AbstractGetter<GItem, GTarget> {
 
-		public final Getter<? super GItem, GValue> target;
+		public final Getter<? super GItem, ? extends GSource> that;
 
-		public final GValue value;
+		public final Getter<? super GSource, ? extends GTarget> trans;
 
-		public DefaultGetter(final Getter<? super GItem, GValue> target, final GValue value) {
-			this.target = Objects.notNull(target);
-			this.value = value;
+		public ConcatGetter(final Getter<? super GItem, ? extends GSource> that, final Getter<? super GSource, ? extends GTarget> trans)
+			throws NullPointerException {
+			this.that = Objects.notNull(that);
+			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
-		public GValue get(final GItem item) {
-			if (item == null) return this.value;
-			return this.target.get(item);
+		public GTarget get(final GItem item) {
+			return this.trans.get(this.that.get(item));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.value);
+			return Objects.toInvokeString(this, this.that, this.trans);
 		}
 
 	}
 
 	public static class BufferedGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
+		public final Getter<? super GItem, ? extends GValue> that;
+
 		public final int limit;
 
 		public final byte inputMode;
 
 		public final byte outputMode;
-
-		public final Getter<? super GItem, ? extends GValue> getter;
 
 		Map<Pointer<GItem>, Pointer<GValue>> buffer = new LinkedHashMap<>(0, 0.75f, true);
 
@@ -143,7 +143,7 @@ public class Getters {
 			this.limit = limit;
 			this.inputMode = (byte)inputMode;
 			this.outputMode = (byte)outputMode;
-			this.getter = Objects.notNull(getter);
+			this.that = Objects.notNull(getter);
 		}
 
 		@Override
@@ -168,7 +168,7 @@ public class Getters {
 					}
 				}
 			}
-			final GValue output = this.getter.get(item);
+			final GValue output = this.that.get(item);
 			this.buffer.put(Pointers.from(this.inputMode, item), Pointers.from(this.outputMode, output));
 			final int size = this.buffer.size(), capacity = this.capacity;
 			if (size >= capacity) {
@@ -182,30 +182,7 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.limit, this.inputMode, this.outputMode, this.getter);
-		}
-
-	}
-
-	public static class ConcatGetter<GItem, GSource, GTarget> extends AbstractGetter<GItem, GTarget> {
-
-		public final Getter<? super GItem, ? extends GSource> target;
-
-		public final Getter<? super GSource, ? extends GTarget> trans;
-
-		public ConcatGetter(final Getter<? super GItem, ? extends GSource> target, final Getter<? super GSource, ? extends GTarget> trans) {
-			this.target = Objects.notNull(target);
-			this.trans = Objects.notNull(trans);
-		}
-
-		@Override
-		public GTarget get(final GItem item) {
-			return this.trans.get(this.target.get(item));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.trans);
+			return Objects.toInvokeString(this, this.limit, this.inputMode, this.outputMode, this.that);
 		}
 
 	}
@@ -218,7 +195,7 @@ public class Getters {
 	 * umgewandelten, Wert. */
 	public static class AggregatedGetter<GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> extends AbstractGetter<GItem, GValue> {
 
-		public final Getter<? super GItem2, GValue2> target;
+		public final Getter<? super GItem2, GValue2> that;
 
 		public final Getter<? super GValue2, ? extends GValue> trans;
 
@@ -226,9 +203,9 @@ public class Getters {
 
 		public final Getter<? super GItem, ? extends GValue> mixed;
 
-		public AggregatedGetter(final Getter<? super GItem2, GValue2> target, final Getter<? super GValue2, ? extends GValue> trans,
-			final Getter<? super GItem, ? extends GValue> empty, final Getter<? super GItem, ? extends GValue> mixed) {
-			this.target = Objects.notNull(target);
+		public AggregatedGetter(final Getter<? super GItem2, GValue2> that, final Getter<? super GValue2, ? extends GValue> trans,
+			final Getter<? super GItem, ? extends GValue> empty, final Getter<? super GItem, ? extends GValue> mixed) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.trans = Objects.notNull(trans);
 			this.empty = Objects.notNull(empty);
 			this.mixed = Objects.notNull(mixed);
@@ -240,10 +217,10 @@ public class Getters {
 			final Iterator<? extends GItem2> iterator = item.iterator();
 			if (!iterator.hasNext()) return this.empty.get(item);
 			final GItem2 entry = iterator.next();
-			final GValue2 value = this.target.get(entry);
+			final GValue2 value = this.that.get(entry);
 			while (iterator.hasNext()) {
 				final GItem2 item2 = iterator.next();
-				final GValue2 value2 = this.target.get(item2);
+				final GValue2 value2 = this.that.get(item2);
 				if (!Objects.equals(value, value2)) return this.mixed.get(item);
 			}
 			return this.trans.get(value);
@@ -251,72 +228,117 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.trans, this.empty, this.mixed);
+			return Objects.toInvokeString(this, this.that, this.trans, this.empty, this.mixed);
+		}
+
+	}
+
+	public static class OptionalizedGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
+
+		public final Getter<? super GItem, GValue> target;
+
+		public final GValue value;
+
+		public OptionalizedGetter(final Getter<? super GItem, GValue> target, final GValue value) {
+			this.target = Objects.notNull(target);
+			this.value = value;
+		}
+
+		@Override
+		public GValue get(final GItem item) {
+			if (item == null) return this.value;
+			return this.target.get(item);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.target, this.value);
 		}
 
 	}
 
 	public static class SynchronizedGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
-		public final Getter<? super GItem, ? extends GValue> target;
+		public final Getter<? super GItem, ? extends GValue> that;
 
 		public final Object mutex;
 
-		public SynchronizedGetter(final Getter<? super GItem, ? extends GValue> getter, final Object mutex) {
-			this.target = Objects.notNull(getter);
+		public SynchronizedGetter(final Getter<? super GItem, ? extends GValue> that, final Object mutex) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.mutex = Objects.notNull(mutex, this);
 		}
 
 		@Override
 		public GValue get(final GItem item) {
 			synchronized (this.mutex) {
-				return this.target.get(item);
+				return this.that.get(item);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target, this.mutex == this ? null : this.mutex);
+			return Objects.toInvokeString(this, this.that, this.mutex == this ? null : this.mutex);
+		}
+
+	}
+
+	/** Diese Klasse implementiert {@link Getters#from(Filter)} */
+	static class FilterGetter<GItem> extends AbstractGetter<GItem, Boolean> {
+
+		public final Filter<? super GItem> that;
+
+		public FilterGetter(final Filter<? super GItem> that) throws NullPointerException {
+			this.that = that;
+		}
+
+		@Override
+		public Boolean get(final GItem item) {
+			return Boolean.valueOf(this.that.accept(item));
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
 
 	static class SourceGetter<GValue, GItem> extends AbstractGetter<GItem, GValue> {
 
-		public final Translator<? extends GValue, ? super GItem> target;
+		public final Translator<? extends GValue, ? super GItem> that;
 
-		public SourceGetter(final Translator<? extends GValue, ? super GItem> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public SourceGetter(final Translator<? extends GValue, ? super GItem> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public GValue get(final Object item) {
-			return this.target.toSource(item);
+			return this.that.toSource(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
 
 	static class TargetGetter<GValue, GItem> extends AbstractGetter<GItem, GValue> {
 
-		public final Translator<? super GItem, ? extends GValue> target;
+		public final Translator<? super GItem, ? extends GValue> that;
 
-		public TargetGetter(final Translator<? super GItem, ? extends GValue> target) {
-			this.target = Objects.notNull(target);
+		public TargetGetter(final Translator<? super GItem, ? extends GValue> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public GValue get(final Object item) {
-			return this.target.toTarget(item);
+			return this.that.toTarget(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
@@ -339,27 +361,6 @@ public class Getters {
 			return Objects.toInvokeString(this, this.target);
 		}
 
-	}
-
-	/** Diese Klasse implementiert {@link Getters#from(Filter)} */
-	static class FilterGetter<GItem> extends AbstractGetter<GItem, Boolean> {
-	
-		public final Filter<? super GItem> filter;
-	
-		public FilterGetter(final Filter<? super GItem> filter) {
-			this.filter = filter;
-		}
-	
-		@Override
-		public Boolean get(final GItem item) {
-			return Boolean.valueOf(this.filter.accept(item));
-		}
-	
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.filter);
-		}
-	
 	}
 
 	@SuppressWarnings ("unchecked")
@@ -554,7 +555,7 @@ public class Getters {
 	 * @return {@code default}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
 	public static <GItem, GValue> Getter3<GItem, GValue> optionalize(final Getter<? super GItem, GValue> target, final GValue value) throws NullPointerException {
-		return new DefaultGetter<>(target, value);
+		return new OptionalizedGetter<>(target, value);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #buffer(int, int, int, Getter) Getters.bufferedGetter(-1, Pointers.SOFT, Pointers.SOFT, getter)}. */

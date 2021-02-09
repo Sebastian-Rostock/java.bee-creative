@@ -151,7 +151,7 @@ public class Comparables {
 
 	}
 
-	/** Diese Klasse implementiert {@link Comparables#toIterable(Comparable)} */
+	/** Diese Klasse implementiert {@link Comparables#iterable(Comparable)} */
 	@SuppressWarnings ("javadoc")
 	public static class IterableComparable<GItem> extends AbstractComparable<Iterable<? extends GItem>> {
 
@@ -737,7 +737,7 @@ public class Comparables {
 	 * @param comparable {@link Comparable}.
 	 * @return {@code iterable}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Comparable<Iterable<? extends GItem>> toIterable(final Comparable<? super GItem> comparable) {
+	public static <GItem> Comparable<Iterable<? extends GItem>> iterable(final Comparable<? super GItem> comparable) {
 		return new IterableComparable<>(comparable);
 	}
 

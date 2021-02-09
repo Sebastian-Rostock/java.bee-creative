@@ -37,7 +37,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<Integer> iterator() {
+		public Iterator2<Integer> iterator() {
 			return Iterators.fromCount(this.count);
 		}
 
@@ -61,7 +61,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.concatAll(Iterators.translate(this.that.iterator(), Iterables.<GItem>iterator()));
 		}
 
@@ -89,7 +89,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.fromItem(this.item, this.count);
 		}
 
@@ -117,7 +117,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.limit(this.that.iterator(), this.count);
 		}
 
@@ -144,7 +144,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.filter(this.that.iterator(), this.filter);
 		}
 
@@ -168,7 +168,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.unique(this.that.iterator());
 		}
 
@@ -193,7 +193,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.translate(this.that.iterator(), this.trans);
 		}
 
@@ -217,7 +217,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.unmodifiable(this.that.iterator());
 		}
 
@@ -244,7 +244,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.unionAll(this.order, Iterators.translate(this.iters.iterator(), Iterables.<GItem>iterator()));
 		}
 
@@ -275,7 +275,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.except(this.order, this.iter1.iterator(), this.iter2.iterator());
 		}
 
@@ -302,7 +302,7 @@ public class Iterables {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.intersectAll(this.order, Iterators.translate(this.iters.iterator(), Iterables.<GItem>iterator()));
 		}
 

@@ -19,8 +19,8 @@ public abstract class AbstractComparator<GItem> extends BaseObject implements Co
 	}
 
 	@Override
-	public Comparator2<Iterable<? extends GItem>> toIterable() {
-		return Comparators.toIterable(this);
+	public Comparator2<Iterable<? extends GItem>> iterable() {
+		return Comparators.iterable(this);
 	}
 
 	@Override
