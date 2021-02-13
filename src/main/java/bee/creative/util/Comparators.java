@@ -520,8 +520,7 @@ public class Comparators {
 		return (Comparator2<GItem>)NaturalComparator.INSTANCE;
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Comparator} als {@link Comparator2}. Wenn er {@code null} ist, wird {@link #neutral() Comparators.neutral()}
-	 * geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Comparator} als {@link Comparator2}. Wenn er {@code null} ist, wird de r{@link NeutralComparator} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Comparator2<GItem> from(final Comparator<? super GItem> that) {
 		if (that == null) return Comparators.neutral();

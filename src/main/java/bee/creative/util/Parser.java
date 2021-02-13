@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import bee.creative.array.CompactIntegerArray;
 import bee.creative.lang.Objects;
 import bee.creative.util.Comparables.Items;
 
@@ -351,6 +352,13 @@ public class Parser {
 			return this.tokens.length;
 		}
 
+		public int[] path(int index){
+			CompactIntegerArray res = new CompactIntegerArray(10);
+			// TODO
+			
+			return res.toArray();
+		}
+		
 		/** Diese Methode gibt die Verkettung der {@link Token#type() Abschnittstypen} der {@link #tokens() Abschnitte} als Zeichenkette zurück.
 		 *
 		 * @see Token#type()
@@ -382,6 +390,8 @@ public class Parser {
 			return this.tokens.clone();
 		}
 
+		
+		
 		@Override
 		public Token get(final int index) throws IndexOutOfBoundsException {
 			return this.tokens[index];

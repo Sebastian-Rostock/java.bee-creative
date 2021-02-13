@@ -230,7 +230,7 @@ public class Producers {
 		return Producers.from(that, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #translate(Producer, Getter) Producers.concat(Producers.fromValue(item), that)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #translate(Producer, Getter) Producers.translate(Producers.fromValue(item), that)}. */
 	public static <GItem, GValue> Producer3<GValue> from(final Getter<? super GItem, ? extends GValue> that, final GItem item) throws NullPointerException {
 		return Producers.translate(Producers.fromValue(item), that);
 	}
