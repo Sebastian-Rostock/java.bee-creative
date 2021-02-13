@@ -529,7 +529,7 @@ public class Comparators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatComparator new ConcatComparator<>(comp1, comp2)}. */
-	public static <GItem> Comparator2<GItem> from(final Comparator<? super GItem> comp1, final Comparator<? super GItem> comp2) throws NullPointerException {
+	public static <GItem> Comparator2<GItem> concat(final Comparator<? super GItem> comp1, final Comparator<? super GItem> comp2) throws NullPointerException {
 		return new ConcatComparator<>(comp1, comp2);
 	}
 

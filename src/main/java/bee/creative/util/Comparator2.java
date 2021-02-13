@@ -8,6 +8,9 @@ import java.util.Comparator;
  * @param <GItem> Typ der Eingabe */
 public interface Comparator2<GItem> extends Comparator<GItem> {
 
+	/** Diese Methode ist eine Abkürzung für {@link Comparators#concat(Comparator, Comparator) Comparators.concat(this, that)}. */
+	public Comparator2<GItem> concat(final Comparator<? super GItem> that) throws NullPointerException;
+
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#iterable(Comparator) Comparators.iterable(this)}. */
 	public Comparator2<Iterable<? extends GItem>> iterable();
 

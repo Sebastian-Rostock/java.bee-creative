@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.util.Comparator;
 import bee.creative.lang.Objects.BaseObject;
 
 /** Diese Klasse implementiert einen abstrakten {@link Comparator2} als {@link BaseObject}.
@@ -14,13 +15,18 @@ public abstract class AbstractComparator<GItem> extends BaseObject implements Co
 	}
 
 	@Override
-	public Comparator2<GItem> optionalize() {
-		return Comparators.optionalize(this);
+	public Comparator2<GItem> concat(Comparator<? super GItem> that) throws NullPointerException {
+		return Comparators.concat(this, that);
 	}
 
 	@Override
 	public Comparator2<Iterable<? extends GItem>> iterable() {
 		return Comparators.iterable(this);
+	}
+
+	@Override
+	public Comparator2<GItem> optionalize() {
+		return Comparators.optionalize(this);
 	}
 
 	@Override

@@ -577,14 +577,13 @@ public class Iterators {
 
 	}
 
-	/** Diese Methode liefert {@link EmptyIterator EmptyIterator.INSTANCE}. */
+	/** Diese Methode liefert den {@link EmptyIterator}. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterator2<GItem> empty() {
 		return (Iterator2<GItem>)EmptyIterator.INSTANCE;
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Iterator} als {@link Iterator2}. Wenn er {@code null} ist, wird {@link #empty() Iterators.empty()}
-	 * geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Iterator} als {@link Iterator2}. Wenn er {@code null} ist, wird der {@link EmptyIterator} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterator2<GItem> from(final Iterator<? extends GItem> that) {
 		if (that == null) return Iterators.empty();
