@@ -347,7 +347,7 @@ public final class Fields {
 	 *
 	 * @see Getters#concat(Getter, Getter)
 	 * @see Setters#translate(Getter, Setter) */
-	public static <GSource, GTarget, GValue> Field2<GSource, GValue> concat(final Getter<? super GSource, ? extends GTarget> source,
+	public static <GSource, GTarget, GValue> Field2<GSource, GValue> translate(final Getter<? super GSource, ? extends GTarget> source,
 		final Field<? super GTarget, GValue> target) throws NullPointerException {
 		return new ConcatField<>(source, target);
 	}

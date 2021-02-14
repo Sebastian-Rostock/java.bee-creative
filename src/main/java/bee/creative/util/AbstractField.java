@@ -26,7 +26,7 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 
 	@Override
 	public <GValue2> Field2<GItem, GValue2> concat(final Field<? super GValue, GValue2> target) {
-		return Fields.concat(this, target);
+		return Fields.translate(this, target);
 	}
 
 	@Override

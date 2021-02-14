@@ -15,7 +15,7 @@ public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#translate(Comparator, Getter) Comparators.from(this, target)}. */
 	public Comparator2<GItem> concat(final Comparator<? super GValue> target);
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#concat(Getter, Field) Fields.concat(this, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#translate(Getter, Field) Fields.concat(this, target)}. */
 	public <GValue2> Field2<GItem, GValue2> concat(final Field<? super GValue, GValue2> target);
 
 	/** Diese Methode ist eine Abkürzung für {@link Filters#translate(Getter, Filter) Filters.from(this, target)}. */

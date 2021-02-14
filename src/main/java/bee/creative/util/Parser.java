@@ -20,7 +20,7 @@ public class Parser {
 	 * Die Methoden {@link #get(int)}, {@link #size()}, {@link #tokens()} und {@link #iterator()} beziehen sich auf die Kindabschnitte. Die Methoden
 	 * {@link #start()}, {@link #end()}, {@link #length()}, {@link #hashCode()} und {@link #equals(Object)} beziehen sich dagegen nur auf Lage und Größe des
 	 * Abschnitts.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class Token implements Items<Token>, Iterable<Token>, Comparable<Token> {
 
@@ -170,6 +170,7 @@ public class Parser {
 			this.offset = offset;
 			this.length = length;
 			this.tokens = tokens;
+			Arrays.sort(tokens);
 		}
 
 		/** Diese Methode gibt den Typ des Abschnitts zurück.
@@ -193,6 +194,14 @@ public class Parser {
 		 * @return Kindabschnittanzahl. */
 		public int size() {
 			return this.tokens.length;
+		}
+
+		public int find(final int index) {
+			return this.find(Token.containing(index));
+		}
+
+		public int find(final Comparable2<Token> comp) {
+			return Comparables.binarySearch(this, comp, 0, this.size());
 		}
 
 		/** Diese Methode liefet die Position des ersten Zeichens nach dem Abschnitt.
@@ -332,6 +341,7 @@ public class Parser {
 			if (Arrays.asList(tokens).contains(null)) throw new NullPointerException();
 			this.root = Objects.notNull(root);
 			this.tokens = tokens;
+			Arrays.sort(tokens);
 		}
 
 		/** Diese Methode gibt den Wurzelknoten der Abschnittshierarchie zurück. Der damit aufgespannte Abschnittsbaum verwendet die {@link #tokens() Abschnitte}
@@ -352,13 +362,17 @@ public class Parser {
 			return this.tokens.length;
 		}
 
-		public int[] path(int index){
-			CompactIntegerArray res = new CompactIntegerArray(10);
-			// TODO
-			
-			return res.toArray();
+		public int[] path(final int index) {
+			final CompactIntegerArray res = new CompactIntegerArray(10);
+			final Comparable2<Token> comp = Token.containing(index);
+			for (Token tok = this.root; true;) {
+				final int pos = tok.find(comp);
+				if (pos < 0) return res.toArray();
+				res.add(pos);
+				tok = tok.get(pos);
+			}
 		}
-		
+
 		/** Diese Methode gibt die Verkettung der {@link Token#type() Abschnittstypen} der {@link #tokens() Abschnitte} als Zeichenkette zurück.
 		 *
 		 * @see Token#type()
@@ -390,8 +404,6 @@ public class Parser {
 			return this.tokens.clone();
 		}
 
-		
-		
 		@Override
 		public Token get(final int index) throws IndexOutOfBoundsException {
 			return this.tokens[index];

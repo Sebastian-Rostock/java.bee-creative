@@ -12,11 +12,11 @@ public interface Producer2<GValue> extends Producer<GValue> {
 	/** Diese Methode ist eine Abkürzung für {@link Producers#buffer(Producer, int) Producers.buffer(this, mode)}. */
 	public Producer3<GValue> buffer(int mode);
 
-	/** Diese Methode ist eine Abkürzung für {@link Consumers#from(Producer, Setter) Consumers.from(this, target)}. */
-	public <GValue2> Consumer3<GValue2> concat(final Setter<? super GValue, GValue2> target);
-
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer, Field) Properties.from(this, target)}. */
 	public <GValue2> Property2<GValue2> concat(final Field<? super GValue, GValue2> target);
+
+	/** Diese Methode ist eine Abkürzung für {@link Consumers#from(Producer, Setter) Consumers.from(this, target)}. */
+	public <GValue2> Consumer3<GValue2> concat(final Setter<? super GValue, GValue2> target);
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#translate(Producer, Getter) Producers.translate(this, trans)}. */
 	public <GValue2> Producer3<GValue2> concat(final Getter<? super GValue, GValue2> trans);
