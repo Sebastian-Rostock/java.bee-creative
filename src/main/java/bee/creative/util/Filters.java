@@ -386,6 +386,10 @@ public class Filters {
 		return (Filter2<GItem>)RejectFilter.INSTANCE;
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code value ? Filters.accept() : Filters.reject()}.
+	 *
+	 * @see #accept()
+	 * @see #reject() */
 	public static <GItem> Filter2<GItem> from(final boolean value) {
 		return value ? Filters.<GItem>accept() : Filters.<GItem>reject();
 	}
@@ -398,31 +402,42 @@ public class Filters {
 		return new GetterFilter<>(that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link ClassFilter new ClassFilter<>(that)}. */
 	public static <GItem> Filter2<GItem> fromClass(final Class<?> that) throws NullPointerException {
 		return new ClassFilter<>(that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link EqualFilter new EqualFilter<>(that)}. */
 	public static <GItem> Filter2<GItem> fromEqual(final Comparable<? super GItem> that) throws NullPointerException {
 		return new EqualFilter<>(that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link LowerFilter new LowerFilter<>(that)}. */
 	public static <GItem> Filter2<GItem> fromLower(final Comparable<? super GItem> that) throws NullPointerException {
 		return new LowerFilter<>(that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link HigherFilter new HigherFilter<>(that)}. */
 	public static <GItem> Filter2<GItem> fromHigher(final Comparable<? super GItem> that) throws NullPointerException {
 		return new HigherFilter<>(that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #fromItems(Collection) Filters.fromItems(Iterables.toSet(Arrays.asList(items)))}.
+	 *
+	 * @see Arrays#asList(Object...)
+	 * @see Iterables#toSet(Iterable) */
 	public static Filter2<Object> fromItems(final Object... items) throws NullPointerException {
-
-		return Filters.fromItems(Arrays.asList(items));
+		return Filters.fromItems(Iterables.toSet(Arrays.asList(items)));
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #fromItems(Collection) Filters.fromItems(Iterables.toSet(that))}.
+	 *
+	 * @see Iterables#toSet(Iterable) */
 	public static Filter2<Object> fromItems(final Iterable<?> that) throws NullPointerException {
-		return fromItems(Iterables.toSet(that));
+		return Filters.fromItems(Iterables.toSet(that));
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link ContainsFilter new ContainsFilter<>(that)}. */
 	public static Filter2<Object> fromItems(final Collection<?> that) throws NullPointerException {
 		return new ContainsFilter(that);
 	}
@@ -439,36 +454,50 @@ public class Filters {
 		return new TargetFilter(that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link NegationFilter new NegationFilter<>(that)}. */
 	public static <GItem> Filter2<GItem> negate(final Filter<? super GItem> that) throws NullPointerException {
 		return new NegationFilter<>(that);
 	}
 
-	public static <GItem> Filter2<GItem> disjoin(final Filter<? super GItem> filter1, final Filter<? super GItem> filter2) throws NullPointerException {
-		return new DisjunctionFilter<>(filter1, filter2);
+	/** Diese Methode ist eine Abkürzung für {@link DisjunctionFilter new DisjunctionFilter<>(that1, that2)}. */
+	public static <GItem> Filter2<GItem> disjoin(final Filter<? super GItem> that1, final Filter<? super GItem> that2) throws NullPointerException {
+		return new DisjunctionFilter<>(that1, that2);
 	}
 
-	public static <GItem> Filter2<GItem> conjoin(final Filter<? super GItem> filter1, final Filter<? super GItem> filter2) throws NullPointerException {
-		return new ConjunctionFilter<>(filter1, filter2);
+	/** Diese Methode ist eine Abkürzung für {@link ConjunctionFilter new ConjunctionFilter<>(that1, that2)}. */
+	public static <GItem> Filter2<GItem> conjoin(final Filter<? super GItem> that1, final Filter<? super GItem> that2) throws NullPointerException {
+		return new ConjunctionFilter<>(that1, that2);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Filters#from(Getter) Filters.from(Getters.from(that).buffer())}.
+	 *
+	 * @see Getters#from(Getter)
+	 * @see Getters#buffer(Getter) */
 	public static <GItem> Filter2<GItem> buffer(final Filter<? super GItem> that) throws NullPointerException {
 		return Filters.from(Getters.from(that).buffer());
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Filters#from(Getter) Filters.from(Getters.from(that).buffer(mode, hasher))}.
+	 *
+	 * @see Getters#from(Getter)
+	 * @see Getters#buffer(Getter, int, Hasher) */
 	public static <GItem> Filter2<GItem> buffer(final Filter<? super GItem> that, final int mode, final Hasher hasher)
 		throws NullPointerException, IllegalArgumentException {
 		return Filters.from(Getters.from(that).buffer(mode, hasher));
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link TranslatedFilter new TranslatedFilter<>(that, trans)}. */
 	public static <GSource, GTarget> Filter2<GTarget> translate(final Filter<? super GSource> that, final Getter<? super GTarget, ? extends GSource> trans)
 		throws NullPointerException {
 		return new TranslatedFilter<>(that, trans);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Filters#synchronize(Filter, Object) Filters.synchronize(that, that)}. */
 	public static <GItem> Filter2<GItem> synchronize(final Filter<? super GItem> that) throws NullPointerException {
 		return Filters.synchronize(that, that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link SynchronizedFilter new SynchronizedFilter<>(that, mutex)}. */
 	public static <GItem> Filter2<GItem> synchronize(final Filter<? super GItem> that, final Object mutex) throws NullPointerException {
 		return new SynchronizedFilter<>(that, mutex);
 	}
