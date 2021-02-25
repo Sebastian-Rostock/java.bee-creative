@@ -6,7 +6,7 @@ import bee.creative.lang.Objects.BaseObject;
 /** Diese Klasse implementiert einen abstrakten {@link Getter3} als {@link BaseObject}.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Eingabe.
+ * @param <GItem> Typ des Datensatzes.
  * @param <GValue> Typ des Werts der Eigenschaft. */
 public abstract class AbstractGetter<GItem, GValue> extends BaseObject implements Getter3<GItem, GValue> {
 
@@ -17,7 +17,7 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 
 	@Override
 	public Filter2<GItem> concat(final Filter<? super GValue> target) {
-		return Filters.translate(this, target);
+		return Filters.translate(target, this);
 	}
 
 	@Override
@@ -43,6 +43,16 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	@Override
 	public Comparator2<GItem> concat(final Comparator<? super GValue> target) {
 		return Comparators.translate(target, this);
+	}
+
+	@Override
+	public Getter3<GItem, GValue> buffer() {
+		return Getters.buffer(this);
+	}
+
+	@Override
+	public Getter3<GItem, GValue> buffer(final int mode, final Hasher hasher) {
+		return Getters.buffer(this, mode, hasher);
 	}
 
 	@Override
@@ -72,6 +82,16 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	}
 
 	@Override
+	public Getter3<GItem, GValue> synchronize() {
+		return Getters.synchronize(this);
+	}
+
+	@Override
+	public Getter3<GItem, GValue> synchronize(final Object mutex) {
+		return Getters.synchronize(this, mutex);
+	}
+
+	@Override
 	public Field2<GItem, GValue> toField() {
 		return Fields.from(this);
 	}
@@ -89,16 +109,6 @@ public abstract class AbstractGetter<GItem, GValue> extends BaseObject implement
 	@Override
 	public Producer3<GValue> toProducer(final GItem item) {
 		return Producers.from(this, item);
-	}
-
-	@Override
-	public Getter3<GItem, GValue> synchronize() {
-		return Getters.synchronize(this);
-	}
-
-	@Override
-	public Getter3<GItem, GValue> synchronize(final Object mutex) {
-		return Getters.synchronize(this, mutex);
 	}
 
 }

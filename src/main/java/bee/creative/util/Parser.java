@@ -124,14 +124,11 @@ public class Parser {
 			};
 		}
 
-		/** Diese Methode gibt ein {@link Comparable} für Abschnitte zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
-		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
-		 * {@link Token#start() Startposition} ist, größer oder gleich der {@link Token#end() Endposition} ist bzw. innerhalb des Abschnitts liegt.
+		/** Diese Methode liefert ein {@link Comparable2}, welches die Grenzen eines {@link Token Abschnitts} mit der gegebenen Position vergleicht und einen
+		 * {@link Comparable#compareTo(Object) Navigationswert} kleiner, größer oder gleich {@code 0} liefert, wenn die gegebene Position kleiner als die
+		 * {@link Token#start() Startposition} des Abschnitts ist, größer oder gleich der {@link Token#end() Endposition} des Abschnitts ist bzw. innerhalb des
+		 * Abschnitts liegt.
 		 *
-		 * @see Token#end()
-		 * @see Token#start()
-		 * @see Comparables
-		 * @see Comparators#compare(int, int)
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
 		public static Comparable2<Token> containing(final int index) {
@@ -196,11 +193,19 @@ public class Parser {
 			return this.tokens.length;
 		}
 
+		/** Diese Methode liefert die Position des {@link #tokens() Kindabschnitts}, der die gegebene Position {@link #containing(int) enthält} und ist eine
+		 * Abkürzung für {@link #find(Comparable) this.find(Token.containing(index))}. */
 		public int find(final int index) {
 			return this.find(Token.containing(index));
 		}
 
-		public int find(final Comparable2<Token> comp) {
+		/** Diese Methode liefert die Position des {@link #tokens() Kindabschnitts} zur gegebenen {@link Comparable Navigationsmethode} und ist eine Abkürzung für
+		 * {@link Comparables#binarySearch(Items, Comparable, int, int) Comparables.binarySearch(this, comp, 0, this.size())}.
+		 * 
+		 * @see #startingAt(int)
+		 * @see #endingAt(int)
+		 * @see #containing(int) */
+		public int find(final Comparable<Token> comp) {
 			return Comparables.binarySearch(this, comp, 0, this.size());
 		}
 
@@ -362,6 +367,32 @@ public class Parser {
 			return this.tokens.length;
 		}
 
+		/** Diese Methode liefert die Position des {@link #tokens() Abschnitts}, der die gegebene Position {@link Token#containing(int) enthält} und ist eine
+		 * Abkürzung für {@link #find(Comparable) this.find(Token.containing(index))}. */
+		public int find(final int index) {
+			return this.find(Token.containing(index));
+		}
+
+		/** Diese Methode liefert die Position des {@link #tokens() Abschnitts} zur gegebenen {@link Comparable Navigationsmethode} und ist eine Abkürzung für
+		 * {@link Comparables#binarySearch(Items, Comparable, int, int) Comparables.binarySearch(this, comp, 0, this.size())}.
+		 * 
+		 * @see Token#startingAt(int)
+		 * @see Token#endingAt(int)
+		 * @see Token#containing(int) */
+		public int find(final Comparable<Token> comp) {
+			return Comparables.binarySearch(this, comp, 0, this.size());
+		}
+
+		/** Diese Methode liefert vom {@link #root() Wurzelknoten} ausgehend die Liste der {@link Token#find(Comparable) Positionen} der jeweiligen
+		 * {@link Token#tokens() Kindkabschnitte}, die die gegebene Position {@link Token#containing(int) enthalten}. Für die gelieferten Positionen {@code res}
+		 * gilt: <pre>
+		 *  res[0] = this.root().find(index);
+		 *  res[1] = this.root().get(res[0]).find(index);
+		 *  res[2] = this.root().get(res[0]).get(res[1]).find(index);
+		 *  ...
+		 *  </pre>
+		 * 
+		 * @see #find(int) */
 		public int[] path(final int index) {
 			final CompactIntegerArray res = new CompactIntegerArray(10);
 			final Comparable2<Token> comp = Token.containing(index);

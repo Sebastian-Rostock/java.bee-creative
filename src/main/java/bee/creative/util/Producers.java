@@ -7,8 +7,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
-import bee.creative.ref.Pointer;
-import bee.creative.ref.Pointers;
+import bee.creative.ref.Reference2;
+import bee.creative.ref.References;
 
 /** Diese Klasse implementiert grundlegende {@link Producer}.
  * 
@@ -112,7 +112,7 @@ public class Producers {
 	}
 
 	/** Diese Klasse implementiert einen puffernden {@link Producer3}, welcher den beim {@link #get() Lesen} einen Wert liefert, der von einem gegebenen
-	 * {@link Producer} gelieferten und mit einem {@link Pointer} im gegebenenen Modus zwischenspeichert wird.
+	 * {@link Producer} gelieferten und mit einem {@link Reference2} im gegebenenen Modus zwischenspeichert wird.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
@@ -122,25 +122,25 @@ public class Producers {
 
 		protected final int mode;
 
-		protected Pointer<GValue> buffer;
+		protected Reference2<GValue> buffer;
 
-		/** Dieser Konstruktor initialisiert das {@link Producer} und Zeigerstärke ({@link Pointers#HARD}, {@link Pointers#WEAK} oder {@link Pointers#SOFT}). */
+		/** Dieser Konstruktor initialisiert das {@link Producer} und Zeigerstärke ({@link References#HARD}, {@link References#WEAK} oder {@link References#SOFT}). */
 		public BufferedProducer(final Producer<? extends GValue> that, final int mode) throws NullPointerException, IllegalArgumentException {
-			Pointers.from(mode, null);
+			References.from(mode, null);
 			this.mode = mode;
 			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public GValue get() {
-			final Pointer<GValue> pointer = this.buffer;
+			final Reference2<GValue> pointer = this.buffer;
 			if (pointer != null) {
 				final GValue data = pointer.get();
 				if (data != null) return data;
-				if (pointer == Pointers.NULL) return null;
+				if (pointer == References.NULL) return null;
 			}
 			final GValue data = this.that.get();
-			this.buffer = Pointers.from(this.mode, data);
+			this.buffer = References.from(this.mode, data);
 			return data;
 		}
 
@@ -322,7 +322,7 @@ public class Producers {
 
 	/** Diese Methode ist eine Abkürzung für {@link #buffer(Producer, int) Producers.buffer(that, Pointers.SOFT)}. */
 	public static <GValue> Producer3<GValue> buffer(final Producer<? extends GValue> that) throws NullPointerException {
-		return Producers.buffer(that, Pointers.SOFT);
+		return Producers.buffer(that, References.SOFT);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link BufferedProducer new BufferedProducer<>(that, mode)}. */

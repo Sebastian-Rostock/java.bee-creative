@@ -6,14 +6,14 @@ import java.lang.ref.WeakReference;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert einen {@link ReferenceQueue}, der automatisch bereinigt wird. Jede über {@link #poll()}, {@link #remove()} oder
- * {@link #remove(long)} entfernte {@link Reference} wird dabei an {@link #customRemove(Reference)} übergeben, sofern sie nicht {@code null} ist. In dieser
- * Methode kann dann auf das Entfernen der {@link Reference} reagiert werden.
+ * {@link #remove(long)} entfernte {@link Reference} wird dazu an {@link #customRemove(Reference)} übergeben, sofern sie nicht {@code null} ist. In dieser
+ * Methode kann dann auf das Bereinigen der {@link Reference} reagiert werden.
  *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GObject> Typ der Objekte, auf welches die verwalteten {@link Reference} verweisen. */
-public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
+ * @param <GObject> Typ der Objekte, auf welche die verwalteten {@link Reference} verweisen. */
+public class ReferenceQueue2<GObject> extends ReferenceQueue<GObject> {
 
-	private static final class QueueNode extends WeakReference<PointerQueue<?>> {
+	private static final class QueueNode extends WeakReference<ReferenceQueue2<?>> {
 
 		public static final QueueNode head = new QueueNode();
 
@@ -26,7 +26,7 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 			this.prev = (this.next = this);
 		}
 
-		public QueueNode(final PointerQueue<?> referent) {
+		public QueueNode(final ReferenceQueue2<?> referent) {
 			super(referent);
 			final QueueNode head = QueueNode.head;
 			synchronized (head) {
@@ -54,7 +54,7 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 					node = head.next;
 				}
 				while (head != node) {
-					final PointerQueue<?> queue = node.get();
+					final ReferenceQueue2<?> queue = node.get();
 					if (queue != null) {
 						try {
 							while (queue.poll() != null) {}
@@ -83,11 +83,11 @@ public class PointerQueue<GObject> extends ReferenceQueue<GObject> {
 		new QueueNode(this);
 	}
 
-	/** Diese Methode wird beim Entfernen einer {@link Reference} über {@link #poll()}, {@link #remove()} bzw. {@link #remove(long)} mit der entfernten
-	 * {@link Reference} aufgerufen, sofern diese nicht {@code null} ist. Die Reaktion auf das Entfernen sollte so schnell es geht behandelt werden. Der aktuelle
-	 * {@link Thread} sollte hierfür keinesfalls längere Zeit warten müssen.
+	/** Diese Methode wird beim Bereinigen einer {@link Reference} über {@link #poll()}, {@link #remove()} bzw. {@link #remove(long)} mit der entfernten
+	 * {@link Reference} aufgerufen, sofern diese nicht {@code null} ist. Das Bereinigen sollte so schnell es geht behandelt werden. Der aktuelle {@link Thread}
+	 * sollte hierfür keinesfalls längere Zeit warten müssen.
 	 *
-	 * @param reference {@link Reference}. */
+	 * @param reference bereinigte {@link Reference}. */
 	protected void customRemove(final Reference<?> reference) {
 	}
 

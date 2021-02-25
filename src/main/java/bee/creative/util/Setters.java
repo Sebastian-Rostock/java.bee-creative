@@ -184,8 +184,8 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Consumer3}, welcher einen gegebenen {@link Consumer} über {@code synchronized(this.mutex)} synchronisiert. Wenn
-	 * dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
+	/** Diese Klasse implementiert einen {@link Setter3}, welcher einen gegebenen {@link Setter} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */

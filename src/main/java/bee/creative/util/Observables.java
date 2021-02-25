@@ -1,11 +1,9 @@
 package bee.creative.util;
 
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.BaseObject;
-import bee.creative.ref.PointerQueue;
+import bee.creative.ref.WeakReference2;
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
  * {@link #pop(Object, Object) abgemeldet} bzw. {@link #fire(Object, Object) benachrichtigt} werden können und bezüglich eines {@link WeakReference schwach}
@@ -41,37 +39,8 @@ import bee.creative.ref.PointerQueue;
  * @param <GObserver> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
 public abstract class Observables<GMessage, GObserver> extends BaseObject {
 
-	/** Diese Klasse implementiert den {@link ReferenceQueue} für {@link WeakSender} und {@link WeakObserver}. */
-	private static final class WeakQueue extends PointerQueue<Object> {
-
-		public static final WeakQueue INSTANCE = new WeakQueue();
-
-		@Override
-		protected void customRemove(final Reference<? extends Object> reference) {
-			if (reference instanceof WeakSender) {
-				final WeakSender source = (WeakSender)reference;
-				final SenderStore store = source.store;
-				synchronized (store) {
-					store.pop(source);
-				}
-			} else if (reference instanceof WeakObserver) {
-				final WeakObserver target = (WeakObserver)reference;
-				final WeakSender sender = target.sender;
-				final SenderStore store = sender.store;
-				synchronized (store) {
-					synchronized (sender) {
-						sender.pop(target);
-						if (sender.observer != null) return;
-						store.pop(sender);
-					}
-				}
-			}
-		}
-
-	}
-
 	/** Diese Klasse implementiert die Verwaltungsdaten eines Ereignissenders. */
-	private static final class WeakSender extends WeakReference<Object> {
+	private static final class WeakSender extends WeakReference2<Object> {
 
 		/** Dieses Feld speichert den Streuwert des Senders. */
 		public final int hash;
@@ -82,9 +51,17 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 		public volatile Object observer;
 
 		public WeakSender(final Object sender, final SenderStore store) {
-			super(sender, WeakQueue.INSTANCE);
+			super(sender);
 			this.hash = System.identityHashCode(sender);
 			this.store = store;
+		}
+
+		@Override
+		protected void customRemove() {
+			final SenderStore store = this.store;
+			synchronized (store) {
+				store.pop(this);
+			}
 		}
 
 		/** Diese Methode meldet den gegebenen Empfänger an.
@@ -159,7 +136,7 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 
 	}
 
-	private static final class WeakObserver extends WeakReference<Object> {
+	private static final class WeakObserver extends WeakReference2<Object> {
 
 		public static Object get(final Object object) {
 			return object instanceof WeakObserver ? ((WeakObserver)object).get() : object;
@@ -168,8 +145,21 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 		public final WeakSender sender;
 
 		public WeakObserver(final Object observer, final WeakSender sender) {
-			super(observer, WeakQueue.INSTANCE);
+			super(observer);
 			this.sender = sender;
+		}
+
+		@Override
+		protected void customRemove() {
+			final WeakSender sender = this.sender;
+			final SenderStore store = sender.store;
+			synchronized (store) {
+				synchronized (sender) {
+					sender.pop(this);
+					if (sender.observer != null) return;
+					store.pop(sender);
+				}
+			}
 		}
 
 		@Override
@@ -192,16 +182,12 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 			super(10);
 		}
 
-		private Object toKey(final Object sender) {
-			return sender != null ? sender : SenderStore.NULL;
-		}
-
 		/** Diese Methode gibt die Verwaltungsdaten zum gegebenen Ereignissender zurück. Wenn keine hinterlegt sind, wird {@code null} geliefert.
 		 *
 		 * @param sender Ereignissender oder {@code null}.
 		 * @return Verwaltungsdaten oder {@code null}. */
 		public WeakSender get(final Object sender) {
-			final int entryIndex = this.getIndexImpl(this.toKey(sender));
+			final int entryIndex = this.getIndexImpl(Objects.notNull(sender, SenderStore.NULL));
 			return entryIndex < 0 ? null : this.customGetKey(entryIndex);
 		}
 
@@ -210,14 +196,14 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 		 * @param sender Ereignissender oder {@code null}.
 		 * @return Verwaltungsdaten. */
 		public WeakSender put(final Object sender) {
-			return this.customGetKey(this.putIndexImpl(this.toKey(sender)));
+			return this.customGetKey(this.putIndexImpl(Objects.notNull(sender, SenderStore.NULL)));
 		}
 
 		/** Diese Methode entfernt die Verwaltungsdaten zum gegebenen Ereignissender.
 		 *
 		 * @param sender Ereignissender, {@link WeakSender Verwaltungsdaten} oder {@code null}. */
 		public void pop(final Object sender) {
-			this.popIndexImpl(this.toKey(sender));
+			this.popIndexImpl(Objects.notNull(sender, SenderStore.NULL));
 			final int capacity = this.capacity() / 2;
 			if (capacity <= this.size()) return;
 			this.allocate(capacity);

@@ -25,38 +25,38 @@ public class Translators {
 	@SuppressWarnings ("javadoc")
 	public static class ConcatTranslator<GSource, GTarget, GCenter> extends AbstractTranslator<GSource, GTarget> {
 
-		public final Translator<GSource, GCenter> trans1;
+		public final Translator<GSource, GCenter> that1;
 
-		public final Translator<GCenter, GTarget> trans2;
+		public final Translator<GCenter, GTarget> that2;
 
-		public ConcatTranslator(final Translator<GSource, GCenter> trans1, final Translator<GCenter, GTarget> trans2) throws NullPointerException {
-			this.trans1 = Objects.notNull(trans1);
-			this.trans2 = Objects.notNull(trans2);
+		public ConcatTranslator(final Translator<GSource, GCenter> that1, final Translator<GCenter, GTarget> that2) throws NullPointerException {
+			this.that1 = Objects.notNull(that1);
+			this.that2 = Objects.notNull(that2);
 		}
 
 		@Override
 		public boolean isTarget(final Object object) {
-			return this.trans2.isTarget(object);
+			return this.that2.isTarget(object);
 		}
 
 		@Override
 		public boolean isSource(final Object object) {
-			return this.trans1.isSource(object);
+			return this.that1.isSource(object);
 		}
 
 		@Override
 		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.trans2.toTarget(this.trans1.toTarget(object));
+			return this.that2.toTarget(this.that1.toTarget(object));
 		}
 
 		@Override
 		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-			return this.trans1.toSource(this.trans2.toSource(object));
+			return this.that1.toSource(this.that2.toSource(object));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.trans1, this.trans2);
+			return Objects.toInvokeString(this, this.that1, this.that2);
 		}
 
 	}

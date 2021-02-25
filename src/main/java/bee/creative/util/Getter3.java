@@ -23,13 +23,13 @@ public interface Getter3<GItem, GValue> extends Getter2<GItem, GValue> {
 	@Override
 	public Getter3<GItem, GValue> optionalize(GValue value);
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter) Fields.from(this)}. */
-	public Field2<GItem, GValue> toField();
-
 	@Override
 	public Getter3<GItem, GValue> synchronize();
 
 	@Override
 	public Getter3<GItem, GValue> synchronize(Object mutex);
+
+	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter) Fields.from(this)}. */
+	public Field2<GItem, GValue> toField();
 
 }

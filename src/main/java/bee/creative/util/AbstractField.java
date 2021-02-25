@@ -21,7 +21,7 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 
 	@Override
 	public Filter2<GItem> concat(final Filter<? super GValue> target) {
-		return Filters.translate(this, target);
+		return Filters.translate(target, this);
 	}
 
 	@Override
@@ -47,6 +47,16 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	@Override
 	public Comparator2<GItem> concat(final Comparator<? super GValue> target) {
 		return Comparators.translate(target, this);
+	}
+
+	@Override
+	public Getter3<GItem, GValue> buffer() {
+		return Getters.buffer(this);
+	}
+
+	@Override
+	public Getter3<GItem, GValue> buffer(final int mode, final Hasher hasher) {
+		return Getters.buffer(this, mode, hasher);
 	}
 
 	@Override

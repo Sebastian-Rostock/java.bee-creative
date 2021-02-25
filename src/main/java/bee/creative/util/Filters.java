@@ -2,533 +2,475 @@ package bee.creative.util;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import bee.creative.lang.Objects;
-import bee.creative.ref.Pointer;
-import bee.creative.ref.Pointers;
-import bee.creative.ref.SoftPointer;
 
 /** Diese Klasse implementiert grundlegende {@link Filter}.
  *
- * @see Filter
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Filters {
 
+	/** Diese Klasse implementiert einen {@link Filter2}, der alle Datensätze akzeptiert, die nicht {@code null} sind. Die Akzeptanz eines Datensatzes
+	 * {@code item} ist {@code item != null}. */
+	@SuppressWarnings ("javadoc")
 	public static class EmptyFilter extends AbstractFilter<Object> {
 
 		public static final Filter<?> INSTANCE = new EmptyFilter();
 
 	}
 
-	public static class ValueFilter extends AbstractFilter<Object> {
+	/** Diese Klasse implementiert einen {@link Filter2}, der alle Datensätze akzeptiert. Die Akzeptanz ist stets {@code true}. */
+	@SuppressWarnings ("javadoc")
+	public static class AcceptFilter extends AbstractFilter<Object> {
 
-		public static final ValueFilter TRUE = new ValueFilter(true);
+		public static final Filter<?> INSTANCE = new AcceptFilter();
 
-		public static final ValueFilter FALSE = new ValueFilter(false);
+		@Override
+		public boolean accept(final Object item) {
+			return true;
+		}
 
-		public final boolean target;
+	}
 
-		public ValueFilter(final boolean source) {
-			this.target = source;
+	/** Diese Klasse implementiert einen {@link Filter2}, der alle Datensätze ablehnt. Die Akzeptanz ist stets {@code false}. */
+	@SuppressWarnings ("javadoc")
+	public static class RejectFilter extends AbstractFilter<Object> {
+
+		public static final Filter<?> INSTANCE = new RejectFilter();
+
+		@Override
+		public boolean accept(final Object item) {
+			return false;
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Filter2}, der alle Datensätze akzeptiert, die Instanzen einer gegebenen {@link Class} sind. Die Akzeptanz eines
+	 * Datensatzes {@code item} ist {@code this.that.isInstance(item)}.
+	 *
+	 * @param <GItem> Typ der Datensätze. */
+	@SuppressWarnings ("javadoc")
+	public static class ClassFilter<GItem> extends AbstractFilter<GItem> {
+
+		public final Class<?> that;
+
+		public ClassFilter(final Class<?> source) throws NullPointerException {
+			this.that = Objects.notNull(source);
+		}
+
+		@Override
+		public boolean accept(final GItem item) {
+			return this.that.isInstance(item);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Filter2}, der nur die Datensätze akzeptiert, deren Ordnung gleich der eines gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.that.compareTo(item) == 0}.
+	 *
+	 * @param <GItem> Typ der Datensätze. */
+	@SuppressWarnings ("javadoc")
+	public static class EqualFilter<GItem> extends AbstractFilter<GItem> {
+
+		public final Comparable<? super GItem> that;
+
+		public EqualFilter(final Comparable<? super GItem> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public boolean accept(final GItem item) {
+			return this.that.compareTo(item) == 0;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Filter2}, der nur die Datensätze akzeptiert, deren Ordnung kleiner der eines gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.that.compareTo(item) > 0}.
+	 *
+	 * @param <GItem> Typ der Datensätze. */
+	@SuppressWarnings ("javadoc")
+	public static class LowerFilter<GItem> extends AbstractFilter<GItem> {
+
+		public final Comparable<? super GItem> that;
+
+		public LowerFilter(final Comparable<? super GItem> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public boolean accept(final GItem item) {
+			return this.that.compareTo(item) > 0;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Filter2}, der nur die Datensätze akzeptiert, deren Ordnung größer der eines gegebenen {@link Comparable} ist. Die
+	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.that.compareTo(item) < 0}.
+	 *
+	 * @param <GItem> Typ der Datensätze. */
+	@SuppressWarnings ("javadoc")
+	public static class HigherFilter<GItem> extends AbstractFilter<GItem> {
+
+		public final Comparable<? super GItem> that;
+
+		public HigherFilter(final Comparable<? super GItem> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public boolean accept(final GItem item) {
+			return this.that.compareTo(item) < 0;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Filter2}, welcher nur die Datensätz akzeptiert, die in einer gegebenen {@link Collection} enthalten sind. Die
+	 * Akzeptanz eines Datensatzes {@code item} ist {@link Collection#contains(Object) this.that.contains(item)}. */
+	@SuppressWarnings ("javadoc")
+	public static class ContainsFilter extends AbstractFilter<Object> {
+
+		public final Collection<?> that;
+
+		public ContainsFilter(final Collection<?> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public boolean accept(final Object item) {
-			return this.target;
+			return this.that.contains(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
 
-	public static class ClassFilter<GItem> extends AbstractFilter<GItem> {
-
-		public final Class<?> target;
-
-		public ClassFilter(final Class<?> source) throws NullPointerException {
-			this.target = Objects.notNull(source);
-		}
-
-		@Override
-		public boolean accept(final GItem item) {
-			return this.target.isInstance(item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target);
-		}
-
-	}
-
+	/** Diese Klasse implementiert einen {@link Filter2}, der nur die Datensätze akzeptiert, die von einem gegebenen {@link Filter} abgelehnt werden. Die
+	 * Akzeptanz eines Datensatzen {@code item} ist {@code !this.that.accept(item)}.
+	 *
+	 * @param <GItem> Typ der Datensätze. */
+	@SuppressWarnings ("javadoc")
 	public static class NegationFilter<GItem> extends AbstractFilter<GItem> {
 
-		public final Filter<? super GItem> target;
+		public final Filter<? super GItem> that;
 
-		public NegationFilter(final Filter<? super GItem> source) {
-			this.target = Objects.notNull(source);
+		public NegationFilter(final Filter<? super GItem> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public boolean accept(final GItem item) {
-			return !this.target.accept(item);
+			return !this.that.accept(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
 
-	public static class TranslatedFilter<GSource, GTarget> extends AbstractFilter<GTarget> {
+	/** Diese Klasse implementiert einen übersetzten {@link Filter2}, der nur die Datensätze akzeptiert, die über einen gegebenen {@link Getter} umgewandelt von
+	 * einem gegebenen {@link Filter} akzeptiert werden. Die Akzeptanz eines Datensatzes {@code item} ist {@code this.that.accept(this.trans.get(item))}.
+	 *
+	 * @param <GItem> Typ der Datensätze.
+	 * @param <GItem2> Typ der Datensätze des gegebenen {@link Filter}. */
+	@SuppressWarnings ("javadoc")
+	public static class TranslatedFilter<GItem, GItem2> extends AbstractFilter<GItem> {
 
-		public final Filter<? super GSource> target;
+		public final Filter<? super GItem2> that;
 
-		public final Getter<? super GTarget, ? extends GSource> trans;
+		public final Getter<? super GItem, ? extends GItem2> trans;
 
-		public TranslatedFilter(final Getter<? super GTarget, ? extends GSource> trans, final Filter<? super GSource> target) {
-			this.target = Objects.notNull(target);
+		public TranslatedFilter(final Filter<? super GItem2> that, final Getter<? super GItem, ? extends GItem2> trans) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
-		public boolean accept(final GTarget item) {
-			return this.target.accept(this.trans.get(item));
+		public boolean accept(final GItem item) {
+			return this.that.accept(this.trans.get(item));
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.trans, this.target);
+			return Objects.toInvokeString(this, this.that, this.trans);
 		}
 
 	}
 
+	/** Diese Klasse implementiert einen {@link Filter2}, der nur die Datensätze akzeptiert, die von mindestens einem der gegebenen {@link Filter} akzeptiert
+	 * werden. Die Akzeptanz eines Datensatzes {@code item} ist {@code this.that1.accept(item) || this.that2.accept(item)}.
+	 *
+	 * @param <GItem> Typ der Datensätze. */
+	@SuppressWarnings ("javadoc")
 	public static class DisjunctionFilter<GItem> extends AbstractFilter<GItem> {
 
-		public final Filter<? super GItem> target1;
+		public final Filter<? super GItem> that1;
 
-		public final Filter<? super GItem> target2;
+		public final Filter<? super GItem> that2;
 
-		public DisjunctionFilter(final Filter<? super GItem> target1, final Filter<? super GItem> target2) {
-			this.target1 = Objects.notNull(target1);
-			this.target2 = Objects.notNull(target2);
+		public DisjunctionFilter(final Filter<? super GItem> that1, final Filter<? super GItem> that2) throws NullPointerException {
+			this.that1 = Objects.notNull(that1);
+			this.that2 = Objects.notNull(that2);
 		}
 
 		@Override
 		public boolean accept(final GItem item) {
-			return this.target1.accept(item) || this.target2.accept(item);
+			return this.that1.accept(item) || this.that2.accept(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target1, this.target2);
+			return Objects.toInvokeString(this, this.that1, this.that2);
 		}
 
 	}
 
+	/** Diese Klasse implementiert einen {@link Filter2}, der nur die Datensätze akzeptiert, die von beiden gegebenen {@link Filter} akzeptiert werden. Die
+	 * Akzeptanz eines Datensatzes {@code item} ist {@code this.that1.accept(item) && this.that2.accept(item)}.
+	 *
+	 * @param <GItem> Typ der Datensätze. */
+	@SuppressWarnings ("javadoc")
 	public static class ConjunctionFilter<GItem> extends AbstractFilter<GItem> {
 
-		public final Filter<? super GItem> target1;
+		public final Filter<? super GItem> that1;
 
-		public final Filter<? super GItem> target2;
+		public final Filter<? super GItem> that2;
 
-		public ConjunctionFilter(final Filter<? super GItem> target1, final Filter<? super GItem> target2) {
-			this.target1 = Objects.notNull(target1);
-			this.target2 = Objects.notNull(target2);
+		public ConjunctionFilter(final Filter<? super GItem> that1, final Filter<? super GItem> that2) throws NullPointerException {
+			this.that1 = Objects.notNull(that1);
+			this.that2 = Objects.notNull(that2);
 		}
 
 		@Override
 		public boolean accept(final GItem item) {
-			return this.target1.accept(item) && this.target2.accept(item);
+			return this.that1.accept(item) && this.that2.accept(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target1, this.target2);
+			return Objects.toInvokeString(this, this.that1, this.that2);
 		}
 
 	}
 
+	/** Diese Klasse implementiert einen {@link Filter2}, welcher einen gegebenen {@link Filter} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
+	 *
+	 * @param <GItem> Typ des Datensatzes. */
+	@SuppressWarnings ("javadoc")
 	public static class SynchronizedFilter<GItem> extends AbstractFilter<GItem> {
 
-		public final Filter<? super GItem> target;
+		public final Filter<? super GItem> that;
 
 		public final Object mutex;
 
-		public SynchronizedFilter(final Filter<? super GItem> target, final Object mutex) {
-			this.target = Objects.notNull(target);
+		public SynchronizedFilter(final Filter<? super GItem> that, final Object mutex) throws NullPointerException {
+			this.that = Objects.notNull(that);
 			this.mutex = Objects.notNull(mutex, this);
 		}
 
 		@Override
 		public boolean accept(final GItem item) {
 			synchronized (this.mutex) {
-				return this.target.accept(item);
+				return this.that.accept(item);
 			}
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
 
-	public static class GetterFilter<GItem> extends AbstractFilter<GItem> {
+	static class GetterFilter<GItem> extends AbstractFilter<GItem> {
 
-		public final Getter<? super GItem, Boolean> target;
+		public final Getter<? super GItem, Boolean> that;
 
-		public GetterFilter(final Getter<? super GItem, Boolean> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public GetterFilter(final Getter<? super GItem, Boolean> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public boolean accept(final GItem entry) {
-			final Boolean result = this.target.get(entry);
+			final Boolean result = this.that.get(entry);
 			return (result != null) && result.booleanValue();
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
 
 	static class SourceFilter extends AbstractFilter<Object> {
 
-		public final Translator<?, ?> target;
+		public final Translator<?, ?> that;
 
-		public SourceFilter(final Translator<?, ?> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public SourceFilter(final Translator<?, ?> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public boolean accept(final Object item) {
-			return this.target.isSource(item);
+			return this.that.isSource(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
 
 	static class TargetFilter extends AbstractFilter<Object> {
 
-		public final Translator<?, ?> target;
+		public final Translator<?, ?> that;
 
-		public TargetFilter(final Translator<?, ?> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
+		public TargetFilter(final Translator<?, ?> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
 		}
 
 		@Override
 		public boolean accept(final Object item) {
-			return this.target.isTarget(item);
+			return this.that.isTarget(item);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.target);
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
 
-	static class LowerFilter<GItem> extends AbstractFilter<GItem> {
-
-		public final Comparable<? super GItem> target;
-
-		public LowerFilter(final Comparable<? super GItem> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
-		}
-
-		@Override
-		public boolean accept(final GItem item) {
-			return this.target.compareTo(item) >= 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target);
-		}
-
-	}
-
-	static class HigherFilter<GItem> extends AbstractFilter<GItem> {
-
-		public final Comparable<? super GItem> target;
-
-		public HigherFilter(final Comparable<? super GItem> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
-		}
-
-		@Override
-		public boolean accept(final GItem item) {
-			return this.target.compareTo(item) <= 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target);
-		}
-
-	}
-
-	static class EqualFilter<GItem> extends AbstractFilter<GItem> {
-
-		public final Comparable<? super GItem> target;
-
-		public EqualFilter(final Comparable<? super GItem> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
-		}
-
-		@Override
-		public boolean accept(final GItem item) {
-			return this.target.compareTo(item) == 0;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Filters#fromItems(Collection)} */
-	static class ContainsFilter extends AbstractFilter<Object> {
-
-		public final Collection<?> target;
-
-		public ContainsFilter(final Collection<?> target) throws NullPointerException {
-			this.target = Objects.notNull(target);
-		}
-
-		@Override
-		public boolean accept(final Object item) {
-			return this.target.contains(item);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.target);
-		}
-
-	}
-
-	/** Diese Methode gibt den {@link Filter} zurück, der alle Elemente akzeptiert, die nicht {@code null} sind. Die Akzeptanz eines Elements {@code item} ist
-	 * {@code item != null}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @return {@code null}-{@link Filter}. */
+	/** Diese Methode liefert den {@link EmptyFilter}. */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Filter<GItem> empty() {
-		return (Filter<GItem>)EmptyFilter.INSTANCE;
+	public static <GItem> Filter2<GItem> empty() {
+		return (Filter2<GItem>)EmptyFilter.INSTANCE;
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, der stets die gegebene Akzeptanz liefert.
-	 *
-	 * @param value Akzeptanz.
-	 * @return {@code value}-{@link Filter}. */
-	public static Filter<Object> from(final boolean value) {
-		return value ? ValueFilter.TRUE : ValueFilter.FALSE;
+	/** Diese Methode liefert den {@link AcceptFilter}. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem> Filter2<GItem> accept() {
+		return (Filter2<GItem>)AcceptFilter.INSTANCE;
 	}
 
-	/** Diese Methode gibt einen {@link Filter} als Adapter zu einem {@link Boolean}-{@link Getter} zurück. Die Akzeptanz einer Eingabe {@code item} entspricht
-	 * {@code Boolean.TRUE.equals(getter.get(item))}.
-	 *
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param getter Eigenschaft mit {@link Boolean}-Wert.
-	 * @return {@link Filter} als {@link Getter}-Adapter.
-	 * @throws NullPointerException Wenn {@code getter} {@code null} ist. */
-	public static <GItem> Filter<GItem> from(final Getter<? super GItem, Boolean> getter) throws NullPointerException {
-		return new GetterFilter<>(getter);
+	/** Diese Methode liefert den {@link RejectFilter}. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem> Filter2<GItem> reject() {
+		return (Filter2<GItem>)RejectFilter.INSTANCE;
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, der nur die Eingaben akzeptiert, die Instanzen der gegebenen {@link Class} oder ihrer Nachfahren sind. Die
-	 * Akzeptanz eines Elements {@code item} ist {@code itemType.isInstance(item)}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param itemClass {@link Class} der akzeptierten Eingaben.
-	 * @return {@code type}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code itemType} {@code null} ist. */
-	public static <GItem> Filter<GItem> fromClass(final Class<?> itemClass) throws NullPointerException {
-		return new ClassFilter<>(itemClass);
+	public static <GItem> Filter2<GItem> from(final boolean value) {
+		return value ? Filters.<GItem>accept() : Filters.<GItem>reject();
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) == 0}.
+	/** Diese Methode gibt einen {@link Filter2} zu {@link Getter#get(Object)} des gegebenen {@link Getter} zurück. Die Akzeptanz eines Datensatzes {@code item}
+	 * entspricht {@code Boolean.TRUE.equals(that.get(item))}.
 	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code equal}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GItem> Filter<GItem> fromEqual(final Comparable<? super GItem> comparable) throws NullPointerException {
-		return new EqualFilter<>(comparable);
+	 * @param <GItem> Typ des Datensatzes. */
+	public static <GItem> Filter2<GItem> from(final Getter<? super GItem, Boolean> that) throws NullPointerException {
+		return new GetterFilter<>(that);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) >= 0}.
-	 *
-	 * @param <GInput> Typ der Elemente.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code lower}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GInput> Filter<GInput> fromLower(final Comparable<? super GInput> comparable) throws NullPointerException {
-		return new LowerFilter<>(comparable);
+	public static <GItem> Filter2<GItem> fromClass(final Class<?> that) throws NullPointerException {
+		return new ClassFilter<>(that);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Elemente akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist. Die
-	 * Akzeptanz eines Elements {@code item} ist {@code comparable.compareTo(item) <= 0}.
-	 *
-	 * @param <GInput> Typ der Elemente.
-	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
-	 * @return {@code higher}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist. */
-	public static <GInput> Filter<GInput> fromHigher(final Comparable<? super GInput> comparable) throws NullPointerException {
-		return new HigherFilter<>(comparable);
+	public static <GItem> Filter2<GItem> fromEqual(final Comparable<? super GItem> that) throws NullPointerException {
+		return new EqualFilter<>(that);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
-	 *
-	 * @see #fromItems(Collection)
-	 * @param items akzeptierte Eingaben.
-	 * @return {@code contains}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static Filter<Object> fromItems(final Object... items) throws NullPointerException {
-		if (items.length == 0) return Filters.from(false);
-		if (items.length == 1) return Filters.fromItems(java.util.Collections.singleton(items[0]));
-		return Filters.fromItems(new HashSet2<>(Arrays.asList(items)));
+	public static <GItem> Filter2<GItem> fromLower(final Comparable<? super GItem> that) throws NullPointerException {
+		return new LowerFilter<>(that);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind. Die Akzeptanz
-	 * einer Eingabe {@code input} ist {@code collection.contains(input)}.
-	 *
-	 * @param collection {@link Collection} der akzeptierten Eingaben.
-	 * @return {@code contains}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code collection} {@code null} ist. */
-	public static Filter2<Object> fromItems(final Collection<?> collection) throws NullPointerException {
-		return new ContainsFilter(collection);
+	public static <GItem> Filter2<GItem> fromHigher(final Comparable<? super GItem> that) throws NullPointerException {
+		return new HigherFilter<>(that);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isSource(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
-	 * {@code item} ist {@code translator.isSource(item)}.
-	 *
-	 * @param translator {@link Translator}.
-	 * @return {@link Filter}, der nur Quellobjekte des {@code translator} akzeptiert.
-	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static Filter<Object> fromSource(final Translator<?, ?> translator) throws NullPointerException {
-		return new SourceFilter(translator);
+	public static Filter2<Object> fromItems(final Object... items) throws NullPointerException {
+
+		return Filters.fromItems(Arrays.asList(items));
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zu {@link Translator#isTarget(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
-	 * {@code item} ist {@code translator.isTarget(item)}.
-	 *
-	 * @param translator {@link Translator}.
-	 * @return {@link Filter}, der nur Zielobjekte des {@code translator} akzeptiert.
-	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static Filter<Object> fromTarget(final Translator<?, ?> translator) throws NullPointerException {
-		return new TargetFilter(translator);
+	public static Filter2<Object> fromItems(final Iterable<?> that) throws NullPointerException {
+		return fromItems(Iterables.toSet(that));
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden. Die Akzeptanz eines
-	 * Elements {@code item} ist {@code !filter.accept(item)}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param filter {@link Filter}.
-	 * @return {@code negation}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
-	public static <GItem> Filter2<GItem> negate(final Filter<? super GItem> filter) throws NullPointerException {
-		return new NegationFilter<>(filter);
+	public static Filter2<Object> fromItems(final Collection<?> that) throws NullPointerException {
+		return new ContainsFilter(that);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von einem der gegebenen {@link Filter} akzeptiert werden Die
-	 * Akzeptanz eines Elements {@code item} ist {@code filter1.accept(item) || filter2.accept(item)}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param filter1 erster {@link Filter}.
-	 * @param filter2 zweiter {@link Filter}.
-	 * @return {@code disjunction}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist. */
-	public static <GItem> Filter<GItem> disjoin(final Filter<? super GItem> filter1, final Filter<? super GItem> filter2) throws NullPointerException {
+	/** Diese Methode gibt einen {@link Filter2} zu {@link Translator#isSource(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
+	 * {@code item} ist {@code translator.isSource(item)}. */
+	public static Filter2<Object> fromSource(final Translator<?, ?> that) throws NullPointerException {
+		return new SourceFilter(that);
+	}
+
+	/** Diese Methode gibt einen {@link Filter2} zu {@link Translator#isTarget(Object)} des gegebenen {@link Translator} zurück. Die Akzeptanz eines Datensatzes
+	 * {@code item} ist {@code translator.isTarget(item)}. */
+	public static Filter2<Object> fromTarget(final Translator<?, ?> that) throws NullPointerException {
+		return new TargetFilter(that);
+	}
+
+	public static <GItem> Filter2<GItem> negate(final Filter<? super GItem> that) throws NullPointerException {
+		return new NegationFilter<>(that);
+	}
+
+	public static <GItem> Filter2<GItem> disjoin(final Filter<? super GItem> filter1, final Filter<? super GItem> filter2) throws NullPointerException {
 		return new DisjunctionFilter<>(filter1, filter2);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert werden Die
-	 * Akzeptanz eines Elements {@code item} ist {@code filter1.accept(item) && filter2.accept(item)}.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param filter1 erster {@link Filter}.
-	 * @param filter2 zweiter {@link Filter}.
-	 * @return {@code conjunction}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist. */
-	public static <GItem> Filter<GItem> conjoin(final Filter<? super GItem> filter1, final Filter<? super GItem> filter2) throws NullPointerException {
+	public static <GItem> Filter2<GItem> conjoin(final Filter<? super GItem> filter1, final Filter<? super GItem> filter2) throws NullPointerException {
 		return new ConjunctionFilter<>(filter1, filter2);
 	}
 
-	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
-	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link SoftPointer} auf Elemente bestückt.
-	 *
-	 * @see #buffer(Filter)
-	 * @param <GItem> Typ der Elemente.
-	 * @param filter {@link Filter}.
-	 * @return {@code buffered}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
-	public static <GItem> Filter<GItem> buffer(final Filter<? super GItem> filter) throws NullPointerException {
-		return Filters.buffer(Integer.MAX_VALUE, Pointers.SOFT, filter);
+	public static <GItem> Filter2<GItem> buffer(final Filter<? super GItem> that) throws NullPointerException {
+		return Filters.from(Getters.from(that).buffer());
 	}
 
-	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
-	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link Pointer} auf Elemente bestückt.
-	 *
-	 * @see Filters#from(Getter)
-	 * @see Getters#from(Filter)
-	 * @see Getters#buffer(int, int, int, Getter)
-	 * @param <GItem> Typ der Elemente.
-	 * @param limit Maximum für die Anzahl der Einträge in der internen {@link Map}.
-	 * @param mode Modus der {@link Pointer}, die auf die Elemente als Schlüssel der {@link Map} erzeugt werden ({@link Pointers#HARD}, {@link Pointers#SOFT},
-	 *        {@link Pointers#WEAK}).
-	 * @param filter {@link Filter}.
-	 * @return {@code buffered}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Getters#buffer(int, int, int, Getter)} eine entsprechende Ausnahme auslöst. */
-	public static <GItem> Filter<GItem> buffer(final int limit, final int mode, final Filter<? super GItem> filter)
+	public static <GItem> Filter2<GItem> buffer(final Filter<? super GItem> that, final int mode, final Hasher hasher)
 		throws NullPointerException, IllegalArgumentException {
-		return Filters.from(Getters.buffer(limit, mode, Pointers.HARD, Getters.from(filter)));
+		return Filters.from(Getters.from(that).buffer(mode, hasher));
 	}
 
-	/** Diese Methode gibt einen übersetzten {@link Filter} zurück, welcher von seinen Elementen mit dem gegebenen {@link Getter} zu den Elementen des gegebenen
-	 * {@link Filter} navigiert. Die Akzeptanz eines Elements {@code item} ist {@code filter.accept(toSource.get(item))}.
-	 *
-	 * @param <GSource> Typ der Elemente des gegebenen {@link Filter} sowie der Ausgabe des {@link Getter}.
-	 * @param <GTarget> Typ der Elemente des gelieferten {@link Filter} sowie der Eingabe des {@link Getter}.
-	 * @param toSource {@link Getter} zur Übersetzung.
-	 * @param filter {@link Field}.
-	 * @return {@code translated}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code toSource} bzw. {@code filter} {@code null} ist. */
-	public static <GSource, GTarget> Filter2<GTarget> translate(final Getter<? super GTarget, ? extends GSource> toSource,
-		final Filter<? super GSource> filter) throws NullPointerException {
-		return new TranslatedFilter<>(toSource, filter);
+	public static <GSource, GTarget> Filter2<GTarget> translate(final Filter<? super GSource> that, final Getter<? super GTarget, ? extends GSource> trans)
+		throws NullPointerException {
+		return new TranslatedFilter<>(that, trans);
 	}
 
-	public static <GItem> Filter<GItem> synchronize(final Filter<? super GItem> target) throws NullPointerException {
-		return Filters.synchronize(target, target);
+	public static <GItem> Filter2<GItem> synchronize(final Filter<? super GItem> that) throws NullPointerException {
+		return Filters.synchronize(that, that);
 	}
 
-	/** Diese Methode gibt einen {@link Filter} zurück, der den gegebenen {@link Filter} über {@code synchronized(filter)} synchronisiert. Wenn das
-	 * Synchronisationsobjekt {@code null} ist, wird der erzeugte {@link Filter} als Synchronisationsobjekt verwendet.
-	 *
-	 * @param target {@link Filter}.
-	 * @param mutex Synchronisationsobjekt oder {@code null}.
-	 * @param <GItem> Typ der Elemente.
-	 * @return {@code synchronized}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code filter} {@code null} ist. */
-	public static <GItem> Filter<GItem> synchronize(final Filter<? super GItem> target, final Object mutex) throws NullPointerException {
-		return new SynchronizedFilter<>(target, mutex);
+	public static <GItem> Filter2<GItem> synchronize(final Filter<? super GItem> that, final Object mutex) throws NullPointerException {
+		return new SynchronizedFilter<>(that, mutex);
 	}
 
 }
