@@ -65,16 +65,16 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> aggregate(final Getter<? super GValue, ? extends GValue2> transGet,
-		final Getter<? super GValue2, ? extends GValue> transSet) {
-		return Fields.aggregate(this, transGet, transSet);
+	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> aggregate(final Getter<? super GValue, ? extends GValue2> getTrans,
+		final Getter<? super GValue2, ? extends GValue> setTrans) {
+		return Fields.aggregate(this, getTrans, setTrans);
 	}
 
 	@Override
-	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> aggregate(final Getter<? super GValue, ? extends GValue2> transGet,
-		final Getter<? super GValue2, ? extends GValue> transSet, final Getter<? super GItem2, ? extends GValue2> empty,
+	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> aggregate(final Getter<? super GValue, ? extends GValue2> getTrans,
+		final Getter<? super GValue2, ? extends GValue> setTrans, final Getter<? super GItem2, ? extends GValue2> empty,
 		final Getter<? super GItem2, ? extends GValue2> mixed) {
-		return Fields.aggregate(this, transGet, transSet, empty, mixed);
+		return Fields.aggregate(this, getTrans, setTrans, empty, mixed);
 	}
 
 	@Override
@@ -118,9 +118,9 @@ public abstract class AbstractField<GItem, GValue> extends BaseObject implements
 	}
 
 	@Override
-	public <GValue2> Field2<GItem, GValue2> translate(final Getter<? super GValue, ? extends GValue2> transGet,
-		final Getter<? super GValue2, ? extends GValue> transSet) {
-		return Fields.translate(this, transGet, transSet);
+	public <GValue2> Field2<GItem, GValue2> translate(final Getter<? super GValue, ? extends GValue2> getTrans,
+		final Getter<? super GValue2, ? extends GValue> setTrans) {
+		return Fields.translate(this, getTrans, setTrans);
 	}
 
 	@Override
