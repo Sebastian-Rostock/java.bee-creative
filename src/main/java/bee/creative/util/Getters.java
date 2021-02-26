@@ -4,13 +4,11 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 import bee.creative.ref.References;
@@ -28,7 +26,7 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert den neutralen {@link Getter3}, welcher beim {@link #get(Object) Lesen} stets die gegebene Eingabe als Wert liefert. */
+	/** Diese Klasse implementiert den neutralen {@link Getter3}, der beim {@link #get(Object) Lesen} stets den gegebenen Datensatz als Wert liefert. */
 	@SuppressWarnings ("javadoc")
 	public static class NeutralGetter extends AbstractGetter<Object, Object> {
 
@@ -41,12 +39,13 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Getter3}, welcher das {@link #get(Object) Lesen} an eine gegebene {@link Method nativen Methode} delegiert. Bei
-	 * einer Klassenmethode liefert er für einen Datensatz {@code item} {@link Method#invoke(Object, Object...) this.that.invoke(null, item)}, bei einer
-	 * Objektmethode dagegen {@link Method#invoke(Object, Object...) this.that.invoke(item)}.
+	/** Diese Klasse implementiert einen {@link Getter3}, der das {@link #get(Object) Lesen} an eine gegebene {@link Method nativen Methode} delegiert. Bei einer
+	 * Klassenmethode liefert er für einen Datensatz {@code item} {@link Method#invoke(Object, Object...) this.that.invoke(null, item)}, bei einer Objektmethode
+	 * dagegen {@link Method#invoke(Object, Object...) this.that.invoke(item)}.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class MethodGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		public final Method that;
@@ -79,19 +78,17 @@ public class Getters {
 
 	}
 
-	/**
- einen {@link Getter} zum gegebenen {@link Constructor nativen Kontruktor} zurück. Der erzeugte {@link Getter} liefert für einen
-	 * Datensatz {@code item} {@code constructor.newInstance(item)}.
+	/** Diese Klasse implementiert einen {@link Getter3}, der das {@link #get(Object) Lesen} an einen gegebenen {@link Constructor nativen Kontruktor} delegiert.
+	 * Für einen Datensatz {@code item} liefert er {@link Constructor#newInstance(Object...) this.that.newInstance(item)}.
 	 *
-	 * @see Constructor#newInstance(Object...)
 	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 */
+	 * @param <GValue> Typ des Werts. */
+	@SuppressWarnings ("javadoc")
 	public static class ConstructorGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		public final Constructor<?> that;
 
-		public ConstructorGetter(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException{
+		public ConstructorGetter(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
@@ -114,7 +111,7 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert einen verkettenden {@link Getter3}, welcher beim {@link #get(Object) Lesen} des Werts eines Datensatzes {@code item}
+	/** Diese Klasse implementiert einen verkettenden {@link Getter3}, der beim {@link #get(Object) Lesen} des Werts eines Datensatzes {@code item}
 	 * {@code this.trans.get(this.that.get(item))} liefert.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
@@ -145,10 +142,10 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert einen gepufferten {@link Getter3}, welcher das {@link #get(Object) Lesen} an einen {@link #that gegebenen} {@link Getter}
-	 * delegiert und den ermittelten Wert zur Wiederverwendung in einem {@link #unique internen} Puffer ablegt, sofern der Puffer den Wert zum Datensatz noch
-	 * nicht enthält, und sonst den im Puffer abgelegte Wert liefert. Der Abgleich der Datensätze erfolgt über einen gegebenen {@link Hasher}. Die Ablage der
-	 * Werte zu den Datensätzen erfolgt über {@link Reference Verweise} der {@lonk #mode gegebenen} Stärke ({@link References#HARD}, {@link References#SOFT},
+	/** Diese Klasse implementiert einen gepufferten {@link Getter3}, der das {@link #get(Object) Lesen} an einen {@link #that gegebenen} {@link Getter} delegiert
+	 * und den ermittelten Wert zur Wiederverwendung in einem {@link #buffer Puffer} ablegt, sofern der Puffer den Wert zum Datensatz noch nicht enthält, und
+	 * sonst den im Puffer abgelegte Wert liefert. Der Abgleich der Datensätze erfolgt über einen gegebenen {@link Hasher}. Die Ablage der Werte zu den
+	 * Datensätzen erfolgt über {@link Reference Verweise} der {@lonk #mode gegebenen} Stärke ({@link References#HARD}, {@link References#SOFT},
 	 * {@link References#WEAK}).
 	 *
 	 * @param <GItem> Typ des Datensatzes.
@@ -230,7 +227,7 @@ public class Getters {
 
 		public final Hasher hasher;
 
-		public final Unique<GItem, ?> unique;
+		public final Unique<GItem, ?> buffer;
 
 		private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
@@ -240,23 +237,23 @@ public class Getters {
 			this.mode = mode;
 			this.hasher = Objects.notNull(hasher);
 			if (mode == References.HARD) {
-				this.unique = Unique.fromHashMap(hasher, that);
+				this.buffer = Unique.fromHashMap(hasher, that);
 			} else if (mode == References.SOFT) {
-				this.unique = Unique.fromHashMap(hasher, new SoftGetter<>(that));
+				this.buffer = Unique.fromHashMap(hasher, new SoftGetter<>(that));
 			} else if (mode == References.WEAK) {
-				this.unique = Unique.fromHashMap(hasher, new WeakGetter<>(that));
+				this.buffer = Unique.fromHashMap(hasher, new WeakGetter<>(that));
 			} else throw new IllegalArgumentException();
 		}
 
 		@Override
 		public GValue get(final GItem item) {
-			final Object val = this.unique.get(item);
+			final Object val = this.buffer.get(item);
 			@SuppressWarnings ("unchecked")
 			final GValue res = (GValue)(val instanceof Entry ? ((Entry)val).get() : val);
 			while (true) {
 				final Object ref = this.queue.poll();
 				if (ref == null) return res;
-				this.unique.mapping().remove(((Entry)ref).item());
+				this.buffer.mapping().remove(((Entry)ref).item());
 			}
 		}
 
@@ -267,11 +264,11 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert einen aggregierenden {@link Getter3}, welcher beim {@link #get(Iterable) Lesen} über einen {@link #that gegebenen}
-	 * {@link Getter} zunächst zu jedem Elemente des iterierbaren Datensatzes einen Wert ermittelt. Wenn der iterierbare Datensatz {@code null} oder leer ist,
-	 * wird das Lesen an einen {@link #empty Leerwert} {@link Getter} delegiert. Wenn sich die ermittelten Werte voneinander {@link Objects#equals(Object)
-	 * unterscheiden}, wird das Lesen an einen {@link #mixed Mischwert} {@link Getter} delegiert. Andernfalls wird der erste Wert über einen {@link #trans
-	 * übersetzenden} {@link Getter} in den Ergebniswert überführt.
+	/** Diese Klasse implementiert einen aggregierenden {@link Getter3}, der beim {@link #get(Iterable) Lesen} über einen {@link #that gegebenen} {@link Getter}
+	 * zunächst zu jedem Elemente des iterierbaren Datensatzes einen Wert ermittelt. Wenn der iterierbare Datensatz {@code null} oder leer ist, wird das Lesen an
+	 * einen {@link #empty Leerwert} {@link Getter} delegiert. Wenn sich die ermittelten Werte voneinander {@link Objects#equals(Object) unterscheiden}, wird das
+	 * Lesen an einen {@link #mixed Mischwert} {@link Getter} delegiert. Andernfalls wird der erste Wert über einen {@link #trans übersetzenden} {@link Getter} in
+	 * den Ergebniswert überführt.
 	 *
 	 * @param <GItem> Typ des iterierbaren Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
@@ -322,7 +319,7 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Getter3}, welcher das {@link #get(Object) Lesen} nur an einen gegebenen {@link Getter} delegiert, wenn der dazu
+	/** Diese Klasse implementiert einen {@link Getter3}, der das {@link #get(Object) Lesen} nur dann an einen gegebenen {@link Getter} delegiert, wenn der dazu
 	 * verwendete Datensatz nicht {@code null} ist, und sonst einen gegebene {@link #value Rückfallwert} liefert.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
@@ -352,7 +349,7 @@ public class Getters {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Getter3}, welcher einen gegebenen {@link Getter} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	/** Diese Klasse implementiert einen {@link Getter3}, der einen gegebenen {@link Getter} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
@@ -475,13 +472,13 @@ public class Getters {
 		return (Getter3<GItem, GItem>)NeutralGetter.INSTANCE;
 	}
 
-	/** Diese Methode gibt einen {@link Getter3} zu {@link Filter#accept(Object)} des gegebenen {@link Filter} zurück. Für einen Datenstz {@code item} liefert er
+	/** Diese Methode liefert einen {@link Getter3} zu {@link Filter#accept(Object)} des gegebenen {@link Filter}. Für einen Datenstz {@code item} liefert er
 	 * {@code Boolean.valueOf(that.accept(item))}. */
 	public static <GItem> Getter3<GItem, Boolean> from(final Filter<? super GItem> that) throws NullPointerException {
 		return new FilterGetter<>(that);
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Getter} als {@link Getter3}. Wenn er {@code null} ist, wird {@link #empty() Getter.empty()} geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Getter} als {@link Getter3}. Wenn er {@code null} ist, wird dern {@link EmptyGetter} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem, GValue> Getter3<GItem, GValue> from(final Getter<? super GItem, ? extends GValue> that) {
 		if (that == null) return Getters.empty();
@@ -489,33 +486,23 @@ public class Getters {
 		return Getters.concat(that, Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode liefert einen {@link Getter3}, der seinen Datensatz ignoriert und den Wert des gegebenen {@link Producer} liefert.
-	 *
-	 * @param <GValue> Typ des Werts. */
+	/** Diese Methode liefert einen {@link Getter3} zu {@link Producer#get()} des gegebenen {@link Producer}. */
 	public static <GValue> Getter3<Object, GValue> from(final Producer<? extends GValue> that) throws NullPointerException {
-		if (that == Producers.empty()) return Getters.empty();
-		return new ProducerGetter<>(that);
+		return that == Producers.empty() ? Getters.<Object, GValue>empty() : new ProducerGetter<>(that);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#fromNative(String, boolean) Getters.nativeGetter(field, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Getters.fromNative(memberText, true)}. */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText) throws NullPointerException, IllegalArgumentException {
 		return Getters.fromNative(memberText, true);
 	}
 
-	/** Diese Methode ist effektiv eine Abkürzung für {@code Fields.nativeField(Natives.parse(memberText), forceAccessible)}.
+	/** Diese Methode ist effektiv eine Abkürzung für {@code Getters.fromNative(Natives.parse(memberText), forceAccessible)}.
 	 *
 	 * @see Natives#parse(String)
 	 * @see Getters#fromNative(java.lang.reflect.Field, boolean)
 	 * @see Getters#fromNative(Method, boolean)
-	 * @see Getters#fromNative(Constructor, boolean)
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GOutput> Typ des Werts.
-	 * @param memberText Pfad einer Methode, eines Konstruktors oder eines Datenfelds.
-	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
-	 * @return {@code native}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Pfad ungültig bzw. sein Ziel nicht zugreifbar ist. */
-	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final String memberText, final boolean forceAccessible)
+	 * @see Getters#fromNative(Constructor, boolean) */
+	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final String memberText, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberText);
 		if (object instanceof java.lang.reflect.Field) return Getters.fromNative((java.lang.reflect.Field)object, forceAccessible);
@@ -524,57 +511,60 @@ public class Getters {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#fromNative(java.lang.reflect.Field, boolean) Getters.nativeGetter(field, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Getters.fromNative(field, true)}. */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
 		return Getters.fromNative(that, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(java.lang.reflect.Field, boolean) Fields.nativeField(field, forceAccessible)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Getter) Getters.from(Fields.fromNative(that, forceAccessible))}.
+	 *
+	 * @see Fields#fromNative(java.lang.reflect.Field, boolean) */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final java.lang.reflect.Field that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Getters.from(Fields.<GItem, GValue>fromNative(that, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#fromNative(Method, boolean) Getters.nativeGetter(method, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Getters.fromNative(that, true)}. */
 	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final Method that) throws NullPointerException, IllegalArgumentException {
 		return Getters.fromNative(that, true);
 	}
 
-	 
+	/** Diese Methode ist eine Abkürzung für {@link MethodGetter new MethodGetter<>(that, forceAccessible)}. */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Method that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new MethodGetter<>(that, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#fromNative(Constructor, boolean) Getters.nativeGetter(constructor, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Constructor, boolean) Getters.fromNative(that, true)}. */
 	public static <GItem, GOutput> Getter3<GItem, GOutput> fromNative(final Constructor<?> that) throws NullPointerException, IllegalArgumentException {
 		return Getters.fromNative(that, true);
 	}
 
-	/** Diese Methode gibt
-	 * @param that Nativer Kontruktor.
-	 * @return {@code native}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Parameteranzahl des nativen Konstruktor ungültig, er nicht zugreifbar oder er nicht statisch ist. */
+	/** Diese Methode ist eine Abkürzung für {@link ConstructorGetter new ConstructorGetter<>(that, forceAccessible)}. */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Constructor<?> that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new ConstructorGetter<>(that, forceAccessible);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#fromNative(Class, String, boolean) Getters.nativeGetter(fieldOwner, fieldName, true)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Getters.fromNative(fieldOwner, fieldName, true)}. */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName)
 		throws NullPointerException, IllegalArgumentException {
 		return Getters.fromNative(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#fromNative(Class, String, boolean) Fields.nativeField(fieldOwner, fieldName, forceAccessible)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Getter) Getters.from(Fields.fromNative(fieldOwner, fieldName, forceAccessible))}.
+	 *
+	 * @see Fields#fromNative(Class, String, boolean) */
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Class<? extends GItem> fieldOwner, final String fieldName,
 		final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
 		return Getters.from(Fields.<GItem, GValue>fromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #from(Getter) Getters.from(Producers.fromValue(that).toGetter())}.
+	 *
+	 * @see Producers#fromValue(Object) */
 	public static <GValue> Getter3<Object, GValue> fromValue(final GValue that) {
-		return Getters.from(Producers.fromValue(that));
+		return Getters.from(Producers.fromValue(that).toGetter());
 	}
 
 	/** Diese Methode gibt einen {@link Getter3} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
@@ -589,6 +579,7 @@ public class Getters {
 		return new TargetGetter<>(that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link ConcatGetter new ConcatGetter<>(that, trans)}. */
 	public static <GItem, GValue2, GValue> Getter3<GItem, GValue> concat(final Getter<? super GItem, ? extends GValue2> that,
 		final Getter<? super GValue2, ? extends GValue> trans) throws NullPointerException {
 		return new ConcatGetter<>(that, trans);
@@ -605,13 +596,13 @@ public class Getters {
 		return new BufferedGetter<>(that, mode, hasher);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregate(Getter, Getter) Getters.aggregate(that, Getters.neutral())}. */
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter) Getters.aggregate(that, Getters.neutral())}. */
 	public static <GItem, GValue> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue> that)
 		throws NullPointerException {
 		return Getters.aggregate(that, Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregate(Getter, Getter, Getter, Getter) Getters.aggregate(that, trans, Getters.empty(),
+	/** Diese Methode ist eine Abkürzung für {@link #aggregate(Getter, Getter, Getter, Getter) Getters.aggregate(that, trans, Getters.empty(),
 	 * Getters.empty())}. */
 	public static <GItem, GValue, GValue2> Getter3<Iterable<? extends GItem>, GValue> aggregate(final Getter<? super GItem, ? extends GValue2> that,
 		final Getter<? super GValue2, ? extends GValue> trans) throws NullPointerException {
@@ -625,7 +616,7 @@ public class Getters {
 		return new AggregatedGetter<>(that, trans, empty, mixed);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#optionalize(Getter, Object) Getters.optionalize(that, null)}. **/
+	/** Diese Methode ist eine Abkürzung für {@link #optionalize(Getter, Object) Getters.optionalize(that, null)}. **/
 	public static <GItem, GValue> Getter3<GItem, GValue> optionalize(final Getter<? super GItem, GValue> that) throws NullPointerException {
 		return Getters.optionalize(that, null);
 	}

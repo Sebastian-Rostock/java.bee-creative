@@ -276,7 +276,7 @@ public class Parser {
 
 		@Override
 		public Iterator<Token> iterator() {
-			return Iterators.fromItems(this, 0, this.size());
+			return Iterators.fromArray(this, 0, this.size());
 		}
 
 		@Override
@@ -445,7 +445,7 @@ public class Parser {
 
 		@Override
 		public Iterator<Token> iterator() {
-			return Iterators.fromItems(this, 0, this.size());
+			return Iterators.fromArray(this, 0, this.size());
 		}
 
 		@Override

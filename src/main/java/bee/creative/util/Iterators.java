@@ -27,7 +27,7 @@ public class Iterators {
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
-	public static class ItemsIterator<GItem> extends AbstractIterator<GItem> {
+	public static class ArrayIterator<GItem> extends AbstractIterator<GItem> {
 
 		public final Array<? extends GItem> that;
 
@@ -37,7 +37,7 @@ public class Iterators {
 
 		protected int index;
 
-		public ItemsIterator(final Array<? extends GItem> that, final int fromIndex, final int toIndex) throws NullPointerException, IllegalArgumentException {
+		public ArrayIterator(final Array<? extends GItem> that, final int fromIndex, final int toIndex) throws NullPointerException, IllegalArgumentException {
 			Comparables.check(fromIndex, toIndex);
 			this.that = Objects.notNull(that);
 			this.fromIndex = fromIndex;
@@ -602,12 +602,6 @@ public class Iterators {
 		return new UniformIterator<>(item, count);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ItemsIterator new ItemsIterator<>(items, fromIndex, toIndex)}. */
-	public static <GItem> Iterator2<GItem> fromItems(final Array<? extends GItem> items, final int fromIndex, final int toIndex)
-		throws NullPointerException, IllegalArgumentException {
-		return new ItemsIterator<>(items, fromIndex, toIndex);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link #from(Iterator) Iterators.from(Arrays.asList(items).iterator())}.
 	 *
 	 * @see Arrays#asList(Object...) */
@@ -623,6 +617,12 @@ public class Iterators {
 	public static <GItem> Iterator2<GItem> fromArray(final GItem[] items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
 		return Iterators.from(Arrays.asList(items).subList(fromIndex, toIndex).iterator());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ArrayIterator new ItemsIterator<>(items, fromIndex, toIndex)}. */
+	public static <GItem> Iterator2<GItem> fromArray(final Array<? extends GItem> items, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException {
+		return new ArrayIterator<>(items, fromIndex, toIndex);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CountIterator new CountIterator(count)}. */

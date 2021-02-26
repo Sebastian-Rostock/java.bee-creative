@@ -116,7 +116,7 @@ public abstract class BEXList implements Array<BEXNode>, Iterable<BEXNode> {
 
 	@Override
 	public Iterator<BEXNode> iterator() {
-		return Iterators.fromItems(this, 0, this.length());
+		return Iterators.fromArray(this, 0, this.length());
 	}
 
 	@Override

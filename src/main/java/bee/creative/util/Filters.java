@@ -394,7 +394,7 @@ public class Filters {
 		return value ? Filters.<GItem>accept() : Filters.<GItem>reject();
 	}
 
-	/** Diese Methode gibt einen {@link Filter2} zu {@link Getter#get(Object)} des gegebenen {@link Getter} zurück. Die Akzeptanz eines Datensatzes {@code item}
+	/** Diese Methode liefert einen {@link Filter2} zu {@link Getter#get(Object)} des gegebenen {@link Getter}. Die Akzeptanz eines Datensatzes {@code item}
 	 * entspricht {@code Boolean.TRUE.equals(that.get(item))}.
 	 *
 	 * @param <GItem> Typ des Datensatzes. */

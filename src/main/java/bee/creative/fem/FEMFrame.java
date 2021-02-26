@@ -352,7 +352,7 @@ public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
 	@Override
 	public final Iterator<FEMValue> iterator() {
-		return Iterators.fromItems(this, 0, this.size());
+		return Iterators.fromArray(this, 0, this.size());
 	}
 
 	@Override
