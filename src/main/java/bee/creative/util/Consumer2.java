@@ -16,6 +16,6 @@ public interface Consumer2<GValue> extends Consumer<GValue> {
 	public Consumer2<GValue> synchronize();
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#synchronize(Consumer, Object) Consumers.synchronize(this, mutex)}. */
-	public Consumer2<GValue> synchronize(final Object mutex);
+	public Consumer2<GValue> synchronize(Object mutex);
 
 }

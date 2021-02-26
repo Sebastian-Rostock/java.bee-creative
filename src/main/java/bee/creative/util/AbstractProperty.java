@@ -36,8 +36,8 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public Producer3<GValue> buffer(final int mode) {
-		return Producers.buffer(this, mode);
+	public Producer3<GValue> buffer(int mode, Hasher hasher) {
+		return Producers.buffer(null, mode, hasher);
 	}
 
 	@Override

@@ -30,8 +30,8 @@ public interface Observable<GMessage, GObserver> {
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
 	public GObserver putWeak(GObserver listener) throws IllegalArgumentException;
 
-	/** Diese Methode meldet den gegebenen Ereignisempfänger für das Ereignis ab. Wenn der Ereignisempfänger {@code null} ist, wird
-	 * er ignoriert. Andernfalls wird er beim zukünftigen {@link #fire(Object) Auslösen} des Ereignisses nicht mehr informiert.
+	/** Diese Methode meldet den gegebenen Ereignisempfänger für das Ereignis ab. Wenn der Ereignisempfänger {@code null} ist, wird er ignoriert. Andernfalls wird
+	 * er beim zukünftigen {@link #fire(Object) Auslösen} des Ereignisses nicht mehr informiert.
 	 *
 	 * @param listener Ereignisempfänger oder {@code null}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */

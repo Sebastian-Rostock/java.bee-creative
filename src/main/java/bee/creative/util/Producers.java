@@ -7,15 +7,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
-import bee.creative.ref.Reference2;
-import bee.creative.ref.References;
 
 /** Diese Klasse implementiert grundlegende {@link Producer}.
- * 
+ *
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Producers {
 
-	/** Diese Klasse implementiert einen {@link Producer3}, welcher beim {@link #get() Lesen} stets {@code null} liefert. */
+	/** Diese Klasse implementiert einen {@link Producer3}, der beim {@link #get() Lesen} stets {@code null} liefert. */
 	@SuppressWarnings ("javadoc")
 	public static class EmptyProducer extends AbstractProducer<Object> {
 
@@ -23,7 +21,7 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Producer3}, welcher beim {@link #get() Lesen} stets einen gegebenen Wert liefert.
+	/** Diese Klasse implementiert einen {@link Producer3}, der beim {@link #get() Lesen} stets einen gegebenen Wert liefert.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
@@ -47,8 +45,8 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Producer3}, welcher das {@link #get() Lesen} an eine gegebene {@link Method nativen statische Methode} delegiert.
-	 * Das Lesen erfolgt über {@code this.that.invoke(null)}.
+	/** Diese Klasse implementiert einen {@link Producer3}, der das {@link #get() Lesen} an eine gegebene {@link Method nativen statische Methode} delegiert. Das
+	 * Lesen erfolgt über {@code this.that.invoke(null)}.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
@@ -79,7 +77,7 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Producer3}, welcher das {@link #get() Lesen} an einen gegebenen {@link Method nativen statischen Konstruktor}
+	/** Diese Klasse implementiert einen {@link Producer3}, der das {@link #get() Lesen} an einen gegebenen {@link Method nativen statischen Konstruktor}
 	 * delegiert. Das Lesen erfolgt über {@code this.that.newInstance()}.
 	 *
 	 * @param <GValue> Typ des Werts. */
@@ -111,50 +109,10 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen puffernden {@link Producer3}, welcher den beim {@link #get() Lesen} einen Wert liefert, der von einem gegebenen
-	 * {@link Producer} gelieferten und mit einem {@link Reference2} im gegebenenen Modus zwischenspeichert wird.
+	/** Diese Klasse implementiert einen übersetzten {@link Producer3}, der beim {@link #get() Lesen} einen Wert liefert, der über einen gegebenen {@link Getter}
+	 * aus dem Wert eines gegebenen {@link Producer} ermittelt wird. Das Lesen erfolgt über {@code this.trans.get(this.that.get())}.
 	 *
-	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
-	public static class BufferedProducer<GValue> extends AbstractProducer<GValue> {
-
-		public final Producer<? extends GValue> that;
-
-		protected final int mode;
-
-		protected Reference2<GValue> buffer;
-
-		/** Dieser Konstruktor initialisiert das {@link Producer} und Zeigerstärke ({@link References#HARD}, {@link References#WEAK} oder {@link References#SOFT}). */
-		public BufferedProducer(final Producer<? extends GValue> that, final int mode) throws NullPointerException, IllegalArgumentException {
-			References.from(mode, null);
-			this.mode = mode;
-			this.that = Objects.notNull(that);
-		}
-
-		@Override
-		public GValue get() {
-			final Reference2<GValue> pointer = this.buffer;
-			if (pointer != null) {
-				final GValue data = pointer.get();
-				if (data != null) return data;
-				if (pointer == References.NULL) return null;
-			}
-			final GValue data = this.that.get();
-			this.buffer = References.from(this.mode, data);
-			return data;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.mode);
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen übersetzten {@link Producer3}, welcher den beim {@link #get() Lesen} einen Wert liefert, der über einen gegebenen
-	 * {@link Getter} aus dem Wert eines gegebenen {@link Producer} ermittelt wird. Das Lesen erfolgt über {@code this.trans.get(this.that.get())}.
-	 *
-	 * @param <GValue> Typ des Werts dieses {@link Producer3}.
+	 * @param <GValue> Typ des Werts.
 	 * @param <GValue2> Typ des Werts des gegebenen {@link Producer}. */
 	@SuppressWarnings ("javadoc")
 	public static class TranslatedProducer<GValue, GValue2> extends AbstractProducer<GValue> {
@@ -180,8 +138,8 @@ public class Producers {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Producer3}, welcher einen gegebenen {@link Producer} über {@code synchronized(this.mutex)} synchronisiert. Wenn
-	 * dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
+	/** Diese Klasse implementiert einen {@link Producer3}, der einen gegebenen {@link Producer} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
@@ -313,21 +271,26 @@ public class Producers {
 		return Producers.fromNative(fieldOwner, fieldName, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Producers.from(Properties.fromNative(fieldOwner, fieldName,
+	/** MAMA Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Producers.from(Properties.fromNative(fieldOwner, fieldName,
 	 * forceAccessible))}. */
 	public static <GValue> Producer3<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Producers.from(Properties.<GValue>fromNative(fieldOwner, fieldName, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #buffer(Producer, int) Producers.buffer(that, Pointers.SOFT)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Getters#buffer(Getter) Getters.from(that).buffer().toProducer()}.
+	 *
+	 * @see Getters#from(Producer) */
 	public static <GValue> Producer3<GValue> buffer(final Producer<? extends GValue> that) throws NullPointerException {
-		return Producers.buffer(that, References.SOFT);
+		return Getters.from(that).buffer().toProducer();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link BufferedProducer new BufferedProducer<>(that, mode)}. */
-	public static <GValue> Producer3<GValue> buffer(final Producer<? extends GValue> that, final int mode) throws NullPointerException, IllegalArgumentException {
-		return new BufferedProducer<>(that, mode);
+	/** Diese Methode ist eine Abkürzung für {@link Getters#buffer(Getter, int, Hasher) Getters.from(that).buffer(mode, hasher).toProducer()}.
+	 *
+	 * @see Getters#from(Producer) */
+	public static <GValue> Producer3<GValue> buffer(final Producer<? extends GValue> that, final int mode, final Hasher hasher)
+		throws NullPointerException, IllegalArgumentException {
+		return Getters.from(that).buffer(mode, hasher).toProducer();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedProducer new TranslatedProducer<>(that, trans)}. */

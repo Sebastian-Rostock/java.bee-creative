@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
-import bee.creative.util.Comparables.Items;
 
 /** Diese Klasse implementiert grundlegende {@link Iterator}.
  *
@@ -15,7 +15,7 @@ import bee.creative.util.Comparables.Items;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Iterators {
 
-	/** Diese Klasse implementiert einen leeren {@link Iterator2}, welcher keine Elemente liefert. */
+	/** Diese Klasse implementiert einen leeren {@link Iterator2}, der keine Elemente liefert. */
 	@SuppressWarnings ("javadoc")
 	public static class EmptyIterator extends AbstractIterator<Object> {
 
@@ -23,13 +23,13 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterator2}, welcher die Elemente eines Abschnitts von gegebenen {@link Items} liefert.
+	/** Diese Klasse implementiert einen {@link Iterator2}, der die Elemente eines Abschnitts von gegebenen {@link Array} liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
 	public static class ItemsIterator<GItem> extends AbstractIterator<GItem> {
 
-		public final Items<? extends GItem> that;
+		public final Array<? extends GItem> that;
 
 		public final int fromIndex;
 
@@ -37,7 +37,7 @@ public class Iterators {
 
 		protected int index;
 
-		public ItemsIterator(final Items<? extends GItem> that, final int fromIndex, final int toIndex) throws NullPointerException, IllegalArgumentException {
+		public ItemsIterator(final Array<? extends GItem> that, final int fromIndex, final int toIndex) throws NullPointerException, IllegalArgumentException {
 			Comparables.check(fromIndex, toIndex);
 			this.that = Objects.notNull(that);
 			this.fromIndex = fromIndex;
@@ -63,7 +63,7 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterator2}, welcher eine gegebene Anzahl an {@link Integer Zahlen} beginnend mit {@code 0} liefert, d.h {@code 0},
+	/** Diese Klasse implementiert einen {@link Iterator2}, der eine gegebene Anzahl an {@link Integer Zahlen} beginnend mit {@code 0} liefert, d.h {@code 0},
 	 * {@code 1}, ..., {@code this.count-1}. */
 	@SuppressWarnings ("javadoc")
 	public static class CountIterator extends AbstractIterator<Integer> {
@@ -94,8 +94,8 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen verkettenden {@link Iterator2}, welcher alle Elemente der gegebenen Iteratoren in der gegebenen Reihenfolge liefert.
-	 * Diese Iteratoren dürfen dabei {@code null} sein.
+	/** Diese Klasse implementiert einen verkettenden {@link Iterator2}, der alle Elemente der gegebenen Iteratoren in der gegebenen Reihenfolge liefert. Diese
+	 * Iteratoren dürfen dabei {@code null} sein.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
@@ -140,8 +140,8 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterator2}, welcher kein Element eines gegebenen {@link Iterator} mehrfach liefert. Zur Duplikaterkennung werden
-	 * die gelieferten Elemente in einer gegebenen {@link Collection} gepuffert.
+	/** Diese Klasse implementiert einen {@link Iterator2}, der kein Element eines gegebenen {@link Iterator} mehrfach liefert. Zur Duplikaterkennung werden die
+	 * gelieferten Elemente in einer gegebenen {@link Collection} gepuffert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
@@ -183,7 +183,7 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterator2}, welcher ein gegebenes Element eine gegebene Anzahl mal liefert.
+	/** Diese Klasse implementiert einen {@link Iterator2}, der ein gegebenes Element eine gegebene Anzahl mal liefert.
 	 *
 	 * @param <GItem> Typ des Elements. */
 	@SuppressWarnings ("javadoc")
@@ -218,8 +218,8 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen begrenzenden {@link Iterator2}, welcher die Elemente eines gegebenen {@link Iterator} bis zu einer gegebenen maximalen
-	 * Anzahl liefert.
+	/** Diese Klasse implementiert einen begrenzenden {@link Iterator2}, der die Elemente eines gegebenen {@link Iterator} bis zu einer gegebenen maximalen Anzahl
+	 * liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
@@ -259,7 +259,7 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen filternden {@link Iterator2}, welcher nur die von einem gegebenen {@link Filter} akzeptierten Elemente des gegebenen
+	/** Diese Klasse implementiert einen filternden {@link Iterator2}, der nur die von einem gegebenen {@link Filter} akzeptierten Elemente des gegebenen
 	 * {@link Iterator} liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
@@ -308,7 +308,7 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen übersetzten {@link Iterator2}, welcher die über einen gegebenen {@link Getter} umgewandelte Elemente eines gegebenen
+	/** Diese Klasse implementiert einen übersetzten {@link Iterator2}, der die über einen gegebenen {@link Getter} umgewandelte Elemente eines gegebenen
 	 * {@link Iterator} liefert.
 	 *
 	 * @param <GItem> Typ der Elemente.
@@ -347,8 +347,8 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen unveränderlichen {@link Iterator2}, welcher beim {@link #remove() Entfernen} stets eine
-	 * {@link UnsupportedOperationException} auslöst.
+	/** Diese Klasse implementiert einen unveränderlichen {@link Iterator2}, der beim {@link #remove() Entfernen} stets eine {@link UnsupportedOperationException}
+	 * auslöst.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
@@ -377,9 +377,9 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterator2}, welcher die aufsteigend geordnete Vereinigung der Elemente zweier gegebener Iteratoren liefert und
-	 * welcher das {@link #remove() Entfernen} von Elementen nicht unterstützt. Die gegebenen Iteratoren müssen ihre Elemente dazu aufsteigend bezüglich einer
-	 * gegebenen Ordnung liefern.
+	/** Diese Klasse implementiert einen {@link Iterator2}, der die aufsteigend geordnete Vereinigung der Elemente zweier gegebener Iteratoren liefert und welcher
+	 * das {@link #remove() Entfernen} von Elementen nicht unterstützt. Die gegebenen Iteratoren müssen ihre Elemente dazu aufsteigend bezüglich einer gegebenen
+	 * Ordnung liefern.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
@@ -451,7 +451,7 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterator2}, welcher aufsteigend geordnete die Elemente eines ersten gegebenen Iterators ohne denen eines zweiten
+	/** Diese Klasse implementiert einen {@link Iterator2}, der aufsteigend geordnete die Elemente eines ersten gegebenen Iterators ohne denen eines zweiten
 	 * gegebenen Iterators liefert und welcher das {@link #remove() Entfernen} von Elementen nicht unterstützt. Die gegebenen Iteratoren müssen ihre Elemente dazu
 	 * aufsteigend bezüglich einer gegebenen Ordnung liefern.
 	 *
@@ -515,7 +515,7 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterator2}, welcher aufsteigend geordnete nur die Elemente liefert, die von beiden gegebenen Iteratoren geliefert
+	/** Diese Klasse implementiert einen {@link Iterator2}, der aufsteigend geordnete nur die Elemente liefert, die von beiden gegebenen Iteratoren geliefert
 	 * werden und und welcher das {@link #remove() Entfernen} von Elementen nicht unterstützt. Die gegebenen Iteratoren müssen ihre Elemente dazu aufsteigend
 	 * bezüglich einer gegebenen Ordnung liefern.
 	 *
@@ -603,7 +603,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ItemsIterator new ItemsIterator<>(items, fromIndex, toIndex)}. */
-	public static <GItem> Iterator2<GItem> fromItems(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
+	public static <GItem> Iterator2<GItem> fromItems(final Array<? extends GItem> items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
 		return new ItemsIterator<>(items, fromIndex, toIndex);
 	}

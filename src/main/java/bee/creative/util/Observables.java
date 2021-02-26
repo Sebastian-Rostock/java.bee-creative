@@ -6,12 +6,12 @@ import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.WeakReference2;
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
- * {@link #pop(Object, Object) abgemeldet} bzw. {@link #fire(Object, Object) benachrichtigt} werden können und bezüglich eines {@link WeakReference schwach}
+ * {@link #pop(Object, Object) abgemeldet} sowie {@link #fire(Object, Object) benachrichtigt} werden können und bezüglich eines {@link WeakReference schwach}
  * referenzierten Ereignissenders gespeichert werden. Die Ereignisempfänger können ebenfalls {@link WeakReference schwach} {@link #putWeak(Object, Object)
  * angemeldet} werden.
  * <p>
  * Beim {@link #fire(Object, Object) Benachrichtigen} der Ereignisempfänger wird eine gegebene Nachricht an alle zu diesem Zeitpunkt für einen gegebenen
- * Ereignissender angemeldeten Empfänger {@link #customFire(Object, Object, Object) gesendet}. Die Reihenfolge der Benachrichtigung der Empfänger entsprichtz
+ * Ereignissender angemeldeten Empfänger {@link #customFire(Object, Object, Object) gesendet}. Die Reihenfolge der Benachrichtigung der Empfänger entspricht
  * der Reihenfolge ihrer Anmeldung.
  * <p>
  * <pre>

@@ -247,25 +247,25 @@ public class Comparators {
 	@SuppressWarnings ("javadoc")
 	public static class ConcatComparator<GItem> extends AbstractComparator<GItem> {
 
-		public final Comparator<? super GItem> comp1;
+		public final Comparator<? super GItem> that1;
 
-		public final Comparator<? super GItem> comp2;
+		public final Comparator<? super GItem> that2;
 
-		public ConcatComparator(final Comparator<? super GItem> target1, final Comparator<? super GItem> target2) throws NullPointerException {
-			this.comp1 = Objects.notNull(target1);
-			this.comp2 = Objects.notNull(target2);
+		public ConcatComparator(final Comparator<? super GItem> that1, final Comparator<? super GItem> that2) throws NullPointerException {
+			this.that1 = Objects.notNull(that1);
+			this.that2 = Objects.notNull(that2);
 		}
 
 		@Override
 		public int compare(final GItem item1, final GItem item2) {
-			final int result = this.comp1.compare(item1, item2);
+			final int result = this.that1.compare(item1, item2);
 			if (result != 0) return result;
-			return this.comp2.compare(item1, item2);
+			return this.that2.compare(item1, item2);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.comp1, this.comp2);
+			return Objects.toInvokeString(this, this.that1, this.that2);
 		}
 
 	}
@@ -528,9 +528,9 @@ public class Comparators {
 		return Comparators.translate(that, Getters.<GItem>neutral());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ConcatComparator new ConcatComparator<>(comp1, comp2)}. */
-	public static <GItem> Comparator2<GItem> concat(final Comparator<? super GItem> comp1, final Comparator<? super GItem> comp2) throws NullPointerException {
-		return new ConcatComparator<>(comp1, comp2);
+	/** Diese Methode ist eine Abkürzung für {@link ConcatComparator new ConcatComparator<>(that1, that2)}. */
+	public static <GItem> Comparator2<GItem> concat(final Comparator<? super GItem> that1, final Comparator<? super GItem> that2) throws NullPointerException {
+		return new ConcatComparator<>(that1, that2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ReverseComparator new ReverseComparator<>(that)}. */

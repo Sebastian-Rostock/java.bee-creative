@@ -15,8 +15,8 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> transGet,
 		Getter<? super GValue2, ? extends GValue> transSet);
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#aggregate(Field, Getter, Getter, Getter, Getter) Fields.aggregate(this, transGet, transSet,
-	 * empty, mixed)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Fields#aggregate(Field, Getter, Getter, Getter, Getter) Fields.aggregate(this, transGet, transSet, empty,
+	 * mixed)}. */
 	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> transGet,
 		Getter<? super GValue2, ? extends GValue> transSet, Getter<? super GItem2, ? extends GValue2> empty, Getter<? super GItem2, ? extends GValue2> mixed);
 
@@ -32,10 +32,10 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 	public Property2<GValue> toProperty();
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field, Object) Properties.from(this, this)}. */
-	public Property2<GValue> toProperty(final GItem item);
+	public Property2<GValue> toProperty(GItem item);
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#setup(Field, Getter) Fields.setup(this, setup)}. */
-	public Field2<GItem, GValue> setup(final Getter<? super GItem, ? extends GValue> setup);
+	public Field2<GItem, GValue> setup(Getter<? super GItem, ? extends GValue> setup);
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#synchronize(Field) Fields.synchronize(this)}. */
 	@Override
@@ -46,10 +46,9 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 	public Field2<GItem, GValue> synchronize(Object mutex);
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#translate(Field, Getter, Getter) Fields.translate(this, transGet, transSet)}. */
-	public <GValue2> Field2<GItem, GValue2> translate(final Getter<? super GValue, ? extends GValue2> transGet,
-		final Getter<? super GValue2, ? extends GValue> transSet);
+	public <GValue2> Field2<GItem, GValue2> translate(Getter<? super GValue, ? extends GValue2> transGet, Getter<? super GValue2, ? extends GValue> transSet);
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#translate(Field, Translator) Fields.translate(this, trans)}. */
-	public <GValue2> Field2<GItem, GValue2> translate(final Translator<GValue, GValue2> trans);
+	public <GValue2> Field2<GItem, GValue2> translate(Translator<GValue, GValue2> trans);
 
 }

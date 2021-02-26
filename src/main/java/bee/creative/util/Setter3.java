@@ -8,7 +8,7 @@ package bee.creative.util;
 public interface Setter3<GItem, GValue> extends Setter2<GItem, GValue> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Setters#translate(Setter, Getter) Setters.translate(this, trans)}. */
-	public <GValue2> Setter3<GItem, GValue2> translate(final Getter<? super GValue2, ? extends GValue> trans);
+	public <GValue2> Setter3<GItem, GValue2> translate(Getter<? super GValue2, ? extends GValue> trans);
 
 	@Override
 	public Setter3<Iterable<? extends GItem>, GValue> aggregate();

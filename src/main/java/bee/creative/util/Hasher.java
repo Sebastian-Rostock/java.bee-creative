@@ -10,13 +10,13 @@ public interface Hasher {
 	 *
 	 * @param input Eingabe.
 	 * @return {@link Object#hashCode() Streuwert}. */
-	public int hash(final Object input);
+	public int hash(Object input);
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Eingaben zurück.
 	 *
 	 * @param input1 Eingabe 1.
 	 * @param input2 Eingabe 2.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Eingaben. */
-	public boolean equals(final Object input1, final Object input2);
+	public boolean equals(Object input1, Object input2);
 
 }

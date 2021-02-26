@@ -16,6 +16,6 @@ public interface Consumer3<GValue> extends Consumer2<GValue> {
 	public Consumer3<GValue> synchronize(Object mutex);
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#translate(Consumer, Getter) Consumers.translate(this, trans)}. */
-	public <GValue2> Consumer3<GValue2> translate(final Getter<? super GValue2, ? extends GValue> trans);
+	public <GValue2> Consumer3<GValue2> translate(Getter<? super GValue2, ? extends GValue> trans);
 
 }

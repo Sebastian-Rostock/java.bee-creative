@@ -16,10 +16,10 @@ import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMMapping;
+import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.AbstractIterator;
-import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
@@ -27,7 +27,7 @@ import bee.creative.util.Iterators;
 /** Diese Klasse implementiert eine unveränderliche Auflistung von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iterable<FEMValue>, UseToString {
+public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iterable<FEMValue>, UseToString {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#extract(Collector)}. */
 	public static interface Collector {

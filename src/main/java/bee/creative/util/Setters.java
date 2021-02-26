@@ -7,12 +7,12 @@ import java.util.Iterator;
 import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Setter}-Konstruktion und -Verarbeitung.
+/** Diese Klasse implementiert grundlegende {@link Setter}.
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Setters {
 
-	/** Diese Klasse implementiert einen {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} ignoriert. */
+	/** Diese Klasse implementiert einen {@link Setter3}, der das {@link #set(Object, Object) Schreiben} ignoriert. */
 	@SuppressWarnings ("javadoc")
 	public static class EmptySetter extends AbstractSetter<Object, Object> {
 
@@ -20,7 +20,7 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} an eine gegebene {@link Method nativen Methode}
+	/** Diese Klasse implementiert einen {@link Setter3}, der das {@link #set(Object, Object) Schreiben} an eine gegebene {@link Method nativen Methode}
 	 * delegiert. Bei einer Klassenmethode erfolgt das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item} über
 	 * {@link Method#invoke(Object, Object...) this.that.invoke(null, item, value)}, bei einer Objektmethode hingegen über {@link Method#invoke(Object, Object...)
 	 * this.that.invoke(item, value)}.
@@ -57,9 +57,9 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert einen übersetzten {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} mit dem über einen gegebenen
-	 * {@link Getter} übersetzten Datensatz an einen gegebenen {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes
-	 * {@code item} erfolgt über {@code this.that.set(this.trans.get(item), value)}.
+	/** Diese Klasse implementiert einen übersetzten {@link Setter3}, der das {@link #set(Object, Object) Schreiben} mit dem über einen gegebenen {@link Getter}
+	 * übersetzten Datensatz an einen gegebenen {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item}
+	 * erfolgt über {@code this.that.set(this.trans.get(item), value)}.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GItem2> Typ des Datensatzes des gegebenen {@link Setter}.
@@ -89,9 +89,9 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert einen übersetzten {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} mit dem über einen gegebenen
-	 * {@link Getter} übersetzten Wert an einen gegebenen {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes
-	 * {@code item} erfolgt über {@code this.that.set(item, this.trans.get(value))}.
+	/** Diese Klasse implementiert einen übersetzten {@link Setter3}, der das {@link #set(Object, Object) Schreiben} mit dem über einen gegebenen {@link Getter}
+	 * übersetzten Wert an einen gegebenen {@link Setter} delegeirt. Das Schreiben des Werts {@code value} der Eigenschaft eines Datensatzes {@code item} erfolgt
+	 * über {@code this.that.set(item, this.trans.get(value))}.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
@@ -120,7 +120,7 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert einen aggregierten {@link Setter3}, welcher das {@link #set(Iterable, Object) Schreiben} mit dem über einen gegebenen
+	/** Diese Klasse implementiert einen aggregierten {@link Setter3}, der das {@link #set(Iterable, Object) Schreiben} mit dem über einen gegebenen
 	 * {@link Getter} übersetzten Wert für jedes Element des iterierbaren Datensatzes an einen gegebenen {@link Setter} delegeirt. Wenn der iterierbare Datensatz
 	 * {@code null} oder leer ist, wird das Setzen ignoriert.
 	 *
@@ -157,7 +157,7 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Setter3}, welcher das {@link #set(Object, Object) Schreiben} nur dann an einen gegebenen {@link Setter} delegiert,
+	/** Diese Klasse implementiert einen {@link Setter3}, der das {@link #set(Object, Object) Schreiben} nur dann an einen gegebenen {@link Setter} delegiert,
 	 * wenn die Eingabe nicht {@code null} ist.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
@@ -184,7 +184,7 @@ public class Setters {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Setter3}, welcher einen gegebenen {@link Setter} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	/** Diese Klasse implementiert einen {@link Setter3}, der einen gegebenen {@link Setter} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GItem> Typ des Datensatzes.
@@ -241,7 +241,7 @@ public class Setters {
 		return (Setter3<GItem, GValue>)EmptySetter.INSTANCE;
 	}
 
-	/** Diese Methode liefert den gegebenen {@link Consumer} als {@link Consumer3}. Wenn er {@code null} ist, wird der {@link EmptySetter} geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Setter} als {@link Setter}. Wenn er {@code null} ist, wird der {@link EmptySetter} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem, GValue> Setter3<GItem, GValue> from(final Setter<? super GItem, ? super GValue> that) {
 		if (that == null) return Setters.empty();
@@ -249,7 +249,7 @@ public class Setters {
 		return Setters.translate(Getters.<GItem>neutral(), that);
 	}
 
-	/** Diese Methode liefert einen {@link Setter3}, welcher beim {@link Setter#set(Object, Object)} den Datensatz ignoriert und den Wert an den gegebenen
+	/** Diese Methode liefert einen {@link Setter3}, der beim {@link Setter#set(Object, Object) Schreiben} den Datensatz ignoriert und den Wert an den gegebenen
 	 * {@link Consumer} delegiert. */
 	public static <GItem, GValue> Setter3<GItem, GValue> from(final Consumer<? super GValue> that) throws NullPointerException {
 		return new ConsumerSetter<>(that);
@@ -273,28 +273,28 @@ public class Setters {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field) fromNative.nativeField(field, true)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
-		return Setters.fromNative(field, true);
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field) fromNative.nativeField(that, true)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field that) throws NullPointerException, IllegalArgumentException {
+		return Setters.fromNative(that, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Setter) Setters.from(Fields.fromNative(field, forceAccessible))}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Setter) Setters.from(Fields.fromNative(that, forceAccessible))}.
 	 *
 	 * @see Fields#fromNative(java.lang.reflect.Field, boolean) */
-	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible)
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final java.lang.reflect.Field that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return Setters.from(Fields.fromNative(field, forceAccessible));
+		return Setters.from(Fields.fromNative(that, forceAccessible));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Setters.fromNative(method, true)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method method) throws NullPointerException, IllegalArgumentException {
-		return Setters.fromNative(method, true);
+	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, boolean) Setters.fromNative(that, true)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method that) throws NullPointerException, IllegalArgumentException {
+		return Setters.fromNative(that, true);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link MethodSetter new MethodSetter<>(method, forceAccessible)}. */
-	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method method, final boolean forceAccessible)
+	/** Diese Methode ist eine Abkürzung für {@link MethodSetter new MethodSetter<>(that, forceAccessible)}. */
+	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final Method that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		return new MethodSetter<>(method, forceAccessible);
+		return new MethodSetter<>(that, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Setters.fromNative(fieldOwner, fieldName, true)}. */

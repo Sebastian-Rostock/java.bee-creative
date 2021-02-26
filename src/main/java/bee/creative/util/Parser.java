@@ -5,8 +5,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import bee.creative.array.CompactIntegerArray;
+import bee.creative.lang.Array;
+import bee.creative.lang.Array2;
 import bee.creative.lang.Objects;
-import bee.creative.util.Comparables.Items;
 
 /** Diese Klasse implementiert ein Objekt zum Parsen einer Zeichenkette in hierarchische {@link Token Abschnitte}.
  *
@@ -22,7 +23,7 @@ public class Parser {
 	 * Abschnitts.
 	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class Token implements Items<Token>, Iterable<Token>, Comparable<Token> {
+	public static final class Token implements Array2<Token>, Comparable<Token> {
 
 		/** Dieses Feld speichert den leeren Abschnitt. */
 		public static final Token EMPTY = new Token("", 0, 0, new Token[0]);
@@ -189,6 +190,7 @@ public class Parser {
 		/** Diese Methode die Anzahl der {@link #tokens() Kindabschnitte} zurück.
 		 *
 		 * @return Kindabschnittanzahl. */
+		@Override
 		public int size() {
 			return this.tokens.length;
 		}
@@ -200,8 +202,8 @@ public class Parser {
 		}
 
 		/** Diese Methode liefert die Position des {@link #tokens() Kindabschnitts} zur gegebenen {@link Comparable Navigationsmethode} und ist eine Abkürzung für
-		 * {@link Comparables#binarySearch(Items, Comparable, int, int) Comparables.binarySearch(this, comp, 0, this.size())}.
-		 * 
+		 * {@link Comparables#binarySearch(Array, Comparable, int, int) Comparables.binarySearch(this, comp, 0, this.size())}.
+		 *
 		 * @see #startingAt(int)
 		 * @see #endingAt(int)
 		 * @see #containing(int) */
@@ -311,7 +313,7 @@ public class Parser {
 	/** Diese Klasse implementiert das Ergebnis der Übersetzung einer Zeichenkett in eine Hierarchie typisierter Abschnitte.
 	 *
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class Result implements Items<Token>, Iterable<Token> {
+	public static final class Result implements Array2<Token> {
 
 		/** Dieses Feld speichert das leere Ergebnis ohne Abschnitte. */
 		public static final Result EMPTY = new Result(Token.EMPTY, new Token[0]);
@@ -363,6 +365,7 @@ public class Parser {
 		 * @see #tokens()
 		 * @see #iterator()
 		 * @return Anzahl der Abschnitte. */
+		@Override
 		public int size() {
 			return this.tokens.length;
 		}
@@ -374,8 +377,8 @@ public class Parser {
 		}
 
 		/** Diese Methode liefert die Position des {@link #tokens() Abschnitts} zur gegebenen {@link Comparable Navigationsmethode} und ist eine Abkürzung für
-		 * {@link Comparables#binarySearch(Items, Comparable, int, int) Comparables.binarySearch(this, comp, 0, this.size())}.
-		 * 
+		 * {@link Comparables#binarySearch(Array, Comparable, int, int) Comparables.binarySearch(this, comp, 0, this.size())}.
+		 *
 		 * @see Token#startingAt(int)
 		 * @see Token#endingAt(int)
 		 * @see Token#containing(int) */
@@ -391,7 +394,7 @@ public class Parser {
 		 *  res[2] = this.root().get(res[0]).get(res[1]).find(index);
 		 *  ...
 		 *  </pre>
-		 * 
+		 *
 		 * @see #find(int) */
 		public int[] path(final int index) {
 			final CompactIntegerArray res = new CompactIntegerArray(10);

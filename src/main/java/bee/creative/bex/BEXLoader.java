@@ -5,8 +5,8 @@ import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMException;
 import bee.creative.iam.IAMIndex;
 import bee.creative.iam.IAMListing;
+import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
-import bee.creative.util.Comparables.Items;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
 
@@ -711,7 +711,7 @@ public class BEXLoader {
 	 *
 	 * @see #getEnabled()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static class BEXStringLoader implements Items<String> {
+	public static class BEXStringLoader implements Array<String> {
 
 		/** Dieses Feld speichert den leeren {@link BEXStringLoader}. */
 		public static final BEXStringLoader EMPTY = new BEXStringLoader(IAMListing.EMPTY);

@@ -17,15 +17,15 @@ public interface Setter2<GItem, GValue> extends Setter<GItem, GValue> {
 	public Setter2<GItem, GValue> synchronize();
 
 	/** Diese Methode ist eine Abkürzung für {@link Setters#synchronize(Setter, Object) Setters.synchronize(this)}. */
-	public Setter2<GItem, GValue> synchronize(final Object mutex);
+	public Setter2<GItem, GValue> synchronize(Object mutex);
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter, Setter) Fields.from(get, this)}. */
-	public Field2<GItem, GValue> toField(final Getter<? super GItem, ? extends GValue> get);
+	public Field2<GItem, GValue> toField(Getter<? super GItem, ? extends GValue> get);
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#from(Setter) Consumer.from(this)}. */
 	public Consumer3<GValue> toConsumer();
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#from(Setter, Object) Consumer.from(this, item)}. */
-	public Consumer3<GValue> toConsumer(final GItem item);
+	public Consumer3<GValue> toConsumer(GItem item);
 
 }

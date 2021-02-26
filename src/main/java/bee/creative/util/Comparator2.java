@@ -9,7 +9,7 @@ import java.util.Comparator;
 public interface Comparator2<GItem> extends Comparator<GItem> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#concat(Comparator, Comparator) Comparators.concat(this, that)}. */
-	public Comparator2<GItem> concat(final Comparator<? super GItem> that) throws NullPointerException;
+	public Comparator2<GItem> concat(Comparator<? super GItem> that) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#iterable(Comparator) Comparators.iterable(this)}. */
 	public Comparator2<Iterable<? extends GItem>> iterable();
@@ -21,6 +21,6 @@ public interface Comparator2<GItem> extends Comparator<GItem> {
 	public Comparator2<GItem> reverse();
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#translate(Comparator, Getter) Comparators.translate(this, trans)}. */
-	public <GItem2> Comparator<GItem2> translate(final Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException;
+	public <GItem2> Comparator<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException;
 
 }

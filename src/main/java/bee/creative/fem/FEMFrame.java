@@ -2,9 +2,9 @@ package bee.creative.fem;
 
 import java.util.Iterator;
 import bee.creative.fem.FEMArray.HashArray;
+import bee.creative.lang.Array2;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
-import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert einen Stapelrahmen ({@code stack-frame}), über welchen einer Funktion eine Liste von Parameterwerten sowie ein Kontextobjekt zur
@@ -15,7 +15,7 @@ import bee.creative.util.Iterators;
  * @see FEMValue
  * @see FEMFunction
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, UseToString {
+public abstract class FEMFrame implements Array2<FEMValue>, UseToString {
 
 	@SuppressWarnings ("javadoc")
 	public static class ArrayFrame extends FEMFrame {
@@ -210,6 +210,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * {@link #get(int)} werden mindestens so viele Parameterwerte bereitgestellt.
 	 *
 	 * @return Anzahl der zugesicherten Parameterwert. */
+	@Override
 	public abstract int size();
 
 	/** Diese Methode gibt die übergeordneten Parameterdaten zurück.

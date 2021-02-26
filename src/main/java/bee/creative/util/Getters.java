@@ -20,7 +20,7 @@ import bee.creative.ref.References;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {
 
-	/** Diese Klasse implementiert den leeren {@link Getter3}, welcher beim {@link #get(Object) Lesen} stets {@code null} liefert. */
+	/** Diese Klasse implementiert den leeren {@link Getter3}, der beim {@link #get(Object) Lesen} stets {@code null} liefert. */
 	@SuppressWarnings ("javadoc")
 	public static class EmptyGetter extends AbstractGetter<Object, Object> {
 
@@ -79,20 +79,28 @@ public class Getters {
 
 	}
 
-	public static class ConstructorGetter<GItem, GOutput> extends AbstractGetter<GItem, GOutput> {
+	/**
+ einen {@link Getter} zum gegebenen {@link Constructor nativen Kontruktor} zurück. Der erzeugte {@link Getter} liefert für einen
+	 * Datensatz {@code item} {@code constructor.newInstance(item)}.
+	 *
+	 * @see Constructor#newInstance(Object...)
+	 * @param <GItem> Typ des Datensatzes.
+	 * @param <GValue> Typ des Werts.
+	 */
+	public static class ConstructorGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		public final Constructor<?> that;
 
-		public ConstructorGetter(final Constructor<?> that, final boolean forceAccessible) {
+		public ConstructorGetter(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException{
 			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
 
 		@Override
-		public GOutput get(final GItem item) {
+		public GValue get(final GItem item) {
 			try {
 				@SuppressWarnings ("unchecked")
-				final GOutput result = (GOutput)this.that.newInstance(item);
+				final GValue result = (GValue)this.that.newInstance(item);
 				return result;
 			} catch (final IllegalAccessException | InstantiationException | InvocationTargetException cause) {
 				throw new IllegalArgumentException(cause);
@@ -532,17 +540,7 @@ public class Getters {
 		return Getters.fromNative(that, true);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link Method nativen Methode} zurück. Bei einer Klassenmethode liefert der erzeugte {@link Getter}
-	 * für einen Datensatz {@code item} {@code method.invoke(null, item)}, bei einer Objektmethode liefert er dagegen {@code method.invoke(item)}.
-	 *
-	 * @see Method#invoke(Object, Object...)
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
-	 * @param that Native Methode.
-	 * @param forceAccessible Parameter für die {@link AccessibleObject#setAccessible(boolean) erzwungene Zugreifbarkeit}.
-	 * @return {@code native}-{@link Getter}.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Parameteranzahl der nativen Methode ungültig oder die Methode nicht zugreifbar ist. */
+	 
 	public static <GItem, GValue> Getter3<GItem, GValue> fromNative(final Method that, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new MethodGetter<>(that, forceAccessible);
@@ -553,12 +551,7 @@ public class Getters {
 		return Getters.fromNative(that, true);
 	}
 
-	/** Diese Methode gibt einen {@link Getter} zum gegebenen {@link Constructor nativen Kontruktor} zurück. Der erzeugte {@link Getter} liefert für einen
-	 * Datensatz {@code item} {@code constructor.newInstance(item)}.
-	 *
-	 * @see Constructor#newInstance(Object...)
-	 * @param <GItem> Typ des Datensatzes.
-	 * @param <GValue> Typ des Werts.
+	/** Diese Methode gibt
 	 * @param that Nativer Kontruktor.
 	 * @return {@code native}-{@link Getter}.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist.

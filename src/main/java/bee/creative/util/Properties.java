@@ -11,7 +11,7 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Properties {
 
-	/** Diese Klasse implementiert ein {@link Property2}, welches das {@link #set(Object) Schreiben} ignoriert und beim {@link #get() Lesen} stets {@code null}
+	/** Diese Klasse implementiert ein {@link Property2}, das das {@link #set(Object) Schreiben} ignoriert und beim {@link #get() Lesen} stets {@code null}
 	 * liefert. */
 	@SuppressWarnings ("javadoc")
 	public static class EmptyProperty extends AbstractProperty<Object> {
@@ -20,8 +20,8 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, welches einen {@link #value Wert} verwaltet, der {@link #get() gelesen} und {@link #set(Object)
-	 * geschrieben} werden kann.
+	/** Diese Klasse implementiert ein {@link Property2}, das einen {@link #value Wert} verwaltet, der {@link #get() gelesen} und {@link #set(Object) geschrieben}
+	 * werden kann.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
@@ -50,9 +50,9 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein initialisierendes {@link Property2}, welches das {@link #set(Object) Schreiben} an ein gegebenes {@link Property} delegiert
-	 * und welches beim {@link #get() Lesen} den Wert über dieses gegebene {@link Property} ermittelt. Wenn dieser Wert {@code null} ist, wird er initialisiert,
-	 * d.h. mit Hilfe eines gegebenen {@link Producer} ermittelt und über das gegebene {@link Property} geschrieben.
+	/** Diese Klasse implementiert ein initialisierendes {@link Property2}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	 * {@link Property} delegiert. Wenn der gelesene Wert {@code null} ist, wird er initialisiert, d.h. mit Hilfe eines gegebenen {@link Producer} ermittelt und
+	 * über das gegebene {@link Property} geschrieben.
 	 *
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
@@ -88,7 +88,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, welches das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	/** Diese Klasse implementiert ein {@link Property2}, dasgb das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
 	 * {@link java.lang.reflect.Field natives statisches Datenfeld} delegiert. *
 	 *
 	 * @param <GValue> Typ des Werts. */
@@ -129,7 +129,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein zusammengesetztes {@link Property2}, welches das {@link #get() Lesen} an einen gegebenen {@link Producer} und das
+	/** Diese Klasse implementiert ein zusammengesetztes {@link Property2}, das das {@link #get() Lesen} an einen gegebenen {@link Producer} und das
 	 * {@link #set(Object) Schreiben} an einen gegebenen {@link Consumer} delegiert.
 	 *
 	 * @param <GValue> Typ des Werts. */
@@ -162,11 +162,9 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link Observable} {@link Property2},welches {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
-	 * {@link Property} delegiert und beim ändernden Schreiben ein Änderungsereignis auslöst.
+	/** Diese Klasse implementiert eine {@link Observable} {@link Property2}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	 * {@link Property} delegiert und beim ändernden Schreiben ein {@link UpdatePropertyListener Änderungsereignis} auslöst.
 	 *
-	 * @see UpdatePropertyEvent
-	 * @see UpdatePropertyListener
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
 	public static class ObservableProperty<GValue> extends AbstractProperty<GValue> implements Observable<UpdatePropertyEvent, UpdatePropertyListener> {
 
@@ -239,7 +237,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, welches ein gegebenes {@link Property} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
+	/** Diese Klasse implementiert ein {@link Property2}, das ein gegebenes {@link Property} über {@code synchronized(this.mutex)} synchronisiert. Wenn dieses
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
@@ -296,7 +294,7 @@ public class Properties {
 		return Properties.from(that, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Field) Properties.concat(Producers.fromValue(item), that)}.
+	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Field) Properties.from(Producers.fromValue(item), that)}.
 	 *
 	 * @see Producers#fromValue(Object) */
 	public static <GItem, GValue> Property2<GValue> from(final Field<? super GItem, GValue> that, final GItem item) throws NullPointerException {

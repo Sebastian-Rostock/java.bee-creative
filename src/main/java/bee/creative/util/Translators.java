@@ -7,7 +7,7 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Translators {
 
-	/** Diese Klasse implementiert einen Translator2, welcher kein Quell- und Zielobjekt akzeptiert.
+	/** Diese Klasse implementiert einen {@link Translator2}, der alle Quell- und Zielobjekte ablehnt.
 	 *
 	 * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	@SuppressWarnings ("javadoc")
@@ -17,7 +17,7 @@ public class Translators {
 
 	}
 
-	/** Diese Klasse implementiert einen verkettenden {@link Translator2}.
+	/** Diese Klasse implementiert einen verketteten {@link Translator2}.
 	 *
 	 * @param <GSource> Typ der Quellobjekte dieses sowie des ersten {@link Translator}.
 	 * @param <GTarget> Typ der Zielobjekte dieses sowie des zweiten {@link Translator}.
@@ -61,7 +61,7 @@ public class Translators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Translator2}, welcher die Übersetzung eines gegebenen {@link Translator} umkehrt.
+	/** Diese Klasse implementiert einen {@link Translator2}, der die Übersetzung eines gegebenen {@link Translator} umkehrt.
 	 *
 	 * @param <GSource> Typ der Quellobjekte dieses sowie der Zielobjekte des gegebenen {@link Translator}.
 	 * @param <GTarget> Typ der Zielobjekte dieses sowie der Quellobjekte des gegebenen {@link Translator}. */
@@ -101,8 +101,8 @@ public class Translators {
 
 	}
 
-	/** Diese Klasse implementiert einen zusammengesetzten {@link Translator2}, welcher Quell- und Zielobjekte an ihren {@link Class Klassen} erkennt und zur
-	 * Umwandlung dieser ineinander entsprechende {@link Getter} nutzt.
+	/** Diese Klasse implementiert einen zusammengesetzten {@link Translator2}, der Quell- und Zielobjekte an ihren {@link Class Klassen} erkennt und zur
+	 * Umwandlung dieser ineinander entsprechende gegebene {@link Getter} verwendet.
 	 *
 	 * @param <GSource> Typ der Quellobjekte.
 	 * @param <GTarget> Typ der Zielobjekte. */
@@ -152,7 +152,7 @@ public class Translators {
 
 	}
 
-	/** Diese Klasse implementiert einen synchronisierten {@link Translator2}, welcher einen gegebenen {@link Translator} über {@code synchronized(this.mutex)}
+	/** Diese Klasse implementiert einen synchronisierten {@link Translator2}, der einen gegebenen {@link Translator} über {@code synchronized(this.mutex)}
 	 * synchronisiert. Wenn dieses Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GSource> Typ der Quellobjekte.
@@ -204,7 +204,7 @@ public class Translators {
 
 	}
 
-	/** Diese Methode liefert {@link EmptyTranslator EmptyTranslator.INSTANCE}. */
+	/** Diese Methode liefert den {@link EmptyTranslator}. */
 	@SuppressWarnings ("unchecked")
 	public static <GSource, GTarget> Translator2<GSource, GTarget> empty() {
 		return (Translator2<GSource, GTarget>)EmptyTranslator.INSTANCE;
@@ -223,8 +223,7 @@ public class Translators {
 		return Translators.from(valueClass, valueClass, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
-	/** Diese Methode gibt den gegebenen {@link Translator} als {@link Translator2} zurück. Wenn er {@code null} ist, wird {@link Translators#empty()
-	 * Translators.empty()} geliefert. */
+	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator2}. Wenn er {@code null} ist, wird der {@link EmptyTranslator} geliefert. */
 	public static <GSource, GTarget> Translator2<GSource, GTarget> from(final Translator<GSource, GTarget> that) {
 		if (that == null) return Translators.empty();
 		if (that instanceof Translator2) return (Translator2<GSource, GTarget>)that;

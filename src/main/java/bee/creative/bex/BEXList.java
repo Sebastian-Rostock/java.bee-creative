@@ -1,15 +1,15 @@
 package bee.creative.bex;
 
 import java.util.Iterator;
+import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
-import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert die homogene Sicht auf Kind- und Attributknotenlisten. Die aufsteigende Navigation von einer Knotenliste zu deren Elternknoten
  * ist optional.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
+public abstract class BEXList implements Array<BEXNode>, Iterable<BEXNode> {
 
 	static class EmptyList extends BEXList {
 

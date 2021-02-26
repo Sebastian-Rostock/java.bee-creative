@@ -10,10 +10,10 @@ import java.util.Iterator;
 public interface Iterator2<GItem> extends Iterator<GItem> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#concat(Iterator, Iterator) Iterators.concat(this, that)}. */
-	public Iterator2<GItem> concat(final Iterator<? extends GItem> that) throws NullPointerException;
+	public Iterator2<GItem> concat(Iterator<? extends GItem> that) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#retainAll(Iterator, Collection) Iterators.retainAll(this, filter)}. */
-	public boolean retainAll(final Collection<?> filter) throws NullPointerException;
+	public boolean retainAll(Collection<?> filter) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#removeAll(Iterator) Iterators.removeAll(this)}. */
 	public boolean removeAll();
@@ -22,22 +22,22 @@ public interface Iterator2<GItem> extends Iterator<GItem> {
 	public int skip(int count);
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#filter(Iterator, Filter) Iterators.filter(this, filter)}. */
-	public Iterator2<GItem> filter(final Filter<? super GItem> filter) throws NullPointerException;
+	public Iterator2<GItem> filter(Filter<? super GItem> filter) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#limit(Iterator, int) Iterators.limit(this, count)}. */
-	public Iterator2<GItem> limit(final int count) throws IllegalArgumentException;
+	public Iterator2<GItem> limit(int count) throws IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#translate(Iterator, Getter) Iterators.translate(this, trans)}. */
-	public <GTarget> Iterator2<GTarget> translate(final Getter<? super GItem, ? extends GTarget> trans) throws NullPointerException;
+	public <GTarget> Iterator2<GTarget> translate(Getter<? super GItem, ? extends GTarget> trans) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#unique(Iterator) Iterators.unique(this)}. */
 	public Iterator2<GItem> unique();
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#unique(Iterator, Hasher) Iterators.unique(this, hasher)}. */
-	public Iterator2<GItem> unique(final Hasher hasher) throws NullPointerException;
+	public Iterator2<GItem> unique(Hasher hasher) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#unique(Iterator, Collection) Iterators.unique(this, buffer)}. */
-	public Iterator2<GItem> unique(final Collection<GItem> buffer) throws NullPointerException;
+	public Iterator2<GItem> unique(Collection<GItem> buffer) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#unmodifiable(Iterator) Iterators.unmodifiable(this)}. */
 	public Iterator2<GItem> unmodifiable();
