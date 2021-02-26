@@ -168,6 +168,17 @@ public class Producers {
 
 	}
 
+	static class GetGetter extends AbstractGetter<Producer<?>, Object> {
+
+		static final Getter3<?, ?> INSTANCE = new GetGetter();
+
+		@Override
+		public Object get(final Producer<?> input) {
+			return input.get();
+		}
+
+	}
+
 	/** Diese Methode liefert den {@link EmptyProducer}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> empty() {
@@ -307,6 +318,12 @@ public class Producers {
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedProducer new SynchronizedProducer<>(that, mutex)}. */
 	public static <GValue> Producer3<GValue> synchronize(final Producer<? extends GValue> that, final Object mutex) throws NullPointerException {
 		return new SynchronizedProducer<>(that, mutex);
+	}
+
+	/** Diese Methode liefert den {@link Getter3} zu {@link Producer#get()}. */
+	@SuppressWarnings ("unchecked")
+	public static <GValue> Getter3<Producer<? extends GValue>, GValue> get() {
+		return (Getter3<Producer<? extends GValue>, GValue>)GetGetter.INSTANCE;
 	}
 
 }

@@ -13,7 +13,7 @@ import bee.creative.lang.Natives;
 import bee.creative.lang.Objects;
 import bee.creative.ref.References;
 
-/** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur {@link Getter}-Konstruktion und -Verarbeitung.
+/** Diese Klasse implementiert grundlegende {@link Getter}.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Getters {

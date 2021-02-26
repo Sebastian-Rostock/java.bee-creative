@@ -4,7 +4,6 @@ import java.util.Map.Entry;
 
 /** Diese Schnittstelle ergänzt einen {@link Entry} insb. um eine Anbindung an Methoden von {@link Entries}.
  *
- * @see Entries
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ des Schlüssels.
  * @param <GValue> Typ des Werts. */

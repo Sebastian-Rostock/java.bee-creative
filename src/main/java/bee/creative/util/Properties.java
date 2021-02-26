@@ -88,7 +88,7 @@ public class Properties {
 
 	}
 
-	/** Diese Klasse implementiert ein {@link Property2}, dasgb das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
+	/** Diese Klasse implementiert ein {@link Property2}, das das {@link #get() Lesen} und {@link #set(Object) Schreiben} an ein gegebenes
 	 * {@link java.lang.reflect.Field natives statisches Datenfeld} delegiert. *
 	 *
 	 * @param <GValue> Typ des Werts. */

@@ -3,7 +3,7 @@ package bee.creative.util;
 import java.util.Map.Entry;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert grundlegende {@link Entry2}.
+/** Diese Klasse implementiert grundlegende {@link Entry}.
  *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Entries {
