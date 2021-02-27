@@ -105,7 +105,7 @@ public class ThreadPool {
 			} finally {
 				synchronized (this.idle) {
 					this.idle[0]++;
-					this.idle.notifyAll();
+					this.idle.notify();
 				}
 			}
 		}

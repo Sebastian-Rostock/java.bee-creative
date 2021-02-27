@@ -18,7 +18,7 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Collections {
 
-	/** Diese Klasse implementiert ein unveränderliches {@link Set} als Sicht auf die Menge ller Elemente beider gegebener {@link Set}.
+	/** Diese Klasse implementiert ein unveränderliches {@link Set} als Sicht auf die Menge aller Elemente von zwei gegebenen {@link Set}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
