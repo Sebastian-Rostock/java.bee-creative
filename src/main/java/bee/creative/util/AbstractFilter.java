@@ -55,7 +55,7 @@ public abstract class AbstractFilter<GItem> extends BaseObject implements Filter
 
 	@Override
 	public Getter3<GItem, Boolean> toGetter() {
-		return Getters.from(this);
+		return Getters.fromFilter(this);
 	}
 
 }

@@ -2,7 +2,6 @@ package bee.creative.util;
 
 import java.lang.ref.WeakReference;
 import bee.creative.lang.Objects;
-import bee.creative.lang.Objects.BaseObject;
 import bee.creative.ref.WeakReference2;
 
 /** Diese Klasse implementiert eine threadsichere Verwaltung von Ereignisempfängern, welche jederzeit {@link #put(Object, Object) angemeldet},
@@ -11,8 +10,8 @@ import bee.creative.ref.WeakReference2;
  * angemeldet} werden.
  * <p>
  * Beim {@link #fire(Object, Object) Benachrichtigen} der Ereignisempfänger wird eine gegebene Nachricht an alle zu diesem Zeitpunkt für einen gegebenen
- * Ereignissender angemeldeten Empfänger {@link #customFire(Object, Object, Object) gesendet}. Die Reihenfolge der Benachrichtigung der Empfänger entspricht
- * der Reihenfolge ihrer Anmeldung.
+ * Ereignissender angemeldeten Empfänger {@link #customFire(Object, Object, Object) gesendet}. Die Reihenfolge der Benachrichtigung der Empfänger entspricht der
+ * Reihenfolge ihrer Anmeldung.
  * <p>
  * <pre>
  *
@@ -37,7 +36,7 @@ import bee.creative.ref.WeakReference2;
  * @author [cc-by] 2018 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GMessage> Typ der Nachricht.
  * @param <GObserver> Typ der Empfänger. Dieser darf kein {@code Object[]} sein. */
-public abstract class Observables<GMessage, GObserver> extends BaseObject {
+public abstract class Observables<GMessage, GObserver> {
 
 	/** Diese Klasse implementiert die Verwaltungsdaten eines Ereignissenders. */
 	private static final class WeakSender extends WeakReference2<Object> {
@@ -127,6 +126,11 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 					this.observer = null;
 				}
 			}
+		}
+
+		/** Diese Methode meldet alle Empfänger ab. */
+		public void popAll() {
+			this.observer = null;
 		}
 
 		@Override
@@ -307,16 +311,7 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	 * @return {@code observer}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
 	public GObserver put(final Object sender, final GObserver observer) throws IllegalArgumentException {
-		if (observer == null) return null;
-		if (observer instanceof Object[]) throw new IllegalArgumentException();
-		final SenderStore store = this.store;
-		synchronized (store) {
-			final WeakSender source = store.put(sender);
-			synchronized (source) {
-				source.put(observer);
-			}
-		}
-		return observer;
+		return putImpl(sender, observer, false);
 	}
 
 	/** Diese Methode meldet den gegebenen Ereignisempfänger für den gegebenen Ereignissender an und gibt ihn zurück. Wenn der Empfänger {@code null} ist, wird er
@@ -328,13 +323,17 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 	 * @return {@code observer}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
 	public GObserver putWeak(final Object sender, final GObserver observer) throws IllegalArgumentException {
+		return putImpl(sender, observer, true);
+	}
+
+	private GObserver putImpl(final Object sender, final GObserver observer, boolean weak) {
 		if (observer == null) return null;
 		if (observer instanceof Object[]) throw new IllegalArgumentException();
 		final SenderStore store = this.store;
 		synchronized (store) {
 			final WeakSender source = store.put(sender);
 			synchronized (source) {
-				source.put(new WeakObserver(observer, source));
+				source.put(weak ? new WeakObserver(observer, source) : observer);
 			}
 		}
 		return observer;
@@ -356,6 +355,21 @@ public abstract class Observables<GMessage, GObserver> extends BaseObject {
 			synchronized (source) {
 				source.pop(observer);
 			}
+		}
+	}
+
+	/** Diese Methode meldet alle Empfänger ab.
+	 *
+	 * @param sender Ereignissender oder {@code null}. */
+	public void popAll(final Object sender) {
+		final SenderStore store = this.store;
+		synchronized (store) {
+			final WeakSender source = store.get(sender);
+			if (source == null) return;
+			synchronized (source) {
+				source.popAll();
+			}
+			store.pop(source);
 		}
 	}
 

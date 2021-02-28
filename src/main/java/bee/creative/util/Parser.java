@@ -159,7 +159,7 @@ public class Parser {
 		private Object value;
 
 		/** Dieses Feld speichert den Abschnittstyp. */
-		private char type;
+		private int type;
 
 		private Token(final String source, final int offset, final int length, final Token[] tokens) throws NullPointerException, IllegalArgumentException {
 			if ((offset < 0) || (length < 0) || (source.length() < (offset + length))) throw new IllegalArgumentException();
@@ -174,7 +174,7 @@ public class Parser {
 		/** Diese Methode gibt den Typ des Abschnitts zurück.
 		 *
 		 * @return Abschnittstyp. */
-		public char type() {
+		public int type() {
 			return this.type;
 		}
 
@@ -183,7 +183,7 @@ public class Parser {
 		 * @param type Abschnittstyp.
 		 * @return {@code this}. */
 		public Token type(final int type) {
-			this.type = (char)type;
+			this.type = type;
 			return this;
 		}
 
@@ -405,20 +405,6 @@ public class Parser {
 				res.add(pos);
 				tok = tok.get(pos);
 			}
-		}
-
-		/** Diese Methode gibt die Verkettung der {@link Token#type() Abschnittstypen} der {@link #tokens() Abschnitte} als Zeichenkette zurück.
-		 *
-		 * @see Token#type()
-		 * @see #tokens()
-		 * @return Abschnittstypen als Zeichenkette. */
-		public String types() {
-			final int length = this.tokens.length;
-			final char[] result = new char[length];
-			for (int i = 0; i < length; i++) {
-				result[i] = this.tokens[i].type();
-			}
-			return new String(result);
 		}
 
 		/** Diese Methode liefert die {@link Token#source() Eingabe} des {@link #root() Wurzelknoten}.

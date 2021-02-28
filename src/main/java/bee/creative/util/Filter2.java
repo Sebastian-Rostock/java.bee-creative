@@ -30,7 +30,7 @@ public interface Filter2<GItem> extends Filter<GItem> {
 	/** Diese Methode ist eine Abkürzung für {@link Filters#translate(Filter, Getter) Filters.translate(this, trans)}. */
 	public <GItem2> Filter2<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException;
 
-	/** Diese Methode ist eine Abkürzung für {@link Getters#from(Filter) Getters.from(this)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Getters#fromFilter(Filter) Getters.fromFilter(this)}. */
 	public Getter3<GItem, Boolean> toGetter();
 
 }

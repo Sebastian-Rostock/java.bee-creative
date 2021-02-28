@@ -386,20 +386,20 @@ public class Filters {
 		return (Filter2<GItem>)RejectFilter.INSTANCE;
 	}
 
+	/** Diese Methode liefert den gegebenen {@link Filter} als {@link Filter2}. Wenn er {@code null} ist, wird der {@link EmptyFilter} geliefert. */
+	@SuppressWarnings ("unchecked")
+	public static <GItem> Filter2<GItem> from(final Filter<? super GItem> that) {
+		if (that == null) return empty();
+		if (that instanceof Filter2) return (Filter2<GItem>)that;
+		return translate(that, Getters.<GItem>neutral());
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@code value ? Filters.accept() : Filters.reject()}.
 	 *
 	 * @see #accept()
 	 * @see #reject() */
-	public static <GItem> Filter2<GItem> from(final boolean value) {
+	public static <GItem> Filter2<GItem> fromValue(final boolean value) {
 		return value ? Filters.<GItem>accept() : Filters.<GItem>reject();
-	}
-
-	/** Diese Methode liefert einen {@link Filter2} zu {@link Getter#get(Object)} des gegebenen {@link Getter}. Die Akzeptanz eines Datensatzes {@code item}
-	 * entspricht {@code Boolean.TRUE.equals(that.get(item))}.
-	 *
-	 * @param <GItem> Typ des Datensatzes. */
-	public static <GItem> Filter2<GItem> from(final Getter<? super GItem, Boolean> that) throws NullPointerException {
-		return new GetterFilter<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ClassFilter new ClassFilter<>(that)}. */
@@ -454,6 +454,14 @@ public class Filters {
 		return new TargetFilter(that);
 	}
 
+	/** Diese Methode liefert einen {@link Filter2} zu {@link Getter#get(Object)} des gegebenen {@link Getter}. Die Akzeptanz eines Datensatzes {@code item}
+	 * entspricht {@code Boolean.TRUE.equals(that.get(item))}.
+	 *
+	 * @param <GItem> Typ des Datensatzes. */
+	public static <GItem> Filter2<GItem> fromGetter(final Getter<? super GItem, Boolean> that) throws NullPointerException {
+		return new GetterFilter<>(that);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link NegationFilter new NegationFilter<>(that)}. */
 	public static <GItem> Filter2<GItem> negate(final Filter<? super GItem> that) throws NullPointerException {
 		return new NegationFilter<>(that);
@@ -469,21 +477,21 @@ public class Filters {
 		return new ConjunctionFilter<>(that1, that2);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#from(Getter) Filters.from(Getters.from(that).buffer())}.
+	/** Diese Methode ist eine Abkürzung für {@link Filters#fromGetter(Getter) Filters.fromGetter(Getters.fromFilter(that).buffer())}.
 	 *
-	 * @see Getters#from(Getter)
+	 * @see Getters#fromFilter(Filter)
 	 * @see Getters#buffer(Getter) */
 	public static <GItem> Filter2<GItem> buffer(final Filter<? super GItem> that) throws NullPointerException {
-		return Filters.from(Getters.from(that).buffer());
+		return Filters.fromGetter(Getters.fromFilter(that).buffer());
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#from(Getter) Filters.from(Getters.from(that).buffer(mode, hasher))}.
+	/** Diese Methode ist eine Abkürzung für {@link Filters#fromGetter(Getter) Filters.fromGetter(Getters.fromFilter(that).buffer(mode, hasher))}.
 	 *
-	 * @see Getters#from(Getter)
+	 * @see Getters#fromFilter(Filter)
 	 * @see Getters#buffer(Getter, int, Hasher) */
 	public static <GItem> Filter2<GItem> buffer(final Filter<? super GItem> that, final int mode, final Hasher hasher)
 		throws NullPointerException, IllegalArgumentException {
-		return Filters.from(Getters.from(that).buffer(mode, hasher));
+		return Filters.fromGetter(Getters.fromFilter(that).buffer(mode, hasher));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedFilter new TranslatedFilter<>(that, trans)}. */

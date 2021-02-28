@@ -314,10 +314,10 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld bildet von einer Funktion auf deren Referenz ab und wird in {@link #put(FEMFunction)} eingesetzt. */
 	private final HashMapOL<FEMFunction> reuseMap = new ReuseMap();
 
-	/** Dieses Feld bildet von einer Adresse auf einen Platzhalter ab und dient in {@link #getProxyByAddr(long)} de Behandlung der Rekursion. */
+	/** Dieses Feld bildet von einer Adresse auf einen Platzhalter ab und dient in {@link #getProxyByAddr(long)} der Behandlung der Rekursion. */
 	private final HashMapLO<FEMProxy> proxyGetMap = new HashMapLO<>();
 
-	/** Dieses Feld bildet von der Kennung eines Platzhalters auf dessen Adresse ab und dient in {@link #putProxyAsRef(FEMProxy)} de Behandlung der Rekursion. */
+	/** Dieses Feld bildet von der Kennung eines Platzhalters auf dessen Adresse ab und dient in {@link #putProxyAsRef(FEMProxy)} der Behandlung der Rekursion. */
 	private final HashMapOL<FEMFunction> proxyPutMap = new HashMapOL<>();
 
 	/** Dieses Feld speichert den Puffer, in dem die Zahlenfolgen abgelegt sind. */

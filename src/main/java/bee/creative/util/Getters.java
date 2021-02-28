@@ -472,12 +472,6 @@ public class Getters {
 		return (Getter3<GItem, GItem>)NeutralGetter.INSTANCE;
 	}
 
-	/** Diese Methode liefert einen {@link Getter3} zu {@link Filter#accept(Object)} des gegebenen {@link Filter}. Für einen Datenstz {@code item} liefert er
-	 * {@code Boolean.valueOf(that.accept(item))}. */
-	public static <GItem> Getter3<GItem, Boolean> from(final Filter<? super GItem> that) throws NullPointerException {
-		return new FilterGetter<>(that);
-	}
-
 	/** Diese Methode liefert den gegebenen {@link Getter} als {@link Getter3}. Wenn er {@code null} ist, wird dern {@link EmptyGetter} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem, GValue> Getter3<GItem, GValue> from(final Getter<? super GItem, ? extends GValue> that) {
@@ -565,6 +559,12 @@ public class Getters {
 	 * @see Producers#fromValue(Object) */
 	public static <GValue> Getter3<Object, GValue> fromValue(final GValue that) {
 		return Getters.from(Producers.fromValue(that).toGetter());
+	}
+
+	/** Diese Methode liefert einen {@link Getter3} zu {@link Filter#accept(Object)} des gegebenen {@link Filter}. Für einen Datenstz {@code item} liefert er
+	 * {@code Boolean.valueOf(that.accept(item))}. */
+	public static <GItem> Getter3<GItem, Boolean> fromFilter(final Filter<? super GItem> that) throws NullPointerException {
+		return new FilterGetter<>(that);
 	}
 
 	/** Diese Methode gibt einen {@link Getter3} zu {@link Translator#toSource(Object)} des gegebenen {@link Translator} zurück. Für einen Datensatz {@code item}
