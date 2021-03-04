@@ -1,8 +1,8 @@
 package bee.creative.qs;
 
-/** Diese Schnittstelle definiert eine Hyperkante vierter Ordnung (Quad-Edge), welcje vier {@link QN Hyperknoten} in den Rollen {@link QE#context() Kontext},
+/** Diese Schnittstelle definiert eine Hyperkante vierter Ordnung (Quad-Edge), welche vier {@link QN Hyperknoten} in den Rollen {@link QE#context() Kontext},
  * {@link QE#predicate() Prädikat}, {@link QE#subject() Subjekt} und {@link QE#object() Objekt} verbindet. {@link #hashCode() Streuwert} und
- * {@link #equals(Object) Äquivalenz} basieren auf den en der vier Hyperknoten.
+ * {@link #equals(Object) Äquivalenz} basieren auf den der vier Hyperknoten.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QE extends QX {

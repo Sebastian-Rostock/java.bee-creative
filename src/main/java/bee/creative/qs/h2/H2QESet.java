@@ -7,13 +7,15 @@ import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
+import bee.creative.util.Filter;
+import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert ein {@link QESet} als Sicht auf das ergebnis einer SQL-Anfrage.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class H2QESet extends H2QXSet<QE, QESet> implements QESet {
+public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
-	static class Iter extends H2QXIter<QE> {
+	static class Iter extends H2QOIter<QE> {
 
 		public Iter(final H2QESet owner) {
 			super(owner);
@@ -130,6 +132,11 @@ public class H2QESet extends H2QXSet<QE, QESet> implements QESet {
 	}
 
 	@Override
+	public H2QESet having(final Filter<? super QE> filter) throws NullPointerException {
+		return this.owner.newEdges(Iterables.filter(this, filter));
+	}
+
+	@Override
 	public H2QESet havingState(final boolean state) {
 		return state ? this.intersect(this.owner.edges()) : this.except(this.owner.edges());
 	}
@@ -176,12 +183,12 @@ public class H2QESet extends H2QXSet<QE, QESet> implements QESet {
 
 	@Override
 	public H2QESet havingNode(final QN node) throws NullPointerException, IllegalArgumentException {
-		return this.havingContext(node).union(this.havingPredicate(node)).union(this.havingSubject(node)).union(this.havingObject(node));
+		return new Set1(this.owner, H2QQ.selectEdgesHavingNode(this, this.owner.asQN(node)), this);
 	}
 
 	@Override
 	public H2QESet havingNodes(final QNSet nodes) throws NullPointerException, IllegalArgumentException {
-		return this.havingContexts(nodes).union(this.havingPredicates(nodes)).union(this.havingSubjects(nodes)).union(this.havingObjects(nodes));
+		return new Set2(this.owner, H2QQ.selectEdgesHavingNodes(this, this.owner.asQNSet(nodes)), this, nodes);
 	}
 
 	@Override

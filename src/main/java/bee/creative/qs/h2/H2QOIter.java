@@ -4,21 +4,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
+import bee.creative.qs.QO;
 import bee.creative.util.AbstractIterator;
 
-/** Diese Klasse implementiert den {@link Iterator} für die Nachfahren von {@link H2QXSet}.
+/** Diese Klasse implementiert den {@link Iterator} für die Nachfahren von {@link H2QOSet}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-abstract class H2QXIter<GItem> extends AbstractIterator<GItem> {
+abstract class H2QOIter<GItem> extends AbstractIterator<GItem> implements QO {
 
-	final H2QXSet<GItem, ?> owner;
+	final H2QOSet<GItem, ?> owner;
 
 	final ResultSet item;
 
 	boolean next;
 
-	H2QXIter(final H2QXSet<GItem, ?> owner) {
+	H2QOIter(final H2QOSet<GItem, ?> owner) {
 		this.owner = owner;
 		try {
 			final Statement stmt = owner.owner.conn.createStatement();
@@ -32,6 +33,11 @@ abstract class H2QXIter<GItem> extends AbstractIterator<GItem> {
 	@Override
 	protected void finalize() throws Throwable {
 		this.item.getStatement().close();
+	}
+
+	@Override
+	public H2QS owner() {
+		return this.owner.owner;
 	}
 
 	@Override

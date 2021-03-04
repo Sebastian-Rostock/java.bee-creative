@@ -3,15 +3,16 @@ package bee.creative.qs.h2;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
-import bee.creative.qs.QNSet;
 import bee.creative.qs.QVSet;
+import bee.creative.util.Filter;
+import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert ein {@link QVSet} als Sicht auf das ergebnis einer SQL-Anfrage.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
+public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
-	static final class Iter extends H2QXIter<String> {
+	static final class Iter extends H2QOIter<String> {
 
 		public Iter(final H2QVSet set) {
 			super(set);
@@ -53,7 +54,7 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 		}
 
 		@Override
-		public QNSet nodes() {
+		public H2QNSet nodes() {
 			return this.owner.nodes();
 		}
 
@@ -74,7 +75,7 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 		}
 
 		@Override
-		public QVSet copy() {
+		public H2QVSet copy() {
 			return this;
 		}
 
@@ -98,7 +99,7 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
-	public QNSet nodes() {
+	public H2QNSet nodes() {
 		return new H2QNSet.Set1(this.owner, H2QQ.selectSaveNodesHavingValues(this), this);
 	}
 
@@ -108,12 +109,17 @@ public class H2QVSet extends H2QXSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
+	public H2QVSet having(final Filter<? super String> filter) throws NullPointerException {
+		return this.owner.newValues(Iterables.filter(this, filter));
+	}
+
+	@Override
 	public H2QVSet havingState(final boolean state) {
 		return state ? this.intersect(this.owner.values()) : this.except(this.owner.values());
 	}
 
 	@Override
-	public QVSet copy() {
+	public H2QVSet copy() {
 		return this.owner.newValues(this);
 	}
 

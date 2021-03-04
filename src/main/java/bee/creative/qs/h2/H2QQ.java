@@ -9,49 +9,38 @@ class H2QQ {
 		return "" //
 			+ "create table if not exists QN (N int not null, V varchar(1G) not null, primary key (N));" //
 			+ "create table if not exists QE (C int not null, P int not null, S int not null, O int not null, primary key (C, P, S, O));" //
-			+ "create table if not exists QNT (T int not null, N int not null, primary key (T, N)); "//
-			+ "create table if not exists QVT (T int not null, V varchar(1G) not null, primary key (T, V));" //
-			+ "create table if not exists QET (T int not null, C int not null, P int not null, S int not null, O int not null, primary key (T, C, P, S, O));"//
 			+ "create index if not exists QE_INDEX_CPO on QE (C, P, O, S);" //
 			+ "create index if not exists QE_INDEX_CSP on QE (C, S, P, O);" //
 			+ "create index if not exists QE_INDEX_COP on QE (C, O, P, S);" //
-			+ "create index if not exists QET_INDEX_TP on QET (T, P);" //
-			+ "create index if not exists QET_INDEX_TS on QET (T, S);" //
-			+ "create index if not exists QET_INDEX_TO on QET (T, O);" //
 			+ "create unique index if not exists QN_INDEX_V on QN (V);" //
-			+ "create sequence if not exists QN_SEQUENCE_K start with 1 maxvalue 2000000000;" //
-			+ "create sequence if not exists QET_SEQUENCE_T start with 1 maxvalue 2000000000;" //
-			+ "create sequence if not exists QNT_SEQUENCE_T start with 1 maxvalue 2000000000;" //
-			+ "create sequence if not exists QVT_SEQUENCE_T start with 1 maxvalue 2000000000;" //
-		;
+			+ "create sequence if not exists QN_SEQUENCE minvalue 1 maxvalue 2000000000 nocycle;" //
+			+ "create sequence if not exists QET_SEQUENCE minvalue 1 maxvalue 2000000000 cycle;" //
+			+ "create sequence if not exists QNT_SEQUENCE minvalue 1 maxvalue 2000000000 cycle;" //
+			+ "create sequence if not exists QVT_SEQUENCE minvalue 1 maxvalue 2000000000 cycle"; //
 	}
 
 	static String deleteSave() {
-		return "delete from QN;delete from QE;" + H2QQ.deleteTemp();
+		return "delete from QN;delete from QE";
 	}
 
-	static String deleteTemp() {
-		return "delete from QVT;delete from QNT;delete from QET;";
-	}
-
-	static String selectAny(final H2QXSet<?, ?> set) {
+	static String selectAny(final H2QOSet<?, ?> set) {
 		return "(select top 1 from " + set.select + ")";
 	}
 
-	static String selectSize(final H2QXSet<?, ?> set) {
+	static String selectSize(final H2QOSet<?, ?> set) {
 		return "(select count(*) from " + set.select + ")";
 	}
 
-	static String selectUnion(final H2QXSet<?, ?> set1, final H2QXSet<?, ?> set2) {
-		return "(select * from " + set1.select + " union select * from " + set2.select + ")";
+	static String selectUnion(final H2QOSet<?, ?> set1, final H2QOSet<?, ?> set2) {
+		return "(" + set1.select + " union " + set2.select + ")";
 	}
 
-	static String selectExcept(final H2QXSet<?, ?> set1, final H2QXSet<?, ?> set2) {
-		return "(select * from " + set1.select + " except select * from " + set2.select + ")";
+	static String selectExcept(final H2QOSet<?, ?> set1, final H2QOSet<?, ?> set2) {
+		return "(" + set1.select + " except " + set2.select + ")";
 	}
 
-	static String selectIntersect(final H2QXSet<?, ?> set1, final H2QXSet<?, ?> set2) {
-		return "(select * from " + set1.select + " intersect select * from " + set2.select + ")";
+	static String selectIntersect(final H2QOSet<?, ?> set1, final H2QOSet<?, ?> set2) {
+		return "(" + set1.select + " intersect " + set2.select + ")";
 	}
 
 	static String selectEdgesOrder(final H2QESet edges) {
@@ -104,6 +93,14 @@ class H2QQ {
 
 	static String selectEdgesWithObjects(final H2QESet edges, final H2QNSet nodes) {
 		return "(select distinct A.C, A.P, A.S, B.N O from " + edges.select + " A, " + nodes.select + " B)";
+	}
+
+	static String selectEdgesHavingNode(final H2QESet edges, final H2QN node) {
+		return "(select * from " + edges.select + " where C = " + node.key + " or P = " + node.key + " or S = " + node.key + " or O = " + node.key + ")";
+	}
+
+	static String selectEdgesHavingNodes(final H2QESet edges, final H2QNSet node) {
+		return "(select * from " + edges.select + " where exists (select N from " + node.select + " where C = N or P = N or S = N or O = N))";
 	}
 
 	static String selectEdgesHavingContext(final H2QESet edges, final H2QN node) {
@@ -182,24 +179,40 @@ class H2QQ {
 		return "delete from QE where O in " + nodes.select;
 	}
 
-	static String insertTempEdges() {
-		return "merge into QET (T, C, P, S, O) values (?, ?, ?, ?, ?)";
+	static String insertTempEdges(int key) {
+		return "insert into QET" + key + " (C, P, S, O) values (?, ?, ?, ?)";
+	}
+
+	static String insertTempEdges(final int key, final int key2) {
+		return "insert into QET" + key + " select distinct C, P, S, O from QET" + key2;
 	}
 
 	static String insertTempEdges(final int key, final H2QESet edges) {
-		return "merge into QET select " + key + " T, C, P, S, O from " + edges.select;
+		return "insert into QET" + key + " select C, P, S, O from " + edges.select;
 	}
 
 	static String selectTempEdges(final int key) {
-		return "(select C, P, S, O from QET where T = " + key + ")";
+		return "(select C, P, S, O from QET" + key + ")";
 	}
 
 	static String deleteTempEdges(final int key) {
-		return "delete from QET whete T = " + key;
+		return "drop table if exists QET" + key + " cascade";
 	}
 
-	static String createTempEdges() {
-		return "select next value for QET_SEQUENCE_T";
+	static String createTempEdges(final int key) {
+		return "create cached local temporary table QET" + key + " (C int not null, P int not null, S int not null, O int not null)";
+	}
+
+	static String createTempEdgesKey() {
+		return "select next value for QET_SEQUENCE";
+	}
+
+	static String createTempEdgesIndex(final int key) {
+		return "" //
+			+ "create index QET" + key + "_INDEX_CPS on QET" + key + " (C, P, S, O);" //
+			+ "create index QET" + key + "_INDEX_CPO on QET" + key + " (C, P, O, S);" //
+			+ "create index QET" + key + "_INDEX_CSP on QET" + key + " (C, S, P, O);" //
+			+ "create index QET" + key + "_INDEX_COP on QET" + key + " (C, O, P, S)";
 	}
 
 	static String selectNodesOrder(final H2QNSet set) {
@@ -231,27 +244,39 @@ class H2QQ {
 	}
 
 	static String createSaveNode() {
-		return "select next value for QN_SEQUENCE_K";
+		return "select next value for QN_SEQUENCE";
 	}
 
-	static String insertTempNodes() {
-		return "merge into QNT (T, N) values (?, ?)";
+	static String insertTempNodes(int key) {
+		return "insert into QNT" + key + " (N) values (?)";
+	}
+
+	static String insertTempNodes(final int key, final int key2) {
+		return "insert into QNT" + key + " select distinct N from QNT" + key2;
 	}
 
 	static String insertTempNodes(final int key, final H2QNSet nodes) {
-		return "merge into QNT select " + key + " T, N from " + nodes.select;
+		return "insert into QNT" + key + " select N from " + nodes.select;
 	}
 
 	static String selectTempNodes(final int key) {
-		return "(select N from QNT where T = " + key + ")";
+		return "(select N from QNT" + key + ")";
 	}
 
 	static String deleteTempNodes(final int key) {
-		return "delete from QNT whete T = " + key;
+		return "drop table if exists QNT" + key + " cascade";
 	}
 
-	static String createTempNodes() {
-		return "select next value for QNT_SEQUENCE_T";
+	static String createTempNodes(final int key) {
+		return "create cached local temporary table QNT" + key + " (N int not null)";
+	}
+
+	static String createTempNodesKey() {
+		return "select next value for QNT_SEQUENCE";
+	}
+
+	static String createTempNodesIndex(final int key) {
+		return "create index QNT" + key + "_INDEX_N on QNT" + key + " (N)";
 	}
 
 	static String selectValuesOrder(final H2QVSet set) {
@@ -274,24 +299,36 @@ class H2QQ {
 		return "delete from QN where N in " + nodes.select;
 	}
 
-	static String insertTempValues() {
-		return "merge into QVT (T, V) values (?, ?)";
+	static String insertTempValues(int key) {
+		return "insert into QVT" + key + " (V) values (?)";
+	}
+
+	static String insertTempValues(int key, int key2) {
+		return "insert into QVT" + key + " select distinct V from QVT" + key2;
 	}
 
 	static String insertTempValues(final int key, final H2QVSet values) {
-		return "merge into QVT select " + key + " T, V from " + values.select;
+		return "insert into QVT" + key + " select V from " + values.select;
 	}
 
 	static String selectTempValues(final int key) {
-		return "(select V from QVT where T = " + key + ")";
+		return "(select V from QVT" + key + ")";
 	}
 
 	static String deleteTempValues(final int key) {
-		return "delete from QVT whete T = " + key;
+		return "drop table if exists QVT" + key + " cascade";
 	}
 
-	static String createTempValues() {
-		return "select next value for QVT_SEQUENCE_T";
+	static String createTempValues(final int key) {
+		return "create cached local temporary table QVT" + key + " (V varchar(1G) not null)";
+	}
+
+	static String createTempValuesKey() {
+		return "select next value for QVT_SEQUENCE";
+	}
+
+	static String createTempValuesIndex(final int key) {
+		return "create index QVT" + key + "_INDEX_V on QVT" + key + " (V)";
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import bee.creative.qs.QOSet;
 import bee.creative.qs.QXSet;
 import bee.creative.util.Iterables;
 
@@ -14,14 +15,14 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GI> Typ der Einträge.
  * @param <GISet> Typ dieser Menge. */
-public abstract class H2QXSet<GI, GISet extends Iterable<GI>> implements QXSet<GI, GISet> {
+public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<GI, GISet> {
 
 	final H2QS owner;
 
 	/** Dieses Feld speichert die SQL-Anfrage zur Ermittlung der Tabelle. */
 	protected final String select;
 
-	H2QXSet(final H2QS owner, final String select) {
+	H2QOSet(final H2QS owner, final String select) {
 		this.owner = owner;
 		this.select = select;
 	}
