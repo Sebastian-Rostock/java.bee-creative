@@ -1,5 +1,7 @@
 package bee.creative.qs;
 
+import java.util.List;
+
 /** Diese Schnittstelle definiert einen Graphspeicher für einen Hypergraphen vierter Ordnung (Quad-Store), dessen {@link QN Hyperknoten} über einen optionalen
  * identifizierenden {@link QN#value() Textwert} verfügen und dessen {@link QE Hyperkanten} jeweils vier Hyperknoten in den Rollen {@link QE#context() Kontext},
  * {@link QE#predicate() Prädikat}, {@link QE#subject() Subjekt} und {@link QE#object() Objekt} referenzieren. Ein Hyperknoten kann dazu in jeder dieser Rollen
@@ -34,7 +36,7 @@ public interface QS {
 	 *
 	 * @param node Hyperknoten.
 	 * @return Hyperkante. */
-	public QE newEdge(final QN node) throws NullPointerException, IllegalArgumentException;
+	public QE newEdge(QN node) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode liefert eine temporäre {@link QE Hyperkante}, die von diesem Graphspeicher {@link QE#owner() verwaltet} wird und die gegebenen {@link QN
 	 * Hyperknoten} mit den Rollen {@link QE#context() Kontext}, {@link QE#predicate() Prädikat}, {@link QE#subject() Subjekt} und {@link QE#object() Objekt}
@@ -46,7 +48,7 @@ public interface QS {
 	 * @param subject {@link QE#subject() Subjektknoten}.
 	 * @param object {@link QE#object() Objektknoten}.
 	 * @return Hyperkante. */
-	public QE newEdge(final QN context, final QN predicate, final QN subject, final QN object) throws NullPointerException, IllegalArgumentException;
+	public QE newEdge(QN context, QN predicate, QN subject, QN object) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #newEdges(QE...) this.newEdges(this.newEdge())}.
 	 *
@@ -58,14 +60,14 @@ public interface QS {
 	 *
 	 * @param edges Hyperkanten.
 	 * @return temporäre Hyperkantenmenge. */
-	public QESet newEdges(final QE... edges) throws NullPointerException, IllegalArgumentException;
+	public QESet newEdges(QE... edges) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die gegebenen {@link QE Hyperkanten} in eine von diesem Graphspeicher {@link QESet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück.
 	 *
 	 * @param edges Hyperkanten.
 	 * @return temporäre Hyperkantenmenge. */
-	public QESet newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException;
+	public QESet newEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode liefert einen neuen temporären {@link QN Hyperknoten}, der von diesem Graphspeicher {@link QN#owner() verwaltet} wird und dessen interne
 	 * Kennung in diesem Graphspeicher einzigartig ist. Der gelieferte Hyperknoten wird dabei nicht in den Graphspeicher eingefügt. Dies kann nur {@link QE#put()
@@ -86,26 +88,34 @@ public interface QS {
 	 *
 	 * @param nodes Hyperknoten.
 	 * @return temporäre Hyperknotenmenge. */
-	public QNSet newNodes(final QN... nodes) throws NullPointerException, IllegalArgumentException;
+	public QNSet newNodes(QN... nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die gegebenen {@link QE Hyperknoten} in eine von diesem Graphspeicher {@link QNSet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück.
 	 *
 	 * @param nodes Hyperknoten.
 	 * @return temporäre Hyperknotenmenge. */
-	public QNSet newNodes(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
+	public QNSet newNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #newValues(Iterable) this.newValues(Arrays.asList(values))}.
 	 *
 	 * @param values Textwerte.
 	 * @return temporäre Textwertmenge. */
-	public QVSet newValues(final Object... values) throws NullPointerException, IllegalArgumentException;
+	public QVSet newValues(Object... values) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die {@link Object#toString() Textdarstellungen} der gegebenen Objekte in eine von diesem Graphspeicher {@link QVSet#owner()
 	 * verwaltete} temporäre Menge und gibt diese zurück.
 	 *
 	 * @param values Textwerte.
 	 * @return temporäre Textwertmenge. */
-	public QVSet newValues(final Iterable<?> values) throws NullPointerException, IllegalArgumentException;
+	public QVSet newValues(Iterable<?> values) throws NullPointerException, IllegalArgumentException;
+
+	public QT newTuple(QT... nodes) throws NullPointerException, IllegalArgumentException;
+	
+	public QT newTuple(Iterable<? extends QT> nodes) throws NullPointerException, IllegalArgumentException;
+
+	public QTSet newTuples(List<String> names, QT[]... tubles) throws NullPointerException, IllegalArgumentException;
+
+	public QTSet newTuples(List<String> names, Iterable<? extends QT> tubles) throws NullPointerException, IllegalArgumentException;
 
 }

@@ -30,7 +30,7 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	 *
 	 * @param values Textwertfilter.
 	 * @return Hyperknoten mit den gegebenen Textwerten. */
-	public QNSet havingValues(final QVSet values) throws NullPointerException, IllegalArgumentException;
+	public QNSet havingValues(QVSet values) throws NullPointerException, IllegalArgumentException;
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(this)}. */
 	@Override

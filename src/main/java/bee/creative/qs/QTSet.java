@@ -10,23 +10,28 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	public int role(String name) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #roles(List) this.roles(Arrays.asList(names))}.
-	 * 
+	 *
 	 * @see Arrays#asList(Object...) */
 	public int[] roles(String... names) throws NullPointerException;
 
 	public int[] roles(List<String> names) throws NullPointerException;
 
-	/** Diese Methode liefert die Namen der {@link QT#get(int) Rollen}, über welche die Hypertupel ihre {@link QN Hyperknoten} referenzieren.
-	 * 
+	/** Diese Methode liefert die Namen der {@link QT#get(int) Rollen}, über welche die Hypertupel ihre Hyperknoten referenzieren.
+	 *
 	 * @return Rollennamen. */
 	public List<String> names();
 
-	/** Diese Methode gibt eine Mengensicht auf alle {@link QN Hyperknoten} zurück, die in den Hypertupel dieser Menge {@link QT#get(int) aufgeführten} sind.
+	/** Diese Methode gibt eine Mengensicht auf alle Hyperknoten zurück, die in den Hypertupel dieser Menge {@link QT#get(int) aufgeführten} sind.
 	 *
 	 * @return Hyperknoten der Hypertupel dieser Menge. */
 	public QNSet nodes();
 
-	public QNSet nodes(int index) throws IllegalArgumentException;
+	/** Diese Methode gibt eine Mengensicht auf alle Hyperknoten zurück, die in den Hypertupel dieser Menge über die gegebene {@link QT#get(int) Rolle}
+	 * referenziert werden.
+	 *
+	 * @param role Rolle der Hyperknoten.
+	 * @return Hyperknoten der gegebenen Rolle. */
+	public QNSet nodes(int role) throws IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #nodes(int) this.nodes(this.role(name))}.
 	 *
@@ -35,89 +40,98 @@ public interface QTSet extends QOSet<QT, QTSet> {
 
 	public QTSet join(QTSet that) throws NullPointerException, IllegalArgumentException; // join auf gleich benannten spalten, sonst cross join
 
-	public QTSet join(QTSet that, String... names) throws NullPointerException, IllegalArgumentException; // join auf gleich benannten spalten, sonst cross join
+	public QTSet join(QTSet that, int... roles) throws NullPointerException, IllegalArgumentException; // join auf gleich benannten spalten, sonst cross join
+
+	/** Diese Methode ist eine Abkürzung für {@link #join(QTSet, int...) this.join(that, this.roles(names))}.
+	 *
+	 * @see #roles(String...) */
+	public QTSet join(QTSet that, String... names) throws NullPointerException, IllegalArgumentException;
+
+	/** Diese Methode ist eine Abkürzung für {@link #join(QTSet, int...) this.join(that, this.roles(names))}.
+	 *
+	 * @see #roles(List) */
+	public QTSet join(QTSet that, List<String> names) throws NullPointerException, IllegalArgumentException;
 
 	public QTSet select(int... roles) throws NullPointerException, IllegalArgumentException; // reduzieren
 
 	/** Diese Methode ist eine Abkürzung für {@link #select(List) this.select(this.roles(names))}.
-	 * 
-	 * @see #roles(List) */
+	 *
+	 * @see #roles(String...) */
 	public QTSet select(String... names) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #select(List) this.select(this.roles(names))}.
-	 * 
+	 *
 	 * @see #roles(List) */
-	public QTSet select(List<String> names) throws NullPointerException, IllegalArgumentException; // reduzieren
+	public QTSet select(List<String> names) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die sich aus denen dieser Menge durch Ersetzung der über die gegebene {@link QT#get(int)
-	 * Rolle} referenzierten {@link QN Hyperknoten} mit dem gegebenen ergeben.
+	 * Rolle} referenzierten Hyperknoten mit dem gegebenen ergeben.
 	 *
 	 * @param role Rolle der Hyperknoten.
 	 * @param node Hyperknoten.
 	 * @return Hypertupel mit dem gegebenen Hyperknoten. */
-	public QESet withNode(int role, final QN node) throws NullPointerException, IllegalArgumentException;
+	public QESet withNode(int role, QN node) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #withNode(int, QN) this.withNode(this.role(name), node)}.
 	 *
 	 * @see #role(String) */
-	public QESet withNode(String name, final QN node) throws NullPointerException, IllegalArgumentException;
+	public QESet withNode(String name, QN node) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die sich aus denen dieser Menge durch Ersetzung der über die gegebene {@link QT#get(int)
-	 * Rolle} referenzierten {@link QN Hyperknoten} mit den gegebenen ergeben.
+	 * Rolle} referenzierten Hyperknoten mit den gegebenen ergeben.
 	 *
 	 * @param role Rolle der Hyperknoten.
 	 * @param nodes Hyperknoten.
 	 * @return Hypertupel mit den gegebenen Hyperknoten. */
-	public QESet withNodes(int role, final QNSet nodes) throws NullPointerException, IllegalArgumentException;
+	public QESet withNodes(int role, QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #withNodes(int, QNSet) this.withNodes(this.role(name), nodes)}.
 	 *
 	 * @see #role(String) */
-	public QESet withNodes(String name, final QNSet nodes) throws NullPointerException, IllegalArgumentException;
+	public QESet withNodes(String name, QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #withNames(List) this.withNames(Arrays.asList(names))}.
-	 * 
+	 *
 	 * @see Arrays#asList(Object...) */
 	public QTSet withNames(String... names) throws NullPointerException, IllegalArgumentException; // umbenennen
 
 	public QTSet withNames(List<String> names) throws NullPointerException, IllegalArgumentException; // umbenennen
 
-	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die auf den gegebenen {@link QN Hyperknoten} verweisen.
+	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die auf den gegebenen Hyperknoten verweisen.
 	 *
 	 * @param node Hyperknotenfilter.
 	 * @return Hypertupel mit den gegebenen Hyperknoten. */
-	public QESet havingNode(final QN node) throws NullPointerException, IllegalArgumentException;
+	public QESet havingNode(QN node) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die über die gegebene {@link QT#get(int) Rolle} auf den gegebenen {@link QN Hyperknoten}
-	 * verweisen.
+	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die über die gegebene {@link QT#get(int) Rolle} auf den gegebenen Hyperknoten verweisen.
 	 *
 	 * @param role Rolle des Hyperknoten.
 	 * @param node Hyperknotenfilter.
 	 * @return Hypertupel mit den gegebenen Hyperknoten. */
-	public QESet havingNode(int role, final QN node) throws NullPointerException, IllegalArgumentException;
+	public QESet havingNode(int role, QN node) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #havingNode(int, QN) this.havingNodes(this.role(name), node)}.
 	 *
 	 * @see #role(String) */
-	public QESet havingNode(String name, final QN node) throws NullPointerException, IllegalArgumentException;
+	public QESet havingNode(String name, QN node) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die auf {@link QN Hyperknoten} der gegebenen Menge verweisen.
+	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die auf Hyperknoten der gegebenen Menge verweisen.
 	 *
 	 * @param nodes Hyperknotenfilter.
 	 * @return Hypertupel mit den gegebenen Hyperknoten. */
-	public QESet havingNodes(final QNSet nodes) throws NullPointerException, IllegalArgumentException;
+	public QESet havingNodes(QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die über die gegebene {@link QT#get(int) Rolle} auf einen {@link QN Hyperknoten} der
-	 * gegebenen Menge verweisen.
+	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die über die gegebene {@link QT#get(int) Rolle} auf einen Hyperknoten der gegebenen Menge
+	 * verweisen.
 	 *
 	 * @param role Rolle des Hyperknoten.
 	 * @param nodes Hyperknotenfilter.
 	 * @return Hypertupel mit den gegebenen Hyperknoten. */
-	public QESet havingNodes(int role, final QNSet nodes) throws NullPointerException, IllegalArgumentException;
+	public QESet havingNodes(int role, QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #havingNodes(int, QNSet) this.havingNodes(this.role(name), nodes)}.
 	 *
 	 * @see #role(String) */
-	public QESet havingNodes(String name, final QNSet nodes) throws NullPointerException, IllegalArgumentException;
+	public QESet havingNodes(String name, QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
 }

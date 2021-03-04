@@ -43,24 +43,24 @@ public interface QE extends QX {
 	 *
 	 * @param context Kontextknoten.
 	 * @return Hyperkante mit dem gegebenen Kontextknoten. */
-	public QE withContext(final QN context) throws NullPointerException, IllegalArgumentException;
+	public QE withContext(QN context) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt diese Hyperkante mit dem gegebenen {@link QE#predicate() Prädikatknoten} zurück.
 	 *
 	 * @param predicate Prädikatknoten.
 	 * @return Hyperkante mit dem gegebenen Prädikatknoten. */
-	public QE withPredicate(final QN predicate) throws NullPointerException, IllegalArgumentException;
+	public QE withPredicate(QN predicate) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt diese Hyperkante mit dem gegebenen {@link QE#subject() Subjektknoten} zurück.
 	 *
 	 * @param subject Subjektknoten.
 	 * @return Hyperkante mit dem gegebenen Subjektknoten. */
-	public QE withSubject(final QN subject) throws NullPointerException, IllegalArgumentException;
+	public QE withSubject(QN subject) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt diese Hyperkante mit dem gegebenen {@link QE#object() Objektknoten} zurück.
 	 *
 	 * @param object Objektknoten.
 	 * @return Hyperkante mit dem gegebenen Objektknoten. */
-	public QE withObject(final QN object) throws NullPointerException, IllegalArgumentException;
+	public QE withObject(QN object) throws NullPointerException, IllegalArgumentException;
 
 }

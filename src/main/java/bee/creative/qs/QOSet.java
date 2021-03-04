@@ -13,7 +13,7 @@ import bee.creative.util.Filter;
 public interface QOSet<GI, GISet> extends QO, Iterable<GI> {
 
 	/** Diese Methode gibt die Anzahl der in dieser Menge enthaltenen Objekte zurück.
-	 * 
+	 *
 	 * @return Objektanzahl. */
 	public long size();
 
@@ -32,6 +32,10 @@ public interface QOSet<GI, GISet> extends QO, Iterable<GI> {
 	 * @return Geordnete Menge. */
 	public GISet order();
 
+	/** Diese Methode gibt eine temporäre Menge der Objekte zurück, die vom gegebenen Filter {@link Filter#accept(Object) akzeptiert} werden.
+	 *
+	 * @param filter Filter.
+	 * @return Gefilterte Menge. */
 	public GISet having(Filter<? super GI> filter) throws NullPointerException;
 
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die in dieser oder der gegebenen Menge enthalten sind.
