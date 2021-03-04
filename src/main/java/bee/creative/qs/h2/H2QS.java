@@ -7,10 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.List;
 import bee.creative.lang.Objects;
 import bee.creative.qs.QE;
 import bee.creative.qs.QN;
 import bee.creative.qs.QS;
+import bee.creative.qs.QT;
+import bee.creative.qs.QTSet;
 
 /** Diese Klasse implementiert einen {@link QS Graphspeicher}, dessen Hyperkanten und Textwerte in einer Datenbank (vorzugsweise embedded H2) gespeichert sind.
  *
@@ -328,6 +331,26 @@ public class H2QS implements QS {
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
+	}
+
+	@Override
+	public QT newTuple(QT... nodes) throws NullPointerException, IllegalArgumentException {
+		return null;
+	}
+
+	@Override
+	public QT newTuple(Iterable<? extends QT> nodes) throws NullPointerException, IllegalArgumentException {
+		return null;
+	}
+
+	@Override
+	public QTSet newTuples(List<String> names, QT[]... tubles) throws NullPointerException, IllegalArgumentException {
+		return null;
+	}
+
+	@Override
+	public QTSet newTuples(List<String> names, Iterable<? extends QT> tubles) throws NullPointerException, IllegalArgumentException {
+		return null;
 	}
 
 	@Override
