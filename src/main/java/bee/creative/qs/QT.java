@@ -10,5 +10,7 @@ import bee.creative.lang.Array2;
 public interface QT extends QO, Array2<QN> {
 
 	public List<QN> toList();
+	
+	public QN[] toArray();
 
 }

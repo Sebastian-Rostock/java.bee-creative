@@ -14,7 +14,7 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
-	static class Iter extends H2QOIter<QN> {
+	static class Iter extends H2QOIter<QN, H2QNSet> {
 
 		public Iter(final H2QNSet owner) {
 			super(owner);
@@ -22,7 +22,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 		@Override
 		public QN next(final ResultSet item) throws SQLException {
-			return new H2QN(this.owner.owner, item.getInt(1));
+			return this.owner.owner.newQN(item.getInt(1));
 		}
 
 	}

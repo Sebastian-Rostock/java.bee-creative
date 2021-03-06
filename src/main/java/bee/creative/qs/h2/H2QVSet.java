@@ -12,10 +12,10 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
-	static final class Iter extends H2QOIter<String> {
+	static final class Iter extends H2QOIter<String, H2QVSet> {
 
-		public Iter(final H2QVSet set) {
-			super(set);
+		public Iter(final H2QVSet owner) {
+			super(owner);
 		}
 
 		@Override

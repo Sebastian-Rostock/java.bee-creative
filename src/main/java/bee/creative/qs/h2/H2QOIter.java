@@ -10,16 +10,16 @@ import bee.creative.util.AbstractIterator;
 /** Diese Klasse implementiert den {@link Iterator} für die Nachfahren von {@link H2QOSet}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Elemente. */
-abstract class H2QOIter<GItem> extends AbstractIterator<GItem> implements QO {
+ * @param <GI> Typ der Elemente. */
+abstract class H2QOIter<GI, GISet extends H2QOSet<?, ?>> extends AbstractIterator<GI> implements QO {
 
-	final H2QOSet<GItem, ?> owner;
+	protected final GISet owner;
 
 	final ResultSet item;
 
 	boolean next;
 
-	H2QOIter(final H2QOSet<GItem, ?> owner) {
+	H2QOIter(final GISet owner) {
 		this.owner = owner;
 		try {
 			final Statement stmt = owner.owner.conn.createStatement();
@@ -50,9 +50,9 @@ abstract class H2QOIter<GItem> extends AbstractIterator<GItem> implements QO {
 	}
 
 	@Override
-	public GItem next() {
+	public GI next() {
 		try {
-			final GItem item = this.next(this.item);
+			final GI item = this.next(this.item);
 			this.next = this.item.next();
 			return item;
 		} catch (final SQLException cause) {
@@ -60,6 +60,6 @@ abstract class H2QOIter<GItem> extends AbstractIterator<GItem> implements QO {
 		}
 	}
 
-	protected abstract GItem next(ResultSet next2) throws SQLException;
+	protected abstract GI next(ResultSet next) throws SQLException;
 
 }

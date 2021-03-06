@@ -26,8 +26,8 @@ public final class H2QT implements QT {
 	}
 
 	@Override
-	public QN get(final int index) throws IndexOutOfBoundsException {
-		return new H2QN(this.owner, this.nodes[index]);
+	public H2QN get(final int index) throws IndexOutOfBoundsException {
+		return this.owner.newQN(this.nodes[index]);
 	}
 
 	@Override
@@ -66,8 +66,18 @@ public final class H2QT implements QT {
 
 	@Override
 	public List<QN> toList() {
-		final ArrayList<QN> result = new ArrayList<>(this.size());
+		final List<QN> result = new ArrayList<>(this.size());
 		Iterables.addAll(result, this);
+		return result;
+	}
+
+	@Override
+	public QN[] toArray() {
+		final int size = this.size();
+		final QN[] result = new QN[size];
+		for (int i = 0; i < size; i++) {
+			result[i] = this.get(i);
+		}
 		return result;
 	}
 

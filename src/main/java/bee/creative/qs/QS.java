@@ -110,11 +110,11 @@ public interface QS {
 	 * @return temporäre Textwertmenge. */
 	public QVSet newValues(Iterable<?> values) throws NullPointerException, IllegalArgumentException;
 
-	public QT newTuple(QT... nodes) throws NullPointerException, IllegalArgumentException;
+	public QT newTuple(QN... nodes) throws NullPointerException, IllegalArgumentException;
 	
-	public QT newTuple(Iterable<? extends QT> nodes) throws NullPointerException, IllegalArgumentException;
+	public QT newTuple(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
-	public QTSet newTuples(List<String> names, QT[]... tubles) throws NullPointerException, IllegalArgumentException;
+	public QTSet newTuples(List<String> names, QN[]... tubles) throws NullPointerException, IllegalArgumentException;
 
 	public QTSet newTuples(List<String> names, Iterable<? extends QT> tubles) throws NullPointerException, IllegalArgumentException;
 
