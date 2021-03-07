@@ -39,19 +39,7 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	public QNSet nodes(String name) throws NullPointerException, IllegalArgumentException;
 
 	public QTSet join(QTSet that) throws NullPointerException, IllegalArgumentException; // join auf gleich benannten spalten, sonst cross join
-
-	public QTSet join(QTSet that, int... roles) throws NullPointerException, IllegalArgumentException; // join auf gleich benannten spalten, sonst cross join
-
-	/** Diese Methode ist eine Abkürzung für {@link #join(QTSet, int...) this.join(that, this.roles(names))}.
-	 *
-	 * @see #roles(String...) */
-	public QTSet join(QTSet that, String... names) throws NullPointerException, IllegalArgumentException;
-
-	/** Diese Methode ist eine Abkürzung für {@link #join(QTSet, int...) this.join(that, this.roles(names))}.
-	 *
-	 * @see #roles(List) */
-	public QTSet join(QTSet that, List<String> names) throws NullPointerException, IllegalArgumentException;
-
+ 
 	public QTSet select(int... roles) throws NullPointerException, IllegalArgumentException; // reduzieren
 
 	/** Diese Methode ist eine Abkürzung für {@link #select(int...) this.select(this.roles(names))}.

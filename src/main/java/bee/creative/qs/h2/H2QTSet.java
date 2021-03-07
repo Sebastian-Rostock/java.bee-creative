@@ -12,9 +12,7 @@ import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QT;
 import bee.creative.qs.QTSet;
-import bee.creative.util.AbstractHashData;
 import bee.creative.util.Filter;
-import bee.creative.util.HashMapOI;
 import bee.creative.util.HashSet;
 import bee.creative.util.Iterables;
 
@@ -74,7 +72,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 		@Override
 		protected void finalize() throws Throwable {
-			this.owner.execImpl(H2QQ.deleteTempNodes(this.key));
+			this.owner.execImpl(H2QQ.deleteTempTuples(this.key));
 		}
 
 		@Override
@@ -99,7 +97,28 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	static class Names extends HashSet<String> implements Array<String> {
 
-		public Names(final List<String> names) {
+		private static final long serialVersionUID = 2586580774778548666L;
+
+		public final List<String> names = new AbstractList<String>() {
+
+			@Override
+			public String get(final int index) {
+				return Names.this.get(index);
+			}
+
+			@Override
+			public int size() {
+				return Names.this.size();
+			}
+
+		};
+
+		public Names(final Names parent, final List<String> names) throws NullPointerException, IllegalArgumentException {
+			this(names);
+			if (size() != parent.size()) throw new IllegalArgumentException();
+		}
+
+		public Names(final List<String> names) throws NullPointerException, IllegalArgumentException {
 			final int size = names.size();
 			this.allocate(size);
 			for (int i = 0; i < size; i++) {
@@ -108,29 +127,26 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 			if (size != this.size()) throw new IllegalArgumentException();
 		}
 
+		public Names(final Names names, final int[] roles) throws NullPointerException, IllegalArgumentException {
+			final int size = roles.length;
+			this.allocate(size);
+			for (int i = 0; i < size; i++) {
+				try {
+					this.putIndexImpl(names.get(roles[i]));
+				} catch (final IndexOutOfBoundsException cause) {
+					throw new IllegalArgumentException(cause);
+				}
+			}
+			if (size != this.size()) throw new IllegalArgumentException();
+		}
+
 		@Override
 		public String get(final int index) {
-			return customGetKey(index);
+			return this.customGetKey(index);
 		}
 
 		public int role(final String name) throws NullPointerException {
-			return getIndexImpl(Objects.notNull(name));
-		}
-
-		public List<String> names() {
-			return new AbstractList<String>() {
-
-				@Override
-				public String get(final int index) {
-					return Names.this.get(index);
-				}
-
-				@Override
-				public int size() {
-					return Names.this.size();
-				}
-
-			};
+			return this.getIndexImpl(Objects.notNull(name));
 		}
 
 	}
@@ -144,7 +160,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet copy() {
-		return this.owner.newTuples(this.names(), this);
+		return this.owner.newTuples(this);
 	}
 
 	@Override
@@ -154,22 +170,22 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public QTSet union(final QTSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectUnion(this, this.owner.asQTSet(set,names)), names, this, set);
+		return new Set2(this.owner, H2QQ.selectUnion(this, this.owner.asQTSet(set, this.names)), this.names, this, set);
 	}
 
 	@Override
 	public QTSet except(final QTSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectExcept(this, this.owner.asQTSet(set, names)), names, this, set);
+		return new Set2(this.owner, H2QQ.selectExcept(this, this.owner.asQTSet(set, this.names)), this.names, this, set);
 	}
 
 	@Override
 	public QTSet intersect(final QTSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectIntersect(this, this.owner.asQTSet(set)), names, this, set);
+		return new Set2(this.owner, H2QQ.selectIntersect(this, this.owner.asQTSet(set, this.names)), this.names, this, set);
 	}
 
 	@Override
 	public int role(final String name) throws NullPointerException {
-		return names.role(name);
+		return this.names.role(name);
 	}
 
 	@Override
@@ -179,13 +195,17 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public int[] roles(final List<String> names) throws NullPointerException {
-		// TODO
-		return null;
+		final int size = names.size();
+		final int[] roles = new int[size];
+		for (int i = 0; i < size; i++) {
+			roles[i] = this.role(names.get(i));
+		}
+		return roles;
 	}
 
 	@Override
 	public List<String> names() {
-		return names.names();
+		return this.names.names;
 	}
 
 	@Override
@@ -211,26 +231,14 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		return null;
 	}
 
-	@Override
-	public H2QTSet join(final QTSet that, final int... roles) throws NullPointerException, IllegalArgumentException {
-		// TODO
-		return null;
-	}
-
-	@Override
-	public H2QTSet join(final QTSet that, final String... names) throws NullPointerException, IllegalArgumentException {
-		return this.join(that, this.roles(names));
-	}
-
-	@Override
-	public H2QTSet join(final QTSet that, final List<String> names) throws NullPointerException, IllegalArgumentException {
-		return this.join(that, this.roles(names));
-	}
+ 
 
 	@Override
 	public H2QTSet select(final int... roles) throws NullPointerException, IllegalArgumentException {
-		// TODO
-		return null;
+		final int size = roles.length;
+		if (size == 0) throw new IllegalArgumentException();
+		final Names names = new Names(this.names, roles);
+		return new Set1(this.owner, H2QQ.selectTuplesSelect(this, roles), names, this);
 	}
 
 	@Override
@@ -272,13 +280,12 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet withNames(final List<String> names) throws NullPointerException, IllegalArgumentException {
-		// TODO
-		return null;
+		return new Set1(this.owner, this.select, new Names(this.names, names), this);
 	}
 
 	@Override
 	public H2QTSet having(final Filter<? super QT> filter) throws NullPointerException {
-		return this.owner.newTuples(this.names(), Iterables.filter(this, filter));
+		return this.owner.newTuples(Iterables.filter(this, filter), this.names());
 	}
 
 	@Override

@@ -18,21 +18,21 @@ public final class H2QT implements QT {
 
 	final H2QS owner;
 
-	final int[] nodes;
+	final int[] keys;
 
-	H2QT(final H2QS owner, final int... nodes) {
+	H2QT(final H2QS owner, final int... keys) {
 		this.owner = owner;
-		this.nodes = nodes;
+		this.keys = keys;
 	}
 
 	@Override
 	public H2QN get(final int index) throws IndexOutOfBoundsException {
-		return this.owner.newQN(this.nodes[index]);
+		return this.owner.newQN(this.keys[index]);
 	}
 
 	@Override
 	public int size() {
-		return this.nodes.length;
+		return this.keys.length;
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public final class H2QT implements QT {
 	@Override
 	public int hashCode() {
 		int result = Objects.hashInit();
-		for (final int node: this.nodes) {
+		for (final int node: this.keys) {
 			result = Objects.hashPush(result, node);
 		}
 		return result;
@@ -59,7 +59,7 @@ public final class H2QT implements QT {
 		if (object == this) return true;
 		if (!(object instanceof H2QT)) return false;
 		final H2QT that = (H2QT)object;
-		if (!Arrays.equals(this.nodes, that.nodes)) return false;
+		if (!Arrays.equals(this.keys, that.keys)) return false;
 		if (this.owner != that.owner) return false;
 		return true;
 	}
@@ -74,11 +74,11 @@ public final class H2QT implements QT {
 	@Override
 	public QN[] toArray() {
 		final int size = this.size();
-		final QN[] result = new QN[size];
+		final QN[] res = new QN[size];
 		for (int i = 0; i < size; i++) {
-			result[i] = this.get(i);
+			res[i] = this.get(i);
 		}
-		return result;
+		return res;
 	}
 
 	@Override

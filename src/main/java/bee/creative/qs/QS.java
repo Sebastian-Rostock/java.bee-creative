@@ -111,11 +111,15 @@ public interface QS {
 	public QVSet newValues(Iterable<?> values) throws NullPointerException, IllegalArgumentException;
 
 	public QT newTuple(QN... nodes) throws NullPointerException, IllegalArgumentException;
-	
+
 	public QT newTuple(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
-	public QTSet newTuples(List<String> names, QN[]... tubles) throws NullPointerException, IllegalArgumentException;
+	public QTSet newTuples(QN[][] tuples, String... names) throws NullPointerException, IllegalArgumentException;
 
-	public QTSet newTuples(List<String> names, Iterable<? extends QT> tubles) throws NullPointerException, IllegalArgumentException;
+	public QTSet newTuples(QN[][] tuples, List<String> names) throws NullPointerException, IllegalArgumentException;
+
+	public QTSet newTuples(Iterable<? extends QT> tuples, String... names) throws NullPointerException, IllegalArgumentException;
+
+	public QTSet newTuples(Iterable<? extends QT> tuples, List<String> names) throws NullPointerException, IllegalArgumentException;
 
 }
