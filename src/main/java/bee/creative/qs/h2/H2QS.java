@@ -393,18 +393,14 @@ public class H2QS implements QS {
 		}
 	}
 
-	final H2QT newTuple(final Object[] nodes) throws NullPointerException, IllegalArgumentException {
+	@Override
+	public H2QT newTuple(final QN... nodes) throws NullPointerException, IllegalArgumentException {
 		return this.newQT(this.toNodeKeys(nodes));
 	}
 
 	@Override
-	public H2QT newTuple(final QN... nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newTuple((Object[])nodes);
-	}
-
-	@Override
-	public H2QT newTuple(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newTuple(Iterables.toArray(nodes));
+	public H2QT newTuple(final List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
+		return this.newQT(this.toNodeKeys(nodes.toArray()));
 	}
 
 	@Override

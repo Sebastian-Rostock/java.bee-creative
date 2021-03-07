@@ -42,10 +42,13 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 * @see #role(String) */
 	public QNSet nodes(String name) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt eine Mengensicht auf die Verschmelzung der Hypertupel dieser und der gegebenen Menge zurück. Wenn die gegebene Menge keine
-	 * {@link #names() Rollennamen} mit dieser gemein hat, entspricht die gelieferte Menge dem kartesischen Produkt beider Mengen. Andernfalls qweden die
-	 * Hypertupel über die Hyperknoten ihrer gemeinsamen Rollen miteinander verbunden. Die Rollennamen der gelieferten Mengensicht bestehen aus den Rollennamen
-	 * dieser Menge gefolgt von den nicht darin enthaltenen Rollennamen der gegebenen Menge. */
+	/** Diese Methode gibt eine Mengensicht auf die Verbindung der Hypertupel dieser und der gegebenen Menge zurück. Wenn die gegebene Menge keine {@link #names()
+	 * Rollennamen} mit dieser gemein hat, enthält die gelieferte Menge jedes Hypertupel dieser Menge verkettet mit jedem Hypertupel der gegebenen Menge.
+	 * Andernfalls weden die Hypertupel über die Hyperknoten ihrer gemeinsamen Rollen miteinander verbunden. Die Rollennamen der gelieferten Mengensicht bestehen
+	 * aus den Rollennamen dieser Menge gefolgt von den nicht darin enthaltenen Rollennamen der gegebenen Menge.
+	 * 
+	 * @param that gegebene Menge.
+	 * @return {@code CROSS JOIN} bzw. {@code NATURAL JOIN} von {@code this} und {@code that}. */
 	public QTSet join(QTSet that) throws NullPointerException, IllegalArgumentException;
 
 	public QTSet select(int... roles) throws NullPointerException, IllegalArgumentException; // reduzieren
@@ -89,9 +92,14 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	/** Diese Methode ist eine Abkürzung für {@link #withNames(List) this.withNames(Arrays.asList(names))}.
 	 *
 	 * @see Arrays#asList(Object...) */
-	public QTSet withNames(String... names) throws NullPointerException, IllegalArgumentException;  
+	public QTSet withNames(String... names) throws NullPointerException, IllegalArgumentException;
 
-	public QTSet withNames(List<String> names) throws NullPointerException, IllegalArgumentException; // umbenennen
+	/** Diese Methode gibt eine Mengensicht auf diese Menge mit den gegebenen {@link #names() Rollennamen} zurück. Bei dieser Ersetzung der Rollennamen muss deren
+	 * Anzahl erhalten bleiben.
+	 * 
+	 * @param names neue Rollennamen.
+	 * @return Mengensicht mit neuen Rollennamen. */
+	public QTSet withNames(List<String> names) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die auf den gegebenen Hyperknoten verweisen.
 	 *
@@ -133,5 +141,5 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(Iterable, List) this.owner().newTuples(this, this.names())}. */
 	@Override
 	public QTSet copy();
-	
+
 }

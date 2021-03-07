@@ -414,4 +414,30 @@ class H2QQ {
 		return "(select * from QTT" + key + ")";
 	}
 
+	public static String selectTuplesHavingNode(H2QTSet set, H2QN node) {
+		// TODO
+		return null;
+	}
+
+	public static String selectTuplesHavingNode(H2QTSet set, H2QN node, int role) {
+		// TODO
+		return null;
+	}
+
+	public static String selectTuplesHavingNodes(H2QTSet h2qtSet, H2QTSet asQTSet) {
+		return null;
+	}
+
+	public static String selectTuplesHavingNodes(H2QTSet h2qtSet, H2QTSet asQTSet, int role) {
+		return null;
+	}
+
+	public static String selectTuplesWithNode(H2QTSet h2qtSet, H2QN asQN, int role) {
+		return null;
+	}
+
+	public static String selectTuplesWithNodes(H2QTSet h2qtSet, H2QTSet asQTSet, int role) {
+		return null;
+	}
+
 }
