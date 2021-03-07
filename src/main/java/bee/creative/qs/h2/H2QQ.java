@@ -97,11 +97,11 @@ class H2QQ {
 	}
 
 	static String selectEdgesHavingNode(final H2QESet edges, final H2QN node) {
-		return "(select * from " + edges.select + " where C = " + node.key + " or P = " + node.key + " or S = " + node.key + " or O = " + node.key + ")";
+		return "(select * from " + edges.select + " where C=" + node.key + " or P=" + node.key + " or S=" + node.key + " or O=" + node.key + ")";
 	}
 
 	static String selectEdgesHavingNodes(final H2QESet edges, final H2QNSet node) {
-		return "(select * from " + edges.select + " where exists (select N from " + node.select + " where C = N or P = N or S = N or O = N))";
+		return "(select * from " + edges.select + " where exists (select N from " + node.select + " where C=N or P=N or S=N or O=N))";
 	}
 
 	static String selectEdgesHavingContext(final H2QESet edges, final H2QN node) {
@@ -144,13 +144,44 @@ class H2QQ {
 		return "(select * from " + set.select + " order by V)";
 	}
 
+	static String selectTuplesJoin(final H2QTSet set1, final int size, final H2QTSet set2, final int[] roles2) {
+		final int size2 = roles2.length;
+		final StringBuilder res = new StringBuilder(set1.select.length() + set2.select.length() + 48 + (size * 8) + (size2 * 16));
+		res.append("(select A.C0");
+		for (int i = 1; i < size; i++) {
+			res.append(", A.C").append(i);
+		}
+		for (int i = 0, j = size; i < size2; i++) {
+			if (roles2[i] < 0) {
+				res.append(", B.C").append(i).append(" C").append(j++);
+			}
+		}
+		res.append(" from ").append(set1.select).append(" A inner join ").append(set2.select).append(" B on true");
+		for (int i = 0; i < size2; i++) {
+			if (roles2[i] >= 0) {
+				res.append(" and A.C").append(roles2[i]).append("=B.C").append(i);
+			}
+		}
+		return res.append(")").toString();
+	}
+
 	static String selectTuplesOrder(final H2QTSet set, final int size) {
-		final StringBuilder res = new StringBuilder(set.select.length() + 25 + (size * 5));
+		final StringBuilder res = new StringBuilder(set.select.length() + 32 + (size * 5));
 		res.append("(select * from ").append(set.select).append(" order by C0");
 		for (int i = 1; i < size; i++) {
 			res.append(", C").append(i);
 		}
 		return res.append(")").toString();
+	}
+
+	static String selectTuplesSelect(final H2QTSet set, final int[] roles) {
+		final int size = roles.length;
+		final StringBuilder res = new StringBuilder(set.select.length() + 32 + (size * 10));
+		res.append("(select distinct C").append(roles[0]).append(" C0");
+		for (int i = 1; i < size; i++) {
+			res.append(", C").append(roles[i]).append(" C").append(i);
+		}
+		return res.append(" from ").append(set.select).append(")").toString();
 	}
 
 	static String insertSaveEdge() {
@@ -162,15 +193,15 @@ class H2QQ {
 	}
 
 	static String deleteSaveEdge() {
-		return "delete from QE where C = ? and P = ? and S = ? and O = ?";
+		return "delete from QE where C=? and P=? and S=? and O=?";
 	}
 
 	static String deleteSaveEdges() {
-		return "delete from QE where C = ?1 or P = ?1 or S = ?1 or O = ?1";
+		return "delete from QE where C=?1 or P=?1 or S=?1 or O=?1";
 	}
 
 	static String deleteSaveEdges(final H2QESet set) {
-		return "delete from QE A where exists (select 0 from " + set.select + " B where A.C = B.C and A.P = B.P and A.S = B.S and A.O = B.O)";
+		return "delete from QE A where exists (select 0 from " + set.select + " B where A.C=B.C and A.P=B.P and A.S=B.S and A.O=B.O)";
 	}
 
 	static String deleteSaveEdgesHavingContexts(final H2QNSet nodes) {
@@ -190,11 +221,11 @@ class H2QQ {
 	}
 
 	static String selectSaveEdge() {
-		return "select top 1 * from QE where C = ? and P = ? and S = ? and O = ?";
+		return "select top 1 * from QE where C=? and P=? and S=? and O=?";
 	}
 
 	static String selectSaveEdges() {
-		return "(select C, P, S, O from QE)";
+		return "(select * from QE)";
 	}
 
 	static String createSaveNodeKey() {
@@ -206,11 +237,11 @@ class H2QQ {
 	}
 
 	static String selectSaveNodesHavingValues(final H2QVSet set) {
-		return "(select N from QN A inner join " + set.select + " B on A.V = B.V)";
+		return "(select N from QN A inner join " + set.select + " B on A.V=B.V)";
 	}
 
 	static String deleteSaveNode() {
-		return "delete from QN where N = ?";
+		return "delete from QN where N=?";
 	}
 
 	static String deleteSaveNodesHavingValues(final H2QVSet values) {
@@ -218,7 +249,7 @@ class H2QQ {
 	}
 
 	static String selectSaveNode() {
-		return "select N from QN where V = ?";
+		return "select N from QN where V=?";
 	}
 
 	static String selectSaveNodes() {
@@ -230,7 +261,7 @@ class H2QQ {
 	}
 
 	static String selectSaveValue() {
-		return "select V from QN where N = ?";
+		return "select V from QN where N=?";
 	}
 
 	static String selectSaveValues() {
@@ -238,7 +269,7 @@ class H2QQ {
 	}
 
 	static String selectSaveValuesHavingNodes(final H2QNSet set) {
-		return "(select V from QN A inner join " + set.select + " B on A.N = B.N)";
+		return "(select V from QN A inner join " + set.select + " B on A.N=B.N)";
 	}
 
 	static String createTempEdges(final int key) {
@@ -262,11 +293,11 @@ class H2QQ {
 	}
 
 	static String insertTempEdges(final int key, final int key2) {
-		return "insert into QET" + key + " select distinct C, P, S, O from QET" + key2;
+		return "insert into QET" + key + " select distinct * from QET" + key2;
 	}
 
 	static String insertTempEdges(final int key, final H2QESet edges) {
-		return "insert into QET" + key + " select C, P, S, O from " + edges.select;
+		return "insert into QET" + key + " select * from " + edges.select;
 	}
 
 	static String deleteTempEdges(final int key) {
@@ -274,7 +305,7 @@ class H2QQ {
 	}
 
 	static String selectTempEdges(final int key) {
-		return "(select C, P, S, O from QET" + key + ")";
+		return "(select * from QET" + key + ")";
 	}
 
 	static String createTempNodes(final int key) {
@@ -350,50 +381,11 @@ class H2QQ {
 		return res.append(")").toString();
 	}
 
-	public static void main(final String[] args) throws Exception {
-		System.out.println(H2QQ.selectTempTuples(123456789, 1).length());
-		System.out.println(H2QQ.selectTempTuples(123456789, 2).length());
-	}
-
 	static String createTempTuplesKey() {
 		return "select next value for QTT_SEQUENCE";
 	}
 
-	static String selectTempTuples(final int key, final int size) {
-		final StringBuilder res = new StringBuilder(25 + (size * 5));
-		res.append("(select *");
-//		res.append("(select C0");
-//		for (int i = 1; i < size; i++) {
-//			res.append(", C").append(i);
-//		}
-		return res.append(" from QTT").append(key).append(")").toString();
-	}
-
-	static String selectTuplesSelect(final H2QTSet set, final int[] roles) {
-		final int size = roles.length;
-		final StringBuilder res = new StringBuilder(set.select.length() + 25 + (size * 10));
-		res.append("(select distinct C").append(roles[0]).append(" C0");
-		for (int i = 1; i < size; i++) {
-			res.append(", C").append(roles[i]).append(" C").append(i);
-		}
-		return res.append(" from ").append(set.select).append(")").toString();
-	}
-
-	static String deleteTempTuples(final int key) {
-		return "drop table if exists QTT" + key + " cascade";
-	}
-
-	public static String insertTempTuples(final int key, final H2QTSet set) {
-		final int size = set.names.size();
-		final StringBuilder res = new StringBuilder(set.select.length() + 30 + (size * 5));
-		res.append("insert into QTT").append(key).append(" select C0");
-		for (int i = 1; i < size; i++) {
-			res.append(", C").append(i);
-		}
-		return res.append(" from ").append(set.select).toString();
-	}
-
-	public static String insertTempTuples(int key, final int size) {
+	static String insertTempTuples(final int key, final int size) {
 		final StringBuilder res = new StringBuilder(35 + (size * 7));
 		res.append("insert into QTT").append(key).append(" (C0");
 		for (int i = 1; i < size; i++) {
@@ -406,8 +398,20 @@ class H2QQ {
 		return res.append(")").toString();
 	}
 
-	public static String insertTempTuples(int key, int key2, int size) {
+	static String insertTempTuples(final int key, final int size, final int key2) {
 		return "insert into QTT" + key + " select distinct * from QTT" + key2;
+	}
+
+	static String insertTempTuples(final int key, final int size, final H2QTSet set) {
+		return "insert into QTT" + key + " select * from " + set.select;
+	}
+
+	static String deleteTempTuples(final int key) {
+		return "drop table if exists QTT" + key + " cascade";
+	}
+
+	static String selectTempTuples(final int key, final int size) {
+		return "(select * from QTT" + key + ")";
 	}
 
 }

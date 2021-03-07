@@ -3,6 +3,9 @@ package bee.creative.qs;
 import java.util.Arrays;
 import java.util.List;
 
+/** Diese Schnittstelle definiert eine {@link QOSet Menge} von Hypertupeln.
+ *
+ * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QTSet extends QOSet<QT, QTSet> {
 
 	/** Diese Methode liefert die Position, die der gegebene Rollennamen in der {@link #names() Liste der Rollennamen} hat. Wenn er dort nicht enthalten ist, wird
@@ -14,6 +17,7 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 * @see Arrays#asList(Object...) */
 	public int[] roles(String... names) throws NullPointerException;
 
+	/** Diese Methode liefert die {@link #role(String) Positionen}, die die gegebenen Rollennamen in der {@link #names() Liste der Rollennamen} haben. */
 	public int[] roles(List<String> names) throws NullPointerException;
 
 	/** Diese Methode liefert die Namen der {@link QT#get(int) Rollen}, über welche die Hypertupel ihre Hyperknoten referenzieren.
@@ -38,8 +42,12 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 * @see #role(String) */
 	public QNSet nodes(String name) throws NullPointerException, IllegalArgumentException;
 
-	public QTSet join(QTSet that) throws NullPointerException, IllegalArgumentException; // join auf gleich benannten spalten, sonst cross join
- 
+	/** Diese Methode gibt eine Mengensicht auf die Verschmelzung der Hypertupel dieser und der gegebenen Menge zurück. Wenn die gegebene Menge keine
+	 * {@link #names() Rollennamen} mit dieser gemein hat, entspricht die gelieferte Menge dem kartesischen Produkt beider Mengen. Andernfalls qweden die
+	 * Hypertupel über die Hyperknoten ihrer gemeinsamen Rollen miteinander verbunden. Die Rollennamen der gelieferten Mengensicht bestehen aus den Rollennamen
+	 * dieser Menge gefolgt von den nicht darin enthaltenen Rollennamen der gegebenen Menge. */
+	public QTSet join(QTSet that) throws NullPointerException, IllegalArgumentException;
+
 	public QTSet select(int... roles) throws NullPointerException, IllegalArgumentException; // reduzieren
 
 	/** Diese Methode ist eine Abkürzung für {@link #select(int...) this.select(this.roles(names))}.
@@ -81,7 +89,7 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	/** Diese Methode ist eine Abkürzung für {@link #withNames(List) this.withNames(Arrays.asList(names))}.
 	 *
 	 * @see Arrays#asList(Object...) */
-	public QTSet withNames(String... names) throws NullPointerException, IllegalArgumentException; // umbenennen
+	public QTSet withNames(String... names) throws NullPointerException, IllegalArgumentException;  
 
 	public QTSet withNames(List<String> names) throws NullPointerException, IllegalArgumentException; // umbenennen
 
@@ -122,4 +130,8 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 * @see #role(String) */
 	public QTSet havingNodes(String name, QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
+	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(Iterable, List) this.owner().newTuples(this, this.names())}. */
+	@Override
+	public QTSet copy();
+	
 }

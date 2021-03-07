@@ -3,6 +3,7 @@ package bee.creative.qs.h2;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -115,7 +116,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 		public Names(final Names parent, final List<String> names) throws NullPointerException, IllegalArgumentException {
 			this(names);
-			if (size() != parent.size()) throw new IllegalArgumentException();
+			if (this.size() != parent.size()) throw new IllegalArgumentException();
 		}
 
 		public Names(final List<String> names) throws NullPointerException, IllegalArgumentException {
@@ -160,26 +161,26 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet copy() {
-		return this.owner.newTuples(this);
+		return this.owner.newTuples(this, this.names());
 	}
 
 	@Override
-	public QTSet order() {
+	public H2QTSet order() {
 		return new Order(this);
 	}
 
 	@Override
-	public QTSet union(final QTSet set) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet union(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		return new Set2(this.owner, H2QQ.selectUnion(this, this.owner.asQTSet(set, this.names)), this.names, this, set);
 	}
 
 	@Override
-	public QTSet except(final QTSet set) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet except(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		return new Set2(this.owner, H2QQ.selectExcept(this, this.owner.asQTSet(set, this.names)), this.names, this, set);
 	}
 
 	@Override
-	public QTSet intersect(final QTSet set) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet intersect(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		return new Set2(this.owner, H2QQ.selectIntersect(this, this.owner.asQTSet(set, this.names)), this.names, this, set);
 	}
 
@@ -209,29 +210,38 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	}
 
 	@Override
-	public QNSet nodes() {
+	public H2QNSet nodes() {
 		// TODO
 		return null;
 	}
 
 	@Override
-	public QNSet nodes(final int role) throws IllegalArgumentException {
+	public H2QNSet nodes(final int role) throws IllegalArgumentException {
 		// TODO
 		return null;
 	}
 
 	@Override
-	public QNSet nodes(final String name) throws NullPointerException, IllegalArgumentException {
+	public H2QNSet nodes(final String name) throws NullPointerException, IllegalArgumentException {
 		return this.nodes(this.role(name));
 	}
 
 	@Override
 	public H2QTSet join(final QTSet that) throws NullPointerException, IllegalArgumentException {
-		// TODO
-		return null;
+		final H2QTSet set2 = this.owner.asQTSet(that);
+		final Names names2 = set2.names;
+		final int size2 = names2.size();
+		final int[] roles2 = this.roles(names2.names);
+		final ArrayList<String> list = new ArrayList<>(this.names.size() + size2);
+		list.addAll(this.names());
+		for (int i = 0; i < size2; i++) {
+			if (roles2[i] < 0) {
+				list.add(names2.get(i));
+			}
+		}
+		final Names names = new Names(list);
+		return new Set2(this.owner, H2QQ.selectTuplesJoin(this, this.names.size(), set2, roles2), names, this, that);
 	}
-
- 
 
 	@Override
 	public H2QTSet select(final int... roles) throws NullPointerException, IllegalArgumentException {

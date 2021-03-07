@@ -110,14 +110,28 @@ public interface QS {
 	 * @return temporäre Textwertmenge. */
 	public QVSet newValues(Iterable<?> values) throws NullPointerException, IllegalArgumentException;
 
+	/** Diese Methode ist eine Abkürzung für {@link #newTuple(List) this.newTuple(Arrays.asList(nodes))}.
+	 * 
+	 * @param nodes Hyperknoten.
+	 * @return temporäres Hypertupel. */
 	public QT newTuple(QN... nodes) throws NullPointerException, IllegalArgumentException;
 
-	public QT newTuple(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
+	public QT newTuple(List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
+	/** Diese Methode ist eine Abkürzung für {@link #newTuples(QN[][], List) this.newTuples(tuples, Arrays.asList(names))}.
+	 * 
+	 * @param tuples Hyperknotentabelle.
+	 * @param names Rollennamen.
+	 * @return temporäre Hypertupelmenge. */
 	public QTSet newTuples(QN[][] tuples, String... names) throws NullPointerException, IllegalArgumentException;
 
 	public QTSet newTuples(QN[][] tuples, List<String> names) throws NullPointerException, IllegalArgumentException;
 
+	/** Diese Methode ist eine Abkürzung für {@link #newTuples(Iterable, List) this.newTuples(tuples, Arrays.asList(names))}.
+	 * 
+	 * @param tuples Hypertupel.
+	 * @param names Rollennamen.
+	 * @return temporäre Hypertupelmenge. */
 	public QTSet newTuples(Iterable<? extends QT> tuples, String... names) throws NullPointerException, IllegalArgumentException;
 
 	public QTSet newTuples(Iterable<? extends QT> tuples, List<String> names) throws NullPointerException, IllegalArgumentException;

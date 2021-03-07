@@ -154,10 +154,18 @@ public class H2QS implements QS {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. Die
-	 * {@link QTSet#names()}#na */
-	protected final H2QTSet asQTSet(final Object src, final Names names) throws NullPointerException, IllegalArgumentException {
+	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. Das {@link H2QTSet} muss die
+	 * gegebene Anzahl an {@link QTSet#names() Rollennamen} besitzen. */
+	protected final H2QTSet asQTSet(final Object src, final int size) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet res = this.asQTSet(src);
+		if (res.names.size() == size) return res;
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. Das {@link H2QTSet} muss die
+	 * gegebenen {@link QTSet#names() Rollennamen} besitzen. */
+	protected final H2QTSet asQTSet(final Object src, final Names names) throws NullPointerException, IllegalArgumentException {
+		final H2QTSet res = this.asQTSet(src, names.size());
 		if (names.names.equals(res.names.names)) return res;
 		throw new IllegalArgumentException();
 	}
@@ -385,27 +393,18 @@ public class H2QS implements QS {
 		}
 	}
 
+	final H2QT newTuple(final Object[] nodes) throws NullPointerException, IllegalArgumentException {
+		return this.newQT(this.toNodeKeys(nodes));
+	}
+
 	@Override
 	public H2QT newTuple(final QN... nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newTupleImpl(nodes);
+		return this.newTuple((Object[])nodes);
 	}
 
 	@Override
 	public H2QT newTuple(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newTupleImpl(Iterables.toArray(nodes));
-	}
-
-	final H2QT newTupleImpl(final Object[] nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newQT(this.toNodeKeys(nodes));
-	}
-
-	int[] toNodeKeys(final Object[] nodes) {
-		final int size = nodes.length;
-		final int[] keys = new int[size];
-		for (int i = 0; i < size; i++) {
-			keys[i] = this.asQN(nodes[i]).key;
-		}
-		return keys;
+		return this.newTuple(Iterables.toArray(nodes));
 	}
 
 	@Override
@@ -429,11 +428,21 @@ public class H2QS implements QS {
 	public H2QTSet newTuples(Iterable<? extends QT> tuples, String... names) throws NullPointerException, IllegalArgumentException {
 		return newTuples(tuples, Arrays.asList(names));
 	}
-	
+
 	@Override
 	public H2QTSet newTuples(final Iterable<? extends QT> tuples, final List<String> names) throws NullPointerException, IllegalArgumentException {
+		Names names2 = new Names(names);
+		int size = names2.size();
+		if (tuples instanceof H2QTSet) {
+			H2QTSet set = asQTSet(tuples, size);
+			final int key = this.keyImpl(this.createTempTuplesKey);
+			this.execImpl(H2QQ.createTempTuples(key, size));
+			this.execImpl(H2QQ.insertTempTuples(key, size, set));
+			return new H2QTSet.Temp(this, names2, key);
+
+		}
 		// TODO kopie konstruktor mit spaltenerkennung
-		
+
 		return this.newTuplesImpl(new Names(names), Iterables.translate(tuples, new Getter<QT, int[]>() {
 
 			@Override
@@ -444,30 +453,32 @@ public class H2QS implements QS {
 		}));
 	}
 
-	H2QTSet newTuples(final H2QTSet set) throws NullPointerException, IllegalArgumentException {
-		final int key = this.keyImpl(this.createTempTuplesKey);
-		this.execImpl(H2QQ.createTempTuples(key, set.names.size()));
-		this.execImpl(H2QQ.insertTempTuples(key, set));
-		return new H2QTSet.Temp(this, set.names, key);
+	int[] toNodeKeys(final Object[] nodes) {
+		final int size = nodes.length;
+		final int[] keys = new int[size];
+		for (int i = 0; i < size; i++) {
+			keys[i] = this.asQN(nodes[i]).key;
+		}
+		return keys;
 	}
 
 	H2QTSet newTuplesImpl(final Names names, final Iterable<int[]> tuples) throws NullPointerException, IllegalArgumentException {
 		try {
 			int size = names.size();
 			final int key2 = this.keyImpl(this.createTempTuplesKey);
-			this.execImpl(H2QQ.createTempTuples(key2,size));
+			this.execImpl(H2QQ.createTempTuples(key2, size));
 			try (final PreparedStatement stmt = this.conn.prepareStatement(H2QQ.insertTempTuples(key2, size))) {
 				for (final int[] item: tuples) {
-					if(item.length!=size)throw new IllegalArgumentException();
-					for(int i=0;i<size;i++)
-					stmt.setInt(i+1, item[i]);
+					if (item.length != size) throw new IllegalArgumentException();
+					for (int i = 0; i < size; i++)
+						stmt.setInt(i + 1, item[i]);
 					stmt.addBatch();
 				}
 				stmt.executeBatch();
 			}
 			final int key = this.keyImpl(this.createTempTuplesKey);
-			this.execImpl(H2QQ.createTempTuples(key,size));
-			this.execImpl(H2QQ.insertTempTuples(key, key2, size));
+			this.execImpl(H2QQ.createTempTuples(key, size));
+			this.execImpl(H2QQ.insertTempTuples(key, size, key2));
 			this.execImpl(H2QQ.deleteTempTuples(key2));
 			return new H2QTSet.Temp(this, names, key);
 		} catch (final SQLException cause) {
