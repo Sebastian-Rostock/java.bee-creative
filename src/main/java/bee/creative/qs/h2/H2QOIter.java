@@ -13,7 +13,7 @@ import bee.creative.util.AbstractIterator;
  * @param <GI> Typ der Elemente. */
 abstract class H2QOIter<GI, GISet extends H2QOSet<?, ?>> extends AbstractIterator<GI> implements QO {
 
-	protected final GISet owner;
+	final GISet owner;
 
 	final ResultSet item;
 
@@ -23,7 +23,7 @@ abstract class H2QOIter<GI, GISet extends H2QOSet<?, ?>> extends AbstractIterato
 		this.owner = owner;
 		try {
 			final Statement stmt = owner.owner.conn.createStatement();
-			this.item = stmt.executeQuery(owner.select);
+			this.item = stmt.executeQuery("select * from " + owner.name);
 			this.next = this.item.next();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);

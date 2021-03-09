@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.UseToString;
 import bee.creative.lang.Strings;
 import bee.creative.qs.QN;
 import bee.creative.qs.QT;
@@ -14,7 +15,7 @@ import bee.creative.util.Iterators;
 /** Diese Klasse implementiert ein {@link QT} mit Bezug zu einer Datenbank.
  *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class H2QT implements QT {
+public final class H2QT implements QT, UseToString {
 
 	final H2QS owner;
 

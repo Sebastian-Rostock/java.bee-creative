@@ -5,16 +5,6 @@ package bee.creative.qs;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QESet extends QXSet<QE, QESet> {
 
-	/** Diese Methode gibt eine Mengensicht auf alle {@link QN Hyperknoten} zurück, die in den Hyperkanten dieser Menge aufgeführten sind. Sie ist damit eine
-	 * Abkürzung für {@code this.contexts().union(this.predicates()).union(this.subjects()).union(this.objects())}.
-	 *
-	 * @see #contexts()
-	 * @see #predicates()
-	 * @see #subjects()
-	 * @see #objects()
-	 * @return Hyperknoten der Hyperkanten dieser Menge. */
-	public QNSet nodes();
-
 	/** Diese Methode gibt eine Mengensicht auf alle {@link QN Kontextknoten} zurück, die in den Hyperkanten dieser Menge {@link QE#context() aufgeführten} sind.
 	 *
 	 * @return Kontextknoten der Hyperkanten dieser Menge. */
@@ -35,6 +25,8 @@ public interface QESet extends QXSet<QE, QESet> {
 	 *
 	 * @return Objektknoten der Hyperkanten dieser Menge. */
 	public QNSet objects();
+
+	public QTSet tuples(String context, String predicate, String subject, String object) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode speichert alle in dieser Menge enthaltenen Hyperkanten im {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn dadurch
 	 * der Inhalt des Graphspeichers verändert wurde.

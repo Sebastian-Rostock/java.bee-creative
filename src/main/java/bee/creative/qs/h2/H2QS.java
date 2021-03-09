@@ -17,7 +17,6 @@ import bee.creative.qs.QT;
 import bee.creative.qs.QTSet;
 import bee.creative.qs.h2.H2QTSet.Names;
 import bee.creative.util.Getter;
-import bee.creative.util.Iterable2;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert einen {@link QS Graphspeicher}, dessen Hyperkanten und Textwerte in einer Datenbank (vorzugsweise embedded H2) gespeichert sind.
@@ -35,7 +34,7 @@ public class H2QS implements QS {
 	/** Dieses Feld speichert die Datenbankverbindung. */
 	final Connection conn;
 
-	/** Dieses Feld speichert die in {@link #execImpl(String)} wiederverwendete Anweisung. */
+	/** Dieses Feld speichert die in {@link #exec(String)} wiederverwendete Anweisung. */
 	final Statement exec;
 
 	final PreparedStatement selectSaveEdge;
@@ -54,15 +53,9 @@ public class H2QS implements QS {
 
 	final PreparedStatement deleteSaveNode;
 
-	final PreparedStatement createSaveNodeKey;
+	final PreparedStatement createNode;
 
-	final PreparedStatement createTempEdgesKey;
-
-	final PreparedStatement createTempNodesKey;
-
-	final PreparedStatement createTempValuesKey;
-
-	final PreparedStatement createTempTuplesKey;
+	final PreparedStatement createTempKey;
 
 	/** Dieser Konstruktor initialisiert die Datenbankverbindung und erstellt bei Bedarf das Tabellenschema.
 	 *
@@ -70,20 +63,25 @@ public class H2QS implements QS {
 	public H2QS(final Connection conn) throws SQLException, NullPointerException {
 		this.conn = conn;
 		this.exec = conn.createStatement();
-		this.execImpl(H2QQ.createAll());
-		this.selectSaveEdge = this.conn.prepareStatement(H2QQ.selectSaveEdge());
-		this.selectSaveNode = this.conn.prepareStatement(H2QQ.selectSaveNode());
-		this.selectSaveValue = this.conn.prepareStatement(H2QQ.selectSaveValue());
-		this.insertSaveEdge = this.conn.prepareStatement(H2QQ.insertSaveEdge());
-		this.insertSaveNode = this.conn.prepareStatement(H2QQ.insertSaveNode());
-		this.deleteSaveEdge = this.conn.prepareStatement(H2QQ.deleteSaveEdge());
-		this.deleteSaveEdges = this.conn.prepareStatement(H2QQ.deleteSaveEdges());
-		this.deleteSaveNode = this.conn.prepareStatement(H2QQ.deleteSaveNode());
-		this.createSaveNodeKey = this.conn.prepareStatement(H2QQ.createSaveNodeKey());
-		this.createTempEdgesKey = this.conn.prepareStatement(H2QQ.createTempEdgesKey());
-		this.createTempNodesKey = this.conn.prepareStatement(H2QQ.createTempNodesKey());
-		this.createTempValuesKey = this.conn.prepareStatement(H2QQ.createTempValuesKey());
-		this.createTempTuplesKey = this.conn.prepareStatement(H2QQ.createTempTuplesKey());
+		this.exec("" //
+			+ "create table if not exists QN (N int not null, V varchar(1G) not null, primary key (N));" //
+			+ "create table if not exists QE (C int not null, P int not null, S int not null, O int not null, primary key (C, P, S, O));" //
+			+ "create index if not exists QE_INDEX_CPO on QE (C, P, O, S);" //
+			+ "create index if not exists QE_INDEX_CSP on QE (C, S, P, O);" //
+			+ "create index if not exists QE_INDEX_COP on QE (C, O, P, S);" //
+			+ "create unique index if not exists QN_INDEX_V on QN (V);" //
+			+ "create sequence if not exists QN_SEQUENCE minvalue 1 maxvalue 1000000000000000 nocycle;" //
+			+ "create sequence if not exists QT_SEQUENCE minvalue 1 maxvalue 1000000000000000 cycle");
+		this.selectSaveEdge = this.conn.prepareStatement("select top 1 * from QE where C=? and P=? and S=? and O=?");
+		this.selectSaveNode = this.conn.prepareStatement("select N from QN where V=?");
+		this.selectSaveValue = this.conn.prepareStatement("select V from QN where N=?");
+		this.insertSaveEdge = this.conn.prepareStatement("merge into QE (C, P, S, O) values (?, ?, ?, ?)");
+		this.insertSaveNode = this.conn.prepareStatement("insert into QN (N, V) values (?, ?)");
+		this.deleteSaveEdge = this.conn.prepareStatement("delete from QE where C=? and P=? and S=? and O=?");
+		this.deleteSaveEdges = this.conn.prepareStatement("delete from QE where C=?1 or P=?1 or S=?1 or O=?1");
+		this.deleteSaveNode = this.conn.prepareStatement("delete from QN where N=?");
+		this.createNode = this.conn.prepareStatement("select next value for QN_SEQUENCE");
+		this.createTempKey = this.conn.prepareStatement("select next value for QT_SEQUENCE");
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QE} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
@@ -166,7 +164,7 @@ public class H2QS implements QS {
 	 * gegebenen {@link QTSet#names() Rollennamen} besitzen. */
 	protected final H2QTSet asQTSet(final Object src, final Names names) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet res = this.asQTSet(src, names.size());
-		if (names.names.equals(res.names.names)) return res;
+		if (names.list.equals(res.names.list)) return res;
 		throw new IllegalArgumentException();
 	}
 
@@ -174,8 +172,21 @@ public class H2QS implements QS {
 		return new H2QE(this, context, predicate, subject, object);
 	}
 
+	int newQN() {
+		return this.newQK(this.createNode);
+	}
+
 	protected final H2QN newQN(final int key) {
 		return new H2QN(this, key);
+	}
+
+	int[] newQT(final Object[] nodes) {
+		final int size = nodes.length;
+		final int[] keys = new int[size];
+		for (int i = 0; i < size; i++) {
+			keys[i] = this.asQN(nodes[i]).key;
+		}
+		return keys;
 	}
 
 	protected final H2QT newQT(final int... keys) {
@@ -184,7 +195,7 @@ public class H2QS implements QS {
 
 	/** Diese Methode führt die gegebene Anfrage {@link PreparedStatement#executeQuery() aus} und gibt den {@link ResultSet#getInt(int) Zahlenwert} des ersten
 	 * Ergebnisses zurück. */
-	final int keyImpl(final PreparedStatement stmt) throws NullPointerException, IllegalStateException {
+	final int newQK(final PreparedStatement stmt) throws NullPointerException, IllegalStateException {
 		try (final ResultSet rset = stmt.executeQuery()) {
 			if (rset.next()) return rset.getInt(1);
 		} catch (final SQLException cause) {
@@ -195,7 +206,7 @@ public class H2QS implements QS {
 
 	/** Diese Methode führt die gegebene Anfrage {@link Statement#executeUpdate(String) aus} und gibt nur dann {@code true} zurück, wenn dadurch Tabellenzeilen
 	 * verändert wurden. */
-	final boolean execImpl(final String query) {
+	final boolean exec(final String query) {
 		try {
 			return this.exec.executeUpdate(query) != 0;
 		} catch (final SQLException cause) {
@@ -205,12 +216,13 @@ public class H2QS implements QS {
 
 	/** Diese Methode leert den Graphspeicher. */
 	public void reset() throws SQLException {
-		this.execImpl(H2QQ.deleteSave());
+		this.exec("delete from QN;delete from QE");
 	}
 
 	/** Diese Methode entfernt alle Hyperknoten mit Textwert, die nich in Hyperkanten verwendet werden. */
 	public void compact() {
-		this.nodes().except(this.edges().nodes()).popAll();
+		final H2QESet edges = this.edges();
+		this.nodes().except(edges.contexts().union(edges.predicates()).union(edges.subjects()).union(edges.objects())).popAll();
 	}
 
 	/** Diese Methode gibt die im Konstruktor übergebene Datenbankverbindung zurück. */
@@ -235,7 +247,7 @@ public class H2QS implements QS {
 
 	@Override
 	public H2QE newEdge() {
-		final int key = this.keyImpl(this.createSaveNodeKey);
+		final int key = this.newQN();
 		return this.newQE(key, key, key, key);
 	}
 
@@ -265,15 +277,13 @@ public class H2QS implements QS {
 		try {
 			if (edges instanceof H2QESet) {
 				final H2QESet set = this.asQESet(edges);
-				final int key = this.keyImpl(this.createTempEdgesKey);
-				this.execImpl(H2QQ.createTempEdges(key));
-				this.execImpl(H2QQ.insertTempEdges(key, set));
-				this.execImpl(H2QQ.createTempEdgesIndex(key));
-				return new H2QESet.Temp(this, key);
+				if (set instanceof H2QESet.Temp) return set;
+				final H2QESet.Temp res = new H2QESet.Temp(this);
+				this.exec("insert into " + res.name + " select * from " + set.name);
+				return res.index();
 			}
-			final int key2 = this.keyImpl(this.createTempEdgesKey);
-			this.execImpl(H2QQ.createTempEdges(key2));
-			try (final PreparedStatement stmt = this.conn.prepareStatement(H2QQ.insertTempEdges(key2))) {
+			final H2QESet.Temp buf = new H2QESet.Temp(this);
+			try (final PreparedStatement stmt = this.conn.prepareStatement("insert into " + buf.name + " (C, P, S, O) values (?, ?, ?, ?)")) {
 				for (final Object item: edges) {
 					final H2QE edge = this.asQE(item);
 					stmt.setInt(1, edge.context);
@@ -284,12 +294,9 @@ public class H2QS implements QS {
 				}
 				stmt.executeBatch();
 			}
-			final int key = this.keyImpl(this.createTempEdgesKey);
-			this.execImpl(H2QQ.createTempEdges(key));
-			this.execImpl(H2QQ.insertTempEdges(key, key2));
-			this.execImpl(H2QQ.deleteTempEdges(key2));
-			this.execImpl(H2QQ.createTempEdgesIndex(key));
-			return new H2QESet.Temp(this, key);
+			final H2QESet.Temp res = new H2QESet.Temp(this);
+			this.exec("insert into " + res.name + " select distinct * from " + buf.name);
+			return res.index();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -297,7 +304,7 @@ public class H2QS implements QS {
 
 	@Override
 	public H2QN newNode() {
-		return this.newQN(this.keyImpl(this.createSaveNodeKey));
+		return this.newQN(this.newQN());
 	}
 
 	@Override
@@ -309,7 +316,7 @@ public class H2QS implements QS {
 			final ResultSet res = stmt.executeQuery();
 			if (res.next()) return this.newQN(res.getInt(1));
 			final PreparedStatement stmt2 = this.insertSaveNode;
-			final int key = this.keyImpl(this.createSaveNodeKey);
+			final int key = this.newQN();
 			stmt2.setInt(1, key);
 			stmt2.setString(2, string);
 			stmt2.executeUpdate();
@@ -329,27 +336,22 @@ public class H2QS implements QS {
 		try {
 			if (nodes instanceof H2QNSet) {
 				final H2QNSet set = this.asQNSet(nodes);
-				final int key = this.keyImpl(this.createTempNodesKey);
-				this.execImpl(H2QQ.createTempNodes(key));
-				this.execImpl(H2QQ.insertTempNodes(key, set));
-				this.execImpl(H2QQ.createTempNodesIndex(key));
-				return new H2QNSet.Temp(this, key);
+				if (set instanceof H2QNSet.Temp) return set;
+				final H2QNSet.Temp res = new H2QNSet.Temp(this);
+				this.exec("insert into " + res.name + " select * from " + set.name);
+				return res.index();
 			}
-			final int key2 = this.keyImpl(this.createTempNodesKey);
-			this.execImpl(H2QQ.createTempNodes(key2));
-			try (final PreparedStatement stmt = this.conn.prepareStatement(H2QQ.insertTempNodes(key2))) {
+			final H2QNSet.Temp buf = new H2QNSet.Temp(this);
+			try (final PreparedStatement stmt = this.conn.prepareStatement("insert into " + buf.name + " (N) values (?)")) {
 				for (final Object item: nodes) {
 					stmt.setInt(1, this.asQN(item).key);
 					stmt.addBatch();
 				}
 				stmt.executeBatch();
 			}
-			final int key = this.keyImpl(this.createTempNodesKey);
-			this.execImpl(H2QQ.createTempNodes(key));
-			this.execImpl(H2QQ.insertTempNodes(key, key2));
-			this.execImpl(H2QQ.deleteTempNodes(key2));
-			this.execImpl(H2QQ.createTempNodesIndex(key));
-			return new H2QNSet.Temp(this, key);
+			final H2QNSet.Temp res = new H2QNSet.Temp(this);
+			this.exec("insert into " + res.name + " select distinct * from " + buf.name);
+			return res.index();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -366,28 +368,23 @@ public class H2QS implements QS {
 			if (values instanceof H2QVSet) {
 				final H2QVSet set = (H2QVSet)values;
 				if (set.owner == this) {
-					final int key = this.keyImpl(this.createTempValuesKey);
-					this.execImpl(H2QQ.createTempValues(key));
-					this.execImpl(H2QQ.insertTempValues(key, set));
-					this.execImpl(H2QQ.createTempValuesIndex(key));
-					return new H2QVSet.Temp(this, key);
+					if (set instanceof H2QVSet.Temp) return set;
+					final H2QVSet.Temp res = new H2QVSet.Temp(this);
+					this.exec("insert into " + res.name + " select V from " + set.name);
+					return res.index();
 				}
 			}
-			final int key2 = this.keyImpl(this.createTempValuesKey);
-			this.execImpl(H2QQ.createTempValues(key2));
-			try (final PreparedStatement stmt = this.conn.prepareStatement(H2QQ.insertTempValues(key2))) {
+			final H2QVSet.Temp buf = new H2QVSet.Temp(this);
+			try (final PreparedStatement stmt = this.conn.prepareStatement("insert into " + buf.name + " (V) values (?)")) {
 				for (final Object item: values) {
 					stmt.setString(1, this.asQV(item));
 					stmt.addBatch();
 				}
 				stmt.executeBatch();
 			}
-			final int key = this.keyImpl(this.createTempValuesKey);
-			this.execImpl(H2QQ.createTempValues(key));
-			this.execImpl(H2QQ.insertTempValues(key, key2));
-			this.execImpl(H2QQ.deleteTempValues(key2));
-			this.execImpl(H2QQ.createTempValuesIndex(key));
-			return new H2QVSet.Temp(this, key);
+			final H2QVSet.Temp res = new H2QVSet.Temp(this);
+			this.exec("insert into " + res.name + " select distinct * from " + buf.name);
+			return res.index();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -395,91 +392,86 @@ public class H2QS implements QS {
 
 	@Override
 	public H2QT newTuple(final QN... nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newQT(this.toNodeKeys(nodes));
+		return this.newQT(this.newQT(nodes));
 	}
 
 	@Override
 	public H2QT newTuple(final List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newQT(this.toNodeKeys(nodes.toArray()));
+		return this.newQT(this.newQT(nodes.toArray()));
+	}
+
+	H2QTSet newTuples(final Iterable<int[]> tuples, final Names names) throws NullPointerException, IllegalArgumentException {
+		try {
+			final int size = names.size();
+			final H2QTSet.Temp buf = new H2QTSet.Temp(this, names);
+			final StringBuilder sql = new StringBuilder(35 + (size * 8));
+			sql.append("insert into ").append(buf.name).append(" (C0");
+			for (int i = 1; i < size; i++) {
+				sql.append(", C").append(i);
+			}
+			sql.append(") values (?");
+			for (int i = 1; i < size; i++) {
+				sql.append(", ?");
+			}
+			sql.append(")");
+			try (final PreparedStatement stmt = this.conn.prepareStatement(sql.toString())) {
+				for (final int[] item: tuples) {
+					if (item.length != size) throw new IllegalArgumentException();
+					for (int i = 0; i < size; i++) {
+						stmt.setInt(i + 1, item[i]);
+					}
+					stmt.addBatch();
+				}
+				stmt.executeBatch();
+			}
+			final H2QTSet.Temp res = new H2QTSet.Temp(this, names);
+			this.exec("insert into " + res.name + " select distinct * from " + buf.name);
+			return res;
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override
-	public H2QTSet newTuples(QN[][] tuples, String... names) throws NullPointerException, IllegalArgumentException {
-		return newTuples(tuples, Arrays.asList(names));
+	public H2QTSet newTuples(final QN[][] tuples, final String... names) throws NullPointerException, IllegalArgumentException {
+		return this.newTuples(tuples, Arrays.asList(names));
 	}
 
 	@Override
 	public H2QTSet newTuples(final QN[][] tuples, final List<String> names) throws NullPointerException, IllegalArgumentException {
-		return this.newTuplesImpl(new Names(names), Iterables.translate(Arrays.asList(tuples), new Getter<QN[], int[]>() {
+		return this.newTuples(Iterables.translate(Arrays.asList(tuples), new Getter<QN[], int[]>() {
 
 			@Override
 			public int[] get(final QN[] item) {
-				return H2QS.this.toNodeKeys(item);
+				return H2QS.this.newQT(item);
 			}
 
-		}));
+		}), new Names(names));
 	}
 
 	@Override
-	public H2QTSet newTuples(Iterable<? extends QT> tuples, String... names) throws NullPointerException, IllegalArgumentException {
-		return newTuples(tuples, Arrays.asList(names));
+	public H2QTSet newTuples(final Iterable<? extends QT> tuples, final String... names) throws NullPointerException, IllegalArgumentException {
+		return this.newTuples(tuples, Arrays.asList(names));
 	}
 
 	@Override
 	public H2QTSet newTuples(final Iterable<? extends QT> tuples, final List<String> names) throws NullPointerException, IllegalArgumentException {
-		Names names2 = new Names(names);
-		int size = names2.size();
+		final Names nam = new Names(names);
 		if (tuples instanceof H2QTSet) {
-			H2QTSet set = asQTSet(tuples, size);
-			final int key = this.keyImpl(this.createTempTuplesKey);
-			this.execImpl(H2QQ.createTempTuples(key, size));
-			this.execImpl(H2QQ.insertTempTuples(key, size, set));
-			return new H2QTSet.Temp(this, names2, key);
-
+			final H2QTSet set = this.asQTSet(tuples, nam.size());
+			if ((set instanceof H2QTSet.Temp) && set.names.list.equals(nam.list)) return set;
+			final H2QTSet.Temp res = new H2QTSet.Temp(this, nam);
+			this.exec("insert into " + res.name + " select * from " + set.name);
+			return res;
 		}
-		// TODO kopie konstruktor mit spaltenerkennung
-
-		return this.newTuplesImpl(new Names(names), Iterables.translate(tuples, new Getter<QT, int[]>() {
+		return this.newTuples(Iterables.translate(tuples, new Getter<QT, int[]>() {
 
 			@Override
 			public int[] get(final QT item) {
 				return H2QS.this.asQT(item).keys;
 			}
 
-		}));
-	}
-
-	int[] toNodeKeys(final Object[] nodes) {
-		final int size = nodes.length;
-		final int[] keys = new int[size];
-		for (int i = 0; i < size; i++) {
-			keys[i] = this.asQN(nodes[i]).key;
-		}
-		return keys;
-	}
-
-	H2QTSet newTuplesImpl(final Names names, final Iterable<int[]> tuples) throws NullPointerException, IllegalArgumentException {
-		try {
-			int size = names.size();
-			final int key2 = this.keyImpl(this.createTempTuplesKey);
-			this.execImpl(H2QQ.createTempTuples(key2, size));
-			try (final PreparedStatement stmt = this.conn.prepareStatement(H2QQ.insertTempTuples(key2, size))) {
-				for (final int[] item: tuples) {
-					if (item.length != size) throw new IllegalArgumentException();
-					for (int i = 0; i < size; i++)
-						stmt.setInt(i + 1, item[i]);
-					stmt.addBatch();
-				}
-				stmt.executeBatch();
-			}
-			final int key = this.keyImpl(this.createTempTuplesKey);
-			this.execImpl(H2QQ.createTempTuples(key, size));
-			this.execImpl(H2QQ.insertTempTuples(key, size, key2));
-			this.execImpl(H2QQ.deleteTempTuples(key2));
-			return new H2QTSet.Temp(this, names, key);
-		} catch (final SQLException cause) {
-			throw new IllegalStateException(cause);
-		}
+		}), nam);
 	}
 
 	@Override

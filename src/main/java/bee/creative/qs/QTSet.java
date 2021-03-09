@@ -20,15 +20,15 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	/** Diese Methode liefert die {@link #role(String) Positionen}, die die gegebenen Rollennamen in der {@link #names() Liste der Rollennamen} haben. */
 	public int[] roles(List<String> names) throws NullPointerException;
 
+	/** Diese Methode liefert den Namen der gegebenen Rolle und ist effektiv eine Abkürzung für {@link #names() this.names().get(role)}. */
+	public String name(int role) throws IllegalArgumentException;
+
+	public String[] names(int... roles) throws IllegalArgumentException;
+
 	/** Diese Methode liefert die Namen der {@link QT#get(int) Rollen}, über welche die Hypertupel ihre Hyperknoten referenzieren.
 	 *
 	 * @return Rollennamen. */
 	public List<String> names();
-
-	/** Diese Methode gibt eine Mengensicht auf alle Hyperknoten zurück, die in den Hypertupel dieser Menge {@link QT#get(int) aufgeführten} sind.
-	 *
-	 * @return Hyperknoten der Hypertupel dieser Menge. */
-	public QNSet nodes();
 
 	/** Diese Methode gibt eine Mengensicht auf alle Hyperknoten zurück, die in den Hypertupel dieser Menge über die gegebene {@link QT#get(int) Rolle}
 	 * referenziert werden.
@@ -51,7 +51,12 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 * @return {@code CROSS JOIN} bzw. {@code NATURAL JOIN} von {@code this} und {@code that}. */
 	public QTSet join(QTSet that) throws NullPointerException, IllegalArgumentException;
 
-	public QTSet select(int... roles) throws NullPointerException, IllegalArgumentException; // reduzieren
+	/** Diese Methode gibt eine Mengensicht auf einen Auszug der Hypertupel dieser Menge zurück. Die Hypertupel in der gelieferten Menge enthalten dabei nur noch
+	 * die Hyperknoten der gegebenen Rollen. Die {@link #names() Rollennamen} der gegebenen Rollen bleiben erhalten.
+	 * 
+	 * @param roles Rollen der Hyperknoten.
+	 * @return Hypertupel auf die gegebenen Rollen projiziert (reduziert und/oder umgeordnet). */
+	public QTSet select(int... roles) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #select(int...) this.select(this.roles(names))}.
 	 *
@@ -101,12 +106,6 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 * @return Mengensicht mit neuen Rollennamen. */
 	public QTSet withNames(List<String> names) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die auf den gegebenen Hyperknoten verweisen.
-	 *
-	 * @param node Hyperknotenfilter.
-	 * @return Hypertupel mit den gegebenen Hyperknoten. */
-	public QTSet havingNode(QN node) throws NullPointerException, IllegalArgumentException;
-
 	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die über die gegebene {@link QT#get(int) Rolle} auf den gegebenen Hyperknoten verweisen.
 	 *
 	 * @param role Rolle des Hyperknoten.
@@ -118,12 +117,6 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 *
 	 * @see #role(String) */
 	public QTSet havingNode(String name, QN node) throws NullPointerException, IllegalArgumentException;
-
-	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die auf Hyperknoten der gegebenen Menge verweisen.
-	 *
-	 * @param nodes Hyperknotenfilter.
-	 * @return Hypertupel mit den gegebenen Hyperknoten. */
-	public QTSet havingNodes(QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hypertupel zurück, die über die gegebene {@link QT#get(int) Rolle} auf einen Hyperknoten der gegebenen Menge
 	 * verweisen.

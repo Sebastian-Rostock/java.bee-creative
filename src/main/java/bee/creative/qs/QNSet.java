@@ -13,10 +13,12 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	@Override
 	public boolean popAll();
 
-	/** Diese Methode gibt eine Mengensichtp auf alle Textwerte zurück, die in den Hyperknoten dieser Menge {@link QN#value() aufgeführt} sind.
+	/** Diese Methode gibt eine Mengensicht auf alle Textwerte zurück, die in den Hyperknoten dieser Menge {@link QN#value() aufgeführt} sind.
 	 *
 	 * @return Textwerte der Hyperknoten dieser Menge. */
 	public QVSet values();
+
+	public QTSet tuples(String name) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten zurück, die einen {@link QN#value() Textwert} besitzen. Die Mengensicht entspricht
 	 * {@link #values() this.values().nodes()}.

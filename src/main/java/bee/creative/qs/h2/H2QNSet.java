@@ -5,7 +5,9 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
+import bee.creative.qs.QTSet;
 import bee.creative.qs.QVSet;
+import bee.creative.qs.h2.H2QTSet.Names;
 import bee.creative.util.Filter;
 import bee.creative.util.Iterables;
 
@@ -52,7 +54,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	static class Save extends H2QNSet {
 
 		public Save(final H2QS owner) {
-			super(owner, H2QQ.selectSaveNodes());
+			super(owner, "select N from QN");
 		}
 
 		@Override
@@ -64,16 +66,9 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	static class Temp extends H2QNSet {
 
-		final int key;
-
-		public Temp(final H2QS owner, final int key) {
-			super(owner, H2QQ.selectTempNodes(key));
-			this.key = key;
-		}
-
-		@Override
-		protected void finalize() throws Throwable {
-			this.owner.execImpl(H2QQ.deleteTempNodes(this.key));
+		public Temp(final H2QS owner) {
+			super(owner, null);
+			this.owner.exec("create cached local temporary table " + this.name + " (N int not null)");
 		}
 
 		@Override
@@ -81,12 +76,17 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 			return this;
 		}
 
+		public Temp index() {
+			this.owner.exec("create index " + this.name + "_INDEX_N on " + this.name + " (N)");
+			return this;
+		}
+
 	}
 
 	static class Order extends Set1 {
 
-		public Order(final H2QNSet set) {
-			super(set.owner, H2QQ.selectNodesOrder(set), set);
+		public Order(final H2QNSet that) {
+			super(that.owner, "table " + that.name + " order by N", that);
 		}
 
 		@Override
@@ -102,23 +102,23 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	@Override
 	public boolean popAll() {
-		final H2QS owner = this.owner;
-		final H2QNSet set = this.copy();
-		return false //
-			| owner.execImpl(H2QQ.deleteSaveValuesHavingNodes(set)) //
-			| owner.execImpl(H2QQ.deleteSaveEdgesHavingContexts(set)) //
-			| owner.execImpl(H2QQ.deleteSaveEdgesHavingPredicates(set)) //
-			| owner.execImpl(H2QQ.deleteSaveEdgesHavingSubjects(set)) //
-			| owner.execImpl(H2QQ.deleteSaveEdgesHavingObjects(set));
+		final H2QNSet that = this.copy();
+		return this.owner.exec("delete from QN where N in (table " + that.name + ")")
+			| this.owner.exec("delete from QE where exists (select N from " + that.name + " where C=N or P=N or S=N or O=N)");
 	}
 
 	@Override
 	public H2QVSet values() {
-		return new H2QVSet.Set1(this.owner, H2QQ.selectSaveValuesHavingNodes(this), this);
+		return new H2QVSet.Set1(this.owner, "select V from QN where N in (table " + this.name + ")", this);
 	}
 
 	@Override
-	public H2QNSet having(Filter<? super QN> filter) throws NullPointerException {
+	public QTSet tuples(final String name) throws NullPointerException, IllegalArgumentException {
+		return new H2QTSet.Set1(this.owner, new Names(name), "select N C0 from " + this.name, this);
+	}
+
+	@Override
+	public H2QNSet having(final Filter<? super QN> filter) throws NullPointerException {
 		return this.owner.newNodes(Iterables.filter(this, filter));
 	}
 
@@ -149,17 +149,20 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	@Override
 	public H2QNSet union(final QNSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectUnion(this, this.owner.asQNSet(set)), this, set);
+		final H2QNSet that = this.owner.asQNSet(set);
+		return new Set2(this.owner, "(table " + this.name + ") union (table " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QNSet except(final QNSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectExcept(this, this.owner.asQNSet(set)), this, set);
+		final H2QNSet that = this.owner.asQNSet(set);
+		return new Set2(this.owner, "(table " + this.name + ") except (table " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QNSet intersect(final QNSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectIntersect(this, this.owner.asQNSet(set)), this, set);
+		final H2QNSet that = this.owner.asQNSet(set);
+		return new Set2(this.owner, "(table " + this.name + ") intersect (table " + that.name + ")", this, that);
 	}
 
 	@Override

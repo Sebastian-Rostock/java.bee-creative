@@ -50,7 +50,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	static class Save extends H2QVSet {
 
 		public Save(final H2QS owner) {
-			super(owner, H2QQ.selectSaveValues());
+			super(owner, "select V from QN");
 		}
 
 		@Override
@@ -62,16 +62,9 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	static class Temp extends H2QVSet {
 
-		final int key;
-
-		public Temp(final H2QS owner, final int key) {
-			super(owner, H2QQ.selectTempValues(key));
-			this.key = key;
-		}
-
-		@Override
-		protected void finalize() throws Throwable {
-			this.owner.execImpl(H2QQ.deleteTempValues(this.key));
+		public Temp(final H2QS owner) {
+			super(owner, null);
+			this.owner.exec("create cached local temporary table " + this.name + " (V varchar(1G) not null)");
 		}
 
 		@Override
@@ -79,12 +72,17 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 			return this;
 		}
 
+		public Temp index() {
+			this.owner.exec("create index if not exists " + this.name + "_INDEX_V on " + this.name + " (V)");
+			return this;
+		}
+
 	}
 
 	static class Order extends Set1 {
 
-		public Order(final H2QVSet set) {
-			super(set.owner, H2QQ.selectValuesOrder(set), set);
+		public Order(final H2QS owner, final String select, final Object set1) {
+			super(owner, select, set1);
 		}
 
 		@Override
@@ -100,12 +98,12 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QNSet nodes() {
-		return new H2QNSet.Set1(this.owner, H2QQ.selectSaveNodesHavingValues(this), this);
+		return new H2QNSet.Set1(this.owner, "select N from QN where V in (table " + this.name + ")", this);
 	}
 
 	@Override
 	public boolean popAll() {
-		return this.owner.execImpl(H2QQ.deleteSaveNodesHavingValues(this));
+		return this.owner.exec("delete from QN where V in (table " + this.name + ")");
 	}
 
 	@Override
@@ -125,22 +123,25 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QVSet order() {
-		return new Order(this);
+		return new Order(this.owner, "table " + this.name + " order by V", this);
 	}
 
 	@Override
 	public H2QVSet union(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectUnion(this, this.owner.asQVSet(set)), this, set);
+		final H2QVSet that = this.owner.asQVSet(set);
+		return new Set2(this.owner, "(table " + this.name + ") union (table " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QVSet except(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectExcept(this, this.owner.asQVSet(set)), this, set);
+		final H2QVSet that = this.owner.asQVSet(set);
+		return new Set2(this.owner, "(table " + this.name + ") except (table " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QVSet intersect(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		return new Set2(this.owner, H2QQ.selectIntersect(this, this.owner.asQVSet(set)), this, set);
+		final H2QVSet that = this.owner.asQVSet(set);
+		return new Set2(this.owner, "(table " + this.name + ") intersect (table " + that.name + ")", this, that);
 	}
 
 	@Override
