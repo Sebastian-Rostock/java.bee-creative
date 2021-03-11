@@ -17,10 +17,10 @@ public interface QOSet<GI, GISet> extends QO, Iterable<GI> {
 	 * @return Objektanzahl. */
 	public long size();
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Menge nicht leer ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Menge leer ist.
 	 *
-	 * @return {@code true}, wenn der {@link #iterator()} mindestend ein Objekt liefert bzw. {@code false} sonst. */
-	public boolean hasAny();
+	 * @return {@code true}, nur wenn der {@link #iterator()} kein Objekt liefert. */
+	public boolean isEmpty();
 
 	/** Diese Methode gibt eine temporäre Kopie dieser Menge zurück.
 	 *
@@ -32,7 +32,7 @@ public interface QOSet<GI, GISet> extends QO, Iterable<GI> {
 	 * @return Geordnete Menge. */
 	public GISet order();
 
-	/** Diese Methode gibt eine temporäre Menge der Objekte zurück, die vom gegebenen Filter {@link Filter#accept(Object) akzeptiert} werden.
+	/** Diese Methode gibt eine temporäre Kopie der Menge der Objekte zurück, die vom gegebenen Filter {@link Filter#accept(Object) akzeptiert} werden.
 	 *
 	 * @param filter Filter.
 	 * @return Gefilterte Menge. */
@@ -40,19 +40,19 @@ public interface QOSet<GI, GISet> extends QO, Iterable<GI> {
 
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die in dieser oder der gegebenen Menge enthalten sind.
 	 *
-	 * @param set Objektmegne.
+	 * @param set Menge.
 	 * @return Vereinigung dieser mit der gegebenen Menge. */
 	public GISet union(GISet set) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die gleichzeitig in dieser und nicht in der gegebenen Menge enthalten sind.
 	 *
-	 * @param set Objektmegne.
+	 * @param set Menge.
 	 * @return Diese Menge ohne die gegebenen Menge. */
 	public GISet except(GISet set) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die gleichzeitig in dieser und in der gegebenen Menge enthalten sind.
 	 *
-	 * @param set Objektmegne.
+	 * @param set Menge.
 	 * @return Schitt dieser mit der gegebenen Menge. */
 	public GISet intersect(GISet set) throws NullPointerException, IllegalArgumentException;
 
@@ -67,7 +67,7 @@ public interface QOSet<GI, GISet> extends QO, Iterable<GI> {
 	 * @return Kopie dieser Menge. */
 	public Set<GI> toSet();
 
-	/** Diese Methode gibt eine aufsteigend geordnete Kopie dieser Menge als {@link List} zurück.
+	/** Diese Methode gibt eine {@link #order() geordnete} Kopie dieser Menge als {@link List} zurück.
 	 *
 	 * @return geordnete Kopie dieser Menge. */
 	public List<GI> toList();

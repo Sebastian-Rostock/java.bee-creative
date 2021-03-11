@@ -5,27 +5,33 @@ package bee.creative.qs;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QESet extends QXSet<QE, QESet> {
 
-	/** Diese Methode gibt eine Mengensicht auf alle {@link QN Kontextknoten} zurück, die in den Hyperkanten dieser Menge {@link QE#context() aufgeführten} sind.
+	/** Diese Methode gibt eine Mengensicht auf alle {@link QE#context() Kontextknoten} zurück, die in den Hyperkanten dieser Menge aufgeführt sind.
 	 *
 	 * @return Kontextknoten der Hyperkanten dieser Menge. */
 	public QNSet contexts();
 
-	/** Diese Methode gibt eine Mengensicht auf alle {@link QN Prädikatknoten} zurück, die in den Hyperkanten dieser Menge {@link QE#predicate() aufgeführten}
-	 * sind.
+	/** Diese Methode gibt eine Mengensicht auf alle {@link QE#predicate() Prädikatknoten} zurück, die in den Hyperkanten dieser Menge aufgeführt sind.
 	 *
 	 * @return Prädikatknoten der Hyperkanten dieser Menge. */
 	public QNSet predicates();
 
-	/** Diese Methode gibt eine Mengensicht auf alle {@link QN Subjektknoten} zurück, die in den Hyperkanten dieser Menge {@link QE#subject() aufgeführten} sind.
+	/** Diese Methode gibt eine Mengensicht auf alle {@link QE#subject() Subjektknoten} zurück, die in den Hyperkanten dieser Menge aufgeführt sind.
 	 *
 	 * @return Subjektknoten der Hyperkanten dieser Menge. */
 	public QNSet subjects();
 
-	/** Diese Methode gibt eine Mengensicht auf alle {@link QN Objektknoten} zurück, die in den Hyperkanten dieser Menge {@link QE#object() aufgeführten} sind.
+	/** Diese Methode gibt eine Mengensicht auf alle {@link QE#object() Objektknoten} zurück, die in den Hyperkanten dieser Menge aufgeführte sind.
 	 *
 	 * @return Objektknoten der Hyperkanten dieser Menge. */
 	public QNSet objects();
 
+	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten dieser Menge als Hypertupel der Länge {@code 4} zurück.
+	 *
+	 * @param context Name der {@link QTSet#names() Rolle} {@code 0}, über welche die Hypertupel den {@link QE#context() Kontextknoten} referenzieren.
+	 * @param predicate Name der {@link QTSet#names() Rolle} {@code 1}, über welche die Hypertupel den {@link QE#predicate() Prädikatknoten} referenzieren.
+	 * @param subject Name der {@link QTSet#names() Rolle} {@code 2}, über welche die Hypertupel den {@link QE#subject() Subjektknoten} referenzieren.
+	 * @param object Name der {@link QTSet#names() Rolle} {@code 3}, über welche die Hypertupel den {@link QE#object() Objektknoten} referenzieren.
+	 * @return Hyperkanten dieser Menge als Hypertupel. */
 	public QTSet tuples(String context, String predicate, String subject, String object) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode speichert alle in dieser Menge enthaltenen Hyperkanten im {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn dadurch
@@ -36,7 +42,7 @@ public interface QESet extends QXSet<QE, QESet> {
 	public boolean putAll();
 
 	/** Diese Methode entfernt alle in dieser Menge enthaltenen Hyperkanten aus dem {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn
-	 * dadurch der Inhalt des Graphspeichers verändert wurde. Von den daraufhin nicht mehr in Hyperkanten verwendeten {QN Hyperknoten} bleiben nur die mit
+	 * dadurch der Inhalt des Graphspeichers verändert wurde. Von den daraufhin nicht mehr in Hyperkanten verwendeten Hyperknoten bleiben nur die mit
 	 * {@link QN#value() Textwert} erhalten.
 	 *
 	 * @see QE#pop()
@@ -102,14 +108,16 @@ public interface QESet extends QXSet<QE, QESet> {
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten mit dem gegebenen Hyperknoten.
 	 *
-	 * @see #havingNodes(QNSet)
+	 * @see #havingContext(QN)
+	 * @see #havingPredicate(QN)
+	 * @see #havingSubject(QN)
+	 * @see #havingObject(QN)
 	 * @param node Hyperknotenfilter.
 	 * @return Hyperkanten mit dem gegebenen Kontextknoten. */
 	public QESet havingNode(QN node) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten zurück, deren {@link QE#context() Kontextknoten}, {@link QE#predicate() Prädikatknoten},
-	 * {@link QE#subject() Subjektknoten} oder {@link QE#object() Objektknoten} in der gegebenen Menge enthalten ist. Sie ist damit eine Abkürzung für
-	 * {@code this.havingContexts(nodes).union(this.havingPredicates(nodes)).union(this.havingSubjects(nodes)).union(this.havingObjects(nodes))}.
+	 * {@link QE#subject() Subjektknoten} oder {@link QE#object() Objektknoten} in der gegebenen Menge enthalten ist.
 	 *
 	 * @see #havingContexts(QNSet)
 	 * @see #havingPredicates(QNSet)
@@ -121,7 +129,6 @@ public interface QESet extends QXSet<QE, QESet> {
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten mit dem gegebenen {@link QE#context() Kontextknoten}.
 	 *
-	 * @see #havingContexts(QNSet)
 	 * @param context Kontextknotenfilter.
 	 * @return Hyperkanten mit dem gegebenen Kontextknoten. */
 	public QESet havingContext(QN context) throws NullPointerException, IllegalArgumentException;
@@ -134,7 +141,6 @@ public interface QESet extends QXSet<QE, QESet> {
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten mit dem gegebenen {@link QE#predicate() Prädikatknoten}.
 	 *
-	 * @see #havingPredicates(QNSet)
 	 * @param predicate Prädikatknotenfilter.
 	 * @return Hyperkanten mit dem gegebenen Prädikatknoten. */
 	public QESet havingPredicate(QN predicate) throws NullPointerException, IllegalArgumentException;
@@ -147,7 +153,6 @@ public interface QESet extends QXSet<QE, QESet> {
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten mit dem gegebenen {@link QE#subject() Subjektknoten}.
 	 *
-	 * @see #havingSubjects(QNSet)
 	 * @param subject Subjektknotenfilter.
 	 * @return Hyperkanten mit dem gegebenen Subjektknoten. */
 	public QESet havingSubject(QN subject) throws NullPointerException, IllegalArgumentException;
@@ -160,7 +165,6 @@ public interface QESet extends QXSet<QE, QESet> {
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperkanten mit dem gegebenen {@link QE#object() Objektknoten}.
 	 *
-	 * @see #havingObjects(QNSet)
 	 * @param object Objektknotenfilter.
 	 * @return Hyperkanten mit dem gegebenen Objektknoten. */
 	public QESet havingObject(QN object) throws NullPointerException, IllegalArgumentException;

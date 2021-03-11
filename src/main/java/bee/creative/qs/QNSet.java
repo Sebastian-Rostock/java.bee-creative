@@ -18,6 +18,10 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	 * @return Textwerte der Hyperknoten dieser Menge. */
 	public QVSet values();
 
+	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten dieser Menge als Hypertupel der Länge {@code 1} zurück.
+	 *
+	 * @param name Name der {@link QTSet#names() Rolle} {@code 0}, über welche die Hypertupel ihren Hyperknoten referenzieren.
+	 * @return Hyperknoten dieser Menge als Hypertupel. */
 	public QTSet tuples(String name) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten zurück, die einen {@link QN#value() Textwert} besitzen. Die Mengensicht entspricht

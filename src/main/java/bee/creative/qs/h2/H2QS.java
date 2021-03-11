@@ -85,7 +85,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QE} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QE asQE(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QE asQE(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QE res = (H2QE)src;
 			if (res.owner == this) return res;
@@ -94,7 +94,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QESet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QESet asQESet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QESet asQESet(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QESet res = (H2QESet)src;
 			if (res.owner == this) return res;
@@ -103,7 +103,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QN} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QN asQN(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QN asQN(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QN res = (H2QN)src;
 			if (res.owner == this) return res;
@@ -112,7 +112,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QNSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QNSet asQNSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QNSet asQNSet(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QNSet res = (H2QNSet)src;
 			if (res.owner == this) return res;
@@ -121,12 +121,12 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert die {@link Object#toString() Textdarstellung} des gegebenen Objekts oder löst eine Ausnahme aus. */
-	protected final String asQV(final Object src) throws NullPointerException {
+	public final String asQV(final Object src) throws NullPointerException {
 		return src.toString();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QVSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QVSet asQVSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QVSet asQVSet(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QVSet res = (H2QVSet)src;
 			if (res.owner == this) return res;
@@ -135,7 +135,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QT} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QT asQT(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QT asQT(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QT res = (H2QT)src;
 			if (res.owner == this) return res;
@@ -144,7 +144,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QTSet asQTSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QTSet asQTSet(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QTSet res = (H2QTSet)src;
 			if (res.owner == this) return res;
@@ -152,11 +152,11 @@ public class H2QS implements QS {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. Das {@link H2QTSet} muss die
-	 * gegebene Anzahl an {@link QTSet#names() Rollennamen} besitzen. */
-	protected final H2QTSet asQTSet(final Object src, final int size) throws NullPointerException, IllegalArgumentException {
+	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} mit der gegebene Anzahl an {@link QTSet#names() Rollen}
+	 * oder löst eine Ausnahme aus. */
+	public final H2QTSet asQTSet(final Object src, final int roles) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet res = this.asQTSet(src);
-		if (res.names.size() == size) return res;
+		if (res.names.size() == roles) return res;
 		throw new IllegalArgumentException();
 	}
 

@@ -230,6 +230,22 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	}
 
 	@Override
+	public H2QESet edges(final int context, final int predicate, final int subject, final int object) throws NullPointerException, IllegalArgumentException {
+		this.name(context);
+		this.name(predicate);
+		this.name(subject);
+		this.name(object);
+		return new H2QESet.Set1(this.owner, "select distinct C" + context + " C, C" + predicate + " P, C" + subject + "S, C" + object + " O from " + this.name,
+			this);
+	}
+
+	@Override
+	public H2QESet edges(final String context, final String predicate, final String subject, final String object)
+		throws NullPointerException, IllegalArgumentException {
+		return this.edges(this.role(context), this.role(predicate), this.role(subject), this.role(object));
+	}
+
+	@Override
 	public H2QNSet nodes(final int role) throws IllegalArgumentException {
 		this.name(role);
 		return new H2QNSet.Set1(this.owner, "select distinct C" + role + " N from " + this.name, this);

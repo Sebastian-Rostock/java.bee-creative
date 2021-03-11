@@ -45,6 +45,11 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 	}
 
 	@Override
+	public H2QS owner() {
+		return this.owner;
+	}
+
+	@Override
 	public long size() {
 		try (ResultSet rset = this.owner.exec.executeQuery("select count(*) from " + this.name)) {
 			return rset.next() ? rset.getLong(1) : 0;
@@ -54,14 +59,9 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 	}
 
 	@Override
-	public H2QS owner() {
-		return this.owner;
-	}
-
-	@Override
-	public boolean hasAny() {
+	public boolean isEmpty() {
 		try (final ResultSet rset = this.owner.exec.executeQuery("select top 1 1 from " + this.name)) {
-			return rset.next();
+			return !rset.next();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
