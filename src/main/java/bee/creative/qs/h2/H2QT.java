@@ -28,7 +28,7 @@ public final class H2QT implements QT, UseToString {
 
 	@Override
 	public H2QN get(final int index) throws IndexOutOfBoundsException {
-		return this.owner.newQN(this.keys[index]);
+		return this.owner.newNode(this.keys[index]);
 	}
 
 	@Override

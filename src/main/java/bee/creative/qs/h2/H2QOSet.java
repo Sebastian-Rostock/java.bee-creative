@@ -26,10 +26,10 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 	/** Dieses Feld speichert {@code true}, wenn {@link #name} für einen {@code VIEW} bzw. {@code false}, wenn er für eine temporäre {@code TABLE} steht. */
 	protected final boolean view;
 
-	/** @param select Anfrage des {@code VIEW} oder {@code null}. */
-	H2QOSet(final H2QS owner, final String select) {
+	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	protected H2QOSet(final H2QS owner, final String select) {
 		this.owner = owner;
-		this.name = "QT" + owner.newQK(owner.createTempKey);
+		this.name = "QT" + owner.newKey(owner.createTemp);
 		this.view = select != null;
 		if (!this.view) return;
 		owner.exec("create view " + this.name + " as " + select);

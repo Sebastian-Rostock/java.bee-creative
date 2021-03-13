@@ -164,7 +164,7 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 * @see #role(String) */
 	public QTSet havingNodes(String name, QNSet nodes) throws NullPointerException, IllegalArgumentException;
 
-	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(Iterable, List) this.owner().newTuples(this, this.names())}. */
+	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(List, Iterable) this.owner().newTuples(this, this.names())}. */
 	@Override
 	public QTSet copy();
 

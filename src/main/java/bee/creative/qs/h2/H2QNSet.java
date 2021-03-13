@@ -24,7 +24,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 		@Override
 		public QN next(final ResultSet item) throws SQLException {
-			return this.owner.owner.newQN(item.getInt(1));
+			return this.owner.owner.newNode(item.getInt(1));
 		}
 
 	}
@@ -96,7 +96,8 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	}
 
-	H2QNSet(final H2QS owner, final String select) {
+	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	protected H2QNSet(final H2QS owner, final String select) {
 		super(owner, select);
 	}
 

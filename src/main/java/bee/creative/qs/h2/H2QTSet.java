@@ -35,7 +35,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 			for (int i = 0; i < size; i++) {
 				ints[i] = item.getInt(i + 1);
 			}
-			return this.owner.owner.newQT(ints);
+			return this.owner.owner.newTuple(ints);
 		}
 
 	}
@@ -125,7 +125,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 			for (int i = 0; i < size; i++) {
 				this.putIndexImpl(Objects.notNull(names.get(i)));
 			}
-			if (size != this.size()) throw new IllegalArgumentException();
+			if ((size == 0) || (size != this.size())) throw new IllegalArgumentException();
 		}
 
 		@Override
@@ -149,14 +149,15 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	final Names names;
 
-	H2QTSet(final H2QS owner, final Names names, final String select) {
+	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	protected H2QTSet(final H2QS owner, final Names names, final String select) {
 		super(owner, select);
 		this.names = names;
 	}
 
 	@Override
 	public H2QTSet copy() {
-		return this.owner.newTuples(this, this.names());
+		return this.owner.newTuples(this.names(), this);
 	}
 
 	@Override
@@ -173,19 +174,19 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet union(final QTSet set) throws NullPointerException, IllegalArgumentException {
-		final H2QTSet that = this.owner.asQTSet(set, this.names);
+		final H2QTSet that = this.owner.asQTSet(set, this.names());
 		return new Set2(this.owner, this.names, "(table " + this.name + ") union (table " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QTSet except(final QTSet set) throws NullPointerException, IllegalArgumentException {
-		final H2QTSet that = this.owner.asQTSet(set, this.names);
+		final H2QTSet that = this.owner.asQTSet(set, this.names());
 		return new Set2(this.owner, this.names, "(table " + this.name + ") except (table " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QTSet intersect(final QTSet set) throws NullPointerException, IllegalArgumentException {
-		final H2QTSet that = this.owner.asQTSet(set, this.names);
+		final H2QTSet that = this.owner.asQTSet(set, this.names());
 		return new Set2(this.owner, this.names, "(table " + this.name + ") intersect (table " + that.name + ")", this, that);
 	}
 
@@ -371,6 +372,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet withNames(final List<String> names) throws NullPointerException, IllegalArgumentException {
+		if (this.names.list.equals(names)) return this;
 		final Names names2 = new Names(names);
 		if (this.names.size() != names2.size()) throw new IllegalArgumentException();
 		return new Set1(this.owner, names2, "table " + this.name, this);
@@ -378,7 +380,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet having(final Filter<? super QT> filter) throws NullPointerException {
-		return this.owner.newTuples(Iterables.filter(this, filter), this.names());
+		return this.owner.newTuples(this.names(), Iterables.filter(this, filter));
 	}
 
 	@Override

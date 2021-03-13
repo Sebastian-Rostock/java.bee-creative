@@ -25,7 +25,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 		@Override
 		public QE next(final ResultSet item) throws SQLException {
-			return this.owner.owner.newQE(item.getInt(1), item.getInt(2), item.getInt(3), item.getInt(4));
+			return this.owner.owner.newEdge(item.getInt(1), item.getInt(2), item.getInt(3), item.getInt(4));
 		}
 
 	}
@@ -97,7 +97,8 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	}
 
-	H2QESet(final H2QS owner, final String select) {
+	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	protected H2QESet(final H2QS owner, final String select) {
 		super(owner, select);
 	}
 

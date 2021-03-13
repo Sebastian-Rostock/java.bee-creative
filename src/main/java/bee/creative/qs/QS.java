@@ -116,24 +116,30 @@ public interface QS {
 	 * @return temporäres Hypertupel. */
 	public QT newTuple(QN... nodes) throws NullPointerException, IllegalArgumentException;
 
+	/** Diese Methode liefert ein temporäres {@link QT Hypertupel}, das von diesem Graphspeicher {@link QT#owner() verwaltet} wird und die gegebenen {@link QN
+	 * Hyperknoten} in der gegebenen Reihenfolge miteinander verbindet. Die gegebene Liste darf nicht leer sein.
+	 * 
+	 * @param nodes Hyperknoten.
+	 * @return Hypertupel. */
 	public QT newTuple(List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode ist eine Abkürzung für {@link #newTuples(QN[][], List) this.newTuples(tuples, Arrays.asList(names))}.
-	 *
+	/** Diese Methode überführt die gegebenen {@link QN Hyperknoten} in eine von diesem Graphspeicher {@link QTSet#owner() verwaltete} temporäre Menge von
+	 * {@link QT Hypertupeln} und gibt diese zurück. Die Anzahl der gegebenen Hyperknoten muss ein ganzzahliges Vielfaches der {@link List#size() Anzahl} der
+	 * gegebenen Rollennamen sein, da stets diese Anzahl direkt aufeinanderfolgender Hyperknoten zu einem Hypertupel miteinander verbunden wird. Die Rollennamen
+	 * dürfen keine Duplikate enthalten und nicht leer sein.
+	 * 
+	 * @param names Rollennamen.
 	 * @param tuples Hyperknotentabelle.
-	 * @param names Rollennamen.
 	 * @return temporäre Hypertupelmenge. */
-	public QTSet newTuples(QN[][] tuples, String... names) throws NullPointerException, IllegalArgumentException;
+	public QTSet newTuples(List<String> names, QN... tuples) throws NullPointerException, IllegalArgumentException;
 
-	public QTSet newTuples(QN[][] tuples, List<String> names) throws NullPointerException, IllegalArgumentException;
-
-	/** Diese Methode ist eine Abkürzung für {@link #newTuples(Iterable, List) this.newTuples(tuples, Arrays.asList(names))}.
-	 *
+	/** Diese Methode überführt die gegebenen {@link QT Hypertupel} in eine von diesem Graphspeicher {@link QTSet#owner() verwaltete} temporäre Menge und gibt
+	 * diese zurück. Die {@link QT#size() Anzahl} der Hyperknoten eines jeden Hypertupel muss gleich der {@link List#size() Anzahl} der gegebenen Rollennamen
+	 * sein. Die Rollennamen dürfen keine Duplikate enthalten und nicht leer sein.
+	 * 
+	 * @param names Rollennamen.
 	 * @param tuples Hypertupel.
-	 * @param names Rollennamen.
 	 * @return temporäre Hypertupelmenge. */
-	public QTSet newTuples(Iterable<? extends QT> tuples, String... names) throws NullPointerException, IllegalArgumentException;
-
-	public QTSet newTuples(Iterable<? extends QT> tuples, List<String> names) throws NullPointerException, IllegalArgumentException;
+	public QTSet newTuples(List<String> names, Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException;
 
 }

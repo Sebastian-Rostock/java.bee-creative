@@ -92,7 +92,8 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	}
 
-	H2QVSet(final H2QS owner, final String select) {
+	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	protected H2QVSet(final H2QS owner, final String select) {
 		super(owner, select);
 	}
 

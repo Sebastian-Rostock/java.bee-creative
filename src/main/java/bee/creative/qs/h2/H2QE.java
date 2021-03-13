@@ -32,22 +32,22 @@ public final class H2QE implements QE {
 
 	@Override
 	public H2QN context() {
-		return this.owner.newQN(this.context);
+		return this.owner.newNode(this.context);
 	}
 
 	@Override
 	public H2QN predicate() {
-		return this.owner.newQN(this.predicate);
+		return this.owner.newNode(this.predicate);
 	}
 
 	@Override
 	public H2QN subject() {
-		return this.owner.newQN(this.subject);
+		return this.owner.newNode(this.subject);
 	}
 
 	@Override
 	public H2QN object() {
-		return this.owner.newQN(this.object);
+		return this.owner.newNode(this.object);
 	}
 
 	@Override
@@ -101,22 +101,22 @@ public final class H2QE implements QE {
 
 	@Override
 	public H2QE withContext(final QN context) throws NullPointerException, IllegalArgumentException {
-		return this.owner.newQE(this.owner.asQN(context).key, this.predicate, this.subject, this.object);
+		return this.owner.newEdge(this.owner.asQN(context).key, this.predicate, this.subject, this.object);
 	}
 
 	@Override
 	public H2QE withPredicate(final QN predicate) throws NullPointerException, IllegalArgumentException {
-		return this.owner.newQE(this.context, this.owner.asQN(predicate).key, this.subject, this.object);
+		return this.owner.newEdge(this.context, this.owner.asQN(predicate).key, this.subject, this.object);
 	}
 
 	@Override
 	public H2QE withSubject(final QN subject) throws NullPointerException, IllegalArgumentException {
-		return this.owner.newQE(this.context, this.predicate, this.owner.asQN(subject).key, this.object);
+		return this.owner.newEdge(this.context, this.predicate, this.owner.asQN(subject).key, this.object);
 	}
 
 	@Override
 	public H2QE withObject(final QN object) throws NullPointerException, IllegalArgumentException {
-		return this.owner.newQE(this.context, this.predicate, this.subject, this.owner.asQN(object).key);
+		return this.owner.newEdge(this.context, this.predicate, this.subject, this.owner.asQN(object).key);
 	}
 
 	@Override
