@@ -114,6 +114,11 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 			return -1;
 		}
 
+		@Override
+		public boolean isIndexed() {
+			return true;
+		}
+
 	}
 
 	/** Diese Klasse implementiert eine Bytefolge als Sicht auf eine Speicherbereich eines {@link MappedBuffer}. */
@@ -639,8 +644,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	/** Diese Methode fügt die gegebene Wertliste in den Puffer ein und gibt die Adresse darauf zurück. Eine über {@link FEMArray#compact(boolean)} indizierte
 	 * Wertliste wird mit der Indizierung kodiert. */
-	protected long putArrayAsRef(final FEMArray src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	protected long putArrayAsRef(FEMArray src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		if (src.isEmpty()) return this.getRef(FEMBuffer.TYPE_ARRAY_DATA1, 0);
+		src = src.compact();
 		final int hash = src.hashCode();
 		final int length = src.length();
 		if (src instanceof CompactArray3) {

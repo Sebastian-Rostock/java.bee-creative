@@ -434,8 +434,8 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 		}
 
 		@Override
-		public boolean isUniform() {
-			return this.array1.isUniform() && this.array2.isUniform();
+		public boolean isIndexed() {
+			return this.array1.isIndexed() && this.array2.isIndexed();
 		}
 
 	}
@@ -477,6 +477,11 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.array);
+		}
+
+		@Override
+		public boolean isIndexed() {
+			return this.array.isIndexed();
 		}
 
 	}

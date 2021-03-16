@@ -168,7 +168,7 @@ public class H2QS implements QS {
 
 	/** Diese Methode führt die gegebene Anfrage {@link Statement#executeUpdate(String) aus} und gibt nur dann {@code true} zurück, wenn dadurch Tabellenzeilen
 	 * verändert wurden. */
-	protected final boolean exec(final String query) {
+	protected final boolean exec(final String query) throws IllegalStateException {
 		try {
 			return this.exec.executeUpdate(query) != 0;
 		} catch (final SQLException cause) {
@@ -177,7 +177,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode leert den Graphspeicher. */
-	public void reset() throws SQLException {
+	public void reset() throws IllegalStateException {
 		this.exec("delete from QN;delete from QE;alter sequence QN_SEQUENCE restart with 1");
 	}
 
@@ -388,7 +388,7 @@ public class H2QS implements QS {
 		return this.newTupleImpl(nodes.toArray());
 	}
 
-	private   H2QT newTupleImpl(final Object[] nodes) {
+	private H2QT newTupleImpl(final Object[] nodes) {
 		final int size = nodes.length;
 		final int[] keys = new int[size];
 		for (int i = 0; i < size; i++) {
@@ -414,7 +414,7 @@ public class H2QS implements QS {
 		return this.newTuplesImpl(new Names(names), tuples, null);
 	}
 
-	private   H2QTSet newTuplesImpl(final Names names, final Iterable<? extends QT> tuples1, final QN[] tuples2)
+	private H2QTSet newTuplesImpl(final Names names, final Iterable<? extends QT> tuples1, final QN[] tuples2)
 		throws NullPointerException, IllegalArgumentException {
 		try {
 			final int size = names.size();
