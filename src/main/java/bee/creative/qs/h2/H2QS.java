@@ -16,11 +16,12 @@ import bee.creative.qs.QS;
 import bee.creative.qs.QT;
 import bee.creative.qs.QTSet;
 import bee.creative.qs.h2.H2QTSet.Names;
+import bee.creative.util.HashSet;
 
 /** Diese Klasse implementiert einen {@link QS Graphspeicher}, dessen Hyperkanten und Textwerte in einer Datenbank (vorzugsweise embedded H2) gespeichert sind.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class H2QS implements QS {
+public class H2QS implements QS, AutoCloseable {
 
 	/** Diese Methode liefert den Graphspeicher zu der Datenbankverbindung, die mit dem {@code jdbc:h2:}-Protokoll zum gegebenen Dateipfad erzeugt wurde. Dazu
 	 * wird das Laden der Klasse {@code org.h2.Driver} erzwungen. */
@@ -33,7 +34,7 @@ public class H2QS implements QS {
 	protected final Connection conn;
 
 	/** Dieses Feld speichert die in {@link #exec(String)} wiederverwendete Anweisung. */
-	final Statement exec;
+	protected final Statement exec;
 
 	final PreparedStatement selectSaveEdge;
 
@@ -54,6 +55,12 @@ public class H2QS implements QS {
 	final PreparedStatement createNode;
 
 	final PreparedStatement createTemp;
+
+	final Object lock = new Object();
+
+	final HashSet<String> views = new HashSet<>();
+
+	final HashSet<String> tables = new HashSet<>();
 
 	/** Dieser Konstruktor initialisiert die Datenbankverbindung und erstellt bei Bedarf das Tabellenschema.
 	 *
@@ -83,7 +90,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QE} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QE asQE(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QE asQE(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QE res = (H2QE)src;
 			if (res.owner == this) return res;
@@ -92,7 +99,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QESet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QESet asQESet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QESet asQESet(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QESet res = (H2QESet)src;
 			if (res.owner == this) return res;
@@ -101,7 +108,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QN} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QN asQN(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QN asQN(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QN res = (H2QN)src;
 			if (res.owner == this) return res;
@@ -110,7 +117,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QNSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QNSet asQNSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QNSet asQNSet(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QNSet res = (H2QNSet)src;
 			if (res.owner == this) return res;
@@ -119,12 +126,12 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert die {@link Object#toString() Textdarstellung} des gegebenen Objekts oder löst eine Ausnahme aus. */
-	protected final String asQV(final Object src) throws NullPointerException {
+	public final String asQV(final Object src) throws NullPointerException {
 		return src.toString();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QVSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QVSet asQVSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QVSet asQVSet(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QVSet res = (H2QVSet)src;
 			if (res.owner == this) return res;
@@ -133,7 +140,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QT} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QT asQT(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QT asQT(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QT res = (H2QT)src;
 			if (res.owner == this) return res;
@@ -142,7 +149,7 @@ public class H2QS implements QS {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	protected final H2QTSet asQTSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QTSet asQTSet(final Object src) throws NullPointerException, IllegalArgumentException {
 		try {
 			final H2QTSet res = (H2QTSet)src;
 			if (res.owner == this) return res;
@@ -152,7 +159,7 @@ public class H2QS implements QS {
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} mit der gegebene Anzahl an {@link QTSet#names() Rollen}
 	 * oder löst eine Ausnahme aus. */
-	protected final H2QTSet asQTSet(final Object src, final int roles) throws NullPointerException, IllegalArgumentException {
+	public final H2QTSet asQTSet(final Object src, final int roles) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet res = this.asQTSet(src);
 		if (res.names.size() == roles) return res;
 		throw new IllegalArgumentException();
@@ -160,7 +167,7 @@ public class H2QS implements QS {
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. Das {@link H2QTSet} muss die
 	 * gegebenen {@link QTSet#names() Rollennamen} besitzen. */
-	protected final H2QTSet asQTSet(final Object src, final List<?> names) throws NullPointerException, IllegalArgumentException {
+	public final H2QTSet asQTSet(final Object src, final List<?> names) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet res = this.asQTSet(src, names.size());
 		if (res.names().equals(names)) return res;
 		throw new IllegalArgumentException();
@@ -168,7 +175,7 @@ public class H2QS implements QS {
 
 	/** Diese Methode führt die gegebene Anfrage {@link Statement#executeUpdate(String) aus} und gibt nur dann {@code true} zurück, wenn dadurch Tabellenzeilen
 	 * verändert wurden. */
-	protected final boolean exec(final String query) throws IllegalStateException {
+	public final boolean exec(final String query) throws IllegalStateException {
 		try {
 			return this.exec.executeUpdate(query) != 0;
 		} catch (final SQLException cause) {
@@ -179,6 +186,19 @@ public class H2QS implements QS {
 	/** Diese Methode leert den Graphspeicher. */
 	public void reset() throws IllegalStateException {
 		this.exec("delete from QN;delete from QE;alter sequence QN_SEQUENCE restart with 1");
+	}
+
+	@Override
+	public void close() throws SQLException {
+		synchronized (this.lock) {
+			for (final String name: this.tables) {
+				this.exec("drop table if exists " + name + " cascade");
+			}
+			for (final String name: this.views) {
+				this.exec("drop view if exists " + name + " cascade");
+			}
+		}
+		this.conn.close();
 	}
 
 	/** Diese Methode entfernt alle Hyperknoten mit Textwert, die nich in Hyperkanten verwendet werden. */
@@ -218,11 +238,6 @@ public class H2QS implements QS {
 		throw new IllegalStateException();
 	}
 
-	/** Diese Methode liefert eine neue {@link H2QE Hyperkante} mit den gegebenen Knotenkennungen. */
-	protected final H2QE newEdge(final int context, final int predicate, final int subject, final int object) {
-		return new H2QE(this, context, predicate, subject, object);
-	}
-
 	@Override
 	public H2QE newEdge() {
 		final int key = this.newKey(this.createNode);
@@ -240,25 +255,30 @@ public class H2QS implements QS {
 		return this.newEdge(this.asQN(context).key, this.asQN(predicate).key, this.asQN(subject).key, this.asQN(object).key);
 	}
 
+	/** Diese Methode liefert eine neue {@link H2QE Hyperkante} mit den gegebenen Knotenkennungen. */
+	public final H2QE newEdge(final int context, final int predicate, final int subject, final int object) {
+		return new H2QE(this, context, predicate, subject, object);
+	}
+
 	@Override
-	public H2QESet newEdges() {
+	public H2QESet.Temp newEdges() {
 		return this.newEdges(this.newEdge());
 	}
 
 	@Override
-	public H2QESet newEdges(final QE... edges) throws NullPointerException, IllegalArgumentException {
+	public H2QESet.Temp newEdges(final QE... edges) throws NullPointerException, IllegalArgumentException {
 		return this.newEdges(Arrays.asList(edges));
 	}
 
 	@Override
-	public H2QESet newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
+	public H2QESet.Temp newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (edges instanceof H2QESet) {
 				final H2QESet set = this.asQESet(edges);
-				if (set instanceof H2QESet.Temp) return set;
+				if (set instanceof H2QESet.Temp) return (H2QESet.Temp)set;
 				final H2QESet.Temp res = new H2QESet.Temp(this);
 				this.exec("insert into " + res.name + " select * from " + set.name);
-				return res.index();
+				return res;
 			}
 			final H2QESet.Temp buf = new H2QESet.Temp(this);
 			try (final PreparedStatement stmt = this.conn.prepareStatement("insert into " + buf.name + " (C, P, S, O) values (?, ?, ?, ?)")) {
@@ -274,15 +294,10 @@ public class H2QS implements QS {
 			}
 			final H2QESet.Temp res = new H2QESet.Temp(this);
 			this.exec("insert into " + res.name + " select distinct * from " + buf.name);
-			return res.index();
+			return res;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
-	}
-
-	/** Diese Methode liefert einen neuen {@link H2QN Hyperknoten} mit der gegebenen Kennung. */
-	protected final H2QN newNode(final int key) {
-		return new H2QN(this, key);
 	}
 
 	@Override
@@ -309,17 +324,22 @@ public class H2QS implements QS {
 		}
 	}
 
+	/** Diese Methode liefert einen neuen {@link H2QN Hyperknoten} mit der gegebenen Kennung. */
+	public final H2QN newNode(final int key) {
+		return new H2QN(this, key);
+	}
+
 	@Override
-	public H2QNSet newNodes(final QN... nodes) throws NullPointerException, IllegalArgumentException {
+	public H2QNSet.Temp newNodes(final QN... nodes) throws NullPointerException, IllegalArgumentException {
 		return this.newNodes(Arrays.asList(nodes));
 	}
 
 	@Override
-	public H2QNSet newNodes(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
+	public H2QNSet.Temp newNodes(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (nodes instanceof H2QNSet) {
 				final H2QNSet set = this.asQNSet(nodes);
-				if (set instanceof H2QNSet.Temp) return set;
+				if (set instanceof H2QNSet.Temp) return (H2QNSet.Temp)set;
 				final H2QNSet.Temp res = new H2QNSet.Temp(this);
 				this.exec("insert into " + res.name + " select * from " + set.name);
 				return res.index();
@@ -341,20 +361,20 @@ public class H2QS implements QS {
 	}
 
 	@Override
-	public H2QVSet newValues(final Object... values) throws NullPointerException, IllegalArgumentException {
+	public H2QVSet.Temp newValues(final Object... values) throws NullPointerException, IllegalArgumentException {
 		return this.newValues(Arrays.asList(values));
 	}
 
 	@Override
-	public H2QVSet newValues(final Iterable<?> values) throws NullPointerException, IllegalArgumentException {
+	public H2QVSet.Temp newValues(final Iterable<?> values) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (values instanceof H2QVSet) {
 				final H2QVSet set = (H2QVSet)values;
 				if (set.owner == this) {
-					if (set instanceof H2QVSet.Temp) return set;
+					if (set instanceof H2QVSet.Temp) return (H2QVSet.Temp)set;
 					final H2QVSet.Temp res = new H2QVSet.Temp(this);
 					this.exec("insert into " + res.name + " select V from " + set.name);
-					return res.index();
+					return res;
 				}
 			}
 			final H2QVSet.Temp buf = new H2QVSet.Temp(this);
@@ -373,22 +393,8 @@ public class H2QS implements QS {
 		}
 	}
 
-	/** Diese Methode liefert ein neues {@link H2QT Hypertupel} mit den gegebenen Knotenkennungen. */
-	protected final H2QT newTuple(final int[] keys) {
-		return new H2QT(this, keys);
-	}
-
 	@Override
 	public H2QT newTuple(final QN... nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newTupleImpl(nodes);
-	}
-
-	@Override
-	public H2QT newTuple(final List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-		return this.newTupleImpl(nodes.toArray());
-	}
-
-	private H2QT newTupleImpl(final Object[] nodes) {
 		final int size = nodes.length;
 		final int[] keys = new int[size];
 		for (int i = 0; i < size; i++) {
@@ -398,15 +404,30 @@ public class H2QS implements QS {
 	}
 
 	@Override
-	public H2QTSet newTuples(final List<String> names, final QN... tuples) throws NullPointerException, IllegalArgumentException {
+	public H2QT newTuple(final List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
+		final int size = nodes.size();
+		final int[] keys = new int[size];
+		for (int i = 0; i < size; i++) {
+			keys[i] = this.asQN(nodes.get(i)).key;
+		}
+		return this.newTuple(keys);
+	}
+
+	/** Diese Methode liefert ein neues {@link H2QT Hypertupel} mit den gegebenen Knotenkennungen. */
+	public final H2QT newTuple(final int[] keys) {
+		return new H2QT(this, keys);
+	}
+
+	@Override
+	public H2QTSet.Temp newTuples(final List<String> names, final QN... tuples) throws NullPointerException, IllegalArgumentException {
 		return this.newTuplesImpl(new Names(names), null, tuples);
 	}
 
 	@Override
-	public H2QTSet newTuples(final List<String> names, final Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet.Temp newTuples(final List<String> names, final Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException {
 		if (tuples instanceof H2QTSet) {
 			final H2QTSet set = this.asQTSet(tuples, names.size());
-			if (set instanceof H2QTSet.Temp) return set.withNames(names);
+			if ((set instanceof H2QTSet.Temp) && set.names.list.equals(names)) return (H2QTSet.Temp)set;
 			final H2QTSet.Temp res = new H2QTSet.Temp(this, new Names(names));
 			this.exec("insert into " + res.name + " select * from " + set.name);
 			return res;
@@ -414,7 +435,7 @@ public class H2QS implements QS {
 		return this.newTuplesImpl(new Names(names), tuples, null);
 	}
 
-	private H2QTSet newTuplesImpl(final Names names, final Iterable<? extends QT> tuples1, final QN[] tuples2)
+	final H2QTSet.Temp newTuplesImpl(final Names names, final Iterable<? extends QT> tuples1, final QN[] tuples2)
 		throws NullPointerException, IllegalArgumentException {
 		try {
 			final int size = names.size();

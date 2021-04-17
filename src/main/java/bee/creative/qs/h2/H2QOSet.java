@@ -18,29 +18,35 @@ import bee.creative.util.Iterables;
 public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<GI, GISet> {
 
 	/** Dieses Feld speichert den Graphspeicher mit {@link H2QS#conn Datenbankverbindung}. */
-	protected final H2QS owner;
+	public final H2QS owner;
 
 	/** Dieses Feld speichert den Namen der {@code TABLE} bzw. des {@code VIEW} mit den Einträgen dieser Menge. */
-	protected final String name;
-
-	/** Dieses Feld speichert {@code true}, wenn {@link #name} für einen {@code VIEW} bzw. {@code false}, wenn er für eine temporäre {@code TABLE} steht. */
-	protected final boolean view;
+	public final String name;
 
 	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
 	protected H2QOSet(final H2QS owner, final String select) {
 		this.owner = owner;
 		this.name = "QT" + owner.newKey(owner.createTemp);
-		this.view = select != null;
-		if (!this.view) return;
-		owner.exec("create view " + this.name + " as " + select);
+		synchronized (owner.lock) {
+			if (select != null) {
+				owner.views.add(this.name);
+				owner.exec("create view " + this.name + " as " + select);
+			} else {
+				owner.tables.add(this.name);
+			}
+		}
 	}
 
 	@Override
 	protected void finalize() throws Throwable {
-		if (this.view) {
-			this.owner.exec("drop view if exists " + this.name + " cascade");
-		} else {
-			this.owner.exec("drop table if exists " + this.name + " cascade");
+		final H2QS owner = this.owner;
+		synchronized (owner.lock) {
+			if (owner.views.remove(this.name)) {
+				owner.exec("drop view if exists " + this.name + " cascade");
+				owner.tables.remove(this.name);
+			} else if (owner.tables.remove(this.name)) {
+				owner.exec("drop table if exists " + this.name + " cascade");
+			}
 		}
 	}
 

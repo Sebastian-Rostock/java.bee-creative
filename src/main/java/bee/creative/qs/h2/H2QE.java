@@ -12,15 +12,20 @@ import bee.creative.qs.QN;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class H2QE implements QE {
 
-	final H2QS owner;
+	/** Dieses Feld speichert den Graphspeicher mit {@link H2QS#conn Datenbankverbindung}. */
+	public final H2QS owner;
 
-	final int context;
+	/** Dieses Feld speichert die Kennung des Kontextknoten. */
+	public final int context;
 
-	final int predicate;
+	/** Dieses Feld speichert die Kennung des Prädikatknoten. */
+	public final int predicate;
 
-	final int subject;
+	/** Dieses Feld speichert die Kennung des Subjektknoten. */
+	public final int subject;
 
-	final int object;
+	/** Dieses Feld speichert die Kennung des Objektknoten. */
+	public final int object;
 
 	H2QE(final H2QS owner, final int context, final int predicate, final int subject, final int object) {
 		this.owner = owner;

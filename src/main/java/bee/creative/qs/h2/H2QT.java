@@ -17,9 +17,11 @@ import bee.creative.util.Iterators;
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class H2QT implements QT, UseToString {
 
-	final H2QS owner;
+	/** Dieses Feld speichert den Graphspeicher mit {@link H2QS#conn Datenbankverbindung}. */
+	public final H2QS owner;
 
-	final int[] keys;
+	/** Dieses Feld speichert die Kennungen der Hyperknoten. */
+	public final int[] keys;
 
 	H2QT(final H2QS owner, final int... keys) {
 		this.owner = owner;

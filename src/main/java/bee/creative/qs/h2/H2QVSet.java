@@ -14,7 +14,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	static final class Iter extends H2QOIter<String, H2QVSet> {
 
-		public Iter(final H2QVSet owner) {
+		Iter(final H2QVSet owner) {
 			super(owner);
 		}
 
@@ -29,7 +29,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 		final Object set1;
 
-		public Set1(final H2QS owner, final String select, final Object set1) {
+		Set1(final H2QS owner, final String select, final Object set1) {
 			super(owner, select);
 			this.set1 = set1;
 		}
@@ -40,7 +40,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 		final Object set2;
 
-		public Set2(final H2QS owner, final String select, final Object set1, final Object set2) {
+		Set2(final H2QS owner, final String select, final Object set1, final Object set2) {
 			super(owner, select, set1);
 			this.set2 = set2;
 		}
@@ -49,7 +49,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	static class Save extends H2QVSet {
 
-		public Save(final H2QS owner) {
+		Save(final H2QS owner) {
 			super(owner, "select V from QN");
 		}
 
@@ -60,9 +60,10 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	}
 
-	static class Temp extends H2QVSet {
+	/** Diese Klasse implementiert ein {@link QVSet} als temporäre {@link #index() indizierbare} Tabelle. */
+	public static class Temp extends H2QVSet {
 
-		public Temp(final H2QS owner) {
+		Temp(final H2QS owner) {
 			super(owner, null);
 			this.owner.exec("create cached local temporary table " + this.name + " (V varchar(1G) not null)");
 		}
@@ -72,6 +73,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 			return this;
 		}
 
+		/** Diese Methode indiziert diese Menge zur schnelleren Suche und gibt {@code this} zurück. */
 		public Temp index() {
 			this.owner.exec("create index if not exists " + this.name + "_INDEX_V on " + this.name + " (V)");
 			return this;
@@ -81,7 +83,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	static class Order extends Set1 {
 
-		public Order(final H2QS owner, final String select, final Object set1) {
+		Order(final H2QS owner, final String select, final Object set1) {
 			super(owner, select, set1);
 		}
 

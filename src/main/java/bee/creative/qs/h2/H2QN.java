@@ -11,9 +11,11 @@ import bee.creative.qs.QN;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class H2QN implements QN {
 
-	final H2QS owner;
+	/** Dieses Feld speichert den Graphspeicher mit {@link H2QS#conn Datenbankverbindung}. */
+	public final H2QS owner;
 
-	final int key;
+	/** Dieses Feld speichert die Kennung dieses Hyperknoten. */
+	public final int key;
 
 	H2QN(final H2QS owner, final int key) {
 		this.owner = owner;

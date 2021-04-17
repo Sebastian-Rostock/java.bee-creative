@@ -31,11 +31,11 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		@Override
 		public QT next(final ResultSet item) throws SQLException {
 			final int size = this.owner.names.size();
-			final int[] ints = new int[size];
+			final int[] keys = new int[size];
 			for (int i = 0; i < size; i++) {
-				ints[i] = item.getInt(i + 1);
+				keys[i] = item.getInt(i + 1);
 			}
-			return this.owner.owner.newTuple(ints);
+			return this.owner.owner.newTuple(keys);
 		}
 
 	}
@@ -62,13 +62,14 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	}
 
-	static class Temp extends H2QTSet {
+	/** Diese Klasse implementiert ein {@link QTSet} als temporäre {@link #index(int[]) indizierbare} Tabelle. */
+	public static class Temp extends H2QTSet {
 
-		public Temp(final H2QS owner, final Names names) {
+		Temp(final H2QS owner, final Names names) {
 			super(owner, names, null);
 			final int size = names.size();
 			final StringBuilder sql = new StringBuilder(50 + (size * 18));
-			sql.append("create cached temporary table ").append(this.name).append(" (");
+			sql.append("create table ").append(this.name).append(" (");
 			for (int i = 0; i < size; i++) {
 				sql.append("C").append(i).append(" int not null, ");
 			}
@@ -80,6 +81,39 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		@Override
 		public H2QTSet copy() {
 			return this;
+		}
+
+		/** Diese Methode indiziert diese Menge bezüglich der gegebenen Rollen in der gegebenen Reihenfolge und gibt {@code this} zurück. */
+		public Temp index(final int... roles) throws NullPointerException, IllegalArgumentException {
+			if (roles.length == 0) return this;
+			final int size = new Names(this.names(roles)).size();
+			final StringBuilder sql = new StringBuilder((this.name.length() * 2) + 50 + (size * 8));
+			sql.append("create index if not exists ").append(this.name).append("_INDEX_");
+			for (int i = 0; i < size; i++) {
+				sql.append("C").append(roles[i]);
+			}
+			sql.append(" on ").append(this.name).append(" (");
+			for (int i = 0; i < size; i++) {
+				sql.append("C").append(roles[i]).append(", ");
+			}
+			sql.setLength(sql.length() - 2);
+			sql.append(")");
+			this.owner.exec(sql.toString());
+			return this;
+		}
+
+		/** Diese Methode ist eine Abkürzung für {@link #index(int...) this.index(this.roles(names))}.
+		 *
+		 * @see #roles(String...) */
+		public Temp index(final String... names) throws NullPointerException, IllegalArgumentException {
+			return this.index(this.roles(names));
+		}
+
+		/** Diese Methode ist eine Abkürzung für {@link #index(int...) this.index(this.roles(names))}.
+		 *
+		 * @see #roles(List) */
+		public Temp index(final List<String> names) throws NullPointerException, IllegalArgumentException {
+			return this.index(this.roles(names));
 		}
 
 	}

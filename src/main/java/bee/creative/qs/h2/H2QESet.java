@@ -19,7 +19,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	static class Iter extends H2QOIter<QE, H2QESet> {
 
-		public Iter(final H2QESet owner) {
+		Iter(final H2QESet owner) {
 			super(owner);
 		}
 
@@ -34,7 +34,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 		final Object set1;
 
-		public Set1(final H2QS owner, final String select, final Object set1) {
+		Set1(final H2QS owner, final String select, final Object set1) {
 			super(owner, select);
 			this.set1 = set1;
 		}
@@ -45,7 +45,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 		final Object set2;
 
-		public Set2(final H2QS owner, final String select, final Object set1, final Object set2) {
+		Set2(final H2QS owner, final String select, final Object set1, final Object set2) {
 			super(owner, select, set1);
 			this.set2 = set2;
 		}
@@ -54,15 +54,16 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	static class Save extends H2QESet {
 
-		public Save(final H2QS owner) {
+		Save(final H2QS owner) {
 			super(owner, "table QE");
 		}
 
 	}
 
-	static class Temp extends H2QESet {
+	/** Diese Klasse implementiert ein {@link QESet} als temporäre {@link #index(String) indizierbare} Tabelle. */
+	public static class Temp extends H2QESet {
 
-		public Temp(final H2QS owner) {
+		Temp(final H2QS owner) {
 			super(owner, null);
 			this.owner.exec("create cached local temporary table " + this.name + " (C int not null, P int not null, S int not null, O int not null)");
 		}
@@ -72,20 +73,25 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 			return this;
 		}
 
-		public Temp index() {
-			this.owner.exec("" //
-				+ "create index " + this.name + "_INDEX_CPS on " + this.name + " (C, P, S, O);" //
-				+ "create index " + this.name + "_INDEX_CPO on " + this.name + " (C, P, O, S);" //
-				+ "create index " + this.name + "_INDEX_CSP on " + this.name + " (C, S, P, O);" //
-				+ "create index " + this.name + "_INDEX_COP on " + this.name + " (C, O, P, S)");
+		/** Diese Methode erzeugt den Index über die gegebenen Spalten in der gegebenen Reihenfolge und gibt {@code this} zurück. Die Spaltenliste {@code cols} muss
+		 * dazu aus den Zeichen {@code C}, {@code P}, {@code S} und {@code O} bestehen, welche für Kontext, Prädikat, Subjekt bzw. Objekt stehen. */
+		public Temp index(final String cols) throws NullPointerException, IllegalArgumentException {
+			if ((cols.length() != 4) || ((cols.indexOf('C') | cols.indexOf('P') | cols.indexOf('S') | cols.indexOf('O')) < 0)) throw new IllegalArgumentException();
+			this.owner.exec("create index if not exists " + this.name + "_INDEX_" + cols + " on " + this.name + " (" + cols.charAt(0) + ", " + cols.charAt(1) + ", "
+				+ cols.charAt(2) + ", " + cols.charAt(3) + ")");
 			return this;
+		}
+
+		/** Diese Methode ist eine Abkürzung für {@link #index(String) this.index("CPSO").index("CPOS").index("CSPO").index("COPS")}. */
+		public Temp index() {
+			return this.index("CPSO").index("CPOS").index("CSPO").index("COPS");
 		}
 
 	}
 
 	static class Order extends Set1 {
 
-		public Order(final H2QS owner, final String select, final Object set1) {
+		Order(final H2QS owner, final String select, final Object set1) {
 			super(owner, select, set1);
 
 		}

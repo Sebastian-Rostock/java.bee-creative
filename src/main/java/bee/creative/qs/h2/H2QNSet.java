@@ -18,7 +18,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	static class Iter extends H2QOIter<QN, H2QNSet> {
 
-		public Iter(final H2QNSet owner) {
+		Iter(final H2QNSet owner) {
 			super(owner);
 		}
 
@@ -33,7 +33,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 		final Object set1;
 
-		public Set1(final H2QS owner, final String select, final Object set1) {
+		Set1(final H2QS owner, final String select, final Object set1) {
 			super(owner, select);
 			this.set1 = set1;
 		}
@@ -44,7 +44,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 		final Object set2;
 
-		public Set2(final H2QS owner, final String select, final Object set1, final Object set2) {
+		Set2(final H2QS owner, final String select, final Object set1, final Object set2) {
 			super(owner, select, set1);
 			this.set2 = set2;
 		}
@@ -53,7 +53,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	static class Save extends H2QNSet {
 
-		public Save(final H2QS owner) {
+		Save(final H2QS owner) {
 			super(owner, "select N from QN");
 		}
 
@@ -64,9 +64,10 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	}
 
-	static class Temp extends H2QNSet {
+	/** Diese Klasse implementiert ein {@link QNSet} als temporäre {@link #index() indizierbare} Tabelle. */
+	public static class Temp extends H2QNSet {
 
-		public Temp(final H2QS owner) {
+		Temp(final H2QS owner) {
 			super(owner, null);
 			this.owner.exec("create cached local temporary table " + this.name + " (N int not null)");
 		}
@@ -76,6 +77,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 			return this;
 		}
 
+		/** Diese Methode indiziert diese Menge zur schnelleren Suche und gibt {@code this} zurück. */
 		public Temp index() {
 			this.owner.exec("create index " + this.name + "_INDEX_N on " + this.name + " (N)");
 			return this;
@@ -85,7 +87,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	static class Order extends Set1 {
 
-		public Order(final H2QNSet that) {
+		Order(final H2QNSet that) {
 			super(that.owner, "table " + that.name + " order by N", that);
 		}
 
