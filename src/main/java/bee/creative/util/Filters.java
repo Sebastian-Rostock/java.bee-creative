@@ -389,9 +389,9 @@ public class Filters {
 	/** Diese Methode liefert den gegebenen {@link Filter} als {@link Filter2}. Wenn er {@code null} ist, wird der {@link EmptyFilter} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Filter2<GItem> from(final Filter<? super GItem> that) {
-		if (that == null) return empty();
+		if (that == null) return Filters.empty();
 		if (that instanceof Filter2) return (Filter2<GItem>)that;
-		return translate(that, Getters.<GItem>neutral());
+		return Filters.translate(that, Getters.<GItem>neutral());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code value ? Filters.accept() : Filters.reject()}.

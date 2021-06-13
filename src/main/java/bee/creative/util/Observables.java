@@ -311,7 +311,7 @@ public abstract class Observables<GMessage, GObserver> {
 	 * @return {@code observer}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
 	public GObserver put(final Object sender, final GObserver observer) throws IllegalArgumentException {
-		return putImpl(sender, observer, false);
+		return this.putImpl(sender, observer, false);
 	}
 
 	/** Diese Methode meldet den gegebenen Ereignisempfänger für den gegebenen Ereignissender an und gibt ihn zurück. Wenn der Empfänger {@code null} ist, wird er
@@ -323,10 +323,10 @@ public abstract class Observables<GMessage, GObserver> {
 	 * @return {@code observer}.
 	 * @throws IllegalArgumentException Wenn der Ereignisempfänger unzulässig ist. */
 	public GObserver putWeak(final Object sender, final GObserver observer) throws IllegalArgumentException {
-		return putImpl(sender, observer, true);
+		return this.putImpl(sender, observer, true);
 	}
 
-	private GObserver putImpl(final Object sender, final GObserver observer, boolean weak) {
+	private GObserver putImpl(final Object sender, final GObserver observer, final boolean weak) {
 		if (observer == null) return null;
 		if (observer instanceof Object[]) throw new IllegalArgumentException();
 		final SenderStore store = this.store;

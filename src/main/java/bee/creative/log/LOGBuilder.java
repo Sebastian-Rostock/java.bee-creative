@@ -9,7 +9,7 @@ import bee.creative.util.Iterators;
 
 /** Diese Klasse dient der Erfassung hierarchischer Protokollzeilen. Diese werden in der {@link #toStrings() Textdarstellung} innerhalb von Protokollebenen
  * entsprechend eingerückt dargestellt.
- * 
+ *
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class LOGBuilder implements Iterable<LOGEntry> {
 

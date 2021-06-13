@@ -8,14 +8,14 @@ import bee.creative.util.Parser.Token;
 
 /** Diese Klasse implementiert ein Objekt zur Bereitstellung eines {@link #token() typisierten Abschnitt} eines {@link Result aufbereiteten Quelltexts}, um
  * diesen Abschnitt in {@link FEMFunction Funktionen} überführen zu können. Dazu wird auch eine {@link #proxies() Abbildung von Namen auf Platzhalter} zur
- * {@link #proxy(String) Bestückung bzw. Wiederverwendung} derselben bereitgestellt.
+ * Wiederverwendung derselben bereitgestellt.
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMToken {
 
 	private final Token token;
 
-	private final Map<String, FEMProxy> proxies;
+	private final Map<String, FEMFunction> proxies;
 
 	/** Dieser Konstruktor initialisiert das Objekt mit dem {@link Token#EMPTY leeren Abschnitt} sowie einer leeren Plazhalterabbildung. */
 	public FEMToken() {
@@ -67,21 +67,10 @@ public class FEMToken {
 		return res;
 	}
 
-	/** Diese Methode gibt den Platzhalter mit dem gegebenen {@link FEMProxy#name() Namen} zurück. Dieser wird bei Bedarf {@link FEMProxy#from(String) erzeugt}.
-	 *
-	 * @param name {@link FEMProxy#from(String) Name und Kennung} des Platzhalters.
-	 * @return Platzhalterfunktion. */
-	public final FEMProxy proxy(final String name) throws NullPointerException {
-		FEMProxy res = this.proxies.get(name);
-		if (res != null) return res;
-		this.proxies.put(name, res = FEMProxy.from(name));
-		return res;
-	}
-
-	/** Diese Methode gibt die über {@link #proxy(String)} erzeugten Platzhalter zurück.
+	/** Diese Methode gibt die bisher zur Wiederverwendung erzeugten Platzhalter zurück.
 	 *
 	 * @return Abbildung von Namen auf Platzhalter. */
-	public final Map<String, FEMProxy> proxies() {
+	public final Map<String, FEMFunction> proxies() {
 		return this.proxies;
 	}
 

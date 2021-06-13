@@ -40,7 +40,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	static class ItemMap implements Map<FEMValue, FEMValue> {
+	static class ItemMap implements Map<FEMValue, FEMValue>, Emuable {
 
 		class Keys extends AbstractSet<FEMValue> {
 
@@ -89,7 +89,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 			@Override
 			public Iterator<Entry<FEMValue, FEMValue>> iterator() {
-				return new EntryIterator();
+				return new EntryIter();
 			}
 
 			@Override
@@ -108,7 +108,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 		}
 
-		class EntryIterator extends AbstractIterator<Entry<FEMValue, FEMValue>> {
+		class EntryIter extends AbstractIterator<Entry<FEMValue, FEMValue>> {
 
 			final Iterator<FEMValue> keys = ItemMap.this.keys.iterator();
 
@@ -232,9 +232,14 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 			return new EntryMap().toString();
 		}
 
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.fromAll(this.keys, this.values);
+		}
+
 	}
 
-	static class ItemList extends AbstractList<FEMValue> implements RandomAccess {
+	static class ItemList extends AbstractList<FEMValue> implements RandomAccess, Emuable {
 
 		public final FEMArray items;
 
@@ -275,6 +280,11 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 		@Override
 		public List<FEMValue> subList(final int fromIndex, final int toIndex) {
 			return this.items.section(fromIndex, toIndex - fromIndex).toList();
+		}
+
+		@Override
+		public long emu() {
+			return EMU.fromObject(this) + EMU.from(this.items);
 		}
 
 	}

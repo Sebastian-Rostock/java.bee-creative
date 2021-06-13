@@ -4,7 +4,7 @@ import java.util.Map.Entry;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein abstraktes {@link Entry2}.
- * 
+ *
  * @param <GKey> Typ des Schlüssels.
  * @param <GValue> Typ des Werts. */
 public abstract class AbstractEntry<GKey, GValue> implements Entry2<GKey, GValue> {

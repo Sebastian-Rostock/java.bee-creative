@@ -696,7 +696,7 @@ public class Parser {
 		return Token.from(this.source(), offset, length, type);
 	}
 
-	/** Diese Methode erzeugt einen an der gegebenen Position beginnenden und an der {@link #index() aktuellen Position} endenden Abschnitt und gibt diesen
+	/** Diese Methode erzeugt einen an der gegebenen Position beginnenden sowie an der {@link #index() aktuellen Position} endenden Abschnitt und gibt diesen
 	 * zurück. Sie ist eine Abkürzung für {@link #make(int, int, int, Iterable) this.make(type, offset, this.index() - offset, tokens)}.
 	 *
 	 * @param type Abschnittstyp.

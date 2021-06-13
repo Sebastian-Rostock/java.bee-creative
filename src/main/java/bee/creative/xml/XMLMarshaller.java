@@ -142,7 +142,7 @@ public class XMLMarshaller {
 		return this;
 	}
 
-	/** Diese Methode überführt die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück. 
+	/** Diese Methode überführt die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück.
 	 *
 	 * @see ResultData#useNode()
 	 * @see #openResultData()
@@ -155,7 +155,7 @@ public class XMLMarshaller {
 		return result.getNode();
 	}
 
-	/** Diese Methode überführt die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück.  
+	/** Diese Methode überführt die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück.
 	 *
 	 * @see StringWriter
 	 * @see ResultData#useWriter(Writer)

@@ -87,7 +87,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		}
 
 	}
-	
+
 	static class ItemFinder implements Collector {
 
 		public final int value;
@@ -1533,7 +1533,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		if (that.length > (this.length - offset)) return -1;
 		return this.customFind(that, offset);
 	}
-	
 
 	int findLast(final Object key) {
 		if (this.length == 0) return -1;

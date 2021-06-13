@@ -26,7 +26,8 @@ import bee.creative.lang.Objects;
  * <p>
  * <table border="1" cellpadding="2" cellspacing="0">
  * <tr>
- * <th rowspan="2">Klasse<br>(JavaSE-1.7)</th>
+ * <th rowspan="2">Klasse<br>
+ * (JavaSE-1.7)</th>
  * <th colspan="4">Speicherverbrauch in Byte</th>
  * </tr>
  * <tr>

@@ -45,7 +45,7 @@ public class Comparables {
 
 	/** Diese Klasse implementiert ein verkettetes {@link Comparable2}, welches den {@link #compareTo(Object) Navigationswert} eines ersten gegebenen
 	 * {@link Comparable} liefert, sofern dieser ungleich {@code 0} ist, und sonst den eines zweiten gegebenen {@link Comparable} verwendet.
-	 * 
+	 *
 	 * @param <GItem> Typ der Eingabe. */
 	@SuppressWarnings ("javadoc")
 	public static class ConcatComparable<GItem> extends AbstractComparable<GItem> {
@@ -101,7 +101,7 @@ public class Comparables {
 	/** Diese Klasse implementiert ein übersetztes {@link Comparable2}, welches seine Eingabe über einen gegebenen {@link Getter} in die Eingabe eines gegebenen
 	 * {@link Comparable} überführt und dessen {@link #compareTo(Object) Navigationswert} liefert. Der Navigationswert für eine Eingabe {@code item} ist
 	 * {@code this.that.compareTo(this.trans.get(item))}. *
-	 * 
+	 *
 	 * @param <GItem> Typ der Eingabe.
 	 * @param <GItem2> Typ der Eingabe des gegebenen {@link Comparable}. */
 	@SuppressWarnings ("javadoc")
@@ -577,9 +577,9 @@ public class Comparables {
 	/** Diese Methode liefert den gegebenen {@link Comparable} als {@link Comparable2}. Wenn er {@code null} ist, wird das {@link EmptyComparable} geliefert. */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Comparable2<GItem> from(final Comparable<? super GItem> that) {
-		if (that == null) return empty();
+		if (that == null) return Comparables.empty();
 		if (that instanceof Comparable2<?>) return (Comparable2<GItem>)that;
-		return translate(that, Getters.<GItem>neutral());
+		return Comparables.translate(that, Getters.<GItem>neutral());
 	}
 
 	/** Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie die gegebene Eingabe zur Berechnung des Navigationswert

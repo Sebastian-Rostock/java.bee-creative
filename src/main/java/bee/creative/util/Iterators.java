@@ -758,7 +758,7 @@ public class Iterators {
 	public static <GItem> Iterator2<GItem> unionAll(final Comparator<? super GItem> order, final Iterator<? extends Iterator<? extends GItem>> iters)
 		throws NullPointerException {
 		if (!iters.hasNext()) return Iterators.empty();
-		Iterator2<GItem> result = from(iters.next());
+		Iterator2<GItem> result = Iterators.from(iters.next());
 		while (iters.hasNext()) {
 			result = Iterators.union(order, result, iters.next());
 		}
@@ -808,7 +808,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #unique(Iterator, Collection) Iterators.unique(that, HashSet2.from(hasher))}. */
-	public static <GItem> Iterator2<GItem> unique(final Iterator<? extends GItem> that, Hasher hasher) throws NullPointerException {
+	public static <GItem> Iterator2<GItem> unique(final Iterator<? extends GItem> that, final Hasher hasher) throws NullPointerException {
 		return Iterators.unique(that, HashSet2.from(hasher));
 	}
 

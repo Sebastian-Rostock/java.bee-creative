@@ -23,7 +23,7 @@ public class Consumers {
 	/** Diese Klasse implementiert einen verketteten {@link Consumer3}, der beim {@link #set(Object) Schreiben} den gegebenen Wert an einen gegebenen
 	 * {@link Setter} delegiert und dazu den von einem gegebenen {@link Producer} bereitgestellten Datensatz verwendet. Das Schreiben des Werts {@code value}
 	 * erfolgt über {@code this.that.set(this.item.get(), value)}.
-	 * 
+	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
 	@SuppressWarnings ("javadoc")
@@ -160,7 +160,7 @@ public class Consumers {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Producer, Setter) Consumers.from(Producers.fromValue(item), that)}.
-	 * 
+	 *
 	 * @see Producers#fromValue(Object) */
 	public static <GItem, GValue> Consumer3<GValue> from(final Setter<? super GItem, ? super GValue> that, final GItem item) throws NullPointerException {
 		return Consumers.from(Producers.fromValue(item), that);
@@ -196,7 +196,7 @@ public class Consumers {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Consumer) Consumers.from(Properties.fromNative(that, forceAccessible))}.
-	 * 
+	 *
 	 * @see Properties#fromNative(java.lang.reflect.Field, boolean) */
 	public static <GValue> Consumer3<GValue> fromNative(final java.lang.reflect.Field that, final boolean forceAccessible) {
 		return Consumers.from(Properties.fromNative(that, forceAccessible));
@@ -218,7 +218,7 @@ public class Consumers {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Consumer) Consumers.from(Properties.fromNative(fieldOwner, fieldName, forceAccessible))}.
-	 * 
+	 *
 	 * @see Properties#fromNative(Class, String, boolean) */
 	public static <GValue> Consumer3<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {

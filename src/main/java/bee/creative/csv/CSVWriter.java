@@ -242,7 +242,7 @@ public class CSVWriter implements Closeable, Flushable {
 
 	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values[0]).writeValue(values[1])...}.
 	 *
-	 * @sell #writeValue(String)
+	 * @see #writeValue(Object)
 	 * @param values Werte.
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.

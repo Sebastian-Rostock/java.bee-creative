@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /** Diese Schnittstelle ergänzt ein {@link Field} insb. um eine Anbindung an Methoden von {@link Fields}.
- * 
+ *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ des Datensatzes.
  * @param <GValue> Typ des Werts der Eigenschaft. */

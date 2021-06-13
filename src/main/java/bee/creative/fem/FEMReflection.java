@@ -311,7 +311,7 @@ public abstract class FEMReflection extends FEMFunction {
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMReflection)) return false;
-		FEMReflection that = (FEMReflection)object;
+		final FEMReflection that = (FEMReflection)object;
 		return this.member().equals(that.member());
 	}
 

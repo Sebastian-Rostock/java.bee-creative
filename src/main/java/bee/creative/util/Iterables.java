@@ -12,7 +12,7 @@ import bee.creative.lang.Objects;
 import bee.creative.util.Iterators.UnmodifiableIterator;
 
 /** Diese Klasse implementiert grundlegende {@link Iterable}.
- * 
+ *
  * @see Iterators
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Iterables {
@@ -340,17 +340,17 @@ public class Iterables {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromItem(Object, int) Iterables.fromItem(item, 1)}. */
-	public static <GItem> Iterable<GItem> fromItem(final GItem item) {
+	public static <GItem> Iterable2<GItem> fromItem(final GItem item) {
 		return Iterables.fromItem(item, 1);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link UniformIterable new UniformIterable<>(item, count)}. */
-	public static <GItem> Iterable<GItem> fromItem(final GItem item, final int count) throws IllegalArgumentException {
+	public static <GItem> Iterable2<GItem> fromItem(final GItem item, final int count) throws IllegalArgumentException {
 		return new UniformIterable<>(item, count);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CountIterable new CountIterable<>(count)}. */
-	public static Iterable<Integer> fromCount(final int count) throws IllegalArgumentException {
+	public static Iterable2<Integer> fromCount(final int count) throws IllegalArgumentException {
 		return new CountIterable(count);
 	}
 

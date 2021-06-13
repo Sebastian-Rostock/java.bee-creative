@@ -12,23 +12,23 @@ public abstract class AbstractProxySet<GItem, GData extends Set<GItem>> extends 
 
 	/** Diese Klasse implementiert {@link AbstractProxySet#toSet(Property)}. */
 	static class PropertySet<GItem> extends AbstractProxySet<GItem, Set<GItem>> {
-	
+
 		public final Property<Set<GItem>> property;
-	
+
 		public PropertySet(final Property<Set<GItem>> property) {
 			this.property = Objects.notNull(property);
 		}
-	
+
 		@Override
 		public Set<GItem> getData(final boolean readonly) {
 			return this.property.get();
 		}
-	
+
 		@Override
 		protected void setData(final Set<GItem> items) {
 			this.property.set(items);
 		}
-	
+
 	}
 
 	@Override

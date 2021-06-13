@@ -172,23 +172,23 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	/** Diese Klasse implementiert {@link AbstractProxyMap#toMap(Property)}. */
 	static class PropertyMap<GKey, GValue> extends AbstractProxyMap<GKey, GValue, Map<GKey, GValue>> {
-	
+
 		public final Property<Map<GKey, GValue>> property;
-	
+
 		public PropertyMap(final Property<Map<GKey, GValue>> property) {
 			this.property = Objects.notNull(property);
 		}
-	
+
 		@Override
 		public Map<GKey, GValue> getData(final boolean readonly) {
 			return this.property.get();
 		}
-	
+
 		@Override
 		protected void setData(final Map<GKey, GValue> items) {
 			this.property.set(items);
 		}
-	
+
 	}
 
 	/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück. Zum Lesen wird er nur in {@link #size()}, {@link #isEmpty()}, {@link #get(Object)},

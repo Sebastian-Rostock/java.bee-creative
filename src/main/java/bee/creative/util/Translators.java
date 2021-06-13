@@ -214,7 +214,7 @@ public class Translators {
 	 * Translators.neutral(Object.class)}. */
 	@SuppressWarnings ("unchecked")
 	public static <GValue> Translator2<GValue, GValue> neutral() {
-		return (Translator2<GValue, GValue>)neutral(Object.class);
+		return (Translator2<GValue, GValue>)Translators.neutral(Object.class);
 	}
 
 	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#from(Class, Class, Getter, Getter)

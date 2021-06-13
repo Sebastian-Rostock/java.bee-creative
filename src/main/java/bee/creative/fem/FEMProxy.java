@@ -111,7 +111,7 @@ public final class FEMProxy extends FEMFunction implements Property<FEMFunction>
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMProxy)) return false;
-		FEMProxy object2 = (FEMProxy)object;
+		final FEMProxy object2 = (FEMProxy)object;
 		final FEMProxy that = object2;
 		return this.id.equals(that.id);
 	}

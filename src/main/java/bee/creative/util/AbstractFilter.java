@@ -34,7 +34,7 @@ public abstract class AbstractFilter<GItem> extends BaseObject implements Filter
 	}
 
 	@Override
-	public Filter2<GItem> buffer(final int mode, Hasher hasher) throws IllegalArgumentException {
+	public Filter2<GItem> buffer(final int mode, final Hasher hasher) throws IllegalArgumentException {
 		return Filters.buffer(null, mode, hasher);
 	}
 

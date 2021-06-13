@@ -77,23 +77,23 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 
 	/** Diese Klasse implementiert {@link AbstractProxyList#toList(Property)}. */
 	static class PropertyList<GItem> extends AbstractProxyList<GItem, List<GItem>> {
-	
+
 		public final Property<List<GItem>> property;
-	
+
 		public PropertyList(final Property<List<GItem>> property) {
 			this.property = Objects.notNull(property);
 		}
-	
+
 		@Override
 		public List<GItem> getData(final boolean readonly) {
 			return this.property.get();
 		}
-	
+
 		@Override
 		protected void setData(final List<GItem> items) {
 			this.property.set(items);
 		}
-	
+
 	}
 
 	/** Diese Methode gibt den Inhalt zum Lesen bzw. Schreiben zurück. Zum Lesen wird er nur in {@link #size()}, {@link #isEmpty()}, {@link #get(int)},

@@ -53,10 +53,10 @@ public final class FEMVoid extends FEMValue {
 		return object instanceof FEMVoid;
 	}
 
-	/** Diese Methode gibt {@code "void"} zurück. */
+	/** Diese Methode gibt {@code "null"} zurück. */
 	@Override
 	public String toString() {
-		return "void";
+		return "null";
 	}
 
 }

@@ -128,7 +128,7 @@ public class XMLFormatter {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().transformToNode()}.
-	 * 
+	 *
 	 * @see #transformToNode()
 	 * @see BaseSourceData#use(Object) */
 	public Node transformToNode(final Object source) throws TransformerException, MalformedURLException {
@@ -150,7 +150,7 @@ public class XMLFormatter {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().transformToString()}.
-	 * 
+	 *
 	 * @see #transformToString()
 	 * @see BaseSourceData#use(Object) */
 	public String transformToString(final Object source) throws TransformerException, MalformedURLException {

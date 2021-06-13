@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /** Diese Schnittstelle ergänzt ein {@link Comparable} insb. um eine Anbindung an Methoden von {@link Comparables}.
- * 
+ *
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Eingabe. */
 public interface Comparable2<GItem> extends Comparable<GItem> {

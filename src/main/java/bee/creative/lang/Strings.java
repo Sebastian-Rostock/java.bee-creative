@@ -545,8 +545,8 @@ public class Strings {
 	}
 
 	/** Diese Methode parst die gegebene Zeichenkette mit den gegebenen Symbolen und gibt die geparste Zeichenkette zurück. Sie realisiert dazu die
-	 * Umkehroperation zu {@link #printSequence(CharSequence, char, char, char)} und liefert {@code null}, wenn das Format ungültig ist. Das Parsen erwartet,
-	 * dass die gegebene Zeichenkette mit {@code openSymbol} beginnt, mit {@code closeSymbol} endet und dass vor allen Vorkommen von {@code openSymbol},
+	 * Umkehroperation zu {@link #printSequence(CharSequence, char, char, char)} und liefert {@code null}, wenn das Format ungültig ist. Das Parsen erwartet, dass
+	 * die gegebene Zeichenkette mit {@code openSymbol} beginnt, mit {@code closeSymbol} endet und dass vor allen Vorkommen von {@code openSymbol},
 	 * {@code maskSymbol} und {@code closeSymbol} zwischen dem ersten und letzten Symbol der Zeichenkette ein {@code maskSymbol} steht.
 	 *
 	 * @see #parseSequence(CharSequence, char, char, char)

@@ -153,17 +153,17 @@ public class Getters {
 	@SuppressWarnings ("javadoc")
 	public static class BufferedGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
-		private static interface Entry extends Producer<Object> {
+		private static interface Ref extends Producer<Object> {
 
 			public Object item();
 
 		}
 
-		private static final class SoftEntry extends SoftReference<Object> implements Entry {
+		private static final class SoftRef extends SoftReference<Object> implements Ref {
 
 			final Object item;
 
-			public SoftEntry(final Object item, final Object value) {
+			public SoftRef(final Object item, final Object value) {
 				super(value);
 				this.item = item;
 			}
@@ -175,11 +175,26 @@ public class Getters {
 
 		}
 
-		private static final class WeakEntry extends WeakReference<Object> implements Entry {
+		private static final class SoftGen<GItem> implements Getter<GItem, Object> {
+
+			final Getter<? super GItem, ?> that;
+
+			public SoftGen(final Getter<? super GItem, ?> that) {
+				this.that = that;
+			}
+
+			@Override
+			public Object get(final GItem item) {
+				return new SoftRef(item, this.that.get(item));
+			}
+
+		}
+
+		private static final class WeakRef extends WeakReference<Object> implements Ref {
 
 			final Object item;
 
-			public WeakEntry(final Object item, final Object value) {
+			public WeakRef(final Object item, final Object value) {
 				super(value);
 				this.item = item;
 			}
@@ -191,32 +206,17 @@ public class Getters {
 
 		}
 
-		private static final class SoftGetter<GItem> implements Getter<GItem, Object> {
+		private static final class WeakGen<GItem> implements Getter<GItem, Object> {
 
 			final Getter<? super GItem, ?> that;
 
-			public SoftGetter(final Getter<? super GItem, ?> that) {
+			public WeakGen(final Getter<? super GItem, ?> that) {
 				this.that = that;
 			}
 
 			@Override
 			public Object get(final GItem item) {
-				return new SoftEntry(item, this.that.get(item));
-			}
-
-		}
-
-		private static final class WeakGetter<GItem> implements Getter<GItem, Object> {
-
-			final Getter<? super GItem, ?> that;
-
-			public WeakGetter(final Getter<? super GItem, ?> that) {
-				this.that = that;
-			}
-
-			@Override
-			public Object get(final GItem item) {
-				return new WeakEntry(item, this.that.get(item));
+				return new WeakRef(item, this.that.get(item));
 			}
 
 		}
@@ -239,21 +239,21 @@ public class Getters {
 			if (mode == References.HARD) {
 				this.buffer = Unique.fromHashMap(hasher, that);
 			} else if (mode == References.SOFT) {
-				this.buffer = Unique.fromHashMap(hasher, new SoftGetter<>(that));
+				this.buffer = Unique.fromHashMap(hasher, new SoftGen<>(that));
 			} else if (mode == References.WEAK) {
-				this.buffer = Unique.fromHashMap(hasher, new WeakGetter<>(that));
+				this.buffer = Unique.fromHashMap(hasher, new WeakGen<>(that));
 			} else throw new IllegalArgumentException();
 		}
 
 		@Override
+		@SuppressWarnings ("unchecked")
 		public GValue get(final GItem item) {
-			final Object val = this.buffer.get(item);
-			@SuppressWarnings ("unchecked")
-			final GValue res = (GValue)(val instanceof Entry ? ((Entry)val).get() : val);
+			if (this.mode == References.HARD) return (GValue)this.buffer.get(item);
+			final GValue res = (GValue)((Ref)this.buffer.get(item)).get();
 			while (true) {
-				final Object ref = this.queue.poll();
-				if (ref == null) return res;
-				this.buffer.mapping().remove(((Entry)ref).item());
+				final Ref ref = (Ref)this.queue.poll();
+				if (ref == null) return res != null ? res : (GValue)((Ref)this.buffer.get(item)).get();
+				this.buffer.mapping().remove(ref.item());
 			}
 		}
 

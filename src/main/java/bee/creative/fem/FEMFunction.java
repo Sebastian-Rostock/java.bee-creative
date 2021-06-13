@@ -20,7 +20,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public String toString() {
-			return FEMDomain.DEFAULT.printGroup(this);
+			return FEMDomain.DEFAULT.printScript(this);
 		}
 
 	}

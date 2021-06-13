@@ -8,7 +8,7 @@ import bee.creative.util.Getter;
 import bee.creative.util.Producer;
 
 /** Diese Klasse implementiert den Generator der {@link LOGBuilder#toStrings() Textdarstellungen} eines {@link LOGBuilder}.
- * 
+ *
  * @see #get()
  * @see #get(Iterable)
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -48,7 +48,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	}
 
 	/** Diese Methode {@link #customPrint(Object, Object[]) erfasst} die gegebene Protokollzeile.
-	 * 
+	 *
 	 * @param node Protokollzeile. */
 	public void print(final LOGEntry node) {
 		this.customPrint(node.text, node.args);
@@ -56,7 +56,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	}
 
 	/** Diese Methode {@link #print(LOGEntry) erfasst} die gegebenen Protokollzeilen.
-	 * 
+	 *
 	 * @param entries Protokollzeilen. */
 	public void printAll(final Iterable<? extends LOGEntry> entries) {
 		for (final LOGEntry entry: entries) {

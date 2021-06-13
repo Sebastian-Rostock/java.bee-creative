@@ -118,7 +118,7 @@ public interface QS {
 
 	/** Diese Methode liefert ein temporäres {@link QT Hypertupel}, das von diesem Graphspeicher {@link QT#owner() verwaltet} wird und die gegebenen {@link QN
 	 * Hyperknoten} in der gegebenen Reihenfolge miteinander verbindet. Die gegebene Liste darf nicht leer sein.
-	 * 
+	 *
 	 * @param nodes Hyperknoten.
 	 * @return Hypertupel. */
 	public QT newTuple(List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
@@ -127,7 +127,7 @@ public interface QS {
 	 * {@link QT Hypertupeln} und gibt diese zurück. Die Anzahl der gegebenen Hyperknoten muss ein ganzzahliges Vielfaches der {@link List#size() Anzahl} der
 	 * gegebenen Rollennamen sein, da stets diese Anzahl direkt aufeinanderfolgender Hyperknoten zu einem Hypertupel miteinander verbunden wird. Die Rollennamen
 	 * dürfen keine Duplikate enthalten und nicht leer sein.
-	 * 
+	 *
 	 * @param names Rollennamen.
 	 * @param tuples Hyperknotentabelle.
 	 * @return temporäre Hypertupelmenge. */
@@ -136,7 +136,7 @@ public interface QS {
 	/** Diese Methode überführt die gegebenen {@link QT Hypertupel} in eine von diesem Graphspeicher {@link QTSet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück. Die {@link QT#size() Anzahl} der Hyperknoten eines jeden Hypertupel muss gleich der {@link List#size() Anzahl} der gegebenen Rollennamen
 	 * sein. Die Rollennamen dürfen keine Duplikate enthalten und nicht leer sein.
-	 * 
+	 *
 	 * @param names Rollennamen.
 	 * @param tuples Hypertupel.
 	 * @return temporäre Hypertupelmenge. */

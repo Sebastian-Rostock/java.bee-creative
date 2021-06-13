@@ -9,17 +9,17 @@ import java.lang.ref.WeakReference;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class References {
 
-	/** Dieses Feld speichert den Modus der Methode {@link References#from(int, Object)} zur Erzeugung eines {@link HardReference3}. Die Referenz auf den Datensatz
-	 * eines solcher {@link Reference2} wird nicht automatisch aufgelöst. */
+	/** Dieses Feld speichert den Modus der Methode {@link References#from(int, Object)} zur Erzeugung eines {@link HardReference3}. Die Referenz auf den
+	 * Datensatz eines solcher {@link Reference2} wird nicht automatisch aufgelöst. */
 	public static final int HARD = 0;
 
-	/** Dieses Feld speichert den Modus der Methode {@link References#from(int, Object)} zur Erzeugung eines {@link WeakReference3}. Die Referenz auf den Datensatz
-	 * eines solcher {@link Reference2} wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist. */
+	/** Dieses Feld speichert den Modus der Methode {@link References#from(int, Object)} zur Erzeugung eines {@link WeakReference3}. Die Referenz auf den
+	 * Datensatz eines solcher {@link Reference2} wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist. */
 	public static final int WEAK = 1;
 
-	/** Dieses Feld speichert den Modus der Methode {@link References#from(int, Object)} zur Erzeugung eines {@link SoftReference3}. Die Referenz auf den Datensatz
-	 * eines solcher {@link Reference2} wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und der Garbage
-	 * Collector dies entscheidet. */
+	/** Dieses Feld speichert den Modus der Methode {@link References#from(int, Object)} zur Erzeugung eines {@link SoftReference3}. Die Referenz auf den
+	 * Datensatz eines solcher {@link Reference2} wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und
+	 * der Garbage Collector dies entscheidet. */
 	public static final int SOFT = 2;
 
 	/** Dieses Feld speichert den {@link Reference2} auf {@code null}. */
@@ -76,8 +76,8 @@ public class References {
 		return (Reference2<GData>)References.NULL;
 	}
 
-	/** Diese Methode gibt einen harten {@link Reference2} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Reference2} wird
-	 * nicht automatisch aufgelöst.
+	/** Diese Methode gibt einen harten {@link Reference2} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Reference2}
+	 * wird nicht automatisch aufgelöst.
 	 *
 	 * @see HardReference3
 	 * @param <GData> Typ des Datensatzes.
@@ -88,8 +88,8 @@ public class References {
 		return new HardReference3<>(data);
 	}
 
-	/** Diese Methode gibt einen {@link WeakReference3} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Reference2} wird nur
-	 * dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist.
+	/** Diese Methode gibt einen {@link WeakReference3} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Reference2} wird
+	 * nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist.
 	 *
 	 * @see WeakReference3
 	 * @param <GData> Typ des Datensatzes.
@@ -100,8 +100,8 @@ public class References {
 		return new WeakReference3<>(data);
 	}
 
-	/** Diese Methode gibt einen {@link SoftReference3} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Reference2} wird nur
-	 * dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und der Garbage Collector dies entscheidet.
+	/** Diese Methode gibt einen {@link SoftReference3} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Reference2} wird
+	 * nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und der Garbage Collector dies entscheidet.
 	 *
 	 * @see SoftReference3
 	 * @param <GData> Typ des Datensatzes.

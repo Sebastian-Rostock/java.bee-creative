@@ -328,36 +328,36 @@ public class Properties {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ValueProperty new ValueProperty<>(value)}. */
-	public static <GValue> Property<GValue> fromValue(final GValue value) {
+	public static <GValue> Property2<GValue> fromValue(final GValue value) {
 		return new ValueProperty<>(value);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(String, boolean) Properties.fromNative(fieldPath, true)}. */
-	public static <GValue> Property<GValue> fromNative(final String fieldPath) throws NullPointerException, IllegalArgumentException {
+	public static <GValue> Property2<GValue> fromNative(final String fieldPath) throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(fieldPath, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field) Properties.fromNative(Natives.parseField(fieldPath), forceAccessible)}.
 	 *
 	 * @see Natives#parseField(String) */
-	public static <GValue> Property<GValue> fromNative(final String fieldPath, final boolean forceAccessible)
+	public static <GValue> Property2<GValue> fromNative(final String fieldPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(Natives.parseField(fieldPath), forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(java.lang.reflect.Field, boolean) Properties.fromNative(field, true)}. */
-	public static <GValue> Property<GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
+	public static <GValue> Property2<GValue> fromNative(final java.lang.reflect.Field field) throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(field, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link NativeProperty new NativeProperty<>(field, forceAccessible)}. */
-	public static <GValue> Property<GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible)
+	public static <GValue> Property2<GValue> fromNative(final java.lang.reflect.Field field, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return new NativeProperty<>(field, forceAccessible);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Method, Method, boolean) Properties.fromNative(get, set, true)}. **/
-	public static <GValue> Property<GValue> fromNative(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
+	public static <GValue> Property2<GValue> fromNative(final Method get, final Method set) throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(get, set, true);
 	}
 
@@ -366,13 +366,13 @@ public class Properties {
 	 *
 	 * @see Producers#fromNative(Method, boolean)
 	 * @see Consumers#fromNative(Method, boolean) */
-	public static <GValue> Property<GValue> fromNative(final Method get, final Method set, final boolean forceAccessible)
+	public static <GValue> Property2<GValue> fromNative(final Method get, final Method set, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Properties.from(Producers.<GValue>fromNative(get, forceAccessible), Consumers.<GValue>fromNative(set, forceAccessible));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #fromNative(Class, String, boolean) Properties.fromNative(fieldOwner, fieldName, true)}. */
-	public static <GValue> Property<GValue> fromNative(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
+	public static <GValue> Property2<GValue> fromNative(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(fieldOwner, fieldName, true);
 	}
 
@@ -380,7 +380,7 @@ public class Properties {
 	 * forceAccessible)}.
 	 *
 	 * @see Natives#parseField(Class, String) */
-	public static <GValue> Property<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
+	public static <GValue> Property2<GValue> fromNative(final Class<?> fieldOwner, final String fieldName, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		return Properties.fromNative(Natives.parseField(fieldOwner, fieldName), forceAccessible);
 	}

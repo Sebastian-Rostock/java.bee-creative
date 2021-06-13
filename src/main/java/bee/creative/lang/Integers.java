@@ -248,7 +248,7 @@ public class Integers {
 	}
 
 	/** Diese Methode fügt die gegebene Speichergröße mit {@link #printSize(long) Maßeinheit formatiert} an den gegebenen Puffer an.
-	 * 
+	 *
 	 * @param res Speichergröße in Byte.
 	 * @param value Puffer. */
 	public static void printSize(final StringBuilder res, final long value) {
@@ -271,7 +271,7 @@ public class Integers {
 	}
 
 	/** Diese Methode fügt die gegebene Zeitspanne mit {@link #printTime(long) Maßeinheit formatiert} an den gegebenen Puffer an.
-	 * 
+	 *
 	 * @param res Zeitspanne in Nanosekunden.
 	 * @param value Puffer. */
 	public static void printTime(final StringBuilder res, final long value) {

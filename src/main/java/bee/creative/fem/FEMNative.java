@@ -61,7 +61,7 @@ public final class FEMNative extends FEMValue {
 	}
 
 	@Override
-	public boolean equals(Object object) {
+	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMValue)) return false;
 		final FEMValue that = (FEMValue)object;
