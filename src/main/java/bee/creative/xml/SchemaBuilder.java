@@ -121,19 +121,7 @@ public abstract class SchemaBuilder<GOwner> extends BaseValueBuilder<Schema, GOw
 		}
 
 	}
-	
-	/** {@inheritDoc}
-	 *
-	 * @see #putValue() */
-	@Override
-	public Schema get() throws IllegalStateException {
-		try {
-			return this.putValue();
-		} catch (Exception cause) {
-			throw new IllegalStateException(cause);
-		}
-	}
-
+ 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
 	 * @param that Konfigurator oder {@code null}.

@@ -19,7 +19,7 @@ public final class XMLEvaluator {
 	/** Diese Klasse implementiert den Konfigurator für einen {@link XPath}.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class XPathData extends BaseXPathData<XPathData> {
+	public final class XPathData extends XPathDataBuilder<XPathData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *

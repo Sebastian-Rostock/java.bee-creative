@@ -363,18 +363,7 @@ public abstract class SchemaFactoryBuilder<GOwner> extends BaseValueBuilder<Sche
 		this.forLanguage().use(that.language());
 		return this.owner();
 	}
-
-	/** {@inheritDoc}
-	 *
-	 * @see #putValue() */
-	@Override
-	public SchemaFactory get() throws IllegalStateException {
-		try {
-			return this.putValue();
-		} catch (Exception cause) {
-			throw new IllegalStateException(cause);
-		}
-	}
+ 
 
 	/** Diese Methode gibt das {@link SchemaFactory} zurück. Wenn über {@link #useValue(Object)} noch keine {@link SchemaFactory} gesetzt wurde, wird über
 	 * {@link SchemaFactory#newInstance(String)} eine neue erstellt, über {@link #useValue(Object)} gesetzt und über {@link #updateValue()} aktualisiert. Die zur

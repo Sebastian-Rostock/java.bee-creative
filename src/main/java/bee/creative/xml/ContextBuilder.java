@@ -152,17 +152,7 @@ public abstract class ContextBuilder<GOwner> extends BaseValueBuilder<JAXBContex
 	}
 
 	
-	/** {@inheritDoc}
-	 *
-	 * @see #putValue() */
-	@Override
-	public JAXBContext get() throws IllegalStateException {
-		try {
-			return this.putValue();
-		} catch (Exception cause) {
-			throw new IllegalStateException(cause);
-		}
-	}
+ 
 	
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *

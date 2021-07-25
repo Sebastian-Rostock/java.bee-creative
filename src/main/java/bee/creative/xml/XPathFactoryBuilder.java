@@ -14,6 +14,86 @@ import bee.creative.util.Builders.BaseValueBuilder;
  * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPathFactory, GOwner> {
 
+	public static abstract class Value<GOwner> extends XPathFactoryBuilder<GOwner> {
+
+		XPathFactory value;
+
+		ModelValue model = new ModelValue();
+
+		FeaturesValue features = new FeaturesValue();
+
+		VariableValue variable = new VariableValue();
+
+		FunctionValue function = new FunctionValue();
+
+		@Override
+		public XPathFactory get() {
+			return this.value;
+		}
+
+		@Override
+		public void set(final XPathFactory value) {
+			this.value = value;
+		}
+
+		@Override
+		public ModelValue model() {
+			return this.model;
+		}
+
+		@Override
+		public FeaturesValue features() {
+			return this.features;
+		}
+
+		@Override
+		public VariableValue variable() {
+			return this.variable;
+		}
+
+		@Override
+		public FunctionValue function() {
+			return this.function;
+		}
+
+	}
+
+	public static abstract class Proxy<GOwner> extends XPathFactoryBuilder<GOwner> {
+
+		protected abstract Value<?> value();
+
+		@Override
+		public XPathFactory get() {
+			return this.value().get();
+		}
+
+		@Override
+		public void set(final XPathFactory value) {
+			this.value().set(value);
+		}
+
+		@Override
+		public ModelValue model() {
+			return this.value().model();
+		}
+
+		@Override
+		public FeaturesValue features() {
+			return this.value().features();
+		}
+
+		@Override
+		public VariableValue variable() {
+			return this.value().variable();
+		}
+
+		@Override
+		public FunctionValue function() {
+			return this.value().function();
+		}
+
+	}
+
 	public static class ModelValue extends ModelBuilder<ModelValue> {
 
 		ModelValue() {
@@ -184,18 +264,6 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class FunctionBuilder<GOwner> extends BaseValueBuilder<XPathFunctionResolver, GOwner> {
 
-	}
-
-	/** {@inheritDoc}
-	 *
-	 * @see #putValue() */
-	@Override
-	public XPathFactory get() throws IllegalStateException {
-		try {
-			return this.putValue();
-		} catch (final Exception cause) {
-			throw new IllegalStateException(cause);
-		}
 	}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
