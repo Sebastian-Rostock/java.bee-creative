@@ -28,7 +28,8 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		public abstract GOwner closeSourceData();
 
 		@Override
-		protected final SourceData<GOwner> customThis() {
+		public
+		final SourceData<GOwner> owner() {
 			return this;
 		}
 
@@ -46,7 +47,8 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 		public abstract GOwner closeFactoryData();
 
 		@Override
-		protected final FactoryData<GOwner> customThis() {
+		public
+		final FactoryData<GOwner> owner() {
 			return this;
 		}
 
@@ -60,7 +62,7 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 
 		@Override
 		public final GThis closeSourceData() {
-			return BaseTemplatesData.this.customThis();
+			return BaseTemplatesData.this.owner();
 		}
 
 	};
@@ -70,7 +72,7 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 
 		@Override
 		public final GThis closeFactoryData() {
-			return BaseTemplatesData.this.customThis();
+			return BaseTemplatesData.this.owner();
 		}
 
 	};
@@ -80,11 +82,11 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseTemplatesData<?> data) {
-		if (data == null) return this.customThis();
+		if (data == null) return this.owner();
 		this.templates = data.templates;
 		this.scriptData.use(data.scriptData);
 		this.factoryData.use(data.factoryData);
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode gibt die {@link Templates} zurück. Wenn über {@link #useTemplates(Templates)} noch keine {@link Templates} gesetzt wurden, werden über
@@ -111,7 +113,7 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	 * @return {@code this}. */
 	public final GThis useTemplates(final Templates templates) {
 		this.templates = templates;
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode setzt die {@link Templates} auf {@code null} und gibt {@code this} zurück. Wenn {@link #getTemplates()} {@code null} liefern soll, müssen
@@ -139,7 +141,8 @@ public abstract class BaseTemplatesData<GThis> extends BaseBuilder<Templates, GT
 	}
 
 	@Override
-	protected abstract GThis customThis();
+	public
+	abstract GThis owner();
 
 	/** {@inheritDoc}
 	 *

@@ -32,14 +32,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMObject from(final String string) throws NullPointerException, IllegalArgumentException {
 		try {
-			final int index2 = string.indexOf('.');
+			final int index1 = string.indexOf('.');
+			if (index1 < 0) throw new IllegalArgumentException();
+			final int index2 = string.indexOf(':');
 			if (index2 < 0) throw new IllegalArgumentException();
-			final int index3 = string.indexOf(':');
-			if (index3 < 0) throw new IllegalArgumentException();
 			if (string.charAt(0) != '@') throw new IllegalArgumentException();
-			final int ref = Integer.parseInt(string.substring(1, index2));
-			final int type = Integer.parseInt(string.substring(index2 + 1, index3));
-			final int owner = Integer.parseInt(string.substring(index3 + 1));
+			final int ref = Integer.parseInt(string.substring(index1 + 1, index2));
+			final int type = Integer.parseInt(string.substring(index2 + 1));
+			final int owner = Integer.parseInt(string.substring(1, index1));
 			return FEMObject.from(ref, type, owner);
 		} catch (final NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
@@ -209,20 +209,20 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	@Override
 	public int compareTo(final FEMObject that) throws NullPointerException {
-		int result = Comparators.compare(this.refValue(), that.refValue());
+		int result = Comparators.compare(this.ownerValue(), that.ownerValue());
 		if (result != 0) return result;
-		result = Comparators.compare(this.ownerValue(), that.ownerValue());
+		result = Comparators.compare(this.refValue(), that.refValue());
 		if (result != 0) return result;
 		return Comparators.compare(this.typeValue(), that.typeValue());
 	}
 
-	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück. Das Format der Textdarstellung ist {@code @}{@link #refValue()
-	 * REF}{@code .}{@link #ownerValue() OWNER}{@code :}{@link #typeValue() TYPE}.
+	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück. Das Format der Textdarstellung ist {@code @}{@link #ownerValue()
+	 * OWNER}{@code .}{@link #refValue() REF}{@code :}{@link #typeValue() TYPE}.
 	 *
 	 * @return Textdarstellung. */
 	@Override
 	public String toString() {
-		return "@" + this.refValue() + "." + this.ownerValue() + ":" + this.typeValue();
+		return "@" + this.ownerValue() + "." + this.refValue() + ":" + this.typeValue();
 	}
 
 }

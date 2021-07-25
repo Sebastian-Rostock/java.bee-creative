@@ -8,20 +8,20 @@ import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
 import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseItemBuilder;
+import bee.creative.util.Builders.BaseValueBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link XPath}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
+ * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
+public abstract class BaseXPathData<GOwner> extends BaseBuilder<XPath, GOwner> {
 
 	/** Diese Klasse implementiert den Konfigurator einer {@link XPathFactory}.
 	 *
 	 * @see XPathFactory#newXPath()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class FactoryData<GOwner> extends BaseXPathFactoryData<FactoryData<GOwner>> {
+	public static abstract class FactoryData<GOwner> extends XPathFactoryBuilder<FactoryData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -29,7 +29,8 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		public abstract GOwner closeFacroryData();
 
 		@Override
-		protected final FactoryData<GOwner> customThis() {
+		public
+		final FactoryData<GOwner> owner() {
 			return this;
 		}
 
@@ -40,7 +41,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 * @see XPath#setNamespaceContext(NamespaceContext)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ContextData<GOwner> extends BaseItemBuilder<NamespaceContext, ContextData<GOwner>> {
+	public static abstract class ContextData<GOwner> extends BaseValueBuilder<NamespaceContext, ContextData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -48,7 +49,8 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		public abstract GOwner closeContextData();
 
 		@Override
-		protected final ContextData<GOwner> customThis() {
+		public
+		final ContextData<GOwner> owner() {
 			return this;
 		}
 
@@ -59,7 +61,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 * @see XPath#setXPathVariableResolver(XPathVariableResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class VariableData<GOwner> extends BaseItemBuilder<XPathVariableResolver, VariableData<GOwner>> {
+	public static abstract class VariableData<GOwner> extends BaseValueBuilder<XPathVariableResolver, VariableData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -67,7 +69,8 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		public abstract GOwner closeVariableData();
 
 		@Override
-		protected final VariableData<GOwner> customThis() {
+		public
+		final VariableData<GOwner> owner() {
 			return this;
 		}
 
@@ -78,7 +81,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 * @see XPath#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class FunctionData<GOwner> extends BaseItemBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
+	public static abstract class FunctionData<GOwner> extends BaseValueBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -86,7 +89,8 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		public abstract GOwner closeFunctionData();
 
 		@Override
-		protected final FunctionData<GOwner> customThis() {
+		public
+		final FunctionData<GOwner> owner() {
 			return this;
 		}
 
@@ -96,41 +100,41 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	XPath xpath;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFacroryData()}. */
-	final FactoryData<GThis> facroryData = new FactoryData<GThis>() {
+	final FactoryData<GOwner> facroryData = new FactoryData<GOwner>() {
 
 		@Override
-		public final GThis closeFacroryData() {
-			return BaseXPathData.this.customThis();
+		public final GOwner closeFacroryData() {
+			return BaseXPathData.this.owner();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openContextData()}. */
-	final ContextData<GThis> contextData = new ContextData<GThis>() {
+	final ContextData<GOwner> contextData = new ContextData<GOwner>() {
 
 		@Override
-		public final GThis closeContextData() {
-			return BaseXPathData.this.customThis();
+		public final GOwner closeContextData() {
+			return BaseXPathData.this.owner();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openVariableData()}. */
-	final VariableData<GThis> variableData = new VariableData<GThis>() {
+	final VariableData<GOwner> variableData = new VariableData<GOwner>() {
 
 		@Override
-		public final GThis closeVariableData() {
-			return BaseXPathData.this.customThis();
+		public final GOwner closeVariableData() {
+			return BaseXPathData.this.owner();
 		}
 
 	};
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFunctionData()}. */
-	final FunctionData<GThis> functionData = new FunctionData<GThis>() {
+	final FunctionData<GOwner> functionData = new FunctionData<GOwner>() {
 
 		@Override
-		public final GThis closeFunctionData() {
-			return BaseXPathData.this.customThis();
+		public final GOwner closeFunctionData() {
+			return BaseXPathData.this.owner();
 		}
 
 	};
@@ -139,14 +143,14 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public final GThis use(final BaseXPathData<?> data) {
-		if (data == null) return this.customThis();
+	public final GOwner use(final BaseXPathData<?> data) {
+		if (data == null) return this.owner();
 		this.xpath = data.xpath;
 		this.facroryData.use(data.facroryData);
 		this.contextData.use(data.contextData);
 		this.variableData.use(data.variableData);
 		this.functionData.use(data.functionData);
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode gibt das {@link XPath} zurück. Wenn über {@link #useXPath(XPath)} noch keine {@link XPath} gesetzt wurde, wird über
@@ -156,12 +160,12 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 * @see #useXPath(XPath)
 	 * @see #updateXPath()
 	 * @return {@link XPath}.
-	 * @throws XPathFactoryConfigurationException Wenn {@link FactoryData#getFactory()} bzw. {@link XPathFactory#newXPath()} eine entsprechende Ausnahme
+	 * @throws XPathFactoryConfigurationException Wenn {@link FactoryData#putValue()} bzw. {@link XPathFactory#newXPath()} eine entsprechende Ausnahme
 	 *         auslöst. */
 	public final XPath getXPath() throws XPathFactoryConfigurationException {
 		XPath result = this.xpath;
 		if (result != null) return result;
-		result = this.facroryData.getFactory().newXPath();
+		result = this.facroryData.putValue().newXPath();
 		this.useXPath(result);
 		this.updateXPath();
 		return result;
@@ -171,16 +175,16 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 *
 	 * @param factory {@link XPath} oder {@code null}.
 	 * @return {@code this}. */
-	public final GThis useXPath(final XPath factory) {
+	public final GOwner useXPath(final XPath factory) {
 		this.xpath = factory;
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode setzt den {@link XPath} auf {@code null} und gibt {@code this} zurück.
 	 *
 	 * @see #useXPath(XPath)
 	 * @return {@code this}. */
-	public final GThis resetXPath() {
+	public final GOwner resetXPath() {
 		return this.useXPath(null);
 	}
 
@@ -190,7 +194,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 *
 	 * @return {@code this}.
 	 * @throws XPathFactoryConfigurationException Wenn {@link #getXPath()} eine entsprechende Ausnahme auslöst. */
-	public final GThis updateXPath() throws XPathFactoryConfigurationException {
+	public final GOwner updateXPath() throws XPathFactoryConfigurationException {
 		final XPath factory = this.getXPath();
 		for (final NamespaceContext value: this.contextData) {
 			factory.setNamespaceContext(value);
@@ -201,13 +205,13 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 		for (final XPathFunctionResolver value: this.functionData) {
 			factory.setXPathFunctionResolver(value);
 		}
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die {@link XPathFactory} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
-	public final FactoryData<GThis> openFacroryData() {
+	public final FactoryData<GOwner> openFacroryData() {
 		return this.facroryData;
 	}
 
@@ -215,7 +219,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 *
 	 * @see XPath#setNamespaceContext(NamespaceContext)
 	 * @return Konfigurator. */
-	public final ContextData<GThis> openContextData() {
+	public final ContextData<GOwner> openContextData() {
 		return this.contextData;
 	}
 
@@ -223,7 +227,7 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 *
 	 * @see XPath#setXPathVariableResolver(XPathVariableResolver)
 	 * @return Konfigurator. */
-	public final VariableData<GThis> openVariableData() {
+	public final VariableData<GOwner> openVariableData() {
 		return this.variableData;
 	}
 
@@ -231,12 +235,13 @@ public abstract class BaseXPathData<GThis> extends BaseBuilder<XPath, GThis> {
 	 *
 	 * @see XPath#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @return Konfigurator. */
-	public final FunctionData<GThis> openFunctionData() {
+	public final FunctionData<GOwner> openFunctionData() {
 		return this.functionData;
 	}
 
 	@Override
-	protected abstract GThis customThis();
+	public
+	abstract GOwner owner();
 
 	/** {@inheritDoc}
 	 *

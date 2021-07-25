@@ -10,8 +10,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseItemBuilder;
-import bee.creative.util.Builders.BaseMapBuilder2;
+import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.Builders.BaseMapBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link TransformerFactory} zur Erzeugung von {@link Templates} oder eines
  * {@link Transformer}.
@@ -24,19 +24,26 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 
 	/** Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link TransformerFactory}.
 	 *
-	 * @see TransformerFactory#setFeature(String, boolean)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class FeatureData<GOwner> extends BaseFeatureData<FeatureData<GOwner>> {
-
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public abstract GOwner closeFeatureData();
+	 * @see TransformerFactory#setFeature(String, boolean) */
+	public static class FeatureValue extends BaseFeaturesData.Value<FeatureValue> {
 
 		@Override
-		protected final FeatureData<GOwner> customThis() {
+		public final FeatureValue owner() {
 			return this;
+		}
+
+	}
+
+	public class FeatureProxy extends BaseFeaturesData.Proxy<FeatureValue> {
+
+		@Override
+		protected FeatureValue value() {
+			return null;
+		}
+
+		@Override
+		public FeatureValue owner() {
+			return null;
 		}
 
 	}
@@ -46,7 +53,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setAttribute(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class AttributeData<GOwner> extends BaseMapBuilder2<String, String, AttributeData<GOwner>> {
+	public static abstract class AttributeData<GOwner> extends BaseMapBuilder<String, String, AttributeData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -54,7 +61,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		public abstract GOwner closeAttributeData();
 
 		@Override
-		protected final AttributeData<GOwner> customThis() {
+		public final AttributeData<GOwner> owner() {
 			return this;
 		}
 
@@ -65,7 +72,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ListenerData<GOwner> extends BaseItemBuilder<ErrorListener, ListenerData<GOwner>> {
+	public static abstract class ListenerData<GOwner> extends BaseValueBuilder<ErrorListener, ListenerData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -73,7 +80,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		public abstract GOwner closeListenerData();
 
 		@Override
-		protected final ListenerData<GOwner> customThis() {
+		public final ListenerData<GOwner> owner() {
 			return this;
 		}
 
@@ -84,7 +91,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ResolverData<GOwner> extends BaseItemBuilder<URIResolver, ResolverData<GOwner>> {
+	public static abstract class ResolverData<GOwner> extends BaseValueBuilder<URIResolver, ResolverData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -92,7 +99,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		public abstract GOwner closeResolverData();
 
 		@Override
-		protected final ResolverData<GOwner> customThis() {
+		public final ResolverData<GOwner> owner() {
 			return this;
 		}
 
@@ -102,11 +109,11 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	TransformerFactory factory;
 
 	/** Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}. */
-	final FeatureData<GThis> featureData = new FeatureData<GThis>() {
+	final FeatureValue<GThis> featureData = new FeatureValue<GThis>() {
 
 		@Override
 		public final GThis closeFeatureData() {
-			return BaseTransformerFactoryData.this.customThis();
+			return BaseTransformerFactoryData.this.owner();
 		}
 
 	};
@@ -116,7 +123,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 
 		@Override
 		public final GThis closeAttributeData() {
-			return BaseTransformerFactoryData.this.customThis();
+			return BaseTransformerFactoryData.this.owner();
 		}
 
 	};
@@ -126,7 +133,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 
 		@Override
 		public final GThis closeListenerData() {
-			return BaseTransformerFactoryData.this.customThis();
+			return BaseTransformerFactoryData.this.owner();
 		}
 
 	};
@@ -136,7 +143,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 
 		@Override
 		public final GThis closeResolverData() {
-			return BaseTransformerFactoryData.this.customThis();
+			return BaseTransformerFactoryData.this.owner();
 		}
 
 	};
@@ -146,13 +153,13 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseTransformerFactoryData<?> data) {
-		if (data == null) return this.customThis();
+		if (data == null) return this.owner();
 		this.factory = data.factory;
 		this.featureData.use(data.featureData);
-		this.attributeData.use(data.attributeData);
+		this.attributeData.useString(data.attributeData);
 		this.listenerData.use(data.listenerData);
 		this.resolverData.use(data.resolverData);
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode gibt die {@link TransformerFactory} zurück. Wenn über {@link #useFactory(TransformerFactory)} noch keine {@link TransformerFactory} gesetzt
@@ -178,7 +185,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	 * @return {@code this}. */
 	public final GThis useFactory(final TransformerFactory factory) {
 		this.factory = factory;
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode setzt die {@link TransformerFactory} auf {@code null} und gibt {@code this} zurück.
@@ -209,14 +216,14 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 		for (final Entry<String, String> entry: this.attributeData) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
 	 *
 	 * @see TransformerFactory#setFeature(String, boolean)
 	 * @return Konfigurator. */
-	public final FeatureData<GThis> openFeatureData() {
+	public final FeatureValue<GThis> openFeatureData() {
 		return this.featureData;
 	}
 
@@ -245,7 +252,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	@Override
-	protected abstract GThis customThis();
+	public abstract GThis owner();
 
 	/** {@inheritDoc}
 	 *

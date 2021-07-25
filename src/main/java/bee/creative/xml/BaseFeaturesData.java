@@ -1,10 +1,13 @@
 package bee.creative.xml;
 
+import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.xpath.XPathFactory;
-import bee.creative.util.Builders.BaseMapBuilder2;
+import bee.creative.util.HashMap;
+import bee.creative.util.Builders.BaseMapBuilder;
+import bee.creative.xml.BaseDocumentBuilderFactoryData.FeaturesValue;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für die Fähigkeiten einer {@link XPathFactory}, {@link TransformerFactory} bzw.
  * {@link DocumentBuilderFactory}.
@@ -13,14 +16,36 @@ import bee.creative.util.Builders.BaseMapBuilder2;
  * @see TransformerFactory#setFeature(String, boolean)
  * @see DocumentBuilderFactory#setFeature(String, boolean)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseFeatureData<GThis> extends BaseMapBuilder2<String, Boolean, GThis> {
+ * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
+public abstract class BaseFeaturesData<GOwner> extends BaseMapBuilder<String, Boolean, Map<String, Boolean>, GOwner> {
+
+	public static abstract class Value<GOwner> extends BaseFeaturesData<GOwner> {
+
+		Map<String, Boolean> value = new HashMap<>();
+
+		@Override
+		public Map<String, Boolean> get() {
+			return this.value;
+		}
+
+	}
+
+	public static abstract class Proxy<GOwner> extends BaseFeaturesData<GOwner> {
+
+		@Override
+		public Map<String, Boolean> get() {
+			return value().get();
+		}
+
+		protected abstract Value<?> value();
+
+	}
 
 	/** Diese Methode wählt {@link XMLConstants#FEATURE_SECURE_PROCESSING} und gibt {@code this} zurück.
 	 *
 	 * @see #forKey(Object)
 	 * @return {@code this}. */
-	public final GThis forFEATURE_SECURE_PROCESSING() {
+	public final ValueData forFEATURE_SECURE_PROCESSING() {
 		return this.forKey(XMLConstants.FEATURE_SECURE_PROCESSING);
 	}
 

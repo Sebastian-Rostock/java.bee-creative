@@ -69,7 +69,7 @@ import bee.creative.util.Parser.Token;
  * <tr>
  * <td>{@link #parseValueToken(FEMParser, boolean) VALUE}</td>
  * <td>::=</td>
- * <td>{@code ARRAY} | {@code HANDLER1} | {@code STRING1} | {@code STRING2} | {@code IDENT} | {@code CONST}</td>
+ * <td>{@code ARRAY} | {@code HANDLER} | {@code STRING1} | {@code STRING2} | {@code IDENT} | {@code CONST}</td>
  * </tr>
  * <tr>
  * <td>{@link #parseArrayToken(FEMParser) ARRAY}</td>
@@ -150,7 +150,7 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseCommentToken(FEMParser) Kommentars}. */
 	public static int TYPE_COMMENT = '/';
 
-	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseFunctionToken(FEMParser, boolean) Funktionsverkettung}. */
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseCompositeToken(FEMParser, Token) Funktionsverkettung}. */
 	public static int TYPE_COMPOSITE = '.';
 
 	/** Diese Methode parst die als maskierte Zeichenkette gegebene Konstente und gibt diese zurück. Sie realisiert damit die Umkehroperation zu

@@ -23,7 +23,7 @@ public abstract class AbstractIterable<GItem> extends BaseObject implements Iter
 
 	@Override
 	public Iterable<GItem> concat(final Iterable<? extends GItem> second) throws NullPointerException {
-		return null;
+		return Iterables.concat(this, second);
 	}
 
 	@Override

@@ -26,44 +26,6 @@ import bee.creative.io.IO;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class XMLCleaner {
 
-	/** Diese Klasse implementiert den Konfigurator für das {@link File} eines {@link XMLCleaner}.
-	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class FileData extends BaseFileData<FileData> {
-
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public XMLCleaner closeFileData() {
-			return XMLCleaner.this;
-		}
-
-		@Override
-		protected final FileData customThis() {
-			return this;
-		}
-
-	}
-
-	/** Diese Klasse implementiert den Konfigurator für das {@link Charset} eines {@link XMLCleaner}.
-	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public final class CharsetData extends BaseCharsetData<CharsetData> {
-
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public XMLCleaner closeCharsetData() {
-			return XMLCleaner.this;
-		}
-
-		@Override
-		protected final CharsetData customThis() {
-			return this;
-		}
-
-	}
-
 	private static final Pattern A = Pattern.compile("\\s*//[^\\r\\n]*[\\r\\n]*");
 
 	private static final Pattern B = Pattern.compile("\\s*(/\\*)([^\\*]*|\\*[^/])*\\*/");
@@ -99,19 +61,17 @@ public class XMLCleaner {
 		return res;
 	}
 
-	/** Dieses Feld speichert den Konfigurator für {@link #openFileData()}. */
-	final FileData fileData = new FileData();
+	Charset charset;
 
-	/** Dieses Feld speichert den Konfigurator für {@link #openCharsetData()}. */
-	final CharsetData charsetData = new CharsetData();
+	File filepath;
 
 	/** Diese Methode bereinigt die gewählten Quelltextdateien und gibt {@code this} zurück.
 	 *
 	 * @return {@code this}.
 	 * @throws IllegalStateException Wenn {@link File} oder {@link Charset} unzulässig konfiguriert sind. */
 	public final XMLCleaner cleanup() throws IllegalStateException, IOException {
-		final File path = this.fileData.get();
-		final Charset charset = this.charsetData.get();
+		final File path = this.filepath;
+		final Charset charset = this.charset;
 		if ((path == null) || (charset == null)) throw new IllegalStateException();
 		if (path.isDirectory()) {
 			final File[] list = path.listFiles();
@@ -127,14 +87,8 @@ public class XMLCleaner {
 		return this;
 	}
 
-	/** Diese Methode öffnet den Konfigurator für das {@link File} und gibt ihn zurück. Das {@link File} steht entweder für eine Quelltextdateien oder ein
-	 * Verzeichnis mit Quelltextdateien.
-	 *
-	 * @see FileInputStream
-	 * @see FileOutputStream
-	 * @return Konfigurator. */
-	public final FileData openFileData() {
-		return this.fileData;
+	public XMLCleaner() {
+		this.forCharset().useDEFAULT();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link Charset} zum Laden und Speichern der Quelltextdateien und gibt ihn zurück.
@@ -142,8 +96,52 @@ public class XMLCleaner {
 	 * @see InputStreamReader#InputStreamReader(java.io.InputStream, Charset)
 	 * @see OutputStreamWriter#OutputStreamWriter(java.io.OutputStream, Charset)
 	 * @return Konfigurator. */
-	public final CharsetData openCharsetData() {
-		return this.charsetData;
+	public BaseCharsetData<XMLCleaner> forCharset() {
+		return new BaseCharsetData<XMLCleaner>() {
+
+			@Override
+			public Charset get() {
+				return XMLCleaner.this.charset;
+			}
+
+			@Override
+			public void set(final Charset value) {
+				XMLCleaner.this.charset = value;
+			}
+
+			@Override
+			public XMLCleaner owner() {
+				return XMLCleaner.this;
+			}
+
+		};
+	}
+
+	/** Diese Methode öffnet den Konfigurator für das {@link File} und gibt ihn zurück. Das {@link File} steht entweder für eine Quelltextdateien oder ein
+	 * Verzeichnis mit Quelltextdateien.
+	 *
+	 * @see FileInputStream
+	 * @see FileOutputStream
+	 * @return Konfigurator. */
+	public BaseFilepathData<XMLCleaner> forFilepath() {
+		return new BaseFilepathData<XMLCleaner>() {
+
+			@Override
+			public File get() {
+				return XMLCleaner.this.filepath;
+			}
+
+			@Override
+			public void set(final File value) {
+				XMLCleaner.this.filepath = value;
+			}
+
+			@Override
+			public XMLCleaner owner() {
+				return XMLCleaner.this;
+			}
+
+		};
 	}
 
 }

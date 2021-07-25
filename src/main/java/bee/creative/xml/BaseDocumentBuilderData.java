@@ -7,30 +7,100 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import bee.creative.lang.Objects;
-import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseItemBuilder;
+import bee.creative.util.Builders.BaseValueBuilder;
 
 /** Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<DocumentBuilder, GThis> {
+ * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
+public abstract class BaseDocumentBuilderData<GOwner> extends BaseValueBuilder<DocumentBuilder, GOwner> {
 
 	/** Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory}.
 	 *
-	 * @see DocumentBuilderFactory#newDocumentBuilder()
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class FactoryData<GOwner> extends BaseDocumentBuilderFactoryData<FactoryData<GOwner>> {
+	 * @see DocumentBuilderFactory#newDocumentBuilder() */
+	public static class FactoryData extends BaseDocumentBuilderFactoryData<FactoryData> {
 
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public abstract GOwner closeFactoryData();
+		DocumentBuilderFactory value;
+
+		SchemaData schema = new SchemaData();
+
+		FeaturesValue features = new FeaturesValue();
+
+		PropertiesData properties = new PropertiesData();
+
+		AttributesData attributes = new AttributesData();
 
 		@Override
-		protected final FactoryData<GOwner> customThis() {
+		public DocumentBuilderFactory get() {
+			return null;
+		}
+
+		@Override
+		public void set(final DocumentBuilderFactory value) {
+		}
+
+		@Override
+		public SchemaData schema() {
+			return this.schema;
+		}
+
+		@Override
+		public FeaturesValue features() {
+			return this.features;
+		}
+
+		@Override
+		public PropertiesData properties() {
+			return this.properties;
+		}
+
+		@Override
+		public AttributesData attributes() {
+			return this.attributes;
+		}
+
+		@Override
+		public FactoryData owner() {
 			return this;
+		}
+
+	}
+
+	public class FactoryData2 extends BaseDocumentBuilderFactoryData<GOwner> {
+
+		@Override
+		public DocumentBuilderFactory get() {
+			return BaseDocumentBuilderData.this.factory().get();
+		}
+
+		@Override
+		public void set(final DocumentBuilderFactory value) {
+			BaseDocumentBuilderData.this.factory().set(value);
+		}
+
+		@Override
+		public SchemaData schema() {
+			return BaseDocumentBuilderData.this.factory().schema();
+		}
+
+		@Override
+		public FeaturesValue features() {
+			return BaseDocumentBuilderData.this.factory().features();
+		}
+
+		@Override
+		public PropertiesData properties() {
+			return BaseDocumentBuilderData.this.factory().properties();
+		}
+
+		@Override
+		public AttributesData attributes() {
+			return BaseDocumentBuilderData.this.factory().attributes();
+		}
+
+		@Override
+		public GOwner owner() {
+			return BaseDocumentBuilderData.this.owner();
 		}
 
 	}
@@ -38,18 +108,47 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 	/** Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler}.
 	 *
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class HandlerData<GOwner> extends BaseItemBuilder<ErrorHandler, HandlerData<GOwner>> {
+	public static abstract class BaseHandlerData<GOwner> extends BaseValueBuilder<ErrorHandler, GOwner> {
 
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public abstract GOwner closeHandlerData();
+	}
+
+	public static class HandlerData extends BaseHandlerData<HandlerData> {
+
+		private ErrorHandler value;
 
 		@Override
-		protected final HandlerData<GOwner> customThis() {
+		public ErrorHandler get() {
+			return this.value;
+		}
+
+		@Override
+		public void set(final ErrorHandler value) {
+			this.value = value;
+		}
+
+		@Override
+		public HandlerData owner() {
 			return this;
+		}
+
+	}
+
+	public class HandlerData2 extends BaseHandlerData<GOwner> {
+
+		@Override
+		public ErrorHandler get() {
+			return BaseDocumentBuilderData.this.handler().get();
+		}
+
+		@Override
+		public void set(final ErrorHandler value) {
+			BaseDocumentBuilderData.this.handler().set(value);
+		}
+
+		@Override
+		public GOwner owner() {
+			return BaseDocumentBuilderData.this.owner();
 		}
 
 	}
@@ -57,164 +156,133 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 	/** Diese Klasse implementiert den Konfigurator für den {@link EntityResolver}.
 	 *
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ResolverData<GOwner> extends BaseItemBuilder<EntityResolver, ResolverData<GOwner>> {
+	public static abstract class BaseResolverData<GOwner> extends BaseValueBuilder<EntityResolver, GOwner> {
 
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public abstract GOwner closeResolverData();
+	}
+
+	public static class ResolverData extends BaseResolverData<ResolverData> {
+
+		EntityResolver value;
 
 		@Override
-		protected final ResolverData<GOwner> customThis() {
+		public EntityResolver get() {
+			return this.value;
+		}
+
+		@Override
+		public void set(final EntityResolver value) {
+			this.value = value;
+		}
+
+		@Override
+		public ResolverData owner() {
 			return this;
 		}
 
 	}
 
-	/** Dieses Feld speichert den {@link DocumentBuilder}. */
-	DocumentBuilder builder;
-
-	/** Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}. */
-	final FactoryData<GThis> factoryData = new FactoryData<GThis>() {
+	public class ResolverData2 extends BaseResolverData<GOwner> {
 
 		@Override
-		public final GThis closeFactoryData() {
-			return BaseDocumentBuilderData.this.customThis();
+		public EntityResolver get() {
+			return BaseDocumentBuilderData.this.resolver().get();
 		}
-
-	};
-
-	/** Dieses Feld speichert den Konfigurator für {@link #openHandlerData()}. */
-	final HandlerData<GThis> handlerData = new HandlerData<GThis>() {
 
 		@Override
-		public final GThis closeHandlerData() {
-			return BaseDocumentBuilderData.this.customThis();
+		public void set(final EntityResolver value) {
+			BaseDocumentBuilderData.this.resolver().set(value);
 		}
-
-	};
-
-	/** Dieses Feld speichert den Konfigurator für {@link #openResolverData()}. */
-	final ResolverData<GThis> resolverData = new ResolverData<GThis>() {
 
 		@Override
-		public final GThis closeResolverData() {
-			return BaseDocumentBuilderData.this.customThis();
+		public GOwner owner() {
+			return BaseDocumentBuilderData.this.owner();
 		}
 
-	};
+	}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
-	 * @param data Konfigurator oder {@code null}.
+	 * @param that Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public final GThis use(final BaseDocumentBuilderData<?> data) {
-		if (data == null) return this.customThis();
-		this.builder = data.builder;
-		this.factoryData.use(data.factoryData);
-		this.handlerData.use(data.handlerData);
-		this.resolverData.use(data.resolverData);
-		return this.customThis();
+	public GOwner use(final BaseDocumentBuilderData<?> that) {
+		if (that == null) return this.owner();
+		this.useValue(that.getValue());
+		this.forFactory().use(that.factory());
+		this.forHandler().use(that.handler());
+		this.forResolver().use(that.resolver());
+		return this.owner();
 	}
 
 	/** Diese Methode gibt den {@link DocumentBuilder} zurück. Wenn über {@link #useBuilder(DocumentBuilder)} noch kein {@link DocumentBuilder} gesetzt wurde,
 	 * wird über {@link DocumentBuilderFactory#newDocumentBuilder()} ein neuer erstellt, über {@link #useBuilder(DocumentBuilder)} gesetzt und über
-	 * {@link #updateBuilder()} aktualisiert. Für die Erstellung wird die {@link DocumentBuilderFactory} genutzt, die in {@link #openFactoryData()} konfiguriert
-	 * ist.
+	 * {@link #updateValue()} aktualisiert. Für die Erstellung wird die {@link DocumentBuilderFactory} genutzt, die in {@link #factory()} konfiguriert ist.
 	 *
 	 * @see #useBuilder(DocumentBuilder)
-	 * @see #updateBuilder()
+	 * @see #updateValue()
 	 * @return {@link DocumentBuilder}.
-	 * @throws SAXException Wenn {@link FactoryData#getFactory()} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link FactoryData#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#newDocumentBuilder()} eine entsprechende Ausnahme auslöst. */
-	public final DocumentBuilder getBuilder() throws SAXException, ParserConfigurationException {
-		DocumentBuilder result = this.builder;
+	public DocumentBuilder putValue() throws SAXException, ParserConfigurationException {
+		DocumentBuilder result = this.getValue();
 		if (result != null) return result;
-		result = this.factoryData.getFactory().newDocumentBuilder();
-		this.useBuilder(result);
-		this.updateBuilder();
+		result = this.forFactory().putValue().newDocumentBuilder();
+		this.useValue(result);
+		this.updateValue();
 		return result;
 	}
 
-	/** Diese Methode setzt den {@link DocumentBuilder} und gibt {@code this} zurück.
-	 *
-	 * @param builder {@link DocumentBuilder} oder {@code null}.
-	 * @return {@code this}. */
-	public final GThis useBuilder(final DocumentBuilder builder) {
-		this.builder = builder;
-		return this.customThis();
-	}
-
-	/** Diese Methode setzt den {@link DocumentBuilder} auf {@code null} und gibt {@code this} zurück.
-	 *
-	 * @see #useBuilder(DocumentBuilder)
-	 * @return {@code this}. */
-	public final GThis resetBuilder() {
-		return this.useBuilder(null);
-	}
-
 	/** Diese Methode aktualisiert die Einstellungen des {@link DocumentBuilder} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
-	 * {@link #getBuilder()} ermittelten {@link DocumentBuilder} die Einstellungen übertragen, die in {@link #openHandlerData()} und {@link #openResolverData()}
+	 * {@link #putValue()} ermittelten {@link DocumentBuilder} die Einstellungen übertragen, die in {@link #openHandlerData()} und {@link #openResolverData()}
 	 * konfiguriert sind.
 	 *
 	 * @return {@code this}.
-	 * @throws SAXException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
-	 * @throws ParserConfigurationException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst. */
-	public final GThis updateBuilder() throws SAXException, ParserConfigurationException {
-		final DocumentBuilder builder = this.getBuilder();
-		for (final ErrorHandler value: this.handlerData) {
-			builder.setErrorHandler(value);
+	 * @throws SAXException Wenn {@link #putValue()} eine entsprechende Ausnahme auslöst.
+	 * @throws ParserConfigurationException Wenn {@link #putValue()} eine entsprechende Ausnahme auslöst. */
+	public GOwner updateValue() throws SAXException, ParserConfigurationException {
+		final DocumentBuilder res = this.putValue();
+		for (final ErrorHandler src: this.handler()) {
+			res.setErrorHandler(src);
 		}
-		for (final EntityResolver value: this.resolverData) {
-			builder.setEntityResolver(value);
+		for (final EntityResolver src: this.resolver()) {
+			res.setEntityResolver(src);
 		}
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die {@link DocumentBuilderFactory} und gibt ihn zurück.
 	 *
 	 * @see DocumentBuilderFactory#newDocumentBuilder()
 	 * @return Konfigurator. */
-	public final FactoryData<GThis> openFactoryData() {
-		return this.factoryData;
+	public abstract FactoryData factory();
+
+	public FactoryData2 forFactory() {
+		return new FactoryData2();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link ErrorHandler} und gibt ihn zurück.
 	 *
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @return Konfigurator. */
-	public final HandlerData<GThis> openHandlerData() {
-		return this.handlerData;
+	public abstract HandlerData handler();
+
+	public HandlerData2 forHandler() {
+		return new HandlerData2();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link EntityResolver} und gibt ihn zurück.
 	 *
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @return Konfigurator. */
-	public final ResolverData<GThis> openResolverData() {
-		return this.resolverData;
+	public abstract ResolverData resolver();
+
+	public ResolverData2 forResolver() {
+		return new ResolverData2();
 	}
 
 	@Override
-	protected abstract GThis customThis();
-
-	/** {@inheritDoc}
-	 *
-	 * @see #getBuilder() */
-	@Override
-	public final DocumentBuilder get() throws IllegalStateException {
-		try {
-			return this.getBuilder();
-		} catch (final SAXException | ParserConfigurationException cause) {
-			throw new IllegalStateException(cause);
-		}
-	}
-
-	@Override
-	public final String toString() {
-		return Objects.toInvokeString(this, this.factoryData, this.handlerData, this.resolverData);
+	public String toString() {
+		return Objects.toInvokeString(this, this.factory(), this.handler(), this.resolver());
 	}
 
 }

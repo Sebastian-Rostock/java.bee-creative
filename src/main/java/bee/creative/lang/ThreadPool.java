@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import bee.creative.util.HashMap3;
+import bee.creative.util.Producer;
 
 /** Diese Klasse implementiert einen {@link java.lang.Thread Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable)
  * Überwachen}, {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Auswertung beliebiger {@link Runnable Berechnungen}
@@ -289,7 +290,6 @@ public class ThreadPool {
 	 *
 	 * @param threads Threadanzahl.
 	 * @param tasks Berechnungen.
-	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void runAll(final int threads, final Runnable... tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
@@ -300,7 +300,6 @@ public class ThreadPool {
 	 *
 	 * @param threads Threadanzahl.
 	 * @param tasks Berechnungen.
-	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void runAll(final int threads, final Iterable<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
@@ -311,27 +310,53 @@ public class ThreadPool {
 	 *
 	 * @param threads Threadanzahl.
 	 * @param tasks Berechnungen.
-	 * @throws NullPointerException Wenn {@code tasks} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void runAll(final int threads, final Iterator<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
+		runAll(threads, new Producer<Runnable>() {
+
+			@Override
+			public Runnable get() {
+				return tasks.hasNext() ? tasks.next() : null;
+			}
+
+		});
+	}
+
+	/** Diese Methode verarbeitet die gegebenen Berechungen mit der gegebenen Anzahl an Threads und wartet auf deren Abschluss.
+	 * 
+	 * @param threads Threadanzahl.
+	 * @param tasks Berechnungen. Diese gelten als abgeschlossen, wenn dieser {@link Producer} {@code null} liefert und keine Berechnungen mehr ausgeführt werden.
+	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void runAll(final int threads, final Producer<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
 		if (threads < 1) throw new IllegalArgumentException();
 		final int[] idle = {threads};
 		try {
-			while (tasks.hasNext()) {
+			while (true) {
 				synchronized (idle) {
-					if (idle[0] <= 0) {
+					while (true) {
+						if (idle[0] > 0) {
+							break;
+						}
 						idle.wait(1000);
-						continue;
 					}
-					if (this.start(new ThreadWorker(idle, Objects.notNull(tasks.next())))) {
+				}
+				final Runnable task = tasks.get();
+				synchronized (idle) {
+					if (task != null) {
+						this.start(new ThreadWorker(idle, task));
 						idle[0]--;
+					} else {
+						if (idle[0] >= threads) return;
+						idle.wait(1000);
 					}
 				}
 			}
+
 		} finally {
-			while (true) {
-				synchronized (idle) {
+			synchronized (idle) {
+				while (true) {
 					if (idle[0] >= threads) {
 						break;
 					}

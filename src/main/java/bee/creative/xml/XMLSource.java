@@ -7,8 +7,20 @@ import javax.xml.transform.Source;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class XMLSource extends BaseSourceData<XMLSource> {
 
+	Source value;
+
 	@Override
-	protected XMLSource customThis() {
+	public Source get() {
+		return value;
+	}
+
+	@Override
+	public void set(Source value) {
+		this.value = value;
+	}
+
+	@Override
+	public XMLSource owner() {
 		return this;
 	}
 

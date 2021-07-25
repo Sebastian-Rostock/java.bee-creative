@@ -9,7 +9,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapBuilder2;
+import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.xml.BaseTemplatesData.FactoryData;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link Transformer}.
@@ -23,7 +23,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @see Transformer#setOutputProperty(String, String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertyData<GOwner> extends BaseMapBuilder2<String, String, PropertyData<GOwner>> {
+	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, String, Map<String, String>, GOwner> {
 
 		/** Diese Methode wählt {@link OutputKeys#INDENT} und gibt {@code this} zurück.
 		 *
@@ -95,7 +95,8 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		public abstract GOwner closePropertyData();
 
 		@Override
-		protected final PropertyData<GOwner> customThis() {
+		public
+		final PropertyData<GOwner> owner() {
 			return this;
 		}
 
@@ -106,7 +107,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @see Transformer#setParameter(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class ParameterData<GOwner> extends BaseMapBuilder2<String, Object, ParameterData<GOwner>> {
+	public static abstract class ParameterData<GOwner> extends BaseMapBuilder<String, Object, ParameterData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 *
@@ -114,7 +115,8 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		public abstract GOwner closeParameterData();
 
 		@Override
-		protected final ParameterData<GOwner> customThis() {
+		public
+		final ParameterData<GOwner> owner() {
 			return this;
 		}
 
@@ -133,7 +135,8 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		public abstract GOwner closeTemplatesData();
 
 		@Override
-		protected final TemplatesData<GOwner> customThis() {
+		public
+		final TemplatesData<GOwner> owner() {
 			return this;
 		}
 
@@ -147,7 +150,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 
 		@Override
 		public final GThis closePropertyData() {
-			return BaseTransformerData.this.customThis();
+			return BaseTransformerData.this.owner();
 		}
 
 	};
@@ -157,7 +160,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 
 		@Override
 		public final GThis closeParameterData() {
-			return BaseTransformerData.this.customThis();
+			return BaseTransformerData.this.owner();
 		}
 
 	};
@@ -167,7 +170,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 
 		@Override
 		public final GThis closeTemplatesData() {
-			return BaseTransformerData.this.customThis();
+			return BaseTransformerData.this.owner();
 		}
 
 	};
@@ -177,12 +180,12 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseTransformerData<?> data) {
-		if (data == null) return this.customThis();
+		if (data == null) return this.owner();
 		this.transformer = data.transformer;
-		this.propertyData.use(data.propertyData);
-		this.parameterData.use(data.parameterData);
+		this.propertyData.useString(data.propertyData);
+		this.parameterData.useString(data.parameterData);
 		this.templatesData.use(data.templatesData);
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode gibt den {@link Transformer} zurück. Wenn über {@link #useTransformer(Transformer)} noch kein {@link Transformer} gesetzt wurde, wird über
@@ -213,7 +216,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * @return {@code this}. */
 	public final GThis useTransformer(final Transformer transformer) {
 		this.transformer = transformer;
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode setzt den {@link Transformer} auf {@code null} und gibt {@code this} zurück.
@@ -237,7 +240,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		for (final Entry<String, Object> entry: this.parameterData) {
 			result.setParameter(entry.getKey(), entry.getValue());
 		}
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabeeigenschaften und gibt ihn zurück.
@@ -266,7 +269,8 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	}
 
 	@Override
-	protected abstract GThis customThis();
+	public
+	abstract GThis owner();
 
 	/** {@inheritDoc}
 	 *

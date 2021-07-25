@@ -22,7 +22,7 @@ public class XMLNode extends BaseNodeData<XMLNode> {
 	}
 
 	@Override
-	protected XMLNode customThis() {
+	public XMLNode owner() {
 		return this;
 	}
 

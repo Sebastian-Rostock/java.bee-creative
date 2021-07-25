@@ -49,7 +49,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		}
 
 		@Override
-		protected final AttrData<GOwner> customThis() {
+		public
+		final AttrData<GOwner> owner() {
 			return this;
 		}
 
@@ -117,7 +118,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		}
 
 		@Override
-		protected final ChldData<GOwner> customThis() {
+		public
+		final ChldData<GOwner> owner() {
 			return this;
 		}
 
@@ -194,7 +196,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 			@Override
 			public final GThis closeAttr() {
-				return BaseNodeData.this.customThis();
+				return BaseNodeData.this.owner();
 			}
 
 		};
@@ -208,7 +210,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 			@Override
 			public final GThis closeChld() {
-				return BaseNodeData.this.customThis();
+				return BaseNodeData.this.owner();
 			}
 
 		};
@@ -219,9 +221,9 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	protected GThis use(final BaseNodeData<?> data) {
-		if (data == null) return this.customThis();
+		if (data == null) return this.owner();
 		this.node = data.node;
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich dem gegebenen ist.
@@ -289,7 +291,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 * @return {@code this}. */
 	protected GThis useNode(final Node node) {
 		this.node = node;
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück zurück.
@@ -332,7 +334,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		} else {
 			node.setNodeValue(value);
 		}
-		return this.customThis();
+		return this.owner();
 	}
 
 	/** Diese Methode gibt den Elternknoten des {@link #getNode() aktuellen Knoten} zurück. Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser
@@ -588,7 +590,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	@Override
-	protected abstract GThis customThis();
+	public
+	abstract GThis owner();
 
 	/** {@inheritDoc}
 	 *

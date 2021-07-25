@@ -12,69 +12,117 @@ import javax.xml.transform.dom.DOMResult;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import bee.creative.lang.Objects;
-import bee.creative.util.Builders.BaseItemBuilder;
+import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.xml.XMLMarshaller.SourceData2;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #marshal() Ausgeben} eines Objekts mit Hilfe eines {@link Marshaller}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class XMLMarshaller {
 
+	public static class ResultData extends BaseResultData<ResultData> {
+
+		Result value;
+
+		@Override
+		public Result get() {
+			return value;
+		}
+
+		@Override
+		public void set(Result value) {
+			this.value = value;
+		}
+
+		@Override
+		public ResultData owner() {
+			return this;
+		}
+
+	}
+
+	public class ResultData2 extends BaseResultData<XMLMarshaller> {
+
+		ResultData resultData = new ResultData();
+
+		@Override
+		public Result get() {
+			return resultData.get();
+		}
+
+		@Override
+		public void set(Result value) {
+			this.resultData.set(value);
+		}
+
+		@Override
+		public XMLMarshaller owner() {
+			return XMLMarshaller.this;
+		}
+
+	}
+
 	/** Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Marshaller}.
 	 *
-	 * @see Transformer#transform(Source, Result)
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public class SourceData extends BaseItemBuilder<Object, SourceData> {
+	 * @see Transformer#transform(Source, Result) */
+	public static class SourceData extends BaseValueBuilder<Object, SourceData> {
 
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public XMLMarshaller closeSourceData() {
-			return XMLMarshaller.this;
+		Object value;
+
+		@Override
+		public Object get() {
+			return value;
 		}
 
 		@Override
-		protected SourceData customThis() {
+		public void set(Object value) {
+			this.value = value;
+		}
+
+		@Override
+		public SourceData owner() {
 			return this;
 		}
 
 	}
 
-	/** Diese Klasse implementiert den Konfigurator für die Ausgabedaten eines {@link Marshaller}.
-	 *
-	 * @see Transformer#transform(Source, Result)
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public class ResultData extends BaseResultData<ResultData> {
+	public class SourceData2 extends BaseValueBuilder<Object, XMLMarshaller> {
 
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public XMLMarshaller closeResultData() {
-			return XMLMarshaller.this;
+		SourceData sourceData = new SourceData();
+
+		@Override
+		public Object get() {
+			return sourceData.get();
 		}
 
 		@Override
-		protected ResultData customThis() {
+		public void set(Object value) {
+			sourceData.set(value);
+		}
+
+		@Override
+		public XMLMarshaller owner() {
+			return XMLMarshaller.this;
+		}
+
+	}
+
+	public static class MarshallerData extends BaseMarshallerData<MarshallerData> {
+
+		@Override
+		public MarshallerData owner() {
 			return this;
 		}
 
 	}
 
-	/** Diese Klasse implementiert den Konfigurator für den {@link Marshaller}.
-	 *
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public class MarshallerData extends BaseMarshallerData<MarshallerData> {
+	public class MarshallerData2 extends BaseMarshallerData<XMLMarshaller> {
 
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public XMLMarshaller closeMarshallerData() {
-			return XMLMarshaller.this;
-		}
-
-		@Override
-		protected MarshallerData customThis() {
-			return this;
-		}
+		
+		MarshallerData marshallerData = new MarshallerData();
+		
+		
+		
 
 	}
 
@@ -83,8 +131,7 @@ public class XMLMarshaller {
 	 * @param classes Klasse.
 	 * @return {@link XMLMarshaller}. */
 	public static XMLMarshaller from(final Class<?>... classes) {
-		return new XMLMarshaller().openMarshallerData().openContextData().openClassData().putAll(classes).closeClassesData().closeContextData()
-			.closeMarshallerData();
+		return new XMLMarshaller().forMarshaller().context().ClassData().putAll(classes).closeClassesData().closeContextData().closeMarshallerData();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode()}.
@@ -92,7 +139,7 @@ public class XMLMarshaller {
 	 * @see #from(Class...)
 	 * @see #marshalString() */
 	public static Node marshalNode(final Object object) throws SAXException, JAXBException {
-		return XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode();
+		return XMLMarshaller.from(object.getClass()).forSource().useValue(object).marshalNode();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString()}.
@@ -100,17 +147,15 @@ public class XMLMarshaller {
 	 * @see #from(Class...)
 	 * @see #marshalString() */
 	public static String marshalString(final Object object) throws SAXException, JAXBException {
-		return XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalString();
+		return XMLMarshaller.from(object.getClass()).forSource().useValue(object).marshalString();
 	}
 
-	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final SourceData sourceData = new SourceData();
+	final ResultData2 resultData = new ResultData2();
 
-	/** Dieses Feld speichert den Konfigurator {@link #openResultData()}. */
-	final ResultData resultData = new ResultData();
+	final SourceData2 sourceData = new SourceData2();
 
-	/** Dieses Feld speichert den Konfigurator {@link #openMarshallerData()}. */
-	final MarshallerData marshallerData = new MarshallerData();
+	/** Dieses Feld speichert den Konfigurator {@link #forMarshaller()}. */
+	final BaseMarshallerData<XMLMarshaller> marshallerData = new BaseMarshallerData<XMLMarshaller>();
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -126,69 +171,77 @@ public class XMLMarshaller {
 
 	/** Diese Methode führt die Formatierung aus und gibt {@code this} zurück.
 	 *
-	 * @see #openSourceData()
-	 * @see #openResultData()
+	 * @see #forSource()
+	 * @see #forResult()
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return {@code this}.
-	 * @throws SAXException Wenn {@link MarshallerData#getMarshaller()} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link BaseMarshallerData#getMarshaller()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link Marshaller#marshal(Object, Result)} eine entsprechende Ausnahme auslöst. */
 	public XMLMarshaller marshal() throws SAXException, JAXBException {
 		final Marshaller marshaller = this.marshallerData.getMarshaller();
 		synchronized (marshaller) {
-			final Object source = this.sourceData.get();
+			final Object source = this.sourceData;
 			final Result result = this.resultData.getResult();
 			marshaller.marshal(source, result);
 		}
 		return this;
 	}
 
-	/** Diese Methode überführt die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück.
+	/** Diese Methode überführt die {@link #forSource() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück.
 	 *
 	 * @see ResultData#useNode()
-	 * @see #openResultData()
+	 * @see #forResult()
 	 * @return Dokumentknoten.
 	 * @throws SAXException Wenn {@link #marshal} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #marshal()} eine entsprechende Ausnahme auslöst. */
 	public Node marshalNode() throws SAXException, JAXBException {
 		final DOMResult result = new DOMResult();
-		this.openResultData().useResult(result).closeResultData().marshal().openResultData().resetResult();
+		this.forResult().useValue(result).marshal().forResult().clear();
 		return result.getNode();
 	}
 
-	/** Diese Methode überführt die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück.
+	/** Diese Methode überführt die {@link #forSource() Eingabedaten} in eine Zeichenkette und gibt diese zurück.
 	 *
 	 * @see StringWriter
-	 * @see ResultData#useWriter(Writer)
-	 * @see #openResultData()
+	 * @see ResultData #useWriter(Writer)
+	 * @see #forResult()
 	 * @return Zeichenkette.
 	 * @throws SAXException Wenn {@link #marshal} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #marshal()} eine entsprechende Ausnahme auslöst. */
 	public String marshalString() throws SAXException, JAXBException {
 		final StringWriter result = new StringWriter();
-		this.openResultData().useWriter(result).closeResultData().marshal().openResultData().resetResult();
+		this.forResult().useWriter(result).marshal().forResult().clear();
 		return result.toString();
 	}
 
-	/** Diese Methode öffnet den Konfigurator für die Eingabedaten und gibt ihn zurück.
-	 *
-	 * @see Marshaller#marshal(Object, Result)
-	 * @return Konfigurator. */
-	public SourceData openSourceData() {
-		return this.sourceData;
+	public ResultData result() {
+		return resultData.resultData;
+	}
+
+	public SourceData source() {
+		return sourceData.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabedaten und gibt ihn zurück.
 	 *
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return Konfigurator. */
-	public ResultData openResultData() {
-		return this.resultData;
+	public ResultData2 forResult() {
+		return resultData;
+	}
+
+	/** Diese Methode öffnet den Konfigurator für die Eingabedaten und gibt ihn zurück.
+	 *
+	 * @see Marshaller#marshal(Object, Result)
+	 * @return Konfigurator. */
+	public SourceData2 forSource() {
+		return sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Marshaller} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
-	public MarshallerData openMarshallerData() {
+	public BaseMarshallerData<XMLMarshaller> forMarshaller() {
 		return this.marshallerData;
 	}
 

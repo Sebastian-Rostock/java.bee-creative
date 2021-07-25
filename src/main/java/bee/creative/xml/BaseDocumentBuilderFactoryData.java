@@ -1,70 +1,76 @@
 package bee.creative.xml;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import org.xml.sax.SAXException;
 import bee.creative.lang.Objects;
-import bee.creative.util.Builders.BaseBuilder;
-import bee.creative.util.Builders.BaseMapBuilder2;
+import bee.creative.util.Builders.BaseMapBuilder;
+import bee.creative.util.Builders.BaseValueBuilder;
+import bee.creative.util.HashMap;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<DocumentBuilderFactory, GThis> {
+ * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
+public abstract class BaseDocumentBuilderFactoryData<GOwner> extends BaseValueBuilder<DocumentBuilderFactory, GOwner> {
 
-	/** Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link DocumentBuilderFactory}.
-	 *
-	 * @see DocumentBuilderFactory#setFeature(String, boolean)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class FeatureData<GOwner> extends BaseFeatureData<FeatureData<GOwner>> {
-
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public abstract GOwner closeFeatureData();
+	public static class FeaturesValue extends BaseFeaturesData.Value<FeaturesValue> {
 
 		@Override
-		protected final FeatureData<GOwner> customThis() {
+		public FeaturesValue owner() {
 			return this;
+		}
+
+	}
+
+	public class FeaturesProxy extends BaseFeaturesData.Proxy<GOwner> {
+
+		protected FeaturesValue value() {
+			return BaseDocumentBuilderFactoryData.this.features();
+		}
+
+		@Override
+		public GOwner owner() {
+			return BaseDocumentBuilderFactoryData.this.owner();
 		}
 
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für das {@link Schema} einer {@link DocumentBuilderFactory}.
 	 *
-	 * @see DocumentBuilderFactory#setSchema(Schema)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class SchemaData<GOwner> extends BaseSchemaData<SchemaData<GOwner>> {
-
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public abstract GOwner closeSchemaData();
+	 * @see DocumentBuilderFactory#setSchema(Schema) */
+	public static class SchemaValue extends SchemaBuilder.Value<SchemaValue> {
 
 		@Override
-		protected final SchemaData<GOwner> customThis() {
+		public SchemaValue owner() {
 			return this;
 		}
 
 	}
 
-	/** Diese Klasse implementiert den Konfigurator für die Eigenschaften einer {@link DocumentBuilderFactory}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertyData<GOwner> extends BaseMapBuilder2<String, Boolean, PropertyData<GOwner>> {
+	public class SchemaProxy extends SchemaBuilder.Proxy<GOwner> {
 
-		/** Diese Methode wählt {@code "Coalescing"} und gibt {@code this} zurück.
+		protected SchemaValue value() {
+			return BaseDocumentBuilderFactoryData.this.schema();
+		}
+
+		@Override
+		public GOwner owner() {
+			return BaseDocumentBuilderFactoryData.this.owner();
+		}
+
+	}
+
+	/** Diese Klasse implementiert den Konfigurator für die Eigenschaften einer {@link DocumentBuilderFactory}. */
+	public static abstract class BasePropertiesData<GOwner> extends BaseMapBuilder<String, Boolean, Map<String, Boolean>, GOwner> {
+
+		/** Diese Methode liefert den den Konfigurator für {@code "Coalescing"}.
 		 *
-		 * @see #forKey(Object)
-		 * @see DocumentBuilderFactory#setCoalescing(boolean)
-		 * @return {@code this}. */
-		public final PropertyData<GOwner> forCoalescing() {
+		 * @see DocumentBuilderFactory#setCoalescing(boolean) */
+		public ValueData forCoalescing() {
 			return this.forKey("Coalescing");
 		}
 
@@ -73,7 +79,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setExpandEntityReferences(boolean)
 		 * @return {@code this}. */
-		public final PropertyData<GOwner> forExpandEntityReferences() {
+		public ValueData forExpandEntityReferences() {
 			return this.forKey("ExpandEntityReferences");
 		}
 
@@ -82,7 +88,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setIgnoringComments(boolean)
 		 * @return {@code this}. */
-		public final PropertyData<GOwner> forIgnoringComments() {
+		public ValueData forIgnoringComments() {
 			return this.forKey("IgnoringComments");
 		}
 
@@ -91,7 +97,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setIgnoringElementContentWhitespace(boolean)
 		 * @return {@code this}. */
-		public final PropertyData<GOwner> forIgnoringElementContentWhitespace() {
+		public ValueData forIgnoringElementContentWhitespace() {
 			return this.forKey("IgnoringElementContentWhitespace");
 		}
 
@@ -100,7 +106,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setNamespaceAware(boolean)
 		 * @return {@code this}. */
-		public final PropertyData<GOwner> forNamespaceAware() {
+		public ValueData forNamespaceAware() {
 			return this.forKey("NamespaceAware");
 		}
 
@@ -109,7 +115,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setValidating(boolean)
 		 * @return {@code this}. */
-		public final PropertyData<GOwner> forValidating() {
+		public ValueData forValidating() {
 			return this.forKey("Validating");
 		}
 
@@ -118,33 +124,36 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 		 * @return {@code this}. */
-		public final PropertyData<GOwner> forXIncludeAware() {
+		public ValueData forXIncludeAware() {
 			return this.forKey("XIncludeAware");
 		}
 
-		/** Diese Methode gibt nur dann {@code true} zurück, wenn der Wert zum {@link #forKey(Object) gewählten Schlüssel} gleich {@link Boolean#TRUE} ist.
-		 *
-		 * @see #getValue()
-		 * @return Wahrheitswert. */
-		public final boolean getBoolean() {
-			return Boolean.TRUE.equals(this.getValue());
-		}
+	}
 
-		/** Diese Methode ist eine Abkürzung für {@code this.useValue(Boolean.TRUE)} und gibt {@code this} zurück.
-		 *
-		 * @return {@code this}. */
-		public final PropertyData<GOwner> useTRUE() {
-			return this.useValue(Boolean.TRUE);
-		}
-
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public abstract GOwner closePropertyData();
+	public static class PropertiesData extends BasePropertiesData<PropertiesData> {
 
 		@Override
-		protected final PropertyData<GOwner> customThis() {
+		public Map<String, Boolean> get() {
+			return null;
+		}
+
+		@Override
+		public PropertiesData owner() {
 			return this;
+		}
+
+	}
+
+	public class PropertiesData2 extends BasePropertiesData<GOwner> {
+
+		@Override
+		public Map<String, Boolean> get() {
+			return BaseDocumentBuilderFactoryData.this.properties().get();
+		}
+
+		@Override
+		public GOwner owner() {
+			return BaseDocumentBuilderFactoryData.this.owner();
 		}
 
 	}
@@ -152,124 +161,83 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	/** Diese Klasse implementiert den Konfigurator für die Attribute einer {@link DocumentBuilderFactory}.
 	 *
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class AttributeData<GOwner> extends BaseMapBuilder2<String, Object, AttributeData<GOwner>> {
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static abstract class BaseAttributesData<GOwner> extends BaseMapBuilder<String, Object, Map<String, Object>, GOwner> {
 
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public abstract GOwner closeAttributeData();
+	}
+
+	public static class AttributesData extends BaseAttributesData<AttributesData> {
+
+		Map<String, Object> value = new HashMap<>();
 
 		@Override
-		protected final AttributeData<GOwner> customThis() {
+		public Map<String, Object> get() {
+			return this.value;
+		}
+
+		@Override
+		public AttributesData owner() {
 			return this;
 		}
 
 	}
 
-	/** Dieses Feld speichert die {@link DocumentBuilderFactory}. */
-	DocumentBuilderFactory factory;
-
-	/** Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}. */
-	final FeatureData<GThis> featureData = new FeatureData<GThis>() {
+	public class AttributesData2 extends BaseAttributesData<GOwner> {
 
 		@Override
-		public final GThis closeFeatureData() {
-			return BaseDocumentBuilderFactoryData.this.customThis();
+		public Map<String, Object> get() {
+			return BaseDocumentBuilderFactoryData.this.attributes().get();
 		}
-
-	};
-
-	/** Dieses Feld speichert den Konfigurator für {@link #openSchemaData()}. */
-	final SchemaData<GThis> _schemaData_ = new SchemaData<GThis>() {
 
 		@Override
-		public final GThis closeSchemaData() {
-			return BaseDocumentBuilderFactoryData.this.customThis();
+		public GOwner owner() {
+			return BaseDocumentBuilderFactoryData.this.owner();
 		}
 
-	};
-
-	/** Dieses Feld speichert den Konfigurator {@link #openPropertyData()}. */
-	final PropertyData<GThis> propertyData = new PropertyData<GThis>() {
-
-		@Override
-		public final GThis closePropertyData() {
-			return BaseDocumentBuilderFactoryData.this.customThis();
-		}
-
-	};
-
-	/** Dieses Feld speichert den Konfigurator für {@link #openAttributeData()}. */
-	final AttributeData<GThis> attributeData = new AttributeData<GThis>() {
-
-		@Override
-		public final GThis closeAttributeData() {
-			return BaseDocumentBuilderFactoryData.this.customThis();
-		}
-
-	};
+	}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public final GThis use(final BaseDocumentBuilderFactoryData<?> data) {
-		if (data == null) return this.customThis();
+	public GOwner use(final BaseDocumentBuilderFactoryData<?> data) {
+		if (data == null) return this.owner();
 		this.factory = data.factory;
 		this.featureData.use(data.featureData);
 		this.propertyData.use(data.propertyData);
-		this.attributeData.use(data.attributeData);
-		return this.customThis();
+		this.attributes().use(data.attributes());
+		return this.owner();
 	}
 
 	/** Diese Methode gibt die {@link DocumentBuilderFactory} zurück. Wenn über {@link #useFactory(DocumentBuilderFactory)} noch keine
 	 * {@link DocumentBuilderFactory} gesetzt wurde, wird über {@link DocumentBuilderFactory#newInstance()} eine neue erstellt, über
-	 * {@link #useFactory(DocumentBuilderFactory)} gesetzt und über {@link #updateFactory()} aktualisiert.
+	 * {@link #useFactory(DocumentBuilderFactory)} gesetzt und über {@link #updateValue()} aktualisiert.
 	 *
 	 * @see #useFactory(DocumentBuilderFactory)
-	 * @see #updateFactory()
+	 * @see #updateValue()
 	 * @return {@link DocumentBuilderFactory}.
-	 * @throws SAXException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst.
-	 * @throws ParserConfigurationException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst. */
-	public final DocumentBuilderFactory getFactory() throws SAXException, ParserConfigurationException {
-		DocumentBuilderFactory result = this.factory;
+	 * @throws SAXException Wenn {@link #updateValue()} eine entsprechende Ausnahme auslöst.
+	 * @throws ParserConfigurationException Wenn {@link #updateValue()} eine entsprechende Ausnahme auslöst. */
+	public DocumentBuilderFactory putValue() throws SAXException, ParserConfigurationException {
+		DocumentBuilderFactory result = this.getValue();
 		if (result != null) return result;
 		result = DocumentBuilderFactory.newInstance();
-		this.useFactory(result);
-		this.updateFactory();
+		this.useValue(result);
+		this.updateValue();
 		return result;
 	}
 
-	/** Diese Methode setzt die {@link DocumentBuilderFactory} und gibt {@code this} zurück.
-	 *
-	 * @param factory {@link DocumentBuilderFactory} oder {@code null}.
-	 * @return {@code this}. */
-	public final GThis useFactory(final DocumentBuilderFactory factory) {
-		this.factory = factory;
-		return this.customThis();
-	}
-
-	/** Diese Methode setzt die {@link DocumentBuilderFactory} auf {@code null} und gibt {@code this} zurück.
-	 *
-	 * @see #useFactory(DocumentBuilderFactory)
-	 * @return {@code this}. */
-	public final GThis resetFactory() {
-		return this.useFactory(null);
-	}
-
 	/** Diese Methode aktualisiert die Einstellungen der {@link DocumentBuilderFactory} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf die
-	 * über {@link #getFactory()} ermittelte {@link DocumentBuilderFactory} die Einstellungen übertragen, die in {@link #openSchemaData()},
-	 * {@link #openFeatureData()}, {@link #openPropertyData()} und {@link #openAttributeData()} konfiguriert sind.
+	 * über {@link #putValue()} ermittelte {@link DocumentBuilderFactory} die Einstellungen übertragen, die in {@link #openSchemaData()}, {@link #forFeatures()},
+	 * {@link #forProperties()} und {@link #attributes()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
-	 * @throws SAXException Wenn {@link SchemaData#getSchema()} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link SchemaValue#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst. */
-	public final GThis updateFactory() throws SAXException, ParserConfigurationException {
-		final DocumentBuilderFactory factory = this.getFactory();
-		factory.setSchema(this._schemaData_.getSchema());
-		final PropertyData<GThis> propertyData = this.propertyData;
+	public GOwner updateValue() throws SAXException, ParserConfigurationException {
+		final DocumentBuilderFactory factory = this.putValue();
+		factory.setSchema(this._schemaData_.putValue());
+		final PropertiesData propertyData = this.propertyData;
 		factory.setCoalescing(propertyData.forCoalescing().getBoolean());
 		factory.setExpandEntityReferences(propertyData.forExpandEntityReferences().getBoolean());
 		factory.setIgnoringComments(propertyData.forIgnoringComments().getBoolean());
@@ -283,26 +251,29 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		for (final Entry<String, Object> entry: this.attributeData) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
-		return this.customThis();
+		return this.owner();
 	}
 
-	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
+	/** Diese Methode liefert den Konfigurator für die Fähigkeiten.
 	 *
-	 * @see DocumentBuilderFactory#setFeature(String, boolean)
-	 * @return Konfigurator. */
-	public final FeatureData<GThis> openFeatureData() {
-		return this.featureData;
+	 * @see DocumentBuilderFactory#setFeature(String, boolean) */
+	public abstract FeaturesValue features();
+
+	public FeaturesProxy forFeatures() {
+		return new FeaturesProxy();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link Schema} und gibt ihn zurück.
 	 *
 	 * @see DocumentBuilderFactory#setSchema(Schema)
 	 * @return Konfigurator. */
-	public final SchemaData<GThis> openSchemaData() {
-		return this._schemaData_;
+	public abstract SchemaValue schema();
+
+	public SchemaProxy forSchema() {
+		return new SchemaProxy();
 	}
 
-	/** Diese Methode öffnet den Konfigurator für die Eigenschaften und gibt ihn zurück.
+	/** Diese Methode liefert den Konfigurator für die Eigenschaften.
 	 *
 	 * @see DocumentBuilderFactory#setCoalescing(boolean)
 	 * @see DocumentBuilderFactory#setExpandEntityReferences(boolean)
@@ -312,36 +283,24 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setValidating(boolean)
 	 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 	 * @return Konfigurator. */
-	public final PropertyData<GThis> openPropertyData() {
-		return this.propertyData;
+	public abstract PropertiesData properties();
+
+	public PropertiesData2 forProperties() {
+		return new PropertiesData2();
 	}
 
-	/** Diese Methode öffnet den Konfigurator für die Attribute und gibt ihn zurück.
+	/** Diese Methode liefert den Konfigurator für die Attribute.
 	 *
-	 * @see DocumentBuilderFactory#setAttribute(String, Object)
-	 * @return Konfigurator. */
-	public final AttributeData<GThis> openAttributeData() {
-		return this.attributeData;
+	 * @see DocumentBuilderFactory#setAttribute(String, Object) */
+	public abstract AttributesData attributes();
+
+	public AttributesData2 forAttributes() {
+		return new AttributesData2();
 	}
 
 	@Override
-	protected abstract GThis customThis();
-
-	/** {@inheritDoc}
-	 *
-	 * @see #getFactory() */
-	@Override
-	public final DocumentBuilderFactory get() throws IllegalStateException {
-		try {
-			return this.getFactory();
-		} catch (final SAXException | ParserConfigurationException cause) {
-			throw new IllegalStateException(cause);
-		}
-	}
-
-	@Override
-	public final String toString() {
-		return Objects.toInvokeString(this, this.featureData, this._schemaData_, this.propertyData, this.attributeData);
+	public String toString() {
+		return Objects.toInvokeString(this, this.features(), this.schema(), this.properties(), this.attributes());
 	}
 
 }

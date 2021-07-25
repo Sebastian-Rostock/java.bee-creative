@@ -29,7 +29,8 @@ public final class XMLEvaluator {
 		}
 
 		@Override
-		protected final XPathData customThis() {
+		public
+		final XPathData owner() {
 			return this;
 		}
 

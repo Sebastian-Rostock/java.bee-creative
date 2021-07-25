@@ -27,7 +27,7 @@ public class XMLParser {
 		}
 
 		@Override
-		protected SourceData customThis() {
+		public SourceData owner() {
 			return this;
 		}
 
@@ -46,7 +46,7 @@ public class XMLParser {
 		}
 
 		@Override
-		protected BuilderData customThis() {
+		public BuilderData owner() {
 			return this;
 		}
 
@@ -73,11 +73,11 @@ public class XMLParser {
 	 *
 	 * @return {@link Document}.
 	 * @throws IOException Wenn {@link DocumentBuilder#parse(InputSource)} eine entsprechende Ausnahme auslöst.
-	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
-	 * @throws ParserConfigurationException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst. */
+	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderData#putValue()} eine entsprechende Ausnahme auslöst.
+	 * @throws ParserConfigurationException Wenn {@link BuilderData#putValue()} eine entsprechende Ausnahme auslöst. */
 	public Document parse() throws IOException, SAXException, ParserConfigurationException {
 		final InputSource source = this.sourceData.getInputSource();
-		final DocumentBuilder builder = this.builderData.getBuilder();
+		final DocumentBuilder builder = this.builderData.putValue();
 		final Document result = builder.parse(source);
 		return result;
 	}
@@ -93,10 +93,10 @@ public class XMLParser {
 	/** Diese Methode erzeugt ein neues {@link Document} und gibt dieses zurück.
 	 *
 	 * @return {@link Document}.
-	 * @throws SAXException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link BuilderData#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilder#newDocument()} eine entsprechende Ausnahme auslöst. */
 	public Document create() throws SAXException, ParserConfigurationException {
-		final DocumentBuilder builder = this.builderData.getBuilder();
+		final DocumentBuilder builder = this.builderData.putValue();
 		final Document result = builder.newDocument();
 		return result;
 	}

@@ -9,7 +9,8 @@ import org.w3c.dom.Document;
 public final class XMLDocumentBuilder extends BaseDocumentBuilderData<XMLDocumentBuilder> {
 
 	@Override
-	protected final XMLDocumentBuilder customThis() {
+	public
+	final XMLDocumentBuilder owner() {
 		return this;
 	}
 

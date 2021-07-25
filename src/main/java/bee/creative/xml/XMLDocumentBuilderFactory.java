@@ -9,7 +9,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public final class XMLDocumentBuilderFactory extends BaseDocumentBuilderFactoryData<XMLDocumentBuilderFactory> {
 
 	@Override
-	protected final XMLDocumentBuilderFactory customThis() {
+	public
+	final XMLDocumentBuilderFactory owner() {
 		return this;
 	}
 

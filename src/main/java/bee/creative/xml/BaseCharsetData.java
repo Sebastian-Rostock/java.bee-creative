@@ -4,88 +4,83 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
-import bee.creative.util.Builders.BaseItemBuilder;
+import bee.creative.util.Builders.BaseValueBuilder;
 
 /** Diese Klasse implementiert den Konfigurator eines {@link Charset}. Initialisiert wird dieses {@link Charset} über {@link #useDEFAULT()}.
  *
  * @see Charset#forName(String)
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseCharsetData<GThis> extends BaseItemBuilder<Charset, GThis> {
+ * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
+public abstract class BaseCharsetData<GOwner> extends BaseValueBuilder<Charset, GOwner> {
 
-	/** Dieser Konstruktor initialisiert das {@link Charset} über {@link #useDEFAULT()}. */
-	public BaseCharsetData() {
-		this.useDEFAULT();
-	}
-
-	/** Diese Methode setzt den Wert auf {@link Charset#forName(String) Charset.forName(charsetName)} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert auf {@link Charset#forName(String) Charset.forName(charsetName)} und gibt {@link #owner()} zurück.
 	 *
-	 * @see #use(Object)
+	 * @see #useValue(Object)
 	 * @see Charset#forName(String)
 	 * @param charsetName Name des {@link Charset}.
-	 * @return {@code this}.
+	 * @return {@link #owner()}.
 	 * @throws NullPointerException Wenn {@link Charset#forName(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn {@link Charset#forName(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalCharsetNameException Wenn {@link Charset#forName(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws UnsupportedCharsetException Wenn {@link Charset#forName(String)} eine entsprechende Ausnahme auslöst. */
-	public GThis use(final String charsetName) throws NullPointerException, IllegalArgumentException, IllegalCharsetNameException, UnsupportedCharsetException {
-		return this.use(Charset.forName(charsetName));
+	public GOwner use(final String charsetName) throws NullPointerException, IllegalArgumentException, IllegalCharsetNameException, UnsupportedCharsetException {
+		return this.useValue(Charset.forName(charsetName));
 	}
 
-	/** Diese Methode setzt den Wert auf {@link StandardCharsets#UTF_8} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert auf {@link StandardCharsets#UTF_8} und gibt {@link #owner()} zurück.
 	 *
-	 * @see #use(Object)
-	 * @return {@code this}. */
-	public GThis useUTF_8() {
-		return this.use(StandardCharsets.UTF_8);
+	 * @see #useValue(Object)
+	 * @return {@link #owner()}. */
+	public GOwner useUTF_8() {
+		return this.useValue(StandardCharsets.UTF_8);
 	}
 
-	/** Diese Methode setzt den Wert auf {@link StandardCharsets#UTF_16} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert auf {@link StandardCharsets#UTF_16} und gibt {@link #owner()} zurück.
 	 *
-	 * @see #use(Object)
-	 * @return {@code this}. */
-	public GThis useUTF_16() {
-		return this.use(StandardCharsets.UTF_16);
+	 * @see #useValue(Object)
+	 * @return {@link #owner()}. */
+	public GOwner useUTF_16() {
+		return this.useValue(StandardCharsets.UTF_16);
 	}
 
-	/** Diese Methode setzt den Wert auf {@link StandardCharsets#UTF_16BE} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert auf {@link StandardCharsets#UTF_16BE} und gibt {@link #owner()} zurück.
 	 *
-	 * @see #use(Object)
-	 * @return {@code this}. */
-	public GThis useUTF_16BE() {
-		return this.use(StandardCharsets.UTF_16BE);
+	 * @see #useValue(Object)
+	 * @return {@link #owner()}. */
+	public GOwner useUTF_16BE() {
+		return this.useValue(StandardCharsets.UTF_16BE);
 	}
 
-	/** Diese Methode setzt den Wert auf {@link StandardCharsets#UTF_16LE} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert auf {@link StandardCharsets#UTF_16LE} und gibt {@link #owner()} zurück.
 	 *
-	 * @see #use(Object)
-	 * @return {@code this}. */
-	public GThis useUTF_16LE() {
-		return this.use(StandardCharsets.UTF_16LE);
+	 * @see #useValue(Object)
+	 * @return {@link #owner()}. */
+	public GOwner useUTF_16LE() {
+		return this.useValue(StandardCharsets.UTF_16LE);
 	}
 
-	/** Diese Methode setzt den Wert auf {@link StandardCharsets#US_ASCII} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert auf {@link StandardCharsets#US_ASCII} und gibt {@link #owner()} zurück.
 	 *
-	 * @see #use(Object)
-	 * @return {@code this}. */
-	public GThis useUS_ASCII() {
-		return this.use(StandardCharsets.US_ASCII);
+	 * @see #useValue(Object)
+	 * @return {@link #owner()}. */
+	public GOwner useUS_ASCII() {
+		return this.useValue(StandardCharsets.US_ASCII);
 	}
 
-	/** Diese Methode setzt den Wert auf {@link StandardCharsets#ISO_8859_1} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert auf {@link StandardCharsets#ISO_8859_1} und gibt {@link #owner()} zurück.
 	 *
-	 * @see #use(Object)
-	 * @return {@code this}. */
-	public GThis useISO_8859_1() {
-		return this.use(StandardCharsets.ISO_8859_1);
+	 * @see #useValue(Object)
+	 * @return {@link #owner()}. */
+	public GOwner useISO_8859_1() {
+		return this.useValue(StandardCharsets.ISO_8859_1);
 	}
 
-	/** Diese Methode setzt den Wert auf {@link Charset#defaultCharset()} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert auf {@link Charset#defaultCharset()} und gibt {@link #owner()} zurück.
 	 *
-	 * @see #use(Object)
-	 * @return {@code this}. */
-	public GThis useDEFAULT() {
-		return this.use(Charset.defaultCharset());
+	 * @see #useValue(Object)
+	 * @return {@link #owner()}. */
+	public GOwner useDEFAULT() {
+		return this.useValue(Charset.defaultCharset());
 	}
 
 }
