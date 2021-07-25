@@ -18,7 +18,7 @@ import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.util.Builders.BaseSetBuilder2;
-import bee.creative.xml.BaseDocumentBuilderFactoryData.SchemaData;
+import bee.creative.xml.DocumentBuilderFactoryBuilder.SchemaData;
 
 /** Diese Klasse implementiert den Konfigurator für einen {@link Marshaller}.
  *

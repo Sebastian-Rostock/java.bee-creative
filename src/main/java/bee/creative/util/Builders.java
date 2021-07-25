@@ -178,6 +178,10 @@ public class Builders {
 				return BaseMapBuilder.this.get().get(this.getKey());
 			}
 
+			public boolean getBoolean() {
+				return Boolean.TRUE.equals(get());
+			}
+
 			@Override
 			public void set(final GValue value) {
 				BaseMapBuilder.this.put(this.getKey(), value);

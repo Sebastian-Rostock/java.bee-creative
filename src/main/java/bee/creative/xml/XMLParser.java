@@ -17,46 +17,58 @@ public class XMLParser {
 	 *
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public class SourceData extends BaseSourceData<SourceData> {
-
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public XMLParser closeSourceData() {
-			return XMLParser.this;
-		}
+	public static class SourceValue extends BaseSourceData.Value<SourceValue> {
 
 		@Override
-		public SourceData owner() {
+		public SourceValue owner() {
 			return this;
 		}
 
 	}
 
-	/** Diese Klasse implementiert den Konfigurator für den {@link DocumentBuilder} zur Erzeugung eines {@link Document}.
-	 *
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public class BuilderData extends BaseDocumentBuilderData<BuilderData> {
+	public class SourceProxy extends BaseSourceData.Proxy<XMLParser> {
 
-		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 *
-		 * @return Besitzer. */
-		public XMLParser closeBuilderData() {
-			return XMLParser.this;
+		@Override
+		protected SourceValue value() {
+			return source();
 		}
 
 		@Override
-		public BuilderData owner() {
+		public XMLParser owner() {
+			return XMLParser.this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert den Konfigurator für den {@link DocumentBuilder} zur Erzeugung eines {@link Document}. */
+	public static class BuilderValue extends DocumentBuilderBuilder.Value<BuilderValue> {
+
+		@Override
+		public BuilderValue owner() {
 			return this;
 		}
 
 	}
 
-	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
-	final SourceData sourceData = new SourceData();
+	public class BuilderProxy extends DocumentBuilderBuilder.Proxy<BuilderValue> {
 
-	/** Dieses Feld speichert den Konfigurator {@link #openBuilderData()}. */
-	final BuilderData builderData = new BuilderData();
+		@Override
+		protected BuilderValue value() {
+			return null;
+		}
+
+		@Override
+		public BuilderValue owner() {
+			return null;
+		}
+
+	}
+
+	/** Dieses Feld speichert den Konfigurator {@link #source()}. */
+	final SourceValue source = new SourceValue();
+
+	/** Dieses Feld speichert den Konfigurator {@link #builder()}. */
+	final BuilderValue builder = new BuilderValue();
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -64,8 +76,8 @@ public class XMLParser {
 	 * @return {@code this}. */
 	public XMLParser use(final XMLParser data) {
 		if (data == null) return this;
-		this.sourceData.use(data.sourceData);
-		this.builderData.use(data.builderData);
+		this.source.use(data.source);
+		this.builder.use(data.builder);
 		return this;
 	}
 
@@ -73,11 +85,11 @@ public class XMLParser {
 	 *
 	 * @return {@link Document}.
 	 * @throws IOException Wenn {@link DocumentBuilder#parse(InputSource)} eine entsprechende Ausnahme auslöst.
-	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderData#putValue()} eine entsprechende Ausnahme auslöst.
-	 * @throws ParserConfigurationException Wenn {@link BuilderData#putValue()} eine entsprechende Ausnahme auslöst. */
+	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderValue#putValue()} eine entsprechende Ausnahme auslöst.
+	 * @throws ParserConfigurationException Wenn {@link BuilderValue#putValue()} eine entsprechende Ausnahme auslöst. */
 	public Document parse() throws IOException, SAXException, ParserConfigurationException {
-		final InputSource source = this.sourceData.getInputSource();
-		final DocumentBuilder builder = this.builderData.putValue();
+		final InputSource source = this.source.getInputSource();
+		final DocumentBuilder builder = this.builder.putValue();
 		final Document result = builder.parse(source);
 		return result;
 	}
@@ -87,16 +99,16 @@ public class XMLParser {
 	 * @see #parse()
 	 * @see BaseSourceData#use(Object) */
 	public Document parse(final Object source) throws IOException, SAXException, ParserConfigurationException {
-		return this.openSourceData().use(source).closeSourceData().parse();
+		return this.forSource().use(source).parse();
 	}
 
 	/** Diese Methode erzeugt ein neues {@link Document} und gibt dieses zurück.
 	 *
 	 * @return {@link Document}.
-	 * @throws SAXException Wenn {@link BuilderData#putValue()} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link BuilderValue#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilder#newDocument()} eine entsprechende Ausnahme auslöst. */
 	public Document create() throws SAXException, ParserConfigurationException {
-		final DocumentBuilder builder = this.builderData.putValue();
+		final DocumentBuilder builder = this.builder.putValue();
 		final Document result = builder.newDocument();
 		return result;
 	}
@@ -105,20 +117,28 @@ public class XMLParser {
 	 *
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @return Konfigurator. */
-	public SourceData openSourceData() {
-		return this.sourceData;
+	public SourceValue source() {
+		return this.source;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link DocumentBuilder} zurück.
 	 *
 	 * @return Konfigurator. */
-	public BuilderData openBuilderData() {
-		return this.builderData;
+	public BuilderValue builder() {
+		return this.builder;
+	}
+
+	public SourceProxy forSource() {
+		return new SourceProxy();
+	}
+
+	public BuilderProxy forBuilder() {
+		return new BuilderProxy();
 	}
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.sourceData, this.builderData);
+		return Objects.toInvokeString(this, this.source, this.builder);
 	}
 
 }

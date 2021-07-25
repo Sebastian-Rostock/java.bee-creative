@@ -13,107 +13,103 @@ import bee.creative.util.Builders.BaseValueBuilder;
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseDocumentBuilderData<GOwner> extends BaseValueBuilder<DocumentBuilder, GOwner> {
+public abstract class DocumentBuilderBuilder<GOwner> extends BaseValueBuilder<DocumentBuilder, GOwner> {
+
+	public static abstract class Value<GOwner> extends DocumentBuilderBuilder<GOwner> {
+
+		DocumentBuilder value;
+
+		FactoryValue factory = new FactoryValue();
+
+		HandlerValue handler = new HandlerValue();
+
+		ResolverValue resolver = new ResolverValue();
+
+		@Override
+		public DocumentBuilder get() {
+			return this.value;
+		}
+
+		@Override
+		public void set(final DocumentBuilder value) {
+			this.value = value;
+		}
+
+		@Override
+		public FactoryValue factory() {
+			return this.factory;
+		}
+
+		@Override
+		public HandlerValue handler() {
+			return this.handler;
+		}
+
+		@Override
+		public ResolverValue resolver() {
+			return this.resolver;
+		}
+
+	}
+
+	public static abstract class Proxy<GOwner> extends DocumentBuilderBuilder<GOwner> {
+
+		protected abstract Value<?> value();
+
+		@Override
+		public DocumentBuilder get() {
+			return this.value().get();
+		}
+
+		@Override
+		public void set(final DocumentBuilder value) {
+			this.value().set(value);
+		}
+
+		@Override
+		public FactoryValue factory() {
+			return this.value().factory();
+		}
+
+		@Override
+		public HandlerValue handler() {
+			return this.value().handler();
+		}
+
+		@Override
+		public ResolverValue resolver() {
+			return this.value().resolver();
+		}
+
+	}
 
 	/** Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory}.
 	 *
 	 * @see DocumentBuilderFactory#newDocumentBuilder() */
-	public static class FactoryData extends BaseDocumentBuilderFactoryData<FactoryData> {
-
-		DocumentBuilderFactory value;
-
-		SchemaData schema = new SchemaData();
-
-		FeaturesValue features = new FeaturesValue();
-
-		PropertiesData properties = new PropertiesData();
-
-		AttributesData attributes = new AttributesData();
+	public static class FactoryValue extends DocumentBuilderFactoryBuilder.Value<FactoryValue> {
 
 		@Override
-		public DocumentBuilderFactory get() {
-			return null;
-		}
-
-		@Override
-		public void set(final DocumentBuilderFactory value) {
-		}
-
-		@Override
-		public SchemaData schema() {
-			return this.schema;
-		}
-
-		@Override
-		public FeaturesValue features() {
-			return this.features;
-		}
-
-		@Override
-		public PropertiesData properties() {
-			return this.properties;
-		}
-
-		@Override
-		public AttributesData attributes() {
-			return this.attributes;
-		}
-
-		@Override
-		public FactoryData owner() {
+		public FactoryValue owner() {
 			return this;
 		}
 
 	}
 
-	public class FactoryData2 extends BaseDocumentBuilderFactoryData<GOwner> {
+	public class FactoryProxy extends DocumentBuilderFactoryBuilder.Proxy<GOwner> {
 
 		@Override
-		public DocumentBuilderFactory get() {
-			return BaseDocumentBuilderData.this.factory().get();
-		}
-
-		@Override
-		public void set(final DocumentBuilderFactory value) {
-			BaseDocumentBuilderData.this.factory().set(value);
-		}
-
-		@Override
-		public SchemaData schema() {
-			return BaseDocumentBuilderData.this.factory().schema();
-		}
-
-		@Override
-		public FeaturesValue features() {
-			return BaseDocumentBuilderData.this.factory().features();
-		}
-
-		@Override
-		public PropertiesData properties() {
-			return BaseDocumentBuilderData.this.factory().properties();
-		}
-
-		@Override
-		public AttributesData attributes() {
-			return BaseDocumentBuilderData.this.factory().attributes();
+		protected FactoryValue value() {
+			return DocumentBuilderBuilder.this.factory();
 		}
 
 		@Override
 		public GOwner owner() {
-			return BaseDocumentBuilderData.this.owner();
+			return DocumentBuilderBuilder.this.owner();
 		}
 
 	}
 
-	/** Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler}.
-	 *
-	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
-	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class BaseHandlerData<GOwner> extends BaseValueBuilder<ErrorHandler, GOwner> {
-
-	}
-
-	public static class HandlerData extends BaseHandlerData<HandlerData> {
+	public static class HandlerValue extends HandlerBuilder<HandlerValue> {
 
 		private ErrorHandler value;
 
@@ -128,40 +124,40 @@ public abstract class BaseDocumentBuilderData<GOwner> extends BaseValueBuilder<D
 		}
 
 		@Override
-		public HandlerData owner() {
+		public HandlerValue owner() {
 			return this;
 		}
 
 	}
 
-	public class HandlerData2 extends BaseHandlerData<GOwner> {
+	public class HandlerProxy extends HandlerBuilder<GOwner> {
 
 		@Override
 		public ErrorHandler get() {
-			return BaseDocumentBuilderData.this.handler().get();
+			return DocumentBuilderBuilder.this.handler().get();
 		}
 
 		@Override
 		public void set(final ErrorHandler value) {
-			BaseDocumentBuilderData.this.handler().set(value);
+			DocumentBuilderBuilder.this.handler().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return BaseDocumentBuilderData.this.owner();
+			return DocumentBuilderBuilder.this.owner();
 		}
 
 	}
 
-	/** Diese Klasse implementiert den Konfigurator für den {@link EntityResolver}.
+	/** Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler}.
 	 *
-	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
+	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class BaseResolverData<GOwner> extends BaseValueBuilder<EntityResolver, GOwner> {
+	public static abstract class HandlerBuilder<GOwner> extends BaseValueBuilder<ErrorHandler, GOwner> {
 
 	}
 
-	public static class ResolverData extends BaseResolverData<ResolverData> {
+	public static class ResolverValue extends ResolverBuilder<ResolverValue> {
 
 		EntityResolver value;
 
@@ -176,28 +172,36 @@ public abstract class BaseDocumentBuilderData<GOwner> extends BaseValueBuilder<D
 		}
 
 		@Override
-		public ResolverData owner() {
+		public ResolverValue owner() {
 			return this;
 		}
 
 	}
 
-	public class ResolverData2 extends BaseResolverData<GOwner> {
+	public class ResolverProxy extends ResolverBuilder<GOwner> {
 
 		@Override
 		public EntityResolver get() {
-			return BaseDocumentBuilderData.this.resolver().get();
+			return DocumentBuilderBuilder.this.resolver().get();
 		}
 
 		@Override
 		public void set(final EntityResolver value) {
-			BaseDocumentBuilderData.this.resolver().set(value);
+			DocumentBuilderBuilder.this.resolver().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return BaseDocumentBuilderData.this.owner();
+			return DocumentBuilderBuilder.this.owner();
 		}
+
+	}
+
+	/** Diese Klasse implementiert den Konfigurator für den {@link EntityResolver}.
+	 *
+	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
+	 * @param <GOwner> Typ des Besitzers. */
+	public static abstract class ResolverBuilder<GOwner> extends BaseValueBuilder<EntityResolver, GOwner> {
 
 	}
 
@@ -205,7 +209,7 @@ public abstract class BaseDocumentBuilderData<GOwner> extends BaseValueBuilder<D
 	 *
 	 * @param that Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public GOwner use(final BaseDocumentBuilderData<?> that) {
+	public GOwner use(final DocumentBuilderBuilder<?> that) {
 		if (that == null) return this.owner();
 		this.useValue(that.getValue());
 		this.forFactory().use(that.factory());
@@ -214,14 +218,13 @@ public abstract class BaseDocumentBuilderData<GOwner> extends BaseValueBuilder<D
 		return this.owner();
 	}
 
-	/** Diese Methode gibt den {@link DocumentBuilder} zurück. Wenn über {@link #useBuilder(DocumentBuilder)} noch kein {@link DocumentBuilder} gesetzt wurde,
-	 * wird über {@link DocumentBuilderFactory#newDocumentBuilder()} ein neuer erstellt, über {@link #useBuilder(DocumentBuilder)} gesetzt und über
-	 * {@link #updateValue()} aktualisiert. Für die Erstellung wird die {@link DocumentBuilderFactory} genutzt, die in {@link #factory()} konfiguriert ist.
+	/** Diese Methode gibt den {@link DocumentBuilder} zurück. Wenn über {@link #useValue(Object)} noch kein {@link DocumentBuilder} gesetzt wurde, wird über
+	 * {@link DocumentBuilderFactory#newDocumentBuilder()} ein neuer erstellt, über {@link #useValue(Object)} gesetzt und über {@link #updateValue()}
+	 * aktualisiert. Für die Erstellung wird die {@link DocumentBuilderFactory} genutzt, die in {@link #factory()} konfiguriert ist.
 	 *
-	 * @see #useBuilder(DocumentBuilder)
 	 * @see #updateValue()
 	 * @return {@link DocumentBuilder}.
-	 * @throws SAXException Wenn {@link FactoryData#putValue()} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link FactoryValue#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#newDocumentBuilder()} eine entsprechende Ausnahme auslöst. */
 	public DocumentBuilder putValue() throws SAXException, ParserConfigurationException {
 		DocumentBuilder result = this.getValue();
@@ -233,8 +236,7 @@ public abstract class BaseDocumentBuilderData<GOwner> extends BaseValueBuilder<D
 	}
 
 	/** Diese Methode aktualisiert die Einstellungen des {@link DocumentBuilder} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
-	 * {@link #putValue()} ermittelten {@link DocumentBuilder} die Einstellungen übertragen, die in {@link #openHandlerData()} und {@link #openResolverData()}
-	 * konfiguriert sind.
+	 * {@link #putValue()} ermittelten {@link DocumentBuilder} die Einstellungen übertragen, die in {@link #handler()} und {@link #resolver()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link #putValue()} eine entsprechende Ausnahme auslöst.
@@ -254,30 +256,30 @@ public abstract class BaseDocumentBuilderData<GOwner> extends BaseValueBuilder<D
 	 *
 	 * @see DocumentBuilderFactory#newDocumentBuilder()
 	 * @return Konfigurator. */
-	public abstract FactoryData factory();
-
-	public FactoryData2 forFactory() {
-		return new FactoryData2();
-	}
+	public abstract FactoryValue factory();
 
 	/** Diese Methode öffnet den Konfigurator für den {@link ErrorHandler} und gibt ihn zurück.
 	 *
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @return Konfigurator. */
-	public abstract HandlerData handler();
-
-	public HandlerData2 forHandler() {
-		return new HandlerData2();
-	}
+	public abstract HandlerValue handler();
 
 	/** Diese Methode öffnet den Konfigurator für den {@link EntityResolver} und gibt ihn zurück.
 	 *
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @return Konfigurator. */
-	public abstract ResolverData resolver();
+	public abstract ResolverValue resolver();
 
-	public ResolverData2 forResolver() {
-		return new ResolverData2();
+	public FactoryProxy forFactory() {
+		return new FactoryProxy();
+	}
+
+	public HandlerProxy forHandler() {
+		return new HandlerProxy();
+	}
+
+	public ResolverProxy forResolver() {
+		return new ResolverProxy();
 	}
 
 	@Override

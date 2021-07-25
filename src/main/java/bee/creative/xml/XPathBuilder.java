@@ -7,14 +7,93 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
 import bee.creative.lang.Objects;
-import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseValueBuilder;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link XPath}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class XPathDataBuilder<GOwner> extends BaseValueBuilder<XPath, GOwner> {
+public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwner> {
+
+	public static abstract class Value<GOwner> extends XPathBuilder<GOwner> {
+
+		private XPath value;
+
+		private FactoryValue facrory = new FactoryValue();
+
+		private VariableValue variable = new VariableValue();
+
+		private FunctionValue function = new FunctionValue();
+
+		private NamespaceValue namespace = new NamespaceValue();
+
+		@Override
+		public XPath get() {
+			return value;
+		}
+
+		@Override
+		public void set(XPath value) {
+			this.value = value;
+		}
+
+		@Override
+		public FactoryValue facrory() {
+			return facrory;
+		}
+
+		@Override
+		public VariableValue variable() {
+			return variable;
+		}
+
+		@Override
+		public FunctionValue function() {
+			return function;
+		}
+
+		@Override
+		public NamespaceValue namespace() {
+			return namespace;
+		}
+
+	}
+
+	public static abstract class Proxy<GOwner> extends XPathBuilder<GOwner> {
+
+		protected abstract Value<?> value();
+
+		@Override
+		public XPath get() {
+			return value().get();
+		}
+
+		@Override
+		public void set(XPath value) {
+			this.value().set(value);
+		}
+
+		@Override
+		public FactoryValue facrory() {
+			return value().facrory();
+		}
+
+		@Override
+		public VariableValue variable() {
+			return value().variable();
+		}
+
+		@Override
+		public FunctionValue function() {
+			return value().function();
+		}
+
+		@Override
+		public NamespaceValue namespace() {
+			return value().namespace();
+		}
+
+	}
 
 	/** Diese Klasse implementiert den Konfigurator einer {@link XPathFactory}.
 	 *
@@ -181,7 +260,7 @@ public abstract class XPathDataBuilder<GOwner> extends BaseValueBuilder<XPath, G
 	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public GOwner use(XPathDataBuilder<?> data) {
+	public GOwner use(XPathBuilder<?> data) {
 		if (data == null) return this.owner();
 		this.useValue(data.getValue());
 		this.forFacrory().use(data.facrory());
@@ -197,7 +276,8 @@ public abstract class XPathDataBuilder<GOwner> extends BaseValueBuilder<XPath, G
 	 *
 	 * @see #updateValue()
 	 * @return {@link XPath}.
-	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactoryBuilder#putValue()} bzw. {@link XPathFactory#newXPath()} eine entsprechende Ausnahme auslöst. */
+	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactoryBuilder#putValue()} bzw. {@link XPathFactory#newXPath()} eine entsprechende Ausnahme
+	 *         auslöst. */
 	public XPath getXPath() throws XPathFactoryConfigurationException {
 		XPath result = this.getValue();
 		if (result != null) return result;
