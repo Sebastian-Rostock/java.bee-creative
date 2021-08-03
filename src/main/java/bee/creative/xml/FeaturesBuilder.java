@@ -17,9 +17,9 @@ import bee.creative.xml.DocumentBuilderFactoryBuilder.FeaturesValue;
  * @see DocumentBuilderFactory#setFeature(String, boolean)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseFeaturesData<GOwner> extends BaseMapBuilder<String, Boolean, Map<String, Boolean>, GOwner> {
+public abstract class FeaturesBuilder<GOwner> extends BaseMapBuilder<String, Boolean, Map<String, Boolean>, GOwner> {
 
-	public static abstract class Value<GOwner> extends BaseFeaturesData<GOwner> {
+	public static abstract class Value<GOwner> extends FeaturesBuilder<GOwner> {
 
 		Map<String, Boolean> value = new HashMap<>();
 
@@ -30,7 +30,7 @@ public abstract class BaseFeaturesData<GOwner> extends BaseMapBuilder<String, Bo
 
 	}
 
-	public static abstract class Proxy<GOwner> extends BaseFeaturesData<GOwner> {
+	public static abstract class Proxy<GOwner> extends FeaturesBuilder<GOwner> {
 
 		@Override
 		public Map<String, Boolean> get() {

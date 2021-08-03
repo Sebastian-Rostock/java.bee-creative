@@ -96,8 +96,8 @@ public class XMLCleaner {
 	 * @see InputStreamReader#InputStreamReader(java.io.InputStream, Charset)
 	 * @see OutputStreamWriter#OutputStreamWriter(java.io.OutputStream, Charset)
 	 * @return Konfigurator. */
-	public BaseCharsetData<XMLCleaner> forCharset() {
-		return new BaseCharsetData<XMLCleaner>() {
+	public CharsetBuilder<XMLCleaner> forCharset() {
+		return new CharsetBuilder<XMLCleaner>() {
 
 			@Override
 			public Charset get() {
@@ -123,8 +123,8 @@ public class XMLCleaner {
 	 * @see FileInputStream
 	 * @see FileOutputStream
 	 * @return Konfigurator. */
-	public BaseFilepathData<XMLCleaner> forFilepath() {
-		return new BaseFilepathData<XMLCleaner>() {
+	public FileBuilder<XMLCleaner> forFilepath() {
+		return new FileBuilder<XMLCleaner>() {
 
 			@Override
 			public File get() {

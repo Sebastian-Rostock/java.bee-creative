@@ -20,10 +20,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
-import bee.creative.lang.Objects;
-import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseValueBuilder;
-import bee.creative.xml.SchemaBuilder.SourceValue;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source} oder {@link InputSource}, die für die Eingabedaten eines {@link Schema},
  * {@link Validator}, {@link DocumentBuilder} bzw. {@link Transformer} genutzt wird.
@@ -34,9 +31,9 @@ import bee.creative.xml.SchemaBuilder.SourceValue;
  * @see TransformerFactory#newTemplates(Source)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GOwner> {
+public abstract class SourceBuilder<GOwner> extends BaseValueBuilder<Source, GOwner> {
 
-	public static abstract class Value<GOwner> extends BaseSourceData<GOwner> {
+	public static abstract class Value<GOwner> extends SourceBuilder<GOwner> {
 
 		Source value;
 
@@ -52,18 +49,18 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 
 	}
 
-	public static abstract class Proxy<GOwner> extends BaseSourceData<GOwner> {
+	public static abstract class Proxy<GOwner> extends SourceBuilder<GOwner> {
 
 		protected abstract Value<?> value();
 
 		@Override
 		public Source get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
 		public void set(final Source value) {
-			value().set(value);
+			this.value().set(value);
 		}
 
 	}
@@ -72,9 +69,9 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * Datentypen werden ignoriert.
 	 *
 	 * @param object Quelldaten als {@link URL}, {@link URI}, {@link File}, {@link String}, {@link Node}, {@link Reader}, {@link InputStream}, {@link Source} oder
-	 *        {@link BaseSourceData}.
+	 *        {@link SourceBuilder}.
 	 * @return {@code this}. */
-	public GOwner use(Object object) throws MalformedURLException {
+	public GOwner use(final Object object) throws MalformedURLException {
 		if (object instanceof URI) return this.useUri((URI)object);
 		if (object instanceof URL) return this.useUrl((URL)object);
 		if (object instanceof File) return this.useFile((File)object);
@@ -83,7 +80,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 		if (object instanceof Reader) return this.useReader((Reader)object);
 		if (object instanceof InputStream) return this.useStream((InputStream)object);
 		if (object instanceof Source) return this.useValue((Source)object);
-		if (object instanceof BaseSourceData<?>) return this.use((BaseSourceData<?>)object);
+		if (object instanceof SourceBuilder<?>) return this.use((SourceBuilder<?>)object);
 		return this.owner();
 	}
 
@@ -94,7 +91,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @param uri {@link URI}.
 	 * @return {@code this}.
 	 * @throws MalformedURLException Wenn {@link URI#toURL()} eine entsprechende Ausnahme auslöst. */
-	public GOwner useUri(URI uri) throws MalformedURLException {
+	public GOwner useUri(final URI uri) throws MalformedURLException {
 		return this.useUrl(uri.toURL());
 	}
 
@@ -106,7 +103,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @return {@code this}.
 	 * @throws URISyntaxException Wenn {@link URI#URI(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws MalformedURLException Wenn {@link #useUri(URI)} eine entsprechende Ausnahme auslöst. */
-	public GOwner useUri(String uri) throws URISyntaxException, MalformedURLException {
+	public GOwner useUri(final String uri) throws URISyntaxException, MalformedURLException {
 		return this.useUri(new URI(uri));
 	}
 
@@ -117,7 +114,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @see StreamSource#StreamSource(String)
 	 * @param url {@link URL}.
 	 * @return {@code this}. */
-	public GOwner useUrl(URL url) {
+	public GOwner useUrl(final URL url) {
 		return this.useValue(new StreamSource(url.toExternalForm()));
 	}
 
@@ -128,7 +125,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @param url URL.
 	 * @return {@code this}.
 	 * @throws MalformedURLException Wenn {@link URL#URL(String)} eine entsprechende Ausnahme auslöst. */
-	public GOwner useUrl(String url) throws MalformedURLException {
+	public GOwner useUrl(final String url) throws MalformedURLException {
 		return this.useUrl(new URL(url));
 	}
 
@@ -138,7 +135,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @see StreamSource#StreamSource(File)
 	 * @param file {@link File}.
 	 * @return {@code this}. */
-	public GOwner useFile(File file) {
+	public GOwner useFile(final File file) {
 		return this.useValue(new StreamSource(file));
 	}
 
@@ -148,7 +145,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @see File#File(String)
 	 * @param file Datei.
 	 * @return {@code this}. */
-	public GOwner useFile(String file) {
+	public GOwner useFile(final String file) {
 		return this.useFile(new File(file));
 	}
 
@@ -158,7 +155,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @see StringReader#StringReader(String)
 	 * @param text Text.
 	 * @return {@code this}. */
-	public GOwner useText(String text) {
+	public GOwner useText(final String text) {
 		return this.useReader(new StringReader(text));
 	}
 
@@ -168,7 +165,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @see DOMSource#DOMSource(Node)
 	 * @param node {@link Node}.
 	 * @return {@code this}. */
-	public GOwner useNode(Node node) {
+	public GOwner useNode(final Node node) {
 		return this.useValue(new DOMSource(node));
 	}
 
@@ -178,7 +175,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @see StreamSource#StreamSource(Reader)
 	 * @param reader {@link Reader}.
 	 * @return {@code this}. */
-	public GOwner useReader(Reader reader) {
+	public GOwner useReader(final Reader reader) {
 		return this.useValue(new StreamSource(reader));
 	}
 
@@ -188,7 +185,7 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 * @see StreamSource#StreamSource(InputStream)
 	 * @param stream {@link InputStream}.
 	 * @return {@code this}. */
-	public GOwner useStream(InputStream stream) {
+	public GOwner useStream(final InputStream stream) {
 		return this.useValue(new StreamSource(stream));
 	}
 
@@ -197,10 +194,10 @@ public abstract class BaseSourceData<GOwner> extends BaseValueBuilder<Source, GO
 	 *
 	 * @return Quelldaten oder {@code null}. */
 	public InputSource getInputSource() {
-		Source source = this.getValue();
+		final Source source = this.getValue();
 		if (!(source instanceof StreamSource)) return null;
-		StreamSource stream = (StreamSource)source;
-		InputSource result = new InputSource();
+		final StreamSource stream = (StreamSource)source;
+		final InputSource result = new InputSource();
 		result.setSystemId(source.getSystemId());
 		result.setCharacterStream(stream.getReader());
 		result.setByteStream(stream.getInputStream());

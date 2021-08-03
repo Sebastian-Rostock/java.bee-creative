@@ -20,7 +20,7 @@ import bee.creative.xml.XMLMarshaller.SourceData2;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class XMLMarshaller {
 
-	public static class ResultData extends BaseResultData<ResultData> {
+	public static class ResultData extends ResultBuilder<ResultData> {
 
 		Result value;
 
@@ -41,7 +41,7 @@ public class XMLMarshaller {
 
 	}
 
-	public class ResultData2 extends BaseResultData<XMLMarshaller> {
+	public class ResultData2 extends ResultBuilder<XMLMarshaller> {
 
 		ResultData resultData = new ResultData();
 
@@ -179,11 +179,9 @@ public class XMLMarshaller {
 	 * @throws JAXBException Wenn {@link Marshaller#marshal(Object, Result)} eine entsprechende Ausnahme auslöst. */
 	public XMLMarshaller marshal() throws SAXException, JAXBException {
 		final Marshaller marshaller = this.marshallerData.getMarshaller();
-		synchronized (marshaller) {
 			final Object source = this.sourceData;
 			final Result result = this.resultData.getResult();
 			marshaller.marshal(source, result);
-		}
 		return this;
 	}
 

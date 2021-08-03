@@ -21,7 +21,7 @@ public class XMLUnmarshaller {
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static class SourceData extends BaseSourceData.Value<SourceData> {
+	public static class SourceData extends SourceBuilder.Value<SourceData> {
 
 		@Override
 		public SourceData owner() {
@@ -30,7 +30,7 @@ public class XMLUnmarshaller {
 
 	}
 
-	public class SourceData2 extends BaseSourceData.Proxy<XMLUnmarshaller> {
+	public class SourceData2 extends SourceBuilder.Proxy<XMLUnmarshaller> {
 
 		@Override
 		protected SourceData value() {

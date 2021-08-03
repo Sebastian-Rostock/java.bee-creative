@@ -17,7 +17,7 @@ public class XMLParser {
 	 *
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static class SourceValue extends BaseSourceData.Value<SourceValue> {
+	public static class SourceValue extends SourceBuilder.Value<SourceValue> {
 
 		@Override
 		public SourceValue owner() {
@@ -26,7 +26,7 @@ public class XMLParser {
 
 	}
 
-	public class SourceProxy extends BaseSourceData.Proxy<XMLParser> {
+	public class SourceProxy extends SourceBuilder.Proxy<XMLParser> {
 
 		@Override
 		protected SourceValue value() {
@@ -97,7 +97,7 @@ public class XMLParser {
 	/** Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().parse()}.
 	 *
 	 * @see #parse()
-	 * @see BaseSourceData#use(Object) */
+	 * @see SourceBuilder#use(Object) */
 	public Document parse(final Object source) throws IOException, SAXException, ParserConfigurationException {
 		return this.forSource().use(source).parse();
 	}

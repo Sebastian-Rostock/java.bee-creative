@@ -19,15 +19,47 @@ import bee.creative.util.Builders.BaseValueBuilder;
  * @see Transformer#transform(Source, Result)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseResultData<GOwner> extends BaseValueBuilder<Result, GOwner> {
+public abstract class ResultBuilder<GOwner> extends BaseValueBuilder<Result, GOwner> {
+
+	public static abstract class Value<GOwner> extends ResultBuilder<GOwner> {
+
+		Result value;
+
+		@Override
+		public Result get() {
+			return this.value;
+		}
+
+		@Override
+		public void set(final Result value) {
+			this.value = value;
+		}
+
+	}
+
+	public static abstract class Proxy<GOwner> extends ResultBuilder<GOwner> {
+
+		protected abstract Value<?> value();
+
+		@Override
+		public Result get() {
+			return this.value().get();
+		}
+
+		@Override
+		public void set(final Result value) {
+			this.value().set(value);
+		}
+
+	}
 
 	/** Diese Methode delegiert das gegebene Objekt abhängig von seinem Datentyp an eine der spezifischen Methoden und gibt {@code this} zurück. Unbekannte
 	 * Datentypen werden ignoriert.
 	 *
-	 * @param object Quelldaten als { {@link File}, {@link Node}, {@link Writer}, {@link OutputStream}, {@link Result} oder {@link BaseResultData}.
+	 * @param object Quelldaten als { {@link File}, {@link Node}, {@link Writer}, {@link OutputStream}, {@link Result} oder {@link ResultBuilder}.
 	 * @return {@code this}. */
 	public GOwner use(final Object object) {
-		if (object instanceof BaseResultData<?>) return this.use((BaseResultData<?>)object);
+		if (object instanceof ResultBuilder<?>) return this.use((ResultBuilder<?>)object);
 		if (object instanceof Result) return this.useValue((Result)object);
 		if (object instanceof File) return this.useFile((File)object);
 		if (object instanceof Node) return this.useNode((Node)object);

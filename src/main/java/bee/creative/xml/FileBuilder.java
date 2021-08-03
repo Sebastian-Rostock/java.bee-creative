@@ -8,7 +8,39 @@ import bee.creative.util.Builders.BaseValueBuilder;
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
-public abstract class BaseFilepathData<GOwner> extends BaseValueBuilder<File, GOwner> {
+public abstract class FileBuilder<GOwner> extends BaseValueBuilder<File, GOwner> {
+
+	public static abstract class Value<GOwner> extends FileBuilder<GOwner> {
+
+		File value;
+
+		@Override
+		public File get() {
+			return this.value;
+		}
+
+		@Override
+		public void set(final File value) {
+			this.value = value;
+		}
+
+	}
+
+	public static abstract class Proxy<GOwner> extends FileBuilder<GOwner> {
+
+		protected abstract Value<?> value();
+
+		@Override
+		public File get() {
+			return value().get();
+		}
+
+		@Override
+		public void set(final File value) {
+			value().set(value);
+		}
+
+	}
 
 	/** Diese Methode setzt den Wert auf {@link File#File(URI) new File(uri)} und gibt {@code this} zurück.
 	 *

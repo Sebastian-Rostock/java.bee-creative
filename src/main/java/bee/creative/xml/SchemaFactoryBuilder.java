@@ -124,7 +124,7 @@ public abstract class SchemaFactoryBuilder<GOwner> extends BaseValueBuilder<Sche
 	/** Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link SchemaFactory}.
 	 *
 	 * @see SchemaFactory#setFeature(String, boolean) */
-	public static class FeaturesValue extends BaseFeaturesData.Value<FeaturesValue> {
+	public static class FeaturesValue extends FeaturesBuilder.Value<FeaturesValue> {
 
 		@Override
 		public FeaturesValue owner() {
@@ -133,7 +133,7 @@ public abstract class SchemaFactoryBuilder<GOwner> extends BaseValueBuilder<Sche
 
 	}
 
-	public class FeaturesProxy extends BaseFeaturesData.Proxy<GOwner> {
+	public class FeaturesProxy extends FeaturesBuilder.Proxy<GOwner> {
 
 		@Override
 		protected FeaturesValue value() {

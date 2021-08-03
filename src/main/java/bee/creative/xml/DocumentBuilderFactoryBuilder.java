@@ -97,7 +97,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 
 	}
 
-	public static class FeaturesValue extends BaseFeaturesData.Value<FeaturesValue> {
+	public static class FeaturesValue extends FeaturesBuilder.Value<FeaturesValue> {
 
 		@Override
 		public FeaturesValue owner() {
@@ -106,7 +106,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 
 	}
 
-	public class FeaturesProxy extends BaseFeaturesData.Proxy<GOwner> {
+	public class FeaturesProxy extends FeaturesBuilder.Proxy<GOwner> {
 
 		@Override
 		protected FeaturesValue value() {
@@ -242,7 +242,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 
 	}
 
-	public static class AttributesValue extends BaseAttributesBuilder<AttributesValue> {
+	public static class AttributesValue extends AttributesBuilder<AttributesValue> {
 
 		Map<String, Object> value = new HashMap<>();
 
@@ -258,7 +258,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 
 	}
 
-	public class AttributesProxy extends BaseAttributesBuilder<GOwner> {
+	public class AttributesProxy extends AttributesBuilder<GOwner> {
 
 		@Override
 		public Map<String, Object> get() {
@@ -275,7 +275,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 	/** Diese Klasse implementiert den Konfigurator für die Attribute einer {@link DocumentBuilderFactory}.
 	 *
 	 * @see DocumentBuilderFactory#setAttribute(String, Object) */
-	public static abstract class BaseAttributesBuilder<GOwner> extends BaseMapBuilder<String, Object, Map<String, Object>, GOwner> {
+	public static abstract class AttributesBuilder<GOwner> extends BaseMapBuilder<String, Object, Map<String, Object>, GOwner> {
 
 	}
 

@@ -73,7 +73,7 @@ public abstract class SchemaBuilder<GOwner> extends BaseValueBuilder<Schema, GOw
 	/** Diese Klasse implementiert den Konfigurator für die Schemadaten eines {@link Schema}.
 	 *
 	 * @see SchemaFactory#newSchema(Source) */
-	public static class SourceValue extends BaseSourceData.Value<SourceValue> {
+	public static class SourceValue extends SourceBuilder.Value<SourceValue> {
 
 		@Override
 		public SourceValue owner() {
@@ -82,7 +82,7 @@ public abstract class SchemaBuilder<GOwner> extends BaseValueBuilder<Schema, GOw
 
 	}
 
-	public class SourceProxy extends BaseSourceData.Proxy<GOwner> {
+	public class SourceProxy extends SourceBuilder.Proxy<GOwner> {
 
 		@Override
 		protected SourceValue value() {

@@ -17,21 +17,88 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class XMLFormatter {
 
-	Source source;
+	public static class SourceValue extends SourceBuilder.Value<SourceValue> {
 
-	Result result;
+		@Override
+		public SourceValue owner() {
+			return this;
+		}
 
-	Transformer transformer;
+	}
+
+	public class SourceProxy extends SourceBuilder.Proxy<XMLFormatter> {
+
+		@Override
+		protected SourceValue value() {
+			return XMLFormatter.this.source();
+		}
+
+		@Override
+		public XMLFormatter owner() {
+			return XMLFormatter.this;
+		}
+
+	}
+
+	public static class ResultValue extends ResultBuilder.Value<ResultValue> {
+
+		@Override
+		public ResultValue owner() {
+			return this;
+		}
+
+	}
+
+	public class ResultProxy extends ResultBuilder.Proxy<XMLFormatter> {
+
+		@Override
+		protected ResultValue value() {
+			return XMLFormatter.this.result();
+		}
+
+		@Override
+		public XMLFormatter owner() {
+			return XMLFormatter.this;
+		}
+
+	}
+
+	public static class TransformerValue extends TransformerBuilder.Value<TransformerValue> {
+
+		@Override
+		public TransformerValue owner() {
+			return this;
+		}
+
+	}
+
+	public class TransformerProxy extends TransformerBuilder.Proxy<XMLFormatter> {
+
+		@Override
+		protected TransformerValue value() {
+			return XMLFormatter.this.transformer();
+		}
+
+		@Override
+		public XMLFormatter owner() {
+			return XMLFormatter.this;
+		}
+
+	}
+
+	SourceValue source = new SourceValue();
+
+	ResultValue result = new ResultValue();
+
+	TransformerValue transformer = new TransformerValue();
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
-	 * @param data Konfigurator oder {@code null}.
+	 * @param that Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public XMLFormatter use(final XMLFormatter data) {
-		if (data == null) return this;
-		this.forSource().useValue(data.source).forResult().useValue(data.result);
-		this.transformerData.use(data.transformerData);
-		return this;
+	public XMLFormatter use(final XMLFormatter that) {
+		if (that == null) return this;
+		return this.forSource().use(that.source()).forResult().use(that.result()).forTransformer().use(that.transformer());
 	}
 
 	/** Diese Methode führt die Transformation aus und gibt {@code this} zurück.
@@ -42,54 +109,52 @@ public class XMLFormatter {
 	 * @return {@code this}.
 	 * @throws TransformerException Wenn {@link Transformer#transform(Source, Result)} eine entsprechende Ausnahme auslöst. */
 	public XMLFormatter transform() throws TransformerException {
-		final Transformer transformer = this.transformerData.getTransformer();
-		synchronized (transformer) {
-			final Source source = this.sourceData.getSource();
-			final Result result = this.resultData.getResult();
+		final Transformer transformer = this.transformer().putValue();
+			final Source source = this.source().getValue();
+			final Result result = this.result().getValue();
 			transformer.transform(source, result);
-		}
 		return this;
 	}
 
 	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück. Dazu wird als
 	 * {@link #openResultData() Ausgabedaten} ein neues {@link DOMResult} eingesetzt.
 	 *
-	 * @see BaseResultData#useNode()
+	 * @see ResultBuilder#useNode()
 	 * @see #openResultData()
 	 * @return Dokumentknoten.
 	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst. */
 	public Node transformToNode() throws TransformerException {
 		final DOMResult result = new DOMResult();
-		this.openResultData().useResult(result).closeResultData().transform().openResultData().resetResult();
+		this.forResult().useValue(result).transform().result().clear();
 		return result.getNode();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().transformToNode()}.
 	 *
 	 * @see #transformToNode()
-	 * @see BaseSourceData#use(Object) */
+	 * @see SourceBuilder#use(Object) */
 	public Node transformToNode(final Object source) throws TransformerException, MalformedURLException {
-		return this.openSourceData().use(source).closeSourceData().transformToNode();
+		return this.forSource().use(source).transformToNode();
 	}
 
 	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück. Dazu wird als {@link #openResultData()
 	 * Ausgabedaten} ein neuer {@link StringWriter} eingesetzt.
 	 *
 	 * @see StringWriter
-	 * @see BaseResultData#useWriter(Writer)
+	 * @see ResultBuilder#useWriter(Writer)
 	 * @see #openResultData()
 	 * @return Zeichenkette.
 	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst. */
 	public String transformToString() throws TransformerException {
 		final StringWriter result = new StringWriter();
-		this.openResultData().useWriter(result).closeResultData().transform().openResultData().resetResult();
+		this.forResult().useWriter(result).transform().result().clear();
 		return result.toString();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().transformToString()}.
 	 *
 	 * @see #transformToString()
-	 * @see BaseSourceData#use(Object) */
+	 * @see SourceBuilder#use(Object) */
 	public String transformToString(final Object source) throws TransformerException, MalformedURLException {
 		return this.forSource().use(source).transformToString();
 	}
@@ -98,64 +163,40 @@ public class XMLFormatter {
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @return Konfigurator. */
-	public BaseSourceData<XMLFormatter> forSource() {
-		return new BaseSourceData<XMLFormatter>() {
+	public SourceValue source() {
+		return this.source;
+	}
 
-			@Override
-			public Source get() {
-				return XMLFormatter.this.source;
-			}
-
-			@Override
-			public void set(final Source value) {
-				XMLFormatter.this.source = value;
-			}
-
-			@Override
-			public XMLFormatter owner() {
-				return null;
-			}
-
-		};
+	public SourceProxy forSource() {
+		return new SourceProxy();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabedaten und gibt ihn zurück.
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @return Konfigurator. */
-	public BaseResultData<XMLFormatter> forResult() {
-		return new BaseResultData<XMLFormatter>() {
+	public ResultValue result() {
+		return this.result;
+	}
 
-			@Override
-			public void set(final Result value) {
-				XMLFormatter.this.result = value;
-			}
-
-			@Override
-			public Result get() {
-				return XMLFormatter.this.result;
-			}
-
-			@Override
-			public XMLFormatter owner() {
-				return XMLFormatter.this;
-			}
-
-		};
+	public ResultProxy forResult() {
+		return new ResultProxy();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Transformer} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
-	public BaseTransformerData<XMLFormatter> openTransformerData() {
-		return new BaseTransformerData<XMLFormatter>() {
+	public TransformerValue transformer() {
+		return this.transformer;
+	}
 
-		};
+	public TransformerProxy forTransformer() {
+		return new TransformerProxy();
 	}
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.source, this.result, this.transformerData);
+		return Objects.toInvokeString(this, this.source(), this.result(), this.transformer());
 	}
 
 }

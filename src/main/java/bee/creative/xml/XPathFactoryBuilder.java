@@ -155,7 +155,7 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 	/** Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link XPathFactory}.
 	 *
 	 * @see XPathFactory#setFeature(String, boolean) */
-	public static class FeaturesValue extends BaseFeaturesData.Value<FeaturesValue> {
+	public static class FeaturesValue extends FeaturesBuilder.Value<FeaturesValue> {
 
 		@Override
 		public FeaturesValue owner() {
@@ -164,7 +164,7 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 
 	}
 
-	public class FeaturesProxy extends BaseFeaturesData.Proxy<GOwner> {
+	public class FeaturesProxy extends FeaturesBuilder.Proxy<GOwner> {
 
 		@Override
 		protected FeaturesValue value() {

@@ -111,7 +111,7 @@ public abstract class DocumentBuilderBuilder<GOwner> extends BaseValueBuilder<Do
 
 	public static class HandlerValue extends HandlerBuilder<HandlerValue> {
 
-		private ErrorHandler value;
+		ErrorHandler value;
 
 		@Override
 		public ErrorHandler get() {
