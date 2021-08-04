@@ -103,24 +103,24 @@ public class XMLFormatter {
 
 	/** Diese Methode führt die Transformation aus und gibt {@code this} zurück.
 	 *
-	 * @see #openSourceData()
-	 * @see #openResultData()
+	 * @see #source()
+	 * @see #result()
 	 * @see Transformer#transform(Source, Result)
 	 * @return {@code this}.
 	 * @throws TransformerException Wenn {@link Transformer#transform(Source, Result)} eine entsprechende Ausnahme auslöst. */
 	public XMLFormatter transform() throws TransformerException {
 		final Transformer transformer = this.transformer().putValue();
-			final Source source = this.source().getValue();
-			final Result result = this.result().getValue();
-			transformer.transform(source, result);
+		final Source source = this.source().getValue();
+		final Result result = this.result().getValue();
+		transformer.transform(source, result);
 		return this;
 	}
 
-	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück. Dazu wird als
-	 * {@link #openResultData() Ausgabedaten} ein neues {@link DOMResult} eingesetzt.
+	/** Diese Methode transformiert die {@link #source() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück. Dazu wird als {@link #result()
+	 * Ausgabedaten} ein neues {@link DOMResult} eingesetzt.
 	 *
 	 * @see ResultBuilder#useNode()
-	 * @see #openResultData()
+	 * @see #result()
 	 * @return Dokumentknoten.
 	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst. */
 	public Node transformToNode() throws TransformerException {
@@ -137,12 +137,12 @@ public class XMLFormatter {
 		return this.forSource().use(source).transformToNode();
 	}
 
-	/** Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück. Dazu wird als {@link #openResultData()
-	 * Ausgabedaten} ein neuer {@link StringWriter} eingesetzt.
+	/** Diese Methode transformiert die {@link #source() Eingabedaten} in eine Zeichenkette und gibt diese zurück. Dazu wird als {@link #result() Ausgabedaten}
+	 * ein neuer {@link StringWriter} eingesetzt.
 	 *
 	 * @see StringWriter
 	 * @see ResultBuilder#useWriter(Writer)
-	 * @see #openResultData()
+	 * @see #result()
 	 * @return Zeichenkette.
 	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst. */
 	public String transformToString() throws TransformerException {
@@ -151,7 +151,7 @@ public class XMLFormatter {
 		return result.toString();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().transformToString()}.
+	/** Diese Methode ist eine Abkürzung für {@code this.forSource().use(source).transformToString()}.
 	 *
 	 * @see #transformToString()
 	 * @see SourceBuilder#use(Object) */

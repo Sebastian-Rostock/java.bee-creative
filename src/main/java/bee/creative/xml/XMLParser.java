@@ -72,12 +72,12 @@ public class XMLParser {
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
-	 * @param data Konfigurator oder {@code null}.
+	 * @param that Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public XMLParser use(final XMLParser data) {
-		if (data == null) return this;
-		this.source.use(data.source);
-		this.builder.use(data.builder);
+	public XMLParser use(final XMLParser that) {
+		if (that == null) return this;
+		this.forSource().use(that.source());
+		this.forBuilder().use(that.builder());
 		return this;
 	}
 
@@ -88,10 +88,7 @@ public class XMLParser {
 	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderValue#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link BuilderValue#putValue()} eine entsprechende Ausnahme auslöst. */
 	public Document parse() throws IOException, SAXException, ParserConfigurationException {
-		final InputSource source = this.source.getInputSource();
-		final DocumentBuilder builder = this.builder.putValue();
-		final Document result = builder.parse(source);
-		return result;
+		return this.builder().putValue().parse(this.source().getInputSource());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code this.openSourceData().use(source).closeSourceData().parse()}.
@@ -108,9 +105,7 @@ public class XMLParser {
 	 * @throws SAXException Wenn {@link BuilderValue#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilder#newDocument()} eine entsprechende Ausnahme auslöst. */
 	public Document create() throws SAXException, ParserConfigurationException {
-		final DocumentBuilder builder = this.builder.putValue();
-		final Document result = builder.newDocument();
-		return result;
+		return this.builder().putValue().newDocument();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Eingabedaten (z.B. xml-Datei) und gibt ihn zurück.
@@ -138,7 +133,7 @@ public class XMLParser {
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.source, this.builder);
+		return Objects.toInvokeString(this, this.source(), this.builder());
 	}
 
 }

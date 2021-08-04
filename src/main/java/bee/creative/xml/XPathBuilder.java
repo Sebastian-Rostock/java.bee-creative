@@ -19,42 +19,42 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 
 		private XPath value;
 
-		private FactoryValue facrory = new FactoryValue();
+		private final FactoryValue facrory = new FactoryValue();
 
-		private VariableValue variable = new VariableValue();
+		private final VariableValue variable = new VariableValue();
 
-		private FunctionValue function = new FunctionValue();
+		private final FunctionValue function = new FunctionValue();
 
-		private NamespaceValue namespace = new NamespaceValue();
+		private final NamespaceValue namespace = new NamespaceValue();
 
 		@Override
 		public XPath get() {
-			return value;
+			return this.value;
 		}
 
 		@Override
-		public void set(XPath value) {
+		public void set(final XPath value) {
 			this.value = value;
 		}
 
 		@Override
 		public FactoryValue facrory() {
-			return facrory;
+			return this.facrory;
 		}
 
 		@Override
 		public VariableValue variable() {
-			return variable;
+			return this.variable;
 		}
 
 		@Override
 		public FunctionValue function() {
-			return function;
+			return this.function;
 		}
 
 		@Override
 		public NamespaceValue namespace() {
-			return namespace;
+			return this.namespace;
 		}
 
 	}
@@ -65,32 +65,32 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 
 		@Override
 		public XPath get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
-		public void set(XPath value) {
+		public void set(final XPath value) {
 			this.value().set(value);
 		}
 
 		@Override
 		public FactoryValue facrory() {
-			return value().facrory();
+			return this.value().facrory();
 		}
 
 		@Override
 		public VariableValue variable() {
-			return value().variable();
+			return this.value().variable();
 		}
 
 		@Override
 		public FunctionValue function() {
-			return value().function();
+			return this.value().function();
 		}
 
 		@Override
 		public NamespaceValue namespace() {
-			return value().namespace();
+			return this.value().namespace();
 		}
 
 	}
@@ -129,7 +129,7 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 		}
 
 		@Override
-		public void set(NamespaceContext value) {
+		public void set(final NamespaceContext value) {
 		}
 
 		@Override
@@ -147,7 +147,7 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 		}
 
 		@Override
-		public void set(NamespaceContext value) {
+		public void set(final NamespaceContext value) {
 		}
 
 		@Override
@@ -174,7 +174,7 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 		}
 
 		@Override
-		public void set(XPathVariableResolver value) {
+		public void set(final XPathVariableResolver value) {
 		}
 
 		@Override
@@ -192,7 +192,7 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 		}
 
 		@Override
-		public void set(XPathVariableResolver value) {
+		public void set(final XPathVariableResolver value) {
 		}
 
 		@Override
@@ -219,7 +219,7 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 		}
 
 		@Override
-		public void set(XPathFunctionResolver value) {
+		public void set(final XPathFunctionResolver value) {
 		}
 
 		@Override
@@ -237,7 +237,7 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 		}
 
 		@Override
-		public void set(XPathFunctionResolver value) {
+		public void set(final XPathFunctionResolver value) {
 		}
 
 		@Override
@@ -258,15 +258,15 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
-	 * @param data Konfigurator oder {@code null}.
+	 * @param that Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public GOwner use(XPathBuilder<?> data) {
-		if (data == null) return this.owner();
-		this.useValue(data.getValue());
-		this.forFacrory().use(data.facrory());
-		this.forVariable().use(data.variable());
-		this.forFunction().use(data.function());
-		this.forNamespace().use(data.namespace());
+	public GOwner use(final XPathBuilder<?> that) {
+		if (that == null) return this.owner();
+		this.useValue(that.getValue());
+		this.forFacrory().use(that.facrory());
+		this.forVariable().use(that.variable());
+		this.forFunction().use(that.function());
+		this.forNamespace().use(that.namespace());
 		return this.owner();
 	}
 
@@ -278,30 +278,30 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 	 * @return {@link XPath}.
 	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactoryBuilder#putValue()} bzw. {@link XPathFactory#newXPath()} eine entsprechende Ausnahme
 	 *         auslöst. */
-	public XPath getXPath() throws XPathFactoryConfigurationException {
-		XPath result = this.getValue();
-		if (result != null) return result;
-		result = this.facrory().putValue().newXPath();
-		this.useValue(result);
+	public XPath putValue() throws XPathFactoryConfigurationException {
+		XPath res = this.getValue();
+		if (res != null) return res;
+		res = this.facrory().putValue().newXPath();
+		this.useValue(res);
 		this.updateValue();
-		return result;
+		return res;
 	}
 
 	/** Diese Methode aktualisiert die Einstellungen des {@link XPath} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
-	 * {@link #getXPath()} ermittelten {@link XPath} die Einstellungen übertragen, die in {@link #namespace()}, {@link #variable()} und {@link #function()}
+	 * {@link #putValue()} ermittelten {@link XPath} die Einstellungen übertragen, die in {@link #namespace()}, {@link #variable()} und {@link #function()}
 	 * konfiguriert sind.
 	 *
 	 * @return {@code this}.
-	 * @throws XPathFactoryConfigurationException Wenn {@link #getXPath()} eine entsprechende Ausnahme auslöst. */
+	 * @throws XPathFactoryConfigurationException Wenn {@link #putValue()} eine entsprechende Ausnahme auslöst. */
 	public GOwner updateValue() throws XPathFactoryConfigurationException {
-		XPath factory = this.getXPath();
-		for (NamespaceContext value: this.namespace()) {
+		final XPath factory = this.putValue();
+		for (final NamespaceContext value: this.namespace()) {
 			factory.setNamespaceContext(value);
 		}
-		for (XPathVariableResolver value: this.variable()) {
+		for (final XPathVariableResolver value: this.variable()) {
 			factory.setXPathVariableResolver(value);
 		}
-		for (XPathFunctionResolver value: this.function()) {
+		for (final XPathFunctionResolver value: this.function()) {
 			factory.setXPathFunctionResolver(value);
 		}
 		return this.owner();

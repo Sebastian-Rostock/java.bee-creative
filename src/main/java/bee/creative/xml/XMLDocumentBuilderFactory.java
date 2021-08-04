@@ -6,11 +6,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 /** Diese Klasse implementiert einen Konfigurator für eine {@link DocumentBuilderFactory} zur Erzeugung eines {@link DocumentBuilder}.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class XMLDocumentBuilderFactory extends DocumentBuilderFactoryBuilder<XMLDocumentBuilderFactory> {
+public final class XMLDocumentBuilderFactory extends DocumentBuilderFactoryBuilder.Value<XMLDocumentBuilderFactory> {
 
 	@Override
-	public
-	final XMLDocumentBuilderFactory owner() {
+	public final XMLDocumentBuilderFactory owner() {
 		return this;
 	}
 

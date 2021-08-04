@@ -20,39 +20,20 @@ import bee.creative.xml.XMLMarshaller.SourceData2;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class XMLMarshaller {
 
-	public static class ResultData extends ResultBuilder<ResultData> {
-
-		Result value;
+	public static class ResultValue extends ResultBuilder.Value<ResultValue> {
 
 		@Override
-		public Result get() {
-			return value;
-		}
-
-		@Override
-		public void set(Result value) {
-			this.value = value;
-		}
-
-		@Override
-		public ResultData owner() {
+		public ResultValue owner() {
 			return this;
 		}
 
 	}
 
-	public class ResultData2 extends ResultBuilder<XMLMarshaller> {
-
-		ResultData resultData = new ResultData();
+	public class ResultProxy extends ResultBuilder.Proxy<XMLMarshaller> {
 
 		@Override
-		public Result get() {
-			return resultData.get();
-		}
-
-		@Override
-		public void set(Result value) {
-			this.resultData.set(value);
+		protected ResultValue value() {
+			return result();
 		}
 
 		@Override
@@ -107,22 +88,26 @@ public class XMLMarshaller {
 
 	}
 
-	public static class MarshallerData extends BaseMarshallerData<MarshallerData> {
+	public static class MarshallerValue extends MarshallerBuilder.Value<MarshallerValue> {
 
 		@Override
-		public MarshallerData owner() {
+		public MarshallerValue owner() {
 			return this;
 		}
 
 	}
 
-	public class MarshallerData2 extends BaseMarshallerData<XMLMarshaller> {
+	public class MarshallerProxy extends MarshallerBuilder.Proxy<XMLMarshaller> {
 
-		
-		MarshallerData marshallerData = new MarshallerData();
-		
-		
-		
+		@Override
+		protected MarshallerValue value() {
+			return marshaller();
+		}
+
+		@Override
+		public XMLMarshaller owner() {
+			return XMLMarshaller.this;
+		}
 
 	}
 
@@ -131,7 +116,7 @@ public class XMLMarshaller {
 	 * @param classes Klasse.
 	 * @return {@link XMLMarshaller}. */
 	public static XMLMarshaller from(final Class<?>... classes) {
-		return new XMLMarshaller().forMarshaller().context().ClassData().putAll(classes).closeClassesData().closeContextData().closeMarshallerData();
+		return new XMLMarshaller().forMarshaller().forContext().forClasses().putAll(classes);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code XMLMarshaller.from(object.getClass()).openSourceData().use(object).closeSourceData().marshalNode()}.
@@ -150,12 +135,11 @@ public class XMLMarshaller {
 		return XMLMarshaller.from(object.getClass()).forSource().useValue(object).marshalString();
 	}
 
-	final ResultData2 resultData = new ResultData2();
+	final ResultValue result = new ResultValue();
 
 	final SourceData2 sourceData = new SourceData2();
 
-	/** Dieses Feld speichert den Konfigurator {@link #forMarshaller()}. */
-	final BaseMarshallerData<XMLMarshaller> marshallerData = new BaseMarshallerData<XMLMarshaller>();
+	final MarshallerValue marshaller = new MarshallerValue();
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -164,8 +148,8 @@ public class XMLMarshaller {
 	public XMLMarshaller use(final XMLMarshaller data) {
 		if (data == null) return this;
 		this.sourceData.use(data.sourceData);
-		this.resultData.use(data.resultData);
-		this.marshallerData.use(data.marshallerData);
+		this.result.use(data.result);
+		this.marshaller.use(data.marshaller);
 		return this;
 	}
 
@@ -175,45 +159,45 @@ public class XMLMarshaller {
 	 * @see #forResult()
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return {@code this}.
-	 * @throws SAXException Wenn {@link BaseMarshallerData#getMarshaller()} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link MarshallerBuilder#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link Marshaller#marshal(Object, Result)} eine entsprechende Ausnahme auslöst. */
 	public XMLMarshaller marshal() throws SAXException, JAXBException {
-		final Marshaller marshaller = this.marshallerData.getMarshaller();
-			final Object source = this.sourceData;
-			final Result result = this.resultData.getResult();
-			marshaller.marshal(source, result);
+		final Marshaller marshaller = this.marshaller().putValue();
+		final Object source = this.source().getValue();
+		final Result result = this.result().getValue();
+		marshaller.marshal(source, result);
 		return this;
 	}
 
 	/** Diese Methode überführt die {@link #forSource() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück.
 	 *
-	 * @see ResultData#useNode()
+	 * @see ResultValue#useNode()
 	 * @see #forResult()
 	 * @return Dokumentknoten.
 	 * @throws SAXException Wenn {@link #marshal} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #marshal()} eine entsprechende Ausnahme auslöst. */
 	public Node marshalNode() throws SAXException, JAXBException {
-		final DOMResult result = new DOMResult();
-		this.forResult().useValue(result).marshal().forResult().clear();
-		return result.getNode();
+		final DOMResult res = new DOMResult();
+		this.forResult().useValue(res).marshal();
+		return res.getNode();
 	}
 
 	/** Diese Methode überführt die {@link #forSource() Eingabedaten} in eine Zeichenkette und gibt diese zurück.
 	 *
 	 * @see StringWriter
-	 * @see ResultData #useWriter(Writer)
+	 * @see ResultValue #useWriter(Writer)
 	 * @see #forResult()
 	 * @return Zeichenkette.
 	 * @throws SAXException Wenn {@link #marshal} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #marshal()} eine entsprechende Ausnahme auslöst. */
 	public String marshalString() throws SAXException, JAXBException {
-		final StringWriter result = new StringWriter();
-		this.forResult().useWriter(result).marshal().forResult().clear();
-		return result.toString();
+		final StringWriter res = new StringWriter();
+		this.forResult().useWriter(res).marshal();
+		return res.toString();
 	}
 
-	public ResultData result() {
-		return resultData.resultData;
+	public ResultValue result() {
+		return result;
 	}
 
 	public SourceData source() {
@@ -224,8 +208,8 @@ public class XMLMarshaller {
 	 *
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return Konfigurator. */
-	public ResultData2 forResult() {
-		return resultData;
+	public ResultProxy forResult() {
+		return new ResultProxy();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Eingabedaten und gibt ihn zurück.
@@ -239,13 +223,17 @@ public class XMLMarshaller {
 	/** Diese Methode öffnet den Konfigurator für den {@link Marshaller} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
-	public BaseMarshallerData<XMLMarshaller> forMarshaller() {
-		return this.marshallerData;
+	public MarshallerValue marshaller() {
+		return marshaller;
 	}
 
+	public MarshallerProxy forMarshaller() {
+		return new MarshallerProxy();
+	}
+	
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.sourceData, this.resultData, this.marshallerData);
+		return Objects.toInvokeString(this, this.source(), this.result(), this.marshaller());
 	}
 
 }

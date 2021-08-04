@@ -1,13 +1,11 @@
 package bee.creative.xml;
 
-import java.util.Arrays;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import bee.creative.lang.Objects;
@@ -21,19 +19,19 @@ public class XMLUnmarshaller {
 	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static class SourceData extends SourceBuilder.Value<SourceData> {
+	public static class SourceValue extends SourceBuilder.Value<SourceValue> {
 
 		@Override
-		public SourceData owner() {
+		public SourceValue owner() {
 			return this;
 		}
 
 	}
 
-	public class SourceData2 extends SourceBuilder.Proxy<XMLUnmarshaller> {
+	public class SourceProxy extends SourceBuilder.Proxy<XMLUnmarshaller> {
 
 		@Override
-		protected SourceData value() {
+		protected SourceValue value() {
 			return XMLUnmarshaller.this.source();
 		}
 
@@ -45,18 +43,19 @@ public class XMLUnmarshaller {
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für den {@link Unmarshaller}. */
-	public static class UnmarshallerData extends UnmarshallerBuilder.Value<UnmarshallerData> {
+	public static class UnmarshallerValue extends UnmarshallerBuilder.Value<UnmarshallerValue> {
 
 		@Override
-		public UnmarshallerData owner() {
+		public UnmarshallerValue owner() {
 			return this;
 		}
 
 	}
 
-	public class UnmarshallerData2 extends UnmarshallerBuilder.Proxy<XMLUnmarshaller> {
+	public class UnmarshallerProxy extends UnmarshallerBuilder.Proxy<XMLUnmarshaller> {
 
-		protected UnmarshallerData value() {
+		@Override
+		protected UnmarshallerValue value() {
 			return XMLUnmarshaller.this.unmarshaller();
 		}
 
@@ -91,11 +90,9 @@ public class XMLUnmarshaller {
 		return XMLUnmarshaller.from(classes).unmarshalString(source);
 	}
 
-	/** Dieses Feld speichert den Konfigurator {@link #source()}. */
-	final SourceData sourceData = new SourceData();
+	final SourceValue source = new SourceValue();
 
-	/** Dieses Feld speichert den Konfigurator {@link #unmarshaller()}. */
-	final UnmarshallerData unmarshallerData = new UnmarshallerData();
+	final UnmarshallerValue unmarshaller = new UnmarshallerValue();
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
@@ -103,8 +100,8 @@ public class XMLUnmarshaller {
 	 * @return {@code this}. */
 	public XMLUnmarshaller use(final XMLUnmarshaller data) {
 		if (data == null) return this;
-		this.sourceData.use(data.sourceData);
-		this.unmarshallerData.use(data.unmarshallerData);
+		this.source.use(data.source);
+		this.unmarshaller.use(data.unmarshaller);
 		return this;
 	}
 
@@ -113,7 +110,7 @@ public class XMLUnmarshaller {
 	 * @see #source()
 	 * @see Unmarshaller#unmarshal(Source)
 	 * @return geparstes Objekt.
-	 * @throws SAXException Wenn {@link UnmarshallerData#putValue()} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link UnmarshallerValue#putValue()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link Unmarshaller#unmarshal(Source)} eine entsprechende Ausnahme auslöst. */
 	public Object unmarshal() throws SAXException, JAXBException {
 		final Unmarshaller unmarshaller = this.unmarshaller().putValue();
@@ -123,7 +120,7 @@ public class XMLUnmarshaller {
 
 	/** Diese Methode überführt den gegebenen Dokumentknoten in ein Objekt und gibt dieses zurück.
 	 *
-	 * @see SourceData#useNode(Node)
+	 * @see SourceValue#useNode(Node)
 	 * @see #source()
 	 * @param source Dokumentknoten.
 	 * @return geparstes Objekt.
@@ -137,7 +134,7 @@ public class XMLUnmarshaller {
 
 	/** Diese Methode überführt die gegebene Zeichenkette in ein Objekt und gibt dieses zurück.
 	 *
-	 * @see SourceData#useText(String)
+	 * @see SourceValue#useText(String)
 	 * @see #source()
 	 * @param source Zeichenkette.
 	 * @return geparstes Objekt.
@@ -153,28 +150,28 @@ public class XMLUnmarshaller {
 	 *
 	 * @see Unmarshaller#unmarshal(Source)
 	 * @return Konfigurator. */
-	public SourceData source() {
-		return this.sourceData;
+	public SourceValue source() {
+		return this.source;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Unmarshaller} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
-	public UnmarshallerData unmarshaller() {
-		return this.unmarshallerData;
+	public UnmarshallerValue unmarshaller() {
+		return this.unmarshaller;
 	}
 
-	public SourceData2 forSource() {
-		return new SourceData2();
+	public SourceProxy forSource() {
+		return new SourceProxy();
 	}
 
-	public UnmarshallerData2 forUnmarshaller() {
-		return new UnmarshallerData2();
+	public UnmarshallerProxy forUnmarshaller() {
+		return new UnmarshallerProxy();
 	}
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.sourceData, this.unmarshallerData);
+		return Objects.toInvokeString(this, this.source, this.unmarshaller);
 	}
 
 }

@@ -10,14 +10,13 @@ import javax.xml.bind.Unmarshaller.Listener;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.validation.Schema;
-import javax.xml.xpath.XPathFactory;
 import org.xml.sax.SAXException;
 import bee.creative.lang.Objects;
-import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.util.Builders.BaseSetBuilder;
 import bee.creative.util.Builders.BaseValueBuilder;
-import bee.creative.util.HashMap;
 import bee.creative.util.HashSet;
+import bee.creative.xml.ContextBuilder.PropertiesBuilder;
+import bee.creative.xml.ContextBuilder.PropertiesValue;
 
 /** Diese Klasse implementiert den Konfigurator für einen {@link Unmarshaller}.
  *
@@ -31,7 +30,7 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 
 		Unmarshaller value;
 
-		ShemaValue shema = new ShemaValue();
+		SchemaValue shema = new SchemaValue();
 
 		AdaptersValue adapters = new AdaptersValue();
 
@@ -54,7 +53,7 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 		}
 
 		@Override
-		public ShemaValue shema() {
+		public SchemaValue schema() {
 			return this.shema;
 		}
 
@@ -100,8 +99,8 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 		}
 
 		@Override
-		public ShemaValue shema() {
-			return this.value().shema();
+		public SchemaValue schema() {
+			return this.value().schema();
 		}
 
 		@Override
@@ -157,20 +156,20 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 	/** Diese Klasse implementiert den Konfigurator für das {@link Schema}.
 	 *
 	 * @see Unmarshaller#setSchema(Schema) */
-	public static class ShemaValue extends SchemaBuilder.Value<ShemaValue> {
+	public static class SchemaValue extends SchemaBuilder.Value<SchemaValue> {
 
 		@Override
-		public ShemaValue owner() {
+		public SchemaValue owner() {
 			return this;
 		}
 
 	}
 
-	public class ShemaProxy extends SchemaBuilder.Proxy<GOwner> {
+	public class SchemaProxy extends SchemaBuilder.Proxy<GOwner> {
 
 		@Override
-		protected bee.creative.xml.SchemaBuilder.Value<?> value() {
-			return null;
+		protected SchemaValue value() {
+			return schema();
 		}
 
 		@Override
@@ -267,21 +266,21 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 
 	}
 
-	public static class PropertiesValue extends PropertiesBuilder<PropertiesValue> {
-
-		Map<String, Object> value = new HashMap<>();
-
-		@Override
-		public Map<String, Object> get() {
-			return this.value;
-		}
-
-		@Override
-		public PropertiesValue owner() {
-			return this;
-		}
-
-	}
+//	public static class PropertiesValue extends PropertiesBuilder<PropertiesValue> {
+//
+//		Map<String, Object> value = new HashMap<>();
+//
+//		@Override
+//		public Map<String, Object> get() {
+//			return this.value;
+//		}
+//
+//		@Override
+//		public PropertiesValue owner() {
+//			return this;
+//		}
+//
+//	}
 
 	public class PropertiesProxy extends PropertiesBuilder<GOwner> {
 
@@ -297,13 +296,13 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 
 	}
 
-	/** Diese Klasse implementiert den Konfigurator für die Eigenschaften.
-	 *
-	 * @see Unmarshaller#setProperty(String, Object)
-	 * @param <GOwner> Typ des Besitzers. */
-	public static abstract class PropertiesBuilder<GOwner> extends BaseMapBuilder<String, Object, Map<String, Object>, GOwner> {
-
-	}
+//	/** Diese Klasse implementiert den Konfigurator für die Eigenschaften.
+//	 *
+//	 * @see Unmarshaller#setProperty(String, Object)
+//	 * @param <GOwner> Typ des Besitzers. */
+//	public static abstract class PropertiesBuilder<GOwner> extends BaseMapBuilder<String, Object, Map<String, Object>, GOwner> {
+//
+//	}
 
 	public static class ValidationValue extends ValidationBuilder<ValidationValue> {
 
@@ -362,7 +361,7 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 	public GOwner use(final UnmarshallerBuilder<?> that) {
 		if (that == null) return this.owner();
 		this.useValue(that.getValue());
-		this.forShema().use(that.shema());
+		this.forSchema().use(that.schema());
 		this.forAdapter().use(that.adapters());
 		this.forListener().use(that.listener());
 		this.forProperties().use(that.properties());
@@ -389,7 +388,7 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 	}
 
 	/** Diese Methode aktualisiert die Einstellungen des {@link Unmarshaller} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
-	 * {@link #getValue()} ermittelten {@link Unmarshaller} die Einstellungen übertragen, die in {@link #shema()}, {@link #adapters()}, {@link #listener()},
+	 * {@link #getValue()} ermittelten {@link Unmarshaller} die Einstellungen übertragen, die in {@link #schema()}, {@link #adapters()}, {@link #listener()},
 	 * {@link #properties()} und {@link #validation()} konfiguriert sind.
 	 *
 	 * @return {@code this}.
@@ -398,7 +397,7 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 	 *         {@link Unmarshaller#setEventHandler(ValidationEventHandler)} eine entsprechende Ausnahme auslöst. */
 	public GOwner updateValue() throws SAXException, JAXBException {
 		final Unmarshaller result = this.putValue();
-		result.setSchema(this.shema().putValue());
+		result.setSchema(this.schema().putValue());
 		result.setListener(this.listener().get());
 		result.setEventHandler(this.validation().get());
 		for (final XmlAdapter<?, ?> entry: this.adapters()) {
@@ -414,7 +413,7 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 	 *
 	 * @see Unmarshaller#setSchema(Schema)
 	 * @return Konfigurator. */
-	public abstract ShemaValue shema();
+	public abstract SchemaValue schema();
 
 	/** Diese Methode öffnet den Konfigurator für die Adapter und gibt ihn zurück.
 	 *
@@ -446,8 +445,8 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 	 * @return Konfigurator. */
 	public abstract ContextValue context();
 
-	public ShemaProxy forShema() {
-		return new ShemaProxy();
+	public SchemaProxy forSchema() {
+		return new SchemaProxy();
 	}
 
 	public AdaptersProxy forAdapter() {
@@ -475,7 +474,7 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.shema(), this.adapters(), this.listener(), this.properties(), this.validation());
+		return Objects.toInvokeString(this, this.schema(), this.adapters(), this.listener(), this.properties(), this.validation());
 	}
 
 }
