@@ -59,7 +59,7 @@ public class Builders {
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GResult> Typ der {@link Collection}.
-	 * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class BaseSetBuilder<GItem, GResult extends Collection<GItem>, GOwner> extends BaseBuilder2<GResult, GOwner>
 		implements Iterable<GItem> {
 
@@ -165,11 +165,11 @@ public class Builders {
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param <GResult> Typ der {@link Map}.
-	 * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class BaseMapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>, GOwner> extends BaseBuilder2<GResult, GOwner>
 		implements Iterable<Entry<GKey, GValue>> {
 
-		public abstract class ValueData extends BaseValueBuilder<GValue, GOwner> {
+		public abstract class ValueProxy extends BaseValueBuilder<GValue, GOwner> {
 
 			protected abstract GKey getKey();
 
@@ -469,8 +469,8 @@ public class Builders {
 		 *
 		 * @param key Schlüssel.
 		 * @return Konfigurator. */
-		public ValueData forKey(final GKey key) {
-			return new ValueData() {
+		public ValueProxy forKey(final GKey key) {
+			return new ValueProxy() {
 
 				@Override
 				protected GKey getKey() {
@@ -490,9 +490,10 @@ public class Builders {
 	/** Diese Klasse implementiert einen abstrakten Konfigurator für einen Wert. Der {@link #iterator()} liefert diesen, sofern er nicht {@code null} ist.
 	 *
 	 * @param <GValue> Typ des Werts.
-	 * @param <GOwner> Typ des konkreten Nachfahren dieser Klasse. */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class BaseValueBuilder<GValue, GOwner> extends BaseBuilder2<GValue, GOwner> implements Iterable<GValue> {
 
+		/** Diese Methode liefert den {@link #get() Wert}. */
 		public GValue getValue() {
 			return this.get();
 		}
@@ -574,8 +575,8 @@ public class Builders {
 		 *
 		 * @param result {@link Set}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		protected SetBuilder(final GResult result) throws NullPointerException {
-			this.result = result;
+		public SetBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.notNull(result);
 		}
 
 		@Override
@@ -692,8 +693,8 @@ public class Builders {
 		 *
 		 * @param result {@link List}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		protected ListBuilder(final GResult result) throws NullPointerException {
-			this.result = result;
+		public ListBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.notNull(result);
 		}
 
 		@Override
@@ -833,8 +834,8 @@ public class Builders {
 		 *
 		 * @param result interne {@link Map}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		protected MapBuilder(final GResult result) throws NullPointerException {
-			this.result = result;
+		public MapBuilder(final GResult result) throws NullPointerException {
+			this.result = Objects.notNull(result);
 		}
 
 		@Override

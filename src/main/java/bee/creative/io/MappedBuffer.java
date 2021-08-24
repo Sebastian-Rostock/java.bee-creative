@@ -230,14 +230,16 @@ public class MappedBuffer implements Emuable {
 	 * {@link #growAlign() Wachstumsausrichtung}, d.h. aus {@code (minSize + minSize * growScale() / 100 + growAlign() - 1) / growAlign() * growAlign()}.
 	 *
 	 * @param minSize minimale Puffergröße.
+	 * @return {@code true}, nur wenn die Puffergröße geändert wurde; sonst {@code false}.
 	 * @throws IllegalArgumentException Wenn die Puffergröße ungültig ist. */
-	public void grow(final long minSize) throws IllegalArgumentException, IllegalStateException {
+	public boolean grow(final long minSize) throws IllegalArgumentException, IllegalStateException {
 		if (minSize < 0) throw new IllegalArgumentException();
 		synchronized (this) {
-			if (minSize <= this.size) return;
+			if (minSize <= this.size) return false;
 			final long scale = this.growScale, align = this.growAlign() - 1;
 			final long newSize = ((minSize + ((minSize * scale) / 32)) + align) & ~align;
-			this.resizeImpl(newSize < 0 ? Long.MAX_VALUE : newSize);
+			this.resizeImpl(newSize < 0 ? Long.MAX_VALUE - 7 : newSize);
+			return true;
 		}
 	}
 

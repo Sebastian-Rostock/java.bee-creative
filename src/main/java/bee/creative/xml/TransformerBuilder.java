@@ -128,7 +128,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
-		public ValueData forINDENT() {
+		public ValueProxy forINDENT() {
 			return this.forKey(OutputKeys.INDENT);
 		}
 
@@ -136,7 +136,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
-		public ValueData forVERSION() {
+		public ValueProxy forVERSION() {
 			return this.forKey(OutputKeys.VERSION);
 		}
 
@@ -144,7 +144,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
-		public ValueData forMETHOD() {
+		public ValueProxy forMETHOD() {
 			return this.forKey(OutputKeys.METHOD);
 		}
 
@@ -152,7 +152,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
-		public ValueData forENCODING() {
+		public ValueProxy forENCODING() {
 			return this.forKey(OutputKeys.ENCODING);
 		}
 
@@ -160,7 +160,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
-		public ValueData forMEDIA_TYPE() {
+		public ValueProxy forMEDIA_TYPE() {
 			return this.forKey(OutputKeys.MEDIA_TYPE);
 		}
 
@@ -168,7 +168,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
-		public ValueData forSTANDALONE() {
+		public ValueProxy forSTANDALONE() {
 			return this.forKey(OutputKeys.STANDALONE);
 		}
 
@@ -176,7 +176,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
-		public ValueData forOMIT_XML_DECLARATION() {
+		public ValueProxy forOMIT_XML_DECLARATION() {
 			return this.forKey(OutputKeys.OMIT_XML_DECLARATION);
 		}
 
@@ -184,7 +184,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
-		public ValueData forCDATA_SECTION_ELEMENTS() {
+		public ValueProxy forCDATA_SECTION_ELEMENTS() {
 			return this.forKey(OutputKeys.CDATA_SECTION_ELEMENTS);
 		}
 

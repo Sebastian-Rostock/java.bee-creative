@@ -45,7 +45,7 @@ public abstract class FeaturesBuilder<GOwner> extends BaseMapBuilder<String, Boo
 	 *
 	 * @see #forKey(Object)
 	 * @return {@code this}. */
-	public final ValueData forFEATURE_SECURE_PROCESSING() {
+	public final ValueProxy forFEATURE_SECURE_PROCESSING() {
 		return this.forKey(XMLConstants.FEATURE_SECURE_PROCESSING);
 	}
 

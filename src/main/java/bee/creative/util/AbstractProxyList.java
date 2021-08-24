@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link List} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden
  * über {@link #setData(List)} geschrieben.
@@ -71,27 +70,6 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 		public void add(final GItem e) {
 			this.iter.add(e);
 			AbstractProxyList.this.setData(this.data);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractProxyList#toList(Property)}. */
-	static class PropertyList<GItem> extends AbstractProxyList<GItem, List<GItem>> {
-
-		public final Property<List<GItem>> property;
-
-		public PropertyList(final Property<List<GItem>> property) {
-			this.property = Objects.notNull(property);
-		}
-
-		@Override
-		public List<GItem> getData(final boolean readonly) {
-			return this.property.get();
-		}
-
-		@Override
-		protected void setData(final List<GItem> items) {
-			this.property.set(items);
 		}
 
 	}
@@ -268,21 +246,6 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link AbstractProxyList#toList(Property) Properties.toList(Fields.toProperty(item, field))}. */
-	public static <GItem, GEntry> List<GEntry> toList(final GItem item, final Field<? super GItem, List<GEntry>> field) throws NullPointerException {
-		return AbstractProxyList.toList(Properties.from(field, item));
-	}
-
-	/** Diese Methode gibt eine {@link List} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
-	 *
-	 * @see AbstractProxyList
-	 * @param property {@link Property}.
-	 * @return {@link List}-{@code Proxy}.
-	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
-	public static <GItem> List<GItem> toList(final Property<List<GItem>> property) throws NullPointerException {
-		return new PropertyList<>(property);
 	}
 
 }

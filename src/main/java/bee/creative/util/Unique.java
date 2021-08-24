@@ -125,8 +125,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	 * @param sorter {@link Comparator} zur Ermittlung der Ordnung der Eingaben in {@link #compare(Object, Object)}.
 	 * @param builder {@link Getter} zur Überführung der Eingaben in Ausgaben in {@link #customTarget(Object)}.
 	 * @param reuser {@link Setter} zur Signalisierung der Wiederverwendung von Einträgen in {@link #customReuse(Object, Object)}.
-	 * @return ordnungsbasiertes {@link Unique}.
-	 * @throws NullPointerException Wenn einer der Parameter {@code null} ist. */
+	 * @return ordnungsbasiertes {@link Unique}. */
 	public static <GSource, GTarget> Unique<GSource, GTarget> fromTreeMap(final Comparator<? super GSource> sorter,
 		final Getter<? super GSource, ? extends GTarget> builder, final Setter<? super GSource, ? super GTarget> reuser) throws NullPointerException {
 		return new TreeMapUnique<>(sorter, reuser, builder);
@@ -189,8 +188,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 
 	/** Dieser Konstruktor initialisiert die intere Abbildung.
 	 *
-	 * @param mapping Abbildung.
-	 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
+	 * @param mapping Abbildung. */
 	public Unique(final Map<GSource, GTarget> mapping) throws NullPointerException {
 		this.mapping = Objects.notNull(mapping);
 	}

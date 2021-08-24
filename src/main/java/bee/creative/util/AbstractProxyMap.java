@@ -1,11 +1,9 @@
 package bee.creative.util;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine abstrakte {@link Map} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden
  * über {@link #setData(Map)} geschrieben.
@@ -95,18 +93,29 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 		final class Iter implements Iterator<Entry<GKey, GValue>> {
 
-			@SuppressWarnings ("serial")
-			final class Next extends SimpleEntry<GKey, GValue> {
+			final class Next extends AbstractEntry<GKey, GValue> {
+
+				final Entry<GKey, GValue> entry;
 
 				public Next(final Entry<GKey, GValue> entry) {
-					super(entry);
+					this.entry = entry;
 				}
 
 				@Override
-				public GValue setValue(final GValue value) {
-					final GValue result = super.setValue(value);
+				public GKey getKey() {
+					return this.entry.getKey();
+				}
+
+				@Override
+				public GValue getValue() {
+					return this.entry.getValue();
+				}
+
+				@Override
+				public Entry2<GKey, GValue> useValue(final GValue value) {
+					this.entry.setValue(value);
 					AbstractProxyMap.this.setData(Iter.this.data.data);
-					return result;
+					return this;
 				}
 
 			}
@@ -166,27 +175,6 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 		@Override
 		protected Set<Entry<GKey, GValue>> getData(final boolean readonly) {
 			return this.data.entrySet();
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link AbstractProxyMap#toMap(Property)}. */
-	static class PropertyMap<GKey, GValue> extends AbstractProxyMap<GKey, GValue, Map<GKey, GValue>> {
-
-		public final Property<Map<GKey, GValue>> property;
-
-		public PropertyMap(final Property<Map<GKey, GValue>> property) {
-			this.property = Objects.notNull(property);
-		}
-
-		@Override
-		public Map<GKey, GValue> getData(final boolean readonly) {
-			return this.property.get();
-		}
-
-		@Override
-		protected void setData(final Map<GKey, GValue> items) {
-			this.property.set(items);
 		}
 
 	}
@@ -287,22 +275,6 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	@Override
 	public String toString() {
 		return this.getData(true).toString();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@link AbstractProxyMap#toMap(Property) Properties.toMap(Fields.toProperty(item, field))}. */
-	public static <GItem, GKey, GValue> Map<GKey, GValue> toMap(final GItem item, final Field<? super GItem, Map<GKey, GValue>> field)
-		throws NullPointerException {
-		return AbstractProxyMap.toMap(Properties.from(field, item));
-	}
-
-	/** Diese Methode gibt eine {@link Map} zurück, deren Inhalt über das gegebene {@link Property} gelesen und geschrieben wird.
-	 *
-	 * @see AbstractProxyMap
-	 * @param property {@link Property}.
-	 * @return {@link Map}-{@code Proxy}.
-	 * @throws NullPointerException Wenn {@code property} {@code null} ist. */
-	public static <GKey, GValue> Map<GKey, GValue> toMap(final Property<Map<GKey, GValue>> property) throws NullPointerException {
-		return new PropertyMap<>(property);
 	}
 
 }

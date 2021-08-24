@@ -182,7 +182,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		/** Diese Methode liefert den den Konfigurator für {@code "Coalescing"}.
 		 *
 		 * @see DocumentBuilderFactory#setCoalescing(boolean) */
-		public ValueData forCoalescing() {
+		public ValueProxy forCoalescing() {
 			return this.forKey("Coalescing");
 		}
 
@@ -191,7 +191,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setExpandEntityReferences(boolean)
 		 * @return {@code this}. */
-		public ValueData forExpandEntityReferences() {
+		public ValueProxy forExpandEntityReferences() {
 			return this.forKey("ExpandEntityReferences");
 		}
 
@@ -200,7 +200,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setIgnoringComments(boolean)
 		 * @return {@code this}. */
-		public ValueData forIgnoringComments() {
+		public ValueProxy forIgnoringComments() {
 			return this.forKey("IgnoringComments");
 		}
 
@@ -209,7 +209,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setIgnoringElementContentWhitespace(boolean)
 		 * @return {@code this}. */
-		public ValueData forIgnoringElementContentWhitespace() {
+		public ValueProxy forIgnoringElementContentWhitespace() {
 			return this.forKey("IgnoringElementContentWhitespace");
 		}
 
@@ -218,7 +218,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setNamespaceAware(boolean)
 		 * @return {@code this}. */
-		public ValueData forNamespaceAware() {
+		public ValueProxy forNamespaceAware() {
 			return this.forKey("NamespaceAware");
 		}
 
@@ -227,7 +227,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setValidating(boolean)
 		 * @return {@code this}. */
-		public ValueData forValidating() {
+		public ValueProxy forValidating() {
 			return this.forKey("Validating");
 		}
 
@@ -236,7 +236,7 @@ public abstract class DocumentBuilderFactoryBuilder<GOwner> extends BaseValueBui
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 		 * @return {@code this}. */
-		public ValueData forXIncludeAware() {
+		public ValueProxy forXIncludeAware() {
 			return this.forKey("XIncludeAware");
 		}
 
