@@ -364,19 +364,22 @@ public class Iterables {
 	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterable} in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
 	 * {@link Collection} {@code true} zurück. */
 	public static <GItem> boolean addAll(final Collection<GItem> target, final Iterable<? extends GItem> source) throws NullPointerException {
+		if (source instanceof Collection<?>) return target.addAll((Collection<? extends GItem>)source);
 		return Iterators.addAll(target, source.iterator());
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung
 	 * des {@link Iterable} {@code true} zurück. */
-	public static boolean retainAll(final Iterable<?> target, final Collection<?> source) throws NullPointerException {
-		return Iterators.retainAll(target.iterator(), Objects.notNull(source));
+	public static boolean retainAll(final Iterable<?> target, final Collection<?> filter) throws NullPointerException {
+		if (target instanceof Collection<?>) return ((Collection<?>)target).retainAll(filter);
+		return Iterators.retainAll(target.iterator(), Objects.notNull(filter));
 	}
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, und gibt nur bei Veränderung der
 	 * {@link Collection} {@code true} zurück. */
-	public static boolean retainAll(final Collection<?> target, final Iterable<?> iterable) throws NullPointerException {
-		return Iterators.retainAll(target, iterable.iterator());
+	public static boolean retainAll(final Collection<?> target, final Iterable<?> filter) throws NullPointerException {
+		if (filter instanceof Collection<?>) return target.retainAll((Collection<?>)filter);
+		return Iterators.retainAll(target, filter.iterator());
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable} und gibt nur bei Veränderung des {@link Iterable} {@code true} zurück. */
@@ -386,20 +389,23 @@ public class Iterables {
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des
 	 * {@link Iterable} {@code true} zurück. */
-	public static boolean removeAll(final Iterable<?> target, final Collection<?> collection) throws NullPointerException {
-		return Iterators.removeAll(target.iterator(), collection);
+	public static boolean removeAll(final Iterable<?> target, final Collection<?> filter) throws NullPointerException {
+		if (target instanceof Collection<?>) return ((Collection<?>)target).removeAll(filter);
+		return Iterators.removeAll(target.iterator(), filter);
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterable} aus der gegebenen {@link Collection} und gibt nur bei Veränderungen an der
 	 * {@link Collection} {@code true} zurück. */
-	public static boolean removeAll(final Collection<?> target, final Iterable<?> iterable) throws NullPointerException {
-		return Iterators.removeAll(target, iterable.iterator());
+	public static boolean removeAll(final Collection<?> target, final Iterable<?> filter) throws NullPointerException {
+		if (filter instanceof Collection<?>) return target.removeAll((Collection<?>)filter);
+		return target.removeAll(toSet(filter));
 	}
 
 	/** Diese Methode liefert nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterable} in der gegebenen {@link Collection} enthalten
 	 * sind. */
-	public static boolean containsAll(final Collection<?> target, final Iterable<?> iterable) throws NullPointerException {
-		return Iterators.containsAll(target, iterable.iterator());
+	public static boolean containsAll(final Collection<?> target, final Iterable<?> filter) throws NullPointerException {
+		if (filter instanceof Collection<?>) return target.containsAll((Collection<?>)filter);
+		return Iterators.containsAll(target, filter.iterator());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #concatAll(Iterable) Iterables.concatAll(Arrays.asList(iter1, iter2))}. */

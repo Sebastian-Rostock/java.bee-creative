@@ -711,23 +711,19 @@ public class Iterators {
 	 * @see Collection#removeAll(Collection)
 	 * @return {@code true} bei Veränderungen an der {@link Collection}. */
 	public static boolean removeAll(final Collection<?> target, final Iterator<?> filter) throws NullPointerException {
-		boolean modified = false;
-		while (filter.hasNext()) {
-			if (target.remove(filter.next())) {
-				modified = true;
-			}
-		}
-		return modified;
+		final HashSet2<Object> filter2 = new HashSet2<>();
+		Iterators.addAll(filter2, filter);
+		return target.removeAll(filter2);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterator} in der gegebenen {@link Collection} enthalten sind.
 	 *
 	 * @see Collection#containsAll(Collection)
 	 * @return {@code true} bei vollständiger Inklusion. */
-	public static boolean containsAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		Objects.notNull(collection);
-		while (iterator.hasNext()) {
-			if (!collection.contains(iterator.next())) return false;
+	public static boolean containsAll(final Collection<?> target, final Iterator<?> filter) throws NullPointerException {
+		Objects.notNull(target);
+		while (filter.hasNext()) {
+			if (!target.contains(filter.next())) return false;
 		}
 		return true;
 	}
