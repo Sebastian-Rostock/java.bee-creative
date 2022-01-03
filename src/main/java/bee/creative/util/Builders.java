@@ -14,6 +14,13 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import bee.creative.lang.Objects;
+import bee.creative.util.Collections.CartesianSet;
+import bee.creative.util.Collections.ConcatList;
+import bee.creative.util.Collections.IntersectSet;
+import bee.creative.util.Collections.ReverseList;
+import bee.creative.util.Collections.TranslatedList;
+import bee.creative.util.Collections.TranslatedSet;
+import bee.creative.util.Collections.UnionSet;
 
 /** Diese Klasse implementiert grundlegende {@link Producer Konfiguratoren}.
  *
@@ -421,17 +428,16 @@ public class Builders {
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GResult> Typ des {@link Set}. */
-	public static class SetBuilder<GItem, GResult extends Set<GItem>> extends BaseSetBuilder<GItem, GResult, SetBuilder<GItem, GResult>> {
+	public static abstract class SetBuilder<GItem, GResult extends Set<GItem>, GOwner> extends BaseSetBuilder<GItem, GResult, GOwner> {
 
 		/** Diese Methode gibt einen {@link SetBuilder} zum gegebenen {@link Set} zurück.
 		 *
 		 * @param <GItem> Typ der Elemente.
-		 * @param <GResult> Typ des {@link Set}.
 		 * @param result {@link Set}.
 		 * @return {@link SetBuilder}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static <GItem, GResult extends Set<GItem>> SetBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new SetBuilder<>(result);
+		public static <GItem> ItemSetBuilder<GItem> from(final Set<GItem> result) throws NullPointerException {
+			return new ItemSetBuilder<>(result);
 		}
 
 		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link TreeSet} mit natürlicher Ordnung zurück. */
@@ -465,6 +471,14 @@ public class Builders {
 			return new HashSetBuilder<>(withHashCache ? new HashSet2<GItem>() : new HashSet<GItem>());
 		}
 
+		/** Diese Methode gibt einen {@link SetBuilder} zu einem neuen {@link ProxySet} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @return {@link SetBuilder} eines {@link ProxySet}. */
+		public static <GItem> ProxySetBuilder<GItem> forProxySet(final Property<Set<GItem>> property) throws NullPointerException {
+			return new ProxySetBuilder<>(ProxySet.from(property));
+		}
+
 		final GResult value;
 
 		/** Dieser Konstruktor initialisiert das {@link Set}. */
@@ -477,36 +491,28 @@ public class Builders {
 			return this.value;
 		}
 
-		@Override
-		public SetBuilder<GItem, GResult> owner() {
-			return this;
-		}
-
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Vereinigungsmenge dieser {@link #get() Menge} und der gegebenen Menge zurück.
 		 *
-		 * @see bee.creative.util.Collections#union(Set, Set)
 		 * @param items zweite Menge.
-		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
-		public SetBuilder<GItem, Set<GItem>> toUnion(final Set<? extends GItem> items) {
-			return SetBuilder.from(bee.creative.util.Collections.union(this.get(), items));
+		 * @return neuer {@link SetBuilder} zum {@link UnionSet}. */
+		public ItemSetBuilder<GItem> toUnited(final Set<? extends GItem> items) {
+			return SetBuilder.from(bee.creative.util.Collections.<GItem>union(this.get(), items));
 		}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für das Kartesische Produkt dieser {@link #get() Menge} und der gegebenen Menge zurück.
 		 *
-		 * @see bee.creative.util.Collections#cartesian(Set, Set)
 		 * @param <GItem2> Typ der Elemente in der zweiten Menge.
 		 * @param items zweite Menge.
-		 * @return neuer {@link SetBuilder} zum {@code cartesianSet}. */
-		public <GItem2> SetBuilder<Entry<GItem, GItem2>, Set<Entry<GItem, GItem2>>> toCartesian(final Set<? extends GItem2> items) {
+		 * @return neuer {@link SetBuilder} zum {@link CartesianSet}. */
+		public <GItem2> ItemSetBuilder<Entry<GItem, GItem2>> toCrossed(final Set<? extends GItem2> items) {
 			return SetBuilder.from(bee.creative.util.Collections.cartesian(this.get(), items));
 		}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die Schnittmenge dieser {@link #get() Menge} und der gegebenen Menge zurück.
 		 *
-		 * @see bee.creative.util.Collections#intersect(Set, Set)
 		 * @param items zweite Menge.
-		 * @return neuer {@link SetBuilder} zum {@code intersectionSet}. */
-		public SetBuilder<GItem, Set<GItem>> toIntersection(final Set<? extends GItem> items) {
+		 * @return neuer {@link SetBuilder} zum {@link IntersectSet}. */
+		public ItemSetBuilder<GItem> toIntersected(final Set<? extends GItem> items) {
 			return SetBuilder.from(bee.creative.util.Collections.intersect(this.get(), items));
 		}
 
@@ -515,17 +521,16 @@ public class Builders {
 		 * @see java.util.Collections#checkedSet(Set, Class)
 		 * @param itemClazz Klasse der Elemente.
 		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
-		public SetBuilder<GItem, Set<GItem>> toChecked(final Class<GItem> itemClazz) {
+		public ItemSetBuilder<GItem> toChecked(final Class<GItem> itemClazz) {
 			return SetBuilder.from(Collections.checkedSet(this.get(), itemClazz));
 		}
 
 		/** Diese Methode gibt einen neuen {@link SetBuilder} für die datentypsichere {@link #get() Menge} zurück.
 		 *
-		 * @see bee.creative.util.Collections#translate(Set, Translator)
 		 * @param <GItem2> Typ der übersetzten Elemente.
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
-		 * @return neuer {@link SetBuilder} zum {@code translatedSet}. */
-		public <GItem2> SetBuilder<GItem2, Set<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
+		 * @return neuer {@link SetBuilder} zum {@link TranslatedSet}. */
+		public <GItem2> ItemSetBuilder<GItem2> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
 			return SetBuilder.from(bee.creative.util.Collections.translate(this.get(), itemTranslator));
 		}
 
@@ -533,7 +538,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#synchronizedSet(Set)
 		 * @return neuer {@link SetBuilder} zum {@code synchronizedSet}. */
-		public SetBuilder<GItem, Set<GItem>> toSynchronized() {
+		public ItemSetBuilder<GItem> toSynchronized() {
 			return SetBuilder.from(Collections.synchronizedSet(this.get()));
 		}
 
@@ -541,23 +546,35 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableSet(Set)
 		 * @return neuer {@link SetBuilder} zum {@code unmodifiableSet}. */
-		public SetBuilder<GItem, Set<GItem>> toUnmodifiable() {
+		public ItemSetBuilder<GItem> toUnmodifiable() {
 			return SetBuilder.from(Collections.unmodifiableSet(this.get()));
 		}
 
 	}
 
-	public static class TreeSetBuilder<GItem> extends BaseSetBuilder<GItem, TreeSet<GItem>, TreeSetBuilder<GItem>> {
+	/** Diese Klasse implementiert einen Konfigurator für ein {@link Set}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	public static class ItemSetBuilder<GItem> extends SetBuilder<GItem, Set<GItem>, ItemSetBuilder<GItem>> {
 
-		final TreeSet<GItem> value;
-
-		public TreeSetBuilder(final TreeSet<GItem> value) throws NullPointerException {
-			this.value = Objects.notNull(value);
+		ItemSetBuilder(final Set<GItem> value) throws NullPointerException {
+			super(value);
 		}
 
 		@Override
-		public TreeSet<GItem> get() {
-			return this.value;
+		public ItemSetBuilder<GItem> owner() {
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen Konfigurator für ein {@link TreeSet}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	public static class TreeSetBuilder<GItem> extends SetBuilder<GItem, TreeSet<GItem>, TreeSetBuilder<GItem>> {
+
+		TreeSetBuilder(final TreeSet<GItem> value) throws NullPointerException {
+			super(value);
 		}
 
 		@Override
@@ -567,17 +584,13 @@ public class Builders {
 
 	}
 
-	public static class HashSetBuilder<GItem> extends BaseSetBuilder<GItem, HashSet<GItem>, HashSetBuilder<GItem>> {
+	/** Diese Klasse implementiert einen Konfigurator für ein {@link HashSet}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	public static class HashSetBuilder<GItem> extends SetBuilder<GItem, HashSet<GItem>, HashSetBuilder<GItem>> {
 
-		final HashSet<GItem> value;
-
-		public HashSetBuilder(final HashSet<GItem> value) throws NullPointerException {
-			this.value = Objects.notNull(value);
-		}
-
-		@Override
-		public HashSet<GItem> get() {
-			return this.value;
+		HashSetBuilder(final HashSet<GItem> value) throws NullPointerException {
+			super(value);
 		}
 
 		@Override
@@ -587,21 +600,36 @@ public class Builders {
 
 	}
 
+	/** Diese Klasse implementiert einen Konfigurator für ein {@link ProxySet}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	public static class ProxySetBuilder<GItem> extends SetBuilder<GItem, ProxySet<GItem>, ProxySetBuilder<GItem>> {
+
+		ProxySetBuilder(final ProxySet<GItem> value) throws NullPointerException {
+			super(value);
+		}
+
+		@Override
+		public ProxySetBuilder<GItem> owner() {
+			return this;
+		}
+
+	}
+
 	/** Diese Klasse implementiert einen Konfigurator für eine {@link List}.
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GResult> Typ der {@link List}. */
-	public static class ListBuilder<GItem, GResult extends List<GItem>> extends BaseSetBuilder<GItem, GResult, ListBuilder<GItem, GResult>> {
+	public static abstract class ListBuilder<GItem, GResult extends List<GItem>, GOwner> extends BaseSetBuilder<GItem, GResult, GOwner> {
 
 		/** Diese Methode gibt einen {@link ListBuilder} zur gegebenen {@link List} zurück.
 		 *
 		 * @param <GItem> Typ der Elemente.
-		 * @param <GResult> Typ des {@link List}.
 		 * @param result {@link List}.
 		 * @return {@link ListBuilder}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static <GItem, GResult extends List<GItem>> ListBuilder<GItem, GResult> from(final GResult result) throws NullPointerException {
-			return new ListBuilder<>(result);
+		public static <GItem> ItemListBuilder<GItem> from(final List<GItem> result) throws NullPointerException {
+			return new ItemListBuilder<>(result);
 		}
 
 		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link ArrayList} zurück.
@@ -620,12 +648,17 @@ public class Builders {
 			return new LinkedListBuilder<>(new LinkedList<GItem>());
 		}
 
+		/** Diese Methode gibt einen {@link ListBuilder} zu einer neuen {@link ProxyList} zurück.
+		 *
+		 * @param <GItem> Typ der Elemente.
+		 * @return {@link ListBuilder} einer {@link ProxyList}. */
+		public static <GItem> ProxyListBuilder<GItem> forProxyList(final Property<List<GItem>> property) throws NullPointerException {
+			return new ProxyListBuilder<>(ProxyList.from(property));
+		}
+
 		final GResult value;
 
-		/** Dieser Konstruktor initialisiert das {@link List}.
-		 *
-		 * @param value {@link List}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
+		/** Dieser Konstruktor initialisiert die {@link List}. */
 		public ListBuilder(final GResult value) throws NullPointerException {
 			this.value = Objects.notNull(value);
 		}
@@ -635,35 +668,27 @@ public class Builders {
 			return this.value;
 		}
 
-		@Override
-		public ListBuilder<GItem, GResult> owner() {
-			return this;
-		}
-
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die rückwärts geordnete {@link #get() Liste} zurück.
 		 *
-		 * @see bee.creative.util.Collections#reverse(List)
-		 * @return neuer {@link ListBuilder} zur {@code reverseList}. */
-		public ListBuilder<GItem, List<GItem>> reverse() {
+		 * @return neuer {@link ListBuilder} zur {@link ReverseList}. */
+		public ItemListBuilder<GItem> toReverse() {
 			return ListBuilder.from(bee.creative.util.Collections.reverse(this.get()));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.
 		 *
-		 * @see bee.creative.util.Collections#concat(List, List)
 		 * @param items zweite Liste.
-		 * @return neuer {@link ListBuilder} zur {@code chained}. */
-		public ListBuilder<GItem, List<GItem>> toChained(final List<GItem> items) {
+		 * @return neuer {@link ListBuilder} zur {@link ConcatList}. */
+		public ItemListBuilder<GItem> toChained(final List<GItem> items) {
 			return ListBuilder.from(bee.creative.util.Collections.concat(this.get(), items));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die Verkettung dieser {@link #get() Liste} mit der gegebenen zurück.
 		 *
-		 * @see bee.creative.util.Collections#concat(List, List, boolean)
 		 * @param items zweite Liste.
 		 * @param extendMode Erweiterungsmodus.
-		 * @return neuer {@link ListBuilder} zur {@code chained}. */
-		public ListBuilder<GItem, List<GItem>> toChained(final List<GItem> items, final boolean extendMode) {
+		 * @return neuer {@link ListBuilder} zur {@link ConcatList}. */
+		public ItemListBuilder<GItem> toChained(final List<GItem> items, final boolean extendMode) {
 			return ListBuilder.from(bee.creative.util.Collections.concat(this.get(), items, extendMode));
 		}
 
@@ -672,17 +697,16 @@ public class Builders {
 		 * @see java.util.Collections#checkedList(List, Class)
 		 * @param itemClazz Klasse der Elemente.
 		 * @return neuer {@link ListBuilder} zur {@code checkedList}. */
-		public ListBuilder<GItem, List<GItem>> toChecked(final Class<GItem> itemClazz) {
+		public ItemListBuilder<GItem> toChecked(final Class<GItem> itemClazz) {
 			return ListBuilder.from(java.util.Collections.checkedList(this.get(), itemClazz));
 		}
 
 		/** Diese Methode gibt einen neuen {@link ListBuilder} für die datentypsichere {@link #get() Liste} zurück.
 		 *
-		 * @see bee.creative.util.Collections#translate(List, Translator)
 		 * @param <GItem2> Typ der übersetzten Elemente.
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
-		 * @return neuer {@link ListBuilder} zur {@code translatedList}. */
-		public <GItem2> ListBuilder<GItem2, List<GItem2>> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
+		 * @return neuer {@link ListBuilder} zur {@link TranslatedList}. */
+		public <GItem2> ItemListBuilder<GItem2> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
 			return ListBuilder.from(bee.creative.util.Collections.translate(this.get(), itemTranslator));
 		}
 
@@ -690,7 +714,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#synchronizedList(List)
 		 * @return neuer {@link ListBuilder} zur {@code synchronizedList}. */
-		public ListBuilder<GItem, List<GItem>> toSynchronized() {
+		public ItemListBuilder<GItem> toSynchronized() {
 			return ListBuilder.from(java.util.Collections.synchronizedList(this.get()));
 		}
 
@@ -698,23 +722,35 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableList(List)
 		 * @return neuer {@link ListBuilder} zur {@code unmodifiableList}. */
-		public ListBuilder<GItem, List<GItem>> toUnmodifiable() {
+		public ItemListBuilder<GItem> toUnmodifiable() {
 			return ListBuilder.from(java.util.Collections.unmodifiableList(this.get()));
 		}
 
 	}
 
-	public static class ArrayListBuilder<GItem> extends BaseSetBuilder<GItem, ArrayList<GItem>, ArrayListBuilder<GItem>> {
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link List}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	public static class ItemListBuilder<GItem> extends ListBuilder<GItem, List<GItem>, ItemListBuilder<GItem>> {
 
-		final ArrayList<GItem> value;
-
-		public ArrayListBuilder(final ArrayList<GItem> value) throws NullPointerException {
-			this.value = Objects.notNull(value);
+		ItemListBuilder(final List<GItem> value) throws NullPointerException {
+			super(value);
 		}
 
 		@Override
-		public ArrayList<GItem> get() {
-			return this.value;
+		public ItemListBuilder<GItem> owner() {
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link ArrayList}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	public static class ArrayListBuilder<GItem> extends ListBuilder<GItem, ArrayList<GItem>, ArrayListBuilder<GItem>> {
+
+		ArrayListBuilder(final ArrayList<GItem> value) throws NullPointerException {
+			super(value);
 		}
 
 		@Override
@@ -724,21 +760,33 @@ public class Builders {
 
 	}
 
-	public static class LinkedListBuilder<GItem> extends BaseSetBuilder<GItem, LinkedList<GItem>, LinkedListBuilder<GItem>> {
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link LinkedList}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	public static class LinkedListBuilder<GItem> extends ListBuilder<GItem, LinkedList<GItem>, LinkedListBuilder<GItem>> {
 
-		final LinkedList<GItem> value;
-
-		public LinkedListBuilder(final LinkedList<GItem> value) throws NullPointerException {
-			this.value = Objects.notNull(value);
-		}
-
-		@Override
-		public LinkedList<GItem> get() {
-			return this.value;
+		LinkedListBuilder(final LinkedList<GItem> value) throws NullPointerException {
+			super(value);
 		}
 
 		@Override
 		public LinkedListBuilder<GItem> owner() {
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link ProxyList}.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	public static class ProxyListBuilder<GItem> extends ListBuilder<GItem, ProxyList<GItem>, ProxyListBuilder<GItem>> {
+
+		ProxyListBuilder(final ProxyList<GItem> value) throws NullPointerException {
+			super(value);
+		}
+
+		@Override
+		public ProxyListBuilder<GItem> owner() {
 			return this;
 		}
 
@@ -749,20 +797,16 @@ public class Builders {
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 * @param <GResult> Typ der {@link Map}. */
-	public static class MapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>>
-		extends BaseMapBuilder<GKey, GValue, GResult, MapBuilder<GKey, GValue, GResult>> {
+	public static abstract class MapBuilder<GKey, GValue, GResult extends Map<GKey, GValue>, GOwner> extends BaseMapBuilder<GKey, GValue, GResult, GOwner> {
 
-		private final GResult result;
-
-		/** Diese Methode gibt einen {@link MapBuilder} zur gegebenen {@link Map} zurück.
+		/** Diese Methode gibt einen {@link ItemMapBuilder} zur gegebenen {@link Map} zurück.
 		 *
 		 * @param <GKey> Typ der Schlüssel.
-		 * @param <GItem> Typ der Werte.
-		 * @param <GResult> Typ der {@link Map}.
+		 * @param <GValue> Typ der Werte.
 		 * @param result {@link Map}.
 		 * @return {@link MapBuilder}. */
-		public static <GKey, GItem, GResult extends Map<GKey, GItem>> MapBuilder<GKey, GItem, GResult> from(final GResult result) {
-			return new MapBuilder<>(result);
+		public static <GKey, GValue> ItemMapBuilder<GKey, GValue> from(final Map<GKey, GValue> result) {
+			return new ItemMapBuilder<>(result);
 		}
 
 		/** Diese Methode gibt einen {@link MapBuilder} zu einer neuen {@link TreeMap} mit natürlicher Ordnung zurück.
@@ -770,7 +814,7 @@ public class Builders {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GItem> Typ der Werte.
 		 * @return {@link MapBuilder} einer {@link TreeMap}. */
-		public static <GKey, GItem> MapBuilder<GKey, GItem, TreeMap<GKey, GItem>> forTreeMap() {
+		public static <GKey, GItem> TreeMapBuilder<GKey, GItem> forTreeMap() {
 			return MapBuilder.forTreeMap(null);
 		}
 
@@ -780,8 +824,8 @@ public class Builders {
 		 * @param <GItem> Typ der Werte.
 		 * @param comparator Ordnung der Schlüssel.
 		 * @return {@link MapBuilder} einer {@link TreeMap}. */
-		public static <GKey, GItem> MapBuilder<GKey, GItem, TreeMap<GKey, GItem>> forTreeMap(final Comparator<? super GKey> comparator) {
-			return MapBuilder.from(new TreeMap<GKey, GItem>(comparator));
+		public static <GKey, GItem> TreeMapBuilder<GKey, GItem> forTreeMap(final Comparator<? super GKey> comparator) {
+			return new TreeMapBuilder<>(new TreeMap<GKey, GItem>(comparator));
 		}
 
 		/** Diese Methode gibt einen {@link MapBuilder} zu einer neuen {@link HashMap} mit Steuwertpuffer zurück.
@@ -789,7 +833,7 @@ public class Builders {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GItem> Typ der Werte.
 		 * @return {@link MapBuilder} einer {@link HashMap}. */
-		public static <GKey, GItem> MapBuilder<GKey, GItem, HashMap<GKey, GItem>> forHashMap() {
+		public static <GKey, GItem> HashMapBuilder<GKey, GItem> forHashMap() {
 			return MapBuilder.forHashMap(true);
 		}
 
@@ -799,26 +843,20 @@ public class Builders {
 		 * @param <GItem> Typ der Werte.
 		 * @param withHashCache Aktivierung des Streuwertpuffers.
 		 * @return {@link MapBuilder} einer {@link HashMap}. */
-		public static <GKey, GItem> MapBuilder<GKey, GItem, HashMap<GKey, GItem>> forHashMap(final boolean withHashCache) {
-			return MapBuilder.from(withHashCache ? new HashMap2<GKey, GItem>() : new HashMap<GKey, GItem>());
+		public static <GKey, GItem> HashMapBuilder<GKey, GItem> forHashMap(final boolean withHashCache) {
+			return new HashMapBuilder<>(withHashCache ? new HashMap2<GKey, GItem>() : new HashMap<GKey, GItem>());
 		}
 
-		/** Dieser Konstruktor initialisiert die interne {@link Map}.
-		 *
-		 * @param result interne {@link Map}.
-		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public MapBuilder(final GResult result) throws NullPointerException {
-			this.result = Objects.notNull(result);
+		final GResult value;
+
+		/** Dieser Konstruktor initialisiert die {@link Map}. */
+		public MapBuilder(final GResult value) throws NullPointerException {
+			this.value = Objects.notNull(value);
 		}
 
 		@Override
 		public GResult get() {
-			return this.result;
-		}
-
-		@Override
-		public MapBuilder<GKey, GValue, GResult> owner() {
-			return this;
+			return this.value;
 		}
 
 		/** Diese Methode gibt einen neuen {@link MapBuilder} zur datentypsicheren {@link #get() Abbildung} zurück.
@@ -827,7 +865,7 @@ public class Builders {
 		 * @param keyClazz Klasse der Schlüssel.
 		 * @param valueClazz Klasse der Werte.
 		 * @return neuer {@link MapBuilder} zur {@code checkedMap}. */
-		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
+		public ItemMapBuilder<GKey, GValue> toChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
 			return MapBuilder.from(Collections.checkedMap(this.get(), keyClazz, valueClazz));
 		}
 
@@ -839,7 +877,7 @@ public class Builders {
 		 * @param keyTranslator {@link Translator} zur Übersetzung der Schlüssel.
 		 * @param valueTranslator {@link Translator} zur Übersetzung der Werte.
 		 * @return neuer {@link MapBuilder} zur {@code translatedMap}. */
-		public <GKey2, GValue2> MapBuilder<GKey2, GValue2, Map<GKey2, GValue2>> toTranslated(final Translator<GKey, GKey2> keyTranslator,
+		public <GKey2, GValue2> ItemMapBuilder<GKey2, GValue2> toTranslated(final Translator<GKey, GKey2> keyTranslator,
 			final Translator<GValue, GValue2> valueTranslator) {
 			return MapBuilder.from(bee.creative.util.Collections.translate(this.get(), keyTranslator, valueTranslator));
 		}
@@ -848,7 +886,7 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#synchronizedMap(Map)
 		 * @return neuer {@link MapBuilder} zur {@code synchronizedMap}. */
-		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toSynchronized() {
+		public ItemMapBuilder<GKey, GValue> toSynchronized() {
 			return MapBuilder.from(Collections.synchronizedMap(this.get()));
 		}
 
@@ -856,35 +894,119 @@ public class Builders {
 		 *
 		 * @see java.util.Collections#unmodifiableMap(Map)
 		 * @return neuer {@link MapBuilder} zur {@code unmodifiableMap}. */
-		public MapBuilder<GKey, GValue, Map<GKey, GValue>> toUnmodifiable() {
+		public ItemMapBuilder<GKey, GValue> toUnmodifiable() {
 			return MapBuilder.from(Collections.unmodifiableMap(this.get()));
 		}
 
 	}
 
-	/** Diese Klasse implementiert einen Konfigurator für einen Wert.
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link Map}.
 	 *
-	 * @param <GValue> Typ des Werts. */
-	public static abstract class ValueBuilder<GValue> extends BaseValueBuilder<GValue, ValueBuilder<GValue>> {
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte. */
+	public static class ItemMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, Map<GKey, GValue>, ItemMapBuilder<GKey, GValue>> {
 
-		public static <GValue> ValueBuilder<GValue> from(final Property<GValue> result) {
-			return new ValueBuilder<GValue>() {
-
-				@Override
-				public GValue get() {
-					return result.get();
-				}
-
-				@Override
-				public void set(final GValue value) {
-					result.set(value);
-				}
-
-			};
+		ItemMapBuilder(Map<GKey, GValue> value) throws NullPointerException {
+			super(value);
 		}
 
 		@Override
-		public ValueBuilder<GValue> owner() {
+		public ItemMapBuilder<GKey, GValue> owner() {
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link TreeMap}.
+	 *
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte. */
+	public static class TreeMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, TreeMap<GKey, GValue>, TreeMapBuilder<GKey, GValue>> {
+
+		TreeMapBuilder(TreeMap<GKey, GValue> value) throws NullPointerException {
+			super(value);
+		}
+
+		@Override
+		public TreeMapBuilder<GKey, GValue> owner() {
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link HashMap}.
+	 *
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte. */
+	public static class HashMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, HashMap<GKey, GValue>, HashMapBuilder<GKey, GValue>> {
+
+		HashMapBuilder(HashMap<GKey, GValue> value) throws NullPointerException {
+			super(value);
+		}
+
+		@Override
+		public HashMapBuilder<GKey, GValue> owner() {
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen Konfigurator für eine {@link ProxyMap}.
+	 *
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte. */
+	public static class ProxyMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, ProxyMap<GKey, GValue>, ProxyMapBuilder<GKey, GValue>> {
+
+		ProxyMapBuilder(ProxyMap<GKey, GValue> value) throws NullPointerException {
+			super(value);
+		}
+
+		@Override
+		public ProxyMapBuilder<GKey, GValue> owner() {
+			return this;
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen abstrakten Konfigurator für einen Wert.
+	 *
+	 * @param <GValue> Typ des Werts.
+	 * @param <GOwner> Typ des Besitzers. */
+	public static abstract class ValueBuilder<GValue, GOwner> extends BaseValueBuilder<GValue, GOwner> {
+
+		/** Diese Methode gibt einen {@link ValueBuilder} zum Wert des gegebenen {@link Property} zurück.
+		 *
+		 * @param <GValue> Typ des Werts.
+		 * @return {@link ValueBuilder} eines {@link Property}. */
+		public static <GValue> ProxyValueBuilder<GValue> fromProxy(final Property<GValue> that) {
+			return new ProxyValueBuilder<>(that);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen Konfigurator für den Wert eines {@link Property}.
+	 *
+	 * @param <GValue> Typ des Werts. */
+	public static class ProxyValueBuilder<GValue> extends ValueBuilder<GValue, ProxyValueBuilder<GValue>> {
+
+		final Property<GValue> that;
+
+		ProxyValueBuilder(final Property<GValue> that) {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public GValue get() {
+			return this.that.get();
+		}
+
+		@Override
+		public void set(final GValue value) {
+			this.that.set(value);
+		}
+
+		@Override
+		public ProxyValueBuilder<GValue> owner() {
 			return this;
 		}
 
