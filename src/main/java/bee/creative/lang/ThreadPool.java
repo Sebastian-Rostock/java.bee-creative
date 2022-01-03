@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import bee.creative.util.HashMap3;
-import bee.creative.util.Producer;
 
 /** Diese Klasse implementiert einen {@link java.lang.Thread Thread}-Puffer, welcher Methoden zum {@link #start(Runnable) Starten}, {@link #isAlive(Runnable)
  * Überwachen}, {@link #interrupt(Runnable) Unterbrechen} und {@link #join(Runnable) Abwarten} der Auswertung beliebiger {@link Runnable Berechnungen}
@@ -87,27 +86,89 @@ public class ThreadPool {
 
 	}
 
-	/** Diese Klasse implementiert das von {@link ThreadPool#runAll(int, Iterator)} verwendete {@link Runnable}. */
-	private final class ThreadWorker implements Runnable {
+	/** Diese Klasse implementiert das von {@link ThreadPool#runAll(int, Object, Iterator)} verwendete {@link Runnable}. */
+	private static final class WorkerTask implements Runnable {
 
-		public final int[] idle;
+		public final WorkerGroup group;
 
-		public final Runnable task;
-
-		public ThreadWorker(final int[] idle, final Runnable task) {
-			this.idle = idle;
-			this.task = task;
+		public WorkerTask(final WorkerGroup group) {
+			this.group = group;
 		}
 
 		@Override
 		public void run() {
 			try {
-				this.task.run();
-			} finally {
-				synchronized (this.idle) {
-					this.idle[0]++;
-					this.idle.notify();
+				for (Runnable task = this.group.next(); task != null; task = this.group.next()) {
+					task.run();
 				}
+			} finally {
+				this.group.done();
+			}
+		}
+
+	}
+
+	private static final class WorkerGroup {
+
+		/** Dieses Feld speichert den {@link ThreadPool} zum Starten neuer {@link WorkerTask}. */
+		public final ThreadPool pool;
+
+		/** Dieses Feld speichert die auszuführenden Berechnungen. */
+		public final Iterator<? extends Runnable> tasks;
+
+		/** Dieses Feld speichert das Mutex zum Schutz des Zugriffs auf {@link #tasks} und {@link #count}. */
+		public final Object mutex;
+
+		/** Dieses Feld speichert die maximale Anzahl der {@link WorkerTask}. */
+		public final int threads;
+
+		/** Dieses Feld speichert die Anzahl der aktiven {@link WorkerTask}. */
+		public int count;
+
+		public WorkerGroup(final ThreadPool pool, final int threads, final Object mutex, final Iterator<? extends Runnable> tasks)
+			throws NullPointerException, IllegalArgumentException, InterruptedException {
+			this.pool = pool;
+			this.mutex = mutex;
+			this.tasks = Objects.notNull(tasks);
+			this.threads = threads;
+			if (threads < 1) throw new IllegalArgumentException();
+			synchronized (this.mutex) {
+				this.push();
+			}
+			synchronized (this) {
+				while (true) {
+					synchronized (this.mutex) {
+						if (this.count <= 0) return;
+					}
+					this.wait(1000);
+				}
+			}
+		}
+
+		/** Diese Methode liefert die nächste Berechnung oder {@code null}. Bei Bedarf und Verfügbarkeit statet sie zudem einen weiteren {@link WorkerTask}. */
+		public Runnable next() {
+			synchronized (this.mutex) {
+				if (!this.tasks.hasNext()) return null;
+				final Runnable next = Objects.notNull(this.tasks.next());
+				if ((this.count >= this.threads) || !this.tasks.hasNext()) return next;
+				this.push();
+				return next;
+			}
+		}
+
+		/** Diese Methode startet einen neuen {@link WorkerTask}. */
+		public void push() {
+			this.pool.start(new WorkerTask(this));
+			this.count++;
+		}
+
+		/** Diese Methode erfasst den Abschluss eines {@link WorkerTask}. */
+		public void done() {
+			synchronized (this.mutex) {
+				if (--this.count > 0) return;
+			}
+			synchronized (this) {
+				this.notifyAll();
 			}
 		}
 
@@ -127,6 +188,7 @@ public class ThreadPool {
 	 * Threads}. */
 	private String activeName;
 
+	/** Dieses Feld speichert den hinter {@link #activeName} angefügten Zähler. */
 	private int activeCount;
 
 	/** Dieses Feld speichert die {@link java.lang.Thread#setPriority(int) Priorität} für die nächsten {@link #start(Runnable) gestartetetn} {@link ThreadItem
@@ -286,84 +348,67 @@ public class ThreadPool {
 		}
 	}
 
-	/** Diese Methode verarbeitet die gegebenen Berechungen mit der gegebenen Anzahl an Threads und wartet auf deren Abschluss.
+	/** Diese Methode ist eine Abkürzung für {@link #runAll(int, Object, Runnable...) this.runAll(threads, tasks, tasks)}.
 	 *
 	 * @param threads Threadanzahl.
 	 * @param tasks Berechnungen.
 	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void runAll(final int threads, final Runnable... tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
-		this.runAll(threads, Arrays.asList(tasks));
+		this.runAll(threads, tasks, tasks);
 	}
 
-	/** Diese Methode verarbeitet die gegebenen Berechungen mit der gegebenen Anzahl an Threads und wartet auf deren Abschluss.
+	/** Diese Methode ist eine Abkürzung für {@link #runAll(int, Object, Iterable) this.runAll(threads, mutex, Arrays.asList(tasks))}.
+	 *
+	 * @param threads Threadanzahl.
+	 * @param tasks Berechnungen.
+	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void runAll(final int threads, Object mutex, final Runnable... tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
+		this.runAll(threads, mutex, Arrays.asList(tasks));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #runAll(int, Object, Iterable) this.runAll(threads, tasks, tasks)}.
 	 *
 	 * @param threads Threadanzahl.
 	 * @param tasks Berechnungen.
 	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void runAll(final int threads, final Iterable<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
-		this.runAll(threads, tasks.iterator());
+		this.runAll(threads, tasks, tasks);
 	}
 
-	/** Diese Methode verarbeitet die gegebenen Berechungen mit der gegebenen Anzahl an Threads und wartet auf deren Abschluss.
+	/** Diese Methode ist eine Abkürzung für {@link #runAll(int, Object, Iterator) this.runAll(threads, tasks, tasks.iterator())}.
+	 *
+	 * @param threads Threadanzahl.
+	 * @param tasks Berechnungen.
+	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
+	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
+	public void runAll(final int threads, final Object mutex, final Iterable<? extends Runnable> tasks)
+		throws NullPointerException, IllegalArgumentException, InterruptedException {
+		this.runAll(threads, mutex, tasks.iterator());
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #runAll(int, Object, Iterator) this.runAll(threads, tasks, tasks)}.
 	 *
 	 * @param threads Threadanzahl.
 	 * @param tasks Berechnungen.
 	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
 	public void runAll(final int threads, final Iterator<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
-		runAll(threads, new Producer<Runnable>() {
-
-			@Override
-			public Runnable get() {
-				return tasks.hasNext() ? tasks.next() : null;
-			}
-
-		});
+		this.runAll(threads, tasks, tasks);
 	}
 
 	/** Diese Methode verarbeitet die gegebenen Berechungen mit der gegebenen Anzahl an Threads und wartet auf deren Abschluss.
-	 * 
+	 *
 	 * @param threads Threadanzahl.
-	 * @param tasks Berechnungen. Diese gelten als abgeschlossen, wenn dieser {@link Producer} {@code null} liefert und keine Berechnungen mehr ausgeführt werden.
+	 * @param mutex Objekt zum Schutz des Zugriffs auf {@code tasks} über {@code synchronized(mutex)}.
+	 * @param tasks Berechnungen.
 	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
-	public void runAll(final int threads, final Producer<? extends Runnable> tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
-		if (threads < 1) throw new IllegalArgumentException();
-		final int[] idle = {threads};
-		try {
-			while (true) {
-				synchronized (idle) {
-					while (true) {
-						if (idle[0] > 0) {
-							break;
-						}
-						idle.wait(1000);
-					}
-				}
-				final Runnable task = tasks.get();
-				synchronized (idle) {
-					if (task != null) {
-						this.start(new ThreadWorker(idle, task));
-						idle[0]--;
-					} else {
-						if (idle[0] >= threads) return;
-						idle.wait(1000);
-					}
-				}
-			}
-
-		} finally {
-			synchronized (idle) {
-				while (true) {
-					if (idle[0] >= threads) {
-						break;
-					}
-					idle.wait(1000);
-				}
-			}
-		}
+	public void runAll(final int threads, final Object mutex, final Iterator<? extends Runnable> tasks)
+		throws NullPointerException, IllegalArgumentException, InterruptedException {
+		new WorkerGroup(this, threads, mutex, tasks);
 	}
 
 	/** Diese Methode implementiert {@link #join(long, Runnable)} ohne Synchronisation. */
