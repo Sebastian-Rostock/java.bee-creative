@@ -116,29 +116,35 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert die normale {@link FEMDomain}. */
 	public static final FEMDomain DEFAULT = new FEMDomain();
 
-	/** Dieses Feld speichert den Abschnittstyp für {@link #parseScriptToken(FEMParser)}. */
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseScriptToken(FEMParser) Funktionsliste}. */
 	public static int TYPE_SCRIPT = '*';
 
 	public static int TYPE_ERROR = '!';
 
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseIdentToken(FEMParser) maskierten Kennung}. */
 	public static int TYPE_IDENT = '<';
 
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseIndexToken(FEMParser) Parameterposition}. */
 	public static int TYPE_INDEX = '#';
 
-	/** Dieses Feld speichert den Abschnittstyp für {@link #parseNameToken(FEMParser)}. */
+	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseNameToken(FEMParser) Parameternamens}. */
 	public static int TYPE_NAME = '~';
 
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseConstToken(FEMParser) Konstanten}. */
 	public static int TYPE_CONST = '?';
 
-	/** Dieses Feld speichert den Abschnittstyp für {@link #parseArrayToken(FEMParser)}. */
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseArrayToken(FEMParser) Wertliste}. */
 	public static int TYPE_ARRAY = '[';
 
 	public static int TYPE_GROUP = '(';
 
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseParamToken(FEMParser) Parameterfunktion}. */
 	public static int TYPE_PARAM = '$';
 
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseString1Token(FEMParser) Zeichenkette}. */
 	public static int TYPE_STRING1 = '\'';
 
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseString2Token(FEMParser) Zeichenkette}. */
 	public static int TYPE_STRING2 = '\"';
 
 	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseHandler1Token(FEMParser) Funktionszeigers}. */
@@ -959,7 +965,11 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die Textdarstellung der gegebenen Zeichenkette. Diese wird über
 	 * {@link Strings#printSequence(CharSequence, char, char, char) Strings.printSequence(string, '"', '\\', '"')} ermittelt. */
 	protected void printString(final FEMPrinter res, final FEMString src) throws NullPointerException {
-		res.push(Strings.printSequence(src.toString(), '"', '\\', '"'));
+		if (src.find('"', 0) >= 0) {
+			res.push(Strings.printSequence(src.toString(), '\'', '\\', '\''));
+		} else {
+			res.push(Strings.printSequence(src.toString(), '"', '\\', '"'));
+		}
 	}
 
 	/** Diese Methode {@link FEMPrinter#push(Object) erfasst} die {@link Object#toString() Textdarstellung} der gegebenen Bytefolge. */
