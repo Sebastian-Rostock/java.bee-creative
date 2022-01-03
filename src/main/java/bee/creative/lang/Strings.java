@@ -15,13 +15,29 @@ import bee.creative.util.Getters;
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Strings {
 
-	/** Diese Klasse implementiert {@link Strings#patternCompiler(int)}. */
-	@SuppressWarnings ("javadoc")
-	public static class PatternCompiler implements Getter<String, Pattern> {
+	private static final class FormatFuture {
 
-		public final int flags;
+		final String format;
 
-		public PatternCompiler(final int flags) {
+		final Object[] args;
+
+		FormatFuture(final String format, final Object[] args) {
+			this.format = Objects.notNull(format);
+			this.args = args;
+		}
+
+		@Override
+		public String toString() {
+			return String.format(this.format, this.args);
+		}
+
+	}
+
+	private static class PatternCompiler implements Getter<String, Pattern> {
+
+		final int flags;
+
+		PatternCompiler(final int flags) {
 			this.flags = flags;
 		}
 
@@ -622,6 +638,12 @@ public class Strings {
 		}
 		result[--offset] = openSymbol;
 		return new String(result);
+	}
+
+	/** Diese Methode liefert ein Objekt, dessen {@link Object#toString() Textdarstellung} über {@link String#format(String, Object...) String.format(format,
+	 * args)} ermittelt wird. */
+	public static Object formatFuture(final String format, final Object... args) {
+		return new FormatFuture(format, args);
 	}
 
 }
