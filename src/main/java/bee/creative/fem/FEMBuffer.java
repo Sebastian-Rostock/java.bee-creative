@@ -495,7 +495,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @param head Kopfdaten, bspw. Typkennung (6 Bit).
 	 * @param body Rumpfdaten, bspw. Adresse (58 Bit).
 	 * @return Referenz. */
-	protected final long putRef(final int head, final long body) {
+	protected long putRef(final int head, final long body) {
 		final long ref = this.getRef(head, body);
 		synchronized (this.buffer) {
 			return this.reusePut(ref);
@@ -509,7 +509,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @return Adresse des Speicherbereichs.
 	 * @throws IllegalStateException Wenn der Puffer nicht zum schreiben angebunden ist.
 	 * @throws IllegalArgumentException Wenn {@code size} ungültig ist. */
-	protected final long putData(final long size) throws IllegalStateException, IllegalArgumentException {
+	protected long putData(final long size) throws IllegalStateException, IllegalArgumentException {
 		final MappedBuffer buffer = this.buffer;
 		synchronized (buffer) {
 			final long addr = this.dataNext, newDataNext = (addr + size + 7) & -8L;
