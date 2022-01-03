@@ -198,7 +198,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	public H2QTSet order() {
 		final int size = this.names.size();
 		final StringBuilder sql = new StringBuilder(this.name.length() + 50 + (size * 5));
-		sql.append("table ").append(this.name).append(" order by ");
+		sql.append("select * from ").append(this.name).append(" order by ");
 		for (int i = 0; i < size; i++) {
 			sql.append("C").append(i).append(", ");
 		}
@@ -209,19 +209,19 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QTSet union(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet that = this.owner.asQTSet(set, this.names());
-		return new Set2(this.owner, this.names, "(table " + this.name + ") union (table " + that.name + ")", this, that);
+		return new Set2(this.owner, this.names, "(select * from " + this.name + ") union (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QTSet except(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet that = this.owner.asQTSet(set, this.names());
-		return new Set2(this.owner, this.names, "(table " + this.name + ") except (table " + that.name + ")", this, that);
+		return new Set2(this.owner, this.names, "(select * from " + this.name + ") except (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QTSet intersect(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet that = this.owner.asQTSet(set, this.names());
-		return new Set2(this.owner, this.names, "(table " + this.name + ") intersect (table " + that.name + ")", this, that);
+		return new Set2(this.owner, this.names, "(select * from " + this.name + ") intersect (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
@@ -409,7 +409,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		if (this.names.list.equals(names)) return this;
 		final Names names2 = new Names(names);
 		if (this.names.size() != names2.size()) throw new IllegalArgumentException();
-		return new Set1(this.owner, names2, "table " + this.name, this);
+		return new Set1(this.owner, names2, "select * from " + this.name, this);
 	}
 
 	@Override
@@ -433,7 +433,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	public H2QTSet havingNodes(final int role, final QNSet nodes) throws NullPointerException, IllegalArgumentException {
 		this.name(role);
 		final H2QTSet that = this.owner.asQTSet(nodes);
-		return new Set2(this.owner, this.names, "select * from " + this.name + " where C" + role + " in (table " + that.name + ")", this, that);
+		return new Set2(this.owner, this.names, "select * from " + this.name + " where C" + role + " in (select * from " + that.name + ")", this, that);
 	}
 
 	@Override

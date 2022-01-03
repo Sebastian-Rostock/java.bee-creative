@@ -65,7 +65,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 		Temp(final H2QS owner) {
 			super(owner, null);
-			this.owner.exec("create cached local temporary table " + this.name + " (V varchar(1G) not null)");
+			this.owner.exec("create table " + this.name + " (V varchar(1G) not null)");
 		}
 
 		@Override
@@ -101,12 +101,12 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QNSet nodes() {
-		return new H2QNSet.Set1(this.owner, "select N from QN where V in (table " + this.name + ")", this);
+		return new H2QNSet.Set1(this.owner, "select N from QN where V in (select * from " + this.name + ")", this);
 	}
 
 	@Override
 	public boolean popAll() {
-		return this.owner.exec("delete from QN where V in (table " + this.name + ")");
+		return this.owner.exec("delete from QN where V in (select * from " + this.name + ")");
 	}
 
 	@Override
@@ -126,25 +126,25 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QVSet order() {
-		return new Order(this.owner, "table " + this.name + " order by V", this);
+		return new Order(this.owner, "select * from " + this.name + " order by V", this);
 	}
 
 	@Override
 	public H2QVSet union(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new Set2(this.owner, "(table " + this.name + ") union (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "(select * from " + this.name + ") union (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QVSet except(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new Set2(this.owner, "(table " + this.name + ") except (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "(select * from " + this.name + ") except (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QVSet intersect(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new Set2(this.owner, "(table " + this.name + ") intersect (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "(select * from " + this.name + ") intersect (select * from " + that.name + ")", this, that);
 	}
 
 	@Override

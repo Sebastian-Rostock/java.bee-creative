@@ -75,8 +75,8 @@ public class H2QS implements QS, AutoCloseable {
 			+ "create index if not exists QE_INDEX_CSP on QE (C, S, P, O);" //
 			+ "create index if not exists QE_INDEX_COP on QE (C, O, P, S);" //
 			+ "create unique index if not exists QN_INDEX_V on QN (V);" //
-			+ "create sequence if not exists QN_SEQUENCE minvalue 1 maxvalue 1000000000000000 nocycle;" //
-			+ "create sequence if not exists QT_SEQUENCE minvalue 1 maxvalue 1000000000000000 cycle");
+			+ "create sequence if not exists QN_SEQUENCE start with 1;" //
+			+ "create sequence if not exists QT_SEQUENCE start with 1");
 		this.selectSaveEdge = this.conn.prepareStatement("select top 1 * from QE where C=? and P=? and S=? and O=?");
 		this.selectSaveNode = this.conn.prepareStatement("select N from QN where V=?");
 		this.selectSaveValue = this.conn.prepareStatement("select V from QN where N=?");

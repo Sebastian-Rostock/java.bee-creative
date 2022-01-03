@@ -55,7 +55,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	static class Save extends H2QESet {
 
 		Save(final H2QS owner) {
-			super(owner, "table QE");
+			super(owner, "select * from QE");
 		}
 
 	}
@@ -65,7 +65,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 		Temp(final H2QS owner) {
 			super(owner, null);
-			this.owner.exec("create cached local temporary table " + this.name + " (C int not null, P int not null, S int not null, O int not null)");
+			this.owner.exec("create table " + this.name + " (C int not null, P int not null, S int not null, O int not null)");
 		}
 
 		@Override
@@ -110,7 +110,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public boolean putAll() {
-		return this.owner.exec("merge into QE table " + this.name);
+		return this.owner.exec("merge into QE select * from " + this.name);
 	}
 
 	@Override
@@ -223,7 +223,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	@Override
 	public H2QESet havingContexts(final QNSet contexts) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(contexts);
-		return new Set2(this.owner, "select * from " + this.name + " where C in (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "select * from " + this.name + " where C in (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
@@ -236,7 +236,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	public H2QESet havingPredicates(final QNSet predicates) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(predicates);
 		final H2QNSet node = that;
-		return new Set2(this.owner, "select * from " + this.name + " where P in (table " + node.name + ")", this, that);
+		return new Set2(this.owner, "select * from " + this.name + " where P in (select * from " + node.name + ")", this, that);
 	}
 
 	@Override
@@ -248,7 +248,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	@Override
 	public H2QESet havingSubjects(final QNSet subjects) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(subjects);
-		return new Set2(this.owner, "select * from " + this.name + " where S in (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "select * from " + this.name + " where S in (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
@@ -260,7 +260,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	@Override
 	public H2QESet havingObjects(final QNSet objects) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(objects);
-		return new Set2(this.owner, "select * from " + this.name + " where O in (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "select * from " + this.name + " where O in (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
@@ -270,25 +270,25 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public H2QESet order() {
-		return new Order(this.owner, "table " + this.name + " order by C, P, S, O", this);
+		return new Order(this.owner, "select * from " + this.name + " order by C, P, S, O", this);
 	}
 
 	@Override
 	public H2QESet union(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
-		return new Set2(this.owner, "(table " + this.name + ") union (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "(select * from " + this.name + ") union (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QESet except(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
-		return new Set2(this.owner, "(table " + this.name + ") except (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "(select * from " + this.name + ") except (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
 	public H2QESet intersect(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
-		return new Set2(this.owner, "(table " + this.name + ") intersect (table " + that.name + ")", this, that);
+		return new Set2(this.owner, "(select * from " + this.name + ") intersect (select * from " + that.name + ")", this, that);
 	}
 
 	@Override
