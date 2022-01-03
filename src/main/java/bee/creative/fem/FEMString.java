@@ -384,6 +384,29 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	public static class ConcatString extends HashString implements Emuable {
 
+		static int size(FEMString string) {
+			for (int size = 0; true; size++) {
+				if (string instanceof ConcatString2) {
+					string = ((ConcatString)string).string2;
+				} else if (string instanceof ConcatString) {
+					string = ((ConcatString)string).string1;
+				} else return size;
+			}
+		}
+
+		static ConcatString from(final FEMString string1, final FEMString string2) throws IllegalArgumentException {
+			final int size1 = ConcatString.size(string1), size2 = ConcatString.size(string2);
+			if ((size1 + 1) < size2) {
+				final ConcatString string = (ConcatString)string2;
+				return ConcatString.from(ConcatString.from(string1, string.string1), string.string2);
+			}
+			if ((size2 + 1) < size1) {
+				final ConcatString string = (ConcatString)string1;
+				return ConcatString.from(string.string1, ConcatString.from(string.string2, string2));
+			}
+			return size1 <= size2 ? new ConcatString2(string1, string2) : new ConcatString(string1, string2);
+		}
+
 		public final FEMString string1;
 
 		public final FEMString string2;
@@ -425,6 +448,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		@Override
 		public long emu() {
 			return EMU.fromObject(this) + EMU.from(this.string1) + EMU.from(this.string2);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class ConcatString2 extends ConcatString {
+
+		ConcatString2(FEMString string1, FEMString string2) throws IllegalArgumentException {
+			super(string1, string2);
 		}
 
 	}
@@ -1431,7 +1463,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	public FEMString concat(final FEMString that) throws NullPointerException {
 		if (that.length == 0) return this;
 		if (this.length == 0) return that;
-		return new ConcatString(this, that);
+		return ConcatString.from(this, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.

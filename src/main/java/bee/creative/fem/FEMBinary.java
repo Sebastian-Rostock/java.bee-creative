@@ -253,6 +253,29 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	@SuppressWarnings ("javadoc")
 	public static class ConcatBinary extends HashBinary implements Emuable {
 
+		static int size(FEMBinary array) {
+			for (int size = 0; true; size++) {
+				if (array instanceof ConcatBinary2) {
+					array = ((ConcatBinary)array).binary2;
+				} else if (array instanceof ConcatBinary) {
+					array = ((ConcatBinary)array).binary1;
+				} else return size;
+			}
+		}
+
+		static ConcatBinary from(final FEMBinary array1, final FEMBinary array2) throws IllegalArgumentException {
+			final int size1 = ConcatBinary.size(array1), size2 = ConcatBinary.size(array2);
+			if ((size1 + 1) < size2) {
+				final ConcatBinary array = (ConcatBinary)array2;
+				return ConcatBinary.from(ConcatBinary.from(array1, array.binary1), array.binary2);
+			}
+			if ((size2 + 1) < size1) {
+				final ConcatBinary array = (ConcatBinary)array1;
+				return ConcatBinary.from(array.binary1, ConcatBinary.from(array.binary2, array2));
+			}
+			return size1 <= size2 ? new ConcatBinary2(array1, array2) : new ConcatBinary(array1, array2);
+		}
+
 		public final FEMBinary binary1;
 
 		public final FEMBinary binary2;
@@ -294,6 +317,15 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			if (offset2 >= 0) return this.binary2.section(offset2, length);
 			if (length2 <= 0) return this.binary1.section(offset, length);
 			return this.binary1.section(offset, -offset2).concat(this.binary2.section(0, length2));
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class ConcatBinary2 extends ConcatBinary {
+
+		ConcatBinary2(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
+			super(binary1, binary2);
 		}
 
 	}
@@ -839,7 +871,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	public FEMBinary concat(final FEMBinary that) throws NullPointerException {
 		if (that.length == 0) return this;
 		if (this.length == 0) return that;
-		return new ConcatBinary(this, that);
+		return ConcatBinary.from(this, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.

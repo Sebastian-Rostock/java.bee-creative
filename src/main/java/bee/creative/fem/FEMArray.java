@@ -382,6 +382,29 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	@SuppressWarnings ("javadoc")
 	public static class ConcatArray extends HashArray implements Emuable {
 
+		static int size(FEMArray array) {
+			for (int size = 0; true; size++) {
+				if (array instanceof ConcatArray2) {
+					array = ((ConcatArray)array).array2;
+				} else if (array instanceof ConcatArray) {
+					array = ((ConcatArray)array).array1;
+				} else return size;
+			}
+		}
+
+		static ConcatArray from(final FEMArray array1, final FEMArray array2) throws IllegalArgumentException {
+			final int size1 = ConcatArray.size(array1), size2 = ConcatArray.size(array2);
+			if ((size1 + 1) < size2) {
+				final ConcatArray array = (ConcatArray)array2;
+				return ConcatArray.from(ConcatArray.from(array1, array.array1), array.array2);
+			}
+			if ((size2 + 1) < size1) {
+				final ConcatArray array = (ConcatArray)array1;
+				return ConcatArray.from(array.array1, ConcatArray.from(array.array2, array2));
+			}
+			return size1 <= size2 ? new ConcatArray2(array1, array2) : new ConcatArray(array1, array2);
+		}
+
 		public final FEMArray array1;
 
 		public final FEMArray array2;
@@ -446,6 +469,15 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 		@Override
 		public boolean isIndexed() {
 			return this.array1.isIndexed() && this.array2.isIndexed();
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class ConcatArray2 extends ConcatArray {
+
+		ConcatArray2(final FEMArray array1, final FEMArray array2) throws IllegalArgumentException {
+			super(array1, array2);
 		}
 
 	}
@@ -1004,7 +1036,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	public FEMArray concat(final FEMArray that) throws NullPointerException {
 		if (that.length == 0) return this;
 		if (this.length == 0) return that;
-		return new ConcatArray(this, that);
+		return ConcatArray.from(this, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #section(int, int) this.section(offset, this.length() - offset)}.
