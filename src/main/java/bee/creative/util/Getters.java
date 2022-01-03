@@ -175,7 +175,7 @@ public class Getters {
 
 		}
 
-		private static final class SoftGen<GItem> implements Getter<GItem, Object> {
+		private static final class SoftGen<GItem> implements Getter<GItem, Ref> {
 
 			final Getter<? super GItem, ?> that;
 
@@ -184,7 +184,7 @@ public class Getters {
 			}
 
 			@Override
-			public Object get(final GItem item) {
+			public Ref get(final GItem item) {
 				return new SoftRef(item, this.that.get(item));
 			}
 
@@ -206,7 +206,7 @@ public class Getters {
 
 		}
 
-		private static final class WeakGen<GItem> implements Getter<GItem, Object> {
+		private static final class WeakGen<GItem> implements Getter<GItem, Ref> {
 
 			final Getter<? super GItem, ?> that;
 
@@ -215,7 +215,7 @@ public class Getters {
 			}
 
 			@Override
-			public Object get(final GItem item) {
+			public Ref get(final GItem item) {
 				return new WeakRef(item, this.that.get(item));
 			}
 
