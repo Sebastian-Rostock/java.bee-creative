@@ -1,22 +1,14 @@
 package bee.creative.fem;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.IllegalFormatException;
-import java.util.Iterator;
-import java.util.List;
-import bee.creative.lang.Strings;
-import bee.creative.util.Filters;
-import bee.creative.util.Iterables;
+import bee.creative.lang.Exception2;
 
-/** Diese Klasse implementiert eine Ausnahme, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(String) angefügt} werden können und welche mit
+/** Diese Klasse implementiert eine Ausnahme, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(Object) angefügt} werden können und welche mit
  * einem {@link #getValue() Wert} sowie einem {@link #getContext() Kontextobjekt} die {@link #getCause() Ursache} eines Ausnahmefalls genauer beschreiben kann.
  * Die von {@link #getMessage()} gelieferte Zeichenkette entspricht den mit dem Trennzeichen {@code '\n'} verketteten {@link #getMessages() Nachrichten}.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMException extends RuntimeException implements Iterable<String> {
+public final class FEMException extends Exception2 {
 
 	private static final long serialVersionUID = -2654985371977072939L;
 
@@ -33,19 +25,19 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	/** Dieses Feld speichert den Wert. */
 	FEMValue value;
 
-	/** Dieses Feld speichert die Ursache. */
-	Throwable cause;
-
 	/** Dieses Feld speichert den Kontextobjekt. */
 	FEMContext context;
-
-	/** Dieses Feld speichert die Nachrichten. */
-	final List<String> messages;
 
 	/** Dieser Konstruktor initialisiert eine neue Ausnahme ohne {@link #getValue() Wert}, {@link #getContext() Kontextobjekt}, {@link #getCause() Ursache} und
 	 * {@link #getMessages() Nachrichten}. */
 	public FEMException() {
-		this.messages = Collections.synchronizedList(new ArrayList<String>());
+	}
+
+	/** Diese Methode gibt den Wert zurück, der die {@link #getCause() Ursache} des Ausnahmefalls genauer beschreibt.
+	 *
+	 * @return Wert oder {@code null}. */
+	public FEMValue getValue() {
+		return this.value;
 	}
 
 	/** Diese Methode setzt den {@link #getValue() Wert} und gibt {@code this} zurück.
@@ -58,14 +50,12 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 		return this;
 	}
 
-	/** Diese Methode setzt die {@link #getCause() Ursache} des Ausnahmefalls und gibt {@code this} zurück.
+	/** Diese Methode gibt das Kontextobjekt zurück, das die {@link #getCause() Ursache} des Ausnahmefalls genauer beschreibt bzw. zur Umwandlung des
+	 * {@link #getValue() Werts} eingesetzt werden kann.
 	 *
-	 * @see #getCause()
-	 * @param cause Ursache des Ausnahmefalls.
-	 * @return {@code this}. */
-	public FEMException useCause(final Throwable cause) {
-		this.cause = cause;
-		return this;
+	 * @return Kontextobjekt oder {@code null}. */
+	public FEMContext getContext() {
+		return this.context;
 	}
 
 	/** Diese Methode setzt das {@link #getContext() Kontextobjekt} und gibt {@code this} zurück.
@@ -78,105 +68,40 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 		return this;
 	}
 
-	/** Diese Methode gibt den Wert zurück, der die {@link #getCause() Ursache} des Ausnahmefalls genauer beschreibt.
-	 *
-	 * @return Wert oder {@code null}. */
-	public FEMValue getValue() {
-		return this.value;
-	}
-
-	/** Diese Methode gibt das Kontextobjekt zurück, das die {@link #getCause() Ursache} des Ausnahmefalls genauer beschreibt bzw. zur Umwandlung des
-	 * {@link #getValue() Werts} eingesetzt werden kann.
-	 *
-	 * @return Kontextobjekt oder {@code null}. */
-	public FEMContext getContext() {
-		return this.context;
-	}
-
-	/** Diese Methode gibt eine unveränderliche Sicht auf die Nachrichten dieser Ausnahme zurück.
-	 *
-	 * @see #push(String)
-	 * @see #clearMessages()
-	 * @return Nachrichten. */
-	public List<String> getMessages() {
-		return Collections.unmodifiableList(this.messages);
-	}
-
-	/** Diese Methode entfernt alle {@link #getMessages() Nachrichten} dieser Ausnahme und gibt {@code this} zurück.
-	 *
-	 * @see #getMessages()
-	 * @return {@code this}. */
-	public FEMException clearMessages() {
-		this.messages.clear();
-		return this;
-	}
-
-	/** Diese Methode fügt die gegebene Nachricht an das Ende der {@link #getMessages() Nachrichten} dieser Ausnahme an und gibt {@code this} zurück. Wenn die
-	 * Nachricht {@code null} ist, wird sie ignoriert.
-	 *
-	 * @see List#add(Object)
-	 * @param message Nachricht oder {@code null}.
-	 * @return {@code this}. */
-	public FEMException push(final String message) {
-		if (message == null) return this;
-		this.messages.add(message);
-		return this;
-	}
-
-	/** Diese Methode {@link String#format(String, Object...) formatiert} die gegebene Nachricht, fügt sie {@link #push(String) hinzu} und gibt {@code this}
-	 * zurück. Wenn die Nachricht {@code null} ist, wird sie ignoriert.
-	 *
-	 * @see #push(String)
-	 * @see String#format(String, Object...)
-	 * @param format Nachricht oder {@code null}.
-	 * @param args Formatargumente.
-	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@link String#format(String, Object...)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalFormatException Wenn {@link String#format(String, Object...)} eine entsprechende Ausnahme auslöst. */
-	public FEMException push(final String format, final Object... args) throws NullPointerException, IllegalFormatException {
-		if (format == null) return this;
-		return this.push(String.format(format, args));
-	}
-
-	/** Diese Methode fügt die gegebenen Nachrichten in der gegebenen Reihenfolge {@link #push(String) hinzu} gibt {@code this} zurück. Wenn die Nachrichten
-	 * {@code null} sind, werden sie ignoriert.
-	 *
-	 * @see #pushAll(Iterable)
-	 * @see Arrays#asList(Object...)
-	 * @param messages Nachrichten oder {@code null}.
-	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code messages} {@code null} ist. */
-	public FEMException pushAll(final String... messages) {
-		if (messages == null) return this;
-		return this.pushAll(Arrays.asList(messages));
-	}
-
-	/** Diese Methode fügt die gegebenen Nachrichten {@link #push(String) hinzu} gibt {@code this} zurück. Wenn die Nachrichten {@code null} sind, werden sie
-	 * ignoriert.
-	 *
-	 * @see #getMessages()
-	 * @see Iterables#addAll(Collection, Iterable)
-	 * @param messages Nachrichten oder {@code null}.
-	 * @return {@code this}. */
-	public FEMException pushAll(final Iterable<String> messages) {
-		if (messages == null) return this;
-		Iterables.addAll(this.messages, Iterables.filter(messages, Filters.empty()));
+	@Override
+	public FEMException useCause(final Throwable cause) {
+		super.useCause(cause);
 		return this;
 	}
 
 	@Override
-	public Iterator<String> iterator() {
-		return this.messages.iterator();
+	public FEMException useHandled(final boolean handled) {
+		super.useHandled(handled);
+		return this;
 	}
 
 	@Override
-	public synchronized Throwable getCause() {
-		return this.cause;
+	public FEMException push(Object message) {
+		super.push(message);
+		return this;
 	}
 
 	@Override
-	public String getMessage() {
-		return Strings.join("\n", this.messages);
+	public FEMException push(String format, Object... args) throws NullPointerException, IllegalFormatException {
+		super.push(format, args);
+		return this;
+	}
+
+	@Override
+	public FEMException pushAll(Iterable<?> messages) {
+		super.pushAll(messages);
+		return this;
+	}
+
+	@Override
+	public FEMException pushAll(Object... messages) {
+		super.pushAll(messages);
+		return this;
 	}
 
 }
