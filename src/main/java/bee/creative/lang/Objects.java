@@ -109,39 +109,35 @@ public class Objects {
 
 	}
 
-	/** Diese Klasse implementiert {@link Objects#toStringObject(String)}. */
-	@SuppressWarnings ("javadoc")
-	public static class StringObject {
+	private static final class PrintFuture {
 
-		public final String string;
+		final Object object;
 
-		public StringObject(final String string) {
-			this.string = Objects.notNull(string);
-		}
+		final boolean format;
 
-		@Override
-		public String toString() {
-			return this.string;
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Objects#toStringObject(boolean, Object)}. */
-	@SuppressWarnings ("javadoc")
-	public static class FormatObject {
-
-		public final boolean format;
-
-		public final Object object;
-
-		public FormatObject(final boolean format, final Object object) {
-			this.format = format;
+		PrintFuture(final Object object, final boolean format) {
 			this.object = object;
+			this.format = format;
 		}
 
 		@Override
 		public String toString() {
 			return Objects.toString(this.format, this.object);
+		}
+
+	}
+
+	private static final class StringFuture {
+
+		final Object object;
+
+		StringFuture(final Object object) {
+			this.object = Objects.notNull(object);
+		}
+
+		@Override
+		public String toString() {
+			return this.object.toString();
 		}
 
 	}
@@ -272,6 +268,17 @@ public class Objects {
 			result.append(format ? ",\n  " : ", ").append(Objects.toString(format, format, next));
 		}
 		return result.append(format ? "\n]" : "]").toString();
+	}
+
+	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der über {@link Objects#toString(boolean, Object)} ermittelten
+	 * Textdarstelung des gegebenen Objekts entspricht.
+	 *
+	 * @see Objects#toString(boolean, Object)
+	 * @param format Aktivierung der hierarchische Formatierung.
+	 * @param object Objekt oder {@code null}.
+	 * @return {@link Objects#toString(boolean, Object)}-Objekt. */
+	public static Object printFuture(final boolean format, final Object object) {
+		return new PrintFuture(object, format);
 	}
 
 	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
@@ -552,30 +559,6 @@ public class Objects {
 		return true;
 	}
 
-	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@code Objects.toStringCall(false, false, name, args)}.
-	 *
-	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
-	 * @param name Funktionsname.
-	 * @param args Argumente.
-	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
-	public static String toInvokeString(final String name, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, false, name, args);
-	}
-
-	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
-	 * {@code Objects.toStringCall(false, false, object, args)}.
-	 *
-	 * @see #toStringCall(boolean, boolean, Object, Object...)
-	 * @param object {@link Object}.
-	 * @param args Argumente bzw. Parameter.
-	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn {@code object} bzw. {@code args} {@code null} ist. */
-	public static String toInvokeString(final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, false, object, args);
-	}
-
 	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht {@link #toString(boolean, Object)
 	 * Objects.toString(false, object)}.
 	 *
@@ -691,23 +674,36 @@ public class Objects {
 		return Objects.toStringCall(format, label, Strings.substringAfterLast(object.getClass().getName(), '.'), args);
 	}
 
-	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der gegebene Zeichenkette entspricht.
+	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der des gegebenen Objekts entspricht.
 	 *
-	 * @param string Textdarstelung.
+	 * @param object Textdarstelung.
 	 * @return Textdarstelung-Objekt. */
-	public static Object toStringObject(final String string) {
-		return string == null ? "null" : new StringObject(string);
+	public static Object toStringFuture(final Object object) {
+		return object == null ? "null" : new StringFuture(object);
 	}
 
-	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der über {@link Objects#toString(boolean, Object)} ermittelten
-	 * Textdarstelung des gegebenen Objekts entspricht.
+	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
+	 * {@code Objects.toStringCall(false, false, name, args)}.
 	 *
-	 * @see Objects#toString(boolean, Object)
-	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param object Objekt oder {@code null}.
-	 * @return {@link Objects#toString(boolean, Object)}-Objekt. */
-	public static Object toStringObject(final boolean format, final Object object) {
-		return new FormatObject(format, object);
+	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
+	 * @param name Funktionsname.
+	 * @param args Argumente.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
+	public static String toInvokeString(final String name, final Object... args) throws NullPointerException {
+		return Objects.toStringCall(false, false, name, args);
+	}
+
+	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
+	 * {@code Objects.toStringCall(false, false, object, args)}.
+	 *
+	 * @see #toStringCall(boolean, boolean, Object, Object...)
+	 * @param object {@link Object}.
+	 * @param args Argumente bzw. Parameter.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 * @throws NullPointerException Wenn {@code object} bzw. {@code args} {@code null} ist. */
+	public static String toInvokeString(final Object object, final Object... args) throws NullPointerException {
+		return Objects.toStringCall(false, false, object, args);
 	}
 
 	/** Diese Methode gibt das gegebene Objekt zurück, wenn dieses nicht {@code null} ist.
