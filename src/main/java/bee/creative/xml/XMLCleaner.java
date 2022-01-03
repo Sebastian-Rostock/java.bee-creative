@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import bee.creative.io.IO;
+import bee.creative.xml.CharsetBuilder.Value;
 
 /** Diese Klasse implementiert einen Konfigurator zum Bereinigen der über {@code JAXB} erzeugten {@code java}-Quelltextdateien.
  * <p>
@@ -25,6 +26,15 @@ import bee.creative.io.IO;
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class XMLCleaner {
+
+	final class CharsetValue extends Value<XMLCleaner> {
+
+		@Override
+		public XMLCleaner owner() {
+			return XMLCleaner.this;
+		}
+
+	}
 
 	private static final Pattern A = Pattern.compile("\\s*//[^\\r\\n]*[\\r\\n]*");
 
@@ -61,7 +71,7 @@ public class XMLCleaner {
 		return res;
 	}
 
-	Charset charset;
+	final CharsetValue charset = new CharsetValue();
 
 	File filepath;
 
@@ -71,7 +81,7 @@ public class XMLCleaner {
 	 * @throws IllegalStateException Wenn {@link File} oder {@link Charset} unzulässig konfiguriert sind. */
 	public final XMLCleaner cleanup() throws IllegalStateException, IOException {
 		final File path = this.filepath;
-		final Charset charset = this.charset;
+		final Charset charset = this.charset.getValue();
 		if ((path == null) || (charset == null)) throw new IllegalStateException();
 		if (path.isDirectory()) {
 			final File[] list = path.listFiles();
@@ -96,25 +106,8 @@ public class XMLCleaner {
 	 * @see InputStreamReader#InputStreamReader(java.io.InputStream, Charset)
 	 * @see OutputStreamWriter#OutputStreamWriter(java.io.OutputStream, Charset)
 	 * @return Konfigurator. */
-	public CharsetBuilder<XMLCleaner> forCharset() {
-		return new CharsetBuilder<XMLCleaner>() {
-
-			@Override
-			public Charset get() {
-				return XMLCleaner.this.charset;
-			}
-
-			@Override
-			public void set(final Charset value) {
-				XMLCleaner.this.charset = value;
-			}
-
-			@Override
-			public XMLCleaner owner() {
-				return XMLCleaner.this;
-			}
-
-		};
+	public CharsetValue forCharset() {
+		return charset;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link File} und gibt ihn zurück. Das {@link File} steht entweder für eine Quelltextdateien oder ein
