@@ -10,14 +10,14 @@ import bee.creative.lang.Objects;
 public class ProxyList<GItem> extends AbstractProxyList<GItem, List<GItem>> {
 
 	/** Diese Methode ist eine Abkürzung für {@link ProxyList new ProxyList<>(that)}. **/
-	public static <GItem> List<GItem> from(final Property<List<GItem>> that) throws NullPointerException {
+	public static <GItem> ProxyList<GItem> from(final Property<List<GItem>> that) throws NullPointerException {
 		return new ProxyList<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Property) ProxyList.from(Properties.from(that, item))}.
 	 *
 	 * @see Properties#from(Field, Object) */
-	public static <GItem, GEntry> List<GEntry> from(final Field<? super GItem, List<GEntry>> that, final GItem item) throws NullPointerException {
+	public static <GItem, GEntry> ProxyList<GEntry> from(final Field<? super GItem, List<GEntry>> that, final GItem item) throws NullPointerException {
 		return ProxyList.from(Properties.from(that, item));
 	}
 

@@ -10,14 +10,14 @@ import bee.creative.lang.Objects;
 public class ProxySet<GItem> extends AbstractProxySet<GItem, Set<GItem>> {
 
 	/** Diese Methode ist eine Abkürzung für {@link ProxySet new ProxySet<>(that)}. */
-	public static <GItem> Set<GItem> from(final Property<Set<GItem>> that) throws NullPointerException {
+	public static <GItem> ProxySet<GItem> from(final Property<Set<GItem>> that) throws NullPointerException {
 		return new ProxySet<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Property) ProxySet.from(Properties.from(that, item))}.
 	 *
 	 * @see Properties#from(Field, Object) */
-	public static <GItem, GEntry> Set<GEntry> from(final Field<? super GItem, Set<GEntry>> that, final GItem item) throws NullPointerException {
+	public static <GItem, GEntry> ProxySet<GEntry> from(final Field<? super GItem, Set<GEntry>> that, final GItem item) throws NullPointerException {
 		return ProxySet.from(Properties.from(that, item));
 	}
 

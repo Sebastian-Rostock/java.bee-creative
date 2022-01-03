@@ -11,14 +11,14 @@ import bee.creative.lang.Objects;
 public class ProxyMap<GKey, GValue> extends AbstractProxyMap<GKey, GValue, Map<GKey, GValue>> {
 
 	/** Diese Methode ist eine Abkürzung für {@link ProxyMap new ProxyMap<>(that)}. */
-	public static <GKey, GValue> Map<GKey, GValue> from(final Property<Map<GKey, GValue>> property) throws NullPointerException {
+	public static <GKey, GValue> ProxyMap<GKey, GValue> from(final Property<Map<GKey, GValue>> property) throws NullPointerException {
 		return new ProxyMap<>(property);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Property) ProxyMap.from(Properties.from(that, item))}.
 	 *
 	 * @see Properties#from(Field, Object) */
-	public static <GItem, GKey, GValue> Map<GKey, GValue> from(final GItem item, final Field<? super GItem, Map<GKey, GValue>> field)
+	public static <GItem, GKey, GValue> ProxyMap<GKey, GValue> from(final GItem item, final Field<? super GItem, Map<GKey, GValue>> field)
 		throws NullPointerException {
 		return ProxyMap.from(Properties.from(field, item));
 	}

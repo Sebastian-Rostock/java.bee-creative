@@ -10,14 +10,14 @@ import bee.creative.lang.Objects;
 public class ProxyCollection<GItem> extends AbstractProxyCollection<GItem, Collection<GItem>> {
 
 	/** Diese Methode ist eine Abkürzung für {@link ProxyCollection new ProxyCollection<>(that)}. */
-	public static <GItem> Collection<GItem> from(final Property<Collection<GItem>> that) throws NullPointerException {
+	public static <GItem> ProxyCollection<GItem> from(final Property<Collection<GItem>> that) throws NullPointerException {
 		return new ProxyCollection<>(that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #from(Property) ProxyCollection.from(Properties.from(that, item))}.
 	 *
 	 * @see Properties#from(Field, Object) */
-	public static <GItem, GEntry> Collection<GEntry> from(final Field<? super GItem, Collection<GEntry>> that, final GItem item) throws NullPointerException {
+	public static <GItem, GEntry> ProxyCollection<GEntry> from(final Field<? super GItem, Collection<GEntry>> that, final GItem item) throws NullPointerException {
 		return ProxyCollection.from(Properties.from(that, item));
 	}
 
