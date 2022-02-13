@@ -12,9 +12,9 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
+import bee.creative.util.HashMap2;
 import bee.creative.util.HashSet;
 import bee.creative.util.Iterables;
-import bee.creative.util.Unique;
 
 @SuppressWarnings ("javadoc")
 public class QSVM {
@@ -243,9 +243,9 @@ public class QSVM {
 		final H2QNUniqueList result = new H2QNUniqueList();
 		final QESet edges = this.qs.edges().havingContext(mergedContext).havingPredicate(predicate);
 		for (final QN subject: subjectSet) {
-			result.get(edges.havingSubject(subject).objects().toList()).add(subject);
+			result.install(edges.havingSubject(subject).objects().toList()).add(subject);
 		}
-		return result.mapping();
+		return result;
 	}
 
 	void setObjectsFromSubjects(final QN predicate, final QNSet subjectSet, final QNSet objectSet) {
@@ -304,10 +304,10 @@ public class QSVM {
 
 }
 
-class H2QNUniqueList extends Unique<List<QN>, List<QN>> {
+class H2QNUniqueList extends HashMap2<List<QN>, List<QN>> {
 
 	@Override
-	protected List<QN> customTarget(final List<QN> source) {
+	protected List<QN> customInstallValue(List<QN> key) {
 		return new ArrayList<>();
 	}
 

@@ -227,7 +227,7 @@ public class Getters {
 
 		public final Hasher hasher;
 
-		public final Unique<GItem, ?> buffer;
+		public final HashMap<GItem, ?> buffer;
 
 		private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
@@ -237,23 +237,23 @@ public class Getters {
 			this.mode = mode;
 			this.hasher = Objects.notNull(hasher);
 			if (mode == References.HARD) {
-				this.buffer = Unique.fromHashMap(hasher, that);
+				this.buffer = HashMap.from(hasher, that);
 			} else if (mode == References.SOFT) {
-				this.buffer = Unique.fromHashMap(hasher, new SoftGen<>(that));
+				this.buffer = HashMap.from(hasher, new SoftGen<>(that));
 			} else if (mode == References.WEAK) {
-				this.buffer = Unique.fromHashMap(hasher, new WeakGen<>(that));
+				this.buffer = HashMap.from(hasher, new WeakGen<>(that));
 			} else throw new IllegalArgumentException();
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
 		public GValue get(final GItem item) {
-			if (this.mode == References.HARD) return (GValue)this.buffer.get(item);
-			final GValue res = (GValue)((Ref)this.buffer.get(item)).get();
+			if (this.mode == References.HARD) return (GValue)this.buffer.install(item);
+			final GValue res = (GValue)((Ref)this.buffer.install(item)).get();
 			while (true) {
 				final Ref ref = (Ref)this.queue.poll();
-				if (ref == null) return res != null ? res : (GValue)((Ref)this.buffer.get(item)).get();
-				this.buffer.mapping().remove(ref.item());
+				if (ref == null) return res != null ? res : (GValue)((Ref)this.buffer.install(item)).get(); // TODO kann null liefern!
+				this.buffer.remove(ref.item());
 			}
 		}
 

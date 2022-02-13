@@ -6,14 +6,18 @@ import java.util.Map;
 import java.util.TreeMap;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten. Dazu werden
+/** Die Funktionalität dieser Klasse ist jetzt Bestandteil von {@link AbstractHashData} und ihrer Nachfahren.
+ * <p>
+ * Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgabeobjekte zu gegebenen Eingabeobjekten. Dazu werden
  * gegebene Eingabeobjekte {@link #customSource(Object) optimiert} und mit den daraus {@link #customTarget(Object) berechneten} Ausgabeobjekten über in einer
  * {@link Map Abbildung} verwaltet. Wenn über {@link #get(Object)} das mit einem gegebenen Eingabeobjekten assoziierte Ausgabeobjekt ermittelt werden soll und
  * dieses zuvor bereits {@link #customTarget(Object) erzeugt} wurde, wird dessen Wiederverwendung über {@link #customReuse(Object, Object)} signalisiert.
  *
+ * @deprecated {@link AbstractHashSet#install(Object)}, {@link AbstractHashMap#install(Object)}
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GSource> Typ der Eingabe.
  * @param <GTarget> Typ der Ausgabe. */
+@Deprecated
 public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget>, Hasher, Comparator<GSource>, Iterable<GTarget> {
 
 	/** Diese Klasse implementiert {@link Unique#fromTreeMap(Comparator, Getter, Setter)} */

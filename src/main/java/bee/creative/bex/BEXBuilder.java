@@ -26,7 +26,7 @@ import bee.creative.iam.IAMListing;
 import bee.creative.iam.IAMListingBuilder;
 import bee.creative.lang.Objects;
 import bee.creative.util.Comparators;
-import bee.creative.util.Unique;
+import bee.creative.util.HashMap;
 
 /** Diese Klasse implementiert die Algorithmen zur Kodierung der {@code Binary Encoded XML} Datenstrukturen.
  *
@@ -173,12 +173,14 @@ public class BEXBuilder {
 
 	}
 
-	/** Diese Klasse implementiert einen abstrakten {@link Unique} zur Verwaltung einzigartiger Datensätze.
+	/** Diese Klasse implementiert einen abstrakten {@link HashMap} zur Verwaltung einzigartiger Datensätze.
 	 *
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ der Eingabedaten.
 	 * @param <GItem> Typ der Datensätze. */
-	static abstract class BEXPool<GData, GItem extends BEXItem> extends Unique<GData, GItem> {
+	static abstract class BEXPool<GData, GItem extends BEXItem> extends HashMap<GData, GItem> {
+
+		private static final long serialVersionUID = 4281145819764444974L;
 
 		/** Dieses Feld speichert die Liste aller einzigartigen Datensätze. */
 		public final List<GItem> items = new ArrayList<>();
@@ -187,20 +189,23 @@ public class BEXBuilder {
 		 *
 		 * @param item Datensatz.
 		 * @return {@code this}. */
-		public GItem put(final GItem item) {
+		public GItem addItem(final GItem item) {
 			this.items.add(item);
 			return item;
 		}
 
-		/** Diese Methode leert den Pool. */
-		public void clear() {
-			this.mapping.clear();
-			this.items.clear();
+		public GItem getItem(final GData source) throws RuntimeException {
+			return this.install(source);
 		}
 
 		@Override
-		protected void customReuse(final GData input, final GItem output) {
-			output.key--;
+		protected void customReuseEntry(final int entryIndex) {
+			this.customGetValue(entryIndex).key--;
+		}
+
+		@Override
+		public void clear() {
+			this.items.clear();
 		}
 
 		@Override
@@ -215,20 +220,22 @@ public class BEXBuilder {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static class BEXTextPool extends BEXPool<String, BEXTextItem> {
 
+		private static final long serialVersionUID = 2008762461427364602L;
+
 		@Override
-		protected BEXTextItem customTarget(final String input) {
-			return this.put(new BEXTextItem(input));
+		protected BEXTextItem customInstallValue(final String key) {
+			return this.addItem(new BEXTextItem(key));
 		}
 
 		@Override
-		public BEXTextItem get(final String input) throws NullPointerException {
-			return super.get(input != null ? input : "");
+		public BEXTextItem getItem(final String input) throws NullPointerException {
+			return super.getItem(input != null ? input : "");
 		}
 
 		@Override
 		public void clear() {
 			super.clear();
-			this.get(null);
+			this.getItem(null);
 		}
 
 	}
@@ -238,23 +245,25 @@ public class BEXBuilder {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static class BEXGroupPool extends BEXPool<List<BEXItem>, BEXGroupItem> {
 
+		private static final long serialVersionUID = 2119371369741103587L;
+
 		/** Dieses Feld speichert die Anzahl der Zeilen der Tabelle, die durch die Datensätze in {@link #items} beschrieben wird. */
 		public int length;
 
 		@Override
-		protected BEXGroupItem customTarget(final List<BEXItem> input) {
-			return this.put(new BEXGroupItem(input));
+		protected BEXGroupItem customInstallValue(final List<BEXItem> key) {
+			return this.addItem(new BEXGroupItem(key));
 		}
 
 		@Override
-		public BEXGroupItem get(final List<BEXItem> input) throws NullPointerException {
-			return super.get(input != null ? input : Collections.<BEXItem>emptyList());
+		public BEXGroupItem getItem(final List<BEXItem> input) throws NullPointerException {
+			return super.getItem(input != null ? input : Collections.<BEXItem>emptyList());
 		}
 
 		@Override
 		public void clear() {
 			super.clear();
-			this.get(null);
+			this.getItem(null);
 		}
 
 	}
@@ -366,9 +375,9 @@ public class BEXBuilder {
 			final BEXStack stack = this.stack;
 			if ((stack.type != BEXStack.ATTR) || (stack.name == null)) throw new IllegalStateException();
 			final BEXStack parent = stack.parent;
-			final BEXItem uri = this.attrUriText.get(this.attrUriEnabled ? stack.uri : null);
-			final BEXItem name = this.attrNameText.get(stack.name);
-			final BEXItem value = this.attrValueText.get(stack.value);
+			final BEXItem uri = this.attrUriText.getItem(this.attrUriEnabled ? stack.uri : null);
+			final BEXItem name = this.attrNameText.getItem(stack.name);
+			final BEXItem value = this.attrValueText.getItem(stack.value);
 			parent.attributes.put(uri).put(name).put(value).put(null).put(this.attrParentEnabled ? parent.item : null);
 			this.stack = parent;
 			return this;
@@ -431,13 +440,14 @@ public class BEXBuilder {
 			final BEXStack parent = stack.parent;
 			final List<BEXItem> chldItems = stack.children.items;
 			final List<BEXItem> attrItems = stack.attributes.items;
-			final BEXItem uri = this.chldUriText.get(this.chldUriEnabled ? stack.uri : null);
-			final BEXItem name = this.chldNameText.get(stack.name);
+			final BEXItem uri = this.chldUriText.getItem(this.chldUriEnabled ? stack.uri : null);
+			final BEXItem name = this.chldNameText.getItem(stack.name);
 			final BEXItem content = ((chldItems.size() == 5) && (chldItems.get(1) == null)) ? //
 				chldItems.get(2) : //
-				(stack.children = this.chldParentEnabled && !chldItems.isEmpty() ? this.chldTablePart.put(stack.children) : this.chldTablePart.get(chldItems));
+				(stack.children = this.chldParentEnabled && !chldItems.isEmpty() ? this.chldTablePart.addItem(stack.children) : this.chldTablePart.getItem(chldItems));
 			final BEXItem attributes = //
-				(stack.attributes = this.attrParentEnabled && !attrItems.isEmpty() ? this.attrTablePart.put(stack.attributes) : this.attrTablePart.get(attrItems));
+				(stack.attributes =
+					this.attrParentEnabled && !attrItems.isEmpty() ? this.attrTablePart.addItem(stack.attributes) : this.attrTablePart.getItem(attrItems));
 			if (parent == null) return this;
 			this.stack = parent;
 			parent.children.put(uri).put(name).put(content).put(attributes).put(this.chldParentEnabled ? parent.item : null);
@@ -475,7 +485,7 @@ public class BEXBuilder {
 		void putTextImpl(final BEXStack parent) {
 			final StringBuilder text = this.text;
 			if (text.length() == 0) return;
-			final BEXItem value = this.chldValueText.get(text.toString());
+			final BEXItem value = this.chldValueText.getItem(text.toString());
 			text.setLength(0);
 			parent.children.put(null).put(null).put(value).put(null).put(this.chldParentEnabled ? parent.item : null);
 		}

@@ -10,7 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseValueBuilder;
-import bee.creative.util.Unique;
+import bee.creative.util.HashMap;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #compile(String) Kompilieren} sowie {@link #evaluate(QName) Auswerten} von {@link XPathExpression}.
  *
@@ -43,15 +43,16 @@ public class XMLEvaluator extends BaseValueBuilder<XPathExpression, XMLEvaluator
 
 	/** Diese Klasse implementiert den Puffer für die erzeugten {@link XPathExpression}.
 	 *
-	 * @see XMLEvaluator#compile(String)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public class CacheData extends Unique<String, XPathExpression> {
+	 * @see XMLEvaluator#compile(String) */
+	public class CacheData extends HashMap<String, XPathExpression> {
+
+		private static final long serialVersionUID = 7710688828217889L;
 
 		@Override
-		protected XPathExpression customTarget(final String input) {
+		protected XPathExpression customInstallValue(final String key) {
 			try {
 				final XPath xpath = XMLEvaluator.this.xpath.putValue();
-				return xpath.compile(input);
+				return xpath.compile(key);
 			} catch (XPathExpressionException | XPathFactoryConfigurationException cause) {
 				throw new IllegalStateException(cause);
 			}
@@ -126,7 +127,7 @@ public class XMLEvaluator extends BaseValueBuilder<XPathExpression, XMLEvaluator
 	 *
 	 * @return {@code this}. */
 	public XMLEvaluator resetCache() {
-		this.cache.mapping().clear();
+		this.cache.clear();
 		return this;
 	}
 
@@ -140,7 +141,7 @@ public class XMLEvaluator extends BaseValueBuilder<XPathExpression, XMLEvaluator
 	public XPathExpression compile(final String expression) throws XPathExpressionException, XPathFactoryConfigurationException {
 		if (expression == null) return null;
 		try {
-			final XPathExpression result = this.cache.get(expression);
+			final XPathExpression result = this.cache.install(expression);
 			return result;
 		} catch (final RuntimeException exception) {
 			final Throwable cause = exception.getCause();
