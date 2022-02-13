@@ -119,6 +119,7 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseScriptToken(FEMParser) Funktionsliste}. */
 	public static int TYPE_SCRIPT = '*';
 
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseErrorToken(FEMParser) Quelltextfehlers}. */
 	public static int TYPE_ERROR = '!';
 
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseIdentToken(FEMParser) maskierten Kennung}. */
@@ -136,6 +137,7 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseArrayToken(FEMParser) Wertliste}. */
 	public static int TYPE_ARRAY = '[';
 
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseGroupToken(FEMParser, boolean) Funktionsliste}. */
 	public static int TYPE_GROUP = '(';
 
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseParamToken(FEMParser) Parameterfunktion}. */
@@ -150,7 +152,7 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseHandler1Token(FEMParser) Funktionszeigers}. */
 	public static int TYPE_HANDLER1 = '{';
 
-	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseHandler1Token(FEMParser) Funktionszeigers als Platzhalter}. */
+	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseHandler2Token(FEMParser, Token) Funktionszeigers als Platzhalter}. */
 	public static int TYPE_HANDLER2 = '=';
 
 	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseCommentToken(FEMParser) Kommentars}. */
@@ -289,7 +291,8 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den verbleibenden {@link Token Abschnitt} der Eingabe als Fehler und gibt ihn zurück. Als
 	 * Abschnittstyp wird {@link #TYPE_ERROR} verwendet. */
 	protected Token parseErrorToken(final FEMParser src) throws NullPointerException {
-		final int pos = src.index(), len = src.length();
+		// TODO Token ab aktueller position bis zum nächsten terminal/ende als fehler markieren
+		final int pos = src.index(), len = src.length(); // len bzw next terminal
 		final Token res = src.make(FEMDomain.TYPE_ERROR, pos, len - pos);
 		src.seek(len);
 		return src.push(res);
@@ -481,6 +484,8 @@ public class FEMDomain extends BaseObject {
 		return FEMHandler.from(fun);
 	}
 
+	/** Diese Methode überführt den von {@link #parseHandler2Token(FEMParser, Token)} ermittelten Abschnitt in einen Funktionszeiger und gibt diese zurück. Für
+	 * andere Abschnitte liefert sie {@code null}. */
 	protected FEMHandler parseHandler2Data(FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
 		if (tok.type() != FEMDomain.TYPE_HANDLER2) return null;
@@ -718,6 +723,8 @@ public class FEMDomain extends BaseObject {
 		return Objects.notNull(this.parseCompositeToken(src, res), res);
 	}
 
+	/** Diese Methode überführt den von {@link #parseCompositeToken(FEMParser, Token)} ermittelten Abschnitt in eine Funtionsverkettung und gibt diese zurück. Für
+	 * andere Abschnitte liefert sie {@code null}. */
 	protected FEMFunction parseCompositeData(FEMToken src) throws NullPointerException, FEMException {
 		Token tok = src.token();
 		if (tok.type() != FEMDomain.TYPE_COMPOSITE) return null;
@@ -796,9 +803,9 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette analog zu
 	 * {@link Strings#parseSequence(CharSequence, char, char, char)} und gibt diesen nur dann zurück, wenn er am {@code openSymbol} erkannt wurde. Andernfalls
 	 * liefert sie {@code null}. Als Abschnittstyp wird {@code type} eingesetzt, wenn die Sequenz nicht vorzeitig endet. Andernfalls wird die Zeichenkette als
-	 * {@link #parseErrorToken(FEMParser) Fehlerbereich} mit dem Abschnittstyp {@link #TYPE_ERROR} erfasst.
+	 * {@link #parseErrorToken(FEMParser) Fehlerbereich} erfasst.
 	 *
-	 * @param type TODO
+	 * @param type Abschnittstyp.
 	 * @param openSym Erstes Symbol der Zeichenkette.
 	 * @param maskSym Symbol zur Maskierung von {@code maskSymbol} und {@code closeSymbol}.
 	 * @param closeSym Letztes Symbol der Zeichenkette. */
@@ -809,10 +816,17 @@ public class FEMDomain extends BaseObject {
 		final int pos = src.index();
 		while (true) {
 			sym = src.skip();
-			if (sym < 0) return src.push(FEMDomain.TYPE_ERROR, pos);
+			if (sym < 0) {
+				src.seek(pos);
+				return this.parseErrorToken(src);
+			}
 			if (sym == maskSym) {
 				sym = src.skip();
-				if (sym < 0) return maskSym == closeSym ? src.push(type, pos) : src.push(FEMDomain.TYPE_ERROR, pos);
+				if (sym < 0) {
+					if (maskSym == closeSym) return src.push(type, pos);
+					src.seek(pos);
+					return this.parseErrorToken(src);
+				}
 				continue;
 			}
 			if (sym == closeSym) {
