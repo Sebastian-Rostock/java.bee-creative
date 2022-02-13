@@ -75,7 +75,7 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final Integer key, final int keyHash) {
+	protected void customSetKey(final int entryIndex, final Integer key) {
 		this.keys[entryIndex] = key;
 	}
 
@@ -89,28 +89,8 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	protected int customHash(final Object key) {
-		return Objects.hash(key);
-	}
-
-	@Override
-	protected int customHashKey(final int entryIndex) {
-		return this.keys[entryIndex];
-	}
-
-	@Override
-	protected int customHashValue(final int entryIndex) {
-		return Objects.hash(this.values[entryIndex]);
-	}
-
-	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
 		return (key instanceof Integer) && (((Integer)key).intValue() == this.keys[entryIndex]);
-	}
-
-	@Override
-	protected boolean customEqualsValue(final int entryIndex, final Object value) {
-		return Objects.equals(this.values[entryIndex], value);
 	}
 
 	@Override

@@ -19,52 +19,62 @@ import bee.creative.lang.Objects;
  * @param <GValue> Typ der Werte. */
 public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> implements Serializable, Cloneable {
 
-	/** Diese Klasse implementiert {@link HashMap#from(Hasher)} */
-	@SuppressWarnings ("javadoc")
-	public static final class HasherHashMap<GKey, GValue> extends HashMap<GKey, GValue> {
-
-		private static final long serialVersionUID = -4549473363883050977L;
-
-		public final Hasher hasher;
-
-		public HasherHashMap(final Hasher hasher) {
-			this.hasher = Objects.notNull(hasher);
-		}
-
-		@Override
-		protected int customHash(final Object key) {
-			return this.hasher.hash(key);
-		}
-
-		@Override
-		protected int customHashKey(final int entryIndex) {
-			return this.hasher.hash(this.keys[entryIndex]);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object key) {
-			return this.hasher.equals(this.keys[entryIndex], key);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-			return this.hasher.equals(this.keys[entryIndex], key);
-		}
-
-	}
-
-	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -8792297171308603896L;
 
-	/** Diese Methode gibt eine neue {@link HashMap} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
-	 *
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 * @param hasher Methoden zum Abgleich der Schlüssel.
-	 * @return An {@link Hasher} gebundene {@link HashMap}.
-	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), Getters.empty(), null)}. */
 	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher) throws NullPointerException {
-		return new HasherHashMap<>(hasher);
+		return HashMap.from(hasher, Getters.<GKey>neutral(), Getters.<GKey, GValue>empty(), null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), installValue, null)}. */
+	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher, final Getter<? super GKey, ? extends GValue> installValue)
+		throws NullPointerException {
+		return HashMap.from(hasher, Getters.<GKey>neutral(), installValue, null);
+	}
+
+	/** Diese Methode liefert eine neue {@link HashMap}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an
+	 * die gegebenen Methoden delegiert.
+	 *
+	 * @param hasher Methoden zur Berechnung von {@link #customHash(Object) Streuwert} und {@link #customEqualsKey(int, Object) Äquivalenz} der Schlüssel.
+	 * @param installKey Methode zur {@link #customInstallKey(Object) Installation} des Schlüssels.
+	 * @param installValue Methode zur {@link #customInstallValue(Object) Installation} des Werts.
+	 * @param reuseEntry Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Eintrags oder {@code null}. */
+	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher, final Getter<? super GKey, ? extends GKey> installKey,
+		final Getter<? super GKey, ? extends GValue> installValue, final Setter<? super GKey, ? super GValue> reuseEntry) throws NullPointerException {
+		Objects.notNull(hasher);
+		Objects.notNull(installKey);
+		Objects.notNull(installValue);
+		return new HashMap<GKey, GValue>() {
+
+			private static final long serialVersionUID = 3593309667398085167L;
+
+			@Override
+			protected int customHash(final Object key) {
+				return hasher.hash(key);
+			}
+
+			@Override
+			protected boolean customEqualsKey(final int entryIndex, final Object key) {
+				return hasher.equals(this.customGetKey(entryIndex), key);
+			}
+
+			@Override
+			protected GKey customInstallKey(final GKey key) {
+				return installKey.get(key);
+			}
+
+			@Override
+			protected GValue customInstallValue(final GKey key) {
+				return installValue.get(key);
+			}
+
+			@Override
+			protected void customReuseEntry(final int entryIndex) {
+				if (reuseEntry == null) return;
+				reuseEntry.set(this.customGetKey(entryIndex), this.customGetValue(entryIndex));
+			}
+
+		};
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
@@ -124,7 +134,7 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
+	protected void customSetKey(final int entryIndex, final GKey key) {
 		this.keys[entryIndex] = key;
 	}
 
@@ -135,36 +145,6 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		final Object result = values[entryIndex];
 		values[entryIndex] = value;
 		return (GValue)result;
-	}
-
-	@Override
-	protected int customHash(final Object key) {
-		return Objects.hash(key);
-	}
-
-	@Override
-	protected int customHashKey(final int entryIndex) {
-		return Objects.hash(this.keys[entryIndex]);
-	}
-
-	@Override
-	protected int customHashValue(final int entryIndex) {
-		return Objects.hash(this.values[entryIndex]);
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return Objects.equals(this.keys[entryIndex], key);
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-		return Objects.equals(this.keys[entryIndex], key);
-	}
-
-	@Override
-	protected boolean customEqualsValue(final int entryIndex, final Object value) {
-		return Objects.equals(this.values[entryIndex], value);
 	}
 
 	@Override

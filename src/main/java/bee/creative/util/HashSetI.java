@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 import bee.creative.emu.EMU;
-import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein auf {@link AbstractHashSet} aufbauendes {@link Set} mit {@link Integer} Elementen und geringem {@link AbstractHashData
  * Speicherverbrauch}.
@@ -68,18 +67,8 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final Integer item, final int itemHash) {
+	protected void customSetKey(final int entryIndex, final Integer item) {
 		this.items[entryIndex] = item;
-	}
-
-	@Override
-	protected int customHash(final Object item) {
-		return Objects.hash(item);
-	}
-
-	@Override
-	protected int customHashKey(final int entryIndex) {
-		return this.items[entryIndex];
 	}
 
 	@Override

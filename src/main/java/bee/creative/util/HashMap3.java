@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert eine {@link HashMap} mit geringem {@link AbstractHashData Speicherverbrauch}, deren Schlüssel über Reverenzvergleich und
  * {@link System#identityHashCode(Object)} abgeglichen werden.
@@ -34,22 +35,12 @@ public class HashMap3<GKey, GValue> extends HashMap<GKey, GValue> {
 
 	@Override
 	protected int customHash(final Object key) {
-		return System.identityHashCode(key);
-	}
-
-	@Override
-	protected int customHashKey(final int entryIndex) {
-		return System.identityHashCode(this.keys[entryIndex]);
+		return Objects.identityHash(key);
 	}
 
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return this.keys[entryIndex] == key;
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-		return this.keys[entryIndex] == key;
+		return Objects.identityEquals(this.customGetKey(entryIndex), key);
 	}
 
 }

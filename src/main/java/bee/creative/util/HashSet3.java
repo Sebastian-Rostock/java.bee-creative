@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.Collection;
 import java.util.Set;
+import bee.creative.lang.Objects;
 
 /** Diese Klasse erweitert ein {@link HashSet} mit geringem {@link AbstractHashData Speicherverbrauch}, dessen Elemente über Reverenzvergleich und
  * {@link System#identityHashCode(Object)} abgeglichen werden.
@@ -40,22 +41,12 @@ public class HashSet3<GItem> extends HashSet<GItem> {
 
 	@Override
 	protected int customHash(final Object key) {
-		return System.identityHashCode(key);
-	}
-
-	@Override
-	protected int customHashKey(final int entryIndex) {
-		return System.identityHashCode(this.items[entryIndex]);
+		return Objects.identityHash(key);
 	}
 
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return this.items[entryIndex] == key;
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-		return this.items[entryIndex] == key;
+		return Objects.identityEquals(this.customGetKey(entryIndex), key);
 	}
 
 }

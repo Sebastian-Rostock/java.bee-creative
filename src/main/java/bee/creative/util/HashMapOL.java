@@ -16,39 +16,8 @@ import bee.creative.lang.Objects;
  * @param <GKey> Typ der Schlüssel. */
 public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Serializable, Cloneable {
 
-	/** Diese Klasse implementiert {@link HashMapOL#from(Hasher)} */
-	@SuppressWarnings ("javadoc")
-	public static final class HasherHashMap<GKey> extends HashMapOL<GKey> {
-
-		private static final long serialVersionUID = 5915519385854194907L;
-
-		public final Hasher hasher;
-
-		public HasherHashMap(final Hasher hasher) {
-			this.hasher = Objects.notNull(hasher);
-		}
-
-		@Override
-		protected int customHash(final Object key) {
-			return this.hasher.hash(key);
-		}
-
-		@Override
-		protected int customHashKey(final int entryIndex) {
-			return this.hasher.hash(this.keys[entryIndex]);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object key) {
-			return this.hasher.equals(this.keys[entryIndex], key);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-			return this.hasher.equals(this.keys[entryIndex], key);
-		}
-
-	}
+	/** Dieses Feld speichert das serialVersionUID. */
+	private static final long serialVersionUID = -3537880648284024766L;
 
 	/** Diese Methode gibt eine neue {@link HashMapOL} zurück, welche Streuwert und Äquivalenz der Schlüssel über den gegebenen {@link Hasher} ermittelt.
 	 *
@@ -57,11 +26,23 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	 * @return An {@link Hasher} gebundene {@link HashMapOL}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
 	public static <GKey> HashMapOL<GKey> from(final Hasher hasher) throws NullPointerException {
-		return new HasherHashMap<>(hasher);
-	}
+		Objects.notNull(hasher);
+		return new HashMapOL<GKey>() {
 
-	/** Dieses Feld speichert das serialVersionUID. */
-	private static final long serialVersionUID = -3537880648284024766L;
+			private static final long serialVersionUID = 5915519385854194907L;
+
+			@Override
+			protected int customHash(final Object key) {
+				return hasher.hash(key);
+			}
+
+			@Override
+			protected boolean customEqualsKey(final int entryIndex, final Object key) {
+				return hasher.equals(this.customGetKey(entryIndex), key);
+			}
+
+		};
+	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
 	transient Object[] keys = AbstractHashData.EMPTY_OBJECTS;
@@ -119,7 +100,7 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
+	protected void customSetKey(final int entryIndex, final GKey key) {
 		this.keys[entryIndex] = key;
 	}
 
@@ -129,36 +110,6 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 		final long result = values[entryIndex];
 		values[entryIndex] = value;
 		return result;
-	}
-
-	@Override
-	protected int customHash(final Object key) {
-		return Objects.hash(key);
-	}
-
-	@Override
-	protected int customHashKey(final int entryIndex) {
-		return Objects.hash(this.keys[entryIndex]);
-	}
-
-	@Override
-	protected int customHashValue(final int entryIndex) {
-		return Objects.hash(this.values[entryIndex]);
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return Objects.equals(this.keys[entryIndex], key);
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-		return Objects.equals(this.keys[entryIndex], key);
-	}
-
-	@Override
-	protected boolean customEqualsValue(final int entryIndex, final Object value) {
-		return Objects.equals(this.values[entryIndex], value);
 	}
 
 	@Override

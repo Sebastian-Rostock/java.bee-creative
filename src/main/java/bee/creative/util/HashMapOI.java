@@ -16,40 +16,6 @@ import bee.creative.lang.Objects;
  * @param <GKey> Typ der Schlüssel. */
 public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements Serializable, Cloneable {
 
-	/** Diese Klasse implementiert {@link HashMapOI#from(Hasher)} */
-	@SuppressWarnings ("javadoc")
-	public static final class HasherHashMap<GKey> extends HashMapOI<GKey> {
-
-		private static final long serialVersionUID = 6526317910119486910L;
-
-		public final Hasher hasher;
-
-		public HasherHashMap(final Hasher hasher) {
-			this.hasher = Objects.notNull(hasher);
-		}
-
-		@Override
-		protected int customHash(final Object key) {
-			return this.hasher.hash(key);
-		}
-
-		@Override
-		protected int customHashKey(final int entryIndex) {
-			return this.hasher.hash(this.keys[entryIndex]);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object key) {
-			return this.hasher.equals(this.keys[entryIndex], key);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-			return this.hasher.equals(this.keys[entryIndex], key);
-		}
-
-	}
-
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -467621651047396939L;
 
@@ -60,7 +26,22 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	 * @return An {@link Hasher} gebundene {@link HashMapOI}.
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
 	public static <GKey> HashMapOI<GKey> from(final Hasher hasher) throws NullPointerException {
-		return new HasherHashMap<>(hasher);
+		Objects.notNull(hasher);
+		return new HashMapOI<GKey>() {
+
+			private static final long serialVersionUID = 6526317910119486910L;
+
+			@Override
+			protected int customHash(final Object key) {
+				return hasher.hash(key);
+			}
+
+			@Override
+			protected boolean customEqualsKey(final int entryIndex, final Object key) {
+				return hasher.equals(this.customGetKey(entryIndex), key);
+			}
+
+		};
 	}
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
@@ -119,7 +100,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
+	protected void customSetKey(final int entryIndex, final GKey key) {
 		this.keys[entryIndex] = key;
 	}
 
@@ -129,36 +110,6 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 		final int result = values[entryIndex];
 		values[entryIndex] = value;
 		return result;
-	}
-
-	@Override
-	protected int customHash(final Object key) {
-		return Objects.hash(key);
-	}
-
-	@Override
-	protected int customHashKey(final int entryIndex) {
-		return Objects.hash(this.keys[entryIndex]);
-	}
-
-	@Override
-	protected int customHashValue(final int entryIndex) {
-		return this.values[entryIndex];
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return Objects.equals(this.keys[entryIndex], key);
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object key, final int keyHash) {
-		return Objects.equals(this.keys[entryIndex], key);
-	}
-
-	@Override
-	protected boolean customEqualsValue(final int entryIndex, final Object value) {
-		return Objects.equals(this.values[entryIndex], value);
 	}
 
 	@Override

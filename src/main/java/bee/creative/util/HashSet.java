@@ -18,46 +18,55 @@ import bee.creative.lang.Objects;
  * @param <GItem> Typ der Elemente. */
 public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializable, Cloneable {
 
-	/** Diese Klasse implementiert {@link HashSet#from(Hasher)} */
-	@SuppressWarnings ("javadoc")
-	public static class HasherHashSet<GItem> extends HashSet<GItem> {
-
-		public static final long serialVersionUID = -1097708178888446196L;
-
-		public final Hasher hasher;
-
-		public HasherHashSet(final Hasher hasher) throws NullPointerException {
-			this.hasher = Objects.notNull(hasher);
-		}
-
-		@Override
-		protected int customHash(final Object item) {
-			return this.hasher.hash(item);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object item) {
-			return this.hasher.equals(this.items[entryIndex], item);
-		}
-
-		@Override
-		protected boolean customEqualsKey(final int entryIndex, final Object item, final int itemHash) {
-			return this.hasher.equals(this.items[entryIndex], item);
-		}
-
-	}
-
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = 1947961515821394540L;
 
-	/** Diese Methode gibt ein neues {@link HashSet} zurück, welche Streuwert und Äquivalenz der Elemente über den gegebenen {@link Hasher} ermittelt.
-	 *
-	 * @param <GItem> Typ der Elemente.
-	 * @param hasher Methoden zum Abgleich der Elemente.
-	 * @return An {@link Hasher} gebundenes {@link HashSet}.
-	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet.from(hasher, Getters.neutral(), null)}. */
 	public static <GItem> HashSet<GItem> from(final Hasher hasher) throws NullPointerException {
-		return new HasherHashSet<>(hasher);
+		return HashSet.from(hasher, Getters.<GItem>neutral(), null);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Consumer) HashSet.from(hasher, installItem, null)}. */
+	public static <GItem> HashSet<GItem> from(final Hasher hasher, final Getter<? super GItem, ? extends GItem> installItem) throws NullPointerException {
+		return HashSet.from(hasher, installItem, null);
+	}
+
+	/** Diese Methode liefert ein neues {@link HashSet}, welches Streuwert, Äquivalenz, Installation und Wiederverwendung von Elementen an die gegebenen Methoden
+	 * delegiert.
+	 *
+	 * @param hasher Methoden zur Berechnung von {@link #customHash(Object) Streuwert} und {@link #customEqualsKey(int, Object) Äquivalenz} der Elemente.
+	 * @param installItem Methode zur {@link #customInstallKey(Object) Installation} des Elements.
+	 * @param reuseItem Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Elements oder {@code null}. */
+	public static <GItem> HashSet<GItem> from(final Hasher hasher, final Getter<? super GItem, ? extends GItem> installItem,
+		final Consumer<? super GItem> reuseItem) throws NullPointerException {
+		Objects.notNull(hasher);
+		Objects.notNull(installItem);
+		return new HashSet<GItem>() {
+
+			private static final long serialVersionUID = -1363112074783475978L;
+
+			@Override
+			protected int customHash(final Object item) {
+				return hasher.hash(item);
+			}
+
+			@Override
+			protected boolean customEqualsKey(final int entryIndex, final Object item) {
+				return hasher.equals(this.customGetKey(entryIndex), item);
+			}
+
+			@Override
+			protected GItem customInstallKey(final GItem key) {
+				return installItem.get(key);
+			}
+
+			@Override
+			protected void customReuseEntry(final int entryIndex) {
+				if (reuseItem == null) return;
+				reuseItem.set(this.customGetKey(entryIndex));
+			}
+
+		};
 	}
 
 	/** Dieses Feld bildet vom Index eines Elements auf dessen Wert ab. Für alle anderen Indizes bildet es auf {@code null} ab. */
@@ -112,28 +121,8 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final GItem item, final int itemHash) {
+	protected void customSetKey(final int entryIndex, final GItem item) {
 		this.items[entryIndex] = item;
-	}
-
-	@Override
-	protected int customHash(final Object item) {
-		return Objects.hash(item);
-	}
-
-	@Override
-	protected int customHashKey(final int entryIndex) {
-		return Objects.hash(this.items[entryIndex]);
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object item) {
-		return Objects.equals(this.items[entryIndex], item);
-	}
-
-	@Override
-	protected boolean customEqualsKey(final int entryIndex, final Object item, final int keyHash) {
-		return Objects.equals(this.items[entryIndex], item);
 	}
 
 	@Override
