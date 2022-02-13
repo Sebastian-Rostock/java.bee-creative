@@ -7,7 +7,6 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseValueBuilder;
-import bee.creative.xml.SourceBuilder.Value;
 
 /** Diese Klasse implementiert den Konfigurator für die {@link Templates} zur Erzeugung eines {@link Transformer}.
  *
@@ -26,22 +25,22 @@ public abstract class TemplatesBuilder<GOwner> extends BaseValueBuilder<Template
 
 		@Override
 		public Templates get() {
-			return value;
+			return this.value;
 		}
 
 		@Override
-		public void set(Templates value) {
+		public void set(final Templates value) {
 			this.value = value;
 		}
 
 		@Override
 		public ScriptValue script() {
-			return script;
+			return this.script;
 		}
 
 		@Override
 		public FactoryValue factory() {
-			return factory;
+			return this.factory;
 		}
 
 	}
@@ -52,22 +51,22 @@ public abstract class TemplatesBuilder<GOwner> extends BaseValueBuilder<Template
 
 		@Override
 		public Templates get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
-		public void set(Templates value) {
+		public void set(final Templates value) {
 			this.value().set(value);
 		}
 
 		@Override
 		public ScriptValue script() {
-			return value().script();
+			return this.value().script();
 		}
 
 		@Override
 		public FactoryValue factory() {
-			return value().factory();
+			return this.value().factory();
 		}
 
 	}
@@ -88,7 +87,7 @@ public abstract class TemplatesBuilder<GOwner> extends BaseValueBuilder<Template
 
 		@Override
 		protected ScriptValue value() {
-			return script();
+			return TemplatesBuilder.this.script();
 		}
 
 		@Override

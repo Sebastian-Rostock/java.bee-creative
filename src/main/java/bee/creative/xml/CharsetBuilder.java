@@ -35,12 +35,12 @@ public abstract class CharsetBuilder<GOwner> extends BaseValueBuilder<Charset, G
 
 		@Override
 		public Charset get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
 		public void set(final Charset value) {
-			value().set(value);
+			this.value().set(value);
 		}
 
 	}

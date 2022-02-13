@@ -324,7 +324,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	@SuppressWarnings ("javadoc")
 	public static class ConcatBinary2 extends ConcatBinary {
 
-		ConcatBinary2(FEMBinary binary1, FEMBinary binary2) throws IllegalArgumentException {
+		ConcatBinary2(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
 			super(binary1, binary2);
 		}
 

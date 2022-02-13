@@ -13,7 +13,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseValueBuilder;
-import bee.creative.xml.XMLMarshaller.SourceData2;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #marshal() Ausgeben} eines Objekts mit Hilfe eines {@link Marshaller}.
  *
@@ -33,7 +32,7 @@ public class XMLMarshaller {
 
 		@Override
 		protected ResultValue value() {
-			return result();
+			return XMLMarshaller.this.result();
 		}
 
 		@Override
@@ -52,11 +51,11 @@ public class XMLMarshaller {
 
 		@Override
 		public Object get() {
-			return value;
+			return this.value;
 		}
 
 		@Override
-		public void set(Object value) {
+		public void set(final Object value) {
 			this.value = value;
 		}
 
@@ -73,12 +72,12 @@ public class XMLMarshaller {
 
 		@Override
 		public Object get() {
-			return sourceData.get();
+			return this.sourceData.get();
 		}
 
 		@Override
-		public void set(Object value) {
-			sourceData.set(value);
+		public void set(final Object value) {
+			this.sourceData.set(value);
 		}
 
 		@Override
@@ -101,7 +100,7 @@ public class XMLMarshaller {
 
 		@Override
 		protected MarshallerValue value() {
-			return marshaller();
+			return XMLMarshaller.this.marshaller();
 		}
 
 		@Override
@@ -197,11 +196,11 @@ public class XMLMarshaller {
 	}
 
 	public ResultValue result() {
-		return result;
+		return this.result;
 	}
 
 	public SourceData source() {
-		return sourceData.sourceData;
+		return this.sourceData.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabedaten und gibt ihn zurück.
@@ -217,20 +216,20 @@ public class XMLMarshaller {
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return Konfigurator. */
 	public SourceData2 forSource() {
-		return sourceData;
+		return this.sourceData;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Marshaller} und gibt ihn zurück.
 	 *
 	 * @return Konfigurator. */
 	public MarshallerValue marshaller() {
-		return marshaller;
+		return this.marshaller;
 	}
 
 	public MarshallerProxy forMarshaller() {
 		return new MarshallerProxy();
 	}
-	
+
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.source(), this.result(), this.marshaller());

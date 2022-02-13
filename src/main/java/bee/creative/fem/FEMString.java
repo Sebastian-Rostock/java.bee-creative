@@ -455,7 +455,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@SuppressWarnings ("javadoc")
 	public static class ConcatString2 extends ConcatString {
 
-		ConcatString2(FEMString string1, FEMString string2) throws IllegalArgumentException {
+		ConcatString2(final FEMString string1, final FEMString string2) throws IllegalArgumentException {
 			super(string1, string2);
 		}
 

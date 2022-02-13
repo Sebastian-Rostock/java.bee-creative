@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.util.Builders.BaseSetBuilder;
@@ -55,22 +54,22 @@ public abstract class ContextBuilder<GOwner> extends BaseValueBuilder<JAXBContex
 
 		@Override
 		public JAXBContext get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
 		public void set(final JAXBContext value) {
-			value().set(value);
+			this.value().set(value);
 		}
 
 		@Override
 		public ClassesValue classes() {
-			return value().classes();
+			return this.value().classes();
 		}
 
 		@Override
 		public PropertiesValue properties() {
-			return value().properties();
+			return this.value().properties();
 		}
 
 	}
@@ -151,9 +150,6 @@ public abstract class ContextBuilder<GOwner> extends BaseValueBuilder<JAXBContex
 
 	}
 
-	
- 
-	
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
 	 * @param that Konfigurator oder {@code null}.

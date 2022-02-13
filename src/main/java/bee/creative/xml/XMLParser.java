@@ -30,7 +30,7 @@ public class XMLParser {
 
 		@Override
 		protected SourceValue value() {
-			return source();
+			return XMLParser.this.source();
 		}
 
 		@Override

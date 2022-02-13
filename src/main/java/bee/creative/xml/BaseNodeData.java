@@ -49,8 +49,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		}
 
 		@Override
-		public
-		final AttrData<GOwner> owner() {
+		public final AttrData<GOwner> owner() {
 			return this;
 		}
 
@@ -118,8 +117,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		}
 
 		@Override
-		public
-		final ChldData<GOwner> owner() {
+		public final ChldData<GOwner> owner() {
 			return this;
 		}
 
@@ -590,8 +588,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	@Override
-	public
-	abstract GThis owner();
+	public abstract GThis owner();
 
 	/** {@inheritDoc}
 	 *

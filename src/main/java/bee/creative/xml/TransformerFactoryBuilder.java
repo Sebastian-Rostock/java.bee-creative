@@ -37,32 +37,32 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 
 		@Override
 		public TransformerFactory get() {
-			return value;
+			return this.value;
 		}
 
 		@Override
-		public void set(TransformerFactory value) {
+		public void set(final TransformerFactory value) {
 			this.value = value;
 		}
 
 		@Override
 		public FeaturesValue features() {
-			return features;
+			return this.features;
 		}
 
 		@Override
 		public AttributesValue attributes() {
-			return attributes;
+			return this.attributes;
 		}
 
 		@Override
 		public ListenerValue listener() {
-			return listener;
+			return this.listener;
 		}
 
 		@Override
 		public ResolverValue resolver() {
-			return resolver;
+			return this.resolver;
 		}
 
 	}
@@ -73,32 +73,32 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 
 		@Override
 		public TransformerFactory get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
-		public void set(TransformerFactory value) {
-			value().set(value);
+		public void set(final TransformerFactory value) {
+			this.value().set(value);
 		}
 
 		@Override
 		public FeaturesValue features() {
-			return value().features();
+			return this.value().features();
 		}
 
 		@Override
 		public AttributesValue attributes() {
-			return value().attributes();
+			return this.value().attributes();
 		}
 
 		@Override
 		public ListenerValue listener() {
-			return value().listener();
+			return this.value().listener();
 		}
 
 		@Override
 		public ResolverValue resolver() {
-			return value().resolver();
+			return this.value().resolver();
 		}
 
 	}
@@ -119,7 +119,7 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 
 		@Override
 		protected FeaturesValue value() {
-			return features();
+			return TransformerFactoryBuilder.this.features();
 		}
 
 		@Override
@@ -178,7 +178,7 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 		}
 
 		@Override
-		public void set(ErrorListener value) {
+		public void set(final ErrorListener value) {
 			this.value = value;
 		}
 
@@ -193,12 +193,12 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 
 		@Override
 		public ErrorListener get() {
-			return listener().get();
+			return TransformerFactoryBuilder.this.listener().get();
 		}
 
 		@Override
-		public void set(ErrorListener value) {
-			listener().set(value);
+		public void set(final ErrorListener value) {
+			TransformerFactoryBuilder.this.listener().set(value);
 		}
 
 		@Override
@@ -227,7 +227,7 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 		}
 
 		@Override
-		public void set(URIResolver value) {
+		public void set(final URIResolver value) {
 			this.value = value;
 		}
 
@@ -242,12 +242,12 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 
 		@Override
 		public URIResolver get() {
-			return resolver().get();
+			return TransformerFactoryBuilder.this.resolver().get();
 		}
 
 		@Override
-		public void set(URIResolver value) {
-			resolver().set(value);
+		public void set(final URIResolver value) {
+			TransformerFactoryBuilder.this.resolver().set(value);
 		}
 
 		@Override
@@ -269,7 +269,7 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 	 *
 	 * @param that Konfigurator oder {@code null}.
 	 * @return {@code this}. */
-	public GOwner use(TransformerFactoryBuilder<?> that) {
+	public GOwner use(final TransformerFactoryBuilder<?> that) {
 		if (that == null) return this.owner();
 		this.useValue(that.getValue());
 		this.forFeatures().use(that.features());
@@ -301,17 +301,17 @@ public abstract class TransformerFactoryBuilder<GOwner> extends BaseValueBuilder
 	 * @return {@code this}.
 	 * @throws TransformerConfigurationException Wenn {@link TransformerFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst. */
 	public GOwner updateValue() throws TransformerConfigurationException {
-		TransformerFactory factory = this.putValue();
-		for (URIResolver value: this.resolver()) {
+		final TransformerFactory factory = this.putValue();
+		for (final URIResolver value: this.resolver()) {
 			factory.setURIResolver(value);
 		}
-		for (ErrorListener value: this.listener()) {
+		for (final ErrorListener value: this.listener()) {
 			factory.setErrorListener(value);
 		}
-		for (Entry<String, Boolean> entry: this.features()) {
+		for (final Entry<String, Boolean> entry: this.features()) {
 			factory.setFeature(entry.getKey(), entry.getValue().booleanValue());
 		}
-		for (Entry<String, String> entry: this.attributes()) {
+		for (final Entry<String, String> entry: this.attributes()) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
 		return this.owner();

@@ -220,7 +220,7 @@ public abstract class Observables<GMessage, GObserver> {
 
 		@Override
 		protected void customSetKey(final int entryIndex, final Object item, final int itemHash) {
-			super.customSetKey(entryIndex, item instanceof WeakSender ? item : new WeakSender(item, this), itemHash);
+			this.customSetKey(entryIndex, item instanceof WeakSender ? item : new WeakSender(item, this));
 		}
 
 		@Override

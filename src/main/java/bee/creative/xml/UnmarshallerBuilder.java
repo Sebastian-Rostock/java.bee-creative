@@ -169,7 +169,7 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 
 		@Override
 		protected SchemaValue value() {
-			return schema();
+			return UnmarshallerBuilder.this.schema();
 		}
 
 		@Override
@@ -266,21 +266,21 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 
 	}
 
-//	public static class PropertiesValue extends PropertiesBuilder<PropertiesValue> {
-//
-//		Map<String, Object> value = new HashMap<>();
-//
-//		@Override
-//		public Map<String, Object> get() {
-//			return this.value;
-//		}
-//
-//		@Override
-//		public PropertiesValue owner() {
-//			return this;
-//		}
-//
-//	}
+	// public static class PropertiesValue extends PropertiesBuilder<PropertiesValue> {
+	//
+	// Map<String, Object> value = new HashMap<>();
+	//
+	// @Override
+	// public Map<String, Object> get() {
+	// return this.value;
+	// }
+	//
+	// @Override
+	// public PropertiesValue owner() {
+	// return this;
+	// }
+	//
+	// }
 
 	public class PropertiesProxy extends PropertiesBuilder<GOwner> {
 
@@ -296,13 +296,13 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 
 	}
 
-//	/** Diese Klasse implementiert den Konfigurator für die Eigenschaften.
-//	 *
-//	 * @see Unmarshaller#setProperty(String, Object)
-//	 * @param <GOwner> Typ des Besitzers. */
-//	public static abstract class PropertiesBuilder<GOwner> extends BaseMapBuilder<String, Object, Map<String, Object>, GOwner> {
-//
-//	}
+	// /** Diese Klasse implementiert den Konfigurator für die Eigenschaften.
+	// *
+	// * @see Unmarshaller#setProperty(String, Object)
+	// * @param <GOwner> Typ des Besitzers. */
+	// public static abstract class PropertiesBuilder<GOwner> extends BaseMapBuilder<String, Object, Map<String, Object>, GOwner> {
+	//
+	// }
 
 	public static class ValidationValue extends ValidationBuilder<ValidationValue> {
 
@@ -351,8 +351,6 @@ public abstract class UnmarshallerBuilder<GOwner> extends BaseValueBuilder<Unmar
 	public static abstract class ValidationBuilder<GOwner> extends BaseValueBuilder<ValidationEventHandler, GOwner> {
 
 	}
-	
- 
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *

@@ -17,7 +17,8 @@ public class ProxyCollection<GItem> extends AbstractProxyCollection<GItem, Colle
 	/** Diese Methode ist eine Abkürzung für {@link #from(Property) ProxyCollection.from(Properties.from(that, item))}.
 	 *
 	 * @see Properties#from(Field, Object) */
-	public static <GItem, GEntry> ProxyCollection<GEntry> from(final Field<? super GItem, Collection<GEntry>> that, final GItem item) throws NullPointerException {
+	public static <GItem, GEntry> ProxyCollection<GEntry> from(final Field<? super GItem, Collection<GEntry>> that, final GItem item)
+		throws NullPointerException {
 		return ProxyCollection.from(Properties.from(that, item));
 	}
 

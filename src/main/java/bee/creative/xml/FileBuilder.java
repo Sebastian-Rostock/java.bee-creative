@@ -32,12 +32,12 @@ public abstract class FileBuilder<GOwner> extends BaseValueBuilder<File, GOwner>
 
 		@Override
 		public File get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
 		public void set(final File value) {
-			value().set(value);
+			this.value().set(value);
 		}
 
 	}

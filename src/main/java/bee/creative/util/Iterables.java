@@ -398,7 +398,7 @@ public class Iterables {
 	 * {@link Collection} {@code true} zurück. */
 	public static boolean removeAll(final Collection<?> target, final Iterable<?> filter) throws NullPointerException {
 		if (filter instanceof Collection<?>) return target.removeAll((Collection<?>)filter);
-		return target.removeAll(toSet(filter));
+		return target.removeAll(Iterables.toSet(filter));
 	}
 
 	/** Diese Methode liefert nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterable} in der gegebenen {@link Collection} enthalten

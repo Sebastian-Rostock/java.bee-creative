@@ -364,7 +364,8 @@ public class ThreadPool {
 	 * @param tasks Berechnungen.
 	 * @throws IllegalArgumentException Wenn {@code threads} kleiner als {@code 1} ist.
 	 * @throws InterruptedException Wenn {@link Object#wait(long)} diese auslöst. */
-	public void runAll(final int threads, Object mutex, final Runnable... tasks) throws NullPointerException, IllegalArgumentException, InterruptedException {
+	public void runAll(final int threads, final Object mutex, final Runnable... tasks)
+		throws NullPointerException, IllegalArgumentException, InterruptedException {
 		this.runAll(threads, mutex, Arrays.asList(tasks));
 	}
 

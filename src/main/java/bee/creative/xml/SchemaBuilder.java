@@ -1,6 +1,5 @@
 package bee.creative.xml;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -86,7 +85,7 @@ public abstract class SchemaBuilder<GOwner> extends BaseValueBuilder<Schema, GOw
 
 		@Override
 		protected SourceValue value() {
-			return source();
+			return SchemaBuilder.this.source();
 		}
 
 		@Override
@@ -121,7 +120,7 @@ public abstract class SchemaBuilder<GOwner> extends BaseValueBuilder<Schema, GOw
 		}
 
 	}
- 
+
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *
 	 * @param that Konfigurator oder {@code null}.

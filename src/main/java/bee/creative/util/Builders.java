@@ -906,7 +906,7 @@ public class Builders {
 	 * @param <GValue> Typ der Werte. */
 	public static class ItemMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, Map<GKey, GValue>, ItemMapBuilder<GKey, GValue>> {
 
-		ItemMapBuilder(Map<GKey, GValue> value) throws NullPointerException {
+		ItemMapBuilder(final Map<GKey, GValue> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -923,7 +923,7 @@ public class Builders {
 	 * @param <GValue> Typ der Werte. */
 	public static class TreeMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, TreeMap<GKey, GValue>, TreeMapBuilder<GKey, GValue>> {
 
-		TreeMapBuilder(TreeMap<GKey, GValue> value) throws NullPointerException {
+		TreeMapBuilder(final TreeMap<GKey, GValue> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -940,7 +940,7 @@ public class Builders {
 	 * @param <GValue> Typ der Werte. */
 	public static class HashMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, HashMap<GKey, GValue>, HashMapBuilder<GKey, GValue>> {
 
-		HashMapBuilder(HashMap<GKey, GValue> value) throws NullPointerException {
+		HashMapBuilder(final HashMap<GKey, GValue> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -957,7 +957,7 @@ public class Builders {
 	 * @param <GValue> Typ der Werte. */
 	public static class ProxyMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, ProxyMap<GKey, GValue>, ProxyMapBuilder<GKey, GValue>> {
 
-		ProxyMapBuilder(ProxyMap<GKey, GValue> value) throws NullPointerException {
+		ProxyMapBuilder(final ProxyMap<GKey, GValue> value) throws NullPointerException {
 			super(value);
 		}
 

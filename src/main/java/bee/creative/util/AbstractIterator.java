@@ -29,12 +29,12 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 
 	@Override
 	public boolean retainAll(final Collection<?> filter) throws NullPointerException {
-		return  Iterators.retainAll(this, filter);
+		return Iterators.retainAll(this, filter);
 	}
 
 	@Override
 	public boolean removeAll() {
-		return  Iterators.removeAll(this) ;
+		return Iterators.removeAll(this);
 	}
 
 	@Override

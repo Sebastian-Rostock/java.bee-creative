@@ -81,25 +81,25 @@ public final class FEMException extends Exception2 {
 	}
 
 	@Override
-	public FEMException push(Object message) {
+	public FEMException push(final Object message) {
 		super.push(message);
 		return this;
 	}
 
 	@Override
-	public FEMException push(String format, Object... args) throws NullPointerException, IllegalFormatException {
+	public FEMException push(final String format, final Object... args) throws NullPointerException, IllegalFormatException {
 		super.push(format, args);
 		return this;
 	}
 
 	@Override
-	public FEMException pushAll(Iterable<?> messages) {
+	public FEMException pushAll(final Iterable<?> messages) {
 		super.pushAll(messages);
 		return this;
 	}
 
 	@Override
-	public FEMException pushAll(Object... messages) {
+	public FEMException pushAll(final Object... messages) {
 		super.pushAll(messages);
 		return this;
 	}

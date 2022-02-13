@@ -3,7 +3,6 @@ package bee.creative.xml;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.XMLConstants;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -12,12 +11,6 @@ import org.xml.sax.SAXException;
 import bee.creative.lang.Objects;
 import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.util.Builders.BaseValueBuilder;
-import bee.creative.xml.SchemaBuilder.FactoryValue;
-import bee.creative.xml.SchemaFactoryBuilder.FeaturesValue;
-import bee.creative.xml.SchemaFactoryBuilder.HandlerValue;
-import bee.creative.xml.SchemaFactoryBuilder.LanguageValue;
-import bee.creative.xml.SchemaFactoryBuilder.PropertiesValue;
-import bee.creative.xml.SchemaFactoryBuilder.ResolverValue;
 import bee.creative.util.HashMap;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link SchemaFactory}.
@@ -86,37 +79,37 @@ public abstract class SchemaFactoryBuilder<GOwner> extends BaseValueBuilder<Sche
 
 		@Override
 		public SchemaFactory get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
 		public void set(final SchemaFactory value) {
-			value().set(value);
+			this.value().set(value);
 		}
 
 		@Override
 		public FeaturesValue features() {
-			return value().features();
+			return this.value().features();
 		}
 
 		@Override
 		public PropertiesValue properties() {
-			return value().properties();
+			return this.value().properties();
 		}
 
 		@Override
 		public HandlerValue handler() {
-			return value().handler();
+			return this.value().handler();
 		}
 
 		@Override
 		public ResolverValue resolver() {
-			return value().resolver();
+			return this.value().resolver();
 		}
 
 		@Override
 		public LanguageValue language() {
-			return value().language();
+			return this.value().language();
 		}
 
 	}
@@ -363,7 +356,6 @@ public abstract class SchemaFactoryBuilder<GOwner> extends BaseValueBuilder<Sche
 		this.forLanguage().use(that.language());
 		return this.owner();
 	}
- 
 
 	/** Diese Methode gibt das {@link SchemaFactory} zurück. Wenn über {@link #useValue(Object)} noch keine {@link SchemaFactory} gesetzt wurde, wird über
 	 * {@link SchemaFactory#newInstance(String)} eine neue erstellt, über {@link #useValue(Object)} gesetzt und über {@link #updateValue()} aktualisiert. Die zur

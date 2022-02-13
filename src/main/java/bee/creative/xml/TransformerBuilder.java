@@ -35,23 +35,23 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 		}
 
 		@Override
-		public void set(Transformer value) {
+		public void set(final Transformer value) {
 			this.value = value;
 		}
 
 		@Override
 		public PropertiesValue properties() {
-			return properties;
+			return this.properties;
 		}
 
 		@Override
 		public ParametersValue parameters() {
-			return parameters;
+			return this.parameters;
 		}
 
 		@Override
 		public TemplatesValue templates() {
-			return templates;
+			return this.templates;
 		}
 
 	}
@@ -62,27 +62,27 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 
 		@Override
 		public Transformer get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		@Override
-		public void set(Transformer value) {
-			value().set(value);
+		public void set(final Transformer value) {
+			this.value().set(value);
 		}
 
 		@Override
 		public PropertiesValue properties() {
-			return value().properties();
+			return this.value().properties();
 		}
 
 		@Override
 		public ParametersValue parameters() {
-			return value().parameters();
+			return this.value().parameters();
 		}
 
 		@Override
 		public TemplatesValue templates() {
-			return value().templates();
+			return this.value().templates();
 		}
 
 	}

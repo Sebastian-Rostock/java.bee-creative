@@ -5,9 +5,8 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.xpath.XPathFactory;
-import bee.creative.util.HashMap;
 import bee.creative.util.Builders.BaseMapBuilder;
-import bee.creative.xml.DocumentBuilderFactoryBuilder.FeaturesValue;
+import bee.creative.util.HashMap;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für die Fähigkeiten einer {@link XPathFactory}, {@link TransformerFactory} bzw.
  * {@link DocumentBuilderFactory}.
@@ -34,7 +33,7 @@ public abstract class FeaturesBuilder<GOwner> extends BaseMapBuilder<String, Boo
 
 		@Override
 		public Map<String, Boolean> get() {
-			return value().get();
+			return this.value().get();
 		}
 
 		protected abstract Value<?> value();

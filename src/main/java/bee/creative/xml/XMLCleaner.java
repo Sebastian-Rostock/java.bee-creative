@@ -107,7 +107,7 @@ public class XMLCleaner {
 	 * @see OutputStreamWriter#OutputStreamWriter(java.io.OutputStream, Charset)
 	 * @return Konfigurator. */
 	public CharsetValue forCharset() {
-		return charset;
+		return this.charset;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link File} und gibt ihn zurück. Das {@link File} steht entweder für eine Quelltextdateien oder ein
