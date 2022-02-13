@@ -13,15 +13,15 @@ import java.util.Set;
  * @param <GItem> Typ der Elemente. */
 public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GItem> implements Set<GItem> {
 
-	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann.
+	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
 	 *
-	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
+	 * @param capacity Anzahl der maximal verwaltbaren Elemente.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Elementen ist. */
 	public void allocate(final int capacity) throws IllegalArgumentException {
 		this.allocateImpl(capacity);
 	}
 
-	/** Diese Methode gibt die Anzahl der Einträge zurück, die ohne erneuter Speicherreservierung verwaltet werden kann.
+	/** Diese Methode gibt die Anzahl der Elemente zurück, die ohne erneuter Speicherreservierung verwaltet werden kann.
 	 *
 	 * @return Kapazität. */
 	public int capacity() {
@@ -31,6 +31,17 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
 	public void compact() {
 		this.allocateImpl(this.countImpl());
+	}
+
+	/** Diese Methode liefert das zum gegebenen Element äquivalente und in diesem {@link Set} verwaltete Element. Wenn das {@link Set} kein solches Element
+	 * enthält, wird das gegebene Element dem {@link Set} hinzugefügt und zurückgegeben.<br>
+	 * Durch Überschreiben von {@link #customInstallKey(Object)} kann beeinflusst werden, welches Element hinzugefügt und zurückgegeben wird. Zusem kann durch
+	 * Überschreiben von {@link #customReuseEntry(int)} auf die Wiederverwendung des gelieferten Elements reagiert werden.
+	 *
+	 * @param item gesuchtes Element.
+	 * @return enthaltenes und ggf. eingefügtes Element. */
+	public GItem install(final GItem item) {
+		return this.customGetKey(this.installImpl(item));
 	}
 
 	@Override

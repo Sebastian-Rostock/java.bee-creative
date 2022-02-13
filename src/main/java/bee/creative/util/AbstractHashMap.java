@@ -34,6 +34,19 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 		this.allocateImpl(this.countImpl());
 	}
 
+	/** Diese Methode liefert den zum gegebenen Schlüssel hinterlegten Wert, analog zu {@link #get(Object)}. Wenn zu diesem Schlüssel noch kein Wert hinterlegt
+	 * ist, wird ein neuer Wert erzeugt und dem Schlüssel zugeordnet.<br>
+	 * Durch Überschreiben von {@link #customInstallKey(Object)} bzw. {@link #customInstallValue(Object)} können Schlüssel und Wert des neu angelegten Eintrags
+	 * angepasst werden. Zudem kann durch Überschreiben von {@link #customReuseEntry(int)} auf die Wiederverwendung des Eintrags zum gegebenen Schlüssel reagiert
+	 * werden.
+	 *
+	 * @see #installImpl(Object)
+	 * @param key gesuchter Schlüssel.
+	 * @return enthaltener und ggf. erzeugter Wert. */
+	public GValue install(final GKey key) {
+		return this.customGetValue(this.installImpl(key));
+	}
+
 	@Override
 	public int size() {
 		return this.countImpl();

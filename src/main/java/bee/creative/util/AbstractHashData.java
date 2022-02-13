@@ -580,12 +580,20 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	 * @return Wert oder {@code null}. */
 	protected abstract GValue customGetValue(final int entryIndex);
 
+	/** Diese Methode wird von {@link #customSetKey(int, Object)} genutzt und ersetzt den Wert des gegebenen Schlüssels.
+	 *
+	 * @param entryIndex Index eines Eintrags.
+	 * @param key neuer Schlüssel oder {@code null}. */
+	protected abstract void customSetKey(final int entryIndex, final GKey key);
+
 	/** Diese Methode wird von {@link #putIndexImpl(Object)} genutzt und ersetzt den Wert des gegebenen Schlüssels.
 	 *
 	 * @param entryIndex Index eines Eintrags.
 	 * @param key neuer Schlüssel oder {@code null}.
 	 * @param keyHash Streuwert des Schlüssels. */
-	protected abstract void customSetKey(final int entryIndex, final GKey key, int keyHash);
+	protected void customSetKey(final int entryIndex, final GKey key, final int keyHash) {
+		this.customSetKey(entryIndex, key);
+	}
 
 	/** Diese Methode wird in {@link #putImpl(Object, Object)} sowie {@link HashEntry#setValue(Object)} genutzt, ersetzt den Wert des gegebenen Eintrags und gibt
 	 * den vorherigen Wert zurück.
@@ -672,12 +680,57 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return Objects.equals(this.customGetValue(entryIndex), value);
 	}
 
+	/** Diese Methode wird von {@link #installImpl(Object)} aufgerufen und soll den gegebenen Schlüssel in den einzutragenden Schlüssel überführen.
+	 * <p>
+	 * Die Implementation in {@link AbstractHashData} liefert {@code key}.
+	 *
+	 * @param key Schlüssel zur Ermittlung des Eintrags.
+	 * @return Schlüssel des neuen Eintrags. */
+	protected GKey customInstallKey(final GKey key) {
+		return key;
+	}
+
+	/** Diese Methode wird von {@link #installImpl(Object)} aufgerufen und soll den gegebenen Schlüssel in den einzutragenden Wert überführen.
+	 * <p>
+	 * Die Implementation in {@link AbstractHashData} liefert {@code null}.
+	 *
+	 * @param key Schlüssel des neuen Eintrags.
+	 * @return Wert des neuen Eintrags. */
+	protected GValue customInstallValue(final GKey key) {
+		return null;
+	}
+
+	/** Diese Methode wird von {@link #installImpl(Object)} aufgerufen und signalisiert die Wiederverwendung des gegebenen Eintrags.
+	 *
+	 * @param entryIndex Index eines Eintrags. */
+	protected void customReuseEntry(final int entryIndex) {
+	}
+
 	/** Diese Methode wird in {@link #allocateImpl(int)} sowie {@link #AbstractHashData()} genutzt und gibt einen neuen Allokator mit der gegebenen Kapazität
 	 * zurück.
 	 *
 	 * @param capacity Kapazität ans Anzahl der zu reservierenden Schlüssel bzw. Werte.
 	 * @return Allokator. */
 	protected abstract HashAllocator customAllocator(int capacity);
+
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn ein solcher Eintrag bereits existiert, wird dessen
+	 * Wiederverwendung über {@link #customReuseEntry(int)} angezeigt. Andernfalls wird er erzeugt. Der dabei verwendete Schlüssel über
+	 * {@link #customInstallKey(Object)} ermittelt. Daraus wird über {@link #customInstallValue(Object)} der initiale Wert des Eintrags abgeleitet.
+	 *
+	 * @param key Schlüssel des Eintrags.
+	 * @return Index des gefundenen oder erzeugten Eintrags. */
+	protected final int installImpl(final GKey key) {
+		final int count = this.count, index = this.putIndexImpl(key);
+		if (count == this.count) {
+			this.customReuseEntry(index);
+		} else {
+			final GKey key2 = this.customInstallKey(key);
+			this.customSetKey(index, key2);
+			final GValue value = this.customInstallValue(key2);
+			this.customSetValue(index, value);
+		}
+		return index;
+	}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
 	 *
@@ -1088,8 +1141,11 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		}
 		final int count = this.count;
 		if (!permille || (count == 0)) return result;
+		int mod = 0;
 		for (final Entry<?, Integer> entry: result.entrySet()) {
-			entry.setValue((entry.getValue() * 1000) / count);
+			final int val = (entry.getValue() * 1000) + mod;
+			mod = val % count;
+			entry.setValue(val / count);
 		}
 		return result;
 	}
