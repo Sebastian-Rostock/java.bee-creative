@@ -288,14 +288,24 @@ public class FEMDomain extends BaseObject {
 		return FEMException.from(cause).push(parseErrorMessage);
 	}
 
-	/** Diese Methode {@link FEMParser#push(Token) erfasst} den verbleibenden {@link Token Abschnitt} der Eingabe als Fehler und gibt ihn zurück. Als
-	 * Abschnittstyp wird {@link #TYPE_ERROR} verwendet. */
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} der Eingabe bis zum nächsten Terminal bzw. Ende der Eingabe als Fehler und
+	 * gibt ihn zurück. Als Abschnittstyp wird {@link #TYPE_ERROR} verwendet. Der Abschnitt wird auch dann geliefert, wenn er leer ist. */
 	protected Token parseErrorToken(final FEMParser src) throws NullPointerException {
-		// TODO Token ab aktueller position bis zum nächsten terminal/ende als fehler markieren
-		final int pos = src.index(), len = src.length(); // len bzw next terminal
-		final Token res = src.make(FEMDomain.TYPE_ERROR, pos, len - pos);
-		src.seek(len);
-		return src.push(res);
+		final int pos = src.index();
+		LOOP: for (int sym = src.symbol(); sym >= 0; sym = src.skip()) {
+			switch (sym) {
+				case ':':
+				case ';':
+				case '(':
+				case ')':
+				case '{':
+				case '}':
+				case '[':
+				case ']':
+				break LOOP;
+			}
+		}
+		return src.push(FEMDomain.TYPE_ERROR, pos);
 	}
 
 	/** Diese Methode überführt den von {@link #parseConstToken(FEMParser)} ermittelten Abschnitt in eine Kennung und gibt diese zurück. */
@@ -737,6 +747,10 @@ public class FEMDomain extends BaseObject {
 		return res.compose(pars);
 	}
 
+	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer beliebig langen Funktonsverkettung und gibt ihn zurück. Als
+	 * Abschnittstyp wird {@link #TYPE_COMPOSITE} verwendet. Als Kindabschnitte wird {@code target} sowie ein der Abschnitt der Parameterliste verwendet.
+	 * Letzterer besitzt den Abschnittstyp {@link #TYPE_GROUP} und enthält als Kindabschnitte die der {@link #parseGroupToken(FEMParser, boolean)
+	 * Parmetergruppe}. */
 	protected Token parseCompositeToken(final FEMParser src, Token target) throws NullPointerException, FEMException {
 		while (true) {
 			this.parseIgnoreToken(src);
