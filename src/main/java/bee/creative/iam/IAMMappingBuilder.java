@@ -3,6 +3,8 @@ package bee.creative.iam;
 import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
+import bee.creative.iam.IAMIndexBuilder.BaseItem;
+import bee.creative.iam.IAMIndexBuilder.BasePool;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert ein modifizierbares {@link IAMMapping}.
@@ -10,16 +12,16 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class IAMMappingBuilder extends IAMMapping implements Emuable {
 
-	static class EntryData extends IAMIndexBuilder.BaseData {
+	static class EntryItem extends BaseItem {
 
 		public IAMArray key;
 
 		public IAMArray value;
 
-		public EntryData(final int index, final IAMArray key) {
-			this.index = index;
+		public EntryItem(final int index, final IAMArray key) {
+			super(index);
 			this.key = key;
-			this.value = key;
+			this.value = IAMArray.EMPTY;
 		}
 
 		@Override
@@ -29,15 +31,17 @@ public class IAMMappingBuilder extends IAMMapping implements Emuable {
 
 	}
 
-	static class EntryPool extends IAMIndexBuilder.BasePool<EntryData> {
+	static class EntryPool extends BasePool<EntryItem> {
+
+		private static final long serialVersionUID = -1058496449455779296L;
 
 		EntryPool(final IAMBuffer buffer) {
 			super(buffer);
 		}
 
 		@Override
-		protected EntryData customData(final int index, final IAMArray source) {
-			return new EntryData(index, source);
+		protected EntryItem customInstallItem(final int index, final IAMArray source) {
+			return new EntryItem(index, source);
 		}
 
 	}
@@ -66,7 +70,7 @@ public class IAMMappingBuilder extends IAMMapping implements Emuable {
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
 	public void put(final IAMArray key, final IAMArray value) throws NullPointerException {
 		Objects.notNull(value);
-		this.entries.get(key).value = this.entries.buffer.get(value);
+		this.entries.getItem(key).value = this.entries.buffer.get(value);
 	}
 
 	@Override
@@ -95,26 +99,26 @@ public class IAMMappingBuilder extends IAMMapping implements Emuable {
 
 	@Override
 	public IAMArray key(final int entryIndex) {
-		final List<EntryData> datas = this.entries.datas;
+		final List<EntryItem> datas = this.entries.items;
 		if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAMArray.EMPTY;
 		return datas.get(entryIndex).key;
 	}
 
 	@Override
 	public IAMArray value(final int entryIndex) {
-		final List<EntryData> datas = this.entries.datas;
+		final List<EntryItem> datas = this.entries.items;
 		if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAMArray.EMPTY;
 		return datas.get(entryIndex).value;
 	}
 
 	@Override
 	public int entryCount() {
-		return this.entries.datas.size();
+		return this.entries.items.size();
 	}
 
 	@Override
 	public int find(final IAMArray key) throws NullPointerException {
-		final EntryData result = this.entries.mapping().get(Objects.notNull(key));
+		final EntryItem result = this.entries.get(Objects.notNull(key));
 		return result != null ? result.index : -1;
 	}
 

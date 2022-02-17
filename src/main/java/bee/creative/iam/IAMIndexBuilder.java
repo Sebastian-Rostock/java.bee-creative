@@ -6,7 +6,7 @@ import java.util.List;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.lang.Objects;
-import bee.creative.util.Unique;
+import bee.creative.util.HashMap2;
 
 /** Diese Klasse implementiert einen modifizierbaren {@link IAMIndex}.
  *
@@ -14,10 +14,14 @@ import bee.creative.util.Unique;
 public class IAMIndexBuilder extends IAMIndex {
 
 	/** Diese Klasse implementiert den abstrakten Ausgabedatensatz eines {@link BasePool}. */
-	static abstract class BaseData implements Emuable {
+	static abstract class BaseItem implements Emuable {
 
-		/** Dieses Feld speichert die Position, unter der dieses Objekt in {@link BasePool#datas} verwaltet wird. */
-		public int index;
+		/** Dieses Feld speichert die Position, unter der dieses Objekt in {@link BasePool#items} verwaltet wird. */
+		public final int index;
+
+		public BaseItem(final int index) {
+			this.index = index;
+		}
 
 		@Override
 		public String toString() {
@@ -26,19 +30,25 @@ public class IAMIndexBuilder extends IAMIndex {
 
 	}
 
-	/** Diese Klasse implementiert ein abstraktes {@link Unique}, über welches Nutzdaten in der Reihenfolge ihrer Erfassung gesammelt werden können.
+	/** Diese Klasse implementiert eine abstrakte {@link HashMap2}, über welche Nutzdaten in der Reihenfolge ihrer Erfassung gesammelt werden können.
 	 *
-	 * @param <GData> Typ der Ausgabe. */
-	static abstract class BasePool<GData> extends Unique<IAMArray, GData> implements Emuable {
+	 * @param <GItem> Typ der Ausgabe. */
+	static abstract class BasePool<GItem> extends HashMap2<IAMArray, GItem> {
+
+		private static final long serialVersionUID = -8857584884331103416L;
 
 		/** Dieses Feld speichert die gesammelten Ausgabedaten. */
-		public final List<GData> datas = new ArrayList<>();
+		public final List<GItem> items = new ArrayList<>();
 
-		/** Dieses Feld speichert Puffer zur Optimierung bzw. Aulagerung der Eingaben in {@link #customSource(IAMArray)}. */
+		/** Dieses Feld speichert Puffer zur Optimierung bzw. Auslagerung der Eingaben in {@link #customInstallKey(IAMArray)}. */
 		public final IAMBuffer buffer;
 
 		public BasePool(final IAMBuffer builder) {
 			this.buffer = Objects.notNull(builder);
+		}
+
+		public GItem getItem(final IAMArray source) throws RuntimeException {
+			return this.install(source);
 		}
 
 		/** Diese Methode nimmt einen neuen Ausgabedatensatz mit den gegebenen Eingabedaten in die Verwaltung auf und gibt diesen zurück.
@@ -46,49 +56,49 @@ public class IAMIndexBuilder extends IAMIndex {
 		 * @param source Eingabedatensatz.
 		 * @return Ausgabedatensatz.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-		public GData put(final IAMArray source) throws NullPointerException {
-			final int index = this.datas.size();
-			final GData data = this.customData(index, this.buffer.get(source));
-			this.datas.add(index, data);
+		public GItem putItem(final IAMArray source) throws NullPointerException {
+			final int index = this.items.size();
+			final GItem data = this.customInstallItem(index, this.buffer.get(source));
+			this.items.add(index, data);
 			return data;
 		}
 
 		@Override
-		public long emu() {
-			return EMU.fromObject(this) + EMU.from(this.mapping) + EMU.from(this.datas) + EMU.fromAll(this.datas);
-		}
-
-		/** Diese Methode leert den Pool. */
 		public void clear() {
-			this.mapping.clear();
-			this.datas.clear();
+			super.clear();
+			this.items.clear();
 		}
 
 		@Override
-		protected final IAMArray customSource(final IAMArray source) {
-			return this.buffer.get(source);
+		public long emu() {
+			return super.emu() + EMU.from(this.items) + EMU.fromAll(this.items);
 		}
 
 		@Override
-		protected final GData customTarget(final IAMArray source) {
-			return this.put(source);
+		protected IAMArray customInstallKey(final IAMArray key) {
+			return this.buffer.get(key);
+		}
+
+		@Override
+		protected GItem customInstallValue(final IAMArray key) {
+			return this.putItem(key);
 		}
 
 		/** Diese Methode erzeugt einen neuen Ausgabedatensatz und gibt diesen zurück.
 		 *
-		 * @param index Position, unter welcher der Ausgabedatensatz in {@link #datas} verwaltet wird.
+		 * @param index Position, unter welcher der Ausgabedatensatz in {@link #items} verwaltet wird.
 		 * @param source Eingabedatensatz.
 		 * @return Ausgabedatensatz. */
-		protected abstract GData customData(int index, IAMArray source);
+		protected abstract GItem customInstallItem(int index, IAMArray source);
 
 	}
 
-	static class ListingData extends IAMIndexBuilder.BaseData {
+	static class ListingItem extends BaseItem {
 
 		public IAMListing listing;
 
-		public ListingData(final int index, final IAMListing listing) {
-			this.index = index;
+		public ListingItem(final int index, final IAMListing listing) {
+			super(index);
 			this.listing = listing;
 		}
 
@@ -99,7 +109,9 @@ public class IAMIndexBuilder extends IAMIndex {
 
 	}
 
-	static class ListingPool extends IAMIndexBuilder.BasePool<ListingData> {
+	static class ListingPool extends BasePool<ListingItem> {
+
+		private static final long serialVersionUID = -8019050767276703804L;
 
 		public ListingPool(final IAMBuffer buffer) {
 			super(buffer);
@@ -107,9 +119,9 @@ public class IAMIndexBuilder extends IAMIndex {
 		}
 
 		@Override
-		protected ListingData customData(final int index, final IAMArray source) {
+		protected ListingItem customInstallItem(final int index, final IAMArray key) {
 			try {
-				return new ListingData(index, IAMListing.from(source));
+				return new ListingItem(index, IAMListing.from(key));
 			} catch (final IOException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -117,12 +129,12 @@ public class IAMIndexBuilder extends IAMIndex {
 
 	}
 
-	static class MappingData extends IAMIndexBuilder.BaseData {
+	static class MappingItem extends BaseItem {
 
 		public IAMMapping mapping;
 
-		public MappingData(final int index, final IAMMapping mapping) {
-			this.index = index;
+		public MappingItem(final int index, final IAMMapping mapping) {
+			super(index);
 			this.mapping = mapping;
 		}
 
@@ -133,7 +145,9 @@ public class IAMIndexBuilder extends IAMIndex {
 
 	}
 
-	static class MappingPool extends IAMIndexBuilder.BasePool<MappingData> {
+	static class MappingPool extends BasePool<MappingItem> {
+
+		private static final long serialVersionUID = 5897263117998581431L;
 
 		public MappingPool(final IAMBuffer buffer) {
 			super(buffer);
@@ -141,9 +155,9 @@ public class IAMIndexBuilder extends IAMIndex {
 		}
 
 		@Override
-		protected MappingData customData(final int index, final IAMArray source) {
+		protected MappingItem customInstallItem(final int index, final IAMArray source) {
 			try {
-				return new MappingData(index, IAMMapping.from(source));
+				return new MappingItem(index, IAMMapping.from(source));
 			} catch (final IOException cause) {
 				throw new IllegalArgumentException(cause);
 			}
@@ -179,7 +193,7 @@ public class IAMIndexBuilder extends IAMIndex {
 	 * @return Position der Abbildung.
 	 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
 	public int put(final IAMMapping mapping) throws NullPointerException {
-		return this.mappings.get(IAMArray.from(mapping.toBytes())).index;
+		return this.mappings.getItem(IAMArray.from(mapping.toBytes())).index;
 	}
 
 	/** Diese Methode setzt die Daten der Abbildung an der gegebenen Position und gibt diese Position zurück. Wenn die Position negativ ist, werden eine neue
@@ -196,11 +210,11 @@ public class IAMIndexBuilder extends IAMIndex {
 	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist. */
 	public int put(final int index, final IAMMapping mapping) throws NullPointerException, IndexOutOfBoundsException {
 		if (index < 0) {
-			final MappingData data = new MappingData(this.mappingCount(), Objects.notNull(mapping));
-			this.mappings.datas.add(data.index, data);
+			final MappingItem data = new MappingItem(this.mappingCount(), Objects.notNull(mapping));
+			this.mappings.items.add(data.index, data);
 			return data.index;
 		} else {
-			this.mappings.datas.get(index).mapping = Objects.notNull(mapping);
+			this.mappings.items.get(index).mapping = Objects.notNull(mapping);
 			return index;
 		}
 	}
@@ -216,7 +230,7 @@ public class IAMIndexBuilder extends IAMIndex {
 	 * @return Position der Auflistung.
 	 * @throws NullPointerException Wenn {@code listing} {@code null} ist. */
 	public int put(final IAMListing listing) throws NullPointerException {
-		return this.listings.get(IAMArray.from(listing.toBytes())).index;
+		return this.listings.getItem(IAMArray.from(listing.toBytes())).index;
 	}
 
 	/** Diese Methode setzt die Daten der Auflistung an der gegebenen Position und gibt diese Position zurück. Wenn die Position negativ ist, werden eine neue
@@ -233,11 +247,11 @@ public class IAMIndexBuilder extends IAMIndex {
 	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist. */
 	public int put(final int index, final IAMListing listing) throws NullPointerException, IndexOutOfBoundsException {
 		if (index < 0) {
-			final ListingData data = new ListingData(this.listingCount(), Objects.notNull(listing));
-			this.listings.datas.add(data.index, data);
+			final ListingItem data = new ListingItem(this.listingCount(), Objects.notNull(listing));
+			this.listings.items.add(data.index, data);
 			return data.index;
 		} else {
-			this.listings.datas.get(index).listing = Objects.notNull(listing);
+			this.listings.items.get(index).listing = Objects.notNull(listing);
 			return index;
 		}
 	}
@@ -251,23 +265,23 @@ public class IAMIndexBuilder extends IAMIndex {
 	@Override
 	public IAMListing listing(final int index) {
 		if ((index < 0) || (index >= this.listingCount())) return IAMListing.EMPTY;
-		return this.listings.datas.get(index).listing;
+		return this.listings.items.get(index).listing;
 	}
 
 	@Override
 	public int listingCount() {
-		return this.listings.datas.size();
+		return this.listings.items.size();
 	}
 
 	@Override
 	public IAMMapping mapping(final int index) {
 		if ((index < 0) || (index >= this.mappingCount())) return IAMMapping.EMPTY;
-		return this.mappings.datas.get(index).mapping;
+		return this.mappings.items.get(index).mapping;
 	}
 
 	@Override
 	public int mappingCount() {
-		return this.mappings.datas.size();
+		return this.mappings.items.size();
 	}
 
 }
