@@ -175,21 +175,6 @@ public class Getters {
 
 		}
 
-		private static final class SoftGen<GItem> implements Getter<GItem, Ref> {
-
-			final Getter<? super GItem, ?> that;
-
-			public SoftGen(final Getter<? super GItem, ?> that) {
-				this.that = that;
-			}
-
-			@Override
-			public Ref get(final GItem item) {
-				return new SoftRef(item, this.that.get(item));
-			}
-
-		}
-
 		private static final class WeakRef extends WeakReference<Object> implements Ref {
 
 			final Object item;
@@ -206,21 +191,6 @@ public class Getters {
 
 		}
 
-		private static final class WeakGen<GItem> implements Getter<GItem, Ref> {
-
-			final Getter<? super GItem, ?> that;
-
-			public WeakGen(final Getter<? super GItem, ?> that) {
-				this.that = that;
-			}
-
-			@Override
-			public Ref get(final GItem item) {
-				return new WeakRef(item, this.that.get(item));
-			}
-
-		}
-
 		public final Getter<? super GItem, ? extends GValue> that;
 
 		public final int mode;
@@ -229,7 +199,9 @@ public class Getters {
 
 		public final HashMap<GItem, ?> buffer;
 
-		private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+		private final ReferenceQueue<Object> queue;
+
+		GValue value;
 
 		public BufferedGetter(final Getter<? super GItem, ? extends GValue> that, final int mode, final Hasher hasher)
 			throws NullPointerException, IllegalArgumentException {
@@ -237,23 +209,70 @@ public class Getters {
 			this.mode = mode;
 			this.hasher = Objects.notNull(hasher);
 			if (mode == References.HARD) {
-				this.buffer = HashMap.from(hasher, that);
+				this.queue = null;
+				this.buffer = HashMap.from(hasher, new Field<GItem, GValue>() {
+
+					@Override
+					public GValue get(final GItem item) {
+						return BufferedGetter.this.value = that.get(item);
+					}
+
+					@Override
+					public void set(final GItem item, final GValue value) {
+						BufferedGetter.this.value = value;
+					}
+
+				});
 			} else if (mode == References.SOFT) {
-				this.buffer = HashMap.from(hasher, new SoftGen<>(that));
+				this.queue = new ReferenceQueue<>();
+				this.buffer = HashMap.from(hasher, new Field<GItem, SoftRef>() {
+
+					@Override
+					public SoftRef get(final GItem item) {
+						return new SoftRef(item, BufferedGetter.this.value = that.get(item));
+					}
+
+					@Override
+					@SuppressWarnings ("unchecked")
+					public void set(final GItem item, final SoftRef value) {
+						if ((BufferedGetter.this.value = (GValue)value.get()) != null) return;
+						((HashMap<GItem, SoftRef>)BufferedGetter.this.buffer).put(item, this.get(item));
+					}
+
+				});
 			} else if (mode == References.WEAK) {
-				this.buffer = HashMap.from(hasher, new WeakGen<>(that));
+				this.queue = new ReferenceQueue<>();
+				this.buffer = HashMap.from(hasher, new Field<GItem, WeakRef>() {
+
+					@Override
+					public WeakRef get(final GItem item) {
+						return new WeakRef(item, BufferedGetter.this.value = that.get(item));
+					}
+
+					@Override
+					@SuppressWarnings ("unchecked")
+					public void set(final GItem item, final WeakRef value) {
+						if ((BufferedGetter.this.value = (GValue)value.get()) != null) return;
+						((HashMap<GItem, WeakRef>)BufferedGetter.this.buffer).put(item, this.get(item));
+					}
+
+				});
 			} else throw new IllegalArgumentException();
 		}
 
 		@Override
-		@SuppressWarnings ("unchecked")
 		public GValue get(final GItem item) {
-			if (this.mode == References.HARD) return (GValue)this.buffer.install(item);
-			final GValue res = (GValue)((Ref)this.buffer.install(item)).get();
-			while (true) {
-				final Ref ref = (Ref)this.queue.poll();
-				if (ref == null) return res != null ? res : (GValue)((Ref)this.buffer.install(item)).get(); // TODO kann null liefern!
-				this.buffer.remove(ref.item());
+			try {
+				this.buffer.install(item);
+				final GValue result = this.value;
+				if (this.queue == null) return result;
+				while (true) {
+					final Ref ref = (Ref)this.queue.poll();
+					if (ref == null) return result;
+					this.buffer.remove(ref.item());
+				}
+			} finally {
+				this.value = null;
 			}
 		}
 

@@ -32,15 +32,22 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		return HashMap.from(hasher, Getters.<GKey>neutral(), installValue, null);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), installAndReuseValue, installAndReuseValue)}. */
+	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher, final Field<? super GKey, GValue> installAndReuseValue)
+		throws NullPointerException {
+		return HashMap.from(hasher, Getters.<GKey>neutral(), installAndReuseValue, installAndReuseValue);
+	}
+
+	
 	/** Diese Methode liefert eine neue {@link HashMap}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an
 	 * die gegebenen Methoden delegiert.
 	 *
 	 * @param hasher Methoden zur Berechnung von {@link #customHash(Object) Streuwert} und {@link #customEqualsKey(int, Object) Äquivalenz} der Schlüssel.
 	 * @param installKey Methode zur {@link #customInstallKey(Object) Installation} des Schlüssels.
 	 * @param installValue Methode zur {@link #customInstallValue(Object) Installation} des Werts.
-	 * @param reuseEntry Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Eintrags oder {@code null}. */
+	 * @param reuseValue Methode zur Anzeige der {@link #customReuseEntry(int) Wiederverwendung} des Eintrags oder {@code null}. */
 	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher, final Getter<? super GKey, ? extends GKey> installKey,
-		final Getter<? super GKey, ? extends GValue> installValue, final Setter<? super GKey, ? super GValue> reuseEntry) throws NullPointerException {
+		final Getter<? super GKey, ? extends GValue> installValue, final Setter<? super GKey, ? super GValue> reuseValue) throws NullPointerException {
 		Objects.notNull(hasher);
 		Objects.notNull(installKey);
 		Objects.notNull(installValue);
@@ -70,8 +77,8 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 
 			@Override
 			protected void customReuseEntry(final int entryIndex) {
-				if (reuseEntry == null) return;
-				reuseEntry.set(this.customGetKey(entryIndex), this.customGetValue(entryIndex));
+				if (reuseValue == null) return;
+				reuseValue.set(this.customGetKey(entryIndex), this.customGetValue(entryIndex));
 			}
 
 		};

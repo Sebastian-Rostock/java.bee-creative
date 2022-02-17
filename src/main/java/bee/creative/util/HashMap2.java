@@ -26,6 +26,13 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		return HashMap2.from(hasher, Getters.<GKey>neutral(), installValue, null);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap2.from(hasher, Getters.neutral(), installAndReuseValue,
+	 * installAndReuseValue)}. */
+	public static <GKey, GValue> HashMap2<GKey, GValue> from(final Hasher hasher, final Field<? super GKey, GValue> installAndReuseValue)
+		throws NullPointerException {
+		return HashMap2.from(hasher, Getters.<GKey>neutral(), installAndReuseValue, installAndReuseValue);
+	}
+
 	/** Diese Methode liefert eine neue {@link HashMap2}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an
 	 * die gegebenen Methoden delegiert.
 	 *
