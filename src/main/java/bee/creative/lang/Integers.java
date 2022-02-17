@@ -1,6 +1,6 @@
 package bee.creative.lang;
 
-/** Diese Klasse implementiert stellt Methoden zum Parsen und Formatieren von Tezimalzahlen zur Verfügung.
+/** Diese Klasse stellt Methoden zum Parsen und Formatieren von Dezimalzahlen zur Verfügung.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Integers {

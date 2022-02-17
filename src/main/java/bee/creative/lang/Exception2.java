@@ -7,8 +7,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-/** Diese Klasse implementiert eine {@link RuntimeException}, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(Object) angefügt} werden können.
- * Die von {@link #getMessage()} gelieferte Zeichenkette entspricht dann der mit dem Trennzeichen {@code '\n'} verketteten {@link #getMessages() Nachrichten}.
+/** Diese Klasse implementiert eine {@link RuntimeException}, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(Object) angefügt} werden können
+ * und welche als Behandelt markiert werden kann. Die von {@link #getMessage()} gelieferte Zeichenkette entspricht dann der mit dem Trennzeichen {@code '\n'}
+ * verketteten {@link #getMessages() Nachrichten}.
  *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Exception2 extends RuntimeException implements Iterable<String> {

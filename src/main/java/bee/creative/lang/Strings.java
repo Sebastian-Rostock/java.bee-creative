@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import bee.creative.util.Getter;
 import bee.creative.util.Getters;
 
-/** Diese Klasse stellt einige statische Methoden bzur Verarbeitung von regulären Ausdrücken und Zeichenketten zur Verfügung.
+/** Diese Klasse stellt einige statische Methoden zur Verarbeitung von regulären Ausdrücken und Zeichenketten zur Verfügung.
  *
  * @see Pattern
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
