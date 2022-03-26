@@ -4,11 +4,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import bee.creative.lang.Objects;
+import bee.creative.lang.Runnable2;
 
-/** Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Test Testmethode} benötigt werden.
+/** Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Runnable2 Testmethode} benötigt werden.
  * <p>
- * Im nachfolgenden Beispiel wird eine anonyme {@link Test Testmethode} instanziiert und vermessen: <pre>
- * Tester result = new Tester(new Method() {
+ * Im nachfolgenden Beispiel wird eine anonyme {@link Runnable2 Testmethode} instanziiert und vermessen: <pre>
+ * Tester result = new Tester(new Runnable2() {
  *   public void run() throws Throwable {
  *     ...
  *   }
@@ -222,7 +223,7 @@ public class Tester {
 	 *
 	 * @param method Testmethode.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public Tester(final Test method) throws NullPointerException {
+	public Tester(final Runnable2 method) throws NullPointerException {
 		this(-1, method);
 	}
 
@@ -233,7 +234,7 @@ public class Tester {
 	 * @param mode Interval der asynchronen Messung der Speicherbelegung in Millisekunden, nagativ bei synchroner Messung und {@code 0} bei deaktivierter.
 	 * @param method Testmethode.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public Tester(final int mode, final Test method) throws NullPointerException {
+	public Tester(final int mode, final Runnable2 method) throws NullPointerException {
 		Objects.notNull(method);
 		final Runtime runtime = Runtime.getRuntime();
 		Throwable cause = null;

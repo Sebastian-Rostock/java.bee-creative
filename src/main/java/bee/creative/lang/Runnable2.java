@@ -1,13 +1,13 @@
-package bee.creative.util;
+package bee.creative.lang;
 
-/** Diese Schnittstelle definiert die Testmethode eines {@link Tester}.
+/** Diese Schnittstelle definiert ein Berechnung, die beliebige Ausnahmen auslösen kann.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface Test {
+public interface Runnable2 {
 
-	/** Diese Methode führt den Test aus. Ein gegebenenfalls geworfenes {@link Throwable} wird dann im {@link Tester} gespeichert.
+	/** Diese Methode führt die Berechnung aus.
 	 *
-	 * @throws Throwable Wenn während des Tests ein Fehler eintritt. */
+	 * @throws Throwable Wenn während der Berechnung ein Fehler eintritt. */
 	public void run() throws Throwable;
 
 }
