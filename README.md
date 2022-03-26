@@ -5,7 +5,7 @@ http://creativecommons.org/licenses/by/3.0/de/ oder wenden Sie sich brieflich an
 
 # FEATURE
 
-- Effiziente *HashSet* mit **33..44 %** Speicher und **45..85%** Rechenzeit (*contains*, *add*, *remove*) der `java.util.HashSet` (`HashSet`, `HashSet2`, `HashSet3`)
+- Effizientes *HashSet* mit **33..44 %** Speicher und **45..85%** Rechenzeit (*contains*, *add*, *remove*) der `java.util.HashSet` (`HashSet`, `HashSet2`, `HashSet3`)
 - Effiziente *HashMap* mit **44..56 %** Speicher und **55..95%** Rechenzeit (*get*, *put*, *remove*) der `java.util.HashMap` (`HashMap`, `HashMap2`, `HashMap3`) 
 - Effiziente *ArrayList* mit **37..45%** Rechenzeit (*add*, *remove*) der `java.util.ArrayList` (`CompactObjectArray`) 
 
@@ -25,6 +25,8 @@ http://creativecommons.org/licenses/by/3.0/de/ oder wenden Sie sich brieflich an
 - Überwachung der *garbage collection* für Referenzen (`ReferenceQueue2`, `SoftReference2`, `WeakReference2`)
 
 - Operatoren auf Datenfeldern, Eigenschaften und deren Bestandteilen (`Field`, `Getter`, `Setter`, `Cunsumer`, `Producer`, `Property`, `Filter`)
+
+- Operatoren auf `Iterator`, `Iterable`, `Comparator` und `Comparable`
 
 # PACKAGES
 
