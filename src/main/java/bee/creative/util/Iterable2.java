@@ -13,7 +13,7 @@ public interface Iterable2<GItem> extends Iterable<GItem> {
 	public Iterator2<GItem> iterator();
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#concat(Iterable, Iterable) Iterables.concat(this, second)}. */
-	public Iterable<GItem> concat(Iterable<? extends GItem> second) throws NullPointerException;
+	public Iterable2<GItem> concat(Iterable<? extends GItem> second) throws NullPointerException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#size(Iterable) Iterables.size(this)}. */
 	public int size();
