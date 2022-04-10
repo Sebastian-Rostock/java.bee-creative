@@ -2,7 +2,6 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
@@ -16,19 +15,6 @@ import bee.creative.util.Iterables;
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
-
-	static class Iter extends H2QOIter<QE, H2QESet> {
-
-		Iter(final H2QESet owner) {
-			super(owner);
-		}
-
-		@Override
-		public QE next(final ResultSet item) throws SQLException {
-			return this.owner.owner.newEdge(item.getInt(1), item.getInt(2), item.getInt(3), item.getInt(4));
-		}
-
-	}
 
 	static class Set1 extends H2QESet {
 
@@ -106,6 +92,11 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
 	protected H2QESet(final H2QS owner, final String select) {
 		super(owner, select);
+	}
+
+	@Override
+	protected QE next(final ResultSet item) throws SQLException {
+		return this.owner.newEdge(item.getInt(1), item.getInt(2), item.getInt(3), item.getInt(4));
 	}
 
 	@Override
@@ -289,11 +280,6 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	public H2QESet intersect(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
 		return new Set2(this.owner, "(select * from " + this.name + ") intersect (select * from " + that.name + ")", this, that);
-	}
-
-	@Override
-	public Iterator<QE> iterator() {
-		return new Iter(this);
 	}
 
 }

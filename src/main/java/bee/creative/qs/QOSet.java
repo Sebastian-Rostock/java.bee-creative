@@ -22,6 +22,11 @@ public interface QOSet<GI, GISet> extends QO, Iterable<GI> {
 	 * @return {@code true}, nur wenn der {@link #iterator()} kein Objekt liefert. */
 	public boolean isEmpty();
 
+	/** Diese Methode gibt das erste Objekt in dieser Menge oder {@code null} zurück.
+	 *
+	 * @return erstes Objekt oder {@code null}. */
+	public GI first();
+
 	/** Diese Methode gibt eine temporäre Kopie dieser Menge zurück.
 	 *
 	 * @return Kopie dieser Menge. */

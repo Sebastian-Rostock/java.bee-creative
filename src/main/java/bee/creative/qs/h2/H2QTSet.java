@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
@@ -21,24 +20,6 @@ import bee.creative.util.Iterables;
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
-
-	static class Iter extends H2QOIter<QT, H2QTSet> {
-
-		public Iter(final H2QTSet owner) {
-			super(owner);
-		}
-
-		@Override
-		public QT next(final ResultSet item) throws SQLException {
-			final int size = this.owner.names.size();
-			final int[] keys = new int[size];
-			for (int i = 0; i < size; i++) {
-				keys[i] = item.getInt(i + 1);
-			}
-			return this.owner.owner.newTuple(keys);
-		}
-
-	}
 
 	static class Set1 extends H2QTSet {
 
@@ -187,6 +168,16 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	protected H2QTSet(final H2QS owner, final Names names, final String select) {
 		super(owner, select);
 		this.names = names;
+	}
+
+	@Override
+	protected QT next(final ResultSet item) throws SQLException {
+		final int size = this.names.size();
+		final int[] keys = new int[size];
+		for (int i = 0; i < size; i++) {
+			keys[i] = item.getInt(i + 1);
+		}
+		return this.owner.newTuple(keys);
 	}
 
 	@Override
@@ -439,11 +430,6 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QTSet havingNodes(final String name, final QNSet nodes) throws NullPointerException, IllegalArgumentException {
 		return this.havingNodes(this.role(name), nodes);
-	}
-
-	@Override
-	public Iterator<QT> iterator() {
-		return new Iter(this);
 	}
 
 }

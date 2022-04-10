@@ -56,11 +56,9 @@ public class H2QS implements QS, AutoCloseable {
 
 	final PreparedStatement createTemp;
 
-	final Object lock = new Object();
+	private final HashSet<String> views = new HashSet<>();
 
-	final HashSet<String> views = new HashSet<>();
-
-	final HashSet<String> tables = new HashSet<>();
+	private final HashSet<String> tables = new HashSet<>();
 
 	/** Dieser Konstruktor initialisiert die Datenbankverbindung und erstellt bei Bedarf das Tabellenschema.
 	 *
@@ -190,7 +188,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	@Override
 	public void close() throws SQLException {
-		synchronized (this.lock) {
+		synchronized (this.views) {
 			for (final String name: this.tables) {
 				this.exec("drop table if exists " + name + " cascade");
 			}
@@ -199,6 +197,30 @@ public class H2QS implements QS, AutoCloseable {
 			}
 		}
 		this.conn.close();
+	}
+
+	void insertQOSet(final String name, final String select) {
+		synchronized (this.views) {
+			if (select != null) {
+				this.views.add(name);
+				this.exec("create view " + name + " as " + select);
+			} else {
+				this.tables.add(name);
+			}
+		}
+
+	}
+
+	void deleteQOSet(final String name) {
+		synchronized (this.views) {
+			if (this.views.remove(name)) {
+				this.exec("drop view if exists " + name + " cascade");
+			}
+			if (this.tables.remove(name)) {
+				this.exec("drop table if exists " + name + " cascade");
+			}
+		}
+
 	}
 
 	/** Diese Methode entfernt alle Hyperknoten mit Textwert, die nich in Hyperkanten verwendet werden. */

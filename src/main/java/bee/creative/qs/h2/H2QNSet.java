@@ -2,7 +2,6 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QTSet;
@@ -15,19 +14,6 @@ import bee.creative.util.Iterables;
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
-
-	static class Iter extends H2QOIter<QN, H2QNSet> {
-
-		Iter(final H2QNSet owner) {
-			super(owner);
-		}
-
-		@Override
-		public QN next(final ResultSet item) throws SQLException {
-			return this.owner.owner.newNode(item.getInt(1));
-		}
-
-	}
 
 	static class Set1 extends H2QNSet {
 
@@ -104,6 +90,11 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	}
 
 	@Override
+	protected QN next(final ResultSet item) throws SQLException {
+		return this.owner.newNode(item.getInt(1));
+	}
+
+	@Override
 	public boolean popAll() {
 		final H2QNSet that = this.copy();
 		return this.owner.exec("delete from QN where N in (select * from " + that.name + ")")
@@ -166,11 +157,6 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	public H2QNSet intersect(final QNSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(set);
 		return new Set2(this.owner, "(select * from " + this.name + ") intersect (select * from " + that.name + ")", this, that);
-	}
-
-	@Override
-	public Iterator<QN> iterator() {
-		return new Iter(this);
 	}
 
 }

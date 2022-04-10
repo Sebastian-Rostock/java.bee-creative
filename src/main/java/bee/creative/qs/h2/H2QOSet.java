@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import bee.creative.qs.QOSet;
@@ -27,28 +28,16 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 	protected H2QOSet(final H2QS owner, final String select) {
 		this.owner = owner;
 		this.name = "QT" + owner.newKey(owner.createTemp);
-		synchronized (owner.lock) {
-			if (select != null) {
-				owner.views.add(this.name);
-				owner.exec("create view " + this.name + " as " + select);
-			} else {
-				owner.tables.add(this.name);
-			}
-		}
+		this.owner.insertQOSet(this.name, select);
 	}
 
 	@Override
 	protected void finalize() throws Throwable {
-		final H2QS owner = this.owner;
-		synchronized (owner.lock) {
-			if (owner.views.remove(this.name)) {
-				owner.exec("drop view if exists " + this.name + " cascade");
-				owner.tables.remove(this.name);
-			} else if (owner.tables.remove(this.name)) {
-				owner.exec("drop table if exists " + this.name + " cascade");
-			}
-		}
+		this.owner.deleteQOSet(this.name);
 	}
+
+	/** Diese Methode liefert das Objekt zum gegebenen {@link ResultSet}. */
+	protected abstract GI next(final ResultSet next) throws SQLException;
 
 	@Override
 	public H2QS owner() {
@@ -65,12 +54,26 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 	}
 
 	@Override
+	public GI first() {
+		try (final ResultSet rset = this.owner.exec.executeQuery("select top 1 1 from " + this.name)) {
+			return rset.next() ? this.next(rset) : null;
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
+	}
+
+	@Override
 	public boolean isEmpty() {
 		try (final ResultSet rset = this.owner.exec.executeQuery("select top 1 1 from " + this.name)) {
 			return !rset.next();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
+	}
+
+	@Override
+	public Iterator<GI> iterator() {
+		return new H2QOIter<>(this);
 	}
 
 	@Override
