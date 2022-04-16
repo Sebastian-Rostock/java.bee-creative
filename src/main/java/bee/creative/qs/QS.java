@@ -56,6 +56,18 @@ public interface QS {
 	 * @return temporäre Hyperkantenmenge. */
 	public QESet newEdges();
 
+	/** Diese Methode ist eine Abkürzung für {@link #newEdges(QE...) this.newEdges(this.newEdge(node))}.
+	 *
+	 * @see #newEdge(QN)
+	 * @return temporäre Hyperkantenmenge. */
+	public QESet newEdges(QN node);
+
+	/** Diese Methode ist eine Abkürzung für {@link #newEdges(QE...) this.newEdges(this.newEdge(context, predicate, subject, object))}.
+	 *
+	 * @see #newEdge(QN, QN, QN, QN)
+	 * @return temporäre Hyperkantenmenge. */
+	public QESet newEdges(QN context, QN predicate, QN subject, QN object);
+
 	/** Diese Methode ist eine Abkürzung für {@link #newEdges(Iterable) this.newEdges(Arrays.asList(edges))}.
 	 *
 	 * @param edges Hyperkanten.

@@ -288,6 +288,16 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
+	public H2QESet.Temp newEdges(final QN node) {
+		return this.newEdges(this.newEdge(node));
+	}
+
+	@Override
+	public H2QESet.Temp newEdges(final QN context, final QN predicate, final QN subject, final QN object) {
+		return this.newEdges(this.newEdge(context, predicate, subject, object));
+	}
+
+	@Override
 	public H2QESet.Temp newEdges(final QE... edges) throws NullPointerException, IllegalArgumentException {
 		return this.newEdges(Arrays.asList(edges));
 	}
