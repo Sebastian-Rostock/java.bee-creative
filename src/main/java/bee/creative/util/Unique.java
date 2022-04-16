@@ -136,9 +136,9 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
-	 * fromHashMap(Objects.HASHER, Getters.neutralGetter(), Setters.emptySetter())}. */
+	 * fromHashMap(Hashers.natural(), Getters.neutralGetter(), Setters.emptySetter())}. */
 	public static <GSource> Unique<GSource, GSource> fromHashMap() {
-		return Unique.fromHashMap(Objects.HASHER, Getters.<GSource>neutral(), Setters.empty());
+		return Unique.fromHashMap(Hashers.natural(), Getters.<GSource>neutral(), Setters.empty());
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
@@ -148,9 +148,9 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)
-	 * fromHashMap(Objects.HASHER, builder, Setters.emptySetter())}. */
+	 * fromHashMap(Hashers.natural(), builder, Setters.emptySetter())}. */
 	public static <GSource, GTarget> Unique<GSource, GTarget> fromHashMap(final Getter<? super GSource, ? extends GTarget> builder) throws NullPointerException {
-		return Unique.fromHashMap(Objects.HASHER, builder, Setters.empty());
+		return Unique.fromHashMap(Hashers.natural(), builder, Setters.empty());
 	}
 
 	/** Diese Methode gibt ein neues streuwertbasiertes {@link Unique} zurück und ist eine Abkürzung für {@link #fromHashMap(Hasher, Getter, Setter)

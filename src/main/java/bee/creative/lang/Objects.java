@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import bee.creative.util.Getter;
-import bee.creative.util.Hasher;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Berechnung von {@link Object#hashCode() Streuwerten}, {@link Object#equals(Object)
  * Äquivalenzen} und {@link Object#toString() Textdarstelungen}.
@@ -30,81 +28,6 @@ public class Objects {
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Objects#HASHER}. */
-	public static class BaseHasher extends BaseObject implements Hasher {
-
-		@Override
-		public int hash(final Object input) {
-			return Objects.hash(input);
-		}
-
-		@Override
-		public boolean equals(final Object input1, final Object input2) {
-			return Objects.equals(input1, input2);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Objects#DEEP_HASHER}. */
-	public static class DeepHasher extends BaseHasher {
-
-		@Override
-		public int hash(final Object input) {
-			return Objects.deepHash(input);
-		}
-
-		@Override
-		public boolean equals(final Object input1, final Object input2) {
-			return Objects.deepEquals(input1, input2);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Objects#IDENTITY_HASHER}. */
-	public static class IdentityHasher extends BaseHasher {
-
-		@Override
-		public int hash(final Object input) {
-			return Objects.identityHash(input);
-		}
-
-		@Override
-		public boolean equals(final Object input1, final Object input2) {
-			return Objects.identityEquals(input1, input2);
-		}
-
-	}
-
-	/** Diese Klasse implementiert {@link Objects#translatedHasher(Getter, Hasher)}. */
-	@SuppressWarnings ("javadoc")
-	public static class TranslatedHasher implements Hasher {
-
-		public final Hasher hasher;
-
-		public final Getter<? super Object, ? extends Object> navigator;
-
-		public TranslatedHasher(final Hasher hasher, final Getter<? super Object, ? extends Object> navigator) {
-			this.hasher = Objects.notNull(hasher);
-			this.navigator = Objects.notNull(navigator);
-		}
-
-		@Override
-		public int hash(final Object input) {
-			return this.hasher.hash(this.navigator.get(input));
-		}
-
-		@Override
-		public boolean equals(final Object input1, final Object input2) {
-			return this.hasher.equals(this.navigator.get(input1), this.navigator.get(input2));
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.navigator, this.hasher);
 		}
 
 	}
@@ -141,15 +64,6 @@ public class Objects {
 		}
 
 	}
-
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#hash(Object)} und {@link Objects#equals(Object, Object)} delegiert. */
-	public static final Hasher HASHER = new BaseHasher();
-
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#deepHash(Object)} und {@link Objects#deepEquals(Object, Object)} delegiert. */
-	public static final Hasher DEEP_HASHER = new DeepHasher();
-
-	/** Dieses Feld speichert den {@link Hasher}, der an {@link Objects#identityHash(Object)} und {@link Objects#identityEquals(Object, Object)} delegiert. */
-	public static final Hasher IDENTITY_HASHER = new IdentityHasher();
 
 	/** Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
 	 * hierarchische Formatierung aktiviert werden.
@@ -725,17 +639,6 @@ public class Objects {
 	 * @return Objekt. */
 	public static <GResult> GResult notNull(final GResult result, final GResult result2) {
 		return result != null ? result : result2;
-	}
-
-	/** Diese Methode gibt einen navigierten {@link Hasher} zurück. Der erzeugte {@link Hasher} liefert für eine Eingabe {@code input} den Streuwert
-	 * {@code hasher.hash(navigator.get(input))}.
-	 *
-	 * @param navigator {@link Getter} zur Navigation.
-	 * @param hasher {@link Hasher} zur Abgleich.
-	 * @return {@code translated}-{@link Hasher}.
-	 * @throws NullPointerException Wenn {@code navigator} bzw. {@code hasher} {@code null} ist. */
-	public static Hasher translatedHasher(final Getter<? super Object, ? extends Object> navigator, final Hasher hasher) throws NullPointerException {
-		return new TranslatedHasher(hasher, navigator);
 	}
 
 }

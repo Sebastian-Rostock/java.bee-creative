@@ -604,9 +604,9 @@ public class Getters {
 		return new ConcatGetter<>(that, trans);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #buffer(Getter, int, Hasher) Getters.buffer(that, References.SOFT, Objects.HASHER)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #buffer(Getter, int, Hasher) Getters.buffer(that, References.SOFT, Hashers.natural())}. */
 	public static <GItem, GValue> Getter3<GItem, GValue> buffer(final Getter<? super GItem, ? extends GValue> that) throws NullPointerException {
-		return Getters.buffer(that, References.SOFT, Objects.HASHER);
+		return Getters.buffer(that, References.SOFT, Hashers.natural());
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link BufferedGetter new BufferedGetter<>(that, mode, hasher)}. */
