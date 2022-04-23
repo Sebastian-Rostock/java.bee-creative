@@ -21,6 +21,6 @@ public interface Comparator2<GItem> extends Comparator<GItem> {
 	public Comparator2<GItem> reverse();
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#translate(Comparator, Getter) Comparators.translate(this, trans)}. */
-	public <GItem2> Comparator<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException;
+	public <GItem2> Comparator2<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException;
 
 }
