@@ -15,7 +15,7 @@ class H2QOIter<GI, GISet extends H2QOSet<GI, ?>> extends AbstractIterator<GI> im
 
 	final GISet owner;
 
-	final ResultSet item;
+	final ResultSet item; 
 
 	boolean next;
 
@@ -23,7 +23,7 @@ class H2QOIter<GI, GISet extends H2QOSet<GI, ?>> extends AbstractIterator<GI> im
 		this.owner = owner;
 		try {
 			final Statement stmt = owner.owner.conn.createStatement();
-			this.item = stmt.executeQuery("select * from " + owner.name);
+			this.item = stmt.executeQuery(owner.table.toString());
 			this.next = this.item.next();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);

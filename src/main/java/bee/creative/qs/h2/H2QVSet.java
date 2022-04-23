@@ -11,32 +11,10 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
-	static class Set1 extends H2QVSet {
-
-		final Object set1;
-
-		Set1(final H2QS owner, final String select, final Object set1) {
-			super(owner, select);
-			this.set1 = set1;
-		}
-
-	}
-
-	static class Set2 extends Set1 {
-
-		final Object set2;
-
-		Set2(final H2QS owner, final String select, final Object set1, final Object set2) {
-			super(owner, select, set1);
-			this.set2 = set2;
-		}
-
-	}
-
 	static class Save extends H2QVSet {
 
 		Save(final H2QS owner) {
-			super(owner, "select V from QN");
+			super(owner, new H2QQ().push("select V from QN"));
 		}
 
 		@Override
@@ -51,7 +29,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 		Temp(final H2QS owner) {
 			super(owner, null);
-			this.owner.exec("create table " + this.name + " (V varchar(1G) not null)");
+			new H2QQ().push("create temporary table ").push(this.table).push(" (V varchar(1G) not null)").update(this.owner);
 		}
 
 		@Override
@@ -61,16 +39,16 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 		/** Diese Methode indiziert diese Menge zur schnelleren Suche und gibt {@code this} zurück. */
 		public Temp index() {
-			this.owner.exec("create index if not exists " + this.name + "_INDEX_V on " + this.name + " (V)");
+			new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_V on ").push(this.table).push(" (V)").update(this.owner);
 			return this;
 		}
 
 	}
 
-	static class Order extends Set1 {
+	static class Order extends H2QVSet {
 
-		Order(final H2QS owner, final String select, final Object set1) {
-			super(owner, select, set1);
+		Order(final H2QVSet that) {
+			super(that.owner, new H2QQ().push("select * from (").push(that).push(") order by V"));
 		}
 
 		@Override
@@ -81,7 +59,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
-	protected H2QVSet(final H2QS owner, final String select) {
+	protected H2QVSet(final H2QS owner, final H2QQ select) {
 		super(owner, select);
 	}
 
@@ -92,12 +70,13 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QNSet nodes() {
-		return new H2QNSet.Set1(this.owner, "select N from QN where V in (select * from " + this.name + ")", this);
+
+		return new H2QNSet(this.owner, new H2QQ().push("select N from QN where V in (").push( this).push( ")"));
 	}
 
 	@Override
 	public boolean popAll() {
-		return this.owner.exec("delete from QN where V in (select * from " + this.name + ")");
+		return new H2QQ().push("delete from QN where V in (").push(this).push(")").update(this.owner);
 	}
 
 	@Override
@@ -117,25 +96,25 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QVSet order() {
-		return new Order(this.owner, "select * from " + this.name + " order by V", this);
+		return new Order(this);
 	}
 
 	@Override
 	public H2QVSet union(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new Set2(this.owner, "(select * from " + this.name + ") union (select * from " + that.name + ")", this, that);
+		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") union (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QVSet except(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new Set2(this.owner, "(select * from " + this.name + ") except (select * from " + that.name + ")", this, that);
+		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") except (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QVSet intersect(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new Set2(this.owner, "(select * from " + this.name + ") intersect (select * from " + that.name + ")", this, that);
+		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") intersect (").push(that).push(")"));
 	}
 
 }

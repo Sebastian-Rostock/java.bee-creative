@@ -3,15 +3,12 @@ package bee.creative.qs.h2;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import bee.creative.qs.QOSet;
-import bee.creative.qs.QXSet;
+import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
 
-/** Diese Klasse implementiert ein {@link QXSet} als Sicht auf das ergebnis einer SQL-Anfrage.
+/** Diese Klasse implementiert ein {@link QOSet} als Sicht auf das ergebnis einer SQL-Anfrage.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GI> Typ der Einträge.
@@ -21,19 +18,13 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 	/** Dieses Feld speichert den Graphspeicher mit {@link H2QS#conn Datenbankverbindung}. */
 	public final H2QS owner;
 
-	/** Dieses Feld speichert den Namen der {@code TABLE} bzw. des {@code VIEW} mit den Einträgen dieser Menge. */
-	public final String name;
+	/** Dieses Feld speichert die Anfrage zur Ermittlung der Einträgen dieser Menge, inklusive des ggf. vorhandenen Namen der {@code TABLE}. */
+	public final H2QQ table;
 
-	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
-	protected H2QOSet(final H2QS owner, final String select) {
+	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage (oder {@code null}). */
+	protected H2QOSet(final H2QS owner, final H2QQ table) {
 		this.owner = owner;
-		this.name = "QT" + owner.newKey(owner.createTemp);
-		this.owner.insertQOSet(this.name, select);
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		this.owner.deleteQOSet(this.name);
+		this.table = table != null ? table : new H2QQ(owner);
 	}
 
 	/** Diese Methode liefert das Objekt zum gegebenen {@link ResultSet}. */
@@ -46,7 +37,7 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 
 	@Override
 	public long size() {
-		try (ResultSet rset = this.owner.exec.executeQuery("select count(*) from " + this.name)) {
+		try (ResultSet rset = new H2QQ().push("select count(*) from (").push(this).push(")").select(this.owner)) {
 			return rset.next() ? rset.getLong(1) : 0;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -55,7 +46,7 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 
 	@Override
 	public GI first() {
-		try (final ResultSet rset = this.owner.exec.executeQuery("select top 1 1 from " + this.name)) {
+		try (final ResultSet rset = new H2QQ().push("select top 1 1 from (").push(this).push(")").select(this.owner)) {
 			return rset.next() ? this.next(rset) : null;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -64,7 +55,7 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 
 	@Override
 	public boolean isEmpty() {
-		try (final ResultSet rset = this.owner.exec.executeQuery("select top 1 1 from " + this.name)) {
+		try (final ResultSet rset = new H2QQ().push("select top 1 1 from (").push(this).push(")").select(this.owner)) {
 			return !rset.next();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -77,17 +68,16 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 	}
 
 	@Override
-	public Set<GI> toSet() {
-		final Set<GI> result = new HashSet<>();
+	public HashSet2<GI> toSet() {
+		final HashSet2<GI> result = new HashSet2<>(100);
 		Iterables.addAll(result, this);
 		return result;
 	}
 
 	@Override
-	public List<GI> toList() {
-		final ArrayList<GI> result = new ArrayList<>();
+	public ArrayList<GI> toList() {
+		final ArrayList<GI> result = new ArrayList<>(100);
 		Iterables.addAll(result, this.order());
-		result.trimToSize();
 		return result;
 	}
 

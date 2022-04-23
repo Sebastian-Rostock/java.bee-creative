@@ -15,32 +15,10 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
-	static class Set1 extends H2QNSet {
-
-		final Object set1;
-
-		Set1(final H2QS owner, final String select, final Object set1) {
-			super(owner, select);
-			this.set1 = set1;
-		}
-
-	}
-
-	static class Set2 extends Set1 {
-
-		final Object set2;
-
-		Set2(final H2QS owner, final String select, final Object set1, final Object set2) {
-			super(owner, select, set1);
-			this.set2 = set2;
-		}
-
-	}
-
 	static class Save extends H2QNSet {
 
 		Save(final H2QS owner) {
-			super(owner, "select N from QN");
+			super(owner, new H2QQ().push("select N from QN"));
 		}
 
 		@Override
@@ -55,26 +33,26 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 		Temp(final H2QS owner) {
 			super(owner, null);
-			this.owner.exec("create table " + this.name + " (N int not null)");
+			new H2QQ().push("create temporary table ").push(this.table).push(" (N int not null)").update(owner);
 		}
 
 		@Override
-		public H2QNSet copy() {
+		public H2QNSet.Temp copy() {
 			return this;
 		}
 
 		/** Diese Methode indiziert diese Menge zur schnelleren Suche und gibt {@code this} zurück. */
-		public Temp index() {
-			this.owner.exec("create index " + this.name + "_INDEX_N on " + this.name + " (N)");
+		public H2QNSet.Temp index() {
+			new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_N on ").push(this.table).push(" (N)").update(this.owner);
 			return this;
 		}
 
 	}
 
-	static class Order extends Set1 {
+	static class Order extends H2QNSet {
 
 		Order(final H2QNSet that) {
-			super(that.owner, "select * from " + that.name + " order by N", that);
+			super(that.owner, new H2QQ().push("select * from (").push(that).push(") order by N"));
 		}
 
 		@Override
@@ -85,7 +63,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	}
 
 	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
-	protected H2QNSet(final H2QS owner, final String select) {
+	protected H2QNSet(final H2QS owner, final H2QQ select) {
 		super(owner, select);
 	}
 
@@ -96,19 +74,23 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	@Override
 	public boolean popAll() {
-		final H2QNSet that = this.copy();
-		return this.owner.exec("delete from QN where N in (select * from " + that.name + ")")
-			| this.owner.exec("delete from QE where exists (select N from " + that.name + " where C=N or P=N or S=N or O=N)");
+		final H2QNSet that = this.copy().index();
+		return false //
+			| new H2QQ().push("delete from QN where N in (").push(that).push(")").update(this.owner) //
+			| new H2QQ().push("delete from QE where C in (").push(that).push(")").update(this.owner) //
+			| new H2QQ().push("delete from QE where P in (").push(that).push(")").update(this.owner) //
+			| new H2QQ().push("delete from QE where S in (").push(that).push(")").update(this.owner) //
+			| new H2QQ().push("delete from QE where O in (").push(that).push(")").update(this.owner);
 	}
 
 	@Override
 	public H2QVSet values() {
-		return new H2QVSet.Set1(this.owner, "select V from QN where N in (select * from " + this.name + ")", this);
+		return new H2QVSet(this.owner, new H2QQ().push("select V from QN where N in (").push(this).push(")"));
 	}
 
 	@Override
 	public QTSet tuples(final String name) throws NullPointerException, IllegalArgumentException {
-		return new H2QTSet.Set1(this.owner, new Names(name), "select N C0 from " + this.name, this);
+		return new H2QTSet(this.owner, new Names(name), new H2QQ().push("select N C0 from (").push(this).push(")"));
 	}
 
 	@Override
@@ -132,7 +114,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	}
 
 	@Override
-	public H2QNSet copy() {
+	public H2QNSet.Temp copy() {
 		return this.owner.newNodes(this);
 	}
 
@@ -144,19 +126,19 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	@Override
 	public H2QNSet union(final QNSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(set);
-		return new Set2(this.owner, "(select * from " + this.name + ") union (select * from " + that.name + ")", this, that);
+		return new H2QNSet(this.owner, new H2QQ().push("(").push(this).push(") union (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QNSet except(final QNSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(set);
-		return new Set2(this.owner, "(select * from " + this.name + ") except (select * from " + that.name + ")", this, that);
+		return new H2QNSet(this.owner, new H2QQ().push("(").push(this).push(") except (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QNSet intersect(final QNSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(set);
-		return new Set2(this.owner, "(select * from " + this.name + ") intersect (select * from " + that.name + ")", this, that);
+		return new H2QNSet(this.owner, new H2QQ().push("(").push(this).push(") intersect (").push(that).push(")"));
 	}
 
 }
