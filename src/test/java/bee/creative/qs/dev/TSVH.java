@@ -15,138 +15,136 @@ import bee.creative.qs.QS;
 public class TSVH {
 
 	// neu anlegen
-	TSVH(final TSVM tsvm) {
-		this(tsvm.target.newNode(), tsvm);
-		this.select(new TSVE(this.owner));
+	TSVH(final TSVM context) {
+		this(context.target.newNode(), context);
+		this.selectImpl(new TSVE(this));
 	}
 
 	// aus knoten des verlaufs laden
-	TSVH(final TSVM tsvm, final QN node) {
-		this(node, tsvm);
+	TSVH(final TSVM owner, final QN context) {
+		this(context, owner);
 		this.check();
 	}
 
-	private TSVH(final QN node, final TSVM tsvm) {
-		this.owner = tsvm;
-		this.node = node;
-		this.edges = tsvm.domainEdges.havingContext(this.node);
+	private TSVH(final QN context, final TSVM owner) {
+		this.owner = owner;
+		this.context = context;
+		this.edges = owner.targetEdges.havingContext(context);
 	}
 
-	/** Dieses Feld speichert die diesen Versionsverlauf besitzende Versionsverwaltung. */
 	final TSVM owner;
 
-	/** Dieses Feld speichert den {@link QE#context() Kontextknoten} dieses Versionsverlaufs. */
-	final QN node;
+	final QN context;
 
 	final QESet edges;
 
 	/** Dieses Feld speichert den aktiven Versionseintrag. */
 	private TSVE version;
 
-	/** Diese Methode liefert und aktualisiert die {@link TSVE#next Nachfolgeversion} des gegebenen Versionseintrags, sofern eine solche existiert. */
-	private TSVE next(final TSVE prev) {
-		if (prev.next != null) return prev.next;
-		final QN node = this.owner.sourceEdges.havingObject(prev.entry).subjects().first();
-		return node != null ? prev.next = new TSVE(this.owner, node) : null;
-	}
-
-	/** Diese Methode setzt und aktiviert den gegebenen Versionseintrags. */
-	private void select(final TSVE version) {
+	/** Diese Methode setzt und aktiviert den gegebenen Versionseintrag. */
+	private void selectImpl(final TSVE version) {
 		this.version = Objects.notNull(version);
-		this.owner.activeEdges.havingSubject(this.node).popAll();
-		this.owner.target.newEdge(this.owner.domainContext, this.owner.activePredicate, this.node, version.entry).put();
+		this.owner.activeEdges.havingSubject(this.context).popAll();
+		this.owner.target.newEdge(this.owner.domainContext, this.owner.activePredicate, this.context, version.node).put();
 	}
 
-	/** Diese Methode verwirft alle {@link TSVE#next Nachfolgeversionen}. Dabei werden folgende Hyperkanten entfernt:
+	// TODO wenn es keinen nachfolger gibt, bleibt alles wie es ist
+	// andernfalls wird neue version erzeugt, diese gewählt und die alte nachfolge als zwei angebunden
+	/** Diese Methode verwirft alle {@link TSVE#nextVersion Nachfolgeversionen}. Dabei werden folgende Hyperkanten entfernt:
 	 * <ul>
-	 * <li>Alle aus {@link TSVM#sourceEdges} mit dem Objektknoten {@link TSVE#entry}.</li>
+	 * <li>Alle aus {@link TSVM#sourceEdges} mit dem Objektknoten {@link TSVE#node}.</li>
 	 * <li>Alle aus {@link TSVM#targetEdges} mit dem Kontextknoten {@link TSVE#insert}.</li>
 	 * <li>Alle aus {@link TSVM#targetEdges} mit dem Kontextknoten {@link TSVE#delete}.</li>
 	 * </ul>
 	 * Sie sollte zu Beginn jeder Änderung aufgerufen werden. */
 	protected void todo() {
-		TSVE next = this.version.next;
+
+		TSVE next = this.version.nextVersion();
 		if (next == null) return;
 		final ArrayList<QN> contexts = new ArrayList<>(10), subjects = new ArrayList<>(10);
 		while (next != null) {
-			subjects.add(next.entry);
+			subjects.add(next.node);
 			contexts.add(next.insert);
 			contexts.add(next.delete);
-			next = this.next(next);
+			next = next.nextVersion();
 		}
-		this.version.next = null;
+		this.version.nextVersion = null;
 		this.owner.targetEdges.havingContexts(this.owner.target.newNodes(contexts)).popAll();
 		this.owner.sourceEdges.havingSubjects(this.owner.target.newNodes(subjects)).popAll();
 	}
 
-	/** Diese Methode kehrt zur nachfolgenden {@link #version() Version} zurück. Dabei werden alle darin gemachten Änderungen wiederhergestellt.
+	/** Diese Methode kehrt zur {@link TSVE#nextVersion() Nachfolgeversion} zurück. Dabei werden alle darin gemachten Änderungen wiederhergestellt.
 	 *
 	 * @return {@code true}, nur wenn das Wiederherstellen der nachfolgenden Version möglich war. */
 	public synchronized boolean redo() {
-		final TSVE prev = this.version, next = this.next(prev);
+		final TSVE prev = this.version, next = prev.nextVersion();
 		if (next == null) return false;
-		this.owner.targetEdges.havingContext(next.insert).withContext(this.node).putAll();
-		this.owner.targetEdges.havingContext(next.delete).withContext(this.node).popAll();
-		this.select(next);
+		this.owner.targetEdges.havingContext(next.insert).withContext(this.context).putAll();
+		this.owner.targetEdges.havingContext(next.delete).withContext(this.context).popAll();
+		this.selectImpl(next);
 		return true;
 	}
 
-	/** Diese Methode kehrt zur vorherigen {@link #version() Version} zurück. Dabei werden alle bis dahin gemachten Änderungen zurückgenommen.
+	/** Diese Methode kehrt zur {@link TSVE#prevVersion() Vorgängerversion} zurück. Dabei werden alle bis dahin gemachten Änderungen zurückgenommen.
 	 *
 	 * @return {@code true}, nur wenn das Wiederherstellen der vorhergehenden Version möglich war. */
 	public synchronized boolean undo() {
-		final TSVE next = this.version;
-		final QN node = this.owner.sourceEdges.havingSubject(next.entry).objects().first();
-		if (node == null) return false;
-		final TSVE prev = new TSVE(this.owner, node);
-		prev.next = next;
-		this.owner.targetEdges.havingContext(next.insert).withContext(this.node).popAll();
-		this.owner.targetEdges.havingContext(next.delete).withContext(this.node).putAll();
-		this.select(prev);
+		final TSVE next = this.version, prev = next.prevVersion();
+		if (prev == null) return false;
+		this.owner.targetEdges.havingContext(next.insert).withContext(this.context).popAll();
+		this.owner.targetEdges.havingContext(next.delete).withContext(this.context).putAll();
+		this.selectImpl(prev);
 		return true;
 	}
 
-	/** Diese Methode schließt die akteulle Version ab, ersetzt alle {@link TSVE#next Nachfolgeversionen} durch eine neue Version und wählt diese als aktuelle. */
+	/** Diese Methode schließt die akteulle Version ab, ersetzt alle {@link TSVE#nextVersion Nachfolgeversionen} durch eine neue Version und wählt diese als
+	 * aktuelle. */
 	public synchronized void done() {
-		final TSVE prev = this.version, next = new TSVE(this.owner);
+		final TSVE prev = this.version, next = new TSVE(this);
 		this.todo();
-		this.owner.target.newEdge(this.owner.domainContext, this.owner.sourcePredicate, prev.entry, next.entry).put();
-		this.select(next);
+		this.owner.target.newEdge(this.owner.domainContext, this.owner.sourcePredicate, prev.node, next.node).put();
+		this.selectImpl(next);
 	}
 
 	/** Diese Methode sollte nach dem Zurücknehmen von Änderungen im grundlegenden {@link QS Graphspeicher} auferufen werden. */
 	public synchronized void check() {
-		this.version = new TSVE(this.owner, this.owner.activeEdges.havingSubject(this.node).objects().first());
-		this.version.next = this.next(this.version);
+		this.version = new TSVE(this, this.owner.activeEdges.havingSubject(this.context).objects().first());
 	}
+	
+	// 
+	
+	void select(final TSVE version) {
+		// branch übernehmen
+	}
+	
 
 	/** Diese Methode liefert die diesen Versionsverlauf besitzende Versionsverwaltung. */
 	public TSVM owner() {
 		return this.owner;
 	}
 
-	/** Diese Methode liefert den Hyperknoten dieses Versionsverlaufs. Dieser wird als {@link QE#context() Kontextknoten} für alle über
-	 * {@link #newEdge(QN, QN, QN)} erzeugten sowie über {@link #edges()} gelieferten Hyperkanten verwendet.
+	public QS target() {
+		return this.owner.target;
+	}
+
+	/** Diese Methode liefert den Hyperknoten dieses Versionsverlaufs. Dieser wird als {@link QE#context() Kontextknoten} für alle {@link #edges() Hyperkanten}
+	 * des Versionsverlaufs verwendet.
 	 *
 	 * @return Verlaufsknoten. */
-	public QN history() {
-		return this.node;
+	public QN context() {
+		return this.context;
 	}
 
 	/** Diese Methode liefert den Hyperknoten der aktuellen Version.
 	 *
 	 * @return Versionsknoten */
-	public synchronized QN version() {
-		return this.version.entry;
+	public synchronized TSVE version() {
+		return this.version;
 	}
 
 	/** Diese Methode liefert die Hyperkanten dieses Versionsverlaufs. Diese enthalten stets das Wissen der aktuellen Version. */
 	public QESet edges() {
 		return this.edges;
-	}
-
-	public QE newEdge(final QN predicate, final QN subject, final QN object) {
-		return this.owner.target.newEdge(this.node, predicate, subject, object);
 	}
 
 	public void putEdges(final QE... edges) {
@@ -155,8 +153,7 @@ public class TSVH {
 
 	public synchronized void putEdges(final Iterable<? extends QE> edges) {
 		this.todo();
-		final QESet newEdges = this.owner.target.newEdges(edges).withContext(this.node);
-		final QESet putEdges = newEdges.except(this.edges).copy();
+		final QESet putEdges = this.owner.target.newEdges(edges).withContext(this.context).except(this.edges).copy();
 		putEdges.putAll();
 		putEdges.withContext(this.version.delete).popAll();
 		putEdges.withContext(this.version.insert).putAll();
@@ -168,8 +165,7 @@ public class TSVH {
 
 	public synchronized void popEdges(final Iterable<? extends QE> edges) {
 		this.todo();
-		final QESet newEdges = this.owner.target.newEdges(edges).withContext(this.node);
-		final QESet popEdges = this.edges.except(newEdges).copy();
+		final QESet popEdges = this.owner.target.newEdges(edges).withContext(this.context).intersect(this.edges).copy();
 		popEdges.popAll();
 		popEdges.withContext(this.version.insert).popAll();
 		popEdges.withContext(this.version.delete).putAll();
