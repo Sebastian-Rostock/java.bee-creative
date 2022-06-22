@@ -263,17 +263,23 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			}
 		}
 
-		static ConcatBinary from(final FEMBinary array1, final FEMBinary array2) throws IllegalArgumentException {
-			final int size1 = ConcatBinary.size(array1), size2 = ConcatBinary.size(array2);
+		static ConcatBinary from(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
+			final int size1 = ConcatBinary.size(binary1), size2 = ConcatBinary.size(binary2);
 			if ((size1 + 1) < size2) {
-				final ConcatBinary array = (ConcatBinary)array2;
-				return ConcatBinary.from(ConcatBinary.from(array1, array.binary1), array.binary2);
+				final ConcatBinary cb2 = (ConcatBinary)binary2;
+				if (!(cb2 instanceof ConcatBinary1)) return from(from(binary1, cb2.binary1), cb2.binary2);
+				final ConcatBinary cb21 = (ConcatBinary)cb2.binary1;
+				return from(binary1, from(cb21.binary1, from(cb21.binary2, cb2.binary2)));
 			}
 			if ((size2 + 1) < size1) {
-				final ConcatBinary array = (ConcatBinary)array1;
-				return ConcatBinary.from(array.binary1, ConcatBinary.from(array.binary2, array2));
+				final ConcatBinary cb1 = (ConcatBinary)binary1;
+				if (!(cb1 instanceof ConcatBinary2)) return from(cb1.binary1, from(cb1.binary2, binary2));
+				final ConcatBinary cb12 = (ConcatBinary)cb1.binary2;
+				return from(from(from(cb1.binary1, cb12.binary1), cb12.binary2), binary2);
 			}
-			return size1 <= size2 ? new ConcatBinary2(array1, array2) : new ConcatBinary(array1, array2);
+			if (size1 > size2) return new ConcatBinary1(binary1, binary2);
+			if (size1 < size2) return new ConcatBinary2(binary1, binary2);
+			return new ConcatBinary(binary1, binary2);
 		}
 
 		public final FEMBinary binary1;
@@ -317,6 +323,15 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			if (offset2 >= 0) return this.binary2.section(offset2, length);
 			if (length2 <= 0) return this.binary1.section(offset, length);
 			return this.binary1.section(offset, -offset2).concat(this.binary2.section(0, length2));
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	public static class ConcatBinary1 extends ConcatBinary {
+
+		ConcatBinary1(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
+			super(binary1, binary2);
 		}
 
 	}

@@ -353,7 +353,7 @@ public class FEMDomain extends BaseObject {
 		if (sym != '[') return null;
 		final int pos = src.index();
 		final List<Token> toks = new ArrayList<>();
-		src.push('[');
+		final Token o = src.push('[');
 		src.skip();
 		this.parseIgnoreToken(src);
 		sym = src.symbol();
@@ -361,6 +361,7 @@ public class FEMDomain extends BaseObject {
 			src.push(']');
 			src.skip();
 		} else if (sym < 0) {
+			o.type(FEMDomain.TYPE_ERROR);
 			toks.add(this.parseErrorToken(src));
 		} else {
 			Token tok = this.parseValueToken(src, false);
@@ -376,6 +377,7 @@ public class FEMDomain extends BaseObject {
 						src.skip();
 						break;
 					} else if ((sym < 0) || (sym != ';')) {
+						o.type(FEMDomain.TYPE_ERROR);
 						toks.add(this.parseErrorToken(src));
 						break;
 					} else {
@@ -525,7 +527,7 @@ public class FEMDomain extends BaseObject {
 		if (sym != '{') return null;
 		final int pos = src.index();
 		final List<Token> toks = new ArrayList<>();
-		src.push('{');
+		final Token o = src.push('{');
 		src.skip();
 		this.parseIgnoreToken(src);
 		sym = src.symbol();
@@ -533,6 +535,7 @@ public class FEMDomain extends BaseObject {
 			src.push(':');
 			src.skip();
 		} else if (sym < 0) {
+			o.type(FEMDomain.TYPE_ERROR);
 			toks.add(this.parseErrorToken(src));
 		} else {
 			Token nam = this.parseIdentToken(src);
@@ -540,6 +543,7 @@ public class FEMDomain extends BaseObject {
 				nam = this.parseNameToken(src);
 			}
 			if (nam == null) {
+				o.type(FEMDomain.TYPE_ERROR);
 				toks.add(this.parseErrorToken(src));
 			} else {
 				toks.add(nam);
@@ -551,6 +555,7 @@ public class FEMDomain extends BaseObject {
 						src.skip();
 						break;
 					} else if ((sym < 0) || (sym != ';')) {
+						o.type(FEMDomain.TYPE_ERROR);
 						toks.add(this.parseErrorToken(src));
 						break;
 					} else {
@@ -562,6 +567,7 @@ public class FEMDomain extends BaseObject {
 							nam = this.parseNameToken(src);
 						}
 						if (nam == null) {
+							o.type(FEMDomain.TYPE_ERROR);
 							toks.add(this.parseErrorToken(src));
 							break;
 						} else {
@@ -583,12 +589,14 @@ public class FEMDomain extends BaseObject {
 		this.parseIgnoreToken(src);
 		final Token tok = this.parseFunctionToken(src, false);
 		if (tok == null) {
+			o.type(FEMDomain.TYPE_ERROR);
 			toks.add(this.parseErrorToken(src));
 		} else {
 			toks.add(tok);
 			this.parseIgnoreToken(src);
 			sym = src.symbol();
 			if ((sym < 0) || (sym != '}')) {
+				o.type(FEMDomain.TYPE_ERROR);
 				toks.add(this.parseErrorToken(src));
 			} else {
 				src.push('}');
@@ -756,13 +764,14 @@ public class FEMDomain extends BaseObject {
 			this.parseIgnoreToken(src);
 			if (src.symbol() != '(') return target;
 			final int pos = src.index();
-			src.push('(');
+			final Token o = src.push('(');
 			src.skip();
 			final List<Token> toks = this.parseGroupToken(src, false);
 			if (src.symbol() == ')') {
 				src.push(')');
 				src.skip();
 			} else {
+				o.type(FEMDomain.TYPE_ERROR);
 				toks.add(this.parseErrorToken(src));
 			}
 			target = src.make(FEMDomain.TYPE_COMPOSITE, target.start(), Arrays.asList(target, src.make(FEMDomain.TYPE_GROUP, pos, toks)));
