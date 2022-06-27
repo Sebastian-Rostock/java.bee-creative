@@ -398,15 +398,15 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 			final int size1 = ConcatString.size(string1), size2 = ConcatString.size(string2);
 			if ((size1 + 1) < size2) {
 				final ConcatString cs2 = (ConcatString)string2;
-				if (!(cs2 instanceof ConcatString1)) return from(from(string1, cs2.string1), cs2.string2);
+				if (!(cs2 instanceof ConcatString1)) return ConcatString.from(ConcatString.from(string1, cs2.string1), cs2.string2);
 				final ConcatString cs21 = (ConcatString)cs2.string1;
-				return from(string1, from(cs21.string1, from(cs21.string2, cs2.string2)));
+				return ConcatString.from(ConcatString.from(string1, cs21.string1), ConcatString.from(cs21.string2, cs2.string2));
 			}
 			if ((size2 + 1) < size1) {
 				final ConcatString cs1 = (ConcatString)string1;
-				if (!(cs1 instanceof ConcatString2)) return from(cs1.string1, from(cs1.string2, string2));
+				if (!(cs1 instanceof ConcatString2)) return ConcatString.from(cs1.string1, ConcatString.from(cs1.string2, string2));
 				final ConcatString cs12 = (ConcatString)cs1.string2;
-				return from(from(from(cs1.string1, cs12.string1), cs12.string2), string2);
+				return ConcatString.from(ConcatString.from(cs1.string1, cs12.string1), ConcatString.from(cs12.string2, string2));
 			}
 			if (size1 > size2) return new ConcatString1(string1, string2);
 			if (size1 < size2) return new ConcatString2(string1, string2);

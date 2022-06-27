@@ -267,15 +267,15 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 			final int size1 = ConcatBinary.size(binary1), size2 = ConcatBinary.size(binary2);
 			if ((size1 + 1) < size2) {
 				final ConcatBinary cb2 = (ConcatBinary)binary2;
-				if (!(cb2 instanceof ConcatBinary1)) return from(from(binary1, cb2.binary1), cb2.binary2);
+				if (!(cb2 instanceof ConcatBinary1)) return ConcatBinary.from(ConcatBinary.from(binary1, cb2.binary1), cb2.binary2);
 				final ConcatBinary cb21 = (ConcatBinary)cb2.binary1;
-				return from(binary1, from(cb21.binary1, from(cb21.binary2, cb2.binary2)));
+				return ConcatBinary.from(ConcatBinary.from(binary1, cb21.binary1), ConcatBinary.from(cb21.binary2, cb2.binary2));
 			}
 			if ((size2 + 1) < size1) {
 				final ConcatBinary cb1 = (ConcatBinary)binary1;
-				if (!(cb1 instanceof ConcatBinary2)) return from(cb1.binary1, from(cb1.binary2, binary2));
+				if (!(cb1 instanceof ConcatBinary2)) return ConcatBinary.from(cb1.binary1, ConcatBinary.from(cb1.binary2, binary2));
 				final ConcatBinary cb12 = (ConcatBinary)cb1.binary2;
-				return from(from(from(cb1.binary1, cb12.binary1), cb12.binary2), binary2);
+				return ConcatBinary.from(ConcatBinary.from(cb1.binary1, cb12.binary1), ConcatBinary.from(cb12.binary2, binary2));
 			}
 			if (size1 > size2) return new ConcatBinary1(binary1, binary2);
 			if (size1 < size2) return new ConcatBinary2(binary1, binary2);

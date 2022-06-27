@@ -396,15 +396,15 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 			final int size1 = ConcatArray.size(array1), size2 = ConcatArray.size(array2);
 			if ((size1 + 1) < size2) {
 				final ConcatArray ca2 = (ConcatArray)array2;
-				if (!(ca2 instanceof ConcatArray1)) return from(from(array1, ca2.array1), ca2.array2);
+				if (!(ca2 instanceof ConcatArray1)) return ConcatArray.from(ConcatArray.from(array1, ca2.array1), ca2.array2);
 				final ConcatArray ca21 = (ConcatArray)ca2.array1;
-				return from(array1, from(ca21.array1, from(ca21.array2, ca2.array2)));
+				return ConcatArray.from(ConcatArray.from(array1, ca21.array1), ConcatArray.from(ca21.array2, ca2.array2));
 			}
 			if ((size2 + 1) < size1) {
 				final ConcatArray ca1 = (ConcatArray)array1;
-				if (!(ca1 instanceof ConcatArray2)) return from(ca1.array1, from(ca1.array2, array2));
+				if (!(ca1 instanceof ConcatArray2)) return ConcatArray.from(ca1.array1, ConcatArray.from(ca1.array2, array2));
 				final ConcatArray ca12 = (ConcatArray)ca1.array2;
-				return from(from(from(ca1.array1, ca12.array1), ca12.array2), array2);
+				return ConcatArray.from(ConcatArray.from(ca1.array1, ca12.array1), ConcatArray.from(ca12.array2, array2));
 			}
 			if (size1 > size2) return new ConcatArray1(array1, array2);
 			if (size1 < size2) return new ConcatArray2(array1, array2);

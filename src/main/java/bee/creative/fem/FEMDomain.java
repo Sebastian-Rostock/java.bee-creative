@@ -292,7 +292,7 @@ public class FEMDomain extends BaseObject {
 	 * gibt ihn zurück. Als Abschnittstyp wird {@link #TYPE_ERROR} verwendet. Der Abschnitt wird auch dann geliefert, wenn er leer ist. */
 	protected Token parseErrorToken(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
-		LOOP: for (int sym = src.symbol(); sym >= 0; sym = src.skip()) {
+		LOOP: for (int sym = src.skip(); sym >= 0; sym = src.skip()) {
 			switch (sym) {
 				case ':':
 				case ';':
