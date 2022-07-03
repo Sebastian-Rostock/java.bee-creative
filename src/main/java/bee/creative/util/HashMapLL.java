@@ -8,36 +8,36 @@ import java.util.Map;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
 
-/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit {@link Integer}-Schlüsseln und -Werten sowie geringem
+/** Diese Klasse implementiert eine auf {@link AbstractHashMap} aufbauende {@link Map} mit {@link Long}-Schlüsseln und -Werten sowie geringem
  * {@link AbstractHashData Speicherverbrauch}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class HashMapII extends AbstractHashMap<Integer, Integer> implements Serializable, Cloneable {
+public class HashMapLL extends AbstractHashMap<Long, Long> implements Serializable, Cloneable {
 
 	/** Dieses Feld speichert das serialVersionUID. */
 	private static final long serialVersionUID = -5580543670395051911L;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Schlüssel ab. */
-	transient int[] keys = AbstractHashData.EMPTY_INTEGERS;
+	transient long[] keys = AbstractHashData.EMPTY_LONGS;
 
 	/** Dieses Feld bildet vom Index eines Eintrags auf dessen Wert ab. */
-	transient int[] values = AbstractHashData.EMPTY_INTEGERS;
+	transient long[] values = AbstractHashData.EMPTY_LONGS;
 
 	/** Dieser Konstruktor initialisiert die Kapazität mit {@code 0}. */
-	public HashMapII() {
+	public HashMapLL() {
 	}
 
 	/** Dieser Konstruktor initialisiert die Kapazität.
 	 *
 	 * @param capacity Kapazität. */
-	public HashMapII(final int capacity) {
+	public HashMapLL(final int capacity) {
 		this.allocateImpl(capacity);
 	}
 
-	/** Dieser Konstruktor initialisiert die {@link HashMapII} mit dem Inhalt der gegebenen {@link Map}.
+	/** Dieser Konstruktor initialisiert die {@link HashMapLL} mit dem Inhalt der gegebenen {@link Map}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashMapII(final Map<? extends Integer, ? extends Integer> source) {
+	public HashMapLL(final Map<? extends Long, ? extends Long> source) {
 		this(source.size());
 		this.putAll(source);
 	}
@@ -46,83 +46,83 @@ public class HashMapII extends AbstractHashMap<Integer, Integer> implements Seri
 		final int count = stream.readInt();
 		this.allocateImpl(count);
 		for (int i = 0; i < count; i++) {
-			final int key = stream.readInt();
-			final int value = stream.readInt();
+			final long key = stream.readInt();
+			final long value = stream.readInt();
 			this.putImpl(key, value);
 		}
 	}
 
 	private void writeObject(final ObjectOutputStream stream) throws IOException {
 		stream.writeInt(this.countImpl());
-		for (final Entry<Integer, Integer> entry: this.newEntriesImpl()) {
-			stream.writeInt(entry.getKey());
-			stream.writeInt(entry.getValue());
+		for (final Entry<Long, Long> entry: this.newEntriesImpl()) {
+			stream.writeLong(entry.getKey());
+			stream.writeLong(entry.getValue());
 		}
 	}
 
 	@Override
-	protected Integer customGetKey(final int entryIndex) {
+	protected Long customGetKey(final int entryIndex) {
 		return this.keys[entryIndex];
 	}
 
 	@Override
-	protected Integer customGetValue(final int entryIndex) {
+	protected Long customGetValue(final int entryIndex) {
 		return this.values[entryIndex];
 	}
 
 	@Override
-	protected void customSetKey(final int entryIndex, final Integer key) {
+	protected void customSetKey(final int entryIndex, final Long key) {
 		this.keys[entryIndex] = key;
 	}
 
 	@Override
-	protected Integer customSetValue(final int entryIndex, final Integer value) {
-		final int[] values = this.values;
-		final Integer result = values[entryIndex];
+	protected Long customSetValue(final int entryIndex, final Long value) {
+		final long[] values = this.values;
+		final Long result = values[entryIndex];
 		values[entryIndex] = value;
 		return result;
 	}
 
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return (key instanceof Integer) && (((Integer)key).intValue() == this.keys[entryIndex]);
+		return (key instanceof Long) && (((Long)key).longValue() == this.keys[entryIndex]);
 	}
 
 	@Override
 	protected boolean customEqualsValue(final int entryIndex, final Object value) {
-		return (value instanceof Integer) && (((Integer)value).intValue() == this.values[entryIndex]);
+		return (value instanceof Long) && (((Long)value).longValue() == this.values[entryIndex]);
 	}
 
 	@Override
 	protected HashAllocator customAllocator(final int capacity) {
-		final int[] keys2;
-		final int[] values2;
+		final long[] keys2;
+		final long[] values2;
 		if (capacity == 0) {
-			keys2 = AbstractHashData.EMPTY_INTEGERS;
-			values2 = AbstractHashData.EMPTY_INTEGERS;
+			keys2 = AbstractHashData.EMPTY_LONGS;
+			values2 = AbstractHashData.EMPTY_LONGS;
 		} else {
-			keys2 = new int[capacity];
-			values2 = new int[capacity];
+			keys2 = new long[capacity];
+			values2 = new long[capacity];
 		}
 		return new HashAllocator() {
 
 			@Override
 			public void copy(final int sourceIndex, final int targetIndex) {
-				keys2[targetIndex] = HashMapII.this.keys[sourceIndex];
-				values2[targetIndex] = HashMapII.this.values[sourceIndex];
+				keys2[targetIndex] = HashMapLL.this.keys[sourceIndex];
+				values2[targetIndex] = HashMapLL.this.values[sourceIndex];
 			}
 
 			@Override
 			public void apply() {
-				HashMapII.this.keys = keys2;
-				HashMapII.this.values = values2;
+				HashMapLL.this.keys = keys2;
+				HashMapLL.this.values = values2;
 			}
 
 		};
 	}
 
 	@Override
-	public Integer put(final Integer key, final Integer value) {
+	public Long put(final Long key, final Long value) {
 		return super.put(Objects.notNull(key), Objects.notNull(value));
 	}
 
@@ -131,8 +131,9 @@ public class HashMapII extends AbstractHashMap<Integer, Integer> implements Seri
 	 *
 	 * @param key Schlüssel.
 	 * @param value Inklement */
-	public void add(final Integer key, final int value) {
-		final int count = this.countImpl(), index = this.putIndexImpl(key), start = (count != this.countImpl()) ? 0 : this.values[index];
+	public void add(final Long key, final long value) {
+		final int count = this.countImpl(), index = this.putIndexImpl(key);
+		final long start = (count != this.countImpl()) ? 0 : this.values[index];
 		this.values[index] = start + value;
 	}
 
@@ -142,8 +143,8 @@ public class HashMapII extends AbstractHashMap<Integer, Integer> implements Seri
 	}
 
 	@Override
-	public HashMapII clone() {
-		final HashMapII result = (HashMapII)super.clone();
+	public HashMapLL clone() {
+		final HashMapLL result = (HashMapLL)super.clone();
 		if (this.capacityImpl() == 0) return result;
 		result.keys = this.keys.clone();
 		result.values = this.values.clone();

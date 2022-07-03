@@ -176,16 +176,12 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	}
 
 	@Override
-	public HashMapOL<GKey> clone() throws CloneNotSupportedException {
-		try {
-			final HashMapOL<GKey> result = (HashMapOL<GKey>)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.keys = this.keys.clone();
-			result.values = this.values.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashMapOL<GKey> clone() {
+		final HashMapOL<GKey> result = (HashMapOL<GKey>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.keys = this.keys.clone();
+		result.values = this.values.clone();
+		return result;
 	}
 
 }

@@ -142,16 +142,12 @@ public class HashMapIO<GValue> extends AbstractHashMap<Integer, GValue> implemen
 	}
 
 	@Override
-	public HashMapIO<GValue> clone() throws CloneNotSupportedException {
-		try {
-			final HashMapIO<GValue> result = (HashMapIO<GValue>)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.keys = this.keys.clone();
-			result.values = this.values.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashMapIO<GValue> clone() {
+		final HashMapIO<GValue> result = (HashMapIO<GValue>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.keys = this.keys.clone();
+		result.values = this.values.clone();
+		return result;
 	}
 
 }

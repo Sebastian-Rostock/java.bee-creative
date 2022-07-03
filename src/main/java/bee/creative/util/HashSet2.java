@@ -141,15 +141,11 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 	}
 
 	@Override
-	public HashSet2<GItem> clone() throws CloneNotSupportedException {
-		try {
-			final HashSet2<GItem> result = (HashSet2<GItem>)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.hashes = this.hashes.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashSet2<GItem> clone() {
+		final HashSet2<GItem> result = (HashSet2<GItem>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.hashes = this.hashes.clone();
+		return result;
 	}
 
 }

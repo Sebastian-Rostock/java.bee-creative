@@ -105,15 +105,11 @@ public class HashSetI extends AbstractHashSet<Integer> implements Serializable, 
 	}
 
 	@Override
-	public HashSetI clone() throws CloneNotSupportedException {
-		try {
-			final HashSetI result = (HashSetI)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.items = this.items.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashSetI clone() {
+		final HashSetI result = (HashSetI)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.items = this.items.clone();
+		return result;
 	}
 
 }

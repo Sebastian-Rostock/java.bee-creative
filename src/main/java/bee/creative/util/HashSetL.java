@@ -105,15 +105,11 @@ public class HashSetL extends AbstractHashSet<Long> implements Serializable, Clo
 	}
 
 	@Override
-	public HashSetL clone() throws CloneNotSupportedException {
-		try {
-			final HashSetL result = (HashSetL)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.items = this.items.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashSetL clone() {
+		final HashSetL result = (HashSetL)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.items = this.items.clone();
+		return result;
 	}
 
 }

@@ -164,15 +164,11 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 	}
 
 	@Override
-	public HashSet<GItem> clone() throws CloneNotSupportedException {
-		try {
-			final HashSet<GItem> result = (HashSet<GItem>)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.items = this.items.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashSet<GItem> clone() {
+		final HashSet<GItem> result = (HashSet<GItem>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.items = this.items.clone();
+		return result;
 	}
 
 }

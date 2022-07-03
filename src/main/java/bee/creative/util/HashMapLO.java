@@ -142,16 +142,12 @@ public class HashMapLO<GValue> extends AbstractHashMap<Long, GValue> implements 
 	}
 
 	@Override
-	public HashMapLO<GValue> clone() throws CloneNotSupportedException {
-		try {
-			final HashMapLO<GValue> result = (HashMapLO<GValue>)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.keys = this.keys.clone();
-			result.values = this.values.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashMapLO<GValue> clone() {
+		final HashMapLO<GValue> result = (HashMapLO<GValue>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.keys = this.keys.clone();
+		result.values = this.values.clone();
+		return result;
 	}
 
 }

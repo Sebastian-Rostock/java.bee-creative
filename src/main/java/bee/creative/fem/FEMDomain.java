@@ -268,13 +268,14 @@ public class FEMDomain extends BaseObject {
 		while (true) {
 			this.parseIgnoreToken(src);
 			if (src.symbol() != ';') return res;
-			src.push(';');
+			final Token tok = src.push(';');
 			src.skip();
 			this.parseIgnoreToken(src);
 			fun = this.parseFunctionToken(src, allowProxy);
 			if (fun != null) {
 				res.add(fun);
 			} else {
+				tok.type(FEMDomain.TYPE_ERROR);
 				res.add(this.parseErrorToken(src));
 			}
 		}
@@ -353,7 +354,7 @@ public class FEMDomain extends BaseObject {
 		if (sym != '[') return null;
 		final int pos = src.index();
 		final List<Token> toks = new ArrayList<>();
-		final Token o = src.push('[');
+		final Token open = src.push(']');
 		src.skip();
 		this.parseIgnoreToken(src);
 		sym = src.symbol();
@@ -361,7 +362,7 @@ public class FEMDomain extends BaseObject {
 			src.push(']');
 			src.skip();
 		} else if (sym < 0) {
-			o.type(FEMDomain.TYPE_ERROR);
+			open.type(FEMDomain.TYPE_ERROR);
 			toks.add(this.parseErrorToken(src));
 		} else {
 			Token tok = this.parseValueToken(src, false);
@@ -376,21 +377,18 @@ public class FEMDomain extends BaseObject {
 						src.push(']');
 						src.skip();
 						break;
-					} else if ((sym < 0) || (sym != ';')) {
-						o.type(FEMDomain.TYPE_ERROR);
+					} else if (sym < 0) {
+						open.type(FEMDomain.TYPE_ERROR);
 						toks.add(this.parseErrorToken(src));
 						break;
+					} else if (sym != ';') {
+						toks.add(this.parseErrorToken(src));
 					} else {
 						src.push(';');
 						src.skip();
 						this.parseIgnoreToken(src);
 						tok = this.parseValueToken(src, false);
-						if (tok == null) {
-							toks.add(this.parseErrorToken(src));
-							break;
-						} else {
-							toks.add(tok);
-						}
+						toks.add(tok == null ? this.parseErrorToken(src) : tok);
 					}
 				}
 			}
@@ -764,14 +762,14 @@ public class FEMDomain extends BaseObject {
 			this.parseIgnoreToken(src);
 			if (src.symbol() != '(') return target;
 			final int pos = src.index();
-			final Token o = src.push('(');
+			final Token open = src.push('(');
 			src.skip();
 			final List<Token> toks = this.parseGroupToken(src, false);
 			if (src.symbol() == ')') {
 				src.push(')');
 				src.skip();
 			} else {
-				o.type(FEMDomain.TYPE_ERROR);
+				open.type(FEMDomain.TYPE_ERROR);
 				toks.add(this.parseErrorToken(src));
 			}
 			target = src.make(FEMDomain.TYPE_COMPOSITE, target.start(), Arrays.asList(target, src.make(FEMDomain.TYPE_GROUP, pos, toks)));

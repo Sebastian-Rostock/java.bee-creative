@@ -59,8 +59,14 @@ import bee.creative.lang.Objects;
  * <td>{@link bee.creative.util.HashMapLO}<br>
  * {@link bee.creative.util.HashMapOL}</td>
  * <td>32</td>
- * <td>20 x capacity + 96 ( 56 % )</td>
- * <td colspan="2">17..20 x capacity + 96 ( 47..56 %)</td>
+ * <td>20 x capacity + 96 ( 38 % )</td>
+ * <td colspan="2">17..20 x capacity + 96 ( 33..38 %)</td>
+ * </tr>
+ * <tr>
+ * <td>{@link bee.creative.util.HashMapLL}</td>
+ * <td>32</td>
+ * <td>24 x capacity + 96 ( 35 % )</td>
+ * <td colspan="2">21..24 x capacity + 96 ( 31..35 %)</td>
  * </tr>
  * <tr>
  * <td>{@link bee.creative.util.HashMap2}</td>
@@ -87,8 +93,8 @@ import bee.creative.lang.Objects;
  * <tr>
  * <td>{@link bee.creative.util.HashSetL}</td>
  * <td>32</td>
- * <td>16 x capacity + 80 ( 44 % )</td>
- * <td colspan="2">13..16 x capacity + 80 ( 36..44 % )</td>
+ * <td>16 x capacity + 80 ( 31 % )</td>
+ * <td colspan="2">13..16 x capacity + 80 ( 25..31 % )</td>
  * </tr>
  * <tr>
  * <td>{@link bee.creative.util.HashSet2}</td>
@@ -1102,7 +1108,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	@Override
-	protected AbstractHashData<GKey, GValue> clone() throws CloneNotSupportedException {
+	protected AbstractHashData<GKey, GValue> clone() {
 		try {
 			@SuppressWarnings ("unchecked")
 			final AbstractHashData<GKey, GValue> result = (AbstractHashData<GKey, GValue>)super.clone();
@@ -1111,7 +1117,7 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 			result.nexts = this.nexts.clone();
 			return result;
 		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
+			throw new IllegalStateException(cause);
 		}
 	}
 

@@ -174,16 +174,12 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	}
 
 	@Override
-	public HashMapOI<GKey> clone() throws CloneNotSupportedException {
-		try {
-			final HashMapOI<GKey> result = (HashMapOI<GKey>)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.keys = this.keys.clone();
-			result.values = this.values.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashMapOI<GKey> clone() {
+		final HashMapOI<GKey> result = (HashMapOI<GKey>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.keys = this.keys.clone();
+		result.values = this.values.clone();
+		return result;
 	}
 
 }

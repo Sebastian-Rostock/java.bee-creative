@@ -32,13 +32,13 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 		return HashMap.from(hasher, Getters.<GKey>neutral(), installValue, null);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), installAndReuseValue, installAndReuseValue)}. */
+	/** Diese Methode ist eine Abkürzung für {@link #from(Hasher, Getter, Getter, Setter) HashMap.from(hasher, Getters.neutral(), installAndReuseValue,
+	 * installAndReuseValue)}. */
 	public static <GKey, GValue> HashMap<GKey, GValue> from(final Hasher hasher, final Field<? super GKey, GValue> installAndReuseValue)
 		throws NullPointerException {
 		return HashMap.from(hasher, Getters.<GKey>neutral(), installAndReuseValue, installAndReuseValue);
 	}
 
-	
 	/** Diese Methode liefert eine neue {@link HashMap}, welche Streuwert, Äquivalenz, Installation und Wiederverwendung von Schlüsseln, Werten bzw. Einträgen an
 	 * die gegebenen Methoden delegiert.
 	 *
@@ -204,16 +204,12 @@ public class HashMap<GKey, GValue> extends AbstractHashMap<GKey, GValue> impleme
 	}
 
 	@Override
-	public HashMap<GKey, GValue> clone() throws CloneNotSupportedException {
-		try {
-			final HashMap<GKey, GValue> result = (HashMap<GKey, GValue>)super.clone();
-			if (this.capacityImpl() == 0) return result;
-			result.keys = this.keys.clone();
-			result.values = this.values.clone();
-			return result;
-		} catch (final Exception cause) {
-			throw new CloneNotSupportedException(cause.getMessage());
-		}
+	public HashMap<GKey, GValue> clone() {
+		final HashMap<GKey, GValue> result = (HashMap<GKey, GValue>)super.clone();
+		if (this.capacityImpl() == 0) return result;
+		result.keys = this.keys.clone();
+		result.values = this.values.clone();
+		return result;
 	}
 
 }
