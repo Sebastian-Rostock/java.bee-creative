@@ -6,7 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.AbstractList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.RandomAccess;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
@@ -15,6 +17,7 @@ import bee.creative.io.MappedBuffer;
 import bee.creative.lang.Bytes;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
+import bee.creative.util.Entries;
 import bee.creative.util.HashMapLO;
 import bee.creative.util.HashMapOL;
 import bee.creative.util.Property;
@@ -329,7 +332,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * <dt>{@code head: int[reusableLimit]}</dt>
 	 * <dd>Spalte der Kopfpositionen der einfach verketten Listen aus Positionen von {@code -1} bis {@link #reusableCount}{@code -1}.</dd>
 	 * <dt>{@code next: int[reusableLimit]}</dt>
-	 * <dd>Spalte der Folgepositionen der infach verketten Listen.</dd>
+	 * <dd>Spalte der Folgepositionen der infach verketten Listen aus Positionen von {@code -1} bis {@link #reusableCount}{@code -1}.</dd>
 	 * <dt>{@code hash: int[reusableLimit]}</dt>
 	 * <dd>Spalte der Streuwerte</dd>
 	 * <dt>{@code item: long[reusableLimit]}</dt>
@@ -345,28 +348,59 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld speichert die Anzahl der aktuell in der {@link #reusableTable} enthaltenen Einträge. */
 	private int reusableCount;
 
+	/** Dieses Feld speichert eine {@link List} als Sicht auf die wiederverwendbaren Funktionen. */
+	private final Reusables reusables = new Reusables();
+
 	/** Dieses Feld bildet von einer Adresse auf einen Platzhalter ab und dient in {@link #getProxyByAddr(long)} der Behandlung der Rekursion. */
-	private final HashMapLO<FEMProxy> proxyGetMap = new HashMapLO<>();
+	protected final HashMapLO<FEMProxy> proxyGetMap = new HashMapLO<>();
+
+	/** Dieses Feld speichert die in {@link #getProxyByAddr(long)} nicht rekursiv aufzulösenden Adresse-Platzhalter-Paare. */
+	protected final LinkedList<Entry<Long, FEMProxy>> proxyGetList = new LinkedList<>();
 
 	/** Dieses Feld bildet von der Kennung eines Platzhalters auf dessen Adresse ab und dient in {@link #putProxyAsRef(FEMProxy)} der Behandlung der Rekursion. */
-	private final HashMapOL<FEMFunction> proxyPutMap = new HashMapOL<>();
+	protected final HashMapOL<FEMValue> proxyPutMap = new HashMapOL<>();
 
-	private final Reusables reusables = new Reusables();
+	/** Dieses Feld speichert die in {@link #putProxyAsRef(FEMProxy)} nicht rekursiv aufzulösenden Adresse-Zielfunktion-Paare. */
+	protected final LinkedList<Entry<Long, FEMFunction>> proxyPutList = new LinkedList<>();
 
 	/** Dieses Feld speichert den Dateipuffer. Dieser besteht auf folgenden Speicherbereichen:
 	 * <dl>
-	 * <dt>{@code fileType: long}
+	 * <dt>{@code fileType: long}</dt>
 	 * <dd>Dateitypkennung {@code FEMFILE2}</dd>
-	 * <dt>{@code rootRef: long}
+	 * <dt>{@code rootRef: long}</dt>
 	 * <dd>Referenz für {@link #get()} und {@link #set(FEMFunction)}.</dd>
-	 * <dt>{@code nextAddr: long}
-	 * <dd>Adresse des nächsten von {@link #putData(long)} gelieferten Speicherbereichs.
-	 * <dt>{@code reusableCount: int}</li>
-	 * <dt>{@code reusableLimit: int}</li>
-	 * <dt>{@code reusableTable: long}</li>
+	 * <dt>{@code nextAddr: long}</dt>
+	 * <dd>Adresse des nächsten von {@link #putData(long)} gelieferten Speicherbereichs.</dd>
+	 * <dt>{@code reusableCount: int}</dt>
+	 * <dd>{@link #reusableCount Anzahl} der erfassten wiederverwendbaren Funktionen.</dd>
+	 * <dt>{@code reusableLimit: int}</dt>
+	 * <dd>{@link #reusableLimit Kapazität} der Tabelle der wiederverwendbaren Funktionen.</dd>
+	 * <dt>{@code reusableTable: long}</dt>
+	 * <dd>{@link #reusableTable Adresse} der Tabelle der wiederverwendbaren Funktionen.</dd>
 	 * </dl>
 	*/
 	protected final MappedBuffer buffer;
+
+	/** Dieser Konstruktor initialisiert den Dateipuffer.
+	 *
+	 * @param buffer Dateipuffer.
+	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
+	public FEMBuffer(final MappedBuffer buffer) throws IOException {
+		this.buffer = buffer;
+		final long fileType = 0x32454c49464d4546L;
+		if (!this.buffer.isReadonly() && (this.buffer.size() == 0)) {
+			this.buffer.resize(120L);
+			this.putFileType(fileType);
+			this.clearBuffer();
+		} else {
+			if (this.buffer.size() < 120L) throw new IOException();
+			if (this.getFileType() != fileType) throw new IOException();
+			this.setNextAddr();
+			this.setReusableCount();
+			this.setReusableLimit();
+			this.setReusableTable();
+		}
+	}
 
 	/** Dieser Konstruktor initialisiert den Puffer zum Zugriff auf die gegebene Datei in nativer Bytereihenfolge.
 	 *
@@ -387,22 +421,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @param order Bytereihenfolge.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public FEMBuffer(final File file, final boolean readonly, final ByteOrder order) throws IOException {
-		this.buffer = new MappedBuffer(file, readonly);
+		this(new MappedBuffer(file, readonly));
 		this.buffer.order(order);
 		this.buffer.growScale(1);
-		final long fileType = 0x32454c49464d4546L;
-		if (!readonly && (this.buffer.size() == 0)) {
-			this.buffer.resize(120L);
-			this.putFileType(fileType);
-			this.clearBuffer();
-		} else {
-			if (this.buffer.size() < 120L) throw new IOException();
-			if (this.getFileType() != fileType) throw new IOException();
-			this.setNextAddr();
-			this.setReusableCount();
-			this.setReusableLimit();
-			this.setReusableTable();
-		}
 	}
 
 	private long getFileType() {
@@ -489,8 +510,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 				this.buffer.copy(reusableTable_itemArrayAddr2, reusableTable_itemArrayAddr, reusableCount * 8L);
 				final int[] headValue = new int[Math.min(262144, reusableLimit2)];
 				Arrays.fill(headValue, -1);
-				for (int reusedIndex = 0; reusedIndex < reusableLimit; reusedIndex += headValue.length) {
-					final long reusableTable_headValueAddr2 = reusableTable2 + (reusedIndex * 4L);
+				for (int reusedIndex2 = 0; reusedIndex2 < reusableLimit2; reusedIndex2 += headValue.length) {
+					final long reusableTable_headValueAddr2 = reusableTable2 + (reusedIndex2 * 4L);
 					this.buffer.putInt(reusableTable_headValueAddr2, headValue);
 				}
 				for (int reusedIndex = 0; reusedIndex < reusableCount; reusedIndex++) {
@@ -522,7 +543,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 				final long reusableTable_itemValueAddr = reusableTable + (reusableLimit * 12L) + (reusedIndex * 8L);
 				final long reusedRef = this.buffer.getLong(reusableTable_itemValueAddr);
 				final FEMFunction reused = this.get(reusedRef);
-				if (this.reuseEquals(reused, reusable)) return reusedRef;
+				if (this.customEquals(reused, reusable)) return reusedRef;
 			}
 			final long reusableTable_nextValueAddr = reusableTable + (reusableLimit * 4L) + (reusedIndex * 4L);
 			reusedIndex = this.buffer.getInt(reusableTable_nextValueAddr);
@@ -530,10 +551,10 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return 0;
 	}
 
-	/** Diese Methode fügt die Funktion mit der gegebenen Referenz in die {@link #reusableTable} ein. Wenn eine dazu {@link #reuseEquals(FEMFunction, FEMFunction)
-	 * äquivalente} Funktion bereits enthalten ist, wird die Referenz nicht in die Tabelle aufgenommen. Dies führt dann zu einem Speicherleck, da es mindestens
-	 * zwei äquivalente Funktionen mit unterschiedlichen Adressen gibt. Dies bei einem Aufruf innerhalb von {@link #put(FEMFunction)} nicht möglich, wenn Die
-	 * Wiederverwendung dort über {@link #getReusableRef(FEMFunction, int)} abgesichert ist. */
+	/** Diese Methode fügt die Funktion mit der gegebenen Referenz in die {@link #reusableTable} ein. Wenn eine dazu
+	 * {@link #customEquals(FEMFunction, FEMFunction) äquivalente} Funktion bereits enthalten ist, wird die Referenz nicht in die Tabelle aufgenommen. Dies führt
+	 * dann zu einem Speicherleck, da es mindestens zwei äquivalente Funktionen mit unterschiedlichen Adressen gibt. Dies bei einem Aufruf innerhalb von
+	 * {@link #put(FEMFunction)} nicht möglich, wenn Die Wiederverwendung dort über {@link #getReusableRef(FEMFunction, int)} abgesichert ist. */
 	private void putReusableRef(final long reusableRef) {
 		final FEMFunction reusable = this.get(reusableRef);
 		final int reusableHash = reusable.hashCode();
@@ -556,7 +577,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	private void clearBuffer() {
 		this.clearReusableTable();
 		this.putNextAddr(40L);
-		this.putRootRef(this.putVoidAsRef());
+		this.putRootRef(0);
 	}
 
 	private void clearProxies() {
@@ -567,32 +588,37 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	}
 
 	FEMFunction reusablesGet(final int index) {
-		if ((index < 0) || (index >= this.reusableCount)) throw new IndexOutOfBoundsException();
-		final long reusableTable_itemValueAddr = this.reusableTable + (this.reusableLimit * 12L) + (index * 8L);
-		return this.get(this.buffer.getLong(reusableTable_itemValueAddr));
+		synchronized (this.buffer) {
+			if ((index < 0) || (index >= this.reusableCount)) throw new IndexOutOfBoundsException();
+			final long reusableTable_itemValueAddr = this.reusableTable + (this.reusableLimit * 12L) + (index * 8L);
+			return this.get(this.buffer.getLong(reusableTable_itemValueAddr));
+		}
 	}
 
 	int reusablesSize() {
-		return this.reusableCount;
+		synchronized (this.buffer) {
+			return this.reusableCount;
+		}
 	}
 
 	boolean reusablesContains(final Object item) {
-		return (item instanceof FEMFunction) && (this.getReusableRef((FEMFunction)item, item.hashCode()) != 0);
+		synchronized (this.buffer) {
+			return (item instanceof FEMFunction) && (this.getReusableRef((FEMFunction)item, item.hashCode()) != 0);
+		}
 	}
 
 	@Override
 	public FEMFunction get() {
-		this.buffer.resize();
 		return this.get(this.getRootRef());
 	}
 
-	/** Diese Methode gibt die Funktion zur gegebenen Referenz zurück.
+	/** Diese Methode gibt die Funktion zur gegebenen Referenz zurück. Für die Referenz {@code 0} wird {@code null} geliefert.
 	 *
-	 * @param ref Referenz.
-	 * @return Funktion.
+	 * @param ref Referenz oder {@code 0}.
+	 * @return Funktion oder {@code null}.
 	 * @throws IllegalArgumentException Wenn die Referenz ungültig ist. */
 	public FEMFunction get(final long ref) throws IllegalArgumentException {
-		return this.customGet(this.getRefHead(ref), this.getRefBody(ref));
+		return ref != 0 ? this.customGet(this.getRefHead(ref), this.getRefBody(ref)) : null;
 	}
 
 	/** Diese Methode gibt die Funktion zur gegebenen Referenz als Instanz der gegebenen Klasse zurück und ist eine Abkürzung für {@link Class#cast(Object)
@@ -662,7 +688,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		this.putRootRef(this.put(value));
 	}
 
-	/** Diese Methode fügt die gegebene Funktion in den Puffer ein und gibt die Referenz darauf zurück.
+	/** Diese Methode fügt die gegebene Funktion in den Puffer ein und gibt die Referenz darauf zurück. Für die Funktion {@code null} wird {@code 0} geliefert.
 	 *
 	 * @param src Funktion.
 	 * @return Referenz auf die Funktion.
@@ -670,10 +696,10 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @throws IllegalStateException Wenn der Puffer nur zum Lesen angebunden ist.
 	 * @throws IllegalArgumentException Wenn die Funktion nicht angefügt werden kann. */
 	public long put(final FEMFunction src) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		if (src == null) return 0;
 		synchronized (this.buffer) {
-			final long res = this.getReusableRef(src, src.hashCode());
-			if (res != 0) return res;
-			return this.customPut(src);
+			final long ref = this.getReusableRef(src, src.hashCode());
+			return ref != 0 ? ref : this.customPut(src);
 		}
 	}
 
@@ -693,7 +719,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return result;
 	}
 
-	/** Diese Methode gibt die {@link #getRef(int, long) Referenz mit den gegebenen Eigenschaften} zurück und speichert diese zur {@link #cleanup()
+	/** Diese Methode gibt die {@link #getRef(int, long) Referenz mit den gegebenen Eigenschaften} zurück und speichert diese zur {@link #reusables()
 	 * Wiederverwendung}.
 	 *
 	 * @param head Kopfdaten, bspw. Typkennung (6 Bit).
@@ -713,33 +739,19 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * @throws IllegalStateException Wenn der Puffer nicht zum schreiben angebunden ist.
 	 * @throws IllegalArgumentException Wenn {@code size} ungültig ist. */
 	protected long putData(final long size) throws IllegalStateException, IllegalArgumentException {
-		final MappedBuffer buffer = this.buffer;
-		synchronized (buffer) {
+		synchronized (this.buffer) {
 			final long nextAddr = this.nextAddr, nextAddr2 = (nextAddr + size + 7) & -8L, reusableTable = this.reusableTable;
 			if (nextAddr2 < nextAddr) throw new IllegalArgumentException();
 			if (nextAddr2 > reusableTable) {
 				final long reusableTableSize = this.reusableLimit * 20L;
-				buffer.grow(nextAddr2 + reusableTableSize + reusableTableSize);
-				final long reusableTable2 = (buffer.size() - reusableTableSize) & -8L;
-				buffer.copy(reusableTable2, reusableTable, reusableTableSize);
+				this.buffer.grow(nextAddr2 + reusableTableSize + reusableTableSize);
+				final long reusableTable2 = (this.buffer.size() - reusableTableSize) & -8L;
+				this.buffer.copy(reusableTable2, reusableTable, reusableTableSize);
 				this.putReusableTable(reusableTable2);
 			}
 			this.putNextAddr(nextAddr2);
 			return nextAddr;
 		}
-	}
-
-	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück.
-	 *
-	 * @param val im Puffer enthaltene Funktion.
-	 * @param key in den Puffer einzufügende Funktion.
-	 * @return Äquivalenz der gegebenen Objekte. */
-	protected boolean reuseEquals(final FEMFunction val, final FEMFunction key) {
-		if (!Objects.equals(val, key)) return false;
-		if (!(key instanceof FEMArray)) return true;
-		if (!((FEMArray)key).isIndexed()) return true;
-		if (!(val instanceof FEMArray)) return true;
-		return ((FEMArray)val).isIndexed();
 	}
 
 	/** Diese Methode gibt die Funktion zu den gegebenen Kopf- und Rumpfdaten zurück.
@@ -845,9 +857,18 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode liefert die gegebene Funktion als {@link FEMProxy#set(FEMFunction) Zielfunktion} eines {@link FEMProxy Funktionsplatzhalters}. */
-	protected FEMFunction customProxy(final FEMFunction src) {
-		return src;
+	/** Diese Methode liefert die {@link Object#equals(Object) Äquivalenz} der gegebenen Funktionen und wird in {@link #putRef(int, long)} zur Erkennung der
+	 * {@link #reusables() Wiederverwendbarkeit} benötogt.
+	 *
+	 * @param val im Puffer enthaltene Funktion.
+	 * @param key in den Puffer einzufügende Funktion.
+	 * @return Äquivalenz der gegebenen Funktionen. */
+	protected boolean customEquals(final FEMFunction val, final FEMFunction key) {
+		if (!Objects.equals(val, key)) return false;
+		if (!(key instanceof FEMArray)) return true;
+		if (!((FEMArray)key).isIndexed()) return true;
+		if (!(val instanceof FEMArray)) return true;
+		return ((FEMArray)val).isIndexed();
 	}
 
 	/** Diese Methode gibt die Referenz auf {@link FEMVoid#INSTANCE} zurück. */
@@ -1100,63 +1121,86 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		return this.putRef(FEMBuffer.TYPE_OBJECT_ADDR1, addr);
 	}
 
+	/** Diese Methode setzt die gegebene Funktion als {@link FEMProxy#set(FEMFunction) Zielfunktion} des gegebenen {@link FEMProxy Funktionsplatzhalters}. */
+	protected void setProxyTarget(final FEMProxy res, final FEMFunction fun) {
+		res.set(fun);
+	}
+
 	/** Diese Methode gibt den im gegebenen Speicherbereich ({@code idRef: long, nameRef: long, targetRef: long}) enthaltenen Platzhalter zurück. */
 	protected FEMProxy getProxyByAddr(final long addr) throws IllegalArgumentException {
-		FEMProxy result;
 		synchronized (this.buffer) {
-			final Long key = new Long(addr);
-			result = this.proxyGetMap.get(key);
-			if (result != null) return result;
-			final FEMValue id = this.getAt(addr, FEMValue.class);
+			final Long addr2 = new Long(addr);
+			final FEMProxy proxy = this.proxyGetMap.get(addr2);
+			if (proxy != null) return proxy;
+			final FEMValue id = this.getAt(addr + 0, FEMValue.class);
 			final FEMString name = this.getAt(addr + 8, FEMString.class);
-			result = new FEMProxy(id, name, null);
-			this.proxyGetMap.put(key, result);
+			final FEMProxy proxy2 = new FEMProxy(id, name, null);
+			this.proxyGetMap.put(addr2, proxy2);
+			this.proxyGetList.addLast(Entries.from(addr2, proxy2));
+			this.proxyPutMap.put(id, addr2);
+			this.runProxyGetList();
+			return proxy2;
 		}
-		final long ref = this.buffer.getLong(addr + 16);
-		if (ref == FEMBuffer.TYPE_PROXY_ADDR1) return result;
-		result.set(this.customProxy(this.get(ref)));
-		return result;
+	}
+
+	/** Diese Methode verarbeitet die in {@link #proxyGetList} erfassten Paare aus Adresse und Platzhalter, sofern dort weniger als 2 erfasst wurden. */
+	protected void runProxyGetList() {
+		if (this.proxyGetList.size() > 1) return;
+		while (!this.proxyGetList.isEmpty()) {
+			final Entry<Long, FEMProxy> next = this.proxyGetList.getFirst();
+			final Long addr = next.getKey();
+			final FEMProxy proxy = next.getValue();
+			final FEMFunction target = this.getAt(addr.longValue() + 16);
+			this.setProxyTarget(proxy, target);
+			this.proxyGetList.removeFirst();
+		}
 	}
 
 	/** Diese Methode fügt den gegebenen Platzhalter in den Puffer ein und gibt die Referenz darauf zurück. Das {@link FEMProxy#get() Ziel} des Platzhalters wird
 	 * hierbei nur dann ebenfalls eingefügt, wenn es nicht {@code null} ist. */
 	protected long putProxyAsRef(final FEMProxy src) throws NullPointerException, IllegalArgumentException {
-		final long addr;
 		synchronized (this.buffer) {
-			final Long key = this.proxyPutMap.get(src.id());
-			if (key != null) {
-				addr = key.longValue();
-				long ref = this.buffer.getLong(addr + 16);
-				final FEMFunction fun = src.get();
-				if (ref == FEMBuffer.TYPE_PROXY_ADDR1) {
-					if (fun != null) {
-						ref = this.put(fun);
-						this.buffer.putLong(addr + 16, ref);
-						final FEMProxy prx = this.proxyGetMap.get(key);
-						if (prx != null) {
-							prx.set(this.customProxy(this.get(ref)));
-						}
-					}
-				} else {
-					if (fun == null) {
-						this.buffer.putLong(addr + 16, FEMBuffer.TYPE_PROXY_ADDR1);
-						final FEMProxy prx = this.proxyGetMap.get(key);
-						if (prx != null) {
-							prx.set(null);
-						}
-					}
-				}
-				return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr);
+			final Long addr = this.proxyPutMap.get(src.id());
+			if (addr != null) {
+				final long addr2 = addr.longValue();
+				final FEMFunction target = src.get();
+				final long targetRef = this.buffer.getLong(addr2 + 16);
+				if ((target == null) && (targetRef == 0)) return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr2);
+				this.proxyPutList.addLast(Entries.from(addr, target));
+				this.runProxyPutList();
+				return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr2);
+			} else {
+				final long idRef = this.put(src.id());
+				final FEMValue id2 = this.get(idRef, FEMValue.class);
+				final long nameRef = this.put(src.name());
+				final FEMString name2 = this.get(nameRef, FEMString.class);
+				final FEMProxy proxy2 = FEMProxy.from(id2, name2);
+				final long addr2 = this.putData(24);
+				final Long addr3 = new Long(addr2);
+				this.buffer.putLong(addr2 + 0, idRef);
+				this.buffer.putLong(addr2 + 8, nameRef);
+				this.buffer.putLong(addr2 + 16, 0);
+				this.proxyGetMap.put(addr3, proxy2);
+				this.proxyGetList.addLast(Entries.from(addr3, proxy2));
+				this.proxyPutMap.put(id2, addr3);
+				this.proxyPutList.addLast(Entries.from(addr3, src.get()));
+				this.runProxyPutList();
+				return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr2);
 			}
-			final long ref = this.put(src.id());
-			addr = this.putData(24);
-			this.buffer.putLong(addr, ref);
-			this.proxyPutMap.put(this.get(ref), new Long(addr));
 		}
-		this.buffer.putLong(addr + 8, this.put(src.name()));
-		final FEMFunction fun = src.get();
-		this.buffer.putLong(addr + 16, fun != null ? this.put(fun) : FEMBuffer.TYPE_PROXY_ADDR1);
-		return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr);
+	}
+
+	/** Diese Methode verarbeitet die in {@link #proxyPutList} erfassten Paare aus Adresse und Zielfunktion, sofern dort weniger als 2 erfasst wurden. */
+	protected void runProxyPutList() {
+		if (this.proxyPutList.size() > 1) return;
+		while (!this.proxyPutList.isEmpty()) {
+			final Entry<Long, FEMFunction> next = this.proxyPutList.getFirst();
+			final Long addr = next.getKey();
+			final FEMFunction target = next.getValue();
+			this.buffer.putLong(addr.longValue() + 16, this.put(target));
+			this.proxyPutList.removeFirst();
+		}
+		this.runProxyGetList();
 	}
 
 	/** Diese Methode gibt die Parameterfunktion zum gegebenen Index zurück. */
@@ -1200,8 +1244,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	@Override
 	public long emu() {
 		synchronized (this.buffer) {
-			return EMU.fromObject(this) + EMU.fromAll(this.buffer, this.proxyGetMap, this.proxyPutMap) + EMU.fromAll(this.proxyGetMap.values())
-				+ EMU.fromAll(this.proxyPutMap.keySet());
+			return EMU.fromObject(this) + EMU.fromAll(this.buffer, this.proxyGetMap, this.proxyGetList, this.proxyPutMap, this.proxyPutList, this.reusables)
+				+ EMU.fromAll(this.proxyGetMap.values()) + EMU.fromAll(this.proxyPutMap.keySet());
 		}
 	}
 

@@ -6,6 +6,7 @@ import bee.creative.emu.Emuable;
 import bee.creative.fem.FEMFunction.BaseFunction;
 import bee.creative.lang.Array2;
 import bee.creative.lang.Objects;
+import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert eine komponierte Funktion, welche eine {@link #target() gegebene Funktion} mit den {@link #params() gegebenen
@@ -17,7 +18,7 @@ import bee.creative.util.Iterators;
  * Die Verkettung ist damit dann anzuwenden, wenn die aufzurufende Funktion einen {@link FEMHandler Funktionszeiger} liefert.
  *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMComposite extends BaseFunction implements Emuable, Array2<FEMFunction> {
+public abstract class FEMComposite extends BaseFunction implements Emuable, Array2<FEMFunction>, UseToString {
 
 	@SuppressWarnings ("javadoc")
 	public static final class FEMCompositeF extends FEMComposite {
