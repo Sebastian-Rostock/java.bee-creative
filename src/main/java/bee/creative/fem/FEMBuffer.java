@@ -354,8 +354,8 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	/** Dieses Feld bildet von einer Adresse auf einen Platzhalter ab und dient in {@link #getProxyByAddr(long)} der Behandlung der Rekursion. */
 	protected final HashMapLO<FEMProxy> proxyGetMap = new HashMapLO<>();
 
-	/** Dieses Feld speichert die in {@link #getProxyByAddr(long)} nicht rekursiv aufzulösenden Adresse-Platzhalter-Paare. */
-	protected final LinkedList<Entry<Long, FEMProxy>> proxyGetList = new LinkedList<>();
+	/** Dieses Feld speichert die in {@link #getProxyByAddr(long)} nicht rekursiv aufzulösenden Adressen. */
+	protected final LinkedList<Long> proxyGetList = new LinkedList<>();
 
 	/** Dieses Feld bildet von der Kennung eines Platzhalters auf dessen Adresse ab und dient in {@link #putProxyAsRef(FEMProxy)} der Behandlung der Rekursion. */
 	protected final HashMapOL<FEMValue> proxyPutMap = new HashMapOL<>();
@@ -582,7 +582,9 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 
 	private void clearProxies() {
 		this.proxyGetMap.clear();
+		this.proxyGetList.clear();
 		this.proxyPutMap.clear();
+		this.proxyPutList.clear();
 		this.proxyGetMap.compact();
 		this.proxyPutMap.compact();
 	}
@@ -1136,24 +1138,27 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 			final FEMString name = this.getAt(addr + 8, FEMString.class);
 			final FEMProxy proxy2 = new FEMProxy(id, name, null);
 			this.proxyGetMap.put(addr2, proxy2);
-			this.proxyGetList.addLast(Entries.from(addr2, proxy2));
+			this.proxyGetList.addLast(addr2);
 			this.proxyPutMap.put(id, addr2);
 			this.runProxyGetList();
 			return proxy2;
 		}
 	}
 
-	/** Diese Methode verarbeitet die in {@link #proxyGetList} erfassten Paare aus Adresse und Platzhalter, sofern dort weniger als 2 erfasst wurden. */
+	/** Diese Methode verarbeitet die in {@link #proxyGetList} erfassten Adressen, sofern dort weniger als 2 erfasst wurden. */
 	protected void runProxyGetList() {
 		if (this.proxyGetList.size() > 1) return;
 		while (!this.proxyGetList.isEmpty()) {
-			final Entry<Long, FEMProxy> next = this.proxyGetList.getFirst();
-			final Long addr = next.getKey();
-			final FEMProxy proxy = next.getValue();
-			final FEMFunction target = this.getAt(addr.longValue() + 16);
-			this.setProxyTarget(proxy, target);
+			this.runProxyGetItem(this.proxyGetList.getFirst());
 			this.proxyGetList.removeFirst();
 		}
+	}
+
+	/** Diese Methode setzt die Zielfunktion des Platzhalters mit der gegebenen Adresse. */
+	protected void runProxyGetItem(final Long addr) {
+		final FEMProxy proxy = this.proxyGetMap.get(addr);
+		final FEMFunction target = this.getAt(addr.longValue() + 16);
+		this.setProxyTarget(proxy, target);
 	}
 
 	/** Diese Methode fügt den gegebenen Platzhalter in den Puffer ein und gibt die Referenz darauf zurück. Das {@link FEMProxy#get() Ziel} des Platzhalters wird
@@ -1165,7 +1170,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 				final long addr2 = addr.longValue();
 				final FEMFunction target = src.get();
 				final long targetRef = this.buffer.getLong(addr2 + 16);
-				if ((target == null) && (targetRef == 0)) return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr2);
+				if ((target == null) == (targetRef == 0)) return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr2);
 				this.proxyPutList.addLast(Entries.from(addr, target));
 				this.runProxyPutList();
 				return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr2);
@@ -1181,11 +1186,10 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 				this.buffer.putLong(addr2 + 8, nameRef);
 				this.buffer.putLong(addr2 + 16, 0);
 				this.proxyGetMap.put(addr3, proxy2);
-				this.proxyGetList.addLast(Entries.from(addr3, proxy2));
 				this.proxyPutMap.put(id2, addr3);
 				this.proxyPutList.addLast(Entries.from(addr3, src.get()));
 				this.runProxyPutList();
-				return this.getRef(FEMBuffer.TYPE_PROXY_ADDR1, addr2);
+				return this.putRef(FEMBuffer.TYPE_PROXY_ADDR1, addr2);
 			}
 		}
 	}
@@ -1195,12 +1199,15 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		if (this.proxyPutList.size() > 1) return;
 		while (!this.proxyPutList.isEmpty()) {
 			final Entry<Long, FEMFunction> next = this.proxyPutList.getFirst();
-			final Long addr = next.getKey();
-			final FEMFunction target = next.getValue();
-			this.buffer.putLong(addr.longValue() + 16, this.put(target));
+			this.runProxyPutItem(next.getKey(), next.getValue());
 			this.proxyPutList.removeFirst();
 		}
-		this.runProxyGetList();
+	}
+
+	/** Diese Methode trägt die Zielfunktion des Platzhalters mit der gegebenen Adresse in den Puffer ein. */
+	protected void runProxyPutItem(final Long addr, final FEMFunction target) {
+		this.buffer.putLong(addr.longValue() + 16, this.put(target));
+		this.runProxyGetItem(addr);
 	}
 
 	/** Diese Methode gibt die Parameterfunktion zum gegebenen Index zurück. */
