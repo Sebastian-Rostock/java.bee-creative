@@ -638,6 +638,11 @@ public class Iterators {
 		return iter.next();
 	}
 
+	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterator} gelieferten Elemente zurück. */
+	public static int size(final Iterator<?> iter) {
+		return -Iterators.skip(iter, -1) - 1;
+	}
+
 	/** Diese Methode versucht die gegebenen Anzahl an Elemente im gegebenen {@link Iterator} zu überspringen und gibt die Anzahl der noch zu überspringenden
 	 * Elemente zurück. Diese Anzahl ist dann größer als {@code 0}, wenn der gegebene Iterator {@link Iterator#hasNext() anzeigt}, dass er keine weiteren Elemente
 	 * mehr liefern kann. Wenn die gegebene Anzahl kleiner {@code 0} ist, wird diese Anzahl vermindert um die Anzahl der Elemente des gegebenen Iterator zurück

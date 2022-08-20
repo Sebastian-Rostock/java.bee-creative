@@ -358,7 +358,7 @@ public class Iterables {
 	public static int size(final Iterable<?> that) throws NullPointerException {
 		if (that instanceof Collection<?>) return ((Collection<?>)that).size();
 		if (that instanceof Array<?, ?>) return ((Array<?, ?>)that).size();
-		return -Iterators.skip(that.iterator(), -1) - 1;
+		return Iterators.size(that.iterator());
 	}
 
 	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterable} in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der

@@ -35,7 +35,7 @@ public class Collections {
 
 		@Override
 		public int size() {
-			return Iterables.size(this);
+			return Iterators.size(this.iterator());
 		}
 
 		@Override
@@ -73,7 +73,7 @@ public class Collections {
 
 		@Override
 		public int size() {
-			return Iterables.size(this);
+			return Iterators.size(this.iterator());
 		}
 
 		@Override
@@ -111,7 +111,7 @@ public class Collections {
 
 		@Override
 		public int size() {
-			return Iterables.size(this);
+			return Iterators.size(this.iterator());
 		}
 
 		@Override
