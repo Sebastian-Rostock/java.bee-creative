@@ -155,7 +155,7 @@ public class MappedBuffer implements Emuable {
 	 * @param readonly {@code true}, wenn die Datei nur mit Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public MappedBuffer(final File file, final boolean readonly) throws IOException {
-		this(file, file.length(), readonly);
+		this(file, -1, readonly);
 	}
 
 	/** Dieser Konstruktor initialisiert den Puffer zum Lesen und Schreiben des Beginns der gegebenen Datei.
@@ -172,15 +172,14 @@ public class MappedBuffer implements Emuable {
 	 *
 	 * @see #resize(long)
 	 * @param file Datei.
-	 * @param size Größe des anzubindenden Speicherbereiches zu Beginn der Datei.
+	 * @param size Größe des anzubindenden Speicherbereiches zu Beginn der Datei. Wenn sie negativ ist, wird die gesamte Datei angebunden.
 	 * @param readonly {@code true}, wenn die Datei nur zum Lesezugriff angebunden werden soll.
 	 * @throws IOException Wenn die Anbindung nicht möglich ist. */
 	public MappedBuffer(final File file, final long size, final boolean readonly) throws IOException {
-		if (size < 0) throw new IOException();
 		this.file = file.getAbsoluteFile();
 		this.buffers = new MappedByteBuffer[1];
 		this.isReadonly = readonly;
-		this.resize(size);
+		this.resize(size < 0 ? file.length() : size);
 	}
 
 	/** Diese Methode gibt die Datei zurück, an die dieser Puffer gebunden ist.
@@ -283,8 +282,8 @@ public class MappedBuffer implements Emuable {
 	}
 
 	/** Diese Methode setzt die Größe des Puffers auf die gegebene.<br>
-	 * <b>Achtung:</b> Wegen der Fehlenden Kontrolle über die Lebenszeit der {@link MappedByteBuffer} kann die angebundene {@link #file() Datei} kann nur
-	 * vergrößert werden, aich wenn dieser Puffer nur einen Teil davon zugänglich macht!
+	 * <b>Achtung:</b> Wegen der Fehlenden Kontrolle über die Lebenszeit der {@link MappedByteBuffer} kann die angebundene {@link #file() Datei} nur vergrößert
+	 * werden, auch wenn dieser Puffer nur einen Teil davon zugänglich macht!
 	 *
 	 * @param newSize neue Puffergröße.
 	 * @throws IllegalArgumentException Wenn die Puffergröße ungültig ist. */
