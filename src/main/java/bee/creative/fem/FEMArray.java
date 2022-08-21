@@ -773,7 +773,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 		@Override
 		protected int customFind(final FEMValue that, final int offset, int length, final boolean foreward) {
-			final int hash = that.hashCode() & (this.table.length - this.length - 2);
+			final int hash = that.hashCode() & (this.table[0] - 2);
 			int l = this.table[hash], r = this.table[hash + 1] - 1;
 			length += offset;
 			if (foreward) {
