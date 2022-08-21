@@ -1509,7 +1509,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 		return new ReverseString(this);
 	}
 
-	/** * Diese Methode gibt diese Zeichenkette mit optimierter Leistungsfähigkeit des {@link #get(int) Codepointzugriffs} zurück. Abhängig vom Wertebereich der
+	/** Diese Methode gibt diese Zeichenkette mit optimierter Leistungsfähigkeit des {@link #get(int) Codepointzugriffs} zurück. Abhängig vom Wertebereich der
 	 * Codepoints kann hierfür eine {@link #compactINT8() 8-Bit}-, {@link #compactINT16() 16-Bit}- oder {@link #compactINT32() 32-Bit}-Einzelwertkodierung zum
 	 * Einsatz kommen.
 	 *
