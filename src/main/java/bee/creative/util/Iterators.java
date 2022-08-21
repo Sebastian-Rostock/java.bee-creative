@@ -23,7 +23,7 @@ public class Iterators {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link Iterator2}, der die Elemente eines Abschnitts von gegebenen {@link Array} liefert.
+	/** Diese Klasse implementiert einen {@link Iterator2}, der die Elemente eines Abschnitts eines gegebenen {@link Array} liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
