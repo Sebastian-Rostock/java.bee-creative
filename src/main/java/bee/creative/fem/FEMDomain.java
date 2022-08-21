@@ -37,12 +37,12 @@ import bee.creative.util.Parser.Token;
  * <td>{@code GROUP1}</td>
  * </tr>
  * <tr>
- * <td>{@link #parseGroupToken(FEMParser, boolean) GROUP1}</td>
+ * <td>{@code GROUP1}</td>
  * <td>::=</td>
  * <td>{@code SC} ({@code FUNCTION1} ({@code SC} {@code ";"} {@code SC} {@code FUNCTION1})* {@code SC})?</td>
  * </tr>
  * <tr>
- * <td>{@link #parseGroupToken(FEMParser, boolean) GROUP2}</td>
+ * <td>{@code GROUP2}</td>
  * <td>::=</td>
  * <td>{@code SC} ({@code FUNCTION2} ({@code SC} {@code ";"} {@code SC} {@code FUNCTION2})* {@code SC})?</td>
  * </tr>
@@ -116,50 +116,128 @@ public class FEMDomain extends BaseObject {
 	/** Dieses Feld speichert die normale {@link FEMDomain}. */
 	public static final FEMDomain DEFAULT = new FEMDomain();
 
+	/** Dieses Feld speichert den Abschnittstyp eines allgemeinen Quelltextfehlers. */
+	public static final int TYPE_ERROR = 1;
+
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseScriptToken(FEMParser) Funktionsliste}. */
-	public static int TYPE_SCRIPT = '*';
-
-	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseErrorToken(FEMParser) Quelltextfehlers}. */
-	public static int TYPE_ERROR = '!';
-
-	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseIdentToken(FEMParser) maskierten Kennung}. */
-	public static int TYPE_IDENT = '<';
-
-	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseIndexToken(FEMParser) Parameterposition}. */
-	public static int TYPE_INDEX = '#';
+	public static final int TYPE_SCRIPT = 2;
 
 	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseNameToken(FEMParser) Parameternamens}. */
-	public static int TYPE_NAME = '~';
+	public static final int TYPE_NAME_LOCAL_TOKEN = 4;
+
+	/** Dieses Feld speichert den Abschnittstyp eines fehlerhaften {@link #parseNameToken(FEMParser) Parameternamens}. */
+	public static final int TYPE_NAME_LOCAL_ERROR = 5;
+
+	/** Dieses Feld speichert den Abschnittstyp des {@link #parseHandler2Token(FEMParser, Token) Namens} einer Platzhalterfunktion. */
+	public static final int TYPE_NAME_GLOBAL_TOKEN = 6;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften {@link #parseHandler2Token(FEMParser, Token) Namens} einer Platzhalterfunktion. */
+	public static final int TYPE_NAME_GLOBAL_ERROR = 7;
+
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseIdentToken(FEMParser) maskierten Kennung}. */
+	public static final int TYPE_IDENT_LOCAL_TOKEN = 8;
+
+	/** Dieses Feld speichert den Abschnittstyp einer fehlerhaften {@link #parseIdentToken(FEMParser) maskierten Kennung}. */
+	public static final int TYPE_IDENT_LOCAL_ERROR = 9;
+
+	/** Dieses Feld speichert den Abschnittstyp des {@link #parseHandler2Token(FEMParser, Token) maskierten Kennung} einer Platzhalterfunktion. */
+	public static final int TYPE_IDENT_GLOBAL_TOKEN = 10;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften {@link #parseHandler2Token(FEMParser, Token) maskierten Kennung} einer Platzhalterfunktion. */
+	public static final int TYPE_IDENT_GLOBAL_ERROR = 11;
+
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseIndexToken(FEMParser) Parameterposition}. */
+	public static final int TYPE_INDEX_TOKEN = 12;
 
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseConstToken(FEMParser) Konstanten}. */
-	public static int TYPE_CONST = '?';
+	public static final int TYPE_CONST_TOKEN = 14;
+
+	/** Dieses Feld speichert den Abschnittstyp des Beginns einer {@link #parseArrayToken(FEMParser) Wertliste}. */
+	public static final int TYPE_ARRAY_ENTER = 16;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Beginns einer {@link #parseArrayToken(FEMParser) Wertliste}. */
+	public static final int TYPE_ARRAY_ENTER_ERROR = 17;
+
+	/** Dieses Feld speichert den Abschnittstyp des Trennzeichens einer {@link #parseArrayToken(FEMParser) Wertliste}. */
+	public static final int TYPE_ARRAY_COMMA = 18;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Trennzeichens einer {@link #parseArrayToken(FEMParser) Wertliste}. */
+	public static final int TYPE_ARRAY_COMMA_ERROR = 19;
+
+	/** Dieses Feld speichert den Abschnittstyp des Endes einer {@link #parseArrayToken(FEMParser) Wertliste}. */
+	public static final int TYPE_ARRAY_LEAVE = 20;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Endes einer {@link #parseArrayToken(FEMParser) Wertliste}. */
+	public static final int TYPE_ARRAY_LEAVE_ERROR = 21;
 
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseArrayToken(FEMParser) Wertliste}. */
-	public static int TYPE_ARRAY = '[';
+	public static final int TYPE_ARRAY_TOKEN = 22;
 
-	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseGroupToken(FEMParser, boolean) Funktionsliste}. */
-	public static int TYPE_GROUP = '(';
+	/** Dieses Feld speichert den Abschnittstyp des Beginns einer {@link #parseCompositeToken(FEMParser, Token) Parameterfunktionsliste}. */
+	public static final int TYPE_GROUP_ENTER = 24;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Beginns einer {@link #parseCompositeToken(FEMParser, Token) Parameterfunktionsliste}. */
+	public static final int TYPE_GROUP_ENTER_ERROR = 25;
+
+	/** Dieses Feld speichert den Abschnittstyp des Trennzeichens einer {@link #parseCompositeToken(FEMParser, Token) Parameterfunktionsliste}. */
+	public static final int TYPE_GROUP_COMMA = 26;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Trennzeichens einer {@link #parseCompositeToken(FEMParser, Token) Parameterfunktionsliste}. */
+	public static final int TYPE_GROUP_COMMA_ERROR = 27;
+
+	/** Dieses Feld speichert den Abschnittstyp des Endes einer {@link #parseCompositeToken(FEMParser, Token) Parameterfunktionsliste}. */
+	public static final int TYPE_GROUP_LEAVE = 28;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Endes einer {@link #parseCompositeToken(FEMParser, Token) Parameterfunktionsliste}. */
+	public static final int TYPE_GROUP_LEAVE_ERROR = 29;
+
+	/** Dieses Feld speichert den Abschnittstyp der Parameterliste einer {@link #parseCompositeToken(FEMParser, Token) Funktionsverkettung}. */
+	public static final int TYPE_GROUP_TOKEN = 30;
 
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseParamToken(FEMParser) Parameterfunktion}. */
-	public static int TYPE_PARAM = '$';
+	public static final int TYPE_PARAM_TOKEN = 32;
 
-	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseString1Token(FEMParser) Zeichenkette}. */
-	public static int TYPE_STRING1 = '\'';
+	/** Dieses Feld speichert den Abschnittstyp einer fehlerhaften {@link #parseParamToken(FEMParser) Parameterfunktion}. */
+	public static final int TYPE_PARAM_ERROR = 33;
 
-	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseString2Token(FEMParser) Zeichenkette}. */
-	public static int TYPE_STRING2 = '\"';
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseString2Token(FEMParser) Zeichenkette} mit einfachem Hochkomma. */
+	public static final int TYPE_STRING_SINGLE_TOKEN = 34;
+
+	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseString1Token(FEMParser) Zeichenkette} mit doppeltem Hochkomma. */
+	public static final int TYPE_STRING_DOUBLE_TOKEN = 36;
+
+	/** Dieses Feld speichert den Abschnittstyp des Beginns eines {@link #parseHandler1Token(FEMParser) Funktionszeigers}. */
+	public static final int TYPE_HANDLER_ENTER = 38;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Beginns eines {@link #parseHandler1Token(FEMParser) Funktionszeigers}. */
+	public static final int TYPE_HANDLER_ENTER_ERROR = 39;
+
+	/** Dieses Feld speichert den Abschnittstyp des Trennzeichens eines {@link #parseHandler1Token(FEMParser) Funktionszeigers}. */
+	public static final int TYPE_HANDLER_COLON = 40;
+
+	/** Dieses Feld speichert den Abschnittstyp des Trennzeichens eines {@link #parseHandler1Token(FEMParser) Parameternamens}. */
+	public static final int TYPE_HANDLER_COMMA = 42;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Trennzeichens eines {@link #parseHandler1Token(FEMParser) Parameternamens}. */
+	public static final int TYPE_HANDLER_COMMA_ERROR = 43;
+
+	/** Dieses Feld speichert den Abschnittstyp des Endes eines {@link #parseHandler1Token(FEMParser) Funktionszeigers}. */
+	public static final int TYPE_HANDLER_LEAVE = 44;
+
+	/** Dieses Feld speichert den Abschnittstyp des fehlerhaften Endes eines {@link #parseHandler1Token(FEMParser) Funktionszeigers}. */
+	public static final int TYPE_HANDLER_LEAVE_ERROR = 45;
 
 	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseHandler1Token(FEMParser) Funktionszeigers}. */
-	public static int TYPE_HANDLER1 = '{';
+	public static final int TYPE_HANDLER_LOCAL_TOKEN = 46;
 
 	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseHandler2Token(FEMParser, Token) Funktionszeigers als Platzhalter}. */
-	public static int TYPE_HANDLER2 = '=';
+	public static final int TYPE_HANDLER_GLOBAL_TOKEN = 48;
 
 	/** Dieses Feld speichert den Abschnittstyp eines {@link #parseCommentToken(FEMParser) Kommentars}. */
-	public static int TYPE_COMMENT = '/';
+	public static final int TYPE_COMMENT_TOKEN = 50;
 
 	/** Dieses Feld speichert den Abschnittstyp einer {@link #parseCompositeToken(FEMParser, Token) Funktionsverkettung}. */
-	public static int TYPE_COMPOSITE = '.';
+	public static final int TYPE_COMPOSITE_TOKEN = 52;
 
 	/** Diese Methode parst die als maskierte Zeichenkette gegebene Konstente und gibt diese zurück. Sie realisiert damit die Umkehroperation zu
 	 * {@link #printIdent(String)}. Das Parsen erfolgt über {@link Strings#parseSequence(CharSequence, char, char, char) Strings.parseSequence(src, '<', '\\',
@@ -175,17 +253,17 @@ public class FEMDomain extends BaseObject {
 	 * liefert sie {@code null}. */
 	protected String parseIdentData(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
-		if (tok.type() != FEMDomain.TYPE_IDENT) return null;
+		if (tok.type() != FEMDomain.TYPE_IDENT_LOCAL_TOKEN) return null;
 		final String res = this.parseIdent(tok.toString());
 		if (res != null) return res;
 		throw this.parseErrorData(src, null);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Kennung und gibt ihn zurück. Die Erkennung erfolgt über
-	 * {@link #parseSequenceToken(FEMParser, int, char, char, char) this.parseSequence(src, FEMDomain.TYPE_IDENT, '<', '\\', '>')}. Als Abschnittstyp wird
-	 * {@link #TYPE_IDENT} verwendet. Wenn keine maskierte Kennung gefunden wurden, wird {@code null} geliefert. */
+	 * {@link #parseSequenceToken(FEMParser, int, char, char, char) this.parseSequence(src, FEMDomain.TYPE_IDENT_TOKEN, '<', '\\', '>')}. Als Abschnittstyp wird
+	 * {@link #TYPE_IDENT_LOCAL_TOKEN} verwendet. Wenn keine maskierte Kennung gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseIdentToken(final FEMParser src) throws NullPointerException {
-		return this.parseSequenceToken(src, FEMDomain.TYPE_IDENT, '<', '\\', '>');
+		return this.parseSequenceToken(src, FEMDomain.TYPE_IDENT_LOCAL_TOKEN, '<', '\\', '>');
 	}
 
 	/** Diese Methode parst die ggf. als {@link #parseIdent(String) maskierte} Zeichenkette gegebene Kennung und gibt diese zurück. Sie realisiert damit die
@@ -239,46 +317,47 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Funktionsliste und gibt deren Elternabschnitt zurück. Als
 	 * Abschnittstyp des Elternabschnitts wird {@link #TYPE_SCRIPT} verwendet. Sein Abschnittswert ist die {@link Set Menge} der {@link String Namen} aller als
 	 * {@link #parseHandler2Token(FEMParser, Token) Funktionszeiger} angegebenen {@link FEMParser#proxies() Platzhalter}. Die {@link Token#tokens()
-	 * Kindabschnitte} sind die Abschnitte der {@link #parseGroupToken(FEMParser, boolean) Funktionen}. */
+	 * Kindabschnitte} sind die Abschnitte der {@link #parseFunctionToken(FEMParser, boolean) Funktionen}. */
 	protected Token parseScriptToken(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
-		final List<Token> funs = this.parseGroupToken(src, true);
-		if (src.symbol() >= 0) {
-			funs.add(this.parseErrorToken(src));
+		final List<Token> funs = new ArrayList<>();
+		while (true) {
+			this.parseIgnoreToken(src);
+			int sym = src.symbol();
+			if (sym < 0) {
+				break;
+			} else if (sym == ';') {
+				src.push(FEMDomain.TYPE_GROUP_COMMA_ERROR);
+				src.skip();
+				continue;
+			}
+			final Token fun = this.parseFunctionToken(src, true);
+			if (fun != null) {
+				funs.add(fun);
+			} else {
+				funs.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
+			}
+			this.parseIgnoreToken(src);
+			sym = src.symbol();
+			if (sym < 0) {
+				break;
+			} else if (sym == ';') {
+				src.push(FEMDomain.TYPE_GROUP_COMMA);
+				src.skip();
+			} else {
+				funs.add(this.parseErrorToken(src, FEMDomain.TYPE_GROUP_COMMA_ERROR));
+			}
 		}
 		return src.make(FEMDomain.TYPE_SCRIPT, pos, funs).value(new HashSet<>(src.proxies()));
 	}
 
-	/** Diese Methode überführt den von {@link #parseGroupToken(FEMParser, boolean)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
+	/** Diese Methode überführt den von {@code parseGroupToken(FEMParser, boolean)} ermittelten Abschnitt in eine Funktionsliste und gibt diese zurück. */
 	protected List<FEMFunction> parseGroupData(final FEMToken src) throws NullPointerException, FEMException {
 		final List<FEMFunction> res = new ArrayList<>();
 		for (final Token tok: src.token()) {
 			res.add(this.parseFunctionData(src.with(tok)));
 		}
 		return res;
-	}
-
-	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Funktionsliste und gibt die Abschnitte der Funktionen zurück. */
-	protected List<Token> parseGroupToken(final FEMParser src, final boolean allowProxy) throws NullPointerException {
-		final List<Token> res = new ArrayList<>();
-		this.parseIgnoreToken(src);
-		Token fun = this.parseFunctionToken(src, allowProxy);
-		if (fun == null) return res;
-		res.add(fun);
-		while (true) {
-			this.parseIgnoreToken(src);
-			if (src.symbol() != ';') return res;
-			final Token tok = src.push(';');
-			src.skip();
-			this.parseIgnoreToken(src);
-			fun = this.parseFunctionToken(src, allowProxy);
-			if (fun != null) {
-				res.add(fun);
-			} else {
-				tok.type(FEMDomain.TYPE_ERROR);
-				res.add(this.parseErrorToken(src));
-			}
-		}
 	}
 
 	/** Diese Methode liefert die beschriftete {@link FEMException Ausnahme} zum gegebeen Abschnitt. */
@@ -290,8 +369,8 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} der Eingabe bis zum nächsten Terminal bzw. Ende der Eingabe als Fehler und
-	 * gibt ihn zurück. Als Abschnittstyp wird {@link #TYPE_ERROR} verwendet. Der Abschnitt wird auch dann geliefert, wenn er leer ist. */
-	protected Token parseErrorToken(final FEMParser src) throws NullPointerException {
+	 * gibt ihn zurück. Als Abschnittstyp wird der gegebene verwendet. Der Abschnitt wird auch dann geliefert, wenn er leer ist. */
+	protected Token parseErrorToken(final FEMParser src, final int type) throws NullPointerException {
 		final int pos = src.index();
 		LOOP: for (int sym = src.skip(); sym >= 0; sym = src.skip()) {
 			switch (sym) {
@@ -306,7 +385,7 @@ public class FEMDomain extends BaseObject {
 				break LOOP;
 			}
 		}
-		return src.push(FEMDomain.TYPE_ERROR, pos);
+		return src.push(type, pos);
 	}
 
 	/** Diese Methode überführt den von {@link #parseConstToken(FEMParser)} ermittelten Abschnitt in eine Kennung und gibt diese zurück. */
@@ -315,7 +394,7 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Konstanten und gibt ihn zurück. Als Abschnittstyp wird
-	 * {@link #TYPE_CONST} verwendet. Wenn keine Konstante erkant wurde, wird {@code null} geliefet. */
+	 * {@link #TYPE_CONST_TOKEN} verwendet. Wenn keine Konstante erkant wurde, wird {@code null} geliefet. */
 	protected Token parseConstToken(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
 		LOOP: for (int sym = src.symbol(); sym > ' '; sym = src.skip()) {
@@ -331,14 +410,14 @@ public class FEMDomain extends BaseObject {
 				break LOOP;
 			}
 		}
-		return pos != src.index() ? src.push(FEMDomain.TYPE_CONST, pos) : null;
+		return pos != src.index() ? src.push(FEMDomain.TYPE_CONST_TOKEN, pos) : null;
 	}
 
 	/** Diese Methode überführt den von {@link #parseArrayToken(FEMParser)} ermittelten Abschnitt in eine Wertliste und gibt diese zurück. Für andere Abschnitte
 	 * liefert sie {@code null}. */
 	protected FEMValue parseArrayData(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
-		if (tok.type() != FEMDomain.TYPE_ARRAY) return null;
+		if (tok.type() != FEMDomain.TYPE_ARRAY_TOKEN) return null;
 		final List<FEMValue> res = new ArrayList<>();
 		for (final Token item: tok) {
 			res.add(this.parseValueData(src.with(item)));
@@ -347,60 +426,71 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Wertliste und gibt deren Elternabschnitt zurück. Als Abschnittstyp
-	 * des Elternabschnitts wird {@link #TYPE_ARRAY} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der {@link #parseValueToken(FEMParser, boolean)
-	 * Werte}. */
+	 * des Elternabschnitts wird {@link #TYPE_ARRAY_TOKEN} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der
+	 * {@link #parseValueToken(FEMParser, boolean) Werte}. */
 	protected Token parseArrayToken(final FEMParser src) throws NullPointerException {
 		int sym = src.symbol();
 		if (sym != '[') return null;
 		final int pos = src.index();
 		final List<Token> toks = new ArrayList<>();
-		final Token open = src.push(']');
+		final Token enter = src.push(FEMDomain.TYPE_ARRAY_ENTER);
 		src.skip();
 		this.parseIgnoreToken(src);
 		sym = src.symbol();
 		if (sym == ']') {
-			src.push(']');
+			src.push(FEMDomain.TYPE_ARRAY_LEAVE);
 			src.skip();
 		} else if (sym < 0) {
-			open.type(FEMDomain.TYPE_ERROR);
-			toks.add(this.parseErrorToken(src));
+			enter.type(FEMDomain.TYPE_ARRAY_ENTER_ERROR);
+			toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
 		} else {
 			Token tok = this.parseValueToken(src, false);
 			if (tok == null) {
-				toks.add(this.parseErrorToken(src));
+				enter.type(FEMDomain.TYPE_ARRAY_ENTER_ERROR);
+				toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
 			} else {
 				toks.add(tok);
 				while (true) {
 					this.parseIgnoreToken(src);
 					sym = src.symbol();
 					if (sym == ']') {
-						src.push(']');
+						if (enter.type() == FEMDomain.TYPE_ARRAY_ENTER_ERROR) {
+							src.push(FEMDomain.TYPE_ARRAY_LEAVE_ERROR);
+						} else {
+							src.push(FEMDomain.TYPE_ARRAY_LEAVE);
+						}
 						src.skip();
 						break;
 					} else if (sym < 0) {
-						open.type(FEMDomain.TYPE_ERROR);
-						toks.add(this.parseErrorToken(src));
+						enter.type(FEMDomain.TYPE_ARRAY_ENTER_ERROR);
+						toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
 						break;
 					} else if (sym != ';') {
-						toks.add(this.parseErrorToken(src));
+						enter.type(FEMDomain.TYPE_ARRAY_ENTER_ERROR);
+						toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ARRAY_COMMA_ERROR));
 					} else {
-						src.push(';');
+						src.push(FEMDomain.TYPE_ARRAY_COMMA);
 						src.skip();
 						this.parseIgnoreToken(src);
 						tok = this.parseValueToken(src, false);
-						toks.add(tok == null ? this.parseErrorToken(src) : tok);
+						if (tok == null) {
+							enter.type(FEMDomain.TYPE_ARRAY_ENTER_ERROR);
+							toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
+						} else {
+							toks.add(tok);
+						}
 					}
 				}
 			}
 		}
-		return src.make(FEMDomain.TYPE_ARRAY, pos, toks);
+		return src.make(FEMDomain.TYPE_ARRAY_TOKEN, pos, toks);
 	}
 
 	/** Diese Methode überführt den von {@link #parseString1Token(FEMParser)} ermittelten Abschnitt in eine Zeichenkette und gibt diese zurück. Für andere
 	 * Abschnitte liefert sie {@code null}. */
 	protected FEMValue parseString1Data(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
-		if (tok.type() != FEMDomain.TYPE_STRING1) return null;
+		if (tok.type() != FEMDomain.TYPE_STRING_DOUBLE_TOKEN) return null;
 		final String res = Strings.parseSequence(tok.toString(), '\"', '\\', '\"');
 		if (res != null) return FEMString.from(res);
 		throw this.parseErrorData(src, null);
@@ -410,31 +500,31 @@ public class FEMDomain extends BaseObject {
 	 * Abschnitte liefert sie {@code null}. */
 	protected FEMValue parseString2Data(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
-		if (tok.type() != FEMDomain.TYPE_STRING2) return null;
+		if (tok.type() != FEMDomain.TYPE_STRING_SINGLE_TOKEN) return null;
 		final String res = Strings.parseSequence(tok.toString(), '\'', '\\', '\'');
 		if (res != null) return FEMString.from(res);
 		throw this.parseErrorData(src, null);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette und gibt ihn zurück. Die Erkennung erfolgt
-	 * über {@link #parseSequenceToken(FEMParser, int, char, char, char) this.parseSequence(parser, FEMDomain.TYPE_STRING1, '\"', '\\', '\"')}. Als Abschnittstyp
-	 * wird {@link #TYPE_STRING1} verwendet. Wenn keine maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
+	 * über {@link #parseSequenceToken(FEMParser, int, char, char, char)}. Als Abschnittstyp wird {@link #TYPE_STRING_DOUBLE_TOKEN} verwendet. Wenn keine
+	 * maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseString1Token(final FEMParser src) throws NullPointerException {
-		return this.parseSequenceToken(src, FEMDomain.TYPE_STRING1, '\"', '\\', '\"');
+		return this.parseSequenceToken(src, FEMDomain.TYPE_STRING_DOUBLE_TOKEN, '\"', '\\', '\"');
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette und gibt ihn zurück. Die Erkennung erfolgt
-	 * über {@link #parseSequenceToken(FEMParser, int, char, char, char) this.parseSequence(parser, FEMDomain.TYPE_STRING2, '\'', '\\', '\'')}. Als Abschnittstyp
-	 * wird {@link #TYPE_STRING2} verwendet. Wenn keine maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
+	 * über {@link #parseSequenceToken(FEMParser, int, char, char, char)}. Als Abschnittstyp wird {@link #TYPE_STRING_SINGLE_TOKEN} verwendet. Wenn keine
+	 * maskierte Zeichenkette gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseString2Token(final FEMParser src) throws NullPointerException {
-		return this.parseSequenceToken(src, FEMDomain.TYPE_STRING2, '\'', '\\', '\'');
+		return this.parseSequenceToken(src, FEMDomain.TYPE_STRING_SINGLE_TOKEN, '\'', '\\', '\'');
 	}
 
 	/** Diese Methode überführt den von {@link #parseParamToken(FEMParser)} ermittelten Abschnitt in eine Parameterwerte liefernde Funktion
 	 * ({@link FEMFrame#FUNCTION} oder {@link FEMParam#from(int)}) und gibt diese zurück. Für andere Abschnitte liefert sie {@code null}. */
 	protected FEMFunction parseParamData(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
-		if (tok.type() != FEMDomain.TYPE_PARAM) return null;
+		if (tok.type() != FEMDomain.TYPE_PARAM_TOKEN) return null;
 		if (tok.size() == 0) return FEMFrame.FUNCTION;
 		try {
 			return FEMParam.from((Integer)tok.value());
@@ -444,13 +534,13 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} einer Parameterfunktion und gibt deren Elternabschnitt zurück. Als
-	 * Abschnittstyp des Elternabschnitts wird {@link #TYPE_PARAM} verwendet. Sein Abschnittswert ist die {@link FEMParam#index() Position} des referenzierten
-	 * Parameters bzw. {@code null}, wenn kein {@link Token#tokens() Kindabschnitt} vorliegen. Als Kindabschnitt wird der Abschnitt der
+	 * Abschnittstyp des Elternabschnitts wird {@link #TYPE_PARAM_TOKEN} verwendet. Sein Abschnittswert ist die {@link FEMParam#index() Position} des
+	 * referenzierten Parameters bzw. {@code null}, wenn kein {@link Token#tokens() Kindabschnitt} vorliegen. Als Kindabschnitt wird der Abschnitt der
 	 * {@link #parseIdentToken(FEMParser) Kennung}, der {@link #parseIndexToken(FEMParser) Position} bzw. des {@link #parseNameToken(FEMParser) Namen} verwendet.
-	 * Wenn Kennung, Position bzw. Name ungültig sind, wird als deren Abschnittstyp {@link #TYPE_ERROR} verwendet. */
+	 * Wenn Kennung, Position bzw. Name ungültig sind, wird als deren Abschnittstyp des Elternabschnitts {@link #TYPE_PARAM_ERROR} verwendet. */
 	protected Token parseParamToken(final FEMParser src) throws NullPointerException {
 		if (src.symbol() != '$') return null;
-		final Token res = src.push(FEMDomain.TYPE_PARAM);
+		final Token res = src.push(FEMDomain.TYPE_PARAM_TOKEN);
 		src.skip();
 		final Token ident = this.parseIdentToken(src), index, name, ref;
 		if (ident == null) {
@@ -469,16 +559,17 @@ public class FEMDomain extends BaseObject {
 			ref = name;
 			val = src.params().indexOf(name.toString());
 		} else return res;
-		if (val < 0) return ref.type(FEMDomain.TYPE_ERROR);
-		return src.make(FEMDomain.TYPE_PARAM, res.start(), Arrays.asList(ref)).value(val);
+		if (val < 0) return ref.type(FEMDomain.TYPE_PARAM_ERROR);
+		return src.make(FEMDomain.TYPE_PARAM_TOKEN, res.start(), Arrays.asList(ref)).value(val);
 	}
 
 	/** Diese Methode überführt den von {@link #parseHandler1Token(FEMParser)} bzw. {@link #parseHandler2Token(FEMParser, Token)} ermittelten Abschnitt in eine
 	 * Parameterfunktion und gibt diese zurück. Für andere Abschnitte liefert sie {@code null}. */
 	protected FEMFunction parseClosureData(final FEMToken src) {
 		FEMHandler res = this.parseHandler1Data(src);
-		if (res == null) return null;
-		res = this.parseHandler2Data(src);
+		if (res == null) {
+			res = this.parseHandler2Data(src);
+		}
 		if (res == null) return null;
 		return FEMClosure.from(res.toFunction());
 	}
@@ -487,7 +578,7 @@ public class FEMDomain extends BaseObject {
 	 * Abschnitte liefert sie {@code null}. */
 	protected FEMHandler parseHandler1Data(final FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
-		if (tok.type() != FEMDomain.TYPE_HANDLER1) return null;
+		if (tok.type() != FEMDomain.TYPE_HANDLER_LOCAL_TOKEN) return null;
 		final int next = tok.size() - 1;
 		if (next < 0) throw this.parseErrorData(src, null);
 		final FEMFunction fun = this.parseFunctionData(src.with(tok.get(next)));
@@ -498,7 +589,7 @@ public class FEMDomain extends BaseObject {
 	 * andere Abschnitte liefert sie {@code null}. */
 	protected FEMHandler parseHandler2Data(FEMToken src) throws NullPointerException, FEMException {
 		final Token tok = src.token();
-		if (tok.type() != FEMDomain.TYPE_HANDLER2) return null;
+		if (tok.type() != FEMDomain.TYPE_HANDLER_GLOBAL_TOKEN) return null;
 		if (tok.size() != 2) throw this.parseErrorData(src, null);
 		src = src.with(tok.get(0));
 		final String str = this.parseIdentData(src);
@@ -517,105 +608,136 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} die {@link Token Abschnitte} eines Funktionszeigers und gibt dessen Elternabschnitt zurück. Als
-	 * Abschnittstyp des Elternabschnitts wird {@link #TYPE_HANDLER1} verwendet. Sein Abschnittswert ist die {@link List Liste} der Parameternamen. Als
+	 * Abschnittstyp des Elternabschnitts wird {@link #TYPE_HANDLER_LOCAL_TOKEN} verwendet. Sein Abschnittswert ist die {@link List Liste} der Parameternamen. Als
 	 * Kindabschnitte werden die Abschnitte der Namen und Kennungen sowei der der Funktion verwendet. Wenn Namen bzw. Kennungen ungültig sind, wird als deren
-	 * Abschnittstyp {@link #TYPE_ERROR} verwendet. */
+	 * Fehlerabschnittstyp verwendet. */
 	protected Token parseHandler1Token(final FEMParser src) throws NullPointerException {
 		int sym = src.symbol();
 		if (sym != '{') return null;
 		final int pos = src.index();
 		final List<Token> toks = new ArrayList<>();
-		final Token o = src.push('{');
+		final Token enter = src.push(FEMDomain.TYPE_HANDLER_ENTER);
 		src.skip();
 		this.parseIgnoreToken(src);
 		sym = src.symbol();
 		if (sym == ':') {
-			src.push(':');
+			src.push(FEMDomain.TYPE_HANDLER_COLON);
 			src.skip();
 		} else if (sym < 0) {
-			o.type(FEMDomain.TYPE_ERROR);
-			toks.add(this.parseErrorToken(src));
+			enter.type(FEMDomain.TYPE_HANDLER_ENTER_ERROR);
+			toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
 		} else {
-			Token nam = this.parseIdentToken(src);
-			if (nam == null) {
-				nam = this.parseNameToken(src);
+			Token name = this.parseIdentToken(src);
+			if (name == null) {
+				name = this.parseNameToken(src);
 			}
-			if (nam == null) {
-				o.type(FEMDomain.TYPE_ERROR);
-				toks.add(this.parseErrorToken(src));
+			if (name == null) {
+				enter.type(FEMDomain.TYPE_HANDLER_ENTER_ERROR);
+				toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
 			} else {
-				toks.add(nam);
+				toks.add(name);
 				while (true) {
 					this.parseIgnoreToken(src);
 					sym = src.symbol();
 					if (sym == ':') {
-						src.push(':');
+						src.push(FEMDomain.TYPE_HANDLER_COLON);
 						src.skip();
 						break;
-					} else if ((sym < 0) || (sym != ';')) {
-						o.type(FEMDomain.TYPE_ERROR);
-						toks.add(this.parseErrorToken(src));
+					} else if (sym < 0) {
+						enter.type(FEMDomain.TYPE_HANDLER_ENTER_ERROR);
+						toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
+						break;
+					} else if (sym != ';') {
+						enter.type(FEMDomain.TYPE_HANDLER_ENTER_ERROR);
+						toks.add(this.parseErrorToken(src, FEMDomain.TYPE_HANDLER_COMMA_ERROR));
 						break;
 					} else {
-						src.push(';');
+						src.push(FEMDomain.TYPE_HANDLER_COMMA);
 						src.skip();
 						this.parseIgnoreToken(src);
-						nam = this.parseIdentToken(src);
-						if (nam == null) {
-							nam = this.parseNameToken(src);
+						name = this.parseIdentToken(src);
+						if (name == null) {
+							name = this.parseNameToken(src);
 						}
-						if (nam == null) {
-							o.type(FEMDomain.TYPE_ERROR);
-							toks.add(this.parseErrorToken(src));
+						if (name == null) {
+							enter.type(FEMDomain.TYPE_HANDLER_ENTER_ERROR);
+							toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
 							break;
 						} else {
-							toks.add(nam);
+							toks.add(name);
 						}
 					}
 				}
 			}
 		}
-		final List<String> nams = new ArrayList<>();
+		final List<String> names = new ArrayList<>();
 		for (final Token tok: toks) {
-			final String nam = tok.toString();
-			if (nams.contains(nam) || src.params().contains(nam)) {
-				tok.type(FEMDomain.TYPE_ERROR);
+			final String name = tok.toString();
+			if (names.contains(name) || src.params().contains(name)) {
+				if (tok.type() == FEMDomain.TYPE_NAME_LOCAL_TOKEN) {
+					tok.type(FEMDomain.TYPE_NAME_LOCAL_ERROR);
+				} else if (tok.type() == FEMDomain.TYPE_IDENT_LOCAL_TOKEN) {
+					tok.type(FEMDomain.TYPE_IDENT_LOCAL_ERROR);
+				} else {
+					tok.type(FEMDomain.TYPE_ERROR);
+				}
 			}
-			nams.add(nam);
+			names.add(name);
 		}
-		src.params().addAll(0, nams);
+		src.params().addAll(0, names);
 		this.parseIgnoreToken(src);
 		final Token tok = this.parseFunctionToken(src, false);
 		if (tok == null) {
-			o.type(FEMDomain.TYPE_ERROR);
-			toks.add(this.parseErrorToken(src));
+			enter.type(FEMDomain.TYPE_HANDLER_ENTER_ERROR);
+			toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
 		} else {
 			toks.add(tok);
 			this.parseIgnoreToken(src);
 			sym = src.symbol();
-			if ((sym < 0) || (sym != '}')) {
-				o.type(FEMDomain.TYPE_ERROR);
-				toks.add(this.parseErrorToken(src));
+			if (sym < 0) {
+				enter.type(FEMDomain.TYPE_HANDLER_ENTER_ERROR);
+				toks.add(this.parseErrorToken(src, FEMDomain.TYPE_HANDLER_LEAVE_ERROR));
+			} else if (sym != '}') {
+				enter.type(FEMDomain.TYPE_HANDLER_ENTER_ERROR);
+				toks.add(this.parseErrorToken(src, FEMDomain.TYPE_HANDLER_LEAVE_ERROR));
 			} else {
-				src.push('}');
+				if (enter.type() == FEMDomain.TYPE_HANDLER_ENTER_ERROR) {
+					src.push(FEMDomain.TYPE_HANDLER_LEAVE_ERROR);
+				} else {
+					src.push(FEMDomain.TYPE_HANDLER_LEAVE);
+				}
 				src.skip();
 			}
 		}
-		src.params().subList(0, nams.size()).clear();
-		return src.make(FEMDomain.TYPE_HANDLER1, pos, toks).value(nams);
+		src.params().subList(0, names.size()).clear();
+		return src.make(FEMDomain.TYPE_HANDLER_LOCAL_TOKEN, pos, toks).value(names);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Platzhalterfunktion mit dem gegebenen Namen. Als Abschnittstyp wird
-	 * {@link #TYPE_HANDLER2} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der gegebenen Kennung und des gefundenen Funktionszeigers. Wenn kein
-	 * Funktionszeiger gefunden wurden, wird {@code null} geliefert. */
+	 * {@link #TYPE_HANDLER_GLOBAL_TOKEN} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der gegebenen Kennung und des gefundenen Funktionszeigers.
+	 * Wenn kein Funktionszeiger gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseHandler2Token(final FEMParser src, final Token name) throws NullPointerException, FEMException {
 		this.parseIgnoreToken(src);
 		final Token impl = this.parseHandler1Token(src);
 		if (impl == null) return null;
 		if (!src.proxies().add(name.toString())) {
-			name.type(FEMDomain.TYPE_ERROR);
+			if (name.type() == FEMDomain.TYPE_NAME_LOCAL_TOKEN) {
+				name.type(FEMDomain.TYPE_NAME_GLOBAL_ERROR);
+			} else if (name.type() == FEMDomain.TYPE_IDENT_LOCAL_TOKEN) {
+				name.type(FEMDomain.TYPE_IDENT_GLOBAL_ERROR);
+			} else {
+				name.type(FEMDomain.TYPE_ERROR);
+			}
+		} else {
+			if (name.type() == FEMDomain.TYPE_NAME_LOCAL_TOKEN) {
+				name.type(FEMDomain.TYPE_NAME_GLOBAL_TOKEN);
+			} else if (name.type() == FEMDomain.TYPE_IDENT_LOCAL_TOKEN) {
+				name.type(FEMDomain.TYPE_IDENT_GLOBAL_TOKEN);
+			} else {
+				name.type(FEMDomain.TYPE_ERROR);
+			}
 		}
-		return src.make(FEMDomain.TYPE_HANDLER2, name.start(), Arrays.asList(name, impl));
+		return src.make(FEMDomain.TYPE_HANDLER_GLOBAL_TOKEN, name.start(), Arrays.asList(name, impl));
 	}
 
 	/** Diese Methode überführt den von {@link #parseValueToken(FEMParser, boolean)} ermittelten Abschnitt in einen Wert und gibt diesen zurück. */
@@ -681,7 +803,9 @@ public class FEMDomain extends BaseObject {
 			if (res == null) return null;
 		}
 		if (!allowProxy) return res;
-		return Objects.notNull(this.parseHandler2Token(src, res), res);
+		final Token res2 = this.parseHandler2Token(src, res);
+		if (res2 != null) return res2;
+		return res;
 	}
 
 	/** Diese Methode überführt den von {@link #parseFunctionToken(FEMParser, boolean)} ermittelten Abschnitt in eine Funktion und gibt diese zurück. */
@@ -725,8 +849,8 @@ public class FEMDomain extends BaseObject {
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Funktion und gibt ihn zurück. Wenn ein Parameter bzw. Wert von einer
 	 * in runden Klammern eingeschlossenen Funktionsliste gefolgt wird, führt dies zur Erkennung einer {@link FEMComposite Funktionsverkettung}, deren
-	 * Elternabschnitt geliefert wird. Als Abschnittstyp wird dann {@link #TYPE_COMPOSITE} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der
-	 * aufgerufenen Funktion und die der Parameterfunktionsliste, letztere mit dem Abschnittstyp {@link #TYPE_GROUP}. */
+	 * Elternabschnitt geliefert wird. Als Abschnittstyp wird dann {@link #TYPE_COMPOSITE_TOKEN} verwendet. Die {@link Token#tokens() Kindabschnitte} sind die der
+	 * aufgerufenen Funktion und die der Parameterfunktionsliste, letztere mit dem Abschnittstyp {@link #TYPE_GROUP_TOKEN}. */
 	protected Token parseFunctionToken(final FEMParser src, final boolean allowProxy) throws NullPointerException, FEMException {
 		Token res = null;
 		if (!allowProxy) {
@@ -743,36 +867,56 @@ public class FEMDomain extends BaseObject {
 	 * andere Abschnitte liefert sie {@code null}. */
 	protected FEMFunction parseCompositeData(FEMToken src) throws NullPointerException, FEMException {
 		Token tok = src.token();
-		if (tok.type() != FEMDomain.TYPE_COMPOSITE) return null;
+		if (tok.type() != FEMDomain.TYPE_COMPOSITE_TOKEN) return null;
 		if (tok.size() != 2) throw this.parseErrorData(src, null);
 		final FEMFunction res = this.parseFunctionData(src.with(tok.get(0)));
 		tok = tok.get(1);
 		src = src.with(tok);
-		if (tok.type() != FEMDomain.TYPE_GROUP) throw this.parseErrorData(src, null);
+		if (tok.type() != FEMDomain.TYPE_GROUP_TOKEN) throw this.parseErrorData(src, null);
 		final List<FEMFunction> pars = this.parseGroupData(src);
 		return res.compose(pars);
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer beliebig langen Funktonsverkettung und gibt ihn zurück. Als
-	 * Abschnittstyp wird {@link #TYPE_COMPOSITE} verwendet. Als Kindabschnitte wird {@code target} sowie ein der Abschnitt der Parameterliste verwendet.
-	 * Letzterer besitzt den Abschnittstyp {@link #TYPE_GROUP} und enthält als Kindabschnitte die der {@link #parseGroupToken(FEMParser, boolean)
+	 * Abschnittstyp wird {@link #TYPE_COMPOSITE_TOKEN} verwendet. Als Kindabschnitte wird {@code target} sowie ein der Abschnitt der Parameterliste verwendet.
+	 * Letzterer besitzt den Abschnittstyp {@link #TYPE_GROUP_TOKEN} und enthält als Kindabschnitte die der {@code parseGroupToken(FEMParser, boolean)
 	 * Parmetergruppe}. */
 	protected Token parseCompositeToken(final FEMParser src, Token target) throws NullPointerException, FEMException {
 		while (true) {
 			this.parseIgnoreToken(src);
 			if (src.symbol() != '(') return target;
-			final int pos = src.index();
-			final Token open = src.push('(');
+			final Token enter = src.push(FEMDomain.TYPE_GROUP_ENTER);
 			src.skip();
-			final List<Token> toks = this.parseGroupToken(src, false);
+			final List<Token> toks = new ArrayList<>();
+			this.parseIgnoreToken(src);
+			Token fun = this.parseFunctionToken(src, false);
+			if (fun != null) {
+				toks.add(fun);
+				while (true) {
+					this.parseIgnoreToken(src);
+					if (src.symbol() != ';') {
+						break;
+					}
+					final Token tok = src.push(FEMDomain.TYPE_GROUP_COMMA);
+					src.skip();
+					this.parseIgnoreToken(src);
+					fun = this.parseFunctionToken(src, false);
+					if (fun != null) {
+						toks.add(fun);
+					} else {
+						tok.type(FEMDomain.TYPE_GROUP_COMMA_ERROR);
+						toks.add(this.parseErrorToken(src, FEMDomain.TYPE_ERROR));
+					}
+				}
+			}
 			if (src.symbol() == ')') {
-				src.push(')');
+				src.push(FEMDomain.TYPE_GROUP_LEAVE);
 				src.skip();
 			} else {
-				open.type(FEMDomain.TYPE_ERROR);
-				toks.add(this.parseErrorToken(src));
+				enter.type(FEMDomain.TYPE_GROUP_ENTER_ERROR);
+				toks.add(this.parseErrorToken(src, FEMDomain.TYPE_GROUP_LEAVE_ERROR));
 			}
-			target = src.make(FEMDomain.TYPE_COMPOSITE, target.start(), Arrays.asList(target, src.make(FEMDomain.TYPE_GROUP, pos, toks)));
+			target = src.make(FEMDomain.TYPE_COMPOSITE_TOKEN, target.start(), Arrays.asList(target, src.make(FEMDomain.TYPE_GROUP_TOKEN, enter.start(), toks)));
 		}
 	}
 
@@ -782,11 +926,11 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer Parameterposition und gibt ihn zurück. Als Abschnittstyp wird
-	 * {@link #TYPE_INDEX} verwendet. Wenn keine Parameterposition gefunden wurden, wird {@code null} geliefert. */
+	 * {@link #TYPE_INDEX_TOKEN} verwendet. Wenn keine Parameterposition gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseIndexToken(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
 		for (int sym = src.symbol(); ('0' <= sym) && (sym <= '9'); sym = src.skip()) {}
-		if (pos != src.index()) return src.push(FEMDomain.TYPE_INDEX, pos);
+		if (pos != src.index()) return src.push(FEMDomain.TYPE_INDEX_TOKEN, pos);
 		return null;
 	}
 
@@ -796,7 +940,7 @@ public class FEMDomain extends BaseObject {
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines Parameternamen und gibt ihn zurück. Als Abschnittstyp wird
-	 * {@link #TYPE_NAME} verwendet. Wenn kein Parameternamen gefunden wurden, wird {@code null} geliefert. */
+	 * {@link #TYPE_NAME_LOCAL_TOKEN} verwendet. Wenn kein Parameternamen gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseNameToken(final FEMParser src) throws NullPointerException {
 		final int pos = src.index();
 		LOOP: for (int sym = src.symbol(); !Parser.isWhitespace(sym); sym = src.skip()) {
@@ -812,19 +956,19 @@ public class FEMDomain extends BaseObject {
 				break LOOP;
 			}
 		}
-		return pos != src.index() ? src.push(FEMDomain.TYPE_NAME, pos) : null;
+		return pos != src.index() ? src.push(FEMDomain.TYPE_NAME_LOCAL_TOKEN, pos) : null;
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} eines maskierten Kommentars und gibt ihn Abschnitt zurück. Als
-	 * Abschnittstyp wird {@link #TYPE_COMMENT} verwendet. Wenn kein maskierter Kommentar gefunden wurden, wird {@code null} geliefert. */
+	 * Abschnittstyp wird {@link #TYPE_COMMENT_TOKEN} verwendet. Wenn kein maskierter Kommentar gefunden wurden, wird {@code null} geliefert. */
 	protected Token parseCommentToken(final FEMParser src) throws NullPointerException {
-		return this.parseSequenceToken(src, FEMDomain.TYPE_COMMENT, '/', '\\', '/');
+		return this.parseSequenceToken(src, FEMDomain.TYPE_COMMENT_TOKEN, '/', '\\', '/');
 	}
 
 	/** Diese Methode {@link FEMParser#push(Token) erfasst} den {@link Token Abschnitt} einer maskierten Zeichenkette analog zu
 	 * {@link Strings#parseSequence(CharSequence, char, char, char)} und gibt diesen nur dann zurück, wenn er am {@code openSymbol} erkannt wurde. Andernfalls
 	 * liefert sie {@code null}. Als Abschnittstyp wird {@code type} eingesetzt, wenn die Sequenz nicht vorzeitig endet. Andernfalls wird die Zeichenkette als
-	 * {@link #parseErrorToken(FEMParser) Fehlerbereich} erfasst.
+	 * {@link #parseErrorToken(FEMParser, int) Fehlerbereich} erfasst.
 	 *
 	 * @param type Abschnittstyp.
 	 * @param openSym Erstes Symbol der Zeichenkette.
@@ -839,14 +983,14 @@ public class FEMDomain extends BaseObject {
 			sym = src.skip();
 			if (sym < 0) {
 				src.seek(pos);
-				return this.parseErrorToken(src);
+				return this.parseErrorToken(src, FEMDomain.TYPE_ERROR);
 			}
 			if (sym == maskSym) {
 				sym = src.skip();
 				if (sym < 0) {
 					if (maskSym == closeSym) return src.push(type, pos);
 					src.seek(pos);
-					return this.parseErrorToken(src);
+					return this.parseErrorToken(src, FEMDomain.TYPE_ERROR);
 				}
 				continue;
 			}
@@ -902,35 +1046,35 @@ public class FEMDomain extends BaseObject {
 	 * @param res Formatierer.
 	 * @param src aufbereiteter Quelltext. */
 	protected void printResult(final FEMPrinter res, final Result src) throws NullPointerException {
-		boolean inline = false;
 		for (final Token tok: src) {
 			switch (tok.type()) {
-				case '{':
-					inline = true;
-					res.push(tok);
-				break;
-				case ':':
-					inline = false;
-				case '/':
-					res.push(tok).push(" ");
-				break;
-				case '(':
-				case '[':
-					res.push(tok).pushBreakInc();
-				break;
-				case ']':
-				case ')':
-					res.pushBreakDec().push(tok);
-				break;
-				case ';':
-					if (inline) {
-						res.push(tok).push(" ");
-					} else {
-						res.push(tok).pushBreakSpc().pushIndent();
-					}
-				break;
 				default:
 					res.push(tok);
+				break;
+				case TYPE_HANDLER_COLON:
+				case TYPE_HANDLER_COMMA:
+				case TYPE_HANDLER_COMMA_ERROR:
+				case TYPE_COMMENT_TOKEN:
+					res.push(tok).push(" ");
+				break;
+				case TYPE_ARRAY_ENTER:
+				case TYPE_ARRAY_ENTER_ERROR:
+				case TYPE_GROUP_ENTER:
+				case TYPE_GROUP_ENTER_ERROR:
+					res.push(tok).pushBreakInc();
+				break;
+				case TYPE_ARRAY_LEAVE:
+				case TYPE_ARRAY_LEAVE_ERROR:
+				case TYPE_GROUP_LEAVE:
+				case TYPE_GROUP_LEAVE_ERROR:
+					res.pushBreakDec().push(tok);
+				break;
+				case TYPE_ARRAY_COMMA:
+				case TYPE_ARRAY_COMMA_ERROR:
+				case TYPE_GROUP_COMMA:
+				case TYPE_GROUP_COMMA_ERROR:
+					res.push(tok).pushBreakSpc().pushIndent();
+				break;
 			}
 		}
 	}
@@ -1020,7 +1164,7 @@ public class FEMDomain extends BaseObject {
 	/** Diese Methode {@link #printFunction(FEMPrinter, FEMFunction) erfasst} die Textdarstellung des gegebenen Funktionszeigers. Deren Funktion wird dabei in
 	 * <code>"{:"</code> und <code>"}"</code> eingeschlossen. */
 	protected void printHandler(final FEMPrinter res, final FEMHandler src) throws NullPointerException, IllegalArgumentException {
-		res.push("{:");
+		res.push("{: ");
 		this.printFunction(res, src.value());
 		res.push("}");
 	}
