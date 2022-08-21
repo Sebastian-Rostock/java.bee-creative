@@ -5,7 +5,6 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
-import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender. Intern wird die Zeitangabe als ein {@code long}
  * dargestellt.
@@ -1247,7 +1246,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	@Override
 	public int hashCode() {
-		return this.valueH ^ this.valueL;
+		final int result = Objects.hash((this.daymillisValueImpl() + (this.zoneValueImpl() * -60000)) + (this.calendardayValueImpl() * 86400000L));
+		return this.hasZone() ? ~result : result;
 	}
 
 	@Override
@@ -1273,21 +1273,29 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * Der Vergleich erfolgt für Zeitangaben mit Datum und/oder Uhrzeit gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime-order">XML
 	 * Schema Part 2: 3.2.7.3 Order relation on dateTime</a>:
 	 * <ul>
-	 * <li>Verschieben beider Zeitangaben auf Zeitzone {@code 00:00}. Zeitangaben mit Datum und ohne Uhrzeit werden hierbei so behandelt, als hätten sie die
-	 * Uhrzeit {@code 00:00:00}. Damit sinkt der {@link #calendardayValue()} nur dann um {@code 1}, wenn der {@link #zoneValue()} größer als {@code 0} ist.</li>
+	 * <li>Wenn nur diese Zeitangabe eine Zeitzone besitzt:
+	 * <ul>
+	 * <li>Wenn diese Zeitangabe früher als die gegebene Zeitangabe mit Zeitzone {@code +14:00} ist, wird {@code -1} geliefert.</li>
+	 * <li>Wenn diese Zeitangabe später als die gegebene Zeitangabe mit Zeitzone {@code -14:00} ist, wird {@code +1} geliefert.</li>
+	 * <li>Andernfalls wird {@code undefined} geliefert.</li>
+	 * </ul>
+	 * </li>
+	 * <li>Wenn nur die gegebene Zeitangabe eine Zeitzone besitzt:
+	 * <ul>
+	 * <li>Wenn diese Zeitangabe mit Zeitzone {@code -14:00} früher als die gegebene Zeitangabe ist, wird {@code -1} geliefert.</li>
+	 * <li>Wenn diese Zeitangabe mit Zeitzone {@code +14:00} später als die gegebene Zeitangabe ist, wird {@code +1} geliefert.</li>
+	 * <li>Andernfalls wird {@code undefined} geliefert.</li>
+	 * </ul>
+	 * </li>
+	 * <li>Andernfalls:
+	 * <ul>
+	 * <li>Zeitangaben mit Zeitzone werden in Zeitzone {@code 00:00} verschoben. Zeitangaben ohne Uhrzeit werden dabei so behandelt, als hätten sie die Uhrzeit
+	 * {@code 00:00:00}. Damit sinkt deren Kalendertag nur dann um {@code 1}, wenn der {@link #zoneValue()} größer als {@code 0} ist.</li>
 	 * <li>Wenn nur eine der Zeitangaben ein Datum besitzt, wird {@code undefined} geliefert.</li>
 	 * <li>Wenn beide ein Datum besitzen und die Differenz von {@link #calendardayValue()} ungleich {@code 0} ist, wird das Vorzeichen dieser Differenz
 	 * geliefert.</li>
 	 * <li>Wenn nur eine der Zeitangaben eine Uhrzeit besitzt, wird {@code undefined} geliefert.</li>
 	 * <li>Wenn beide eine Uhrzeit besitzen, wird das Vorzeichen der Differenz von {@link #daymillisValue()} geliefert.</li>
-	 * <li>Andernfalls wird {@code 0} geliefert.</li>
-	 * </ul>
-	 * </p>
-	 * <p>
-	 * Der Vergleich für Zeitangaben ohne Datum und ohne Uhrzeit erfolgt über folgende Schritte:
-	 * <ul>
-	 * <li>Wenn nur eine der Zeitangaben eine Zeitzone besitzt, wird {@code undefined} geliefert.</li>
-	 * <li>Wenn beide eine Zeitzone besitzen, wird das Vorzeichen der Differenz von {@link #zoneValue()} geliefert.</li>
 	 * <li>Andernfalls wird {@code 0} geliefert.</li>
 	 * </ul>
 	 * </p>
@@ -1297,68 +1305,40 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Vergleichswert oder {@code undefined}.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public int compareTo(final FEMDatetime that, final int undefined) throws NullPointerException {
-		int result;
-		if (this.hasDate()) {
-			if (!that.hasDate()) return undefined;
-			result = this.calendardayValueImpl() - that.calendardayValueImpl();
-			if ((result < -2) || (result > 2)) return Comparators.compare(result, 0);
-			if (this.hasTime()) {
-				if (that.hasTime()) {
-					result *= 86400000;
-					result += (this.daymillisValueImpl() - that.daymillisValueImpl());
-					result += (this.zoneValueImpl() - that.zoneValueImpl()) * -60000;
-					return Comparators.compare(result, 0);
-				} else {
-					if (that.zoneValueImpl() > 0) {
-						result++;
-					}
-					result *= 86400000;
-					result += this.daymillisValueImpl();
-					result += this.zoneValueImpl() * -60000;
-					if (result < 0) return -1;
-					if (result >= 86400000) return +1;
-					return undefined;
-				}
-			} else {
-				if (that.hasTime()) {
-					if (this.zoneValueImpl() > 0) {
-						result--;
-					}
-					result *= 86400000;
-					result -= that.daymillisValueImpl();
-					result -= that.zoneValueImpl() * -60000;
-					if (result > 0) return +1;
-					if (result <= -86400000) return -1;
-					return undefined;
-				} else {
-					if (this.zoneValueImpl() > 0) {
-						result--;
-					}
-					if (that.zoneValueImpl() > 0) {
-						result++;
-					}
-					return Comparators.compare(result, 0);
-				}
-			}
+		if (this.hasZone() == that.hasZone()) return this.compareToImpl(that, 0, undefined);
+		if (this.compareToImpl(that, +50400000, +1) < 0) return -1;
+		if (this.compareToImpl(that, -50400000, -1) > 0) return +1;
+		return undefined;
+	}
+
+	private int compareToImpl(final FEMDatetime that, final int offsetmillis, final int undefined) {
+		final boolean thisHasDate = this.hasDate(), thatHasDate = that.hasDate();
+		if (thisHasDate != thatHasDate) return undefined;
+		int deltamillis;
+		if (thisHasDate) {
+			final int deltadays = this.calendardayValueImpl() - that.calendardayValueImpl();
+			if (deltadays < -2) return -1;
+			if (deltadays > +2) return +1;
+			deltamillis = (deltadays * 86400000) + offsetmillis;
 		} else {
-			if (that.hasDate()) return undefined;
-			if (this.hasTime()) {
-				if (!that.hasTime()) return undefined;
-				result = this.daymillisValueImpl() - that.daymillisValueImpl();
-				result += (this.zoneValueImpl() - that.zoneValueImpl()) * -60000;
-				return Comparators.compare(result, 0);
-			} else {
-				if (that.hasTime()) return undefined;
-				if (this.hasZone()) {
-					if (!that.hasZone()) return undefined;
-					result = that.zoneValueImpl() - this.zoneValueImpl();
-					return Comparators.compare(result, 0);
-				} else {
-					if (that.hasZone()) return undefined;
-					return 0;
-				}
-			}
+			deltamillis = offsetmillis;
 		}
+		if (this.hasZone()) {
+			deltamillis += this.zoneValueImpl() * -60000;
+		}
+		if (that.hasZone()) {
+			deltamillis += that.zoneValueImpl() * +60000;
+		}
+		final boolean thisHasTime = this.hasTime(), thatHasTime = that.hasTime();
+		if (thisHasTime || thatHasTime) {
+			deltamillis += this.daymillisValueImpl() - that.daymillisValueImpl();
+		}
+		if (deltamillis < -86400000) return -1;
+		if (deltamillis > +86400000) return +1;
+		if (thisHasTime != thatHasTime) return undefined;
+		if (deltamillis < 0) return -1;
+		if (deltamillis > 0) return +1;
+		return 0;
 	}
 
 	/** Diese Methode gibt diese Zeitangabe als Anzahl an Millisekunden seit dem Zeitpunkt {@code 1970-01-01T00:00:00Z} zurück. Wenn diese Zeitangabe
