@@ -11,7 +11,7 @@ import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert eine komponierte Funktion, welche eine {@link #target() gegebene Funktion} mit den {@link #params() gegebenen
  * Parameterfunktionen} aufruft. Der Ergebniswert der komponierten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} ist dazu von der
- * {@link #concat() Verkettung} abhängig.
+ * {@link #isConcat() Verkettung} abhängig.
  * <p>
  * Ohne Verkettung entspricht der Ergebniswert: <pre>this.target().invoke(frame.newFrame(this.params())</pre><br>
  * Mit Verkettung ist er dagegen <pre>this.target().invoke(frame).toFunction().invoke(frame.newFrame(this.params())</pre><br>
@@ -33,7 +33,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 		}
 
 		@Override
-		public boolean concat() {
+		public boolean isConcat() {
 			return false;
 		}
 
@@ -52,7 +52,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 		}
 
 		@Override
-		public boolean concat() {
+		public boolean isConcat() {
 			return true;
 		}
 
@@ -110,7 +110,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 	/** Diese Methode die {@link FEMComposite Verkettung} zurück.
 	 *
 	 * @return Verkettung. */
-	public abstract boolean concat();
+	public abstract boolean isConcat();
 
 	@Override
 	public final long emu() {
@@ -123,7 +123,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 		for (int i = 0, size = params.length; i < size; i++) {
 			params[i] = params[i].trace(tracer);
 		}
-		return FEMComposite.from(this.concat(), this.target.trace(tracer), params);
+		return FEMComposite.from(this.isConcat(), this.target.trace(tracer), params);
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public abstract class FEMComposite extends BaseFunction implements Emuable, Arra
 		if (object == this) return true;
 		if (!(object instanceof FEMComposite)) return false;
 		final FEMComposite that = (FEMComposite)object;
-		return (this.concat() == that.concat()) && (this.hashCode() == that.hashCode()) && Objects.equals(this.target, that.target)
+		return (this.isConcat() == that.isConcat()) && (this.hashCode() == that.hashCode()) && Objects.equals(this.target, that.target)
 			&& Objects.equals(this.params, that.params);
 	}
 
