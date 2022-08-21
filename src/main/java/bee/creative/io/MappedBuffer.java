@@ -253,10 +253,12 @@ public class MappedBuffer implements Emuable {
 	 * Wert ist.
 	 *
 	 * @param align Wachstumsausrichtung in Byte (8..1073741824).
+	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn {@code scale} ungültig ist. */
-	public void growAlign(final int align) {
+	public MappedBuffer growAlign(final int align) {
 		if ((align < 8) || (align > 1073741824)) throw new IllegalArgumentException();
 		this.growAlign = (byte)(31 - Integer.numberOfLeadingZeros(align));
+		return this;
 	}
 
 	/** Diese Methode gibt den Wachstumsfaktor zurück, der in {@link #grow(long)} zur Berechnung der neuen Puffergröße verwendet wird.
@@ -269,10 +271,12 @@ public class MappedBuffer implements Emuable {
 	/** Diese Methode setzt den {@link #growScale() Wachstumsfaktor}.
 	 *
 	 * @param scale Wachstumsfaktor in Prozent (0..200).
+	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn {@code scale} ungültig ist. */
-	public void growScale(final int scale) throws IllegalArgumentException {
+	public MappedBuffer growScale(final int scale) throws IllegalArgumentException {
 		if ((scale < 0) || (scale > 200)) throw new IllegalArgumentException();
 		this.growScale = (byte)((scale * 32) / 100);
+		return this;
 	}
 
 	/** Diese Methode setzt die {@link #resize(long) Größe} des Puffers auf die Größe der {@link #file() Datei}. Dies kann notwendig werden, wenn Inhalt und Größe
@@ -286,17 +290,19 @@ public class MappedBuffer implements Emuable {
 	 * werden, auch wenn dieser Puffer nur einen Teil davon zugänglich macht!
 	 *
 	 * @param newSize neue Puffergröße.
+	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn die Puffergröße ungültig ist. */
-	public void resize(final long newSize) throws IllegalArgumentException, IllegalStateException {
+	public MappedBuffer resize(final long newSize) throws IllegalArgumentException, IllegalStateException {
 		if (newSize < 0) throw new IllegalArgumentException();
 		synchronized (this) {
-			if (this.size == newSize) return;
+			if (this.size == newSize) return this;
 			this.resizeImpl(newSize);
 		}
+		return this;
 	}
 
 	/** Diese Methode implementiert {@link #resize(long)} ohne {@code synchronized} und ohne Parameterprüfung. */
-	private final void resizeImpl(final long newSize) throws IllegalStateException {
+	private void resizeImpl(final long newSize) throws IllegalStateException {
 		final MappedByteBuffer[] oldBuffers = this.buffers, newBuffers;
 		final int oldLength = oldBuffers.length, newLength = Math.max(MappedBuffer.bufferIndex(newSize - 1) + 1, 1);
 		if (oldLength != newLength) {
@@ -319,6 +325,21 @@ public class MappedBuffer implements Emuable {
 		}
 		this.size = newSize;
 		this.buffers = newBuffers;
+	}
+
+	/** Diese Methode setzt die {@link File#length() Größe} der angebundenen {@link #file() Datei} auf {@link #size()}.
+	 *
+	 * @return {@code this}.
+	 * @throws IOException Wenn die Größe der Datei nicht verkleinert werden kann. Dies ist bspw. der Fall, wenn ein Teil des abzuschneidenden Speicherbereichs
+	 *         noch über {@link MappedByteBuffer} angebunden ist. */
+	public MappedBuffer truncate() throws IOException {
+		if (this.isReadonly) throw new IOException();
+		synchronized (this) {
+			try (final RandomAccessFile file = new RandomAccessFile(this.file, "rw")) {
+				file.setLength(this.size);
+			}
+		}
+		return this;
 	}
 
 	/** Diese Methode versucht alle Änderungen auf den Festspeicher zu übertragen.
@@ -365,16 +386,18 @@ public class MappedBuffer implements Emuable {
 	/** Diese Methode setzt die Bytereihenfolge.
 	 *
 	 * @see ByteBuffer#order(ByteOrder)
-	 * @param order Bytereihenfolge. */
-	public void order(ByteOrder order) {
+	 * @param order Bytereihenfolge.
+	 * @return {@code this}. */
+	public MappedBuffer order(ByteOrder order) {
 		order = Bytes.directOrder(order);
 		synchronized (this) {
-			if (this.order == order) return;
+			if (this.order == order) return this;
 			this.order = order;
 			for (final MappedByteBuffer buffer: this.buffers) {
 				buffer.order(order);
 			}
 		}
+		return this;
 	}
 
 	/** Diese Methode gibt den größtmöglichen Speicherbereich (16KB..1GB) ab der gegebenen Adresse als {@link ByteBuffer} zurück.
