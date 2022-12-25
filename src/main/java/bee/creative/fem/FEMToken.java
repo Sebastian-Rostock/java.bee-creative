@@ -36,31 +36,31 @@ public class FEMToken {
 	}
 
 	/** Diese Methode gibt den aktuellen Abschnitt zurück. */
-	public final Token token() {
+	public Token token() {
 		return this.token;
 	}
 
 	/** Diese Methode gibt die Zeichenkette zurück, auf die sich die Positionsangaben dieses Abschnitts beziehen. Sie ist eine Abkürzung für {@link Token#source()
 	 * this.token().source()}. */
-	public final String source() {
+	public String source() {
 		return this.token.source();
 	}
 
 	/** Diese Methode gibt die {@link Token#start() Startposition} des {@link #token() aktuellen Abschnitts} zurück. Sie ist eine Abkürzung für
 	 * {@link Token#start() this.token().start()}. */
-	public final int srcIndex() {
+	public int srcIndex() {
 		return this.token.start();
 	}
 
 	/** Diese Methode gibt die Spaltennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
-	public final int colIndex() {
+	public int colIndex() {
 		final String src = this.source();
 		final int pos = this.srcIndex(), add = src.lastIndexOf('\n', pos);
 		return (pos + 1) - (add < 0 ? 0 : add);
 	}
 
 	/** Diese Methode gibt die Zeilennummer zur {@link #srcIndex() aktuellen Quelltextposition} zurück. */
-	public final int rowIndex() {
+	public int rowIndex() {
 		final String src = this.source();
 		int res = 0;
 		for (int pos = this.srcIndex() + 1; pos >= 0; pos = src.lastIndexOf('\n', pos - 1), res++) {}
@@ -70,7 +70,7 @@ public class FEMToken {
 	/** Diese Methode gibt die bisher zur Wiederverwendung erzeugten Platzhalter zurück.
 	 *
 	 * @return Abbildung von Namen auf Platzhalter. */
-	public final Map<String, FEMFunction> proxies() {
+	public Map<String, FEMFunction> proxies() {
 		return this.proxies;
 	}
 
