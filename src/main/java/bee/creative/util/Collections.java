@@ -733,7 +733,7 @@ public class Collections {
 		@Override
 		public boolean containsValue(final Object value2) {
 			if (!this.valueTrans.isTarget(value2)) return false;
-			return this.that.containsKey(this.valueTrans.toSource(value2));
+			return this.that.containsValue(this.valueTrans.toSource(value2));
 		}
 
 		@Override
