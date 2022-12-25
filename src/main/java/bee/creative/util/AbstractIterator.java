@@ -2,7 +2,9 @@ package bee.creative.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import bee.creative.lang.Objects.BaseObject;
 import bee.creative.lang.Objects.UseToString;
 
@@ -80,6 +82,26 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 	@Override
 	public Iterator2<GItem> unmodifiable() {
 		return Iterators.unmodifiable(this);
+	}
+
+	@Override
+	public Set<GItem> toSet() {
+		return Iterators.toSet(this);
+	}
+
+	@Override
+	public List<GItem> toList() {
+		return Iterators.toList(this);
+	}
+
+	@Override
+	public Object[] toArray() {
+		return Iterators.toArray(this);
+	}
+
+	@Override
+	public GItem[] toArray(final GItem[] array) throws NullPointerException {
+		return Iterators.toArray(this, array);
 	}
 
 }

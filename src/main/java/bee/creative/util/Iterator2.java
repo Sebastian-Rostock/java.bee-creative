@@ -2,6 +2,8 @@ package bee.creative.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /** Diese Schnittstelle ergänzt einen {@link Iterator} insb. um eine Anbindung an Methoden von {@link Iterators}.
  *
@@ -41,5 +43,17 @@ public interface Iterator2<GItem> extends Iterator<GItem> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#unmodifiable(Iterator) Iterators.unmodifiable(this)}. */
 	public Iterator2<GItem> unmodifiable();
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#toSet(Iterator) Iterators.toSet(this)}. */
+	public Set<GItem> toSet();
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#toList(Iterator) Iterators.toList(this)}. */
+	public List<GItem> toList();
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#toArray(Iterator) Iterators.toArray(this)}. */
+	public Object[] toArray();
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#toArray(Iterator, Object[]) Iterators.toArray(this, array)}. */
+	public GItem[] toArray(GItem[] array) throws NullPointerException;
 
 }

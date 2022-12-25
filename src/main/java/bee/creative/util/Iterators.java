@@ -1,11 +1,13 @@
 package bee.creative.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
 
@@ -827,6 +829,34 @@ public class Iterators {
 	/** Diese Methode ist eine Abkürzung für {@link UnmodifiableIterator new UnmodifiableIterator<>(that)}. */
 	public static <GItem> Iterator2<GItem> unmodifiable(final Iterator<? extends GItem> that) throws NullPointerException {
 		return new UnmodifiableIterator<>(that);
+	}
+
+	/** Diese Methode liefert die Elemente des gegebenen {@link Iterable} als {@link Set}. Hierbei wird eine über {@link #addAll(Collection, Iterator)} befülltes
+	 * {@link HashSet2} geliefert. */
+	public static <GItem> Set<GItem> toSet(final Iterator<GItem> source) throws NullPointerException {
+		final HashSet2<GItem> result = new HashSet2<>();
+		Iterators.addAll(result, source);
+		return result;
+	}
+
+	/** Diese Methode liefert die Elemente des gegebenen {@link Iterator} als {@link List}. Hierbei wird eine über {@link #addAll(Collection, Iterator)} befüllte
+	 * {@link ArrayList} geliefert. */
+	public static <GItem> List<GItem> toList(final Iterator<GItem> source) throws NullPointerException {
+		final ArrayList<GItem> result = new ArrayList<>();
+		Iterators.addAll(result, source);
+		return result;
+	}
+
+	/** Diese Methode liefert die Elemente des gegebenen {@link Iterator} als Array. Dazu wird der Iterator in eine {@link Collection} überführt, deren Inhalt
+	 * schließlich als Array {@link Collection#toArray() geliefert} wird. */
+	public static Object[] toArray(final Iterator<?> source) throws NullPointerException {
+		return Iterators.toList(source).toArray();
+	}
+
+	/** Diese Methode liefert die Elemente des gegebenen {@link Iterator} als Array. Dazu wird der Iterator in eine {@link Collection} überführt, deren Inhalt
+	 * schließlich als Array {@link Collection#toArray(Object[]) geliefert} wird. */
+	public static <GItem> GItem[] toArray(final Iterator<? extends GItem> source, final GItem[] array) throws NullPointerException {
+		return Iterators.toList(source).toArray(array);
 	}
 
 }
