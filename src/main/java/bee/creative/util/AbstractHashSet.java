@@ -35,13 +35,23 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 
 	/** Diese Methode liefert das zum gegebenen Element äquivalente und in diesem {@link Set} verwaltete Element. Wenn das {@link Set} kein solches Element
 	 * enthält, wird das gegebene Element dem {@link Set} hinzugefügt und zurückgegeben.<br>
-	 * Durch Überschreiben von {@link #customInstallKey(Object)} kann beeinflusst werden, welches Element hinzugefügt und zurückgegeben wird. Zusem kann durch
+	 * Durch Überschreiben von {@link #customInstallKey(Object)} kann beeinflusst werden, welches Element hinzugefügt und zurückgegeben wird. Zudem kann durch
 	 * Überschreiben von {@link #customReuseEntry(int)} auf die Wiederverwendung des gelieferten Elements reagiert werden.
 	 *
 	 * @param item gesuchtes Element.
 	 * @return enthaltenes und ggf. eingefügtes Element. */
 	public GItem install(final GItem item) {
 		return this.customGetKey(this.installImpl(item));
+	}
+
+	/** Diese Methode liefert das zum gegebenen Element äquivalente und in diesem {@link Set} verwaltete Element. Wenn das {@link Set} kein solches Element
+	 * enthält, wird das über {@code installItem} aus dem gegebenen Element abgeleitete Element dem {@link Set} hinzugefügt und zurückgegeben.
+	 *
+	 * @param item gesuchtes Element.
+	 * @param installItem Methode zur Überführung des gegebenen Elements in das einzutragende Element.
+	 * @return enthaltenes und ggf. eingefügtes Element. */
+	public GItem install(final GItem item, Getter<? super GItem, ? extends GItem> installItem) {
+		return this.customGetKey(this.installImpl(item, installItem, Getters.<GItem>neutral()));
 	}
 
 	@Override

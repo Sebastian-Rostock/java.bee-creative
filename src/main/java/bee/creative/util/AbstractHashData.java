@@ -738,6 +738,24 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 		return index;
 	}
 
+	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird er erzeugt. Der
+	 * dabei verwendete Schlüssel wird über über {@code installKey} ermittelt. Daraus wird über {@code installValue} der initiale Wert des Eintrags abgeleitet.
+	 *
+	 * @param key Schlüssel des Eintrags.
+	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
+	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
+	 * @return Index des gefundenen oder erzeugten Eintrags. */
+	protected final int installImpl(final GKey key, final Getter<? super GKey, ? extends GKey> installKey,
+		final Getter<? super GKey, ? extends GValue> installValue) {
+		final int count = this.count, index = this.putIndexImpl(key);
+		if (count == this.count) return index;
+		final GKey key2 = installKey.get(key);
+		this.customSetKey(index, key2);
+		final GValue value = installValue.get(key2);
+		this.customSetValue(index, value);
+		return index;
+	}
+
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
 	 *
 	 * @return Anzahl der Einträge. */
