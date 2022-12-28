@@ -7,7 +7,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import bee.creative.array.Array;
+import bee.creative.lang.Array;
+import bee.creative.lang.Array2;
 import bee.creative.lang.Objects;
 import bee.creative.util.Iterators.UnmodifiableIterator;
 
@@ -22,6 +23,37 @@ public class Iterables {
 	public static class EmptyIterable extends AbstractIterable<Object> {
 
 		public static final Iterable<?> INSTANCE = new EmptyIterable();
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Iterable2}, der die Elemente eines Abschnitts eines gegebenen {@link Array} liefert.
+	 *
+	 * @param <GItem> Typ der Elemente. */
+	@SuppressWarnings ("javadoc")
+	public static class ArrayIterable<GItem> extends AbstractIterable<GItem> {
+
+		public final Array<? extends GItem> items;
+
+		public final int fromIndex;
+
+		public final int toIndex;
+
+		public ArrayIterable(final Array<? extends GItem> items, final int fromIndex, final int toIndex) throws NullPointerException, IllegalArgumentException {
+			Comparables.check(fromIndex, toIndex);
+			this.items = Objects.notNull(items);
+			this.fromIndex = fromIndex;
+			this.toIndex = toIndex;
+		}
+
+		@Override
+		public Iterator2<GItem> iterator() {
+			return Iterators.fromArray(this.items, this.fromIndex, this.toIndex);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.items, this.fromIndex, this.toIndex);
+		}
 
 	}
 
@@ -349,6 +381,29 @@ public class Iterables {
 		return new UniformIterable<>(item, count);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link #from(Iterable) Iterables.from(Arrays.asList(items))}.
+	 *
+	 * @see Arrays#asList(Object...) */
+	@SafeVarargs
+	public static <GItem> Iterable2<GItem> fromArray(final GItem... items) throws NullPointerException {
+		return Iterables.from(Arrays.asList(items));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link #from(Iterable) Iterables.from(Arrays.asList(items).subList(fromIndex, toIndex))}.
+	 *
+	 * @see List#subList(int, int)
+	 * @see Arrays#asList(Object...) */
+	public static <GItem> Iterable2<GItem> fromArray(final GItem[] items, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException {
+		return Iterables.from(Arrays.asList(items).subList(fromIndex, toIndex));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link ArrayIterable new ArrayIterable<>(items, fromIndex, toIndex)}. */
+	public static <GItem> Iterable2<GItem> fromArray(final Array<? extends GItem> items, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException {
+		return new ArrayIterable<>(items, fromIndex, toIndex);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link CountIterable new CountIterable<>(count)}. */
 	public static Iterable2<Integer> fromCount(final int count) throws IllegalArgumentException {
 		return new CountIterable(count);
@@ -357,7 +412,8 @@ public class Iterables {
 	/** Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück. */
 	public static int size(final Iterable<?> that) throws NullPointerException {
 		if (that instanceof Collection<?>) return ((Collection<?>)that).size();
-		if (that instanceof Array<?, ?>) return ((Array<?, ?>)that).size();
+		if (that instanceof Array2<?>) return ((Array2<?>)that).size();
+		if (that instanceof bee.creative.array.Array<?, ?>) return ((bee.creative.array.Array<?, ?>)that).size();
 		return Iterators.size(that.iterator());
 	}
 
@@ -406,6 +462,11 @@ public class Iterables {
 	public static boolean containsAll(final Collection<?> target, final Iterable<?> filter) throws NullPointerException {
 		if (filter instanceof Collection<?>) return target.containsAll((Collection<?>)filter);
 		return Iterators.containsAll(target, filter.iterator());
+	}
+
+	/** Diese Methode übergibt alle Elemente des gegebene {@link Iterable} an den gegebenen {@link Consumer}. */
+	public static <GItem> void collectAll(final Iterable<? extends GItem> source, final Consumer<? super GItem> target) throws NullPointerException {
+		Iterators.collectAll(source.iterator(), target);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #concatAll(Iterable) Iterables.concatAll(Arrays.asList(iter1, iter2))}. */

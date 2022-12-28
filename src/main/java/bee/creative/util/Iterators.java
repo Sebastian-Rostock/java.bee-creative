@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -604,24 +603,19 @@ public class Iterators {
 		return new UniformIterator<>(item, count);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Iterator) Iterators.from(Arrays.asList(items).iterator())}.
-	 *
-	 * @see Arrays#asList(Object...) */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#fromArray(Object...) Iterables.fromArray(items).iterator()}. */
 	@SafeVarargs
 	public static <GItem> Iterator2<GItem> fromArray(final GItem... items) throws NullPointerException {
-		return Iterators.from(Arrays.asList(items).iterator());
+		return Iterables.fromArray(items).iterator();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link #from(Iterator) Iterators.from(Arrays.asList(items).subList(fromIndex, toIndex).iterator())}.
-	 *
-	 * @see List#subList(int, int)
-	 * @see Arrays#asList(Object...) */
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#fromArray(Object[], int, int) Iterables.fromArray(items, fromIndex, toIndex).iterator()}. */
 	public static <GItem> Iterator2<GItem> fromArray(final GItem[] items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
-		return Iterators.from(Arrays.asList(items).subList(fromIndex, toIndex).iterator());
+		return Iterables.fromArray(items, fromIndex, toIndex).iterator();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link ArrayIterator new ItemsIterator<>(items, fromIndex, toIndex)}. */
+	/** Diese Methode ist eine Abkürzung für {@link ArrayIterator new ArrayIterator<>(items, fromIndex, toIndex)}. */
 	public static <GItem> Iterator2<GItem> fromArray(final Array<? extends GItem> items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
 		return new ArrayIterator<>(items, fromIndex, toIndex);
@@ -733,6 +727,14 @@ public class Iterators {
 			if (!target.contains(filter.next())) return false;
 		}
 		return true;
+	}
+
+	/** Diese Methode übergibt alle Elemente des gegebene {@link Iterator} an den gegebenen {@link Consumer}. */
+	public static <GItem> void collectAll(final Iterator<? extends GItem> source, final Consumer<? super GItem> target) throws NullPointerException {
+		Objects.notNull(target);
+		while (source.hasNext()) {
+			target.set(source.next());
+		}
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #concatAll(Iterator) Iterators.concatAll(Iterators.fromArray(iter1, iter2))}.

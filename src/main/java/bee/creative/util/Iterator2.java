@@ -44,6 +44,9 @@ public interface Iterator2<GItem> extends Iterator<GItem> {
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#unmodifiable(Iterator) Iterators.unmodifiable(this)}. */
 	public Iterator2<GItem> unmodifiable();
 
+	/** Diese Methode ist eine Abkürzung für {@link Iterators#collectAll(Iterator, Consumer) Iterators.collectAll(this, target)}. */
+	public void collectAll(final Consumer<? super GItem> target) throws NullPointerException;
+
 	/** Diese Methode ist eine Abkürzung für {@link Iterators#toSet(Iterator) Iterators.toSet(this)}. */
 	public Set<GItem> toSet();
 

@@ -85,6 +85,11 @@ public abstract class AbstractIterator<GItem> extends BaseObject implements Iter
 	}
 
 	@Override
+	public void collectAll(final Consumer<? super GItem> target) throws NullPointerException {
+		Iterators.collectAll(this, target);
+	}
+
+	@Override
 	public Set<GItem> toSet() {
 		return Iterators.toSet(this);
 	}
