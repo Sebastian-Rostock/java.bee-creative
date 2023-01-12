@@ -113,6 +113,11 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	}
 
 	@Override
+	protected boolean customEqualsValue(final int entryIndex, final Object value) {
+		return (value instanceof Long) && (((Long)value).longValue() == this.values[entryIndex]);
+	}
+
+	@Override
 	protected void customClear() {
 		Arrays.fill(this.keys, null);
 	}

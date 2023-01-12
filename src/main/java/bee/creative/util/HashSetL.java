@@ -73,7 +73,7 @@ public class HashSetL extends AbstractHashSet<Long> implements Serializable, Clo
 
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object item) {
-		return (item instanceof Long) && (((Long)item).intValue() == this.items[entryIndex]);
+		return (item instanceof Long) && (((Long)item).longValue() == this.items[entryIndex]);
 	}
 
 	@Override

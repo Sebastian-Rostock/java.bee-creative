@@ -90,7 +90,7 @@ public class HashMapLO<GValue> extends AbstractHashMap<Long, GValue> implements 
 
 	@Override
 	protected boolean customEqualsKey(final int entryIndex, final Object key) {
-		return (key instanceof Long) && (((Long)key).intValue() == this.keys[entryIndex]);
+		return (key instanceof Long) && (((Long)key).longValue() == this.keys[entryIndex]);
 	}
 
 	@Override

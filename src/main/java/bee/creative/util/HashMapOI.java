@@ -113,6 +113,11 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	}
 
 	@Override
+	protected boolean customEqualsValue(final int entryIndex, final Object value) {
+		return (value instanceof Integer) && (((Integer)value).intValue() == this.values[entryIndex]);
+	}
+
+	@Override
 	protected void customClear() {
 		Arrays.fill(this.keys, null);
 	}
