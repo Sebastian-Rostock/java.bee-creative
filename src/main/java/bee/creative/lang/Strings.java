@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import bee.creative.util.Getter;
 import bee.creative.util.Getters;
+import bee.creative.util.Setter;
 
 /** Diese Klasse stellt einige statische Methoden zur Verarbeitung von regulären Ausdrücken und Zeichenketten zur Verfügung.
  *
@@ -238,6 +239,26 @@ public class Strings {
 		result.append(iter.next());
 		while (iter.hasNext()) {
 			result.append(space).append(iter.next());
+		}
+	}
+
+	/** Diese Methode fügt die Verkettung der Textdarstelungen der gegebenen Elemente mit dem gegebenen Trennzeichen an den gegebenen {@link StringBuilder} an.
+	 * Das Trennzeichen wird hierbei zwischen die Textdarstelungen aufeinanderfolgender Elemente platziert. Die Textdarstelung jedes Elements wird dazu über den
+	 * gegebenen {@link Setter} an den gegebenen {@link StringBuilder} angefügt.
+	 * 
+	 * @param <GItem> Typ der Elemente.
+	 * @param result Verkettungstext.
+	 * @param space Trennzeichen.
+	 * @param items Elemente.
+	 * @param printer Methode zum Anfügen der Textdarstelung eines Elements.
+	 * @throws NullPointerException Wenn {@code result}, {@code space}, {@code items} bzw. {@code printer} {@code null} ist. */
+	public static <GItem> void join(final StringBuilder result, final String space, final Iterable<GItem> items,
+		final Setter<? super StringBuilder, ? super GItem> printer) throws NullPointerException {
+		final Iterator<GItem> iter = items.iterator();
+		if (!iter.hasNext()) return;
+		printer.set(result, iter.next());
+		while (iter.hasNext()) {
+			printer.set(result.append(space), iter.next());
 		}
 	}
 
@@ -576,8 +597,7 @@ public class Strings {
 	public static String parseSequence(final CharSequence string, final char openSymbol, final char maskSymbol, final char closeSymbol)
 		throws NullPointerException {
 		final int length = string.length();
-		if (length < 2) return null;
-		if (string.charAt(0) != openSymbol) return null;
+		if ((length < 2) || (string.charAt(0) != openSymbol)) return null;
 		final char[] result = new char[length - 2];
 		int index = 1, offset = 0;
 		while (index < length) {
