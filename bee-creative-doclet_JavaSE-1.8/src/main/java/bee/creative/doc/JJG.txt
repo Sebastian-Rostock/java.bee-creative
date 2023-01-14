@@ -1,0 +1,125 @@
+
+RootDoc = packages: PackageDoc[], classes: ClassDoc[]?
+
+PackageDoc = name: string, docs: Tag[]?, tags: Tag[]?
+
+Tag = text: string? | @see: LinkTag? | @link: LinkTag? | @param: ParamTag? | @throws: ThrowsTag? | @return: Tag[]? | @code: Tag[]? | @serial: Tag[]? | @author: Tag[]? | @version: Tag[]? | @deprecated: Tag[]? | @...: Tag[]?
+
+LinkTag {
+	href: string
+	text: string?
+}
+
+ParamTag {
+	name: string
+	isType: true?
+	docs: Tag[]?
+}
+
+ThrowsTag {
+	type: Type
+	docs: Tag[]?
+}
+
+ClassInfo {
+	key: REF
+	name: TEXT
+	parent: REF?
+	isFinal: TRUE?
+	isStatic: TRUE?
+	isPublic: TRUE?
+	isPrivate: TRUE?
+	isAbstract: TRUE?
+	isProtected: TRUE?
+	isError: TRUE?
+	isException: TRUE?
+	isInterface: TRUE?
+	isSerializable: TRUE?
+	isExternalizable: TRUE?
+	docs: Tag[]?
+	tags: Tag[]?
+	vars: VarInfo[]?
+	superclass: Type?
+	interfaces: Type?
+	fields: Field[]?
+	methods: Method[]?
+	constructors: Constructor[]?
+}
+
+VarInfo {
+	key: REF
+	name: TEXT
+	extends: TypeInfo[]?
+}
+
+TypeInfo {
+	((name: string
+	args: Type[]?) 
+	| param: string"
+	|  super: Type[]?
+	| extends: Type[]?
+	)
+	dims: string? // "[]", "[][]", ...
+}
+
+Field {
+		JJG.putStr(res, "name", src.name());
+		JJG.putBol(res, "isFinal", src.isFinal());
+		JJG.putBol(res, "isStatic", src.isStatic());
+		JJG.putBol(res, "isPublic", src.isPublic());
+		JJG.putBol(res, "isPrivate", src.isPrivate());
+		JJG.putBol(res, "isProtected", src.isProtected());
+		JJG.putBol(res, "isVolatile", src.isVolatile());
+		JJG.putBol(res, "isSynthetic", src.isSynthetic());
+		JJG.putBol(res, "isTransient", src.isTransient());
+		JJG.putArr(res, "docs", src.inlineTags(), JJG::putTag);
+		JJG.putArr(res, "tags", src.tags(), JJG::putTag);
+		JJG.putObj(res, "type", src.type(), JJG::putType);
+		JJG.putStr(res, "value", src.constantValueExpression());
+}
+
+Method {
+		JJG.putStr(res, "name", src.name());
+		JJG.putBol(res, "isFinal", src.isFinal());
+		JJG.putBol(res, "isStatic", src.isStatic());
+		JJG.putBol(res, "isPublic", src.isPublic());
+		JJG.putBol(res, "isPrivate", src.isPrivate());
+		JJG.putBol(res, "isAbstract", src.isAbstract());
+		JJG.putBol(res, "isProtected", src.isProtected());
+		JJG.putBol(res, "isNative", src.isNative());
+		JJG.putBol(res, "isDefault", src.isDefault());
+		JJG.putBol(res, "isSynthetic", src.isSynthetic());
+		JJG.putBol(res, "isSynchronized", src.isSynchronized());
+		JJG.putBol(res, "isVarArgs", src.isVarArgs());
+		JJG.putArr(res, "docs", src.inlineTags(), JJG::putTag);
+		JJG.putArr(res, "tags", src.tags(), JJG::putTag);
+		JJG.putArr(res, "vars", src.typeParameters(), JJG::putVar);
+		JJG.putArr(res, "params", src.parameters(), JJG::putParam);
+		JJG.putObj(res, "result", r, JJG::putType);
+		JJG.putArr(res, "throws", src.thrownExceptionTypes(), JJG::putType);
+		JJG.putStr(res, "signature", JJG.calcHref(src.flatSignature()) + ':' + r.typeName() + r.dimension());
+}
+
+Constructor {
+		JJG.putStr(res, "name", src.name());
+		JJG.putBol(res, "isFinal", src.isFinal());
+		JJG.putBol(res, "isStatic", src.isStatic());
+		JJG.putBol(res, "isPublic", src.isPublic());
+		JJG.putBol(res, "isPrivate", src.isPrivate());
+		JJG.putBol(res, "isProtected", src.isProtected());
+		JJG.putBol(res, "isNative", src.isNative());
+		JJG.putBol(res, "isSynthetic", src.isSynthetic());
+		JJG.putBol(res, "isSynchronized", src.isSynchronized());
+		JJG.putBol(res, "isVarArgs", src.isVarArgs());
+		JJG.putArr(res, "docs", src.inlineTags(), JJG::putTag);
+		JJG.putArr(res, "tags", src.tags(), JJG::putTag);
+		JJG.putArr(res, "vars", src.typeParameters(), JJG::putVar);
+		JJG.putArr(res, "params", src.parameters(), JJG::putParam);
+		JJG.putArr(res, "throws", src.thrownExceptionTypes(), JJG::putType);
+		JJG.putStr(res, "signature", JJG.calcHref(src.flatSignature()));
+}
+
+Param {
+	name: string
+	type: Type
+}
