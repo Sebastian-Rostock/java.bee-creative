@@ -556,7 +556,7 @@ public class Parser {
 	 * @param index Position.
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist. */
-	public final int seek(final int index) throws IndexOutOfBoundsException {
+	public int seek(final int index) throws IndexOutOfBoundsException {
 		if (index < 0) throw new IndexOutOfBoundsException();
 		if (index < this.length) return this.symbol = this.chars[this.index = index];
 		this.index = this.length;
@@ -577,7 +577,7 @@ public class Parser {
 	/** Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
 	 *
 	 * @see #seek(int) */
-	public final void reset() {
+	public void reset() {
 		this.seek(0);
 	}
 
@@ -587,7 +587,7 @@ public class Parser {
 	 * @see #take()
 	 * @see #symbol()
 	 * @return aktuelle Position. */
-	public final int index() {
+	public int index() {
 		return this.index;
 	}
 
@@ -598,14 +598,14 @@ public class Parser {
 	 * @see #take()
 	 * @see #index()
 	 * @return aktuelles Zeichen oder {@code -1}. */
-	public final int symbol() {
+	public int symbol() {
 		return this.symbol;
 	}
 
 	/** Diese Methode gibt die Auflistung aller {@link #push(Token) erfassten Abschnitte} zurück.
 	 *
 	 * @return Abschnittsliste. */
-	public final LinkedList<Token> tokens() {
+	public LinkedList<Token> tokens() {
 		return this.tokens;
 	}
 
@@ -616,7 +616,7 @@ public class Parser {
 	 * @see #reset()
 	 * @see #index()
 	 * @return {@code true}, wenn die aktuelle Position minimal ist. */
-	public final boolean isReset() {
+	public boolean isReset() {
 		return this.index == 0;
 	}
 
@@ -628,7 +628,7 @@ public class Parser {
 	 * @see #length()
 	 * @see #symbol()
 	 * @return {@code true}, wenn die aktuelle Position maximal ist. */
-	public final boolean isParsed() {
+	public boolean isParsed() {
 		return this.symbol < 0;
 	}
 
@@ -641,7 +641,7 @@ public class Parser {
 	 * @see #symbol()
 	 * @see #target()
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}. */
-	public final int take() {
+	public int take() {
 		this.take(this.symbol);
 		return this.skip();
 	}
@@ -651,7 +651,7 @@ public class Parser {
 	 * @see #take()
 	 * @see #target()
 	 * @param symbol Zeichen. */
-	public final void take(final int symbol) {
+	public void take(final int symbol) {
 		if (symbol < 0) return;
 		this.target.append((char)symbol);
 	}
@@ -662,7 +662,7 @@ public class Parser {
 	 * @see #take()
 	 * @see #target()
 	 * @throws NullPointerException Wenn die Zeichenkette {@code null} ist. */
-	public final void take(final String symbols) throws NullPointerException {
+	public void take(final String symbols) throws NullPointerException {
 		this.target.append(symbols.toString());
 	}
 
@@ -671,7 +671,7 @@ public class Parser {
 	 *
 	 * @param type Abschnittstyp.
 	 * @return neuer Abschnitt. */
-	public final Token make(final int type) throws IllegalArgumentException {
+	public Token make(final int type) throws IllegalArgumentException {
 		return this.make(type, this.index(), 1);
 	}
 
@@ -681,7 +681,7 @@ public class Parser {
 	 * @param type Abschnittstyp.
 	 * @param offset Abschnittsbeginn.
 	 * @return neuer Abschnitt. */
-	public final Token make(final int type, final int offset) throws IllegalArgumentException {
+	public Token make(final int type, final int offset) throws IllegalArgumentException {
 		return this.make(type, offset, this.index() - offset);
 	}
 
@@ -692,7 +692,7 @@ public class Parser {
 	 * @param offset Abschnittsbeginn.
 	 * @param length Abschnittslänge.
 	 * @return neuer Abschnitt. */
-	public final Token make(final int type, final int offset, final int length) throws IllegalArgumentException {
+	public Token make(final int type, final int offset, final int length) throws IllegalArgumentException {
 		return Token.from(this.source(), offset, length, type);
 	}
 
@@ -703,7 +703,7 @@ public class Parser {
 	 * @param offset Abschnittsbeginn.
 	 * @param tokens Kindabschnitte.
 	 * @return neuer Abschnitt. */
-	public final Token make(final int type, final int offset, final List<Token> tokens) throws NullPointerException, IllegalArgumentException {
+	public Token make(final int type, final int offset, final List<Token> tokens) throws NullPointerException, IllegalArgumentException {
 		return this.make(type, offset, this.index() - offset, tokens);
 	}
 
@@ -715,8 +715,7 @@ public class Parser {
 	 * @param length Abschnittslänge.
 	 * @param tokens Kindabschnitte.
 	 * @return neuer Abschnitt. */
-	public final Token make(final int type, final int offset, final int length, final Iterable<Token> tokens)
-		throws NullPointerException, IllegalArgumentException {
+	public Token make(final int type, final int offset, final int length, final Iterable<Token> tokens) throws NullPointerException, IllegalArgumentException {
 		return Token.from(this.source(), offset, length, type, tokens);
 	}
 
@@ -725,7 +724,7 @@ public class Parser {
 	 * @see #make(int)
 	 * @param type Abschnittstyp.
 	 * @return Abschnitt. */
-	public final Token push(final int type) throws IllegalArgumentException {
+	public Token push(final int type) throws IllegalArgumentException {
 		return this.push(this.make(type));
 	}
 
@@ -735,7 +734,7 @@ public class Parser {
 	 * @param type Abschnittstyp.
 	 * @param offset Abschnittsbeginn.
 	 * @return Abschnitt oder {@code null}. */
-	public final Token push(final int type, final int offset) throws IllegalArgumentException {
+	public Token push(final int type, final int offset) throws IllegalArgumentException {
 		return this.push(this.make(type, offset));
 	}
 
@@ -746,7 +745,7 @@ public class Parser {
 	 * @param offset Abschnittsbeginn.
 	 * @param length Abschnittslänge.
 	 * @return Abschnitt oder {@code null}. */
-	public final Token push(final int type, final int offset, final int length) {
+	public Token push(final int type, final int offset, final int length) {
 		return this.push(this.make(type, offset, length));
 	}
 
@@ -755,7 +754,7 @@ public class Parser {
 	 *
 	 * @param token Abschnitt oder {@code null}.
 	 * @return Abschnitt oder {@code null}. */
-	public final Token push(final Token token) {
+	public Token push(final Token token) {
 		if ((token == null) || (token.length() == 0)) return token;
 		this.tokens.add(token);
 		return token;
@@ -767,7 +766,7 @@ public class Parser {
 	 * @see #take(int)
 	 * @see #take(String)
 	 * @see #target() */
-	public final void clear() {
+	public void clear() {
 		this.target.setLength(0);
 	}
 
@@ -780,7 +779,7 @@ public class Parser {
 	 * @see #clear()
 	 * @see #symbol()
 	 * @return Ausgabe. */
-	public final String target() {
+	public String target() {
 		return this.target.toString();
 	}
 
@@ -790,14 +789,14 @@ public class Parser {
 	 * @see #index()
 	 * @see #source()
 	 * @return Länge der Eingabe. */
-	public final int length() {
+	public int length() {
 		return this.length;
 	}
 
 	/** Diese Methode gibt die Eingabe zurück.
 	 *
 	 * @return Eingabe. */
-	public final String source() {
+	public String source() {
 		return this.source;
 	}
 
