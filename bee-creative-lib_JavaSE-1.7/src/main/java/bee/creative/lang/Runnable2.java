@@ -7,7 +7,7 @@ public interface Runnable2 {
 
 	/** Diese Methode führt die Berechnung aus.
 	 *
-	 * @throws Throwable Wenn während der Berechnung ein Fehler eintritt. */
-	public void run() throws Throwable;
+	 * @throws Exception Wenn während der Berechnung ein Fehler eintritt. */
+	public void run() throws Exception;
 
 }
