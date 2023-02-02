@@ -47,7 +47,7 @@ public abstract class MarshallerBuilder<GOwner> extends BaseValueBuilder<Marshal
 
 		@Override
 		public Marshaller get() {
-			return null;
+			return this.value;
 		}
 
 		@Override
@@ -133,16 +133,6 @@ public abstract class MarshallerBuilder<GOwner> extends BaseValueBuilder<Marshal
 
 	}
 
-	// /** Diese Klasse implementiert den Konfigurator für das {@link Schema}. */
-	// public static class ShemaValue extends SchemaBuilder.Value<ShemaValue> {
-	//
-	// @Override
-	// public ShemaValue owner() {
-	// return this;
-	// }
-	//
-	// }
-
 	/** Diese Klasse implementiert den Konfigurator für das {@link Schema}. */
 	public class SchemaProxy extends SchemaBuilder.Proxy<GOwner> {
 
@@ -158,15 +148,6 @@ public abstract class MarshallerBuilder<GOwner> extends BaseValueBuilder<Marshal
 
 	}
 
-	// public static class ContextValue extends ContextBuilder.Value<ContextValue> {
-	//
-	// @Override
-	// public ContextValue owner() {
-	// return this;
-	// }
-	//
-	// }
-
 	public class ContextProxy extends ContextBuilder.Proxy<GOwner> {
 
 		@Override
@@ -181,46 +162,38 @@ public abstract class MarshallerBuilder<GOwner> extends BaseValueBuilder<Marshal
 
 	}
 
-	// public static class AdaptersValue extends AdaptersBuilder<AdaptersValue> {
-	//
-	// }
-
 	public class AdaptersProxy extends AdaptersBuilder<GOwner> {
 
 		@Override
 		public Set<XmlAdapter<?, ?>> get() {
-			return null;
+			return MarshallerBuilder.this.adapters().get();
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return MarshallerBuilder.this.owner();
 		}
 
 	}
 
-	// /** Diese Klasse implementiert den Konfigurator für die {@link XmlAdapter}.
-	// *
-	// * @see Marshaller#setAdapter(XmlAdapter)
-	// * @param <GOwner> Typ des Besitzers. */
-	// public static abstract class AdaptersBuilder<GOwner> extends BaseSetBuilder<XmlAdapter<?, ?>, Set<XmlAdapter<?, ?>>, GOwner> {
-	//
-	// }
-
+	// TODO
 	public static class ListenerValue extends ListenerBuilder<ListenerValue> {
+
+		Listener value;
 
 		@Override
 		public Listener get() {
-			return null;
+			return this.value;
 		}
 
 		@Override
 		public void set(final Listener value) {
+			this.value = value;
 		}
 
 		@Override
 		public ListenerValue owner() {
-			return null;
+			return this;
 		}
 
 	}
@@ -229,16 +202,17 @@ public abstract class MarshallerBuilder<GOwner> extends BaseValueBuilder<Marshal
 
 		@Override
 		public Listener get() {
-			return null;
+			return MarshallerBuilder.this.listener().get();
 		}
 
 		@Override
 		public void set(final Listener value) {
+			MarshallerBuilder.this.listener().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return MarshallerBuilder.this.owner();
 		}
 
 	}
@@ -251,61 +225,38 @@ public abstract class MarshallerBuilder<GOwner> extends BaseValueBuilder<Marshal
 
 	}
 
-	// public static class PropertiesValue extends PropertiesBuilder<PropertiesValue> {
-	//
-	// }
-
 	public class PropertiesProxy extends PropertiesBuilder<GOwner> {
 
 		@Override
 		public Map<String, Object> get() {
-			return null;
+			return MarshallerBuilder.this.properties().get();
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return MarshallerBuilder.this.owner();
 		}
 
 	}
-
-	// /** Diese Klasse implementiert den Konfigurator für die Eigenschaften.
-	// *
-	// * @see Marshaller#setProperty(String, Object)
-	// * @param <GOwner> Typ des Besitzers. */
-	// public static abstract class PropertiesBuilder<GOwner> extends BaseMapBuilder<String, Object, Map<String, Object>, GOwner> {
-	//
-	// }
-
-	// public static class ValidationValue extends ValidationBuilder<ValidationValue> {
-	//
-	// }
 
 	public class ValidationProxy extends ValidationBuilder<GOwner> {
 
 		@Override
 		public ValidationEventHandler get() {
-			return null;
+			return MarshallerBuilder.this.validation().get();
 		}
 
 		@Override
 		public void set(final ValidationEventHandler value) {
+			MarshallerBuilder.this.validation().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return MarshallerBuilder.this.owner();
 		}
 
 	}
-	//
-	// /** Diese Klasse implementiert den Konfigurator für den {@link ValidationEventHandler}.
-	// *
-	// * @see Marshaller#setEventHandler(ValidationEventHandler)
-	// * @param <GOwner> Typ des Besitzers. */
-	// public static abstract class ValidationBuilder<GOwner> extends BaseValueBuilder<ValidationEventHandler, ValidationBuilder<GOwner>> {
-	//
-	// }
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 *

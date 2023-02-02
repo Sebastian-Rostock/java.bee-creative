@@ -96,11 +96,11 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 
 	public static class ModelValue extends ModelBuilder<ModelValue> {
 
+		String value;
+
 		ModelValue() {
 			this.useDEFAULT_OBJECT_MODEL_URI();
 		}
-
-		String value;
 
 		@Override
 		public String get() {
@@ -123,16 +123,17 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 
 		@Override
 		public String get() {
-			return null;
+			return XPathFactoryBuilder.this.model().get();
 		}
 
 		@Override
 		public void set(final String value) {
+			XPathFactoryBuilder.this.model().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return XPathFactoryBuilder.this.owner();
 		}
 
 	}
@@ -173,25 +174,28 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return XPathFactoryBuilder.this.owner();
 		}
 
 	}
 
 	public static class VariableValue extends VariableBuilder<VariableValue> {
 
+		XPathVariableResolver value;
+
 		@Override
 		public XPathVariableResolver get() {
-			return null;
+			return this.value;
 		}
 
 		@Override
 		public void set(final XPathVariableResolver value) {
+			this.value = value;
 		}
 
 		@Override
 		public VariableValue owner() {
-			return null;
+			return this;
 		}
 
 	}
@@ -200,16 +204,17 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 
 		@Override
 		public XPathVariableResolver get() {
-			return null;
+			return XPathFactoryBuilder.this.variable().get();
 		}
 
 		@Override
 		public void set(final XPathVariableResolver value) {
+			XPathFactoryBuilder.this.variable().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return XPathFactoryBuilder.this.owner();
 		}
 
 	}
@@ -224,18 +229,21 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 
 	public static class FunctionValue extends FunctionBuilder<FunctionValue> {
 
+		XPathFunctionResolver value;
+
 		@Override
 		public XPathFunctionResolver get() {
-			return null;
+			return this.value;
 		}
 
 		@Override
 		public void set(final XPathFunctionResolver value) {
+			this.value = value;
 		}
 
 		@Override
 		public FunctionValue owner() {
-			return null;
+			return this;
 		}
 
 	}
@@ -244,16 +252,17 @@ public abstract class XPathFactoryBuilder<GOwner> extends BaseValueBuilder<XPath
 
 		@Override
 		public XPathFunctionResolver get() {
-			return null;
+			return XPathFactoryBuilder.this.function().get();
 		}
 
 		@Override
 		public void set(final XPathFunctionResolver value) {
+			XPathFactoryBuilder.this.function().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return XPathFactoryBuilder.this.owner();
 		}
 
 	}

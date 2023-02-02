@@ -31,7 +31,7 @@ public abstract class TransformerBuilder<GOwner> extends BaseValueBuilder<Transf
 
 		@Override
 		public Transformer get() {
-			return null;
+			return this.value;
 		}
 
 		@Override

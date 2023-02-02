@@ -1,7 +1,6 @@
 package bee.creative.xml;
 
 import java.io.StringWriter;
-import java.io.Writer;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -45,7 +44,7 @@ public class XMLMarshaller {
 	/** Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Marshaller}.
 	 *
 	 * @see Transformer#transform(Source, Result) */
-	public static class SourceData extends BaseValueBuilder<Object, SourceData> {
+	public static class SourceValue extends BaseValueBuilder<Object, SourceValue> {
 
 		Object value;
 
@@ -60,24 +59,22 @@ public class XMLMarshaller {
 		}
 
 		@Override
-		public SourceData owner() {
+		public SourceValue owner() {
 			return this;
 		}
 
 	}
 
-	public class SourceData2 extends BaseValueBuilder<Object, XMLMarshaller> {
-
-		SourceData sourceData = new SourceData();
+	public class SourceProxy extends BaseValueBuilder<Object, XMLMarshaller> {
 
 		@Override
 		public Object get() {
-			return this.sourceData.get();
+			return XMLMarshaller.this.source().get();
 		}
 
 		@Override
 		public void set(final Object value) {
-			this.sourceData.set(value);
+			XMLMarshaller.this.source().set(value);
 		}
 
 		@Override
@@ -136,7 +133,7 @@ public class XMLMarshaller {
 
 	final ResultValue result = new ResultValue();
 
-	final SourceData2 sourceData = new SourceData2();
+	final SourceValue source = new SourceValue();
 
 	final MarshallerValue marshaller = new MarshallerValue();
 
@@ -146,7 +143,7 @@ public class XMLMarshaller {
 	 * @return {@code this}. */
 	public XMLMarshaller use(final XMLMarshaller data) {
 		if (data == null) return this;
-		this.sourceData.use(data.sourceData);
+		this.source.use(data.source);
 		this.result.use(data.result);
 		this.marshaller.use(data.marshaller);
 		return this;
@@ -199,8 +196,8 @@ public class XMLMarshaller {
 		return this.result;
 	}
 
-	public SourceData source() {
-		return this.sourceData.sourceData;
+	public SourceValue source() {
+		return this.source;
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabedaten und gibt ihn zurück.
@@ -215,8 +212,8 @@ public class XMLMarshaller {
 	 *
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return Konfigurator. */
-	public SourceData2 forSource() {
-		return this.sourceData;
+	public SourceProxy forSource() {
+		return new SourceProxy();
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Marshaller} und gibt ihn zurück.

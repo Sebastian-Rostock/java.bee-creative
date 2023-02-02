@@ -110,31 +110,34 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 	public class FactoryProxy extends XPathFactoryBuilder.Proxy<GOwner> {
 
 		@Override
-		protected bee.creative.xml.XPathFactoryBuilder.Value<?> value() {
-			return null;
+		protected XPathFactoryBuilder.Value<?> value() {
+			return XPathBuilder.this.facrory();
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return XPathBuilder.this.owner();
 		}
 
 	}
 
 	public static class NamespaceValue extends NamespaceBuilder<NamespaceValue> {
 
+		NamespaceContext value;
+
 		@Override
 		public NamespaceContext get() {
-			return null;
+			return this.value;
 		}
 
 		@Override
 		public void set(final NamespaceContext value) {
+			this.value = value;
 		}
 
 		@Override
 		public NamespaceValue owner() {
-			return null;
+			return this;
 		}
 
 	}
@@ -143,16 +146,17 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 
 		@Override
 		public NamespaceContext get() {
-			return null;
+			return XPathBuilder.this.namespace().get();
 		}
 
 		@Override
 		public void set(final NamespaceContext value) {
+			XPathBuilder.this.namespace().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return XPathBuilder.this.owner();
 		}
 
 	}
@@ -168,18 +172,21 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 
 	public static class VariableValue extends VariableBuilder<VariableValue> {
 
+		XPathVariableResolver value;
+
 		@Override
 		public XPathVariableResolver get() {
-			return null;
+			return this.value;
 		}
 
 		@Override
 		public void set(final XPathVariableResolver value) {
+			this.value = value;
 		}
 
 		@Override
 		public VariableValue owner() {
-			return null;
+			return this;
 		}
 
 	}
@@ -188,16 +195,17 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 
 		@Override
 		public XPathVariableResolver get() {
-			return null;
+			return XPathBuilder.this.variable().get();
 		}
 
 		@Override
 		public void set(final XPathVariableResolver value) {
+			XPathBuilder.this.variable().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return XPathBuilder.this.owner();
 		}
 
 	}
@@ -213,18 +221,21 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 
 	public static class FunctionValue extends FunctionBuilder<FunctionValue> {
 
+		XPathFunctionResolver value;
+
 		@Override
 		public XPathFunctionResolver get() {
-			return null;
+			return this.value;
 		}
 
 		@Override
 		public void set(final XPathFunctionResolver value) {
+			this.value = value;
 		}
 
 		@Override
 		public FunctionValue owner() {
-			return null;
+			return this;
 		}
 
 	}
@@ -233,16 +244,17 @@ public abstract class XPathBuilder<GOwner> extends BaseValueBuilder<XPath, GOwne
 
 		@Override
 		public XPathFunctionResolver get() {
-			return null;
+			return XPathBuilder.this.function().get();
 		}
 
 		@Override
 		public void set(final XPathFunctionResolver value) {
+			XPathBuilder.this.function().set(value);
 		}
 
 		@Override
 		public GOwner owner() {
-			return null;
+			return XPathBuilder.this.owner();
 		}
 
 	}

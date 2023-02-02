@@ -50,16 +50,16 @@ public class XMLParser {
 
 	}
 
-	public class BuilderProxy extends DocumentBuilderBuilder.Proxy<BuilderValue> {
+	public class BuilderProxy extends DocumentBuilderBuilder.Proxy<XMLParser> {
 
 		@Override
 		protected BuilderValue value() {
-			return null;
+			return XMLParser.this.builder();
 		}
 
 		@Override
-		public BuilderValue owner() {
-			return null;
+		public XMLParser owner() {
+			return XMLParser.this;
 		}
 
 	}

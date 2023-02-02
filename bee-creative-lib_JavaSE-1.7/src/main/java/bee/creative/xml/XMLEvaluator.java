@@ -22,7 +22,7 @@ public class XMLEvaluator extends BaseValueBuilder<XPathExpression, XMLEvaluator
 
 		@Override
 		public XPathValue owner() {
-			return null;
+			return this;
 		}
 
 	}
@@ -30,13 +30,13 @@ public class XMLEvaluator extends BaseValueBuilder<XPathExpression, XMLEvaluator
 	public class XPathProxy extends XPathBuilder.Proxy<XMLEvaluator> {
 
 		@Override
-		public XMLEvaluator owner() {
-			return XMLEvaluator.this;
+		protected XPathValue value() {
+			return XMLEvaluator.this.xpath();
 		}
 
 		@Override
-		protected XPathValue value() {
-			return XMLEvaluator.this.xpath();
+		public XMLEvaluator owner() {
+			return XMLEvaluator.this;
 		}
 
 	}
