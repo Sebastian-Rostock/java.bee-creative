@@ -36,12 +36,12 @@ import com.sun.javadoc.WildcardType;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")
 @Deprecated
-public class JavaDocGen extends Doclet {
+  class Deprecated_JavaDocGen extends Doclet {
 
 	/** Dieses Feld speichert den Namen der {@link RootDoc#options() Option}, die den Dateinamen der Ausgabedatei angibt. */
 	public static final String OPTION_TARGET = "-targetfile";
 	public static void main(final String[] args) throws Exception {
-		com.sun.tools.javadoc.Main.execute("TESSSSSS", JavaDocGen.class.getCanonicalName(),
+		com.sun.tools.javadoc.Main.execute("TESSSSSS", Deprecated_JavaDocGen.class.getCanonicalName(),
 			new String[]{ //
 				"-protected", //
 				OPTION_TARGET, "D:/projects/java/bee-creative (javadoc)/doc.html", //
@@ -51,7 +51,7 @@ public class JavaDocGen extends Doclet {
 	}
 	public static boolean start(final RootDoc rootDoc) {
 		try {
-			final JavaDocGen gen = new JavaDocGen();
+			final Deprecated_JavaDocGen gen = new Deprecated_JavaDocGen();
 			gen.loadOptions(rootDoc);
 			gen.writeRoot(rootDoc);
 			return true;
@@ -62,7 +62,7 @@ public class JavaDocGen extends Doclet {
 	}
 
 	public static int optionLength(final String option) {
-		if (JavaDocGen.OPTION_TARGET.equals(option)) return 2;
+		if (Deprecated_JavaDocGen.OPTION_TARGET.equals(option)) return 2;
 		return 0;
 	}
 
@@ -74,7 +74,7 @@ public class JavaDocGen extends Doclet {
 
 	final void loadOptions(final RootDoc rootDoc) {
 		for (final String[] option: rootDoc.options()) {
-			if ((option.length == 2) && JavaDocGen.OPTION_TARGET.equals(option[0])) {
+			if ((option.length == 2) && Deprecated_JavaDocGen.OPTION_TARGET.equals(option[0])) {
 				this.targetFile = option[1];
 			}
 		}
@@ -687,7 +687,7 @@ public class JavaDocGen extends Doclet {
 	}
 
 	final String loadFile(final String name) throws IOException {
-		try (InputStream stream = JavaDocGen.class.getResourceAsStream(name)) {
+		try (InputStream stream = Deprecated_JavaDocGen.class.getResourceAsStream(name)) {
 			try (Scanner scanner = new Scanner(stream, "UTF8")) {
 				return scanner.useDelimiter("\\Z").next();
 			}

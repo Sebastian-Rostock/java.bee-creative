@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,14 +24,14 @@ import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.PackageDoc;
 import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.Parameter;
-import com.sun.javadoc.ProgramElementDoc;
+import com.sun.javadoc.ParameterizedType;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.SeeTag;
 import com.sun.javadoc.Tag;
 import com.sun.javadoc.ThrowsTag;
 import com.sun.javadoc.Type;
 import com.sun.javadoc.TypeVariable;
-import com.sun.javafx.image.impl.ByteIndexed.Getter;
+import com.sun.javadoc.WildcardType;
 
 /** Diese Klasse implementiert ein {@link Doclet}, welches die Inhalte einer {@link RootDoc} in eine {@code json}-Datei exportiert.<br>
  * Der Name dieser Datei wird über die Option {@value #TARGETPATH} angegeben.
@@ -40,62 +39,32 @@ import com.sun.javafx.image.impl.ByteIndexed.Getter;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class HtmlDoclet extends Doclet {
 
-	static class ARR extends ArrayList<Object> {
-
-		private static final long serialVersionUID = 4688485079740562562L;
-
-	}
-
-	static class OBJ extends LinkedHashMap<String, Object> {
-
-		private static final long serialVersionUID = 958817899797592534L;
-
-	}
-
-	static interface PUT<GRes, GSrc> {
-
-		void put(GRes res, GSrc src);
-
-	}
-
 	/** Dieses Feld speichert den Namen der {@link RootDoc#options() Option}, die den Dateinamen der Ausgabedatei angibt. */
 	public static final String TARGETPATH = "-targetpath";
 
-	public static void main2(final String... args) throws Exception {
-		com.sun.tools.javadoc.Main.execute("javadoc-json-gen", HtmlDoclet.class.getCanonicalName(),
-			new String[]{ //
-				"-protected", //
-				HtmlDoclet.TARGETPATH, "D:/projects/java/bee-creative (javadoc)/javadoc.js", //
-				"-sourcepath", "D:/projects/java/bee-creative (javadoc)/src/main/java", //
-				"bee.creative.doc"//
-			});
-
-	}
-
 	public static void main(final String[] args) throws Exception {
-		com.sun.tools.javadoc.Main.execute("javadoc-json-gen", HtmlDoclet.class.getCanonicalName(),
-			new String[]{ //
-				"-protected", //
-				HtmlDoclet.TARGETPATH, "D:\\projects\\java.bee-creative\\bee-creative-doclet_JavaSE-1.8\\src\\main\\web", //
-				"-sourcepath", "D:\\projects\\java.bee-creative\\bee-creative-lib_JavaSE-1.7\\src\\main\\java", //
-				"bee.creative.array", //
-				"bee.creative.bex", //
-				"bee.creative.csv", //
-				"bee.creative.emu", //
-				"bee.creative.fem", //
-				"bee.creative.iam", //
-				"bee.creative.ini", //
-				"bee.creative.io", //
-				"bee.creative.lang", //
-				"bee.creative.log", //
-				"bee.creative.mmi", //
-				"bee.creative.qs", //
-				"bee.creative.qs.h2", //
-				"bee.creative.ref", //
-				"bee.creative.xml", //
-				"bee.creative.xml.bind", //
-				"bee.creative.util" //
-			});
+		com.sun.tools.javadoc.Main.execute("javadoc-json-gen", HtmlDoclet.class.getCanonicalName(), new String[]{ //
+			"-protected", //
+			HtmlDoclet.TARGETPATH, "D:\\projects\\java.bee-creative\\bee-creative-doclet_JavaSE-1.8\\src\\main\\web", //
+			"-sourcepath", "D:\\projects\\java.bee-creative\\bee-creative-lib_JavaSE-1.7\\src\\main\\java", //
+			"bee.creative.array", //
+			"bee.creative.bex", //
+			"bee.creative.csv", //
+			"bee.creative.emu", //
+			"bee.creative.fem", //
+			"bee.creative.iam", //
+			"bee.creative.ini", //
+			"bee.creative.io", //
+			"bee.creative.lang", //
+			"bee.creative.log", //
+			"bee.creative.mmi", //
+			"bee.creative.qs", //
+			"bee.creative.qs.h2", //
+			"bee.creative.ref", //
+			"bee.creative.util", //
+			"bee.creative.xml", //
+			"bee.creative.xml.bind", //
+		});
 
 	}
 
@@ -123,9 +92,20 @@ public class HtmlDoclet extends Doclet {
 
 	HashMap<Object, OBJ> objectMap = new HashMap<>();
 
+	void runObj(final OBJ res, final Runnable task) {
+		final HashMap<Object, OBJ> objectMap = this.objectMap;
+		this.objectMap = new HashMap<>(objectMap);
+		try {
+			this.objectMap.put(null, res);
+			task.run();
+		} finally {
+			this.objectMap = objectMap;
+		}
+	}
+
 	private RootDoc root;
 
-	private void run(final RootDoc src) throws IOException {
+	void run(final RootDoc src) throws IOException {
 		File targetpath = new File(".").getAbsoluteFile();
 
 		for (final String[] option: src.options()) {
@@ -133,48 +113,19 @@ public class HtmlDoclet extends Doclet {
 				targetpath = new File(option[1]);
 			}
 		}
-		final File file = new File(targetpath, "javadoc.js");
+		final File file = new File(targetpath, "javadoc.dat");
 
 		final OBJ res = this.newObj(src, this::putRootInfo);
 		final ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
-			writer.append("var JAVADOC=");
+			writer.append("var JAVADOC = ");
 			mapper.writeValue(writer, res);
 		}
 
 	}
 
-	<S, T> List<T> toList(final S[] src, final Function<? super S, ? extends T> map) {
-		return (List<T>)Arrays.asList(Arrays.asList(src).stream().map(map).toArray());
-	}
-
-	PackageNode toPackageNode(final PackageDoc src) {
-		PackageNode res = new PackageNode();
-		res.name = src.name();
-		res.docs = toList(src.inlineTags(), this::toDocNode);
-		// this.putArr(res, "tags", src.tags(), this::putTag_);
-		// this.putArr(res, "classes", src.allClasses(), this::putClassInfo);
-		return res;
-	}
-
-	DocNode toDocNode(final Tag src) {
-		DocNode res = new DocNode();
-		if (src instanceof SeeTag) {
-			final SeeTag src2 = (SeeTag)src;
-			final String text = src2.label();
-			res.href = this.calcHref(src2);
-			res.text = (text != null) && !text.isEmpty() ? text : this.calcName(src2);
-		} else {
-			if (!"Text".equals(src.name())) {
-				res.type = src.name();
-			}
-			res.text = src.text();
-		}
-		return res;
-	}
-
-	<SRC> SRC[] sort(final SRC[] src, Function<? super SRC, String> pr) {
+	<SRC> SRC[] sort(final SRC[] src, final Function<? super SRC, String> pr) {
 		Arrays.sort(src, (a, b) -> pr.apply(a).compareTo(pr.apply(b)));
 		return src;
 	}
@@ -225,26 +176,31 @@ public class HtmlDoclet extends Doclet {
 	}
 
 	void putRootInfo(final OBJ res, final RootDoc src) {
-		RootNode n = new RootNode();
-		n.packages = toList(src.specifiedPackages(), this::toPackageNode);
-		Collections.sort(n.packages);
 		this.root = src;
-		this.putArr(res, "packages", sort(src.specifiedPackages(), PackageDoc::name), this::putPackageInfo);
+		this.putArr(res, "packages", this.sort(src.specifiedPackages(), PackageDoc::name), this::putPackageInfo);
 	}
 
 	void putPackageInfo(final OBJ res, final PackageDoc src) {
 		this.putStr(res, "href", this.calcHref(src));
-		this.putStr(res, "name", src.name());
-		this.putArr(res, "docs", src.inlineTags(), this::putDoc_);
+		this.putStr(res, "name", this.calcName(src));
+		this.putArr(res, "docs", src.inlineTags(), this::putDocInfo);
 		this.putArr(res, "tags", src.tags(), this::putTag_);
 		this.putArr(res, "classes", src.allClasses(), this::putClassInfo);
 	}
 
-	void putVariable_(final OBJ res, final TypeVariable src) {
-		final String name = src.typeName();
-		this.putStr(res, "name", name);
-		this.putArr(res, "extends", src.bounds(), this::putType);
-		this.objectMap.put("V-" + name, res);
+	void putVarInfo(final OBJ res, final TypeVariable src) {
+		this.objectMap.put("V-" + src.typeName(), res);
+		this.putStr(res, "href", this.calcHref_VarInfo(src));
+		this.putStr(res, "name", this.calcName_VarInfo(src));
+		this.putArr(res, "extends", src.bounds(), this::putTypeInfo);
+	}
+
+	private String calcName_VarInfo(final TypeVariable src) {
+		return src.typeName();
+	}
+
+	private String calcHref_VarInfo(final TypeVariable src) {
+		return this.calcHref(src.owner()) + "-V-" + src.typeName();
 	}
 
 	void putFieldInfo(final OBJ res, final FieldDoc src) {
@@ -258,121 +214,122 @@ public class HtmlDoclet extends Doclet {
 		this.putBol(res, "isVolatile", src.isVolatile());
 		this.putBol(res, "isSynthetic", src.isSynthetic());
 		this.putBol(res, "isTransient", src.isTransient());
-		this.putObj(res, "type", src.type(), this::putType);
+		this.putObj(res, "type", src.type(), this::putTypeInfo);
 		this.putStr(res, "value", src.constantValueExpression());
-		this.putArr(res, "docs", src.inlineTags(), this::putDoc_);
+		this.putArr(res, "docs", src.inlineTags(), this::putDocInfo);
 		this.putArr(res, "tags", src.tags(), this::putTag_);
 	}
 
 	void putClassInfo(final OBJ res, final ClassDoc src) {
+		this.runObj(res, () -> {
+			final ClassDoc c = src.containingClass();
+			final String key = this.calcHref(src);
+			this.putStr(res, "href", key);
+			this.putStr(res, "name", this.calcName(src));
+			this.putStr(res, "parent", c != null ? this.calcHref(c) : null);
+			this.putBol(res, "isFinal", src.isFinal());
+			this.putBol(res, "isStatic", src.isStatic());
+			this.putBol(res, "isPublic", src.isPublic());
+			this.putBol(res, "isPrivate", src.isPrivate());
+			this.putBol(res, "isAbstract", src.isAbstract());
+			this.putBol(res, "isProtected", src.isProtected());
+			this.putBol(res, "isError", src.isError());
+			this.putBol(res, "isException", src.isException());
+			this.putBol(res, "isInterface", src.isInterface());
+			this.putBol(res, "isSerializable", src.isSerializable());
+			this.putBol(res, "isExternalizable", src.isExternalizable());
 
-		final ClassDoc c = src.containingClass();
-		final String key = this.calcHref(src);
-		this.objectMap.clear();
-		this.putStr(res, "href", key);
-		this.putStr(res, "name", src.simpleTypeName());
-		this.putStr(res, "parent", c != null ? this.calcHref(c) : null);
-		this.putBol(res, "isFinal", src.isFinal());
-		this.putBol(res, "isStatic", src.isStatic());
-		this.putBol(res, "isPublic", src.isPublic());
-		this.putBol(res, "isPrivate", src.isPrivate());
-		this.putBol(res, "isAbstract", src.isAbstract());
-		this.putBol(res, "isProtected", src.isProtected());
-		this.putBol(res, "isError", src.isError());
-		this.putBol(res, "isException", src.isException());
-		this.putBol(res, "isInterface", src.isInterface());
-		this.putBol(res, "isSerializable", src.isSerializable());
-		this.putBol(res, "isExternalizable", src.isExternalizable());
-
-		this.putArr(res, "vars", src.typeParameters(), this::putVariable_);
-		this.putObj(res, "superclass", src.superclassType(), this::putSuper);
-		this.putArr(res, "interfaces", src.interfaceTypes(), this::putType);
-		this.putArr(res, "docs", src.inlineTags(), this::putDoc_);
-		this.putArr(res, "tags", src.tags(), this::putTag_);
-		this.putArr(res, "fields", src.fields(), this::putFieldInfo);
-		this.putArr(res, "methods", src.methods(), this::putMethodInfo);
-		this.putArr(res, "constructors", src.constructors(), this::putConstructorInfo);
+			this.putArr(res, "vars", src.typeParameters(), this::putVarInfo);
+			this.putObj(res, "superclass", src.superclassType(), this::putSuper);
+			this.putArr(res, "interfaces", src.interfaceTypes(), this::putTypeInfo);
+			this.putArr(res, "docs", src.inlineTags(), this::putDocInfo);
+			this.putArr(res, "tags", src.tags(), this::putTag_);
+			this.putArr(res, "fields", src.fields(), this::putFieldInfo);
+			this.putArr(res, "methods", src.methods(), this::putMethodInfo);
+			this.putArr(res, "constructors", src.constructors(), this::putConstructorInfo);
+		});
 	}
 
 	void putMethodInfo(final OBJ res, final MethodDoc src) {
-		final String key = this.calcHref(src);
-		this.objectMap.clear();
-		this.putStr(res, "href", key);
-		this.putStr(res, "name", src.name());
-		// this.putStr(res, "signature", this.calcSignature(src));
-		this.putBol(res, "isFinal", src.isFinal());
-		this.putBol(res, "isStatic", src.isStatic());
-		this.putBol(res, "isPublic", src.isPublic());
-		this.putBol(res, "isPrivate", src.isPrivate());
-		this.putBol(res, "isAbstract", src.isAbstract());
-		this.putBol(res, "isProtected", src.isProtected());
-		this.putBol(res, "isNative", src.isNative());
-		this.putBol(res, "isSynthetic", src.isSynthetic());
-		this.putBol(res, "isSynchronized", src.isSynchronized());
-		this.putBol(res, "isVarargs", src.isVarArgs());
-		this.putArr(res, "vars", src.typeParameters(), this::putVariable_);
-		this.putArr(res, "params", src.parameters(), this::putParameter_);
-		this.putObj(res, "result", src.returnType(), this::putReturn_);
-		this.putArr(res, "throws", src.thrownExceptionTypes(), this::putThrows_);
-		this.putArr(res, "docs", src.inlineTags(), this::putDoc_);
-		this.putArr(res, "tags", src.tags(), this::putTag_);
+		this.runObj(res, () -> {
+			final String key = this.calcHref(src);
+			this.putStr(res, "href", key);
+			this.putStr(res, "name", src.name());
+			this.putBol(res, "isFinal", src.isFinal());
+			this.putBol(res, "isStatic", src.isStatic());
+			this.putBol(res, "isPublic", src.isPublic());
+			this.putBol(res, "isPrivate", src.isPrivate());
+			this.putBol(res, "isAbstract", src.isAbstract());
+			this.putBol(res, "isProtected", src.isProtected());
+			this.putBol(res, "isNative", src.isNative());
+			this.putBol(res, "isSynthetic", src.isSynthetic());
+			this.putBol(res, "isSynchronized", src.isSynchronized());
+			this.putBol(res, "isVarargs", src.isVarArgs());
+			this.putArr(res, "vars", src.typeParameters(), this::putVarInfo);
+			this.putArr(res, "params", src.parameters(), this::putParameter_);
+			this.putObj(res, "result", src.returnType(), this::putReturn_);
+			this.putArr(res, "throws", src.thrownExceptionTypes(), this::putThrows_);
+			this.putArr(res, "docs", src.inlineTags(), this::putDocInfo);
+			this.putArr(res, "tags", src.tags(), this::putTag_);
+		});
 	}
 
 	void putConstructorInfo(final OBJ res, final ConstructorDoc src) {
-		this.objectMap.clear();
-		this.putStr(res, "href", this.calcHref(src));
-		this.putStr(res, "name", src.name());
-		// this.putStr(res, "signature", this.calcSignature(src));
-		this.putBol(res, "isFinal", src.isFinal());
-		this.putBol(res, "isStatic", src.isStatic());
-		this.putBol(res, "isPublic", src.isPublic());
-		this.putBol(res, "isPrivate", src.isPrivate());
-		this.putBol(res, "isProtected", src.isProtected());
-		this.putBol(res, "isNative", src.isNative());
-		this.putBol(res, "isSynthetic", src.isSynthetic());
-		this.putBol(res, "isSynchronized", src.isSynchronized());
-		this.putBol(res, "isVarargs", src.isVarArgs());
-		this.putArr(res, "vars", src.typeParameters(), this::putVariable_);
-		this.putArr(res, "params", src.parameters(), this::putParameter_);
-		this.putArr(res, "throws", src.thrownExceptionTypes(), this::putThrows_);
-		this.putArr(res, "docs", src.inlineTags(), this::putDoc_);
-		this.putArr(res, "tags", src.tags(), this::putTag_);
+		this.runObj(res, () -> {
+			this.putStr(res, "href", this.calcHref(src));
+			this.putStr(res, "name", src.name());
+			this.putBol(res, "isFinal", src.isFinal());
+			this.putBol(res, "isStatic", src.isStatic());
+			this.putBol(res, "isPublic", src.isPublic());
+			this.putBol(res, "isPrivate", src.isPrivate());
+			this.putBol(res, "isProtected", src.isProtected());
+			this.putBol(res, "isNative", src.isNative());
+			this.putBol(res, "isSynthetic", src.isSynthetic());
+			this.putBol(res, "isSynchronized", src.isSynchronized());
+			this.putBol(res, "isVarargs", src.isVarArgs());
+			this.putArr(res, "vars", src.typeParameters(), this::putVarInfo);
+			this.putArr(res, "params", src.parameters(), this::putParameter_);
+			this.putArr(res, "throws", src.thrownExceptionTypes(), this::putThrows_);
+			this.putArr(res, "docs", src.inlineTags(), this::putDocInfo);
+			this.putArr(res, "tags", src.tags(), this::putTag_);
+		});
 	}
 
 	void putThrows_(final OBJ res, final Type src) {
-		this.putType(res, src);
-		final Object name = res.get("name");
-		this.objectMap.put("T-" + (name != null ? name : res.get("param")), res);
+		this.putTypeInfo(res, src);
+		final Object name = res.get("href");
+		this.objectMap.put("T-" + name, res);
 	}
 
 	void putReturn_(final OBJ res, final Type src) {
-		this.putType(res, src);
+		this.putTypeInfo(res, src);
 		this.objectMap.put("R", res);
 	}
 
 	void putSuper(final OBJ res, final Type src) {
-		if (src == null) return;
-		if ("java.lang.Object".equals(src.qualifiedTypeName())) return;
-		putType(res, src);
+		if ((src == null) || "java.lang.Object".equals(src.qualifiedTypeName())) return;
+		this.putTypeInfo(res, src);
 	}
 
-	void putType(final OBJ res, final Type src) {
-		// TODO
+	void putTypeInfo(final OBJ res, final Type src) {
 		if (src == null) return;
 		if (src.asParameterizedType() != null) {
-			this.putStr(res, "href", src.asParameterizedType().qualifiedTypeName());
-			this.putStr(res, "name", src.asParameterizedType().typeName());
-			this.putArr(res, "args", src.asParameterizedType().typeArguments(), this::putType);
+			final ParameterizedType src2 = src.asParameterizedType();
+			this.putStr(res, "href", src2.qualifiedTypeName());
+			this.putStr(res, "name", src2.typeName());
+			this.putArr(res, "args", src2.typeArguments(), this::putTypeInfo);
 		} else if (src.asTypeVariable() != null) {
-			// src.asTypeVariable().owner()
-			// todo href
-			this.putStr(res, "param", src.simpleTypeName());
+			final TypeVariable src2 = src.asTypeVariable();
+			this.putStr(res, "href", this.calcHref_VarInfo(src2));
+			this.putStr(res, "name", this.calcName_VarInfo(src2));
 		} else if (src.asWildcardType() != null) {
-			this.putArr(res, "super", src.asWildcardType().superBounds(), this::putType);
-			this.putArr(res, "extends", src.asWildcardType().extendsBounds(), this::putType);
+			final WildcardType src2 = src.asWildcardType();
+			this.putArr(res, "super", src2.superBounds(), this::putTypeInfo);
+			this.putArr(res, "extends", src2.extendsBounds(), this::putTypeInfo);
 		} else if (src.asClassDoc() != null) {
-			this.putStr(res, "href", src.asClassDoc().qualifiedName());
-			this.putStr(res, "name", src.asClassDoc().name());
+			final ClassDoc src2 = src.asClassDoc();
+			this.putStr(res, "href", this.calcHref(src2));
+			this.putStr(res, "name", this.calcName(src2));
 		} else {
 			this.putStr(res, "name", src.simpleTypeName());
 		}
@@ -381,33 +338,40 @@ public class HtmlDoclet extends Doclet {
 
 	void putParameter_(final OBJ res, final Parameter src) {
 		final String name = src.name();
+		final String href = this.objectMap.get(null).get("href") + "-P-" + name;
+		this.putStr(res, "href", href);
 		this.putStr(res, "name", name);
-		this.putObj(res, "type", src.type(), this::putType);
+		this.putObj(res, "type", src.type(), this::putTypeInfo);
 		this.objectMap.put("P-" + name, res);
 	}
 
-	void putDoc_(final OBJ res, final Tag src) {
+	void putDocInfo(final OBJ res, final Tag src) {
 		if (src instanceof SeeTag) {
 			final SeeTag src2 = (SeeTag)src;
 			final String text = src2.label();
 			this.putStr(res, "href", this.calcHref(src2));
-			this.putStr(res, "text", (text != null) && !text.isEmpty() ? text : this.calcName(src2));
+			this.putStr(res, "html", (text != null) && !text.isEmpty() ? text : this.calcName(src2));
+		} else if ("@code".equals(src.name())) {
+			this.putStr(res, "code", src.text());
+		} else if ("@literal".equals(src.name())) {
+			this.putStr(res, "text", src.text());
 		} else {
 			if (!"Text".equals(src.name())) {
 				this.putStr(res, "type", src.name());
 			}
-			this.putStr(res, "text", src.text());
+			this.putStr(res, "html", src.text());
 		}
 	}
 
 	void putTag_(final OBJ res, final Tag src) {
 		if (src instanceof ParamTag) {
+			// In putVarInfo vorbereitetes OBJ ergänzen
 			final ParamTag src2 = (ParamTag)src;
 			final OBJ res2 = this.objectMap.get((src2.isTypeParameter() ? "V-" : "P-") + src2.parameterName());
 			if (res2 == null) {
 				this.root.printWarning(src2.position(), "@param " + src2.parameterName() + " invalid.");
 			} else {
-				this.putArr(res2, "docs", src2.inlineTags(), this::putDoc_);
+				this.putArr(res2, "docs", src2.inlineTags(), this::putDocInfo);
 			}
 		} else if (src instanceof ThrowsTag) {
 			final ThrowsTag src2 = (ThrowsTag)src;
@@ -417,45 +381,36 @@ public class HtmlDoclet extends Doclet {
 			if (res2 == null) {
 				this.root.printWarning(src2.position(), "@throws " + src2.exceptionName() + " invalid.");
 			} else {
-				this.putArr(res2, "docs", src2.inlineTags(), this::putDoc_);
+				this.putArr(res2, "docs", src2.inlineTags(), this::putDocInfo);
 			}
 		} else if ("@return".equals(src.name())) {
 			final OBJ res2 = this.objectMap.get("R");
 			if (res2 == null) {
 				this.root.printWarning(src.position(), "@return invalid.");
 			} else {
-				this.putArr(res2, "docs", src.inlineTags(), this::putDoc_);
+				this.putArr(res2, "docs", src.inlineTags(), this::putDocInfo);
 			}
 		} else {
 			this.putStr(res, "type", src.name());
 			// TODO docs bei see ohne erstem text
-			this.putArr(res, "docs", src.inlineTags(), this::putDoc_);
 			if (src instanceof SeeTag) {
 				final SeeTag src2 = (SeeTag)src;
 				final String text = src2.label();
 				this.putStr(res, "href", this.calcHref(src2));
-				this.putStr(res, "text", (text != null) && !text.isEmpty() ? text : calcSignature(this.calcName(src2)));
+				this.putStr(res, "html", (text != null) && !text.isEmpty() ? text : this.calcSignature(this.calcName(src2)));
 			}
+			this.putArr(res, "docs", src.inlineTags(), this::putDocInfo);
 		}
 	}
 
-	String calcHref(final FieldDoc src) {
-		return src.qualifiedName() + ':' + src.type().typeName() + src.type().dimension();
-	}
-
-	String calcHref(final MethodDoc src) {
-		return src.qualifiedName() + this.calcSignature(src);
-	}
-
-	String calcHref(final ConstructorDoc src) {
-		return src.qualifiedName() + this.calcSignature(src);
-	}
+	{}
 
 	/** Diese Methode gibt die gegebene Zeichenkette ohne generische Parameter zurück.
 	 *
 	 * @param src Zeichenkette.
 	 * @return Zeichenkette ohne {@code '<'}, {@code '>'} und die Texte dazwischen. */
 	String calcSignature(final String src) {
+		if (src == null) return null;
 		final int count = src.length();
 		final StringBuilder res = new StringBuilder(count);
 		for (int i = 0, level = 0; i < count; i++) {
@@ -479,22 +434,45 @@ public class HtmlDoclet extends Doclet {
 		return this.calcSignature(src.flatSignature());
 	}
 
+	{}
+
 	String calcHref(final Doc src) {
 		if (src.isField()) return this.calcHref((FieldDoc)src);
 		if (src.isMethod()) return this.calcHref((MethodDoc)src);
 		if (src.isConstructor()) return this.calcHref((ConstructorDoc)src);
-		if (src instanceof PackageDoc) return ((PackageDoc)src).name();
-		return ((ProgramElementDoc)src).qualifiedName();
+		if (src instanceof PackageDoc) return this.calcHref((PackageDoc)src);
+		if (src instanceof ClassDoc) return this.calcHref((ClassDoc)src);
+		return null;
 	}
 
 	String calcHref(final SeeTag src) {
 		final MemberDoc src2 = src.referencedMember();
 		if (src2 != null) return this.calcHref(src2);
 		final ClassDoc src3 = src.referencedClass();
-		if (src3 != null) return src3.qualifiedName();
+		if (src3 != null) return this.calcHref(src3);
 		final PackageDoc src4 = src.referencedPackage();
-		if (src4 != null) return src4.name();
+		if (src4 != null) return this.calcHref(src4);
 		return null;
+	}
+
+	String calcHref(final ClassDoc src) {
+		return src.qualifiedName();
+	}
+
+	String calcHref(final PackageDoc src) {
+		return src.name();
+	}
+
+	String calcHref(final FieldDoc src) {
+		return src.qualifiedName() + ':' + src.type().typeName() + src.type().dimension();
+	}
+
+	String calcHref(final MethodDoc src) {
+		return src.qualifiedName() + this.calcSignature(src);
+	}
+
+	String calcHref(final ConstructorDoc src) {
+		return src.qualifiedName() + this.calcSignature(src);
 	}
 
 	String calcHref(final ParamTag src) {
@@ -503,16 +481,26 @@ public class HtmlDoclet extends Doclet {
 		return href + "-" + src.parameterName();
 	}
 
+	{}
+
 	String calcName(final SeeTag src) {
-		final String s = src.label();
-		if ((s != null) && !s.isEmpty()) return s;
+		final String res = src.label();
+		if ((res != null) && !res.isEmpty()) return res;
 		final MemberDoc src2 = src.referencedMember();
 		if (src2 != null) return this.calcName(src2);
 		final ClassDoc src3 = src.referencedClass();
-		if (src3 != null) return src3.simpleTypeName();
+		if (src3 != null) return this.calcName(src3);
 		final PackageDoc src4 = src.referencedPackage();
-		if (src4 != null) return src4.name();
-		return "-";
+		if (src4 != null) return this.calcName(src4);
+		return null;
+	}
+
+	String calcName(final ClassDoc src) {
+		return src.simpleTypeName();
+	}
+
+	String calcName(final PackageDoc src) {
+		return src.name();
 	}
 
 	String calcName(final MemberDoc src) {
@@ -523,15 +511,33 @@ public class HtmlDoclet extends Doclet {
 	}
 
 	String calcName(final FieldDoc src) {
-		return src.containingClass().simpleTypeName() + "." + src.name();
+		return this.calcName(src.containingClass()) + "." + src.name();
 	}
 
 	String calcName(final MethodDoc src) {
-		return src.containingClass().simpleTypeName() + "." + src.name() + src.flatSignature();
+		return this.calcName(src.containingClass()) + "." + src.name() + src.flatSignature();
 	}
 
 	String calcName(final ConstructorDoc src) {
-		return src.containingClass().simpleTypeName() + "." + src.name() + src.flatSignature();
+		return this.calcName(src.containingClass()) + "." + src.name() + src.flatSignature();
+	}
+
+	static class ARR extends ArrayList<Object> {
+
+		private static final long serialVersionUID = 4688485079740562562L;
+
+	}
+
+	static class OBJ extends LinkedHashMap<String, Object> {
+
+		private static final long serialVersionUID = 958817899797592534L;
+
+	}
+
+	static interface PUT<GRes, GSrc> {
+
+		void put(GRes res, GSrc src);
+
 	}
 
 }
