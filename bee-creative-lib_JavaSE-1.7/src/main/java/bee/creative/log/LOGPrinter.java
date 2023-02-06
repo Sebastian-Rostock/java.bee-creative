@@ -135,6 +135,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 * @param count Anzahl der Protokollebenen.
 	 * @return Zeichenkette zur Einrückung. */
 	protected String customIndent(final int count) {
+		if (count <= 0) return "";
 		final String space = "                                        "; // 40 x Space
 		if (count <= 20) return space.substring(0, count * 2);
 		return "(" + count + ")" + space.substring(0, 40 - Integers.getSize(count));
