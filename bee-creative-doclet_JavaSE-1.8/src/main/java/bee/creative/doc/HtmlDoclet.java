@@ -44,7 +44,7 @@ public class HtmlDoclet extends Doclet {
 
 	public static void main(final String[] args) throws Exception {
 		com.sun.tools.javadoc.Main.execute("javadoc-json-gen", HtmlDoclet.class.getCanonicalName(), new String[]{ //
-			"-protected", //
+			"-private", //
 			HtmlDoclet.TARGETPATH, "D:\\projects\\java.bee-creative\\bee-creative-doclet_JavaSE-1.8\\src\\main\\web", //
 			"-sourcepath", "D:\\projects\\java.bee-creative\\bee-creative-lib_JavaSE-1.7\\src\\main\\java", //
 			"bee.creative.array", //
@@ -113,7 +113,7 @@ public class HtmlDoclet extends Doclet {
 				targetpath = new File(option[1]);
 			}
 		}
-		final File file = new File(targetpath, "javadoc.dat");
+		final File file = new File(targetpath, "javadoc.info");
 
 		final OBJ res = this.newObj(src, this::putRootInfo);
 		final ObjectMapper mapper = new ObjectMapper();
@@ -267,8 +267,8 @@ public class HtmlDoclet extends Doclet {
 			this.putBol(res, "isVarargs", src.isVarArgs());
 			this.putArr(res, "vars", src.typeParameters(), this::putVarInfo);
 			this.putArr(res, "params", src.parameters(), this::putParameter_);
-			this.putObj(res, "result", src.returnType(), this::putReturn_);
 			this.putArr(res, "throws", src.thrownExceptionTypes(), this::putThrows_);
+			this.putObj(res, "returns", src.returnType(), this::putReturnsInfo);
 			this.putArr(res, "docs", src.inlineTags(), this::putDocInfo);
 			this.putArr(res, "tags", src.tags(), this::putTag_);
 		});
@@ -296,13 +296,12 @@ public class HtmlDoclet extends Doclet {
 	}
 
 	void putThrows_(final OBJ res, final Type src) {
-		this.putTypeInfo(res, src);
-		final Object name = res.get("href");
-		this.objectMap.put("T-" + name, res);
+		this.putObj(res, "type", src, this::putTypeInfo);
+		this.objectMap.put("T-" + res.get("href"), res);
 	}
 
-	void putReturn_(final OBJ res, final Type src) {
-		this.putTypeInfo(res, src);
+	void putReturnsInfo(final OBJ res, final Type src) {
+		this.putObj(res, "type", src, this::putTypeInfo);
 		this.objectMap.put("R", res);
 	}
 
@@ -374,9 +373,9 @@ public class HtmlDoclet extends Doclet {
 				this.putArr(res2, "docs", src2.inlineTags(), this::putDocInfo);
 			}
 		} else if (src instanceof ThrowsTag) {
+
 			final ThrowsTag src2 = (ThrowsTag)src;
 			final Type x = src2.exceptionType();
-
 			final OBJ res2 = this.objectMap.get("T-" + (x != null ? x.qualifiedTypeName() : src2.exceptionName()));
 			if (res2 == null) {
 				this.root.printWarning(src2.position(), "@throws " + src2.exceptionName() + " invalid.");

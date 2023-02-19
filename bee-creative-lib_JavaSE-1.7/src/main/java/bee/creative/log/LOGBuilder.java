@@ -182,6 +182,13 @@ public class LOGBuilder implements Iterable<LOGEntry> {
 		this.pushEntry(logger);
 	}
 
+	public void pushLogger(final LOGBuilder logger, final LOGPrinter printer) throws NullPointerException {
+		for (final String s: printer.get(logger)) {
+			this.pushEntry(s);
+		}
+
+	}
+
 	/** Diese Methode entfernt alle bisher erfassten Protokollzeilen. */
 	public void clear() {
 		this.head.delete();

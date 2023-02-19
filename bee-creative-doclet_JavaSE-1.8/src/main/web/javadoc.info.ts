@@ -1,5 +1,7 @@
 
-interface RootInfo {
+declare var JAVADOC: JavadocInfo
+
+interface JavadocInfo {
 	packages?: PackageInfo[]
 }
 
@@ -8,7 +10,7 @@ interface PackageInfo {
 	name: string
 	docs?: DocInfo[]
 	tags?: TagInfo[]
-	clsses?: ClassInfo[]
+	classes?: ClassInfo[]
 }
 
 type DocInfo = DocInfo_CODE | DocInfo_TEXT | DocInfo_LINK | DocInfo_TYPE
@@ -29,7 +31,7 @@ interface TagInfo {
 	html?: string
 	docs?: DocInfo[]
 }
- 
+
 interface ClassInfo {
 	href: string
 	name: string
@@ -45,7 +47,7 @@ interface ClassInfo {
 	isInterface?: true
 	isSerializable?: true
 	isExternalizable?: true
-	vars?: VarInfo[]
+	vars?: TemplateInfo[]
 	superclass?: TypeInfo
 	interfaces?: TypeInfo[]
 	docs?: DocInfo[]
@@ -55,25 +57,14 @@ interface ClassInfo {
 	constructors?: ConstructorInfo[]
 }
 
-interface VarInfo {
-	href: string
-	name: string
-	docs?: DocInfo[]
-	extends?: TypeInfo[]
-}
-
-type TypeInfo = TypeInfo_CL | TypeInfo_SU | TypeInfo_EX
-
-interface TypeInfo_CL {
+interface TypeInfo {
 	href?: string
 	name: string
-	args?: TypeInfo[]
+	args?: TypeInfo2[]
 	dims?: string // "[]", "[][]", ...
 }
 
-interface TypeInfo_SU { super: TypeInfo[] }
-
-interface TypeInfo_EX { extends: TypeInfo[] }
+type TypeInfo2 = TypeInfo | { super: TypeInfo[] } | { extends: TypeInfo[] }
 
 interface FieldInfo {
 	href: string
@@ -105,17 +96,16 @@ interface MethodInfo {
 	isSynthetic?: true
 	isSynchronized?: true
 	isVarargs?: true
-	vars?: VarInfo[]
-	params?: ParamInfo[]
-	result: ReturnInfo
+	vars?: TemplateInfo[]
+	params?: ParameterInfo[]
 	throws?: ReturnInfo[]
+	returns: ReturnInfo
 	docs?: DocInfo[]
 	tags?: TagInfo[]
 }
 
 interface ConstructorInfo {
 	href: string
-	name: string
 	isFinal?: true
 	isStatic?: true
 	isPublic?: true
@@ -125,21 +115,30 @@ interface ConstructorInfo {
 	isSynthetic?: true
 	isSynchronized?: true
 	isVarargs?: true
-	vars?: VarInfo[]
-	params?: ParamInfo[]
+	vars?: TemplateInfo[]
+	params?: ParameterInfo[]
 	throws?: ReturnInfo[]
 	docs?: DocInfo[]
 	tags?: TagInfo[]
 }
 
-interface ParamInfo {
-	href: string
-	name: string
+interface ReturnInfo {
 	type: TypeInfo
 	docs?: DocInfo[]
 }
 
-interface ReturnInfo extends TypeInfo_CL {
+/** Dieser Datentyp beschreibt die Merkmale einer Typvariable. */
+interface TemplateInfo {
 	docs?: DocInfo[]
+	extends?: TypeInfo[]
 }
+
+/** Dieser Datentyp beschreibt die Merkmale eines Parameters. */
+interface ParameterInfo {
+	docs?: DocInfo[]
+	type: TypeInfo2
+}
+
+
+
 
