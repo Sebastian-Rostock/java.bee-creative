@@ -129,12 +129,16 @@ interface ReturnInfo {
 
 /** Dieser Datentyp beschreibt die Merkmale einer Typvariable. */
 interface TemplateInfo {
+	href: string
+	name: string
 	docs?: DocInfo[]
 	extends?: TypeInfo[]
 }
 
 /** Dieser Datentyp beschreibt die Merkmale eines Parameters. */
 interface ParameterInfo {
+	href: string
+	name: string
 	docs?: DocInfo[]
 	type: TypeInfo2
 }

@@ -7,6 +7,8 @@ interface ItemNode {
     nodeAsJavadoc?: JavadocNode
     nodeAsField?: FieldInfo
     nodeAsMethod?: MethodInfo
+    nodeAsTemplate?: TemplateInfo
+    nodeAsParameter?: ParameterInfo
     nodeAsConstructor?: ConstructorInfo
 }
 

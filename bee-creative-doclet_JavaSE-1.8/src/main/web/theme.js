@@ -29,14 +29,17 @@ Node.prototype._addAnchor = function (name, text) {
 JAVADOC_.nodePackages.forEach(p => {
 	let ps = document.body._newElem("section");
 	ps.appendChild(p.nodeTitle);
-	ps.appendChild(p.nodeInfos);
+	let pd = ps._newElem("div");
+	pd.appendChild(p.nodeInfos);
 	p.nodeClasses.forEach(c => {
-		let cs = document.body._newElem("section");
+		let cs = pd._newElem("section");
 		cs.appendChild(c.nodeTitle);
-		cs.appendChild(c.nodeLabel);
-		cs.appendChild(c.nodeInfos);
+
+		let cd = cs._newElem("div");
+		cd.appendChild(c.nodeLabel);
+		cd.appendChild(c.nodeInfos);
 		c.nodeMembers.forEach(m => {
-			let ms = document.body._newElem("section");
+			let ms = cd._newElem("section");
 			ms.appendChild(m.nodeLabel);
 			ms.appendChild(m.nodeInfos);
 		})
