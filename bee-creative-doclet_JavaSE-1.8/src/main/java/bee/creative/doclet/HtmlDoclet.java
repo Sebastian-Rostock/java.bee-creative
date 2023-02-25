@@ -1,4 +1,4 @@
-package bee.creative.doc;
+package bee.creative.doclet;
 
 import java.io.File;
 import java.io.FileOutputStream;
