@@ -59,9 +59,14 @@ public class CSVReader implements Closeable {
 	 * @throws NullPointerException Wenn {@code reader} {@code null} ist. */
 	public CSVReader(final Reader reader) throws IOException, NullPointerException {
 		this.reader = reader;
-		this.symbol = reader.read();
 		this.value = new StringBuilder();
 		this.entry = new ArrayList<>();
+		// Leere Zeilen zu Beginn ignorieren.
+		int symbol = reader.read();
+		while ((symbol == '\r') || (symbol == '\n')) {
+			symbol = reader.read();
+		}
+		this.symbol = symbol;
 	}
 
 	/** Diese Methode gibt das Maskierungszeichen zurück. Maskierte {@link #readValue() Werte} werden in diese Zeichen eingeschlossen und enthalten dieses Zeichen
@@ -149,33 +154,22 @@ public class CSVReader implements Closeable {
 	}
 
 	String[] readEntryImpl() throws IOException, IllegalArgumentException {
-		final Reader reader = this.reader;
-		int symbol = this.symbol;
-		if (symbol < 0) return null;
 		final ArrayList<String> result = this.entry;
 		try {
-			result.add(this.readValueImpl());
-			final char comma = this.comma;
-			symbol = this.symbol;
-			while (symbol == comma) {
-				this.symbol = reader.read();
-				result.add(this.readValueImpl());
-				symbol = this.symbol;
+			while (true) {
+				final String value = this.readValueImpl();
+				if (value == null) return result.isEmpty() ? null : result.toArray(new String[result.size()]);
+				result.add(value);
 			}
-			while ((symbol == '\r') || (symbol == '\n')) {
-				symbol = reader.read();
-			}
-			return result.toArray(new String[result.size()]);
 		} finally {
-			this.symbol = symbol;
 			result.clear();
 		}
 	}
 
-	/** Diese Methode ließt den nächsten Wert und gibt ihn zurück. Wenn es auf der aktuellen Zeile keinen weiteren Wert gibt, wird {@code ""} geliefert. Wenn der
-	 * Wert nicht in {@link #getQuote() Maskierungszeichen} eingeschlossen ist, endet er spätentens am Ende der Eingabe, am Ende der Zeile oder an einem
-	 * {@link #getComma() Trennzeichen}. Andernfalls endet er nach dem ersten {@link #getQuote() Maskierungszeichen}, dem kein weiteres {@link #getQuote()
-	 * Maskierungszeichen} folgt.
+	/** Diese Methode ließt den nächsten Wert und gibt ihn zurück. Wenn es auf der aktuellen Zeile keinen weiteren Wert gibt, wird {@code null} geliefert. Der
+	 * nächste Wert nach {@code null} ist der erste Wert der nächsten Zeile. Wenn der Wert nicht in {@link #getQuote() Maskierungszeichen} eingeschlossen ist,
+	 * endet er spätentens am Ende der Eingabe, am Ende der Zeile oder an einem {@link #getComma() Trennzeichen}. Andernfalls endet er nach dem ersten
+	 * {@link #getQuote() Maskierungszeichen}, dem kein weiteres {@link #getQuote() Maskierungszeichen} folgt.
 	 *
 	 * @see #getQuote()
 	 * @see #getComma()
@@ -189,28 +183,41 @@ public class CSVReader implements Closeable {
 	}
 
 	String readValueImpl() throws IOException, IllegalArgumentException {
+		final char quote = this.quote, comma = this.comma;
 		final Reader reader = this.reader;
 		final StringBuilder result = this.value;
 		int symbol = this.symbol;
 		try {
-			final char quote = this.quote;
+			// Zeilenende erkennen.
+			while ((symbol == '\r') || (symbol == '\n')) {
+				symbol = reader.read();
+			}
+			if (symbol != this.symbol) return null;
+			// Maskierung erkennen.
 			if (symbol == quote) {
 				symbol = reader.read();
 				while (symbol >= 0) {
 					if (symbol == quote) {
 						symbol = reader.read();
-						if (symbol != quote) return result.toString().intern();
+						if (symbol != quote) {
+							if (symbol == comma) {
+								symbol = reader.read();
+							}
+							return result.toString().intern();
+						}
 					}
 					result.append((char)symbol);
 					symbol = reader.read();
 				}
 				throw new IllegalArgumentException();
-			} else {
-				final char comma = this.comma;
-				while ((symbol >= 0) && (symbol != comma) && (symbol != '\r') && (symbol != '\n')) {
-					result.append((char)symbol);
-					symbol = reader.read();
-				}
+			}
+			// Wertende erkennen.
+			while ((symbol >= 0) && (symbol != comma) && (symbol != '\r') && (symbol != '\n')) {
+				result.append((char)symbol);
+				symbol = reader.read();
+			}
+			if (symbol == comma) {
+				symbol = reader.read();
 			}
 			return result.toString().intern();
 		} finally {
