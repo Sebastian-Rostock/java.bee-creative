@@ -129,7 +129,7 @@ public class CSVWriter implements Closeable, Flushable {
 	/** Diese Methode schreibt die gegebene Tabelle und gibt this zurück. Dabei werden die gegebenen {@link #writeEntry(String...) Einträge} in der gegebenen
 	 * Reihenfolge ausgegeben.
 	 *
-	 * @see #writeEntry(String...)
+	 * @see #writeEntry(Object...)
 	 * @param entries Tabelle (Liste von Einträgen).
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link #writeEntry(String...)} eine entsprechende Ausnahme auslöst.
@@ -165,8 +165,8 @@ public class CSVWriter implements Closeable, Flushable {
 
 	/** Diese Methode ist eine Abkürzung für {@code this.writeValue(values).writeEntry()}.
 	 *
-	 * @sell #writeValue(String...)
-	 * @sell #writeEntry()
+	 * @see #writeValue(Object...)
+	 * @see #writeEntry()
 	 * @param values Werte.
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link #writeValue(String...)} bzw. {@link #writeEntry()} eine entsprechende Ausnahme auslöst.
