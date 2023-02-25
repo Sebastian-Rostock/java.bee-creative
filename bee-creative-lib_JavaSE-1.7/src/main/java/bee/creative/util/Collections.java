@@ -1,9 +1,6 @@
 package bee.creative.util;
 
-import java.util.AbstractCollection;
-import java.util.AbstractList;
 import java.util.AbstractMap;
-import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +19,7 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
-	public static class UnionSet<GItem> extends AbstractSet<GItem> {
+	public static class UnionSet<GItem> extends AbstractSet2<GItem> {
 
 		public final Set<? extends GItem> items1;
 
@@ -44,7 +41,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.filter(this.items1.iterator(), Filters.fromItems(this.items2).negate()).concat(this.items2.iterator()).unmodifiable();
 		}
 
@@ -60,7 +57,7 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
-	public static class ExceptSet<GItem> extends AbstractSet<GItem> {
+	public static class ExceptSet<GItem> extends AbstractSet2<GItem> {
 
 		public final Set<? extends GItem> items1;
 
@@ -82,7 +79,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.filter(this.items1.iterator(), Filters.fromItems(this.items2).negate()).unmodifiable();
 		}
 
@@ -98,7 +95,7 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
-	public static class IntersectSet<GItem> extends AbstractSet<GItem> {
+	public static class IntersectSet<GItem> extends AbstractSet2<GItem> {
 
 		public final Set<? extends GItem> items1;
 
@@ -120,7 +117,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.filter(this.items1.iterator(), Filters.fromItems(this.items2)).unmodifiable();
 		}
 
@@ -137,7 +134,7 @@ public class Collections {
 	 * @param <GKey> Typ der Elemente der Schlüsselmenge.
 	 * @param <GValue> Typ der Elemente der Wertmenge. */
 	@SuppressWarnings ("javadoc")
-	public static class CartesianSet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
+	public static class CartesianSet<GKey, GValue> extends AbstractSet2<Entry<GKey, GValue>> {
 
 		class Iter extends AbstractIterator<Entry<GKey, GValue>> {
 
@@ -184,7 +181,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<Entry<GKey, GValue>> iterator() {
+		public Iterator2<Entry<GKey, GValue>> iterator() {
 			return new Iter();
 		}
 
@@ -201,7 +198,7 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
-	public static class ReverseList<GItem> extends AbstractList<GItem> {
+	public static class ReverseList<GItem> extends AbstractList2<GItem> {
 
 		class Iter implements ListIterator<GItem> {
 
@@ -341,8 +338,8 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
-			return this.listIterator(0);
+		public Iterator2<GItem> iterator() {
+			return Iterators.from(this.listIterator(0));
 		}
 
 		@Override
@@ -358,7 +355,7 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
-	public static class ConcatList<GItem> extends AbstractList<GItem> {
+	public static class ConcatList<GItem> extends AbstractList2<GItem> {
 
 		public final List<GItem> items1;
 
@@ -463,7 +460,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.concat(this.items1.iterator(), this.items2.iterator());
 		}
 
@@ -549,7 +546,7 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente. */
 	@SuppressWarnings ("javadoc")
-	public static class ConcatCollection<GItem> extends AbstractCollection<GItem> {
+	public static class ConcatCollection<GItem> extends AbstractCollection2<GItem> {
 
 		public final Collection<GItem> items1;
 
@@ -609,7 +606,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.concat(this.items1.iterator(), this.items2.iterator());
 		}
 
@@ -791,7 +788,7 @@ public class Collections {
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GItem2> Typ der Elemente der gegebenen {@link List}. */
 	@SuppressWarnings ("javadoc")
-	public static class TranslatedList<GItem, GItem2> extends AbstractList<GItem> {
+	public static class TranslatedList<GItem, GItem2> extends AbstractList2<GItem> {
 
 		public final List<GItem2> that;
 
@@ -884,7 +881,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.translate(this.that.iterator(), Getters.fromTarget(this.trans));
 		}
 
@@ -906,7 +903,7 @@ public class Collections {
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GItem2> Typ der Elemente des gegebenen {@link Set}. */
 	@SuppressWarnings ("javadoc")
-	public static class TranslatedSet<GItem, GItem2> extends AbstractSet<GItem> {
+	public static class TranslatedSet<GItem, GItem2> extends AbstractSet2<GItem> {
 
 		public final Set<GItem2> that;
 
@@ -968,7 +965,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.translate(this.that.iterator(), Getters.fromTarget(this.trans));
 		}
 
@@ -979,7 +976,7 @@ public class Collections {
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GItem2> Typ der Elemente der gegebenen {@link Collection}. */
 	@SuppressWarnings ("javadoc")
-	public static class TranslatedCollection<GItem, GItem2> extends AbstractCollection<GItem> {
+	public static class TranslatedCollection<GItem, GItem2> extends AbstractCollection2<GItem> {
 
 		public final Collection<GItem2> that;
 
@@ -1041,7 +1038,7 @@ public class Collections {
 		}
 
 		@Override
-		public Iterator<GItem> iterator() {
+		public Iterator2<GItem> iterator() {
 			return Iterators.translate(this.that.iterator(), Getters.fromTarget(this.trans));
 		}
 
