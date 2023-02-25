@@ -189,6 +189,7 @@ public class CSVReader implements Closeable {
 		int symbol = this.symbol;
 		try {
 			// Zeilenende erkennen.
+			if (symbol == -1) return null;
 			while ((symbol == '\r') || (symbol == '\n')) {
 				symbol = reader.read();
 			}
