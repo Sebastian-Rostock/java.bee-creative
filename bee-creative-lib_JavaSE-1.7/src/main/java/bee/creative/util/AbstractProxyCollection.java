@@ -3,14 +3,14 @@ package bee.creative.util;
 import java.util.Collection;
 import java.util.Iterator;
 
-/** Diese Klasse implementiert eine abstrakte {@link Collection} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt
+/** Diese Klasse implementiert eine abstrakte {@link Collection2} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt
  * werden über {@link #setData(Collection)} geschrieben.
  *
  * @param <GItem> Typ der Elemente.
  * @param <GData> Typ des Inhalts. */
-public abstract class AbstractProxyCollection<GItem, GData extends Collection<GItem>> implements Collection<GItem> {
+public abstract class AbstractProxyCollection<GItem, GData extends Collection<GItem>> implements Collection2<GItem> {
 
-	final class Iter implements Iterator<GItem> {
+	final class Iter extends AbstractIterator<GItem> {
 
 		final GData data;
 
@@ -131,7 +131,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	}
 
 	@Override
-	public Iterator<GItem> iterator() {
+	public Iterator2<GItem> iterator() {
 		return new Iter();
 	}
 

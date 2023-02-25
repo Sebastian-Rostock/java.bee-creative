@@ -1,9 +1,9 @@
 package bee.creative.array;
 
-import java.util.AbstractList;
 import java.util.List;
 import java.util.RandomAccess;
 import bee.creative.lang.Objects;
+import bee.creative.util.AbstractList2;
 
 /** Diese Klasse implementiert ein abstraktes {@link Array} auf Basis einer {@link ArrayData}.
  *
@@ -70,7 +70,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 *        oder {@code boolean[]}).
 	 * @param <GValue> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder
 	 *        {@link Boolean}). */
-	public static class UnmodifiableValues<GArray, GValue> extends AbstractList<GValue> implements RandomAccess {
+	public static class UnmodifiableValues<GArray, GValue> extends AbstractList2<GValue> implements RandomAccess {
 
 		/** Dieses Feld speichert den Besitzer. */
 		protected final CompactArray<GArray, GValue> owner;

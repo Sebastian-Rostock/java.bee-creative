@@ -1,17 +1,15 @@
 package bee.creative.util;
 
-import java.util.AbstractList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-/** Diese Klasse implementiert eine abstrakte {@link List} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden
+/** Diese Klasse implementiert eine abstrakte {@link List2} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden
  * über {@link #setData(List)} geschrieben.
  *
  * @param <GItem> Typ der Elemente.
  * @param <GData> Typ des Inhalts. */
-public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extends AbstractList<GItem> {
+public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extends AbstractList2<GItem> {
 
 	class Iter implements ListIterator<GItem> {
 
@@ -229,8 +227,8 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public Iterator<GItem> iterator() {
-		return this.listIterator(0);
+	public Iterator2<GItem> iterator() {
+		return Iterators.from(this.listIterator(0));
 	}
 
 	@Override

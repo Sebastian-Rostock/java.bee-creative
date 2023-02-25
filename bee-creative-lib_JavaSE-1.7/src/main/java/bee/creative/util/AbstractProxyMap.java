@@ -5,13 +5,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-/** Diese Klasse implementiert eine abstrakte {@link Map} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden
+/** Diese Klasse implementiert eine abstrakte {@link Map3} als Platzhalter. Ihren Inhalt liest sie über {@link #getData(boolean)}. Änderungen am Inhalt werden
  * über {@link #setData(Map)} geschrieben.
  *
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte.
  * @param <GData> Typ des Inhalts. */
-public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GValue>> implements Map<GKey, GValue> {
+public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GValue>> implements Map3<GKey, GValue> {
 
 	static abstract class Data<GItem, GData extends Collection<GItem>> extends AbstractProxyCollection<GItem, GData> {
 
@@ -31,7 +31,7 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	class Keys extends Data<GKey, KeysData> implements Set<GKey> {
+	class Keys extends Data<GKey, KeysData> implements Set2<GKey> {
 
 		@Override
 		protected KeysData getData(final boolean readonly) {
@@ -45,7 +45,7 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	class KeysData extends Data<GKey, Set<GKey>> implements Set<GKey> {
+	class KeysData extends Data<GKey, Set<GKey>> implements Set2<GKey> {
 
 		final GData data;
 
@@ -89,9 +89,9 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 	}
 
-	class Entries extends Data<Entry<GKey, GValue>, EntriesData> implements Set<Entry<GKey, GValue>> {
+	class Entries extends Data<Entry<GKey, GValue>, EntriesData> implements Set2<Entry<GKey, GValue>> {
 
-		final class Iter implements Iterator<Entry<GKey, GValue>> {
+		final class Iter extends AbstractIterator<Entry<GKey, GValue>> {
 
 			final class Next extends AbstractEntry<GKey, GValue> {
 
@@ -157,14 +157,9 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 			AbstractProxyMap.this.setData(data.data);
 		}
 
-		@Override
-		public Iterator<java.util.Map.Entry<GKey, GValue>> iterator() {
-			return super.iterator();
-		}
-
 	}
 
-	class EntriesData extends Data<Entry<GKey, GValue>, Set<Entry<GKey, GValue>>> implements Set<Entry<GKey, GValue>> {
+	class EntriesData extends Data<Entry<GKey, GValue>, Set<Entry<GKey, GValue>>> implements Set2<Entry<GKey, GValue>> {
 
 		final GData data;
 
@@ -248,17 +243,17 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	}
 
 	@Override
-	public Set<GKey> keySet() {
+	public Set2<GKey> keySet() {
 		return new Keys();
 	}
 
 	@Override
-	public Collection<GValue> values() {
+	public Collection2<GValue> values() {
 		return new Values();
 	}
 
 	@Override
-	public Set<Entry<GKey, GValue>> entrySet() {
+	public Set2<Entry<GKey, GValue>> entrySet() {
 		return new Entries();
 	}
 
