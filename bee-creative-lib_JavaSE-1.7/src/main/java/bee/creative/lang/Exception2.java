@@ -1,11 +1,12 @@
 package bee.creative.lang;
 
-import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import bee.creative.util.AbstractList2;
+import bee.creative.util.List2;
 
 /** Diese Klasse implementiert eine {@link RuntimeException}, an welche mehrere {@link #getMessages() Nachrichten} {@link #push(Object) angefügt} werden können
  * und welche als Behandelt markiert werden kann. Die von {@link #getMessage()} gelieferte Zeichenkette entspricht dann der mit dem Trennzeichen {@code '\n'}
@@ -14,7 +15,7 @@ import java.util.List;
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Exception2 extends RuntimeException implements Iterable<String> {
 
-	private final class Messages extends AbstractList<String> {
+	private final class Messages extends AbstractList2<String> {
 
 		final List<Object> that;
 
@@ -130,7 +131,7 @@ public class Exception2 extends RuntimeException implements Iterable<String> {
 	 *
 	 * @see #push(Object)
 	 * @return Nachrichten. */
-	public List<String> getMessages() {
+	public List2<String> getMessages() {
 		return new Messages(this.messages);
 	}
 
