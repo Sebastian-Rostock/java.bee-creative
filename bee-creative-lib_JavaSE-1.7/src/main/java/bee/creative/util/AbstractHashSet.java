@@ -1,7 +1,6 @@
 package bee.creative.util;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Set;
 
 /** Diese Klasse implementiert ein auf {@link AbstractHashData} aufbauendes {@link Set} mit geringem {@link AbstractHashData Speicherverbrauch}.
@@ -11,7 +10,7 @@ import java.util.Set;
  *
  * @author [cc-by] 2017 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
-public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GItem> implements Set<GItem> {
+public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GItem> implements Set2<GItem> {
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
 	 *
@@ -119,7 +118,7 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	}
 
 	@Override
-	public Iterator<GItem> iterator() {
+	public Iterator2<GItem> iterator() {
 		return this.newKeysIteratorImpl();
 	}
 

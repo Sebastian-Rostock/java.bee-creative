@@ -1,8 +1,6 @@
 package bee.creative.util;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /** Diese Klasse implementiert eine auf {@link AbstractHashData} aufbauende {@link Map} mit geringem {@link AbstractHashData Speicherverbrauch}.
  * <p>
@@ -12,7 +10,7 @@ import java.util.Set;
  * @author [cc-by] 2017 Sebastian Rostock [http://cureativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
-public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKey, GValue> implements Map<GKey, GValue> {
+public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKey, GValue> implements Map3<GKey, GValue> {
 
 	/** Diese Methode setzt die Kapazität, sodass dieses die gegebene Anzahl an Einträgen verwaltet werden kann.
 	 *
@@ -116,17 +114,17 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	}
 
 	@Override
-	public Set<GKey> keySet() {
+	public Set2<GKey> keySet() {
 		return this.newKeysImpl();
 	}
 
 	@Override
-	public Collection<GValue> values() {
+	public Collection2<GValue> values() {
 		return this.newValuesImpl();
 	}
 
 	@Override
-	public Set<Entry<GKey, GValue>> entrySet() {
+	public Set2<Entry<GKey, GValue>> entrySet() {
 		return this.newEntriesImpl();
 	}
 
