@@ -1,18 +1,14 @@
 package bee.creative.fem;
 
-import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.RandomAccess;
-import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.emu.Emuable;
 import bee.creative.iam.IAMMapping;
@@ -20,9 +16,14 @@ import bee.creative.lang.Array;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
 import bee.creative.util.AbstractIterator;
+import bee.creative.util.AbstractList2;
+import bee.creative.util.AbstractSet2;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
+import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
+import bee.creative.util.List2;
+import bee.creative.util.Map3;
 
 /** Diese Klasse implementiert eine unveränderliche Auflistung von Werten sowie Methoden zur Erzeugung solcher Wertlisten.
  *
@@ -40,9 +41,9 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	static class ItemMap implements Map<FEMValue, FEMValue>, Emuable {
+	static class ItemMap implements Map3<FEMValue, FEMValue>, Emuable {
 
-		class Keys extends AbstractSet<FEMValue> {
+		class Keys extends AbstractSet2<FEMValue> {
 
 			@Override
 			public boolean contains(final Object o) {
@@ -50,7 +51,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 			}
 
 			@Override
-			public Iterator<FEMValue> iterator() {
+			public Iterator2<FEMValue> iterator() {
 				return ItemMap.this.keys.iterator();
 			}
 
@@ -61,7 +62,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 		}
 
-		class Values extends AbstractSet<FEMValue> {
+		class Values extends AbstractSet2<FEMValue> {
 
 			@Override
 			public boolean contains(final Object o) {
@@ -69,7 +70,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 			}
 
 			@Override
-			public Iterator<FEMValue> iterator() {
+			public Iterator2<FEMValue> iterator() {
 				return ItemMap.this.values.iterator();
 			}
 
@@ -80,7 +81,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 		}
 
-		class EntrySet extends AbstractSet<Entry<FEMValue, FEMValue>> {
+		class EntrySet extends AbstractSet2<Entry<FEMValue, FEMValue>> {
 
 			@Override
 			public boolean contains(final Object o) {
@@ -88,7 +89,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 			}
 
 			@Override
-			public Iterator<Entry<FEMValue, FEMValue>> iterator() {
+			public Iterator2<Entry<FEMValue, FEMValue>> iterator() {
 				return new EntryIter();
 			}
 
@@ -192,17 +193,17 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 		}
 
 		@Override
-		public Set<FEMValue> keySet() {
+		public Keys keySet() {
 			return new Keys();
 		}
 
 		@Override
-		public Collection<FEMValue> values() {
+		public Values values() {
 			return new Values();
 		}
 
 		@Override
-		public Set<Entry<FEMValue, FEMValue>> entrySet() {
+		public EntrySet entrySet() {
 			return new EntrySet();
 		}
 
@@ -239,7 +240,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 
 	}
 
-	static class ItemList extends AbstractList<FEMValue> implements RandomAccess, Emuable {
+	static class ItemList extends AbstractList2<FEMValue> implements RandomAccess, Emuable {
 
 		public final FEMArray items;
 
@@ -258,7 +259,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 		}
 
 		@Override
-		public Iterator<FEMValue> iterator() {
+		public Iterator2<FEMValue> iterator() {
 			return this.items.iterator();
 		}
 
@@ -1202,7 +1203,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	}
 
 	@Override
-	public Iterator<FEMValue> iterator() {
+	public Iterator2<FEMValue> iterator() {
 		return Iterators.fromArray(this, 0, this.length);
 	}
 
@@ -1230,7 +1231,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	 *
 	 * @return {@link Map}-Sicht.
 	 * @throws IllegalArgumentException Wenn diese Wertliste nicth aus zwei Wertlisten besteht oder die Längen dieser Wertlisten ungleich sind. */
-	public final Map<FEMValue, FEMValue> toMap() throws IllegalArgumentException {
+	public final Map3<FEMValue, FEMValue> toMap() throws IllegalArgumentException {
 		if (this.length != 2) throw new IllegalArgumentException();
 		final FEMValue keys1 = this.customGet(0), values1 = this.customGet(1);
 		if (!(keys1 instanceof FEMArray)) throw new IllegalArgumentException();
@@ -1246,7 +1247,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	 * @see #length()
 	 * @see #iterator()
 	 * @return {@link List}-Sicht. */
-	public final List<FEMValue> toList() {
+	public final List2<FEMValue> toList() {
 		return new ItemList(this);
 	}
 

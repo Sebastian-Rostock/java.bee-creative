@@ -3,9 +3,7 @@ package bee.creative.fem;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
-import java.util.AbstractSet;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -20,8 +18,10 @@ import bee.creative.lang.Array2;
 import bee.creative.lang.Bytes;
 import bee.creative.lang.Integers;
 import bee.creative.lang.Objects;
+import bee.creative.util.AbstractSet2;
 import bee.creative.util.Entries;
 import bee.creative.util.HashMapLO;
+import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 import bee.creative.util.Property;
 
@@ -236,7 +236,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	}
 
 	/** Diese Klasse implementiert die {@link FEMBuffer#reusables() Liste der Wiederverwendbaren Funktionen}. */
-	public class Reusables extends AbstractSet<FEMFunction> implements Array2<FEMFunction>, RandomAccess {
+	public class Reusables extends AbstractSet2<FEMFunction> implements Array2<FEMFunction>, RandomAccess {
 
 		@Override
 		public FEMFunction get(final int index) {
@@ -254,7 +254,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 		}
 
 		@Override
-		public Iterator<FEMFunction> iterator() {
+		public Iterator2<FEMFunction> iterator() {
 			return Iterators.fromArray(this, 0, this.size());
 		}
 
