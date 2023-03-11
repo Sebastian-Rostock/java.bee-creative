@@ -1,20 +1,11 @@
 package bee.creative.qs.dev;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
-import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
-import bee.creative.util.HashMap2;
-import bee.creative.util.HashSet;
-import bee.creative.util.Iterables;
 
 // lesen der daten einer revision
 public class TSVM {
