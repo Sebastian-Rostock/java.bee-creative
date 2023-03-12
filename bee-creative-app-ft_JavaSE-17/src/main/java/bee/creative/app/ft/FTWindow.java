@@ -631,7 +631,7 @@ class FTWindow extends JFrame {
 	void updateTask(final ActionEvent event) {
 		if (this.isTaskRunning) {
 			final String title = Objects.notNull(this.taskTitle, "?"), entry = String.valueOf(Objects.notNull(this.taskEntry, ""));
-			this.taskInfo.setText("<html>" + title + " - " + this.taskCount + " - " + entry.replaceAll("\\\\", "\\<wbr>") + "</html>");
+			this.taskInfo.setText("<html>" + title + " - " + this.taskCount + " - " + entry.replaceAll("\\\\", "\\\\<wbr>") + "</html>");
 		} else {
 			this.taskInfo.setText(" ");
 		}
