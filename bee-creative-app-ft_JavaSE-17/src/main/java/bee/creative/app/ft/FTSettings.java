@@ -15,7 +15,7 @@ class FTSettings extends FTStorable {
 	/** Dieses Feld speichert das Dateialter in Tagen für {@link FTWindow#refreshInputFiles()}. */
 	public final FTLongOption copyFilesTimeFilter = new FTLongOption(1800, 100, 20000, 100);
 
-	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTWindow#createTargetsWithTimename()} und {@link FTWindow#createTargetsWithTimepaths()}. */
+	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTWindow#createTargetsWithTimenameFromTime()} und {@link FTWindow#createTargetsWithTimepathFromTime()}. */
 	public final FTLongOption moveFilesTimeOffset = new FTLongOption(0L, -40000000, 40000000, 3600);
 
 	/** Dieses Feld speichert die Puffergröße des Dateivergleichs für {@link FTWindow#createTableWithClones()}. */

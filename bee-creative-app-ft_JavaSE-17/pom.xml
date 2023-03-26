@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>bee-creative</groupId>
 			<artifactId>bee-creative</artifactId>
-			<version>25.1.2.283-JavaSE-1.7</version>
+			<version>25.1.2.283-JavaSE-11</version>
 		</dependency>
 	</dependencies>
 

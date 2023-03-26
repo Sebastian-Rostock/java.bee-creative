@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.UIManager;
 import bee.creative.fem.FEMDatetime;
@@ -595,7 +596,20 @@ public class FTMain extends FTWindow {
 		this.createTableWithClonesRespond(this.createLineText(targetList), targetList.size(), failCount[0]);
 	}
 
-	private int createTargetsWithTimeImpl(final String tableText, final List<List<String>> keepList, final long moveTime, final boolean isPath) { // DONE
+	private final Pattern datetime = Pattern.compile("([0-9]{4})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*");
+
+	private FEMDatetime getDatetime(final String fileName, final long moveTime) {
+		final Matcher m = this.datetime.matcher(fileName);
+		if (!m.find()) return null;
+		return FEMDatetime.from(m.group(1) + "-" + m.group(2) + "-" + m.group(3) + "T" + m.group(4) + ":" + m.group(5) + ":" + m.group(6)).move(0, moveTime * 1000);
+	}
+
+	FEMDatetime getDatetime(final long fileTime, final long moveTime) {
+		return FEMDatetime.from(fileTime + (moveTime * 1000));
+	}
+
+	private int createTargetsWithTimeImpl(final String tableText, final List<List<String>> keepList, final long moveTime, final boolean isPath,
+		final boolean isName) {
 		final var pathSet = this.createPathSet();
 		final var lineList = this.createLineList(tableText);
 		final var failCount = new int[]{lineList.size()};
@@ -603,18 +617,19 @@ public class FTMain extends FTWindow {
 			keepList.add(line);
 			if (line.size() < 1) return;
 			final var source = new File(line.get(0));
-			if (!source.isAbsolute() || !source.isFile()) return;
+			if (!source.isAbsolute() || (!isName && !source.isFile())) return;
 			final var parentFile = source.getParentFile();
 			if (parentFile == null) return;
 			final var parentName = isPath ? parentFile.getName() : null;
 			final var grandparentFile = isPath ? parentFile.getParentFile() : parentFile;
 			if (grandparentFile == null) return;
-			final var name = source.getName();
-			final var index = name.lastIndexOf('.');
+			final var fileName = source.getName();
+			final var fileTime = source.lastModified();
+			final var index = fileName.lastIndexOf('.');
 			if (index < 0) return;
 			this.taskEntry = source.getPath();
-			final var type = name.substring(index).toLowerCase();
-			var datetime = FEMDatetime.from(source.lastModified() + (moveTime * 1000));
+			final var type = fileName.substring(index).toLowerCase();
+			var datetime = isName ? this.getDatetime(fileName, moveTime) : this.getDatetime(fileTime, moveTime);
 			while (true) {
 				final var targetName = String.format("%04d-%02d-%02d %02d.%02d.%02d%s", //
 					datetime.yearValue(), datetime.monthValue(), datetime.dateValue(), //
@@ -640,17 +655,31 @@ public class FTMain extends FTWindow {
 	}
 
 	@Override
-	public void createTargetsWithTimenameRequest(final String tableText, final long moveTime) {
+	public void createTargetsWithTimenameFromNameRequest(final String tableText, final long moveTime) {
 		final var keepList = this.createLineList();
-		final var failCount = this.createTargetsWithTimeImpl(tableText, keepList, moveTime, false);
-		this.createTargetsWithTimenameRespond(this.createLineText(keepList), keepList.size(), failCount);
+		final var failCount = this.createTargetsWithTimeImpl(tableText, keepList, moveTime, false, true);
+		this.createTargetsWithTimenameFromNameRespond(this.createLineText(keepList), keepList.size(), failCount);
 	}
 
 	@Override
-	public void createTargetsWithTimepathsRequest(final String tableText, final long moveTime) {
+	public void createTargetsWithTimepathFromNameRequest(final String tableText, final long moveTime) {
 		final var keepList = this.createLineList();
-		final var failCount = this.createTargetsWithTimeImpl(tableText, keepList, moveTime, true);
-		this.createTargetsWithTimepathsRespond(this.createLineText(keepList), keepList.size(), failCount);
+		final var failCount = this.createTargetsWithTimeImpl(tableText, keepList, moveTime, true, true);
+		this.createTargetsWithTimepathFromNameRespond(this.createLineText(keepList), keepList.size(), failCount);
+	}
+
+	@Override
+	public void createTargetsWithTimenameFromTimeRequest(final String tableText, final long moveTime) {
+		final var keepList = this.createLineList();
+		final var failCount = this.createTargetsWithTimeImpl(tableText, keepList, moveTime, false, false);
+		this.createTargetsWithTimenameFromTimeRespond(this.createLineText(keepList), keepList.size(), failCount);
+	}
+
+	@Override
+	public void createTargetsWithTimepathFromTimeRequest(final String tableText, final long moveTime) {
+		final var keepList = this.createLineList();
+		final var failCount = this.createTargetsWithTimeImpl(tableText, keepList, moveTime, true, false);
+		this.createTargetsWithTimepathFromTimeRespond(this.createLineText(keepList), keepList.size(), failCount);
 	}
 
 	private int procSourceToTargetFilesImpl(final String tableText, final List<List<String>> keepList, final boolean isMove) {

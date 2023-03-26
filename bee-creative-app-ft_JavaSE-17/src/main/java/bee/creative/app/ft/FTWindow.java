@@ -263,7 +263,7 @@ class FTWindow extends JFrame {
 	private JMenuBar tableMenu;
 
 	private String getTableText() {
-		return this.inputArea.getText();
+		return this.tableArea.getText();
 	}
 
 	private void setTableText(final String tableText) {
@@ -379,17 +379,31 @@ class FTWindow extends JFrame {
 				this.createMenuBreak(), //
 				this.createMenuItem("" + //
 					"<html>" + //
-					"Zeitnamen ableiten...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zieldateinamen werden aus dem Änderungszeitpunkt der Quelldatei abgeleitet.</i>" + //
+					"Zeitnamen ableiten... (Name)<br>" + //
+					"<i>&nbsp;&nbsp;Alle Zieldateinamen werden aus dem Zeitpunkt im Quellnamen abgeleitet.</i>" + //
 					"</html>", //
-					this::createTargetsWithTimename //
+					this::createTargetsWithTimenameFromName //
 				), //
 				this.createMenuItem("" + //
 					"<html>" + //
-					"Zeitpfade ableiten...<br>" + //
+					"Zeitnamen ableiten... (Zeit)<br>" + //
+					"<i>&nbsp;&nbsp;Alle Zieldateinamen werden aus dem Änderungszeitpunkt der Quelldatei abgeleitet.</i>" + //
+					"</html>", //
+					this::createTargetsWithTimenameFromTime //
+				), //
+				this.createMenuItem("" + //
+					"<html>" + //
+					"Zeitpfade ableiten... (Name)<br>" + //
 					"<i>&nbsp;&nbsp;Alle Zieldateipfade werden aus dem Zeitpunkt im Quellnamen abgeleitet.</i>" + //
 					"</html>", //
-					this::createTargetsWithTimepaths //
+					this::createTargetsWithTimepathFromName //
+				), //
+				this.createMenuItem("" + //
+					"<html>" + //
+					"Zeitpfade ableiten... (Zeit)<br>" + //
+					"<i>&nbsp;&nbsp;Alle Zieldateipfade werden aus ddem Änderungszeitpunkt der Quelldatei abgeleitet.</i>" + //
+					"</html>", //
+					this::createTargetsWithTimepathFromTime //
 				) //
 			), //
 			this.createMenu(//
@@ -1782,34 +1796,35 @@ class FTWindow extends JFrame {
 			.withButton("Okay");
 	}
 
-	void createTargetsWithTimename() {
+	void createTargetsWithTimenameFromName() {
 		this.createDialog() //
 			.withTitle("Zeitnamen ableiten") //
 			.withMessage("" + //
 				"<html>" + //
-				"<b>Sollen die Zielnamen wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?</b><br> " + //
+				"<b>Sollen die Zielnamen wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?</b><br> " + //
 				"Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
-				"verschobenen Änderungszeitpunkten der Quelldateien. Die Zielpfade haben das Format <tt>{EP}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, " + //
-				"wobei <tt>{EP}</tt> für den Elternverzeichnispfad und <tt>{NE}</tt> für die kleingeschriebene Namenserweiterung der Quelldatei stehen." + //
+				"verschobenen Zeitpunkten, die im Quellnamen mit beliebigen Trennzeichen angegeben sind. " + //
+				"Die Zielpfade haben das Format <tt>{EP}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, wobei <tt>{EP}</tt> für den " + //
+				"Elternverzeichnispfad und <tt>{NE}</tt> für die kleingeschriebene Namenserweiterung der Quelldatei stehen." + //
 				"</html>" //
 			) //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
-			.withButton("Ja", this::createTargetsWithTimenameStart) //
+			.withButton("Ja", this::createTargetsWithTimenameFromNameStart) //
 			.withButton("Nein");
 	}
 
-	void createTargetsWithTimenameStart() {
+	void createTargetsWithTimenameFromNameStart() {
 		final var tableText = this.getTableText();
 		final var moveTime = this.settings.moveFilesTimeOffset.val;
 		this.settings.persist();
-		this.runTask("Zeitnamensableitung", () -> this.createTargetsWithTimenameRequest(tableText, moveTime));
+		this.runTask("Zeitnamensableitung", () -> this.createTargetsWithTimenameFromNameRequest(tableText, moveTime));
 	}
 
-	public void createTargetsWithTimenameRequest(final String tableText, final long moveTime) {
-		this.runDemo(() -> this.createTargetsWithTimenameRespond(tableText, 1234567, 7890));
+	public void createTargetsWithTimenameFromNameRequest(final String tableText, final long moveTime) {
+		this.runDemo(() -> this.createTargetsWithTimenameFromNameRespond(tableText, 1234567, 7890));
 	}
 
-	public void createTargetsWithTimenameRespond(final String keepText, final int keepCount, final int failCount) {
+	public void createTargetsWithTimenameFromNameRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withTitle("Zeitnamen abgeleitet") //
@@ -1823,35 +1838,121 @@ class FTWindow extends JFrame {
 			.withButton("Okay");
 	}
 
-	void createTargetsWithTimepaths() {
+	void createTargetsWithTimepathFromName() {
 		this.createDialog() //
 			.withTitle("Zeitpfade ableiten") //
 			.withMessage("" + //
 				"<html>" + //
-				"<b>Sollen die Zielpfade wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?</b><br> " + //
+				"<b>Sollen die Zielpfade wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?</b><br> " + //
 				"Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
-				"verschobenen Änderungszeitpunkten der Quelldateien. Die Zielpfade haben das Format <tt>{GP}\\JJJJ-MM_{EN}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, " + //
-				"wobei <tt>{GP}</tt> für den Großelternverzeichnispfad, <tt>{EN}</tt> für den Elternverzeichnisnamen und <tt>{NE}</tt> für die kleingeschriebene " + //
+				"verschobenen Zeitpunkten, die im Quellnamen mit beliebigen Trennzeichen angegeben sind.<br> " + //
+				"Die Zielpfade haben das Format <tt>{GP}\\JJJJ-MM_{EN}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, wobei <tt>{GP}</tt> für den " + //
+				"Großelternverzeichnispfad, <tt>{EN}</tt> für den Elternverzeichnisnamen und <tt>{NE}</tt> für die kleingeschriebene " + //
 				"Namenserweiterung der Quelldatei stehen." + //
 				"</html>" //
 			) //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
-			.withButton("Ja", this::createTargetsWithTimepathsStart) //
+			.withButton("Ja", this::createTargetsWithTimepathFromNameStart) //
 			.withButton("Nein");
 	}
 
-	void createTargetsWithTimepathsStart() {
+	void createTargetsWithTimepathFromNameStart() {
 		final var tableText = this.getTableText();
 		final var moveTime = this.settings.moveFilesTimeOffset.val;
 		this.settings.persist();
-		this.runTask("Zeitpfadableitung", () -> this.createTargetsWithTimepathsRequest(tableText, moveTime));
+		this.runTask("Zeitpfadableitung", () -> this.createTargetsWithTimepathFromNameRequest(tableText, moveTime));
 	}
 
-	public void createTargetsWithTimepathsRequest(final String tableText, final long moveTime) {
-		this.runDemo(() -> this.createTargetsWithTimepathsRespond(tableText, 1234567, 7890));
+	public void createTargetsWithTimepathFromNameRequest(final String tableText, final long moveTime) {
+		this.runDemo(() -> this.createTargetsWithTimepathFromNameRespond(tableText, 1234567, 7890));
 	}
 
-	public void createTargetsWithTimepathsRespond(final String keepText, final int keepCount, final int failCount) {
+	public void createTargetsWithTimepathFromNameRespond(final String keepText, final int keepCount, final int failCount) {
+		this.setTableText(keepText);
+		this.createDialog() //
+			.withTitle("Zeitpfade abgeleitet") //
+			.withMessage("" + //
+				"<html>" + //
+				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
+				"<b>%s</b> Zeilen konnten nicht angepasst werden." + //
+				"</html>", //
+				keepCount - failCount, failCount //
+			) //
+			.withButton("Okay");
+	}
+
+	void createTargetsWithTimenameFromTime() {
+		this.createDialog() //
+			.withTitle("Zeitnamen aus Änderungszeitpunkten ableiten") //
+			.withMessage("" + //
+				"<html>" + //
+				"<b>Sollen die Zielnamen wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?</b><br> " + //
+				"Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
+				"verschobenen Änderungszeitpunkten der Quelldateien.<br> " + //
+				"Die Zielpfade haben das Format <tt>{EP}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, wobei <tt>{EP}</tt> für den " + //
+				"Elternverzeichnispfad und <tt>{NE}</tt> für die kleingeschriebene Namenserweiterung der Quelldatei stehen." + //
+				"</html>" //
+			) //
+			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
+			.withButton("Ja", this::createTargetsWithTimenameFromTimeStart) //
+			.withButton("Nein");
+	}
+
+	void createTargetsWithTimenameFromTimeStart() {
+		final var tableText = this.getTableText();
+		final var moveTime = this.settings.moveFilesTimeOffset.val;
+		this.settings.persist();
+		this.runTask("Zeitnamensableitung", () -> this.createTargetsWithTimenameFromTimeRequest(tableText, moveTime));
+	}
+
+	public void createTargetsWithTimenameFromTimeRequest(final String tableText, final long moveTime) {
+		this.runDemo(() -> this.createTargetsWithTimenameFromTimeRespond(tableText, 1234567, 7890));
+	}
+
+	public void createTargetsWithTimenameFromTimeRespond(final String keepText, final int keepCount, final int failCount) {
+		this.setTableText(keepText);
+		this.createDialog() //
+			.withTitle("Zeitnamen abgeleitet") //
+			.withMessage("" + //
+				"<html>" + //
+				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
+				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
+				"</html>", //
+				keepCount - failCount, failCount //
+			) //
+			.withButton("Okay");
+	}
+
+	void createTargetsWithTimepathFromTime() {
+		this.createDialog() //
+			.withTitle("Zeitpfade aus Änderungszeitpunkten ableiten") //
+			.withMessage("" + //
+				"<html>" + //
+				"<b>Sollen die Zielpfade wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?</b><br> " + //
+				"Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
+				"verschobenen Änderungszeitpunkten der Quelldateien.<br> " + //
+				"Die Zielpfade haben das Format <tt>{GP}\\JJJJ-MM_{EN}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, wobei <tt>{GP}</tt> für den " + //
+				"Großelternverzeichnispfad, <tt>{EN}</tt> für den Elternverzeichnisnamen und <tt>{NE}</tt> für die kleingeschriebene " + //
+				"Namenserweiterung der Quelldatei stehen." + //
+				"</html>" //
+			) //
+			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
+			.withButton("Ja", this::createTargetsWithTimepathFromTimeStart) //
+			.withButton("Nein");
+	}
+
+	void createTargetsWithTimepathFromTimeStart() {
+		final var tableText = this.getTableText();
+		final var moveTime = this.settings.moveFilesTimeOffset.val;
+		this.settings.persist();
+		this.runTask("Zeitpfadableitung", () -> this.createTargetsWithTimepathFromTimeRequest(tableText, moveTime));
+	}
+
+	public void createTargetsWithTimepathFromTimeRequest(final String tableText, final long moveTime) {
+		this.runDemo(() -> this.createTargetsWithTimepathFromTimeRespond(tableText, 1234567, 7890));
+	}
+
+	public void createTargetsWithTimepathFromTimeRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withTitle("Zeitpfade abgeleitet") //
