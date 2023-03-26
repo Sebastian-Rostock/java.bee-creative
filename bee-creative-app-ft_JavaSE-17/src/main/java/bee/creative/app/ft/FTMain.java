@@ -691,6 +691,7 @@ public class FTMain extends FTWindow {
 				try {
 					if (sourceFile.isAbsolute() && targetFile.isAbsolute() && sourceFile.isFile() && !targetFile.isFile()) {
 						this.taskEntry = sourceFile;
+						targetFile.getParentFile().mkdirs();
 						if (isMove) {
 							Files.move(sourceFile.toPath(), targetFile.toPath());
 						} else {
