@@ -1,5 +1,7 @@
 package bee.creative.qs;
 
+import java.util.Map;
+
 /** Diese Schnittstelle definiert eine {@link QN#value() Textwertmenge} mit Bezug zu einem {@link #owner() Graphspeicher}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -18,6 +20,11 @@ public interface QVSet extends QXSet<String, QVSet> {
 	 *
 	 * @return Hyperknoten mit Textwert in dieser Menge. */
 	public QNSet nodes();
+
+	/** Diese Methode ergänzt die gegebene Abbildung um die {@link QN Hyperknoten}, die einen der Textwerte dieser Menge {@link QN#value() besitzen}.
+	 * 
+	 * @param nodes Abbildung von {@link QN#value() Textwerten} auf {@link QN Hyperknoten}. */
+	public void nodes(Map<String, QN> nodes);
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newValues(Iterable) this.owner().newValues(this)}. */
 	@Override
