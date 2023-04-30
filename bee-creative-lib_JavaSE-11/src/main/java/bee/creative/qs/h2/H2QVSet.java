@@ -2,6 +2,8 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
+import bee.creative.qs.QN;
 import bee.creative.qs.QVSet;
 import bee.creative.util.Filter;
 import bee.creative.util.Iterables;
@@ -70,8 +72,18 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QNSet nodes() {
+		return new H2QNSet(this.owner, new H2QQ().push("select N from QN where V in (").push(this).push(")"));
+	}
 
-		return new H2QNSet(this.owner, new H2QQ().push("select N from QN where V in (").push( this).push( ")"));
+	@Override
+	public void nodes(final Map<String, QN> nodes) {
+		try (final ResultSet rset = new H2QQ().push("select V, N from QN where V in (").push(this).push(")").select(this.owner)) {
+			while (rset.next()) {
+				nodes.put(rset.getString(1), this.owner.newNode(rset.getInt(2)));
+			}
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	@Override

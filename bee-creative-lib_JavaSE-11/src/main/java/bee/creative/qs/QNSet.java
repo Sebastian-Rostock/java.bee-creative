@@ -1,5 +1,7 @@
 package bee.creative.qs;
 
+import java.util.Map;
+
 /** Diese Schnittstelle definiert eine {@link QXSet Menge} von {@link QN Hyperknoten}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -18,6 +20,11 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	 * @return Textwerte der Hyperknoten dieser Menge. */
 	public QVSet values();
 
+	/** Diese Methode ergänzt die gegebene Abbildung um die {@link QN Hyperknoten} dieser Menge, die einen Textwert {@link QN#value() besitzen}.
+	 *
+	 * @param values Abbildung von {@link QN Hyperknoten} auf {@link QN#value() Textwerte}. */
+	public void values(Map<QN, String> values);
+
 	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten dieser Menge als Hypertupel der Länge {@code 1} zurück.
 	 *
 	 * @param name Name der {@link QTSet#names() Rolle} {@code 0}, über welche die Hypertupel ihren Hyperknoten referenzieren.
@@ -25,7 +32,7 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	public QTSet tuples(String name) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten zurück, die einen {@link QN#value() Textwert} besitzen. Die Mengensicht entspricht
-	 * {@link #values() this.values().nodes()}.
+	 * {@code this.intersect(this.owner().nodes())}.
 	 *
 	 * @see #havingValues(QVSet)
 	 * @return Hyperknoten mit Textwerten. */

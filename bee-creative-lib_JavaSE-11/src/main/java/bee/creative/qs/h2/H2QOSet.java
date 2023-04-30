@@ -2,11 +2,11 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import bee.creative.qs.QOSet;
-import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
+import bee.creative.util.Iterator2;
 
 /** Diese Klasse implementiert ein {@link QOSet} als Sicht auf das ergebnis einer SQL-Anfrage.
  *
@@ -63,22 +63,18 @@ public abstract class H2QOSet<GI, GISet extends Iterable<GI>> implements QOSet<G
 	}
 
 	@Override
-	public Iterator<GI> iterator() {
+	public Iterator2<GI> iterator() {
 		return new H2QOIter<>(this);
 	}
 
 	@Override
-	public HashSet2<GI> toSet() {
-		final HashSet2<GI> result = new HashSet2<>(100);
-		Iterables.addAll(result, this);
-		return result;
+	public Set<GI> toSet() {
+		return Iterables.toSet(this);
 	}
 
 	@Override
-	public ArrayList<GI> toList() {
-		final ArrayList<GI> result = new ArrayList<>(100);
-		Iterables.addAll(result, this.order());
-		return result;
+	public List<GI> toList() {
+		return Iterables.toList(this.order());
 	}
 
 	@Override

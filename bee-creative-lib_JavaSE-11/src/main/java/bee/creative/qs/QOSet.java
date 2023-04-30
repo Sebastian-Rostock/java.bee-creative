@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import bee.creative.util.Filter;
+import bee.creative.util.Iterator2;
 
 /** Diese Schnittstelle definiert eine beliebig große Sicht auf eine Menge von Objekten mit Bezug zu einem {@link #owner() Graphspeicher}.
  *
@@ -61,11 +62,11 @@ public interface QOSet<GI, GISet> extends QO, Iterable<GI> {
 	 * @return Schitt dieser mit der gegebenen Menge. */
 	public GISet intersect(GISet set) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt den {@link Iterator} über die Objekte dieser Menge zurück. Die Methode {@link Iterator#remove()} wird nicht unterstützt.
+	/** Diese Methode gibt den {@link Iterator2} über die Objekte dieser Menge zurück. Die Methode {@link Iterator#remove()} wird nicht unterstützt.
 	 *
 	 * @return Iterator. */
 	@Override
-	public Iterator<GI> iterator();
+	public Iterator2<GI> iterator();
 
 	/** Diese Methode gibt eine Kopie dieser Menge als {@link Set} zurück.
 	 *
