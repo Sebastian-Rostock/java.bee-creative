@@ -1,6 +1,6 @@
 package bee.creative.qs;
 
-import java.util.Map;
+import bee.creative.util.Setter;
 
 /** Diese Schnittstelle definiert eine {@link QXSet Menge} von {@link QN Hyperknoten}.
  *
@@ -23,7 +23,7 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	/** Diese Methode ergänzt die gegebene Abbildung um die {@link QN Hyperknoten} dieser Menge, die einen Textwert {@link QN#value() besitzen}.
 	 *
 	 * @param values Abbildung von {@link QN Hyperknoten} auf {@link QN#value() Textwerte}. */
-	public void values(Map<QN, String> values);
+	public void values(Setter<QN, String> values);
 
 	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten dieser Menge als Hypertupel der Länge {@code 1} zurück.
 	 *
