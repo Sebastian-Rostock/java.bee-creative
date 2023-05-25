@@ -134,7 +134,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	 *
 	 * @return {@link Double}. */
 	public Double toNumber() {
-		return new Double(this.value);
+		return Double.valueOf(this.value);
 	}
 
 }
