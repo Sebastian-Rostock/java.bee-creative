@@ -132,7 +132,7 @@ public interface QTSet extends QOSet<QT, QTSet> {
 	 * @see Arrays#asList(Object...) */
 	public QTSet withNames(String... names) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt eine Mengensicht auf diese Menge zueück, bei welcher die {@link #names() Rollennamen} durch die gegeben ersetzt wurden. Die Anzahl der
+	/** Diese Methode gibt eine Mengensicht auf diese Menge zurück, bei welcher die {@link #names() Rollennamen} durch die gegeben ersetzt wurden. Die Anzahl der
 	 * Rollen muss dabei erhalten bleiben.
 	 *
 	 * @param names neue Rollennamen.
