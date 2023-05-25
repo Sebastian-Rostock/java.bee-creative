@@ -23,11 +23,6 @@ public final class H2QT implements QT, UseToString {
 	/** Dieses Feld speichert die Kennungen der Hyperknoten. */
 	public final int[] keys;
 
-	H2QT(final H2QS owner, final int... keys) {
-		this.owner = owner;
-		this.keys = keys;
-	}
-
 	@Override
 	public H2QN get(final int index) throws IndexOutOfBoundsException {
 		return this.owner.newNode(this.keys[index]);
@@ -87,6 +82,11 @@ public final class H2QT implements QT, UseToString {
 	@Override
 	public String toString() {
 		return "(" + Strings.join(" ", this) + ")";
+	}
+
+	H2QT(final H2QS owner, final int... keys) {
+		this.owner = owner;
+		this.keys = keys;
 	}
 
 }

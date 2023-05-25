@@ -17,11 +17,6 @@ public final class H2QN implements QN {
 	/** Dieses Feld speichert die Kennung dieses Hyperknoten. */
 	public final int key;
 
-	H2QN(final H2QS owner, final int key) {
-		this.owner = owner;
-		this.key = key;
-	}
-
 	@Override
 	public boolean pop() {
 		try {
@@ -74,6 +69,11 @@ public final class H2QN implements QN {
 	public String toString() {
 		final String value = this.value();
 		return value == null ? Integer.toString(this.key) : Objects.toString(value);
+	}
+
+	H2QN(final H2QS owner, final int key) {
+		this.owner = owner;
+		this.key = key;
 	}
 
 }

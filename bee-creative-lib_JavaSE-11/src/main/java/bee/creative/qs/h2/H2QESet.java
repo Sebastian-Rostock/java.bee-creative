@@ -16,66 +16,6 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
-	static class Save extends H2QESet {
-
-		Save(final H2QS owner) {
-			super(owner, new H2QQ().push("select * from QE"));
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein {@link QESet} als temporäre {@link #index(String) indizierbare} Tabelle. */
-	public static class Temp extends H2QESet {
-
-		Temp(final H2QS owner) {
-			super(owner, null);
-			new H2QQ().push("create temporary table ").push(this.table).push(" (C int not null, P int not null, S int not null, O int not null)").update(owner);
-		}
-
-		@Override
-		public Temp copy() {
-			return this;
-		}
-
-		/** Diese Methode erzeugt den Index über die gegebenen Spalten in der gegebenen Reihenfolge und gibt {@code this} zurück. Die Spaltenliste {@code cols} muss
-		 * dazu aus den Zeichen {@code C}, {@code P}, {@code S} und {@code O} bestehen, welche für Kontext, Prädikat, Subjekt bzw. Objekt stehen. */
-		public Temp index(final String cols) throws NullPointerException, IllegalArgumentException {
-			if ((cols.length() != 4) || ((cols.indexOf('C') | cols.indexOf('P') | cols.indexOf('S') | cols.indexOf('O')) < 0)) throw new IllegalArgumentException();
-			new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_").push(cols).push(" on ").push(this.table).push(" (").push(cols.charAt(0))
-				.push(", ").push(cols.charAt(1)).push(", ").push(cols.charAt(2)).push(", ").push(cols.charAt(3)).push(")").update(this.owner);
-			return this;
-		}
-
-		/** Diese Methode ist eine Abkürzung für {@link #index(String) this.index("CPSO").index("CPOS").index("CSPO").index("COPS")}. */
-		public Temp index() {
-			return this.index("CPSO").index("CPOS").index("CSPO").index("COPS");
-		}
-
-	}
-
-	static class Order extends H2QESet {
-
-		Order(final H2QESet that) {
-			super(that.owner, new H2QQ().push("select * from (").push(that).push(") order by C, P, S, O"));
-		}
-
-		@Override
-		public H2QESet order() {
-			return this;
-		}
-
-	}
-
-	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
-	protected H2QESet(final H2QS owner, final H2QQ select) {
-		super(owner, select);
-	}
-
-	@Override
-	protected QE next(final ResultSet item) throws SQLException {
-		return this.owner.newEdge(item.getInt(1), item.getInt(2), item.getInt(3), item.getInt(4));
-	}
-
 	@Override
 	public boolean putAll() {
 		return new H2QQ().push("merge into QE select * from (").push(this).push(")").update(this.owner);
@@ -244,6 +184,19 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 		return new Order(this);
 	}
 
+	/** {@inheritDoc} Sie ist eine Abkürzung für {@link #index(String) this.index("CPSO")}. */
+	@Override
+	public H2QESet index() {
+		return this.index("CPSO");
+	}
+
+	/** Diese Methode indiziert diese temporäre Menge zur schnelleren Suche über die gegebenen Spalten in der gegebenen Reihenfolge und gibt diese bzw. eine
+	 * derart indizierte temporäre Kopie zurück. Die Spaltenliste {@code cols} muss dazu aus den Zeichen {@code C}, {@code P}, {@code S} und {@code O} bestehen,
+	 * welche für Kontext, Prädikat, Subjekt bzw. Objekt stehen. */
+	public H2QESet index(final String cols) throws NullPointerException, IllegalArgumentException {
+		return this.copy().index(cols);
+	}
+
 	@Override
 	public H2QESet union(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
@@ -260,6 +213,69 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	public H2QESet intersect(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
 		return new H2QESet(this.owner, new H2QQ().push("(").push(this).push(") intersect (").push(that).push(")"));
+	}
+
+	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	protected H2QESet(final H2QS owner, final H2QQ select) {
+		super(owner, select);
+	}
+
+	@Override
+	protected QE item(final ResultSet item) throws SQLException {
+		return this.owner.newEdge(item.getInt(1), item.getInt(2), item.getInt(3), item.getInt(4));
+	}
+
+	private static void check(final String cols) {
+		if ((cols.length() != 4) || ((cols.indexOf('C') | cols.indexOf('P') | cols.indexOf('S') | cols.indexOf('O')) < 0)) throw new IllegalArgumentException();
+	}
+
+	static class Save extends H2QESet {
+
+		public Save(final H2QS owner) {
+			super(owner, new H2QQ().push("select * from QE"));
+		}
+
+		@Override
+		public H2QESet index(final String cols) throws NullPointerException, IllegalArgumentException {
+			H2QESet.check(cols);
+			return this;
+		}
+
+	}
+
+	static class Temp extends H2QESet {
+
+		public Temp(final H2QS owner) {
+			super(owner, null);
+			new H2QQ().push("create temporary table ").push(this.table).push(" (C int not null, P int not null, S int not null, O int not null)").update(owner);
+		}
+
+		@Override
+		public Temp copy() {
+			return this;
+		}
+
+		@Override
+		public Temp index(final String cols) throws NullPointerException, IllegalArgumentException {
+			H2QESet.check(cols);
+			new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_").push(cols).push(" on ").push(this.table).push(" (").push(cols.charAt(0))
+				.push(", ").push(cols.charAt(1)).push(", ").push(cols.charAt(2)).push(", ").push(cols.charAt(3)).push(")").update(this.owner);
+			return this;
+		}
+
+	}
+
+	static class Order extends H2QESet {
+
+		public Order(final H2QESet that) {
+			super(that.owner, new H2QQ().push("select * from (").push(that).push(") order by C, P, S, O"));
+		}
+
+		@Override
+		public H2QESet order() {
+			return this;
+		}
+
 	}
 
 }

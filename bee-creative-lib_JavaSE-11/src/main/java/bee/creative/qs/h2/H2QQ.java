@@ -7,16 +7,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import bee.creative.lang.Objects;
+import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert den Bauplan einer Datenbankanfrage als {@link ArrayList Auflistung} von Anfragetoken. Die {@link #toString() Textdarstellung} des
  * Bauplans entspricht der Verkettung der Textdarstellungen der Anfragetoken.
  *
  * @author [cc-by] 2022 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class H2QQ {
-
-	private final Object name;
-
-	private final ArrayList<Object> query = new ArrayList<>(10);
 
 	/** Dieser Konstruktor initialisiert den Namen der temporären Tabelle mit {@code null}. */
 	public H2QQ() {
@@ -35,14 +32,14 @@ public final class H2QQ {
 		return this.push(table.name);
 	}
 
-	/** Diese Methode fügt die Anfragetoken der {@link H2QOSet#table Anfrage} des gegebenen {@link H2QOSet} an und gibt {@code this} zurück. */
-	public H2QQ push(final H2QOSet<?, ?> set) throws NullPointerException {
+	/** Diese Methode fügt die Anfragetoken der {@link H2QISet#table Anfrage} des gegebenen {@link H2QISet} an und gibt {@code this} zurück. */
+	public H2QQ push(final H2QISet<?> set) throws NullPointerException {
 		this.query.addAll(set.table.query);
 		return this;
 	}
 
 	/** Diese Methode fügt den gegebenen Anfragetoken an und gibt {@code this} zurück. Der Anfragetoken darf nicht {@code null}, kein {@link H2QQ} und kein
-	 * {@link H2QOSet} sein. */
+	 * {@link H2QISet} sein. */
 	public H2QQ push(final Object token) throws NullPointerException {
 		this.query.add(Objects.notNull(token));
 		return this;
@@ -79,14 +76,12 @@ public final class H2QQ {
 	public String toString() {
 		final StringBuilder res = new StringBuilder(512);
 		this.query.trimToSize();
-		for (final Object object: this.query) {
-			res.append(object.toString());
-		}
-		{
-			System.err.println(res);
-
-		}
+		Iterables.collectAll(this.query, res::append);
 		return res.toString();
 	}
+
+	private final Object name;
+
+	private final ArrayList<Object> query = new ArrayList<>(10);
 
 }

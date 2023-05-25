@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import bee.creative.lang.Objects;
 import bee.creative.qs.QE;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
@@ -66,6 +65,7 @@ public class H2QS implements QS, AutoCloseable {
 		this.conn = conn;
 		this.exec = conn.createStatement();
 		this.exec.executeUpdate("" //
+			// + "create table if not exists QI (N int not null, primary key (N));" //
 			+ "create table if not exists QN (N int not null, V varchar(1G) not null, primary key (N));" //
 			+ "create table if not exists QE (C int not null, P int not null, S int not null, O int not null, primary key (C, P, S, O));" //
 			+ "create index if not exists QE_INDEX_CPO on QE (C, P, O, S);" //
@@ -357,21 +357,21 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public H2QNSet.Temp newNodes(final QN... nodes) throws NullPointerException, IllegalArgumentException {
+	public H2QNSet newNodes(final QN... nodes) throws NullPointerException, IllegalArgumentException {
 		return this.newNodes(Arrays.asList(nodes));
 	}
 
 	@Override
-	public H2QNSet.Temp newNodes(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
+	public H2QNSet newNodes(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (nodes instanceof H2QNSet) {
 				final H2QNSet set = this.asQNSet(nodes);
-				if (set instanceof H2QNSet.Temp) return (H2QNSet.Temp)set;
-				final H2QNSet.Temp res = new H2QNSet.Temp(this);
+				if (set instanceof H2QNSet.Temp) return (H2QNSet)set;
+				final H2QNSet res = new H2QNSet.Temp(this);
 				new H2QQ().push("insert into ").push(res.table).push(" select * from (").push(set).push(")").update(this);
 				return res;
 			}
-			final H2QNSet.Temp buf = new H2QNSet.Temp(this);
+			final H2QNSet buf = new H2QNSet.Temp(this);
 			try (final PreparedStatement stmt = new H2QQ().push("insert into ").push(buf.table).push(" (N) values (?)").prepare(this)) {
 				for (final Object item: nodes) {
 					stmt.setInt(1, this.asQN(item).key);
@@ -379,7 +379,7 @@ public class H2QS implements QS, AutoCloseable {
 				}
 				stmt.executeBatch();
 			}
-			final H2QNSet.Temp res = new H2QNSet.Temp(this);
+			final H2QNSet res = new H2QNSet.Temp(this);
 			new H2QQ().push("insert into ").push(res.table).push(" select distinct * from ").push(buf.table).update(this);
 			return res;
 		} catch (final SQLException cause) {
@@ -446,23 +446,23 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public H2QTSet.Temp newTuples(final List<String> names, final QN... tuples) throws NullPointerException, IllegalArgumentException {
-		return this.newTuplesImpl(new Names(names), null, tuples);
+	public H2QTSet newTuples(final List<String> names, final QN... tuples) throws NullPointerException, IllegalArgumentException {
+		return this.newTuples(new Names(names), null, tuples);
 	}
 
 	@Override
-	public H2QTSet.Temp newTuples(final List<String> names, final Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet newTuples(final List<String> names, final Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException {
 		if (tuples instanceof H2QTSet) {
 			final H2QTSet set = this.asQTSet(tuples, names.size());
-			if ((set instanceof H2QTSet.Temp) && set.names.list.equals(names)) return (H2QTSet.Temp)set;
+			if (set instanceof H2QTSet.Temp) return ((H2QTSet)set).withNames(names);
 			final H2QTSet.Temp res = new H2QTSet.Temp(this, new Names(names));
 			new H2QQ().push("insert into ").push(res.table).push(" select * from (").push(set).push(")").update(this);
 			return res;
 		}
-		return this.newTuplesImpl(new Names(names), tuples, null);
+		return this.newTuples(new Names(names), tuples, null);
 	}
 
-	final H2QTSet.Temp newTuplesImpl(final Names names, final Iterable<? extends QT> tuples1, final QN[] tuples2)
+	private final H2QTSet newTuples(final Names names, final Iterable<? extends QT> tuples1, final QN[] tuples2)
 		throws NullPointerException, IllegalArgumentException {
 		try {
 			final int size = names.size();
@@ -504,11 +504,6 @@ public class H2QS implements QS, AutoCloseable {
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringCall(false, true, this, "edges", this.edges().size(), "values", this.values().size());
 	}
 
 }

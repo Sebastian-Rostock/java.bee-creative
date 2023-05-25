@@ -27,14 +27,6 @@ public final class H2QE implements QE {
 	/** Dieses Feld speichert die Kennung des Objektknoten. */
 	public final int object;
 
-	H2QE(final H2QS owner, final int context, final int predicate, final int subject, final int object) {
-		this.owner = owner;
-		this.context = context;
-		this.predicate = predicate;
-		this.subject = subject;
-		this.object = object;
-	}
-
 	@Override
 	public H2QN context() {
 		return this.owner.newNode(this.context);
@@ -150,6 +142,14 @@ public final class H2QE implements QE {
 	@Override
 	public String toString() {
 		return "(" + this.context() + " " + this.predicate() + " " + this.subject() + " " + this.object() + ")";
+	}
+
+	H2QE(final H2QS owner, final int context, final int predicate, final int subject, final int object) {
+		this.owner = owner;
+		this.context = context;
+		this.predicate = predicate;
+		this.subject = subject;
+		this.object = object;
 	}
 
 }

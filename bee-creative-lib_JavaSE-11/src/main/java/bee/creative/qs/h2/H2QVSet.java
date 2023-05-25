@@ -2,73 +2,16 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 import bee.creative.qs.QN;
 import bee.creative.qs.QVSet;
 import bee.creative.util.Filter;
 import bee.creative.util.Iterables;
+import bee.creative.util.Setter;
 
 /** Diese Klasse implementiert ein {@link QVSet} als Sicht auf das ergebnis einer SQL-Anfrage.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
-
-	static class Save extends H2QVSet {
-
-		Save(final H2QS owner) {
-			super(owner, new H2QQ().push("select V from QN"));
-		}
-
-		@Override
-		public H2QNSet nodes() {
-			return this.owner.nodes();
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein {@link QVSet} als temporäre {@link #index() indizierbare} Tabelle. */
-	public static class Temp extends H2QVSet {
-
-		Temp(final H2QS owner) {
-			super(owner, null);
-			new H2QQ().push("create temporary table ").push(this.table).push(" (V varchar(1G) not null)").update(this.owner);
-		}
-
-		@Override
-		public H2QVSet copy() {
-			return this;
-		}
-
-		/** Diese Methode indiziert diese Menge zur schnelleren Suche und gibt {@code this} zurück. */
-		public Temp index() {
-			new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_V on ").push(this.table).push(" (V)").update(this.owner);
-			return this;
-		}
-
-	}
-
-	static class Order extends H2QVSet {
-
-		Order(final H2QVSet that) {
-			super(that.owner, new H2QQ().push("select * from (").push(that).push(") order by V"));
-		}
-
-		@Override
-		public H2QVSet order() {
-			return this;
-		}
-
-	}
-
-	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
-	protected H2QVSet(final H2QS owner, final H2QQ select) {
-		super(owner, select);
-	}
-
-	@Override
-	protected String next(final ResultSet item) throws SQLException {
-		return item.getString(1);
-	}
 
 	@Override
 	public H2QNSet nodes() {
@@ -76,10 +19,10 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
-	public void nodes(final Map<String, QN> nodes) {
+	public void nodes(final Setter<String, QN> nodes) {
 		try (final ResultSet rset = new H2QQ().push("select V, N from QN where V in (").push(this).push(")").select(this.owner)) {
 			while (rset.next()) {
-				nodes.put(rset.getString(1), this.owner.newNode(rset.getInt(2)));
+				nodes.set(rset.getString(1), this.owner.newNode(rset.getInt(2)));
 			}
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -112,6 +55,11 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
+	public H2QVSet index() {
+		return this.copy().index();
+	}
+
+	@Override
 	public H2QVSet union(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
 		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") union (").push(that).push(")"));
@@ -127,6 +75,67 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	public H2QVSet intersect(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
 		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") intersect (").push(that).push(")"));
+	}
+
+	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	protected H2QVSet(final H2QS owner, final H2QQ select) {
+		super(owner, select);
+	}
+
+	@Override
+	protected String item(final ResultSet item) throws SQLException {
+		return item.getString(1);
+	}
+
+	static class Save extends H2QVSet {
+
+		public Save(final H2QS owner) {
+			super(owner, new H2QQ().push("select V from QN"));
+		}
+
+		@Override
+		public H2QVSet index() {
+			return this;
+		}
+
+		@Override
+		public H2QNSet nodes() {
+			return this.owner.nodes();
+		}
+
+	}
+
+	static class Temp extends H2QVSet {
+
+		public Temp(final H2QS owner) {
+			super(owner, null);
+			new H2QQ().push("create temporary table ").push(this.table).push(" (V varchar(1G) not null)").update(this.owner);
+		}
+
+		@Override
+		public H2QVSet copy() {
+			return this;
+		}
+
+		@Override
+		public H2QVSet index() {
+			new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_V on ").push(this.table).push(" (V)").update(this.owner);
+			return this;
+		}
+
+	}
+
+	static class Order extends H2QVSet {
+
+		public Order(final H2QVSet that) {
+			super(that.owner, new H2QQ().push("select * from (").push(that).push(") order by V"));
+		}
+
+		@Override
+		public H2QVSet order() {
+			return this;
+		}
+
 	}
 
 }
