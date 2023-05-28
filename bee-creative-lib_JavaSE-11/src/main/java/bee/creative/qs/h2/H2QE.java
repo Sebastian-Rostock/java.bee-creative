@@ -16,16 +16,16 @@ public final class H2QE implements QE {
 	public final H2QS owner;
 
 	/** Dieses Feld speichert die Kennung des Kontextknoten. */
-	public final int context;
+	public final long context;
 
 	/** Dieses Feld speichert die Kennung des Prädikatknoten. */
-	public final int predicate;
+	public final long predicate;
 
 	/** Dieses Feld speichert die Kennung des Subjektknoten. */
-	public final int subject;
+	public final long subject;
 
 	/** Dieses Feld speichert die Kennung des Objektknoten. */
-	public final int object;
+	public final long object;
 
 	@Override
 	public H2QN context() {
@@ -56,10 +56,10 @@ public final class H2QE implements QE {
 	public boolean put() {
 		try {
 			final PreparedStatement stmt = this.owner.insertSaveEdge;
-			stmt.setInt(1, this.context);
-			stmt.setInt(2, this.predicate);
-			stmt.setInt(3, this.subject);
-			stmt.setInt(4, this.object);
+			stmt.setLong(1, this.context);
+			stmt.setLong(2, this.predicate);
+			stmt.setLong(3, this.subject);
+			stmt.setLong(4, this.object);
 			return stmt.executeUpdate() != 0;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -70,10 +70,10 @@ public final class H2QE implements QE {
 	public boolean pop() {
 		try {
 			final PreparedStatement stmt = this.owner.deleteSaveEdge;
-			stmt.setInt(1, this.context);
-			stmt.setInt(2, this.predicate);
-			stmt.setInt(3, this.subject);
-			stmt.setInt(4, this.object);
+			stmt.setLong(1, this.context);
+			stmt.setLong(2, this.predicate);
+			stmt.setLong(3, this.subject);
+			stmt.setLong(4, this.object);
 			return stmt.executeUpdate() != 0;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -84,10 +84,10 @@ public final class H2QE implements QE {
 	public boolean state() {
 		try {
 			final PreparedStatement stmt = this.owner.selectSaveEdge;
-			stmt.setInt(1, this.context);
-			stmt.setInt(2, this.predicate);
-			stmt.setInt(3, this.subject);
-			stmt.setInt(4, this.object);
+			stmt.setLong(1, this.context);
+			stmt.setLong(2, this.predicate);
+			stmt.setLong(3, this.subject);
+			stmt.setLong(4, this.object);
 			try (final ResultSet rset = stmt.executeQuery()) {
 				return rset.next();
 			}
@@ -119,10 +119,10 @@ public final class H2QE implements QE {
 	@Override
 	public int hashCode() {
 		int result = Objects.hashInit();
-		result = Objects.hashPush(result, this.context);
-		result = Objects.hashPush(result, this.predicate);
-		result = Objects.hashPush(result, this.subject);
-		result = Objects.hashPush(result, this.object);
+		result = Objects.hashPush(result, Objects.hash(this.context));
+		result = Objects.hashPush(result, Objects.hash(this.predicate));
+		result = Objects.hashPush(result, Objects.hash(this.subject));
+		result = Objects.hashPush(result, Objects.hash(this.object));
 		return result;
 	}
 
@@ -144,7 +144,7 @@ public final class H2QE implements QE {
 		return "(" + this.context() + " " + this.predicate() + " " + this.subject() + " " + this.object() + ")";
 	}
 
-	H2QE(final H2QS owner, final int context, final int predicate, final int subject, final int object) {
+	H2QE(final H2QS owner, final long context, final long predicate, final long subject, final long object) {
 		this.owner = owner;
 		this.context = context;
 		this.predicate = predicate;

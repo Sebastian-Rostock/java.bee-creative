@@ -24,7 +24,7 @@ public final class H2QQ {
 	 * {@code this.push("select * from ").push(this)}. */
 	public H2QQ(final H2QS owner) {
 		this.name = owner.createTemp();
-		this.push("select * from ").push(this);
+		this.push("SELECT * FROM ").push(this);
 	}
 
 	/** Diese Methode fügt den Namen der temporären Tabelle der gegebenen Anfrage an und gibt {@code this} zurück. */
@@ -57,8 +57,8 @@ public final class H2QQ {
 	 *
 	 * @see Statement#executeUpdate(String) */
 	public boolean update(final H2QS owner) throws IllegalStateException {
-		try {
-			return owner.exec.executeUpdate(this.toString()) != 0;
+		try (Statement stmt = owner.conn.createStatement()) {
+			return stmt.executeUpdate(this.toString()) != 0;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -69,7 +69,7 @@ public final class H2QQ {
 	 *
 	 * @see Statement#executeQuery(String) */
 	public ResultSet select(final H2QS owner) throws SQLException {
-		return owner.exec.executeQuery(this.toString());
+		return owner.conn.createStatement().executeQuery(this.toString());
 	}
 
 	@Override

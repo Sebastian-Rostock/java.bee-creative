@@ -15,12 +15,12 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public H2QNSet nodes() {
-		return new H2QNSet(this.owner, new H2QQ().push("select N from QN where V in (").push(this).push(")"));
+		return new H2QNSet(this.owner, new H2QQ().push("SELECT N FROM QN WHERE V IN (").push(this).push(")"));
 	}
 
 	@Override
 	public void nodes(final Setter<String, QN> nodes) {
-		try (final ResultSet rset = new H2QQ().push("select V, N from QN where V in (").push(this).push(")").select(this.owner)) {
+		try (final ResultSet rset = new H2QQ().push("SELECT V, N FROM QN WHERE V IN (").push(this).push(")").select(this.owner)) {
 			while (rset.next()) {
 				nodes.set(rset.getString(1), this.owner.newNode(rset.getInt(2)));
 			}
@@ -31,7 +31,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public boolean popAll() {
-		return new H2QQ().push("delete from QN where V in (").push(this).push(")").update(this.owner);
+		return new H2QQ().push("DELETE FROM QN WHERE V IN (").push(this).push(")").update(this.owner);
 	}
 
 	@Override
@@ -62,22 +62,23 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	@Override
 	public H2QVSet union(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") union (").push(that).push(")"));
+		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") UNION (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QVSet except(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") except (").push(that).push(")"));
+		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") EXCEPT (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QVSet intersect(final QVSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QVSet that = this.owner.asQVSet(set);
-		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") intersect (").push(that).push(")"));
+		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") INTERSECT (").push(that).push(")"));
 	}
 
-	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
+	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (V VARCHAR(1G) NOT NULL)} besitzen. */
 	protected H2QVSet(final H2QS owner, final H2QQ select) {
 		super(owner, select);
 	}
@@ -87,10 +88,10 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 		return item.getString(1);
 	}
 
-	static class Save extends H2QVSet {
+	static class Main extends H2QVSet {
 
-		public Save(final H2QS owner) {
-			super(owner, new H2QQ().push("select V from QN"));
+		public Main(final H2QS owner) {
+			super(owner, new H2QQ().push("SELECT V FROM QN"));
 		}
 
 		@Override
@@ -109,7 +110,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 		public Temp(final H2QS owner) {
 			super(owner, null);
-			new H2QQ().push("create temporary table ").push(this.table).push(" (V varchar(1G) not null)").update(this.owner);
+			new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (V VARCHAR(1G) NOT NULL)").update(this.owner);
 		}
 
 		@Override
@@ -119,7 +120,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 		@Override
 		public H2QVSet index() {
-			new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_V on ").push(this.table).push(" (V)").update(this.owner);
+			new H2QQ().push("CREATE INDEX IF NOT EXISTS ").push(this.table).push("_INDEX_V ON ").push(this.table).push(" (V)").update(this.owner);
 			return this;
 		}
 
@@ -128,7 +129,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	static class Order extends H2QVSet {
 
 		public Order(final H2QVSet that) {
-			super(that.owner, new H2QQ().push("select * from (").push(that).push(") order by V"));
+			super(that.owner, new H2QQ().push("SELECT * FROM (").push(that).push(") ORDER BY V"));
 		}
 
 		@Override

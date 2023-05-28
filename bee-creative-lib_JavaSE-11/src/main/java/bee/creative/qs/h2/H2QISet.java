@@ -2,7 +2,6 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Set;
 import bee.creative.qs.QISet;
@@ -18,9 +17,6 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 	/** Dieses Feld speichert den Graphspeicher mit {@link H2QS#conn Datenbankverbindung}. */
 	public final H2QS owner;
 
-	/** Dieses Feld speichert die Anfrage zur Ermittlung der Einträgen dieser Menge, inklusive des ggf. vorhandenen Namen der {@code TABLE}. */
-	public final H2QQ table;
-
 	@Override
 	public H2QS owner() {
 		return this.owner;
@@ -28,7 +24,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 
 	@Override
 	public long size() {
-		try (ResultSet rset = new H2QQ().push("select count(*) from (").push(this).push(")").select(this.owner)) {
+		try (ResultSet rset = new H2QQ().push("SELECT COUNT(*) FROM (").push(this).push(")").select(this.owner)) {
 			return rset.next() ? rset.getLong(1) : 0;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -37,7 +33,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 
 	@Override
 	public GI first() {
-		try (final ResultSet rset = new H2QQ().push("select top 1 1 from (").push(this).push(")").select(this.owner)) {
+		try (final ResultSet rset = new H2QQ().push("SELECT TOP 1 * FROM (").push(this).push(")").select(this.owner)) {
 			return rset.next() ? this.item(rset) : null;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -46,7 +42,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 
 	@Override
 	public boolean isEmpty() {
-		try (final ResultSet rset = new H2QQ().push("select top 1 1 from (").push(this).push(")").select(this.owner)) {
+		try (final ResultSet rset = new H2QQ().push("SELECT TOP 1 * FROM (").push(this).push(")").select(this.owner)) {
 			return !rset.next();
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -73,21 +69,24 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 		return this.toList().toString();
 	}
 
-	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage (oder {@code null}). */
+	/** Dieses Feld speichert die Anfrage zur Ermittlung der Einträge dieser Menge. */
+	protected final H2QQ table;
+
+	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
+	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. */
 	protected H2QISet(final H2QS owner, final H2QQ table) {
 		this.owner = owner;
 		this.table = table != null ? table : new H2QQ(owner);
 	}
 
-	/** Diese Methode liefert das Objekt zum gegebenen {@link ResultSet}. */
+	/** Diese Methode liefert den Eintrag zum gegebenen {@link ResultSet}. */
 	protected abstract GI item(final ResultSet next) throws SQLException;
 
 	private class Iter extends AbstractIterator<GI> {
 
 		public Iter() {
 			try {
-				final Statement stmt = H2QISet.this.owner.conn.createStatement();
-				this.item = stmt.executeQuery(H2QISet.this.table.toString());
+				this.item = H2QISet.this.table.select(H2QISet.this.owner);
 				this.next = this.item.next();
 			} catch (final SQLException cause) {
 				throw new IllegalStateException(cause);
@@ -106,7 +105,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 		@Override
 		public GI next() {
 			try {
-				final GI item = item(this.item);
+				final GI item = H2QISet.this.item(this.item);
 				this.next = this.item.next();
 				return item;
 			} catch (final SQLException cause) {
@@ -119,9 +118,9 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 			this.item.getStatement().close();
 		}
 
-		private final ResultSet item;
-
 		private boolean next;
+
+		private final ResultSet item;
 
 	}
 

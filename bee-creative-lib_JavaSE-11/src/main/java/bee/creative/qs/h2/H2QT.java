@@ -21,7 +21,7 @@ public final class H2QT implements QT, UseToString {
 	public final H2QS owner;
 
 	/** Dieses Feld speichert die Kennungen der Hyperknoten. */
-	public final int[] keys;
+	public final long[] keys;
 
 	@Override
 	public H2QN get(final int index) throws IndexOutOfBoundsException {
@@ -46,8 +46,8 @@ public final class H2QT implements QT, UseToString {
 	@Override
 	public int hashCode() {
 		int result = Objects.hashInit();
-		for (final int node: this.keys) {
-			result = Objects.hashPush(result, node);
+		for (final long key: this.keys) {
+			result = Objects.hashPush(result, Objects.hash(key));
 		}
 		return result;
 	}
@@ -57,8 +57,7 @@ public final class H2QT implements QT, UseToString {
 		if (object == this) return true;
 		if (!(object instanceof H2QT)) return false;
 		final H2QT that = (H2QT)object;
-		if (!Arrays.equals(this.keys, that.keys)) return false;
-		if (this.owner != that.owner) return false;
+		if (!Arrays.equals(this.keys, that.keys) || (this.owner != that.owner)) return false;
 		return true;
 	}
 
@@ -84,7 +83,7 @@ public final class H2QT implements QT, UseToString {
 		return "(" + Strings.join(" ", this) + ")";
 	}
 
-	H2QT(final H2QS owner, final int... keys) {
+	H2QT(final H2QS owner, final long... keys) {
 		this.owner = owner;
 		this.keys = keys;
 	}

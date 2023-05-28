@@ -203,7 +203,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QTSet withNode(final int role, final QN node) throws NullPointerException, IllegalArgumentException {
 		this.name(role);
-		final Integer key = this.owner.asQN(node).key;
+		final Long key = this.owner.asQN(node).key;
 		final int size = this.names.size();
 		final H2QQ qry = new H2QQ().push(role != 0 ? "select distinct C0" : "select distinct ");
 		for (int i = 1; i < role; i++) {
@@ -271,7 +271,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QTSet havingNode(final int role, final QN node) throws NullPointerException, IllegalArgumentException {
 		this.name(role);
-		final int key = this.owner.asQN(node).key;
+		final Long key = this.owner.asQN(node).key;
 		return new H2QTSet(this.owner, this.names, new H2QQ().push("select * from (").push(this).push(") where C").push(role).push("=").push(key));
 	}
 
@@ -292,7 +292,8 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		return this.havingNodes(this.role(name), nodes);
 	}
 
-	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
+	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (C0 BIGINT NOT NULL, C1 BIGINT NOT NULL, ...)} besitzen. */
 	protected H2QTSet(final H2QS owner, final Names names, final H2QQ select) {
 		super(owner, select);
 		this.names = names;
@@ -301,9 +302,9 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	protected QT item(final ResultSet item) throws SQLException {
 		final int size = this.names.size();
-		final int[] keys = new int[size];
+		final long[] keys = new long[size];
 		for (int i = 0; i < size; i++) {
-			keys[i] = item.getInt(i + 1);
+			keys[i] = item.getLong(i + 1);
 		}
 		return this.owner.newTuple(keys);
 	}
@@ -315,9 +316,9 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		public Temp(final H2QS owner, final Names names) {
 			super(owner, names, null);
 			final int size = names.size();
-			final H2QQ qry = new H2QQ().push("create temporary table ").push(this.table).push(" (C0 int not null");
+			final H2QQ qry = new H2QQ().push("create temporary table ").push(this.table).push(" (C0 bigint not null");
 			for (int i = 1; i < size; i++) {
-				qry.push(", C").push(i).push(" int not null");
+				qry.push(", C").push(i).push(" bigint not null");
 			}
 			qry.push(")").update(owner);
 		}

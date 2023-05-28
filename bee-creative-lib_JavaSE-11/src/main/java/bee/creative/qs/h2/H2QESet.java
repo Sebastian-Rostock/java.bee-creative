@@ -18,40 +18,40 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public boolean putAll() {
-		return new H2QQ().push("merge into QE select * from (").push(this).push(")").update(this.owner);
+		return new H2QQ().push("MERGE INTO QE SELECT * FROM (").push(this.index()).push(")").update(this.owner);
 	}
 
 	@Override
 	public boolean popAll() {
-		return new H2QQ().push("delete from QE A where exists (select 0 from (").push(this).push(") B where A.C=B.C and A.P=B.P and A.S=B.S and A.O=B.O)")
+		return new H2QQ().push("DELETE FROM QE AS A WHERE EXISTS (").push(this).push(" AS B WHERE A.C=B.C AND A.P=B.P AND A.S=B.S AND A.O=B.O)")
 			.update(this.owner);
 	}
 
 	@Override
 	public H2QNSet contexts() {
-		return new H2QNSet(this.owner, new H2QQ().push("select distinct C N from (").push(this).push(")"));
+		return new H2QNSet(this.owner, new H2QQ().push("SELECT DISTINCT C AS N FROM (").push(this).push(")"));
 	}
 
 	@Override
 	public H2QNSet predicates() {
-		return new H2QNSet(this.owner, new H2QQ().push("select distinct P N from (").push(this).push(")"));
+		return new H2QNSet(this.owner, new H2QQ().push("SELECT DISTINCT P AS N FROM (").push(this).push(")"));
 	}
 
 	@Override
 	public H2QNSet subjects() {
-		return new H2QNSet(this.owner, new H2QQ().push("select distinct S N from (").push(this).push(")"));
+		return new H2QNSet(this.owner, new H2QQ().push("SELECT DISTINCT S AS N FROM (").push(this).push(")"));
 	}
 
 	@Override
 	public H2QNSet objects() {
-		return new H2QNSet(this.owner, new H2QQ().push("select distinct O N from (").push(this).push(")"));
+		return new H2QNSet(this.owner, new H2QQ().push("SELECT DISTINCT O AS N FROM (").push(this).push(")"));
 	}
 
 	@Override
 	public QTSet tuples(final String context, final String predicate, final String subject, final String object)
 		throws NullPointerException, IllegalArgumentException {
 		return new H2QTSet(this.owner, new Names(context, predicate, subject, object),
-			new H2QQ().push("select C C0, P C1, S C2, O C3 from (").push(this).push(")"));
+			new H2QQ().push("SELECT C AS C0, P AS C1, S AS C2, O AS C3 FROM (").push(this).push(")"));
 	}
 
 	@Override
@@ -66,116 +66,116 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public H2QESet withContext(final QN context) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(context).key;
-		return new H2QESet(this.owner, new H2QQ().push("select distinct ").push(key).push(" C, P, S, O from (").push(this).push(")"));
+		final long key = this.owner.asQN(context).key;
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT ").push(key).push(" C, P, S, O FROM (").push(this).push(")"));
 	}
 
 	@Override
 	public H2QESet withContexts(final QNSet contexts) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(contexts);
-		return new H2QESet(this.owner, new H2QQ().push("select distinct B.N C, A.P, A.S, A.O from (").push(this).push(") A, (").push(that).push(") B"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT B.N AS C, A.P, A.S, A.O FROM (").push(this).push(") AS A, (").push(that).push(") AS B"));
 	}
 
 	@Override
 	public H2QESet withPredicate(final QN predicate) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(predicate).key;
-		return new H2QESet(this.owner, new H2QQ().push("select distinct C, ").push(key).push(" P, S, O from (").push(this).push(")"));
+		final Long key = this.owner.asQN(predicate).key;
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT C, ").push(key).push(" AS P, S, O FROM (").push(this).push(")"));
 	}
 
 	@Override
 	public H2QESet withPredicates(final QNSet predicates) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(predicates);
-		return new H2QESet(this.owner, new H2QQ().push("select distinct A.C, B.N P, A.S, A.O from (").push(this).push(") A, (").push(that).push(") B"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT A.C, B.N AS P, A.S, A.O FROM (").push(this).push(") AS A, (").push(that).push(") AS B"));
 	}
 
 	@Override
 	public H2QESet withSubject(final QN subject) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(subject).key;
-		return new H2QESet(this.owner, new H2QQ().push("select distinct C, P, ").push(key).push(" S, O from (").push(this).push(")"));
+		final Long key = this.owner.asQN(subject).key;
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT C, P, ").push(key).push(" AS S, O FROM (").push(this).push(")"));
 	}
 
 	@Override
 	public H2QESet withSubjects(final QNSet subjects) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(subjects);
-		return new H2QESet(this.owner, new H2QQ().push("select distinct A.C, A.P, B.N S, A.O from (").push(this).push(") A, (").push(that).push(") B"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT A.C, A.P, B.N AS S, A.O FROM (").push(this).push(") AS A, (").push(that).push(") AS B"));
 	}
 
 	@Override
 	public H2QESet withObject(final QN object) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(object).key;
-		return new H2QESet(this.owner, new H2QQ().push("select distinct C, P, S, ").push(key).push(" O from (").push(this).push(")"));
+		final Long key = this.owner.asQN(object).key;
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT C, P, S, ").push(key).push(" AS O FROM (").push(this).push(")"));
 	}
 
 	@Override
 	public H2QESet withObjects(final QNSet objects) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(objects);
-		return new H2QESet(this.owner, new H2QQ().push("select distinct A.C, A.P, A.S, B.N O from (").push(this).push(") A, (").push(that).push(") B"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT A.C, A.P, A.S, B.N AS O FROM (").push(this).push(") AS A, (").push(that).push(") AS B"));
 	}
 
 	@Override
 	public H2QESet havingNode(final QN node) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(node).key;
+		final Long key = this.owner.asQN(node).key;
 		return new H2QESet(this.owner,
-			new H2QQ().push("select * from (").push(this).push(") where C=").push(key).push(" or P=").push(key).push(" or S=").push(key).push(" or O=").push(key));
+			new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE C=").push(key).push(" OR P=").push(key).push(" OR S=").push(key).push(" OR O=").push(key));
 	}
 
 	@Override
 	public H2QESet havingNodes(final QNSet nodes) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(nodes);
 		return new H2QESet(this.owner,
-			new H2QQ().push("select * from (").push(this).push(") where exists (select N from (").push(that).push(") where C=N or P=N or S=N or O=N)"));
+			new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE EXISTS (SELECT N FROM (").push(that).push(") WHERE C=N OR P=N OR S=N OR O=N)"));
 	}
 
 	@Override
 	public H2QESet havingContext(final QN context) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(context).key;
-		return new H2QESet(this.owner, new H2QQ().push("select * from (").push(this).push(") where C=").push(key));
+		final Long key = this.owner.asQN(context).key;
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE C=").push(key));
 	}
 
 	@Override
 	public H2QESet havingContexts(final QNSet contexts) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(contexts);
-		return new H2QESet(this.owner, new H2QQ().push("select * from (").push(this).push(") where C in (select * from (").push(that).push("))"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE C IN (SELECT N FROM (").push(that).push("))"));
 	}
 
 	@Override
 	public H2QESet havingPredicate(final QN predicate) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(predicate).key;
-		return new H2QESet(this.owner, new H2QQ().push("select * from (").push(this).push(") where P=").push(key));
+		final Long key = this.owner.asQN(predicate).key;
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE P=").push(key));
 	}
 
 	@Override
 	public H2QESet havingPredicates(final QNSet predicates) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(predicates);
-		return new H2QESet(this.owner, new H2QQ().push("select * from (").push(this).push(") where P in (select * from (").push(that).push("))"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE P IN (SELECT N FROM (").push(that).push("))"));
 	}
 
 	@Override
 	public H2QESet havingSubject(final QN subject) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(subject).key;
-		return new H2QESet(this.owner, new H2QQ().push("select * from (").push(this).push(") where S=").push(key));
+		final Long key = this.owner.asQN(subject).key;
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE S=").push(key));
 	}
 
 	@Override
 	public H2QESet havingSubjects(final QNSet subjects) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(subjects);
-		return new H2QESet(this.owner, new H2QQ().push("select * from (").push(this).push(" where S in (select * from (").push(that).push("))"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(" WHERE S IN (SELECT N FROM (").push(that).push("))"));
 	}
 
 	@Override
 	public H2QESet havingObject(final QN object) throws NullPointerException, IllegalArgumentException {
-		final int key = this.owner.asQN(object).key;
-		return new H2QESet(this.owner, new H2QQ().push("select * from (").push(this).push(") where O=").push(key));
+		final Long key = this.owner.asQN(object).key;
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE O=").push(key));
 	}
 
 	@Override
 	public H2QESet havingObjects(final QNSet objects) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(objects);
-		return new H2QESet(this.owner, new H2QQ().push("select * from (").push(this).push(") where O in (select * from (").push(that).push("))"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE O IN (SELECT N FROM (").push(that).push("))"));
 	}
 
 	@Override
-	public H2QESet.Temp copy() {
+	public H2QESet copy() {
 		return this.owner.newEdges(this);
 	}
 
@@ -200,22 +200,24 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	@Override
 	public H2QESet union(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
-		return new H2QESet(this.owner, new H2QQ().push("(").push(this).push(") union (").push(that).push(")"));
+		return new H2QESet(this.owner, new H2QQ().push("(").push(this).push(") UNION (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QESet except(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
-		return new H2QESet(this.owner, new H2QQ().push("(").push(this).push(") except (").push(that).push(")"));
+		return new H2QESet(this.owner, new H2QQ().push("(").push(this).push(") EXCEPT (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QESet intersect(final QESet set) throws NullPointerException, IllegalArgumentException {
 		final H2QESet that = this.owner.asQESet(set);
-		return new H2QESet(this.owner, new H2QQ().push("(").push(this).push(") intersect (").push(that).push(")"));
+		return new H2QESet(this.owner, new H2QQ().push("(").push(this).push(") INTERSECT (").push(that).push(")"));
 	}
 
-	/** Dieser Konstruktor initialisiert den Graphspeicher sowie die Anfrage des {@code VIEW} (oder {@code null}). */
+	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
+	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL)}
+	 * besitzen. */
 	protected H2QESet(final H2QS owner, final H2QQ select) {
 		super(owner, select);
 	}
@@ -229,10 +231,10 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 		if ((cols.length() != 4) || ((cols.indexOf('C') | cols.indexOf('P') | cols.indexOf('S') | cols.indexOf('O')) < 0)) throw new IllegalArgumentException();
 	}
 
-	static class Save extends H2QESet {
+	static class Main extends H2QESet {
 
-		public Save(final H2QS owner) {
-			super(owner, new H2QQ().push("select * from QE"));
+		public Main(final H2QS owner) {
+			super(owner, new H2QQ().push("SELECT * FROM QE"));
 		}
 
 		@Override
@@ -247,18 +249,19 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 		public Temp(final H2QS owner) {
 			super(owner, null);
-			new H2QQ().push("create temporary table ").push(this.table).push(" (C int not null, P int not null, S int not null, O int not null)").update(owner);
+			new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL)")
+				.update(owner);
 		}
 
 		@Override
-		public Temp copy() {
+		public H2QESet copy() {
 			return this;
 		}
 
 		@Override
-		public Temp index(final String cols) throws NullPointerException, IllegalArgumentException {
+		public H2QESet index(final String cols) throws NullPointerException, IllegalArgumentException {
 			H2QESet.check(cols);
-			new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_").push(cols).push(" on ").push(this.table).push(" (").push(cols.charAt(0))
+			new H2QQ().push("CREATE INDEX IF NOT EXISTS ").push(this.table).push("_INDEX_").push(cols).push(" ON ").push(this.table).push(" (").push(cols.charAt(0))
 				.push(", ").push(cols.charAt(1)).push(", ").push(cols.charAt(2)).push(", ").push(cols.charAt(3)).push(")").update(this.owner);
 			return this;
 		}
@@ -268,7 +271,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	static class Order extends H2QESet {
 
 		public Order(final H2QESet that) {
-			super(that.owner, new H2QQ().push("select * from (").push(that).push(") order by C, P, S, O"));
+			super(that.owner, new H2QQ().push("SELECT * FROM (").push(that).push(") ORDER BY C, P, S, O"));
 		}
 
 		@Override
