@@ -11,9 +11,9 @@ import bee.creative.lang.Array2;
 public interface QT extends QO, Array2<QN> {
 
 	/** Diese Methode liefert eine {@link List} als kopie der Hyperknoten dieses Hypertupel. */
-	public List<QN> toList();
+	List<QN> toList();
 
 	/** Diese Methode liefert ein Array als Kopie der Hyperknoten dieses Hypertupel. */
-	public QN[] toArray();
+	QN[] toArray();
 
 }

@@ -55,7 +55,7 @@ public final class H2QE implements QE {
 	@Override
 	public boolean put() {
 		try {
-			final PreparedStatement stmt = this.owner.insertSaveEdge;
+			final PreparedStatement stmt = this.owner.putQE_CPSO;
 			stmt.setLong(1, this.context);
 			stmt.setLong(2, this.predicate);
 			stmt.setLong(3, this.subject);
@@ -69,7 +69,7 @@ public final class H2QE implements QE {
 	@Override
 	public boolean pop() {
 		try {
-			final PreparedStatement stmt = this.owner.deleteSaveEdge;
+			final PreparedStatement stmt = this.owner.popQE_CPSO;
 			stmt.setLong(1, this.context);
 			stmt.setLong(2, this.predicate);
 			stmt.setLong(3, this.subject);
@@ -83,7 +83,7 @@ public final class H2QE implements QE {
 	@Override
 	public boolean state() {
 		try {
-			final PreparedStatement stmt = this.owner.selectSaveEdge;
+			final PreparedStatement stmt = this.owner.getQE_CPSO;
 			stmt.setLong(1, this.context);
 			stmt.setLong(2, this.predicate);
 			stmt.setLong(3, this.subject);

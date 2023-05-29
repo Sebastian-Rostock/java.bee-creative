@@ -20,10 +20,10 @@ public final class H2QN implements QN {
 	@Override
 	public boolean pop() {
 		try {
-			final PreparedStatement stmt1 = this.owner.deleteSaveEdges, stmt2 = this.owner.deleteSaveNode;
+			final PreparedStatement stmt1 = this.owner.popQE_N, stmt2 = this.owner.popQV_N;
 			stmt1.setLong(1, this.key);
 			stmt2.setLong(1, this.key);
-			return (stmt1.executeUpdate() | stmt2.executeUpdate()) != 0;
+			return (stmt1.executeUpdate() != 0) | this.owner.markPopValue(stmt2.executeUpdate() != 0);
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -37,7 +37,7 @@ public final class H2QN implements QN {
 	@Override
 	public String value() {
 		try {
-			final PreparedStatement stmt = this.owner.selectSaveValue;
+			final PreparedStatement stmt = this.owner.getQV_N;
 			stmt.setLong(1, this.key);
 			try (final ResultSet rset = stmt.executeQuery()) {
 				return rset.next() ? rset.getString(1) : null;

@@ -12,12 +12,12 @@ public interface QXSet<GI, GISet> extends QOSet<GI, GISet> {
 	 * der Inhalt des Graphspeichers verändert wurde.
 	 *
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst. */
-	public boolean popAll();
+	boolean popAll();
 
 	/** Diese Methode gibt eine Mengensicht auf die Objekte mit dem gegebenen Speicherzustand zurück.
 	 *
 	 * @param state {@code true} für die im {@link QS Graphspeicher} gespeicherten Objekte bzw. {@code false} für die temporären Objekte.
 	 * @return Objekte mit dem gegebenen Speicherzustand. */
-	public GISet havingState(boolean state);
+	GISet havingState(boolean state);
 
 }

@@ -14,32 +14,32 @@ public interface QISet<GI> extends QO, Iterable<GI> {
 	/** Diese Methode gibt die Anzahl der in dieser Menge enthaltenen Objekte zurück.
 	 *
 	 * @return Objektanzahl. */
-	public long size();
+	long size();
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Menge leer ist.
 	 *
 	 * @return {@code true}, nur wenn der {@link #iterator()} kein Objekt liefert. */
-	public boolean isEmpty();
+	boolean isEmpty();
 
 	/** Diese Methode gibt das erste Objekt in dieser Menge oder {@code null} zurück.
 	 *
 	 * @return erstes Objekt oder {@code null}. */
-	public GI first();
+	GI first();
 
 	/** Diese Methode gibt den {@link Iterator2} über die Objekte dieser Menge zurück. Die Methode {@link Iterator#remove()} wird nicht unterstützt.
 	 *
 	 * @return Iterator. */
 	@Override
-	public Iterator2<GI> iterator();
+	Iterator2<GI> iterator();
 
 	/** Diese Methode gibt eine Kopie dieser Menge als {@link Set} zurück.
 	 *
 	 * @return Kopie dieser Menge. */
-	public Set<GI> toSet();
+	Set<GI> toSet();
 
 	/** Diese Methode gibt eine Kopie dieser Menge als {@link List} zurück.
 	 *
 	 * @return geordnete Kopie dieser Menge. */
-	public List<GI> toList();
+	List<GI> toList();
 
 }

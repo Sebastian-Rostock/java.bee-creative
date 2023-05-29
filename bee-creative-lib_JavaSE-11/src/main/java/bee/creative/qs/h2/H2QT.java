@@ -2,7 +2,6 @@ package bee.creative.qs.h2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Objects.UseToString;
@@ -10,6 +9,7 @@ import bee.creative.lang.Strings;
 import bee.creative.qs.QN;
 import bee.creative.qs.QT;
 import bee.creative.util.Iterables;
+import bee.creative.util.Iterator2;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert ein {@link QT} mit Bezug zu einer Datenbank.
@@ -39,7 +39,7 @@ public final class H2QT implements QT, UseToString {
 	}
 
 	@Override
-	public Iterator<QN> iterator() {
+	public Iterator2<QN> iterator() {
 		return Iterators.fromArray(this, 0, this.size());
 	}
 

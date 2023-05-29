@@ -14,6 +14,17 @@ import bee.creative.util.Setter;
 public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
+	public boolean putAll() {
+		return this.owner.markPutValue(
+			new H2QQ().push("MERGE INTO QN (N, V) KEY (V) SELECT NEXT VALUE FOR QN_SEQUENCE AS N, V FROM (").push(this.index()).push(")").update(this.owner));
+	}
+
+	@Override
+	public boolean popAll() {
+		return this.owner.markPopValue(new H2QQ().push("DELETE FROM QN WHERE V IN (").push(this).push(")").update(this.owner));
+	}
+
+	@Override
 	public H2QNSet nodes() {
 		return new H2QNSet(this.owner, new H2QQ().push("SELECT N FROM QN WHERE V IN (").push(this).push(")"));
 	}
@@ -22,16 +33,11 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	public void nodes(final Setter<String, QN> nodes) {
 		try (final ResultSet rset = new H2QQ().push("SELECT V, N FROM QN WHERE V IN (").push(this).push(")").select(this.owner)) {
 			while (rset.next()) {
-				nodes.set(rset.getString(1), this.owner.newNode(rset.getInt(2)));
+				nodes.set(rset.getString(1), this.owner.newNode(rset.getLong(2)));
 			}
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
-	}
-
-	@Override
-	public boolean popAll() {
-		return new H2QQ().push("DELETE FROM QN WHERE V IN (").push(this).push(")").update(this.owner);
 	}
 
 	@Override
@@ -79,8 +85,8 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (V VARCHAR(1G) NOT NULL)} besitzen. */
-	protected H2QVSet(final H2QS owner, final H2QQ select) {
-		super(owner, select);
+	protected H2QVSet(final H2QS owner, final H2QQ table) {
+		super(owner, table);
 	}
 
 	@Override

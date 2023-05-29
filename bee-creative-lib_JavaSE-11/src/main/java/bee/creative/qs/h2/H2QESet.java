@@ -23,7 +23,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public boolean popAll() {
-		return new H2QQ().push("DELETE FROM QE AS A WHERE EXISTS (").push(this).push(" AS B WHERE A.C=B.C AND A.P=B.P AND A.S=B.S AND A.O=B.O)")
+		return new H2QQ().push("DELETE FROM QE AS A WHERE EXISTS ((").push(this).push(") AS B WHERE A.C=B.C AND A.P=B.P AND A.S=B.S AND A.O=B.O)")
 			.update(this.owner);
 	}
 

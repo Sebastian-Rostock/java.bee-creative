@@ -40,22 +40,26 @@ public class H2QS implements QS, AutoCloseable {
 		this.conn = conn;
 		new H2QQ() //
 			.push("CREATE TABLE IF NOT EXISTS QN (N BIGINT NOT NULL, V VARCHAR(1G) NOT NULL, PRIMARY KEY (N));") //
+			.push("CREATE UNIQUE INDEX IF NOT EXISTS QN_INDEX_V ON QN (V);") //
+			.push("CREATE SEQUENCE IF NOT EXISTS QN_SEQUENCE START WITH 1;") //
 			.push("CREATE TABLE IF NOT EXISTS QE (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL, PRIMARY KEY (C, P, S, O));") //
 			.push("CREATE INDEX IF NOT EXISTS QE_INDEX_CPO ON QE (C, P, O, S);") //
 			.push("CREATE INDEX IF NOT EXISTS QE_INDEX_CSP ON QE (C, S, P, O);") //
 			.push("CREATE INDEX IF NOT EXISTS QE_INDEX_COP ON QE (C, O, P, S);") //
-			.push("CREATE UNIQUE INDEX IF NOT EXISTS QN_INDEX_V ON QN (V);") //
-			.push("CREATE SEQUENCE IF NOT EXISTS QN_SEQUENCE START WITH 1;") //
 			.push("CREATE SEQUENCE IF NOT EXISTS QT_SEQUENCE START WITH 1") //
 			.update(this);
-		this.selectSaveEdge = this.conn.prepareStatement("SELECT TOP 1 * FROM QE WHERE C=? AND P=? AND S=? AND O=?");
-		this.selectSaveNode = this.conn.prepareStatement("SELECT N FROM QN WHERE V=?");
-		this.selectSaveValue = this.conn.prepareStatement("SELECT V FROM QN WHERE N=?");
-		this.insertSaveEdge = this.conn.prepareStatement("MERGE INTO QE (C, P, S, O) VALUES (?, ?, ?, ?)");
+
+		this.nodes = new H2QNSet.Main(this);
+		this.edges = new H2QESet.Main(this);
+
+		this.selectQN_V = this.conn.prepareStatement("SELECT N FROM QN WHERE V=?");
+		this.getQV_N = this.conn.prepareStatement("SELECT V FROM QN WHERE N=?");
+		this.getQE_CPSO = this.conn.prepareStatement("SELECT TOP 1 * FROM QE WHERE C=? AND P=? AND S=? AND O=?");
+		this.putQE_CPSO = this.conn.prepareStatement("MERGE INTO QE (C, P, S, O) VALUES (?, ?, ?, ?)");
 		this.insertSaveNode = this.conn.prepareStatement("INSERT INTO QN (N, V) VALUES (?, ?)");
-		this.deleteSaveEdge = this.conn.prepareStatement("DELETE FROM QE WHERE C=? AND P=? AND S=? AND O=?");
-		this.deleteSaveEdges = this.conn.prepareStatement("DELETE FROM QE WHERE C=?1 OR P=?1 OR S=?1 OR O=?1");
-		this.deleteSaveNode = this.conn.prepareStatement("DELETE FROM QN WHERE N=?");
+		this.popQE_CPSO = this.conn.prepareStatement("DELETE FROM QE WHERE C=? AND P=? AND S=? AND O=?");
+		this.popQE_N = this.conn.prepareStatement("DELETE FROM QE WHERE C=?1 OR P=?1 OR S=?1 OR O=?1");
+		this.popQV_N = this.conn.prepareStatement("DELETE FROM QN WHERE N=?");
 		this.createNode = this.conn.prepareStatement("SELECT NEXT VALUE FOR QN_SEQUENCE");
 		this.createTemp = this.conn.prepareStatement("SELECT NEXT VALUE FOR QT_SEQUENCE");
 	}
@@ -147,7 +151,7 @@ public class H2QS implements QS, AutoCloseable {
 	/** Diese Methode leert den Graphspeicher. */
 	public void reset() throws IllegalStateException {
 		try (Statement stmt = this.conn.createStatement()) {
-			this.deleteValueVersion = new Object();
+			this.popValueMark = new Object();
 			stmt.executeUpdate("DELETE FROM QN;DELETE FROM QE;ALTER SEQUENCE QN_SEQUENCE RESTART WITH 1");
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -172,12 +176,12 @@ public class H2QS implements QS, AutoCloseable {
 
 	@Override
 	public H2QESet edges() {
-		return new H2QESet.Main(this);
+		return this.edges;
 	}
 
 	@Override
 	public H2QNSet nodes() {
-		return new H2QNSet.Main(this);
+		return this.nodes;
 	}
 
 	@Override
@@ -208,27 +212,27 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public H2QESet.Temp newEdges() {
+	public H2QESet newEdges() {
 		return this.newEdges(this.newEdge());
 	}
 
 	@Override
-	public H2QESet.Temp newEdges(final QN node) {
+	public H2QESet newEdges(final QN node) {
 		return this.newEdges(this.newEdge(node));
 	}
 
 	@Override
-	public H2QESet.Temp newEdges(final QN context, final QN predicate, final QN subject, final QN object) {
+	public H2QESet newEdges(final QN context, final QN predicate, final QN subject, final QN object) {
 		return this.newEdges(this.newEdge(context, predicate, subject, object));
 	}
 
 	@Override
-	public H2QESet.Temp newEdges(final QE... edges) throws NullPointerException, IllegalArgumentException {
+	public H2QESet newEdges(final QE... edges) throws NullPointerException, IllegalArgumentException {
 		return this.newEdges(Arrays.asList(edges));
 	}
 
 	@Override
-	public H2QESet.Temp newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
+	public H2QESet newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (edges instanceof H2QESet) {
 				final H2QESet set = this.asQESet(edges);
@@ -266,15 +270,15 @@ public class H2QS implements QS, AutoCloseable {
 	public H2QN newNode(final Object value) {
 		try {
 			final String string = this.asQV(value);
-			final PreparedStatement stmt = this.selectSaveNode;
+			final PreparedStatement stmt = this.selectQN_V;
 			stmt.setString(1, string);
 			final ResultSet res = stmt.executeQuery();
-			if (res.next()) return this.newNode(res.getInt(1));
+			if (res.next()) return this.newNode(res.getLong(1));
 			final PreparedStatement stmt2 = this.insertSaveNode;
 			final long key = this.newKey(this.createNode);
 			stmt2.setLong(1, key);
 			stmt2.setString(2, string);
-			stmt2.executeUpdate();
+			this.markPutValue(stmt2.executeUpdate() != 0);
 			return this.newNode(key);
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
@@ -318,12 +322,12 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public H2QVSet.Temp newValues(final Object... values) throws NullPointerException, IllegalArgumentException {
+	public H2QVSet newValues(final Object... values) throws NullPointerException, IllegalArgumentException {
 		return this.newValues(Arrays.asList(values));
 	}
 
 	@Override
-	public H2QVSet.Temp newValues(final Iterable<?> values) throws NullPointerException, IllegalArgumentException {
+	public H2QVSet newValues(final Iterable<?> values) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (values instanceof H2QVSet) {
 				final H2QVSet set = (H2QVSet)values;
@@ -392,21 +396,25 @@ public class H2QS implements QS, AutoCloseable {
 		return this.newTuples(new Names(names), tuples, null);
 	}
 
-	final PreparedStatement selectSaveEdge;
+	private final H2QESet edges;
 
-	final PreparedStatement selectSaveNode;
+	private final H2QNSet nodes;
 
-	final PreparedStatement selectSaveValue;
+	final PreparedStatement getQV_N;
 
-	final PreparedStatement insertSaveEdge;
+	final PreparedStatement selectQN_V;
+
+	final PreparedStatement getQE_CPSO;
+
+	final PreparedStatement putQE_CPSO;
 
 	final PreparedStatement insertSaveNode;
 
-	final PreparedStatement deleteSaveEdge;
+	final PreparedStatement popQE_CPSO;
 
-	final PreparedStatement deleteSaveEdges;
+	final PreparedStatement popQE_N;
 
-	final PreparedStatement deleteSaveNode;
+	final PreparedStatement popQV_N;
 
 	private final HashSet<String> tempTables = new HashSet<>();
 
@@ -414,18 +422,22 @@ public class H2QS implements QS, AutoCloseable {
 
 	private final PreparedStatement createTemp;
 
-	Object insertValueVersion;
+	Object putValueMark;
 
-	Object deleteValueVersion;
+	Object popValueMark;
 
-	void insertValue() {
-		insertValueVersion = new Object();
+	boolean markPutValue(final boolean changed) {
+		if (!changed) return false;
+		this.putValueMark = new Object();
+		return true;
 	}
 
-	void deleteValue() {
-		deleteValueVersion = new Object();
+	boolean markPopValue(final boolean changed) {
+		if (!changed) return false;
+		this.popValueMark = new Object();
+		return true;
 	}
-	
+
 	Object createTemp() {
 		synchronized (this.tempTables) {
 			final String name = "QT" + this.newKey(this.createTemp);
@@ -457,7 +469,7 @@ public class H2QS implements QS, AutoCloseable {
 		}
 	}
 
-	/** Diese Methode führt die gegebene Anfrage {@link PreparedStatement#executeQuery() aus} und gibt den {@link ResultSet#getInt(int) Zahlenwert} des ersten
+	/** Diese Methode führt die gegebene Anfrage {@link PreparedStatement#executeQuery() aus} und gibt den {@link ResultSet#getLong(int) Zahlenwert} des ersten
 	 * Ergebnisses zurück. */
 	private final long newKey(final PreparedStatement stmt) throws NullPointerException, IllegalStateException {
 		try (final ResultSet rset = stmt.executeQuery()) {

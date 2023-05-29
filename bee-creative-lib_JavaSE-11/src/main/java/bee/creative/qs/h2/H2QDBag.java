@@ -64,7 +64,7 @@ public abstract class H2QDBag<GI> extends H2QISet<GI> {
 		Object deleteValueVersion;
 	
 		void updateValueVersion() {
-			final Object insertVV = H2QDBag.this.owner.insertValueVersion, deleteVV = H2QDBag.this.owner.deleteValueVersion;
+			final Object insertVV = H2QDBag.this.owner.putValueMark, deleteVV = H2QDBag.this.owner.popValueMark;
 			final boolean insertVVC = this.insertValueVersion != insertVV, deleteVVC = this.deleteValueVersion != deleteVV;
 			if (!insertVVC && !deleteVVC) return;
 			this.insertValueVersion = insertVV;

@@ -28,12 +28,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet order() {
-		final int size = this.names.size();
-		final H2QQ qry = new H2QQ().push("select * from (").push(this).push(") order by C0");
-		for (int i = 1; i < size; i++) {
-			qry.push(", C").push(i);
-		}
-		return new Order(this.owner, this.names, qry);
+		return new Order(this.owner, this.names);
 	}
 
 	@Override
@@ -63,19 +58,19 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QTSet union(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet that = this.owner.asQTSet(set, this.names());
-		return new H2QTSet(this.owner, this.names, new H2QQ().push("(").push(this).push(") union (").push(that).push(")"));
+		return new H2QTSet(this.owner, this.names, new H2QQ().push("(").push(this).push(") UNION (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QTSet except(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet that = this.owner.asQTSet(set, this.names());
-		return new H2QTSet(this.owner, this.names, new H2QQ().push("(").push(this).push(") except (").push(that).push(")"));
+		return new H2QTSet(this.owner, this.names, new H2QQ().push("(").push(this).push(") EXCEPT (").push(that).push(")"));
 	}
 
 	@Override
 	public H2QTSet intersect(final QTSet set) throws NullPointerException, IllegalArgumentException {
 		final H2QTSet that = this.owner.asQTSet(set, this.names());
-		return new H2QTSet(this.owner, this.names, new H2QQ().push("(").push(this).push(") intersect (").push(that).push(")"));
+		return new H2QTSet(this.owner, this.names, new H2QQ().push("(").push(this).push(") INTERSECT (").push(that).push(")"));
 	}
 
 	@Override
@@ -124,8 +119,8 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		this.name(predicate);
 		this.name(subject);
 		this.name(object);
-		return new H2QESet(this.owner, new H2QQ().push("select distinct C").push(context).push(" C, C").push(predicate).push(" P, C").push(subject).push("S, C")
-			.push(object).push(" O from (").push(this).push(")"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT C").push(context).push(" AS C, C").push(predicate).push(" AS P, C").push(subject)
+			.push("AS S, C").push(object).push(" AS O FROM (").push(this).push(")"));
 	}
 
 	@Override
@@ -137,7 +132,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QNSet nodes(final int role) throws IllegalArgumentException {
 		this.name(role);
-		return new H2QNSet(this.owner, new H2QQ().push("select distinct C").push(role).push(" N from (").push(this).push(")"));
+		return new H2QNSet(this.owner, new H2QQ().push("SELECT DISTINCT C").push(role).push(" AS N FROM (").push(this).push(")"));
 	}
 
 	@Override
@@ -159,19 +154,19 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 			}
 		}
 		final Names names = new Names(list);
-		final H2QQ qry = new H2QQ().push("(select A.C0");
+		final H2QQ qry = new H2QQ().push("(SELECT A.C0");
 		for (int i = 1; i < size1; i++) {
 			qry.push(", A.C").push(i); // add all from this
 		}
 		for (int i = size1, i2 = 0; i2 < size2; i2++) {
 			if (roles[i2] < 0) { // add new from that
-				qry.push(", B.C").push(i2).push(" C").push(i++);
+				qry.push(", B.C").push(i2).push(" AS C").push(i++);
 			}
 		}
-		qry.push(" from (").push(this).push(") A inner join (").push(that).push(") B on true");
+		qry.push(" FROM (").push(this).push(") AS A INNER JOIN (").push(that).push(") AS B ON TRUE");
 		for (int i2 = 0; i2 < size2; i2++) {
 			if (roles[i2] >= 0) {
-				qry.push(" and A.C").push(roles[i2]).push("=B.C").push(i2);
+				qry.push(" AND A.C").push(roles[i2]).push("=B.C").push(i2);
 			}
 		}
 		qry.push(")");
@@ -182,11 +177,11 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	public H2QTSet select(final int... roles) throws NullPointerException, IllegalArgumentException {
 		final Names names = new Names(this.names(roles));
 		final int size = names.size();
-		final H2QQ qry = new H2QQ().push("select distinct C").push(roles[0]).push(" C0");
+		final H2QQ qry = new H2QQ().push("SELECT DISTINCT C").push(roles[0]).push(" AS C0");
 		for (int i = 1; i < size; i++) {
-			qry.push(", C").push(roles[i]).push(" C").push(i);
+			qry.push(", C").push(roles[i]).push(" AS C").push(i);
 		}
-		qry.push(" from (").push(this).push(")");
+		qry.push(" FROM (").push(this).push(")");
 		return new H2QTSet(this.owner, names, qry);
 	}
 
@@ -205,19 +200,19 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		this.name(role);
 		final Long key = this.owner.asQN(node).key;
 		final int size = this.names.size();
-		final H2QQ qry = new H2QQ().push(role != 0 ? "select distinct C0" : "select distinct ");
+		final H2QQ qry = new H2QQ().push(role != 0 ? "SELECT DISTINCT C0" : "SELECT DISTINCT ");
 		for (int i = 1; i < role; i++) {
 			qry.push(", C").push(i);
 		}
 		if (role == 0) {
-			qry.push(key).push(" C0");
+			qry.push(key).push(" AS C0");
 		} else {
-			qry.push(", ").push(key).push(" C").push(role);
+			qry.push(", ").push(key).push(" AS C").push(role);
 		}
 		for (int i = role + 1; i < size; i++) {
 			qry.push(", C").push(i);
 		}
-		qry.push(" from (").push(this).push(")");
+		qry.push(" FROM (").push(this).push(")");
 		return new H2QTSet(this.owner, this.names, qry);
 	}
 
@@ -231,17 +226,17 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		this.name(role);
 		final H2QTSet that = this.owner.asQTSet(nodes);
 		final int size = this.names.size();
-		final H2QQ qry = new H2QQ().push(role != 0 ? "select distinct A.C0" : "select distinct B.N C0");
+		final H2QQ qry = new H2QQ().push(role != 0 ? "SELECT DISTINCT A.C0" : "SELECT DISTINCT B.N AS C0");
 		for (int i = 1; i < role; i++) {
 			qry.push(", A.C").push(i);
 		}
 		if (role != 0) {
-			qry.push(", B.N C").push(role);
+			qry.push(", B.N AS C").push(role);
 		}
 		for (int i = role + 1; i < size; i++) {
 			qry.push(", A.C").push(i);
 		}
-		qry.push(" from (").push(this).push(") A, (").push(that).push(") B");
+		qry.push(" FROM (").push(this).push(") AS A, (").push(that).push(") AS B");
 		return new H2QTSet(this.owner, this.names, qry);
 	}
 
@@ -272,7 +267,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	public H2QTSet havingNode(final int role, final QN node) throws NullPointerException, IllegalArgumentException {
 		this.name(role);
 		final Long key = this.owner.asQN(node).key;
-		return new H2QTSet(this.owner, this.names, new H2QQ().push("select * from (").push(this).push(") where C").push(role).push("=").push(key));
+		return new H2QTSet(this.owner, this.names, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE C").push(role).push("=").push(key));
 	}
 
 	@Override
@@ -284,7 +279,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	public H2QTSet havingNodes(final int role, final QNSet nodes) throws NullPointerException, IllegalArgumentException {
 		this.name(role);
 		final H2QTSet that = this.owner.asQTSet(nodes);
-		return new H2QTSet(this.owner, this.names, new H2QQ().push("select * from (").push(this).push(") where C").push(role).push(" in (").push(that).push(")"));
+		return new H2QTSet(this.owner, this.names, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE C").push(role).push(" IN (").push(that).push(")"));
 	}
 
 	@Override
@@ -316,9 +311,9 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		public Temp(final H2QS owner, final Names names) {
 			super(owner, names, null);
 			final int size = names.size();
-			final H2QQ qry = new H2QQ().push("create temporary table ").push(this.table).push(" (C0 bigint not null");
+			final H2QQ qry = new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (C0 BIGINT NOT NULL");
 			for (int i = 1; i < size; i++) {
-				qry.push(", C").push(i).push(" bigint not null");
+				qry.push(", C").push(i).push(" BIGINT NOT NULL");
 			}
 			qry.push(")").update(owner);
 		}
@@ -332,11 +327,11 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		public H2QTSet index(final int... roles) throws NullPointerException, IllegalArgumentException {
 			if (roles.length == 0) return this;
 			final int size = new Names(this.names(roles)).size();
-			final H2QQ qry = new H2QQ().push("create index if not exists ").push(this.table).push("_INDEX_");
+			final H2QQ qry = new H2QQ().push("CREATE INDEX IF NOT EXISTS ").push(this.table).push("_INDEX_");
 			for (int i = 0; i < size; i++) {
 				qry.push("C").push(roles[i]);
 			}
-			qry.push(" on ").push(this.table).push(" (C").push(roles[0]);
+			qry.push(" ON ").push(this.table).push(" (C").push(roles[0]);
 			for (int i = 1; i < size; i++) {
 				qry.push(", C").push(roles[i]);
 			}
@@ -344,20 +339,17 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 			return this;
 		}
 
-		@Override
-		public H2QTSet withNames(final List<String> names) throws NullPointerException, IllegalArgumentException {
-			if (this.names().equals(names)) return this;
-			final Names names2 = new Names(names);
-			if (this.names().size() != names2.size()) throw new IllegalArgumentException();
-			return new H2QTSet(this.owner, names2, new H2QQ().push("select * from (").push(this).push(")"));
-		}
-
 	}
 
 	static class Order extends H2QTSet {
 
-		public Order(final H2QS owner, final Names names, final H2QQ select) {
-			super(owner, names, select);
+		public Order(final H2QS owner, final Names names) {
+			super(owner, names, new H2QQ());
+			final int size = names.size();
+			final H2QQ qry = this.table.push("SELECT * FROM (").push(this).push(") ORDER BY C0");
+			for (int i = 1; i < size; i++) {
+				qry.push(", C").push(i);
+			}
 		}
 
 		@Override

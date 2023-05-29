@@ -19,8 +19,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	@Override
 	public boolean popAll() {
 		final H2QNSet that = this.index();
-		return false //
-			| new H2QQ().push("DELETE FROM QN WHERE N IN (").push(that).push(")").update(this.owner) //
+		return this.owner.markPopValue(new H2QQ().push("DELETE FROM QN WHERE N IN (").push(that).push(")").update(this.owner)) //
 			| new H2QQ().push("DELETE FROM QE WHERE C IN (").push(that).push(")").update(this.owner) //
 			| new H2QQ().push("DELETE FROM QE WHERE P IN (").push(that).push(")").update(this.owner) //
 			| new H2QQ().push("DELETE FROM QE WHERE S IN (").push(that).push(")").update(this.owner) //

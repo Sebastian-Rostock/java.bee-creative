@@ -11,6 +11,6 @@ public interface QO {
 	/** Diese Methode gibt den Graphspeicher zurück, der dieses Objekt verwaltet.
 	 *
 	 * @return Graphspeicher. */
-	public QS owner();
+	QS owner();
 
 }

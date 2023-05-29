@@ -12,7 +12,7 @@ public interface QN extends QX {
 	 * zur {@link QS#newNode(Object) Identifikation} des Hyperknoten im {@link #owner() Graphspeicher} eingesetzt werden.
 	 *
 	 * @return Textwert oder {@code null}. */
-	public String value();
+	String value();
 
 	/** {@inheritDoc} Damit werden auch der {@link QN#value() Textwert} dieses Hyperknoten sowie alle diese Hyperknoten verwendenden {@link QE Hyperkanten}
 	 * entfernt. */
@@ -22,6 +22,6 @@ public interface QN extends QX {
 	/** {@inheritDoc} Der Hyperknoten ist nur dann im Graphspeicher enthalten, wenn er einen Textwert besitzt oder in einer gespeicherten {@link QE Hyperkante}
 	 * verwendet wird. */
 	@Override
-	public boolean state();
+	boolean state();
 
 }
