@@ -2,8 +2,11 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map.Entry;
 import bee.creative.lang.Objects;
 import bee.creative.qs.QN;
+import bee.creative.qs.QS;
+import bee.creative.util.Entries;
 import bee.creative.util.Setter;
 
 public abstract class H2QDBag<GI> extends H2QISet<GI> {
@@ -30,64 +33,91 @@ public abstract class H2QDBag<GI> extends H2QISet<GI> {
 		return this.nodes().values();
 	}
 
-	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Die erste Spalte der Tabelle muss
-	 * {@code (N BIGINT NOT NULL PRIMARY KEY)} sein. */
-	protected H2QDBag(final H2QS owner, final H2QQ table, final boolean isMain) {
+	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Die Tabelle muss mit der Spalte
+	 * {@code N BIGINT NOT NULL PRIMARY KEY} beginnen. Der Cache besteht nur aus dieser Spalte, gibt die Menge der geprüften {@link QS#nodes() Hperknoten mit
+	 * Textwert} an und ist nur bei der Hauptwertesammlung anzugeben. */
+	protected H2QDBag(final H2QS owner, final H2QQ table, final String cache) {
 		super(owner, Objects.notNull(table));
-		if (!isMain) return;
-
+		if (cache == null) return;
+		this.table.push(new Cache(cache));
 	}
 
 	protected QN node(final ResultSet next) throws SQLException {
 		return this.owner.newNode(next.getLong(1));
 	}
 
-	protected void insertItems() throws SQLException {
-		this.insertItems(new H2QQ().push("select N, V from QV where N NOT IN (SELECT N FROM (").push(this).push("))"));
+	protected void putItems(final PutItemSet putItemSet) throws SQLException {
 	}
 
-	protected void insertItems(final H2QQ newItems) throws SQLException {
-
+	protected void popItems(final PopItemSet popItemSet) throws SQLException {
 	}
 
-	protected void deleteItems() {
-		this.deleteItems(new H2QQ().push("SELECT N FROM (").push(this).push(") where N NOT IN (select N from QV)"));
-	}
+	protected class Cache {
 
-	protected void deleteItems(final H2QQ push) {
-	}
-
-	private class Updater {
-	
-		Object insertValueVersion;
-	
-		Object deleteValueVersion;
-	
-		void updateValueVersion() {
-			final Object insertVV = H2QDBag.this.owner.putValueMark, deleteVV = H2QDBag.this.owner.popValueMark;
-			final boolean insertVVC = this.insertValueVersion != insertVV, deleteVVC = this.deleteValueVersion != deleteVV;
-			if (!insertVVC && !deleteVVC) return;
-			this.insertValueVersion = insertVV;
-			this.deleteValueVersion = deleteVV;
+		@Override
+		public String toString() {
+			final Object putValueMark = H2QDBag.this.owner.putValueMark;
+			final Object popValueMark = H2QDBag.this.owner.popValueMark;
+			final boolean putValueChanged = this.putValueMark != putValueMark;
+			final boolean popValueChanged = this.popValueMark != popValueMark;
+			if (!putValueChanged && !popValueChanged) return "";
+			this.putValueMark = putValueMark;
+			this.popValueMark = popValueMark;
 			try {
-				if (insertVVC) {
-					H2QDBag.this.insertItems();
+				if (popValueChanged) {
+					H2QDBag.this.popItems(this.popItemSet);
 				}
-				if (deleteVVC) {
-					H2QDBag.this.deleteItems();
+				if (putValueChanged) {
+					H2QDBag.this.putItems(this.putItemSet);
 				}
 			} catch (final Exception cause) {
 				throw new IllegalStateException(cause);
 			}
-		}
-	
-		@Override
-		public String toString() {
-			this.updateValueVersion();
-	
 			return "";
 		}
-	
+
+		final String cache;
+
+		final PutItemSet putItemSet;
+
+		final PopItemSet popItemSet;
+
+		Object putValueMark;
+
+		Object popValueMark;
+
+		Cache(final String cache) {
+			this.cache = cache;
+			this.putItemSet = new PutItemSet(H2QDBag.this.owner, cache);
+			this.popItemSet = new PopItemSet(H2QDBag.this.owner, cache);
+		}
+
+	}
+
+	protected static class PutItemSet extends H2QISet<Entry<Long, String>> {
+
+		@Override
+		protected Entry<Long, String> item(final ResultSet next) throws SQLException {
+			return Entries.from(next.getLong(1), next.getString(2));
+		}
+
+		PutItemSet(final H2QS owner, final String cache) {
+			super(owner, new H2QQ().push("SELECT N, V FROM QN where N NOT IN (SELECT N FROM (").push(cache).push("))"));
+		}
+
+	}
+
+	protected static class PopItemSet extends H2QISet<Long> {
+
+		@Override
+		protected Long item(final ResultSet next) throws SQLException {
+			return next.getLong(1);
+		}
+
+		PopItemSet(final H2QS owner, final String cache) {
+			super(owner, new H2QQ().push("SELECT N FROM (").push(cache).push(") where N NOT IN (select N from QN)"));
+		}
+
 	}
 
 }
