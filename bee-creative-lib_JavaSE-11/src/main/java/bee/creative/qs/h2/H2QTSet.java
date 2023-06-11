@@ -27,6 +27,11 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	}
 
 	@Override
+	public H2QTSet copy(final Filter<? super QT> filter) throws NullPointerException {
+		return this.owner.newTuples(this.names(), Iterables.filter(this, filter));
+	}
+
+	@Override
 	public H2QTSet order() {
 		return new Order(this.owner, this.names);
 	}
@@ -259,11 +264,6 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	}
 
 	@Override
-	public H2QTSet having(final Filter<? super QT> filter) throws NullPointerException {
-		return this.owner.newTuples(this.names(), Iterables.filter(this, filter));
-	}
-
-	@Override
 	public H2QTSet havingNode(final int role, final QN node) throws NullPointerException, IllegalArgumentException {
 		this.name(role);
 		final Long key = this.owner.asQN(node).key;
@@ -295,7 +295,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	}
 
 	@Override
-	protected QT item(final ResultSet item) throws SQLException {
+	protected QT customItem(final ResultSet item) throws SQLException {
 		final int size = this.names.size();
 		final long[] keys = new long[size];
 		for (int i = 0; i < size; i++) {

@@ -16,6 +16,7 @@ import bee.creative.qs.QS;
 import bee.creative.qs.QT;
 import bee.creative.qs.QTSet;
 import bee.creative.qs.h2.H2QTSet.Names;
+import bee.creative.util.HashMap;
 import bee.creative.util.HashSet;
 
 /** Diese Klasse implementiert einen {@link QS Graphspeicher}, dessen Hyperkanten und Textwerte in einer Datenbank (vorzugsweise embedded H2) gespeichert sind.
@@ -421,6 +422,8 @@ public class H2QS implements QS, AutoCloseable {
 	private final PreparedStatement createNode;
 
 	private final PreparedStatement createTemp;
+
+	final HashMap<String, H2QDBag<?, ?>.Cache> cacheMap = new HashMap<>();
 
 	Object putValueMark;
 

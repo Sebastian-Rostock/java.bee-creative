@@ -34,7 +34,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 	@Override
 	public GI first() {
 		try (final ResultSet rset = new H2QQ().push("SELECT TOP 1 * FROM (").push(this).push(")").select(this.owner)) {
-			return rset.next() ? this.item(rset) : null;
+			return rset.next() ? this.customItem(rset) : null;
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
@@ -80,7 +80,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 	}
 
 	/** Diese Methode liefert den Eintrag zum gegebenen {@link ResultSet}. */
-	protected abstract GI item(final ResultSet next) throws SQLException;
+	protected abstract GI customItem(final ResultSet next) throws SQLException;
 
 	private class Iter extends AbstractIterator<GI> {
 
@@ -105,7 +105,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 		@Override
 		public GI next() {
 			try {
-				final GI item = H2QISet.this.item(this.item);
+				final GI item = H2QISet.this.customItem(this.item);
 				this.next = this.item.next();
 				return item;
 			} catch (final SQLException cause) {

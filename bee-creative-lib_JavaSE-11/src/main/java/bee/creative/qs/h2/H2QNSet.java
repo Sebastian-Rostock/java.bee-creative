@@ -32,7 +32,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	}
 
 	@Override
-	public void values(final Setter<QN, String> values) {
+	public void values(final Setter<? super QN, ? super String> values) {
 		try (final ResultSet rset = new H2QQ().push("SELECT N, V FROM QN WHERE N IN (").push(this).push(")").select(this.owner)) {
 			while (rset.next()) {
 				values.set(this.owner.newNode(rset.getInt(1)), rset.getString(2));
@@ -45,11 +45,6 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	@Override
 	public QTSet tuples(final String name) throws NullPointerException, IllegalArgumentException {
 		return new H2QTSet(this.owner, new Names(name), new H2QQ().push("SELECT N C0 FROM (").push(this).push(")"));
-	}
-
-	@Override
-	public H2QNSet having(final Filter<? super QN> filter) throws NullPointerException {
-		return this.owner.newNodes(Iterables.filter(this, filter));
 	}
 
 	@Override
@@ -70,6 +65,11 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	@Override
 	public H2QNSet copy() {
 		return this.owner.newNodes(this);
+	}
+
+	@Override
+	public H2QNSet copy(final Filter<? super QN> filter) throws NullPointerException {
+		return this.owner.newNodes(Iterables.filter(this, filter));
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	}
 
 	@Override
-	protected QN item(final ResultSet item) throws SQLException {
+	protected QN customItem(final ResultSet item) throws SQLException {
 		return this.owner.newNode(item.getInt(1));
 	}
 

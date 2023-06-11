@@ -30,7 +30,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
-	public void nodes(final Setter<String, QN> nodes) {
+	public void nodes(final Setter<? super String, ? super QN> nodes) {
 		try (final ResultSet rset = new H2QQ().push("SELECT V, N FROM QN WHERE V IN (").push(this).push(")").select(this.owner)) {
 			while (rset.next()) {
 				nodes.set(rset.getString(1), this.owner.newNode(rset.getLong(2)));
@@ -41,11 +41,6 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
-	public H2QVSet having(final Filter<? super String> filter) throws NullPointerException {
-		return this.owner.newValues(Iterables.filter(this, filter));
-	}
-
-	@Override
 	public H2QVSet havingState(final boolean state) {
 		return state ? this.intersect(this.owner.values()) : this.except(this.owner.values());
 	}
@@ -53,6 +48,11 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	@Override
 	public H2QVSet copy() {
 		return this.owner.newValues(this);
+	}
+
+	@Override
+	public H2QVSet copy(final Filter<? super String> filter) throws NullPointerException {
+		return this.owner.newValues(Iterables.filter(this, filter));
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
-	protected String item(final ResultSet item) throws SQLException {
+	protected String customItem(final ResultSet item) throws SQLException {
 		return item.getString(1);
 	}
 

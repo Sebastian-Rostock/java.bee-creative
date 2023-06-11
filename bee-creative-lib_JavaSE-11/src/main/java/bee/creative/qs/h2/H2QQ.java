@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import bee.creative.lang.Objects;
+import bee.creative.util.Consumer;
 import bee.creative.util.Iterables;
+import bee.creative.util.Producer;
 
 /** Diese Klasse implementiert den Bauplan einer Datenbankanfrage als {@link ArrayList Auflistung} von Anfragetoken. Die {@link #toString() Textdarstellung} des
  * Bauplans entspricht der Verkettung der Textdarstellungen der Anfragetoken.
@@ -38,6 +40,15 @@ public final class H2QQ {
 		return this;
 	}
 
+//	public H2QQ push(final int token) throws NullPointerException {
+//	}
+//	public H2QQ push(final Long token) throws NullPointerException {
+//	}
+	public H2QQ push(final Consumer<? super H2QQ> token) throws NullPointerException {
+		token.set(this);
+		return this;
+	}
+	
 	/** Diese Methode fügt den gegebenen Anfragetoken an und gibt {@code this} zurück. Der Anfragetoken darf nicht {@code null}, kein {@link H2QQ} und kein
 	 * {@link H2QISet} sein. */
 	public H2QQ push(final Object token) throws NullPointerException {

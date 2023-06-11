@@ -55,11 +55,6 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	}
 
 	@Override
-	public H2QESet having(final Filter<? super QE> filter) throws NullPointerException {
-		return this.owner.newEdges(Iterables.filter(this, filter));
-	}
-
-	@Override
 	public H2QESet havingState(final boolean state) {
 		return state ? this.intersect(this.owner.edges()) : this.except(this.owner.edges());
 	}
@@ -180,6 +175,11 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	}
 
 	@Override
+	public H2QESet copy(final Filter<? super QE> filter) throws NullPointerException {
+		return this.owner.newEdges(Iterables.filter(this, filter));
+	}
+
+	@Override
 	public H2QESet order() {
 		return new Order(this);
 	}
@@ -223,12 +223,8 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	}
 
 	@Override
-	protected QE item(final ResultSet item) throws SQLException {
+	protected QE customItem(final ResultSet item) throws SQLException {
 		return this.owner.newEdge(item.getInt(1), item.getInt(2), item.getInt(3), item.getInt(4));
-	}
-
-	private static void check(final String cols) {
-		if ((cols.length() != 4) || ((cols.indexOf('C') | cols.indexOf('P') | cols.indexOf('S') | cols.indexOf('O')) < 0)) throw new IllegalArgumentException();
 	}
 
 	static class Main extends H2QESet {
@@ -238,8 +234,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 		}
 
 		@Override
-		public H2QESet index(final String cols) throws NullPointerException, IllegalArgumentException {
-			H2QESet.check(cols);
+		public H2QESet index() {
 			return this;
 		}
 
@@ -260,7 +255,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 		@Override
 		public H2QESet index(final String cols) throws NullPointerException, IllegalArgumentException {
-			H2QESet.check(cols);
+			if ((cols.length() != 4) || ((cols.indexOf('C') | cols.indexOf('P') | cols.indexOf('S') | cols.indexOf('O')) < 0)) throw new IllegalArgumentException();
 			new H2QQ().push("CREATE INDEX IF NOT EXISTS ").push(this.table).push("_INDEX_").push(cols).push(" ON ").push(this.table).push(" (").push(cols.charAt(0))
 				.push(", ").push(cols.charAt(1)).push(", ").push(cols.charAt(2)).push(", ").push(cols.charAt(3)).push(")").update(this.owner);
 			return this;
