@@ -30,7 +30,7 @@ public interface QVSet extends QXSet<String, QVSet> {
 	/** Diese Methode ergänzt die gegebene Abbildung um die {@link QN Hyperknoten}, die einen der Textwerte dieser Menge {@link QN#value() besitzen}.
 	 *
 	 * @param nodes Abbildung von {@link QN#value() Textwerten} auf {@link QN Hyperknoten}. */
-	void nodes(Setter<String, QN> nodes);
+	void nodes(Setter<? super String, ? super QN> nodes);
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newValues(Iterable) this.owner().newValues(this)}. */
 	@Override

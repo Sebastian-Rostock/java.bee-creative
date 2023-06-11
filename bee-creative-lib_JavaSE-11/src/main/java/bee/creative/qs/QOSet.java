@@ -15,16 +15,16 @@ public interface QOSet<GI, GISet> extends QISet<GI> {
 	 * @return Kopie dieser Menge. */
 	GISet copy();
 
-	/** Diese Methode gibt die geordnete Mengensicht auf die Objekte dieser Menge zurück.
-	 *
-	 * @return Geordnete Menge. */
-	GISet order();
-
 	/** Diese Methode gibt eine temporäre Kopie der Menge der Objekte zurück, die vom gegebenen Filter {@link Filter#accept(Object) akzeptiert} werden.
 	 *
 	 * @param filter Filter.
 	 * @return Gefilterte Menge. */
-	GISet having(Filter<? super GI> filter) throws NullPointerException;
+	GISet copy(Filter<? super GI> filter) throws NullPointerException;
+
+	/** Diese Methode gibt die geordnete Mengensicht auf die Objekte dieser Menge zurück.
+	 *
+	 * @return Geordnete Menge. */
+	GISet order();
 
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die in dieser oder der gegebenen Menge enthalten sind.
 	 *
