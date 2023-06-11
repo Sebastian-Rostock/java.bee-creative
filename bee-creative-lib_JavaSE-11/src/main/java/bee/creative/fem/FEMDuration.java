@@ -580,7 +580,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * <li>monthsValue - 4 Bit</li>
 	 * <li>millisecondsValue - 10 Bit</li>
 	 * </ul>
-	*/
+	 */
 	final int valueL;
 
 	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitspanne.
@@ -593,7 +593,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * <li>minutesValue - 6 Bit</li>
 	 * <li>secondsValue - 6 Bit</li>
 	 * </ul>
-	*/
+	 */
 	final int valueH;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung der Zeitspanne.
@@ -603,14 +603,9 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
 	public FEMDuration(final long value) throws IllegalArgumentException {
 		this(Integers.toIntH(value), Integers.toIntL(value));
-		if (value == 0) return;
 		FEMDuration.checkYears(this.yearsValue());
-		if (this.monthsValue() > 11) throw new IllegalArgumentException();
-		if (this.daysValue() > 146096) throw new IllegalArgumentException();
-		if (this.hoursValue() > 23) throw new IllegalArgumentException();
-		if (this.minutesValue() > 59) throw new IllegalArgumentException();
-		if (this.secondsValue() > 59) throw new IllegalArgumentException();
-		if (this.millisecondsValue() > 999) throw new IllegalArgumentException();
+		if ((this.monthsValue() > 11) || (this.daysValue() > 146096) || (this.hoursValue() > 23) || (this.minutesValue() > 59) || (this.secondsValue() > 59)
+			|| (this.millisecondsValue() > 999)) throw new IllegalArgumentException();
 	}
 
 	FEMDuration(final int valueH, final int valueL) {
@@ -712,6 +707,22 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @return Gesamtanzahl der Millisekunden ({@code 0..315569519999999}). */
 	public long durationmillisValue() {
 		return FEMDuration.durationmillisOfImpl(this.daysValue(), this.hoursValue(), this.minutesValue(), this.secondsValue(), this.millisecondsValue());
+	}
+
+	/** Diese Methode liefert die minimale Länge dieser Zeitspanne in Millisekunden. Diese fast {@link #durationmillisValue()} und die {@link #minLengthOf(int)}
+	 * von {@link #durationmonthsValue()} zusammen.
+	 *
+	 * @return minimale Länge in Millisekunden. */
+	public long durationmillisMinValue() {
+		return this.durationmillisValue() + (FEMDuration.minLengthOf(this.durationmonthsValue()) * 86400000L);
+	}
+
+	/** Diese Methode liefert die maximale Länge dieser Zeitspanne in Millisekunden. Diese fast {@link #durationmillisValue()} und die {@link #maxLengthOf(int)}
+	 * von {@link #durationmonthsValue()} zusammen.
+	 *
+	 * @return maximale Länge in Millisekunden. */
+	public long durationmillisMaxValue() {
+		return this.durationmillisValue() + (FEMDuration.maxLengthOf(this.durationmonthsValue()) * 86400000L);
 	}
 
 	/** Diese Methode gibt die Gesamtanzahl der Monate zurück. Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
