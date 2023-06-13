@@ -15,7 +15,7 @@ public class FEMIntegerBag extends H2QDBag<FEMInteger, FEMIntegerBag> {
 
 	@Override
 	protected FEMInteger customItem(final ResultSet next) throws SQLException {
-		return FEMInteger.from(next.getLong(2));
+		return new FEMInteger(next.getLong(2));
 	}
 
 	@Override

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import bee.creative.lang.Objects;
 import bee.creative.util.Consumer;
 import bee.creative.util.Iterables;
-import bee.creative.util.Producer;
 
 /** Diese Klasse implementiert den Bauplan einer Datenbankanfrage als {@link ArrayList Auflistung} von Anfragetoken. Die {@link #toString() Textdarstellung} des
  * Bauplans entspricht der Verkettung der Textdarstellungen der Anfragetoken.

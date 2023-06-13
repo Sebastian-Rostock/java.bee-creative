@@ -709,22 +709,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		return FEMDuration.durationmillisOfImpl(this.daysValue(), this.hoursValue(), this.minutesValue(), this.secondsValue(), this.millisecondsValue());
 	}
 
-	/** Diese Methode liefert die minimale Länge dieser Zeitspanne in Millisekunden. Diese fast {@link #durationmillisValue()} und die {@link #minLengthOf(int)}
-	 * von {@link #durationmonthsValue()} zusammen.
-	 *
-	 * @return minimale Länge in Millisekunden. */
-	public long durationmillisMinValue() {
-		return this.durationmillisValue() + (FEMDuration.minLengthOf(this.durationmonthsValue()) * 86400000L);
-	}
-
-	/** Diese Methode liefert die maximale Länge dieser Zeitspanne in Millisekunden. Diese fast {@link #durationmillisValue()} und die {@link #maxLengthOf(int)}
-	 * von {@link #durationmonthsValue()} zusammen.
-	 *
-	 * @return maximale Länge in Millisekunden. */
-	public long durationmillisMaxValue() {
-		return this.durationmillisValue() + (FEMDuration.maxLengthOf(this.durationmonthsValue()) * 86400000L);
-	}
-
 	/** Diese Methode gibt die Gesamtanzahl der Monate zurück. Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
 	 *
 	 * @return Gesamtanzahl der Monate ({@code 0..119999}). */

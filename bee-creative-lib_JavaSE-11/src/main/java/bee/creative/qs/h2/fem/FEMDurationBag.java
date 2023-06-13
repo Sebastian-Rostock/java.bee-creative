@@ -3,7 +3,6 @@ package bee.creative.qs.h2.fem;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import bee.creative.fem.FEMDuration;
-import bee.creative.fem.FEMInteger;
 import bee.creative.qs.h2.H2QDBag;
 import bee.creative.qs.h2.H2QQ;
 import bee.creative.qs.h2.H2QS;
@@ -16,28 +15,28 @@ public class FEMDurationBag extends H2QDBag<FEMDuration, FEMDurationBag> {
 
 	@Override
 	protected FEMDuration customItem(final ResultSet next) throws SQLException {
-		return FEMDuration.from(next.getInt(2), next.getLong(3));
+		return new FEMDuration(next.getLong(2));
 	}
 
 	@Override
 	protected void customSetup() {
-		new H2QQ().push("CREATE TABLE IF NOT EXISTS QD_FEMDURATION (N BIGINT NOT NULL, DURATIONMONTHS INT NOT NULL, DURATIONMILLIS BIGINT NOT NULL, " + //
-			"DURATIONMILLISMIN BIGINT NOT NULL, DURATIONMILLISMAX BIGINT NOT NULL, PRIMARY KEY (N));" + //
-			"CREATE INDEX IF NOT EXISTS QD_FEMDURATION_INDEX_1 ON QD_FEMINTEGER (DURATIONMILLISMIN, DURATIONMILLISMAX);").update(this.owner);
+		new H2QQ().push("CREATE TABLE IF NOT EXISTS QD_FEMDURATION (N BIGINT NOT NULL, DURATIONVALUE BIGINT NOT NULL, " + //
+			"DURATIONMINIMUM BIGINT NOT NULL, DURATIONMAXIMUM BIGINT NOT NULL, PRIMARY KEY (N));" + //
+			"CREATE INDEX IF NOT EXISTS QD_FEMDURATION_INDEX_1 ON QD_FEMINTEGER (DURATIONMINIMUM, DURATIONMAXIMUM);" + //
+			"CREATE INDEX IF NOT EXISTS QD_FEMDURATION_INDEX_2 ON QD_FEMINTEGER (DURATIONMAXIMUM);").update(this.owner);
 	}
 
 	@Override
 	protected void customInsert(final InsertSet putItemSet) throws SQLException {
-		try (final var stmt = new H2QQ().push("MERGE INTO QD_FEMDURATION (N, DURATIONMONTHS, DURATIONMILLIS, DURATIONMILLISMIN, DURATIONMILLISMAX) " + //
-			"VALUES (?, ?, ?, ?, ?)").prepare(this.owner)) {
+		try (final var stmt =
+			new H2QQ().push("MERGE INTO QD_FEMDURATION (N, DURATIONVALUE, DURATIONMINIMUM, DURATIONMAXIMUM) VALUES (?, ?, ?, ?)").prepare(this.owner)) {
 			for (final var entry: putItemSet) {
 				try {
 					final var item = FEMDuration.from(entry.getValue());
 					stmt.setObject(1, entry.getKey());
-					stmt.setInt(2, item.durationmonthsValue());
-					stmt.setLong(3, item.durationmillisValue());
-					stmt.setLong(4, item.durationmillisMinValue());
-					stmt.setLong(5, item.durationmillisMaxValue());
+					stmt.setLong(2, item.value());
+					stmt.setObject(3, this.durationminimum(item));
+					stmt.setObject(4, this.durationmaximum(item));
 					stmt.addBatch();
 				} catch (final Exception ignore) {}
 			}
@@ -57,21 +56,29 @@ public class FEMDurationBag extends H2QDBag<FEMDuration, FEMDurationBag> {
 
 	@Override
 	protected void customHavingItemEQ(final H2QQ table, final FEMDuration item) throws NullPointerException, IllegalArgumentException {
-		table.push("DURATIONMILLISMIN=").push(item.durationmillisMinValue()).push("AND DURATIONMILLISMAX=").push(item.durationmillisMaxValue());
+		table.push("DURATIONMINIMUM=").push(this.durationminimum(item)).push("AND DURATIONMAXIMUM=").push(this.durationmaximum(item));
 	}
 
 	@Override
 	protected void customHavingItemLT(final H2QQ table, final FEMDuration item) throws NullPointerException, IllegalArgumentException {
-		table.push("DURATIONMILLISMAX<").push(item.durationmillisMinValue());
+		table.push("DURATIONMAXIMUM<").push(this.durationminimum(item));
 	}
 
 	@Override
 	protected void customHavingItemGT(final H2QQ table, final FEMDuration item) throws NullPointerException, IllegalArgumentException {
-		table.push("DURATIONMILLISMIN>").push(item.durationmillisMaxValue());
+		table.push("DURATIONMINIMUM>").push(this.durationmaximum(item));
 	}
 
 	private FEMDurationBag(final H2QS owner, final H2QQ table, final String cache) {
 		super(owner, table, cache);
+	}
+
+	private Long durationminimum(final FEMDuration item) {
+		return (FEMDuration.minLengthOf(item.durationmonthsValue()) * 86400000L) + item.durationmillisValue();
+	}
+
+	private Long durationmaximum(final FEMDuration item) {
+		return (FEMDuration.maxLengthOf(item.durationmonthsValue()) * 86400000L) + item.durationmillisValue();
 	}
 
 }
