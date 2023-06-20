@@ -47,22 +47,24 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 
 	/** Diese Methode liefert den zum gegebenen Schlüssel hinterlegten Wert, analog zu {@link #get(Object)}. Wenn zu diesem Schlüssel noch kein Wert hinterlegt
 	 * ist, wird diesem Schlüssel der daraus über {@code installValue} erzeugte Wert zugeordnet.
-	 * 
+	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return enthaltener und ggf. erzeugter Wert. */
-	public GValue install(final GKey key, Getter<? super GKey, ? extends GValue> installValue) {
+	public GValue install(final GKey key, final Getter<? super GKey, ? extends GValue> installValue) {
 		return this.install(key, Getters.<GKey>neutral(), installValue);
 	}
 
 	/** Diese Methode liefert den zum gegebenen Schlüssel hinterlegten Wert, analog zu {@link #get(Object)}. Wenn zu diesem Schlüssel noch kein Wert hinterlegt
-	 * ist, wird dem über {@code installKey} aus dem gegebenen Schlüssel abgeleiteten Schlüssel der daraus über {@code installValue} erzeugte Wert zugeordnet.
-	 * 
+	 * ist, wird dem über {@code installKey} aus dem gegebenen Schlüssel abgeleiteten Schlüssel der daraus über {@code installValue} erzeugte Wert zugeordnet.<br>
+	 * <b>Achtung:</b> Innerhalb der Methoden {@code installKey} und {@code installValue} dürfen Einträge nicht {@link #put(Object, Object) eingefügt},
+	 * {@link #remove(Object) entfernt} oder {@link #allocate(int) reserviert} werden.
+	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return enthaltener und ggf. erzeugter Wert. */
-	public GValue install(final GKey key, Getter<? super GKey, ? extends GKey> installKey, Getter<? super GKey, ? extends GValue> installValue) {
+	public GValue install(final GKey key, final Getter<? super GKey, ? extends GKey> installKey, final Getter<? super GKey, ? extends GValue> installValue) {
 		return this.customGetValue(this.installImpl(key, installKey, installValue));
 	}
 

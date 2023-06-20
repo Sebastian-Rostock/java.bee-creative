@@ -719,7 +719,9 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn ein solcher Eintrag bereits existiert, wird dessen
 	 * Wiederverwendung über {@link #customReuseEntry(int)} angezeigt. Andernfalls wird er erzeugt. Der dabei verwendete Schlüssel über
-	 * {@link #customInstallKey(Object)} ermittelt. Daraus wird über {@link #customInstallValue(Object)} der initiale Wert des Eintrags abgeleitet.
+	 * {@link #customInstallKey(Object)} ermittelt. Daraus wird über {@link #customInstallValue(Object)} der initiale Wert des Eintrags abgeleitet.<br>
+	 * <b>Achtung:</b> Innerhalb der Methoden {@link #customInstallKey(Object)} und {@link #customInstallValue(Object)} dürfen Einträge nicht
+	 * {@link #putKeyImpl(Object) eingefügt}, {@link #popIndexImpl(Object) entfernt} oder {@link #allocateImpl(int) reserviert} werden.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @return Index des gefundenen oder erzeugten Eintrags. */
@@ -737,7 +739,10 @@ public abstract class AbstractHashData<GKey, GValue> implements Emuable {
 	}
 
 	/** Diese Methode sucht den Eintrag mit dem gegebenen Schlüssel und gibt dessen Position zurück. Wenn kein solcher Eintrag existiert, wird er erzeugt. Der
-	 * dabei verwendete Schlüssel wird über über {@code installKey} ermittelt. Daraus wird über {@code installValue} der initiale Wert des Eintrags abgeleitet.
+	 * dabei verwendete Schlüssel wird über über {@code installKey} ermittelt. Daraus wird über {@code installValue} der initiale Wert des Eintrags
+	 * abgeleitet.<br>
+	 * <b>Achtung:</b> Innerhalb der Methoden {@code installKey} und {@code installValue} dürfen Einträge nicht {@link #putKeyImpl(Object) eingefügt},
+	 * {@link #popIndexImpl(Object) entfernt} oder {@link #allocateImpl(int) reserviert} werden.
 	 *
 	 * @param key Schlüssel des Eintrags.
 	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
