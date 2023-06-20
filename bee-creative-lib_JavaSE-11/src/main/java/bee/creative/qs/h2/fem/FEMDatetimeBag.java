@@ -116,7 +116,7 @@ public class FEMDatetimeBag extends H2QDBag<FEMDatetime, FEMDatetimeBag> {
 	}
 
 	private int zonemillis(final FEMDatetime item, final int undefined) {
-		return item.hasZone() ? 0 : undefined;
+		return item.hasZone() ? -item.zoneValue() : undefined;
 	}
 
 }
