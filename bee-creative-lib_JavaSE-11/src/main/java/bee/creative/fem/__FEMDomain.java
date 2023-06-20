@@ -106,7 +106,7 @@ import bee.creative.util.Parser.Token;
  * </table>
  *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-  class __FEMDomain extends BaseObject {
+class __FEMDomain extends BaseObject {
 
 	/** Dieses Feld speichert die normale {@link __FEMDomain}. */
 	public static final __FEMDomain DEFAULT = new __FEMDomain();

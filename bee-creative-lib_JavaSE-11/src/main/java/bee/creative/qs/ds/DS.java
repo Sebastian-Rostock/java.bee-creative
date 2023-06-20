@@ -161,7 +161,7 @@ public class DS {
 
 	/** Diese Methode ergänzt zu jedem der gegebenen {@link QE#subject() Subjektknoten} die {@link QE Hyperkanten} zu den gegebenen zugeordneten
 	 * {@link QE#object() Objektknoten} mit dem gegebenen {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten}.
-	 * 
+	 *
 	 * @see #getObject_DONE(QN, QN, Iterable)
 	 * @param context Kontextknoten der betrachteten Hyperkanten.
 	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.

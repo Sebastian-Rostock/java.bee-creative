@@ -13,7 +13,7 @@ import bee.creative.lang.Objects;
 /** Diese Klasse implementiert ein Objekt zum Parsen einer Zeichenkette in hierarchische {@link Token Abschnitte}.
  *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-    class __Parser {
+class __Parser {
 
 	/** Diese Klasse implementiert einen {@link #type() typisierten} Abschnitt einer {@link #source() Zeichenkette}. Die {@link #compareTo(Token) Ordnung} von
 	 * Abschnitten folgt aus ihrer {@link #start() Startposition}. Abschnitte können zudem über {@link #tokens() untergeordnete Kindabschnitte} einen
@@ -96,7 +96,7 @@ import bee.creative.lang.Objects;
 		 * @param index Position.
 		 * @return {@link Comparable} für Endpositionen von Abschnitten. */
 		public static Comparable2<Token> endingAt(final int index) {
-			return new AbstractComparable<Token>() {
+			return new AbstractComparable<>() {
 
 				@Override
 				public int compareTo(final Token value) {
@@ -116,7 +116,7 @@ import bee.creative.lang.Objects;
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
 		public static Comparable2<Token> startingAt(final int index) {
-			return new AbstractComparable<Token>() {
+			return new AbstractComparable<>() {
 
 				@Override
 				public int compareTo(final Token value) {
@@ -134,7 +134,7 @@ import bee.creative.lang.Objects;
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
 		public static Comparable2<Token> containing(final int index) {
-			return new AbstractComparable<Token>() {
+			return new AbstractComparable<>() {
 
 				@Override
 				public int compareTo(final Token value) {
