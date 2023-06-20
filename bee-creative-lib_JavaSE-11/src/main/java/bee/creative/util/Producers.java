@@ -226,7 +226,7 @@ public class Producers {
 	public static <GValue> Producer3<GValue> fromNative(final String memberPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberPath);
-		if (object instanceof Class<?>) return Producers.fromNative((java.lang.reflect.Field)object, forceAccessible);
+		if (object instanceof Class<?>) return Producers.fromNative((Class)object, forceAccessible);
 		if (object instanceof java.lang.reflect.Field) return Producers.fromNative((java.lang.reflect.Field)object, forceAccessible);
 		if (object instanceof Method) return Producers.fromNative((Method)object, forceAccessible);
 		if (object instanceof Constructor<?>) return Producers.fromNative((Constructor<?>)object, forceAccessible);
