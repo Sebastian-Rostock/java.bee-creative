@@ -34,7 +34,7 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		final Consumer<? super GItem> reuseItem) throws NullPointerException {
 		Objects.notNull(hasher);
 		Objects.notNull(installItem);
-		return new HashSet2<GItem>() {
+		return new HashSet2<>() {
 
 			private static final long serialVersionUID = 2607996617303285033L;
 

@@ -81,7 +81,8 @@ public class Comparators {
 			final int s1 = item1.length(), s2 = item2.length();
 			int a1 = 0, a2 = 0;
 			boolean n1 = false, n2 = false;
-			{ /** Vorzeichen ermitteln und überspringen */
+			{
+				/** Vorzeichen ermitteln und überspringen */
 				if (a1 < s1) {
 					final int c1 = item1.charAt(a1);
 					if (c1 == '-') {
@@ -101,7 +102,8 @@ public class Comparators {
 					}
 				}
 			}
-			{ /** '0' überspringen */
+			{
+				/** '0' überspringen */
 				while ((a1 < s1) && (item1.charAt(a1) == '0')) {
 					a1++;
 				}
@@ -109,7 +111,8 @@ public class Comparators {
 					a2++;
 				}
 			}
-			{ /** War eine der Eingaben Leer oder "0" */
+			{
+				/** War eine der Eingaben Leer oder "0" */
 				if (a1 == s1) {
 					if (a2 == s2) return 0;
 					return n2 ? +1 : -1;
@@ -151,7 +154,8 @@ public class Comparators {
 			final int s1 = item1.length(), s2 = item2.length();
 			int a1 = 0, a2 = 0, e1, e2;
 			while ((a1 < s1) && (a2 < s2)) {
-				{ /** Buchstaben überspringen => Halt, wenn Ziffer gefunden */
+				{
+					/** Buchstaben überspringen => Halt, wenn Ziffer gefunden */
 					for (e1 = a1; e1 < s1; e1++) {
 						final char c1 = item1.charAt(e1);
 						if (('0' <= c1) && (c1 <= '9')) {
@@ -165,7 +169,8 @@ public class Comparators {
 						}
 					}
 				}
-				{ /** Buchstaben vergleichen */
+				{
+					/** Buchstaben vergleichen */
 					if (a1 == e1) {
 						if (a2 != e2) return -1;
 					} else if (a2 != e2) {
@@ -173,7 +178,8 @@ public class Comparators {
 						if (result != 0) return result;
 					} else return 1;
 				}
-				{ /** '0' überspringen => Halt, wenn nicht '0' gefunden */
+				{
+					/** '0' überspringen => Halt, wenn nicht '0' gefunden */
 					for (a1 = e1; a1 < s1; a1++) {
 						if (item1.charAt(a1) != '0') {
 							break;
@@ -185,7 +191,8 @@ public class Comparators {
 						}
 					}
 				}
-				{ /** Ziffern überspringen => Halt, wenn nicht Ziffer gefunden */
+				{
+					/** Ziffern überspringen => Halt, wenn nicht Ziffer gefunden */
 					for (e1 = a1; e1 < s1; e1++) {
 						final char c1 = item1.charAt(e1);
 						if (('0' > c1) || (c1 > '9')) {
@@ -199,7 +206,8 @@ public class Comparators {
 						}
 					}
 				}
-				{ /** Ziffern vergleichen */
+				{
+					/** Ziffern vergleichen */
 					if (a1 == e1) {
 						if (a2 != e2) return -1;
 					} else if (a2 != e2) {

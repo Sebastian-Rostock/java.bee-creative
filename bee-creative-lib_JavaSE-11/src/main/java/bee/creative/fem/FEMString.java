@@ -1390,8 +1390,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
 	protected boolean customEquals(final FEMString that) throws NullPointerException {
 		final int length = this.length;
-		if (length != that.length) return false;
-		if (this.hashCode() != that.hashCode()) return false;
+		if ((length != that.length) || (this.hashCode() != that.hashCode())) return false;
 		return this.customEquals(that, 0);
 	}
 
@@ -1582,14 +1581,12 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	}
 
 	int findLast(final Object key) {
-		if (this.length == 0) return -1;
-		if (!(key instanceof Integer)) return -1;
+		if ((this.length == 0) || !(key instanceof Integer)) return -1;
 		return this.customFind((Integer)key, 0, this.length, false);
 	}
 
 	int findFirst(final Object key) {
-		if (this.length == 0) return -1;
-		if (!(key instanceof Integer)) return -1;
+		if ((this.length == 0) || !(key instanceof Integer)) return -1;
 		return this.customFind((Integer)key, 0, this.length, true);
 	}
 
@@ -1652,7 +1649,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	@Override
 	public final Iterator<Integer> iterator() {
-		return new AbstractIterator<Integer>() {
+		return new AbstractIterator<>() {
 
 			int index = 0;
 

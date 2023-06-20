@@ -45,7 +45,7 @@ public class HashMap2<GKey, GValue> extends HashMap<GKey, GValue> {
 		Objects.notNull(hasher);
 		Objects.notNull(installKey);
 		Objects.notNull(installValue);
-		return new HashMap2<GKey, GValue>() {
+		return new HashMap2<>() {
 
 			private static final long serialVersionUID = 2518756984792880994L;
 

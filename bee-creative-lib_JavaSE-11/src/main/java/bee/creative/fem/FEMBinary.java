@@ -797,8 +797,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
 	protected boolean customEquals(final FEMBinary that) throws NullPointerException {
 		final int length = this.length;
-		if (length != that.length) return false;
-		if (this.hashCode() != that.hashCode()) return false;
+		if ((length != that.length) || (this.hashCode() != that.hashCode())) return false;
 		return this.customEquals(that, 0);
 	}
 
@@ -959,14 +958,12 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	}
 
 	int findLast(final Object key) {
-		if (this.length == 0) return -1;
-		if (!(key instanceof Byte)) return -1;
+		if ((this.length == 0) || !(key instanceof Byte)) return -1;
 		return this.customFind((Byte)key, 0, this.length, false);
 	}
 
 	int findFirst(final Object key) {
-		if (this.length == 0) return -1;
-		if (!(key instanceof Byte)) return -1;
+		if ((this.length == 0) || !(key instanceof Byte)) return -1;
 		return this.customFind((Byte)key, 0, this.length, true);
 	}
 
@@ -1020,7 +1017,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 
 	@Override
 	public final Iterator<Byte> iterator() {
-		return new AbstractIterator<Byte>() {
+		return new AbstractIterator<>() {
 
 			int index = 0;
 

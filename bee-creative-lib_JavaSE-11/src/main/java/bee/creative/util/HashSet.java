@@ -41,7 +41,7 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		final Consumer<? super GItem> reuseItem) throws NullPointerException {
 		Objects.notNull(hasher);
 		Objects.notNull(installItem);
-		return new HashSet<GItem>() {
+		return new HashSet<>() {
 
 			private static final long serialVersionUID = -1363112074783475978L;
 

@@ -364,7 +364,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * <dt>{@code item: long[reusableLimit]}</dt>
 	 * <dd>Spalte der Referenzen auf die wiederverwendbaren Funktionen.</dd>
 	 * </dl>
-	*/
+	 */
 	private long reusableTable;
 
 	/** Dieses Feld speichert die Kapazität der {@link #reusableTable} und ist stets eine positive Potenz von {@code 2}. Bei Zahlenüberlauf wird die
@@ -401,7 +401,7 @@ public class FEMBuffer implements Property<FEMFunction>, Emuable {
 	 * <dt>{@code reusableTable: long}</dt>
 	 * <dd>{@link #reusableTable Adresse} der Tabelle der wiederverwendbaren Funktionen.</dd>
 	 * </dl>
-	*/
+	 */
 	protected final MappedBuffer buffer;
 
 	/** Dieser Konstruktor initialisiert den Dateipuffer.

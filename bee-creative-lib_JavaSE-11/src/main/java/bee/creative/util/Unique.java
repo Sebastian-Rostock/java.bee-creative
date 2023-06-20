@@ -187,7 +187,7 @@ public abstract class Unique<GSource, GTarget> implements Field<GSource, GTarget
 	 *
 	 * @param useHashMap {@code true} für {@link HashMap2}; {@code false} für {@link TreeMap}. */
 	public Unique(final boolean useHashMap) {
-		this.mapping = useHashMap ? HashMap2.<GSource, GTarget>from(this) : new TreeMap<GSource, GTarget>(this);
+		this.mapping = useHashMap ? HashMap2.<GSource, GTarget>from(this) : new TreeMap<>(this);
 	}
 
 	/** Dieser Konstruktor initialisiert die intere Abbildung.

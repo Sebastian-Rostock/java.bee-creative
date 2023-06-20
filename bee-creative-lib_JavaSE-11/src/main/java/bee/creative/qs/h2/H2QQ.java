@@ -39,15 +39,11 @@ public final class H2QQ {
 		return this;
 	}
 
-//	public H2QQ push(final int token) throws NullPointerException {
-//	}
-//	public H2QQ push(final Long token) throws NullPointerException {
-//	}
 	public H2QQ push(final Consumer<? super H2QQ> token) throws NullPointerException {
 		token.set(this);
 		return this;
 	}
-	
+
 	/** Diese Methode fügt den gegebenen Anfragetoken an und gibt {@code this} zurück. Der Anfragetoken darf nicht {@code null}, kein {@link H2QQ} und kein
 	 * {@link H2QISet} sein. */
 	public H2QQ push(final Object token) throws NullPointerException {

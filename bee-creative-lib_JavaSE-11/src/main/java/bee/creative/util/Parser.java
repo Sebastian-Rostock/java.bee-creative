@@ -95,7 +95,7 @@ public class Parser {
 		 * @param index Position.
 		 * @return {@link Comparable} für Endpositionen von Abschnitten. */
 		public static Comparable2<Token> endingAt(final int index) {
-			return new AbstractComparable<Token>() {
+			return new AbstractComparable<>() {
 
 				@Override
 				public int compareTo(final Token value) {
@@ -115,7 +115,7 @@ public class Parser {
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
 		public static Comparable2<Token> startingAt(final int index) {
-			return new AbstractComparable<Token>() {
+			return new AbstractComparable<>() {
 
 				@Override
 				public int compareTo(final Token value) {
@@ -133,7 +133,7 @@ public class Parser {
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Abschnitten. */
 		public static Comparable2<Token> containing(final int index) {
-			return new AbstractComparable<Token>() {
+			return new AbstractComparable<>() {
 
 				@Override
 				public int compareTo(final Token value) {

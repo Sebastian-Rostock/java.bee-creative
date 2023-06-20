@@ -288,7 +288,7 @@ public abstract class Observables<GMessage, GObserver> {
 	 * @param customFire Methode zur Benachrichtigung eines Ereignisempfängers mit einer Ereignisnachricht.
 	 * @return Ereignisempfängerverwaltung. */
 	public static <GMessage, GObserver> Observables<GMessage, GObserver> from(final Setter<? super GObserver, ? super GMessage> customFire) {
-		return new Observables<GMessage, GObserver>() {
+		return new Observables<>() {
 
 			@Override
 			protected void customFire(final Object sender, final GMessage message, final GObserver observer) {

@@ -117,7 +117,7 @@ public class XMLCleaner {
 	 * @see FileOutputStream
 	 * @return Konfigurator. */
 	public FileBuilder<XMLCleaner> forFilepath() {
-		return new FileBuilder<XMLCleaner>() {
+		return new FileBuilder<>() {
 
 			@Override
 			public File get() {

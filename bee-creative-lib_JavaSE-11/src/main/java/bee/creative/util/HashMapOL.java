@@ -27,7 +27,7 @@ public class HashMapOL<GKey> extends AbstractHashMap<GKey, Long> implements Seri
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
 	public static <GKey> HashMapOL<GKey> from(final Hasher hasher) throws NullPointerException {
 		Objects.notNull(hasher);
-		return new HashMapOL<GKey>() {
+		return new HashMapOL<>() {
 
 			private static final long serialVersionUID = 5915519385854194907L;
 

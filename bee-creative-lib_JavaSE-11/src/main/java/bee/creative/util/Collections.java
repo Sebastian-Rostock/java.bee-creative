@@ -476,7 +476,7 @@ public class Collections {
 				iterator2 = this.items2.listIterator(index - size);
 			}
 			size = 0;
-			return new ListIterator<GItem>() {
+			return new ListIterator<>() {
 
 				int size = ConcatList.this.items1.size();
 

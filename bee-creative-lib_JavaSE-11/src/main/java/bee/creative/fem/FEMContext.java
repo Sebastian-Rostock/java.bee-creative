@@ -45,14 +45,7 @@ public class FEMContext extends BaseObject {
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist. */
 	public <GData> Getter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
 		Objects.notNull(type);
-		return new AbstractGetter<FEMValue, GData>() {
-
-			@Override
-			public GData get(final FEMValue value) {
-				return FEMContext.this.dataFrom(value, type);
-			}
-
-		};
+		return value -> this.dataFrom(value, type);
 	}
 
 	/** Diese Methode gibt die in {@link FEMValue#data() Nutzdaten} des gegebenen Werts im gegebenen Datentyp ({@code GData}) zurück. Hierbei werden die Nutzdaten
@@ -77,14 +70,7 @@ public class FEMContext extends BaseObject {
 	 *
 	 * @return {@code arrayFrom}-{@link Getter}. */
 	public Getter<Object, FEMArray> arrayFrom() {
-		return new AbstractGetter<Object, FEMArray>() {
-
-			@Override
-			public FEMArray get(final Object object) {
-				return FEMContext.this.arrayFrom(object);
-			}
-
-		};
+		return this::arrayFrom;
 	}
 
 	/** Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.
@@ -125,14 +111,7 @@ public class FEMContext extends BaseObject {
 	 *
 	 * @return {@code valueFrom}-{@link Getter}. */
 	public Getter<Object, FEMValue> valueFrom() {
-		return new AbstractGetter<Object, FEMValue>() {
-
-			@Override
-			public FEMValue get(final Object object) {
-				return FEMContext.this.valueFrom(object);
-			}
-
-		};
+		return this::valueFrom;
 	}
 
 	/** Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück. Welcher Wert- und Datentyp hierfür verwendet
@@ -148,9 +127,7 @@ public class FEMContext extends BaseObject {
 		if (object instanceof char[]) return FEMString.from((char[])object);
 		if (object instanceof String) return FEMString.from((String)object);
 		if (object instanceof byte[]) return FEMBinary.from((byte[])object);
-		if (object instanceof Float) return FEMDecimal.from((Number)object);
-		if (object instanceof Double) return FEMDecimal.from((Number)object);
-		if (object instanceof BigDecimal) return FEMDecimal.from((Number)object);
+		if ((object instanceof Float) || (object instanceof Double) || (object instanceof BigDecimal)) return FEMDecimal.from((Number)object);
 		if (object instanceof Number) return FEMInteger.from((Number)object);
 		if (object instanceof Boolean) return FEMBoolean.from((Boolean)object);
 		if (object instanceof Calendar) return FEMDatetime.from((Calendar)object);
@@ -162,14 +139,7 @@ public class FEMContext extends BaseObject {
 	 *
 	 * @return {@code objectFrom}-{@link Getter}. */
 	public Getter<FEMValue, Object> objectFrom() {
-		return new AbstractGetter<FEMValue, Object>() {
-
-			@Override
-			public Object get(final FEMValue value) {
-				return FEMContext.this.objectFrom(value);
-			}
-
-		};
+		return this::objectFrom;
 	}
 
 	/** Diese Methode gibt ein {@link Object} zurück, welches über {@link #valueFrom(Object)} in einen Wert überführt werden kann, der zum gegebenen Wert

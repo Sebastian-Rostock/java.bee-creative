@@ -190,7 +190,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 *
 	 * @return Konfigurator. */
 	protected final AttrData<GThis> newAttrData() {
-		return new AttrData<GThis>() {
+		return new AttrData<>() {
 
 			@Override
 			public final GThis closeAttr() {
@@ -204,7 +204,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 *
 	 * @return Konfigurator. */
 	protected final ChldData<GThis> newChldData() {
-		return new ChldData<GThis>() {
+		return new ChldData<>() {
 
 			@Override
 			public final GThis closeChld() {

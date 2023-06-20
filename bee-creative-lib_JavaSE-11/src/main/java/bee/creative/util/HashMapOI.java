@@ -27,7 +27,7 @@ public class HashMapOI<GKey> extends AbstractHashMap<GKey, Integer> implements S
 	 * @throws NullPointerException Wenn {@code hasher} {@code null} ist. */
 	public static <GKey> HashMapOI<GKey> from(final Hasher hasher) throws NullPointerException {
 		Objects.notNull(hasher);
-		return new HashMapOI<GKey>() {
+		return new HashMapOI<>() {
 
 			private static final long serialVersionUID = 6526317910119486910L;
 

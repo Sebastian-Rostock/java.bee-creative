@@ -258,8 +258,7 @@ public class BEXAdapter {
 			final String nodeValue = this.getNodeValue();
 			for (int i = 0, size = nodeValue.length(); i < size; i++) {
 				final char value = nodeValue.charAt(i);
-				if ((value > 0x20) || (value < 0x09)) return false;
-				if ((value != 0x0A) && (value != 0x0D)) return false;
+				if ((value > 0x20) || (value < 0x09) || ((value != 0x0A) && (value != 0x0D))) return false;
 			}
 			return true;
 		}

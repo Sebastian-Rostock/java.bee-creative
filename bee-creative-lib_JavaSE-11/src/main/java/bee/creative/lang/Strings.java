@@ -144,8 +144,8 @@ public class Strings {
 		final List<List<String>> result = new ArrayList<>();
 		final int[] cursorList = new int[count];
 		while (matcher.find()) {
-			final List<String> spliList = (split ? new ArrayList<String>() : null);
-			final List<String> matchList = (match ? new ArrayList<String>() : null);
+			final List<String> spliList = (split ? new ArrayList<>() : null);
+			final List<String> matchList = (match ? new ArrayList<>() : null);
 			for (int i = 0; i < count; i++) {
 				final int from = matcher.start(i);
 				if (from >= 0) {
@@ -245,7 +245,7 @@ public class Strings {
 	/** Diese Methode fügt die Verkettung der Textdarstelungen der gegebenen Elemente mit dem gegebenen Trennzeichen an den gegebenen {@link StringBuilder} an.
 	 * Das Trennzeichen wird hierbei zwischen die Textdarstelungen aufeinanderfolgender Elemente platziert. Die Textdarstelung jedes Elements wird dazu über den
 	 * gegebenen {@link Setter} an den gegebenen {@link StringBuilder} angefügt.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param result Verkettungstext.
 	 * @param space Trennzeichen.

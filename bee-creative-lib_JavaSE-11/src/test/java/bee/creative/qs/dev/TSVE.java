@@ -11,7 +11,7 @@ import bee.creative.qs.QS;
  * Ein {@link #nextVersion() nachfolgender} Versionseintrag verweist im {@link TSVM#domainContext} mit dem {@link TSVM#sourcePredicate} auf seinen
  * {@link #prevVersion() vorhergehenden} Versionseintrag. Durch das {@link #fork() Verzweigen} wird die {@link #nextVersion()} der {@link #prevVersion()} durch
  * einen neuen {@link #nextBranch()} ersetzt.
- * 
+ *
  * @author [cc-by] 2022 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class TSVE {
 
@@ -38,7 +38,7 @@ class TSVE {
 
 	/** Dieses Feld puffert die Vorgängerversion. */
 	TSVE prevVersion = this;
-	
+
 	TSVE[] twigs;
 
 	TSVE(final TSVH versionHistory) {

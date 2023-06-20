@@ -204,16 +204,14 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	static FEMDatetime fromT12(final FEMDatetime result, final char[] buffer, final int offset) {
-		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.')) throw new IllegalArgumentException();
-		if (Integers.getSize(buffer, offset + 9, 3) != 3) throw new IllegalArgumentException();
+		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.') || (Integers.getSize(buffer, offset + 9, 3) != 3)) throw new IllegalArgumentException();
 		final int hour = FEMDatetime.fromI2(buffer, offset + 0), minute = FEMDatetime.fromI2(buffer, offset + 3), second = FEMDatetime.fromI2(buffer, offset + 6),
 			millisecond = Integers.parseInt(buffer, offset + 9, 3);
 		return result.withTime(hour, minute, second, millisecond);
 	}
 
 	static FEMDatetime fromD10(final FEMDatetime result, final char[] buffer, final int offset) {
-		if ((buffer[offset + 4] != '-') || (buffer[offset + 7] != '-')) throw new IllegalArgumentException();
-		if (Integers.getSize(buffer, offset, 4) != 4) throw new IllegalArgumentException();
+		if ((buffer[offset + 4] != '-') || (buffer[offset + 7] != '-') || (Integers.getSize(buffer, offset, 4) != 4)) throw new IllegalArgumentException();
 		final int year = Integers.parseInt(buffer, offset, 4), month = FEMDatetime.fromI2(buffer, offset + 5), date = FEMDatetime.fromI2(buffer, offset + 8);
 		return result.withDate(year, month, date);
 	}
@@ -305,23 +303,18 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	static void checkDate(final int year, final int month, final int date) throws IllegalArgumentException {
 		if (year != 1582) {
 			FEMDatetime.checkYear(year);
-			if ((month < 1) || (month > 12)) throw new IllegalArgumentException();
-			if (date < 1) throw new IllegalArgumentException();
+			if ((month < 1) || (month > 12) || (date < 1)) throw new IllegalArgumentException();
 		} else if (month != 10) {
-			if ((month < 10) || (month > 12)) throw new IllegalArgumentException();
-			if (date < 1) throw new IllegalArgumentException();
+			if ((month < 10) || (month > 12) || (date < 1)) throw new IllegalArgumentException();
 		} else if (date < 15) throw new IllegalArgumentException();
 		if (date > FEMDatetime.lengthOfImpl(month, year)) throw new IllegalArgumentException();
 	}
 
 	static void checkTime(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
 		if (hour == 24) {
-			if (minute != 0) throw new IllegalArgumentException();
-			if (second != 0) throw new IllegalArgumentException();
-			if (millisecond != 0) throw new IllegalArgumentException();
+			if ((minute != 0) || (second != 0) || (millisecond != 0)) throw new IllegalArgumentException();
 		} else {
-			if ((hour < 0) || (hour > 23)) throw new IllegalArgumentException();
-			if ((minute < 0) || (minute > 59)) throw new IllegalArgumentException();
+			if ((hour < 0) || (hour > 23) || (minute < 0) || (minute > 59)) throw new IllegalArgumentException();
 			if ((second < 0) || (second > 59)) throw new IllegalArgumentException();
 			if ((millisecond < 0) || (millisecond > 999)) throw new IllegalArgumentException();
 		}
@@ -565,7 +558,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>hourValue - 5 Bit</li>
 	 * <li>millisecondValue - 10 Bit</li>
 	 * </ul>
-	*/
+	 */
 	final int valueL;
 
 	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitangabe.
@@ -579,7 +572,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>hasDate - 1 Bit</li>
 	 * <li>hasTime - 1 Bit</li>
 	 * </ul>
-	*/
+	 */
 	final int valueH;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung.
@@ -975,8 +968,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		if ((zoneHour == -14) || (zoneHour == 14)) {
 			if (zoneMinute != 0) throw new IllegalArgumentException();
 		} else {
-			if ((zoneHour < -14) || (zoneHour > 14)) throw new IllegalArgumentException();
-			if ((zoneMinute < 0) || (zoneMinute > 59)) throw new IllegalArgumentException();
+			if ((zoneHour < -14) || (zoneHour > 14) || (zoneMinute < 0) || (zoneMinute > 59)) throw new IllegalArgumentException();
 		}
 		final int zone = (zoneHour * 60) + (zoneHour < 0 ? -zoneMinute : zoneMinute);
 		if (!this.hasZone()) return this.withZoneImpl(zone);
@@ -1217,8 +1209,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public FEMDatetime moveZone(final int hours, final int minutes) throws IllegalStateException, IllegalArgumentException {
 		if (!this.hasZone()) throw new IllegalStateException();
 		if ((hours == 0) && (minutes == 0)) return this;
-		if ((hours < -28) || (hours > 28)) throw new IllegalArgumentException();
-		if ((minutes < -1680) || (minutes > 1680)) throw new IllegalArgumentException();
+		if ((hours < -28) || (hours > 28) || (minutes < -1680) || (minutes > 1680)) throw new IllegalArgumentException();
 		return this.moveZoneImpl((hours * 60) + minutes);
 	}
 
@@ -1238,8 +1229,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 *
 	 * @return normalisierte Zeitangabe. */
 	public FEMDatetime normalize() {
-		if (!this.hasDate() || !this.hasTime()) return this;
-		if (this.hourValueImpl() != 24) return this;
+		if (!this.hasDate() || !this.hasTime() || (this.hourValueImpl() != 24)) return this;
 		if ((this.yearValueImpl() == 9999) && (this.monthValueImpl() == 12) && (this.dateValueImpl() == 31)) return this;
 		return this.withTimeImpl(0, 0, 0, 0).moveImpl(0, 86400000);
 	}

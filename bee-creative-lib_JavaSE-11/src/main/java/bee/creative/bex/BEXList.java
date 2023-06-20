@@ -92,10 +92,7 @@ public abstract class BEXList implements Array<BEXNode>, Iterable<BEXNode> {
 		final boolean useUri = uri.length() != 0, useName = name.length() != 0;
 		for (int i = start, length = this.length(); i < length; i++) {
 			final BEXNode node = this.get(i);
-			if (useUri && !node.uri().equals(uri)) {
-				continue;
-			}
-			if (useName && !node.name().equals(name)) {
+			if ((useUri && !node.uri().equals(uri)) || (useName && !node.name().equals(name))) {
 				continue;
 			}
 			return i;

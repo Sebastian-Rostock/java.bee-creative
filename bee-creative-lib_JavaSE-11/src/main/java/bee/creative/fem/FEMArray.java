@@ -973,8 +973,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. **/
 	protected boolean customEquals(final FEMArray that) throws NullPointerException {
 		if (this == that) return true;
-		if (this.length != that.length) return false;
-		if (this.hashCode() != that.hashCode()) return false;
+		if ((this.length != that.length) || (this.hashCode() != that.hashCode())) return false;
 		return this.customEquals(that, 0);
 	}
 
@@ -1135,14 +1134,12 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	}
 
 	int findLast(final Object key) {
-		if (this.length == 0) return -1;
-		if (!(key instanceof FEMValue)) return -1;
+		if ((this.length == 0) || !(key instanceof FEMValue)) return -1;
 		return this.customFind((FEMValue)key, 0, this.length, false);
 	}
 
 	int findFirst(final Object key) {
-		if (this.length == 0) return -1;
-		if (!(key instanceof FEMValue)) return -1;
+		if ((this.length == 0) || !(key instanceof FEMValue)) return -1;
 		return this.customFind((FEMValue)key, 0, this.length, true);
 	}
 
@@ -1234,8 +1231,7 @@ public abstract class FEMArray extends FEMValue implements Array<FEMValue>, Iter
 	public final Map3<FEMValue, FEMValue> toMap() throws IllegalArgumentException {
 		if (this.length != 2) throw new IllegalArgumentException();
 		final FEMValue keys1 = this.customGet(0), values1 = this.customGet(1);
-		if (!(keys1 instanceof FEMArray)) throw new IllegalArgumentException();
-		if (!(values1 instanceof FEMArray)) throw new IllegalArgumentException();
+		if (!(keys1 instanceof FEMArray) || !(values1 instanceof FEMArray)) throw new IllegalArgumentException();
 		final FEMArray keys2 = (FEMArray)keys1, values2 = (FEMArray)values1;
 		if (keys2.length != values2.length) throw new IllegalArgumentException();
 		return new ItemMap(keys2, values2);

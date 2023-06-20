@@ -18,24 +18,10 @@ import bee.creative.util.Iterables;
 public class Natives {
 
 	/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
-	static final HashMap<Object, Class<?>> parseClass = MapBuilder.<Object, Class<?>>forHashMap(false).putAllValues(new Getter<Class<?>, Object>() {
-
-		@Override
-		public Object get(final Class<?> input) {
-			return input.getName();
-		}
-
-	}, byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class).get();
+	static final HashMap<Object, Class<?>> parseClass = MapBuilder.<Object, Class<?>>forHashMap(false).putAllValues(Class::getName, byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class, void.class).get();
 
 	/** Dieses Feld speichert den {@link Getter} zu {@link #printClass(Class)}. */
-	static final Getter<Class<?>, Object> printClass = new Getter<Class<?>, Object>() {
-
-		@Override
-		public Object get(final Class<?> input) {
-			return Natives.printClass(input);
-		}
-
-	};
+	static final Getter<Class<?>, Object> printClass = Natives::printClass;
 
 	/** Diese Methode gibt das native Objekt zur gegebenen Pfadangabe zurück. Die Pfadangabe kodiert hierbei eine Klasse, eine Methode, einen Konstruktor oder ein
 	 * Datenfeld. Die folgenden Pfadangaben werden unterstützt:

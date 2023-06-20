@@ -36,7 +36,7 @@ public class IAMListingBuilder extends IAMListing implements Emuable {
 		}
 
 		@Override
-		protected ArrayItem customInstallItem(int index, IAMArray source) {
+		protected ArrayItem customInstallItem(final int index, final IAMArray source) {
 			return new ArrayItem(index, source);
 		}
 

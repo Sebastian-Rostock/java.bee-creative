@@ -131,10 +131,7 @@ public final class H2QE implements QE {
 		if (object == this) return true;
 		if (!(object instanceof H2QE)) return false;
 		final H2QE that = (H2QE)object;
-		if (this.object != that.object) return false;
-		if (this.subject != that.subject) return false;
-		if (this.predicate != that.predicate) return false;
-		if (this.context != that.context) return false;
+		if ((this.object != that.object) || (this.subject != that.subject) || (this.predicate != that.predicate) || (this.context != that.context)) return false;
 		if (this.owner != that.owner) return false;
 		return true;
 	}

@@ -63,15 +63,10 @@ public class BEXBuilder {
 
 		/** Dieses Feld speichert einen {@link Comparator}, der einen Datensatz mit leerem {@link #text} vor einen mit nichtleerem {@link #text} ordnet und
 		 * andernfalls zwei Datensätze bezüglich des {@link #key} aufsteigend ordnet. */
-		public static final Comparator<BEXTextItem> ORDER = new Comparator<BEXTextItem>() {
-
-			@Override
-			public int compare(final BEXTextItem item1, final BEXTextItem item2) {
-				final int result = Boolean.compare(item2.text.isEmpty(), item1.text.isEmpty());
-				if (result != 0) return result;
-				return Comparators.compare(item1.key, item2.key);
-			}
-
+		public static final Comparator<BEXTextItem> ORDER = (item1, item2) -> {
+			final int result = Boolean.compare(item2.text.isEmpty(), item1.text.isEmpty());
+			if (result != 0) return result;
+			return Comparators.compare(item1.key, item2.key);
 		};
 
 		/** Dieses Feld speichert die Zeichenkette. */
@@ -98,7 +93,7 @@ public class BEXBuilder {
 
 		/** Dieses Feld speichert einen {@link Comparator}, der einen Datensatz mit leeren {@link #items} vor einen mit nichtleeren {@link #items} ordnet und
 		 * andernfalls zwei Datensätze bezüglich des {@link #key} aufsteigend ordnet. */
-		public static final Comparator<BEXGroupItem> ORDER = new Comparator<BEXGroupItem>() {
+		public static final Comparator<BEXGroupItem> ORDER = new Comparator<>() {
 
 			@Override
 			public int compare(final BEXGroupItem item1, final BEXGroupItem item2) {

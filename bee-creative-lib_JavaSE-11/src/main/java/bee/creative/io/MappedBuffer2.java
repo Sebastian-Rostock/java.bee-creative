@@ -50,8 +50,7 @@ public class MappedBuffer2 extends MappedBuffer {
 			this.grow(48);
 			this.putLong(0, new long[]{MAGIC, 0, 16, 16, 48, 0});
 		} else {
-			if (size < 48) throw new IllegalArgumentException();
-			if (this.getLong(0) != MAGIC) throw new IllegalArgumentException();
+			if ((size < 48) || (this.getLong(0) != MAGIC)) throw new IllegalArgumentException();
 		}
 	}
 
@@ -152,8 +151,7 @@ public class MappedBuffer2 extends MappedBuffer {
 	private long regionSizeImpl(final long node) throws IllegalArgumentException {
 		if ((node < 48) || !MappedBuffer2.isAlingnedValue(node)) throw new IllegalArgumentException();
 		final long size = this.getNodeSize(node);
-		if ((size < 0) || !MappedBuffer2.isAlingnedValue(size)) throw new IllegalArgumentException();
-		if (this.getLong(node + size) != size) throw new IllegalArgumentException();
+		if ((size < 0) || !MappedBuffer2.isAlingnedValue(size) || (this.getLong(node + size) != size)) throw new IllegalArgumentException();
 		return size;
 	}
 

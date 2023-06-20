@@ -35,8 +35,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 			final int index1 = string.indexOf('.');
 			if (index1 < 0) throw new IllegalArgumentException();
 			final int index2 = string.indexOf(':');
-			if (index2 < 0) throw new IllegalArgumentException();
-			if (string.charAt(0) != '@') throw new IllegalArgumentException();
+			if ((index2 < 0) || (string.charAt(0) != '@')) throw new IllegalArgumentException();
 			final int ref = Integer.parseInt(string.substring(index1 + 1, index2));
 			final int type = Integer.parseInt(string.substring(index2 + 1));
 			final int owner = Integer.parseInt(string.substring(1, index1));
@@ -76,7 +75,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * <li>typeValue - 16 Bit</li>
 	 * <li>ownerValue - 16 Bit</li>
 	 * </ul>
-	*/
+	 */
 	final int valueL;
 
 	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitangabe.
@@ -85,7 +84,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * <ul>
 	 * <li>refValue - 32 Bit</li>
 	 * </ul>
-	*/
+	 */
 	final int valueH;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung der Referenz.

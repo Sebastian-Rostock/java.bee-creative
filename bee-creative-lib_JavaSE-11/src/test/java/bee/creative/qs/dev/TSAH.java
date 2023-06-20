@@ -12,7 +12,6 @@ import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
 import bee.creative.util.Getter;
 import bee.creative.util.HashMap;
-import bee.creative.util.HashMap2;
 import bee.creative.util.HashMapOI;
 import bee.creative.util.HashSet;
 import bee.creative.util.Hashers;

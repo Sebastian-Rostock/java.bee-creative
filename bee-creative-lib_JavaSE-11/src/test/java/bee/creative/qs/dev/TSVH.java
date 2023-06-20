@@ -110,13 +110,12 @@ public class TSVH {
 	public synchronized void check() {
 		this.version = new TSVE(this, this.owner.activeEdges.havingSubject(this.context).objects().first());
 	}
-	
-	// 
-	
+
+	//
+
 	void select(final TSVE version) {
 		// branch übernehmen
 	}
-	
 
 	/** Diese Methode liefert die diesen Versionsverlauf besitzende Versionsverwaltung. */
 	public TSVM owner() {

@@ -46,8 +46,7 @@ public final class FEMVoid extends FEMValue {
 
 	@Override
 	public boolean equals(Object object) {
-		if (object == this) return true;
-		if (object instanceof FEMVoid) return true;
+		if ((object == this) || (object instanceof FEMVoid)) return true;
 		if (!(object instanceof FEMValue)) return false;
 		object = ((FEMValue)object).data();
 		return object instanceof FEMVoid;

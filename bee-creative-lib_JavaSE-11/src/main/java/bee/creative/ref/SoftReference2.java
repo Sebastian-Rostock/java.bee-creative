@@ -11,7 +11,7 @@ import bee.creative.util.Producer;
  * @param <GValue> Typ des referenzierten Objekts. */
 public class SoftReference2<GValue> extends SoftReference<GValue> implements Producer<GValue> {
 
-	static private final ReferenceQueue2<Object> QUEUE = new ReferenceQueue2<Object>() {
+	static private final ReferenceQueue2<Object> QUEUE = new ReferenceQueue2<>() {
 
 		@Override
 		protected void customRemove(final Reference<?> reference) {

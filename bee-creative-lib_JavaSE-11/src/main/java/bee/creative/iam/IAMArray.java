@@ -879,7 +879,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	@Override
 	public final Iterator<Integer> iterator() {
-		return new AbstractIterator<Integer>() {
+		return new AbstractIterator<>() {
 
 			int index = 0;
 
