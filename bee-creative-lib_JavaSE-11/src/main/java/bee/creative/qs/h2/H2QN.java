@@ -20,7 +20,7 @@ public final class H2QN implements QN {
 	@Override
 	public boolean pop() {
 		try {
-			final PreparedStatement stmt1 = this.owner.popQE_N, stmt2 = this.owner.popQV_N;
+			final PreparedStatement stmt1 = this.owner.popQN, stmt2 = this.owner.popQV;
 			stmt1.setLong(1, this.key);
 			stmt2.setLong(1, this.key);
 			return (stmt1.executeUpdate() != 0) | this.owner.markPopValue(stmt2.executeUpdate() != 0);
@@ -31,13 +31,13 @@ public final class H2QN implements QN {
 
 	@Override
 	public boolean state() {
-		return this.value() != null;
+		return (this.value() != null) || !this.owner.edges.havingNode(this).isEmpty();
 	}
 
 	@Override
 	public String value() {
 		try {
-			final PreparedStatement stmt = this.owner.getQV_N;
+			final PreparedStatement stmt = this.owner.getQV;
 			stmt.setLong(1, this.key);
 			try (final ResultSet rset = stmt.executeQuery()) {
 				return rset.next() ? rset.getString(1) : null;

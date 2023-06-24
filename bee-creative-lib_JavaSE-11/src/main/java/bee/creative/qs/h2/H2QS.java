@@ -19,7 +19,7 @@ import bee.creative.qs.h2.H2QTSet.Names;
 import bee.creative.util.HashMap;
 import bee.creative.util.HashSet;
 
-/** Diese Klasse implementiert einen {@link QS Graphspeicher}, dessen Hyperkanten und Textwerte in einer Datenbank (vorzugsweise embedded H2) gespeichert sind.
+/** Diese Klasse implementiert einen {@link QS Graphspeicher}, dessen Hyperkanten und Textwerte in einer Datenbank (embedded H2) gespeichert sind.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QS implements QS, AutoCloseable {
@@ -39,30 +39,31 @@ public class H2QS implements QS, AutoCloseable {
 	 * @param conn Datenbankverbindung. */
 	public H2QS(final Connection conn) throws SQLException, NullPointerException {
 		this.conn = conn;
-		new H2QQ() //
-			.push("CREATE TABLE IF NOT EXISTS QN (N BIGINT NOT NULL, V VARCHAR(1G) NOT NULL, PRIMARY KEY (N));") //
-			.push("CREATE UNIQUE INDEX IF NOT EXISTS QN_INDEX_V ON QN (V);") //
-			.push("CREATE SEQUENCE IF NOT EXISTS QN_SEQUENCE START WITH 1;") //
-			.push("CREATE TABLE IF NOT EXISTS QE (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL, PRIMARY KEY (C, P, S, O));") //
-			.push("CREATE INDEX IF NOT EXISTS QE_INDEX_CPO ON QE (C, P, O, S);") //
-			.push("CREATE INDEX IF NOT EXISTS QE_INDEX_CSP ON QE (C, S, P, O);") //
-			.push("CREATE INDEX IF NOT EXISTS QE_INDEX_COP ON QE (C, O, P, S);") //
-			.push("CREATE SEQUENCE IF NOT EXISTS QT_SEQUENCE START WITH 1") //
-			.update(this);
+		new H2QQ().push("" + //
+			"CREATE SEQUENCE IF NOT EXISTS QT_SEQ;" + //
+			"CREATE SEQUENCE IF NOT EXISTS QN_SEQ;" + //
+			"CREATE TABLE IF NOT EXISTS QN (N BIGINT NOT NULL, V VARCHAR(1G) NOT NULL, PRIMARY KEY (N));" + //
+			"CREATE TABLE IF NOT EXISTS QE (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL, PRIMARY KEY (C, P, S, O));" + //
+			"CREATE UNIQUE INDEX IF NOT EXISTS QN_INDEX_V ON QN (V);" + //
+			"CREATE INDEX IF NOT EXISTS QE_INDEX_CPO ON QE (C, P, O, S);" + //
+			"CREATE INDEX IF NOT EXISTS QE_INDEX_CSP ON QE (C, S, P, O);" + //
+			"CREATE INDEX IF NOT EXISTS QE_INDEX_COP ON QE (C, O, P, S);" //
+		).update(this);
 
 		this.nodes = new H2QNSet.Main(this);
 		this.edges = new H2QESet.Main(this);
+		this.values = new H2QVSet.Main(this);
 
-		this.selectQN_V = this.conn.prepareStatement("SELECT N FROM QN WHERE V=?");
-		this.getQV_N = this.conn.prepareStatement("SELECT V FROM QN WHERE N=?");
-		this.getQE_CPSO = this.conn.prepareStatement("SELECT TOP 1 * FROM QE WHERE C=? AND P=? AND S=? AND O=?");
-		this.putQE_CPSO = this.conn.prepareStatement("MERGE INTO QE (C, P, S, O) VALUES (?, ?, ?, ?)");
-		this.insertSaveNode = this.conn.prepareStatement("INSERT INTO QN (N, V) VALUES (?, ?)");
-		this.popQE_CPSO = this.conn.prepareStatement("DELETE FROM QE WHERE C=? AND P=? AND S=? AND O=?");
-		this.popQE_N = this.conn.prepareStatement("DELETE FROM QE WHERE C=?1 OR P=?1 OR S=?1 OR O=?1");
-		this.popQV_N = this.conn.prepareStatement("DELETE FROM QN WHERE N=?");
-		this.createNode = this.conn.prepareStatement("SELECT NEXT VALUE FOR QN_SEQUENCE");
-		this.createTemp = this.conn.prepareStatement("SELECT NEXT VALUE FOR QT_SEQUENCE");
+		this.getQN = this.conn.prepareStatement("SELECT N FROM QN WHERE V=?");
+		this.getQV = this.conn.prepareStatement("SELECT V FROM QN WHERE N=?");
+		this.getQE = this.conn.prepareStatement("SELECT TOP 1 * FROM QE WHERE C=? AND P=? AND S=? AND O=?");
+		this.putQN = this.conn.prepareStatement("SELECT NEXT VALUE FOR QN_SEQ");
+		this.putQV = this.conn.prepareStatement("MERGE INTO QN (N, V) KEY (V) VALUES (NEXT VALUE FOR QN_SEQ, ?)");
+		this.putQE = this.conn.prepareStatement("MERGE INTO QE (C, P, S, O) VALUES (?, ?, ?, ?)");
+		this.putQT = this.conn.prepareStatement("SELECT NEXT VALUE FOR QT_SEQ");
+		this.popQN = this.conn.prepareStatement("DELETE FROM QE WHERE C=?1 OR P=?1 OR S=?1 OR O=?1");
+		this.popQV = this.conn.prepareStatement("DELETE FROM QN WHERE N=?");
+		this.popQE = this.conn.prepareStatement("DELETE FROM QE WHERE C=? AND P=? AND S=? AND O=?");
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QE} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
@@ -151,19 +152,15 @@ public class H2QS implements QS, AutoCloseable {
 
 	/** Diese Methode leert den Graphspeicher. */
 	public void reset() throws IllegalStateException {
-		try (Statement stmt = this.conn.createStatement()) {
-			this.popValueMark = new Object();
-			stmt.executeUpdate("DELETE FROM QN;DELETE FROM QE;ALTER SEQUENCE QN_SEQUENCE RESTART WITH 1");
-		} catch (final SQLException cause) {
-			throw new IllegalStateException(cause);
-		}
+		this.popValueMark = new Object();
+		new H2QQ().push("DELETE FROM QN;DELETE FROM QE").update(this);
 	}
 
 	@Override
 	public void close() throws SQLException {
-		synchronized (this.tempTables) {
-			for (final String name: new ArrayList<>(this.tempTables)) {
-				this.deleteTemp(name);
+		synchronized (this.tables) {
+			for (final String name: new ArrayList<>(this.tables)) {
+				this.popTable(name);
 			}
 		}
 		this.conn.close();
@@ -187,12 +184,12 @@ public class H2QS implements QS, AutoCloseable {
 
 	@Override
 	public H2QVSet values() {
-		return new H2QVSet.Main(this);
+		return this.values;
 	}
 
 	@Override
 	public H2QE newEdge() {
-		final long key = this.newKey(this.createNode);
+		final long key = this.newKey(this.putQN);
 		return this.newEdge(key, key, key, key);
 	}
 
@@ -237,7 +234,7 @@ public class H2QS implements QS, AutoCloseable {
 		try {
 			if (edges instanceof H2QESet) {
 				final H2QESet set = this.asQESet(edges);
-				if (set instanceof H2QESet.Temp) return (H2QESet.Temp)set;
+				if (set instanceof H2QESet.Temp) return set;
 				final H2QESet.Temp res = new H2QESet.Temp(this);
 				new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT * FROM (").push(set).push(")").update(this);
 				return res;
@@ -264,26 +261,24 @@ public class H2QS implements QS, AutoCloseable {
 
 	@Override
 	public H2QN newNode() {
-		return this.newNode(this.newKey(this.createNode));
+		return this.newNode(this.newKey(this.putQN));
 	}
 
 	@Override
 	public H2QN newNode(final Object value) {
 		try {
 			final String string = this.asQV(value);
-			final PreparedStatement stmt = this.selectQN_V;
-			stmt.setString(1, string);
-			final ResultSet res = stmt.executeQuery();
+			final PreparedStatement putStmt = this.putQV;
+			putStmt.setString(1, string);
+			this.markPutValue(putStmt.executeUpdate() != 0);
+			final PreparedStatement getStmt = this.getQN;
+			getStmt.setString(1, string);
+			final ResultSet res = getStmt.executeQuery();
 			if (res.next()) return this.newNode(res.getLong(1));
-			final PreparedStatement stmt2 = this.insertSaveNode;
-			final long key = this.newKey(this.createNode);
-			stmt2.setLong(1, key);
-			stmt2.setString(2, string);
-			this.markPutValue(stmt2.executeUpdate() != 0);
-			return this.newNode(key);
 		} catch (final SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
+		throw new IllegalStateException();
 	}
 
 	/** Diese Methode liefert einen neuen {@link H2QN Hyperknoten} mit der gegebenen Kennung. */
@@ -333,7 +328,7 @@ public class H2QS implements QS, AutoCloseable {
 			if (values instanceof H2QVSet) {
 				final H2QVSet set = (H2QVSet)values;
 				if (set.owner == this) {
-					if (set instanceof H2QVSet.Temp) return (H2QVSet.Temp)set;
+					if (set instanceof H2QVSet.Temp) return set;
 					final H2QVSet.Temp res = new H2QVSet.Temp(this);
 					new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT V FROM (").push(set).push(")").update(this);
 					return res;
@@ -397,31 +392,33 @@ public class H2QS implements QS, AutoCloseable {
 		return this.newTuples(new Names(names), tuples, null);
 	}
 
-	private final H2QESet edges;
+	final PreparedStatement getQN;
 
-	private final H2QNSet nodes;
+	final PreparedStatement getQV;
 
-	final PreparedStatement getQV_N;
+	final PreparedStatement getQE;
 
-	final PreparedStatement selectQN_V;
+	final PreparedStatement putQN;
 
-	final PreparedStatement getQE_CPSO;
+	final PreparedStatement putQV;
 
-	final PreparedStatement putQE_CPSO;
+	final PreparedStatement putQE;
 
-	final PreparedStatement insertSaveNode;
+	final PreparedStatement putQT;
 
-	final PreparedStatement popQE_CPSO;
+	final PreparedStatement popQN;
 
-	final PreparedStatement popQE_N;
+	final PreparedStatement popQV;
 
-	final PreparedStatement popQV_N;
+	final PreparedStatement popQE;
 
-	private final HashSet<String> tempTables = new HashSet<>();
+	final H2QESet edges;
 
-	private final PreparedStatement createNode;
+	final H2QNSet nodes;
 
-	private final PreparedStatement createTemp;
+	final H2QVSet values;
+
+	final HashSet<String> tables = new HashSet<>();
 
 	final HashMap<String, H2QDBag<?, ?>.Cache> cacheMap = new HashMap<>();
 
@@ -429,27 +426,15 @@ public class H2QS implements QS, AutoCloseable {
 
 	Object popValueMark;
 
-	boolean markPutValue(final boolean changed) {
-		if (!changed) return false;
-		this.putValueMark = new Object();
-		return true;
-	}
-
-	boolean markPopValue(final boolean changed) {
-		if (!changed) return false;
-		this.popValueMark = new Object();
-		return true;
-	}
-
-	Object createTemp() {
-		synchronized (this.tempTables) {
-			final String name = "QT" + this.newKey(this.createTemp);
-			this.tempTables.add(name);
+	Object putTable() {
+		synchronized (this.tables) {
+			final String name = "QT" + this.newKey(this.putQT);
+			this.tables.add(name);
 			return new Object() {
 
 				@Override
 				protected void finalize() throws Throwable {
-					H2QS.this.deleteTemp(name);
+					H2QS.this.popTable(name);
 				}
 
 				@Override
@@ -461,15 +446,27 @@ public class H2QS implements QS, AutoCloseable {
 		}
 	}
 
-	/** Diese Methode entfernt die Tabelle mit dem gegebenen Namen, sofern dieser Name über {@link #createTemp()} erzeugt wurde. */
-	void deleteTemp(final String name) throws SQLException {
-		synchronized (this.tempTables) {
-			if (this.tempTables.remove(name)) {
+	/** Diese Methode entfernt die Tabelle mit dem gegebenen Namen, sofern dieser Name über {@link #putTable()} erzeugt wurde. */
+	void popTable(final String name) throws SQLException {
+		synchronized (this.tables) {
+			if (this.tables.remove(name)) {
 				try (Statement stmt = this.conn.createStatement()) {
 					stmt.executeUpdate("DROP TABLE IF EXISTS " + name);
 				}
 			}
 		}
+	}
+
+	boolean markPutValue(final boolean changed) {
+		if (!changed) return false;
+		this.putValueMark = new Object();
+		return true;
+	}
+
+	boolean markPopValue(final boolean changed) {
+		if (!changed) return false;
+		this.popValueMark = new Object();
+		return true;
 	}
 
 	/** Diese Methode führt die gegebene Anfrage {@link PreparedStatement#executeQuery() aus} und gibt den {@link ResultSet#getLong(int) Zahlenwert} des ersten

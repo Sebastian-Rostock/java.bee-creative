@@ -21,10 +21,10 @@ public final class H2QQ {
 		this.name = null;
 	}
 
-	/** Dieser Konstruktor initialisiert den Namen der temporären Tabelle über {@link H2QS#createTemp()} und bestückt die Anfrage anschließend mit
+	/** Dieser Konstruktor initialisiert den Namen der temporären Tabelle über {@link H2QS#putTable()} und bestückt die Anfrage anschließend mit
 	 * {@code this.push("select * from ").push(this)}. */
 	public H2QQ(final H2QS owner) {
-		this.name = owner.createTemp();
+		this.name = owner.putTable();
 		this.push("SELECT * FROM ").push(this);
 	}
 
@@ -39,6 +39,7 @@ public final class H2QQ {
 		return this;
 	}
 
+	/** Diese Methode ruft die gegebene Methode mit diesem Objekt auf und gibt {@code this} zurück. */
 	public H2QQ push(final Consumer<? super H2QQ> token) throws NullPointerException {
 		token.set(this);
 		return this;
