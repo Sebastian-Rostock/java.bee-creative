@@ -13,24 +13,4 @@ public abstract class AbstractComparable<GItem> extends BaseObject implements Co
 		return 0;
 	}
 
-	@Override
-	public Comparable2<GItem> concat(final Comparable<? super GItem> that) throws NullPointerException {
-		return Comparables.concat(this, that);
-	}
-
-	@Override
-	public Comparable2<GItem> optionalize() {
-		return Comparables.optionalize(this);
-	}
-
-	@Override
-	public Comparable2<GItem> reverse() {
-		return Comparables.reverse(this);
-	}
-
-	@Override
-	public <GItem2> Comparable2<GItem2> translate(final Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
-		return Comparables.translate(this, trans);
-	}
-
 }

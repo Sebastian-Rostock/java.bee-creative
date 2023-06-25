@@ -7,15 +7,23 @@ package bee.creative.util;
 public interface Comparable2<GItem> extends Comparable<GItem> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparables#concat(Comparable, Comparable) Comparables.concat(this, that)}. */
-	public Comparable2<GItem> concat(Comparable<? super GItem> that) throws NullPointerException;
-
-	/** Diese Methode ist eine Abkürzung für {@link Comparables#optionalize(Comparable) Comparables.optionalize(this)}. */
-	public Comparable2<GItem> optionalize();
+	default Comparable2<GItem> concat(final Comparable<? super GItem> that) throws NullPointerException {
+		return Comparables.concat(this, that);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparables#reverse(Comparable) Comparables.reverse(this)}. */
-	public Comparable2<GItem> reverse();
+	default Comparable2<GItem> reverse() {
+		return Comparables.reverse(this);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Comparables#optionalize(Comparable) Comparables.optionalize(this)}. */
+	default Comparable2<GItem> optionalize() {
+		return Comparables.optionalize(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparables#translate(Comparable, Getter) Comparables.translate(this, trans)}. */
-	public <GItem2> Comparable2<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException;
+	default <GItem2> Comparable2<GItem2> translate(final Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
+		return Comparables.translate(this, trans);
+	}
 
 }
