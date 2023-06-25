@@ -7,15 +7,23 @@ package bee.creative.util;
 public interface Consumer3<GValue> extends Consumer2<GValue> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Consumers#translate(Consumer, Getter) Consumers.translate(this, trans)}. */
-	public <GValue2> Consumer3<GValue2> translate(Getter<? super GValue2, ? extends GValue> trans);
+	default <GValue2> Consumer3<GValue2> translate(Getter<? super GValue2, ? extends GValue> trans) {
+		return Consumers.translate(this, trans);
+	}
 
 	@Override
-	public Consumer3<GValue> synchronize();
+	default Consumer3<GValue> synchronize(){
+		return Consumers.synchronize(this);
+	}
 
 	@Override
-	public Consumer3<GValue> synchronize(Object mutex);
+	default Consumer3<GValue> synchronize(Object mutex) {
+		return Consumers.synchronize(this, mutex);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Consumer) Properties.from(this)}. */
-	public Property2<GValue> toProperty();
+	default Property2<GValue> toProperty() {
+		return Properties.from(this);
+	}
 
 }

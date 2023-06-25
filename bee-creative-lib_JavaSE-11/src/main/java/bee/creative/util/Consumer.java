@@ -12,6 +12,6 @@ public interface Consumer<GValue> {
 	/** Diese Methode setzt den Werts, der durch dieses Objekt verwaltet, konfiguriert oder anderweitig verwendet wird.
 	 *
 	 * @param value Wert. */
-	public void set(GValue value);
+	void set(GValue value);
 
 }

@@ -12,34 +12,4 @@ public abstract class AbstractConsumer<GValue> extends BaseObject implements Con
 	public void set(final GValue value) {
 	}
 
-	@Override
-	public Property2<GValue> toProperty() {
-		return Properties.from(this);
-	}
-
-	@Override
-	public Property2<GValue> toProperty(final Producer<? extends GValue> get) {
-		return Properties.from(get, this);
-	}
-
-	@Override
-	public Setter3<Object, GValue> toSetter() {
-		return Setters.from(this);
-	}
-
-	@Override
-	public Consumer3<GValue> synchronize() {
-		return Consumers.synchronize(this);
-	}
-
-	@Override
-	public Consumer3<GValue> synchronize(final Object mutex) {
-		return Consumers.synchronize(this, mutex);
-	}
-
-	@Override
-	public <GValue2> Consumer3<GValue2> translate(final Getter<? super GValue2, ? extends GValue> trans) {
-		return Consumers.translate(this, trans);
-	}
-
 }
