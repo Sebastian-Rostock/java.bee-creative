@@ -181,6 +181,11 @@ public class Filters {
 		}
 
 		@Override
+		public Filter2<GItem> negate() {
+			return Filters.from(this.that);
+		}
+
+		@Override
 		public boolean accept(final GItem item) {
 			return !this.that.accept(item);
 		}

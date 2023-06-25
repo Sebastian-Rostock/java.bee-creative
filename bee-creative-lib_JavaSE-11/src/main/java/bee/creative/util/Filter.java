@@ -11,6 +11,6 @@ public interface Filter<GItem> {
 	 *
 	 * @param item Datensätze.
 	 * @return Akzeptanz. */
-	public boolean accept(GItem item);
+	boolean accept(GItem item);
 
 }

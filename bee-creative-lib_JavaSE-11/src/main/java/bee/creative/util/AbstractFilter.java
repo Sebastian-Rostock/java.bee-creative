@@ -13,49 +13,4 @@ public abstract class AbstractFilter<GItem> extends BaseObject implements Filter
 		return item != null;
 	}
 
-	@Override
-	public Filter2<GItem> negate() {
-		return Filters.negate(this);
-	}
-
-	@Override
-	public Filter2<GItem> disjoin(final Filter<? super GItem> that) throws NullPointerException {
-		return Filters.disjoin(this, that);
-	}
-
-	@Override
-	public Filter2<GItem> conjoin(final Filter<? super GItem> that) throws NullPointerException {
-		return Filters.conjoin(this, that);
-	}
-
-	@Override
-	public Filter2<GItem> buffer() {
-		return Filters.buffer(this);
-	}
-
-	@Override
-	public Filter2<GItem> buffer(final int mode, final Hasher hasher) throws IllegalArgumentException {
-		return Filters.buffer(this, mode, hasher);
-	}
-
-	@Override
-	public <GItem2> Filter2<GItem2> translate(final Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
-		return Filters.translate(this, trans);
-	}
-
-	@Override
-	public Filter2<GItem> synchronize() {
-		return Filters.synchronize(this);
-	}
-
-	@Override
-	public Filter2<GItem> synchronize(final Object mutex) {
-		return Filters.synchronize(this, mutex);
-	}
-
-	@Override
-	public Getter3<GItem, Boolean> toGetter() {
-		return Getters.fromFilter(this);
-	}
-
 }
