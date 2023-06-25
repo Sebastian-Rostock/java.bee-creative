@@ -12,6 +12,6 @@ public interface Producer<GValue> {
 	/** Diese Methode gibt den Werts zurück, der durch dieses Objekt erzeugt, verwaltet, konfiguriert oder anderweitig bereitgestellt wird.
 	 *
 	 * @return Wert. */
-	public GValue get();
+	GValue get();
 
 }

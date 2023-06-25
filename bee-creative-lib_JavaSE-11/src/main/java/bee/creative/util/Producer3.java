@@ -7,12 +7,18 @@ package bee.creative.util;
 public interface Producer3<GValue> extends Producer2<GValue> {
 
 	@Override
-	public Producer3<GValue> synchronize();
+	default Producer3<GValue> synchronize() {
+		return Producers.synchronize(this);
+	}
 
 	@Override
-	public Producer3<GValue> synchronize(Object mutex);
+	default Producer3<GValue> synchronize(final Object mutex) {
+		return Producers.synchronize(this, mutex);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Producer) Properties.from(this)}. */
-	public Property2<GValue> toProperty();
+	default Property2<GValue> toProperty() {
+		return Properties.from(this);
+	}
 
 }
