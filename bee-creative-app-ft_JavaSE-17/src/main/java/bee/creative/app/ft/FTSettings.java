@@ -1,5 +1,6 @@
 package bee.creative.app.ft;
 
+import java.io.File;
 import java.util.Arrays;
 import bee.creative.csv.CSVReader;
 import bee.creative.csv.CSVWriter;
@@ -7,15 +8,13 @@ import bee.creative.csv.CSVWriter;
 /** Diese Klasse implementiert die Einstellungen und deren Persistierung.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class FTSettings extends FTStorable {
-
-	/** Dieses Feld speichert den Dateinamen für {@link #persist()} und {@link #restore()}. */
-	public static final String FILENAME = "setings.csv.gz";
+class FTSettings implements FTStorable2 {
 
 	/** Dieses Feld speichert das Dateialter in Tagen für {@link FTWindow#refreshInputFiles()}. */
 	public final FTLongOption copyFilesTimeFilter = new FTLongOption(1800, 100, 20000, 100);
 
-	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTWindow#createTargetsWithTimenameFromTime()} und {@link FTWindow#createTargetsWithTimepathFromTime()}. */
+	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTWindow#createTargetsWithTimenameFromTime()} und
+	 * {@link FTWindow#createTargetsWithTimepathFromTime()}. */
 	public final FTLongOption moveFilesTimeOffset = new FTLongOption(0L, -40000000, 40000000, 3600);
 
 	/** Dieses Feld speichert die Puffergröße des Dateivergleichs für {@link FTWindow#createTableWithClones()}. */
@@ -49,6 +48,10 @@ class FTSettings extends FTStorable {
 		this.findClonesHashSize.val = Long.parseLong(reader.readValue());
 	}
 
+	/** Dieses Feld speichert den Dateinamen für {@link #persist()} und {@link #restore()}. */
+	private static final File FILENAME = new File("setings.csv.gz").getAbsoluteFile();
+
+	/** Dieses Feld speichert die Spaltennamen der Tabelle. */
 	private static final String[] FILEHEAD = {"copyFilesTimeFilter", "moveFilesTimeOffset", "findClonesTestSize", "findClonesHashSize"};
 
 }

@@ -13,13 +13,21 @@ import bee.creative.util.HashMap;
 /** Diese Klasse implementiert einen persistierbaren Puffer für Streuwerte von Dateien.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class FTHashes extends FTStorable {
+class FTHashes implements FTStorable2 {
 
-	/** Dieses Feld speichert den Dateinamen für {@link #persist()} und {@link #restore()}. */
-	public static final String FILENAME = "hashes.csv.gz";
+	public static final String FILENAME = "ft-cache.csv.gz";
 
-	public FTHashes() throws NoSuchAlgorithmException {
-		this.digest = MessageDigest.getInstance("SHA-256");
+	public static File fileFrom(final String rootpath) {
+		return rootpath.isEmpty() ? new File(FTHashes.FILENAME).getAbsoluteFile() : new File(rootpath, FTHashes.FILENAME);
+	}
+
+	public FTHashes(final String rootpath) {
+		try {
+			this.digest = MessageDigest.getInstance("SHA-256");
+			this.rootpath = rootpath;
+		} catch (final NoSuchAlgorithmException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	/** Diese Methode liefert den Streuwert der gegebenen Datei. Dazu wird höchstens die gegebene Byteanzahl jeweils am Beginn und Ende der Datei herangezogen. */
@@ -53,22 +61,30 @@ class FTHashes extends FTStorable {
 
 	@Override
 	public void persist() {
-		this.persist(FTHashes.FILENAME);
+		this.persist(FTHashes.fileFrom(this.rootpath));
 	}
 
 	@Override
 	public void persist(final CSVWriter writer) throws NullPointerException, IOException {
 		writer.writeEntry((Object[])FTHashes.FILEHEAD);
+		final var rootLength = this.rootpath.length();
 		for (final var src: this.cache.entrySet()) {
-			final Object[] entry = src.getValue();
+			final var entry = src.getValue();
+			final var fileName = src.getKey();
 			final var hashCount = this.getHashCount(entry);
-			final var values = new Object[(hashCount * 2) + 3];
-			values[0] = src.getKey();
-			values[1] = this.getFileSize(entry);
-			values[2] = this.getFileTime(entry);
+			final var values = new Object[(hashCount * 2) + 4];
+			if ((rootLength != 0) && fileName.startsWith(this.rootpath)) {
+				values[0] = "R";
+				values[1] = fileName.substring(rootLength);
+			} else {
+				values[0] = "A";
+				values[1] = fileName;
+			}
+			values[2] = this.getFileSize(entry);
+			values[3] = this.getFileTime(entry);
 			for (var i = 0; i < hashCount; i++) {
-				values[(i * 2) + 3] = this.getHashSize(entry, i);
-				values[(i * 2) + 4] = this.getHashCode(entry, i);
+				values[i + i + 4] = this.getHashSize(entry, i);
+				values[i + i + 5] = this.getHashCode(entry, i);
 			}
 			writer.writeEntry(values);
 		}
@@ -76,33 +92,40 @@ class FTHashes extends FTStorable {
 
 	@Override
 	public void restore() {
-		this.restore(FTHashes.FILENAME);
+		this.restore(FTHashes.fileFrom(this.rootpath));
 	}
 
 	@Override
 	public void restore(final CSVReader reader) throws NullPointerException, IllegalArgumentException, IOException {
 		if (!Arrays.equals(FTHashes.FILEHEAD, reader.readEntry())) return;
 		for (var src = reader.readEntry(); src != null; src = reader.readEntry()) {
-			final var hashCount = (src.length - 3) / 2;
+			final var hashCount = (src.length - 4) / 2;
 			final var entry = this.setHashCount(FTHashes.EMPTY, hashCount);
-			this.setFileSize(entry, Long.valueOf(src[1]));
-			this.setFileTime(entry, Long.valueOf(src[2]));
+			this.setFileSize(entry, Long.valueOf(src[2]));
+			this.setFileTime(entry, Long.valueOf(src[3]));
 			for (var i = 0; i < hashCount; i++) {
-				this.setHashSize(entry, i, Long.valueOf(src[(i * 2) + 3]));
-				this.setHashCode(entry, i, src[(i * 2) + 4]);
+				this.setHashSize(entry, i, Long.valueOf(src[i + i + 4]));
+				this.setHashCode(entry, i, src[i + i + 5]);
 			}
-			this.cache.put(src[0], entry);
+			if ("A".equals(src[0])) {
+				this.cache.put(src[1], entry);
+			} else {
+				this.cache.put(this.rootpath + src[1], entry);
+			}
 		}
 	}
 
 	private static final Object[] EMPTY = new Object[0];
 
-	private static final String[] FILEHEAD = {"filePath", "fileSize", "fileTime", "hashSize#", "hashCode#"};
+	private static final String[] FILEHEAD = {"pathType", "filePath", "fileSize", "fileTime", "hashSize#", "hashCode#"};
 
 	/** Dieses Feld bildet von einem absoluten Dateipfad auf eine Liste der Form ({@link Long}, {@link String})+ besteht. */
 	private final HashMap<String, Object[]> cache = new HashMap<>(1000);
 
 	private final MessageDigest digest;
+
+	/** Dieses Feld speichert den Verzeichnispfad für {@link #persist()} und {@link #restore()} sowie den Wurzelpfad aller relativeb Dateipfade. */
+	private final String rootpath;
 
 	private String getImpl(final String filePath, final long fileSize, final long hashSize) {
 		try (var channel = FTData.openChannel(filePath)) {

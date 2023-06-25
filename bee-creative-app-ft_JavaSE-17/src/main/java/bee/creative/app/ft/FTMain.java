@@ -482,13 +482,13 @@ public class FTMain extends FTWindow {
 		this.refreshInputFilesRespond(this.createLineText(keepList), keepList.size(), baseList.size() - keepList.size());
 	}
 
-	FTHashes hashes;
+	FTCaches caches;
 
 	@Override
 	public void createTableWithClonesRequest(final String inputText, final long hashSize, final long testSize) throws Exception {
 
-		this.hashes = new FTHashes();
-		this.hashes.restore();
+		this.caches = new FTCaches();
+		this.caches.restore();
 
 		final var pathSet = this.createPathSet();
 		final var itemList = new LinkedList<FTItem>();
@@ -541,7 +541,7 @@ public class FTMain extends FTWindow {
 					this.taskCount--;
 					next = equalSizeItem.previousItem;
 
-					equalSizeItem.sourceHash = Objects.notNull(this.hashes.get(equalSizeItem.sourcePath, hashSize), equalSizeItem);
+					equalSizeItem.sourceHash = Objects.notNull(this.caches.get(equalSizeItem.sourcePath, hashSize), equalSizeItem);
 
 					equalSizeItem.previousItem = hashListMap.put(equalSizeItem.sourceHash, equalSizeItem);
 					if (equalSizeItem.previousItem != null) {
@@ -590,8 +590,8 @@ public class FTMain extends FTWindow {
 			this.taskCount--;
 		}
 
-		this.hashes.persist();
-		this.hashes = null;
+		this.caches.persist();
+		this.caches = null;
 
 		this.createTableWithClonesRespond(this.createLineText(targetList), targetList.size(), failCount[0]);
 	}

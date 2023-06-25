@@ -1761,7 +1761,9 @@ class FTWindow extends JFrame {
 				"Die Pfade der anderen Dateien der Partitionen werden diesem als Zielpfade zugeordnet. " + //
 				"Jedem Zielpfad wird zudem der Streuwert sowie die Dateigröße informativ angefügte. " + //
 				"Quellpfade ohne Zielpfade werden verworfen. " + //
-				"Duplikate sowie Relative Dateipfade werden verworfen." + //
+				"Duplikate sowie Relative Dateipfade werden verworfen.<br>" + //
+				"Die Streuwerte werden in der Pufferdatei <u>" + FTHashes.FILENAME + "</u> zwischengespeichert. " + //
+				"Dabei wird die im Elternpfad näheste bzw. die im Anwendungsverzeichnis liegende Pufferdatei verwendet." + //
 				"</html>" //
 			) //
 			.withOption("Puffergröße für Streuwert", this.settings.findClonesHashSize) //
