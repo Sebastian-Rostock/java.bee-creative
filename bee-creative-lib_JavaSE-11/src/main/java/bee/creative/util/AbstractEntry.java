@@ -61,9 +61,4 @@ public abstract class AbstractEntry<GKey, GValue> implements Entry2<GKey, GValue
 		return this.getKey() + "=" + this.getValue();
 	}
 
-	@Override
-	public Entry2<GValue, GKey> reverse() {
-		return Entries.reverse(this);
-	}
-
 }

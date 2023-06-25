@@ -10,9 +10,11 @@ import java.util.Map.Entry;
 public interface Entry2<GKey, GValue> extends Entry<GKey, GValue> {
 
 	/** Diese Methode setzt den Schlüssel. Wenn dies nicht möglich ist, wird eine {@link UnsupportedOperationException} ausgelöst. */
-	public GKey setKey(GKey key) throws UnsupportedOperationException;
+	GKey setKey(GKey key) throws UnsupportedOperationException;
 
 	/** Diese Methode ist eine Abkürzung für {@link Entries#reverse(Entry) Entries.reverse(this)}. */
-	public Entry2<GValue, GKey> reverse();
+	default Entry2<GValue, GKey> reverse() {
+		return Entries.reverse(this);
+	}
 
 }

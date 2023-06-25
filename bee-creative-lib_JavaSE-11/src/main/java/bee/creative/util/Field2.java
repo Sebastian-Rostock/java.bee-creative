@@ -9,46 +9,70 @@ public interface Field2<GItem, GValue> extends Field<GItem, GValue>, Getter2<GIt
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#aggregate(Field) Fields.aggregate(this)}. */
 	@Override
-	public Field2<Iterable<? extends GItem>, GValue> aggregate();
+	default Field2<Iterable<? extends GItem>, GValue> aggregate() {
+		return Fields.aggregate(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#aggregate(Field, Getter, Getter) Fields.aggregate(this, getTrans, setTrans)}. */
-	public <GValue2> Field2<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> getTrans,
-		Getter<? super GValue2, ? extends GValue> setTrans);
+	default <GValue2> Field2<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> getTrans,
+		Getter<? super GValue2, ? extends GValue> setTrans) {
+		return Fields.aggregate(this, getTrans, setTrans);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#aggregate(Field, Getter, Getter, Getter, Getter) Fields.aggregate(this, getTrans, setTrans, empty,
 	 * mixed)}. */
-	public <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> getTrans,
-		Getter<? super GValue2, ? extends GValue> setTrans, Getter<? super GItem2, ? extends GValue2> empty, Getter<? super GItem2, ? extends GValue2> mixed);
+	default <GItem2 extends Iterable<? extends GItem>, GValue2> Field2<GItem2, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> getTrans,
+		Getter<? super GValue2, ? extends GValue> setTrans, Getter<? super GItem2, ? extends GValue2> empty, Getter<? super GItem2, ? extends GValue2> mixed) {
+		return Fields.aggregate(this, getTrans, setTrans, empty, mixed);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#optionalize(Field) Fields.optionalize(this)}. */
 	@Override
-	public Field2<GItem, GValue> optionalize();
+	default Field2<GItem, GValue> optionalize() {
+		return Fields.optionalize(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#optionalize(Field, Object) Fields.optionalize(this, value)}. */
 	@Override
-	public Field2<GItem, GValue> optionalize(GValue value);
+	default Field2<GItem, GValue> optionalize(GValue value) {
+		return Fields.optionalize(this, value);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#setup(Field, Getter) Fields.setup(this, setup)}. */
-	public Field2<GItem, GValue> setup(Getter<? super GItem, ? extends GValue> setup);
+	default Field2<GItem, GValue> setup(Getter<? super GItem, ? extends GValue> setup) {
+		return Fields.setup(this, setup);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#synchronize(Field) Fields.synchronize(this)}. */
 	@Override
-	public Field2<GItem, GValue> synchronize();
+	default Field2<GItem, GValue> synchronize() {
+		return Fields.synchronize(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#synchronize(Field) Fields.synchronize(this, mutex)}. */
 	@Override
-	public Field2<GItem, GValue> synchronize(Object mutex);
+	default Field2<GItem, GValue> synchronize(Object mutex) {
+		return Fields.synchronize(this, mutex);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#translate(Field, Getter, Getter) Fields.translate(this, getTrans, setTrans)}. */
-	public <GValue2> Field2<GItem, GValue2> translate(Getter<? super GValue, ? extends GValue2> getTrans, Getter<? super GValue2, ? extends GValue> setTrans);
+	default <GValue2> Field2<GItem, GValue2> translate(Getter<? super GValue, ? extends GValue2> getTrans, Getter<? super GValue2, ? extends GValue> setTrans) {
+		return Fields.translate(this, getTrans, setTrans);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#translate(Field, Translator) Fields.translate(this, trans)}. */
-	public <GValue2> Field2<GItem, GValue2> translate(Translator<GValue, GValue2> trans);
+	default <GValue2> Field2<GItem, GValue2> translate(Translator<GValue, GValue2> trans) {
+		return Fields.translate(this, trans);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field) Properties.from(this)}. */
-	public Property2<GValue> toProperty();
+	default Property2<GValue> toProperty() {
+		return Properties.from(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Properties#from(Field, Object) Properties.from(this, this)}. */
-	public Property2<GValue> toProperty(GItem item);
+	default Property2<GValue> toProperty(GItem item) {
+		return Properties.from(this, item);
+	}
 
 }

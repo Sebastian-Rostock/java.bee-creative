@@ -9,12 +9,12 @@ import java.util.Comparator;
  * @param <GValue> Typ des Werts der Eigenschaft. */
 public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 
-	/** Diese Methode ist eine Abkürzung für {@link Comparables#translate(Comparable, Getter) Comparables.translate(this, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Comparables#translate(Comparable, Getter) Comparables.translate(target, this)}. */
 	default Comparable2<GItem> concat(Comparable<? super GValue> target) {
 		return Comparables.translate(target, this);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Comparators#translate(Comparator, Getter) Comparators.translate(this, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Comparators#translate(Comparator, Getter) Comparators.translate(target, this)}. */
 	default Comparator2<GItem> concat(Comparator<? super GValue> target) {
 		return Comparators.translate(target, this);
 	}
@@ -24,7 +24,7 @@ public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 		return Fields.translate(this, target);
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Filters#translate(Filter, Getter) Filters.translate(this, target)}. */
+	/** Diese Methode ist eine Abkürzung für {@link Filters#translate(Filter, Getter) Filters.translate(target, this)}. */
 	default Filter2<GItem> concat(Filter<? super GValue> target) {
 		return Filters.translate(target, this);
 	}
