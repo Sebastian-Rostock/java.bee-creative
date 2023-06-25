@@ -8,15 +8,23 @@ package bee.creative.util;
 public interface Translator2<GSource, GTarget> extends Translator<GSource, GTarget> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Translators#concat(Translator, Translator) Translators.concat(this, trans)}. */
-	public <GTarget2> Translator2<GSource, GTarget2> concat(Translator<GTarget, GTarget2> trans) throws NullPointerException;
+	default <GTarget2> Translator2<GSource, GTarget2> concat(Translator<GTarget, GTarget2> trans) throws NullPointerException {
+		return Translators.concat(this, trans);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Translators#reverse(Translator) Translators.reverse(this)}. */
-	public Translator2<GTarget, GSource> reverse();
+	default Translator2<GTarget, GSource> reverse() {
+		return Translators.reverse(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Translators#synchronize(Translator) Translators.synchronize(this)}. */
-	public Translator2<GSource, GTarget> synchronize();
+	default Translator2<GSource, GTarget> synchronize() {
+		return Translators.synchronize(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Translators#synchronize(Translator) Translators.synchronize(this, mutex)}. */
-	public Translator2<GSource, GTarget> synchronize(Object mutex);
+	default Translator2<GSource, GTarget> synchronize(Object mutex) {
+		return Translators.synchronize(this, mutex);
+	}
 
 }

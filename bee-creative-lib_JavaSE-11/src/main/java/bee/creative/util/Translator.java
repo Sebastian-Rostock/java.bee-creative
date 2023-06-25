@@ -12,13 +12,13 @@ public interface Translator<GSource, GTarget> {
 	 *
 	 * @param object Objekt.
 	 * @return {@code true}, wenn {@code object} ein Zielobjekt ist. */
-	public boolean isTarget(Object object);
+	boolean isTarget(Object object);
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Objekt ein gültiges Quellobjekt ist.
 	 *
 	 * @param object Objekt.
 	 * @return {@code true}, wenn {@code object} ein Quellobjekt ist. */
-	public boolean isSource(Object object);
+	boolean isSource(Object object);
 
 	/** Diese Methode übersetzt das gegebene Quellobjekt in den Zieldatentyp und gibt das so ermittelte Zielobjekt zurück.
 	 *
@@ -26,7 +26,7 @@ public interface Translator<GSource, GTarget> {
 	 * @return Zielobjekt.
 	 * @throws ClassCastException Wenn {@code object} kein {@link #isSource(Object) Quellobjekt} ist.
 	 * @throws IllegalArgumentException Wenn {@code object} nicht übersetzt werden kann. */
-	public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException;
+	GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException;
 
 	/** Diese Methode übersetzt das gegebene Zielobjekt in den Quelldatentyp und gibt das so ermittelte Quellobjekt zurück.
 	 *
@@ -34,6 +34,6 @@ public interface Translator<GSource, GTarget> {
 	 * @return Quellobjekt.
 	 * @throws ClassCastException Wenn {@code object} kein {@link #isTarget(Object) Zielobjekt} ist.
 	 * @throws IllegalArgumentException Wenn {@code object} nicht übersetzt werden kann. */
-	public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException;
+	GSource toSource(Object object) throws ClassCastException, IllegalArgumentException;
 
 }

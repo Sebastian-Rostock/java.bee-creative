@@ -29,24 +29,4 @@ public abstract class AbstractTranslator<GSource, GTarget> extends BaseObject im
 		throw new IllegalArgumentException();
 	}
 
-	@Override
-	public <GTarget2> Translator2<GSource, GTarget2> concat(final Translator<GTarget, GTarget2> trans) throws NullPointerException {
-		return Translators.concat(this, trans);
-	}
-
-	@Override
-	public Translator2<GTarget, GSource> reverse() {
-		return Translators.reverse(this);
-	}
-
-	@Override
-	public Translator2<GSource, GTarget> synchronize() {
-		return Translators.synchronize(this);
-	}
-
-	@Override
-	public Translator2<GSource, GTarget> synchronize(final Object mutex) {
-		return Translators.synchronize(this, mutex);
-	}
-
 }
