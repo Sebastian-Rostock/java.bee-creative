@@ -10,51 +10,83 @@ import java.util.Comparator;
 public interface Getter2<GItem, GValue> extends Getter<GItem, GValue> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparables#translate(Comparable, Getter) Comparables.translate(this, target)}. */
-	public Comparable2<GItem> concat(Comparable<? super GValue> target);
+	default Comparable2<GItem> concat(Comparable<? super GValue> target) {
+		return Comparables.translate(target, this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#translate(Comparator, Getter) Comparators.translate(this, target)}. */
-	public Comparator2<GItem> concat(Comparator<? super GValue> target);
+	default Comparator2<GItem> concat(Comparator<? super GValue> target) {
+		return Comparators.translate(target, this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#translate(Getter, Field) Fields.translate(this, target)}. */
-	public <GValue2> Field2<GItem, GValue2> concat(Field<? super GValue, GValue2> target);
+	default <GValue2> Field2<GItem, GValue2> concat(Field<? super GValue, GValue2> target) {
+		return Fields.translate(this, target);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Filters#translate(Filter, Getter) Filters.translate(this, target)}. */
-	public Filter2<GItem> concat(Filter<? super GValue> target);
+	default Filter2<GItem> concat(Filter<? super GValue> target) {
+		return Filters.translate(target, this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#concat(Getter, Getter) Getters.concat(this, target)}. */
-	public <GValue2> Getter3<GItem, GValue2> concat(Getter<? super GValue, ? extends GValue2> target);
+	default <GValue2> Getter3<GItem, GValue2> concat(Getter<? super GValue, ? extends GValue2> target) {
+		return Getters.concat(this, target);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Setters#translate(Getter, Setter) Setters.translate(this, target)}. */
-	public <GValue2> Setter3<GItem, GValue2> concat(Setter<? super GValue, ? super GValue2> target);
+	default <GValue2> Setter3<GItem, GValue2> concat(Setter<? super GValue, ? super GValue2> target) {
+		return Setters.translate(this, target);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#buffer(Getter) Getters.buffer(this)}. */
-	public Getter3<GItem, GValue> buffer();
+	default Getter3<GItem, GValue> buffer() {
+		return Getters.buffer(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#buffer(Getter, int, Hasher) Getters.buffer(this, mode, hasher)}. */
-	public Getter3<GItem, GValue> buffer(int mode, Hasher hasher);
+	default Getter3<GItem, GValue> buffer(int mode, Hasher hasher) {
+		return Getters.buffer(this, mode, hasher);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregate(Getter) Getters.aggregate(this)}. */
-	public Getter2<Iterable<? extends GItem>, GValue> aggregate();
+	default Getter2<Iterable<? extends GItem>, GValue> aggregate() {
+		return Getters.aggregate(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#optionalize(Getter) Getters.optionalize(this)}. */
-	public Getter2<GItem, GValue> optionalize();
+	default Getter2<GItem, GValue> optionalize() {
+		return Getters.optionalize(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#optionalize(Getter, Object) Getters.optionalize(this, value)}. */
-	public Getter2<GItem, GValue> optionalize(GValue value);
+	default Getter2<GItem, GValue> optionalize(GValue value) {
+		return Getters.optionalize(this, value);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#synchronize(Getter) Getters.synchronize(this)}. */
-	public Getter2<GItem, GValue> synchronize();
+	default Getter2<GItem, GValue> synchronize() {
+		return Getters.synchronize(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#synchronize(Getter, Object) Getters.synchronize(this, mutex)}. */
-	public Getter2<GItem, GValue> synchronize(Object mutex);
+	default Getter2<GItem, GValue> synchronize(Object mutex) {
+		return Getters.synchronize(this, mutex);
+	}
 
-	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter, Setter) Fields.from(this, target)}. */
-	public Field2<GItem, GValue> toField(Setter<? super GItem, ? super GValue> target);
+	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter, Setter) Fields.from(this, set)}. */
+	default Field2<GItem, GValue> toField(Setter<? super GItem, ? super GValue> set) {
+		return Fields.from(this, set);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#from(Getter) Producers.from(this)}. */
-	public Producer3<GValue> toProducer();
+	default Producer3<GValue> toProducer() {
+		return Producers.from(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Producers#from(Getter, Object) Producers.from(this, item)}. */
-	public Producer3<GValue> toProducer(GItem item);
+	default Producer3<GValue> toProducer(GItem item) {
+		return Producers.from(this, item);
+	}
 
 }

@@ -8,28 +8,44 @@ package bee.creative.util;
 public interface Getter3<GItem, GValue> extends Getter2<GItem, GValue> {
 
 	@Override
-	public Getter3<Iterable<? extends GItem>, GValue> aggregate();
+	default Getter3<Iterable<? extends GItem>, GValue> aggregate() {
+		return Getters.aggregate(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregate(Getter, Getter) Getters.aggregate(this, trans)}. */
-	public <GValue2> Getter3<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> trans);
+	default <GValue2> Getter3<Iterable<? extends GItem>, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> trans) {
+		return Getters.aggregate(this, trans);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Getters#aggregate(Getter, Getter, Getter, Getter) Getters.aggregate(this, trans, empty, mixed)}. */
-	public <GItem2 extends Iterable<? extends GItem>, GValue2> Getter3<GItem2, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> trans,
-		Getter<? super GItem2, ? extends GValue2> empty, Getter<? super GItem2, ? extends GValue2> mixed);
+	default <GItem2 extends Iterable<? extends GItem>, GValue2> Getter3<GItem2, GValue2> aggregate(Getter<? super GValue, ? extends GValue2> trans,
+		Getter<? super GItem2, ? extends GValue2> empty, Getter<? super GItem2, ? extends GValue2> mixed) {
+		return Getters.aggregate(this, trans, empty, mixed);
+	}
 
 	@Override
-	public Getter3<GItem, GValue> optionalize();
+	default Getter3<GItem, GValue> optionalize() {
+		return Getters.optionalize(this);
+	}
 
 	@Override
-	public Getter3<GItem, GValue> optionalize(GValue value);
+	default Getter3<GItem, GValue> optionalize(GValue value) {
+		return Getters.optionalize(this, value);
+	}
 
 	@Override
-	public Getter3<GItem, GValue> synchronize();
+	default Getter3<GItem, GValue> synchronize() {
+		return Getters.synchronize(this);
+	}
 
 	@Override
-	public Getter3<GItem, GValue> synchronize(Object mutex);
+	default Getter3<GItem, GValue> synchronize(Object mutex) {
+		return Getters.synchronize(this, mutex);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Fields#from(Getter) Fields.from(this)}. */
-	public Field2<GItem, GValue> toField();
+	default Field2<GItem, GValue> toField() {
+		return Fields.from(this);
+	}
 
 }
