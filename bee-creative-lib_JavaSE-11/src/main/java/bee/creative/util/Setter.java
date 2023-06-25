@@ -11,6 +11,6 @@ public interface Setter<GItem, GValue> {
 	 *
 	 * @param item Datensatz.
 	 * @param value Wert der Eigenschaft. */
-	public abstract void set(GItem item, GValue value);
+	void set(GItem item, GValue value);
 
 }

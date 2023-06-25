@@ -13,7 +13,6 @@ import bee.creative.lang.Objects;
 public class Setters {
 
 	/** Diese Klasse implementiert einen {@link Setter3}, der das {@link #set(Object, Object) Schreiben} ignoriert. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptySetter extends AbstractSetter<Object, Object> {
 
 		public static final Setter3<?, ?> INSTANCE = new EmptySetter();
@@ -27,7 +26,6 @@ public class Setters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class MethodSetter<GItem, GValue> extends AbstractSetter<GItem, GValue> {
 
 		public final Method that;
@@ -64,7 +62,6 @@ public class Setters {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GItem2> Typ des Datensatzes des gegebenen {@link Setter}.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedSetter1<GItem, GItem2, GValue> extends AbstractSetter<GItem, GValue> {
 
 		public final Setter<? super GItem2, ? super GValue> that;
@@ -96,7 +93,6 @@ public class Setters {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param <GValue2> Typ des Datensatzes des Übersetzers sowie des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedSetter2<GItem, GValue, GValue2> extends AbstractSetter<GItem, GValue> {
 
 		public final Setter<? super GItem, ? super GValue2> that;
@@ -127,7 +123,6 @@ public class Setters {
 	 * @param <GItem> Typ der Elemente des iterierbaren Datensatzes.
 	 * @param <GValue> Typ des Werts.
 	 * @param <GValue2> Typ des Werts der Eigenschaft der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class AggregatedSetter<GItem, GValue, GValue2> extends AbstractSetter<Iterable<? extends GItem>, GValue> {
 
 		public final Setter<? super GItem, GValue2> that;
@@ -162,7 +157,6 @@ public class Setters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class OptionalizedSetter<GItem, GValue> extends AbstractSetter<GItem, GValue> {
 
 		public final Setter<? super GItem, ? super GValue> that;
@@ -189,7 +183,6 @@ public class Setters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class SynchronizedSetter<GItem, GValue> extends AbstractSetter<GItem, GValue> {
 
 		public final Setter<? super GItem, ? super GValue> that;
