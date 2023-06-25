@@ -292,6 +292,11 @@ public class Comparators {
 		}
 
 		@Override
+		public Comparator2<GItem> reverse() {
+			return Comparators.from(this.that);
+		}
+
+		@Override
 		public int compare(final GItem item1, final GItem item2) {
 			return this.that.compare(item2, item1);
 		}
@@ -371,6 +376,11 @@ public class Comparators {
 		@Override
 		public int compare(final GItem item1, final GItem item2) {
 			return Comparators.compare(item1, item2, this.that);
+		}
+
+		@Override
+		public Comparator2<GItem> optionalize() {
+			return this;
 		}
 
 		@Override

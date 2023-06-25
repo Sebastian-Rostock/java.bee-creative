@@ -9,18 +9,28 @@ import java.util.Comparator;
 public interface Comparator2<GItem> extends Comparator<GItem> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#concat(Comparator, Comparator) Comparators.concat(this, that)}. */
-	public Comparator2<GItem> concat(Comparator<? super GItem> that) throws NullPointerException;
-
-	/** Diese Methode ist eine Abkürzung für {@link Comparators#iterable(Comparator) Comparators.iterable(this)}. */
-	public Comparator2<Iterable<? extends GItem>> iterable();
-
-	/** Diese Methode ist eine Abkürzung für {@link Comparators#optionalize(Comparator) Comparators.optionalize(this)}. */
-	public Comparator2<GItem> optionalize();
+	default Comparator2<GItem> concat(Comparator<? super GItem> that) throws NullPointerException {
+		return Comparators.concat(this, that);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#reverse(Comparator) Comparators.reverse(this)}. */
-	public Comparator2<GItem> reverse();
+	default Comparator2<GItem> reverse() {
+		return Comparators.reverse(this);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Comparators#iterable(Comparator) Comparators.iterable(this)}. */
+	default Comparator2<Iterable<? extends GItem>> iterable() {
+		return Comparators.iterable(this);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Comparators#optionalize(Comparator) Comparators.optionalize(this)}. */
+	default Comparator2<GItem> optionalize() {
+		return Comparators.optionalize(this);
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparators#translate(Comparator, Getter) Comparators.translate(this, trans)}. */
-	public <GItem2> Comparator2<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException;
+	default <GItem2> Comparator2<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
+		return Comparators.translate(this, trans);
+	}
 
 }
