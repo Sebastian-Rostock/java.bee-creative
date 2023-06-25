@@ -16,9 +16,4 @@ public abstract class AbstractHasher extends BaseObject implements Hasher2 {
 		return Objects.equals(input1, input2);
 	}
 
-	@Override
-	public Hasher2 translate(final Getter<? super Object, ?> trans) throws NullPointerException {
-		return Hashers.translate(this, trans);
-	}
-
 }

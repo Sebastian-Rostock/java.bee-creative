@@ -6,6 +6,8 @@ package bee.creative.util;
 public interface Hasher2 extends Hasher {
 
 	/** Diese Methode ist eine Abkürzung für {@link Hashers#translate(Hasher, Getter) Hashers.translate(this, trans)}. */
-	public Hasher2 translate(Getter<? super Object, ?> trans) throws NullPointerException;
+	default Hasher2 translate(Getter<? super Object, ?> trans) throws NullPointerException {
+		return Hashers.translate(this, trans);
+	}
 
 }
