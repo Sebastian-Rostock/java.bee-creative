@@ -13,7 +13,6 @@ import bee.creative.lang.Objects;
 public class Consumers {
 
 	/** Diese Klasse implementiert einen {@link Consumer3}, der das {@link #set(Object) Schreiben} ignoriert. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyConsumer extends AbstractConsumer<Object> {
 
 		public static final Consumer3<?> INSTANCE = new EmptyConsumer();
@@ -26,7 +25,6 @@ public class Consumers {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class SetterConsumer<GItem, GValue> extends AbstractConsumer<GValue> {
 
 		public final Producer<? extends GItem> item;
@@ -54,7 +52,6 @@ public class Consumers {
 	 * delegiert. Das Schreiben des Werts {@code value} erfolgt über {@code this.that.invoke(null, value)}.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class MethodConsumer<GValue> extends AbstractConsumer<GValue> {
 
 		public final Method that;
@@ -86,7 +83,6 @@ public class Consumers {
 	 *
 	 * @param <GValue> Typ des Werts dieses {@link Consumer3}.
 	 * @param <GValue2> Typ des Werts des gegebenen {@link Consumer}. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedConsumer<GValue, GValue2> extends AbstractConsumer<GValue> {
 
 		public final Consumer<? super GValue2> that;
@@ -114,7 +110,6 @@ public class Consumers {
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class SynchronizedConsumer<GValue> extends AbstractConsumer<GValue> {
 
 		public final Consumer<? super GValue> that;
