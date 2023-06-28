@@ -35,8 +35,8 @@ public class FTDialog extends JDialog {
 				"<html><b>Soll das wirklich passieren mid den folgenden Optionen?</b><br> Soll das wirklich passieren mid den folgenden Optionen? Soll das wirklich passieren mid den folgenden Optionen? </html>") //
 			.withButton("Bloß nicht!") //
 			.withButton("Ja doch!", () -> System.out.println("JA")) //
-			.withOption("abc", new FTLongOption(0, 0, 500, 2)) //
-			.withOption("def", new FTLongOption(0, 0, 500, 2)) //
+			.withOption("abc", new FTOptionInt(0, 0, 500, 2)) //
+			.withOption("def", new FTOptionInt(0, 0, 500, 2)) //
 			.withOption("ghi", new FTTextOption("mal sehen")) //
 			.open();
 	}

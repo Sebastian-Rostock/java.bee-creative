@@ -25,7 +25,7 @@ import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class FTMain extends FTWindow {
+public class FTMain extends FTWindow_SWT {
 
 	public static void main(final String[] args) throws Exception {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -33,7 +33,7 @@ public class FTMain extends FTWindow {
 	}
 
 	public FTMain() {
-		this.setVisible(true);
+		this.run();
 	}
 
 	private HashSet2<String> createPathSet() {
@@ -57,7 +57,7 @@ public class FTMain extends FTWindow {
 	}
 
 	private String createLineText(final Iterable<? extends Iterable<?>> lines) {
-		final var res = new StringBuilder();
+		final var res = new StringBuilder(1024 * 1024 * 16);
 		Strings.join(res, "\n", lines, (res2, line) -> Strings.join(res2, "\t", line));
 		return res.toString();
 	}

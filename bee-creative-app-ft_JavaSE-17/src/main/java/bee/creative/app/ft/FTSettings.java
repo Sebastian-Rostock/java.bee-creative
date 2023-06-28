@@ -11,17 +11,17 @@ import bee.creative.csv.CSVWriter;
 class FTSettings implements FTStorable2 {
 
 	/** Dieses Feld speichert das Dateialter in Tagen für {@link FTWindow#refreshInputFiles()}. */
-	public final FTLongOption copyFilesTimeFilter = new FTLongOption(1800, 100, 20000, 100);
+	public final FTOptionInt copyFilesTimeFilter = new FTOptionInt(1800, 100, 20000, 100);
 
 	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTWindow#createTargetsWithTimenameFromTime()} und
 	 * {@link FTWindow#createTargetsWithTimepathFromTime()}. */
-	public final FTLongOption moveFilesTimeOffset = new FTLongOption(0L, -40000000, 40000000, 3600);
+	public final FTOptionInt moveFilesTimeOffset = new FTOptionInt(0, -40000000, 40000000, 3600);
 
 	/** Dieses Feld speichert die Puffergröße des Dateivergleichs für {@link FTWindow#createTableWithClones()}. */
-	public final FTLongOption findClonesTestSize = new FTLongOption(20971520, 0, 1000000000000000000L, 1048576);
+	public final FTOptionInt findClonesTestSize = new FTOptionInt(20971520, 0, 2000000000, 1048576);
 
 	/** Dieses Feld speichert die Puffergröße der Streuwertberechnung für {@link FTWindow#createTableWithClones()}. */
-	public final FTLongOption findClonesHashSize = new FTLongOption(1048576, 0, 1000000000000000000L, 1048576);
+	public final FTOptionInt findClonesHashSize = new FTOptionInt(1048576, 0, 2000000000, 1048576);
 
 	@Override
 	public void persist() {
@@ -42,10 +42,10 @@ class FTSettings implements FTStorable2 {
 	@Override
 	public void restore(final CSVReader reader) throws Exception {
 		if (!Arrays.equals(FTSettings.FILEHEAD, reader.readEntry())) return;
-		this.copyFilesTimeFilter.val = Long.parseLong(reader.readValue());
-		this.moveFilesTimeOffset.val = Long.parseLong(reader.readValue());
-		this.findClonesTestSize.val = Long.parseLong(reader.readValue());
-		this.findClonesHashSize.val = Long.parseLong(reader.readValue());
+		this.copyFilesTimeFilter.val = Integer.parseInt(reader.readValue());
+		this.moveFilesTimeOffset.val = Integer.parseInt(reader.readValue());
+		this.findClonesTestSize.val = Integer.parseInt(reader.readValue());
+		this.findClonesHashSize.val = Integer.parseInt(reader.readValue());
 	}
 
 	/** Dieses Feld speichert den Dateinamen für {@link #persist()} und {@link #restore()}. */

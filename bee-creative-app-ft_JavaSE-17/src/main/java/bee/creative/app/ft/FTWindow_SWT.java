@@ -1,19 +1,10 @@
 package bee.creative.app.ft;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -21,97 +12,91 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CancellationException;
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Decorations;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Text;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Runnable2;
 import bee.creative.lang.Strings;
+import bee.creative.util.Consumer;
 import bee.creative.util.Iterables;
-import bee.creative.util.Iterators;
-import bee.creative.util.Tester;
+import bee.creative.util.Producer;
+import bee.creative.util.Properties;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class FTWindow extends JFrame implements Runnable {
+class FTWindow_SWT implements Runnable {
 
-	private static final long serialVersionUID = -7101649509849692992L;
-
-	public static void main(final String[] args) throws Exception {
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		new FTWindow().setVisible(true);
+	public static void openAndWait(final Shell shell) {
+		shell.open();
+		final Display display = shell.getDisplay();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
 	}
 
-	FTWindow() {
-		this.setTitle("File-Tool");
-		this.setMinimumSize(new Dimension(400, 200));
-		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		this.setSize(new Dimension(600, 400));
-		final JTabbedPane pagePanel = new JTabbedPane(SwingConstants.TOP);
+	public FTWindow_SWT() {
+		this.display = Display.getDefault();
+		this.shell = new Shell(this.display, SWT.SHELL_TRIM);
+		this.shell.setText("File-Tool");
+		this.shell.setMinimumSize(400, 200);
+		this.shell.setSize(600, 400);
+		this.shell.setLayout(new GridLayout(2, false));
+		this.shell.addShellListener(ShellListener.shellClosedAdapter(event -> this.shell.dispose()));
+
+		final var pagePanel = new TabFolder(this.shell, SWT.TOP);
+		pagePanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		{
-			final JPanel inputPage = new JPanel();
-			inputPage.setBackground(UIManager.getColor("TabbedPane.highlight"));
-			inputPage.setLayout(new GridBagLayout());
-			pagePanel.addTab("Pfadliste (Eingabepfade)", null, inputPage, null);
-			{
-				this.inputMenu = this.createInputMenu();
-				this.inputArea = this.createInputArea();
-			}
-			{
-				final JScrollPane inputPanel = new JScrollPane(this.inputArea);
-				inputPanel.setColumnHeaderView(this.inputMenu);
-				inputPage.add(inputPanel, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3, 3, 3, 3), 0, 0));
-			}
-			{
-				final JLabel inputLabel = this.createInputLabel();
-				inputPage.add(inputLabel, new GridBagConstraints(0, 1, 1, 1, 1, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 3, 3, 3), 0, 0));
-			}
+			final var inputPage = new TabItem(pagePanel, SWT.NONE);
+			final var inputPanel = new Decorations(pagePanel, SWT.NO_TRIM);
+			inputPage.setText("Pfadliste (Eingabepfade)");
+			inputPage.setControl(inputPanel);
+			inputPanel.setLayout(new GridLayout());
+			this.inputMenu = this.createInputMenu(inputPanel);
+			this.inputArea = this.createInputArea(inputPanel);
+			this.inputArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			final var inputLabel = this.createInputLabel(inputPanel);
+			inputLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		}
 		{
-			final JPanel tablePage = new JPanel();
-			tablePage.setBackground(UIManager.getColor("TabbedPane.highlight"));
-			tablePage.setLayout(new GridBagLayout());
-			pagePanel.addTab("Pfadtabelle (Quell- und Zielpfade)", null, tablePage, null);
-			{
-				this.tableMenu = this.createTableMenu();
-				this.tableArea = this.createTableArea();
-			}
-			{
-				final JScrollPane targetPanel = new JScrollPane(this.tableArea);
-				targetPanel.setColumnHeaderView(this.tableMenu);
-				tablePage.add(targetPanel, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3, 3, 3, 3), 0, 0));
-			}
-			{
-				final JLabel inputLabel = this.createTableLabel();
-				tablePage.add(inputLabel, new GridBagConstraints(0, 1, 1, 1, 1, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 3, 3, 3), 0, 0));
-			}
+			final var tablePage = new TabItem(pagePanel, SWT.NONE);
+			final var tablePanel = new Decorations(pagePanel, SWT.NO_TRIM);
+			tablePage.setText("Pfadtabelle (Quell- und Zielpfade)");
+			tablePage.setControl(tablePanel);
+			tablePanel.setLayout(new GridLayout());
+			this.tableMenu = this.createTableMenu(tablePanel);
+			this.tableArea = this.createTableArea(tablePanel);
+			this.tableArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			final var tableLabel = this.createTableLabel(tablePanel);
+			tableLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		}
 		{
-			this.taskInfo = new JLabel();
-			this.taskStop = new JButton("abbrechen");
-			this.taskStop.addActionListener(this::cancelProcess);
+			this.taskInfo = new Label(this.shell, SWT.NONE);
+			this.taskInfo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		}
-		final Container contentPane = this.getContentPane();
-		contentPane.setLayout(new GridBagLayout());
-		contentPane.add(pagePanel, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3, 3, 3, 3), 0, 0));
-		contentPane.add(this.taskInfo,
-			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 3, 3, 3), 0, 0));
-		contentPane.add(this.taskStop,
-			new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 3, 3), 0, 0));
+		{
+			this.taskStop = new Button(this.shell, SWT.NONE);
+			this.taskStop.setText("abbrechen");
+			this.taskStop.addSelectionListener(SelectionListener.widgetSelectedAdapter(this::cancelProcess));
+		}
 		this.execUpdateEnabled();
-		this.setLocationRelativeTo(null);
 		new Timer(500, this::updateTask).start();
 		this.settings.restore();
 		this.settings.persist();
@@ -119,415 +104,175 @@ class FTWindow extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
-		this.setVisible(true);
+		this.shell.layout();
+		final var bounds = this.display.getPrimaryMonitor().getBounds();
+		final var rect = this.shell.getBounds();
+		this.shell.setLocation(bounds.x + ((bounds.width - rect.width) / 2), bounds.y + ((bounds.height - rect.height) / 2));
+		final Shell shell2 = this.shell;
+		FTWindow_SWT.openAndWait(shell2);
+		System.exit(0);
 	}
 
-	private FTEditor inputArea;
+	private final Shell shell;
 
-	private JMenuBar inputMenu;
+	private final Display display;
+
+	private final Text inputArea;
+
+	private final Menu inputMenu;
+
+	private <T> T getSync(final Producer<T> getter) {
+		final var res = Properties.<T>fromValue(null);
+		this.display.syncExec(() -> res.set(getter.get()));
+		return res.get();
+	}
+
+	private <T> void setSync(final Consumer<? super T> setter, final T value) {
+		this.display.asyncExec(() -> setter.set(value));
+	}
 
 	private String getInputText() {
-		return this.inputArea.getText();
+		return this.getSync(this.inputArea::getText);
 	}
 
 	private void setInputText(final String inputText) {
-		// System.out.println("setter " + new Tester(() -> {
-		// this.inputArea.setText(inputText);
-		// }));
-		System.err.println(inputText);
-
-		this.runLater(() -> {
-			System.out.println("setter " + new Tester(() -> {
-				this.inputArea.setText(inputText);
-			}));
-		});
+		this.setSync(this.inputArea::setText, inputText);
 	}
 
-	private FTEditor createInputArea() {
-		final FTEditor res = new FTEditor();
-		res.setOnDrop(this::setupImportInputs);
-		res.setOnPaste(this::setupImportInputs);
+	private Menu createInputMenu(final Decorations parent) {
+		final var res = this.createMenuBar(parent);
+		final var mn1 = this.createMenu(res, "Eingabepfade");
+		this.createMenuItem(mn1, "Fehlerpfade erhalten...", this::cleanupExistingInputs);
+		this.createMenuItem(mn1, "Fehlerpfade entfernen...", this::cleanupMissingInputs);
+		this.createMenuItem(mn1, "Dateien auflösen...", this::resolveInputToFiles);
+		this.createMenuItem(mn1, "Verzeichnisse auflösen...", this::resolveInputToFolders);
+		this.createMenuBreak(mn1);
+		this.createMenuItem(mn1, "Eingabepfade übertragen...", this::transferInputs);
+		this.createMenuItem(mn1, "Eingabepfade kopieren", this::exportInputs);
+		final var mn2 = this.createMenu(res, "Dateien");
+		this.createMenuItem(mn2, "Dateien löschen...", this::deleteInputFilesPermanently);
+		this.createMenuItem(mn2, "Dateien recyceln...", this::deleteInputFilesTemporary);
+		this.createMenuItem(mn2, "Dateien erneuern...", this::refreshInputFiles);
+		this.createMenuBreak(mn2);
+		this.createMenuItem(mn2, "Dateiduplikate übertragen...", this::createTableWithClones);
+		final var m23 = this.createMenu(res, "Verzeichnisse");
+		this.createMenuItem(m23, "Verzeichnisse löschen...", this::deleteInputFoldersPermanently);
+		this.createMenuItem(m23, "Verzeichnisse recyceln...", this::deleteInputFoldersTemporary);
 		return res;
 	}
 
-	private JLabel createInputLabel() {
-		return new JLabel("" + //
-			"<html>" + //
-			"Dateien und Verzeichnisse können hier aus der Zwischenablage eingefügt bzw. aus dem Dateiexplorer fallengelassen werden." + //
-			"</html>" //
-		);
+	private Text createInputArea(final Composite parent) {
+		final var res = new Text(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+		// res.setOnDrop(this::setupImportInputs);
+		// res.setOnPaste(this::setupImportInputs);
+		return res;
 	}
 
-	private JMenuBar createInputMenu() {
-		return this.createMenuBar( //
-			this.createMenu( //
-				"Eingabepfade", //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Fehlerpfade erhalten...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Eingabepfade zu existierenden Dateien bzw. Verzeichnissen werden verworfen.</i>" + //
-					"</html>", //
-					this::cleanupExistingInputs //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Fehlerpfade entfernen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Eingabepfade zu nicht existierenden Dateien bzw. Verzeichnissen werden verworfen.</i>" + //
-					"</html>", //
-					this::cleanupMissingInputs //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Dateien auflösen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Verzeichnispfade werden durch alle rekursiv darin enthaltenen Dateipfade ersetzt.</i>" + //
-					"</html>", //
-					this::resolveInputToFiles //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Verzeichnisse auflösen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Verzeichnispfade werden um alle rekursiv darin enthaltenen Verzeichnispfade ergänzt.</i>" + //
-					"</html>", //
-					this::resolveInputToFolders //
-				), //
-				this.createMenuBreak(), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Eingabepfade übertragen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Eingabepfade werden in die Pfadtabelle übertragen.</i>" + //
-					"</html>", //
-					this::transferInputs //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Eingabepfade exportieren<br>" + //
-					"<i>&nbsp;&nbsp;Alle Eingabepfade werden in die Zwischenablage kopiert.</i>" + //
-					"</html>", //
-					this::exportInputs //
-				) //
-			), //
-			this.createMenu( //
-				"Dateien", //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Dateien löschen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Dateien werden endgültig gelöscht.</i>" + //
-					"</html>", //
-					this::deleteInputFilesPermanently //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Dateien recyceln...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Dateien werden in den Papierkorb verschoben.</i>" + //
-					"</html>", //
-					this::deleteInputFilesTemporary //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Dateien erneuern...<br>" + //
-					"<i>&nbsp;&nbsp;Alle alten Dateien werden kopiert und durch ihre Kopien ersetzt." + //
-					"</html>", //
-					this::refreshInputFiles //
-				), //
-				this.createMenuBreak(), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Dateiduplikate übertragen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Datenpfade zu inhaltlich gleichen Dateien werden in die Pfadtabelle übertragen." + //
-					"</html>", //
-					this::createTableWithClones //
-				) //
-			), //
-			this.createMenu( //
-				"Verzeichnisse", //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Verzeichnisse löschen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle leeren Verzeichnisse werden endgültig gelöscht.</i>" + //
-					"</html>", //
-					this::deleteInputFoldersPermanently //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Verzeichnisse recyceln...<br>" + //
-					"<i>&nbsp;&nbsp;Alle leeren Verzeichnisse werden in den Papierkorb verschoben.</i>" + //
-					"</html>", //
-					this::deleteInputFoldersTemporary //
-				) //
-			) //
-		);
+	private Label createInputLabel(final Composite parent) {
+		final var res = new Label(parent, SWT.WRAP);
+		res.setText("Dateien und Verzeichnisse können hier aus der Zwischenablage eingefügt bzw. aus dem Dateiexplorer fallengelassen werden.");
+		return res;
 	}
 
-	private JTextArea tableArea;
+	private Text tableArea;
 
-	private JMenuBar tableMenu;
+	private Menu tableMenu;
 
 	private String getTableText() {
-		return this.tableArea.getText();
+		return this.getSync(this.tableArea::getText);
 	}
 
 	private void setTableText(final String tableText) {
-		this.runLater(() -> this.tableArea.setText(tableText));
+		this.setSync(this.tableArea::setText, tableText);
 	}
 
-	private JTextArea createTableArea() {
-		return new JTextArea();
+	private Menu createTableMenu(final Decorations parent) {
+		final var res = this.createMenuBar(parent); //
+		final var mn1 = this.createMenu(res, "Quellpfade");
+		this.createMenuItem(mn1, "Fehlerpfade erhalten...", this::cleanupExistingSources);
+		this.createMenuItem(mn1, "Fehlerpfade entfernen...", this::cleanupMissingSources);
+		this.createMenuItem(mn1, "Quellpfade ersetzen...", this::replaceSourcesWithTargets);
+		this.createMenuItem(mn1, "Quellpfade tauschen...", this::exchangeSourcesWithTargets);
+		this.createMenuBreak(mn1);
+		this.createMenuItem(mn1, "Quellpfade übertragen...", this::transferSources);
+		this.createMenuItem(mn1, "Quellpfade kopieren", this::exportSources);
+		final var mn2 = this.createMenu(res, "Zielpfade");
+		this.createMenuItem(mn2, "Fehlerpfade erhalten...", this::cleanupExistingTargets);
+		this.createMenuItem(mn2, "Fehlerpfade entfernen...", this::cleanupMissingTargets);
+		this.createMenuItem(mn2, "Zielpfade ersetzen...", this::replaceTargetsWithSources);
+		this.createMenuItem(mn2, "Zielpfade tauschen...", this::exchangeTargetsWithSources);
+		this.createMenuBreak(mn2);
+		this.createMenuItem(mn2, "Zielpfade übertragen...", this::transferTargets);
+		this.createMenuItem(mn2, "Zielpfade kopieren", this::exportTargets);
+		this.createMenuBreak(mn2);
+		this.createMenuItem(mn2, "Zeitnamen ableiten... (Name)", this::createTargetsWithTimenameFromName);
+		this.createMenuItem(mn2, "Zeitnamen ableiten... (Zeit)", this::createTargetsWithTimenameFromTime);
+		this.createMenuItem(mn2, "Zeitpfade ableiten... (Name)", this::createTargetsWithTimepathFromName);
+		this.createMenuItem(mn2, "Zeitpfade ableiten... (Zeit)", this::createTargetsWithTimepathFromTime);
+		final var mn3 = this.createMenu(res, "Dateien");
+		this.createMenuItem(mn3, "Quelldateien löschen...", this::deleteSourceFilesPermanently);
+		this.createMenuItem(mn3, "Quelldateien recyceln...", this::deleteSourceFilesTemporary);
+		this.createMenuBreak(mn3);
+		this.createMenuItem(mn3, "Zieldateien löschen...", this::deleteTargetFilesPermanently);
+		this.createMenuItem(mn3, "Zieldateien recyceln...", this::deleteTargetFilesTemporary);
+		this.createMenuBreak(mn3);
+		this.createMenuItem(mn3, "Dateien anzeigen...", this::showSourceAndTargetFiles);
+		this.createMenuItem(mn3, "Dateien kopieren...", this::copySourceToTargetFiles);
+		this.createMenuItem(mn3, "Dateien verschieben...", this::moveSourceToTargetFiles);
+		final var mn4 = this.createMenu(res, "Verzeichnisse");
+		this.createMenuItem(mn4, "Quellverzeichnisse löschen...", this::deleteSourceFoldersPermanently);
+		this.createMenuItem(mn4, "Quellverzeichnisse recyceln...", this::deleteSourceFoldersTemporary);
+		this.createMenuBreak(mn4);
+		this.createMenuItem(mn4, "Zielverzeichnisse löschen...", this::deleteTargetFoldersPermanently);
+		this.createMenuItem(mn4, "Zielverzeichnisse recyceln...", this::deleteTargetFoldersTemporary);
+		return res;
 	}
 
-	private JLabel createTableLabel() {
-		return new JLabel("" + //
-			"<html>" + //
-			"Jede Zeile besteht mindestens aus einem Quell- und einen Zieldatenpfad. Alle Werte einer Zeile werden mit Tabulatoren getrennt." + //
-			"</html>" //
-		);
+	private Text createTableArea(final Composite parent) {
+		return new Text(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
 	}
 
-	private JMenuBar createTableMenu() {
-		return this.createMenuBar( //
-			this.createMenu( //
-				"Quellpfade", //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Fehlerpfade erhalten...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Quellpfade zu existierenden Dateien bzw. Verzeichnissen werden verworfen.</i>" + //
-					"</html>", //
-					this::cleanupExistingSources //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Fehlerpfade entfernen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Quellpfade zu nicht existierenden Dateien bzw. Verzeichnissen werden verworfen.</i>" + //
-					"</html>", //
-					this::cleanupMissingSources //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Quellpfade ersetzen...<br>" + //
-					"<i>&nbsp; Alle Quellpfade werden durch deren Zielpfaden ersetzt.<i>" + //
-					"</html>", //
-					this::replaceSourcesWithTargets //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Quellpfade tauschen...<br>" + //
-					"<i>&nbsp; Alle Quell- und Zielpfade werden miteinander getauscht.<i>" + //
-					"</html>", //
-					this::exchangeSourcesWithTargets //
-				), //
-				this.createMenuBreak(), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Quellpfade übertragen...<br>" + //
-					"<i>&nbsp; Alle Eingabepfade werden mit allen Quellpfaden ersetzt.<i>" + //
-					"</html>", //
-					this::transferSources //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Quellpfade exportieren<br>" + //
-					"<i>&nbsp;&nbsp;Alle Quellpfade werden in die Zwischenablage kopiert.</i>" + //
-					"</html>", //
-					this::exportSources //
-				)//
-			), //
-
-			this.createMenu( //
-				"Zielpfade", //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Fehlerpfade erhalten...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zielpfade zu existierenden Dateien bzw. Verzeichnissen werden verworfen.</i>" + //
-					"</html>", //
-					this::cleanupExistingTargets //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Fehlerpfade entfernen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zielpfade zu nicht existierenden Dateien bzw. Verzeichnissen werden verworfen.</i>" + //
-					"</html>", //
-					this::cleanupMissingTargets //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zielpfade ersetzen...<br>" + //
-					"<i>&nbsp; Alle Zielpfade werden durch deren Quellpfaden ersetzt.<i>" + //
-					"</html>", //
-					this::replaceTargetsWithSources //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zielpfade tauschen...<br>" + //
-					"<i>&nbsp; Alle Ziel- und Quellpfade werden miteinander getauscht.<i>" + //
-					"</html>", //
-					this::exchangeTargetsWithSources //
-				), //
-				this.createMenuBreak(), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zielpfade übertragen...<br>" + //
-					"<i>&nbsp; Alle Eingabepfade werden mit allen Zielpfaden ersetzt.<i>" + //
-					"</html>", //
-					this::transferTargets //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zielpfade exportieren<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zielpfade werden in die Zwischenablage kopiert.</i>" + //
-					"</html>", //
-					this::exportTargets //
-				), //
-				this.createMenuBreak(), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zeitnamen ableiten... (Name)<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zieldateinamen werden aus dem Zeitpunkt im Quellnamen abgeleitet.</i>" + //
-					"</html>", //
-					this::createTargetsWithTimenameFromName //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zeitnamen ableiten... (Zeit)<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zieldateinamen werden aus dem Änderungszeitpunkt der Quelldatei abgeleitet.</i>" + //
-					"</html>", //
-					this::createTargetsWithTimenameFromTime //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zeitpfade ableiten... (Name)<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zieldateipfade werden aus dem Zeitpunkt im Quellnamen abgeleitet.</i>" + //
-					"</html>", //
-					this::createTargetsWithTimepathFromName //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zeitpfade ableiten... (Zeit)<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zieldateipfade werden aus ddem Änderungszeitpunkt der Quelldatei abgeleitet.</i>" + //
-					"</html>", //
-					this::createTargetsWithTimepathFromTime //
-				) //
-			), //
-			this.createMenu(//
-				"Dateien", //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Quelldateien löschen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Quelldateien werden endgültig gelöscht.</i>" + //
-					"</html>", //
-					this::deleteSourceFilesPermanently //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Quelldateien recyceln...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Quelldateien werden in den Papierkorb verschoben.</i>" + //
-					"</html>", //
-					this::deleteSourceFilesTemporary //
-				), //
-				this.createMenuBreak(), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zieldateien löschen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zieldateien werden endgültig gelöscht.</i>" + //
-					"</html>", //
-					this::deleteTargetFilesPermanently //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zieldateien recyceln...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Zieldateien werden in den Papierkorb verschoben.</i>" + //
-					"</html>", //
-					this::deleteTargetFilesTemporary //
-				), //
-				this.createMenuBreak(), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Dateien anzeigen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle Dateien werden zur Anzeige über Symlinks in ein temporäres Verteichnis eingefügt.</i>" + //
-					"</html>", //
-					this::showSourceAndTargetFiles //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Dateien kopieren...<br>" + //
-					"<i>&nbsp;&nbsp;Alle in den Quellpfaden genannten Dateien werden in ihren Zielpfad kopiert.</i>" + //
-					"</html>", //
-					this::copySourceToTargetFiles //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Dateien verschieben...<br>" + //
-					"<i>&nbsp;&nbsp;Alle in den Quellpfaden genannten Dateien werden in ihren Zielpfad verschoben.</i>" + //
-					"</html>", //
-					this::moveSourceToTargetFiles //
-				) //
-			), //
-			this.createMenu(//
-				"Verzeichnisse", //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Quellverzeichnisse löschen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle leeren Quellverzeichnisse werden endgültig gelöscht.</i>" + //
-					"</html>", //
-					this::deleteSourceFoldersPermanently //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Quellverzeichnisse recyceln...<br>" + //
-					"<i>&nbsp;&nbsp;Alle leeren Quellverzeichnisse werden in den Papierkorb verschoben.</i>" + //
-					"</html>", //
-					this::deleteSourceFoldersTemporary //
-				), //
-				this.createMenuBreak(), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zielverzeichnisse löschen...<br>" + //
-					"<i>&nbsp;&nbsp;Alle leeren Zielverzeichnisse werden endgültig gelöscht.</i>" + //
-					"</html>", //
-					this::deleteTargetFoldersPermanently //
-				), //
-				this.createMenuItem("" + //
-					"<html>" + //
-					"Zielverzeichnisse recyceln...<br>" + //
-					"<i>&nbsp;&nbsp;Alle leeren Zielverzeichnisse werden in den Papierkorb verschoben.</i>" + //
-					"</html>", //
-					this::deleteTargetFoldersTemporary //
-				) //
-			) //
-		);
+	private Label createTableLabel(final Composite parent) {
+		final var res = new Label(parent, SWT.WRAP);
+		res.setText("Jede Zeile besteht mindestens aus einem Quell- und einen Zieldatenpfad. Alle Werte einer Zeile werden mit Tabulatoren getrennt.");
+		return res;
 	}
 
-	private JMenu createMenu(final String text, final Component... items) {
-		final JMenu result = new JMenu(text);
-		Iterators.fromArray(items).collectAll(result::add);
-		return result;
+	private MenuItem createMenu(final Menu parent, final String text) {
+		final var res = new MenuItem(parent, SWT.CASCADE);
+		res.setText(text);
+		res.setMenu(new Menu(res));
+		return res;
 	}
 
-	private JMenuBar createMenuBar(final JMenu... menus) {
-		final JMenuBar result = new JMenuBar();
-		Iterators.fromArray(menus).collectAll(result::add);
-		return result;
+	private Menu createMenuBar(final Decorations parent) {
+		final var res = new Menu(parent, SWT.BAR);
+		parent.setMenuBar(res);
+		return res;
 	}
 
-	private JMenuItem createMenuItem(final String text, final Runnable onClick) {
-		final JMenuItem result = new JMenuItem(text);
-		result.addActionListener(event -> onClick.run());
-		return result;
+	private MenuItem createMenuItem(final MenuItem parent, final String text, final Runnable onClick) {
+		final var res = new MenuItem(parent.getMenu(), SWT.NONE);
+		res.setText(text);
+		res.addSelectionListener(SelectionListener.widgetSelectedAdapter(event -> onClick.run()));
+		return res;
 	}
 
-	private JSeparator createMenuBreak() {
-		return new JSeparator();
+	private MenuItem createMenuBreak(final MenuItem parent) {
+		return new MenuItem(parent.getMenu(), SWT.SEPARATOR);
 	}
 
 	public final FTSettings settings = new FTSettings();
 
-	private FTDialog createDialog() {
-		final FTDialog res = new FTDialog();
-		this.runLater(res::open);
+	private FTDialog_SWT createDialog() {
+		final var res = new FTDialog_SWT();
+		this.runLater(() -> res.open(this.shell));
 		return res;
 	}
 
-	JLabel taskInfo;
+	Label taskInfo;
 
-	JButton taskStop;
+	Button taskStop;
 
 	String taskTitle;
 
@@ -535,7 +280,7 @@ class FTWindow extends JFrame implements Runnable {
 
 	int taskCount;
 
-	FTDialog taskCancel;
+	FTDialog_SWT taskCancel;
 
 	boolean isTaskRunning;
 
@@ -552,14 +297,14 @@ class FTWindow extends JFrame implements Runnable {
 				this.taskCount = 0;
 				this.isTaskRunning = true;
 				this.isTaskCanceled = false;
-				EventQueue.invokeLater(this::execUpdateEnabled);
+				this.runLater(this::execUpdateEnabled);
 			}
 			try {
 				task.run();
 			} catch (final CancellationException ignore) {
 
 			} catch (final Throwable error) {
-				EventQueue.invokeLater(() -> this.createDialog() //
+				this.runLater(() -> this.createDialog() //
 					.withTitle(title) //
 					.withMessage("<html><b>Unerwarteter Fehler</b><br>%s</html>", error.toString().replaceAll("&", "&amp;").replaceAll("<", "&lt;")) //
 					.withButton("Okay"));
@@ -570,7 +315,7 @@ class FTWindow extends JFrame implements Runnable {
 					this.taskCount = 0;
 					this.isTaskRunning = false;
 					this.isTaskCanceled = false;
-					EventQueue.invokeLater(this::execUpdateEnabled);
+					this.runLater(this::execUpdateEnabled);
 					if (this.taskCancel == null) return;
 					this.taskCancel.dispose();
 					this.taskCancel = null;
@@ -583,7 +328,7 @@ class FTWindow extends JFrame implements Runnable {
 
 	/** Diese Methode führt die gegebene Berechnung {@code task} später aus. */
 	private void runLater(final Runnable task) {
-		EventQueue.invokeLater(task);
+		this.display.asyncExec(task);
 	}
 
 	private void runDemo(final Runnable task) {
@@ -605,11 +350,18 @@ class FTWindow extends JFrame implements Runnable {
 		this.taskStop.setEnabled(!enabled && !this.isTaskCanceled);
 	}
 
-	private void execUpdateEnabled(final boolean value, final Component... targets) {
+	private void execUpdateEnabled(final boolean value, final Object... targets) {
 		for (final var target: targets) {
-			target.setEnabled(value);
-			if (target instanceof Container) {
-				this.execUpdateEnabled(value, ((Container)target).getComponents());
+			if (target instanceof Control) {
+				((Control)target).setEnabled(value);
+			} else if (target instanceof Menu) {
+				final Menu that = (Menu)target;
+				that.setEnabled(value);
+				this.execUpdateEnabled(value, (Object[])that.getItems());
+			} else if (target instanceof MenuItem) {
+				final MenuItem that = (MenuItem)target;
+				that.setEnabled(value);
+				this.execUpdateEnabled(value, that.getMenu());
 			}
 		}
 	}
@@ -645,9 +397,9 @@ class FTWindow extends JFrame implements Runnable {
 	void updateTask(final ActionEvent event) {
 		if (this.isTaskRunning) {
 			final String title = Objects.notNull(this.taskTitle, "?"), entry = String.valueOf(Objects.notNull(this.taskEntry, ""));
-			this.taskInfo.setText("<html>" + title + " - " + this.taskCount + " - " + entry.replaceAll("\\\\", "\\\\<wbr>") + "</html>");
+			this.setSync(this.taskInfo::setText, title + " - " + this.taskCount + " - " + entry);
 		} else {
-			this.taskInfo.setText(" ");
+			this.setSync(this.taskInfo::setText, " ");
 		}
 	}
 
@@ -2078,7 +1830,7 @@ class FTWindow extends JFrame implements Runnable {
 			.withButton("Okay");
 	}
 
-	void cancelProcess(final ActionEvent event) {
+	void cancelProcess(final SelectionEvent event) {
 		this.taskCancel = this.createDialog() //
 			.withTitle(Objects.notNull(this.taskTitle, "Abbrechen")) //
 			.withMessage("" + //
