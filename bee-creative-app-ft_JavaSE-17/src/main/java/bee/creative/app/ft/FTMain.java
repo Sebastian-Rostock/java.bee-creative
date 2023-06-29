@@ -25,7 +25,7 @@ import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class FTMain extends FTWindow_SWT {
+public class FTMain extends FTWindow {
 
 	public static void main(final String[] args) throws Exception {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

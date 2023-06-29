@@ -8,7 +8,7 @@ import bee.creative.lang.Objects;
 import bee.creative.util.Getter;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class FTOptionStr implements Getter<Composite, Control> {
+class FTOptionStr implements Getter<Composite, Control> {
 
 	public String val;
 

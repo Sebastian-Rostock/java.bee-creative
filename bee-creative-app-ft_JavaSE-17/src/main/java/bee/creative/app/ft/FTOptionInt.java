@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Spinner;
 import bee.creative.util.Getter;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class FTOptionInt implements Getter<Composite, Control> {
+class FTOptionInt implements Getter<Composite, Control> {
 
 	public int val;
 

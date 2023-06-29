@@ -38,7 +38,7 @@ import bee.creative.util.Producer;
 import bee.creative.util.Properties;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class FTWindow_SWT implements Runnable {
+class FTWindow implements Runnable {
 
 	public static void center(final Shell shell) {
 		final var srcRect = shell.getBounds();
@@ -58,7 +58,7 @@ class FTWindow_SWT implements Runnable {
 
 	public final FTSettings settings = new FTSettings();
 
-	public FTWindow_SWT() {
+	public FTWindow() {
 		this.display = Display.getDefault();
 		this.shell = new Shell(this.display, SWT.SHELL_TRIM);
 		this.shell.setText("File-Tool");
@@ -111,8 +111,8 @@ class FTWindow_SWT implements Runnable {
 	@Override
 	public void run() {
 		this.shell.layout();
-		FTWindow_SWT.center(this.shell);
-		FTWindow_SWT.openAndWait(this.shell);
+		FTWindow.center(this.shell);
+		FTWindow.openAndWait(this.shell);
 		System.exit(0);
 	}
 
@@ -161,7 +161,7 @@ class FTWindow_SWT implements Runnable {
 
 			@Override
 			public void drop(final DropTargetEvent event) {
-				FTWindow_SWT.this.importInputsStart(event);
+				FTWindow.this.importInputsStart(event);
 			}
 
 		});
@@ -272,8 +272,8 @@ class FTWindow_SWT implements Runnable {
 		this.display.asyncExec(() -> setter.set(value));
 	}
 
-	private FTDialog_SWT createDialog() {
-		final var res = new FTDialog_SWT();
+	private FTDialog createDialog() {
+		final var res = new FTDialog();
 		this.runLater(() -> res.create(this.shell));
 		return res;
 	}
@@ -288,7 +288,7 @@ class FTWindow_SWT implements Runnable {
 
 	int taskCount;
 
-	FTDialog_SWT taskCancel;
+	FTDialog taskCancel;
 
 	boolean isTaskRunning;
 

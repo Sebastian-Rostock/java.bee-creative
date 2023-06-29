@@ -20,12 +20,12 @@ import bee.creative.lang.Objects;
 import bee.creative.util.Entries;
 import bee.creative.util.Getter;
 
-public class FTDialog_SWT {
+class FTDialog {
 
 	public static void main(final String[] args) throws Exception {
 		final var display = Display.getDefault();
 		final var shell = new Shell(display);
-		new FTDialog_SWT() //
+		new FTDialog() //
 			.withText("Verzeichnisse aufbereiten") //
 			.withTitle("Soll Dies und Das passieren?") //
 			.withMessage(
@@ -93,8 +93,8 @@ public class FTDialog_SWT {
 		{
 			this.shell.setSize(this.shell.computeSize(500, SWT.DEFAULT, true));
 			this.shell.layout(true);
-			FTWindow_SWT.center(this.shell);
-			FTWindow_SWT.openAndWait(this.shell);
+			FTWindow.center(this.shell);
+			FTWindow.openAndWait(this.shell);
 		}
 	}
 
@@ -105,26 +105,26 @@ public class FTDialog_SWT {
 		}
 	}
 
-	public FTDialog_SWT withText(final String text) {
+	public FTDialog withText(final String text) {
 		this.text = Objects.notNull(text);
 		return this;
 	}
 
-	public FTDialog_SWT withTitle(final String title) {
+	public FTDialog withTitle(final String title) {
 		this.title = Objects.notNull(title);
 		return this;
 	}
 
-	public FTDialog_SWT withMessage(final String message) {
+	public FTDialog withMessage(final String message) {
 		this.message = Objects.notNull(message);
 		return this;
 	}
 
-	public FTDialog_SWT withMessage(final String message, final Object... args) {
+	public FTDialog withMessage(final String message, final Object... args) {
 		return this.withMessage(String.format(message, args));
 	}
 
-	public FTDialog_SWT withButton(final String string) {
+	public FTDialog withButton(final String string) {
 		return this.withButton(string, null);
 	}
 
@@ -134,12 +134,12 @@ public class FTDialog_SWT {
 	 * @param text Beschriftung des {@link Button}.
 	 * @param onClick Berechnung oder {@code null};
 	 * @return {@code this}. */
-	public FTDialog_SWT withButton(final String text, final Runnable onClick) {
+	public FTDialog withButton(final String text, final Runnable onClick) {
 		this.buttons.add(Entries.from(Objects.notNull(text), onClick));
 		return this;
 	}
 
-	public FTDialog_SWT withOption(final String label, final Getter<Composite, Control> option) {
+	public FTDialog withOption(final String label, final Getter<Composite, Control> option) {
 		this.options.add(Entries.from(Objects.notNull(label), Objects.notNull(option)));
 		return this;
 	}
