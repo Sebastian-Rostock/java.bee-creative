@@ -142,6 +142,7 @@ class FTWindow implements Runnable {
 		this.createMenuBreak(mn1);
 		this.createMenuItem(mn1, "Eingabepfade übertragen...", this::transferInputs);
 		this.createMenuItem(mn1, "In Zwischanablage kopieren", this::exportInputs);
+		this.createMenuItem(mn1, "Aus Zwischanablage einfügen", this::importInputs);
 		final var mn2 = this.createMenu(res, "Dateien");
 		this.createMenuItem(mn2, "Dateien löschen...", this::deleteInputFilesPermanently);
 		this.createMenuItem(mn2, "Dateien recyceln...", this::deleteInputFilesTemporary);
@@ -156,8 +157,9 @@ class FTWindow implements Runnable {
 
 	private Text createInputArea(final Composite parent) {
 		final var res = new Text(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-
-		new DropTarget(res, DND.DROP_LINK).addDropListener(new DropTargetAdapter() {
+		final var dnd = new DropTarget(res, DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK);
+		dnd.setTransfer(FileTransfer.getInstance(), TextTransfer.getInstance());
+		dnd.addDropListener(new DropTargetAdapter() {
 
 			@Override
 			public void drop(final DropTargetEvent event) {
@@ -273,9 +275,7 @@ class FTWindow implements Runnable {
 	}
 
 	private FTDialog createDialog() {
-		final var res = new FTDialog();
-		this.runLater(() -> res.create(this.shell));
-		return res;
+		return new FTDialog(this.shell);
 	}
 
 	Label taskInfo;
@@ -311,11 +311,12 @@ class FTWindow implements Runnable {
 				task.run();
 			} catch (final CancellationException ignore) {
 
-			} catch (final Throwable error) {
-				this.runLater(() -> this.createDialog() //
+			} catch (final Exception error) {
+				this.createDialog() //
 					.withText(title) //
 					.withMessage("<html><b>Unerwarteter Fehler</b><br>%s</html>", error.toString().replaceAll("&", "&amp;").replaceAll("<", "&lt;")) //
-					.withButton("Okay"));
+					.withButton("Okay") //
+					.open();
 			} finally {
 				synchronized (this) {
 					this.taskTitle = null;
@@ -396,14 +397,11 @@ class FTWindow implements Runnable {
 	void cleanupExistingInputs() {
 		this.createDialog()//
 			.withText("Fehlerpfade erhalten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Datenpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
-				"Duplikate sowie relative Datenpfade werden ebenfalls verworfen. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Datenpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?") //
+			.withMessage("Duplikate sowie relative Datenpfade werden ebenfalls verworfen.") //
 			.withButton("Ja", this::cleanupExistingInputsStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void cleanupExistingInputsStart() {
@@ -419,14 +417,9 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Fehlerpfade erhalten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				validCount, errorCount//
-			) //
-			.withButton("Okay");
+			.withMessage("%,d Zeilen bleiben erhalten.\ns%,d Zeilen konnten nicht verarbeitet werden.", validCount, errorCount) //
+			.withButton("Okay") //
+			.open();
 	}
 
 	void cleanupExistingSources() {
@@ -439,7 +432,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::cleanupExistingSourcesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void cleanupExistingSourcesStart() {
@@ -462,7 +456,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				validCount, errorCount//
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void cleanupExistingTargets() {
@@ -475,7 +470,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::cleanupExistingTargetsStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void cleanupExistingTargetsStart() {
@@ -498,7 +494,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				validCount, errorCount//
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void cleanupMissingInputs() {
@@ -510,7 +507,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::cleanupMissingInputsStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void cleanupMissingInputsStart() {
@@ -533,7 +531,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				validCount, errorCount//
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void cleanupMissingSources() {
@@ -546,7 +545,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::cleanupMissingSourcesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void cleanupMissingSourcesStart() {
@@ -569,7 +569,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				validCount, errorCount//
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void cleanupMissingTargets() {
@@ -581,7 +582,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::cleanupMissingTargetsStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void cleanupMissingTargetsStart() {
@@ -604,7 +606,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				validCount, errorCount//
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteInputFilesTemporary() {
@@ -617,7 +620,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteInputFilesTemporaryStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteInputFilesTemporaryStart() {
@@ -640,7 +644,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteInputFilesPermanently() {
@@ -653,7 +658,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteInputFilesPermanentlyStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteInputFilesPermanentlyStart() {
@@ -676,7 +682,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteInputFoldersTemporary() {
@@ -689,7 +696,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteInputFoldersTemporaryStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteInputFoldersTemporaryStart() {
@@ -712,7 +720,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteInputFoldersPermanently() {
@@ -725,7 +734,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteInputFoldersPermanentlyStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteInputFoldersPermanentlyStart() {
@@ -748,7 +758,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteSourceFilesTemporary() {
@@ -761,7 +772,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteSourceFilesTemporaryStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteSourceFilesTemporaryStart() {
@@ -784,7 +796,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteSourceFilesPermanently() {
@@ -797,7 +810,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteSourceFilesPermanentlyStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteSourceFilesPermanentlyStart() {
@@ -820,7 +834,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteSourceFoldersTemporary() {
@@ -833,7 +848,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteSourceFoldersTemporaryStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteSourceFoldersTemporaryStart() {
@@ -856,7 +872,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteSourceFoldersPermanently() {
@@ -869,7 +886,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteSourceFoldersPermanentlyStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteSourceFoldersPermanentlyStart() {
@@ -892,7 +910,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteTargetFilesTemporary() {
@@ -905,7 +924,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteTargetFilesTemporaryStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteTargetFilesTemporaryStart() {
@@ -928,7 +948,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteTargetFilesPermanently() {
@@ -941,7 +962,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteTargetFilesPermanentlyStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteTargetFilesPermanentlyStart() {
@@ -964,7 +986,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteTargetFoldersTemporary() {
@@ -977,7 +1000,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteTargetFoldersTemporaryStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteTargetFoldersTemporaryStart() {
@@ -1000,7 +1024,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void deleteTargetFoldersPermanently() {
@@ -1013,7 +1038,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::deleteTargetFoldersPermanentlyStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void deleteTargetFoldersPermanentlyStart() {
@@ -1036,7 +1062,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void importInputs() {
@@ -1053,13 +1080,18 @@ class FTWindow implements Runnable {
 	}
 
 	void importInputsStart(final DropTargetEvent event) {
-		if (!this.inputArea.isEnabled() || (event.currentDataType == null)) return;
+		if (!this.inputArea.isEnabled()) return;
 		event.detail = DND.DROP_COPY;
-		if (!FileTransfer.getInstance().isSupportedType(event.currentDataType)) return;
 		try {
-			final var inputText = this.getInputText();
-			final var fileList = (String[])FileTransfer.getInstance().nativeToJava(event.currentDataType);
-			this.importInputsRequest(inputText, Arrays.asList(fileList));
+			if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
+				final var inputText = this.getInputText();
+				final var fileList = (String[])FileTransfer.getInstance().nativeToJava(event.currentDataType);
+				this.importInputsRequest(inputText, Arrays.asList(fileList));
+			} else if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
+				final var inputText = this.getInputText();
+				final var file = (String)TextTransfer.getInstance().nativeToJava(event.currentDataType);
+				this.importInputsRequest(inputText, Arrays.asList(file));
+			}
 		} catch (final Exception ignore) {}
 	}
 
@@ -1131,7 +1163,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::exchangeSourcesWithTargetsStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void exchangeSourcesWithTargetsStart() {
@@ -1154,7 +1187,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount - failCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void exchangeTargetsWithSources() {
@@ -1166,7 +1200,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::exchangeTargetsWithSourcesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void exchangeTargetsWithSourcesStart() {
@@ -1189,7 +1224,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount - failCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void replaceSourcesWithTargets() {
@@ -1201,7 +1237,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::replaceSourcesWithTargetsStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void replaceSourcesWithTargetsStart() {
@@ -1224,7 +1261,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount - failCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void replaceTargetsWithSources() {
@@ -1236,7 +1274,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::replaceTargetsWithSourcesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void replaceTargetsWithSourcesStart() {
@@ -1259,7 +1298,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount - failCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void transferInputs() {
@@ -1272,7 +1312,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::transferInputsStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void transferInputsStart() {
@@ -1295,7 +1336,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void transferSources() {
@@ -1307,7 +1349,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::transferSourcesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void transferSourcesStart() {
@@ -1330,7 +1373,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void transferTargets() {
@@ -1343,7 +1387,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::transferTargetsStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void transferTargetsStart() {
@@ -1366,7 +1411,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void resolveInputToFiles() {
@@ -1381,7 +1427,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::resolveInputToFilesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void resolveInputToFilesStart() {
@@ -1404,7 +1451,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount, dropCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void resolveInputToFolders() {
@@ -1419,7 +1467,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::resolveInputToFoldersStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void resolveInputToFoldersStart() {
@@ -1442,7 +1491,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount, dropCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void refreshInputFiles() {
@@ -1458,7 +1508,8 @@ class FTWindow implements Runnable {
 			) //
 			.withOption("Dateialter in Tagen", this.settings.copyFilesTimeFilter) //
 			.withButton("Ja", this::refreshInputFilesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void refreshInputFilesStart() {
@@ -1482,7 +1533,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void createTableWithClones() {
@@ -1508,7 +1560,8 @@ class FTWindow implements Runnable {
 			.withOption("Puffergröße für Streuwert", this.settings.findClonesHashSize) //
 			.withOption("Puffergröße für Dateivergleich", this.settings.findClonesTestSize) //
 			.withButton("Ja", this::createTableWithClonesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void createTableWithClonesStart() {
@@ -1534,7 +1587,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void createTargetsWithTimenameFromName() {
@@ -1551,7 +1605,8 @@ class FTWindow implements Runnable {
 			) //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
 			.withButton("Ja", this::createTargetsWithTimenameFromNameStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void createTargetsWithTimenameFromNameStart() {
@@ -1576,7 +1631,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount - failCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void createTargetsWithTimepathFromName() {
@@ -1594,7 +1650,8 @@ class FTWindow implements Runnable {
 			) //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
 			.withButton("Ja", this::createTargetsWithTimepathFromNameStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void createTargetsWithTimepathFromNameStart() {
@@ -1619,7 +1676,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount - failCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void createTargetsWithTimenameFromTime() {
@@ -1636,7 +1694,8 @@ class FTWindow implements Runnable {
 			) //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
 			.withButton("Ja", this::createTargetsWithTimenameFromTimeStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void createTargetsWithTimenameFromTimeStart() {
@@ -1661,7 +1720,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount - failCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void createTargetsWithTimepathFromTime() {
@@ -1679,7 +1739,8 @@ class FTWindow implements Runnable {
 			) //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
 			.withButton("Ja", this::createTargetsWithTimepathFromTimeStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void createTargetsWithTimepathFromTimeStart() {
@@ -1704,7 +1765,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				keepCount - failCount, failCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void copySourceToTargetFiles() {
@@ -1717,7 +1779,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::copySourceToTargetFilesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void copySourceToTargetFilesStart() {
@@ -1740,7 +1803,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void moveSourceToTargetFiles() {
@@ -1753,7 +1817,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::moveSourceToTargetFilesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void moveSourceToTargetFilesStart() {
@@ -1776,7 +1841,8 @@ class FTWindow implements Runnable {
 				"</html>", //
 				dropCount, keepCount //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void showSourceAndTargetFiles() {
@@ -1792,7 +1858,8 @@ class FTWindow implements Runnable {
 				"</html>" //
 			) //
 			.withButton("Ja", this::showSourceAndTargetFilesStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	void showSourceAndTargetFilesStart() {
@@ -1814,25 +1881,23 @@ class FTWindow implements Runnable {
 				"</html>", //
 				linkCount, linkPath //
 			) //
-			.withButton("Okay");
+			.withButton("Okay") //
+			.open();
 	}
 
 	void cancelProcess(final SelectionEvent event) {
-		this.taskCancel = this.createDialog() //
+		(this.taskCancel = this.createDialog()) //
 			.withText(Objects.notNull(this.taskTitle, "Abbrechen")) //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen der Vorgang wirklich abgebrochen werden?</b> " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen der Vorgang wirklich abgebrochen werden?") //
 			.withButton("Ja", this::cancelProcessStart) //
-			.withButton("Nein");
+			.withButton("Nein") //
+			.open();
 	}
 
 	synchronized void cancelProcessStart() {
 		if (this.isTaskCanceled || !this.isTaskRunning) return;
 		this.isTaskCanceled = true;
-		this.runLater(this::execUpdateEnabled);
+		this.execUpdateEnabled();
 	}
 
 }
