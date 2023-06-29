@@ -10,17 +10,17 @@ import bee.creative.csv.CSVWriter;
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class FTSettings implements FTStorable2 {
 
-	/** Dieses Feld speichert das Dateialter in Tagen für {@link FTWindow#refreshInputFiles()}. */
+	/** Dieses Feld speichert das Dateialter in Tagen für {@link FTMain#refreshInputFiles()}. */
 	public final FTOptionInt copyFilesTimeFilter = new FTOptionInt(1800, 100, 20000, 100);
 
-	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTWindow#createTargetsWithTimenameFromTime()} und
-	 * {@link FTWindow#createTargetsWithTimepathFromTime()}. */
+	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTMain#createTargetsWithTimenameFromTime()} und
+	 * {@link FTMain#createTargetsWithTimepathFromTime()}. */
 	public final FTOptionInt moveFilesTimeOffset = new FTOptionInt(0, -40000000, 40000000, 3600);
 
-	/** Dieses Feld speichert die Puffergröße des Dateivergleichs für {@link FTWindow#createTableWithClones()}. */
+	/** Dieses Feld speichert die Puffergröße des Dateivergleichs für {@link FTMain#createTableWithClones()}. */
 	public final FTOptionInt findClonesTestSize = new FTOptionInt(20971520, 0, 2000000000, 1048576);
 
-	/** Dieses Feld speichert die Puffergröße der Streuwertberechnung für {@link FTWindow#createTableWithClones()}. */
+	/** Dieses Feld speichert die Puffergröße der Streuwertberechnung für {@link FTMain#createTableWithClones()}. */
 	public final FTOptionInt findClonesHashSize = new FTOptionInt(1048576, 0, 2000000000, 1048576);
 
 	@Override

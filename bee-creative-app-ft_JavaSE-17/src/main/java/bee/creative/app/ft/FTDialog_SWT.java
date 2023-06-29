@@ -1,15 +1,13 @@
 package bee.creative.app.ft;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import javax.swing.JLabel;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -18,6 +16,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import bee.creative.lang.Objects;
 import bee.creative.util.Entries;
 import bee.creative.util.Getter;
 
@@ -27,37 +26,42 @@ public class FTDialog_SWT {
 		final var display = Display.getDefault();
 		final var shell = new Shell(display);
 		new FTDialog_SWT() //
-			.withTitle("Verzeichnisse aufbereiten") //
-			.withMessage("<html><b>Soll das wirklich passieren mid den folgenden Optionen?</b>"
-				+ "<br> Soll das <u>wirklich</u> passieren mid den folgenden Optionen? Soll das wirklich passieren mid den folgenden Optionen? </html>") //
+			.withText("Verzeichnisse aufbereiten") //
+			.withTitle("Soll Dies und Das passieren?") //
+			.withMessage(
+				"Soll das wirklich mit den folgenden Optionen passieren? Soll das wirklich mit den folgenden Optionen passieren? Soll das wirklich mit den folgenden Optionen passieren? ") //
 			.withButton("Bloß nicht!") //
 			.withButton("Ja doch!", () -> System.out.println("JA")) //
 			.withOption("abc dsfsdf asdf dsa ", new FTOptionInt(0, 0, 500, 2)) //
 			.withOption("def", new FTOptionInt(0, 0, 500, 2)) //
-			// .withOption("ghi", new FTTextOption("mal sehen")) //
-			.open(shell);
+			.withOption("ghi", new FTOptionStr("mal sehen")) //
+			.create(shell);
 	}
 
-	private Shell shell;
-
-	public void open(final Shell parent) {
-		this.shell = new Shell(parent, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
-		this.shell.setText(this.title);
-		this.shell.setLayout(new GridLayout());
-		this.shell.setMinimumSize(500, 0);
-		this.shell.addShellListener(ShellListener.shellClosedAdapter(event -> this.shell.dispose()));
+	public void create(final Shell parent) {
+		this.dispose();
 		{
-			final var messagePane = new Composite(this.shell, SWT.EMBEDDED);
-			messagePane.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-			final var background = this.shell.getBackground().getRGB();
-			final var messageFrame = SWT_AWT.new_Frame(messagePane);
-			messageFrame.setBackground(new Color(background.red, background.green, background.blue));
-			final var font = this.shell.getFont().getFontData()[0];
-			final var foreground = this.shell.getForeground().getRGB();
-			final var messageLabel = new JLabel(this.message);
-			messageLabel.setFont(new Font(font.getName(), Font.PLAIN, (font.getHeight() * 5) / 4));
-			messageLabel.setForeground(new Color(foreground.red, foreground.green, foreground.blue));
-			messageFrame.add(messageLabel);
+			final var lay = new GridLayout();
+			this.shell = new Shell(parent, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
+			this.shell.setText(Objects.notNull(this.text, ""));
+			lay.marginWidth = 10;
+			lay.marginHeight = 10;
+			lay.verticalSpacing = 0;
+			lay.horizontalSpacing = 0;
+			this.shell.setLayout(lay);
+			this.shell.addShellListener(ShellListener.shellClosedAdapter(event -> this.shell.dispose()));
+		}
+		{
+			final var titleLabel = new Label(this.shell, SWT.WRAP);
+			final var font = titleLabel.getFont().getFontData()[0];
+			titleLabel.setText(this.title);
+			titleLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+			titleLabel.setFont(new Font(this.shell.getDisplay(), new FontData(font.getName(), font.getHeight(), SWT.BOLD)));
+		}
+		{
+			final var messageLabel = new Label(this.shell, SWT.WRAP);
+			messageLabel.setText(this.message);
+			messageLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		}
 		{
 			final var optionaPane = new Composite(this.shell, SWT.NONE);
@@ -80,30 +84,44 @@ public class FTDialog_SWT {
 				res.setText(entry.getKey());
 				res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 				res.addSelectionListener(SelectionListener.widgetSelectedAdapter(event -> {
-					event.display.asyncExec(entry.getValue());
 					this.shell.dispose();
+					event.display.syncExec(entry.getValue());
 				}));
+				this.shell.setDefaultButton(Objects.notNull(this.shell.getDefaultButton(), res));
 			});
 		}
-		this.shell.pack();
-		this.shell.layout();
-		FTWindow_SWT.openAndWait(this.shell);
+		{
+			this.shell.setSize(this.shell.computeSize(500, SWT.DEFAULT, true));
+			this.shell.layout(true);
+			FTWindow_SWT.center(this.shell);
+			FTWindow_SWT.openAndWait(this.shell);
+		}
 	}
 
 	public void dispose() {
 		if (this.shell != null) {
 			this.shell.dispose();
+			this.shell = null;
 		}
 	}
 
+	public FTDialog_SWT withText(final String text) {
+		this.text = Objects.notNull(text);
+		return this;
+	}
+
 	public FTDialog_SWT withTitle(final String title) {
-		this.title = title;
+		this.title = Objects.notNull(title);
+		return this;
+	}
+
+	public FTDialog_SWT withMessage(final String message) {
+		this.message = Objects.notNull(message);
 		return this;
 	}
 
 	public FTDialog_SWT withMessage(final String message, final Object... args) {
-		this.message = String.format(message, args);
-		return this;
+		return this.withMessage(String.format(message, args));
 	}
 
 	public FTDialog_SWT withButton(final String string) {
@@ -117,18 +135,22 @@ public class FTDialog_SWT {
 	 * @param onClick Berechnung oder {@code null};
 	 * @return {@code this}. */
 	public FTDialog_SWT withButton(final String text, final Runnable onClick) {
-		this.buttons.add(Entries.from(text, onClick));
+		this.buttons.add(Entries.from(Objects.notNull(text), onClick));
 		return this;
 	}
 
 	public FTDialog_SWT withOption(final String label, final Getter<Composite, Control> option) {
-		this.options.add(Entries.from(label, option));
+		this.options.add(Entries.from(Objects.notNull(label), Objects.notNull(option)));
 		return this;
 	}
 
-	private String title;
+	private Shell shell;
 
-	private String message;
+	private String text = "";
+
+	private String title = "";
+
+	private String message = "";
 
 	private final List<Entry<String, Runnable>> buttons = new LinkedList<>();
 

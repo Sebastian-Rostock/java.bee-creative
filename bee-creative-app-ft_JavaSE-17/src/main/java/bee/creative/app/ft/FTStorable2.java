@@ -11,7 +11,7 @@ import java.util.zip.GZIPOutputStream;
 import bee.creative.csv.CSVReader;
 import bee.creative.csv.CSVWriter;
 
-/** Diese Klasse implementiert ein als .csv.gz-Datei speicherbares Objekt.
+/** Diese Schnittstelle definiert ein als {@code .csv.gz}-Datei speicherbares Objekt.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 interface FTStorable2 extends FTStorable {
@@ -20,15 +20,13 @@ interface FTStorable2 extends FTStorable {
 	@Override
 	void persist();
 
-	/** Diese Methode speichert die Daten dieses Objekts über {@link #persist(CSVWriter)} in die gegebene .csv.gz-Datei. */
+	/** Diese Methode speichert die Daten dieses Objekts über {@link #persist(CSVWriter)} in die gegebene {@code .csv.gz}-Datei. */
 	default void persist(final File file) {
 		try (var stream = new GZIPOutputStream(new FileOutputStream(file))) {
 			try (var writer = new CSVWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8))) {
 				this.persist(writer);
 			}
-		} catch (final Exception error) {
-			error.printStackTrace();
-		}
+		} catch (final Exception ignore) {}
 	}
 
 	/** Diese Methode speichert die Daten dieses Objekts über den gegebenen {@link CSVWriter}. */
@@ -38,16 +36,14 @@ interface FTStorable2 extends FTStorable {
 	@Override
 	void restore();
 
-	/** Diese Methode lädt die Daten dieses Objekts über {@link #restore(CSVReader)} aus der gegebenen .csv.gz-Datei. */
+	/** Diese Methode lädt die Daten dieses Objekts über {@link #restore(CSVReader)} aus der gegebenen {@code .csv.gz}-Datei. */
 	default void restore(final File file) {
 		if (!file.isFile() || (file.length() == 0)) return;
 		try (var stream = new GZIPInputStream(new FileInputStream(file))) {
 			try (var reader = new CSVReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 				this.restore(reader);
 			}
-		} catch (final Exception error) {
-			error.printStackTrace();
-		}
+		} catch (final Exception ignore) {}
 	}
 
 	/** Diese Methode lädt die Daten dieses Objekts über den gegebenen {@link CSVReader}. */

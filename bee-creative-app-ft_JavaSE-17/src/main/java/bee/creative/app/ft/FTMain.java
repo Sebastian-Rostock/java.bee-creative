@@ -29,11 +29,7 @@ public class FTMain extends FTWindow_SWT {
 
 	public static void main(final String[] args) throws Exception {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		new FTMain();
-	}
-
-	public FTMain() {
-		this.run();
+		new FTMain().run();
 	}
 
 	private HashSet2<String> createPathSet() {
@@ -80,12 +76,12 @@ public class FTMain extends FTWindow_SWT {
 	}
 
 	@Override
-	public void importInputsRequest(final String inputText, final List<File> fileList) {
+	public void importInputsRequest(final String inputText, final List<String> fileList) {
 		final var tableList = this.createLineList();
 		if (!inputText.isEmpty()) {
 			tableList.add(Collections.singletonList(inputText));
 		}
-		this.runItems(fileList, file -> tableList.add(Collections.singletonList(file.getPath())), null);
+		this.runItems(fileList, file -> tableList.add(Collections.singletonList(file)), null);
 		this.importInputsRespond(this.createLineText(tableList));
 	}
 
@@ -276,9 +272,9 @@ public class FTMain extends FTWindow_SWT {
 		this.deleteTargetFoldersPermanentlyRespond(this.createLineText(keepList), keepList.size(), dropCount);
 	}
 
-	private List<File> exportImpl(final String tableText, final int itemCol) { // DONE
+	private List<String> exportImpl(final String tableText, final int itemCol) { // DONE
 		final var pathSet = this.createPathSet();
-		final var fileList = new ArrayList<File>();
+		final var fileList = new ArrayList<String>();
 		this.runItems(this.createLineList(tableText), line -> {
 			if (line.size() <= itemCol) return;
 			final var file = new File(line.get(itemCol));
@@ -286,7 +282,7 @@ public class FTMain extends FTWindow_SWT {
 			final var path = file.getPath();
 			this.taskEntry = path;
 			if (!pathSet.add(path)) return;
-			fileList.add(file);
+			fileList.add(path);
 		}, null);
 		return fileList;
 	}
@@ -747,7 +743,5 @@ public class FTMain extends FTWindow_SWT {
 		Desktop.getDesktop().open(parentFile);
 		this.showSourceAndTargetFilesRespond(parentFile.getPath(), linkCount[1]);
 	}
-
-	private static final long serialVersionUID = -7889325283531060273L;
 
 }

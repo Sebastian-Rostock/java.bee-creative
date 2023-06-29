@@ -1,19 +1,18 @@
 package bee.creative.app.ft;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CancellationException;
-import javax.swing.Timer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellListener;
@@ -35,12 +34,17 @@ import bee.creative.lang.Objects;
 import bee.creative.lang.Runnable2;
 import bee.creative.lang.Strings;
 import bee.creative.util.Consumer;
-import bee.creative.util.Iterables;
 import bee.creative.util.Producer;
 import bee.creative.util.Properties;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class FTWindow_SWT implements Runnable {
+
+	public static void center(final Shell shell) {
+		final var srcRect = shell.getBounds();
+		final var tgtRect = shell.getDisplay().getPrimaryMonitor().getBounds();
+		shell.setLocation(tgtRect.x + ((tgtRect.width - srcRect.width) / 2), tgtRect.y + ((tgtRect.height - srcRect.height) / 2));
+	}
 
 	public static void openAndWait(final Shell shell) {
 		shell.open();
@@ -51,6 +55,8 @@ class FTWindow_SWT implements Runnable {
 			}
 		}
 	}
+
+	public final FTSettings settings = new FTSettings();
 
 	public FTWindow_SWT() {
 		this.display = Display.getDefault();
@@ -97,7 +103,7 @@ class FTWindow_SWT implements Runnable {
 			this.taskStop.addSelectionListener(SelectionListener.widgetSelectedAdapter(this::cancelProcess));
 		}
 		this.execUpdateEnabled();
-		new Timer(500, this::updateTask).start();
+		this.updateTask();
 		this.settings.restore();
 		this.settings.persist();
 	}
@@ -105,11 +111,8 @@ class FTWindow_SWT implements Runnable {
 	@Override
 	public void run() {
 		this.shell.layout();
-		final var bounds = this.display.getPrimaryMonitor().getBounds();
-		final var rect = this.shell.getBounds();
-		this.shell.setLocation(bounds.x + ((bounds.width - rect.width) / 2), bounds.y + ((bounds.height - rect.height) / 2));
-		final Shell shell2 = this.shell;
-		FTWindow_SWT.openAndWait(shell2);
+		FTWindow_SWT.center(this.shell);
+		FTWindow_SWT.openAndWait(this.shell);
 		System.exit(0);
 	}
 
@@ -120,16 +123,6 @@ class FTWindow_SWT implements Runnable {
 	private final Text inputArea;
 
 	private final Menu inputMenu;
-
-	private <T> T getSync(final Producer<T> getter) {
-		final var res = Properties.<T>fromValue(null);
-		this.display.syncExec(() -> res.set(getter.get()));
-		return res.get();
-	}
-
-	private <T> void setSync(final Consumer<? super T> setter, final T value) {
-		this.display.asyncExec(() -> setter.set(value));
-	}
 
 	private String getInputText() {
 		return this.getSync(this.inputArea::getText);
@@ -148,7 +141,7 @@ class FTWindow_SWT implements Runnable {
 		this.createMenuItem(mn1, "Verzeichnisse auflösen...", this::resolveInputToFolders);
 		this.createMenuBreak(mn1);
 		this.createMenuItem(mn1, "Eingabepfade übertragen...", this::transferInputs);
-		this.createMenuItem(mn1, "Eingabepfade kopieren", this::exportInputs);
+		this.createMenuItem(mn1, "In Zwischanablage kopieren", this::exportInputs);
 		final var mn2 = this.createMenu(res, "Dateien");
 		this.createMenuItem(mn2, "Dateien löschen...", this::deleteInputFilesPermanently);
 		this.createMenuItem(mn2, "Dateien recyceln...", this::deleteInputFilesTemporary);
@@ -163,8 +156,15 @@ class FTWindow_SWT implements Runnable {
 
 	private Text createInputArea(final Composite parent) {
 		final var res = new Text(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-		// res.setOnDrop(this::setupImportInputs);
-		// res.setOnPaste(this::setupImportInputs);
+
+		new DropTarget(res, DND.DROP_LINK).addDropListener(new DropTargetAdapter() {
+
+			@Override
+			public void drop(final DropTargetEvent event) {
+				FTWindow_SWT.this.importInputsStart(event);
+			}
+
+		});
 		return res;
 	}
 
@@ -195,7 +195,7 @@ class FTWindow_SWT implements Runnable {
 		this.createMenuItem(mn1, "Quellpfade tauschen...", this::exchangeSourcesWithTargets);
 		this.createMenuBreak(mn1);
 		this.createMenuItem(mn1, "Quellpfade übertragen...", this::transferSources);
-		this.createMenuItem(mn1, "Quellpfade kopieren", this::exportSources);
+		this.createMenuItem(mn1, "In Zwischanablage kopieren", this::exportSources);
 		final var mn2 = this.createMenu(res, "Zielpfade");
 		this.createMenuItem(mn2, "Fehlerpfade erhalten...", this::cleanupExistingTargets);
 		this.createMenuItem(mn2, "Fehlerpfade entfernen...", this::cleanupMissingTargets);
@@ -203,7 +203,7 @@ class FTWindow_SWT implements Runnable {
 		this.createMenuItem(mn2, "Zielpfade tauschen...", this::exchangeTargetsWithSources);
 		this.createMenuBreak(mn2);
 		this.createMenuItem(mn2, "Zielpfade übertragen...", this::transferTargets);
-		this.createMenuItem(mn2, "Zielpfade kopieren", this::exportTargets);
+		this.createMenuItem(mn2, "In Zwischanablage kopieren", this::exportTargets);
 		this.createMenuBreak(mn2);
 		this.createMenuItem(mn2, "Zeitnamen ableiten... (Name)", this::createTargetsWithTimenameFromName);
 		this.createMenuItem(mn2, "Zeitnamen ableiten... (Zeit)", this::createTargetsWithTimenameFromTime);
@@ -262,11 +262,19 @@ class FTWindow_SWT implements Runnable {
 		return new MenuItem(parent.getMenu(), SWT.SEPARATOR);
 	}
 
-	public final FTSettings settings = new FTSettings();
+	private <T> T getSync(final Producer<T> getter) {
+		final var res = Properties.<T>fromValue(null);
+		this.display.syncExec(() -> res.set(getter.get()));
+		return res.get();
+	}
+
+	private <T> void setSync(final Consumer<? super T> setter, final T value) {
+		this.display.asyncExec(() -> setter.set(value));
+	}
 
 	private FTDialog_SWT createDialog() {
 		final var res = new FTDialog_SWT();
-		this.runLater(() -> res.open(this.shell));
+		this.runLater(() -> res.create(this.shell));
 		return res;
 	}
 
@@ -305,7 +313,7 @@ class FTWindow_SWT implements Runnable {
 
 			} catch (final Throwable error) {
 				this.runLater(() -> this.createDialog() //
-					.withTitle(title) //
+					.withText(title) //
 					.withMessage("<html><b>Unerwarteter Fehler</b><br>%s</html>", error.toString().replaceAll("&", "&amp;").replaceAll("<", "&lt;")) //
 					.withButton("Okay"));
 			} finally {
@@ -366,81 +374,28 @@ class FTWindow_SWT implements Runnable {
 		}
 	}
 
-	private void execExportToClipboard(final List<File> fileList) {
-		this.runLater(() -> {
-			final var clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			clipboard.setContents(new Transferable() {
-
-				@Override
-				public boolean isDataFlavorSupported(final DataFlavor flavor) {
-					for (final var item: this.getTransferDataFlavors())
-						if (item.equals(flavor)) return true;
-					return false;
-				}
-
-				@Override
-				public DataFlavor[] getTransferDataFlavors() {
-					return new DataFlavor[]{DataFlavor.javaFileListFlavor, DataFlavor.stringFlavor};
-				}
-
-				@Override
-				public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-					if (DataFlavor.javaFileListFlavor.equals(flavor)) return fileList;
-					if (DataFlavor.stringFlavor.equals(flavor)) return Strings.join("\n", Iterables.translate(fileList, File::getPath));
-					throw new UnsupportedFlavorException(flavor);
-				}
-
-			}, null);
-		});
+	private void execExportToClipboard(final List<String> fileList) {
+		if (fileList.isEmpty()) return;
+		this.setSync(val -> {
+			final var clipboard = new Clipboard(this.display);
+			clipboard.setContents(new Object[]{val, Strings.join("\n", (Object[])val)}, new Transfer[]{FileTransfer.getInstance(), TextTransfer.getInstance()});
+			clipboard.dispose();
+		}, fileList.toArray(new String[0]));
 	}
 
-	void updateTask(final ActionEvent event) {
+	void updateTask() {
+		this.display.timerExec(500, this::updateTask);
 		if (this.isTaskRunning) {
 			final String title = Objects.notNull(this.taskTitle, "?"), entry = String.valueOf(Objects.notNull(this.taskEntry, ""));
-			this.setSync(this.taskInfo::setText, title + " - " + this.taskCount + " - " + entry);
+			this.taskInfo.setText(title + " - " + this.taskCount + " - " + entry);
 		} else {
-			this.setSync(this.taskInfo::setText, " ");
+			this.taskInfo.setText(" ");
 		}
-	}
-
-	void setupImportInputs(final DropTargetDropEvent event) {
-		if (!this.inputArea.isEnabled()) return;
-		final Transferable transData = event.getTransferable();
-		if (transData == null) return;
-		event.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-		this.startImportInputs(transData);
-	}
-
-	void setupImportInputs(final ActionEvent event) {
-		if (!this.inputArea.isEnabled()) return;
-		final Transferable transData = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-		if ((transData == null) || this.startImportInputs(transData)) return;
-		this.inputArea.paste();
-	}
-
-	boolean startImportInputs(final Transferable transData) {
-		if (!transData.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) return false;
-		try {
-			final var inputText = this.getInputText();
-			@SuppressWarnings ("unchecked")
-			final var fileList = (List<File>)transData.getTransferData(DataFlavor.javaFileListFlavor);
-			this.importInputsRequest(inputText, fileList);
-			return true;
-		} catch (final Exception ignore) {}
-		return false;
-	}
-
-	public void importInputsRequest(final String inputText, final List<File> fileList) {
-		this.runDemo(() -> this.importInputsRespond(inputText));
-	}
-
-	public void importInputsRespond(final String inputText) {
-		this.setInputText(inputText);
 	}
 
 	void cleanupExistingInputs() {
 		this.createDialog()//
-			.withTitle("Fehlerpfade erhalten") //
+			.withText("Fehlerpfade erhalten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Datenpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
@@ -463,7 +418,7 @@ class FTWindow_SWT implements Runnable {
 	public void cleanupExistingInputsRespond(final String keepText, final int validCount, final int errorCount) {
 		this.setInputText(keepText);
 		this.createDialog() //
-			.withTitle("Fehlerpfade erhalten") //
+			.withText("Fehlerpfade erhalten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
@@ -476,7 +431,7 @@ class FTWindow_SWT implements Runnable {
 
 	void cleanupExistingSources() {
 		this.createDialog()//
-			.withTitle("Fehlerquellpfade erhalten") //
+			.withText("Fehlerquellpfade erhalten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Quellpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
@@ -499,7 +454,7 @@ class FTWindow_SWT implements Runnable {
 	public void cleanupExistingSourcesRespond(final String tableText, final int validCount, final int errorCount) {
 		this.setTableText(tableText);
 		this.createDialog() //
-			.withTitle("Fehlerquellpfade erhalten") //
+			.withText("Fehlerquellpfade erhalten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
@@ -512,7 +467,7 @@ class FTWindow_SWT implements Runnable {
 
 	void cleanupExistingTargets() {
 		this.createDialog()//
-			.withTitle("Fehlerzielpfade erhalten") //
+			.withText("Fehlerzielpfade erhalten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Zielpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
@@ -535,7 +490,7 @@ class FTWindow_SWT implements Runnable {
 	public void cleanupExistingTargetsRespond(final String tableText, final int validCount, final int errorCount) {
 		this.setTableText(tableText);
 		this.createDialog() //
-			.withTitle("Fehlerzielpfade erhalten") //
+			.withText("Fehlerzielpfade erhalten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
@@ -548,7 +503,7 @@ class FTWindow_SWT implements Runnable {
 
 	void cleanupMissingInputs() {
 		this.createDialog()//
-			.withTitle("Fehlerpfade entfernen") //
+			.withText("Fehlerpfade entfernen") //
 			.withMessage("<html>" + //
 				"<b>Sollen alle Datenpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
 				"Duplikate sowie relative Datenpfade werden ebenfalls verworfen. " + //
@@ -570,7 +525,7 @@ class FTWindow_SWT implements Runnable {
 	public void cleanupMissingInputsRespond(final String inputText, final int validCount, final int errorCount) {
 		this.setInputText(inputText);
 		this.createDialog() //
-			.withTitle("Fehlerpfade entfernt") //
+			.withText("Fehlerpfade entfernt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
@@ -583,7 +538,7 @@ class FTWindow_SWT implements Runnable {
 
 	void cleanupMissingSources() {
 		this.createDialog()//
-			.withTitle("Fehlerquellpfade entfernen") //
+			.withText("Fehlerquellpfade entfernen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Quellpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
@@ -606,7 +561,7 @@ class FTWindow_SWT implements Runnable {
 	public void cleanupMissingSourcesRespond(final String tableText, final int validCount, final int errorCount) {
 		this.setTableText(tableText);
 		this.createDialog() //
-			.withTitle("Fehlerquellpfade entfernt") //
+			.withText("Fehlerquellpfade entfernt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
@@ -619,7 +574,7 @@ class FTWindow_SWT implements Runnable {
 
 	void cleanupMissingTargets() {
 		this.createDialog()//
-			.withTitle("Fehlerzielpfade entfernen") //
+			.withText("Fehlerzielpfade entfernen") //
 			.withMessage("<html>" + //
 				"<b>Sollen alle Zielpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
 				"Relative Zielpfade werden ebenfalls verworfen. " + //
@@ -641,7 +596,7 @@ class FTWindow_SWT implements Runnable {
 	public void cleanupMissingTargetsRespond(final String tableText, final int validCount, final int errorCount) {
 		this.setTableText(tableText);
 		this.createDialog() //
-			.withTitle("Fehlerzielpfade entfernt") //
+			.withText("Fehlerzielpfade entfernt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
@@ -654,7 +609,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteInputFilesTemporary() {
 		this.createDialog()//
-			.withTitle("Eingabedateien recyceln") //
+			.withText("Eingabedateien recyceln") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien wirklich in den Papierkorb verschoben werden?</b><br> " + //
@@ -677,7 +632,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteInputFilesTemporaryRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setInputText(keepText);
 		this.createDialog() //
-			.withTitle("Eingabedateien recycelt") //
+			.withText("Eingabedateien recycelt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden recycelt.<br> " + //
@@ -690,7 +645,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteInputFilesPermanently() {
 		this.createDialog()//
-			.withTitle("Eingabedateien löschen") //
+			.withText("Eingabedateien löschen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien wirklich endgültig gelöscht werden?</b><br> " + //
@@ -713,7 +668,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteInputFilesPermanentlyRespond(final String inputText, final int keepCount, final int dropCount) {
 		this.setInputText(inputText);
 		this.createDialog() //
-			.withTitle("Eingabedateien gelöscht") //
+			.withText("Eingabedateien gelöscht") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden gelöscht.<br> " + //
@@ -726,7 +681,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteInputFoldersTemporary() {
 		this.createDialog()//
-			.withTitle("Eingabeverzeichnisse recyceln") //
+			.withText("Eingabeverzeichnisse recyceln") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?</b><br> " + //
@@ -749,7 +704,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteInputFoldersTemporaryRespond(final String inputText, final int keepCount, final int dropCount) {
 		this.setInputText(inputText);
 		this.createDialog() //
-			.withTitle("Eingabeverzeichnisse recycelt") //
+			.withText("Eingabeverzeichnisse recycelt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Verzeichnisse wurden recycelt.<br>" + //
@@ -762,7 +717,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteInputFoldersPermanently() {
 		this.createDialog()//
-			.withTitle("Eingabeverzeichnisse löschen") //
+			.withText("Eingabeverzeichnisse löschen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?</b><br> " + //
@@ -785,7 +740,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteInputFoldersPermanentlyRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setInputText(keepText);
 		this.createDialog() //
-			.withTitle("Eingabeverzeichnisse gelöscht") //
+			.withText("Eingabeverzeichnisse gelöscht") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Verzeichnisse wurden gelöscht.<br> " + //
@@ -798,7 +753,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteSourceFilesTemporary() {
 		this.createDialog()//
-			.withTitle("Quelldateien recyceln") //
+			.withText("Quelldateien recyceln") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien wirklich in den Papierkorb verschoben werden?</b><br> " + //
@@ -821,7 +776,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteSourceFilesTemporaryRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Quelldateien recycelt") //
+			.withText("Quelldateien recycelt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden recycelt.<br> " + //
@@ -834,7 +789,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteSourceFilesPermanently() {
 		this.createDialog()//
-			.withTitle("Quelldateien löschen") //
+			.withText("Quelldateien löschen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien wirklich endgültig gelöscht werden?</b><br> " + //
@@ -857,7 +812,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteSourceFilesPermanentlyRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Quelldateien gelöscht") //
+			.withText("Quelldateien gelöscht") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden gelöscht.<br> " + //
@@ -870,7 +825,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteSourceFoldersTemporary() {
 		this.createDialog()//
-			.withTitle("Quellverzeichnisse recyceln") //
+			.withText("Quellverzeichnisse recyceln") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?</b><br> " + //
@@ -893,7 +848,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteSourceFoldersTemporaryRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Quellverzeichnisse recycelt") //
+			.withText("Quellverzeichnisse recycelt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Verzeichnisse wurden recycelt.<br>" + //
@@ -906,7 +861,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteSourceFoldersPermanently() {
 		this.createDialog()//
-			.withTitle("Quellverzeichnisse löschen") //
+			.withText("Quellverzeichnisse löschen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?</b><br> " + //
@@ -929,7 +884,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteSourceFoldersPermanentlyRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Quellverzeichnisse gelöscht") //
+			.withText("Quellverzeichnisse gelöscht") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Verzeichnisse wurden gelöscht.<br> " + //
@@ -942,7 +897,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteTargetFilesTemporary() {
 		this.createDialog()//
-			.withTitle("Zieldateien recyceln") //
+			.withText("Zieldateien recyceln") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien wirklich in den Papierkorb verschoben werden?</b><br> " + //
@@ -965,7 +920,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteTargetFilesTemporaryRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zieldateien recycelt") //
+			.withText("Zieldateien recycelt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden recycelt.<br> " + //
@@ -978,7 +933,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteTargetFilesPermanently() {
 		this.createDialog()//
-			.withTitle("Zieldateien löschen") //
+			.withText("Zieldateien löschen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien wirklich endgültig gelöscht werden?</b><br> " + //
@@ -1001,7 +956,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteTargetFilesPermanentlyRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zieldateien gelöscht") //
+			.withText("Zieldateien gelöscht") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden gelöscht.<br> " + //
@@ -1014,7 +969,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteTargetFoldersTemporary() {
 		this.createDialog()//
-			.withTitle("Zielverzeichnisse recyceln") //
+			.withText("Zielverzeichnisse recyceln") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?</b><br> " + //
@@ -1037,7 +992,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteTargetFoldersTemporaryRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zielverzeichnisse recycelt") //
+			.withText("Zielverzeichnisse recycelt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Verzeichnisse wurden recycelt.<br>" + //
@@ -1050,7 +1005,7 @@ class FTWindow_SWT implements Runnable {
 
 	void deleteTargetFoldersPermanently() {
 		this.createDialog()//
-			.withTitle("Zielverzeichnisse löschen") //
+			.withText("Zielverzeichnisse löschen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?</b><br> " + //
@@ -1073,7 +1028,7 @@ class FTWindow_SWT implements Runnable {
 	public void deleteTargetFoldersPermanentlyRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zielverzeichnisse gelöscht") //
+			.withText("Zielverzeichnisse gelöscht") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Verzeichnisse wurden gelöscht.<br> " + //
@@ -1082,6 +1037,38 @@ class FTWindow_SWT implements Runnable {
 				dropCount, keepCount //
 			) //
 			.withButton("Okay");
+	}
+
+	void importInputs() {
+		this.importInputsStart();
+	}
+
+	void importInputsStart() {
+		if (!this.inputArea.isEnabled()) return;
+		final var clp = new Clipboard(this.display);
+		final var fileList = (String[])clp.getContents(FileTransfer.getInstance());
+		clp.dispose();
+		if (fileList == null) return;
+		this.importInputsRequest(this.getInputText(), Arrays.asList(fileList));
+	}
+
+	void importInputsStart(final DropTargetEvent event) {
+		if (!this.inputArea.isEnabled() || (event.currentDataType == null)) return;
+		event.detail = DND.DROP_COPY;
+		if (!FileTransfer.getInstance().isSupportedType(event.currentDataType)) return;
+		try {
+			final var inputText = this.getInputText();
+			final var fileList = (String[])FileTransfer.getInstance().nativeToJava(event.currentDataType);
+			this.importInputsRequest(inputText, Arrays.asList(fileList));
+		} catch (final Exception ignore) {}
+	}
+
+	public void importInputsRequest(final String inputText, final List<String> fileList) {
+		this.runDemo(() -> this.importInputsRespond(inputText));
+	}
+
+	public void importInputsRespond(final String inputText) {
+		this.setInputText(inputText);
 	}
 
 	void exportInputs() {
@@ -1097,7 +1084,7 @@ class FTWindow_SWT implements Runnable {
 		this.runDemo(() -> this.exportInputsRespond(Collections.emptyList()));
 	}
 
-	public void exportInputsRespond(final List<File> fileList) {
+	public void exportInputsRespond(final List<String> fileList) {
 		this.execExportToClipboard(fileList);
 	}
 
@@ -1114,7 +1101,7 @@ class FTWindow_SWT implements Runnable {
 		this.runDemo(() -> this.exportSourcesRespond(Collections.emptyList()));
 	}
 
-	public void exportSourcesRespond(final List<File> fileList) {
+	public void exportSourcesRespond(final List<String> fileList) {
 		this.execExportToClipboard(fileList);
 	}
 
@@ -1131,13 +1118,13 @@ class FTWindow_SWT implements Runnable {
 		this.runDemo(() -> this.exportTargetsRespond(Collections.emptyList()));
 	}
 
-	public void exportTargetsRespond(final List<File> fileList) {
+	public void exportTargetsRespond(final List<String> fileList) {
 		this.execExportToClipboard(fileList);
 	}
 
 	void exchangeSourcesWithTargets() {
 		this.createDialog()//
-			.withTitle("Quellpfade tauschen") //
+			.withText("Quellpfade tauschen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Quellpfade mit deren Zielpfaden getauscht werden?</b><br> " + //
@@ -1159,7 +1146,7 @@ class FTWindow_SWT implements Runnable {
 	public void exchangeSourcesWithTargetsRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Quellpfade getauscht") //
+			.withText("Quellpfade getauscht") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Quellpfade wurden getauscht.<br>" + //
@@ -1172,7 +1159,7 @@ class FTWindow_SWT implements Runnable {
 
 	void exchangeTargetsWithSources() {
 		this.createDialog()//
-			.withTitle("Zielpfade tauschen") //
+			.withText("Zielpfade tauschen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Zielpfade mit deren Quellpfaden getauscht werden?</b> " + //
@@ -1194,7 +1181,7 @@ class FTWindow_SWT implements Runnable {
 	public void exchangeTargetsWithSourcesRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Quellpfade getauscht") //
+			.withText("Quellpfade getauscht") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zielpfade wurden getauscht.<br>" + //
@@ -1207,7 +1194,7 @@ class FTWindow_SWT implements Runnable {
 
 	void replaceSourcesWithTargets() {
 		this.createDialog()//
-			.withTitle("Quellpfade ersetzen") //
+			.withText("Quellpfade ersetzen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Quellpfade durch deren Zielpfade ersetzt werden?</b><br> " + //
@@ -1229,7 +1216,7 @@ class FTWindow_SWT implements Runnable {
 	public void replaceSourcesWithTargetsRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Quellpfade ersetzt") //
+			.withText("Quellpfade ersetzt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Quellpfade wurden ersetzt.<br>" + //
@@ -1242,7 +1229,7 @@ class FTWindow_SWT implements Runnable {
 
 	void replaceTargetsWithSources() {
 		this.createDialog()//
-			.withTitle("Zielpfade ersetzen") //
+			.withText("Zielpfade ersetzen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Zielpfade mit deren Quellpfaden ersetzt werden?</b> " + //
@@ -1264,7 +1251,7 @@ class FTWindow_SWT implements Runnable {
 	public void replaceTargetsWithSourcesRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zielpfade ersetzt") //
+			.withText("Zielpfade ersetzt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zielpfade wurden ersetzt.<br>" + //
@@ -1277,7 +1264,7 @@ class FTWindow_SWT implements Runnable {
 
 	void transferInputs() {
 		this.createDialog()//
-			.withTitle("Eingabepfade übertragen") //
+			.withText("Eingabepfade übertragen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Datenpfade wirklich als Quell- und Zielpfade in die Pfadtabelle übernommen werden?</b><br> " + //
@@ -1300,7 +1287,7 @@ class FTWindow_SWT implements Runnable {
 	public void transferInputsRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Eingabepfade übertragen") //
+			.withText("Eingabepfade übertragen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Eingabepfade wurden übernommen.<br> " + //
@@ -1313,7 +1300,7 @@ class FTWindow_SWT implements Runnable {
 
 	void transferSources() {
 		this.createDialog()//
-			.withTitle("Quellpfade übertragen") //
+			.withText("Quellpfade übertragen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Eingabepfade in der Pfadliste mit allen Quellpfaden ersetzt werden?</b> " + //
@@ -1335,7 +1322,7 @@ class FTWindow_SWT implements Runnable {
 	public void transferSourcesRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setInputText(keepText);
 		this.createDialog() //
-			.withTitle("Quellpfade übertragen") //
+			.withText("Quellpfade übertragen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Quellpfade wurden übernommen.<br> " + //
@@ -1348,7 +1335,7 @@ class FTWindow_SWT implements Runnable {
 
 	void transferTargets() {
 		this.createDialog()//
-			.withTitle("Zielpfade übertragen") //
+			.withText("Zielpfade übertragen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Zielpfade wirklich als Eingabepfade in die Pfadliste übernommen werden?</b><br> " + //
@@ -1371,7 +1358,7 @@ class FTWindow_SWT implements Runnable {
 	public void transferTargetsRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setInputText(keepText);
 		this.createDialog() //
-			.withTitle("Zielpfade übertragen") //
+			.withText("Zielpfade übertragen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zielpfade wurden übernommen.<br> " + //
@@ -1384,7 +1371,7 @@ class FTWindow_SWT implements Runnable {
 
 	void resolveInputToFiles() {
 		this.createDialog()//
-			.withTitle("Dateien auflösen") //
+			.withText("Dateien auflösen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Verzeichnispfade wirklich durch die Pfade aller darin enthaltenen Dateien ersetzt werden?</b><br> " + //
@@ -1409,7 +1396,7 @@ class FTWindow_SWT implements Runnable {
 	public void resolveInputToFilesRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setInputText(keepText);
 		this.createDialog() //
-			.withTitle("Dateien aufgelöst") //
+			.withText("Dateien aufgelöst") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateipfade wurden ermittelt.<br> " + //
@@ -1422,7 +1409,7 @@ class FTWindow_SWT implements Runnable {
 
 	void resolveInputToFolders() {
 		this.createDialog()//
-			.withTitle("Verzeichnisse auflösen") //
+			.withText("Verzeichnisse auflösen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Verzeichnispfade wirklich um die Pfade aller darin enthaltenen Verzeichnisse ergänzt werden?</b><br> " + //
@@ -1447,7 +1434,7 @@ class FTWindow_SWT implements Runnable {
 	public void resolveInputToFoldersRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setInputText(keepText);
 		this.createDialog() //
-			.withTitle("Verzeichnisse aufgelöst") //
+			.withText("Verzeichnisse aufgelöst") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Verzeichnispfade wurden ermittelt.<br> " + //
@@ -1460,7 +1447,7 @@ class FTWindow_SWT implements Runnable {
 
 	void refreshInputFiles() {
 		this.createDialog()//
-			.withTitle("Dateien erneuern") //
+			.withText("Dateien erneuern") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle alten Dateien wirklich erneuert werden?</b><br> " + //
@@ -1487,7 +1474,7 @@ class FTWindow_SWT implements Runnable {
 	public void refreshInputFilesRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setInputText(keepText);
 		this.createDialog() //
-			.withTitle("Dateien erneuert") //
+			.withText("Dateien erneuert") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden erneuert.<br> " + //
@@ -1500,7 +1487,7 @@ class FTWindow_SWT implements Runnable {
 
 	void createTableWithClones() {
 		this.createDialog() //
-			.withTitle("Duplikate übernehmen") //
+			.withText("Duplikate übernehmen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien auf Duplikate hin untersucht werden?</b><br> " + //
@@ -1539,7 +1526,7 @@ class FTWindow_SWT implements Runnable {
 	public void createTableWithClonesRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Duplikate übernommen") //
+			.withText("Duplikate übernommen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Duplikate wurden gefunden.<br> " + //
@@ -1552,7 +1539,7 @@ class FTWindow_SWT implements Runnable {
 
 	void createTargetsWithTimenameFromName() {
 		this.createDialog() //
-			.withTitle("Zeitnamen ableiten") //
+			.withText("Zeitnamen ableiten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen die Zielnamen wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?</b><br> " + //
@@ -1581,7 +1568,7 @@ class FTWindow_SWT implements Runnable {
 	public void createTargetsWithTimenameFromNameRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zeitnamen abgeleitet") //
+			.withText("Zeitnamen abgeleitet") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
@@ -1594,7 +1581,7 @@ class FTWindow_SWT implements Runnable {
 
 	void createTargetsWithTimepathFromName() {
 		this.createDialog() //
-			.withTitle("Zeitpfade ableiten") //
+			.withText("Zeitpfade ableiten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen die Zielpfade wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?</b><br> " + //
@@ -1624,7 +1611,7 @@ class FTWindow_SWT implements Runnable {
 	public void createTargetsWithTimepathFromNameRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zeitpfade abgeleitet") //
+			.withText("Zeitpfade abgeleitet") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
@@ -1637,7 +1624,7 @@ class FTWindow_SWT implements Runnable {
 
 	void createTargetsWithTimenameFromTime() {
 		this.createDialog() //
-			.withTitle("Zeitnamen aus Änderungszeitpunkten ableiten") //
+			.withText("Zeitnamen aus Änderungszeitpunkten ableiten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen die Zielnamen wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?</b><br> " + //
@@ -1666,7 +1653,7 @@ class FTWindow_SWT implements Runnable {
 	public void createTargetsWithTimenameFromTimeRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zeitnamen abgeleitet") //
+			.withText("Zeitnamen abgeleitet") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
@@ -1679,7 +1666,7 @@ class FTWindow_SWT implements Runnable {
 
 	void createTargetsWithTimepathFromTime() {
 		this.createDialog() //
-			.withTitle("Zeitpfade aus Änderungszeitpunkten ableiten") //
+			.withText("Zeitpfade aus Änderungszeitpunkten ableiten") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen die Zielpfade wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?</b><br> " + //
@@ -1709,7 +1696,7 @@ class FTWindow_SWT implements Runnable {
 	public void createTargetsWithTimepathFromTimeRespond(final String keepText, final int keepCount, final int failCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Zeitpfade abgeleitet") //
+			.withText("Zeitpfade abgeleitet") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
@@ -1722,7 +1709,7 @@ class FTWindow_SWT implements Runnable {
 
 	void copySourceToTargetFiles() {
 		this.createDialog() //
-			.withTitle("Dateien kopieren") //
+			.withText("Dateien kopieren") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien wirklich nicht ersetzend kopiert werden?</b><br> " + //
@@ -1745,7 +1732,7 @@ class FTWindow_SWT implements Runnable {
 	public void copySourceToTargetFilesRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Dateien kopiert") //
+			.withText("Dateien kopiert") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden kopiert.<br> " + //
@@ -1758,7 +1745,7 @@ class FTWindow_SWT implements Runnable {
 
 	void moveSourceToTargetFiles() {
 		this.createDialog() //
-			.withTitle("Dateien verschieben") //
+			.withText("Dateien verschieben") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen alle Dateien wirklich nicht ersetzend verschoben werden?</b><br> " + //
@@ -1781,7 +1768,7 @@ class FTWindow_SWT implements Runnable {
 	public void moveSourceToTargetFilesRespond(final String keepText, final int keepCount, final int dropCount) {
 		this.setTableText(keepText);
 		this.createDialog() //
-			.withTitle("Dateien verschoben") //
+			.withText("Dateien verschoben") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Dateien wurden verschoben.<br> " + //
@@ -1794,7 +1781,7 @@ class FTWindow_SWT implements Runnable {
 
 	void showSourceAndTargetFiles() {
 		this.createDialog() //
-			.withTitle("Dateipaare anzeigen") //
+			.withText("Dateipaare anzeigen") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen die Quell- und Zieldateien wirklich angezeigt werden?</b><br> " + //
@@ -1819,7 +1806,7 @@ class FTWindow_SWT implements Runnable {
 
 	public void showSourceAndTargetFilesRespond(final String linkPath, final int linkCount) {
 		this.createDialog() //
-			.withTitle("Dateipaare angezeigt") //
+			.withText("Dateipaare angezeigt") //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>%,d</b> Symlinks wurden in das folgende Verzeichnis eingefügt:<br>" + //
@@ -1832,7 +1819,7 @@ class FTWindow_SWT implements Runnable {
 
 	void cancelProcess(final SelectionEvent event) {
 		this.taskCancel = this.createDialog() //
-			.withTitle(Objects.notNull(this.taskTitle, "Abbrechen")) //
+			.withText(Objects.notNull(this.taskTitle, "Abbrechen")) //
 			.withMessage("" + //
 				"<html>" + //
 				"<b>Sollen der Vorgang wirklich abgebrochen werden?</b> " + //
