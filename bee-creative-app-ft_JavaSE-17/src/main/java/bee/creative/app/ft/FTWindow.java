@@ -314,7 +314,7 @@ class FTWindow implements Runnable {
 			} catch (final Exception error) {
 				this.createDialog() //
 					.withText(title) //
-					.withMessage("<html><b>Unerwarteter Fehler</b><br>%s</html>", error.toString().replaceAll("&", "&amp;").replaceAll("<", "&lt;")) //
+					.withMessage("Unerwarteter Fehler\n%s", error.toString().replaceAll("&", "&amp;").replaceAll("<", "&lt;")) //
 					.withButton("Okay") //
 					.open();
 			} finally {
@@ -417,7 +417,8 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Fehlerpfade erhalten") //
-			.withMessage("%,d Zeilen bleiben erhalten.\ns%,d Zeilen konnten nicht verarbeitet werden.", validCount, errorCount) //
+			.withTitle("%,d Zeilen bleiben erhalten.", validCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", errorCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -425,12 +426,8 @@ class FTWindow implements Runnable {
 	void cleanupExistingSources() {
 		this.createDialog()//
 			.withText("Fehlerquellpfade erhalten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Quellpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
-				"Relative Datenpfade werden ebenfalls verworfen. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Quellpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?") //
+			.withMessage("Relative Datenpfade werden ebenfalls verworfen.") //
 			.withButton("Ja", this::cleanupExistingSourcesStart) //
 			.withButton("Nein") //
 			.open();
@@ -449,13 +446,8 @@ class FTWindow implements Runnable {
 		this.setTableText(tableText);
 		this.createDialog() //
 			.withText("Fehlerquellpfade erhalten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				validCount, errorCount//
-			) //
+			.withTitle("%,d Zeilen bleiben erhalten.", validCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", errorCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -463,12 +455,8 @@ class FTWindow implements Runnable {
 	void cleanupExistingTargets() {
 		this.createDialog()//
 			.withText("Fehlerzielpfade erhalten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Zielpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
-				"Relative Zielpfade werden ebenfalls verworfen. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Zielpfade zu existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?") //
+			.withMessage("Relative Zielpfade werden ebenfalls verworfen.") //
 			.withButton("Ja", this::cleanupExistingTargetsStart) //
 			.withButton("Nein") //
 			.open();
@@ -487,13 +475,8 @@ class FTWindow implements Runnable {
 		this.setTableText(tableText);
 		this.createDialog() //
 			.withText("Fehlerzielpfade erhalten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				validCount, errorCount//
-			) //
+			.withTitle("%,d Zeilen bleiben erhalten.", validCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", errorCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -501,11 +484,8 @@ class FTWindow implements Runnable {
 	void cleanupMissingInputs() {
 		this.createDialog()//
 			.withText("Fehlerpfade entfernen") //
-			.withMessage("<html>" + //
-				"<b>Sollen alle Datenpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
-				"Duplikate sowie relative Datenpfade werden ebenfalls verworfen. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Datenpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?") //
+			.withMessage("Duplikate sowie relative Datenpfade werden ebenfalls verworfen.") //
 			.withButton("Ja", this::cleanupMissingInputsStart) //
 			.withButton("Nein") //
 			.open();
@@ -524,13 +504,8 @@ class FTWindow implements Runnable {
 		this.setInputText(inputText);
 		this.createDialog() //
 			.withText("Fehlerpfade entfernt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				validCount, errorCount//
-			) //
+			.withTitle("%,d Zeilen bleiben erhalten.", validCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", errorCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -538,12 +513,8 @@ class FTWindow implements Runnable {
 	void cleanupMissingSources() {
 		this.createDialog()//
 			.withText("Fehlerquellpfade entfernen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Quellpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
-				"Relative Datenpfade werden ebenfalls verworfen. " + //
-				"</html>" //
-			) //
+			.withMessage("Sollen alle Quellpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?\n " + //
+				"Relative Datenpfade werden ebenfalls verworfen.") //
 			.withButton("Ja", this::cleanupMissingSourcesStart) //
 			.withButton("Nein") //
 			.open();
@@ -562,13 +533,8 @@ class FTWindow implements Runnable {
 		this.setTableText(tableText);
 		this.createDialog() //
 			.withText("Fehlerquellpfade entfernt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				validCount, errorCount//
-			) //
+			.withTitle("%,d Zeilen bleiben erhalten.", validCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", errorCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -576,11 +542,8 @@ class FTWindow implements Runnable {
 	void cleanupMissingTargets() {
 		this.createDialog()//
 			.withText("Fehlerzielpfade entfernen") //
-			.withMessage("<html>" + //
-				"<b>Sollen alle Zielpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?</b><br> " + //
-				"Relative Zielpfade werden ebenfalls verworfen. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Zielpfade zu nicht existierenden Dateien bzw. Verzeichnissen wirklich verworfen werden?") //
+			.withMessage("Relative Zielpfade werden ebenfalls verworfen.") //
 			.withButton("Ja", this::cleanupMissingTargetsStart) //
 			.withButton("Nein") //
 			.open();
@@ -599,13 +562,8 @@ class FTWindow implements Runnable {
 		this.setTableText(tableText);
 		this.createDialog() //
 			.withText("Fehlerzielpfade entfernt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zeilen bleiben erhalten.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				validCount, errorCount//
-			) //
+			.withTitle("%,d Zeilen bleiben erhalten.", validCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", errorCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -613,12 +571,8 @@ class FTWindow implements Runnable {
 	void deleteInputFilesTemporary() {
 		this.createDialog()//
 			.withText("Eingabedateien recyceln") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien wirklich in den Papierkorb verschoben werden?</b><br> " + //
-				"Die Zeilen recycelter Dateien werden aus der Pfadliste entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Dateien wirklich in den Papierkorb verschoben werden?") //
+			.withMessage("Die Zeilen recycelter Dateien werden aus der Pfadliste entfert.") //
 			.withButton("Ja", this::deleteInputFilesTemporaryStart) //
 			.withButton("Nein") //
 			.open();
@@ -637,13 +591,8 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Eingabedateien recycelt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden recycelt.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden recycelt.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -651,12 +600,8 @@ class FTWindow implements Runnable {
 	void deleteInputFilesPermanently() {
 		this.createDialog()//
 			.withText("Eingabedateien löschen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien wirklich endgültig gelöscht werden?</b><br> " + //
-				"Die Zeilen gelöschter Dateien werden aus der Pfadliste entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Dateien wirklich endgültig gelöscht werden?") //
+			.withMessage("Die Zeilen gelöschter Dateien werden aus der Pfadliste entfert.") //
 			.withButton("Ja", this::deleteInputFilesPermanentlyStart) //
 			.withButton("Nein") //
 			.open();
@@ -675,13 +620,8 @@ class FTWindow implements Runnable {
 		this.setInputText(inputText);
 		this.createDialog() //
 			.withText("Eingabedateien gelöscht") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden gelöscht.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden gelöscht.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -689,12 +629,8 @@ class FTWindow implements Runnable {
 	void deleteInputFoldersTemporary() {
 		this.createDialog()//
 			.withText("Eingabeverzeichnisse recyceln") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?</b><br> " + //
-				"Die Zeilen recycelter Verzeichnisse werden aus der Pfadliste entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?") //
+			.withMessage("Die Zeilen recycelter Verzeichnisse werden aus der Pfadliste entfert.") //
 			.withButton("Ja", this::deleteInputFoldersTemporaryStart) //
 			.withButton("Nein") //
 			.open();
@@ -713,13 +649,8 @@ class FTWindow implements Runnable {
 		this.setInputText(inputText);
 		this.createDialog() //
 			.withText("Eingabeverzeichnisse recycelt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Verzeichnisse wurden recycelt.<br>" + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Verzeichnisse wurden recycelt.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -727,12 +658,8 @@ class FTWindow implements Runnable {
 	void deleteInputFoldersPermanently() {
 		this.createDialog()//
 			.withText("Eingabeverzeichnisse löschen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?</b><br> " + //
-				"Die Zeilen gelöschter Verzeichnisse werden aus der Pfadliste entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?") //
+			.withMessage("Die Zeilen gelöschter Verzeichnisse werden aus der Pfadliste entfert.") //
 			.withButton("Ja", this::deleteInputFoldersPermanentlyStart) //
 			.withButton("Nein") //
 			.open();
@@ -751,13 +678,8 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Eingabeverzeichnisse gelöscht") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Verzeichnisse wurden gelöscht.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Verzeichnisse wurden gelöscht.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -765,12 +687,8 @@ class FTWindow implements Runnable {
 	void deleteSourceFilesTemporary() {
 		this.createDialog()//
 			.withText("Quelldateien recyceln") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien wirklich in den Papierkorb verschoben werden?</b><br> " + //
-				"Die Zeilen recycelter Dateien werden aus der Pfadtabelle entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Dateien wirklich in den Papierkorb verschoben werden?") //
+			.withMessage("Die Zeilen recycelter Dateien werden aus der Pfadtabelle entfert.") //
 			.withButton("Ja", this::deleteSourceFilesTemporaryStart) //
 			.withButton("Nein") //
 			.open();
@@ -789,13 +707,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Quelldateien recycelt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden recycelt.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden recycelt.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -803,12 +716,8 @@ class FTWindow implements Runnable {
 	void deleteSourceFilesPermanently() {
 		this.createDialog()//
 			.withText("Quelldateien löschen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien wirklich endgültig gelöscht werden?</b><br> " + //
-				"Die Zeilen gelöschter Dateien werden aus der Pfadtabelle entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Dateien wirklich endgültig gelöscht werden?") //
+			.withMessage("Die Zeilen gelöschter Dateien werden aus der Pfadtabelle entfert.") //
 			.withButton("Ja", this::deleteSourceFilesPermanentlyStart) //
 			.withButton("Nein") //
 			.open();
@@ -827,13 +736,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Quelldateien gelöscht") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden gelöscht.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden gelöscht.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -841,12 +745,8 @@ class FTWindow implements Runnable {
 	void deleteSourceFoldersTemporary() {
 		this.createDialog()//
 			.withText("Quellverzeichnisse recyceln") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?</b><br> " + //
-				"Die Zeilen recycelter Verzeichnisse werden aus der Pfadtabelle entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?") //
+			.withMessage("Die Zeilen recycelter Verzeichnisse werden aus der Pfadtabelle entfert.") //
 			.withButton("Ja", this::deleteSourceFoldersTemporaryStart) //
 			.withButton("Nein") //
 			.open();
@@ -865,13 +765,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Quellverzeichnisse recycelt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Verzeichnisse wurden recycelt.<br>" + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Verzeichnisse wurden recycelt.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -879,12 +774,8 @@ class FTWindow implements Runnable {
 	void deleteSourceFoldersPermanently() {
 		this.createDialog()//
 			.withText("Quellverzeichnisse löschen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?</b><br> " + //
-				"Die Zeilen gelöschter Verzeichnisse werden aus der Pfadtabelle entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?") //
+			.withMessage("Die Zeilen gelöschter Verzeichnisse werden aus der Pfadtabelle entfert.") //
 			.withButton("Ja", this::deleteSourceFoldersPermanentlyStart) //
 			.withButton("Nein") //
 			.open();
@@ -903,13 +794,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Quellverzeichnisse gelöscht") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Verzeichnisse wurden gelöscht.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Verzeichnisse wurden gelöscht.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -917,12 +803,8 @@ class FTWindow implements Runnable {
 	void deleteTargetFilesTemporary() {
 		this.createDialog()//
 			.withText("Zieldateien recyceln") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien wirklich in den Papierkorb verschoben werden?</b><br> " + //
-				"Die Zeilen recycelter Dateien werden aus der Pfadtabelle entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Dateien wirklich in den Papierkorb verschoben werden?") //
+			.withMessage("Die Zeilen recycelter Dateien werden aus der Pfadtabelle entfert.") //
 			.withButton("Ja", this::deleteTargetFilesTemporaryStart) //
 			.withButton("Nein") //
 			.open();
@@ -941,13 +823,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zieldateien recycelt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden recycelt.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden recycelt.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -955,12 +832,8 @@ class FTWindow implements Runnable {
 	void deleteTargetFilesPermanently() {
 		this.createDialog()//
 			.withText("Zieldateien löschen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien wirklich endgültig gelöscht werden?</b><br> " + //
-				"Die Zeilen gelöschter Dateien werden aus der Pfadtabelle entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Dateien wirklich endgültig gelöscht werden?") //
+			.withMessage("Die Zeilen gelöschter Dateien werden aus der Pfadtabelle entfert.") //
 			.withButton("Ja", this::deleteTargetFilesPermanentlyStart) //
 			.withButton("Nein") //
 			.open();
@@ -979,13 +852,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zieldateien gelöscht") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden gelöscht.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden gelöscht.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -993,12 +861,8 @@ class FTWindow implements Runnable {
 	void deleteTargetFoldersTemporary() {
 		this.createDialog()//
 			.withText("Zielverzeichnisse recyceln") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?</b><br> " + //
-				"Die Zeilen recycelter Verzeichnisse werden aus der Pfadtabelle entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?") //
+			.withMessage("Die Zeilen recycelter Verzeichnisse werden aus der Pfadtabelle entfert.") //
 			.withButton("Ja", this::deleteTargetFoldersTemporaryStart) //
 			.withButton("Nein") //
 			.open();
@@ -1017,13 +881,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zielverzeichnisse recycelt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Verzeichnisse wurden recycelt.<br>" + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Verzeichnisse wurden recycelt.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1031,12 +890,8 @@ class FTWindow implements Runnable {
 	void deleteTargetFoldersPermanently() {
 		this.createDialog()//
 			.withText("Zielverzeichnisse löschen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?</b><br> " + //
-				"Die Zeilen gelöschter Verzeichnisse werden aus der Pfadtabelle entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?") //
+			.withMessage("Die Zeilen gelöschter Verzeichnisse werden aus der Pfadtabelle entfert.") //
 			.withButton("Ja", this::deleteTargetFoldersPermanentlyStart) //
 			.withButton("Nein") //
 			.open();
@@ -1055,13 +910,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zielverzeichnisse gelöscht") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Verzeichnisse wurden gelöscht.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Verzeichnisse wurden gelöscht.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1157,11 +1007,7 @@ class FTWindow implements Runnable {
 	void exchangeSourcesWithTargets() {
 		this.createDialog()//
 			.withText("Quellpfade tauschen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Quellpfade mit deren Zielpfaden getauscht werden?</b><br> " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Quellpfade mit deren Zielpfaden getauscht werden?") //
 			.withButton("Ja", this::exchangeSourcesWithTargetsStart) //
 			.withButton("Nein") //
 			.open();
@@ -1180,13 +1026,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Quellpfade getauscht") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Quellpfade wurden getauscht.<br>" + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount - failCount, failCount //
-			) //
+			.withTitle("%,d Quellpfade wurden getauscht.", keepCount - failCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1194,11 +1035,7 @@ class FTWindow implements Runnable {
 	void exchangeTargetsWithSources() {
 		this.createDialog()//
 			.withText("Zielpfade tauschen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Zielpfade mit deren Quellpfaden getauscht werden?</b> " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Zielpfade mit deren Quellpfaden getauscht werden?") //
 			.withButton("Ja", this::exchangeTargetsWithSourcesStart) //
 			.withButton("Nein") //
 			.open();
@@ -1217,13 +1054,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Quellpfade getauscht") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zielpfade wurden getauscht.<br>" + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount - failCount, failCount //
-			) //
+			.withTitle("%,d Zielpfade wurden getauscht.", keepCount - failCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1231,11 +1063,7 @@ class FTWindow implements Runnable {
 	void replaceSourcesWithTargets() {
 		this.createDialog()//
 			.withText("Quellpfade ersetzen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Quellpfade durch deren Zielpfade ersetzt werden?</b><br> " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Quellpfade durch deren Zielpfade ersetzt werden?") //
 			.withButton("Ja", this::replaceSourcesWithTargetsStart) //
 			.withButton("Nein") //
 			.open();
@@ -1254,13 +1082,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Quellpfade ersetzt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Quellpfade wurden ersetzt.<br>" + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount - failCount, failCount //
-			) //
+			.withTitle("%,d Quellpfade wurden ersetzt.", keepCount - failCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1268,11 +1091,7 @@ class FTWindow implements Runnable {
 	void replaceTargetsWithSources() {
 		this.createDialog()//
 			.withText("Zielpfade ersetzen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Zielpfade mit deren Quellpfaden ersetzt werden?</b> " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Zielpfade mit deren Quellpfaden ersetzt werden?") //
 			.withButton("Ja", this::replaceTargetsWithSourcesStart) //
 			.withButton("Nein") //
 			.open();
@@ -1291,13 +1110,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zielpfade ersetzt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zielpfade wurden ersetzt.<br>" + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount - failCount, failCount //
-			) //
+			.withTitle("%,d Zielpfade wurden ersetzt.", keepCount - failCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1305,12 +1119,8 @@ class FTWindow implements Runnable {
 	void transferInputs() {
 		this.createDialog()//
 			.withText("Eingabepfade übertragen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Datenpfade wirklich als Quell- und Zielpfade in die Pfadtabelle übernommen werden?</b><br> " + //
-				"Duplikate sowie relative Datenpfade werden ignoriert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Datenpfade wirklich als Quell- und Zielpfade in die Pfadtabelle übernommen werden?") //
+			.withMessage("Duplikate sowie relative Datenpfade werden ignoriert.") //
 			.withButton("Ja", this::transferInputsStart) //
 			.withButton("Nein") //
 			.open();
@@ -1329,13 +1139,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Eingabepfade übertragen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Eingabepfade wurden übernommen.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount, failCount //
-			) //
+			.withTitle("%,d Eingabepfade wurden übernommen.", keepCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1343,11 +1148,7 @@ class FTWindow implements Runnable {
 	void transferSources() {
 		this.createDialog()//
 			.withText("Quellpfade übertragen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Eingabepfade in der Pfadliste mit allen Quellpfaden ersetzt werden?</b> " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Eingabepfade in der Pfadliste mit allen Quellpfaden ersetzt werden?") //
 			.withButton("Ja", this::transferSourcesStart) //
 			.withButton("Nein") //
 			.open();
@@ -1366,13 +1167,8 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Quellpfade übertragen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Quellpfade wurden übernommen.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount, failCount //
-			) //
+			.withTitle("%,d Quellpfade wurden übernommen.", keepCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1380,12 +1176,8 @@ class FTWindow implements Runnable {
 	void transferTargets() {
 		this.createDialog()//
 			.withText("Zielpfade übertragen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Zielpfade wirklich als Eingabepfade in die Pfadliste übernommen werden?</b><br> " + //
-				"Duplikate sowie relative Zielpfade werden ignoriert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Zielpfade wirklich als Eingabepfade in die Pfadliste übernommen werden?") //
+			.withMessage("Duplikate sowie relative Zielpfade werden ignoriert.") //
 			.withButton("Ja", this::transferTargetsStart) //
 			.withButton("Nein") //
 			.open();
@@ -1404,13 +1196,8 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Zielpfade übertragen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zielpfade wurden übernommen.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount, failCount //
-			) //
+			.withTitle("%,d Zielpfade wurden übernommen.", keepCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1418,14 +1205,10 @@ class FTWindow implements Runnable {
 	void resolveInputToFiles() {
 		this.createDialog()//
 			.withText("Dateien auflösen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Verzeichnispfade wirklich durch die Pfade aller darin enthaltenen Dateien ersetzt werden?</b><br> " + //
-				"Die Dateiauflösung wird in allen Unterverzeichnissen fortgesetzt. " + //
+			.withTitle("Sollen alle Verzeichnispfade wirklich durch die Pfade aller darin enthaltenen Dateien ersetzt werden?")
+			.withMessage("Die Dateiauflösung wird in allen Unterverzeichnissen fortgesetzt. " + //
 				"Duplikate sowie relative Datenpfade werden verworfen. " + //
-				"Dateipfade bleiben erhalten. " + //
-				"</html>" //
-			) //
+				"Dateipfade bleiben erhalten. ") //
 			.withButton("Ja", this::resolveInputToFilesStart) //
 			.withButton("Nein") //
 			.open();
@@ -1444,13 +1227,8 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Dateien aufgelöst") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateipfade wurden ermittelt.<br> " + //
-				"<b>%,d</b> Datenpfade wurden verworfen." + //
-				"</html>", //
-				keepCount, dropCount //
-			) //
+			.withTitle("%,d Dateipfade wurden ermittelt.", keepCount) //
+			.withMessage("%,d Datenpfade wurden verworfen.", dropCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1458,14 +1236,10 @@ class FTWindow implements Runnable {
 	void resolveInputToFolders() {
 		this.createDialog()//
 			.withText("Verzeichnisse auflösen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Verzeichnispfade wirklich um die Pfade aller darin enthaltenen Verzeichnisse ergänzt werden?</b><br> " + //
-				"Die Verzeichnisauflösung wird in allen Unterverzeichnissen fortgesetzt. " + //
+			.withTitle("Sollen alle Verzeichnispfade wirklich um die Pfade aller darin enthaltenen Verzeichnisse ergänzt werden?")
+			.withMessage("Die Verzeichnisauflösung wird in allen Unterverzeichnissen fortgesetzt. " + //
 				"Duplikate sowie relative Datenpfade werden verworfen. " + //
-				"Dateipfade werden ebenfalls verworfen. " + //
-				"</html>" //
-			) //
+				"Dateipfade werden ebenfalls verworfen. ") //
 			.withButton("Ja", this::resolveInputToFoldersStart) //
 			.withButton("Nein") //
 			.open();
@@ -1484,13 +1258,8 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Verzeichnisse aufgelöst") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Verzeichnispfade wurden ermittelt.<br> " + //
-				"<b>%,d</b> Datenpfade wurden verworfen." + //
-				"</html>", //
-				keepCount, dropCount //
-			) //
+			.withMessage("%,d Verzeichnispfade wurden ermittelt.", keepCount) //
+			.withMessage("%,d Datenpfade wurden verworfen.", dropCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1498,14 +1267,11 @@ class FTWindow implements Runnable {
 	void refreshInputFiles() {
 		this.createDialog()//
 			.withText("Dateien erneuern") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle alten Dateien wirklich erneuert werden?</b><br> " + //
-				"Beim Erneuern werden alle Dateien, die vor mehr als der unten angegebenen Anzahl an Tagen erstellt wurden, kopiert und durch ihre Kopien ersetzt. " + //
-				"Die dazu temporär erzeugten Kopien tragen die Dateiendung <u>.tempcopy</u>. " + //
-				"Die Zeilen erneuerter Dateien werden aus der Pfadliste entfert. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle alten Dateien wirklich erneuert werden?") //
+			.withMessage("Beim Erneuern werden alle Dateien, die vor mehr als der unten angegebenen Anzahl " + //
+				"an Tagen erstellt wurden, kopiert und durch ihre Kopien ersetzt. " + //
+				"Die dazu temporär erzeugten Kopien tragen die Dateiendung .tempcopy. " + //
+				"Die Zeilen erneuerter Dateien werden aus der Pfadliste entfert. ") //
 			.withOption("Dateialter in Tagen", this.settings.copyFilesTimeFilter) //
 			.withButton("Ja", this::refreshInputFilesStart) //
 			.withButton("Nein") //
@@ -1526,13 +1292,8 @@ class FTWindow implements Runnable {
 		this.setInputText(keepText);
 		this.createDialog() //
 			.withText("Dateien erneuert") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden erneuert.<br> " + //
-				"<b>%,d</b> Zeilen wurden nicht verarbeitet." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden erneuert.", dropCount) //
+			.withMessage("%,d Zeilen wurden nicht verarbeitet.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1540,23 +1301,19 @@ class FTWindow implements Runnable {
 	void createTableWithClones() {
 		this.createDialog() //
 			.withText("Duplikate übernehmen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien auf Duplikate hin untersucht werden?</b><br> " + //
-				"Beim Suchen von Duplikaten werden alle Dateien zunächst bezüglich ihrer <u>Dateigröße</u> partitioniert. " + //
-				"Die Dateien innerhalb einer Dateigrößenpartition werden dann bezüglich ihres <u>SHA-256-Streuwerts</u> partitioniert. " + //
+			.withTitle("Sollen alle Dateien auf Duplikate hin untersucht werden?") //
+			.withMessage("Beim Suchen von Duplikaten werden alle Dateien zunächst bezüglich ihrer Dateigröße partitioniert. " + //
+				"Die Dateien innerhalb einer Dateigrößenpartition werden dann bezüglich ihres SHA-256-Streuwerts partitioniert. " + //
 				"Dieser Streuwert wird aus höchstens der unten eingestellten Anzanl an Bytes jeweils ab dem Dateibeginn und dem Dateiende berechnet. " + //
-				"Schließlich werden die Dateien innerhalb einer Streuwertpartition nach ihrem <u>Dateiinhalt</u> partitioniert. " + //
-				"Als Dateiinhalt wird höchstens die unten eingestellte Anzanl an Bytes jeweils ab dem Dateibeginn und dem Dateiende betrachtet.<br>" + //
+				"Schließlich werden die Dateien innerhalb einer Streuwertpartition nach ihrem Dateiinhalt partitioniert. " + //
+				"Als Dateiinhalt wird höchstens die unten eingestellte Anzanl an Bytes jeweils ab dem Dateibeginn und dem Dateiende betrachtet.\n" + //
 				"Der Pfad der ersten Datei einer Dateiinhaltspartition wird als Quellpfad verwendet. " + //
 				"Die Pfade der anderen Dateien der Partitionen werden diesem als Zielpfade zugeordnet. " + //
 				"Jedem Zielpfad wird zudem der Streuwert sowie die Dateigröße informativ angefügte. " + //
 				"Quellpfade ohne Zielpfade werden verworfen. " + //
-				"Duplikate sowie Relative Dateipfade werden verworfen.<br>" + //
-				"Die Streuwerte werden in der Pufferdatei <u>" + FTHashes.FILENAME + "</u> zwischengespeichert. " + //
-				"Dabei wird die im Elternpfad näheste bzw. die im Anwendungsverzeichnis liegende Pufferdatei verwendet." + //
-				"</html>" //
-			) //
+				"Duplikate sowie Relative Dateipfade werden verworfen.\n" + //
+				"Die Streuwerte werden in der Pufferdatei " + FTHashes.FILENAME + " zwischengespeichert. " + //
+				"Dabei wird die im Elternpfad näheste bzw. die im Anwendungsverzeichnis liegende Pufferdatei verwendet.") //
 			.withOption("Puffergröße für Streuwert", this.settings.findClonesHashSize) //
 			.withOption("Puffergröße für Dateivergleich", this.settings.findClonesTestSize) //
 			.withButton("Ja", this::createTableWithClonesStart) //
@@ -1580,13 +1337,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Duplikate übernommen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Duplikate wurden gefunden.<br> " + //
-				"<b>%,d</b> Datenpfade konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount, failCount //
-			) //
+			.withTitle("%,d Duplikate wurden gefunden.", keepCount) //
+			.withMessage("%,d Datenpfade konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1594,15 +1346,11 @@ class FTWindow implements Runnable {
 	void createTargetsWithTimenameFromName() {
 		this.createDialog() //
 			.withText("Zeitnamen ableiten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen die Zielnamen wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?</b><br> " + //
-				"Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
+			.withTitle("Sollen die Zielnamen wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?") //
+			.withMessage("Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
 				"verschobenen Zeitpunkten, die im Quellnamen mit beliebigen Trennzeichen angegeben sind. " + //
-				"Die Zielpfade haben das Format <tt>{EP}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, wobei <tt>{EP}</tt> für den " + //
-				"Elternverzeichnispfad und <tt>{NE}</tt> für die kleingeschriebene Namenserweiterung der Quelldatei stehen." + //
-				"</html>" //
-			) //
+				"Die Zielpfade haben das Format {EP}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {EP} für den " + //
+				"Elternverzeichnispfad und {NE} für die kleingeschriebene Namenserweiterung der Quelldatei stehen.") //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
 			.withButton("Ja", this::createTargetsWithTimenameFromNameStart) //
 			.withButton("Nein") //
@@ -1624,13 +1372,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zeitnamen abgeleitet") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount - failCount, failCount //
-			) //
+			.withTitle("%,d Zielpfade wurden angepasst.", keepCount - failCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1638,16 +1381,12 @@ class FTWindow implements Runnable {
 	void createTargetsWithTimepathFromName() {
 		this.createDialog() //
 			.withText("Zeitpfade ableiten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen die Zielpfade wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?</b><br> " + //
-				"Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
-				"verschobenen Zeitpunkten, die im Quellnamen mit beliebigen Trennzeichen angegeben sind.<br> " + //
-				"Die Zielpfade haben das Format <tt>{GP}\\JJJJ-MM_{EN}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, wobei <tt>{GP}</tt> für den " + //
-				"Großelternverzeichnispfad, <tt>{EN}</tt> für den Elternverzeichnisnamen und <tt>{NE}</tt> für die kleingeschriebene " + //
-				"Namenserweiterung der Quelldatei stehen." + //
-				"</html>" //
-			) //
+			.withTitle("Sollen die Zielpfade wirklich aus den Zeitpunkten in den Quellnamen abgeleitet werden?") //
+			.withMessage("Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
+				"verschobenen Zeitpunkten, die im Quellnamen mit beliebigen Trennzeichen angegeben sind.\n " + //
+				"Die Zielpfade haben das Format {GP}\\JJJJ-MM_{EN}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {GP} für den " + //
+				"Großelternverzeichnispfad, {EN} für den Elternverzeichnisnamen und {NE} für die kleingeschriebene " + //
+				"Namenserweiterung der Quelldatei stehen.") //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
 			.withButton("Ja", this::createTargetsWithTimepathFromNameStart) //
 			.withButton("Nein") //
@@ -1669,13 +1408,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zeitpfade abgeleitet") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
-				"<b>%s</b> Zeilen konnten nicht angepasst werden." + //
-				"</html>", //
-				keepCount - failCount, failCount //
-			) //
+			.withTitle("%,d Zielpfade wurden angepasst.", keepCount - failCount) //
+			.withMessage("%s Zeilen konnten nicht angepasst werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1683,15 +1417,11 @@ class FTWindow implements Runnable {
 	void createTargetsWithTimenameFromTime() {
 		this.createDialog() //
 			.withText("Zeitnamen aus Änderungszeitpunkten ableiten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen die Zielnamen wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?</b><br> " + //
-				"Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
-				"verschobenen Änderungszeitpunkten der Quelldateien.<br> " + //
-				"Die Zielpfade haben das Format <tt>{EP}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, wobei <tt>{EP}</tt> für den " + //
-				"Elternverzeichnispfad und <tt>{NE}</tt> für die kleingeschriebene Namenserweiterung der Quelldatei stehen." + //
-				"</html>" //
-			) //
+			.withTitle("Sollen die Zielnamen wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?") //
+			.withMessage("Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
+				"verschobenen Änderungszeitpunkten der Quelldateien.\n " + //
+				"Die Zielpfade haben das Format {EP}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {EP} für den " + //
+				"Elternverzeichnispfad und {NE} für die kleingeschriebene Namenserweiterung der Quelldatei stehen.") //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
 			.withButton("Ja", this::createTargetsWithTimenameFromTimeStart) //
 			.withButton("Nein") //
@@ -1713,13 +1443,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zeitnamen abgeleitet") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				keepCount - failCount, failCount //
-			) //
+			.withTitle("%,d Zielpfade wurden angepasst.", keepCount - failCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1727,16 +1452,12 @@ class FTWindow implements Runnable {
 	void createTargetsWithTimepathFromTime() {
 		this.createDialog() //
 			.withText("Zeitpfade aus Änderungszeitpunkten ableiten") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen die Zielpfade wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?</b><br> " + //
-				"Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
-				"verschobenen Änderungszeitpunkten der Quelldateien.<br> " + //
-				"Die Zielpfade haben das Format <tt>{GP}\\JJJJ-MM_{EN}\\JJJJ-MM-TT hh.mm.ss{NE}</tt>, wobei <tt>{GP}</tt> für den " + //
-				"Großelternverzeichnispfad, <tt>{EN}</tt> für den Elternverzeichnisnamen und <tt>{NE}</tt> für die kleingeschriebene " + //
-				"Namenserweiterung der Quelldatei stehen." + //
-				"</html>" //
-			) //
+			.withTitle("Sollen die Zielpfade wirklich aus den Änderungszeitpunkten der Quelldateien abgeleitet werden?") //
+			.withMessage("Die verwendeten Zeitpunkte entsprechen den um die unten angegebene Anzahl an Sekunden in die Zukunft " + //
+				"verschobenen Änderungszeitpunkten der Quelldateien.\n " + //
+				"Die Zielpfade haben das Format {GP}\\JJJJ-MM_{EN}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {GP} für den " + //
+				"Großelternverzeichnispfad, {EN} für den Elternverzeichnisnamen und {NE} für die kleingeschriebene " + //
+				"Namenserweiterung der Quelldatei stehen.") //
 			.withOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
 			.withButton("Ja", this::createTargetsWithTimepathFromTimeStart) //
 			.withButton("Nein") //
@@ -1758,13 +1479,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Zeitpfade abgeleitet") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Zielpfade wurden angepasst.<br> " + //
-				"<b>%s</b> Zeilen konnten nicht angepasst werden." + //
-				"</html>", //
-				keepCount - failCount, failCount //
-			) //
+			.withTitle("%,d Zielpfade wurden angepasst.", keepCount - failCount) //
+			.withMessage("%s Zeilen konnten nicht angepasst werden.", failCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1772,12 +1488,8 @@ class FTWindow implements Runnable {
 	void copySourceToTargetFiles() {
 		this.createDialog() //
 			.withText("Dateien kopieren") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien wirklich nicht ersetzend kopiert werden?</b><br> " + //
-				"Die Zeilen erfolgreich kopierter Dateien werden aus der Pfadtabelle entfernt. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Dateien wirklich nicht ersetzend kopiert werden?") //
+			.withMessage("Die Zeilen erfolgreich kopierter Dateien werden aus der Pfadtabelle entfernt.") //
 			.withButton("Ja", this::copySourceToTargetFilesStart) //
 			.withButton("Nein") //
 			.open();
@@ -1796,13 +1508,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Dateien kopiert") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden kopiert.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden kopiert.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1810,12 +1517,8 @@ class FTWindow implements Runnable {
 	void moveSourceToTargetFiles() {
 		this.createDialog() //
 			.withText("Dateien verschieben") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen alle Dateien wirklich nicht ersetzend verschoben werden?</b><br> " + //
-				"Die Zeilen erfolgreich verschobener Dateien werden aus der Pfadtabelle entfernt. " + //
-				"</html>" //
-			) //
+			.withTitle("Sollen alle Dateien wirklich nicht ersetzend verschoben werden?") //
+			.withMessage("Die Zeilen erfolgreich verschobener Dateien werden aus der Pfadtabelle entfernt.") //
 			.withButton("Ja", this::moveSourceToTargetFilesStart) //
 			.withButton("Nein") //
 			.open();
@@ -1834,13 +1537,8 @@ class FTWindow implements Runnable {
 		this.setTableText(keepText);
 		this.createDialog() //
 			.withText("Dateien verschoben") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Dateien wurden verschoben.<br> " + //
-				"<b>%,d</b> Zeilen konnten nicht verarbeitet werden." + //
-				"</html>", //
-				dropCount, keepCount //
-			) //
+			.withTitle("%,d Dateien wurden verschoben.", dropCount) //
+			.withMessage("%,d Zeilen konnten nicht verarbeitet werden.", keepCount) //
 			.withButton("Okay") //
 			.open();
 	}
@@ -1848,15 +1546,11 @@ class FTWindow implements Runnable {
 	void showSourceAndTargetFiles() {
 		this.createDialog() //
 			.withText("Dateipaare anzeigen") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>Sollen die Quell- und Zieldateien wirklich angezeigt werden?</b><br> " + //
-				"Die Dateien werden dabei als Symlinks in ein temporäres Verzeichnis eingefügt. " + //
-				"Die Quelldateien werden als <u>-ORIGINAL-</u> gekennzeichnet, die Zieldateien als <u>-DUPLIKAT-</u>. " + //
-				"Das temporäre Verzeichnis wird abschließend angezeigt.<br>" + //
-				"Das Erzeugen von Symlinks benötigt Administrator-Rechte!" + //
-				"</html>" //
-			) //
+			.withTitle("Sollen die Quell- und Zieldateien wirklich angezeigt werden?") //
+			.withMessage("Die Dateien werden dabei als Symlinks in ein temporäres Verzeichnis eingefügt. " + //
+				"Die Quelldateien werden als -ORIGINAL- gekennzeichnet, die Zieldateien als -DUPLIKAT-. " + //
+				"Das temporäre Verzeichnis wird abschließend angezeigt.\n" + //
+				"Das Erzeugen von Symlinks benötigt Administrator-Rechte!") //
 			.withButton("Ja", this::showSourceAndTargetFilesStart) //
 			.withButton("Nein") //
 			.open();
@@ -1874,13 +1568,8 @@ class FTWindow implements Runnable {
 	public void showSourceAndTargetFilesRespond(final String linkPath, final int linkCount) {
 		this.createDialog() //
 			.withText("Dateipaare angezeigt") //
-			.withMessage("" + //
-				"<html>" + //
-				"<b>%,d</b> Symlinks wurden in das folgende Verzeichnis eingefügt:<br>" + //
-				"<b>%s</b>" + //
-				"</html>", //
-				linkCount, linkPath //
-			) //
+			.withTitle("%,d Symlinks wurden in das Verzeichnis eingefügt:", linkCount) //
+			.withMessage(linkPath) //
 			.withButton("Okay") //
 			.open();
 	}

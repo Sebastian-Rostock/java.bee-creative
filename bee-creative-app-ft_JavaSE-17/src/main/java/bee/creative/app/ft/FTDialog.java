@@ -106,10 +106,9 @@ class FTDialog {
 	}
 
 	public void dispose() {
-		if (this.shell != null) {
-			this.shell.dispose();
-			this.shell = null;
-		}
+		if (this.shell == null) return;
+		this.shell.dispose();
+		this.shell = null;
 	}
 
 	public FTDialog withText(final String text) {
@@ -117,9 +116,17 @@ class FTDialog {
 		return this;
 	}
 
+	public FTDialog withText(final String text, final Object... args) {
+		return this.withText(String.format(text, args));
+	}
+
 	public FTDialog withTitle(final String title) {
 		this.title = Objects.notNull(title);
 		return this;
+	}
+
+	public FTDialog withTitle(final String title, final Object... args) {
+		return this.withTitle(String.format(title, args));
 	}
 
 	public FTDialog withMessage(final String message) {

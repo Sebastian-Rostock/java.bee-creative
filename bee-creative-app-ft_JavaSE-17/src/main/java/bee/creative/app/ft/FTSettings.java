@@ -18,10 +18,10 @@ class FTSettings implements FTStorable2 {
 	public final FTOptionInt moveFilesTimeOffset = new FTOptionInt(0, -40000000, 40000000, 3600);
 
 	/** Dieses Feld speichert die Puffergröße des Dateivergleichs für {@link FTMain#createTableWithClones()}. */
-	public final FTOptionInt findClonesTestSize = new FTOptionInt(20971520, 0, 2000000000, 1048576);
+	public final FTOptionInt findClonesTestSize = new FTOptionInt(1048576 * 10, 0, 2000000000, 1048576);
 
 	/** Dieses Feld speichert die Puffergröße der Streuwertberechnung für {@link FTMain#createTableWithClones()}. */
-	public final FTOptionInt findClonesHashSize = new FTOptionInt(1048576, 0, 2000000000, 1048576);
+	public final FTOptionInt findClonesHashSize = new FTOptionInt(1048576 * 2, 0, 2000000000, 1048576);
 
 	@Override
 	public void persist() {
