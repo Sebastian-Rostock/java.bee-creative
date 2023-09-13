@@ -19,6 +19,7 @@ import javax.swing.UIManager;
 import bee.creative.fem.FEMDatetime;
 import bee.creative.lang.Objects;
 import bee.creative.lang.Strings;
+import bee.creative.util.Comparators;
 import bee.creative.util.Consumer;
 import bee.creative.util.HashMap2;
 import bee.creative.util.HashSet2;
@@ -54,7 +55,7 @@ public class FTMain extends FTWindow {
 
 	private String createLineText(final Iterable<? extends Iterable<?>> lines) {
 		final var res = new StringBuilder(1024 * 1024 * 16);
-		Strings.join(res, "\n", lines, (res2, line) -> Strings.join(res2, "\t", line));
+		Strings.join(res, "\r\n", lines, (res2, line) -> Strings.join(res2, "\t", line));
 		return res.toString();
 	}
 
@@ -478,13 +479,12 @@ public class FTMain extends FTWindow {
 		this.refreshInputFilesRespond(this.createLineText(keepList), keepList.size(), baseList.size() - keepList.size());
 	}
 
-	FTCaches caches;
-
+ 
 	@Override
 	public void createTableWithClonesRequest(final String inputText, final long hashSize, final long testSize) throws Exception {
 
-		this.caches = new FTCaches();
-		this.caches.restore();
+		var caches = new FTCaches();
+		caches.restore();
 
 		final var pathSet = this.createPathSet();
 		final var itemList = new LinkedList<FTItem>();
@@ -537,7 +537,7 @@ public class FTMain extends FTWindow {
 					this.taskCount--;
 					next = equalSizeItem.previousItem;
 
-					equalSizeItem.sourceHash = Objects.notNull(this.caches.get(equalSizeItem.sourcePath, hashSize), equalSizeItem);
+					equalSizeItem.sourceHash = Objects.notNull(caches.get(equalSizeItem.sourcePath, hashSize), equalSizeItem);
 
 					equalSizeItem.previousItem = hashListMap.put(equalSizeItem.sourceHash, equalSizeItem);
 					if (equalSizeItem.previousItem != null) {
@@ -586,10 +586,41 @@ public class FTMain extends FTWindow {
 			this.taskCount--;
 		}
 
-		this.caches.persist();
-		this.caches = null;
+		caches.persist();
+		
+		targetList.sort(Comparators.<String>natural().iterable());
 
 		this.createTableWithClonesRespond(this.createLineText(targetList), targetList.size(), failCount[0]);
+	}
+
+	public void updateHashesRequest(final String inputText, final long hashSize, final long testSize) throws Exception {
+	
+		var caches = new FTCaches();
+		caches.restore();
+	
+		final var pathSet = this.createPathSet();
+		final var lineList = this.createLineList(inputText);
+		final var failCount = new int[]{lineList.size()};
+		this.runItems(lineList, line -> {
+			if (line.size() <= 0) return;
+			final var file = new File(line.get(0));
+			if (!file.isAbsolute() || !file.isFile()) return;
+			failCount[0]--;
+			final var path = file.getPath();
+			this.taskEntry = path;
+			if (!pathSet.add(path)) return;
+			caches.get(path, hashSize);
+			this.taskCount++;
+		}, null);
+	
+		caches.persist();
+		
+		
+	
+		this.updateHashesRespond(inputText, pathSet.size(), failCount[0]);
+	}
+
+	public void updateHashesRespond(String inputText, int size, int i) {
 	}
 
 	private final Pattern datetime = Pattern.compile("([0-9]{4})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*([0-9]{2})[^0-9]*");

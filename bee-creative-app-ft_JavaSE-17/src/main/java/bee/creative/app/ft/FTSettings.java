@@ -2,8 +2,12 @@ package bee.creative.app.ft;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.LinkedList;
 import bee.creative.csv.CSVReader;
 import bee.creative.csv.CSVWriter;
+import bee.creative.util.Iterable2;
+import bee.creative.util.Iterables;
+import bee.creative.util.Producer;
 
 /** Diese Klasse implementiert die Einstellungen und deren Persistierung.
  *
@@ -11,17 +15,21 @@ import bee.creative.csv.CSVWriter;
 class FTSettings implements FTStorable2 {
 
 	/** Dieses Feld speichert das Dateialter in Tagen für {@link FTMain#refreshInputFiles()}. */
-	public final FTOptionInt copyFilesTimeFilter = new FTOptionInt(1800, 100, 20000, 100);
+	public final AppOptionLong copyFilesTimeFilter = new AppOptionLong().useMinimum(100).useMaximum(20000).useIncrease(100).useValue(1800);
 
 	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTMain#createTargetsWithTimenameFromTime()} und
 	 * {@link FTMain#createTargetsWithTimepathFromTime()}. */
-	public final FTOptionInt moveFilesTimeOffset = new FTOptionInt(0, -40000000, 40000000, 3600);
+	public final AppOptionLong moveFilesTimeOffset = new AppOptionLong().useMinimum(-40000000).useMaximum(40000000).useIncrease(3600).useValue(0);
 
 	/** Dieses Feld speichert die Puffergröße des Dateivergleichs für {@link FTMain#createTableWithClones()}. */
-	public final FTOptionInt findClonesTestSize = new FTOptionInt(1048576 * 10, 0, 2000000000, 1048576);
+	public final AppOptionLong findClonesTestSize = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1 << 20).useValue(1 << 24);
 
 	/** Dieses Feld speichert die Puffergröße der Streuwertberechnung für {@link FTMain#createTableWithClones()}. */
-	public final FTOptionInt findClonesHashSize = new FTOptionInt(1048576 * 2, 0, 2000000000, 1048576);
+	public final AppOptionLong findClonesHashSize = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1 << 20).useValue(1 << 22);
+
+	public final AppOptionLong filterSizeMin = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1L << 20).useValue(0);
+
+	public final AppOptionLong filterSizeMax = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1L << 20).useValue(1 << 23);
 
 	@Override
 	public void persist() {
@@ -31,7 +39,11 @@ class FTSettings implements FTStorable2 {
 	@Override
 	public void persist(final CSVWriter writer) throws Exception {
 		writer.writeEntry((Object[])FTSettings.FILEHEAD);
-		writer.writeEntry(this.copyFilesTimeFilter.val, this.moveFilesTimeOffset.val, this.findClonesTestSize.val, this.findClonesHashSize.val);
+		writer.writeEntry(this.getOptions().translate(Producer::get).toArray());
+	}
+
+	private Iterable2<AppOptionLong> getOptions() {
+		return Iterables.fromArray(this.copyFilesTimeFilter, this.moveFilesTimeOffset, this.findClonesTestSize, this.findClonesHashSize);
 	}
 
 	@Override
@@ -42,10 +54,8 @@ class FTSettings implements FTStorable2 {
 	@Override
 	public void restore(final CSVReader reader) throws Exception {
 		if (!Arrays.equals(FTSettings.FILEHEAD, reader.readEntry())) return;
-		this.copyFilesTimeFilter.val = Integer.parseInt(reader.readValue());
-		this.moveFilesTimeOffset.val = Integer.parseInt(reader.readValue());
-		this.findClonesTestSize.val = Integer.parseInt(reader.readValue());
-		this.findClonesHashSize.val = Integer.parseInt(reader.readValue());
+		var values = new LinkedList<>(Arrays.asList(reader.readEntry()));
+		this.getOptions().collectAll(option -> option.set(values.pollFirst()));
 	}
 
 	/** Dieses Feld speichert den Dateinamen für {@link #persist()} und {@link #restore()}. */

@@ -22,22 +22,6 @@ import bee.creative.util.Getter;
 
 class FTDialog {
 
-	public static void main(final String[] args) throws Exception {
-		final var display = Display.getDefault();
-		final var shell = new Shell(display);
-		new FTDialog(shell) //
-			.withText("Verzeichnisse aufbereiten") //
-			.withTitle("Soll Dies und Das passieren?") //
-			.withMessage(
-				"Soll das wirklich mit den folgenden Optionen passieren? Soll das wirklich mit den folgenden Optionen passieren? Soll das wirklich mit den folgenden Optionen passieren? ") //
-			.withButton("Bloß nicht!") //
-			.withButton("Ja doch!", () -> System.out.println("JA")) //
-			.withOption("abc dsfsdf asdf dsa ", new FTOptionInt(0, 0, 500, 2)) //
-			.withOption("def", new FTOptionInt(0, 0, 500, 2)) //
-			.withOption("ghi", new FTOptionStr("mal sehen")) //
-			.open();
-	}
-
 	public FTDialog(final Shell parent) {
 		this.parent = parent;
 	}

@@ -48,6 +48,10 @@ class FTWindow implements Runnable {
 
 	public static void openAndWait(final Shell shell) {
 		shell.open();
+		wait(shell);
+	}
+
+	public static void wait(final Shell shell) {
 		final Display display = shell.getDisplay();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
@@ -1280,7 +1284,7 @@ class FTWindow implements Runnable {
 
 	void refreshInputFilesStart() {
 		final var inputText = this.getInputText();
-		final var copyTime = this.settings.copyFilesTimeFilter.val;
+		final var copyTime = this.settings.copyFilesTimeFilter.getValue();
 		this.runTask("Dateierneuerung", () -> this.refreshInputFilesRequest(inputText, copyTime));
 	}
 
@@ -1323,8 +1327,8 @@ class FTWindow implements Runnable {
 
 	void createTableWithClonesStart() {
 		final var inputText = this.getInputText();
-		final var hashSize = this.settings.findClonesHashSize.val;
-		final var testSize = this.settings.findClonesTestSize.val;
+		final var hashSize = this.settings.findClonesHashSize.getValue();
+		final var testSize = this.settings.findClonesTestSize.getValue();
 		this.settings.persist();
 		this.runTask("Duplikateübernahme", () -> this.createTableWithClonesRequest(inputText, hashSize, testSize));
 	}
@@ -1359,7 +1363,7 @@ class FTWindow implements Runnable {
 
 	void createTargetsWithTimenameFromNameStart() {
 		final var tableText = this.getTableText();
-		final var moveTime = this.settings.moveFilesTimeOffset.val;
+		final var moveTime = this.settings.moveFilesTimeOffset.getValue();
 		this.settings.persist();
 		this.runTask("Zeitnamensableitung", () -> this.createTargetsWithTimenameFromNameRequest(tableText, moveTime));
 	}
@@ -1395,7 +1399,7 @@ class FTWindow implements Runnable {
 
 	void createTargetsWithTimepathFromNameStart() {
 		final var tableText = this.getTableText();
-		final var moveTime = this.settings.moveFilesTimeOffset.val;
+		final var moveTime = this.settings.moveFilesTimeOffset.getValue();
 		this.settings.persist();
 		this.runTask("Zeitpfadableitung", () -> this.createTargetsWithTimepathFromNameRequest(tableText, moveTime));
 	}
@@ -1430,7 +1434,7 @@ class FTWindow implements Runnable {
 
 	void createTargetsWithTimenameFromTimeStart() {
 		final var tableText = this.getTableText();
-		final var moveTime = this.settings.moveFilesTimeOffset.val;
+		final var moveTime = this.settings.moveFilesTimeOffset.getValue();
 		this.settings.persist();
 		this.runTask("Zeitnamensableitung", () -> this.createTargetsWithTimenameFromTimeRequest(tableText, moveTime));
 	}
@@ -1466,7 +1470,7 @@ class FTWindow implements Runnable {
 
 	void createTargetsWithTimepathFromTimeStart() {
 		final var tableText = this.getTableText();
-		final var moveTime = this.settings.moveFilesTimeOffset.val;
+		final var moveTime = this.settings.moveFilesTimeOffset.getValue();
 		this.settings.persist();
 		this.runTask("Zeitpfadableitung", () -> this.createTargetsWithTimepathFromTimeRequest(tableText, moveTime));
 	}
