@@ -1,5 +1,8 @@
 package bee.creative.app.ft;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,7 +49,7 @@ public class AppOptionLong implements AppOption {
 
 	@Override
 	public String get() {
-		return Long.toString(this.val);
+		return NumberFormat.getInstance(Locale.getDefault()).format(this.val);
 	}
 
 	@Override
@@ -81,7 +84,11 @@ public class AppOptionLong implements AppOption {
 
 	@Override
 	public void set(String value) {
-		this.useValue(Long.parseLong(value));
+		try {
+			this.useValue(NumberFormat.getInstance(Locale.getDefault()).parse(value).longValue());
+		} catch (ParseException cause) {
+			throw new IllegalArgumentException(cause);
+		}
 	}
 
 	private long val = 0;

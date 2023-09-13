@@ -119,11 +119,11 @@ public class AppWindow extends Shell {
 
 			});
 			this.createMenu(men, "Filtern...", save -> {
-				this.createMenuItem(save, "...nach Größe", this::askFilterEntriesByAge);
-				this.createMenuItem(save, "...nach Muster", this::askFilterEntriesByAge);
-				this.createMenuItem(save, "...nach Existenz", this::askFilterEntriesByAge);
-				this.createMenuItem(save, "...nach Änderung", this::askFilterEntriesByAge);
-				this.createMenuItem(save, "...nach Erzeugung", this::askFilterEntriesByAge);
+				this.createMenuItem(save, "...nach Größe", this::askFilterSourcesByLength);
+				this.createMenuItem(save, "...nach Muster", this::askFilterSourcesByPattern);
+				this.createMenuItem(save, "...nach Existenz", this::askFilterSourcesByCreation);
+				this.createMenuItem(save, "...nach Änderung", this::askFilterSourcesByModification);
+				this.createMenuItem(save, "...nach Erzeugung", this::askFilterSourcesByCreation);
 			});
 			this.createMenu(men, "Drop...", drop -> {
 				this.createMenuItem(drop, "Sources", this::runDropSources);
@@ -132,7 +132,7 @@ public class AppWindow extends Shell {
 						this.createMenuItem(drop2, "Aging", this::runDropEntriesBySourceAging);
 						this.createMenuItem(drop2, "Existing", this::runDropEntriesBySourceExisting);
 						this.createMenuItem(drop2, "Matching", this::runDropEntriesBySourceMatching);
-						this.createMenuItem(drop2, "Changing", this::runDropEntriesBySourceChanging); 
+						this.createMenuItem(drop2, "Changing", this::runDropEntriesBySourceChanging);
 					});
 					this.createMenu(drop1, "ByTarget", drop2 -> {});
 				});
@@ -204,7 +204,6 @@ public class AppWindow extends Shell {
 			.useTitle("Zeilen nach Quellpfadmuster verwerfen") //
 			.useMessage("Zeilen mit Quelldateien mit bestimmten Dateipfaden werden entfernt."), //
 			this::runDropEntriesBySourceMatching);
- 
 
 		this.putMenuItem("MS", null, menu -> menu.useTitle("Wiederholen").useMessage("Ersetzt die Pfadtabelle mit der nachfolgenden."), this::runSaveEntriesToVar);
 
@@ -265,35 +264,65 @@ public class AppWindow extends Shell {
 	public void runDropSources() {
 	}
 
-	
-	public final AppOptionTime filterByAgeMin = new AppOptionTime();
-	
-	public final AppOptionTime filterByAgeMax = new AppOptionTime();
-	
-	public void askFilterEntriesByAge() { //
-		openDialog() //
-		.useTitle("") //
-		.useMessage("") //
-		.putOption("Frühester Erzeugungszeitpunkt", filterByAgeMin) //
-		.putOption("Spätester Erzeugungszeitpunkt", filterByAgeMax) //
-		.useButton("Eingabepfade erhalten", null) //
-		.useButton("Eingabepfade verwerfen", null);
-	}
-	
-	
-	public void askFilterEntriesBySize() {
+	public void askFilterSourcesByLength() {
+		this.openDialog() //
+			.useTitle("Eingabepfad nach Dateigröße filtern") //
+			.useMessage("Ein Eingabepfad gilt als Treffer, wenn er eine Datei mit einer Dateigröße innerhalb der unten angegebenen Grenzen besitzt."
+				+ " Ein Eingabepfad wird verworfen, wenn er ein Verzeichnis angibt.") //
+			.useOption("Minimale Dateigröße", this.settings.filterLengthMin) //
+			.useOption("Maximale Dateigröße", this.settings.filterLengthMax) //
+			.useButton("Treffer erhalten", null) //
+			.useButton("Treffer verwerfen", null) //
+		;
 		// min max dateigröße in MB schritten spinner
 		// File f;
 		// f.length();
 	}
-	
-	public void runDropEntriesBySourceAging() { //
+
+	public void askFilterSourcesByCreation() { //
+		this.openDialog() //
+			.useTitle("Eingabepfad nach Erzeugungszeitpunkt filtern") //
+			.useMessage("Ein Eingabepfad gilt als Treffer, wenn er eine Datei mit einem Erzeugungszeitpunkt innerhalb der unten angegebenen Grenzen besitzt."
+				+ " Ein Eingabepfad wird verworfen, wenn er ein Verzeichnis angibt.") //
+			.useOption("Frühester Erzeugungszeitpunkt", this.settings.filterCreationMin) //
+			.useOption("Spätester Erzeugungszeitpunkt", this.settings.filterCreationMax) //
+			.useButton("Treffer erhalten", null) //
+			.useButton("Treffer verwerfen", null) //
+		;
 		// try {
 		// BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
 		// FileTime fileTime = attr.creationTime();
 		// } catch (IOException ex) {
 		// // handle exception
 		// }
+	}
+
+	public void askFilterSourcesByModification() { //
+		this.openDialog() //
+			.useTitle("Eingabepfad nach Änderungszeitpunkt filtern") //
+			.useMessage("Ein Eingabepfad gilt als Treffer, wenn er eine Datei mit einem Änderungszeitpunkt innerhalb der unten angegebenen Grenzen besitzt."
+				+ " Ein Eingabepfad wird verworfen, wenn er ein Verzeichnis angibt.") //
+			.useOption("Frühester Änderungszeitpunkt", this.settings.filterModificationMin) //
+			.useOption("Spätester Änderungszeitpunkt", this.settings.filterModificationMax) //
+			.useButton("Treffer erhalten", null) //
+			.useButton("Treffer verwerfen", null) //
+		;
+		// File f;
+		// f.lastModified();
+	}
+
+	public void askFilterSourcesByPattern() { //
+		this.openDialog() //
+			.useTitle("Eingabepfad nach Muster filtern") //
+			.useMessage("Ein Eingabepfad gilt als Treffer, wenn den unten angegebenen regulären Ausdruck darin einen Treffer findet.") //
+			.useOption("Regulärer Ausdruck", this.settings.filterPattern) //
+			.useButton("Treffer erhalten", null) //
+			.useButton("Treffer verwerfen", null) //
+		;
+	}
+
+	public void runDropEntriesBySourceAging() { //
+
 	}
 
 	public void runDropEntriesBySourceExisting() {
@@ -303,10 +332,8 @@ public class AppWindow extends Shell {
 	}
 
 	public void runDropEntriesBySourceChanging() { //
-		// File f;
-		// f.lastModified();
-	}
 
+	}
 
 	public void runKeepEntriesBySourceAging() {
 	}
@@ -386,6 +413,8 @@ public class AppWindow extends Shell {
 
 	public void runShowSourcesAndTargets() throws Exception {
 	}
+
+	FTSettings settings = new FTSettings();
 
 	private MenuItem createMenu(final Menu parent, final String text, Consumer<MenuItem> setup) {
 		final var res = new MenuItem(parent, SWT.CASCADE);

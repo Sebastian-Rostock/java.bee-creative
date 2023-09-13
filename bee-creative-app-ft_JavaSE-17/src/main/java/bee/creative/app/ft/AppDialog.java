@@ -59,9 +59,9 @@ class AppDialog {
 					"Soll das wirklich mit den folgenden Optionen passieren? Soll das wirklich mit den folgenden Optionen passieren? Soll das wirklich mit den folgenden Optionen passieren? ") //
 				.useButton("Bloß nicht!") //
 				.useButton("Ja doch!", () -> System.out.println("JA")) //
-				.putOption("abc dsfsdf asdf dsa ", new AppOptionLong().useMinimum(0).useMaximum(1<<20).useIncrease(1<<10)) //
-				.putOption("def", new AppOptionTime()) //
-				.putOption("def", new AppOptionText().useValue("lala")) //
+				.useOption("abc dsfsdf asdf dsa ", new AppOptionLong().useMinimum(0).useMaximum(1<<20).useIncrease(1<<10)) //
+				.useOption("def", new AppOptionTime()) //
+				.useOption("def", new AppOptionText().useValue("lala")) //
  ;
 		});
 
@@ -207,7 +207,7 @@ class AppDialog {
 		return this;
 	}
 
-	public AppDialog putOption(final String label, final Getter<Composite, Control> option) {
+	public AppDialog useOption(final String label, final Getter<Composite, Control> option) {
 		this.options.add(Entries.from(Objects.notNull(label), Objects.notNull(option)));
 		return this;
 	}

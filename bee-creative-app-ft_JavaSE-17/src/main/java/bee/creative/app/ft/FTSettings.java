@@ -27,9 +27,19 @@ class FTSettings implements FTStorable2 {
 	/** Dieses Feld speichert die Puffergröße der Streuwertberechnung für {@link FTMain#createTableWithClones()}. */
 	public final AppOptionLong findClonesHashSize = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1 << 20).useValue(1 << 22);
 
-	public final AppOptionLong filterSizeMin = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1L << 20).useValue(0);
+	public final AppOptionText filterPattern = new AppOptionText();
 
-	public final AppOptionLong filterSizeMax = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1L << 20).useValue(1 << 23);
+	public final AppOptionTime filterCreationMin = new AppOptionTime();
+
+	public final AppOptionTime filterCreationMax = new AppOptionTime();
+
+	public final AppOptionTime filterModificationMin = new AppOptionTime();
+
+	public final AppOptionTime filterModificationMax = new AppOptionTime();
+
+	public final AppOptionLong filterLengthMin = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1L << 20).useValue(0);
+
+	public final AppOptionLong filterLengthMax = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1L << 20).useValue(1 << 23);
 
 	@Override
 	public void persist() {
