@@ -92,9 +92,9 @@ class AppDialog {
 
 			this.shell.setLocation(x);
 		} else {
-			final var tgtRect = this.parent.getSize();
+			final var tgtRect = this.parent.getClientArea();
 			var sz = this.shell.getSize();
-			this.shell.setLocation(this.parent.toDisplay((tgtRect.x - sz.x) / 2, (tgtRect.y - sz.y) / 2));
+			this.shell.setLocation(this.parent.toDisplay((tgtRect.width - sz.x) / 2, (tgtRect.height - sz.y) / 2));
 
 		}
 	}
