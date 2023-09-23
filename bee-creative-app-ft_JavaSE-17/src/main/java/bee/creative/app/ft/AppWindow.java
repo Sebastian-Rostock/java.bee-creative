@@ -23,6 +23,7 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -67,36 +68,58 @@ public class AppWindow {
 		this.display = display;
 
 		this.createMenuBar(this.shell, men -> {
-			this.undoMenuItem = this.createMenuItem(men, "Undo", this::runUndoEntries);
+			this.undoMenuItem = this.createMenuItem(men, "icon-undo.png", "", this::runUndoEntries);
 			this.undoMenuItem.setAccelerator(SWT.CTRL | 'Z');
-			this.redoMenuItem = this.createMenuItem(men, "Redo", this::runRedoEntries);
+
+			this.redoMenuItem = this.createMenuItem(men, "icon-redo.png", "", this::runRedoEntries);
 			this.redoMenuItem.setAccelerator(SWT.CTRL | 'Y');
-			this.createMenu(men, "Filtern...", save -> {
-				this.createMenuItem(save, "...nach Datei", this::askFilterSourcesByFile);
-				this.createMenuItem(save, "...nach Ordner", this::askFilterSourcesByFolder);
-				this.createMenuItem(save, "...nach Größe", this::askFilterSourcesByLength);
-				this.createMenuItem(save, "...nach Änderung", this::askFilterSourcesByModification);
-				this.createMenuItem(save, "...nach Erzeugung", this::askFilterSourcesByCreation);
-				this.createMenuItem(save, "...nach Datenpfad", this::askFilterSourcesByPattern);
+
+			this.createMenu(men, null, "Swap...", swap -> {
+
 			});
-			this.createMenu(men, "Sortieren...", save -> {
-				this.createMenuItem(save, "...nach Größe", this::askFilterSourcesByLength);
-				this.createMenuItem(save, "...nach Änderung", this::askFilterSourcesByModification);
-				this.createMenuItem(save, "...nach Erzeugung", this::askFilterSourcesByCreation);
-				this.createMenuItem(save, "...nach Datenpfad", this::askFilterSourcesByPattern);
+
+			this.createMenu(men, null, "Filtern...", save -> {
+				this.createMenuItem(save, "icon-file.png", "...nach Datei", this::askFilterSourcesByFile);
+				this.createMenuItem(save, "icon-folder.png", "...nach Ordner", this::askFilterSourcesByFolder);
+				this.createMenuItem(save, "icon-size.png", "...nach Größe", this::askFilterSourcesByLength);
+				this.createMenuItem(save, "icon-time.png", "...nach Änderung", this::askFilterSourcesByModification);
+				this.createMenuItem(save, "icon-made.png", "...nach Erzeugung", this::askFilterSourcesByCreation);
+				this.createMenuItem(save, "icon-name.png", "...nach Datenpfad", this::askFilterSourcesByPattern);
 			});
-			this.createMenu(men, "Speicher", save -> {
-				this.createMenuItem(save, "...in Variable speichern", this::runSaveEntriesToVar);
-				this.createMenuItem(save, "...aus Variable einfügen", this::runLoadEntriesFromVar);
+			this.createMenu(men, null, "Sortieren...", save -> {
+				this.createMenuItem(save, null, "...nach Größe", this::runSortEntriesBySourceSize);
+				this.createMenuItem(save, null, "...nach Änderung", this::runSortEntriesBySourceTime);
+				this.createMenuItem(save, null, "...nach Erzeugung", this::runSortEntriesBySourceMade);
+				this.createMenuItem(save, null, "...nach Datenpfad", this::runSortEntriesBySourcePath);
+			});
+			this.createMenu(men, null, "Hash", hash -> {
+				this.createMenuItem(hash, null, "Duplikate erkennen", null);
+				this.createMenuBreak(hash);
+				this.createMenuItem(hash, null, "Cache anlegen", null);
+				this.createMenuItem(hash, null, "Cache aktualisieren", null);
+			});
+			this.createMenu(men, null, "Speicher", save -> {
+				this.createMenuItem(save, null, "...in Variable speichern", this::runSaveEntriesToVar);
+				this.createMenuItem(save, null, "...aus Variable einfügen", this::runLoadEntriesFromVar);
 				this.createMenuBreak(save);
-				this.createMenuItem(save, "...in Zwischenablage speichern", this::runSaveEntriesToClip);
-				this.createMenuItem(save, "...aus Zwischenablage einfügen", this::runLoadEntriesFromClip);
+				this.createMenuItem(save, null, "...in Zwischenablage speichern", this::runSaveEntriesToClip);
+				this.createMenuItem(save, null, "...aus Zwischenablage einfügen", this::runLoadEntriesFromClip);
 
 			});
-			this.createMenu(men, "Swap...", swap -> {
-
+			this.createMenu(men, null, "Dateien", save -> {
+				this.createMenuItem(save, null, "Dateien löschen", null);
+				this.createMenuItem(save, null, "Dateien recyclen", null);
+				this.createMenuItem(save, null, "Dateien erneuern", null);
+				this.createMenuBreak(save);
+				this.createMenuItem(save, null, "Dateien anzeigen", null);
+				this.createMenuItem(save, null, "Dateien kopieren", null);
+				this.createMenuItem(save, null, "Dateien umbenennen", null);
 			});
-			this.taskStop = this.createMenuItem(men, "Abbrechen", this::runCancelProcesses);
+			this.createMenu(men, null, "Ordner", save -> {
+				this.createMenuItem(save, null, "Ordner löschen", null);
+				this.createMenuItem(save, null, "Ordner recyclen", null);
+			});
+			this.taskStop = this.createMenuItem(men, null, "Abbrechen", this::runCancelProcesses);
 		});
 
 		this.menu = new AppDialog(this.shell);
@@ -116,17 +139,6 @@ public class AppWindow {
 			public void drop(final DropTargetEvent event) {
 				AppWindow.this.runDropEntries(event);
 			}
-
-			// @Override
-			// public void dropAccept(DropTargetEvent event) {
-			// if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
-			// event.operations=DND.DROP_COPY;
-			// } else if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
-			// event.operations=DND.DROP_COPY;
-			// }else
-			// event.operations=DND.DROP_NONE;
-			//
-			// }
 
 		});
 
@@ -152,6 +164,22 @@ public class AppWindow {
 			}
 
 		};
+
+		this.editWait = System.currentTimeMillis() + Integer.MIN_VALUE;
+
+		this.runUndoEnable();
+		this.runRedoEnable();
+
+	}
+
+	private Image getIcon(String string) {
+		try {
+			return new Image(this.display, AppWindow.class.getResourceAsStream(string));
+		} catch (Exception e) {
+			System.out.println(string + " " + e);
+			return null;
+			// TODO: handle exception
+		}
 	}
 
 	public String getInput() {
@@ -297,8 +325,8 @@ public class AppWindow {
 		this.openDialog() //
 			.useTitle("Eingabepfad nach Datei filtern") //
 			.useMessage("Möchten Sie Eingabepfade zu existierenden Dateien behalten oder entfernen?\nRelative Eingabepfade werden entfernt.") //
-			.useButton("Behalten", () -> this.runFilterSourcesByFile(true)) //
-			.useButton("Entfernen", () -> this.runFilterSourcesByFile(false)) //
+			.useButton("Dateien behalten", () -> this.runFilterSourcesByFile(true)) //
+			.useButton("Dateien entfernen", () -> this.runFilterSourcesByFile(false)) //
 		;
 	}
 
@@ -311,8 +339,8 @@ public class AppWindow {
 		this.openDialog() //
 			.useTitle("Eingabepfad nach Ordner filtern") //
 			.useMessage("Möchten Sie Eingabepfade zu existierenden Ordnern behalten oder entfernen?\nRelative Eingabepfade werden entfernt.") //
-			.useButton("Behalten", () -> this.runFilterSourcesByFolder(true)) //
-			.useButton("Entfernen", () -> this.runFilterSourcesByFolder(false)) //
+			.useButton("Ordnern behalten", () -> this.runFilterSourcesByFolder(true)) //
+			.useButton("Ordnern entfernen", () -> this.runFilterSourcesByFolder(false)) //
 		;
 	}
 
@@ -326,8 +354,8 @@ public class AppWindow {
 			.useTitle("Eingabepfad nach Muster filtern") //
 			.useMessage("Ein Eingabepfad gilt als Treffer, wenn den unten angegebenen regulären Ausdruck darin einen Treffer findet.") //
 			.useOption("Regulärer Ausdruck", this.settings.filterPattern) //
-			.useButton("Treffer erhalten", () -> this.runFilterSourcesByPattern(true)) //
-			.useButton("Treffer verwerfen", () -> this.runFilterSourcesByPattern(false)) //
+			.useButton("Treffer behalten", () -> this.runFilterSourcesByPattern(true)) //
+			.useButton("Treffer entfernen", () -> this.runFilterSourcesByPattern(false)) //
 		;
 	}
 
@@ -344,10 +372,9 @@ public class AppWindow {
 			.useTitle("Eingabepfad nach Dateigröße filtern") //
 			.useMessage("Ein Eingabepfad gilt als Treffer, wenn er eine Datei mit einer Dateigröße innerhalb der unten angegebenen Grenzen besitzt."
 				+ " Ein Eingabepfad wird verworfen, wenn er ein Verzeichnis angibt.") //
-			.useOption("Minimale Dateigröße", this.settings.filterLengthMin) //
-			.useOption("Maximale Dateigröße", this.settings.filterLengthMax) //
-			.useButton("Treffer behalten", () -> this.runFilterSourcesByLength(true)) //
-			.useButton("Treffer entfernen", () -> this.runFilterSourcesByLength(false)) //
+			.useOption("Dateigröße", this.settings.filterLengthMin) //
+			.useButton("Kleinere behalten", () -> this.runFilterSourcesByLength(true)) //
+			.useButton("Größere behalten", () -> this.runFilterSourcesByLength(false)) //
 		;
 	}
 
@@ -363,10 +390,9 @@ public class AppWindow {
 			.useTitle("Eingabepfad nach Erzeugungszeitpunkt filtern") //
 			.useMessage("Ein Eingabepfad gilt als Treffer, wenn er eine Datei mit einem Erzeugungszeitpunkt innerhalb der unten angegebenen Grenzen besitzt."
 				+ " Ein Eingabepfad wird verworfen, wenn er ein Verzeichnis angibt.") //
-			.useOption("Frühester Erzeugungszeitpunkt", this.settings.filterCreationMin) //
-			.useOption("Spätester Erzeugungszeitpunkt", this.settings.filterCreationMax) //
-			.useButton("Treffer behalten", null) //
-			.useButton("Treffer entfernen", null) //
+			.useOption("Erzeugungszeitpunkt", this.settings.filterCreationMin) //
+			.useButton("Ältere behalten", null) //
+			.useButton("Jüngere behalten", null) //
 		;
 		// try {
 		// BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
@@ -381,10 +407,9 @@ public class AppWindow {
 			.useTitle("Eingabepfad nach Änderungszeitpunkt filtern") //
 			.useMessage("Ein Eingabepfad gilt als Treffer, wenn er eine Datei mit einem Änderungszeitpunkt innerhalb der unten angegebenen Grenzen besitzt."
 				+ " Ein Eingabepfad wird verworfen, wenn er ein Verzeichnis angibt.") //
-			.useOption("Frühester Änderungszeitpunkt", this.settings.filterModificationMin) //
-			.useOption("Spätester Änderungszeitpunkt", this.settings.filterModificationMax) //
-			.useButton("Treffer erhalten", null) //
-			.useButton("Treffer verwerfen", null) //
+			.useOption("Änderungszeitpunkt", this.settings.filterModificationMin) //
+			.useButton("Ältere behalten", null) //
+			.useButton("Jüngere behalten", null) //
 		;
 		// File f;
 		// f.lastModified();
@@ -403,13 +428,15 @@ public class AppWindow {
 	}
 
 	public void runSortEntriesBySourcePath() {
-
 	}
 
 	public void runSortEntriesBySourceTime() {
 	}
 
 	public void runSortEntriesBySourceSize() {
+	}
+
+	public void runSortEntriesBySourceMade() {
 	}
 
 	public void runSaveEntriesToClip() { // file
@@ -508,17 +535,22 @@ public class AppWindow {
 
 	FTSettings settings = new FTSettings();
 
-	private MenuItem createMenu(final Menu parent, final String text, Consumer<MenuItem> setup) {
+	private MenuItem createMenu(final Menu parent, String icon, final String text, Consumer<Menu> setup) {
 		final var res = new MenuItem(parent, SWT.CASCADE);
-		res.setText(text);
+		if (icon != null) {
+			res.setImage(this.getIcon(icon));
+		}
+		if (text != null) {
+			res.setText(text);
+		}
 		res.setMenu(new Menu(res));
-		setup.set(res);
+		setup.set(res.getMenu());
 		return res;
 	}
 
-	private MenuItem createMenu(final MenuItem parent, final String text, Consumer<MenuItem> setup) {
-		return this.createMenu(parent.getMenu(), text, setup);
-	}
+	// private MenuItem createMenu(final MenuItem parent, final String text, Consumer<MenuItem> setup) {
+	// return this.createMenu(parent.getMenu(), text, setup);
+	// }
 
 	private Menu createMenuBar(final Decorations parent, Consumer<Menu> setup) {
 		final var res = new Menu(parent, SWT.BAR);
@@ -527,21 +559,22 @@ public class AppWindow {
 		return res;
 	}
 
-	private MenuItem createMenuItem(final Menu parent, final String text, final Runnable onClick) {
+	private MenuItem createMenuItem(final Menu parent, String icon, final String text, final Runnable onClick) {
 		final var res = new MenuItem(parent, SWT.NONE);
-		res.setText(text);
+		if (icon != null) {
+			res.setImage(this.getIcon(icon));
+		}
+		if (text != null) {
+			res.setText(text);
+		}
 		if (onClick != null) {
 			res.addListener(SWT.Selection, event -> onClick.run());
 		}
 		return res;
 	}
 
-	private MenuItem createMenuItem(final MenuItem parent, final String text, final Runnable onClick) {
-		return this.createMenuItem(parent.getMenu(), text, onClick);
-	}
-
-	private MenuItem createMenuBreak(final MenuItem parent) {
-		return new MenuItem(parent.getMenu(), SWT.SEPARATOR);
+	private MenuItem createMenuBreak(final Menu parent) {
+		return new MenuItem(parent, SWT.SEPARATOR);
 	}
 
 	Label taskInfo;
