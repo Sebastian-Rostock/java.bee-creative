@@ -22,26 +22,33 @@ class AppEntry {
 	}
 
 	public static List<AppEntry> parseAll(final String src) {
-		return Iterables.translate(Strings.match(FTMain.lineText, src), AppEntry::parse).filter(Filters.empty()).toList();
+		return Iterables.translate(Strings.match(AppEntry.lineText, src), AppEntry::parse).filter(Filters.empty()).toList();
 	}
 
 	public static String printAll(final Iterable<AppEntry> src) {
 		final var res = new StringBuilder(1 << 20);
-		Strings.join(res, "\r\n", src, (res2, src2) -> res2.append(src2.source).append(src2.target.text().isEmpty() ? "" : "\t").append(src2.target));
+		Strings.join(res, "\r\n", src, (res2, src2) -> {
+			res2.append(src2.source).append(src2.source.text.isEmpty() || src2.target.text.isEmpty() ? "" : "\t").append(src2.target);
+		});
 		return res.toString();
 	}
 
-	AppItem source;
+	public final AppItem source;
 
-	AppItem target;
+	public final AppItem target;
 
 	public AppEntry(String source, String target) {
 		this.source = new AppItem(source);
 		this.target = new AppItem(target);
 	}
 
-	static final Pattern lineText = Pattern.compile("[^\r\n]+");
+	@Override
+	public String toString() {
+		return this.source.toString();
+	}
 
-	static final Pattern itemText = Pattern.compile("[\t]+");
+	private static final Pattern lineText = Pattern.compile("[^\r\n]+");
+
+	private static final Pattern itemText = Pattern.compile("[\t]+");
 
 }

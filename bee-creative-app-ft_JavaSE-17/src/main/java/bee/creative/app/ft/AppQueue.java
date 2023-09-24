@@ -60,6 +60,12 @@ public class AppQueue extends Thread {
 			this.next.isCanceled = true;
 		}
 	}
+	
+	public AppProcess current() {
+		synchronized (this.queue) {
+			return this.next;
+		}
+	}
 
 	/** Diese Methode liefet nur dann {@code true}, wenn Berechnungen laufen. */
 	public boolean isRunning() {

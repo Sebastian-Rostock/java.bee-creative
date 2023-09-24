@@ -7,12 +7,18 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 class AppItem {
 
+	public final String text;
+
 	public AppItem(String text) {
 		this.text = text.toString();
 	}
 
-	public String text() {
-		return this.text;
+	public boolean isFile() {
+		return (this.fileOrNull() != null) && this.file.isFile();
+	}
+
+	public boolean isFolder() {
+		return (this.fileOrNull() != null) && this.file.isDirectory();
 	}
 
 	public File fileOrNull() {
@@ -23,7 +29,7 @@ class AppItem {
 
 	public Long sizeOrNull() {
 		if (this.size != AppItem.NO_LONG) return this.size;
-		return this.size = (this.fileOrNull() != null) && this.file.isFile() ? this.file.length() : null;
+		return this.size = this.isFile() ? this.file.length() : null;
 	}
 
 	public Path pathOrNull() {
@@ -33,13 +39,13 @@ class AppItem {
 
 	public Long timeOrNull() {
 		if (this.time != AppItem.NO_LONG) return this.time;
-		return this.time = (this.fileOrNull() != null) && this.file.isFile() ? this.file.lastModified() : null;
+		return this.time = this.isFile() ? this.file.lastModified() : null;
 	}
 
 	public Long madeOrNull() {
 		if (this.made != AppItem.NO_LONG) return this.made;
 		try {
-			return this.made = (this.pathOrNull() != null) && this.file.isFile() //
+			return this.made = this.isFile() && (this.pathOrNull() != null) //
 				? Files.readAttributes(this.path, BasicFileAttributes.class).creationTime().toMillis() : null;
 		} catch (Exception ignore) {}
 		return this.made = null;
@@ -55,8 +61,6 @@ class AppItem {
 	private static final Path NO_PATH = AppItem.NO_FILE.toPath();
 
 	private static final Long NO_LONG = Long.MIN_VALUE;
-
-	private final String text;
 
 	private File file = AppItem.NO_FILE;
 
