@@ -25,18 +25,13 @@ class AppDialog {
 		this.parent = parent;
 	}
 
-	public AppDialog useFocus(boolean focus) {
-		this.focus = focus;
-		return this;
-	}
-
-	public AppDialog useTarget(Control target) {
-		this.target = target;
-		return this;
-	}
-
 	public AppDialog useSetup(Consumer<AppDialog> setup) {
 		setup.set(this);
+		return this;
+	}
+
+	public AppDialog useFocus(boolean focus) {
+		this.focus = focus;
 		return this;
 	}
 
@@ -47,6 +42,11 @@ class AppDialog {
 
 	public AppDialog useTitle(final String title, final Object... args) {
 		return this.useTitle(String.format(title, args));
+	}
+
+	public AppDialog useTarget(Control target) {
+		this.target = target;
+		return this;
 	}
 
 	public AppDialog useMessage(final String message) {
@@ -91,23 +91,23 @@ class AppDialog {
 		if (this.focus) {
 			this.shell.setFocus();
 		}
-		FTWindow.wait(this.shell);
+		AppUtil.wait(this.shell);
 		return this.reset();
 	}
 
-	public AppDialog openOnClick(Button target, Consumer<AppDialog> onClick) {
-		target.addListener(SWT.Selection, event -> this.reset().useSetup(onClick).useFocus(true).useTarget(null).open());
+	public AppDialog openOnClick(Button target, Consumer<AppDialog> setupOnClick) {
+		target.addListener(SWT.Selection, event -> this.reset().useSetup(setupOnClick).useFocus(true).useTarget(null).open());
 		return this;
 	}
 
-	public AppDialog openOnHover(Control target, Consumer<AppDialog> onHover) {
+	public AppDialog openOnHover(Control target, Consumer<AppDialog> setupOnHover) {
 		target.addListener(SWT.MouseExit, event -> {
 			if (this.isActive()) return;
 			this.reset();
 		});
 		target.addListener(SWT.MouseEnter, event -> {
 			if (this.isActive()) return;
-			this.reset().useSetup(onHover).useFocus(false).useTarget(target).open();
+			this.reset().useSetup(setupOnHover).useFocus(false).useTarget(target).open();
 		});
 		return this;
 	}
@@ -120,13 +120,13 @@ class AppDialog {
 	}
 
 	public AppDialog reset() {
+		this.focus = false;
 		this.title = "";
+		this.active = false;
+		this.target = null;
 		this.message = "";
 		this.buttons.clear();
 		this.options.clear();
-		this.focus = false;
-		this.active = false;
-		this.target = null;
 		return this.close();
 	}
 
@@ -165,7 +165,7 @@ class AppDialog {
 			var x = this.target.toDisplay(p.width - 5, p.height - 5);
 			this.shell.setLocation(x);
 		} else {
-			final var tgtRect = this.parent.getClientArea();
+			var tgtRect = this.parent.getClientArea();
 			var sz = this.shell.getSize();
 			this.shell.setLocation(this.parent.toDisplay((tgtRect.width - sz.x) / 2, (tgtRect.height - sz.y) / 2));
 		}
@@ -184,22 +184,22 @@ class AppDialog {
 		this.shell.addListener(SWT.Deactivate, event -> this.reset());
 	}
 
-	void createTitle() {
+	private void createTitle() {
 		if (this.title.isEmpty()) return;
-		final var titleLabel = new Label(this.shell, SWT.WRAP);
-		final var font = titleLabel.getFont().getFontData()[0];
-		titleLabel.setText(this.title);
-		titleLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-		titleLabel.setFont(new Font(this.shell.getDisplay(), new FontData(font.getName(), font.getHeight(), SWT.BOLD)));
+		final var res = new Label(this.shell, SWT.WRAP);
+		final var font = res.getFont().getFontData()[0];
+		res.setText(this.title);
+		res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		res.setFont(new Font(this.shell.getDisplay(), new FontData(font.getName(), font.getHeight(), SWT.BOLD)));
 	}
 
-	void createButtons() {
+	private void createButtons() {
 		if (this.buttons.isEmpty()) return;
-		final var buttonPane = new Composite(this.shell, SWT.NONE);
-		buttonPane.setLayout(new GridLayout(this.buttons.size(), true));
-		buttonPane.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false, 1, 1));
+		final var parent = new Composite(this.shell, SWT.NONE);
+		parent.setLayout(new GridLayout(this.buttons.size(), true));
+		parent.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false, 1, 1));
 		this.buttons.forEach(entry -> {
-			final var res = new Button(buttonPane, SWT.PUSH);
+			final var res = new Button(parent, SWT.PUSH);
 			res.setText(entry.getKey());
 			res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 			res.addListener(SWT.Selection, event -> {
@@ -210,25 +210,24 @@ class AppDialog {
 		});
 	}
 
-	void createOptions() {
+	private void createOptions() {
 		if (this.options.isEmpty()) return;
-		final var optionPane = new Composite(this.shell, SWT.NONE);
-		optionPane.setLayout(new GridLayout(2, false));
-		optionPane.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false, 1, 1));
+		final var parent = new Composite(this.shell, SWT.NONE);
+		parent.setLayout(new GridLayout(2, false));
+		parent.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false, 1, 1));
 		this.options.forEach(entry -> {
-			final var lbl = new Label(optionPane, SWT.NONE);
-			lbl.setText(entry.getKey());
-			final var layoutData = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
-			layoutData.widthHint = 250;
-			entry.getValue().get(optionPane).setLayoutData(layoutData);
+			new Label(parent, SWT.NONE).setText(entry.getKey());
+			final var lay = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
+			lay.widthHint = 250;
+			entry.getValue().get(parent).setLayoutData(lay);
 		});
 	}
 
-	void createMessage() {
+	private void createMessage() {
 		if (this.message.isEmpty()) return;
-		final var messageLabel = new Label(this.shell, SWT.WRAP);
-		messageLabel.setText(this.message);
-		messageLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		final var res = new Label(this.shell, SWT.WRAP);
+		res.setText(this.message);
+		res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 	}
 
 }

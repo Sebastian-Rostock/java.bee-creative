@@ -48,16 +48,7 @@ class FTWindow implements Runnable {
 
 	public static void openAndWait(final Shell shell) {
 		shell.open();
-		wait(shell);
-	}
-
-	public static void wait(final Shell shell) {
-		final Display display = shell.getDisplay();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
+		AppUtil.wait(shell);
 	}
 
 	public final FTSettings settings = new FTSettings();

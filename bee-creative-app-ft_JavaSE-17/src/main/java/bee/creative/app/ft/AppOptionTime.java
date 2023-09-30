@@ -33,7 +33,6 @@ public class AppOptionTime implements AppOption {
 	@Override
 	public Control get(final Composite item) {
 		final var lay = new GridLayout(2, true);
-
 		lay.marginWidth = 0;
 		lay.marginHeight = 0;
 		var dat = new GridData();

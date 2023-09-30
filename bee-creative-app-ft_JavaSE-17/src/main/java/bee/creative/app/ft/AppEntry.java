@@ -7,6 +7,9 @@ import bee.creative.lang.Strings;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
 
+/** Diese Klasse implementiert ein Paar aus {@link #source Eingabedatenpfad} und {@link #target Ausgabedatenpfad}
+ *
+ * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class AppEntry {
 
 	public static List<AppEntry> list() {
@@ -14,32 +17,44 @@ class AppEntry {
 	}
 
 	public static AppEntry parse(final String src) {
-		final var parts = Strings.split(AppEntry.itemText, src.trim());
+		final var parts = Strings.split(AppEntry.ITEM_PATTERN, src.trim());
 		final var count = parts.size();
 		if (count == 0) return null;
-		if (count == 1) return new AppEntry(parts.get(0), "");
+		if (count == 1) return new AppEntry(parts.get(0));
 		return new AppEntry(parts.get(0), parts.get(1));
 	}
 
 	public static List<AppEntry> parseAll(final String src) {
-		return Iterables.translate(Strings.match(AppEntry.lineText, src), AppEntry::parse).filter(Filters.empty()).toList();
+		return Iterables.translate(Strings.match(AppEntry.LINE_PATTERN, src), AppEntry::parse).filter(Filters.empty()).toList();
 	}
 
 	public static String printAll(final Iterable<AppEntry> src) {
 		final var res = new StringBuilder(1 << 20);
 		Strings.join(res, "\r\n", src, (res2, src2) -> {
-			res2.append(src2.source).append(src2.source.text.isEmpty() || src2.target.text.isEmpty() ? "" : "\t").append(src2.target);
+			res2.append(src2.source).append(src2.target.text.isEmpty() ? "" : "\t").append(src2.target);
 		});
 		return res.toString();
 	}
 
+	/** Dieses Feld speichert den Eingabedatenpfad. */
 	public final AppItem source;
 
+	/** Dieses Feld speichert den Ausgabedatenpfad. */
 	public final AppItem target;
 
+	/** Dieser Konstruktor initialisiert {@link #source} und {@link #target}. */
+	public AppEntry(String source) {
+		this(source, "");
+	}
+
+	/** Dieser Konstruktor initialisiert {@link #source} und {@link #target}. */
 	public AppEntry(String source, String target) {
-		this.source = new AppItem(source);
-		this.target = new AppItem(target);
+		this(new AppItem(source), new AppItem(target));
+	}
+
+	public AppEntry(AppItem source, AppItem target) {
+		this.source = source;
+		this.target = target;
 	}
 
 	@Override
@@ -47,8 +62,8 @@ class AppEntry {
 		return this.source.toString();
 	}
 
-	private static final Pattern lineText = Pattern.compile("[^\r\n]+");
+	private static final Pattern LINE_PATTERN = Pattern.compile("[^\r\n]+");
 
-	private static final Pattern itemText = Pattern.compile("[\t]+");
+	private static final Pattern ITEM_PATTERN = Pattern.compile("[\t]+");
 
 }

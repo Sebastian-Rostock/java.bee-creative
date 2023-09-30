@@ -5,31 +5,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
+/** Diese Klasse implementiert ein Objekt, dass eine {@link #text Zeichenkette} als {@link #fileOrNull() absoluten Datenpfad} interpretieren und zu der damit
+ * genannten Datei die {@link #sizeOrNull() Größe}, den {@link #timeOrNull() Änderungszeitpunkt} sowie den {@link #madeOrNull() Erzeugungszeitpunkt}
+ * bereitstellen kann.
+ *
+ * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class AppItem {
 
+	/** Dieses Feld speichert die Zeichenkette. */
 	public final String text;
 
+	/** Dieser Konstruktor initialisiert den {@link #text}. */
 	public AppItem(String text) {
 		this.text = text.toString();
 	}
 
-	public boolean isFile() {
-		return (this.fileOrNull() != null) && this.file.isFile();
-	}
-
-	public boolean isFolder() {
-		return (this.fileOrNull() != null) && this.file.isDirectory();
-	}
-
 	public File fileOrNull() {
 		if (this.file != AppItem.NO_FILE) return this.file;
-		var file = new File(this.text);
-		return this.file = file.isAbsolute() ? file : null;
+		try {
+			var file = new File(this.text);
+			return this.file = file.isAbsolute() ? file.getAbsoluteFile() : null;
+		} catch (Exception ignore) {}
+		return this.file = null;
 	}
 
 	public Long sizeOrNull() {
 		if (this.size != AppItem.NO_LONG) return this.size;
-		return this.size = this.isFile() ? this.file.length() : null;
+		try {
+			return this.size = (this.fileOrNull() != null) && this.file.isFile() ? this.file.length() : null;
+		} catch (Exception ignore) {}
+		return this.size = null;
 	}
 
 	public Path pathOrNull() {
@@ -39,13 +44,13 @@ class AppItem {
 
 	public Long timeOrNull() {
 		if (this.time != AppItem.NO_LONG) return this.time;
-		return this.time = this.isFile() ? this.file.lastModified() : null;
+		return this.time = (this.fileOrNull() != null) && this.file.isFile() ? this.file.lastModified() : null;
 	}
 
 	public Long madeOrNull() {
 		if (this.made != AppItem.NO_LONG) return this.made;
 		try {
-			return this.made = this.isFile() && (this.pathOrNull() != null) //
+			return this.made = (this.fileOrNull() != null) && this.file.isFile() && (this.pathOrNull() != null) //
 				? Files.readAttributes(this.path, BasicFileAttributes.class).creationTime().toMillis() : null;
 		} catch (Exception ignore) {}
 		return this.made = null;
@@ -56,20 +61,26 @@ class AppItem {
 		return this.text;
 	}
 
-	private static final File NO_FILE = new File("");
+	static final File NO_FILE = new File("");
 
-	private static final Path NO_PATH = AppItem.NO_FILE.toPath();
+	static final Path NO_PATH = AppItem.NO_FILE.toPath();
 
-	private static final Long NO_LONG = Long.MIN_VALUE;
+	static final Long NO_LONG = Long.MIN_VALUE;
 
-	private File file = AppItem.NO_FILE;
+	File file = AppItem.NO_FILE;
 
-	private Long size = AppItem.NO_LONG;
+	Long size = AppItem.NO_LONG;
 
-	private Long time = AppItem.NO_LONG;
+	Long time = AppItem.NO_LONG;
 
-	private Path path = AppItem.NO_PATH;
+	Path path = AppItem.NO_PATH;
 
-	private Long made = AppItem.NO_LONG;
+	Long made = AppItem.NO_LONG;
+
+	Object hash;
+
+	Object data;
+
+	AppItem prev;
 
 }

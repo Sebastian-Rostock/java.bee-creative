@@ -26,7 +26,11 @@ public class AppQueue extends Thread {
 			synchronized (this.queue) {
 				this.next = this.queue.pollFirst();
 			}
-			this.onSelect(this.next);
+			try {
+				this.onSelect(this.next);
+			} catch (final Throwable error) {
+				this.onError(this.next, error);
+			}
 			if (this.next == null) {
 				synchronized (this.queue) {
 					try {
@@ -60,7 +64,7 @@ public class AppQueue extends Thread {
 			this.next.isCanceled = true;
 		}
 	}
-	
+
 	public AppProcess current() {
 		synchronized (this.queue) {
 			return this.next;

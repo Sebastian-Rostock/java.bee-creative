@@ -487,7 +487,7 @@ public class FTMain extends FTWindow {
 		caches.restore();
 
 		final var pathSet = this.createPathSet();
-		final var itemList = new LinkedList<FTItem>();
+		final var itemList = new LinkedList<AppItem>();
 		final var lineList = this.createLineList(inputText);
 		final var failCount = new int[]{lineList.size()};
 		this.runItems(lineList, line -> {
@@ -498,49 +498,49 @@ public class FTMain extends FTWindow {
 			final var path = file.getPath();
 			this.taskEntry = path;
 			if (!pathSet.add(path)) return;
-			itemList.add(0, new FTItem(path));
+			itemList.add(0, new AppItem(path));
 			this.taskCount++;
 		}, null);
 
 		pathSet.clear();
-		final var sizeListMap = new HashMap2<Object, FTItem>();
+		final var sizeListMap = new HashMap2<Object, AppItem>();
 		while (!itemList.isEmpty() && !this.isTaskCanceled) { // rückwärts
 			final var sizeItem = itemList.remove(0);
 			this.taskEntry = sizeItem;
 			this.taskCount--;
 			try {
-				sizeItem.sourceSize = new File(sizeItem.sourcePath).length();
+				sizeItem.size = new File(sizeItem.text).length();
 			} catch (final Exception error) {
-				sizeItem.sourceSize = null;
+				sizeItem.size = null;
 			}
-			sizeItem.previousItem = sizeListMap.put(sizeItem.sourceSize, sizeItem);
-			if (sizeItem.previousItem != null) {
+			sizeItem.prev = sizeListMap.put(sizeItem.size, sizeItem);
+			if (sizeItem.prev != null) {
 				this.taskCount++;
 			}
 		}
 		sizeListMap.remove(null);
 		itemList.clear();
 
-		final var hashListMap = new HashMap2<Object, FTItem>();
-		final var itemDataListMap = new HashMap2<Object, FTItem>();
-		final var originalList = new LinkedList<FTItem>();
+		final var hashListMap = new HashMap2<Object, AppItem>();
+		final var itemDataListMap = new HashMap2<Object, AppItem>();
+		final var originalList = new LinkedList<AppItem>();
 
 		final var equalSizeIter = sizeListMap.values().iterator();
 		while (equalSizeIter.hasNext() && !this.isTaskCanceled) {
 			final var equalSizeList = equalSizeIter.next();
-			if (equalSizeList.previousItem != null) {
+			if (equalSizeList.prev != null) {
 				this.taskCount++;
 				hashListMap.clear();
-				final var testSize2 = Math.min(equalSizeList.sourceSize.longValue(), testSize);
-				for (FTItem equalSizeItem = equalSizeList, next; equalSizeItem != null; equalSizeItem = next) { // vorwärts
+				final var testSize2 = Math.min(equalSizeList.size.longValue(), testSize);
+				for (AppItem equalSizeItem = equalSizeList, next; equalSizeItem != null; equalSizeItem = next) { // vorwärts
 					this.taskEntry = equalSizeItem;
 					this.taskCount--;
-					next = equalSizeItem.previousItem;
+					next = equalSizeItem.prev;
 
-					equalSizeItem.sourceHash = Objects.notNull(caches.get(equalSizeItem.sourcePath, hashSize), equalSizeItem);
+					equalSizeItem.hash = Objects.notNull(caches.get(equalSizeItem.text, hashSize), equalSizeItem);
 
-					equalSizeItem.previousItem = hashListMap.put(equalSizeItem.sourceHash, equalSizeItem);
-					if (equalSizeItem.previousItem != null) {
+					equalSizeItem.prev = hashListMap.put(equalSizeItem.hash, equalSizeItem);
+					if (equalSizeItem.prev != null) {
 						this.taskCount++;
 					}
 				}
@@ -549,23 +549,23 @@ public class FTMain extends FTWindow {
 				while (iterator.hasNext() && !this.isTaskCanceled) {
 					final var hashList = iterator.next();
 
-					if (hashList.previousItem != null) {
+					if (hashList.prev != null) {
 						this.taskCount++;
 
 						itemDataListMap.clear();
-						for (FTItem item3 = hashList, prev; (item3 != null) && !this.isTaskCanceled; item3 = prev) { // rückwärts
+						for (AppItem item3 = hashList, prev; (item3 != null) && !this.isTaskCanceled; item3 = prev) { // rückwärts
 
-							prev = item3.previousItem;
+							prev = item3.prev;
 
-							item3.sourceData = new FTData(item3.sourcePath, testSize2);
+							item3.data = new FTData(item3.text, testSize2);
 
-							item3.previousItem = itemDataListMap.put(item3.sourceData, item3);
-							if (item3.previousItem != null) {
+							item3.prev = itemDataListMap.put(item3.data, item3);
+							if (item3.prev != null) {
 								this.taskCount++;
 							}
 						}
 						for (final var original: itemDataListMap.values()) {
-							if (original.previousItem != null) {
+							if (original.prev != null) {
 								originalList.add(original);
 							}
 						}
@@ -580,8 +580,8 @@ public class FTMain extends FTWindow {
 		while (!originalList.isEmpty() && !this.isTaskCanceled) {
 			final var original = originalList.remove(0);
 			this.taskEntry = original;
-			for (var duplikat = original.previousItem; (duplikat != null) && !this.isTaskCanceled; duplikat = duplikat.previousItem) { // vorwärts
-				targetList.add(Arrays.asList(original.sourcePath, duplikat.sourcePath, original.sourceHash.toString(), original.sourceSize.toString()));
+			for (var duplikat = original.prev; (duplikat != null) && !this.isTaskCanceled; duplikat = duplikat.prev) { // vorwärts
+				targetList.add(Arrays.asList(original.text, duplikat.text, original.hash.toString(), original.size.toString()));
 			}
 			this.taskCount--;
 		}
