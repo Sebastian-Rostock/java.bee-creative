@@ -59,14 +59,24 @@ public class AppWindow {
 		this.text = this.createText();
 		this.info = this.createInfo();
 		this.queue = this.createQueue();
-		this.limit = System.currentTimeMillis() + Integer.MIN_VALUE;
+		this.editLimit = System.currentTimeMillis() + Integer.MIN_VALUE;
 		this.createMenu();
-		this.DONE_runUndoEnable();
-		this.DONE_runRedoEnable();
+		this.enableUndo_DONE();
+		this.enableRedo_DONE();
 		this.DONE_runInfoUpdate();
 	}
 
 	private final Shell shell;
+
+	private MenuItem redoItem;
+
+	private MenuItem undoItem;
+
+	private MenuItem stopMenuItem;
+
+	private final Text text;
+
+	private final Label info;
 
 	private Shell createShell() {
 		final var res = new Shell(this.display, SWT.SHELL_TRIM);
@@ -74,14 +84,13 @@ public class AppWindow {
 		res.setSize(600, 400);
 		res.setLayout(new GridLayout(1, false));
 		res.setMenuBar(new Menu(res, SWT.BAR));
+		this.setImage(res::setImage, AppIcon.iconApp);
 		return res;
 	}
 
-	private final Text text;
-
 	private Text createText() {
 		final var res = new Text(this.shell, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
-		res.addListener(SWT.Verify, event -> this.DONE_runEditEntries());
+		res.addListener(SWT.Verify, event -> this.runEdit_DONE());
 		res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		final var dnd = new DropTarget(res, DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK);
 		dnd.setTransfer(FileTransfer.getInstance(), TextTransfer.getInstance());
@@ -105,85 +114,76 @@ public class AppWindow {
 		return res;
 	}
 
-	private final Label info;
-
 	private Label createInfo() {
 		final var res = new Label(this.shell, SWT.NONE);
 		res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		return res;
 	}
 
-	private MenuItem stopMenuItem;
-
-	private MenuItem redoMenuItem;
-
-	private MenuItem undoMenuItem;
-
 	private void createMenu() {
 		final var res = this.shell.getMenuBar();
 
-		this.undoMenuItem = this.createMenuItem(res, "icon-undo.png", null, this::DONE_runUndoEntries);
-		this.undoMenuItem.setAccelerator(SWT.CTRL | 'Z');
+		this.undoItem = this.createMenuItem(res, AppIcon.menuUndo, null, this::runUndo_DONE);
+		this.undoItem.setAccelerator(SWT.CTRL | 'Z');
 
-		this.redoMenuItem = this.createMenuItem(res, "icon-redo.png", null, this::DONE_runRedoEntries);
-		this.redoMenuItem.setAccelerator(SWT.CTRL | 'Y');
+		this.redoItem = this.createMenuItem(res, AppIcon.menuRedo, null, this::runRedo_DONE);
+		this.redoItem.setAccelerator(SWT.CTRL | 'Y');
 
-		this.createMenuItem(res, "icon-swap.png", null, this::DONE_runSwapEntries);
+		this.createMenuItem(res, AppIcon.menuSwap, null, this::runSwap_DONE);
 
-		this.createMenu(res, "icon-filter.png", null, menu -> {
-			this.createMenuItem(menu, "icon-file.png", "Dateien filtern...", this::DONE_askFilterEntriesBySourceFile);
-			this.createMenuItem(menu, "icon-folder.png", "Verzeichnisse filtern...", this::DONE_askFilterEntriesBySourceFolder);
+		this.createMenu(res, AppIcon.menuFilter, null, menu -> {
+			this.createMenuItem(menu, AppIcon.itemFilterBySourceFile, "Dateien filtern...", this::runFilterBySourceFile_DONE);
+			this.createMenuItem(menu, AppIcon.filterFolder, "Verzeichnisse filtern...", this::askFilterBySourceFolder_DONE);
 			this.createMenuLine(menu);
-			this.createMenuItem(menu, "icon-time.png", "Nach Änderung filtern..", this::DONE_askFilterEntriesBySourceTime);
-			this.createMenuItem(menu, "icon-made.png", "Nach Erzeugung filtern...", this::DONE_askFilterEntriesBySourceMade);
-			this.createMenuItem(menu, "icon-size.png", "Nach Dateigröße filtern...", this::DONE_askFilterEntriesBySourceSize);
-			this.createMenuItem(menu, "icon-name.png", "Nach Eingabepfad filtern..", this::DONE_askFilterEntriesBySourcePath);
+			this.createMenuItem(menu, AppIcon.filterChange, "Nach Änderung filtern..", this::DONE_askFilterEntriesBySourceTime);
+			this.createMenuItem(menu, AppIcon.filterCreate, "Nach Erzeugung filtern...", this::DONE_askFilterEntriesBySourceMade);
+			this.createMenuItem(menu, AppIcon.filterLength, "Nach Dateigröße filtern...", this::DONE_askFilterEntriesBySourceSize);
+			this.createMenuItem(menu, AppIcon.filterLabel, "Nach Datenpfad filtern..", this::DONE_askFilterEntriesBySourcePath);
 		});
-		this.createMenu(res, "icon-sort.png", null, menu -> {
-			this.createMenuItem(menu, null, "Rückwärts ordnen", this::DONE_runSortEntriesReverse);
+		this.createMenu(res, AppIcon.menuSort, null, menu -> {
+			this.createMenuItem(menu, AppIcon.sortReverse, "Rückwärts ordnen", this::DONE_runSortEntriesReverse);
 			this.createMenuLine(menu);
-			this.createMenuItem(menu, "icon-time.png", "Nach Änderung sortieren", this::DONE_runSortEntriesBySourceTime);
-			this.createMenuItem(menu, "icon-made.png", "Nach Erzeugung sortieren", this::DONE_runSortEntriesBySourceMade);
-			this.createMenuItem(menu, "icon-size.png", "Nach Dateigröße sortieren", this::DONE_runSortEntriesBySourceSize);
-			this.createMenuItem(menu, "icon-name.png", "Nach Eingabepfad sortieren", this::DONE_runSortEntriesBySourcePath);
+			this.createMenuItem(menu, AppIcon.sortChange, "Nach Änderung sortieren", this::DONE_runSortEntriesBySourceTime);
+			this.createMenuItem(menu, AppIcon.sortCreate, "Nach Erzeugung sortieren", this::DONE_runSortEntriesBySourceMade);
+			this.createMenuItem(menu, AppIcon.sortLength, "Nach Dateigröße sortieren", this::DONE_runSortEntriesBySourceSize);
+			this.createMenuItem(menu, AppIcon.sortLabel, "Nach Eingabepfad sortieren", this::DONE_runSortEntriesBySourcePath);
 		});
-		this.createMenu(res, null, "Hash", menu -> {
-			this.createMenuItem(menu, null, "Duplikate erkennen", this::askReplaceEntriesWithSourceClones);
+		this.createMenu(res, AppIcon.menuHash, null, menu -> {
+			this.createMenuItem(menu, AppIcon.hashAnalyze, "Duplikate erkennen", this::askAnalyzeHashes);
 			this.createMenuLine(menu);
-			this.createMenuItem(menu, null, "Streuwertepuffer erzeugen", this::DONE_askCreateHashes);
-			this.createMenuItem(menu, null, "Streuwertepuffer befüllen", this::DONE_askUpdateHashes);
+			this.createMenuItem(menu, AppIcon.hashSetup, "Streuwertepuffer erzeugen", this::DONE_askSetupHashes);
+			this.createMenuItem(menu, AppIcon.hashUpdate, "Streuwertepuffer befüllen", this::DONE_askUpdateHashes);
 		});
-		this.createMenu(res, null, "Speicher", menu -> {
-			this.createMenuItem(menu, null, "...in Variable speichern", this::runSaveEntriesToVar);
-			this.createMenuItem(menu, null, "...aus Variable einfügen", this::runLoadEntriesFromVar);
+		this.createMenu(res, AppIcon.menuMemory, null, menu -> {
+			this.createMenuItem(menu, AppIcon.saveVariable, "...in Variable speichern", this::runSaveEntriesToVar);
+			this.createMenuItem(menu, AppIcon.loadVariable, "...aus Variable einfügen", this::runLoadEntriesFromVar);
 			this.createMenuLine(menu);
-			this.createMenuItem(menu, null, "...in Zwischenablage speichern", this::runSaveEntriesToClip);
-			this.createMenuItem(menu, null, "...aus Zwischenablage einfügen", this::runLoadEntriesFromClip);
-
+			this.createMenuItem(menu, AppIcon.saveClipboard, "...in Zwischenablage speichern", this::runSaveEntriesToClip);
+			this.createMenuItem(menu, AppIcon.loadClipboard, "...aus Zwischenablage einfügen", this::runLoadEntriesFromClip);
 		});
-		this.createMenu(res, "icon-file.png", null, menu -> {
-			this.createMenuItem(menu, "icon-file-delete.png", "Dateien löschen", this::askDeleteSourceFilesPermanently);
-			this.createMenuItem(menu, "icon-recycle.png", "Dateien recyclen", this::askDeleteSourceFilesTemporary);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, "icon-file-update.png", "Dateien erneuern", null);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, "icon-show.png", "Dateien anzeigen", this::DONE_askShowSourcesAndTargets);
-			this.createMenuItem(menu, "icon-copy.png", "Dateien kopieren", this::DONE_askCopySourcesToTargets);
-			this.createMenuItem(menu, "icon-rename.png", "Dateien umbenennen", this::DONE_askMoveSourcesToTargets);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, null, "Zeitnamen ableiten", null);
-			this.createMenuItem(menu, null, "Zeitnamen ableiten", null);
-			this.createMenuItem(menu, null, "Zeitpfade ableiten", null);
-			this.createMenuItem(menu, null, "Zeitpfade ableiten", null);
+		this.createMenu(res, AppIcon.menuName, null, menu -> {
+			this.createMenuItem(menu, AppIcon.setupTimeName, "Zeitnamen ableiten", null);
+			this.createMenuItem(menu, AppIcon.updateTimeName, "Zeitnamen aktualisieren", null);
+			this.createMenuItem(menu, AppIcon.updateTimePath, "Zeitpfade aktualisieren", null);
 		});
-		this.createMenu(res, "icon-folder.png", null, menu -> {
-			this.createMenuItem(menu, "icon-folder-delete2.png", "Verzeichnisse löschen", this::askDeleteSourceFoldersPermanently);
-			this.createMenuItem(menu, "icon-folder-recycle.png", "Verzeichnisse recyclen", this::askDeleteSourceFoldersTemporary);
+		this.createMenu(res, AppIcon.file, null, menu -> {
+			this.createMenuItem(menu, AppIcon.deleteFile, "Dateien löschen", this::askDeleteSourceFilesPermanently);
+			this.createMenuItem(menu, AppIcon.recycleFile, "Dateien recyclen", this::askDeleteSourceFilesTemporary);
 			this.createMenuLine(menu);
-			this.createMenuItem(menu, null, "Dateien auflösen...", this::askReplaceEntriesWithSourcesFiles);
-			this.createMenuItem(menu, null, "Verteichnisse auflösen...", this::askReplaceEntriesWithSourcesFolders);
+			this.createMenuItem(menu, AppIcon.refreshFile, "Dateien erneuern", null);
+			this.createMenuLine(menu);
+			this.createMenuItem(menu, AppIcon.showFile, "Dateien anzeigen", this::DONE_askShowSourcesAndTargets);
+			this.createMenuItem(menu, AppIcon.copyFile, "Dateien kopieren", this::DONE_askCopySourcesToTargets);
+			this.createMenuItem(menu, AppIcon.moveFile, "Dateien umbenennen", this::DONE_askMoveSourcesToTargets);
 		});
-		this.stopMenuItem = this.createMenuItem(res, null, "Abbrechen", this::DONE_runStopQueue);
+		this.createMenu(res, AppIcon.folder, null, menu -> {
+			this.createMenuItem(menu, AppIcon.deleteFolder, "Verzeichnisse löschen", this::askDeleteSourceFoldersPermanently);
+			this.createMenuItem(menu, AppIcon.recycleFolder, "Verzeichnisse recyclen", this::askDeleteSourceFoldersTemporary);
+			this.createMenuLine(menu);
+			this.createMenuItem(menu, AppIcon.resolveFile, "Dateien auflösen...", this::askReplaceEntriesWithSourcesFiles);
+			this.createMenuItem(menu, AppIcon.resolveFolder, "Verteichnisse auflösen...", this::askReplaceEntriesWithSourcesFolders);
+		});
+		this.stopMenuItem = this.createMenuItem(res, AppIcon.stop, null, this::runStop_DONE);
 	}
 
 	private MenuItem createMenu(final Menu parent, String image, final String label, Consumer<Menu> setup) {
@@ -232,47 +232,45 @@ public class AppWindow {
 
 	private void updateMenuItem(final ToolItem item, String image, final String label) {
 		if (image != null) {
-			try {
-				item.setImage(new Image(this.display, AppWindow.class.getResourceAsStream(image)));
-			} catch (Exception e) {
-				System.out.println(image + " " + e);
-				// TODO: handle exception
-			}
+			this.setImage(item::setImage, image);
 		}
 		if (label != null) {
 			item.setText(label);
 		}
 	}
 
-	AppQueue queue;
+	private void setImage(Consumer<Image> taret, String image) {
+		try {
+			taret.set(new Image(this.display, AppWindow.class.getResourceAsStream(image)));
+		} catch (Exception e) {
+			System.out.println(image + " " + e);
+		}
+	}
 
-	private final LinkedList<AppState> redoQueue = new LinkedList<>();
-
-	private final LinkedList<AppState> undoQueue = new LinkedList<>();
+	private final AppQueue queue;
 
 	private AppQueue createQueue() {
 		return new AppQueue() {
 
 			@Override
 			public void onError(AppProcess proc, Throwable error) {
-				AppWindow.this.DONE_ask() //
+				AppWindow.this.runDialog_DONE() //
 					.useTitle(proc != null ? proc.title : "") //
-					.useMessage("Unerwarteter Fehler\n%s", error.toString());
+					.useMessage("Unerwarteter Fehler\n%s", error);
 			}
 
 			@Override
 			public void onSelect(AppProcess proc) {
 				AppWindow.this.display.syncExec(() -> {
-					final var enabled = !this.isRunning();
-					AppWindow.this.text.setEnabled(enabled);
-					AppWindow.this.stopMenuItem.setEnabled(!enabled);
+					enableText_DONE();
+					enableStop_DONE();
 				});
 			}
 
 		};
 	}
 
-	public AppDialog DONE_ask() {
+	public AppDialog runDialog_DONE() {
 		var res = new AppDialog(this.shell);
 		this.shell.getDisplay().asyncExec(res::open);
 		return res.useFocus(true);
@@ -294,60 +292,76 @@ public class AppWindow {
 		this.setInput(AppEntry.printAll(value));
 	}
 
-	/** Dieses Feld speichert den Zeitpunkt, ab welchem Änderungen über {@link #DONE_runEditEntries()} in den {@link #undoQueue} übernommen werden dürfen. */
-	private long limit = System.currentTimeMillis();
+	/** Dieses Feld speichert den Zeitpunkt, ab welchem Änderungen über {@link #runEdit_DONE()} in den {@link #undoQueue} übernommen werden dürfen. */
+	private long editLimit = System.currentTimeMillis();
 
-	public void DONE_runEditEntries() {
+	private final LinkedList<AppState> redoQueue = new LinkedList<>();
+
+	private final LinkedList<AppState> undoQueue = new LinkedList<>();
+
+	private void enableUndo_DONE() {
+		this.undoItem.setEnabled(!this.undoQueue.isEmpty());
+	}
+
+	private void enableRedo_DONE() {
+		this.redoItem.setEnabled(!this.redoQueue.isEmpty());
+	}
+
+	private void enableStop_DONE() {
+		this.stopMenuItem.setEnabled(this.queue.isRunning());
+	}
+
+	private void enableText_DONE() {
+		this.text.setEnabled(!this.queue.isRunning());
+	}
+
+	public void runEdit_DONE() {
 		this.display.syncExec(() -> {
 			final var time = System.currentTimeMillis();
-			if ((time - this.limit) >= 0) {
+			if ((time - this.editLimit) >= 0) {
 				this.undoQueue.addFirst(new AppState(this.text));
-				this.DONE_runUndoEnable();
+				this.enableUndo_DONE();
 				this.redoQueue.clear();
-				this.DONE_runRedoEnable();
+				this.enableRedo_DONE();
 			}
-			this.limit = time + 500;
+			this.editLimit = time + 500;
 		});
 	}
 
-	private void DONE_runUndoEnable() {
-		this.undoMenuItem.setEnabled(!this.undoQueue.isEmpty());
-	}
-
-	public void DONE_runUndoEntries() {
+	public void runUndo_DONE() {
 		this.runTask("Undo", proc -> this.display.syncExec(() -> {
 			if (this.undoQueue.isEmpty()) return;
 			final var state = this.undoQueue.removeFirst();
-			this.DONE_runUndoEnable();
+			this.enableUndo_DONE();
 			this.redoQueue.addFirst(new AppState(this.text));
-			this.DONE_runRedoEnable();
-			this.limit = System.currentTimeMillis() + Integer.MAX_VALUE;
+			this.enableRedo_DONE();
+			this.editLimit = System.currentTimeMillis() + Integer.MAX_VALUE;
 			state.apply(this.text);
 		}));
 	}
 
-	private void DONE_runRedoEnable() {
-		this.redoMenuItem.setEnabled(!this.redoQueue.isEmpty());
-	}
-
-	public void DONE_runRedoEntries() {
+	public void runRedo_DONE() {
 		this.runTask("Redo", proc -> this.display.syncExec(() -> {
 			if (this.redoQueue.isEmpty()) return;
 			final var state = this.redoQueue.removeFirst();
-			this.DONE_runRedoEnable();
+			this.enableRedo_DONE();
 			this.undoQueue.addFirst(new AppState(this.text));
-			this.DONE_runUndoEnable();
-			this.limit = System.currentTimeMillis() + Integer.MAX_VALUE;
+			this.enableUndo_DONE();
+			this.editLimit = System.currentTimeMillis() + Integer.MAX_VALUE;
 			state.apply(this.text);
 		}));
 	}
 
-	public void DONE_runSwapEntries() {
+	public void runSwap_DONE() {
 		this.runTask("Tauschen", proc -> {
 			final var entries = AppEntry.list();
 			this.runItems(proc, this.DONE_getEntries(), entry -> entries.add(new AppEntry(entry.target.text, entry.source.text)), entries::add);
 			this.DONE_setEntries(entries);
 		});
+	}
+
+	public void runStop_DONE() {
+		this.queue.cancel();
 	}
 
 	public void DONE_runPushEntries(final List<String> sourceList) {
@@ -375,22 +389,22 @@ public class AppWindow {
 		});
 	}
 
-	public void DONE_askFilterEntriesBySourceFile() {
-		this.DONE_ask() //
+	public void runFilterBySourceFile_DONE() {
+		this.runDialog_DONE() //
 			.useTitle("Möchten Sie Eingabepfade behalten bzw. entfernen, die existierende Dateien angeben?") //
 			.useMessage("Relative Eingabepfade werden entfernt.") //
-			.useButton("Eingabepfade von Dateien behalten", () -> this.DONE_runFilterEntriesBySourceFile(true)) //
-			.useButton("Eingabepfade von Dateien entfernen", () -> this.DONE_runFilterEntriesBySourceFile(false)) //
+			.useButton("Eingabepfade von Dateien behalten", () -> this.runFilterBySourceFileImpl_DONE(true)) //
+			.useButton("Eingabepfade von Dateien entfernen", () -> this.runFilterBySourceFileImpl_DONE(false)) //
 		;
 	}
 
-	private void DONE_runFilterEntriesBySourceFile(boolean isKeep) {
+	private void runFilterBySourceFileImpl_DONE(boolean isKeep) {
 		this.DONE_runFilterEntriesBySource(isKeep ? "Eingabepfade behalten (Datei)" : "Eingabepfade entfernen (Datei)",
 			() -> source -> (source.fileOrNull() != null) && (source.fileOrNull().isFile() == isKeep));
 	}
 
-	public void DONE_askFilterEntriesBySourceFolder() {
-		this.DONE_ask() //
+	public void askFilterBySourceFolder_DONE() {
+		this.runDialog_DONE() //
 			.useTitle("Möchten Sie Eingabepfade behalten bzw. entfernen, die existierende Verzeichnisse angeben?") //
 			.useMessage("Relative Eingabepfade werden entfernt.") //
 			.useButton("Eingabepfade von Verzeichnissen behalten", () -> this.DONE_runFilterEntriesBySourceFolder(true)) //
@@ -404,7 +418,7 @@ public class AppWindow {
 	}
 
 	public void DONE_askFilterEntriesBySourcePath() { //
-		this.DONE_ask() //
+		this.runDialog_DONE() //
 			.useTitle("Möchten Sie Eingabepfade behalten bzw. entfernen, für die der unten genannte reguläre Ausdruck einen Treffer findet?") //
 			.useOption("Regulärer Ausdruck", this.settings.filterPath) //
 			.useButton("Eingabepfade behalten", () -> this.DONE_runFilterEntriesBySourcePath(true)) //
@@ -421,7 +435,7 @@ public class AppWindow {
 	}
 
 	public void DONE_askFilterEntriesBySourceSize() {
-		this.DONE_ask() //
+		this.runDialog_DONE() //
 			.useTitle("Möchten Sie Eingabepfade behalten bzw. entfernen, die Dateie angeben, deren Größe kleiner als die unten genannte ist?") //
 			.useMessage("Relative Eingabepfade und die zu Verzeichnissen werden entfernt.") //
 			.useOption("Dateigröße", this.settings.filterSize) //
@@ -437,7 +451,7 @@ public class AppWindow {
 	}
 
 	public void DONE_askFilterEntriesBySourceMade() { //
-		this.DONE_ask() //
+		this.runDialog_DONE() //
 			.useTitle("Möchten Sie Eingabepfade behalten bzw. entfernen, die vor dem unten genannten Zeitpunkt erzeugte Dateien angeben?") //
 			.useMessage("Relative Eingabepfade und die zu Verzeichnissen werden entfernt.") //
 			.useOption("Erzeugungszeitpunkt", this.settings.filterMade) //
@@ -453,7 +467,7 @@ public class AppWindow {
 	}
 
 	public void DONE_askFilterEntriesBySourceTime() { //
-		this.DONE_ask() //
+		this.runDialog_DONE() //
 			.useTitle("Möchten Sie Eingabepfade behalten bzw. entfernen, die vor dem unten genannten Zeitpunkt geänderte Dateien angeben?") //
 			.useMessage("Relative Eingabepfade und die zu Verzeichnissen werden entfernt.") //
 			.useOption("Änderungszeitpunkt", this.settings.filterTime) //
@@ -500,8 +514,8 @@ public class AppWindow {
 		this.DONE_runSortEntriesBySource("Sortierung nach Erzeugung", Comparators.LongComparator.INSTANCE.translate(AppItem::madeOrNull));
 	}
 
-	void askReplaceEntriesWithSourceClones() {
-		this.DONE_ask() //
+	void askAnalyzeHashes() {
+		this.runDialog_DONE() //
 			.useTitle("Sollen alle Eingabedateien auf Duplikate hin untersucht werden?") //
 			.useMessage("""
 				Beim Suchen von Duplikaten werden alle Eingabedateien zunächst bezüglich ihrer Dateigröße partitioniert. \
@@ -637,8 +651,8 @@ public class AppWindow {
 		});
 	}
 
-	public void DONE_askCreateHashes() {
-		this.DONE_ask() //
+	public void DONE_askSetupHashes() {
+		this.runDialog_DONE() //
 			.useTitle("Sollen Streuwertepuffer in den Eingabeordnern angelegt werden?") //
 			.useMessage("""
 				Die Pufferdateien tragen den Namen '%s'.
@@ -662,7 +676,7 @@ public class AppWindow {
 	}
 
 	public void DONE_askUpdateHashes() {
-		this.DONE_ask() //
+		this.runDialog_DONE() //
 			.useTitle("Sollen Streuwertepuffer mit den Streuwerten der Eingabedateien befüllt werden?") //
 			.useMessage("""
 				Die SHA-256-Streuwerte werden aus höchstens der unten genannten Anzanl an Bytes jeweils ab dem Dateibeginn und dem Dateiende berechnet \
@@ -791,7 +805,7 @@ public class AppWindow {
 	}
 
 	public void askReplaceEntriesWithSourcesFiles() {
-		this.DONE_ask()//
+		this.runDialog_DONE()//
 			.useTitle("Sollen alle Verzeichnispfade wirklich durch die Pfade aller darin enthaltenen Dateien ersetzt werden?") //
 			.useMessage("""
 				Die Dateiauflösung wird in allen Unterverzeichnissen fortgesetzt. \
@@ -801,7 +815,7 @@ public class AppWindow {
 	}
 
 	public void askReplaceEntriesWithSourcesFolders() {
-		this.DONE_ask()//
+		this.runDialog_DONE()//
 			.useTitle("Sollen alle Verzeichnispfade wirklich um die Pfade aller darin enthaltenen Verzeichnisse ergänzt werden?") //
 			.useMessage("""
 				Die Verzeichnisauflösung wird in allen Unterverzeichnissen fortgesetzt. \
@@ -826,7 +840,7 @@ public class AppWindow {
 	}
 
 	void askDeleteSourceFilesTemporary() {
-		this.DONE_ask()//
+		this.runDialog_DONE()//
 			.useTitle("Sollen alle Dateien wirklich in den Papierkorb verschoben werden?") //
 			.useMessage("Die Zeilen recycelter Dateien werden aus der Pfadtabelle entfert.") //
 			.useButton("Ja", this::runDeleteSourceFilesTemporary) //
@@ -838,7 +852,7 @@ public class AppWindow {
 	}
 
 	void askDeleteSourceFilesPermanently() {
-		this.DONE_ask()//
+		this.runDialog_DONE()//
 			.useTitle("Sollen alle Dateien wirklich endgültig gelöscht werden?") //
 			.useMessage("Die Zeilen gelöschter Dateien werden aus der Pfadtabelle entfert.") //
 			.useButton("Ja", this::runDeleteSourceFilesPermanently) //
@@ -850,7 +864,7 @@ public class AppWindow {
 	}
 
 	void askDeleteSourceFoldersTemporary() {
-		this.DONE_ask()//
+		this.runDialog_DONE()//
 			.useTitle("Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?") //
 			.useMessage("Die Zeilen recycelter Verzeichnisse werden aus der Pfadtabelle entfert.") //
 			.useButton("Ja", this::runDeleteSourceFoldersTemporary) //
@@ -862,7 +876,7 @@ public class AppWindow {
 	}
 
 	void askDeleteSourceFoldersPermanently() {
-		this.DONE_ask()//
+		this.runDialog_DONE()//
 			.useTitle("Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?") //
 			.useMessage("Die Zeilen gelöschter Verzeichnisse werden aus der Pfadtabelle entfert.") //
 			.useButton("Ja", this::runDeleteSourceFoldersPermanently) //
@@ -897,7 +911,7 @@ public class AppWindow {
 	}
 
 	public void DONE_askCopySourcesToTargets() {
-		this.DONE_ask() //
+		this.runDialog_DONE() //
 			.useTitle("Sollen alle Dateien wirklich nicht ersetzend kopiert werden?") //
 			.useMessage("""
 				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad.\s\
@@ -914,7 +928,7 @@ public class AppWindow {
 	}
 
 	public void DONE_askMoveSourcesToTargets() {
-		this.DONE_ask() //
+		this.runDialog_DONE() //
 			.useTitle("Sollen alle Dateien wirklich nicht ersetzend verschoben werden?") //
 			.useMessage("""
 				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad.\s\
@@ -931,7 +945,7 @@ public class AppWindow {
 	}
 
 	public void DONE_askShowSourcesAndTargets() {
-		this.DONE_ask() //
+		this.runDialog_DONE() //
 			.useTitle("Sollen die Quell- und Zieldateien wirklich angezeigt werden?") //
 			.useMessage("""
 				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad.\s\
@@ -1015,10 +1029,6 @@ public class AppWindow {
 				Thread.sleep(step);
 			} catch (InterruptedException e) {}
 		}
-	}
-
-	public void DONE_runStopQueue() {
-		this.queue.cancel();
 	}
 
 	public void DONE_runInfoUpdate() {

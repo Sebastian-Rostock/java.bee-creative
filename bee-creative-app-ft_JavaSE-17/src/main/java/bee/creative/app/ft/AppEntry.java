@@ -17,7 +17,7 @@ class AppEntry {
 	}
 
 	public static AppEntry parse(final String src) {
-		final var parts = Strings.split(AppEntry.ITEM_PATTERN, src.trim());
+		final var parts = Strings.split(AppEntry.ITEM_PATTERN, src);
 		final var count = parts.size();
 		if (count == 0) return null;
 		if (count == 1) return new AppEntry(parts.get(0));

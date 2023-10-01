@@ -1,44 +1,60 @@
 package bee.creative.app.ft;
 
-public enum AppIcon {
+class AppIcon {
 
-	app, //
-	undo, // FUNCTION
-	redo, // FUNCTION
-	swap, // FUNCTION
-	sort, //
-	sortLabel, // FUNCTION
-	sortLength, // FUNCTION
-	sortChange, // FUNCTION
-	sortCreate, // FUNCTION
-	sortReverse, // FUNCTION
+	public static final String //
 
-	filter, //
-	filterFile, // FUNCTION
-	filterFolder, // FUNCTION
-	filterLabel, // FUNCTION
-	filterLength, // FUNCTION
-	filterChange, // FUNCTION
-	filterCreate, // FUNCTION
+	iconApp = "file-gear.png", //
 
-	hash, hashSetup, hashUpdate, hashAnalyze,
+		menuUndo = "arrow-undo.png", //
+		menuRedo = "arrow-redo.png", //
+		menuSwap = "arrow-swap.png", //
 
-	file, folder,
+		menuSort = "sort-asc.png", //
+		sortLabel = "name.png", //
+		sortLength = "size.png", //
+		sortChange = "update.png", //
+		sortCreate = "date.png", //
+		sortReverse = "sort-des.png", //
 
-	deleteFile, deleteFolder,
+		menuFilter = "filter.png", //
+		itemFilterBySourceFile = "file.png", //
+		filterFolder = "folder.png", //
+		filterLabel = "name.png", //
+		filterLength = "size.png", //
+		filterChange = "update.png", //
+		filterCreate = "date.png", //
 
-	recycleFile, recycleFolder,
+		menuHash = "hash.png", //
+		hashSetup = "hash-check.png", //
+		hashUpdate = "hash-update.png", //
+		hashAnalyze = "clone.png", //
 
-	resolveFile, resolveFolder,
+		menuMemory = "mem.png", //
+		saveVariable = "copy.png", //
+		saveClipboard = "copy.png", //
+		loadVariable = "paste.png", //
+		loadClipboard = "paste.png", //
 
-	showFile, copyFile, moveFile, refreshFile,
+		file = "file.png", //
+		deleteFile = "delete-perm.png", //
+		recycleFile = "delete-temp.png", //
+		refreshFile = "update.png", //
+		showFile = "show.png", //
+		copyFile = "copy.png", //
+		moveFile = "move.png", //
 
-	name, setupTimeName, updateTimeName, createTimePath,
+		folder = "folder.png", //
+		deleteFolder = "delete-perm.png", //
+		recycleFolder = "delete-temp.png", //
+		resolveFile = "file-lup.png", //
+		resolveFolder = "folder-lup.png", //
 
-	clipboard, clipboardCopy, clipboardPaste,
+		menuName = "name.png", //
+		setupTimeName = "name-okay.png", //
+		updateTimeName = "name-update.png", //
+		updateTimePath = "name-edit.png", //
 
-	var, varSave, varLoad, varUnion, varExcept, varIntersect,
-
-	stop
+		stop = "stop.png";
 
 }
