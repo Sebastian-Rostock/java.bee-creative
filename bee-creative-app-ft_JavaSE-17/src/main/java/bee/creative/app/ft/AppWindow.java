@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -167,21 +168,21 @@ public class AppWindow {
 			this.createMenuItem(menu, AppIcon.updateTimePath, "Zeitpfade aktualisieren", null);
 		});
 		this.createMenu(res, AppIcon.file, null, menu -> {
-			this.createMenuItem(menu, AppIcon.deleteFile, "Dateien löschen", this::askDeleteSourceFilesPermanently);
-			this.createMenuItem(menu, AppIcon.recycleFile, "Dateien recyclen", this::askDeleteSourceFilesTemporary);
+			this.createMenuItem(menu, AppIcon.deleteFile, "Dateien löschen", this::runDeleteSourceFilesPermanently_DONE);
+			this.createMenuItem(menu, AppIcon.recycleFile, "Dateien recyclen", this::runDeleteSourceFilesTemporary_DONE);
 			this.createMenuLine(menu);
 			this.createMenuItem(menu, AppIcon.refreshFile, "Dateien erneuern", null);
 			this.createMenuLine(menu);
 			this.createMenuItem(menu, AppIcon.showFile, "Dateien anzeigen", this::DONE_askShowSourcesAndTargets);
-			this.createMenuItem(menu, AppIcon.copyFile, "Dateien kopieren", this::DONE_askCopySourcesToTargets);
-			this.createMenuItem(menu, AppIcon.moveFile, "Dateien umbenennen", this::DONE_askMoveSourcesToTargets);
+			this.createMenuItem(menu, AppIcon.copyFile, "Dateien kopieren", this::askCopySourcesToTargets_DONE);
+			this.createMenuItem(menu, AppIcon.moveFile, "Dateien umbenennen", this::askMoveSourcesToTargets_DONE);
 		});
 		this.createMenu(res, AppIcon.folder, null, menu -> {
-			this.createMenuItem(menu, AppIcon.deleteFolder, "Verzeichnisse löschen", this::askDeleteSourceFoldersPermanently);
-			this.createMenuItem(menu, AppIcon.recycleFolder, "Verzeichnisse recyclen", this::askDeleteSourceFoldersTemporary);
+			this.createMenuItem(menu, AppIcon.deleteFolder, "Verzeichnisse löschen", this::runDeleteSourceFoldersPermanently_DONE);
+			this.createMenuItem(menu, AppIcon.recycleFolder, "Verzeichnisse recyclen", this::runDeleteSourceFoldersTemporary_DONE);
 			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.resolveFile, "Dateien auflösen...", this::askReplaceEntriesWithSourcesFiles);
-			this.createMenuItem(menu, AppIcon.resolveFolder, "Verteichnisse auflösen...", this::askReplaceEntriesWithSourcesFolders);
+			this.createMenuItem(menu, AppIcon.resolveFile, "Dateien auflösen...", this::runResolveSourceFiles_DONE);
+			this.createMenuItem(menu, AppIcon.resolveFolder, "Verteichnisse auflösen...", this::runResolveSourceFolders_DONE);
 		});
 		this.stopMenuItem = this.createMenuItem(res, AppIcon.stop, null, this::runStop_DONE);
 	}
@@ -262,8 +263,8 @@ public class AppWindow {
 			@Override
 			public void onSelect(AppProcess proc) {
 				AppWindow.this.display.syncExec(() -> {
-					enableText_DONE();
-					enableStop_DONE();
+					AppWindow.this.enableText_DONE();
+					AppWindow.this.enableStop_DONE();
 				});
 			}
 
@@ -284,11 +285,11 @@ public class AppWindow {
 		this.display.syncExec(() -> this.text.setText(value));
 	}
 
-	public List<AppEntry> DONE_getEntries() {
+	public List<AppEntry> getEntries_DONE() {
 		return AppEntry.parseAll(this.getInput());
 	}
 
-	public void DONE_setEntries(Iterable<AppEntry> value) {
+	public void setEntries_DONE(Iterable<AppEntry> value) {
 		this.setInput(AppEntry.printAll(value));
 	}
 
@@ -355,8 +356,8 @@ public class AppWindow {
 	public void runSwap_DONE() {
 		this.runTask("Tauschen", proc -> {
 			final var entries = AppEntry.list();
-			this.runItems(proc, this.DONE_getEntries(), entry -> entries.add(new AppEntry(entry.target.text, entry.source.text)), entries::add);
-			this.DONE_setEntries(entries);
+			this.runItems(proc, this.getEntries_DONE(), entry -> entries.add(new AppEntry(entry.target.text, entry.source.text)), entries::add);
+			this.setEntries_DONE(entries);
 		});
 	}
 
@@ -372,7 +373,7 @@ public class AppWindow {
 				entries.add(new AppEntry(input, ""));
 			}
 			this.runItems(proc, sourceList, source -> entries.add(new AppEntry(source, "")), null);
-			this.DONE_setEntries(entries);
+			this.setEntries_DONE(entries);
 		});
 	}
 
@@ -380,12 +381,12 @@ public class AppWindow {
 		this.runTask(title, proc -> {
 			var resultList = AppEntry.list();
 			var sourceFilter = filterBuilder.get();
-			this.runItems(proc, this.DONE_getEntries(), entry -> {
+			this.runItems(proc, this.getEntries_DONE(), entry -> {
 				if (sourceFilter.accept(entry.source)) {
 					resultList.add(entry);
 				}
 			}, resultList::add);
-			this.DONE_setEntries(resultList);
+			this.setEntries_DONE(resultList);
 		});
 	}
 
@@ -484,17 +485,17 @@ public class AppWindow {
 
 	public void DONE_runSortEntriesReverse() {
 		this.runTask("Sortierung umkehren", proc -> {
-			var resultList = this.DONE_getEntries();
+			var resultList = this.getEntries_DONE();
 			Collections.reverse(resultList);
-			this.DONE_setEntries(resultList);
+			this.setEntries_DONE(resultList);
 		});
 	}
 
 	private void DONE_runSortEntriesBySource(String title, Comparator<AppItem> order) {
 		this.runTask(title, proc -> {
-			var resultList = this.DONE_getEntries();
+			var resultList = this.getEntries_DONE();
 			resultList.sort(Comparators.optionalize(order).translate(entry -> entry.source));
-			this.DONE_setEntries(resultList);
+			this.setEntries_DONE(resultList);
 		});
 	}
 
@@ -547,7 +548,7 @@ public class AppWindow {
 
 			var pathSet = new HashSet2<>(1000);
 			var itemList = new LinkedList<AppItem>();
-			var entryList = this.DONE_getEntries();
+			var entryList = this.getEntries_DONE();
 
 			// Dateien Duplikatfrei erfassen
 			this.runItems(proc, entryList, line -> {
@@ -647,7 +648,7 @@ public class AppWindow {
 				}
 			}, null);
 
-			this.DONE_setEntries(result);
+			this.setEntries_DONE(result);
 		});
 	}
 
@@ -663,7 +664,7 @@ public class AppWindow {
 
 	public void DONE_runCreateHashes() {
 		this.runTask("Streuwertepuffer anlegen", proc -> {
-			this.runItems(proc, this.DONE_getEntries(), entry -> {
+			this.runItems(proc, this.getEntries_DONE(), entry -> {
 				try {
 					if (entry.source.fileOrNull() != null) {
 						FTHashes.fileFrom(entry.source.text).createNewFile();
@@ -693,7 +694,7 @@ public class AppWindow {
 			var caches = new FTCaches();
 			caches.restore();
 			var hashSize = this.settings.findClonesHashSize.getValue();
-			this.runItems(proc, this.DONE_getEntries(), entry -> {
+			this.runItems(proc, this.getEntries_DONE(), entry -> {
 				var file = entry.source.fileOrNull();
 				if ((file != null) && file.isFile()) {
 					caches.get(file.getPath(), hashSize);
@@ -765,12 +766,12 @@ public class AppWindow {
 	public void runResolveSourcesToFolders() {
 	}
 
-	private void runReplaceEntriesWithSources(boolean isFile) {
+	private void runResolveSources(boolean isFile) {
 		this.runTask(isFile ? "Dateien auflösen" : "Verzeichnisse auflösen", proc -> {
 			var pathSet = new HashSet2<>(100);
 			var result = AppEntry.list();
 			var fileStack = new LinkedList<File>();
-			this.runItems(proc, this.DONE_getEntries(), line -> {
+			this.runItems(proc, this.getEntries_DONE(), line -> {
 				var file = line.source.fileOrNull();
 				if (file != null) {
 					proc.steps++;
@@ -800,27 +801,27 @@ public class AppWindow {
 				proc.steps--;
 			}
 			result.addAll(0, Iterables.translate(fileStack, file -> new AppEntry(file.getPath())).toList());
-			this.DONE_setEntries(result);
+			this.setEntries_DONE(result);
 		});
 	}
 
-	public void askReplaceEntriesWithSourcesFiles() {
+	public void runResolveSourceFiles_DONE() {
 		this.runDialog_DONE()//
 			.useTitle("Sollen alle Verzeichnispfade wirklich durch die Pfade aller darin enthaltenen Dateien ersetzt werden?") //
 			.useMessage("""
 				Die Dateiauflösung wird in allen Unterverzeichnissen fortgesetzt. \
 				Duplikate sowie relative Eingabepfade werden ignoriert, die zu Dateien bleiben erhalten.""") //
-			.useButton("Dateipfade ermitteln", () -> this.runReplaceEntriesWithSources(true)) //
+			.useButton("Dateipfade ermitteln", () -> this.runResolveSources(true)) //
 		;
 	}
 
-	public void askReplaceEntriesWithSourcesFolders() {
+	public void runResolveSourceFolders_DONE() {
 		this.runDialog_DONE()//
 			.useTitle("Sollen alle Verzeichnispfade wirklich um die Pfade aller darin enthaltenen Verzeichnisse ergänzt werden?") //
 			.useMessage("""
 				Die Verzeichnisauflösung wird in allen Unterverzeichnissen fortgesetzt. \
 				Duplikate sowie relative Eingabepfade und die zu Dateien werden ignoriert.""") //
-			.useButton("Verzeichnispfade ermitteln", () -> this.runReplaceEntriesWithSources(false)) //
+			.useButton("Verzeichnispfade ermitteln", () -> this.runResolveSources(false)) //
 		;
 	}
 
@@ -839,58 +840,81 @@ public class AppWindow {
 			.open();
 	}
 
-	void askDeleteSourceFilesTemporary() {
+	private void runDeleteSourcesImpl(boolean isFile, boolean isTemp) {
+		this.runTask(isFile ? (isTemp ? "Dateien recyclen" : "Dateien löschen") : (isTemp ? "Verzeichnisse recyclen" : "Verzeichnisse löschen"), proc -> {
+			var pathSet = new HashSet2<String>(1000);
+			this.runItems(proc, this.getEntries_DONE(), entry -> {
+				if (entry.source.fileOrNull() == null) return;
+				pathSet.add(entry.source.file.getPath());
+			}, null);
+			var desktop = Desktop.getDesktop();
+			var pathList = new ArrayList<>(pathSet);
+			pathList.sort(Comparators.IntComparator.INSTANCE.translate(String::length).reverse());
+			pathSet.clear();
+			this.runItems(proc, pathList, path -> {
+				try {
+					var file = new File(path);
+					if (!isFile) {
+						if (!file.isDirectory()) return;
+						var files = file.list();
+						if ((files != null) && (files.length != 0)) return;
+					} else {
+						if (!file.isFile()) return;
+					}
+					if (isTemp) {
+						if (!desktop.moveToTrash(file)) return;
+					} else {
+						if (!file.delete()) return;
+					}
+					pathSet.add(path);
+				} catch (Exception ignore) {}
+			}, null);
+			var keepList = AppEntry.list();
+			this.runItems(proc, this.getEntries_DONE(), line -> {
+				var file = line.source.fileOrNull();
+				if ((file == null) || pathSet.contains(file.getPath())) return;
+				keepList.add(line);
+			}, keepList::add);
+			this.setEntries_DONE(keepList);
+		});
+	}
+
+	public void runDeleteSourceFilesTemporary_DONE() {
 		this.runDialog_DONE()//
-			.useTitle("Sollen alle Dateien wirklich in den Papierkorb verschoben werden?") //
+			.useTitle("Sollen alle Eingabedateien wirklich in den Papierkorb verschoben werden?") //
 			.useMessage("Die Zeilen recycelter Dateien werden aus der Pfadtabelle entfert.") //
-			.useButton("Ja", this::runDeleteSourceFilesTemporary) //
-			.useButton("Nein") //
+			.useButton("Dateien recyclen", () -> this.runDeleteSourcesImpl(true, true)) //
 		;
 	}
 
-	public void runDeleteSourceFilesTemporary() {
-	}
-
-	void askDeleteSourceFilesPermanently() {
+	public void runDeleteSourceFilesPermanently_DONE() {
 		this.runDialog_DONE()//
-			.useTitle("Sollen alle Dateien wirklich endgültig gelöscht werden?") //
+			.useTitle("Sollen alle Eingabedateien wirklich endgültig gelöscht werden?") //
 			.useMessage("Die Zeilen gelöschter Dateien werden aus der Pfadtabelle entfert.") //
-			.useButton("Ja", this::runDeleteSourceFilesPermanently) //
-			.useButton("Nein") //
+			.useButton("Dateien löschen", () -> this.runDeleteSourcesImpl(true, false)) //
 		;
 	}
 
-	public void runDeleteSourceFilesPermanently() {
-	}
-
-	void askDeleteSourceFoldersTemporary() {
+	public void runDeleteSourceFoldersTemporary_DONE() {
 		this.runDialog_DONE()//
 			.useTitle("Sollen alle leeren Verzeichnisse wirklich in den Papierkorb verschoben werden?") //
 			.useMessage("Die Zeilen recycelter Verzeichnisse werden aus der Pfadtabelle entfert.") //
-			.useButton("Ja", this::runDeleteSourceFoldersTemporary) //
-			.useButton("Nein") //
+			.useButton("Verzeichnisse recyclen", () -> this.runDeleteSourcesImpl(false, true)) //
 		;
 	}
 
-	public void runDeleteSourceFoldersTemporary() {
-	}
-
-	void askDeleteSourceFoldersPermanently() {
+	public void runDeleteSourceFoldersPermanently_DONE() {
 		this.runDialog_DONE()//
 			.useTitle("Sollen alle leeren Verzeichnisse wirklich endgültig gelöscht werden?") //
 			.useMessage("Die Zeilen gelöschter Verzeichnisse werden aus der Pfadtabelle entfert.") //
-			.useButton("Ja", this::runDeleteSourceFoldersPermanently) //
-			.useButton("Nein") //
+			.useButton("Verzeichnisse löschen", () -> this.runDeleteSourcesImpl(false, false)) //
 		;
 	}
 
-	public void runDeleteSourceFoldersPermanently() {
-	}
-
-	private void DONE_runProcSourcesToTargets(String title, boolean isMove) {
-		this.runTask(title, proc -> {
+	private void runProcSourcesToTargetsImpl_DONE(boolean isMove) {
+		this.runTask(isMove ? "Dateiverschieben" : "Dateikopieren", proc -> {
 			var resultList = AppEntry.list();
-			this.runItems(proc, this.DONE_getEntries(), entry -> {
+			this.runItems(proc, this.getEntries_DONE(), entry -> {
 				var source = entry.source;
 				var target = entry.target;
 				if ((source.fileOrNull() != null) && source.fileOrNull().isFile() && (target.fileOrNull() != null) && !target.fileOrNull().isFile()) {
@@ -906,42 +930,32 @@ public class AppWindow {
 				}
 				resultList.add(entry);
 			}, resultList::add);
-			this.DONE_setEntries(resultList);
+			this.setEntries_DONE(resultList);
 		});
 	}
 
-	public void DONE_askCopySourcesToTargets() {
+	public void askCopySourcesToTargets_DONE() {
 		this.runDialog_DONE() //
 			.useTitle("Sollen alle Dateien wirklich nicht ersetzend kopiert werden?") //
 			.useMessage("""
-				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad.\s\
-				Trennzeichen der Pfade ist ein Tabulator.
-				 \
+				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad. \
+				Trennzeichen der Pfade ist ein Tabulator. \
 				Die Zeilen erfolgreich kopierter Dateien werden entfernt.""") //
-			.useButton("Ja", this::DONE_runCopySourcesToTargets) //
+			.useButton("Ja", () -> this.runProcSourcesToTargetsImpl_DONE(false)) //
 			.useButton("Nein") //
 		;
 	}
 
-	public void DONE_runCopySourcesToTargets() {
-		this.DONE_runProcSourcesToTargets("Dateikopieren", false);
-	}
-
-	public void DONE_askMoveSourcesToTargets() {
+	public void askMoveSourcesToTargets_DONE() {
 		this.runDialog_DONE() //
 			.useTitle("Sollen alle Dateien wirklich nicht ersetzend verschoben werden?") //
 			.useMessage("""
-				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad.\s\
-				Trennzeichen der Pfade ist ein Tabulator.
-				 \
+				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad. \
+				Trennzeichen der Pfade ist ein Tabulator. \
 				Die Zeilen erfolgreich verschobener Dateien werden entfernt.""") //
-			.useButton("Ja", this::DONE_runMoveSourcesToTargets) //
+			.useButton("Ja", () -> this.runProcSourcesToTargetsImpl_DONE(true)) //
 			.useButton("Nein") //
 		;
-	}
-
-	public void DONE_runMoveSourcesToTargets() {
-		this.DONE_runProcSourcesToTargets("Dateiverschieben", true);
 	}
 
 	public void DONE_askShowSourcesAndTargets() {
@@ -964,7 +978,7 @@ public class AppWindow {
 		this.runTask("Dateien anzeigen", proc -> {
 			var parentFile = Files.createTempDirectory("file-tool-app-").toFile();
 			var linkCount = new int[2];
-			var inputList = this.DONE_getEntries();
+			var inputList = this.getEntries_DONE();
 			this.runItems(proc, inputList, entry -> {
 				var source = entry.source;
 				var target = entry.target;
