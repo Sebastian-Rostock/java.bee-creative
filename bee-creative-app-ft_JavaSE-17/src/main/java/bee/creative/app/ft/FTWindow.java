@@ -1307,7 +1307,7 @@ class FTWindow implements Runnable {
 				"Jedem Zielpfad wird zudem der Streuwert sowie die Dateigröße informativ angefügte. " + //
 				"Quellpfade ohne Zielpfade werden verworfen. " + //
 				"Duplikate sowie Relative Dateipfade werden verworfen.\n" + //
-				"Die Streuwerte werden in der Pufferdatei " + FTHashes.FILENAME + " zwischengespeichert. " + //
+				"Die Streuwerte werden in der Pufferdatei " + AppHashes.FILENAME + " zwischengespeichert. " + //
 				"Dabei wird die im Elternpfad näheste bzw. die im Anwendungsverzeichnis liegende Pufferdatei verwendet.") //
 			.withOption("Puffergröße für Streuwert", this.settings.findClonesHashSize) //
 			.withOption("Puffergröße für Dateivergleich", this.settings.findClonesTestSize) //

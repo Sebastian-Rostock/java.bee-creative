@@ -483,7 +483,7 @@ public class FTMain extends FTWindow {
 	@Override
 	public void createTableWithClonesRequest(final String inputText, final long hashSize, final long testSize) throws Exception {
 
-		var caches = new FTCaches();
+		var caches = new AppCaches();
 		caches.restore();
 
 		final var pathSet = this.createPathSet();
@@ -557,7 +557,7 @@ public class FTMain extends FTWindow {
 
 							prev = item3.prev;
 
-							item3.data = new FTData(item3.text, testSize2);
+							item3.data = new AppData(item3.text, testSize2);
 
 							item3.prev = itemDataListMap.put(item3.data, item3);
 							if (item3.prev != null) {
@@ -595,7 +595,7 @@ public class FTMain extends FTWindow {
 
 	public void updateHashesRequest(final String inputText, final long hashSize, final long testSize) throws Exception {
 	
-		var caches = new FTCaches();
+		var caches = new AppCaches();
 		caches.restore();
 	
 		final var pathSet = this.createPathSet();

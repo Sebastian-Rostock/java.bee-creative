@@ -13,15 +13,15 @@ import bee.creative.util.HashMap;
 /** Diese Klasse implementiert einen persistierbaren Puffer für Streuwerte von Dateien.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class FTHashes implements FTStorable2 {
+class AppHashes implements FTStorable2 {
 
 	public static final String FILENAME = "ft-cache.csv.gz";
 
 	public static File fileFrom(final String rootpath) {
-		return rootpath.isEmpty() ? new File(FTHashes.FILENAME).getAbsoluteFile() : new File(rootpath, FTHashes.FILENAME);
+		return rootpath.isEmpty() ? new File(AppHashes.FILENAME).getAbsoluteFile() : new File(rootpath, AppHashes.FILENAME);
 	}
 
-	public FTHashes(final String rootpath) {
+	public AppHashes(final String rootpath) {
 		try {
 			this.digest = MessageDigest.getInstance("SHA-256");
 			this.rootpath = rootpath;
@@ -50,7 +50,7 @@ class FTHashes implements FTStorable2 {
 			return hashCode;
 		}
 		final var hashCode = this.getImpl(filePath, fileSize, hashSize);
-		entry = this.setHashCount(FTHashes.EMPTY, 1);
+		entry = this.setHashCount(AppHashes.EMPTY, 1);
 		this.setFileSize(entry, fileSize);
 		this.setFileTime(entry, fileTime);
 		this.setHashSize(entry, 0, hashSize2);
@@ -61,12 +61,12 @@ class FTHashes implements FTStorable2 {
 
 	@Override
 	public void persist() {
-		this.persist(FTHashes.fileFrom(this.rootpath));
+		this.persist(AppHashes.fileFrom(this.rootpath));
 	}
 
 	@Override
 	public void persist(final CSVWriter writer) throws NullPointerException, IOException {
-		writer.writeEntry((Object[])FTHashes.FILEHEAD);
+		writer.writeEntry((Object[])AppHashes.FILEHEAD);
 		final var rootLength = this.rootpath.length();
 		for (final var src: this.cache.entrySet()) {
 			final var entry = src.getValue();
@@ -92,15 +92,15 @@ class FTHashes implements FTStorable2 {
 
 	@Override
 	public void restore() {
-		this.restore(FTHashes.fileFrom(this.rootpath));
+		this.restore(AppHashes.fileFrom(this.rootpath));
 	}
 
 	@Override
 	public void restore(final CSVReader reader) throws NullPointerException, IllegalArgumentException, IOException {
-		if (!Arrays.equals(FTHashes.FILEHEAD, reader.readEntry())) return;
+		if (!Arrays.equals(AppHashes.FILEHEAD, reader.readEntry())) return;
 		for (var src = reader.readEntry(); src != null; src = reader.readEntry()) {
 			final var hashCount = (src.length - 4) / 2;
-			final var entry = this.setHashCount(FTHashes.EMPTY, hashCount);
+			final var entry = this.setHashCount(AppHashes.EMPTY, hashCount);
 			this.setFileSize(entry, Long.valueOf(src[2]));
 			this.setFileTime(entry, Long.valueOf(src[3]));
 			for (var i = 0; i < hashCount; i++) {
@@ -128,14 +128,14 @@ class FTHashes implements FTStorable2 {
 	private final String rootpath;
 
 	private String getImpl(final String filePath, final long fileSize, final long hashSize) {
-		try (var channel = FTData.openChannel(filePath)) {
+		try (var channel = AppData.openChannel(filePath)) {
 			this.digest.reset();
 			if (fileSize > (2 * hashSize)) {
-				FTData.digestChannel(this.digest, channel, hashSize);
+				AppData.digestChannel(this.digest, channel, hashSize);
 				channel.position(fileSize - hashSize);
-				FTData.digestChannel(this.digest, channel, hashSize);
+				AppData.digestChannel(this.digest, channel, hashSize);
 			} else {
-				FTData.digestChannel(this.digest, channel, fileSize);
+				AppData.digestChannel(this.digest, channel, fileSize);
 			}
 			return FEMBinary.from(this.digest.digest()).toString(false);
 		} catch (final Exception error) {

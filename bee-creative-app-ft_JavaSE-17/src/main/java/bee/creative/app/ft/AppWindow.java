@@ -52,8 +52,6 @@ public class AppWindow {
 		FTWindow.openAndWait(shell.shell);
 	}
 
-	public final Display display;
-
 	public AppWindow(Display display) {
 		this.display = display;
 		this.shell = this.createShell();
@@ -66,6 +64,8 @@ public class AppWindow {
 		this.enableRedo_DONE();
 		this.DONE_runInfoUpdate();
 	}
+
+	private final Display display;
 
 	private final Shell shell;
 
@@ -173,9 +173,9 @@ public class AppWindow {
 			this.createMenuLine(menu);
 			this.createMenuItem(menu, AppIcon.refreshFile, "Dateien erneuern", null);
 			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.showFile, "Dateien anzeigen", this::DONE_askShowSourcesAndTargets);
-			this.createMenuItem(menu, AppIcon.copyFile, "Dateien kopieren", this::askCopySourcesToTargets_DONE);
-			this.createMenuItem(menu, AppIcon.moveFile, "Dateien umbenennen", this::askMoveSourcesToTargets_DONE);
+			this.createMenuItem(menu, AppIcon.showFile, "Dateien anzeigen", this::runShowSourcesAndTargets_DONE);
+			this.createMenuItem(menu, AppIcon.copyFile, "Dateien kopieren", this::runCopySourcesToTargets_DONE);
+			this.createMenuItem(menu, AppIcon.moveFile, "Dateien umbenennen", this::runMoveSourcesToTargets_DONE);
 		});
 		this.createMenu(res, AppIcon.folder, null, menu -> {
 			this.createMenuItem(menu, AppIcon.deleteFolder, "Verzeichnisse löschen", this::runDeleteSourceFoldersPermanently_DONE);
@@ -529,7 +529,7 @@ public class AppWindow {
 				Eingabepfade ohne Ausgabepfad beschreiben einzigartige Dateien.
 				Die Streuwerte werden in der Pufferdatei '%s' zwischengespeichert. \
 				Dabei wird die im Elternpfad näheste bzw. die im Verzeichnis dieser Anwendung liegende Pufferdatei verwendet.
-				Relative Eingabepfade und die zu Verzeichnissen werden ignoriert.""", FTHashes.FILENAME) //
+				Relative Eingabepfade und die zu Verzeichnissen werden ignoriert.""", AppHashes.FILENAME) //
 			.useOption("Puffergröße für Streuwert", this.settings.findClonesHashSize) //
 			.useOption("Puffergröße für Dateivergleich", this.settings.findClonesTestSize) //
 			.useButton("Duplikate behalten", () -> this.runReplaceEntriesWithSourceClones(true)) //
@@ -543,7 +543,7 @@ public class AppWindow {
 			var hashSize = this.settings.findClonesHashSize.getValue();
 			var testSize = this.settings.findClonesTestSize.getValue();
 
-			var caches = new FTCaches();
+			var caches = new AppCaches();
 			caches.restore();
 
 			var pathSet = new HashSet2<>(1000);
@@ -607,7 +607,7 @@ public class AppWindow {
 
 								prev = item3.prev;
 
-								item3.data = new FTData(item3.text, testSize2);
+								item3.data = new AppData(item3.text, testSize2);
 
 								item3.prev = itemDataListMap.put(item3.data, item3);
 								if (item3.prev != null) {
@@ -657,7 +657,7 @@ public class AppWindow {
 			.useTitle("Sollen Streuwertepuffer in den Eingabeordnern angelegt werden?") //
 			.useMessage("""
 				Die Pufferdateien tragen den Namen '%s'.
-				Relative Eingabepfade und die zu Dateien werden ignoriert.""", FTHashes.FILENAME) //
+				Relative Eingabepfade und die zu Dateien werden ignoriert.""", AppHashes.FILENAME) //
 			.useButton("Streuwertepuffer erzeugen", () -> this.DONE_runCreateHashes()) //
 		;
 	}
@@ -667,7 +667,7 @@ public class AppWindow {
 			this.runItems(proc, this.getEntries_DONE(), entry -> {
 				try {
 					if (entry.source.fileOrNull() != null) {
-						FTHashes.fileFrom(entry.source.text).createNewFile();
+						AppHashes.fileFrom(entry.source.text).createNewFile();
 					}
 				} catch (IOException e) {
 					throw new RuntimeException(e);
@@ -683,7 +683,7 @@ public class AppWindow {
 				Die SHA-256-Streuwerte werden aus höchstens der unten genannten Anzanl an Bytes jeweils ab dem Dateibeginn und dem Dateiende berechnet \
 				und in der Pufferdatei '%s' zwischengespeichert. Dabei wird die im Elternpfad näheste bzw. die im Verzeichnis dieser Anwendung liegende \
 				Pufferdatei verwendet.
-				Relative Eingabepfade und die zu Verzeichnissen werden ignoriert.""", FTHashes.FILENAME) //
+				Relative Eingabepfade und die zu Verzeichnissen werden ignoriert.""", AppHashes.FILENAME) //
 			.useOption("Puffergröße für Streuwert", this.settings.findClonesHashSize) //
 			.useButton("Streuwertepuffer befüllen", () -> this.DONE_runUpdateHashes()) //
 		;
@@ -691,7 +691,7 @@ public class AppWindow {
 
 	public void DONE_runUpdateHashes() {
 		this.runTask("Streuwertepuffer befüllen", proc -> {
-			var caches = new FTCaches();
+			var caches = new AppCaches();
 			caches.restore();
 			var hashSize = this.settings.findClonesHashSize.getValue();
 			this.runItems(proc, this.getEntries_DONE(), entry -> {
@@ -934,47 +934,44 @@ public class AppWindow {
 		});
 	}
 
-	public void askCopySourcesToTargets_DONE() {
+	public void runCopySourcesToTargets_DONE() {
 		this.runDialog_DONE() //
 			.useTitle("Sollen alle Dateien wirklich nicht ersetzend kopiert werden?") //
 			.useMessage("""
 				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad. \
 				Trennzeichen der Pfade ist ein Tabulator. \
 				Die Zeilen erfolgreich kopierter Dateien werden entfernt.""") //
-			.useButton("Ja", () -> this.runProcSourcesToTargetsImpl_DONE(false)) //
-			.useButton("Nein") //
+			.useButton("Dateien kopieren", () -> this.runProcSourcesToTargetsImpl_DONE(false)) //
 		;
 	}
 
-	public void askMoveSourcesToTargets_DONE() {
+	public void runMoveSourcesToTargets_DONE() {
 		this.runDialog_DONE() //
 			.useTitle("Sollen alle Dateien wirklich nicht ersetzend verschoben werden?") //
 			.useMessage("""
 				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad. \
 				Trennzeichen der Pfade ist ein Tabulator. \
 				Die Zeilen erfolgreich verschobener Dateien werden entfernt.""") //
-			.useButton("Ja", () -> this.runProcSourcesToTargetsImpl_DONE(true)) //
-			.useButton("Nein") //
+			.useButton("Dateien verschieben", () -> this.runProcSourcesToTargetsImpl_DONE(true)) //
 		;
 	}
 
-	public void DONE_askShowSourcesAndTargets() {
+	public void runShowSourcesAndTargets_DONE() {
 		this.runDialog_DONE() //
 			.useTitle("Sollen die Quell- und Zieldateien wirklich angezeigt werden?") //
 			.useMessage("""
-				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad.\s\
-				Trennzeichen der Pfade ist ein Tabulator.
-				 \
-				Die Quell- und Zieldateien werden als Symlinks in ein temporäres Verzeichnis eingefügt.\s\
-				Die Quelldateien werden als -ORIGINAL- gekennzeichnet, die Zieldateien als -DUPLIKAT-.\s\
+				Jede Zeile des Textfeldes besteht dazu aus einem Quell- und einen Zieldateipfad. \
+				Trennzeichen der Pfade ist ein Tabulator. \
+				Die Quell- und Zieldateien werden als Symlinks in ein temporäres Verzeichnis eingefügt. \
+				Die Quelldateien werden als -ORIGINAL- gekennzeichnet, die Zieldateien als -DUPLIKAT-. \
 				Das temporäre Verzeichnis wird abschließend angezeigt.
 				Das Erzeugen von Symlinks benötigt Administrator-Rechte!""") //
-			.useButton("Ja", this::DONE_runShowSourcesAndTargets) //
+			.useButton("Ja", this::runShowSourcesAndTargetsImpl_DONE) //
 			.useButton("Nein") //
 		;
 	}
 
-	public void DONE_runShowSourcesAndTargets() {
+	private void runShowSourcesAndTargetsImpl_DONE() {
 		this.runTask("Dateien anzeigen", proc -> {
 			var parentFile = Files.createTempDirectory("file-tool-app-").toFile();
 			var linkCount = new int[2];
