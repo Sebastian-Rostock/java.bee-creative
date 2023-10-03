@@ -54,7 +54,7 @@ public class AppWindow {
 		this.display = Display.getDefault();
 		this.edit = System.currentTimeMillis() + Integer.MIN_VALUE;
 		{
-			this.queue = new AppQueue() {
+			this.procQueue = new AppQueue() {
 
 				@Override
 				public void onError(AppProcess proc, Throwable error) {
@@ -78,71 +78,71 @@ public class AppWindow {
 			this.shell.setText("File-Tool");
 			this.shell.setSize(600, 400);
 			this.shell.setLayout(new GridLayout(1, false));
-			var mbar = new Menu(this.shell, SWT.BAR);
-			this.shell.setMenuBar(mbar);
+			this.shell.setMenuBar(new Menu(this.shell, SWT.BAR));
+			var mbar = this.shell.getMenuBar();
 
-			this.undo = this.createMenuItem(mbar, AppIcon.menuUndo, null, this::runUndo_DONE);
+			this.undo = this.createMenuItem(mbar, "arrow-undo.png", null, this::runUndo_DONE);
 			this.undo.setAccelerator(SWT.CTRL | 'Z');
 
-			this.redo = this.createMenuItem(mbar, AppIcon.menuRedo, null, this::runRedo_DONE);
+			this.redo = this.createMenuItem(mbar, "arrow-redo.png", null, this::runRedo_DONE);
 			this.redo.setAccelerator(SWT.CTRL | 'Y');
 
-			this.createMenuItem(mbar, AppIcon.menuSwap, null, this::runSwap_DONE);
+			this.createMenuItem(mbar, "arrow-swap.png", null, this::runSwap_DONE);
 
-			this.createMenu(mbar, AppIcon.menuFilter, null, menu -> {
-				this.createMenuItem(menu, AppIcon.itemFilterBySourceFile, "Dateien filtern...", this::runFilterBySourceFile_DONE);
-				this.createMenuItem(menu, AppIcon.itemFilterBySourceFolder, "Verzeichnisse filtern...", this::runFilterBySourceFolder_DONE);
+			this.createMenu(mbar, "filter.png", null, menu -> {
+				this.createMenuItem(menu, "file.png", "Dateien filtern...", this::runFilterBySourceFile_DONE);
+				this.createMenuItem(menu, "folder.png", "Verzeichnisse filtern...", this::runFilterBySourceFolder_DONE);
 				this.createMenuLine(menu);
-				this.createMenuItem(menu, AppIcon.itemFilterBySourceChange, "Nach Änderung filtern..", this::runFilterBySourceChange_DONE);
-				this.createMenuItem(menu, AppIcon.itemFilterBySourceCreate, "Nach Erzeugung filtern...", this::runFilterBySourceCreate_DONE);
-				this.createMenuItem(menu, AppIcon.itemFilterBySourceSize, "Nach Dateigröße filtern...", this::runFilterBySourceSize_DONE);
-				this.createMenuItem(menu, AppIcon.itemFilterBySourcePath, "Nach Datenpfad filtern..", this::runFilterBySourcePath_DONE);
+				this.createMenuItem(menu, "update.png", "Nach Änderung filtern..", this::runFilterBySourceChange_DONE);
+				this.createMenuItem(menu, "date.png", "Nach Erzeugung filtern...", this::runFilterBySourceCreate_DONE);
+				this.createMenuItem(menu, "size.png", "Nach Dateigröße filtern...", this::runFilterBySourceSize_DONE);
+				this.createMenuItem(menu, "name.png", "Nach Datenpfad filtern..", this::runFilterBySourcePath_DONE);
 			});
-			this.createMenu(mbar, AppIcon.menuSort, null, menu -> {
-				this.createMenuItem(menu, AppIcon.itemSortReverse, "Rückwärts ordnen", this::runSortReverse_DONE);
+			this.createMenu(mbar, "sort-asc.png", null, menu -> {
+				this.createMenuItem(menu, "sort-des.png", "Rückwärts ordnen", this::runSortReverse_DONE);
 				this.createMenuLine(menu);
-				this.createMenuItem(menu, AppIcon.itemSortBySourceChang, "Nach Änderung sortieren", this::runSortBySourceChange_DONE);
-				this.createMenuItem(menu, AppIcon.itemSortBySourceCreate, "Nach Erzeugung sortieren", this::runSortBySourceCreate_DONE);
-				this.createMenuItem(menu, AppIcon.itemSortBySourceSize, "Nach Dateigröße sortieren", this::runSortBySourceSize_DONE);
-				this.createMenuItem(menu, AppIcon.itemSortBySourcePath, "Nach Eingabepfad sortieren", this::runSortBySourcePath_DONE);
+				this.createMenuItem(menu, "update.png", "Nach Änderung sortieren", this::runSortByChange_DONE);
+				this.createMenuItem(menu, "date.png", "Nach Erzeugung sortieren", this::runSortByCreate_DONE);
+				this.createMenuItem(menu, "size.png", "Nach Dateigröße sortieren", this::runSortBySize_DONE);
+				this.createMenuItem(menu, "name.png", "Nach Eingabepfad sortieren", this::runSortByPath_DONE);
 			});
-			this.createMenu(mbar, AppIcon.menuHash, null, menu -> {
-				this.createMenuItem(menu, AppIcon.itemAnalyzeContent, "Duplikate erkennen", this::runAnalyzeContent_DONE);
+			this.createMenu(mbar, "hash.png", null, menu -> {
+				this.createMenuItem(menu, "clone.png", "Duplikate erkennen", this::runAnalyzeContent_DONE);
 				this.createMenuLine(menu);
-				this.createMenuItem(menu, AppIcon.itemSetupCaches, "Streuwertepuffer erzeugen", this::runSetupCaches_DONE);
-				this.createMenuItem(menu, AppIcon.itemUpdateCaches, "Streuwertepuffer befüllen", this::runUpdateCaches_DONE);
+				this.createMenuItem(menu, "hash-check.png", "Streuwertepuffer erzeugen", this::runSetupCaches_DONE);
+				this.createMenuItem(menu, "hash-update.png", "Streuwertepuffer befüllen", this::runUpdateCaches_DONE);
 			});
-			this.createMenu(mbar, AppIcon.menuMemory, null, menu -> {
+			this.createMenu(mbar, "mem.png", null, menu -> {
 				// this.createMenuItem(menu, AppIcon.saveVariable, "...in Variable speichern", this::runSaveEntriesToVar);
 				// this.createMenuItem(menu, AppIcon.loadVariable, "...aus Variable einfügen", this::runLoadEntriesFromVar);
 				// this.createMenuLine(menu);
-				this.createMenuItem(menu, AppIcon.saveClipboard, "Datenpfade in Zwischenablage kopieren", this::runSaveSourcesToClipboard);
-				this.createMenuItem(menu, AppIcon.loadClipboard, "Datenpfade aus Zwischenablage annfügen", this::runLoadSourcesFromClipboard);
+				this.createMenuItem(menu, "copy.png", "Datenpfade in Zwischenablage kopieren", this::runSaveSourcesToClipboard);
+				this.createMenuItem(menu, "paste.png", "Datenpfade aus Zwischenablage annfügen", this::runLoadSourcesFromClipboard);
 			});
-			this.createMenu(mbar, AppIcon.menuName, null, menu -> {
-				this.createMenuItem(menu, AppIcon.setupTimeName, "Zeitnamen ableiten", this::runSetupTimename);
-				this.createMenuItem(menu, AppIcon.updateTimeName, "Zeitnamen aktualisieren", this::runUpdateTimename);
-				this.createMenuItem(menu, AppIcon.updateTimePath, "Zeitpfade aktualisieren", this::runUpdateTimepath);
+			this.createMenu(mbar, "name.png", null, menu -> {
+				this.createMenuItem(menu, "name-okay.png", "Zeitnamen ableiten", this::runSetupTimename);
+				this.createMenuItem(menu, "name-update.png", "Zeitnamen aktualisieren", this::runUpdateTimename);
+				this.createMenuItem(menu, "name-edit.png", "Zeitpfade aktualisieren", this::runUpdateTimepath);
 			});
-			this.createMenu(mbar, AppIcon.file, null, menu -> {
-				this.createMenuItem(menu, AppIcon.deleteFile, "Dateien löschen", this::runDeleteFilesPermanently_DONE);
-				this.createMenuItem(menu, AppIcon.recycleFile, "Dateien recyclen", this::runDeleteFilesTemporary_DONE);
+			this.createMenu(mbar, "file.png", null, menu -> {
+				this.createMenuItem(menu, "delete-perm.png", "Dateien löschen", this::runDeleteFilesPermanently_DONE);
+				this.createMenuItem(menu, "delete-temp.png", "Dateien recyclen", this::runDeleteFilesTemporary_DONE);
 				this.createMenuLine(menu);
-				this.createMenuItem(menu, AppIcon.refreshFile, "Dateien erneuern", this::runRefreshFiles_DONE);
+				this.createMenuItem(menu, "update.png", "Dateien erneuern", this::runRefreshFiles_DONE);
 				this.createMenuLine(menu);
-				this.createMenuItem(menu, AppIcon.showFile, "Dateien anzeigen", this::runShowFiles_DONE);
-				this.createMenuItem(menu, AppIcon.copyFile, "Dateien kopieren", this::runCopyFiles_DONE);
-				this.createMenuItem(menu, AppIcon.moveFile, "Dateien umbenennen", this::runMoveFiles_DONE);
+				this.createMenuItem(menu, "show.png", "Dateien anzeigen", this::runShowFiles_DONE);
+				this.createMenuItem(menu, "copy.png", "Dateien kopieren", this::runCopyFiles_DONE);
+				this.createMenuItem(menu, "move.png", "Dateien umbenennen", this::runMoveFiles_DONE);
 			});
-			this.createMenu(mbar, AppIcon.folder, null, menu -> {
-				this.createMenuItem(menu, AppIcon.deleteFolder, "Verzeichnisse löschen", this::runDeleteFoldersPermanently_DONE);
-				this.createMenuItem(menu, AppIcon.recycleFolder, "Verzeichnisse recyclen", this::runDeleteFoldersTemporary_DONE);
+			this.createMenu(mbar, "folder.png", null, menu -> {
+				this.createMenuItem(menu, "delete-perm.png", "Verzeichnisse löschen", this::runDeleteFoldersPermanently_DONE);
+				this.createMenuItem(menu, "delete-temp.png", "Verzeichnisse recyclen", this::runDeleteFoldersTemporary_DONE);
 				this.createMenuLine(menu);
-				this.createMenuItem(menu, AppIcon.resolveFile, "Dateien auflösen...", this::runResolveFiles_DONE);
-				this.createMenuItem(menu, AppIcon.resolveFolder, "Verteichnisse auflösen...", this::runResolveFolders_DONE);
+				this.createMenuItem(menu, "file-search.png", "Dateien auflösen...", this::runResolveFiles_DONE);
+				this.createMenuItem(menu, "folder-search.png", "Verteichnisse auflösen...", this::runResolveFolders_DONE);
 			});
-			this.stop = this.createMenuItem(mbar, AppIcon.stop, null, this::runStop_DONE);
-			this.setIcon(this.shell::setImage, AppIcon.iconApp);
+			this.stop = this.createMenuItem(mbar, "stop.png", null, this::runStop_DONE);
+			this.setIcon(this.shell::setImage, "file-gear.png");
 		}
 		{
 			this.text = new Text(this.shell, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
@@ -188,34 +188,38 @@ public class AppWindow {
 
 	private final Display display;
 
-	private final AppQueue queue;
-
 	private final Shell shell;
+
+	private final MenuItem stop;
 
 	private final MenuItem redo;
 
 	private final MenuItem undo;
 
-	private final MenuItem stop;
-
 	private final Text text;
+
+	private final Label info;
 
 	/** Dieses Feld speichert den Zeitpunkt, ab welchem Änderungen über {@link #runEdit_DONE()} in den {@link #undoQueue} übernommen werden dürfen. */
 	private long edit;
 
-	private final Label info;
+	private final AppQueue procQueue;
 
-	private void setIcon(Consumer<Image> taret, String icon) {
-		try {
-			if (icon == null) return;
-			taret.set(new Image(this.display, AppWindow.class.getResourceAsStream(icon)));
-		} catch (Exception ignore) {}
-	}
+	private final LinkedList<AppState> redoQueue = new LinkedList<>();
+
+	private final LinkedList<AppState> undoQueue = new LinkedList<>();
 
 	private void setText(Consumer<String> taret, String text) {
 		try {
 			if (text == null) return;
 			taret.set(text);
+		} catch (Exception ignore) {}
+	}
+
+	private void setIcon(Consumer<Image> taret, String icon) {
+		try {
+			if (icon == null) return;
+			taret.set(new Image(this.display, AppWindow.class.getResourceAsStream(icon)));
 		} catch (Exception ignore) {}
 	}
 
@@ -242,12 +246,6 @@ public class AppWindow {
 		return new MenuItem(parent, SWT.SEPARATOR);
 	}
 
-	public AppDialog runDialog_DONE() {
-		var res = new AppDialog(this.shell);
-		this.shell.getDisplay().asyncExec(res::open);
-		return res.useFocus(true);
-	}
-
 	public String getInput() {
 		return this.display.syncCall(this.text::getText);
 	}
@@ -264,10 +262,6 @@ public class AppWindow {
 		this.setInput(AppEntry.printAll(value));
 	}
 
-	private final LinkedList<AppState> redoQueue = new LinkedList<>();
-
-	private final LinkedList<AppState> undoQueue = new LinkedList<>();
-
 	private void enableUndo_DONE() {
 		this.undo.setEnabled(!this.undoQueue.isEmpty());
 	}
@@ -277,11 +271,43 @@ public class AppWindow {
 	}
 
 	private void enableStop_DONE() {
-		this.stop.setEnabled(this.queue.isRunning());
+		this.stop.setEnabled(this.procQueue.isRunning());
 	}
 
 	private void enableText_DONE() {
-		this.text.setEnabled(!this.queue.isRunning());
+		this.text.setEnabled(!this.procQueue.isRunning());
+	}
+
+	/** Diese Methode führt die gegebene Berechnung {@code task} mit dem gegebenen Titel {@code title} in einem {@link Thread} aus. */
+	void runTask(String title, AppTask task) {
+		this.procQueue.push(title, task);
+	}
+
+	<GItem> void runItems(AppProcess proc, Collection<GItem> items, Consumer<GItem> regular, Consumer<GItem> canceled) {
+		var iter = items.iterator();
+		proc.steps += items.size();
+		if (regular != null) {
+			while (iter.hasNext() && !proc.isCanceled) {
+				var item = iter.next();
+				proc.object = item;
+				regular.set(item);
+				proc.steps--;
+			}
+		}
+		if (canceled != null) {
+			while (iter.hasNext()) {
+				var item = iter.next();
+				proc.object = item;
+				canceled.set(item);
+				proc.steps--;
+			}
+		}
+	}
+
+	public AppDialog runDialog_DONE() {
+		var res = new AppDialog(this.shell);
+		this.shell.getDisplay().asyncExec(res::open);
+		return res.useFocus(true);
 	}
 
 	public void runEdit_DONE() {
@@ -330,7 +356,7 @@ public class AppWindow {
 	}
 
 	public void runStop_DONE() {
-		this.queue.cancel();
+		this.procQueue.cancel();
 	}
 
 	public void runPush_DONE(List<String> sourceList) {
@@ -456,15 +482,23 @@ public class AppWindow {
 			() -> source -> (source.timeOrNull() != null) && ((source.time.longValue() < filter) == isKeep));
 	}
 
-	public void runSortReverse_DONE() {
-		this.runTask("Sortierung umkehren", proc -> {
-			var result = this.getEntries_DONE();
-			Collections.reverse(result);
-			this.setEntries_DONE(result);
-		});
+	public void runSortBySize_DONE() {
+		this.runSortByImpl_DONE("Sortierung nach Größe", Comparators.LongComparator.INSTANCE.translate(AppItem::sizeOrNull));
 	}
 
-	private void runSortBySourceImpl_DONE(String title, Comparator<AppItem> order) {
+	public void runSortByPath_DONE() {
+		this.runSortByImpl_DONE("Sortierung nach Datenpfad", Comparators.AlphanumericalComparator.INSTANCE.translate(item -> item.text));
+	}
+
+	public void runSortByCreate_DONE() {
+		this.runSortByImpl_DONE("Sortierung nach Erzeugung", Comparators.LongComparator.INSTANCE.translate(AppItem::madeOrNull));
+	}
+
+	public void runSortByChange_DONE() {
+		this.runSortByImpl_DONE("Sortierung nach Änderung", Comparators.LongComparator.INSTANCE.translate(AppItem::timeOrNull));
+	}
+
+	private void runSortByImpl_DONE(String title, Comparator<AppItem> order) {
 		this.runTask(title, proc -> {
 			var result = this.getEntries_DONE();
 			result.sort(Comparators.optionalize(order).translate(entry -> entry.source));
@@ -472,20 +506,12 @@ public class AppWindow {
 		});
 	}
 
-	public void runSortBySourcePath_DONE() {
-		this.runSortBySourceImpl_DONE("Sortierung nach Datenpfad", Comparators.AlphanumericalComparator.INSTANCE.translate(item -> item.text));
-	}
-
-	public void runSortBySourceChange_DONE() {
-		this.runSortBySourceImpl_DONE("Sortierung nach Änderung", Comparators.LongComparator.INSTANCE.translate(AppItem::timeOrNull));
-	}
-
-	public void runSortBySourceSize_DONE() {
-		this.runSortBySourceImpl_DONE("Sortierung nach Größe", Comparators.LongComparator.INSTANCE.translate(AppItem::sizeOrNull));
-	}
-
-	public void runSortBySourceCreate_DONE() {
-		this.runSortBySourceImpl_DONE("Sortierung nach Erzeugung", Comparators.LongComparator.INSTANCE.translate(AppItem::madeOrNull));
+	public void runSortReverse_DONE() {
+		this.runTask("Sortierung umkehren", proc -> {
+			var result = this.getEntries_DONE();
+			Collections.reverse(result);
+			this.setEntries_DONE(result);
+		});
 	}
 
 	public void runAnalyzeContent_DONE() {
@@ -1053,35 +1079,9 @@ public class AppWindow {
 		});
 	}
 
-	/** Diese Methode führt die gegebene Berechnung {@code task} mit dem gegebenen Titel {@code title} in einem {@link Thread} aus. */
-	public void runTask(String title, AppTask task) {
-		this.queue.push(title, task);
-	}
-
-	private <GItem> void runItems(AppProcess proc, Collection<GItem> items, Consumer<GItem> regular, Consumer<GItem> canceled) {
-		var iter = items.iterator();
-		proc.steps += items.size();
-		if (regular != null) {
-			while (iter.hasNext() && !proc.isCanceled) {
-				var item = iter.next();
-				proc.object = item;
-				regular.set(item);
-				proc.steps--;
-			}
-		}
-		if (canceled != null) {
-			while (iter.hasNext()) {
-				var item = iter.next();
-				proc.object = item;
-				canceled.set(item);
-				proc.steps--;
-			}
-		}
-	}
-
 	public void runInfo_DONOE() {
 		this.display.timerExec(500, this::runInfo_DONOE);
-		var proc = this.queue.current();
+		var proc = this.procQueue.current();
 		this.info.setText(proc != null ? Objects.notNull(proc.title, "?") + " - " + proc.steps + " - " + Objects.notNull(proc.object, "") : " ");
 	}
 
