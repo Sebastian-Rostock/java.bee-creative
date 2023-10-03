@@ -19,7 +19,6 @@ import bee.creative.util.Iterators.UnmodifiableIterator;
 public class Iterables {
 
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#empty()}. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyIterable extends AbstractIterable<Object> {
 
 		public static final Iterable<?> INSTANCE = new EmptyIterable();
@@ -29,7 +28,6 @@ public class Iterables {
 	/** Diese Klasse implementiert einen {@link Iterable2}, der die Elemente eines Abschnitts eines gegebenen {@link Array} liefert.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class ArrayIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Array<? extends GItem> items;
@@ -58,7 +56,6 @@ public class Iterables {
 	}
 
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#fromCount(int)}. */
-	@SuppressWarnings ("javadoc")
 	public static class CountIterable extends AbstractIterable<Integer> {
 
 		public final int count;
@@ -83,7 +80,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#concatAll(Iterator)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class ConcatIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Iterable<? extends Iterable<? extends GItem>> that;
@@ -107,7 +103,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#fromItem(Object, int)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class UniformIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final GItem item;
@@ -135,7 +130,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#unmodifiable(Iterator)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class LimitedIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Iterable<? extends GItem> that;
@@ -163,7 +157,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#filter(Iterator, Filter)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class FilteredIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Iterable<? extends GItem> that;
@@ -190,7 +183,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#unique(Iterator)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class UniqueIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Iterable<? extends GItem> that;
@@ -212,7 +204,6 @@ public class Iterables {
 	}
 
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#translate(Iterator, Getter)}. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedIterable<GItem, GItem2> extends AbstractIterable<GItem> {
 
 		public final Iterable<? extends GItem2> that;
@@ -239,7 +230,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link UnmodifiableIterator}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class UnmodifiableIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Iterable<? extends GItem> that;
@@ -263,7 +253,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#unionAll(Comparator, Iterator)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class UnionIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Comparator<? super GItem> order;
@@ -290,7 +279,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#except(Comparator, Iterator, Iterator)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class ExceptIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Comparator<? super GItem> order;
@@ -321,7 +309,6 @@ public class Iterables {
 	/** Diese Klasse implementiert das {@link Iterable2} zu {@link Iterators#intersectAll(Comparator, Iterator)}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class IntersectIterable<GItem> extends AbstractIterable<GItem> {
 
 		public final Comparator<? super GItem> order;
