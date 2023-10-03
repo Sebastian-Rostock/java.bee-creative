@@ -11,7 +11,7 @@ import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class AppOptionText implements AppOption {
+class AppOptionText implements AppOption {
 
 	public String getValue() {
 		return this.value;
@@ -44,8 +44,8 @@ public class AppOptionText implements AppOption {
 	}
 
 	@Override
-	public Control get(final Composite item) {
-		final var res = new Combo(item, SWT.BORDER);
+	public Control get(Composite item) {
+		var res = new Combo(item, SWT.BORDER);
 		res.setText(Objects.notNull(this.value, ""));
 		res.setItems(this.options.toArray(new String[0]));
 		res.addModifyListener(event -> this.value = res.getText());

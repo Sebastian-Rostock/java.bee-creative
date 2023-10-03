@@ -16,20 +16,20 @@ class AppEntry {
 		return new ArrayList<>();
 	}
 
-	public static AppEntry parse(final String src) {
-		final var parts = Strings.split(AppEntry.ITEM_PATTERN, src);
-		final var count = parts.size();
+	public static AppEntry parse(String src) {
+		var parts = Strings.split(AppEntry.ITEM_PATTERN, src);
+		var count = parts.size();
 		if (count == 0) return null;
 		if (count == 1) return new AppEntry(parts.get(0));
 		return new AppEntry(parts.get(0), parts.get(1));
 	}
 
-	public static List<AppEntry> parseAll(final String src) {
+	public static List<AppEntry> parseAll(String src) {
 		return Iterables.translate(Strings.match(AppEntry.LINE_PATTERN, src), AppEntry::parse).filter(Filters.empty()).toList();
 	}
 
-	public static String printAll(final Iterable<AppEntry> src) {
-		final var res = new StringBuilder(1 << 20);
+	public static String printAll(Iterable<AppEntry> src) {
+		var res = new StringBuilder(1 << 20);
 		Strings.join(res, "\r\n", src, (res2, src2) -> {
 			res2.append(src2.source).append(src2.target.text.isEmpty() ? "" : "\t").append(src2.target);
 		});

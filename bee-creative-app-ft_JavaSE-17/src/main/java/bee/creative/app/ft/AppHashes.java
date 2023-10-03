@@ -17,39 +17,39 @@ class AppHashes implements AppStorable2 {
 
 	public static final String FILENAME = "ft-cache.csv.gz";
 
-	public static File fileFrom(final String rootpath) {
+	public static File fileFrom(String rootpath) {
 		return rootpath.isEmpty() ? new File(AppHashes.FILENAME).getAbsoluteFile() : new File(rootpath, AppHashes.FILENAME);
 	}
 
-	public AppHashes(final String rootpath) {
+	public AppHashes(String rootpath) {
 		try {
 			this.digest = MessageDigest.getInstance("SHA-256");
 			this.rootpath = rootpath;
-		} catch (final NoSuchAlgorithmException cause) {
+		} catch (NoSuchAlgorithmException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
 
 	/** Diese Methode liefert den Streuwert der gegebenen Datei. Dazu wird höchstens die gegebene Byteanzahl jeweils am Beginn und Ende der Datei herangezogen. */
-	public String get(final String filePath, final long hashSize) {
-		final var file = new File(filePath);
-		final var fileSize = file.length();
-		final var fileTime = file.lastModified();
-		final var hashSize2 = Math.min(fileSize, hashSize * 2);
+	public String get(String filePath, long hashSize) {
+		var file = new File(filePath);
+		var fileSize = file.length();
+		var fileTime = file.lastModified();
+		var hashSize2 = Math.min(fileSize, hashSize * 2);
 		var entry = this.cache.get(filePath);
 		if ((entry != null) && (this.getFileSize(entry).longValue() == fileSize) && (this.getFileTime(entry).longValue() == fileTime)) {
-			final var count = this.getHashCount(entry);
+			var count = this.getHashCount(entry);
 			for (var index = 0; index < count; index++) {
 				if (this.getHashSize(entry, index).longValue() == hashSize2) return this.getHashCode(entry, index);
 			}
-			final var hashCode = this.getImpl(filePath, fileSize, hashSize);
+			var hashCode = this.getImpl(filePath, fileSize, hashSize);
 			entry = this.setHashCount(entry, count + 1);
 			this.setHashSize(entry, count, hashSize2);
 			this.setHashCode(entry, count, hashCode);
 			this.cache.put(filePath, entry);
 			return hashCode;
 		}
-		final var hashCode = this.getImpl(filePath, fileSize, hashSize);
+		var hashCode = this.getImpl(filePath, fileSize, hashSize);
 		entry = this.setHashCount(AppHashes.EMPTY, 1);
 		this.setFileSize(entry, fileSize);
 		this.setFileTime(entry, fileTime);
@@ -65,14 +65,14 @@ class AppHashes implements AppStorable2 {
 	}
 
 	@Override
-	public void persist(final CSVWriter writer) throws NullPointerException, IOException {
+	public void persist(CSVWriter writer) throws NullPointerException, IOException {
 		writer.writeEntry((Object[])AppHashes.FILEHEAD);
-		final var rootLength = this.rootpath.length();
-		for (final var src: this.cache.entrySet()) {
-			final var entry = src.getValue();
-			final var fileName = src.getKey();
-			final var hashCount = this.getHashCount(entry);
-			final var values = new Object[(hashCount * 2) + 4];
+		var rootLength = this.rootpath.length();
+		for (var src: this.cache.entrySet()) {
+			var entry = src.getValue();
+			var fileName = src.getKey();
+			var hashCount = this.getHashCount(entry);
+			var values = new Object[(hashCount * 2) + 4];
 			if ((rootLength != 0) && fileName.startsWith(this.rootpath)) {
 				values[0] = "R";
 				values[1] = fileName.substring(rootLength);
@@ -96,11 +96,11 @@ class AppHashes implements AppStorable2 {
 	}
 
 	@Override
-	public void restore(final CSVReader reader) throws NullPointerException, IllegalArgumentException, IOException {
+	public void restore(CSVReader reader) throws NullPointerException, IllegalArgumentException, IOException {
 		if (!Arrays.equals(AppHashes.FILEHEAD, reader.readEntry())) return;
 		for (var src = reader.readEntry(); src != null; src = reader.readEntry()) {
-			final var hashCount = (src.length - 4) / 2;
-			final var entry = this.setHashCount(AppHashes.EMPTY, hashCount);
+			var hashCount = (src.length - 4) / 2;
+			var entry = this.setHashCount(AppHashes.EMPTY, hashCount);
 			this.setFileSize(entry, Long.valueOf(src[2]));
 			this.setFileTime(entry, Long.valueOf(src[3]));
 			for (var i = 0; i < hashCount; i++) {
@@ -127,7 +127,7 @@ class AppHashes implements AppStorable2 {
 	/** Dieses Feld speichert den Verzeichnispfad für {@link #persist()} und {@link #restore()} sowie den Wurzelpfad aller relativeb Dateipfade. */
 	private final String rootpath;
 
-	private String getImpl(final String filePath, final long fileSize, final long hashSize) {
+	private String getImpl(String filePath, long fileSize, long hashSize) {
 		try (var channel = AppData.openChannel(filePath)) {
 			this.digest.reset();
 			if (fileSize > (2 * hashSize)) {
@@ -138,49 +138,49 @@ class AppHashes implements AppStorable2 {
 				AppData.digestChannel(this.digest, channel, fileSize);
 			}
 			return FEMBinary.from(this.digest.digest()).toString(false);
-		} catch (final Exception error) {
+		} catch (Exception error) {
 			error.printStackTrace();
 			return null;
 		}
 	}
 
-	private Long getFileSize(final Object[] entry) {
+	private Long getFileSize(Object[] entry) {
 		return (Long)entry[0];
 	}
 
-	private void setFileSize(final Object[] entry, final Long value) {
+	private void setFileSize(Object[] entry, Long value) {
 		entry[0] = value;
 	}
 
-	private Long getFileTime(final Object[] entry) {
+	private Long getFileTime(Object[] entry) {
 		return (Long)entry[1];
 	}
 
-	private void setFileTime(final Object[] entry, final Long value) {
+	private void setFileTime(Object[] entry, Long value) {
 		entry[1] = value;
 	}
 
-	private Long getHashSize(final Object[] entry, final int index) {
+	private Long getHashSize(Object[] entry, int index) {
 		return (Long)entry[(index * 2) + 2];
 	}
 
-	private void setHashSize(final Object[] entry, final int index, final Long value) {
+	private void setHashSize(Object[] entry, int index, Long value) {
 		entry[(index * 2) + 2] = value;
 	}
 
-	private String getHashCode(final Object[] entry, final int index) {
+	private String getHashCode(Object[] entry, int index) {
 		return (String)entry[(index * 2) + 3];
 	}
 
-	private void setHashCode(final Object[] entry, final int index, final String value) {
+	private void setHashCode(Object[] entry, int index, String value) {
 		entry[(index * 2) + 3] = value;
 	}
 
-	private int getHashCount(final Object[] entry) {
+	private int getHashCount(Object[] entry) {
 		return (entry.length - 2) / 2;
 	}
 
-	private Object[] setHashCount(final Object[] entry, final int value) {
+	private Object[] setHashCount(Object[] entry, int value) {
 		return Arrays.copyOf(entry, 2 + (value * 2));
 	}
 

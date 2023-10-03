@@ -14,17 +14,16 @@ import bee.creative.util.Producer;
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class AppSettings implements AppStorable2 {
 
-	/** Dieses Feld speichert das Dateialter in Tagen für {@link FTMain#refreshInputFiles()}. */
+	/** Dieses Feld speichert das Dateialter in Tagen. */
 	public final AppOptionLong copyFilesTimeFilter = new AppOptionLong().useMinimum(100).useMaximum(20000).useIncrease(100).useValue(1800);
 
-	/** Dieses Feld speichert die Zeitkorrektur in Sekunden für {@link FTMain#createTargetsWithTimenameFromTime()} und
-	 * {@link FTMain#createTargetsWithTimepathFromTime()}. */
+	/** Dieses Feld speichert die Zeitkorrektur in Sekunden. */
 	public final AppOptionLong moveFilesTimeOffset = new AppOptionLong().useMinimum(-40000000).useMaximum(40000000).useIncrease(3600).useValue(0);
 
-	/** Dieses Feld speichert die Puffergröße des Dateivergleichs für {@link FTMain#createTableWithClones()}. */
+	/** Dieses Feld speichert die Puffergröße des Dateivergleichs. */
 	public final AppOptionLong findClonesTestSize = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1 << 20).useValue(1 << 24);
 
-	/** Dieses Feld speichert die Puffergröße der Streuwertberechnung für {@link FTMain#createTableWithClones()}. */
+	/** Dieses Feld speichert die Puffergröße der Streuwertberechnung. */
 	public final AppOptionLong findClonesHashSize = new AppOptionLong().useMinimum(0).useMaximum(1L << 60).useIncrease(1 << 20).useValue(1 << 22);
 
 	public final AppOptionText filterPath = new AppOptionText();
@@ -41,7 +40,7 @@ class AppSettings implements AppStorable2 {
 	}
 
 	@Override
-	public void persist(final CSVWriter writer) throws Exception {
+	public void persist(CSVWriter writer) throws Exception {
 		writer.writeEntry((Object[])AppSettings.FILEHEAD);
 		writer.writeEntry(this.getOptions().translate(Producer::get).toArray());
 	}
@@ -56,7 +55,7 @@ class AppSettings implements AppStorable2 {
 	}
 
 	@Override
-	public void restore(final CSVReader reader) throws Exception {
+	public void restore(CSVReader reader) throws Exception {
 		if (!Arrays.equals(AppSettings.FILEHEAD, reader.readEntry())) return;
 		var values = new LinkedList<>(Arrays.asList(reader.readEntry()));
 		this.getOptions().collectAll(option -> option.set(values.pollFirst()));

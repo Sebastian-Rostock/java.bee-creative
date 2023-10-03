@@ -2,7 +2,7 @@ package bee.creative.app.ft;
 
 import bee.creative.lang.Runnable2;
 
-public final class AppProcess implements Runnable2 {
+class AppProcess implements Runnable2 {
 
 	/** Dieses Feld speichert den Title des Prozesses, der in Statusanzeigen und Fehlermeldungen verwendet wird. */
 	public String title;

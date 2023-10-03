@@ -21,7 +21,16 @@ import bee.creative.util.Getter;
 
 class AppDialog {
 
-	public AppDialog(final Shell parent) {
+	public static void wait(Shell shell) {
+		var display = shell.getDisplay();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+	}
+
+	public AppDialog(Shell parent) {
 		this.parent = parent;
 	}
 
@@ -35,12 +44,12 @@ class AppDialog {
 		return this;
 	}
 
-	public AppDialog useTitle(final String title) {
+	public AppDialog useTitle(String title) {
 		this.title = Objects.notNull(title, "");
 		return this;
 	}
 
-	public AppDialog useTitle(final String title, final Object... args) {
+	public AppDialog useTitle(String title, Object... args) {
 		return this.useTitle(String.format(title, args));
 	}
 
@@ -49,16 +58,16 @@ class AppDialog {
 		return this;
 	}
 
-	public AppDialog useMessage(final String message) {
+	public AppDialog useMessage(String message) {
 		this.message = Objects.notNull(message);
 		return this;
 	}
 
-	public AppDialog useMessage(final String message, final Object... args) {
+	public AppDialog useMessage(String message, Object... args) {
 		return this.useMessage(String.format(message, args));
 	}
 
-	public AppDialog useButton(final String string) {
+	public AppDialog useButton(String string) {
 		return this.useButton(string, null);
 	}
 
@@ -68,12 +77,12 @@ class AppDialog {
 	 * @param text Beschriftung des {@link Button}.
 	 * @param onClick Berechnung oder {@code null};
 	 * @return {@code this}. */
-	public AppDialog useButton(final String text, final Runnable onClick) {
+	public AppDialog useButton(String text, Runnable onClick) {
 		this.buttons.add(Entries.from(Objects.notNull(text), onClick));
 		return this;
 	}
 
-	public AppDialog useOption(final String label, final Getter<Composite, Control> option) {
+	public AppDialog useOption(String label, Getter<Composite, Control> option) {
 		this.options.add(Entries.from(Objects.notNull(label), Objects.notNull(option)));
 		return this;
 	}
@@ -91,7 +100,7 @@ class AppDialog {
 		if (this.focus) {
 			this.shell.setFocus();
 		}
-		AppUtil.wait(this.shell);
+		AppDialog.wait(this.shell);
 		return this.reset();
 	}
 
@@ -172,7 +181,7 @@ class AppDialog {
 	}
 
 	private void createShell() {
-		final var lay = new GridLayout();
+		var lay = new GridLayout();
 		lay.marginWidth = 4;
 		lay.marginHeight = 4;
 		lay.verticalSpacing = 0;
@@ -186,8 +195,8 @@ class AppDialog {
 
 	private void createTitle() {
 		if (this.title.isEmpty()) return;
-		final var res = new Label(this.shell, SWT.WRAP);
-		final var font = res.getFont().getFontData()[0];
+		var res = new Label(this.shell, SWT.WRAP);
+		var font = res.getFont().getFontData()[0];
 		res.setText(this.title);
 		res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		res.setFont(new Font(this.shell.getDisplay(), new FontData(font.getName(), font.getHeight(), SWT.BOLD)));
@@ -195,11 +204,11 @@ class AppDialog {
 
 	private void createButtons() {
 		if (this.buttons.isEmpty()) return;
-		final var parent = new Composite(this.shell, SWT.NONE);
+		var parent = new Composite(this.shell, SWT.NONE);
 		parent.setLayout(new GridLayout(this.buttons.size(), true));
 		parent.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false, 1, 1));
 		this.buttons.forEach(entry -> {
-			final var res = new Button(parent, SWT.PUSH);
+			var res = new Button(parent, SWT.PUSH);
 			res.setText(entry.getKey());
 			res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 			res.addListener(SWT.Selection, event -> {
@@ -212,12 +221,12 @@ class AppDialog {
 
 	private void createOptions() {
 		if (this.options.isEmpty()) return;
-		final var parent = new Composite(this.shell, SWT.NONE);
+		var parent = new Composite(this.shell, SWT.NONE);
 		parent.setLayout(new GridLayout(2, false));
 		parent.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false, 1, 1));
 		this.options.forEach(entry -> {
 			new Label(parent, SWT.NONE).setText(entry.getKey());
-			final var lay = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
+			var lay = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
 			lay.widthHint = 250;
 			entry.getValue().get(parent).setLayoutData(lay);
 		});
@@ -225,7 +234,7 @@ class AppDialog {
 
 	private void createMessage() {
 		if (this.message.isEmpty()) return;
-		final var res = new Label(this.shell, SWT.WRAP);
+		var res = new Label(this.shell, SWT.WRAP);
 		res.setText(this.message);
 		res.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 	}

@@ -78,7 +78,7 @@ public class AppWindow {
 			this.shell.setText("File-Tool");
 			this.shell.setSize(600, 400);
 			this.shell.setLayout(new GridLayout(1, false));
-			final var mbar = new Menu(this.shell, SWT.BAR);
+			var mbar = new Menu(this.shell, SWT.BAR);
 			this.shell.setMenuBar(mbar);
 
 			this.undo = this.createMenuItem(mbar, AppIcon.menuUndo, null, this::runUndo_DONE);
@@ -148,22 +148,22 @@ public class AppWindow {
 			this.text = new Text(this.shell, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 			this.text.addListener(SWT.Verify, event -> this.runEdit_DONE());
 			this.text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			final var dnd = new DropTarget(this.text, DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK);
+			var dnd = new DropTarget(this.text, DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK);
 			dnd.setTransfer(FileTransfer.getInstance(), TextTransfer.getInstance());
 			dnd.addDropListener(new DropTargetAdapter() {
 
 				@Override
-				public void drop(final DropTargetEvent event) {
+				public void drop(DropTargetEvent event) {
 					event.detail = DND.DROP_COPY;
 					try {
 						if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
-							final var fileList = (String[])FileTransfer.getInstance().nativeToJava(event.currentDataType);
+							var fileList = (String[])FileTransfer.getInstance().nativeToJava(event.currentDataType);
 							AppWindow.this.runPush_DONE(Arrays.asList(fileList));
 						} else if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
-							final var file = (String)TextTransfer.getInstance().nativeToJava(event.currentDataType);
+							var file = (String)TextTransfer.getInstance().nativeToJava(event.currentDataType);
 							AppWindow.this.runPush_DONE(Arrays.asList(file));
 						}
-					} catch (final Exception ignore) {}
+					} catch (Exception ignore) {}
 				}
 
 			});
@@ -175,8 +175,13 @@ public class AppWindow {
 		this.enableUndo_DONE();
 		this.enableRedo_DONE();
 		this.runInfo_DONOE();
-		AppUtil.center(this.shell);
-		AppUtil.openAndWait(this.shell);
+		{
+			var srcRect = this.shell.getBounds();
+			var tgtRect = this.shell.getDisplay().getPrimaryMonitor().getBounds();
+			this.shell.setLocation(tgtRect.x + ((tgtRect.width - srcRect.width) / 2), tgtRect.y + ((tgtRect.height - srcRect.height) / 2));
+		}
+		this.shell.open();
+		AppDialog.wait(this.shell);
 	}
 
 	private final AppSettings settings = new AppSettings();
@@ -187,11 +192,11 @@ public class AppWindow {
 
 	private final Shell shell;
 
-	private MenuItem redo;
+	private final MenuItem redo;
 
-	private MenuItem undo;
+	private final MenuItem undo;
 
-	private MenuItem stop;
+	private final MenuItem stop;
 
 	private final Text text;
 
@@ -214,8 +219,8 @@ public class AppWindow {
 		} catch (Exception ignore) {}
 	}
 
-	private MenuItem createMenu(final Menu parent, String image, final String label, Consumer<Menu> setup) {
-		final var res = new MenuItem(parent, SWT.CASCADE);
+	private MenuItem createMenu(Menu parent, String image, String label, Consumer<Menu> setup) {
+		var res = new MenuItem(parent, SWT.CASCADE);
 		this.setIcon(res::setImage, image);
 		this.setText(res::setText, label);
 		res.setMenu(new Menu(res));
@@ -223,8 +228,8 @@ public class AppWindow {
 		return res;
 	}
 
-	private MenuItem createMenuItem(final Menu parent, String image, final String label, final Runnable onClick) {
-		final var res = new MenuItem(parent, SWT.NONE);
+	private MenuItem createMenuItem(Menu parent, String image, String label, Runnable onClick) {
+		var res = new MenuItem(parent, SWT.NONE);
 		this.setIcon(res::setImage, image);
 		this.setText(res::setText, label);
 		if (onClick != null) {
@@ -233,7 +238,7 @@ public class AppWindow {
 		return res;
 	}
 
-	private MenuItem createMenuLine(final Menu parent) {
+	private MenuItem createMenuLine(Menu parent) {
 		return new MenuItem(parent, SWT.SEPARATOR);
 	}
 
@@ -281,7 +286,7 @@ public class AppWindow {
 
 	public void runEdit_DONE() {
 		this.display.syncExec(() -> {
-			final var time = System.currentTimeMillis();
+			var time = System.currentTimeMillis();
 			if ((time - this.edit) >= 0) {
 				this.undoQueue.addFirst(new AppState(this.text));
 				this.enableUndo_DONE();
@@ -295,7 +300,7 @@ public class AppWindow {
 	public void runUndo_DONE() {
 		this.runTask("Undo", proc -> this.display.syncExec(() -> {
 			if (this.undoQueue.isEmpty()) return;
-			final var state = this.undoQueue.removeFirst();
+			var state = this.undoQueue.removeFirst();
 			this.enableUndo_DONE();
 			this.redoQueue.addFirst(new AppState(this.text));
 			this.enableRedo_DONE();
@@ -307,7 +312,7 @@ public class AppWindow {
 	public void runRedo_DONE() {
 		this.runTask("Redo", proc -> this.display.syncExec(() -> {
 			if (this.redoQueue.isEmpty()) return;
-			final var state = this.redoQueue.removeFirst();
+			var state = this.redoQueue.removeFirst();
 			this.enableRedo_DONE();
 			this.undoQueue.addFirst(new AppState(this.text));
 			this.enableUndo_DONE();
@@ -318,7 +323,7 @@ public class AppWindow {
 
 	public void runSwap_DONE() {
 		this.runTask("Tauschen", proc -> {
-			final var entries = AppEntry.list();
+			var entries = AppEntry.list();
 			this.runItems(proc, this.getEntries_DONE(), entry -> entries.add(new AppEntry(entry.target.text, entry.source.text)), entries::add);
 			this.setEntries_DONE(entries);
 		});
@@ -328,16 +333,16 @@ public class AppWindow {
 		this.queue.cancel();
 	}
 
-	public void runPush_DONE(final List<String> sourceList) {
+	public void runPush_DONE(List<String> sourceList) {
 		this.runTask("Datenpfade anfügen", proc -> {
 			this.runPushImpl(proc, sourceList);
 		});
 	}
 
-	private void runPushImpl(AppProcess proc, final List<String> sourceList) {
+	private void runPushImpl(AppProcess proc, List<String> sourceList) {
 		if (sourceList.isEmpty()) return;
 		var input = this.getInput();
-		final var entries = AppEntry.list();
+		var entries = AppEntry.list();
 		if (!input.isEmpty()) {
 			entries.add(new AppEntry(input, ""));
 		}
@@ -808,7 +813,7 @@ public class AppWindow {
 		;
 	}
 
-	void runComputeTimenameImpl(final boolean isPath, final boolean isName) {
+	void runComputeTimenameImpl(boolean isPath, boolean isName) {
 		// isName = true, wenn Zeitpunkt aus Dateinamen abgeleitet werden soll
 		// isName = false, wenn Anderungszeitpunkt verwendet werden soll
 		long moveTime = this.settings.moveFilesTimeOffset.getValue();
@@ -876,7 +881,7 @@ public class AppWindow {
 			var entryList = AppEntry.list();
 			this.runItems(proc, this.getEntries_DONE(), entry -> {
 				try {
-					final var sourceFile = entry.source.file;
+					var sourceFile = entry.source.file;
 					if ((sourceFile != null) && sourceFile.isFile() && (entry.source.madeOrNull().longValue() < filterTime)) {
 						var sourcePath = sourceFile.toPath();
 						var targetFile = new File(sourceFile.getParentFile(), sourceFile.getName() + ".tempcopy");
@@ -885,7 +890,7 @@ public class AppWindow {
 						Files.move(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 						return;
 					}
-				} catch (final Exception ignored) {}
+				} catch (Exception ignored) {}
 				entryList.add(entry);
 			}, entryList::add);
 			this.setEntries_DONE(entryList);

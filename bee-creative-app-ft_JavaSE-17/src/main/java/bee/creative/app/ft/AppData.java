@@ -15,7 +15,7 @@ class AppData {
 
 	public final long testSize;
 
-	public AppData(final String filePath, final long testSize) {
+	public AppData(String filePath, long testSize) {
 		this.filePath = filePath;
 		this.testSize = testSize;
 	}
@@ -26,20 +26,19 @@ class AppData {
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof AppData)) return false;
-		final var that = (AppData)object;
+		if (!(object instanceof AppData that)) return false;
 		if (Objects.equals(this.filePath, that.filePath) || (this.testSize != that.testSize)) return true;
 		try (var thisChannel = AppData.openChannel(this.filePath)) {
 			try (var thatChannel = AppData.openChannel(that.filePath)) {
-				final var testSize = this.testSize;
-				final var fileSize = thisChannel.size();
+				var testSize = this.testSize;
+				var fileSize = thisChannel.size();
 				if (fileSize <= (2 * testSize)) return AppData.equalsChannel(thisChannel, thatChannel, fileSize);
 				if (!AppData.equalsChannel(thisChannel, thatChannel, testSize)) return false;
 				return AppData.equalsChannel(thisChannel.position(fileSize - testSize), thatChannel.position(fileSize - testSize), testSize);
 			}
-		} catch (final Exception error) {
+		} catch (Exception error) {
 			error.printStackTrace();
 			return false;
 		}
@@ -50,16 +49,16 @@ class AppData {
 		return this.filePath;
 	}
 
-	static FileChannel openChannel(final String filepath) throws IOException {
+	static FileChannel openChannel(String filepath) throws IOException {
 		return FileChannel.open(new File(filepath).toPath(), StandardOpenOption.READ);
 	}
 
 	/** Diese Methode überträgt die gegebene Anzahl an Byte vom gegebenen {@link FileChannel} in das gegebene {@link MessageDigest}. */
-	static void digestChannel(final MessageDigest target, final FileChannel source, final long length) throws IOException {
-		final var bufSize = AppData.BUFFER_SIZE;
-		final var hashBuffer = AppData.BUFFER_HASH;
+	static void digestChannel(MessageDigest target, FileChannel source, long length) throws IOException {
+		var bufSize = AppData.BUFFER_SIZE;
+		var hashBuffer = AppData.BUFFER_HASH;
 		for (var remSize = length; remSize > 0; remSize -= bufSize) {
-			final var done = AppData.readChannel(source, hashBuffer.limit((int)Math.min(remSize, bufSize)).position(0));
+			var done = AppData.readChannel(source, hashBuffer.limit((int)Math.min(remSize, bufSize)).position(0));
 			target.update(hashBuffer.limit(hashBuffer.position()).position(0));
 			if (done) return;
 		}
@@ -67,14 +66,14 @@ class AppData {
 
 	/** Diese Methode liefert nur dann {@code true}, wenn die gegebenen {@link FileChannel} ab ihrer jeweiligen Position die gleichen Daten enthalten, wobei hier
 	 * höchstens die gegebene Anzahl an Byte herangezogen wird. */
-	static boolean equalsChannel(final FileChannel thisChannel, final FileChannel thatChannel, final long length) throws IOException {
-		final var bufSize = AppData.BUFFER_SIZE;
-		final var bufThis = AppData.BUFFER_THIS;
-		final var bufThat = AppData.BUFFER_THAT;
+	static boolean equalsChannel(FileChannel thisChannel, FileChannel thatChannel, long length) throws IOException {
+		var bufSize = AppData.BUFFER_SIZE;
+		var bufThis = AppData.BUFFER_THIS;
+		var bufThat = AppData.BUFFER_THAT;
 		for (long remSize = length; remSize > 0; remSize -= bufSize) {
-			final int remLimit = (int)Math.min(remSize, bufSize);
-			final var thisLast = AppData.readChannel(thisChannel, bufThis.limit(remLimit).position(0));
-			final var thatLast = AppData.readChannel(thatChannel, bufThat.limit(remLimit).position(0));
+			int remLimit = (int)Math.min(remSize, bufSize);
+			var thisLast = AppData.readChannel(thisChannel, bufThis.limit(remLimit).position(0));
+			var thatLast = AppData.readChannel(thatChannel, bufThat.limit(remLimit).position(0));
 			if ((thisLast != thatLast) || !bufThis.limit(bufThis.position()).position(0).equals(bufThat.limit(bufThat.position()).position(0))) return false;
 		}
 		return true;
@@ -82,7 +81,7 @@ class AppData {
 
 	/** Diese Methode füllt den gegebenen {@link ByteBuffer} mit den Daten aus dem gegebenen {@link FileChannel} und liefert nur dann {@code true}, wenn dabei das
 	 * Ende des {@link FileChannel} erreicht wurde. */
-	private static boolean readChannel(final FileChannel source, final ByteBuffer target) throws IOException {
+	private static boolean readChannel(FileChannel source, ByteBuffer target) throws IOException {
 		while (target.remaining() != 0) {
 			if (source.read(target) < 0) return true;
 		}

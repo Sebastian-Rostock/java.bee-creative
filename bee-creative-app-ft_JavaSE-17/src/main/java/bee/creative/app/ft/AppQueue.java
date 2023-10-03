@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.concurrent.CancellationException;
 import bee.creative.lang.Objects;
 
-public class AppQueue extends Thread {
+class AppQueue extends Thread {
 
 	public AppQueue() {
 		this.setDaemon(true);
@@ -28,7 +28,7 @@ public class AppQueue extends Thread {
 			}
 			try {
 				this.onSelect(this.next);
-			} catch (final Throwable error) {
+			} catch (Throwable error) {
 				this.onError(this.next, error);
 			}
 			if (this.next == null) {
@@ -40,16 +40,16 @@ public class AppQueue extends Thread {
 			} else {
 				try {
 					this.next.run();
-				} catch (final CancellationException ignore) {
+				} catch (CancellationException ignore) {
 					this.cancel();
-				} catch (final Throwable error) {
+				} catch (Throwable error) {
 					this.onError(this.next, error);
 				}
 			}
 		}
 	}
 
-	public void push(final String title, final AppTask task) {
+	public void push(String title, AppTask task) {
 		synchronized (this.queue) {
 			this.queue.offerLast(new AppProcess(Objects.notNull(task), Objects.notNull(title)));
 			this.queue.notifyAll();

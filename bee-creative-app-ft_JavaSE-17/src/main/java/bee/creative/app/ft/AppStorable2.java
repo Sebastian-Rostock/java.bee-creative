@@ -21,12 +21,12 @@ interface AppStorable2 extends AppStorable {
 	void persist();
 
 	/** Diese Methode speichert die Daten dieses Objekts über {@link #persist(CSVWriter)} in die gegebene {@code .csv.gz}-Datei. */
-	default void persist(final File file) {
+	default void persist(File file) {
 		try (var stream = new GZIPOutputStream(new FileOutputStream(file))) {
 			try (var writer = new CSVWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8))) {
 				this.persist(writer);
 			}
-		} catch (final Exception ignore) {}
+		} catch (Exception ignore) {}
 	}
 
 	/** Diese Methode speichert die Daten dieses Objekts über den gegebenen {@link CSVWriter}. */
@@ -37,13 +37,13 @@ interface AppStorable2 extends AppStorable {
 	void restore();
 
 	/** Diese Methode lädt die Daten dieses Objekts über {@link #restore(CSVReader)} aus der gegebenen {@code .csv.gz}-Datei. */
-	default void restore(final File file) {
+	default void restore(File file) {
 		if (!file.isFile() || (file.length() == 0)) return;
 		try (var stream = new GZIPInputStream(new FileInputStream(file))) {
 			try (var reader = new CSVReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 				this.restore(reader);
 			}
-		} catch (final Exception ignore) {}
+		} catch (Exception ignore) {}
 	}
 
 	/** Diese Methode lädt die Daten dieses Objekts über den gegebenen {@link CSVReader}. */

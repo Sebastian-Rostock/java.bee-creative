@@ -9,59 +9,59 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class AppOptionLong implements AppOption {
+class AppOptionLong implements AppOption {
 
 	public long getValue() {
-		return this.val;
+		return this.value;
 	}
 
 	public AppOptionLong useValue(long value) {
-		this.val = Math.min(Math.max(value, this.min), this.max);
+		this.value = Math.min(Math.max(value, this.minimum), this.maximum);
+		return this;
+	}
+
+	public long getIncrease() {
+		return this.increase;
+	}
+
+	public AppOptionLong useIncrease(long inc) {
+		this.increase = Math.max(inc, 0);
 		return this;
 	}
 
 	public long getMinimum() {
-		return this.min;
+		return this.minimum;
 	}
 
 	public AppOptionLong useMinimum(long min) {
-		this.min = min;
-		return this.useMaximum(this.max);
+		this.minimum = min;
+		return this.useMaximum(this.maximum);
 	}
 
 	public long getMaximum() {
-		return this.max;
+		return this.maximum;
 	}
 
 	public AppOptionLong useMaximum(long value) {
-		this.max = Math.max(this.min, value);
-		return this.useValue(this.val);
-	}
-
-	public long getIncrease() {
-		return this.inc;
-	}
-
-	public AppOptionLong useIncrease(long inc) {
-		this.inc = Math.max(inc, 0);
-		return this;
+		this.maximum = Math.max(this.minimum, value);
+		return this.useValue(this.value);
 	}
 
 	@Override
 	public String get() {
-		return NumberFormat.getInstance(Locale.getDefault()).format(this.val);
+		return NumberFormat.getInstance(Locale.getDefault()).format(this.value);
 	}
 
 	@Override
-	public Control get(final Composite item) {
-		final var res = new Text(item, SWT.BORDER);
+	public Control get(Composite item) {
+		var res = new Text(item, SWT.BORDER);
 		res.addListener(SWT.KeyDown, event -> {
 			if (!(event.keyCode == SWT.ARROW_DOWN) && !(event.keyCode == SWT.ARROW_UP)) return;
 			try {
 				this.set(res.getText());
-				this.val = event.keyCode == SWT.ARROW_DOWN //
-					? ((this.val - this.min) > this.inc ? this.val - this.inc : this.min) //
-					: ((this.max - this.val) > this.inc ? this.val + this.inc : this.max);
+				this.value = event.keyCode == SWT.ARROW_DOWN //
+					? ((this.value - this.minimum) > this.increase ? this.value - this.increase : this.minimum) //
+					: ((this.maximum - this.value) > this.increase ? this.value + this.increase : this.maximum);
 				var sel = res.getSelection();
 				res.setText(this.get());
 				res.setSelection(sel);
@@ -91,12 +91,12 @@ public class AppOptionLong implements AppOption {
 		}
 	}
 
-	private long val = 0;
+	private long value;
 
-	private long min = Long.MIN_VALUE;
+	private long increase = 1;
 
-	private long max = Long.MAX_VALUE;
+	private long minimum = Long.MIN_VALUE;
 
-	private long inc = 1;
+	private long maximum = Long.MAX_VALUE;
 
 }
