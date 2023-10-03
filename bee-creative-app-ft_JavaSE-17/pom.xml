@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bee-creative</groupId>
 	<artifactId>bee-creative.app-ft</artifactId>
-	<version>1.0.0-SNAPSHOT-JavaSE-17</version>
+	<version>2.0.0-JavaSE-17</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
@@ -18,9 +18,10 @@
 						<configuration>
 							<archive>
 								<manifest>
-									<mainClass>bee.creative.app.ft.FTMain</mainClass>
+									<mainClass>bee.creative.app.ft.AppWindow</mainClass>
 								</manifest>
 							</archive>
+							
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
@@ -29,6 +30,14 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<resources>
+            <resource>
+                <directory>${project.basedir}/src/main/java</directory>
+                <includes>
+                    <include>**/*.png</include>
+                </includes>
+            </resource>
+        </resources>
 	</build>
 	<properties>
 		<maven.compiler.target>17</maven.compiler.target>
