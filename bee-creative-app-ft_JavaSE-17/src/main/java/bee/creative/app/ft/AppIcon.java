@@ -11,11 +11,11 @@ class AppIcon {
 		menuSwap = "arrow-swap.png", //
 
 		menuSort = "sort-asc.png", //
+		itemSortReverse = "sort-des.png", //
 		itemSortBySourcePath = "name.png", //
 		itemSortBySourceSize = "size.png", //
 		itemSortBySourceChang = "update.png", //
 		itemSortBySourceCreate = "date.png", //
-		itemSortReverse = "sort-des.png", //
 
 		menuFilter = "filter.png", //
 		itemFilterBySourceFile = "file.png", //
@@ -26,9 +26,9 @@ class AppIcon {
 		itemFilterBySourceCreate = "date.png", //
 
 		menuHash = "hash.png", //
-		hashSetup = "hash-check.png", //
-		hashUpdate = "hash-update.png", //
-		hashAnalyze = "clone.png", //
+		itemSetupCaches = "hash-check.png", //
+		itemUpdateCaches = "hash-update.png", //
+		itemAnalyzeContent = "clone.png", //
 
 		menuMemory = "mem.png", //
 		saveVariable = "copy.png", //
