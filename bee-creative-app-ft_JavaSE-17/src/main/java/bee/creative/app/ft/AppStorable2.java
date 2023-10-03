@@ -14,7 +14,7 @@ import bee.creative.csv.CSVWriter;
 /** Diese Schnittstelle definiert ein als {@code .csv.gz}-Datei speicherbares Objekt.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-interface FTStorable2 extends AppStorable {
+interface AppStorable2 extends AppStorable {
 
 	/** Diese Methode speichert die Daten dieses Objekts über {@link #persist(File)} in eine .csv.gz-Datei. */
 	@Override

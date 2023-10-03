@@ -40,18 +40,7 @@ import bee.creative.util.Properties;
 /** @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class FTWindow implements Runnable {
 
-	public static void center(final Shell shell) {
-		final var srcRect = shell.getBounds();
-		final var tgtRect = shell.getDisplay().getPrimaryMonitor().getBounds();
-		shell.setLocation(tgtRect.x + ((tgtRect.width - srcRect.width) / 2), tgtRect.y + ((tgtRect.height - srcRect.height) / 2));
-	}
-
-	public static void openAndWait(final Shell shell) {
-		shell.open();
-		AppUtil.wait(shell);
-	}
-
-	public final FTSettings settings = new FTSettings();
+	public final AppSettings settings = new AppSettings();
 
 	public FTWindow() {
 		this.display = Display.getDefault();
@@ -106,8 +95,8 @@ class FTWindow implements Runnable {
 	@Override
 	public void run() {
 		this.shell.layout();
-		FTWindow.center(this.shell);
-		FTWindow.openAndWait(this.shell);
+		AppUtil.center(this.shell);
+		AppUtil.openAndWait(this.shell);
 		System.exit(0);
 	}
 

@@ -83,8 +83,8 @@ class FTDialog {
 			{
 				this.shell.setSize(this.shell.computeSize(500, SWT.DEFAULT, true));
 				this.shell.layout(true);
-				FTWindow.center(this.shell);
-				FTWindow.openAndWait(this.shell);
+				AppUtil.center(this.shell);
+				AppUtil.openAndWait(this.shell);
 			}
 		});
 	}

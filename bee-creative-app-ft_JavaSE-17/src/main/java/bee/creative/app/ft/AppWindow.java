@@ -22,6 +22,7 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,6 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import bee.creative.fem.FEMDatetime;
 import bee.creative.lang.Objects;
+import bee.creative.lang.Strings;
 import bee.creative.util.Comparators;
 import bee.creative.util.Consumer;
 import bee.creative.util.Filter;
@@ -45,14 +47,11 @@ public class AppWindow {
 
 	public static void main(String args[]) throws Exception {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		Display display = Display.getDefault();
-		AppWindow shell = new AppWindow(display);
-		FTWindow.center(shell.shell);
-		FTWindow.openAndWait(shell.shell);
+		new AppWindow();
 	}
 
-	public AppWindow(Display display) {
-		this.display = display;
+	public AppWindow() {
+		this.display = Display.getDefault();
 		this.edit = System.currentTimeMillis() + Integer.MIN_VALUE;
 		{
 			this.queue = new AppQueue() {
@@ -79,9 +78,71 @@ public class AppWindow {
 			this.shell.setText("File-Tool");
 			this.shell.setSize(600, 400);
 			this.shell.setLayout(new GridLayout(1, false));
-			this.shell.setMenuBar(new Menu(this.shell, SWT.BAR));
+			final var mbar = new Menu(this.shell, SWT.BAR);
+			this.shell.setMenuBar(mbar);
+
+			this.undo = this.createMenuItem(mbar, AppIcon.menuUndo, null, this::runUndo_DONE);
+			this.undo.setAccelerator(SWT.CTRL | 'Z');
+
+			this.redo = this.createMenuItem(mbar, AppIcon.menuRedo, null, this::runRedo_DONE);
+			this.redo.setAccelerator(SWT.CTRL | 'Y');
+
+			this.createMenuItem(mbar, AppIcon.menuSwap, null, this::runSwap_DONE);
+
+			this.createMenu(mbar, AppIcon.menuFilter, null, menu -> {
+				this.createMenuItem(menu, AppIcon.itemFilterBySourceFile, "Dateien filtern...", this::runFilterBySourceFile_DONE);
+				this.createMenuItem(menu, AppIcon.itemFilterBySourceFolder, "Verzeichnisse filtern...", this::runFilterBySourceFolder_DONE);
+				this.createMenuLine(menu);
+				this.createMenuItem(menu, AppIcon.itemFilterBySourceChange, "Nach Änderung filtern..", this::runFilterBySourceChange_DONE);
+				this.createMenuItem(menu, AppIcon.itemFilterBySourceCreate, "Nach Erzeugung filtern...", this::runFilterBySourceCreate_DONE);
+				this.createMenuItem(menu, AppIcon.itemFilterBySourceSize, "Nach Dateigröße filtern...", this::runFilterBySourceSize_DONE);
+				this.createMenuItem(menu, AppIcon.itemFilterBySourcePath, "Nach Datenpfad filtern..", this::runFilterBySourcePath_DONE);
+			});
+			this.createMenu(mbar, AppIcon.menuSort, null, menu -> {
+				this.createMenuItem(menu, AppIcon.itemSortReverse, "Rückwärts ordnen", this::runSortReverse_DONE);
+				this.createMenuLine(menu);
+				this.createMenuItem(menu, AppIcon.itemSortBySourceChang, "Nach Änderung sortieren", this::runSortBySourceChange_DONE);
+				this.createMenuItem(menu, AppIcon.itemSortBySourceCreate, "Nach Erzeugung sortieren", this::runSortBySourceCreate_DONE);
+				this.createMenuItem(menu, AppIcon.itemSortBySourceSize, "Nach Dateigröße sortieren", this::runSortBySourceSize_DONE);
+				this.createMenuItem(menu, AppIcon.itemSortBySourcePath, "Nach Eingabepfad sortieren", this::runSortBySourcePath_DONE);
+			});
+			this.createMenu(mbar, AppIcon.menuHash, null, menu -> {
+				this.createMenuItem(menu, AppIcon.itemAnalyzeContent, "Duplikate erkennen", this::runAnalyzeContent_DONE);
+				this.createMenuLine(menu);
+				this.createMenuItem(menu, AppIcon.itemSetupCaches, "Streuwertepuffer erzeugen", this::runSetupCaches_DONE);
+				this.createMenuItem(menu, AppIcon.itemUpdateCaches, "Streuwertepuffer befüllen", this::runUpdateCaches_DONE);
+			});
+			this.createMenu(mbar, AppIcon.menuMemory, null, menu -> {
+				// this.createMenuItem(menu, AppIcon.saveVariable, "...in Variable speichern", this::runSaveEntriesToVar);
+				// this.createMenuItem(menu, AppIcon.loadVariable, "...aus Variable einfügen", this::runLoadEntriesFromVar);
+				// this.createMenuLine(menu);
+				this.createMenuItem(menu, AppIcon.saveClipboard, "Datenpfade in Zwischenablage kopieren", this::runSaveSourcesToClipboard);
+				this.createMenuItem(menu, AppIcon.loadClipboard, "Datenpfade aus Zwischenablage annfügen", this::runLoadSourcesFromClipboard);
+			});
+			this.createMenu(mbar, AppIcon.menuName, null, menu -> {
+				this.createMenuItem(menu, AppIcon.setupTimeName, "Zeitnamen ableiten", this::runSetupTimename);
+				this.createMenuItem(menu, AppIcon.updateTimeName, "Zeitnamen aktualisieren", this::runUpdateTimename);
+				this.createMenuItem(menu, AppIcon.updateTimePath, "Zeitpfade aktualisieren", this::runUpdateTimepath);
+			});
+			this.createMenu(mbar, AppIcon.file, null, menu -> {
+				this.createMenuItem(menu, AppIcon.deleteFile, "Dateien löschen", this::runDeleteFilesPermanently_DONE);
+				this.createMenuItem(menu, AppIcon.recycleFile, "Dateien recyclen", this::runDeleteFilesTemporary_DONE);
+				this.createMenuLine(menu);
+				this.createMenuItem(menu, AppIcon.refreshFile, "Dateien erneuern", this::runRefreshFiles_DONE);
+				this.createMenuLine(menu);
+				this.createMenuItem(menu, AppIcon.showFile, "Dateien anzeigen", this::runShowFiles_DONE);
+				this.createMenuItem(menu, AppIcon.copyFile, "Dateien kopieren", this::runCopyFiles_DONE);
+				this.createMenuItem(menu, AppIcon.moveFile, "Dateien umbenennen", this::runMoveFiles_DONE);
+			});
+			this.createMenu(mbar, AppIcon.folder, null, menu -> {
+				this.createMenuItem(menu, AppIcon.deleteFolder, "Verzeichnisse löschen", this::runDeleteFoldersPermanently_DONE);
+				this.createMenuItem(menu, AppIcon.recycleFolder, "Verzeichnisse recyclen", this::runDeleteFoldersTemporary_DONE);
+				this.createMenuLine(menu);
+				this.createMenuItem(menu, AppIcon.resolveFile, "Dateien auflösen...", this::runResolveFiles_DONE);
+				this.createMenuItem(menu, AppIcon.resolveFolder, "Verteichnisse auflösen...", this::runResolveFolders_DONE);
+			});
+			this.stop = this.createMenuItem(mbar, AppIcon.stop, null, this::runStop_DONE);
 			this.setIcon(this.shell::setImage, AppIcon.iconApp);
-			this.createMenu();
 		}
 		{
 			this.text = new Text(this.shell, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
@@ -114,9 +175,11 @@ public class AppWindow {
 		this.enableUndo_DONE();
 		this.enableRedo_DONE();
 		this.runInfo_DONOE();
+		AppUtil.center(this.shell);
+		AppUtil.openAndWait(this.shell);
 	}
 
-	private final FTSettings settings = new FTSettings();
+	private final AppSettings settings = new AppSettings();
 
 	private final Display display;
 
@@ -149,72 +212,6 @@ public class AppWindow {
 			if (text == null) return;
 			taret.set(text);
 		} catch (Exception ignore) {}
-	}
-
-	private void createMenu() {
-		final var res = this.shell.getMenuBar();
-
-		this.undo = this.createMenuItem(res, AppIcon.menuUndo, null, this::runUndo_DONE);
-		this.undo.setAccelerator(SWT.CTRL | 'Z');
-
-		this.redo = this.createMenuItem(res, AppIcon.menuRedo, null, this::runRedo_DONE);
-		this.redo.setAccelerator(SWT.CTRL | 'Y');
-
-		this.createMenuItem(res, AppIcon.menuSwap, null, this::runSwap_DONE);
-
-		this.createMenu(res, AppIcon.menuFilter, null, menu -> {
-			this.createMenuItem(menu, AppIcon.itemFilterBySourceFile, "Dateien filtern...", this::runFilterBySourceFile_DONE);
-			this.createMenuItem(menu, AppIcon.itemFilterBySourceFolder, "Verzeichnisse filtern...", this::runFilterBySourceFolder_DONE);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.itemFilterBySourceChange, "Nach Änderung filtern..", this::runFilterBySourceChange_DONE);
-			this.createMenuItem(menu, AppIcon.itemFilterBySourceCreate, "Nach Erzeugung filtern...", this::runFilterBySourceCreate_DONE);
-			this.createMenuItem(menu, AppIcon.itemFilterBySourceSize, "Nach Dateigröße filtern...", this::runFilterBySourceSize_DONE);
-			this.createMenuItem(menu, AppIcon.itemFilterBySourcePath, "Nach Datenpfad filtern..", this::runFilterBySourcePath_DONE);
-		});
-		this.createMenu(res, AppIcon.menuSort, null, menu -> {
-			this.createMenuItem(menu, AppIcon.itemSortReverse, "Rückwärts ordnen", this::runSortReverse_DONE);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.itemSortBySourceChang, "Nach Änderung sortieren", this::runSortBySourceChange_DONE);
-			this.createMenuItem(menu, AppIcon.itemSortBySourceCreate, "Nach Erzeugung sortieren", this::runSortBySourceCreate_DONE);
-			this.createMenuItem(menu, AppIcon.itemSortBySourceSize, "Nach Dateigröße sortieren", this::runSortBySourceSize_DONE);
-			this.createMenuItem(menu, AppIcon.itemSortBySourcePath, "Nach Eingabepfad sortieren", this::runSortBySourcePath_DONE);
-		});
-		this.createMenu(res, AppIcon.menuHash, null, menu -> {
-			this.createMenuItem(menu, AppIcon.itemAnalyzeContent, "Duplikate erkennen", this::runAnalyzeContent_DONE);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.itemSetupCaches, "Streuwertepuffer erzeugen", this::runSetupCaches_DONE);
-			this.createMenuItem(menu, AppIcon.itemUpdateCaches, "Streuwertepuffer befüllen", this::runUpdateCaches_DONE);
-		});
-		this.createMenu(res, AppIcon.menuMemory, null, menu -> {
-			this.createMenuItem(menu, AppIcon.saveVariable, "...in Variable speichern", this::runSaveEntriesToVar);
-			this.createMenuItem(menu, AppIcon.loadVariable, "...aus Variable einfügen", this::runLoadEntriesFromVar);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.saveClipboard, "...in Zwischenablage speichern", this::runSaveEntriesToClip);
-			this.createMenuItem(menu, AppIcon.loadClipboard, "...aus Zwischenablage einfügen", this::runLoadEntriesFromClip);
-		});
-		this.createMenu(res, AppIcon.menuName, null, menu -> {
-			this.createMenuItem(menu, AppIcon.setupTimeName, "Zeitnamen ableiten", this::runSetupTimename);
-			this.createMenuItem(menu, AppIcon.updateTimeName, "Zeitnamen aktualisieren", this::runUpdateTimename);
-			this.createMenuItem(menu, AppIcon.updateTimePath, "Zeitpfade aktualisieren", this::runUpdateTimepath);
-		});
-		this.createMenu(res, AppIcon.file, null, menu -> {
-			this.createMenuItem(menu, AppIcon.deleteFile, "Dateien löschen", this::runDeleteFilesPermanently_DONE);
-			this.createMenuItem(menu, AppIcon.recycleFile, "Dateien recyclen", this::runDeleteFilesTemporary_DONE);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.refreshFile, "Dateien erneuern", this::runRefreshFiles_DONE);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.showFile, "Dateien anzeigen", this::runShowFiles_DONE);
-			this.createMenuItem(menu, AppIcon.copyFile, "Dateien kopieren", this::runCopyFiles_DONE);
-			this.createMenuItem(menu, AppIcon.moveFile, "Dateien umbenennen", this::runMoveFiles_DONE);
-		});
-		this.createMenu(res, AppIcon.folder, null, menu -> {
-			this.createMenuItem(menu, AppIcon.deleteFolder, "Verzeichnisse löschen", this::runDeleteFoldersPermanently_DONE);
-			this.createMenuItem(menu, AppIcon.recycleFolder, "Verzeichnisse recyclen", this::runDeleteFoldersTemporary_DONE);
-			this.createMenuLine(menu);
-			this.createMenuItem(menu, AppIcon.resolveFile, "Dateien auflösen...", this::runResolveFiles_DONE);
-			this.createMenuItem(menu, AppIcon.resolveFolder, "Verteichnisse auflösen...", this::runResolveFolders_DONE);
-		});
-		this.stop = this.createMenuItem(res, AppIcon.stop, null, this::runStop_DONE);
 	}
 
 	private MenuItem createMenu(final Menu parent, String image, final String label, Consumer<Menu> setup) {
@@ -333,14 +330,19 @@ public class AppWindow {
 
 	public void runPush_DONE(final List<String> sourceList) {
 		this.runTask("Datenpfade anfügen", proc -> {
-			var input = this.getInput();
-			final var entries = AppEntry.list();
-			if (!input.isEmpty()) {
-				entries.add(new AppEntry(input, ""));
-			}
-			this.runItems(proc, sourceList, source -> entries.add(new AppEntry(source, "")), null);
-			this.setEntries_DONE(entries);
+			this.runPushImpl(proc, sourceList);
 		});
+	}
+
+	private void runPushImpl(AppProcess proc, final List<String> sourceList) {
+		if (sourceList.isEmpty()) return;
+		var input = this.getInput();
+		final var entries = AppEntry.list();
+		if (!input.isEmpty()) {
+			entries.add(new AppEntry(input, ""));
+		}
+		this.runItems(proc, sourceList, source -> entries.add(new AppEntry(source, "")), null);
+		this.setEntries_DONE(entries);
 	}
 
 	private void runFilterBySourceImpl_DONE(String title, Producer<Filter<AppItem>> filterBuilder) {
@@ -669,23 +671,38 @@ public class AppWindow {
 		});
 	}
 
-	public void runSaveEntriesToClip() { // file
-	}
-
 	// tabelle als text in ram puffer
 	public void runSaveEntriesToVar() {
+	}
+
+	public void runSaveSourcesToClipboard() {
+		this.runTask("Kopieren", prov -> {
+			var pathList = new ArrayList<String>(1000);
+			this.runItems(prov, this.getEntries_DONE(), entry -> {
+				if (entry.source.fileOrNull() == null) return;
+				pathList.add(entry.source.file.getPath());
+			}, null);
+			var fileData = pathList.toArray(new String[0]);
+			var textData = Strings.join(System.lineSeparator(), pathList);
+			this.display.syncExec(() -> {
+				var clp = new Clipboard(this.display);
+				clp.setContents(new Object[]{fileData, textData}, new Transfer[]{FileTransfer.getInstance(), TextTransfer.getInstance()});
+				clp.dispose();
+			});
+		});
 	}
 
 	public void runLoadEntriesFromVar() {
 	}
 
-	public void runLoadEntriesFromClip() {
-		this.display.syncExec(() -> {
-			var clp = new Clipboard(this.display);
-			var fileList = (String[])clp.getContents(FileTransfer.getInstance());
-			clp.dispose();
-			if (fileList == null) return;
-			this.runPush_DONE(Arrays.asList(fileList));
+	public void runLoadSourcesFromClipboard() {
+		this.runTask("Einfügen", proc -> {
+			this.runPushImpl(proc, this.display.syncCall(() -> {
+				var clp = new Clipboard(this.display);
+				var res = (String[])clp.getContents(FileTransfer.getInstance());
+				clp.dispose();
+				return res != null ? Arrays.asList(res) : Collections.emptyList();
+			}));
 		});
 	}
 
@@ -760,7 +777,7 @@ public class AppWindow {
 				Die Zielpfade haben das Format {EP}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {EP} für den \
 				Elternverzeichnispfad und {NE} für die kleingeschriebene Namenserweiterung der Quelldatei stehen.""") //
 			.useOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
-			.useButton("Ja", () -> this.runComputeTimenameImpl(false, false)) //
+			.useButton("Zeitnamen ableiten", () -> this.runComputeTimenameImpl(false, false)) //
 		;
 	}
 
@@ -773,7 +790,7 @@ public class AppWindow {
 				Die Zielpfade haben das Format {EP}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {EP} für den \
 				Elternverzeichnispfad und {NE} für die kleingeschriebene Namenserweiterung der Quelldatei stehen.""") //
 			.useOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
-			.useButton("Ja", () -> this.runComputeTimenameImpl(false, true)) //
+			.useButton("Zeitnamen aktualisieren", () -> this.runComputeTimenameImpl(false, true)) //
 		;
 	}
 
@@ -787,7 +804,7 @@ public class AppWindow {
 				Großelternverzeichnispfad, {EN} für den Elternverzeichnisnamen und {NE} für die kleingeschriebene \
 				Namenserweiterung der Quelldatei stehen.""") //
 			.useOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
-			.useButton("Ja", () -> this.runComputeTimenameImpl(true, true)) //
+			.useButton("Zeitpfade aktualisieren", () -> this.runComputeTimenameImpl(true, true)) //
 		;
 	}
 

@@ -13,7 +13,7 @@ import bee.creative.util.HashMap;
 /** Diese Klasse implementiert einen persistierbaren Puffer für Streuwerte von Dateien.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class AppHashes implements FTStorable2 {
+class AppHashes implements AppStorable2 {
 
 	public static final String FILENAME = "ft-cache.csv.gz";
 

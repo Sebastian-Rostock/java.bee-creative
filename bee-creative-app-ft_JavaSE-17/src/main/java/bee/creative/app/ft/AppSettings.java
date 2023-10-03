@@ -12,7 +12,7 @@ import bee.creative.util.Producer;
 /** Diese Klasse implementiert die Einstellungen und deren Persistierung.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-class FTSettings implements FTStorable2 {
+class AppSettings implements AppStorable2 {
 
 	/** Dieses Feld speichert das Dateialter in Tagen für {@link FTMain#refreshInputFiles()}. */
 	public final AppOptionLong copyFilesTimeFilter = new AppOptionLong().useMinimum(100).useMaximum(20000).useIncrease(100).useValue(1800);
@@ -37,12 +37,12 @@ class FTSettings implements FTStorable2 {
 
 	@Override
 	public void persist() {
-		this.persist(FTSettings.FILENAME);
+		this.persist(AppSettings.FILENAME);
 	}
 
 	@Override
 	public void persist(final CSVWriter writer) throws Exception {
-		writer.writeEntry((Object[])FTSettings.FILEHEAD);
+		writer.writeEntry((Object[])AppSettings.FILEHEAD);
 		writer.writeEntry(this.getOptions().translate(Producer::get).toArray());
 	}
 
@@ -52,12 +52,12 @@ class FTSettings implements FTStorable2 {
 
 	@Override
 	public void restore() {
-		this.restore(FTSettings.FILENAME);
+		this.restore(AppSettings.FILENAME);
 	}
 
 	@Override
 	public void restore(final CSVReader reader) throws Exception {
-		if (!Arrays.equals(FTSettings.FILEHEAD, reader.readEntry())) return;
+		if (!Arrays.equals(AppSettings.FILEHEAD, reader.readEntry())) return;
 		var values = new LinkedList<>(Arrays.asList(reader.readEntry()));
 		this.getOptions().collectAll(option -> option.set(values.pollFirst()));
 	}
