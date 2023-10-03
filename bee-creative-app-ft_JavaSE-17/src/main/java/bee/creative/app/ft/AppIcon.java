@@ -11,19 +11,19 @@ class AppIcon {
 		menuSwap = "arrow-swap.png", //
 
 		menuSort = "sort-asc.png", //
-		sortLabel = "name.png", //
-		sortLength = "size.png", //
-		sortChange = "update.png", //
-		sortCreate = "date.png", //
-		sortReverse = "sort-des.png", //
+		itemSortBySourcePath = "name.png", //
+		itemSortBySourceSize = "size.png", //
+		itemSortBySourceChang = "update.png", //
+		itemSortBySourceCreate = "date.png", //
+		itemSortReverse = "sort-des.png", //
 
 		menuFilter = "filter.png", //
 		itemFilterBySourceFile = "file.png", //
-		filterFolder = "folder.png", //
-		filterLabel = "name.png", //
-		filterLength = "size.png", //
-		filterChange = "update.png", //
-		filterCreate = "date.png", //
+		itemFilterBySourceFolder = "folder.png", //
+		itemFilterBySourcePath = "name.png", //
+		itemFilterBySourceSize = "size.png", //
+		itemFilterBySourceChange = "update.png", //
+		itemFilterBySourceCreate = "date.png", //
 
 		menuHash = "hash.png", //
 		hashSetup = "hash-check.png", //
