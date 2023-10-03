@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import bee.creative.lang.Objects;
+import bee.creative.lang.Strings;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
 
@@ -40,21 +41,22 @@ class AppOptionText implements AppOption {
 
 	@Override
 	public String get() {
-		return this.value;
+		return Strings.join("\n", Iterables.fromItem(this.value).concat(this.options));
 	}
 
 	@Override
 	public Control get(Composite item) {
 		var res = new Combo(item, SWT.BORDER);
-		res.setText(Objects.notNull(this.value, ""));
 		res.setItems(this.options.toArray(new String[0]));
+		res.setText(Objects.notNull(this.value, ""));
 		res.addModifyListener(event -> this.value = res.getText());
 		return res;
 	}
 
 	@Override
 	public void set(String value) {
-		this.value = value;
+		var options = Strings.split("\n", value);
+		this.useValue(options.remove(0)).useOptions(options);
 	}
 
 	private String value = "";

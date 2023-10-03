@@ -51,8 +51,13 @@ public class AppWindow {
 	}
 
 	public AppWindow() {
-		this.display = Display.getDefault();
-		this.edit = System.currentTimeMillis() + Integer.MIN_VALUE;
+		{
+			this.settings = new AppSettings();
+			this.settings.restore();
+		}
+		{
+			this.display = Display.getDefault();
+		}
 		{
 			this.procQueue = new AppQueue() {
 
@@ -172,6 +177,9 @@ public class AppWindow {
 			this.info = new Label(this.shell, SWT.NONE);
 			this.info.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		}
+		{
+			this.edit = System.currentTimeMillis() + Integer.MIN_VALUE;
+		}
 		this.enableUndo_DONE();
 		this.enableRedo_DONE();
 		this.runInfo_DONOE();
@@ -182,9 +190,10 @@ public class AppWindow {
 		}
 		this.shell.open();
 		AppDialog.wait(this.shell);
+		this.settings.persist();
 	}
 
-	private final AppSettings settings = new AppSettings();
+	private final AppSettings settings;
 
 	private final Display display;
 
@@ -454,14 +463,14 @@ public class AppWindow {
 		this.runDialog_DONE() //
 			.useTitle("Möchten Sie Eingabepfade behalten bzw. entfernen, die vor dem unten genannten Zeitpunkt erzeugte Dateien angeben?") //
 			.useMessage("Relative Eingabepfade und die zu Verzeichnissen werden entfernt.") //
-			.useOption("Erzeugungszeitpunkt", this.settings.filterMade) //
+			.useOption("Erzeugungszeitpunkt", this.settings.filterCreate) //
 			.useButton("Pfade alterer Dateien behalten", () -> this.runFilterBySourceCreateImpl_DONE(true)) //
 			.useButton("Pfade alterer Dateien entfernen", () -> this.runFilterBySourceCreateImpl_DONE(false)) //
 		;
 	}
 
 	private void runFilterBySourceCreateImpl_DONE(boolean isKeep) {
-		var filter = this.settings.filterMade.getValue();
+		var filter = this.settings.filterCreate.getValue();
 		this.runFilterBySourceImpl_DONE(isKeep ? "Eingabepfade behalten (Erzeugung)" : "Eingabepfade entfernen (Erzeugung)",
 			() -> source -> (source.madeOrNull() != null) && ((source.made.longValue() < filter) == isKeep));
 	}
@@ -470,14 +479,14 @@ public class AppWindow {
 		this.runDialog_DONE() //
 			.useTitle("Möchten Sie Eingabepfade behalten bzw. entfernen, die vor dem unten genannten Zeitpunkt geänderte Dateien angeben?") //
 			.useMessage("Relative Eingabepfade und die zu Verzeichnissen werden entfernt.") //
-			.useOption("Änderungszeitpunkt", this.settings.filterTime) //
+			.useOption("Änderungszeitpunkt", this.settings.filterChange) //
 			.useButton("Pfade alterer Dateien behalten", () -> this.runFilterBySourceChangeImpl_DONE(true)) //
 			.useButton("Pfade alterer Dateien entfernen", () -> this.runFilterBySourceChangeImpl_DONE(false)) //
 		;
 	}
 
 	private void runFilterBySourceChangeImpl_DONE(boolean isKeep) {
-		var filter = this.settings.filterMade.getValue();
+		var filter = this.settings.filterCreate.getValue();
 		this.runFilterBySourceImpl_DONE(isKeep ? "Eingabepfade behalten (Änderung)" : "Eingabepfade entfernen (Änderung)",
 			() -> source -> (source.timeOrNull() != null) && ((source.time.longValue() < filter) == isKeep));
 	}
@@ -529,16 +538,16 @@ public class AppWindow {
 				Die Streuwerte werden in der Pufferdatei '%s' zwischengespeichert. \
 				Dabei wird die im Elternpfad näheste bzw. die im Verzeichnis dieser Anwendung liegende Pufferdatei verwendet.
 				Relative Eingabepfade und die zu Verzeichnissen werden ignoriert.""", AppHashes.FILENAME) //
-			.useOption("Puffergröße für Streuwert", this.settings.findClonesHashSize) //
-			.useOption("Puffergröße für Dateivergleich", this.settings.findClonesTestSize) //
+			.useOption("Puffergröße für Streuwert", this.settings.contentHashSize) //
+			.useOption("Puffergröße für Dateivergleich", this.settings.contentTestSize) //
 			.useButton("Duplikate Dateien finden", () -> this.runAnalyzeContentImpl_DONE(true)) //
 			.useButton("Einzigartige Dateien finden", () -> this.runAnalyzeContentImpl_DONE(false)) //
 		;
 	}
 
 	private void runAnalyzeContentImpl_DONE(boolean isKeep) {
-		var hashSize = this.settings.findClonesHashSize.getValue();
-		var testSize = this.settings.findClonesTestSize.getValue();
+		var hashSize = this.settings.contentHashSize.getValue();
+		var testSize = this.settings.contentTestSize.getValue();
 		this.runTask(isKeep ? "Duplikate behalten" : "Duplikate entfernen", proc -> {
 
 			var caches = new AppCaches();
@@ -682,13 +691,13 @@ public class AppWindow {
 				und in der Pufferdatei '%s' zwischengespeichert. Dabei wird die im Elternpfad näheste bzw. die im Verzeichnis dieser Anwendung liegende \
 				Pufferdatei verwendet.
 				Relative Eingabepfade und die zu Verzeichnissen werden ignoriert.""", AppHashes.FILENAME) //
-			.useOption("Puffergröße für Streuwert", this.settings.findClonesHashSize) //
+			.useOption("Puffergröße für Streuwert", this.settings.contentHashSize) //
 			.useButton("Streuwertepuffer befüllen", () -> this.runUpdateCachesImpl_DONE()) //
 		;
 	}
 
 	private void runUpdateCachesImpl_DONE() {
-		var hashSize = this.settings.findClonesHashSize.getValue();
+		var hashSize = this.settings.contentHashSize.getValue();
 		this.runTask("Streuwertepuffer befüllen", proc -> {
 			var caches = new AppCaches();
 			caches.restore();
@@ -807,7 +816,7 @@ public class AppWindow {
 				verschobenen Änderungszeitpunkten der Quelldateien.
 				Die Zielpfade haben das Format {EP}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {EP} für den \
 				Elternverzeichnispfad und {NE} für die kleingeschriebene Namenserweiterung der Quelldatei stehen.""") //
-			.useOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
+			.useOption("Zeitkorrektur in Sekunden", this.settings.timenameOffset) //
 			.useButton("Zeitnamen ableiten", () -> this.runComputeTimenameImpl(false, false)) //
 		;
 	}
@@ -820,7 +829,7 @@ public class AppWindow {
 				verschobenen Zeitpunkten, die im Quellnamen mit beliebigen Trennzeichen angegeben sind.
 				Die Zielpfade haben das Format {EP}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {EP} für den \
 				Elternverzeichnispfad und {NE} für die kleingeschriebene Namenserweiterung der Quelldatei stehen.""") //
-			.useOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
+			.useOption("Zeitkorrektur in Sekunden", this.settings.timenameOffset) //
 			.useButton("Zeitnamen aktualisieren", () -> this.runComputeTimenameImpl(false, true)) //
 		;
 	}
@@ -834,7 +843,7 @@ public class AppWindow {
 				Die Zielpfade haben das Format {GP}\\JJJJ-MM_{EN}\\JJJJ-MM-TT hh.mm.ss{NE}, wobei {GP} für den \
 				Großelternverzeichnispfad, {EN} für den Elternverzeichnisnamen und {NE} für die kleingeschriebene \
 				Namenserweiterung der Quelldatei stehen.""") //
-			.useOption("Zeitkorrektur in Sekunden", this.settings.moveFilesTimeOffset) //
+			.useOption("Zeitkorrektur in Sekunden", this.settings.timenameOffset) //
 			.useButton("Zeitpfade aktualisieren", () -> this.runComputeTimenameImpl(true, true)) //
 		;
 	}
@@ -842,7 +851,7 @@ public class AppWindow {
 	void runComputeTimenameImpl(boolean isPath, boolean isName) {
 		// isName = true, wenn Zeitpunkt aus Dateinamen abgeleitet werden soll
 		// isName = false, wenn Anderungszeitpunkt verwendet werden soll
-		long moveTime = this.settings.moveFilesTimeOffset.getValue();
+		long moveTime = this.settings.timenameOffset.getValue();
 		this.runTask(isName ? (isPath ? "Zeitpfade aktualisieren" : "Zeitnamen aktualisieren") : (isPath ? "Zeitpfade ableiten" : "Zeitnamen ableiten"), proc -> {
 			var result = AppEntry.list();
 			var pathSet = new HashSet2<String>(1000);
@@ -896,14 +905,14 @@ public class AppWindow {
 				an Tagen erstellt wurden, kopiert und durch ihre Kopien ersetzt. \
 				Die dazu temporär erzeugten Kopien tragen die Dateiendung '.tempcopy'. \
 				Die Zeilen erneuerter Dateien werden aus der Pfadliste entfert.""") //
-			.useOption("Dateialter in Tagen", this.settings.copyFilesTimeFilter) //
+			.useOption("Dateialter in Tagen", this.settings.refreshOffset) //
 			.useButton("Dateien erneuern", () -> this.runRefreshFilesImpl_DONE()) //
 		;
 	}
 
 	private void runRefreshFilesImpl_DONE() {
 		this.runTask("Dateien erneuern", proc -> {
-			var filterTime = System.currentTimeMillis() - (this.settings.copyFilesTimeFilter.getValue() * 24 * 60 * 60 * 1000);
+			var filterTime = System.currentTimeMillis() - (this.settings.refreshOffset.getValue() * 24 * 60 * 60 * 1000);
 			var entryList = AppEntry.list();
 			this.runItems(proc, this.getEntries_DONE(), entry -> {
 				try {
