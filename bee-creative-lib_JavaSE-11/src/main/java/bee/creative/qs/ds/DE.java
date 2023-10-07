@@ -1,6 +1,6 @@
 package bee.creative.qs.ds;
 
-import java.util.List;
+import java.util.Set;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 
@@ -28,12 +28,24 @@ public interface DE extends DO {
 		return this.model().itemIdentLink().getTarget(this.node());
 	}
 
+	/** Diese Methode liefert den {@link QN#value() Textwert} des {@link #label() Beschriftungsknoten}. Wenn dieser {@code null} ist, wird die leere Zeichenkette
+	 * geliefert. */
+	default String labelAsString() {
+		var label = this.label();
+		return label != null ? label.value() : "";
+	}
+
 	/** Diese Methode liefert die Menge der {@link QN Hyperknoten}, die zur Erkennung dieses Objekts dient. Dazu sollten diese Erkennungsknoten einen
 	 * {@link QN#value() Textwert} besitzen.
 	 *
 	 * @return Erkennungsknotenmenge. */
 	default QNSet idents() {
 		return this.model().itemIdentLink().getTargetSet(this.node());
+	}
+
+	/** Diese Methode liefert die {@link QN#value() Textwerte} der {@link #idents() Erkennungsknoten}. */
+	default Set<String> identsAsStrings() {
+		return this.idents().values().toSet();
 	}
 
 }

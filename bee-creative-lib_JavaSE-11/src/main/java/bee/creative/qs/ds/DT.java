@@ -1,23 +1,34 @@
 package bee.creative.qs.ds;
 
 import bee.creative.qs.QN;
+import bee.creative.qs.QNSet;
+import bee.creative.util.Builders.MapBuilder;
 
 public interface DT extends DE {
 
-	String LINK_NAME_HAS_NAME = "DM:TYPE_HAS_NAME";
+	default QNSet items() {
+		final var model = this.model();
+		return model.edges().havingPredicate(model.nodeTypeLink().node()).havingObject(this.node()).subjects();
+	}
 
-	String LINK_NAME_HAS_LABEL = "DM:TYPE_HAS_LABEL";
+	/** Diese Methode setzt {@link #node()} als Datentyp des gegebenen {@link QN Hyperknoten}. */
+	default void assignToItem(QN item) {
+		this.model().nodeTypeLink().setTarget(item, this.node());
+	}
 
-	default void set(QN item) {
-		// model().nodeTypeLink()
-	};
-
-	void setAll(Iterable<? extends QN> items);
+	/** Diese Methode setzt {@link #node()} als Datentyp der gegebenen {@link QN Hyperknoten}. */
+	default void assignToItems(Iterable<? extends QN> itemSet) {
+		var type = this.node();
+		this.model().nodeTypeLink().setTargetMap(MapBuilder.<QN, QN>forHashMap().putAllKeys(node -> type, itemSet).get());
+	}
 
 	/** Diese Methode liefert die {@link DL Datenfelder}, die von Instanzen dieses Datentyps ausgehen. */
 	DLSet sourceLinks();
 
 	/** Diese Methode liefert die {@link DL Datenfelder}, die auf Instanzen dieses Datentyps verweisen. */
-	DLSet targetLinks();
+	default DLSet targetLinks() {
+		final var model = this.model();
+		return model.nodesAsLinks(model.linkTargetLink().getSourceSet(this.node()));
+	}
 
 }
