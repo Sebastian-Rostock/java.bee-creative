@@ -35,11 +35,15 @@ public interface QISet<GI> extends QO, Iterable<GI> {
 	/** Diese Methode gibt eine Kopie dieser Menge als {@link Set} zurück.
 	 *
 	 * @return Kopie dieser Menge. */
-	Set<GI> toSet();
+	default Set<GI> toSet(){
+		return this.iterator().toSet();
+	}
 
 	/** Diese Methode gibt eine Kopie dieser Menge als {@link List} zurück.
 	 *
 	 * @return geordnete Kopie dieser Menge. */
-	List<GI> toList();
+	default List<GI> toList() {
+		return this.iterator().toList();
+	}
 
 }

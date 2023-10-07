@@ -1,6 +1,5 @@
 package bee.creative.qs.h2;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import bee.creative.lang.Objects;
@@ -24,7 +23,7 @@ public final class H2QT implements QT, UseToString {
 	public final long[] keys;
 
 	@Override
-	public H2QN get(final int index) throws IndexOutOfBoundsException {
+	public H2QN get(int index) throws IndexOutOfBoundsException {
 		return this.owner.newNode(this.keys[index]);
 	}
 
@@ -45,34 +44,32 @@ public final class H2QT implements QT, UseToString {
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hashInit();
-		for (final long key: this.keys) {
+		var result = Objects.hashInit();
+		for (var key: this.keys) {
 			result = Objects.hashPush(result, Objects.hash(key));
 		}
 		return result;
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof H2QT)) return false;
-		final H2QT that = (H2QT)object;
+		var that = (H2QT)object;
 		if (!Arrays.equals(this.keys, that.keys) || (this.owner != that.owner)) return false;
 		return true;
 	}
 
 	@Override
 	public List<QN> toList() {
-		final List<QN> result = new ArrayList<>(this.size());
-		Iterables.addAll(result, this);
-		return result;
+		return Iterables.toList(this);
 	}
 
 	@Override
 	public QN[] toArray() {
-		final int size = this.size();
-		final QN[] res = new QN[size];
-		for (int i = 0; i < size; i++) {
+		var size = this.size();
+		var res = new QN[size];
+		for (var i = 0; i < size; i++) {
 			res[i] = this.get(i);
 		}
 		return res;
@@ -83,7 +80,7 @@ public final class H2QT implements QT, UseToString {
 		return "(" + Strings.join(" ", this) + ")";
 	}
 
-	H2QT(final H2QS owner, final long... keys) {
+	H2QT(H2QS owner, long... keys) {
 		this.owner = owner;
 		this.keys = keys;
 	}

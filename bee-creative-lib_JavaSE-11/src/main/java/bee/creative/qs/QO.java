@@ -8,7 +8,7 @@ package bee.creative.qs;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QO {
 
-	/** Diese Methode gibt den Graphspeicher zurück, der dieses Objekt verwaltet.
+	/** Diese Methode liefet den dieses Objekt verwaltenden Graphspeicher.
 	 *
 	 * @return Graphspeicher. */
 	QS owner();

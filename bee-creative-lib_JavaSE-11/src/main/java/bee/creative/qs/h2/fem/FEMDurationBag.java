@@ -3,11 +3,11 @@ package bee.creative.qs.h2.fem;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import bee.creative.fem.FEMDuration;
-import bee.creative.qs.h2.H2QDBag;
+import bee.creative.qs.h2.H2QIRangeBag;
 import bee.creative.qs.h2.H2QQ;
 import bee.creative.qs.h2.H2QS;
 
-public class FEMDurationBag extends H2QDBag<FEMDuration, FEMDurationBag> {
+public class FEMDurationBag extends H2QIRangeBag<FEMDuration, FEMDurationBag> {
 
 	public FEMDurationBag(final H2QS owner) {
 		this(owner, new H2QQ().push("SELECT * FROM QD_FEMDURATION"), "QI_FEMDURATION");

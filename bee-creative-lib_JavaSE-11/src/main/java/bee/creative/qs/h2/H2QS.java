@@ -420,7 +420,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	final HashSet<String> tables = new HashSet<>();
 
-	final HashMap<String, H2QDBag<?, ?>.Cache> cacheMap = new HashMap<>();
+	final HashMap<String, H2QIBag<?, ?>.Cache> cacheMap = new HashMap<>();
 
 	Object putValueMark;
 

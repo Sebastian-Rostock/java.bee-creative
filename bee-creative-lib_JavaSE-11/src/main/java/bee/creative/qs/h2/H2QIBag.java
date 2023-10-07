@@ -4,20 +4,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map.Entry;
 import bee.creative.lang.Objects;
+import bee.creative.qs.QIBag;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
 import bee.creative.util.Entries;
 import bee.creative.util.Setter;
 
-public abstract class H2QDBag<GI, GIBag> extends H2QISet<GI> {
+public abstract class H2QIBag<GI, GIBag> extends H2QISet<GI> implements QIBag<GI, GIBag> {
 
-	/** Diese Methode ergänzt die gegebene Abbildung um die {@link QN Hyperknoten} dieser Menge, die einen Textwert {@link QN#value() besitzen}, der die
-	 * {@link Object#toString() Textdarstellung} eines Elements dieser Datensammlung darstellt.
-	 *
-	 * @param items Abbildung von {@link QN Hyperknoten} auf {@link QN#value() Textwerte}. */
-	public void items(final Setter<? super H2QN, ? super GI> items) {
-		try (final ResultSet rset = this.table.select(this.owner)) {
+	@Override
+	public void items(final Setter<? super QN, ? super GI> items) {
+		try (var rset = this.table.select(this.owner)) {
 			while (rset.next()) {
 				items.set(this.owner.newNode(rset.getLong(1)), this.customItem(rset));
 			}
@@ -26,36 +24,17 @@ public abstract class H2QDBag<GI, GIBag> extends H2QISet<GI> {
 		}
 	}
 
+	@Override
 	public H2QNSet nodes() {
 		return new H2QNSet(this.owner, new H2QQ().push("SELECT N FROM (").push(this).push(")"));
 	}
 
+	@Override
 	public H2QVSet values() {
 		return this.nodes().values();
 	}
 
-	public GIBag havingItemsEQ(final GI item) throws NullPointerException, IllegalArgumentException {
-		return this.customHaving(new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE ").push(table -> this.customHavingItemEQ(table, item)));
-	}
-
-	public GIBag havingItemsLT(final GI item) throws NullPointerException, IllegalArgumentException {
-		return this.customHaving(new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE ").push(table -> this.customHavingItemLT(table, item)));
-	}
-
-	public GIBag havingItemsLE(final GI item) throws NullPointerException, IllegalArgumentException {
-		return this.customHaving(new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE (").push(table -> this.customHavingItemLT(table, item)).push(") OR (")
-			.push(table -> this.customHavingItemEQ(table, item)).push(")"));
-	}
-
-	public GIBag havingItemsGT(final GI item) throws NullPointerException, IllegalArgumentException {
-		return this.customHaving(new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE ").push(table -> this.customHavingItemGT(table, item)));
-	}
-
-	public GIBag havingItemsGE(final GI item) throws NullPointerException, IllegalArgumentException {
-		return this.customHaving(new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE (").push(table -> this.customHavingItemGT(table, item)).push(") OR (")
-			.push(table -> this.customHavingItemEQ(table, item)).push(")"));
-	}
-
+	@Override
 	public GIBag havingNodes(final QNSet nodes) throws NullPointerException, IllegalArgumentException {
 		final H2QNSet that = this.owner.asQNSet(nodes);
 		return this.customHaving(new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE N IN (SELECT N FROM (").push(that).push("))"));
@@ -64,14 +43,14 @@ public abstract class H2QDBag<GI, GIBag> extends H2QISet<GI> {
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Die Tabelle muss mit der Spalte
 	 * {@code N BIGINT NOT NULL PRIMARY KEY} beginnen. Der {@code index} gibt den Namen der automatisch erzeugten Tabelle zur Erfassung der indizierten
 	 * {@link QS#nodes() Hperknoten mit Textwert} an. */
-	protected H2QDBag(final H2QS owner, final H2QQ table, final String index) {
+	protected H2QIBag(final H2QS owner, final H2QQ table, final String index_or_null) {
 		super(owner, Objects.notNull(table));
-		if (index == null) return;
+		if (index_or_null == null) return;
 		synchronized (owner.cacheMap) {
-			this.table.push(owner.cacheMap.install(index, index2 -> {
-				new H2QQ().push("CREATE TABLE IF NOT EXISTS ").push(index2).push(" (N BIGINT NOT NULL, PRIMARY KEY (N));").update(owner);
+			this.table.push(owner.cacheMap.install(index_or_null, index -> {
+				new H2QQ().push("CREATE TABLE IF NOT EXISTS ").push(index).push(" (N BIGINT NOT NULL, PRIMARY KEY (N));").update(owner);
 				this.customSetup();
-				return new Cache(index2);
+				return new Cache(index);
 			}));
 		}
 	}
@@ -84,17 +63,11 @@ public abstract class H2QDBag<GI, GIBag> extends H2QISet<GI> {
 
 	protected abstract GIBag customHaving(H2QQ table) throws NullPointerException, IllegalArgumentException;
 
-	protected abstract void customHavingItemEQ(final H2QQ table, final GI item) throws NullPointerException, IllegalArgumentException;
-
-	protected abstract void customHavingItemLT(final H2QQ table, final GI item) throws NullPointerException, IllegalArgumentException;
-
-	protected abstract void customHavingItemGT(final H2QQ table, final GI item) throws NullPointerException, IllegalArgumentException;
-
 	protected final class Cache {
 
 		@Override
 		public String toString() {
-			final var that = H2QDBag.this;
+			final var that = H2QIBag.this;
 			final var owner = that.owner;
 			final var putValueMark = owner.putValueMark;
 			final var popValueMark = owner.popValueMark;
@@ -135,7 +108,7 @@ public abstract class H2QDBag<GI, GIBag> extends H2QISet<GI> {
 	}
 
 	/** Diese Klasse implementiert eine temporäre Kopie der Menge der noch nicht indizierten {@link H2QS#nodes() Hyperknoten mit Textwert} für
-	 * {@link H2QDBag#customInsert(InsertSet)}. Die {@link Entry#getKey() Schüssel} jedes Eintrags nennt die {@link H2QN#key Kennung} des {@link H2QE
+	 * {@link H2QIBag#customInsert(InsertSet)}. Die {@link Entry#getKey() Schüssel} jedes Eintrags nennt die {@link H2QN#key Kennung} des {@link H2QE
 	 * Hyperknoten}, dessen {@link H2QN#value() Textwert} im {@link Entry#getValue() Werte} des Eintrags angegeben ist. */
 	protected static final class InsertSet extends H2QISet<Entry<Long, String>> {
 
@@ -162,7 +135,7 @@ public abstract class H2QDBag<GI, GIBag> extends H2QISet<GI> {
 	}
 
 	/** Diese Klasse implementiert eine temporäre Kopie der Menge der indizierten {@link H2QS#nodes() Hyperknoten mit Textwert} für
-	 * {@link H2QDBag#customDelete(DeleteSet)}. Jeder Eintrag nennt die {@link H2QN#key Kennung} eines gelöschten {@link H2QE Hyperknoten}. */
+	 * {@link H2QIBag#customDelete(DeleteSet)}. Jeder Eintrag nennt die {@link H2QN#key Kennung} eines gelöschten {@link H2QE Hyperknoten}. */
 	protected static final class DeleteSet extends H2QISet<Long> {
 
 		@Override

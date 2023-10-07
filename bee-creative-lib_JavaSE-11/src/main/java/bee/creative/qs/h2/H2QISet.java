@@ -2,8 +2,6 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
 import bee.creative.qs.QISet;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Iterator2;
@@ -52,16 +50,6 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 	@Override
 	public Iterator2<GI> iterator() {
 		return new Iter();
-	}
-
-	@Override
-	public Set<GI> toSet() {
-		return this.iterator().toSet();
-	}
-
-	@Override
-	public List<GI> toList() {
-		return this.iterator().toList();
 	}
 
 	@Override

@@ -3,11 +3,11 @@ package bee.creative.qs.h2.fem;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import bee.creative.fem.FEMInteger;
-import bee.creative.qs.h2.H2QDBag;
+import bee.creative.qs.h2.H2QIRangeBag;
 import bee.creative.qs.h2.H2QQ;
 import bee.creative.qs.h2.H2QS;
 
-public class FEMIntegerBag extends H2QDBag<FEMInteger, FEMIntegerBag> {
+public class FEMIntegerBag extends H2QIRangeBag<FEMInteger, FEMIntegerBag> {
 
 	public FEMIntegerBag(final H2QS owner) {
 		this(owner, new H2QQ().push("SELECT * FROM QD_FEMINTEGER"), "QI_FEMINTEGER");
