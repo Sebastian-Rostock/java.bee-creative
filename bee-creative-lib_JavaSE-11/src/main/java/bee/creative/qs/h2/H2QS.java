@@ -188,6 +188,19 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
+	public H2QN getNode(final Object value) {
+		try {
+			final String string = this.asQV(value);
+			final PreparedStatement getStmt = this.getQV;
+			getStmt.setString(1, string);
+			final ResultSet res = getStmt.executeQuery();
+			return res.next() ? this.newNode(res.getLong(1)) : null;
+		} catch (final SQLException cause) {
+			throw new IllegalStateException(cause);
+		}
+	}
+
+	@Override
 	public H2QE newEdge() {
 		final long key = this.newKey(this.putQN);
 		return this.newEdge(key, key, key, key);
