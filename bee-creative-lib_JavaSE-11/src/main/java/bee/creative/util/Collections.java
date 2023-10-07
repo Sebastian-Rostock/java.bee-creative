@@ -619,7 +619,7 @@ public class Collections {
 	 * @param <GValue> Typ der Werte.
 	 * @param <GValue2> Typ der Werte der gegebenen {@link Map}. */
 	@SuppressWarnings ("javadoc")
-	public static class TranslatedMap<GKey, GValue, GKey2, GValue2> extends AbstractMap<GKey, GValue> {
+	public static class TranslatedMap<GKey, GValue, GKey2, GValue2> extends AbstractMap<GKey, GValue> implements Map3<GKey, GValue> {
 
 		class SourceEntry extends AbstractEntry<GKey2, GValue2> {
 
@@ -745,7 +745,7 @@ public class Collections {
 		}
 
 		@Override
-		public Set<GKey> keySet() {
+		public Set2<GKey> keySet() {
 			return Collections.translate(this.that.keySet(), this.keyTrans);
 		}
 
@@ -772,12 +772,12 @@ public class Collections {
 		}
 
 		@Override
-		public Collection<GValue> values() {
+		public Collection2<GValue> values() {
 			return Collections.translate(this.that.values(), this.valueTrans);
 		}
 
 		@Override
-		public Set<Entry<GKey, GValue>> entrySet() {
+		public Set2<Entry<GKey, GValue>> entrySet() {
 			return Collections.translate(this.that.entrySet(), new EntryTranslator());
 		}
 
@@ -1045,70 +1045,71 @@ public class Collections {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link UnionSet new UnionSet<>(items1, items2)}. */
-	public static <GItem> Set<GItem> union(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+	public static <GItem> Set2<GItem> union(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
 		return new UnionSet<>(items1, items2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ExceptSet new ExceptSet<>(items1, items2)}. */
-	public static <GItem> Set<GItem> except(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+	public static <GItem> Set2<GItem> except(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
 		return new ExceptSet<>(items1, items2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link IntersectSet new IntersectSet<>(items1, items2)}. */
-	public static <GItem> Set<GItem> intersect(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+	public static <GItem> Set2<GItem> intersect(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
 		return new IntersectSet<>(items1, items2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatList new ConcatList<>(items1, items2, extendMode)}. */
-	public static <GKey, GValue> Set<Entry<GKey, GValue>> cartesian(final Set<? extends GKey> keys, final Set<? extends GValue> values)
+	public static <GKey, GValue> Set2<Entry<GKey, GValue>> cartesian(final Set<? extends GKey> keys, final Set<? extends GValue> values)
 		throws NullPointerException {
 		return new CartesianSet<>(keys, values);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ReverseList new ReverseList<>(items)}. */
-	public static <GItem> List<GItem> reverse(final List<GItem> items) throws NullPointerException {
+	public static <GItem> List2<GItem> reverse(final List<GItem> items) throws NullPointerException {
 		return new ReverseList<>(items);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Collections#concat(List, List, boolean) Collections.concat(items1, items2, true)}. */
-	public static <GTarget> List<GTarget> concat(final List<GTarget> items1, final List<GTarget> items2) throws NullPointerException {
+	public static <GTarget> List2<GTarget> concat(final List<GTarget> items1, final List<GTarget> items2) throws NullPointerException {
 		return Collections.concat(items1, items2, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatList new ConcatList<>(items1, items2, extendMode)}. */
-	public static <GItem> List<GItem> concat(final List<GItem> items1, final List<GItem> items2, final boolean extendMode) throws NullPointerException {
+	public static <GItem> List2<GItem> concat(final List<GItem> items1, final List<GItem> items2, final boolean extendMode) throws NullPointerException {
 		return new ConcatList<>(items1, items2, extendMode);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Collections#concat(Collection, Collection, boolean) Collections.concat(items1, items2, true)}. */
-	public static <GItem> Collection<GItem> concat(final Collection<GItem> items1, final Collection<GItem> items2) throws NullPointerException {
+	public static <GItem> Collection2<GItem> concat(final Collection<GItem> items1, final Collection<GItem> items2) throws NullPointerException {
 		return Collections.concat(items1, items2, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatCollection new ConcatCollection<>(items1, items2, extendMode)}. */
-	public static <GItem> Collection<GItem> concat(final Collection<GItem> items1, final Collection<GItem> items2, final boolean extendMode)
+	public static <GItem> Collection2<GItem> concat(final Collection<GItem> items1, final Collection<GItem> items2, final boolean extendMode)
 		throws NullPointerException {
 		return new ConcatCollection<>(items1, items2, extendMode);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedMap new TranslatedMap<>(that, keyTrans, valueTrans)}. */
-	public static <GKey2, GValue2, GKey, GValue> Map<GKey, GValue> translate(final Map<GKey2, GValue2> that, final Translator<GKey2, GKey> keyTrans,
+	public static <GKey2, GValue2, GKey, GValue> Map3<GKey, GValue> translate(final Map<GKey2, GValue2> that, final Translator<GKey2, GKey> keyTrans,
 		final Translator<GValue2, GValue> valueTrans) throws NullPointerException {
 		return new TranslatedMap<>(that, keyTrans, valueTrans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedList new TranslatedList<>(that, trans)}. */
-	public static <GItem2, GItem> List<GItem> translate(final List<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
+	public static <GItem2, GItem> List2<GItem> translate(final List<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
 		return new TranslatedList<>(that, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedSet new TranslatedSet<>(that, trans)}. */
-	public static <GItem2, GItem> Set<GItem> translate(final Set<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
+	public static <GItem2, GItem> Set2<GItem> translate(final Set<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
 		return new TranslatedSet<>(that, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedCollection new TranslatedCollection<>(that, trans)}. */
-	public static <GItem2, GItem> Collection<GItem> translate(final Collection<GItem2> items, final Translator<GItem2, GItem> trans) throws NullPointerException {
+	public static <GItem2, GItem> Collection2<GItem> translate(final Collection<GItem2> items, final Translator<GItem2, GItem> trans)
+		throws NullPointerException {
 		return new TranslatedCollection<>(items, trans);
 	}
 
