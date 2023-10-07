@@ -3,10 +3,10 @@ package bee.creative.qs.ds;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
+import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
 import bee.creative.util.Consumer;
 import bee.creative.util.Filters;
@@ -15,6 +15,186 @@ import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
 
 public class DS {
+
+	public static QNSet getObjectSet(QN context, QN predicate, QN subject) throws NullPointerException, IllegalArgumentException {
+		return DS.getPredicateEdges(context, predicate).withSubject(subject).objects();
+	}
+
+	/** Diese Methode liefert zu jedem der gegebenen {@link QE#subject() Subjektknoten} einen diesem über {@link QE Hyperkanten} mit dem gegebenen
+	 * {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten} zugeordneten {@link QE#object() Objektknoten}. Zu jedem
+	 * Subjektknoten, dem kein Objektknoten zugeordnet ist, wird {@code null} geliefert.
+	 *
+	 * @param context Kontextknoten der betrachteten Hyperkanten.
+	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
+	 * @param subjectSet Subjektknoten der betrachteten Hyperkanten.
+	 * @return Abbildung von Subjektknoten auf Objektknoten oder {@code null}. */
+	public static HashMap2<QN, QN> getObjectMap(QN context, QN predicate, Iterable<? extends QN> subjectSet)
+		throws NullPointerException, IllegalArgumentException {
+		var subjectObjectMap = DS.newNodeNodeMap(subjectSet);
+		DS.getObjectEdges(context, predicate, subjectObjectMap).iterator().collectAll(edge -> subjectObjectMap.put(edge.subject(), edge.object()));
+		return subjectObjectMap;
+	}
+
+	/** Diese Methode liefert zu jedem der gegebenen {@link QE#subject() Subjektknoten} alle diesem über {@link QE Hyperkanten} mit dem gegebenen
+	 * {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten} zugeordneten {@link QE#object() Objektknoten}. Zu jedem
+	 * Subjektknoten, dem kein Objektknoten zugeordnet ist, wird eine leere Liste geliefert.
+	 *
+	 * @param context Kontextknoten der betrachteten Hyperkanten.
+	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
+	 * @param subjectSet Subjektknoten der betrachteten Hyperkanten.
+	 * @return Abbildung von Subjektknoten auf Objektknotenlisten. */
+	public static HashMap2<QN, List<QN>> getObjectSetMap(QN context, QN predicate, Iterable<? extends QN> subjectSet)
+		throws NullPointerException, IllegalArgumentException {
+		var subjectObjectSetMap = DS.newNodeNodeSetMap(subjectSet);
+		DS.getObjectEdges(context, predicate, subjectObjectSetMap).iterator().collectAll(edge -> subjectObjectSetMap.get(edge.subject()).add(edge.object()));
+		return subjectObjectSetMap;
+	}
+
+	public static QNSet getSubjectSet(QN context, QN predicate, QN object) throws NullPointerException, IllegalArgumentException {
+		return DS.getPredicateEdges(context, predicate).withObject(object).objects();
+	}
+
+	public static HashMap2<QN, QN> getSubjectMap(QN context, QN predicate, Iterable<? extends QN> objectSet)
+		throws NullPointerException, IllegalArgumentException {
+		var objectSubjectMap = DS.newNodeNodeMap(objectSet);
+		DS.getSubjectEdges(context, predicate, objectSubjectMap).iterator().collectAll(edge -> objectSubjectMap.put(edge.object(), edge.subject()));
+		return objectSubjectMap;
+	}
+
+	public static HashMap2<QN, List<QN>> getSubjectSetMap(QN context, QN predicate, Iterable<? extends QN> objectSet)
+		throws NullPointerException, IllegalArgumentException {
+		var objectSubjectSetMap = DS.newNodeNodeSetMap(objectSet);
+		DS.getSubjectEdges(context, predicate, objectSubjectSetMap).iterator().collectAll(edge -> objectSubjectSetMap.get(edge.object()).add(edge.subject()));
+		return objectSubjectSetMap;
+	}
+
+	public static void setObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
+		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
+			DS.getObjectEdges(context, predicate, subjectObjectMap).copy(), DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap).copy());
+	}
+
+	public static void setObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
+		QN popContextOrNull) {
+		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
+			DS.getObjectEdges(context, predicate, subjectObjectSetMap).copy(), DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap).copy());
+	}
+
+	public static void setSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
+		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
+			DS.getSubjectEdges(context, predicate, objectSubjectMap).copy(), DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap).copy());
+	}
+
+	public static void setSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
+		QN popContextOrNull) {
+		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
+			DS.getSubjectEdges(context, predicate, objectSubjectSetMap).copy(), DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap).copy());
+	}
+
+	/** Diese Methode ergänzt zu jedem der gegebenen {@link QE#subject() Subjektknoten} die {@link QE Hyperkanten} zu den gegebenen zugeordneten
+	 * {@link QE#object() Objektknoten} mit dem gegebenen {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten}.
+	 *
+	 * @see #getObjectMap(QN, QN, Iterable)
+	 * @param context Kontextknoten der betrachteten Hyperkanten.
+	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
+	 * @param subjectObjectMap Abbildung von Subjektknoten auf Objektknoten oder {@code null}. */
+	public static void putObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
+		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap));
+	}
+
+	/** Diese Methode ergänzt zu jedem der gegebenen {@link QE#subject() Subjektknoten} die {@link QE Hyperkanten} zu allen gegebenen zugeordneten
+	 * {@link QE#object() Objektknoten} mit dem gegebenen {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten}.
+	 *
+	 * @see #getObjectSetMap(QN, QN, Iterable)
+	 * @param context Kontextknoten der betrachteten Hyperkanten.
+	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
+	 * @param subjectObjectSetMap Abbildung von Subjektknoten auf Objektknotenlisten. */
+	public static void putObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
+		QN popContextOrNull) {
+		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap));
+	}
+
+	public static void putSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
+		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap));
+	}
+
+	public static void putSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
+		QN popContextOrNull) {
+		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap));
+	}
+
+	public static void popObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
+		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap));
+	}
+
+	public static void popObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
+		QN popContextOrNull) {
+		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap));
+	}
+
+	public static void popSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
+		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap));
+	}
+
+	public static void popSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
+		QN popContextOrNull) {
+		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap));
+	}
+
+	static QESet getObjectEdges(QN context, QN predicate, Map<? extends QN, ?> subjectObjectMap) {
+		return DS.getPredicateEdges(context, predicate).havingSubjects(context.owner().newNodes(subjectObjectMap.keySet()));
+	}
+
+	static QESet getSubjectEdges(QN context, QN predicate, Map<? extends QN, ?> objectSubjectMap) {
+		return DS.getPredicateEdges(context, predicate).havingObjects(context.owner().newNodes(objectSubjectMap.keySet()));
+	}
+
+	static QESet getPredicateEdges(QN context, QN predicate) {
+		return context.owner().edges().havingContext(context).havingPredicate(predicate);
+	}
+
+	static HashMap2<QN, QN> newNodeNodeMap(Iterable<? extends QN> nodeSet) {
+		var nodeMap = new HashMap2<QN, QN>(100);
+		Iterables.collectAll(nodeSet, node -> nodeMap.put(node, null));
+		return nodeMap;
+	}
+
+	static HashMap2<QN, List<QN>> newNodeNodeSetMap(Iterable<? extends QN> nodeSet) {
+		var nodeSetMap = new HashMap2<QN, List<QN>>(100);
+		Iterables.collectAll(nodeSet, node -> nodeSetMap.put(node, new ArrayList<>()));
+		return nodeSetMap;
+	}
+
+	static QESet newObjectSubjectMapEdges(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap) {
+		var owner = context.owner();
+		return owner.newEdges(Iterables.translate(objectSubjectMap.entrySet(), entry -> {
+			var subject = entry.getValue();
+			return subject != null ? owner.newEdge(context, predicate, subject, entry.getKey()) : null;
+		}).filter(Filters.empty()));
+	}
+
+	static QESet newObjectSubjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap) {
+		var owner = context.owner();
+		return owner.newEdges(Iterables.concatAll(Iterables.translate(objectSubjectSetMap.entrySet(), entry -> {
+			var object = entry.getKey();
+			return Iterables.translate(entry.getValue(), subject -> owner.newEdge(context, predicate, subject, object));
+		})));
+	}
+
+	static QESet newSubjectObjectMapEdges(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap) {
+		var owner = context.owner();
+		return owner.newEdges(Iterables.translate(subjectObjectMap.entrySet(), entry -> {
+			var object = entry.getValue();
+			return object != null ? owner.newEdge(context, predicate, entry.getKey(), object) : null;
+		}).filter(Filters.empty()));
+	}
+
+	static QESet newSubjectObjectSetMapEdges(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap) {
+		var owner = context.owner();
+		return owner.newEdges(Iterables.concatAll(Iterables.translate(subjectObjectSetMap.entrySet(), entry -> {
+			var subject = entry.getKey();
+			return Iterables.translate(entry.getValue(), object -> owner.newEdge(context, predicate, subject, object));
+		})));
+	}
 
 	/** Diese Methode speichert die als {@link QE Hyperkanten} gegebenen Prädikat-Subjekt-Objekt-Tripel mit dem gegebenen {@link QE#context() Kontextknoten} in
 	 * {@link QE#owner() dessen} Graphspeicher. Mithilfe der beiden anderen Kontextknoten kann der Unterschied gegenüber eines vorherigen Datenstandes erfasst
@@ -26,9 +206,9 @@ public class DS {
 	 * @param edges Hinzuzufügende Prädikat-Subjekt-Objekt-Tripel.
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst.
 	 * @see QESet#putAll() */
-	public boolean putEdges_DONE(final QN context, final QN putContextOrNull, final QN popContextOrNull, final Iterable<? extends QE> edges)
+	public boolean putEdges_DONE(QN context, QN putContextOrNull, QN popContextOrNull, Iterable<? extends QE> edges)
 		throws NullPointerException, IllegalArgumentException {
-		return this.putEdgesImpl(context, putContextOrNull, popContextOrNull, context.owner().newEdges(edges).withContext(context));
+		return DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, context.owner().newEdges(edges).withContext(context));
 	}
 
 	/** Diese Methode entfernt die als {@link QE Hyperkanten} gegebenen Prädikat-Subjekt-Objekt-Tripel mit dem gegebenen {@link QE#context() Kontextknoten} aus
@@ -41,9 +221,9 @@ public class DS {
 	 * @param edges Hinzuzufügende Prädikat-Subjekt-Objekt-Tripel.
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst.
 	 * @see QESet#putAll() */
-	public boolean popEdges_DONE(final QN context, final QN putContextOrNull, final QN popContextOrNull, final Iterable<? extends QE> edges)
+	public boolean popEdges_DONE(QN context, QN putContextOrNull, QN popContextOrNull, Iterable<? extends QE> edges)
 		throws NullPointerException, IllegalArgumentException {
-		return this.popEdgesImpl(context, putContextOrNull, popContextOrNull, context.owner().newEdges(edges).withContext(context));
+		return DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, context.owner().newEdges(edges).withContext(context));
 	}
 
 	/** Diese Methode fügt an die gegebene Liste die im gegebenen {@link QS Graphspeicher} hinterlegten {@link QN Hyperknoten} mit den gegebenen {@link QN#value()
@@ -54,9 +234,8 @@ public class DS {
 	 * @param owner Besitzer der Hyperknoten.
 	 * @param dirty {@code true}, wenn für Textwerte ohne Hyperknoten {@code null} angefügt werden soll.<br>
 	 *        {@code false}, wenn Textwerte ohne Hyperknoten ignoriert werden sollen. */
-	public void getNodes_DONE(final List<QN> result, final List<String> values, final QS owner, final boolean dirty)
-		throws NullPointerException, IllegalArgumentException {
-		final var sourceToResult = new HashMap2<String, QN>(values.size());
+	public void getNodes_DONE(List<QN> result, List<String> values, QS owner, boolean dirty) throws NullPointerException, IllegalArgumentException {
+		var sourceToResult = new HashMap2<String, QN>(values.size());
 		owner.newValues(values).nodes(sourceToResult::put);
 		this.getItems(result, values, sourceToResult, dirty);
 	}
@@ -69,9 +248,8 @@ public class DS {
 	 * @param owner Besitzer der Hyperknoten.
 	 * @param dirty {@code true}, wenn für Textwerte ohne Hyperknoten {@code null} eingefügt werden soll.<br>
 	 *        {@code false}, wenn Textwerte ohne Hyperknoten ignoriert werden sollen. */
-	public <K> void getNodes_DONE(final Map<K, QN> result, final Map<K, String> values, final QS owner, final boolean dirty)
-		throws NullPointerException, IllegalArgumentException {
-		final var sourceToResult = new HashMap2<String, QN>(values.size());
+	public <K> void getNodes_DONE(Map<K, QN> result, Map<K, String> values, QS owner, boolean dirty) throws NullPointerException, IllegalArgumentException {
+		var sourceToResult = new HashMap2<String, QN>(values.size());
 		owner.newValues(values.values()).nodes(sourceToResult::put);
 		this.getItems(result, values, sourceToResult, dirty);
 	}
@@ -84,9 +262,8 @@ public class DS {
 	 * @param owner Besitzer der Hyperknoten.
 	 * @param dirty {@code true}, wenn für Hyperknoten ohne Textwerte {@code null} angefügt werden soll.<br>
 	 *        {@code false}, wenn Hyperknoten ohne Textwerte ignoriert werden sollen. */
-	public void getValues_DONE(final List<String> result, final List<QN> nodes, final QS owner, final boolean dirty)
-		throws NullPointerException, IllegalArgumentException {
-		final var sourceToResult = new HashMap2<QN, String>(nodes.size());
+	public void getValues_DONE(List<String> result, List<QN> nodes, QS owner, boolean dirty) throws NullPointerException, IllegalArgumentException {
+		var sourceToResult = new HashMap2<QN, String>(nodes.size());
 		owner.newNodes(nodes).values(sourceToResult::put);
 		this.getItems(result, nodes, sourceToResult, dirty);
 	}
@@ -99,122 +276,39 @@ public class DS {
 	 * @param owner Besitzer der Hyperknoten.
 	 * @param dirty {@code true}, wenn für Hyperknoten ohne Textwerte {@code null} eingefügt werden soll.<br>
 	 *        {@code false}, wenn Hyperknoten ohne Textwerte ignoriert werden sollen. */
-	public <K> void getValues_DONE(final Map<K, String> result, final Map<K, QN> nodes, final QS owner, final boolean dirty)
-		throws NullPointerException, IllegalArgumentException {
-		final var sourceToResult = new HashMap2<QN, String>(nodes.size());
+	public <K> void getValues_DONE(Map<K, String> result, Map<K, QN> nodes, QS owner, boolean dirty) throws NullPointerException, IllegalArgumentException {
+		var sourceToResult = new HashMap2<QN, String>(nodes.size());
 		owner.newNodes(nodes.values()).values(sourceToResult::put);
 		this.getItems(result, nodes, sourceToResult, dirty);
 	}
 
-	/** Diese Methode liefert zu jedem der gegebenen {@link QE#subject() Subjektknoten} einen diesem über {@link QE Hyperkanten} mit dem gegebenen
-	 * {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten} zugeordneten {@link QE#object() Objektknoten}. Zu jedem
-	 * Subjektknoten, dem kein Objektknoten zugeordnet ist, wird {@code null} geliefert.
-	 *
-	 * @param context Kontextknoten der betrachteten Hyperkanten.
-	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
-	 * @param subjects Subjektknoten der betrachteten Hyperkanten.
-	 * @return Abbildung von Subjektknoten auf Objektknoten oder {@code null}. */
-	public HashMap2<QN, QN> getObject_DONE(final QN context, final QN predicate, final Iterable<? extends QN> subjects)
-		throws NullPointerException, IllegalArgumentException {
-		final var result = new HashMap2<QN, QN>(100);
-		for (final var subject: subjects) {
-			result.put(subject, null);
-		}
-		for (final var edge: this.oldObjectEdgeSet(context, predicate, result)) {
-			result.put(edge.subject(), edge.object());
-		}
-		return result;
-	}
+	public QESet getCloneEdges(Map<QN, QN> clones, QN context, Iterable<? extends QN> nodes) {
 
-	/** Diese Methode liefert zu jedem der gegebenen {@link QE#subject() Subjektknoten} alle diesem über {@link QE Hyperkanten} mit dem gegebenen
-	 * {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten} zugeordneten {@link QE#object() Objektknoten}. Zu jedem
-	 * Subjektknoten, dem kein Objektknoten zugeordnet ist, wird eine leere Liste geliefert.
-	 *
-	 * @param context Kontextknoten der betrachteten Hyperkanten.
-	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
-	 * @param subjects Subjektknoten der betrachteten Hyperkanten.
-	 * @return Abbildung von Subjektknoten auf Objektknotenlisten. */
-	public HashMap2<QN, List<QN>> getObjects_DONE(final QN context, final QN predicate, final Iterable<? extends QN> subjects)
-		throws NullPointerException, IllegalArgumentException {
-		final var result = new HashMap2<QN, List<QN>>(100);
-		for (final var subject: subjects) {
-			result.put(subject, new ArrayList<QN>());
-		}
-		for (final var edge: this.oldObjectEdgeSet(context, predicate, result)) {
-			result.get(edge.subject()).add(edge.object());
-		}
-		return result;
-	}
+		var CLONE_WITH_EDGE = new Object();
+		var CLONE_WITH_NODE = new Object();
 
-	public void setObject(final QN context, final QN predicate, final Map<? extends QN, ? extends QN> object, final QN putContextOrNull,
-		final QN popContextOrNull) {
-		this.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
-			this.oldObjectEdgeSet(context, predicate, object).copy(), this.newObjectEdgeSet(context, predicate, object).copy());
-	}
+		var cloneWithObject = new HashMap2<QN, Object>(100);
+		var cloneEdgeWithObject = (Consumer<QN>)predicate -> cloneWithObject.put(predicate, CLONE_WITH_EDGE);
+		var cloneNodeWithObject = (Consumer<QN>)predicate -> cloneWithObject.put(predicate, CLONE_WITH_NODE);
 
-	public void setObjects(final QN context, final QN predicate, final Map<? extends QN, ? extends Iterable<? extends QN>> object, final QN putContextOrNull,
-		final QN popContextOrNull) {
-		final QESet oldEdges = this.oldObjectEdgeSet(context, predicate, object).copy();
-		final QESet newEdges = this.newObjectsEdgeSet(context, predicate, object).copy();
-		this.setEdgesImpl(context, putContextOrNull, popContextOrNull, oldEdges, newEdges);
-	}
+		var cloneWithSubject = new HashMap2<QN, Object>(100);
+		var cloneEdgeWithSubject = (Consumer<QN>)predicate -> cloneWithSubject.put(predicate, CLONE_WITH_EDGE);
+		var cloneNodeWithSubject = (Consumer<QN>)predicate -> cloneWithSubject.put(predicate, CLONE_WITH_NODE);
 
-	/** Diese Methode ergänzt zu jedem der gegebenen {@link QE#subject() Subjektknoten} die {@link QE Hyperkanten} zu den gegebenen zugeordneten
-	 * {@link QE#object() Objektknoten} mit dem gegebenen {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten}.
-	 *
-	 * @see #getObject_DONE(QN, QN, Iterable)
-	 * @param context Kontextknoten der betrachteten Hyperkanten.
-	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
-	 * @param objects Abbildung von Subjektknoten auf Objektknoten oder {@code null}. */
-	public void putObject_DONE(final QN context, final QN putContextOrNull, final QN popContextOrNull, final QN predicate,
-		final Map<? extends QN, ? extends QN> objects) {
-		this.putEdgesImpl(context, putContextOrNull, popContextOrNull, this.newObjectEdgeSet(context, predicate, objects));
-	}
+		var nodesToClone = new ArrayList<QN>(100);
 
-	/** Diese Methode ergänzt zu jedem der gegebenen {@link QE#subject() Subjektknoten} die {@link QE Hyperkanten} zu allen gegebenen zugeordneten
-	 * {@link QE#object() Objektknoten} mit dem gegebenen {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten}.
-	 *
-	 * @see #getObjects_DONE(QN, QN, Iterable)
-	 * @param context Kontextknoten der betrachteten Hyperkanten.
-	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
-	 * @param objects Abbildung von Subjektknoten auf Objektknotenlisten. */
-	public void putObjects_DONE(final QN context, final QN putContextOrNull, final QN popContextOrNull, final QN predicate,
-		final Map<? extends QN, ? extends Iterable<? extends QN>> objects) {
-		this.putEdgesImpl(context, putContextOrNull, popContextOrNull, this.newObjectsEdgeSet(context, predicate, objects));
-	}
+		var nodesToCheckForClone = new HashSet2<QN>(100);
+		var nodesToCheckForValue = new HashSet2<QN>(100);
 
-	public void popObjects(final QN context, final QN putContextOrNull, final QN popContextOrNull, final QN predicate,
-		final Map<? extends QN, ? extends Iterable<? extends QN>> objects) {
-		this.popEdgesImpl(context, putContextOrNull, popContextOrNull, this.newObjectsEdgeSet(context, predicate, objects));
-	}
-
-	public QESet getCloneEdges(final Map<QN, QN> clones, final QN context, final Iterable<? extends QN> nodes) {
-
-		final var CLONE_WITH_EDGE = new Object();
-		final var CLONE_WITH_NODE = new Object();
-
-		final var cloneWithObject = new HashMap2<QN, Object>(100);
-		final var cloneEdgeWithObject = (Consumer<QN>)predicate -> cloneWithObject.put(predicate, CLONE_WITH_EDGE);
-		final var cloneNodeWithObject = (Consumer<QN>)predicate -> cloneWithObject.put(predicate, CLONE_WITH_NODE);
-
-		final var cloneWithSubject = new HashMap2<QN, Object>(100);
-		final var cloneEdgeWithSubject = (Consumer<QN>)predicate -> cloneWithSubject.put(predicate, CLONE_WITH_EDGE);
-		final var cloneNodeWithSubject = (Consumer<QN>)predicate -> cloneWithSubject.put(predicate, CLONE_WITH_NODE);
-
-		final var nodesToClone = new ArrayList<QN>(100);
-
-		final var nodesToCheckForClone = new HashSet2<QN>(100);
-		final var nodesToCheckForValue = new HashSet2<QN>(100);
-
-		final var qs = context.owner();
-		final var edges = qs.edges().havingContext(context);
+		var qs = context.owner();
+		var edges = qs.edges().havingContext(context);
 
 		Iterables.addAll(nodesToCheckForClone, nodes);
 
 		while (!nodesToCheckForClone.isEmpty()) {
 
 			nodesToCheckForValue.allocate(Math.max(nodesToCheckForValue.size(), nodesToCheckForClone.size()));
-			for (final var node: nodesToCheckForClone) {
+			for (var node: nodesToCheckForClone) {
 				if (clones.get(node) == null) {
 					nodesToCheckForValue.add(node);
 				}
@@ -225,7 +319,7 @@ public class DS {
 				break;
 			}
 
-			for (final var node: qs.newNodes(nodesToCheckForValue).havingValue()) {
+			for (var node: qs.newNodes(nodesToCheckForValue).havingValue()) {
 				clones.put(node, node);
 				nodesToCheckForValue.remove(node);
 			}
@@ -235,18 +329,18 @@ public class DS {
 			}
 
 			nodesToClone.ensureCapacity(nodesToClone.size() + nodesToCheckForValue.size());
-			for (final var node: nodesToCheckForValue) {
+			for (var node: nodesToCheckForValue) {
 				clones.put(node, qs.newNode());
 				nodesToClone.add(node);
 			}
 
-			final var nodesToCloneWithoutValue = qs.newNodes(nodesToCheckForValue);
+			var nodesToCloneWithoutValue = qs.newNodes(nodesToCheckForValue);
 			nodesToCheckForValue.clear();
 
-			final var edgesHavingObjectsToClone = edges.havingObjects(nodesToCloneWithoutValue);
-			final var predicatesFromEdgesHavingObjectsToClone = edgesHavingObjectsToClone.predicates().toList();
-			final var predicatesFromEdgesHavingObjectsToCloneForUpdate = new ArrayList<QN>(predicatesFromEdgesHavingObjectsToClone.size());
-			for (final var node: predicatesFromEdgesHavingObjectsToClone) {
+			var edgesHavingObjectsToClone = edges.havingObjects(nodesToCloneWithoutValue);
+			var predicatesFromEdgesHavingObjectsToClone = edgesHavingObjectsToClone.predicates().toList();
+			var predicatesFromEdgesHavingObjectsToCloneForUpdate = new ArrayList<QN>(predicatesFromEdgesHavingObjectsToClone.size());
+			for (var node: predicatesFromEdgesHavingObjectsToClone) {
 				if (!cloneWithObject.containsKey(node)) {
 					cloneWithObject.put(node, null);
 					predicatesFromEdgesHavingObjectsToCloneForUpdate.add(node);
@@ -255,22 +349,22 @@ public class DS {
 			if (!predicatesFromEdgesHavingObjectsToCloneForUpdate.isEmpty()) {
 				this.getCloneWithObject_DONE(context, cloneEdgeWithObject, cloneNodeWithObject, predicatesFromEdgesHavingObjectsToCloneForUpdate);
 			}
-			final var predicatesFromEdgesHavingObjectsToCloneAndSubjectsToClone = new ArrayList<QN>(predicatesFromEdgesHavingObjectsToClone.size());
-			for (final var node: predicatesFromEdgesHavingObjectsToClone) {
+			var predicatesFromEdgesHavingObjectsToCloneAndSubjectsToClone = new ArrayList<QN>(predicatesFromEdgesHavingObjectsToClone.size());
+			for (var node: predicatesFromEdgesHavingObjectsToClone) {
 				if (cloneWithObject.get(node) == CLONE_WITH_NODE) {
 					predicatesFromEdgesHavingObjectsToCloneAndSubjectsToClone.add(node);
 				}
 			}
 
-			final var subjectsFromEdgesHavingObjectsToCloneWithSubjectsToClone =
+			var subjectsFromEdgesHavingObjectsToCloneWithSubjectsToClone =
 				edgesHavingObjectsToClone.havingPredicates(qs.newNodes(predicatesFromEdgesHavingObjectsToCloneAndSubjectsToClone)).subjects();
 
 			Iterables.addAll(nodesToCheckForClone, subjectsFromEdgesHavingObjectsToCloneWithSubjectsToClone);
 
-			final var edgesHavingSubjectsToClone = edges.havingSubjects(nodesToCloneWithoutValue);
-			final var predicatesFromEdgesHavingSubjectsToClone = edgesHavingSubjectsToClone.predicates().toList();
-			final var predicatesFromEdgesHavingSubjectsToCloneForUpdate = new ArrayList<QN>(predicatesFromEdgesHavingSubjectsToClone.size());
-			for (final var node: predicatesFromEdgesHavingSubjectsToClone) {
+			var edgesHavingSubjectsToClone = edges.havingSubjects(nodesToCloneWithoutValue);
+			var predicatesFromEdgesHavingSubjectsToClone = edgesHavingSubjectsToClone.predicates().toList();
+			var predicatesFromEdgesHavingSubjectsToCloneForUpdate = new ArrayList<QN>(predicatesFromEdgesHavingSubjectsToClone.size());
+			for (var node: predicatesFromEdgesHavingSubjectsToClone) {
 				if (!cloneWithSubject.containsKey(node)) {
 					cloneWithSubject.put(node, null);
 					predicatesFromEdgesHavingSubjectsToCloneForUpdate.add(node);
@@ -279,14 +373,14 @@ public class DS {
 			if (!predicatesFromEdgesHavingSubjectsToCloneForUpdate.isEmpty()) {
 				this.getCloneWithSubject_DONE(context, cloneEdgeWithSubject, cloneNodeWithSubject, predicatesFromEdgesHavingSubjectsToCloneForUpdate);
 			}
-			final var predicatesFromEdgesHavingSubjectsToCloneWithObjectsToClone = new ArrayList<QN>(predicatesFromEdgesHavingSubjectsToClone.size());
-			for (final var node: predicatesFromEdgesHavingSubjectsToClone) {
+			var predicatesFromEdgesHavingSubjectsToCloneWithObjectsToClone = new ArrayList<QN>(predicatesFromEdgesHavingSubjectsToClone.size());
+			for (var node: predicatesFromEdgesHavingSubjectsToClone) {
 				if (cloneWithSubject.get(node) == CLONE_WITH_NODE) {
 					predicatesFromEdgesHavingSubjectsToCloneWithObjectsToClone.add(node);
 				}
 			}
 
-			final var objectsToClone = edgesHavingSubjectsToClone.havingPredicates(qs.newNodes(predicatesFromEdgesHavingSubjectsToCloneWithObjectsToClone)).objects();
+			var objectsToClone = edgesHavingSubjectsToClone.havingPredicates(qs.newNodes(predicatesFromEdgesHavingSubjectsToCloneWithObjectsToClone)).objects();
 
 			Iterables.addAll(nodesToCheckForClone, objectsToClone);
 
@@ -295,31 +389,31 @@ public class DS {
 		nodesToCheckForClone.compact();
 		nodesToCheckForValue.compact();
 
-		final var nodesToCloneWithoutValue = qs.newNodes(nodesToClone);
+		var nodesToCloneWithoutValue = qs.newNodes(nodesToClone);
 		nodesToClone.clear();
 		nodesToClone.trimToSize();
 
-		final var edgesHavingObjectsToClone = edges.havingObjects(nodesToCloneWithoutValue);
+		var edgesHavingObjectsToClone = edges.havingObjects(nodesToCloneWithoutValue);
 
-		final var edgesHavingObjectsToCloneIterable = Iterables.translate(edgesHavingObjectsToClone, edge -> {
-			final Object cloneWith = cloneWithObject.get(edge.predicate());
+		var edgesHavingObjectsToCloneIterable = Iterables.translate(edgesHavingObjectsToClone, edge -> {
+			Object cloneWith = cloneWithObject.get(edge.predicate());
 			if ((cloneWith != CLONE_WITH_EDGE) && (cloneWith != CLONE_WITH_NODE)) return null;
-			final QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
+			QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
 			if (sourceObject == targetObject) return null;
-			final QN sourceSubject = edge.subject(), targetSubject = clones.get(sourceSubject);
+			QN sourceSubject = edge.subject(), targetSubject = clones.get(sourceSubject);
 			if (sourceSubject == targetSubject) return null;
 			if (targetSubject == null) return edge.withObject(targetObject);
 			return edge.withObject(targetObject).withSubject(targetSubject);
 		});
 
-		final var edgesHavingSubjectsToClone = edges.havingSubjects(nodesToCloneWithoutValue);
+		var edgesHavingSubjectsToClone = edges.havingSubjects(nodesToCloneWithoutValue);
 
-		final var edgesHavingSubjectsToCloneIterable = Iterables.translate(edgesHavingSubjectsToClone, edge -> {
-			final Object cloneWith = cloneWithObject.get(edge.predicate());
+		var edgesHavingSubjectsToCloneIterable = Iterables.translate(edgesHavingSubjectsToClone, edge -> {
+			Object cloneWith = cloneWithObject.get(edge.predicate());
 			if ((cloneWith != CLONE_WITH_EDGE) && (cloneWith != CLONE_WITH_NODE)) return null;
-			final QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
+			QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
 			if (sourceObject == targetObject) return null;
-			final QN sourceSubject = edge.subject(), targetSubject = clones.get(sourceSubject);
+			QN sourceSubject = edge.subject(), targetSubject = clones.get(sourceSubject);
 			if (sourceSubject == targetSubject) return null;
 			if (targetObject == null) return edge.withSubject(targetSubject);
 			return edge.withObject(targetObject).withSubject(targetSubject);
@@ -336,8 +430,7 @@ public class DS {
 	 * @param cloneEdgeWithObject Methode zur Markierung eines Prädikatknoten zum Klonen seiner Hyperkanten.
 	 * @param cloneNodeWithObject Methode zur Markierung eines Prädikatknoten zum Klonen seiner Hyperkanten und derer Subjektknoen.
 	 * @param predicates Prädikatknoten. */
-	protected void getCloneWithObject_DONE(final QN context, final Consumer<QN> cloneEdgeWithObject, final Consumer<QN> cloneNodeWithObject,
-		final Iterable<QN> predicates) {
+	protected void getCloneWithObject_DONE(QN context, Consumer<QN> cloneEdgeWithObject, Consumer<QN> cloneNodeWithObject, Iterable<QN> predicates) {
 	}
 
 	/** Diese Methode ermittelt zu jedem der gegebenen {@link QE#predicate() Prädikatknoten}, ob beim {@link #getCloneEdges(Map, QN, Iterable) Klonen} von
@@ -348,28 +441,27 @@ public class DS {
 	 * @param cloneEdgeWithSubject Methode zur Markierung eines Prädikatknoten zum Klonen seiner Hyperkanten.
 	 * @param cloneNodeWithSubject Methode zur Markierung eines Prädikatknoten zum Klonen seiner Hyperkanten und derer Objektknoen.
 	 * @param predicates Prädikatknoten. */
-	protected void getCloneWithSubject_DONE(final QN context, final Consumer<QN> cloneEdgeWithSubject, final Consumer<QN> cloneNodeWithSubject,
-		final Iterable<QN> predicates) {
+	protected void getCloneWithSubject_DONE(QN context, Consumer<QN> cloneEdgeWithSubject, Consumer<QN> cloneNodeWithSubject, Iterable<QN> predicates) {
 	}
 
-	private void setEdgesImpl(final QN context, final QN putContextOrNull, final QN popContextOrNull, final QESet oldEdges, final QESet newEdges) {
-		this.putEdgesImpl(context, putContextOrNull, popContextOrNull, newEdges.except(oldEdges));
-		this.popEdgesImpl(context, putContextOrNull, popContextOrNull, oldEdges.except(newEdges));
+	static void setEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet oldEdges, QESet newEdges) {
+		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, newEdges.except(oldEdges));
+		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, oldEdges.except(newEdges));
 	}
 
-	private boolean putEdgesImpl(final QN context, final QN putContextOrNull, final QN popContextOrNull, final QESet putEdges) {
-		if (!this.useAllContexts(context, putContextOrNull, popContextOrNull)) return putEdges.putAll();
-		final QESet putEdges2 = putEdges.except(context.owner().edges()).copy();
+	static boolean putEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet putEdges) {
+		if (!DS.useAllContexts(context, putContextOrNull, popContextOrNull)) return putEdges.putAll();
+		QESet putEdges2 = putEdges.except(context.owner().edges()).copy();
 		return putEdges2.putAll() | putEdges2.withContext(putContextOrNull).putAll() | putEdges2.withContext(popContextOrNull).popAll();
 	}
 
-	private boolean popEdgesImpl(final QN context, final QN putContextOrNull, final QN popContextOrNull, final QESet popEdges) {
-		if (!this.useAllContexts(context, putContextOrNull, popContextOrNull)) return popEdges.popAll();
-		final QESet popEdges2 = popEdges.intersect(context.owner().edges()).copy();
+	static boolean popEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet popEdges) {
+		if (!DS.useAllContexts(context, putContextOrNull, popContextOrNull)) return popEdges.popAll();
+		QESet popEdges2 = popEdges.intersect(context.owner().edges()).copy();
 		return popEdges2.popAll() | popEdges2.withContext(putContextOrNull).popAll() | popEdges2.withContext(popContextOrNull).putAll();
 	}
 
-	private boolean useAllContexts(final QN context, final QN putContextOrNull, final QN popContextOrNull) throws NullPointerException, IllegalArgumentException {
+	static boolean useAllContexts(QN context, QN putContextOrNull, QN popContextOrNull) throws NullPointerException, IllegalArgumentException {
 		if ((context == null) || ((putContextOrNull == null) != (popContextOrNull == null))) throw new NullPointerException();
 		if ((context == putContextOrNull) || (context == popContextOrNull)) throw new IllegalArgumentException();
 		if (putContextOrNull == null) return false;
@@ -377,44 +469,18 @@ public class DS {
 		throw new IllegalArgumentException();
 	}
 
-	private QESet oldObjectEdgeSet(final QN context, final QN predicate, final Map<? extends QN, ?> subjects) {
-		final QS qs = context.owner();
-		return qs.edges().havingContext(context).havingPredicate(predicate).havingSubjects(qs.newNodes(subjects.keySet()));
-	}
-
-	private QESet newObjectEdgeSet(final QN context, final QN predicate, final Map<? extends QN, ? extends QN> object) {
-		final var owner = context.owner();
-		final ArrayList<QE> edges = new ArrayList<>(object.size());
-		for (final Entry<? extends QN, ? extends QN> entry: object.entrySet()) {
-			final QN subject = entry.getValue();
-			if (subject != null) {
-				edges.add(owner.newEdge(context, predicate, entry.getKey(), subject));
-			}
-		}
-		return owner.newEdges(edges);
-	}
-
-	private QESet newObjectsEdgeSet(final QN context, final QN predicate, final Map<? extends QN, ? extends Iterable<? extends QN>> objects) {
-		final var owner = context.owner();
-		final var predicateEdge = owner.newEdge(context, predicate, predicate, predicate);
-		return owner.newEdges(Iterables.concatAll(Iterables.translate(objects.entrySet(), entry -> {
-			final var subjectEdge = predicateEdge.withSubject(entry.getKey());
-			return Iterables.translate(entry.getValue(), subjectEdge::withObject);
-		})));
-	}
-
-	private <R, S> void getItems(final List<R> results, final List<S> sources, final Map<S, R> sourceToResult, final boolean keepNull) {
-		for (final var source: sources) {
-			final var result = sourceToResult.get(source);
+	private <R, S> void getItems(List<R> results, List<S> sources, Map<S, R> sourceToResult, boolean keepNull) {
+		for (var source: sources) {
+			var result = sourceToResult.get(source);
 			if ((result != null) || keepNull) {
 				results.add(result);
 			}
 		}
 	}
 
-	private <K, R, S> void getItems(final Map<K, R> results, final Map<K, S> sources, final Map<S, R> sourceToResult, final boolean keepNull) {
-		for (final var source: sources.entrySet()) {
-			final var result = sourceToResult.get(source.getValue());
+	private <K, R, S> void getItems(Map<K, R> results, Map<K, S> sources, Map<S, R> sourceToResult, boolean keepNull) {
+		for (var source: sources.entrySet()) {
+			var result = sourceToResult.get(source.getValue());
 			if ((result != null) || keepNull) {
 				results.put(source.getKey(), result);
 			}
