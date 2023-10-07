@@ -10,10 +10,55 @@ public class Translators {
 	/** Diese Klasse implementiert einen {@link Translator2}, der alle Quell- und Zielobjekte ablehnt.
 	 *
 	 * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyTranslator extends AbstractTranslator<Object, Object> {
 
 		public static final Translator2<?, ?> INSTANCE = new EmptyTranslator();
+
+	}
+
+	public static final class EnumTranslator<GEnum extends Enum<?>> extends AbstractTranslator<String, GEnum> {
+
+		public final Class<GEnum> enumClass;
+
+		public EnumTranslator(Class<GEnum> enumClass) {
+			var enums = enumClass.getEnumConstants();
+			this.enumClass = enumClass;
+			this.toTargetMap = new HashMap<>(enums.length);
+			this.toSourceMap = new HashMap<>(enums.length);
+			Iterables.fromArray(enums).collectAll(item -> {
+				this.toTargetMap.put(item.name(), item);
+				this.toSourceMap.put(item, item.name());
+			});
+		}
+
+		@Override
+		public boolean isTarget(Object object) {
+			return this.toSourceMap.containsKey(object);
+		}
+
+		@Override
+		public boolean isSource(Object object) {
+			return this.toTargetMap.containsKey(object);
+		}
+
+		@Override
+		public GEnum toTarget(Object object) throws ClassCastException, IllegalArgumentException {
+			return this.toTargetMap.get(object);
+		}
+
+		@Override
+		public String toSource(Object object) throws ClassCastException, IllegalArgumentException {
+			return this.toSourceMap.get(object);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.enumClass);
+		}
+
+		private final HashMap<String, GEnum> toTargetMap;
+
+		private final HashMap<GEnum, String> toSourceMap;
 
 	}
 
@@ -65,7 +110,6 @@ public class Translators {
 	 *
 	 * @param <GSource> Typ der Quellobjekte dieses sowie der Zielobjekte des gegebenen {@link Translator}.
 	 * @param <GTarget> Typ der Zielobjekte dieses sowie der Quellobjekte des gegebenen {@link Translator}. */
-	@SuppressWarnings ("javadoc")
 	public static class ReverseTranslator<GSource, GTarget> extends AbstractTranslator<GSource, GTarget> {
 
 		public final Translator<GTarget, GSource> that;
@@ -106,7 +150,6 @@ public class Translators {
 	 *
 	 * @param <GSource> Typ der Quellobjekte.
 	 * @param <GTarget> Typ der Zielobjekte. */
-	@SuppressWarnings ("javadoc")
 	public static class CompositeTranslator<GSource, GTarget> extends AbstractTranslator<GSource, GTarget> {
 
 		public final Class<GSource> sourceClass;
@@ -157,7 +200,6 @@ public class Translators {
 	 *
 	 * @param <GSource> Typ der Quellobjekte.
 	 * @param <GTarget> Typ der Zielobjekte. */
-	@SuppressWarnings ("javadoc")
 	public static class SynchronizedTranslator<GSource, GTarget> extends AbstractTranslator<GSource, GTarget> {
 
 		public final Translator<GSource, GTarget> that;
@@ -228,6 +270,10 @@ public class Translators {
 		if (that == null) return Translators.empty();
 		if (that instanceof Translator2) return (Translator2<GSource, GTarget>)that;
 		return Translators.reverse(Translators.reverse(that));
+	}
+
+	public static <GEnum extends Enum<?>> Translator2<String, GEnum> from(final Class<GEnum> enumClass) throws NullPointerException {
+		return new EnumTranslator<>(enumClass);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link CompositeTranslator new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans)}. */

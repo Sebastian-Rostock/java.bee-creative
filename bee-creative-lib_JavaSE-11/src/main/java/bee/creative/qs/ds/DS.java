@@ -196,6 +196,8 @@ public class DS {
 		})));
 	}
 
+	int TODO;
+	
 	/** Diese Methode speichert die als {@link QE Hyperkanten} gegebenen Prädikat-Subjekt-Objekt-Tripel mit dem gegebenen {@link QE#context() Kontextknoten} in
 	 * {@link QE#owner() dessen} Graphspeicher. Mithilfe der beiden anderen Kontextknoten kann der Unterschied gegenüber eines vorherigen Datenstandes erfasst
 	 * werden.
@@ -232,12 +234,12 @@ public class DS {
 	 * @param result Liste der ermittelten Hyperknoten.
 	 * @param values Liste der gegebenen Textwerte.
 	 * @param owner Besitzer der Hyperknoten.
-	 * @param dirty {@code true}, wenn für Textwerte ohne Hyperknoten {@code null} angefügt werden soll.<br>
+	 * @param keepNull {@code true}, wenn für Textwerte ohne Hyperknoten {@code null} angefügt werden soll.<br>
 	 *        {@code false}, wenn Textwerte ohne Hyperknoten ignoriert werden sollen. */
-	public void getNodes_DONE(List<QN> result, List<String> values, QS owner, boolean dirty) throws NullPointerException, IllegalArgumentException {
+	public void getNodes_DONE(List<QN> result, List<String> values, QS owner, boolean keepNull) throws NullPointerException, IllegalArgumentException {
 		var sourceToResult = new HashMap2<String, QN>(values.size());
 		owner.newValues(values).nodes(sourceToResult::put);
-		this.getItems(result, values, sourceToResult, dirty);
+		this.getItems(result, values, sourceToResult, keepNull);
 	}
 
 	/** Diese Methode fügt in die gegebene Abbilding die im gegebenen {@link QS Graphspeicher} hinterlegten {@link QN Hyperknoten} mit den gegebenen
@@ -246,12 +248,12 @@ public class DS {
 	 * @param result Abbilding von Schlüsseln auf ermittelte Hyperknoten.
 	 * @param values Abbilding von Schlüsseln auf gegebene Textwerte.
 	 * @param owner Besitzer der Hyperknoten.
-	 * @param dirty {@code true}, wenn für Textwerte ohne Hyperknoten {@code null} eingefügt werden soll.<br>
+	 * @param keepNull {@code true}, wenn für Textwerte ohne Hyperknoten {@code null} eingefügt werden soll.<br>
 	 *        {@code false}, wenn Textwerte ohne Hyperknoten ignoriert werden sollen. */
-	public <K> void getNodes_DONE(Map<K, QN> result, Map<K, String> values, QS owner, boolean dirty) throws NullPointerException, IllegalArgumentException {
+	public <K> void getNodes_DONE(Map<K, QN> result, Map<K, String> values, QS owner, boolean keepNull) throws NullPointerException, IllegalArgumentException {
 		var sourceToResult = new HashMap2<String, QN>(values.size());
 		owner.newValues(values.values()).nodes(sourceToResult::put);
-		this.getItems(result, values, sourceToResult, dirty);
+		this.getItems(result, values, sourceToResult, keepNull);
 	}
 
 	/** Diese Methode fügt an die gegebene Liste die im gegebenen {@link QS Graphspeicher} hinterlegten {@link QN#value() Textwerte} der gegebenen {@link QN
@@ -260,12 +262,12 @@ public class DS {
 	 * @param result Liste der ermittelten Textwerte.
 	 * @param nodes Liste der gegebenen Hyperknoten.
 	 * @param owner Besitzer der Hyperknoten.
-	 * @param dirty {@code true}, wenn für Hyperknoten ohne Textwerte {@code null} angefügt werden soll.<br>
+	 * @param keepNull {@code true}, wenn für Hyperknoten ohne Textwerte {@code null} angefügt werden soll.<br>
 	 *        {@code false}, wenn Hyperknoten ohne Textwerte ignoriert werden sollen. */
-	public void getValues_DONE(List<String> result, List<QN> nodes, QS owner, boolean dirty) throws NullPointerException, IllegalArgumentException {
+	public void getValues_DONE(List<String> result, List<QN> nodes, QS owner, boolean keepNull) throws NullPointerException, IllegalArgumentException {
 		var sourceToResult = new HashMap2<QN, String>(nodes.size());
 		owner.newNodes(nodes).values(sourceToResult::put);
-		this.getItems(result, nodes, sourceToResult, dirty);
+		this.getItems(result, nodes, sourceToResult, keepNull);
 	}
 
 	/** Diese Methode fügt in die gegebene Abbilding die im gegebenen {@link QS Graphspeicher} hinterlegten {@link QN#value() Textwerte} der gegebenen {@link QN
@@ -274,12 +276,12 @@ public class DS {
 	 * @param result Abbilding von Schlüsseln auf ermittelte Textwerte.
 	 * @param nodes Abbilding von Schlüsseln auf gegebenen Hyperknoten.
 	 * @param owner Besitzer der Hyperknoten.
-	 * @param dirty {@code true}, wenn für Hyperknoten ohne Textwerte {@code null} eingefügt werden soll.<br>
+	 * @param keepNull {@code true}, wenn für Hyperknoten ohne Textwerte {@code null} eingefügt werden soll.<br>
 	 *        {@code false}, wenn Hyperknoten ohne Textwerte ignoriert werden sollen. */
-	public <K> void getValues_DONE(Map<K, String> result, Map<K, QN> nodes, QS owner, boolean dirty) throws NullPointerException, IllegalArgumentException {
+	public <K> void getValues_DONE(Map<K, String> result, Map<K, QN> nodes, QS owner, boolean keepNull) throws NullPointerException, IllegalArgumentException {
 		var sourceToResult = new HashMap2<QN, String>(nodes.size());
 		owner.newNodes(nodes.values()).values(sourceToResult::put);
-		this.getItems(result, nodes, sourceToResult, dirty);
+		this.getItems(result, nodes, sourceToResult, keepNull);
 	}
 
 	public QESet getCloneEdges(Map<QN, QN> clones, QN context, Iterable<? extends QN> nodes) {

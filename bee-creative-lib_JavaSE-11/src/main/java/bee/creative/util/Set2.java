@@ -32,7 +32,8 @@ public interface Set2<E> extends Set<E>, Collection2<E> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Collections#translate(Set, Translator) Collections.translate(this, trans)}. */
-	default <E2> Set<E2> translate(Set<E> that, Translator<E, E2> trans) throws NullPointerException {
+	@Override
+	default <E2> Set2<E2> translate(Translator<E, E2> trans) throws NullPointerException {
 		return Collections.translate(this, trans);
 	}
 
