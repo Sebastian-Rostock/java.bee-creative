@@ -9,7 +9,6 @@ import bee.creative.lang.Objects;
 public class Entries {
 
 	/** Diese Klasse implementiert ein unveränderliches {@link Entry2} mit {@code null} als Schlüssel und Wert. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyEntry extends AbstractEntry<Object, Object> {
 
 		public static final Entry2<?, ?> INSTANCE = new EmptyEntry();
@@ -25,7 +24,6 @@ public class Entries {
 	 *
 	 * @param <GKey> Typ des Schlüssels.
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class ValueEnrty<GKey, GValue> extends AbstractEntry<GKey, GValue> {
 
 		public GKey key;
@@ -65,7 +63,6 @@ public class Entries {
 	 *
 	 * @param <GKey> Typ des Schlüssels.
 	 * @param <GValue> Typ des Werts dieses sowie des Schlüssels des gegebenen {@link Entry}. */
-	@SuppressWarnings ("javadoc")
 	public static class ReverseEntry<GKey, GValue> extends AbstractEntry<GKey, GValue> {
 
 		public final Entry<GValue, GKey> that;
@@ -130,6 +127,21 @@ public class Entries {
 
 	}
 
+	static class EntryConsumer<GKey, GValue> extends AbstractConsumer<Entry2<GKey, GValue>> {
+
+		public final Setter<? super GKey, ? super GValue> that;
+
+		public EntryConsumer(Setter<? super GKey, ? super GValue> that) {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public void set(Entry2<GKey, GValue> entry) {
+			this.that.set(entry.getKey(), entry.getValue());
+		}
+
+	}
+
 	/** Diese Methode liefert das {@link EmptyEntry}. */
 	@SuppressWarnings ("unchecked")
 	public static <GKey, GValue> Entry2<GKey, GValue> empty() {
@@ -162,6 +174,10 @@ public class Entries {
 	/** Diese Methode ist eine Abkürzung für {@link ReverseEntry new ReverseEntry<>(that)}. */
 	public static <GKey, GValue> Entry2<GKey, GValue> reverse(final Entry<GValue, GKey> that) {
 		return new ReverseEntry<>(that);
+	}
+
+	public static <GKey, GValue> Consumer2<Entry2<GKey, GValue>> consumer(Setter<? super GKey, ? super GValue> that) {
+		return new EntryConsumer<>(that);
 	}
 
 	/** Diese Methode liefert den {@link Getter3} zu {@link Entry#getKey()}. */
