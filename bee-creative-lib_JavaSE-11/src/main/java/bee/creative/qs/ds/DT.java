@@ -2,10 +2,44 @@ package bee.creative.qs.ds;
 
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
+import bee.creative.util.AbstractTranslator;
 import bee.creative.util.Builders.MapBuilder;
+import bee.creative.util.Getter;
 import bee.creative.util.Set2;
+import bee.creative.util.Translator2;
 
 public interface DT extends DE {
+
+	/**
+	 * Diese Methode gibt das  zurück.
+	 * @param nodeAsType Diese Methode liefet den {@link DL Datentyp} mit dem gegebenen {@link DT#node() Typknoten}.
+	 * @return
+	 */
+	static Translator2<QN, DT> trans(Getter<QN, DT> nodeAsType) {
+		return new AbstractTranslator<>() {
+	
+			@Override
+			public boolean isTarget(Object object) {
+				return object instanceof DT;
+			}
+	
+			@Override
+			public boolean isSource(Object object) {
+				return object instanceof QN;
+			}
+	
+			@Override
+			public DT toTarget(Object object) throws ClassCastException, IllegalArgumentException {
+				return object != null ? nodeAsType.get((QN)object) : null;
+			}
+	
+			@Override
+			public QN toSource(Object object) throws ClassCastException, IllegalArgumentException {
+				return object != null ? ((DT)object).node() : null;
+			}
+	
+		};
+	}
 
 	default QNSet items() {
 		final var model = this.model();

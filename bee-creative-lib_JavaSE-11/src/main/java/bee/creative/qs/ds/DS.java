@@ -17,7 +17,7 @@ import bee.creative.util.Iterables;
 public class DS {
 
 	public static QNSet getObjectSet(QN context, QN predicate, QN subject) throws NullPointerException, IllegalArgumentException {
-		return DS.getPredicateEdges(context, predicate).withSubject(subject).objects();
+		return DS.getEdgesHavingContextAndPredicate(context, predicate).withSubject(subject).objects();
 	}
 
 	/** Diese Methode liefert zu jedem der gegebenen {@link QE#subject() Subjektknoten} einen diesem über {@link QE Hyperkanten} mit dem gegebenen
@@ -31,7 +31,8 @@ public class DS {
 	public static HashMap2<QN, QN> getObjectMap(QN context, QN predicate, Iterable<? extends QN> subjectSet)
 		throws NullPointerException, IllegalArgumentException {
 		var subjectObjectMap = DS.newNodeNodeMap(subjectSet);
-		DS.getObjectEdges(context, predicate, subjectObjectMap).iterator().collectAll(edge -> subjectObjectMap.put(edge.subject(), edge.object()));
+		DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectMap.keySet()).iterator()
+			.collectAll(edge -> subjectObjectMap.put(edge.subject(), edge.object()));
 		return subjectObjectMap;
 	}
 
@@ -46,48 +47,55 @@ public class DS {
 	public static HashMap2<QN, List<QN>> getObjectSetMap(QN context, QN predicate, Iterable<? extends QN> subjectSet)
 		throws NullPointerException, IllegalArgumentException {
 		var subjectObjectSetMap = DS.newNodeNodeSetMap(subjectSet);
-		DS.getObjectEdges(context, predicate, subjectObjectSetMap).iterator().collectAll(edge -> subjectObjectSetMap.get(edge.subject()).add(edge.object()));
+		DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectSetMap.keySet()).iterator()
+			.collectAll(edge -> subjectObjectSetMap.get(edge.subject()).add(edge.object()));
 		return subjectObjectSetMap;
 	}
 
 	public static QNSet getSubjectSet(QN context, QN predicate, QN object) throws NullPointerException, IllegalArgumentException {
-		return DS.getPredicateEdges(context, predicate).withObject(object).objects();
+		return DS.getEdgesHavingContextAndPredicate(context, predicate).withObject(object).objects();
 	}
 
 	public static HashMap2<QN, QN> getSubjectMap(QN context, QN predicate, Iterable<? extends QN> objectSet)
 		throws NullPointerException, IllegalArgumentException {
 		var objectSubjectMap = DS.newNodeNodeMap(objectSet);
-		DS.getSubjectEdges(context, predicate, objectSubjectMap).iterator().collectAll(edge -> objectSubjectMap.put(edge.object(), edge.subject()));
+		DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectMap.keySet()).iterator()
+			.collectAll(edge -> objectSubjectMap.put(edge.object(), edge.subject()));
 		return objectSubjectMap;
 	}
 
 	public static HashMap2<QN, List<QN>> getSubjectSetMap(QN context, QN predicate, Iterable<? extends QN> objectSet)
 		throws NullPointerException, IllegalArgumentException {
 		var objectSubjectSetMap = DS.newNodeNodeSetMap(objectSet);
-		DS.getSubjectEdges(context, predicate, objectSubjectSetMap).iterator().collectAll(edge -> objectSubjectSetMap.get(edge.object()).add(edge.subject()));
+		DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectSetMap.keySet()).iterator()
+			.collectAll(edge -> objectSubjectSetMap.get(edge.object()).add(edge.subject()));
 		return objectSubjectSetMap;
 	}
 
 	public static void setObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
 		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
-			DS.getObjectEdges(context, predicate, subjectObjectMap).copy(), DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap).copy());
+			DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectMap.keySet()).copy(),
+			DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap).copy());
 	}
 
 	public static void setObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
 		QN popContextOrNull) {
 		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
-			DS.getObjectEdges(context, predicate, subjectObjectSetMap).copy(), DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap).copy());
+			DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectSetMap.keySet()).copy(),
+			DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap).copy());
 	}
 
 	public static void setSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
 		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
-			DS.getSubjectEdges(context, predicate, objectSubjectMap).copy(), DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap).copy());
+			DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectMap.keySet()).copy(),
+			DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap).copy());
 	}
 
 	public static void setSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
 		QN popContextOrNull) {
 		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
-			DS.getSubjectEdges(context, predicate, objectSubjectSetMap).copy(), DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap).copy());
+			DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectSetMap.keySet()).copy(),
+			DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap).copy());
 	}
 
 	/** Diese Methode ergänzt zu jedem der gegebenen {@link QE#subject() Subjektknoten} die {@link QE Hyperkanten} zu den gegebenen zugeordneten
@@ -140,16 +148,16 @@ public class DS {
 		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap));
 	}
 
-	static QESet getObjectEdges(QN context, QN predicate, Map<? extends QN, ?> subjectObjectMap) {
-		return DS.getPredicateEdges(context, predicate).havingSubjects(context.owner().newNodes(subjectObjectMap.keySet()));
-	}
-
-	static QESet getSubjectEdges(QN context, QN predicate, Map<? extends QN, ?> objectSubjectMap) {
-		return DS.getPredicateEdges(context, predicate).havingObjects(context.owner().newNodes(objectSubjectMap.keySet()));
-	}
-
-	static QESet getPredicateEdges(QN context, QN predicate) {
+	static QESet getEdgesHavingContextAndPredicate(QN context, QN predicate) {
 		return context.owner().edges().havingContext(context).havingPredicate(predicate);
+	}
+
+	static QESet getEdgesHavingContextAndPredicateAndObjects(QN context, QN predicate, Iterable<? extends QN> objectSet) {
+		return DS.getEdgesHavingContextAndPredicate(context, predicate).havingObjects(context.owner().newNodes(objectSet));
+	}
+
+	static QESet getEdgesHavingContextAndPredicateAndSubjects(QN context, QN predicate, Iterable<? extends QN> subjectSet) {
+		return DS.getEdgesHavingContextAndPredicate(context, predicate).havingSubjects(context.owner().newNodes(subjectSet));
 	}
 
 	static HashMap2<QN, QN> newNodeNodeMap(Iterable<? extends QN> nodeSet) {
@@ -196,19 +204,17 @@ public class DS {
 		})));
 	}
 
-	int TODO;
-	
 	/** Diese Methode speichert die als {@link QE Hyperkanten} gegebenen Prädikat-Subjekt-Objekt-Tripel mit dem gegebenen {@link QE#context() Kontextknoten} in
 	 * {@link QE#owner() dessen} Graphspeicher. Mithilfe der beiden anderen Kontextknoten kann der Unterschied gegenüber eines vorherigen Datenstandes erfasst
 	 * werden.
 	 *
 	 * @param context Kontextknoten, mit dem die Prädikat-Subjekt-Objekt-Tripel gespeichert werden sollen.
+	 * @param edges Hinzuzufügende Prädikat-Subjekt-Objekt-Tripel.
 	 * @param putContextOrNull Kontextknoten zur Erfassung der gegenüber des vorherigen Datenstandes gespeicherten Prädikat-Subjekt-Objekt-Tripel.
 	 * @param popContextOrNull Kontextknoten zur Erfassung der gegenüber des vorherigen Datenstandes entfernten Prädikat-Subjekt-Objekt-Tripel.
-	 * @param edges Hinzuzufügende Prädikat-Subjekt-Objekt-Tripel.
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst.
 	 * @see QESet#putAll() */
-	public boolean putEdges_DONE(QN context, QN putContextOrNull, QN popContextOrNull, Iterable<? extends QE> edges)
+	public static boolean putEdges(QN context, Iterable<? extends QE> edges, QN putContextOrNull, QN popContextOrNull)
 		throws NullPointerException, IllegalArgumentException {
 		return DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, context.owner().newEdges(edges).withContext(context));
 	}
@@ -218,15 +224,42 @@ public class DS {
 	 * werden.
 	 *
 	 * @param context Kontextknoten, mit dem die Prädikat-Subjekt-Objekt-Tripel entfernt werden sollen.
+	 * @param edges Hinzuzufügende Prädikat-Subjekt-Objekt-Tripel.
 	 * @param putContextOrNull Kontextknoten zur Erfassung der gegenüber des vorherigen Datenstandes gespeicherten Prädikat-Subjekt-Objekt-Tripel.
 	 * @param popContextOrNull Kontextknoten zur Erfassung der gegenüber des vorherigen Datenstandes entfernten Prädikat-Subjekt-Objekt-Tripel.
-	 * @param edges Hinzuzufügende Prädikat-Subjekt-Objekt-Tripel.
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst.
 	 * @see QESet#putAll() */
-	public boolean popEdges_DONE(QN context, QN putContextOrNull, QN popContextOrNull, Iterable<? extends QE> edges)
+	public static boolean popEdges(QN context, Iterable<? extends QE> edges, QN putContextOrNull, QN popContextOrNull)
 		throws NullPointerException, IllegalArgumentException {
 		return DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, context.owner().newEdges(edges).withContext(context));
 	}
+
+	static void setEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet oldEdges, QESet newEdges) {
+		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, newEdges.except(oldEdges));
+		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, oldEdges.except(newEdges));
+	}
+
+	static boolean putEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet putEdges) {
+		if (!DS.useAllContexts(context, putContextOrNull, popContextOrNull)) return putEdges.putAll();
+		var putEdges2 = putEdges.except(context.owner().edges()).copy();
+		return putEdges2.putAll() | putEdges2.withContext(putContextOrNull).putAll() | putEdges2.withContext(popContextOrNull).popAll();
+	}
+
+	static boolean popEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet popEdges) {
+		if (!DS.useAllContexts(context, putContextOrNull, popContextOrNull)) return popEdges.popAll();
+		var popEdges2 = popEdges.intersect(context.owner().edges()).copy();
+		return popEdges2.popAll() | popEdges2.withContext(putContextOrNull).popAll() | popEdges2.withContext(popContextOrNull).putAll();
+	}
+
+	static boolean useAllContexts(QN context, QN putContextOrNull, QN popContextOrNull) throws NullPointerException, IllegalArgumentException {
+		if ((context == null) || ((putContextOrNull == null) != (popContextOrNull == null))) throw new NullPointerException();
+		if ((context == putContextOrNull) || (context == popContextOrNull)) throw new IllegalArgumentException();
+		if (putContextOrNull == null) return false;
+		if (putContextOrNull != popContextOrNull) return true;
+		throw new IllegalArgumentException();
+	}
+
+	int TODO;
 
 	/** Diese Methode fügt an die gegebene Liste die im gegebenen {@link QS Graphspeicher} hinterlegten {@link QN Hyperknoten} mit den gegebenen {@link QN#value()
 	 * Textwerten} an.
@@ -239,7 +272,7 @@ public class DS {
 	public void getNodes_DONE(List<QN> result, List<String> values, QS owner, boolean keepNull) throws NullPointerException, IllegalArgumentException {
 		var sourceToResult = new HashMap2<String, QN>(values.size());
 		owner.newValues(values).nodes(sourceToResult::put);
-		this.getItems(result, values, sourceToResult, keepNull);
+		DS.getItems(result, values, sourceToResult, keepNull);
 	}
 
 	/** Diese Methode fügt in die gegebene Abbilding die im gegebenen {@link QS Graphspeicher} hinterlegten {@link QN Hyperknoten} mit den gegebenen
@@ -253,7 +286,7 @@ public class DS {
 	public <K> void getNodes_DONE(Map<K, QN> result, Map<K, String> values, QS owner, boolean keepNull) throws NullPointerException, IllegalArgumentException {
 		var sourceToResult = new HashMap2<String, QN>(values.size());
 		owner.newValues(values.values()).nodes(sourceToResult::put);
-		this.getItems(result, values, sourceToResult, keepNull);
+		DS.getItems(result, values, sourceToResult, keepNull);
 	}
 
 	/** Diese Methode fügt an die gegebene Liste die im gegebenen {@link QS Graphspeicher} hinterlegten {@link QN#value() Textwerte} der gegebenen {@link QN
@@ -267,7 +300,7 @@ public class DS {
 	public void getValues_DONE(List<String> result, List<QN> nodes, QS owner, boolean keepNull) throws NullPointerException, IllegalArgumentException {
 		var sourceToResult = new HashMap2<QN, String>(nodes.size());
 		owner.newNodes(nodes).values(sourceToResult::put);
-		this.getItems(result, nodes, sourceToResult, keepNull);
+		DS.getItems(result, nodes, sourceToResult, keepNull);
 	}
 
 	/** Diese Methode fügt in die gegebene Abbilding die im gegebenen {@link QS Graphspeicher} hinterlegten {@link QN#value() Textwerte} der gegebenen {@link QN
@@ -281,7 +314,25 @@ public class DS {
 	public <K> void getValues_DONE(Map<K, String> result, Map<K, QN> nodes, QS owner, boolean keepNull) throws NullPointerException, IllegalArgumentException {
 		var sourceToResult = new HashMap2<QN, String>(nodes.size());
 		owner.newNodes(nodes.values()).values(sourceToResult::put);
-		this.getItems(result, nodes, sourceToResult, keepNull);
+		DS.getItems(result, nodes, sourceToResult, keepNull);
+	}
+
+	static <R, S> void getItems(List<R> results, List<S> sources, Map<S, R> sourceToResult, boolean keepNull) {
+		for (var source: sources) {
+			var result = sourceToResult.get(source);
+			if ((result != null) || keepNull) {
+				results.add(result);
+			}
+		}
+	}
+
+	static <K, R, S> void getItems(Map<K, R> results, Map<K, S> sources, Map<S, R> sourceToResult, boolean keepNull) {
+		for (var source: sources.entrySet()) {
+			var result = sourceToResult.get(source.getValue());
+			if ((result != null) || keepNull) {
+				results.put(source.getKey(), result);
+			}
+		}
 	}
 
 	public QESet getCloneEdges(Map<QN, QN> clones, QN context, Iterable<? extends QN> nodes) {
@@ -398,7 +449,7 @@ public class DS {
 		var edgesHavingObjectsToClone = edges.havingObjects(nodesToCloneWithoutValue);
 
 		var edgesHavingObjectsToCloneIterable = Iterables.translate(edgesHavingObjectsToClone, edge -> {
-			Object cloneWith = cloneWithObject.get(edge.predicate());
+			var cloneWith = cloneWithObject.get(edge.predicate());
 			if ((cloneWith != CLONE_WITH_EDGE) && (cloneWith != CLONE_WITH_NODE)) return null;
 			QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
 			if (sourceObject == targetObject) return null;
@@ -411,7 +462,7 @@ public class DS {
 		var edgesHavingSubjectsToClone = edges.havingSubjects(nodesToCloneWithoutValue);
 
 		var edgesHavingSubjectsToCloneIterable = Iterables.translate(edgesHavingSubjectsToClone, edge -> {
-			Object cloneWith = cloneWithObject.get(edge.predicate());
+			var cloneWith = cloneWithObject.get(edge.predicate());
 			if ((cloneWith != CLONE_WITH_EDGE) && (cloneWith != CLONE_WITH_NODE)) return null;
 			QN sourceObject = edge.object(), targetObject = clones.get(sourceObject);
 			if (sourceObject == targetObject) return null;
@@ -444,49 +495,6 @@ public class DS {
 	 * @param cloneNodeWithSubject Methode zur Markierung eines Prädikatknoten zum Klonen seiner Hyperkanten und derer Objektknoen.
 	 * @param predicates Prädikatknoten. */
 	protected void getCloneWithSubject_DONE(QN context, Consumer<QN> cloneEdgeWithSubject, Consumer<QN> cloneNodeWithSubject, Iterable<QN> predicates) {
-	}
-
-	static void setEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet oldEdges, QESet newEdges) {
-		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, newEdges.except(oldEdges));
-		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, oldEdges.except(newEdges));
-	}
-
-	static boolean putEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet putEdges) {
-		if (!DS.useAllContexts(context, putContextOrNull, popContextOrNull)) return putEdges.putAll();
-		QESet putEdges2 = putEdges.except(context.owner().edges()).copy();
-		return putEdges2.putAll() | putEdges2.withContext(putContextOrNull).putAll() | putEdges2.withContext(popContextOrNull).popAll();
-	}
-
-	static boolean popEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet popEdges) {
-		if (!DS.useAllContexts(context, putContextOrNull, popContextOrNull)) return popEdges.popAll();
-		QESet popEdges2 = popEdges.intersect(context.owner().edges()).copy();
-		return popEdges2.popAll() | popEdges2.withContext(putContextOrNull).popAll() | popEdges2.withContext(popContextOrNull).putAll();
-	}
-
-	static boolean useAllContexts(QN context, QN putContextOrNull, QN popContextOrNull) throws NullPointerException, IllegalArgumentException {
-		if ((context == null) || ((putContextOrNull == null) != (popContextOrNull == null))) throw new NullPointerException();
-		if ((context == putContextOrNull) || (context == popContextOrNull)) throw new IllegalArgumentException();
-		if (putContextOrNull == null) return false;
-		if (putContextOrNull != popContextOrNull) return true;
-		throw new IllegalArgumentException();
-	}
-
-	private <R, S> void getItems(List<R> results, List<S> sources, Map<S, R> sourceToResult, boolean keepNull) {
-		for (var source: sources) {
-			var result = sourceToResult.get(source);
-			if ((result != null) || keepNull) {
-				results.add(result);
-			}
-		}
-	}
-
-	private <K, R, S> void getItems(Map<K, R> results, Map<K, S> sources, Map<S, R> sourceToResult, boolean keepNull) {
-		for (var source: sources.entrySet()) {
-			var result = sourceToResult.get(source.getValue());
-			if ((result != null) || keepNull) {
-				results.put(source.getKey(), result);
-			}
-		}
 	}
 
 }

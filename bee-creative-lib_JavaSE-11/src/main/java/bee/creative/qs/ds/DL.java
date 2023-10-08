@@ -7,8 +7,10 @@ import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
+import bee.creative.util.AbstractTranslator;
 import bee.creative.util.Field2;
 import bee.creative.util.Fields;
+import bee.creative.util.Getter;
 import bee.creative.util.Getter3;
 import bee.creative.util.Getters;
 import bee.creative.util.Properties;
@@ -27,6 +29,97 @@ public interface DL extends DE {
 
 	/** Dieses Feld speichert den Textwert eines {@link #idents() Erkennungsknoten} für das {@link #targets()}-{@link DL Datenfeld}. */
 	String IDENT_LINK_HAS_TARGET = "DM:LINK_HAS_TARGET";
+
+	/** Diese Methode gibt das zurück.
+	 *
+	 * @param nodeAsLink Methode liefet das {@link DL Datenfeld} mit dem gegebenen {@link DT#node() Feldknoten}
+	 * @return */
+	static Translator2<QN, DL> trans(Getter<QN, DL> nodeAsLink) {
+		return new AbstractTranslator<>() {
+
+			@Override
+			public boolean isTarget(Object object) {
+				return object instanceof DL;
+			}
+
+			@Override
+			public boolean isSource(Object object) {
+				return object instanceof QN;
+			}
+
+			@Override
+			public DL toTarget(Object object) throws ClassCastException, IllegalArgumentException {
+				return object != null ? nodeAsLink.get((QN)object) : null;
+			}
+
+			@Override
+			public QN toSource(Object object) throws ClassCastException, IllegalArgumentException {
+				return object != null ? ((DL)object).node() : null;
+			}
+
+		};
+	}
+
+	/** {@inheritDoc} Dieser wird als {@link QE#predicate() Prädikatknoten} von {@link QE Hyperkanten} verwendet. Als {@link QE#context() Kontextknoten} wird der
+	 * des {@link #model() Datenmodells} verwendet. */
+	@Override
+	QN node();
+
+	default QESet edges() {
+		return this.model().edges().havingPredicate(this.node());
+	}
+
+	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
+	 *
+	 * @return Subjektdatentypknoten. */
+	default Set2<QN> sources() {
+		return this.model().linkSourceLink().getTargetProxy(this.node());
+	}
+
+	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
+	 *
+	 * @return Subjektdatentypen. */
+	default Set2<DT> sourcesAsTypes() {
+		return this.sources().translate(this.model().typeTrans());
+	}
+
+	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
+	 *
+	 * @return Objektdatentypknoten. */
+	default Set2<QN> targets() {
+		return this.model().linkTargetLink().getTargetProxy(this.node());
+	}
+
+	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
+	 *
+	 * @return Objektdatentypen. */
+	default Set2<DT> targetsAsTypes() {
+		return this.targets().translate(this.model().typeTrans());
+	}
+
+	default Property2<QN> clonability() {
+		return this.model().linkClonabilityLink().asTargetField().toProperty(this.node());
+	}
+
+	default Property2<CLONABILITY> clonabilityAsEnum() {
+		return this.clonabilityAsString().translate(CLONABILITY.trans);
+	}
+
+	default Property2<String> clonabilityAsString() {
+		return this.clonability().translate(this.owner().valueTrans());
+	}
+
+	default Property2<QN> multiplicity() {
+		return this.model().linkMultiplicityLink().asTargetField().toProperty(this.node());
+	}
+
+	default Property2<MULTIPLICITY> multiplicityAsEnum() {
+		return this.multiplicityAsString().translate(MULTIPLICITY.trans);
+	}
+
+	default Property2<String> multiplicityAsString() {
+		return this.multiplicity().translate(this.owner().valueTrans());
+	}
 
 	default Field2<QN, QN> asSourceField() {
 		return Fields.from(this.asSourceGetter(), this.asSourceSetter());
@@ -279,89 +372,21 @@ public interface DL extends DE {
 		DS.popObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
-
-	boolean getAllowMultipleObjects();
-
-	boolean getAllowMultipleSujects();
-
-	boolean getCloneEdgeWithObject();
-
-	boolean getCloneEdgeWithSubject();
-
-	boolean getCloneNodeWithObject();
-
-	boolean getCloneNodeWithSubject();
-
-	/** {@inheritDoc} Dieser wird als {@link QE#predicate() Prädikatknoten} von {@link QE Hyperkanten} verwendet. Als {@link QE#context() Kontextknoten} wird der
-	 * des {@link #model() Datenmodells} verwendet. */
-	@Override
-	default QN node() {
-		return null;
-	}
-
-	default QESet edges() {
-		return this.model().edges().havingPredicate(this.node());
-	}
-
-	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
-	 *
-	 * @return Subjektdatentypknoten. */
-	default Set2<QN> sources() {
-		return this.model().linkSourceLink().getTargetProxy(this.node());
-	}
-
-	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
-	 *
-	 * @return Subjektdatentypen. */
-	default Set2<DT> sourcesAsTypes() {
-		return this.sources().translate(this.model().typeTrans());
-	}
-
-	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
-	 *
-	 * @return Objektdatentypknoten. */
-	default Set2<QN> targets() {
-		return this.model().linkTargetLink().getTargetProxy(this.node());
-	}
-
-	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
-	 *
-	 * @return Objektdatentypen. */
-	default Set2<DT> targetsAsTypes() {
-		return this.targets().translate(this.model().typeTrans());
-	}
-
-	default Property2<QN> clonability() {
-		return this.model().linkClonabilityLink().asTargetField().toProperty(this.node());
-	}
-
-	default Property2<CLONABILITY> clonabilityAsEnum() {
-		return this.clonabilityAsString().translate(CLONABILITY.trans);
-	}
-
-	default Property2<String> clonabilityAsString() {
-		return this.clonability().translate(this.owner().valueTrans());
-	}
-
-	default Property2<QN> multiplicity() {
-		return this.model().linkMultiplicityLink().asTargetField().toProperty(this.node());
-	}
-
-	default Property2<MULTIPLICITY> multiplicityAsEnum() {
-		return this.multiplicityAsString().translate(MULTIPLICITY.trans);
-	}
-
-	default Property2<String> multiplicityAsString() {
-		return this.multiplicity().translate(this.owner().valueTrans());
-	}
+ 
+ 
 
 	enum CLONABILITY {
 
-		SD
+		CloneEdgeWithObject,
+		
+		CloneNodeWithObject,
+		
+		
+		CloneEdgeWithSubject,
+		
+		
+		CloneNodeWithSubject
 
-		
-		
-		
 		;
 
 		static final Translator2<String, CLONABILITY> trans = Translators.from(CLONABILITY.class);

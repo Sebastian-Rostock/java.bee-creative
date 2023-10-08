@@ -5,7 +5,6 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
 import bee.creative.qs.QS;
-import bee.creative.util.AbstractTranslator;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator2;
 
@@ -13,11 +12,6 @@ import bee.creative.util.Translator2;
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DM extends QO {
-
-	@Override
-	default QS owner() {
-		return this.context().owner();
-	}
 
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link #context() Kontextknoten} dieses Datenmodells.
 	 *
@@ -27,17 +21,16 @@ public interface DM extends QO {
 		return context.owner().edges().havingContext(context);
 	}
 
+	@Override
+	default QS owner() {
+		return this.context().owner();
+	}
+
 	QN model(); // sobjekt des domänenmodells
 
 	QN context(); // kontext für alles
 
 	DH history(); // log oder null
-
-	/** Diese Methode liefet das {@link DL Datenfeld} mit dem gegebenen {@link DT#node() Feldknoten}. */
-	DL nodeAsLink(QN node);
-
-	/** Diese Methode liefet den {@link DL Datentyp} mit dem gegebenen {@link DT#node() Typknoten}. */
-	DT nodeAsType(QN node);
 
 	/** Diese Methode lieferrrt das Datenfeld zur Verbindung eines beliebigen {@link QN Hyperknoten} mit dem {@link DT#node() Typknoten} seines {@link DT
 	 * Datentyps}.
@@ -53,6 +46,16 @@ public interface DM extends QO {
 
 	DL itemIdentLink();
 
+	default Set2<QN> links() { // datenfelder, beziehungen
+		return this.modelLinkLink().getTargetProxy(this.model());
+	}
+
+	default Set2<DL> linksAsLinks() {
+		return this.links().translate(this.linkTrans());
+	}
+
+	Translator2<QN, DL> linkTrans();
+
 	DL linkSourceLink();
 
 	DL linkTargetLink();
@@ -61,76 +64,28 @@ public interface DM extends QO {
 
 	DL linkMultiplicityLink();
 
-	DL modelTypesLink();
-
-	DL modelLinksLink();
-
-	default Translator2<QN, DL> linkTrans() {
-		return new AbstractTranslator<>() {
-	
-			@Override
-			public boolean isTarget(Object object) {
-				return object instanceof DL;
-			}
-	
-			@Override
-			public boolean isSource(Object object) {
-				return object instanceof QN;
-			}
-	
-			@Override
-			public DL toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-				return object != null ? DM.this.nodeAsLink((QN)object) : null;
-			}
-	
-			@Override
-			public QN toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return object != null ? ((DL)object).node() : null;
-			}
-	
-		};
-	}
-
-	default Set2<QN> links() { // datenfelder, beziehungen
-		return this.modelLinksLink().getTargetProxy(this.model());
-	}
-
-	default Set2<DL> linksAsLinks() {
-		return this.links().translate(this.linkTrans());
-	}
-
-	default Translator2<QN, DT> typeTrans() {
-		return new AbstractTranslator<>() {
-	
-			@Override
-			public boolean isTarget(Object object) {
-				return object instanceof DT;
-			}
-	
-			@Override
-			public boolean isSource(Object object) {
-				return object instanceof QN;
-			}
-	
-			@Override
-			public DT toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-				return object != null ? DM.this.nodeAsType((QN)object) : null;
-			}
-	
-			@Override
-			public QN toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return object != null ? ((DT)object).node() : null;
-			}
-	
-		};
-	}
-
 	default Set2<QN> types() { // datentypen
-		return this.modelLinksLink().getTargetProxy(this.model());
+		return this.modelLinkLink().getTargetProxy(this.model());
 	}
 
 	default Set2<DT> typesAsTypes() {
 		return this.types().translate(this.typeTrans());
+	}
+
+	Translator2<QN, DT> typeTrans();
+
+	DL modelTypeLink();
+
+	DL modelLinkLink();
+
+	default boolean putEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
+		var history = this.history();
+		return DS.putEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+	}
+
+	default boolean popEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
+		var history = this.history();
+		return DS.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 }
