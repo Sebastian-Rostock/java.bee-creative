@@ -791,7 +791,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte>, Comp
 	protected int customFind(final byte that, final int offset, final int length, final boolean foreward) {
 		final ItemFinder finder = new ItemFinder(that);
 		if (this.customExtract(finder, offset, length, foreward)) return -1;
-		return foreward ? (finder.index + offset) : (length - finder.index);
+		return foreward ? (finder.index + offset) : (length - finder.index - 1);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist. Sie Implementiert {@link #equals(Object)}. */
