@@ -72,28 +72,28 @@ public class DS {
 		return objectSubjectSetMap;
 	}
 
-	public static void setObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
-		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
+	public static boolean setObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
+		return DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
 			DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectMap.keySet()).copy(),
 			DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap).copy());
 	}
 
-	public static void setObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
+	public static boolean setObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
 		QN popContextOrNull) {
-		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
+		return DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
 			DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectSetMap.keySet()).copy(),
 			DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap).copy());
 	}
 
-	public static void setSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
-		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
+	public static boolean setSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
+		return DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
 			DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectMap.keySet()).copy(),
 			DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap).copy());
 	}
 
-	public static void setSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
+	public static boolean setSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
 		QN popContextOrNull) {
-		DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
+		return DS.setEdgesImpl(context, putContextOrNull, popContextOrNull, //
 			DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectSetMap.keySet()).copy(),
 			DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap).copy());
 	}
@@ -104,9 +104,10 @@ public class DS {
 	 * @see #getObjectMap(QN, QN, Iterable)
 	 * @param context Kontextknoten der betrachteten Hyperkanten.
 	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
-	 * @param subjectObjectMap Abbildung von Subjektknoten auf Objektknoten oder {@code null}. */
-	public static void putObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
-		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap));
+	 * @param subjectObjectMap Abbildung von Subjektknoten auf Objektknoten oder {@code null}.
+	 * @return */
+	public static boolean putObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
+		return DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap));
 	}
 
 	/** Diese Methode ergänzt zu jedem der gegebenen {@link QE#subject() Subjektknoten} die {@link QE Hyperkanten} zu allen gegebenen zugeordneten
@@ -115,37 +116,38 @@ public class DS {
 	 * @see #getObjectSetMap(QN, QN, Iterable)
 	 * @param context Kontextknoten der betrachteten Hyperkanten.
 	 * @param predicate Prädikatknoten der betrachteten Hyperkanten.
-	 * @param subjectObjectSetMap Abbildung von Subjektknoten auf Objektknotenlisten. */
-	public static void putObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
+	 * @param subjectObjectSetMap Abbildung von Subjektknoten auf Objektknotenlisten.
+	 * @return */
+	public static boolean putObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
 		QN popContextOrNull) {
-		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap));
+		return DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap));
 	}
 
-	public static void putSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
-		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap));
+	public static boolean putSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
+		return DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap));
 	}
 
-	public static void putSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
+	public static boolean putSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
 		QN popContextOrNull) {
-		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap));
+		return DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap));
 	}
 
-	public static void popObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
-		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap));
+	public static boolean popObjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> subjectObjectMap, QN putContextOrNull, QN popContextOrNull) {
+		return DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectMapEdges(context, predicate, subjectObjectMap));
 	}
 
-	public static void popObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
+	public static boolean popObjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> subjectObjectSetMap, QN putContextOrNull,
 		QN popContextOrNull) {
-		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap));
+		return DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newSubjectObjectSetMapEdges(context, predicate, subjectObjectSetMap));
 	}
 
-	public static void popSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
-		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap));
+	public static boolean popSubjectMap(QN context, QN predicate, Map<? extends QN, ? extends QN> objectSubjectMap, QN putContextOrNull, QN popContextOrNull) {
+		return DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectMapEdges(context, predicate, objectSubjectMap));
 	}
 
-	public static void popSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
+	public static boolean popSubjectSetMap(QN context, QN predicate, Map<? extends QN, ? extends Iterable<? extends QN>> objectSubjectSetMap, QN putContextOrNull,
 		QN popContextOrNull) {
-		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap));
+		return DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, DS.newObjectSubjectSetMapEdges(context, predicate, objectSubjectSetMap));
 	}
 
 	static QESet getEdgesHavingContextAndPredicate(QN context, QN predicate) {
@@ -234,9 +236,9 @@ public class DS {
 		return DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, context.owner().newEdges(edges).withContext(context));
 	}
 
-	static void setEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet oldEdges, QESet newEdges) {
-		DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, newEdges.except(oldEdges));
-		DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, oldEdges.except(newEdges));
+	static boolean setEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet oldEdges, QESet newEdges) {
+		return DS.putEdgesImpl(context, putContextOrNull, popContextOrNull, newEdges.except(oldEdges))
+			| DS.popEdgesImpl(context, putContextOrNull, popContextOrNull, oldEdges.except(newEdges));
 	}
 
 	static boolean putEdgesImpl(QN context, QN putContextOrNull, QN popContextOrNull, QESet putEdges) {

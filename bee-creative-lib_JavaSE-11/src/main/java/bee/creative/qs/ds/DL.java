@@ -205,9 +205,7 @@ public interface DL extends DE {
 		return this.getSourceSet(target).first();
 	}
 
-	default QNSet getSourceSet(QN target) throws NullPointerException, IllegalArgumentException {
-		return DS.getSubjectSet(this.model().context(), this.node(), target);
-	}
+	DLSet getSourceSet(QN target) throws NullPointerException, IllegalArgumentException;
 
 	default Map<QN, QN> getSourceMap(Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
 		return DS.getSubjectMap(this.model().context(), this.node(), targetSet);
@@ -221,69 +219,69 @@ public interface DL extends DE {
 		return ProxySet.from(Properties.from(() -> this.getSourceSet(target).toSet(), sourceSet -> this.setSourceSet(target, sourceSet)));
 	}
 
-	default void setSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
-		this.setSourceMap(Collections.singletonMap(target, source));
+	default boolean setSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
+		return this.setSourceMap(Collections.singletonMap(target, source));
 	}
 
-	default void setSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		this.setSourceSetMap(Collections.singletonMap(target, sourceSet));
+	default boolean setSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
+		return this.setSourceSetMap(Collections.singletonMap(target, sourceSet));
 	}
 
-	default void setSourceMap(final Map<? extends QN, ? extends QN> targetSourceMap) {
+	default boolean setSourceMap(final Map<? extends QN, ? extends QN> targetSourceMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.setSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DS.setSubjectMap(model.context(), this.node(), targetSourceMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void setSourceSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
+	default boolean setSourceSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.setSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DS.setSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void putSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
-		this.putSourceMap(Collections.singletonMap(target, source));
+	default boolean putSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
+		return this.putSourceMap(Collections.singletonMap(target, source));
 	}
 
-	default void putSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		this.setSourceSetMap(Collections.singletonMap(target, sourceSet));
+	default boolean putSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
+		return this.putSourceSetMap(Collections.singletonMap(target, sourceSet));
 	}
 
-	default void putSourceMap(final Map<? extends QN, ? extends QN> targetSourceMap) {
+	default boolean putSourceMap(final Map<? extends QN, ? extends QN> targetSourceMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.putSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DS.putSubjectMap(model.context(), this.node(), targetSourceMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void putSourceSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
+	default boolean putSourceSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.putSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DS.putSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void popSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
-		this.popSourceMap(Collections.singletonMap(target, source));
+	default boolean popSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
+		return this.popSourceMap(Collections.singletonMap(target, source));
 	}
 
-	default void popSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		this.popSourceSetMap(Collections.singletonMap(target, sourceSet));
+	default boolean popSourceSet(QN target, Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
+		return this.popSourceSetMap(Collections.singletonMap(target, sourceSet));
 	}
 
-	default void popSourceMap(final Map<? extends QN, ? extends QN> targetSourceMap) {
+	default boolean popSourceMap(final Map<? extends QN, ? extends QN> targetSourceMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.popSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DS.popSubjectMap(model.context(), this.node(), targetSourceMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void popSourceSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
+	default boolean popSourceSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.popSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DS.popSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
@@ -291,9 +289,7 @@ public interface DL extends DE {
 		return this.getTargetSet(source).first();
 	}
 
-	default QNSet getTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
-		return DS.getObjectSet(this.model().context(), this.node(), source);
-	}
+	DLSet getTargetSet(QN source) throws NullPointerException, IllegalArgumentException;
 
 	default Map<QN, QN> getTargetMap(Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
 		return DS.getObjectMap(this.model().context(), this.node(), sourceSet);
@@ -307,84 +303,84 @@ public interface DL extends DE {
 		return ProxySet.from(Properties.from(() -> this.getTargetSet(source).toSet(), targetSet -> this.setTargetSet(source, targetSet)));
 	}
 
-	default void setTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
-		this.setTargetMap(Collections.singletonMap(source, target));
+	default Set2<QN> getTargetProxy_(QN source) {
+		return ProxySet.from(Properties.from(() -> this.getTargetSet(source).toSet(), targetSet -> this.setTargetSet(source, targetSet)));
 	}
 
-	default void setTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		this.setTargetSetMap(Collections.singletonMap(source, targetSet));
+	default boolean setTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
+		return this.setTargetMap(Collections.singletonMap(source, target));
 	}
 
-	default void setTargetMap(final Map<? extends QN, ? extends QN> sourceTargetMap) {
+	default boolean setTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
+		return this.setTargetSetMap(Collections.singletonMap(source, targetSet));
+	}
+
+	default boolean setTargetMap(final Map<? extends QN, ? extends QN> sourceTargetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.setObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DS.setObjectMap(model.context(), this.node(), sourceTargetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void setTargetSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
+	default boolean setTargetSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.setObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DS.setObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void putTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
-		this.putTargetMap(Collections.singletonMap(source, target));
+	default boolean putTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
+		return this.putTargetMap(Collections.singletonMap(source, target));
 	}
 
-	default void putTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		this.setTargetSetMap(Collections.singletonMap(source, targetSet));
+	default boolean putTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
+		return this.putTargetSetMap(Collections.singletonMap(source, targetSet));
 	}
 
-	default void putTargetMap(final Map<? extends QN, ? extends QN> sourceTargetMap) {
+	default boolean putTargetMap(final Map<? extends QN, ? extends QN> sourceTargetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.putObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DS.putObjectMap(model.context(), this.node(), sourceTargetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void putTargetSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
+	default boolean putTargetSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.putObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DS.putObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void popTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
-		this.popTargetMap(Collections.singletonMap(source, target));
+	default boolean popTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
+		return this.popTargetMap(Collections.singletonMap(source, target));
 	}
 
-	default void popTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		this.popTargetSetMap(Collections.singletonMap(source, targetSet));
+	default boolean popTargetSet(QN source, Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
+		return this.popTargetSetMap(Collections.singletonMap(source, targetSet));
 	}
 
-	default void popTargetMap(final Map<? extends QN, ? extends QN> sourceTargetMap) {
+	default boolean popTargetMap(final Map<? extends QN, ? extends QN> sourceTargetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.popObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DS.popObjectMap(model.context(), this.node(), sourceTargetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	default void popTargetSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
+	default boolean popTargetSetMap(final Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
 		var model = this.model();
 		var history = model.history();
-		DS.popObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DS.popObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
- 
- 
 
 	enum CLONABILITY {
 
 		CloneEdgeWithObject,
-		
+
 		CloneNodeWithObject,
-		
-		
+
 		CloneEdgeWithSubject,
-		
-		
+
 		CloneNodeWithSubject
 
 		;
