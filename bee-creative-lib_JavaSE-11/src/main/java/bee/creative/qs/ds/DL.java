@@ -73,19 +73,19 @@ public interface DL extends DE {
 
 	@Override
 	default Property2<QN> label() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).asTargetField().toProperty(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithLabel).asTargetField().toProperty(this.node());
 	}
 
 	@Override
 	default Set2<QN> idents() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargetProxy(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithIdent).getTargetProxy(this.node());
 	}
 
 	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
 	 *
 	 * @return Subjektdatentypknoten. */
 	default Set2<QN> sourceTypes() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getTargetProxy(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithSourceType).getTargetProxy(this.node());
 	}
 
 	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
@@ -99,7 +99,7 @@ public interface DL extends DE {
 	 *
 	 * @return Subjektklonbarkeit. */
 	default Property2<QN> sourceClonability() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceClonability).asTargetField().toProperty(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithSourceClonability).asTargetField().toProperty(this.node());
 	}
 
 	default Property2<CLONABILITY> sourceClonabilityAsEnum() {
@@ -111,7 +111,7 @@ public interface DL extends DE {
 	}
 
 	default Property2<QN> sourceMultiplicity() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceMultiplicity).asTargetField().toProperty(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithSourceMultiplicity).asTargetField().toProperty(this.node());
 	}
 
 	default Property2<MULTIPLICITY> sourceMultiplicityAsEnum() {
@@ -126,7 +126,7 @@ public interface DL extends DE {
 	 *
 	 * @return Objektdatentypknoten. */
 	default Set2<QN> targetTypes() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getTargetProxy(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithTargetType).getTargetProxy(this.node());
 	}
 
 	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
@@ -137,7 +137,7 @@ public interface DL extends DE {
 	}
 
 	default Property2<QN> targetClonability() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetClonability).asTargetField().toProperty(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithTargetClonability).asTargetField().toProperty(this.node());
 	}
 
 	default Property2<CLONABILITY> targetClonabilityAsEnum() {
@@ -149,7 +149,7 @@ public interface DL extends DE {
 	}
 
 	default Property2<QN> targetMultiplicity() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetMultiplicity).asTargetField().toProperty(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithTargetMultiplicity).asTargetField().toProperty(this.node());
 	}
 
 	default Property2<MULTIPLICITY> targetMultiplicityAsEnum() {

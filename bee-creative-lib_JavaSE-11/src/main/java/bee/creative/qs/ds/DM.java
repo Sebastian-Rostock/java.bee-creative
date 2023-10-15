@@ -62,12 +62,17 @@ public interface DM extends QO {
 
 	DH history(); // log oder null
 
-	DL getLink(String ident);
+	/** Diese Methode liefert das {@link DL Datenfeld} mit dem gegebenen Erkennungstextwert.
+	 * 
+	 * @see #updateLinks()
+	 * @param ident {@link QN#value() Textwert} eines {@link DL#idents() Erkennugnsknoten}.
+	 * @return {@link DL Datenfeld} oder {@code null}. */
+	DL link(String ident);
 
 	Translator2<QN, DL> linkTrans();
 
 	default Set2<QN> links() { // datenfelder, beziehungen
-		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargetProxy(this.getType(DM.TYPE_IDENT_IsLink).node());
+		return this.link(DM.LINK_IDENT_IsTypeWithInstance).getTargetProxy(this.getType(DM.TYPE_IDENT_IsLink).node());
 	}
 
 	default Set2<DL> linksAsLinks() {
@@ -79,7 +84,7 @@ public interface DM extends QO {
 	Translator2<QN, DT> typeTrans();
 
 	default Set2<QN> types() { // datentypen
-		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargetProxy(this.getType(DM.TYPE_IDENT_IsType).node());
+		return this.link(DM.LINK_IDENT_IsTypeWithInstance).getTargetProxy(this.getType(DM.TYPE_IDENT_IsType).node());
 	}
 
 	default Set2<DT> typesAsTypes() {
@@ -95,5 +100,11 @@ public interface DM extends QO {
 		var history = this.history();
 		return DS.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
+
+	void setupLinks(); 
+	
+	/** Diese Methode signalisiert dem Datenmodell Änderungen an {@link DL#idents()}. Daraufhin können interne Puffer zur Beschleunigung von {@link #link(String)}
+	 * entsprechend aktualisiert werden. */
+	void updateLinks();
 
 }

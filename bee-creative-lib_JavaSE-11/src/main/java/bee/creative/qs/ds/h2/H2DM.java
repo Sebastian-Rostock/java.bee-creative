@@ -57,13 +57,21 @@ public class H2DM implements DM {
  
 
 	@Override
-	public DL getLink(String ident) {
+	public DL link(String ident) {
 		return null;
 	}
 
 	@Override
 	public DT getType(String ident) {
 		return null;
+	}
+
+	@Override
+	public void setupLinks() {
+	}
+
+	@Override
+	public void updateLinks() {
 	}
 
 }

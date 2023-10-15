@@ -41,16 +41,16 @@ public interface DT extends DE {
 
 	@Override
 	default Property2<QN> label() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithLabel).asTargetField().toProperty(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsTypeWithLabel).asTargetField().toProperty(this.node());
 	}
 
 	@Override
 	default Set2<QN> idents() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithIdent).getTargetProxy(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsTypeWithIdent).getTargetProxy(this.node());
 	}
 
 	default QNSetL instances() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargetSet(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsTypeWithInstance).getTargetSet(this.node());
 	}
 
 	/** Diese Methode setzt {@link #node()} als Datentyp des gegebenen {@link QN Hyperknoten}. */
@@ -67,7 +67,7 @@ public interface DT extends DE {
 	 *
 	 * @return Subjektdatenfeldknoten. */
 	default Set2<QN> sourceLinks() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getSourceProxy(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithSourceType).getSourceProxy(this.node());
 	}
 
 	/** Diese Methode liefert die von {@link #instances() Instanzen} dieses Datentyps ausgehenden {@link DL Datenfelder}.
@@ -78,7 +78,7 @@ public interface DT extends DE {
 	}
 
 	default Set2<QN> targetLinks() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getSourceProxy(this.node());
+		return this.parent().link(DM.LINK_IDENT_IsLinkWithTargetType).getSourceProxy(this.node());
 	}
 
 	default Set2<DL> targetLinksAsLinks() {
