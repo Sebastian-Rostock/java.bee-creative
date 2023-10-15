@@ -289,8 +289,8 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (C0 BIGINT NOT NULL, C1 BIGINT NOT NULL, ...)} besitzen. */
-	protected H2QTSet(final H2QS owner, final Names names, final H2QQ select) {
-		super(owner, select);
+	protected H2QTSet(final H2QS owner, final Names names, final H2QQ table) {
+		super(owner, table);
 		this.names = names;
 	}
 

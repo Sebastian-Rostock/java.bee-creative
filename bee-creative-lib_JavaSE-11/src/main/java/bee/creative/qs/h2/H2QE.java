@@ -1,7 +1,5 @@
 package bee.creative.qs.h2;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import bee.creative.lang.Objects;
 import bee.creative.qs.QE;
@@ -55,13 +53,13 @@ public final class H2QE implements QE {
 	@Override
 	public boolean put() {
 		try {
-			final PreparedStatement stmt = this.owner.putQE;
+			var stmt = this.owner.putQE;
 			stmt.setLong(1, this.context);
 			stmt.setLong(2, this.predicate);
 			stmt.setLong(3, this.subject);
 			stmt.setLong(4, this.object);
 			return stmt.executeUpdate() != 0;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
@@ -69,13 +67,13 @@ public final class H2QE implements QE {
 	@Override
 	public boolean pop() {
 		try {
-			final PreparedStatement stmt = this.owner.popQE;
+			var stmt = this.owner.popQE;
 			stmt.setLong(1, this.context);
 			stmt.setLong(2, this.predicate);
 			stmt.setLong(3, this.subject);
 			stmt.setLong(4, this.object);
 			return stmt.executeUpdate() != 0;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
@@ -83,42 +81,42 @@ public final class H2QE implements QE {
 	@Override
 	public boolean state() {
 		try {
-			final PreparedStatement stmt = this.owner.getQE;
+			var stmt = this.owner.getQE;
 			stmt.setLong(1, this.context);
 			stmt.setLong(2, this.predicate);
 			stmt.setLong(3, this.subject);
 			stmt.setLong(4, this.object);
-			try (final ResultSet rset = stmt.executeQuery()) {
+			try (var rset = stmt.executeQuery()) {
 				return rset.next();
 			}
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
 
 	@Override
-	public H2QE withContext(final QN context) throws NullPointerException, IllegalArgumentException {
+	public H2QE withContext(QN context) throws NullPointerException, IllegalArgumentException {
 		return this.owner.newEdge(this.owner.asQN(context).key, this.predicate, this.subject, this.object);
 	}
 
 	@Override
-	public H2QE withPredicate(final QN predicate) throws NullPointerException, IllegalArgumentException {
+	public H2QE withPredicate(QN predicate) throws NullPointerException, IllegalArgumentException {
 		return this.owner.newEdge(this.context, this.owner.asQN(predicate).key, this.subject, this.object);
 	}
 
 	@Override
-	public H2QE withSubject(final QN subject) throws NullPointerException, IllegalArgumentException {
+	public H2QE withSubject(QN subject) throws NullPointerException, IllegalArgumentException {
 		return this.owner.newEdge(this.context, this.predicate, this.owner.asQN(subject).key, this.object);
 	}
 
 	@Override
-	public H2QE withObject(final QN object) throws NullPointerException, IllegalArgumentException {
+	public H2QE withObject(QN object) throws NullPointerException, IllegalArgumentException {
 		return this.owner.newEdge(this.context, this.predicate, this.subject, this.owner.asQN(object).key);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hashInit();
+		var result = Objects.hashInit();
 		result = Objects.hashPush(result, Objects.hash(this.context));
 		result = Objects.hashPush(result, Objects.hash(this.predicate));
 		result = Objects.hashPush(result, Objects.hash(this.subject));
@@ -127,10 +125,10 @@ public final class H2QE implements QE {
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof H2QE)) return false;
-		final H2QE that = (H2QE)object;
+		var that = (H2QE)object;
 		if ((this.object != that.object) || (this.subject != that.subject) || (this.predicate != that.predicate) || (this.context != that.context)) return false;
 		if (this.owner != that.owner) return false;
 		return true;
@@ -141,7 +139,7 @@ public final class H2QE implements QE {
 		return "(" + this.context() + " " + this.predicate() + " " + this.subject() + " " + this.object() + ")";
 	}
 
-	H2QE(final H2QS owner, final long context, final long predicate, final long subject, final long object) {
+	H2QE(H2QS owner, long context, long predicate, long subject, long object) {
 		this.owner = owner;
 		this.context = context;
 		this.predicate = predicate;

@@ -218,8 +218,8 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL)}
 	 * besitzen. */
-	protected H2QESet(final H2QS owner, final H2QQ select) {
-		super(owner, select);
+	protected H2QESet(final H2QS owner, final H2QQ table) {
+		super(owner, table);
 	}
 
 	@Override

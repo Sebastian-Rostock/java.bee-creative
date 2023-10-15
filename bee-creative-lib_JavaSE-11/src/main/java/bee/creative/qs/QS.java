@@ -165,7 +165,7 @@ public interface QS {
 
 	/** Diese Methode liefert einen {@link Translator2}, der einen {@link QN Hyperknoten} bidirektional in seinen {@link QN#value() Textwert} übersetzt.
 	 *
-	 * @return Übersetzer von Hyperknoten zu Textwerten und umgekehrt. */
+	 * @return Hyperknoten-Textwert-Übersetzer. */
 	default Translator2<QN, String> valueTrans() {
 		return new AbstractTranslator<>() {
 	

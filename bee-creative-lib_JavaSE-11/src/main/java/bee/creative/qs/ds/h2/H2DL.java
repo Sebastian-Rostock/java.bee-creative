@@ -1,0 +1,29 @@
+package bee.creative.qs.ds.h2;
+
+import bee.creative.qs.QN;
+import bee.creative.qs.ds.DL;
+import bee.creative.qs.h2.H2QESet;
+import bee.creative.qs.h2.H2QN;
+
+public class H2DL extends H2DE implements DL {
+
+	@Override
+	public H2QESet edges() {
+		return this.parent.edges().havingPredicate(this.node);
+	}
+
+	@Override
+	public H2QNSetLS getSourceSet(QN target) throws NullPointerException, IllegalArgumentException {
+		return new H2QNSetLS(this, this.node.owner.asQN(target));
+	}
+
+	@Override
+	public H2QNSetLT getTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
+		return new H2QNSetLT(this, this.node.owner.asQN(source));
+	}
+
+	protected H2DL(H2DM model, H2QN node) {
+		super(model, node);
+	}
+
+}

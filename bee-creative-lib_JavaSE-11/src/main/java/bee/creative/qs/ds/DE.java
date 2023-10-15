@@ -1,45 +1,51 @@
 package bee.creative.qs.ds;
 
 import bee.creative.qs.QN;
+import bee.creative.qs.QO;
+import bee.creative.qs.QS;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert ein Datenelement (Domain-Element) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #model() Datenmodell}.
- *
+/** Diese Schnittstelle definiert ein Datenelement (Domain-Element) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Datenmodell},
+ * {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
+ * 
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface DE extends DO {
-
-	/** Dieses Feld speichert den Textwert eines {@link #idents() Erkennungsknoten} für das {@link #label()}-{@link DL Datenfeld}. */
-	String IDENT_ITEM_HAS_LABEL = "DM:ITEM_HAS_LABEL";
-
-	/** Dieses Feld speichert den Textwert eines {@link #idents() Erkennungsknoten} für das {@link #idents()}-{@link DL Datenfeld}. */
-	String IDENT_ITEM_HAS_IDENT = "DM:ITEM_HAS_IDENT";
+public interface DE extends QO {
 
 	/** Diese Methode liefert den dieses Objekt repräsentierenden Hyperknoten.
 	 *
 	 * @return Hyperknoten, über den der Zustand dieses Objets gespeichert ist. */
 	QN node();
 
-	/** Diese Methode liefert den {@link QN Hyperknoten}, der zur Beschriftung dieses Objekts dient. Dazu sollte dieser Beschriftungsknoten einen
-	 * {@link QN#value() Textwert} besitzen.
+	/** Diese Methode liefet den Graphspeicher des {@link #node() Hyperknoten}.
+	 *
+	 * @return Graphspeicher. */
+	@Override
+	default QS owner() {
+		return this.parent().owner();
+	}
+
+	/** Diese Methode liefet das dieses Objekt verwaltende Datenmodell.
+	 *
+	 * @return Datenmodell. */
+	DM parent();
+
+	/** Diese Methode liefert den {@link QN Hyperknoten} zur Beschriftung dieses Objekts. Dieser Beschriftungsknoten sollte dazu einen {@link QN#value() Textwert}
+	 * besitzen oder beschreiben.
 	 *
 	 * @return Beschriftungsknoten. */
-	default Property2<QN> label() {
-		return this.model().itemIdentLink().asTargetField().toProperty(this.node());
-	}
+	Property2<QN> label();
 
 	/** Diese Methode liefert den {@link QN#value() Textwert} des {@link #label() Beschriftungsknoten} bzw. {@code null}. */
 	default Property2<String> labelAsString() {
 		return this.label().translate(this.owner().valueTrans());
 	}
 
-	/** Diese Methode liefert die Menge der {@link QN Hyperknoten}, die zur Erkennung dieses Objekts dient. Dazu sollten diese Erkennungsknoten einen
-	 * {@link QN#value() Textwert} besitzen.
+	/** Diese Methode liefert die Menge der {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen {@link QN#value()
+	 * Textwert} besitzen.
 	 *
 	 * @return Erkennungsknotenmenge. */
-	default Set2<QN> idents() {
-		return this.model().itemIdentLink().getTargetProxy(this.node());
-	}
+	Set2<QN> idents();
 
 	/** Diese Methode liefert die {@link QN#value() Textwerte} der {@link #idents() Erkennungsknoten}. */
 	default Set2<String> identsAsStrings() {
