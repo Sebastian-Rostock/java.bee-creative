@@ -8,7 +8,7 @@ import bee.creative.util.Set2;
 
 /** Diese Schnittstelle definiert ein Datenelement (Domain-Element) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Datenmodell},
  * {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
- * 
+ *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DE extends QO {
 
@@ -38,7 +38,7 @@ public interface DE extends QO {
 
 	/** Diese Methode liefert den {@link QN#value() Textwert} des {@link #label() Beschriftungsknoten} bzw. {@code null}. */
 	default Property2<String> labelAsString() {
-		return this.label().translate(this.owner().valueTrans());
+		return this.parent().asString(this.label());
 	}
 
 	/** Diese Methode liefert die Menge der {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen {@link QN#value()
@@ -49,7 +49,7 @@ public interface DE extends QO {
 
 	/** Diese Methode liefert die {@link QN#value() Textwerte} der {@link #idents() Erkennungsknoten}. */
 	default Set2<String> identsAsStrings() {
-		return this.idents().translate(this.owner().valueTrans());
+		return this.parent().asString(this.idents());
 	}
 
 }

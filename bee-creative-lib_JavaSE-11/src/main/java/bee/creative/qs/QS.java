@@ -1,8 +1,6 @@
 package bee.creative.qs;
 
 import java.util.List;
-import bee.creative.util.AbstractTranslator;
-import bee.creative.util.Translator2;
 
 /** Diese Schnittstelle definiert einen Graphspeicher für einen Hypergraphen vierter Ordnung (Quad-Store), dessen {@link QN Hyperknoten} über einen optionalen
  * identifizierenden {@link QN#value() Textwert} verfügen und dessen {@link QE Hyperkanten} jeweils vier Hyperknoten in den Rollen {@link QE#context() Kontext},
@@ -162,34 +160,5 @@ public interface QS {
 	 * @param tuples Hypertupel.
 	 * @return temporäre Hypertupelmenge. */
 	QTSet newTuples(List<String> names, Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException;
-
-	/** Diese Methode liefert einen {@link Translator2}, der einen {@link QN Hyperknoten} bidirektional in seinen {@link QN#value() Textwert} übersetzt.
-	 *
-	 * @return Hyperknoten-Textwert-Übersetzer. */
-	default Translator2<QN, String> valueTrans() {
-		return new AbstractTranslator<>() {
-	
-			@Override
-			public boolean isTarget(Object object) {
-				return object instanceof String;
-			}
-	
-			@Override
-			public boolean isSource(Object object) {
-				return object instanceof QN;
-			}
-	
-			@Override
-			public String toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-				return object != null ? ((QN)object).value() : null;
-			}
-	
-			@Override
-			public QN toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return object != null ? QS.this.getNode(object) : null;
-			}
-	
-		};
-	}
 
 }

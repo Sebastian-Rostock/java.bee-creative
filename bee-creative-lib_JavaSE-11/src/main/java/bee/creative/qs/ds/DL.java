@@ -3,6 +3,7 @@ package bee.creative.qs.ds;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
@@ -13,9 +14,7 @@ import bee.creative.util.Fields;
 import bee.creative.util.Getter;
 import bee.creative.util.Getter3;
 import bee.creative.util.Getters;
-import bee.creative.util.Properties;
 import bee.creative.util.Property2;
-import bee.creative.util.ProxySet;
 import bee.creative.util.Set2;
 import bee.creative.util.Setter3;
 import bee.creative.util.Setters;
@@ -24,7 +23,7 @@ import bee.creative.util.Translators;
 
 /** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #node() Feldnoten} mit Bezug zu einem {@link #parent() Datenmodell}, {@link #label()
  * Beschriftung}, {@link #idents() Erkennungsmerkmalen} sowie Hinweisen zu gewünschten Datentypen von Quell- und Zielknoten.
- * 
+ *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DL extends DE {
 
@@ -73,19 +72,19 @@ public interface DL extends DE {
 
 	@Override
 	default Property2<QN> label() {
-		return this.parent().link(DM.LINK_IDENT_IsLinkWithLabel).asTargetField().toProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).asTargetField().toProperty(this.node());
 	}
 
 	@Override
 	default Set2<QN> idents() {
-		return this.parent().link(DM.LINK_IDENT_IsLinkWithIdent).getTargetProxy(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargets(this.node()).asSet();
 	}
 
 	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
 	 *
 	 * @return Subjektdatentypknoten. */
 	default Set2<QN> sourceTypes() {
-		return this.parent().link(DM.LINK_IDENT_IsLinkWithSourceType).getTargetProxy(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getTargets(this.node()).asSet();
 	}
 
 	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
@@ -99,7 +98,7 @@ public interface DL extends DE {
 	 *
 	 * @return Subjektklonbarkeit. */
 	default Property2<QN> sourceClonability() {
-		return this.parent().link(DM.LINK_IDENT_IsLinkWithSourceClonability).asTargetField().toProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceClonability).asTargetField().toProperty(this.node());
 	}
 
 	default Property2<CLONABILITY> sourceClonabilityAsEnum() {
@@ -107,11 +106,11 @@ public interface DL extends DE {
 	}
 
 	default Property2<String> sourceClonabilityAsString() {
-		return this.sourceClonability().translate(this.owner().valueTrans());
+		return this.parent().asString(this.sourceClonability());
 	}
 
 	default Property2<QN> sourceMultiplicity() {
-		return this.parent().link(DM.LINK_IDENT_IsLinkWithSourceMultiplicity).asTargetField().toProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceMultiplicity).asTargetField().toProperty(this.node());
 	}
 
 	default Property2<MULTIPLICITY> sourceMultiplicityAsEnum() {
@@ -119,14 +118,14 @@ public interface DL extends DE {
 	}
 
 	default Property2<String> sourceMultiplicityAsString() {
-		return this.sourceMultiplicity().translate(this.owner().valueTrans());
+		return this.parent().asString(this.sourceMultiplicity());
 	}
 
 	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
 	 *
 	 * @return Objektdatentypknoten. */
 	default Set2<QN> targetTypes() {
-		return this.parent().link(DM.LINK_IDENT_IsLinkWithTargetType).getTargetProxy(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getTargets(this.node()).asSet();
 	}
 
 	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
@@ -137,7 +136,7 @@ public interface DL extends DE {
 	}
 
 	default Property2<QN> targetClonability() {
-		return this.parent().link(DM.LINK_IDENT_IsLinkWithTargetClonability).asTargetField().toProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetClonability).asTargetField().toProperty(this.node());
 	}
 
 	default Property2<CLONABILITY> targetClonabilityAsEnum() {
@@ -145,11 +144,11 @@ public interface DL extends DE {
 	}
 
 	default Property2<String> targetClonabilityAsString() {
-		return this.targetClonability().translate(this.owner().valueTrans());
+		return this.parent().asString(this.targetClonability());
 	}
 
 	default Property2<QN> targetMultiplicity() {
-		return this.parent().link(DM.LINK_IDENT_IsLinkWithTargetMultiplicity).asTargetField().toProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetMultiplicity).asTargetField().toProperty(this.node());
 	}
 
 	default Property2<MULTIPLICITY> targetMultiplicityAsEnum() {
@@ -157,11 +156,11 @@ public interface DL extends DE {
 	}
 
 	default Property2<String> targetMultiplicityAsString() {
-		return this.targetMultiplicity().translate(this.owner().valueTrans());
+		return this.parent().asString(this.targetMultiplicity());
 	}
 
 	default Field2<QN, QN> asSourceField() {
-		return Fields.from(this.asSourceGetter(), this.asSourceSetter());
+		return Fields.from(this::getSource, this::setSource);
 	}
 
 	default Getter3<QN, QN> asSourceGetter() {
@@ -180,11 +179,11 @@ public interface DL extends DE {
 		return Setters.from(this::popSource);
 	}
 
-	default Field2<QN, QNSet> asSourceSetField() {
-		return Fields.from(this.asSourceSetGetter(), this.asSourceSetSetter());
+	default Field2<QN, Set<QN>> asSourceSetField() {
+		return Fields.from(this::getSourceSet, this::setSourceSet);
 	}
 
-	default Getter3<QN, QNSet> asSourceSetGetter() {
+	default Getter3<QN, Set2<QN>> asSourceSetGetter() {
 		return Getters.from(this::getSourceSet);
 	}
 
@@ -225,7 +224,7 @@ public interface DL extends DE {
 	}
 
 	default Getter3<QN, QNSet> asTargetSetGetter() {
-		return Getters.from(this::getTargetSet);
+		return Getters.from(this::getTargets);
 	}
 
 	default Setter3<QN, Iterable<? extends QN>> asTargetSetSetter() {
@@ -241,10 +240,14 @@ public interface DL extends DE {
 	}
 
 	default QN getSource(QN target) throws NullPointerException, IllegalArgumentException {
-		return this.getSourceSet(target).first();
+		return this.getSources(target).first();
 	}
 
-	QNSetL getSourceSet(QN target) throws NullPointerException, IllegalArgumentException;
+	QNSetL getSources(QN target) throws NullPointerException, IllegalArgumentException;
+
+	default Set2<QN> getSourceSet(QN target) throws NullPointerException, IllegalArgumentException {
+		return this.getSources(target).asSet();
+	}
 
 	default Map<QN, QN> getSourceMap(Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
 		return DS.getSubjectMap(this.parent().context(), this.node(), targetSet);
@@ -252,10 +255,6 @@ public interface DL extends DE {
 
 	default Map<QN, List<QN>> getSourceSetMap(Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
 		return DS.getSubjectSetMap(this.parent().context(), this.node(), targetSet);
-	}
-
-	default Set2<QN> getSourceProxy(QN target) {
-		return ProxySet.from(Properties.from(() -> this.getSourceSet(target).toSet(), sourceSet -> this.setSourceSet(target, sourceSet)));
 	}
 
 	default boolean setSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
@@ -325,10 +324,14 @@ public interface DL extends DE {
 	}
 
 	default QN getTarget(QN source) throws NullPointerException, IllegalArgumentException {
-		return this.getTargetSet(source).first();
+		return this.getTargets(source).first();
 	}
 
-	QNSetL getTargetSet(QN source) throws NullPointerException, IllegalArgumentException;
+	QNSetL getTargets(QN source) throws NullPointerException, IllegalArgumentException;
+
+	default Set2<QN> getTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
+		return this.getTargets(source).asSet();
+	}
 
 	default Map<QN, QN> getTargetMap(Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
 		return DS.getObjectMap(this.parent().context(), this.node(), sourceSet);
@@ -336,10 +339,6 @@ public interface DL extends DE {
 
 	default Map<QN, List<QN>> getTargetSetMap(Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
 		return DS.getObjectSetMap(this.parent().context(), this.node(), sourceSet);
-	}
-
-	default Set2<QN> getTargetProxy(QN source) {
-		return ProxySet.from(Properties.from(() -> this.getTargetSet(source).toSet(), targetSet -> this.setTargetSet(source, targetSet)));
 	}
 
 	default boolean setTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {

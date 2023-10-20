@@ -8,17 +8,15 @@ import bee.creative.qs.ds.DT;
 import bee.creative.qs.h2.H2QESet;
 import bee.creative.qs.h2.H2QN;
 import bee.creative.qs.h2.H2QS;
+import bee.creative.util.Set2;
 import bee.creative.util.Translator2;
 
 public class H2DM implements DM {
 
-	public  H2QN model;
+	public H2QN model;
 
-	public  H2QN context;
+	public H2QN context;
 
-	
-	
-	
 	@Override
 	public H2QN model() {
 		return this.model;
@@ -44,20 +42,8 @@ public class H2DM implements DM {
 		return null;
 	}
 
- 
 	@Override
-	public Translator2<QN, DL> linkTrans() {
-		return null;
-	}
-
-	@Override
-	public Translator2<QN, DT> typeTrans() {
-		return null;
-	}
- 
-
-	@Override
-	public DL link(String ident) {
+	public DL getLink(String ident) {
 		return null;
 	}
 
@@ -67,11 +53,12 @@ public class H2DM implements DM {
 	}
 
 	@Override
-	public void setupLinks() {
+	public void updateIdents() {
 	}
 
 	@Override
-	public void updateLinks() {
+	public Set2<String> asString(Set2<QN> nodes) {
+		return null;
 	}
 
 }
