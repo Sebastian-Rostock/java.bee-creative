@@ -7,6 +7,26 @@ import java.util.Collection;
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface Collection2<E> extends Collection<E> {
 
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#addAll(java.util.Collection, Iterable) Iterables.addAll(this, c)}. */
+	default boolean addAll(Iterable<? extends E> c) {
+		return Iterables.addAll(this, c);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#retainAll(java.util.Collection, Iterable) Iterables.retainAll(this, c)}. */
+	default boolean retainAll(Iterable<? extends E> c) {
+		return Iterables.retainAll(this, c);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#removeAll(java.util.Collection, Iterable) Iterables.removeAll(this, c)}. */
+	default boolean removeAll(Iterable<? extends E> c) {
+		return Iterables.removeAll(this, c);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@link Iterables#containsAll(java.util.Collection, Iterable) Iterables.containsAll(this, c)}. */
+	default boolean containsAll(Iterable<? extends E> c) {
+		return Iterables.containsAll(this, c);
+	}
+
 	@Override
 	Iterator2<E> iterator();
 
