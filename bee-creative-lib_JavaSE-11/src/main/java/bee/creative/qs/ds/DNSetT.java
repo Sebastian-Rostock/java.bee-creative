@@ -3,7 +3,10 @@ package bee.creative.qs.ds;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 
-public interface QNSetLT extends DNSet {
+/** Diese Schnittstelle definiert das {@link DNSet} für {@link DL#getTargets(QN)}.
+ *
+ * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public interface DNSetT extends DNSet {
 
 	@Override
 	default QN target() {

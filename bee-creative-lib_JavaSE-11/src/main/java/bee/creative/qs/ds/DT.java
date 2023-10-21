@@ -5,6 +5,7 @@ import bee.creative.util.AbstractTranslator;
 import bee.creative.util.Getter;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
+import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
 
 public interface DT extends DE {
@@ -73,9 +74,12 @@ public interface DT extends DE {
 
 	/** Diese Methode liefert die diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
 	 *
+	 * @see DM#getLink(QN)
+	 * @see DL#linkTrans(Getter)
+	 * @see Set2#translate(Translator)
 	 * @return Quelldatenfelder. */
 	default Set2<DL> targetLinksAsLinks() {
-		return this.targetLinks().translate(this.parent().linkTrans());
+		return this.parent().asLinks( this.targetLinks());
 	}
 
 	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
@@ -88,9 +92,12 @@ public interface DT extends DE {
 
 	/** Diese Methode liefert die diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
 	 *
+	 * @see DM#getLink(QN)
+	 * @see DL#linkTrans(Getter)
+	 * @see Set2#translate(Translator)
 	 * @return Quelldatenfelder. */
 	default Set2<DL> sourceLinksAsLinks() {
-		return this.sourceLinks().translate(this.parent().linkTrans());
+		return this.sourceLinks().translate(DL.linkTrans(this.parent()::getLink));
 	}
 
 }

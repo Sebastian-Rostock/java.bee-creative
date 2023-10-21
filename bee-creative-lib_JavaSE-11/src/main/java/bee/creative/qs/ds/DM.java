@@ -6,6 +6,7 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
 import bee.creative.util.AbstractTranslator;
+import bee.creative.util.Collections;
 import bee.creative.util.Properties;
 import bee.creative.util.Property;
 import bee.creative.util.Property2;
@@ -67,42 +68,12 @@ public interface DM extends QO {
 
 	DH history(); // log oder null
 
-	default Translator2<QN, DL> linkTrans() {
-		return new AbstractTranslator<>() {
-
-			@Override
-			public boolean isTarget(Object object) {
-				return object instanceof DL;
-			}
-
-			@Override
-			public boolean isSource(Object object) {
-				return object instanceof QN;
-			}
-
-			@Override
-			public DL toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-				return DM.this.getLink((QN)object);
-			}
-
-			@Override
-			public QN toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return ((DL)object).node();
-			}
-
-		};
-	}
-
 	default Set2<QN> links() { // datenfelder, beziehungen
 		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.getType(DM.TYPE_IDENT_IsLink).node()).asSet();
 	}
 
 	default Set2<DL> linksAsLinks() {
-		return this.links().translate(this.linkTrans());
-	}
-
-	default Translator2<QN, DT> typeTrans() {
-		return DT.typeTrans(this::getType);
+		return asLinks(this.links());
 	}
 
 	default Set2<QN> types() { // datentypen
@@ -110,7 +81,7 @@ public interface DM extends QO {
 	}
 
 	default Set2<DT> typesAsTypes() {
-		return this.types().translate(this.typeTrans());
+		return asTypes(this.types());
 	}
 
 	default DL getLink(QN ident) {
@@ -143,6 +114,18 @@ public interface DM extends QO {
 	/** Diese Methode signalisiert dem Datenmodell Änderungen an {@link DE#idents()}. Daraufhin können interne Puffer zur Beschleunigung von {@link #getLink(QN)}
 	 * und {@link #getType(QN)} entsprechend aktualisiert werden. */
 	void updateIdents();
+
+	DL asLink(QN node);
+
+	default Set2<DL> asLinks(Set<QN> nodes) {
+		return Collections.translate(nodes, DL.linkTrans(this::asLink));
+	}
+
+	DT asType(QN node);
+
+	default Set2<DT> asTypes(Set<QN> nodes) {
+		return Collections.translate(nodes, DT.typeTrans(this::asType));
+	}
 
 	public default Property2<String> asString(Property<QN> prop) {
 		return Properties.translate(prop, node -> node != null ? node.value() : null, value -> value != null ? this.owner().newNode(value) : null);

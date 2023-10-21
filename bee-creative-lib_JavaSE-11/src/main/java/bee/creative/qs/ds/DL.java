@@ -91,7 +91,7 @@ public interface DL extends DE {
 	 *
 	 * @return Subjektdatentypen. */
 	default Set2<DT> sourceTypesAsTypes() {
-		return this.sourceTypes().translate(this.parent().typeTrans());
+		return this.parent().asTypes(this.sourceTypes());
 	}
 
 	/** Diese Methode liefert die Textknoten der erwünschten {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Subjektknoten}.
@@ -132,7 +132,7 @@ public interface DL extends DE {
 	 *
 	 * @return Objektdatentypen. */
 	default Set2<DT> targetTypesAsTypes() {
-		return this.targetTypes().translate(this.parent().typeTrans());
+		return this.parent().asTypes(this.targetTypes());
 	}
 
 	default Property2<QN> targetClonability() {

@@ -3,7 +3,10 @@ package bee.creative.qs.ds;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 
-public interface QNSetLS extends DNSet {
+/** Diese Schnittstelle definiert das {@link DNSet} für {@link DL#getSources(QN)}.
+ *
+ * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+public interface DNSetS extends DNSet {
 
 	@Override
 	default QN source() {
