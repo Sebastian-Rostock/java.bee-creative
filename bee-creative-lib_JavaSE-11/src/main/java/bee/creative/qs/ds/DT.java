@@ -1,11 +1,11 @@
 package bee.creative.qs.ds;
 
+import java.util.Set;
 import bee.creative.qs.QN;
 import bee.creative.util.AbstractTranslator;
 import bee.creative.util.Getter;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
-import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
 
 public interface DT extends DE {
@@ -56,7 +56,7 @@ public interface DT extends DE {
 		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithIdent).getTargets(this.node()).asSet();
 	}
 
-	/** Diese Methode liefert die Menge der {@link QN Hyperknoten} der Instanzen dieses Datentyps.
+	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} der Instanzen dieses Datentyps.
 	 *
 	 * @see DM#LINK_IDENT_IsTypeWithInstance
 	 * @return Instanzknotenmenge. */
@@ -64,7 +64,7 @@ public interface DT extends DE {
 		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.node()).asSet();
 	}
 
-	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
 	 *
 	 * @see DM#LINK_IDENT_IsLinkWithTargetType
 	 * @return Zielfeldknoten. */
@@ -74,12 +74,10 @@ public interface DT extends DE {
 
 	/** Diese Methode liefert die diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
 	 *
-	 * @see DM#getLink(QN)
-	 * @see DL#linkTrans(Getter)
-	 * @see Set2#translate(Translator)
-	 * @return Quelldatenfelder. */
+	 * @see DM#asLinks(Set)
+	 * @return Zieldatenfelder. */
 	default Set2<DL> targetLinksAsLinks() {
-		return this.parent().asLinks( this.targetLinks());
+		return this.parent().asLinks(this.targetLinks());
 	}
 
 	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
@@ -92,12 +90,10 @@ public interface DT extends DE {
 
 	/** Diese Methode liefert die diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
 	 *
-	 * @see DM#getLink(QN)
-	 * @see DL#linkTrans(Getter)
-	 * @see Set2#translate(Translator)
+	 * @see DM#asLinks(Set)
 	 * @return Quelldatenfelder. */
 	default Set2<DL> sourceLinksAsLinks() {
-		return this.sourceLinks().translate(DL.linkTrans(this.parent()::getLink));
+		return this.parent().asLinks(this.sourceLinks());
 	}
 
 }

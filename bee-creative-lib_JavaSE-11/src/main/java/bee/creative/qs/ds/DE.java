@@ -32,27 +32,27 @@ public interface DE extends QO {
 	 * @return Datenmodell. */
 	DM parent();
 
-	/** Diese Methode liefert den {@link QN Hyperknoten} zur Beschriftung dieses Objekts. Dieser Beschriftungsknoten sollte dazu einen {@link QN#value() Textwert}
-	 * besitzen oder beschreiben.
+	/** Diese Methode erlaubt Zugriff auf den {@link QN Hyperknoten} zur Beschriftung dieses Objekts. Dieser Beschriftungsknoten sollte dazu einen
+	 * {@link QN#value() Textwert} besitzen oder beschreiben.
 	 *
 	 * @return Beschriftungsknoten. */
 	Property2<QN> label();
 
-	/** Diese Methode liefert den {@link QN#value() Textwert} des {@link #label() Beschriftungsknoten} bzw. {@code null}.
-	 * 
+	/** Diese Methode erlaubt Zugriff auf den {@link QN#value() Textwert} der {@link #label() Beschriftung} dieses Objekts.
+	 *
 	 * @see DM#asString(Property) */
 	default Property2<String> labelAsString() {
 		return this.parent().asString(this.label());
 	}
 
-	/** Diese Methode liefert die Menge der {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen {@link QN#value()
-	 * Textwert} besitzen.
+	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen
+	 * {@link QN#value() Textwert} besitzen.
 	 *
 	 * @return Erkennungsknotenmenge. */
 	Set2<QN> idents();
 
-	/** Diese Methode liefert die {@link QN#value() Textwerte} der {@link #idents() Erkennungsknoten}.
-	 * 
+	/** Diese Methode erlaubt Zugriff auf die {@link QN#value() Textwerte} zur {@link #idents() Erkennung} dieses Objekts.
+	 *
 	 * @see DM#asStrings(Set) */
 	default Set2<String> identsAsStrings() {
 		return this.parent().asStrings(this.idents());

@@ -62,6 +62,22 @@ public interface DL extends DE {
 	@Override
 	QN node();
 
+	/** {@inheritDoc}
+	 *
+	 * @see DM#LINK_IDENT_IsLinkWithLabel */
+	@Override
+	default Property2<QN> label() {
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).asTargetField().toProperty(this.node());
+	}
+
+	/** {@inheritDoc}
+	 *
+	 * @see DM#LINK_IDENT_IsLinkWithIdent */
+	@Override
+	default Set2<QN> idents() {
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargets(this.node()).asSet();
+	}
+
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link QE#context() Kontextknoten} des {@link #parent()
 	 * Datenmodells} und dem {@link #node() Feldknoten} dieses Datenfeldes als {@link QE#predicate() Prädikatknoten}.
 	 *
@@ -70,41 +86,40 @@ public interface DL extends DE {
 		return this.parent().edges().havingPredicate(this.node());
 	}
 
-	@Override
-	default Property2<QN> label() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).asTargetField().toProperty(this.node());
-	}
-
-	@Override
-	default Set2<QN> idents() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargets(this.node()).asSet();
-	}
-
-	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
+	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} der {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
-	 * @return Subjektdatentypknoten. */
+	 * @see DM#LINK_IDENT_IsLinkWithSourceType
+	 * @return Quelltypknoten. */
 	default Set2<QN> sourceTypes() {
 		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getTargets(this.node()).asSet();
 	}
 
-	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#subject() Subjektknoten}.
+	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
-	 * @return Subjektdatentypen. */
+	 * @return Quelldatentypen. */
 	default Set2<DT> sourceTypesAsTypes() {
 		return this.parent().asTypes(this.sourceTypes());
 	}
 
-	/** Diese Methode liefert die Textknoten der erwünschten {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Subjektknoten}.
+	/** Diese Methode liefert die Textknoten der erwünschten {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
-	 * @return Subjektklonbarkeit. */
+	 * @see DM#LINK_IDENT_IsLinkWithSourceClonability
+	 * @return Quellklonbarkeitstextknoten. */
 	default Property2<QN> sourceClonability() {
 		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceClonability).asTargetField().toProperty(this.node());
 	}
 
+	/** Diese Methode liefert die erwünschte {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
+	 *
+	 * @return Quellklonbarkeit. */
 	default Property2<CLONABILITY> sourceClonabilityAsEnum() {
 		return this.sourceClonabilityAsString().translate(CLONABILITY.trans);
 	}
 
+	/** Diese Methode liefert den Textwert der erwünschten {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
+	 * 
+	 * @see #sourceClonability()
+	 * @return Quellklonbarkeitstextwert. */
 	default Property2<String> sourceClonabilityAsString() {
 		return this.parent().asString(this.sourceClonability());
 	}
