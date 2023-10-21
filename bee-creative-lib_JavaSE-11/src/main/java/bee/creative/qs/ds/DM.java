@@ -1,5 +1,6 @@
 package bee.creative.qs.ds;
 
+import java.util.Set;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
@@ -101,29 +102,7 @@ public interface DM extends QO {
 	}
 
 	default Translator2<QN, DT> typeTrans() {
-		return new AbstractTranslator<>() {
-
-			@Override
-			public boolean isTarget(Object object) {
-				return object instanceof DT;
-			}
-
-			@Override
-			public boolean isSource(Object object) {
-				return object instanceof QN;
-			}
-
-			@Override
-			public DT toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-				return DM.this.getType((QN)object);
-			}
-
-			@Override
-			public QN toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return ((DT)object).node();
-			}
-
-		};
+		return DT.typeTrans(this::getType);
 	}
 
 	default Set2<QN> types() { // datentypen
@@ -169,6 +148,6 @@ public interface DM extends QO {
 		return Properties.translate(prop, node -> node != null ? node.value() : null, value -> value != null ? this.owner().newNode(value) : null);
 	}
 
-	Set2<String> asString(Set2<QN> nodes);
+	Set2<String> asStrings(Set<QN> nodes);
 
 }

@@ -9,11 +9,11 @@ import bee.creative.util.Translator2;
 
 public interface DT extends DE {
 
-	/** Diese Methode gibt das zurück.
+	/** Diese Methode liefert einen {@link Translator2}, der einen {@link QN Hyperknoten} bidirektional in ein {@link DL Datentyp} übersetzt.
 	 *
-	 * @param nodeAsType Diese Methode liefet den {@link DL Datentyp} mit dem gegebenen {@link DT#node() Typknoten}.
-	 * @return */
-	static Translator2<QN, DT> trans(Getter<QN, DT> nodeAsType) {
+	 * @param nodeAsType Methode zur Übersetzung eines {@link DT#node() Typknoten} in das zugehörige {@link DL Datentyp}.
+	 * @return Hyperknoten-Datentyp-Übersetzer. */
+	static Translator2<QN, DT> typeTrans(Getter<QN, DT> nodeAsType) {
 		return new AbstractTranslator<>() {
 
 			@Override
@@ -39,50 +39,58 @@ public interface DT extends DE {
 		};
 	}
 
+	/** {@inheritDoc}
+	 *
+	 * @see DM#LINK_IDENT_IsTypeWithLabel */
 	@Override
 	default Property2<QN> label() {
 		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithLabel).asTargetField().toProperty(this.node());
 	}
 
+	/** {@inheritDoc}
+	 *
+	 * @see DM#LINK_IDENT_IsTypeWithIdent */
 	@Override
 	default Set2<QN> idents() {
-		return  this.parent().getLink(DM.LINK_IDENT_IsTypeWithIdent).getTargets(this.node()).asSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithIdent).getTargets(this.node()).asSet();
 	}
 
-	default QNSetL instances() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.node());
-	}
-
-	/** Diese Methode setzt {@link #node()} als Datentyp des gegebenen {@link QN Hyperknoten}. */
-	default void assign(QN item) {
-		this.instances().putNode(item);
-	}
-
-	/** Diese Methode setzt {@link #node()} als Datentyp der gegebenen {@link QN Hyperknoten}. */
-	default void assignAll(Iterable<? extends QN> itemSet) {
-		this.instances().putNodes(itemSet);
-	}
-
-	/** Diese Methode liefert die {@link DL#node() Feldknoten} der von {@link #instances() Instanzen} dieses Datentyps ausgehenden {@link DL Datenfelder}.
+	/** Diese Methode liefert die Menge der {@link QN Hyperknoten} der Instanzen dieses Datentyps.
 	 *
-	 * @return Subjektdatenfeldknoten. */
-	default Set2<QN> sourceLinks() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getSources(this.node()).asSet();
+	 * @see DM#LINK_IDENT_IsTypeWithInstance
+	 * @return Instanzknotenmenge. */
+	default Set2<QN> instances() {
+		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.node()).asSet();
 	}
 
-	/** Diese Methode liefert die von {@link #instances() Instanzen} dieses Datentyps ausgehenden {@link DL Datenfelder}.
+	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
 	 *
-	 * @return Subjektdatenfelder. */
-	default Set2<DL> sourceLinksAsLinks() {
-		return this.sourceLinks().translate(this.parent().linkTrans());
-	}
-
+	 * @see DM#LINK_IDENT_IsLinkWithTargetType
+	 * @return Zielfeldknoten. */
 	default Set2<QN> targetLinks() {
 		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getSources(this.node()).asSet();
 	}
 
+	/** Diese Methode liefert die diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
+	 *
+	 * @return Quelldatenfelder. */
 	default Set2<DL> targetLinksAsLinks() {
 		return this.targetLinks().translate(this.parent().linkTrans());
+	}
+
+	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
+	 *
+	 * @see DM#LINK_IDENT_IsLinkWithSourceType
+	 * @return Quellfeldknoten. */
+	default Set2<QN> sourceLinks() {
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getSources(this.node()).asSet();
+	}
+
+	/** Diese Methode liefert die diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
+	 *
+	 * @return Quelldatenfelder. */
+	default Set2<DL> sourceLinksAsLinks() {
+		return this.sourceLinks().translate(this.parent().linkTrans());
 	}
 
 }

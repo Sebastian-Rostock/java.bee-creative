@@ -29,7 +29,7 @@ public interface DL extends DE {
 
 	/** Diese Methode liefert einen {@link Translator2}, der einen {@link QN Hyperknoten} bidirektional in ein {@link DL Datenfeld} übersetzt.
 	 *
-	 * @param nodeAsLink Methode liefet das {@link DL Datenfeld} mit dem gegebenen {@link DT#node() Feldknoten}.
+	 * @param nodeAsLink Methode zur Übersetzung eines {@link DL#node() Feldknoten} in das zugehörige {@link DL Datenfeld}.
 	 * @return Hyperknoten-Datenfeld-Übersetzer. */
 	static Translator2<QN, DL> linkTrans(Getter<QN, DL> nodeAsLink) {
 		return new AbstractTranslator<>() {
@@ -159,91 +159,11 @@ public interface DL extends DE {
 		return this.parent().asString(this.targetMultiplicity());
 	}
 
-	default Field2<QN, QN> asSourceField() {
-		return Fields.from(this::getSource, this::setSource);
-	}
-
-	default Getter3<QN, QN> asSourceGetter() {
-		return Getters.from(this::getSource);
-	}
-
-	default Setter3<QN, QN> asSourceSetter() {
-		return Setters.from(this::setSource);
-	}
-
-	default Setter3<QN, QN> asSourcePutter() {
-		return Setters.from(this::putSource);
-	}
-
-	default Setter3<QN, QN> asSourcePopper() {
-		return Setters.from(this::popSource);
-	}
-
-	default Field2<QN, Set<QN>> asSourceSetField() {
-		return Fields.from(this::getSourceSet, this::setSourceSet);
-	}
-
-	default Getter3<QN, Set2<QN>> asSourceSetGetter() {
-		return Getters.from(this::getSourceSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asSourceSetSetter() {
-		return Setters.from(this::setSourceSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asSourceSetPutter() {
-		return Setters.from(this::putSourceSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asSourceSetPopper() {
-		return Setters.from(this::popSourceSet);
-	}
-
-	default Field2<QN, QN> asTargetField() {
-		return Fields.from(this.asTargetGetter(), this.asTargetSetter());
-	}
-
-	default Getter3<QN, QN> asTargetGetter() {
-		return Getters.from(this::getTarget);
-	}
-
-	default Setter3<QN, QN> asTargetSetter() {
-		return Setters.from(this::setTarget);
-	}
-
-	default Setter3<QN, QN> asTargetPutter() {
-		return Setters.from(this::putTarget);
-	}
-
-	default Setter3<QN, QN> asTargetPopper() {
-		return Setters.from(this::popTarget);
-	}
-
-	default Field2<QN, QNSet> asTargetSetField() {
-		return Fields.from(this.asTargetSetGetter(), this.asTargetSetSetter());
-	}
-
-	default Getter3<QN, QNSet> asTargetSetGetter() {
-		return Getters.from(this::getTargets);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asTargetSetSetter() {
-		return Setters.from(this::setTargetSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asTargetSetPutter() {
-		return Setters.from(this::putTargetSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asTargetSetPopper() {
-		return Setters.from(this::popTargetSet);
-	}
-
 	default QN getSource(QN target) throws NullPointerException, IllegalArgumentException {
 		return this.getSources(target).first();
 	}
 
-	QNSetL getSources(QN target) throws NullPointerException, IllegalArgumentException;
+	DNSet getSources(QN target) throws NullPointerException, IllegalArgumentException;
 
 	default Set2<QN> getSourceSet(QN target) throws NullPointerException, IllegalArgumentException {
 		return this.getSources(target).asSet();
@@ -327,7 +247,7 @@ public interface DL extends DE {
 		return this.getTargets(source).first();
 	}
 
-	QNSetL getTargets(QN source) throws NullPointerException, IllegalArgumentException;
+	DNSet getTargets(QN source) throws NullPointerException, IllegalArgumentException;
 
 	default Set2<QN> getTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
 		return this.getTargets(source).asSet();
@@ -405,6 +325,86 @@ public interface DL extends DE {
 		var history = model.history();
 		return DS.popObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+	}
+
+	default Field2<QN, QN> asSourceField() {
+		return Fields.from(this::getSource, this::setSource);
+	}
+
+	default Getter3<QN, QN> asSourceGetter() {
+		return Getters.from(this::getSource);
+	}
+
+	default Setter3<QN, QN> asSourceSetter() {
+		return Setters.from(this::setSource);
+	}
+
+	default Setter3<QN, QN> asSourcePutter() {
+		return Setters.from(this::putSource);
+	}
+
+	default Setter3<QN, QN> asSourcePopper() {
+		return Setters.from(this::popSource);
+	}
+
+	default Field2<QN, Set<QN>> asSourceSetField() {
+		return Fields.from(this::getSourceSet, this::setSourceSet);
+	}
+
+	default Getter3<QN, Set2<QN>> asSourceSetGetter() {
+		return Getters.from(this::getSourceSet);
+	}
+
+	default Setter3<QN, Iterable<? extends QN>> asSourceSetSetter() {
+		return Setters.from(this::setSourceSet);
+	}
+
+	default Setter3<QN, Iterable<? extends QN>> asSourceSetPutter() {
+		return Setters.from(this::putSourceSet);
+	}
+
+	default Setter3<QN, Iterable<? extends QN>> asSourceSetPopper() {
+		return Setters.from(this::popSourceSet);
+	}
+
+	default Field2<QN, QN> asTargetField() {
+		return Fields.from(this.asTargetGetter(), this.asTargetSetter());
+	}
+
+	default Getter3<QN, QN> asTargetGetter() {
+		return Getters.from(this::getTarget);
+	}
+
+	default Setter3<QN, QN> asTargetSetter() {
+		return Setters.from(this::setTarget);
+	}
+
+	default Setter3<QN, QN> asTargetPutter() {
+		return Setters.from(this::putTarget);
+	}
+
+	default Setter3<QN, QN> asTargetPopper() {
+		return Setters.from(this::popTarget);
+	}
+
+	default Field2<QN, QNSet> asTargetSetField() {
+		return Fields.from(this.asTargetSetGetter(), this.asTargetSetSetter());
+	}
+
+	default Getter3<QN, QNSet> asTargetSetGetter() {
+		return Getters.from(this::getTargets);
+	}
+
+	default Setter3<QN, Iterable<? extends QN>> asTargetSetSetter() {
+		return Setters.from(this::setTargetSet);
+	}
+
+	default Setter3<QN, Iterable<? extends QN>> asTargetSetPutter() {
+		return Setters.from(this::putTargetSet);
+	}
+
+	default Setter3<QN, Iterable<? extends QN>> asTargetSetPopper() {
+		return Setters.from(this::popTargetSet);
 	}
 
 	enum CLONABILITY {

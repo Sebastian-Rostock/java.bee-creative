@@ -1,12 +1,14 @@
 package bee.creative.qs.ds;
 
+import java.util.Set;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
 import bee.creative.qs.QS;
+import bee.creative.util.Property;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert ein Datenelement (Domain-Element) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Datenmodell},
+/** Diese Schnittstelle definiert ein Datenelement (Domain-Element) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Datenmodell} sowie mit
  * {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -36,7 +38,9 @@ public interface DE extends QO {
 	 * @return Beschriftungsknoten. */
 	Property2<QN> label();
 
-	/** Diese Methode liefert den {@link QN#value() Textwert} des {@link #label() Beschriftungsknoten} bzw. {@code null}. */
+	/** Diese Methode liefert den {@link QN#value() Textwert} des {@link #label() Beschriftungsknoten} bzw. {@code null}.
+	 * 
+	 * @see DM#asString(Property) */
 	default Property2<String> labelAsString() {
 		return this.parent().asString(this.label());
 	}
@@ -47,9 +51,11 @@ public interface DE extends QO {
 	 * @return Erkennungsknotenmenge. */
 	Set2<QN> idents();
 
-	/** Diese Methode liefert die {@link QN#value() Textwerte} der {@link #idents() Erkennungsknoten}. */
+	/** Diese Methode liefert die {@link QN#value() Textwerte} der {@link #idents() Erkennungsknoten}.
+	 * 
+	 * @see DM#asStrings(Set) */
 	default Set2<String> identsAsStrings() {
-		return this.parent().asString(this.idents());
+		return this.parent().asStrings(this.idents());
 	}
 
 }

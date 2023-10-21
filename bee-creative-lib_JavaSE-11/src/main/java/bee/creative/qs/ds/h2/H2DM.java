@@ -23,7 +23,7 @@ public class H2DM implements DM {
 	}
 
 	@Override
-	public H2QESet edges() {
+	public H2QESet edges() {                                
 		return this.context.owner.edges().havingContext(this.context);
 	}
 
@@ -57,7 +57,7 @@ public class H2DM implements DM {
 	}
 
 	@Override
-	public Set2<String> asString(Set2<QN> nodes) {
+	public Set2<String> asStrings(Set2<QN> nodes) {
 		return null;
 	}
 

@@ -3,7 +3,7 @@ package bee.creative.qs.ds;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 
-public interface QNSetLS extends QNSetL {
+public interface QNSetLS extends DNSet {
 
 	@Override
 	default QN source() {

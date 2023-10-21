@@ -1,10 +1,10 @@
 package bee.creative.qs.ds.h2;
 
-import bee.creative.qs.ds.QNSetL;
+import bee.creative.qs.ds.DNSet;
 import bee.creative.qs.h2.H2QNSet;
 import bee.creative.qs.h2.H2QQ;
 
-public abstract class H2QNSetL extends H2QNSet implements QNSetL {
+public abstract class H2QNSetL extends H2QNSet implements DNSet {
 
 	public final H2DL link;
 
