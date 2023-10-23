@@ -1,10 +1,7 @@
 package bee.creative.qs.ds;
 
-import java.util.Set;
 import bee.creative.qs.QN;
-import bee.creative.qs.QO;
 import bee.creative.qs.QS;
-import bee.creative.util.Property;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
@@ -12,7 +9,7 @@ import bee.creative.util.Set2;
  * {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface DE extends QO {
+public interface DE extends DO {
 
 	/** Diese Methode liefert den dieses Objekt repräsentierenden Hyperknoten.
 	 *
@@ -27,35 +24,34 @@ public interface DE extends QO {
 		return this.parent().owner();
 	}
 
-	/** Diese Methode liefet das dieses Objekt verwaltende Datenmodell.
-	 *
-	 * @return Datenmodell. */
-	DM parent();
-
 	/** Diese Methode erlaubt Zugriff auf den {@link QN Hyperknoten} zur Beschriftung dieses Objekts. Dieser Beschriftungsknoten sollte dazu einen
 	 * {@link QN#value() Textwert} besitzen oder beschreiben.
 	 *
+	 * @see DNSet#asNode()
 	 * @return Beschriftungsknoten. */
 	Property2<QN> label();
 
 	/** Diese Methode erlaubt Zugriff auf den {@link QN#value() Textwert} der {@link #label() Beschriftung} dieses Objekts.
 	 *
-	 * @see DM#asString(Property) */
+	 * @see DNSet#asValue()
+	 * @return Beschriftungstextwert. */
 	default Property2<String> labelAsString() {
-		return this.parent().asString(this.label());
+		return this.parent().asValue(this.label());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen
 	 * {@link QN#value() Textwert} besitzen.
 	 *
+	 * @see DNSet#asNodeSet()
 	 * @return Erkennungsknotenmenge. */
 	Set2<QN> idents();
 
 	/** Diese Methode erlaubt Zugriff auf die {@link QN#value() Textwerte} zur {@link #idents() Erkennung} dieses Objekts.
 	 *
-	 * @see DM#asStrings(Set) */
+	 * @see DNSet#asValueSet()
+	 * @return Erkennungstextwerte. */
 	default Set2<String> identsAsStrings() {
-		return this.parent().asStrings(this.idents());
+		return this.parent().asValueSet(this.idents());
 	}
 
 }

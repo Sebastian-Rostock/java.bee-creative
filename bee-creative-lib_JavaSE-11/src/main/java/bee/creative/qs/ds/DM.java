@@ -5,13 +5,11 @@ import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
-import bee.creative.util.AbstractTranslator;
 import bee.creative.util.Collections;
 import bee.creative.util.Properties;
 import bee.creative.util.Property;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
-import bee.creative.util.Translator2;
 
 /** Diese Schnittstelle definiert ein Domänenmodell ({@code domain-model}).
  *
@@ -69,19 +67,19 @@ public interface DM extends QO {
 	DH history(); // log oder null
 
 	default Set2<QN> links() { // datenfelder, beziehungen
-		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.getType(DM.TYPE_IDENT_IsLink).node()).asSet();
+		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.getType(DM.TYPE_IDENT_IsLink).node()).asNodeSet();
 	}
 
 	default Set2<DL> linksAsLinks() {
-		return asLinks(this.links());
+		return this.asLinkSet(this.links());
 	}
 
 	default Set2<QN> types() { // datentypen
-		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.getType(DM.TYPE_IDENT_IsType).node()).asSet();
+		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.getType(DM.TYPE_IDENT_IsType).node()).asNodeSet();
 	}
 
 	default Set2<DT> typesAsTypes() {
-		return asTypes(this.types());
+		return this.asTypes(this.types());
 	}
 
 	default DL getLink(QN ident) {
@@ -117,7 +115,7 @@ public interface DM extends QO {
 
 	DL asLink(QN node);
 
-	default Set2<DL> asLinks(Set<QN> nodes) {
+	default Set2<DL> asLinkSet(Set<QN> nodes) {
 		return Collections.translate(nodes, DL.linkTrans(this::asLink));
 	}
 
@@ -132,5 +130,11 @@ public interface DM extends QO {
 	}
 
 	Set2<String> asStrings(Set<QN> nodes);
+
+	default Property2<String> asValue(Property<QN> prop){
+		return Properties.translate(prop, node -> node != null ? node.value() : null, value -> value != null ? this.owner().newNode(value) : null);
+	}
+
+	Set2<String> asValueSet(Set2<QN> idents);
 
 }

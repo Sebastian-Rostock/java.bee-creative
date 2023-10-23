@@ -8,7 +8,6 @@ import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterator2;
-import bee.creative.util.Properties;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
@@ -16,7 +15,7 @@ import bee.creative.util.Set2;
  * Quellknoten} bzw. einem {@link #target() Zielknoten} zugeordnet ist.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface DNSet extends QNSet {
+public interface DNSet extends QNSet, DO {
 
 	/** Diese Methode liefert das Datenfeld, dessen {@link DL#node() Feldknoten} in den {@link #edges() verwendet wird}.
 	 *
@@ -86,7 +85,7 @@ public interface DNSet extends QNSet {
 	boolean putNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode entfernt den gegebenen {@link QN Hyperknoten} aus dieser Menge.
-	 * 
+	 *
 	 * @see #popNodes(Iterable)
 	 * @param node Hyperknoten oder {@code null}.
 	 * @return {@code true}, wenn die Menge verändert wurde. {@code false} sonst. */
@@ -100,6 +99,13 @@ public interface DNSet extends QNSet {
 	 * @return {@code true}, wenn die Menge verändert wurde. {@code false} sonst. */
 	boolean popNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
+	/** Diese Methode liefert eine {@link Property2}-Sicht auf den ersten bzw. einzigen {@link QN Hyperknoten} dieser Menge.
+	 *
+	 * @see #getNode()
+	 * @see #setNode(QN)
+	 * @return Elementsicht. */
+	Property2<QN> asNode();
+
 	/** Diese Methode liefert eine {@link Set}-Sicht auf die {@link QN Hyperknoten} dieser Menge.
 	 *
 	 * @see #size()
@@ -108,7 +114,7 @@ public interface DNSet extends QNSet {
 	 * @see #putNodes(Iterable)
 	 * @see #popNodes(Iterable)
 	 * @return Mengensicht. */
-	default Set2<QN> asSet() {
+	default Set2<QN> asNodeSet() {
 		return new Set2<>() {
 
 			@Override
@@ -220,13 +226,12 @@ public interface DNSet extends QNSet {
 		};
 	}
 
-	/** Diese Methode liefert eine {@link Property2}-Sicht auf den ersten bzw. einzigen {@link QN Hyperknoten} dieser Menge.
-	 *
-	 * @see #getNode()
-	 * @see #setNode(QN)
-	 * @return Elementsicht. */
-	default Property2<QN> asProp() {
-		return Properties.from(this::getNode, this::setNode);
+	default Property2<String> asValue() {
+		return this.parent().asValue(this.asNode());
+	}
+
+	default Set2<String> asValueSet() {
+		return this.parent().asValueSet(this.asNodeSet());
 	}
 
 }

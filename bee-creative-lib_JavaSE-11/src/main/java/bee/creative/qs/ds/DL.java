@@ -4,20 +4,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import bee.creative.lang.Objects;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
-import bee.creative.qs.QNSet;
 import bee.creative.util.AbstractTranslator;
 import bee.creative.util.Field2;
 import bee.creative.util.Fields;
 import bee.creative.util.Getter;
-import bee.creative.util.Getter3;
-import bee.creative.util.Getters;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
-import bee.creative.util.Setter3;
-import bee.creative.util.Setters;
 import bee.creative.util.Translator2;
 import bee.creative.util.Translators;
 
@@ -67,7 +63,15 @@ public interface DL extends DE {
 	 * @see DM#LINK_IDENT_IsLinkWithLabel */
 	@Override
 	default Property2<QN> label() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).asTargetField().toProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).getTargets(this.node()).asNode();
+	}
+
+	/** {@inheritDoc}
+	 *
+	 * @see DM#LINK_IDENT_IsLinkWithLabel */
+	@Override
+	default Property2<String> labelAsString() {
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).getTargets(this.node()).asValue();
 	}
 
 	/** {@inheritDoc}
@@ -75,7 +79,15 @@ public interface DL extends DE {
 	 * @see DM#LINK_IDENT_IsLinkWithIdent */
 	@Override
 	default Set2<QN> idents() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargets(this.node()).asSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargets(this.node()).asNodeSet();
+	}
+
+	/** {@inheritDoc}
+	 *
+	 * @see DM#LINK_IDENT_IsLinkWithIdent */
+	@Override
+	default Set2<String> identsAsStrings() {
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargets(this.node()).asValueSet();
 	}
 
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link QE#context() Kontextknoten} des {@link #parent()
@@ -91,7 +103,7 @@ public interface DL extends DE {
 	 * @see DM#LINK_IDENT_IsLinkWithSourceType
 	 * @return Quelltypknoten. */
 	default Set2<QN> sourceTypes() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getTargets(this.node()).asSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getTargets(this.node()).asNodeSet();
 	}
 
 	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#subject() Quell- bzw. Subjektknoten}.
@@ -106,7 +118,7 @@ public interface DL extends DE {
 	 * @see DM#LINK_IDENT_IsLinkWithSourceClonability
 	 * @return Quellklonbarkeitstextknoten. */
 	default Property2<QN> sourceClonability() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceClonability).asTargetField().toProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceClonability).asTargetProperty(this.node());
 	}
 
 	/** Diese Methode liefert die erwünschte {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
@@ -117,7 +129,7 @@ public interface DL extends DE {
 	}
 
 	/** Diese Methode liefert den Textwert der erwünschten {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
-	 * 
+	 *
 	 * @see #sourceClonability()
 	 * @return Quellklonbarkeitstextwert. */
 	default Property2<String> sourceClonabilityAsString() {
@@ -140,7 +152,7 @@ public interface DL extends DE {
 	 *
 	 * @return Objektdatentypknoten. */
 	default Set2<QN> targetTypes() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getTargets(this.node()).asSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getTargets(this.node()).asNodeSet();
 	}
 
 	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
@@ -181,7 +193,7 @@ public interface DL extends DE {
 	DNSet getSources(QN target) throws NullPointerException, IllegalArgumentException;
 
 	default Set2<QN> getSourceSet(QN target) throws NullPointerException, IllegalArgumentException {
-		return this.getSources(target).asSet();
+		return this.getSources(target).asNodeSet();
 	}
 
 	default Map<QN, QN> getSourceMap(Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
@@ -265,7 +277,7 @@ public interface DL extends DE {
 	DNSet getTargets(QN source) throws NullPointerException, IllegalArgumentException;
 
 	default Set2<QN> getTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
-		return this.getTargets(source).asSet();
+		return this.getTargets(source).asNodeSet();
 	}
 
 	default Map<QN, QN> getTargetMap(Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
@@ -346,80 +358,28 @@ public interface DL extends DE {
 		return Fields.from(this::getSource, this::setSource);
 	}
 
-	default Getter3<QN, QN> asSourceGetter() {
-		return Getters.from(this::getSource);
-	}
-
-	default Setter3<QN, QN> asSourceSetter() {
-		return Setters.from(this::setSource);
-	}
-
-	default Setter3<QN, QN> asSourcePutter() {
-		return Setters.from(this::putSource);
-	}
-
-	default Setter3<QN, QN> asSourcePopper() {
-		return Setters.from(this::popSource);
+	default Property2<QN> asSourceProperty(QN target) {
+		return this.asSourceField().toProperty(Objects.notNull(target));
 	}
 
 	default Field2<QN, Set<QN>> asSourceSetField() {
 		return Fields.from(this::getSourceSet, this::setSourceSet);
 	}
 
-	default Getter3<QN, Set2<QN>> asSourceSetGetter() {
-		return Getters.from(this::getSourceSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asSourceSetSetter() {
-		return Setters.from(this::setSourceSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asSourceSetPutter() {
-		return Setters.from(this::putSourceSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asSourceSetPopper() {
-		return Setters.from(this::popSourceSet);
+	default Property2<Set<QN>> asSourceSetProperty(QN target) {
+		return this.asSourceSetField().toProperty(Objects.notNull(target));
 	}
 
 	default Field2<QN, QN> asTargetField() {
-		return Fields.from(this.asTargetGetter(), this.asTargetSetter());
+		return Fields.from(this::getTarget, this::setTarget);
 	}
 
-	default Getter3<QN, QN> asTargetGetter() {
-		return Getters.from(this::getTarget);
+	default Property2<QN> asTargetProperty(QN source) {
+		return this.asTargetField().toProperty(Objects.notNull(source));
 	}
 
-	default Setter3<QN, QN> asTargetSetter() {
-		return Setters.from(this::setTarget);
-	}
-
-	default Setter3<QN, QN> asTargetPutter() {
-		return Setters.from(this::putTarget);
-	}
-
-	default Setter3<QN, QN> asTargetPopper() {
-		return Setters.from(this::popTarget);
-	}
-
-	default Field2<QN, QNSet> asTargetSetField() {
-		return Fields.from(this.asTargetSetGetter(), this.asTargetSetSetter());
-	}
-
-	default Getter3<QN, QNSet> asTargetSetGetter() {
-		return Getters.from(this::getTargets);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asTargetSetSetter() {
-		return Setters.from(this::setTargetSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asTargetSetPutter() {
-		return Setters.from(this::putTargetSet);
-	}
-
-	default Setter3<QN, Iterable<? extends QN>> asTargetSetPopper() {
-		return Setters.from(this::popTargetSet);
+	default Field2<QN, Set<QN>> asTargetSetField() {
+		return Fields.from(this::getTargetSet, this::setTargetSet);
 	}
 
 	enum CLONABILITY {

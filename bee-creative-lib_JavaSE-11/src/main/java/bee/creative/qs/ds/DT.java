@@ -45,7 +45,7 @@ public interface DT extends DE {
 	 * @see DM#LINK_IDENT_IsTypeWithLabel */
 	@Override
 	default Property2<QN> label() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithLabel).asTargetField().toProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithLabel).asTargetProperty(this.node());
 	}
 
 	/** {@inheritDoc}
@@ -53,7 +53,7 @@ public interface DT extends DE {
 	 * @see DM#LINK_IDENT_IsTypeWithIdent */
 	@Override
 	default Set2<QN> idents() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithIdent).getTargets(this.node()).asSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithIdent).getTargets(this.node()).asNodeSet();
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} der Instanzen dieses Datentyps.
@@ -61,23 +61,24 @@ public interface DT extends DE {
 	 * @see DM#LINK_IDENT_IsTypeWithInstance
 	 * @return Instanzknotenmenge. */
 	default Set2<QN> instances() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.node()).asSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.node()).asNodeSet();
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL
+	 * Datenfelder}.
 	 *
 	 * @see DM#LINK_IDENT_IsLinkWithTargetType
 	 * @return Zielfeldknoten. */
 	default Set2<QN> targetLinks() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getSources(this.node()).asSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getSources(this.node()).asNodeSet();
 	}
 
 	/** Diese Methode liefert die diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
 	 *
-	 * @see DM#asLinks(Set)
+	 * @see DM#asLinkSet(Set)
 	 * @return Zieldatenfelder. */
 	default Set2<DL> targetLinksAsLinks() {
-		return this.parent().asLinks(this.targetLinks());
+		return this.parent().asLinkSet(this.targetLinks());
 	}
 
 	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
@@ -85,15 +86,15 @@ public interface DT extends DE {
 	 * @see DM#LINK_IDENT_IsLinkWithSourceType
 	 * @return Quellfeldknoten. */
 	default Set2<QN> sourceLinks() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getSources(this.node()).asSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getSources(this.node()).asNodeSet();
 	}
 
 	/** Diese Methode liefert die diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
 	 *
-	 * @see DM#asLinks(Set)
+	 * @see DM#asLinkSet(Set)
 	 * @return Quelldatenfelder. */
 	default Set2<DL> sourceLinksAsLinks() {
-		return this.parent().asLinks(this.sourceLinks());
+		return this.parent().asLinkSet(this.sourceLinks());
 	}
 
 }
