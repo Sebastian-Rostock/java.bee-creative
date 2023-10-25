@@ -7,9 +7,9 @@ import bee.creative.qs.h2.H2QS;
 
 public abstract class H2DE implements DE {
 
-	public final H2DM parent;
-
 	public final H2QN node;
+
+	public final H2DM parent;
 
 	@Override
 	public H2QN node() {

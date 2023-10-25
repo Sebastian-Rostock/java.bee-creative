@@ -50,16 +50,19 @@ public class H2DM implements DM {
 
 	@Override
 	public DL getLink(String ident) {
+		// TODO
 		return null;
 	}
 
 	@Override
 	public DT getType(String ident) {
+		// TODO
 		return null;
 	}
 
 	@Override
 	public void updateIdents() {
+		// TODO
 	}
 
 	@Override

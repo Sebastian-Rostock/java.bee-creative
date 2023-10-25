@@ -5,7 +5,7 @@ import bee.creative.qs.h2.H2QESet;
 import bee.creative.qs.h2.H2QN;
 import bee.creative.qs.h2.H2QQ;
 
-public class H2QNSetLS extends H2QNSetL implements DNSetS {
+public class H2DNSetS extends H2DNSet implements DNSetS {
 
 	public final H2QN target;
 
@@ -19,7 +19,7 @@ public class H2QNSetLS extends H2QNSetL implements DNSetS {
 		return this.target;
 	}
 
-	protected H2QNSetLS(H2DL link, H2QN target) {
+	protected H2DNSetS(H2DL link, H2QN target) {
 		super(link, new H2QQ().push(link.edges().havingObject(target).subjects()));
 		this.target = target;
 	}
