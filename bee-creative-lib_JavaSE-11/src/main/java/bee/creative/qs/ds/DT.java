@@ -1,51 +1,17 @@
 package bee.creative.qs.ds;
 
-import java.util.Set;
 import bee.creative.qs.QN;
-import bee.creative.util.AbstractTranslator;
-import bee.creative.util.Getter;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
-import bee.creative.util.Translator2;
 
 public interface DT extends DE {
-
-	/** Diese Methode liefert einen {@link Translator2}, der einen {@link QN Hyperknoten} bidirektional in ein {@link DL Datentyp} übersetzt.
-	 *
-	 * @param nodeAsType Methode zur Übersetzung eines {@link DT#node() Typknoten} in das zugehörige {@link DL Datentyp}.
-	 * @return Hyperknoten-Datentyp-Übersetzer. */
-	static Translator2<QN, DT> typeTrans(Getter<QN, DT> nodeAsType) {
-		return new AbstractTranslator<>() {
-
-			@Override
-			public boolean isTarget(Object object) {
-				return object instanceof DT;
-			}
-
-			@Override
-			public boolean isSource(Object object) {
-				return object instanceof QN;
-			}
-
-			@Override
-			public DT toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-				return object != null ? nodeAsType.get((QN)object) : null;
-			}
-
-			@Override
-			public QN toSource(Object object) throws ClassCastException, IllegalArgumentException {
-				return object != null ? ((DT)object).node() : null;
-			}
-
-		};
-	}
 
 	/** {@inheritDoc}
 	 *
 	 * @see DM#LINK_IDENT_IsTypeWithLabel */
 	@Override
 	default Property2<QN> label() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithLabel).asTargetProperty(this.node());
+		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithLabel).asTargetProp(this.node());
 	}
 
 	/** {@inheritDoc}
@@ -53,7 +19,7 @@ public interface DT extends DE {
 	 * @see DM#LINK_IDENT_IsTypeWithIdent */
 	@Override
 	default Set2<QN> idents() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithIdent).getTargets(this.node()).asNodeSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithIdent).getTargetSet(this.node());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} der Instanzen dieses Datentyps.
@@ -61,7 +27,7 @@ public interface DT extends DE {
 	 * @see DM#LINK_IDENT_IsTypeWithInstance
 	 * @return Instanzknotenmenge. */
 	default Set2<QN> instances() {
-		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.node()).asNodeSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargetSet(this.node());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL
@@ -70,15 +36,15 @@ public interface DT extends DE {
 	 * @see DM#LINK_IDENT_IsLinkWithTargetType
 	 * @return Zielfeldknoten. */
 	default Set2<QN> targetLinks() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getSources(this.node()).asNodeSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).asSourceSet(this.node());
 	}
 
 	/** Diese Methode liefert die diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
 	 *
-	 * @see DM#asLinkSet(Set)
+	 * @see DM#linkTrans()
 	 * @return Zieldatenfelder. */
 	default Set2<DL> targetLinksAsLinks() {
-		return this.parent().asLinkSet(this.targetLinks());
+		return this.targetLinks().translate(this.parent().linkTrans());
 	}
 
 	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
@@ -86,15 +52,15 @@ public interface DT extends DE {
 	 * @see DM#LINK_IDENT_IsLinkWithSourceType
 	 * @return Quellfeldknoten. */
 	default Set2<QN> sourceLinks() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getSources(this.node()).asNodeSet();
+		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).asSourceSet(this.node());
 	}
 
 	/** Diese Methode liefert die diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
 	 *
-	 * @see DM#asLinkSet(Set)
+	 * @see DM#linkTrans()
 	 * @return Quelldatenfelder. */
 	default Set2<DL> sourceLinksAsLinks() {
-		return this.parent().asLinkSet(this.sourceLinks());
+		return this.sourceLinks().translate(this.parent().linkTrans());
 	}
 
 }

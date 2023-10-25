@@ -1,15 +1,11 @@
 package bee.creative.qs.ds;
 
-import java.util.Set;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
-import bee.creative.util.Collections;
-import bee.creative.util.Properties;
-import bee.creative.util.Property;
-import bee.creative.util.Property2;
 import bee.creative.util.Set2;
+import bee.creative.util.Translator2;
 
 /** Diese Schnittstelle definiert ein Domänenmodell ({@code domain-model}).
  *
@@ -67,19 +63,19 @@ public interface DM extends QO {
 	DH history(); // log oder null
 
 	default Set2<QN> links() { // datenfelder, beziehungen
-		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.getType(DM.TYPE_IDENT_IsLink).node()).asNodeSet();
+		return this.getType(DM.TYPE_IDENT_IsLink).instances();
 	}
 
 	default Set2<DL> linksAsLinks() {
-		return this.asLinkSet(this.links());
+		return this.links().translate(this.linkTrans());
 	}
 
 	default Set2<QN> types() { // datentypen
-		return this.getLink(DM.LINK_IDENT_IsTypeWithInstance).getTargets(this.getType(DM.TYPE_IDENT_IsType).node()).asNodeSet();
+		return this.getType(DM.TYPE_IDENT_IsType).instances();
 	}
 
 	default Set2<DT> typesAsTypes() {
-		return this.asTypes(this.types());
+		return this.types().translate(this.typeTrans());
 	}
 
 	default DL getLink(QN ident) {
@@ -109,32 +105,12 @@ public interface DM extends QO {
 		return DS.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	/** Diese Methode signalisiert dem Datenmodell Änderungen an {@link DE#idents()}. Daraufhin können interne Puffer zur Beschleunigung von {@link #getLink(QN)}
-	 * und {@link #getType(QN)} entsprechend aktualisiert werden. */
+	/** Diese Methode signalisiert dem Datenmodell Änderungen an {@link DE#idents()}. Daraufhin können interne Puffer zur Beschleunigung von {@link #getLink(String)}
+	 * und {@link #getType(String)} entsprechend aktualisiert werden. */
 	void updateIdents();
 
-	DL asLink(QN node);
+	Translator2<QN, DL> linkTrans();
 
-	default Set2<DL> asLinkSet(Set<QN> nodes) {
-		return Collections.translate(nodes, DL.linkTrans(this::asLink));
-	}
-
-	DT asType(QN node);
-
-	default Set2<DT> asTypes(Set<QN> nodes) {
-		return Collections.translate(nodes, DT.typeTrans(this::asType));
-	}
-
-	public default Property2<String> asString(Property<QN> prop) {
-		return Properties.translate(prop, node -> node != null ? node.value() : null, value -> value != null ? this.owner().newNode(value) : null);
-	}
-
-	Set2<String> asStrings(Set<QN> nodes);
-
-	default Property2<String> asValue(Property<QN> prop){
-		return Properties.translate(prop, node -> node != null ? node.value() : null, value -> value != null ? this.owner().newNode(value) : null);
-	}
-
-	Set2<String> asValueSet(Set2<QN> idents);
+	Translator2<QN, DT> typeTrans();
 
 }

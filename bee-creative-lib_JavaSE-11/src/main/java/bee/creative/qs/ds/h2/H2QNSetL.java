@@ -13,6 +13,11 @@ public abstract class H2QNSetL extends H2QNSet implements DNSet {
 		return this.link;
 	}
 
+	@Override
+	public H2DM parent() {
+		return this.link.parent;
+	}
+
 	protected H2QNSetL(H2DL link, H2QQ table) {
 		super(link.owner(), table);
 		this.link = link;

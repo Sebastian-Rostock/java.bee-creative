@@ -8,14 +8,20 @@ import bee.creative.qs.ds.DT;
 import bee.creative.qs.h2.H2QESet;
 import bee.creative.qs.h2.H2QN;
 import bee.creative.qs.h2.H2QS;
-import bee.creative.util.Set2;
 import bee.creative.util.Translator2;
+import bee.creative.util.Translators;
 
 public class H2DM implements DM {
 
-	public H2QN model;
+	public final H2QN model;
 
-	public H2QN context;
+	public final H2QN context;
+
+	public H2DM(H2QN model, H2QN context) {
+		this.model = model;
+		this.context = context;
+		if (model.owner != context.owner) throw new IllegalArgumentException();
+	}
 
 	@Override
 	public H2QN model() {
@@ -23,7 +29,7 @@ public class H2DM implements DM {
 	}
 
 	@Override
-	public H2QESet edges() {                                
+	public H2QESet edges() {
 		return this.context.owner.edges().havingContext(this.context);
 	}
 
@@ -57,8 +63,25 @@ public class H2DM implements DM {
 	}
 
 	@Override
-	public Set2<String> asStrings(Set2<QN> nodes) {
-		return null;
+	public Translator2<QN, DL> linkTrans() {
+		return this.linkTrans;
+	}
+
+	@Override
+	public Translator2<QN, DT> typeTrans() {
+		return this.typeTrans;
+	}
+
+	final Translator2<QN, DL> linkTrans = Translators.from(QN.class, DL.class, this::asLink, DL::node).optionalize();
+
+	final Translator2<QN, DT> typeTrans = Translators.from(QN.class, DT.class, this::asType, DT::node).optionalize();
+
+	H2DL asLink(QN node) {
+		return new H2DL(this, this.context.owner.asQN(node));
+	}
+
+	H2DT asType(QN node) {
+		return new H2DT(this, this.context.owner.asQN(node));
 	}
 
 }

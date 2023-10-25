@@ -33,10 +33,10 @@ public interface DE extends DO {
 
 	/** Diese Methode erlaubt Zugriff auf den {@link QN#value() Textwert} der {@link #label() Beschriftung} dieses Objekts.
 	 *
-	 * @see DNSet#asValue()
+	 * @see QS#valueTrans()
 	 * @return Beschriftungstextwert. */
 	default Property2<String> labelAsString() {
-		return this.parent().asValue(this.label());
+		return this.label().translate(this.owner().valueTrans());
 	}
 
 	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen
@@ -48,10 +48,10 @@ public interface DE extends DO {
 
 	/** Diese Methode erlaubt Zugriff auf die {@link QN#value() Textwerte} zur {@link #idents() Erkennung} dieses Objekts.
 	 *
-	 * @see DNSet#asValueSet()
+	 * @see QS#valueTrans()
 	 * @return Erkennungstextwerte. */
 	default Set2<String> identsAsStrings() {
-		return this.parent().asValueSet(this.idents());
+		return this.idents().translate(this.owner().valueTrans());
 	}
 
 }

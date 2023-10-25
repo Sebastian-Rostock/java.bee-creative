@@ -227,11 +227,11 @@ public interface DNSet extends QNSet, DO {
 	}
 
 	default Property2<String> asValue() {
-		return this.parent().asValue(this.asNode());
+		return this.asNode().translate(this.owner().valueTrans());
 	}
 
 	default Set2<String> asValueSet() {
-		return this.parent().asValueSet(this.asNodeSet());
+		return this.asNodeSet().translate(this.owner().valueTrans());
 	}
 
 }

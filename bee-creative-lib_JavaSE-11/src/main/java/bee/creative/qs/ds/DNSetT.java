@@ -36,7 +36,7 @@ public interface DNSetT extends DNSet {
 
 	@Override
 	default Property2<QN> asNode() {
-		return this.link().asTargetProperty(this.source());
+		return this.link().asTargetProp(this.source());
 	}
 
 }
