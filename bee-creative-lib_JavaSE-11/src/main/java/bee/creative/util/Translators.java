@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.util.Arrays;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Translator}.
@@ -16,19 +17,24 @@ public class Translators {
 
 	}
 
-	public static final class EnumTranslator<GEnum extends Enum<?>> extends AbstractTranslator<String, GEnum> {
+	public static class EnumTranslator<GSource, GTarget> extends AbstractTranslator<GSource, GTarget> {
 
-		public final Class<GEnum> enumClass;
+		public final Getter<GTarget, GSource> ident;
 
-		public EnumTranslator(Class<GEnum> enumClass) {
-			var enums = enumClass.getEnumConstants();
-			this.enumClass = enumClass;
-			this.toTargetMap = new HashMap<>(enums.length);
-			this.toSourceMap = new HashMap<>(enums.length);
-			Iterables.fromArray(enums).collectAll(item -> {
-				this.toTargetMap.put(item.name(), item);
-				this.toSourceMap.put(item, item.name());
+		public final Iterable<GTarget> targets;
+
+		public EnumTranslator(Getter<GTarget, GSource> ident, Iterable<GTarget> targets) {
+			this.ident = ident;
+			this.targets = targets;
+			this.toTargetMap = new HashMap<>(100);
+			this.toSourceMap = new HashMap<>(100);
+			Iterables.collectAll(targets, target -> {
+				var source = ident.get(target);
+				this.toTargetMap.put(source, target);
+				this.toSourceMap.put(target, source);
 			});
+			this.toTargetMap.compact();
+			this.toSourceMap.compact();
 		}
 
 		@Override
@@ -42,23 +48,23 @@ public class Translators {
 		}
 
 		@Override
-		public GEnum toTarget(Object object) throws ClassCastException, IllegalArgumentException {
+		public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException {
 			return this.toTargetMap.get(object);
 		}
 
 		@Override
-		public String toSource(Object object) throws ClassCastException, IllegalArgumentException {
+		public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException {
 			return this.toSourceMap.get(object);
 		}
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.enumClass);
+			return Objects.toInvokeString(this, this.ident, this.targets);
 		}
 
-		private final HashMap<String, GEnum> toTargetMap;
+		private final HashMap<GSource, GTarget> toTargetMap;
 
-		private final HashMap<GEnum, String> toSourceMap;
+		private final HashMap<GTarget, GSource> toSourceMap;
 
 	}
 
@@ -67,35 +73,34 @@ public class Translators {
 	 * @param <GSource> Typ der Quellobjekte dieses sowie des ersten {@link Translator}.
 	 * @param <GTarget> Typ der Zielobjekte dieses sowie des zweiten {@link Translator}.
 	 * @param <GCenter> Typ der Zielobjekte des ersten sowie der Quellobjekte des zweiten {@link Translator}. */
-	@SuppressWarnings ("javadoc")
 	public static class ConcatTranslator<GSource, GTarget, GCenter> extends AbstractTranslator<GSource, GTarget> {
 
 		public final Translator<GSource, GCenter> that1;
 
 		public final Translator<GCenter, GTarget> that2;
 
-		public ConcatTranslator(final Translator<GSource, GCenter> that1, final Translator<GCenter, GTarget> that2) throws NullPointerException {
+		public ConcatTranslator(Translator<GSource, GCenter> that1, Translator<GCenter, GTarget> that2) throws NullPointerException {
 			this.that1 = Objects.notNull(that1);
 			this.that2 = Objects.notNull(that2);
 		}
 
 		@Override
-		public boolean isTarget(final Object object) {
+		public boolean isTarget(Object object) {
 			return this.that2.isTarget(object);
 		}
 
 		@Override
-		public boolean isSource(final Object object) {
+		public boolean isSource(Object object) {
 			return this.that1.isSource(object);
 		}
 
 		@Override
-		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+		public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException {
 			return this.that2.toTarget(this.that1.toTarget(object));
 		}
 
 		@Override
-		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+		public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException {
 			return this.that1.toSource(this.that2.toSource(object));
 		}
 
@@ -114,27 +119,27 @@ public class Translators {
 
 		public final Translator<GTarget, GSource> that;
 
-		public ReverseTranslator(final Translator<GTarget, GSource> that) throws NullPointerException {
+		public ReverseTranslator(Translator<GTarget, GSource> that) throws NullPointerException {
 			this.that = Objects.notNull(that);
 		}
 
 		@Override
-		public boolean isTarget(final Object object) {
+		public boolean isTarget(Object object) {
 			return this.that.isSource(object);
 		}
 
 		@Override
-		public boolean isSource(final Object object) {
+		public boolean isSource(Object object) {
 			return this.that.isTarget(object);
 		}
 
 		@Override
-		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+		public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException {
 			return this.that.toSource(object);
 		}
 
 		@Override
-		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+		public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException {
 			return this.that.toTarget(object);
 		}
 
@@ -160,8 +165,8 @@ public class Translators {
 
 		public final Getter<? super GTarget, ? extends GSource> targetTrans;
 
-		public CompositeTranslator(final Class<GSource> sourceClass, final Class<GTarget> targetClass, final Getter<? super GSource, ? extends GTarget> sourceTrans,
-			final Getter<? super GTarget, ? extends GSource> targetTrans) throws NullPointerException {
+		public CompositeTranslator(Class<GSource> sourceClass, Class<GTarget> targetClass, Getter<? super GSource, ? extends GTarget> sourceTrans,
+			Getter<? super GTarget, ? extends GSource> targetTrans) throws NullPointerException {
 			this.sourceClass = Objects.notNull(sourceClass);
 			this.targetClass = Objects.notNull(targetClass);
 			this.sourceTrans = Objects.notNull(sourceTrans);
@@ -169,28 +174,67 @@ public class Translators {
 		}
 
 		@Override
-		public boolean isTarget(final Object object) {
+		public boolean isTarget(Object object) {
 			return this.targetClass.isInstance(object);
 		}
 
 		@Override
-		public boolean isSource(final Object object) {
+		public boolean isSource(Object object) {
 			return this.sourceClass.isInstance(object);
 		}
 
 		@Override
-		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+		public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException {
 			return this.sourceTrans.get(this.sourceClass.cast(object));
 		}
 
 		@Override
-		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+		public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException {
 			return this.targetTrans.get(this.targetClass.cast(object));
 		}
 
 		@Override
 		public String toString() {
 			return Objects.toInvokeString(this, this.sourceClass, this.targetClass, this.sourceTrans, this.targetTrans);
+		}
+
+	}
+
+	/** Diese Klasse implementiert einen {@link Translator2}, der die Übersetzung eines gegebenen {@link Translator} {@code null}-tollerant macht.
+	 *
+	 * @param <GSource> Typ der Quellobjekte.
+	 * @param <GTarget> Typ der Zielobjekte. */
+	public static class OptionalizedTranslator<GSource, GTarget> extends AbstractTranslator<GSource, GTarget> {
+
+		public final Translator<GSource, GTarget> that;
+
+		public OptionalizedTranslator(Translator<GSource, GTarget> that) throws NullPointerException {
+			this.that = Objects.notNull(that);
+		}
+
+		@Override
+		public boolean isTarget(Object object) {
+			return (object == null) || this.that.isTarget(object);
+		}
+
+		@Override
+		public boolean isSource(Object object) {
+			return (object == null) || this.that.isSource(object);
+		}
+
+		@Override
+		public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException {
+			return object == null ? this.that.toTarget(object) : null;
+		}
+
+		@Override
+		public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException {
+			return object == null ? this.that.toSource(object) : null;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.that);
 		}
 
 	}
@@ -206,34 +250,34 @@ public class Translators {
 
 		public final Object mutex;
 
-		public SynchronizedTranslator(final Translator<GSource, GTarget> that, final Object mutex) throws NullPointerException {
+		public SynchronizedTranslator(Translator<GSource, GTarget> that, Object mutex) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.mutex = Objects.notNull(mutex, this);
 		}
 
 		@Override
-		public boolean isTarget(final Object object) {
+		public boolean isTarget(Object object) {
 			synchronized (this.mutex) {
 				return this.that.isSource(object);
 			}
 		}
 
 		@Override
-		public boolean isSource(final Object object) {
+		public boolean isSource(Object object) {
 			synchronized (this.mutex) {
 				return this.that.isTarget(object);
 			}
 		}
 
 		@Override
-		public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+		public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException {
 			synchronized (this.mutex) {
 				return this.that.toTarget(object);
 			}
 		}
 
 		@Override
-		public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+		public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException {
 			synchronized (this.mutex) {
 				return this.that.toSource(object);
 			}
@@ -261,46 +305,60 @@ public class Translators {
 
 	/** Diese Methode liefert einen neutralen {@link Translator2} und ist eine Abkürzung für {@link Translators#from(Class, Class, Getter, Getter)
 	 * Translators.from(valueClass, valueClass, Getters.neutral(), Getters.neutral())}. */
-	public static <GValue> Translator2<GValue, GValue> neutral(final Class<GValue> valueClass) throws NullPointerException {
+	public static <GValue> Translator2<GValue, GValue> neutral(Class<GValue> valueClass) throws NullPointerException {
 		return Translators.from(valueClass, valueClass, Getters.<GValue>neutral(), Getters.<GValue>neutral());
 	}
 
 	/** Diese Methode liefert den gegebenen {@link Translator} als {@link Translator2}. Wenn er {@code null} ist, wird der {@link EmptyTranslator} geliefert. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> from(final Translator<GSource, GTarget> that) {
+	public static <GSource, GTarget> Translator2<GSource, GTarget> from(Translator<GSource, GTarget> that) {
 		if (that == null) return Translators.empty();
 		if (that instanceof Translator2) return (Translator2<GSource, GTarget>)that;
 		return Translators.reverse(Translators.reverse(that));
 	}
 
-	public static <GEnum extends Enum<?>> Translator2<String, GEnum> from(final Class<GEnum> enumClass) throws NullPointerException {
-		return new EnumTranslator<>(enumClass);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@link CompositeTranslator new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> from(final Class<GSource> sourceClass, final Class<GTarget> targetClass,
-		final Getter<? super GSource, ? extends GTarget> sourceTrans, final Getter<? super GTarget, ? extends GSource> targetTrans) throws NullPointerException {
+	public static <GSource, GTarget> Translator2<GSource, GTarget> from(Class<GSource> sourceClass, Class<GTarget> targetClass,
+		Getter<? super GSource, ? extends GTarget> sourceTrans, Getter<? super GTarget, ? extends GSource> targetTrans) throws NullPointerException {
 		return new CompositeTranslator<>(sourceClass, targetClass, sourceTrans, targetTrans);
 	}
 
+	public static <GEnum extends Enum<?>> Translator2<String, GEnum> fromEnum(Class<GEnum> enumClass) throws NullPointerException {
+		return Translators.fromEnum(Enum::name, enumClass.getEnumConstants());
+	}
+
+	@SafeVarargs
+	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Getter<GTarget, GSource> ident, GTarget... targets) throws NullPointerException {
+		return Translators.fromEnum(ident, Arrays.asList(targets));
+	}
+
+	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Getter<GTarget, GSource> ident, Iterable<GTarget> targets)
+		throws NullPointerException {
+		return new EnumTranslator<>(ident, targets);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link ConcatTranslator new ConcatTranslator<>(that, trans)}. */
-	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> concat(final Translator<GSource, GCenter> that,
-		final Translator<GCenter, GTarget> trans) throws NullPointerException {
+	public static <GSource, GCenter, GTarget> Translator2<GSource, GTarget> concat(Translator<GSource, GCenter> that, Translator<GCenter, GTarget> trans)
+		throws NullPointerException {
 		return new ConcatTranslator<>(that, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ReverseTranslator new ReverseTranslator<>(that)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> reverse(final Translator<GTarget, GSource> that) throws NullPointerException {
+	public static <GSource, GTarget> Translator2<GSource, GTarget> reverse(Translator<GTarget, GSource> that) throws NullPointerException {
 		return new ReverseTranslator<>(that);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link OptionalizedTranslator new OptionalizedTranslator<>(that, mutex)}. */
+	public static <GSource, GTarget> Translator2<GSource, GTarget> optionalize(Translator<GSource, GTarget> that) throws NullPointerException {
+		return new OptionalizedTranslator<>(that);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link #synchronize(Translator, Object) Translators.synchronize(that, that)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(final Translator<GSource, GTarget> that) throws NullPointerException {
+	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(Translator<GSource, GTarget> that) throws NullPointerException {
 		return Translators.synchronize(that, that);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link SynchronizedTranslator new SynchronizedTranslator<>(that, mutex)}. */
-	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(final Translator<GSource, GTarget> that, final Object mutex)
-		throws NullPointerException {
+	public static <GSource, GTarget> Translator2<GSource, GTarget> synchronize(Translator<GSource, GTarget> that, Object mutex) throws NullPointerException {
 		return new SynchronizedTranslator<>(that, mutex);
 	}
 

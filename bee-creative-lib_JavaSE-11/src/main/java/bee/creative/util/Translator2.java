@@ -17,6 +17,11 @@ public interface Translator2<GSource, GTarget> extends Translator<GSource, GTarg
 		return Translators.reverse(this);
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@link Translators#optionalize(Translator) Translators.optionalize(this)}. */
+	default Translator2<GSource, GTarget> optionalize() {
+		return Translators.optionalize(this);
+	}
+
 	/** Diese Methode ist eine Abkürzung für {@link Translators#synchronize(Translator) Translators.synchronize(this)}. */
 	default Translator2<GSource, GTarget> synchronize() {
 		return Translators.synchronize(this);
