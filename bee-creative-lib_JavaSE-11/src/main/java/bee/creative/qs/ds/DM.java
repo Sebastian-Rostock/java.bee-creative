@@ -7,63 +7,49 @@ import bee.creative.qs.QO;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator2;
 
-/** Diese Schnittstelle definiert ein Domänenmodell ({@code domain-model}).
+/** Diese Schnittstelle definiert ein Domänenmodell (domain-model).
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DM extends QO {
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DL}. */
-	String TYPE_IDENT_IsLink = "DM:IsLink";
+	String IDENT_IsLink = "DM:IsLink";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DT}. */
-	String TYPE_IDENT_IsType = "DM:IsType";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#label()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsLinkWithLabel = "DM:IsLinkWithLabel";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#idents()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsLinkWithIdent = "DM:IsLinkWithIdent";
+	String IDENT_IsType = "DM:IsType";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceTypes()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsLinkWithSourceType = "DM:IsLinkWithSourceType";
+	String IDENT_IsLinkWithSourceType = "DM:IsLinkWithSourceType";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceClonability()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsLinkWithSourceClonability = "DM:IsLinkWithSourceClonability";
+	String IDENT_IsLinkWithSourceClonability = "DM:IsLinkWithSourceClonability";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceMultiplicity()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsLinkWithSourceMultiplicity = "DM:IsLinkWithSourceMultiplicity";
+	String IDENT_IsLinkWithSourceMultiplicity = "DM:IsLinkWithSourceMultiplicity";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetTypes()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsLinkWithTargetType = "DM:IsLinkWithTargetType";
+	String IDENT_IsLinkWithTargetType = "DM:IsLinkWithTargetType";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetClonability()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsLinkWithTargetClonability = "DM:IsLinkWithTargetClonability";
+	String IDENT_IsLinkWithTargetClonability = "DM:IsLinkWithTargetClonability";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetMultiplicity()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsLinkWithTargetMultiplicity = "DM:IsLinkWithTargetMultiplicity";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DT#label()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsTypeWithLabel = "DM:IsTypeWithLabel";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DT#idents()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsTypeWithIdent = "DM:IsTypeWithIdent";
+	String IDENT_IsLinkWithTargetMultiplicity = "DM:IsLinkWithTargetMultiplicity";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DT#instances()}-{@link DL Datenfeld}. */
-	String LINK_IDENT_IsTypeWithInstance = "DM:IsTypeWithInstance";
+	String IDENT_IsTypeWithInstance = "DM:IsTypeWithInstance";
 
-	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link #context() Kontextknoten} dieses Datenmodells.
+	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link #context() Kontextknoten} dieses Domänenmodells.
 	 *
 	 * @return Hyperkanten mit {@link #context()}. */
 	QESet edges();
-
-	QN model(); // sobjekt des domänenmodells
 
 	QN context(); // kontext für alles
 
 	DH history(); // log oder null
 
 	default Set2<QN> links() { // datenfelder, beziehungen
-		return this.getType(DM.TYPE_IDENT_IsLink).instances();
+		return this.getType(DM.IDENT_IsLink).instances();
 	}
 
 	default Set2<DL> linksAsLinks() {
@@ -71,7 +57,7 @@ public interface DM extends QO {
 	}
 
 	default Set2<QN> types() { // datentypen
-		return this.getType(DM.TYPE_IDENT_IsType).instances();
+		return this.getType(DM.IDENT_IsType).instances();
 	}
 
 	default Set2<DT> typesAsTypes() {
@@ -105,8 +91,8 @@ public interface DM extends QO {
 		return DS.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	/** Diese Methode signalisiert dem Datenmodell Änderungen an {@link DE#idents()}. Daraufhin können interne Puffer zur Beschleunigung von {@link #getLink(String)}
-	 * und {@link #getType(String)} entsprechend aktualisiert werden. */
+	/** Diese Methode signalisiert dem Domänenmodell Änderungen an {@link DE#idents()}. Daraufhin können interne Puffer zur Beschleunigung von
+	 * {@link #getLink(String)} und {@link #getType(String)} entsprechend aktualisiert werden. */
 	void updateIdents();
 
 	Translator2<QN, DL> linkTrans();

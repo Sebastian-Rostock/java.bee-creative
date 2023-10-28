@@ -5,11 +5,17 @@ import bee.creative.qs.QS;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert ein Datenelement (Domain-Element) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Datenmodell} sowie mit
- * {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
+/** Diese Schnittstelle definiert ein Domänenkonstante (domain-enum) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Domänenmodell} sowie
+ * mit {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DE extends DO {
+
+	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DE#label()}-{@link DL Datenfeld}. */
+	String IDENT_IsEnumWithLabel = "DM:IsEnumWithLabel";
+
+	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DE#idents()}-{@link DL Datenfeld}. */
+	String IDENT_IsEnumWithIdent = "DM:IsEnumWithIdent";
 
 	/** Diese Methode liefert den dieses Objekt repräsentierenden Hyperknoten.
 	 *
@@ -27,9 +33,12 @@ public interface DE extends DO {
 	/** Diese Methode erlaubt Zugriff auf den {@link QN Hyperknoten} zur Beschriftung dieses Objekts. Dieser Beschriftungsknoten sollte dazu einen
 	 * {@link QN#value() Textwert} besitzen oder beschreiben.
 	 *
-	 * @see DNSet#asNode()
+	 * @see DE#IDENT_IsEnumWithLabel
+	 * @see DL#asTargetProp(QN)
 	 * @return Beschriftungsknoten. */
-	Property2<QN> label();
+	default Property2<QN> label() {
+		return this.parent().getLink(DE.IDENT_IsEnumWithLabel).asTargetProp(this.node());
+	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link QN#value() Textwert} der {@link #label() Beschriftung} dieses Objekts.
 	 *
@@ -41,10 +50,13 @@ public interface DE extends DO {
 
 	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen
 	 * {@link QN#value() Textwert} besitzen.
-	 *
-	 * @see DNSet#asNodeSet()
+	 * 
+	 * @see DE#IDENT_IsEnumWithIdent
+	 * @see DL#asTargetSet(QN)
 	 * @return Erkennungsknotenmenge. */
-	Set2<QN> idents();
+	default Set2<QN> idents() {
+		return this.parent().getLink(DE.IDENT_IsEnumWithIdent).getTargetSet(this.node());
+	}
 
 	/** Diese Methode erlaubt Zugriff auf die {@link QN#value() Textwerte} zur {@link #idents() Erkennung} dieses Objekts.
 	 *

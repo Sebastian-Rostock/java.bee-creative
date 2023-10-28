@@ -13,20 +13,14 @@ import bee.creative.util.Translators;
 
 public class H2DM implements DM {
 
-	public final H2QN model;
 
 	public final H2QN context;
 
-	public H2DM(H2QN model, H2QN context) {
-		this.model = model;
+	public H2DM(  H2QN context) {
 		this.context = context;
-		if (model.owner != context.owner) throw new IllegalArgumentException();
 	}
 
-	@Override
-	public H2QN model() {
-		return this.model;
-	}
+ 
 
 	@Override
 	public H2QESet edges() {
@@ -62,6 +56,8 @@ public class H2DM implements DM {
 
 	@Override
 	public void updateIdents() {
+		var x = edges().havingPredicate(context).havingObject(context).subjects().first();
+		
 		// TODO
 	}
 
@@ -75,6 +71,10 @@ public class H2DM implements DM {
 		return this.typeTrans;
 	}
 
+	H2DL isEnumWithLabel;
+	
+	H2DL isEnumWithIdent;
+	
 	final Translator2<QN, DL> linkTrans = Translators.from(QN.class, DL.class, this::asLink, DL::node).optionalize();
 
 	final Translator2<QN, DT> typeTrans = Translators.from(QN.class, DT.class, this::asType, DT::node).optionalize();

@@ -1,9 +1,12 @@
 package bee.creative.qs.ds.h2;
 
 import bee.creative.lang.Objects;
+import bee.creative.qs.QN;
 import bee.creative.qs.ds.DE;
 import bee.creative.qs.h2.H2QN;
 import bee.creative.qs.h2.H2QS;
+import bee.creative.util.Property2;
+import bee.creative.util.Set2;
 
 public abstract class H2DE implements DE {
 
@@ -24,6 +27,16 @@ public abstract class H2DE implements DE {
 	@Override
 	public H2DM parent() {
 		return this.parent;
+	}
+
+	@Override
+	public Property2<QN> label() {
+		return this.parent.isEnumWithLabel.asTargetProp(this.node());
+	}
+
+	@Override
+	public Set2<QN> idents() {
+		return this.parent.isEnumWithIdent.getTargetSet(this.node());
 	}
 
 	@Override

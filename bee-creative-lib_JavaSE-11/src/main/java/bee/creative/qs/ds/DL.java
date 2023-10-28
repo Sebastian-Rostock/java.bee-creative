@@ -13,51 +13,21 @@ import bee.creative.util.Set2;
 import bee.creative.util.Translator2;
 import bee.creative.util.Translators;
 
-/** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #node() Feldnoten} mit Bezug zu einem {@link #parent() Datenmodell}, {@link #label()
+/** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #node() Feldnoten} mit Bezug zu einem {@link #parent() Domänenmodell}, {@link #label()
  * Beschriftung}, {@link #idents() Erkennungsmerkmalen} sowie Hinweisen zu gewünschten Datentypen von Quell- und Zielknoten.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DL extends DE {
 
 	/** {@inheritDoc} Dieser wird als {@link QE#predicate() Prädikatknoten} der {@link #edges() Hyperkanten} verwendet. Als {@link QE#context() Kontextknoten}
-	 * wird der des {@link #parent() Datenmodells} verwendet. */
+	 * wird der des {@link #parent() Domänenmodells} verwendet. */
 	@Override
 	QN node();
 
-	/** {@inheritDoc}
-	 *
-	 * @see DM#LINK_IDENT_IsLinkWithLabel */
-	@Override
-	default Property2<QN> label() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).getTargets(this.node()).asNode();
-	}
-
-	/** {@inheritDoc}
-	 *
-	 * @see DM#LINK_IDENT_IsLinkWithLabel */
-	@Override
-	default Property2<String> labelAsString() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithLabel).getTargets(this.node()).asValue();
-	}
-
-	/** {@inheritDoc}
-	 *
-	 * @see DM#LINK_IDENT_IsLinkWithIdent */
-	@Override
-	default Set2<QN> idents() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargets(this.node()).asNodeSet();
-	}
-
-	/** {@inheritDoc}
-	 *
-	 * @see DM#LINK_IDENT_IsLinkWithIdent */
-	@Override
-	default Set2<String> identsAsStrings() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithIdent).getTargets(this.node()).asValueSet();
-	}
+ 
 
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link QE#context() Kontextknoten} des {@link #parent()
-	 * Datenmodells} und dem {@link #node() Feldknoten} dieses Datenfeldes als {@link QE#predicate() Prädikatknoten}.
+	 * Domänenmodells} und dem {@link #node() Feldknoten} dieses Datenfeldes als {@link QE#predicate() Prädikatknoten}.
 	 *
 	 * @return Hyperkanten mit Kontext- und Prädikatbindung. */
 	default QESet edges() {
@@ -66,10 +36,10 @@ public interface DL extends DE {
 
 	/** Diese Methode liefert die {@link DT#node() Typknoten} der erwünschten {@link DT Datentypen} der {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
-	 * @see DM#LINK_IDENT_IsLinkWithSourceType
+	 * @see DM#IDENT_IsLinkWithSourceType
 	 * @return Quelltypknoten. */
 	default Set2<QN> sourceTypes() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceType).getTargets(this.node()).asNodeSet();
+		return this.parent().getLink(DM.IDENT_IsLinkWithSourceType).getTargets(this.node()).asNodeSet();
 	}
 
 	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#subject() Quell- bzw. Subjektknoten}.
@@ -79,22 +49,22 @@ public interface DL extends DE {
 		return this.sourceTypes().translate(this.parent().typeTrans());
 	}
 
-	/** Diese Methode liefert die Textknoten der erwünschten {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
+	/** Diese Methode liefert die Textknoten der erwünschten {@link FOLLOWING Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
-	 * @see DM#LINK_IDENT_IsLinkWithSourceClonability
+	 * @see DM#IDENT_IsLinkWithSourceClonability
 	 * @return Quellklonbarkeitstextknoten. */
 	default Property2<QN> sourceClonability() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceClonability).asTargetProp(this.node());
+		return this.parent().getLink(DM.IDENT_IsLinkWithSourceClonability).asTargetProp(this.node());
 	}
 
-	/** Diese Methode liefert die erwünschte {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
+	/** Diese Methode liefert die erwünschte {@link FOLLOWING Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
 	 * @return Quellklonbarkeit. */
-	default Property2<CLONABILITY> sourceClonabilityAsEnum() {
-		return this.sourceClonabilityAsString().translate(CLONABILITY.trans);
+	default Property2<FOLLOWING> sourceClonabilityAsEnum() {
+		return this.sourceClonabilityAsString().translate(FOLLOWING.trans);
 	}
 
-	/** Diese Methode liefert den Textwert der erwünschten {@link CLONABILITY Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
+	/** Diese Methode liefert den Textwert der erwünschten {@link FOLLOWING Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
 	 * @see #sourceClonability()
 	 * @return Quellklonbarkeitstextwert. */
@@ -103,11 +73,11 @@ public interface DL extends DE {
 	}
 
 	default Property2<QN> sourceMultiplicity() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithSourceMultiplicity).asTargetProp(this.node());
+		return this.parent().getLink(DM.IDENT_IsLinkWithSourceMultiplicity).asTargetProp(this.node());
 	}
 
-	default Property2<MULTIPLICITY> sourceMultiplicityAsEnum() {
-		return this.sourceMultiplicityAsString().translate(MULTIPLICITY.trans);
+	default Property2<COUNTING> sourceMultiplicityAsEnum() {
+		return this.sourceMultiplicityAsString().translate(COUNTING.trans);
 	}
 
 	default Property2<String> sourceMultiplicityAsString() {
@@ -118,7 +88,7 @@ public interface DL extends DE {
 	 *
 	 * @return Objektdatentypknoten. */
 	default Set2<QN> targetTypes() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetType).getTargets(this.node()).asNodeSet();
+		return this.parent().getLink(DM.IDENT_IsLinkWithTargetType).getTargets(this.node()).asNodeSet();
 	}
 
 	/** Diese Methode liefert die erwünschten {@link DT Datentypen} von {@link QE#object() Objektknoten}.
@@ -129,11 +99,11 @@ public interface DL extends DE {
 	}
 
 	default Property2<QN> targetClonability() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetClonability).asTargetProp(this.node());
+		return this.parent().getLink(DM.IDENT_IsLinkWithTargetClonability).asTargetProp(this.node());
 	}
 
-	default Property2<CLONABILITY> targetClonabilityAsEnum() {
-		return this.targetClonabilityAsString().translate(CLONABILITY.trans);
+	default Property2<FOLLOWING> targetClonabilityAsEnum() {
+		return this.targetClonabilityAsString().translate(FOLLOWING.trans);
 	}
 
 	default Property2<String> targetClonabilityAsString() {
@@ -141,11 +111,11 @@ public interface DL extends DE {
 	}
 
 	default Property2<QN> targetMultiplicity() {
-		return this.parent().getLink(DM.LINK_IDENT_IsLinkWithTargetMultiplicity).asTargetProp(this.node());
+		return this.parent().getLink(DM.IDENT_IsLinkWithTargetMultiplicity).asTargetProp(this.node());
 	}
 
-	default Property2<MULTIPLICITY> targetMultiplicityAsEnum() {
-		return this.targetMultiplicityAsString().translate(MULTIPLICITY.trans);
+	default Property2<COUNTING> targetMultiplicityAsEnum() {
+		return this.targetMultiplicityAsString().translate(COUNTING.trans);
 	}
 
 	default Property2<String> targetMultiplicityAsString() {
@@ -338,19 +308,19 @@ public interface DL extends DE {
 		return Properties.from(() -> this.getTarget(source), target -> this.setTarget(source, target));
 	}
 
-	enum CLONABILITY {
-
-		Disabled, Enabled, Cascade;
-
-		static final Translator2<String, CLONABILITY> trans = Translators.fromEnum(CLONABILITY.class).optionalize();
-
+	enum COUNTING {
+	
+		M01, M0N, M11, M1N;
+	
+		static final Translator2<String, COUNTING> trans = Translators.fromEnum(COUNTING.class).optionalize();
+	
 	}
 
-	enum MULTIPLICITY {
+	enum FOLLOWING {
 
-		M01, M0N, M11, M1N;
+		Ignored, Enabled, Cascade;
 
-		static final Translator2<String, MULTIPLICITY> trans = Translators.fromEnum(MULTIPLICITY.class).optionalize();
+		static final Translator2<String, FOLLOWING> trans = Translators.fromEnum(FOLLOWING.class).optionalize();
 
 	}
 
