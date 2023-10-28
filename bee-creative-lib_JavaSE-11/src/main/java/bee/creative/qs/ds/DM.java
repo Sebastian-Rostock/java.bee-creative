@@ -12,33 +12,6 @@ import bee.creative.util.Translator2;
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DM extends QO {
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DL}. */
-	String IDENT_IsLink = "DM:IsLink";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DT}. */
-	String IDENT_IsType = "DM:IsType";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceTypes()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceType = "DM:IsLinkWithSourceType";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceClonability()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceClonability = "DM:IsLinkWithSourceClonability";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceMultiplicity()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceMultiplicity = "DM:IsLinkWithSourceMultiplicity";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetTypes()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetType = "DM:IsLinkWithTargetType";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetClonability()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetClonability = "DM:IsLinkWithTargetClonability";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetMultiplicity()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetMultiplicity = "DM:IsLinkWithTargetMultiplicity";
-
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DT#instances()}-{@link DL Datenfeld}. */
-	String IDENT_IsTypeWithInstance = "DM:IsTypeWithInstance";
-
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link #context() Kontextknoten} dieses Domänenmodells.
 	 *
 	 * @return Hyperkanten mit {@link #context()}. */
@@ -49,7 +22,7 @@ public interface DM extends QO {
 	DH history(); // log oder null
 
 	default Set2<QN> links() { // datenfelder, beziehungen
-		return this.getType(DM.IDENT_IsLink).instances();
+		return this.getType(DL.IDENT_IsLink).instances();
 	}
 
 	default Set2<DL> linksAsLinks() {
@@ -57,7 +30,7 @@ public interface DM extends QO {
 	}
 
 	default Set2<QN> types() { // datentypen
-		return this.getType(DM.IDENT_IsType).instances();
+		return this.getType(DT.IDENT_IsType).instances();
 	}
 
 	default Set2<DT> typesAsTypes() {
