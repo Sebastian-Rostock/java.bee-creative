@@ -83,7 +83,7 @@ public final class H2QQ {
 	public String toString() {
 		final StringBuilder res = new StringBuilder(512);
 		this.query.trimToSize();
-		Iterables.collectAll(this.query, res::append);
+		this.query.forEach(res::append);
 		return res.toString();
 	}
 

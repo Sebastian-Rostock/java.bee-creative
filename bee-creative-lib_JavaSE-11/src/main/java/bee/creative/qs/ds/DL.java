@@ -33,8 +33,8 @@ public interface DL extends DE {
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceTypes()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithSourceType = "DM:IsLinkWithSourceType";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceClonability()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceClonability = "DM:IsLinkWithSourceClonability";
+	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceAssociation()}-{@link DL Datenfeld}. */
+	String IDENT_IsLinkWithSourceAssociation = "DM:IsLinkWithSourceAssociation";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#sourceMultiplicity()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithSourceMultiplicity = "DM:IsLinkWithSourceMultiplicity";
@@ -42,8 +42,8 @@ public interface DL extends DE {
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetTypes()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithTargetType = "DM:IsLinkWithTargetType";
 
-	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetClonability()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetClonability = "DM:IsLinkWithTargetClonability";
+	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetAssociation()}-{@link DL Datenfeld}. */
+	String IDENT_IsLinkWithTargetAssociation = "DM:IsLinkWithTargetAssociation";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DL#targetMultiplicity()}-{@link DL Datenfeld}. */
 	String IDENT_IsLinkWithTargetMultiplicity = "DM:IsLinkWithTargetMultiplicity";
@@ -94,25 +94,25 @@ public interface DL extends DE {
 
 	/** Diese Methode liefert die Textknoten der erwünschten {@link Association Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
-	 * @see DL#IDENT_IsLinkWithSourceClonability
+	 * @see DL#IDENT_IsLinkWithSourceAssociation
 	 * @return Quellklonbarkeitstextknoten. */
-	default Property2<QN> sourceClonability() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithSourceClonability).asTargetProp(this.node());
+	default Property2<QN> sourceAssociation() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithSourceAssociation).asTargetProp(this.node());
 	}
 
 	/** Diese Methode liefert die erwünschte {@link Association Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
 	 * @return Quellklonbarkeit. */
-	default Property2<Association> sourceClonabilityAsEnum() {
-		return this.sourceClonabilityAsString().translate(Association.trans);
+	default Property2<Association> sourceAssociationAsEnum() {
+		return this.sourceAssociationAsString().translate(Association.trans);
 	}
 
 	/** Diese Methode liefert den Textwert der erwünschten {@link Association Klonbarkeit} vom {@link QE#subject() Quell- bzw. Subjektknoten}.
 	 *
-	 * @see #sourceClonability()
+	 * @see #sourceAssociation()
 	 * @return Quellklonbarkeitstextwert. */
-	default Property2<String> sourceClonabilityAsString() {
-		return this.sourceClonability().translate(this.owner().valueTrans());
+	default Property2<String> sourceAssociationAsString() {
+		return this.sourceAssociation().translate(this.owner().valueTrans());
 	}
 
 	default Property2<QN> sourceMultiplicity() {
@@ -141,16 +141,16 @@ public interface DL extends DE {
 		return this.targetTypes().translate(this.parent().typeTrans());
 	}
 
-	default Property2<QN> targetClonability() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithTargetClonability).asTargetProp(this.node());
+	default Property2<QN> targetAssociation() {
+		return this.parent().getLink(DL.IDENT_IsLinkWithTargetAssociation).asTargetProp(this.node());
 	}
 
-	default Property2<Association> targetClonabilityAsEnum() {
-		return this.targetClonabilityAsString().translate(Association.trans);
+	default Property2<Association> targetAssociationAsEnum() {
+		return this.targetAssociationAsString().translate(Association.trans);
 	}
 
-	default Property2<String> targetClonabilityAsString() {
-		return this.targetClonability().translate(this.owner().valueTrans());
+	default Property2<String> targetAssociationAsString() {
+		return this.targetAssociation().translate(this.owner().valueTrans());
 	}
 
 	default Property2<QN> targetMultiplicity() {
@@ -351,6 +351,26 @@ public interface DL extends DE {
 		return Properties.from(() -> this.getTarget(source), target -> this.setTarget(source, target));
 	}
 
+	/** Diese Klasse definiert die Beziehungsformen von referenzierenden {@link QN Hyperknoten} zu referenzierten {@link QN Hyperknoten} und deren Handhabung. */
+	enum Association {
+	
+		/** Beim Entfernen des referenzierenden {@link QN Hyperknoten} sollen die {@link QE Hyperkanten} zu den referenzierten Hyperknoten ebenfalls entfernt
+		 * werden. Beim Duplizieren sollen die Hyperkanten nicht dupliziert werden. */
+		Association,
+	
+		/** Beim Entfernen bzw. Duplizieren des referenzierenden {@link QN Hyperknoten} sollen die {@link QE Hyperkanten} zu den referenzierten Hyperknoten
+		 * ebenfalls entfernt bzw. dupliziert werden. */
+		Aggregation,
+	
+		/** Beim Entfernen bzw. Duplizieren des referenzierenden {@link QN Hyperknoten} sollen sowohl die {@link QE Hyperkanten} zu den referenzierten Hyperknoten
+		 * als auch die referenzierten Hyperknoten ebenfalls entfernt bzw. dupliziert werden. */
+		Composition;
+	
+		/** Dieses Feld speichert den {@link OptionalizedTranslator optionalisierten} {@link Association}-{@link EnumTranslator}. */
+		static final Translator2<String, Association> trans = Translators.fromEnum(Association.class).optionalize();
+	
+	}
+
 	enum Multiplicity {
 
 		/** Einem referenzierenden {@link QN Hyperknoten} soll höchstens ein referenzierter Hyperknoten zugeordnet werden können. */
@@ -367,26 +387,6 @@ public interface DL extends DE {
 
 		/** Dieses Feld speichert den {@link OptionalizedTranslator optionalisierten} {@link Multiplicity}-{@link EnumTranslator}. */
 		static final Translator2<String, Multiplicity> trans = Translators.fromEnum(Multiplicity.class).optionalize();
-
-	}
-
-	/** Diese Klasse definiert die Beziehungsformen von referenzierenden {@link QN Hyperknoten} zu referenzierten {@link QN Hyperknoten} und deren Handhabung. */
-	enum Association {
-
-		/** Beim Entfernen des referenzierenden {@link QN Hyperknoten} sollen die {@link QE Hyperkanten} zu den referenzierten Hyperknoten ebenfalls entfernt
-		 * werden. Beim Duplizieren sollen die Hyperkanten nicht dupliziert werden. */
-		Association,
-
-		/** Beim Entfernen bzw. Duplizieren des referenzierenden {@link QN Hyperknoten} sollen die {@link QE Hyperkanten} zu den referenzierten Hyperknoten
-		 * ebenfalls entfernt bzw. dupliziert werden. */
-		Aggregation,
-
-		/** Beim Entfernen bzw. Duplizieren des referenzierenden {@link QN Hyperknoten} sollen sowohl die {@link QE Hyperkanten} zu den referenzierten Hyperknoten
-		 * als auch die referenzierten Hyperknoten ebenfalls entfernt bzw. dupliziert werden. */
-		Composition;
-
-		/** Dieses Feld speichert den {@link OptionalizedTranslator optionalisierten} {@link Association}-{@link EnumTranslator}. */
-		static final Translator2<String, Association> trans = Translators.fromEnum(Association.class).optionalize();
 
 	}
 

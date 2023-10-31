@@ -730,6 +730,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode übergibt alle Elemente des gegebene {@link Iterator} an den gegebenen {@link Consumer}. */
+	@Deprecated
 	public static <GItem> void collectAll(final Iterator<? extends GItem> source, final Consumer<? super GItem> target) throws NullPointerException {
 		Objects.notNull(target);
 		while (source.hasNext()) {

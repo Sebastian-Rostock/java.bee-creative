@@ -31,8 +31,8 @@ public class DS {
 	public static HashMap2<QN, QN> getObjectMap(QN context, QN predicate, Iterable<? extends QN> subjectSet)
 		throws NullPointerException, IllegalArgumentException {
 		var subjectObjectMap = DS.newNodeNodeMap(subjectSet);
-		DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectMap.keySet()).iterator()
-			.collectAll(edge -> subjectObjectMap.put(edge.subject(), edge.object()));
+		DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectMap.keySet())
+			.forEach(edge -> subjectObjectMap.put(edge.subject(), edge.object()));
 		return subjectObjectMap;
 	}
 
@@ -47,8 +47,8 @@ public class DS {
 	public static HashMap2<QN, List<QN>> getObjectSetMap(QN context, QN predicate, Iterable<? extends QN> subjectSet)
 		throws NullPointerException, IllegalArgumentException {
 		var subjectObjectSetMap = DS.newNodeNodeSetMap(subjectSet);
-		DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectSetMap.keySet()).iterator()
-			.collectAll(edge -> subjectObjectSetMap.get(edge.subject()).add(edge.object()));
+		DS.getEdgesHavingContextAndPredicateAndSubjects(context, predicate, subjectObjectSetMap.keySet())
+			.forEach(edge -> subjectObjectSetMap.get(edge.subject()).add(edge.object()));
 		return subjectObjectSetMap;
 	}
 
@@ -59,16 +59,16 @@ public class DS {
 	public static HashMap2<QN, QN> getSubjectMap(QN context, QN predicate, Iterable<? extends QN> objectSet)
 		throws NullPointerException, IllegalArgumentException {
 		var objectSubjectMap = DS.newNodeNodeMap(objectSet);
-		DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectMap.keySet()).iterator()
-			.collectAll(edge -> objectSubjectMap.put(edge.object(), edge.subject()));
+		DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectMap.keySet())
+			.forEach(edge -> objectSubjectMap.put(edge.object(), edge.subject()));
 		return objectSubjectMap;
 	}
 
 	public static HashMap2<QN, List<QN>> getSubjectSetMap(QN context, QN predicate, Iterable<? extends QN> objectSet)
 		throws NullPointerException, IllegalArgumentException {
 		var objectSubjectSetMap = DS.newNodeNodeSetMap(objectSet);
-		DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectSetMap.keySet()).iterator()
-			.collectAll(edge -> objectSubjectSetMap.get(edge.object()).add(edge.subject()));
+		DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectSetMap.keySet())
+			.forEach(edge -> objectSubjectSetMap.get(edge.object()).add(edge.subject()));
 		return objectSubjectSetMap;
 	}
 
@@ -164,13 +164,13 @@ public class DS {
 
 	static HashMap2<QN, QN> newNodeNodeMap(Iterable<? extends QN> nodeSet) {
 		var nodeMap = new HashMap2<QN, QN>(100);
-		Iterables.collectAll(nodeSet, node -> nodeMap.put(node, null));
+		nodeSet.forEach(node -> nodeMap.put(node, null));
 		return nodeMap;
 	}
 
 	static HashMap2<QN, List<QN>> newNodeNodeSetMap(Iterable<? extends QN> nodeSet) {
 		var nodeSetMap = new HashMap2<QN, List<QN>>(100);
-		Iterables.collectAll(nodeSet, node -> nodeSetMap.put(node, new ArrayList<>()));
+		nodeSet.forEach(node -> nodeSetMap.put(node, new ArrayList<>()));
 		return nodeSetMap;
 	}
 

@@ -13,17 +13,17 @@ public interface Collection2<E> extends Collection<E> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#retainAll(java.util.Collection, Iterable) Iterables.retainAll(this, c)}. */
-	default boolean retainAll(Iterable<? extends E> c) {
+	default boolean retainAll(Iterable<?> c) {
 		return Iterables.retainAll(this, c);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#removeAll(java.util.Collection, Iterable) Iterables.removeAll(this, c)}. */
-	default boolean removeAll(Iterable<? extends E> c) {
+	default boolean removeAll(Iterable<?> c) {
 		return Iterables.removeAll(this, c);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Iterables#containsAll(java.util.Collection, Iterable) Iterables.containsAll(this, c)}. */
-	default boolean containsAll(Iterable<? extends E> c) {
+	default boolean containsAll(Iterable<?> c) {
 		return Iterables.containsAll(this, c);
 	}
 

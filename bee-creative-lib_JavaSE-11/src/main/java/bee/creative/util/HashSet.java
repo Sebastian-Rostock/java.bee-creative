@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
@@ -91,10 +90,10 @@ public class HashSet<GItem> extends AbstractHashSet<GItem> implements Serializab
 		this.addAll(source);
 	}
 
-	/** Dieser Konstruktor initialisiert das {@link HashSet} mit dem Inhalt der gegebenen {@link Collection}.
+	/** Dieser Konstruktor initialisiert das {@link HashSet} mit dem Inhalt des gegebenen {@link Iterable}.
 	 *
 	 * @param source gegebene Elemente. */
-	public HashSet(final Collection<? extends GItem> source) {
+	public HashSet(final Iterable<? extends GItem> source) {
 		this.addAll(source);
 	}
 

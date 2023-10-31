@@ -28,7 +28,7 @@ public class Translators {
 			this.targets = targets;
 			this.toTargetMap = new HashMap<>(100);
 			this.toSourceMap = new HashMap<>(100);
-			Iterables.collectAll(targets, target -> {
+			targets.forEach(target -> {
 				var source = ident.get(target);
 				this.toTargetMap.put(source, target);
 				this.toSourceMap.put(target, source);

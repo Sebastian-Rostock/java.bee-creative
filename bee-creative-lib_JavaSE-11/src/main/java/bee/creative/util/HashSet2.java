@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import java.util.Collection;
 import java.util.Set;
 import bee.creative.emu.EMU;
 import bee.creative.lang.Objects;
@@ -84,10 +83,10 @@ public class HashSet2<GItem> extends HashSet<GItem> {
 		this.addAll(source);
 	}
 
-	/** Dieser Konstruktor initialisiert das {@link HashSet2} mit dem Inhalt der gegebenen {@link Collection}.
+	/** Dieser Konstruktor initialisiert das {@link HashSet2} mit dem Inhalt des gegebenen {@link Iterable}.
 	 *
 	 * @param source gegebene Einträge. */
-	public HashSet2(final Collection<? extends GItem> source) {
+	public HashSet2(final Iterable<? extends GItem> source) {
 		this.addAll(source);
 	}
 
