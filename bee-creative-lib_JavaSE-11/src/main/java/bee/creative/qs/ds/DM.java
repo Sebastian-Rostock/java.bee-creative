@@ -21,6 +21,8 @@ public interface DM extends QO {
 
 	DH history(); // log oder null
 
+	Translator2<QN, DL> linkTrans();
+
 	default Set2<QN> links() { // datenfelder, beziehungen
 		return this.getType(DL.IDENT_IsLink).instances();
 	}
@@ -28,6 +30,8 @@ public interface DM extends QO {
 	default Set2<DL> linksAsLinks() {
 		return this.links().translate(this.linkTrans());
 	}
+
+	Translator2<QN, DT> typeTrans();
 
 	default Set2<QN> types() { // datentypen
 		return this.getType(DT.IDENT_IsType).instances();
@@ -37,11 +41,16 @@ public interface DM extends QO {
 		return this.types().translate(this.typeTrans());
 	}
 
+	/** Diese Methode liefert das {@link DL Datenfeld} mit dem gegebenen Erkennungsknoten oder {@code null}.
+	 *
+	 * @see #updateIdents()
+	 * @param ident {@link DL#idents() Erkennugnsknoten}.
+	 * @return {@link DL Datenfeld} oder {@code null}. */
 	default DL getLink(QN ident) {
 		return this.getLink(ident.value());
 	}
 
-	/** Diese Methode liefert das {@link DL Datenfeld} mit dem gegebenen Erkennungstextwert.
+	/** Diese Methode liefert das {@link DL Datenfeld} mit dem gegebenen Erkennungstextwert oder {@code null}.
 	 *
 	 * @see #updateIdents()
 	 * @param ident {@link QN#value() Textwert} eines {@link DL#idents() Erkennugnsknoten}.
@@ -67,9 +76,5 @@ public interface DM extends QO {
 	/** Diese Methode signalisiert dem Domänenmodell Änderungen an {@link DE#idents()}. Daraufhin können interne Puffer zur Beschleunigung von
 	 * {@link #getLink(String)} und {@link #getType(String)} entsprechend aktualisiert werden. */
 	void updateIdents();
-
-	Translator2<QN, DL> linkTrans();
-
-	Translator2<QN, DT> typeTrans();
 
 }

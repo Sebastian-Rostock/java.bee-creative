@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import bee.creative.qs.QN;
+import bee.creative.qs.ds.DE;
 import bee.creative.qs.ds.DH;
 import bee.creative.qs.ds.DL;
+import bee.creative.qs.ds.DL.Association;
+import bee.creative.qs.ds.DL.Multiplicity;
 import bee.creative.qs.ds.DM;
 import bee.creative.qs.ds.DT;
 import bee.creative.qs.h2.H2QESet;
@@ -14,6 +17,7 @@ import bee.creative.qs.h2.H2QS;
 import bee.creative.util.Consumer;
 import bee.creative.util.Getter;
 import bee.creative.util.HashMap2;
+import bee.creative.util.Iterables;
 import bee.creative.util.Setter;
 import bee.creative.util.Translator2;
 import bee.creative.util.Translators;
@@ -69,7 +73,6 @@ public class H2DM implements DM {
 	@Override
 	public void updateIdents() {
 		H2DL isLinkWithIdent;
-		H2DL isTypeWithIdent;
 		{
 			var isLinkWithIdent_Ident = this.owner().newNode(DL.IDENT_IsLinkWithIdent);
 			var isLinkWithIdent_EdgeList = this.edges().havingObject(isLinkWithIdent_Ident) //
@@ -80,6 +83,8 @@ public class H2DM implements DM {
 				isLinkWithIdent = this.asLink(this.owner().newNode());
 				isLinkWithIdent.setTarget(isLinkWithIdent.node, isLinkWithIdent_Ident);
 				// TODO alle installieren
+				var setup = this.customSetup();
+				this.customSetup(setup);
 
 				var nodeMap = new HashMap2<String, QN>(100);
 				var textSet = this.owner().newValues(this.setupLinkMap.keySet().concat(this.setupTypeMap.keySet()));
@@ -112,7 +117,7 @@ public class H2DM implements DM {
 		var typeByTextMap = new HashMap2<String, H2DT>(100);
 		var typeByNodeMap = new HashMap2<QN, H2DT>(100);
 		{
-			isTypeWithIdent = linkByTextMap.get(DT.IDENT_IsTypeWithIdent);
+			var isTypeWithIdent = linkByTextMap.get(DT.IDENT_IsTypeWithIdent);
 			this.setupIdentMaps(isTypeWithIdent, typeByNodeMap::put, typeByTextMap::put, this::asType, ident -> "DT with ident " + ident + " is not unique");
 			typeByNodeMap.compact();
 			typeByTextMap.compact();
@@ -122,6 +127,16 @@ public class H2DM implements DM {
 		this.linkByTextMap = linkByTextMap;
 		this.typeByNodeMap = typeByNodeMap;
 		this.typeByTextMap = typeByTextMap;
+	}
+
+	@Override
+	public Translator2<QN, DL> linkTrans() {
+		return this.linkTrans;
+	}
+
+	@Override
+	public Translator2<QN, DT> typeTrans() {
+		return this.typeTrans;
 	}
 
 	/** Diese Methode TODO */
@@ -159,40 +174,45 @@ public class H2DM implements DM {
 		});
 	}
 
-	protected void customSetupLink(String ident, Consumer<H2DL> onSetup) {
-		this.setupLinkMap.install(ident, v -> new ArrayList<>()).add(onSetup);
+	protected Setup customSetup() {
+		return new Setup();
 	}
 
-	protected void customSetup() {
-	}
+	protected void customSetup(Setup setup) {
+		setup.putType(DT.IDENT_IsType, typeType -> {
+			typeType.instances().addAll(Iterables.fromArray(//
+				DT.IDENT_IsType, DL.IDENT_IsLink).translate(typeType.parent::getType).translate(DE::node));
+		});
+		setup.putTypeLabel(DT.IDENT_IsType, "domain-type");
 
-	protected void customSetupType(HashMap2<String, Consumer<H2DL>> res, String ident, String label, Iterable<String> sourceTypes,
-		DL.Association sourceAssociation, DL.Multiplicity sourceMultiplicity, Iterable<String> targetTypes, DL.Association targetAssociation,
-		DL.Multiplicity targetMultiplicity) {
+		setup.putLinkLabel(DT.IDENT_IsTypeWithIdent, "idents");
+		setup.putLinkSources(DT.IDENT_IsTypeWithIdent, Association.Association, Multiplicity.Multiplicity11, DT.IDENT_IsType);
+		setup.putLinkTargets(DT.IDENT_IsTypeWithIdent, Association.Association, Multiplicity.Multiplicity1N);
 
-	}
+		setup.putLinkLabel(DT.IDENT_IsTypeWithLabel, "label");
+		setup.putLinkSources(DT.IDENT_IsTypeWithLabel, Association.Association, Multiplicity.Multiplicity1N, DT.IDENT_IsType);
+		setup.putLinkTargets(DT.IDENT_IsTypeWithLabel, Association.Aggregation, Multiplicity.Multiplicity01);
 
-	protected void customSetupLink(String ident, String label, Iterable<String> sourceTypes, DL.Association sourceAssociation, DL.Multiplicity sourceMultiplicity,
-		Iterable<String> targetTypes, DL.Association targetAssociation, DL.Multiplicity targetMultiplicity) {
+		setup.putLinkLabel(DT.IDENT_IsTypeWithInstance, "instances");
+		setup.putLinkSources(DT.IDENT_IsTypeWithInstance, Association.Aggregation, Multiplicity.Multiplicity0N);
+		setup.putLinkTargets(DT.IDENT_IsTypeWithInstance, Association.Association, Multiplicity.Multiplicity0N);
 
-	}
+		setup.putType(DL.IDENT_IsLink, linkType -> {
+			linkType.instances().addAll(Iterables.fromArray( //
+				DT.IDENT_IsTypeWithIdent, DT.IDENT_IsTypeWithLabel, DT.IDENT_IsTypeWithInstance, DL.IDENT_IsLinkWithIdent
 
-	protected void setupLinkSourceTypes(String linkIdent, String... sourceTypeIdents) {
+			).translate(linkType.parent::getLink).translate(DE::node));
+		});
+		setup.putTypeLabel(DL.IDENT_IsLink, "domain-link");
 
-	}
+		setup.putLinkLabel(DL.IDENT_IsLinkWithIdent, "idents");
+		setup.putLinkSources(DL.IDENT_IsLinkWithIdent, Association.Association, Multiplicity.Multiplicity11, DL.IDENT_IsLink);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithIdent, Association.Association, Multiplicity.Multiplicity1N);
 
-	protected void setupLinkTargetTypes(String linkIdent, String... targetTypeIdents) {
+		setup.putLinkLabel(DL.IDENT_IsLinkWithLabel, "label");
+		setup.putLinkSources(DL.IDENT_IsLinkWithLabel, Association.Association, Multiplicity.Multiplicity1N, DL.IDENT_IsLink);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithLabel, Association.Aggregation, Multiplicity.Multiplicity01);
 
-	}
-
-	@Override
-	public Translator2<QN, DL> linkTrans() {
-		return this.linkTrans;
-	}
-
-	@Override
-	public Translator2<QN, DT> typeTrans() {
-		return this.typeTrans;
 	}
 
 	private final Translator2<QN, DL> linkTrans = Translators.from(QN.class, DL.class, this::asLink, DL::node).optionalize();
@@ -218,5 +238,45 @@ public class H2DM implements DM {
 	private final HashMap2<String, List<Consumer<H2DL>>> setupLinkMap = new HashMap2<>();
 
 	private final HashMap2<String, List<Consumer<H2DT>>> setupTypeMap = new HashMap2<>();
+
+	static protected class Setup {
+
+		final HashMap2<String, List<Consumer<H2DL>>> setupLinkMap = new HashMap2<>();
+
+		final HashMap2<String, List<Consumer<H2DT>>> setupTypeMap = new HashMap2<>();
+
+		public void putLink(String ident, Consumer<H2DL> setup) {
+			this.setupLinkMap.install(ident, ignored -> new ArrayList<>()).add(setup);
+		}
+
+		public void putLinkLabel(String ident, String label) {
+			this.putLink(ident, link -> link.labelAsString().set(label));
+		}
+
+		public void putLinkSources(String ident, DL.Association association, DL.Multiplicity multiplicity, String... typeIdents) {
+			this.putLink(ident, link -> {
+				link.sourceAssociationAsEnum().set(association);
+				link.sourceMultiplicityAsEnum().set(multiplicity);
+				link.sourceTypesAsTypes().addAll(Iterables.fromArray(typeIdents).translate(link.parent::getType));
+			});
+		}
+
+		public void putLinkTargets(String ident, DL.Association association, DL.Multiplicity multiplicity, String... typeIdents) {
+			this.putLink(ident, link -> {
+				link.targetAssociationAsEnum().set(association);
+				link.targetMultiplicityAsEnum().set(multiplicity);
+				link.targetTypesAsTypes().addAll(Iterables.fromArray(typeIdents).translate(link.parent::getType));
+			});
+		}
+
+		public void putType(String ident, Consumer<H2DT> setup) {
+			this.setupTypeMap.install(ident, ignored -> new ArrayList<>()).add(setup);
+		}
+
+		public void putTypeLabel(String ident, String label) {
+			this.putType(ident, type -> type.labelAsString().set(label));
+		}
+
+	}
 
 }
