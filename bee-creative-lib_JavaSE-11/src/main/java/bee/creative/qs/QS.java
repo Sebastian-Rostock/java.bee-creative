@@ -1,7 +1,10 @@
 package bee.creative.qs;
 
 import java.util.List;
+import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
+import bee.creative.util.Translators;
+import bee.creative.util.Translators.OptionalizedTranslator;
 
 /** Diese Schnittstelle definiert einen Graphspeicher für einen Hypergraphen vierter Ordnung (Quad-Store), dessen {@link QN Hyperknoten} über einen optionalen
  * identifizierenden {@link QN#value() Textwert} verfügen und dessen {@link QE Hyperkanten} jeweils vier Hyperknoten in den Rollen {@link QE#context() Kontext},
@@ -162,6 +165,10 @@ public interface QS {
 	 * @return temporäre Hypertupelmenge. */
 	QTSet newTuples(List<String> names, Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException;
 
-	Translator2<QN, String> valueTrans();
+	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link QN#value() Textwert}-{@link #newNode(Object)
+	 * Hyperknoten}-{@link Translator}. */
+	default Translator2<QN, String> valueTrans() {
+		return Translators.from(QN.class, String.class, QN::value, this::newNode).optionalize();
+	}
 
 }

@@ -5,7 +5,9 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
 import bee.creative.util.Set2;
+import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
+import bee.creative.util.Translators.OptionalizedTranslator;
 
 /** Diese Schnittstelle definiert ein Domänenmodell (domain-model).
  *
@@ -21,6 +23,7 @@ public interface DM extends QO {
 
 	DH history(); // log oder null
 
+	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DL#node() Feldknoten}-{@link DL Datenfeld}-{@link Translator}. */
 	Translator2<QN, DL> linkTrans();
 
 	default Set2<QN> links() { // datenfelder, beziehungen
@@ -31,6 +34,7 @@ public interface DM extends QO {
 		return this.links().translate(this.linkTrans());
 	}
 
+	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DT#node() Typknoten}-{@link DT Datentyp}-{@link Translator}. */
 	Translator2<QN, DT> typeTrans();
 
 	default Set2<QN> types() { // datentypen
@@ -73,8 +77,10 @@ public interface DM extends QO {
 		return DS.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
-	/** Diese Methode signalisiert dem Domänenmodell Änderungen an {@link DE#idents()}. Daraufhin können interne Puffer zur Beschleunigung von
-	 * {@link #getLink(String)} und {@link #getType(String)} entsprechend aktualisiert werden. */
-	void updateIdents();
+	/** Diese Methode übernimmt Änderungen an {@link DE#idents()} auf die internen Puffer zur Beschleunigung von {@link #getLink(String)} und
+	 * {@link #getType(String)}. Wenn das {@link DL Datenfeld} zu {@link DL#IDENT_IsLinkWithIdent} nicht ermittelt werden kann, wird das Datenmodell
+	 * initialisiert. Wenn essentielle Datenfelder oder Datentypen nicht ermittelt werden können, wird eine Ausnahme ausgelöst. Dies verursachende Änderungen an
+	 * den {@link #edges()} sollten über die {@link #history()} rückgängig gemacht werden. */
+	void updateIdents() throws IllegalArgumentException;
 
 }
