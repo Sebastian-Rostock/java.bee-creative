@@ -541,7 +541,7 @@ public class AppWindow {
 			.useOption("Puffergröße für Streuwert", this.settings.contentHashSize) //
 			.useOption("Puffergröße für Dateivergleich", this.settings.contentTestSize) //
 			.useButton("Duplikate Dateien finden", () -> this.runAnalyzeContentImpl_DONE(true)) //
-			.useButton("Einzigartige Dateien finden", () -> this.runAnalyzeContentImpl_DONE(false)) //
+		//	.useButton("Einzigartige Dateien finden", () -> this.runAnalyzeContentImpl_DONE(false)) //
 		;
 	}
 
@@ -778,7 +778,7 @@ public class AppWindow {
 				var file = line.source.fileOrNull();
 				if (file != null) {
 					proc.steps++;
-					fileStack.addFirst(file);
+					fileStack.addLast(file);
 				}
 			}, result::add);
 			while (!fileStack.isEmpty() && !proc.isCanceled) {

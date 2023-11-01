@@ -59,7 +59,7 @@ class AppSettings implements AppStorable2 {
 	public void restore(CSVReader reader) throws Exception {
 		if (!Arrays.equals(AppSettings.FILEHEAD, reader.readEntry())) return;
 		var values = new LinkedList<>(Arrays.asList(reader.readEntry()));
-		this.getOptions().collectAll(option -> option.set(values.pollFirst()));
+		this.getOptions().forEach(option -> option.set(values.pollFirst()));
 	}
 
 	/** Dieses Feld speichert den Dateinamen für {@link #persist()} und {@link #restore()}. */
