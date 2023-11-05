@@ -6,10 +6,10 @@ import java.util.Map;
 import bee.creative.qs.QN;
 import bee.creative.qs.dm.DH;
 import bee.creative.qs.dm.DL;
-import bee.creative.qs.dm.DM;
-import bee.creative.qs.dm.DT;
 import bee.creative.qs.dm.DL.Handling;
 import bee.creative.qs.dm.DL.Multiplicity;
+import bee.creative.qs.dm.DM;
+import bee.creative.qs.dm.DT;
 import bee.creative.qs.h2.H2QESet;
 import bee.creative.qs.h2.H2QN;
 import bee.creative.qs.h2.H2QS;
@@ -211,7 +211,10 @@ public class H2DM implements DM {
 		var identTextSet = setup.setupLinkMap.keySet().concat(setup.setupTypeMap.keySet());
 		var identNodeByIdentTextMap = new HashMap2<String, QN>(identTextSet.size());
 
-		var textSet = this.owner().newValues(identTextSet);
+		var maps = Iterables.fromArray( //
+			setup.typeLabelMap, setup.linkLabelMap, setup.linkSourceTypeMap, setup.linkSourceHandlingMap, setup.linkSourceMultiplicityMap);
+
+		var textSet = this.owner().newValues(Iterables.concat(Iterables.concatAll(maps.translate(Map::keySet)), Iterables.concatAll(maps.translate(Map::values))));
 		textSet.putAll();
 		textSet.nodes(identNodeByIdentTextMap::put);
 
@@ -231,76 +234,61 @@ public class H2DM implements DM {
 			typeSetupList.forEach(typeSetup -> typeSetup.set(type));
 		});
 
+		this.typesAsTypes().addAll(this.typeByNodeMap.values());
+		this.linksAsLinks().addAll(this.linkByNodeMap.values());
+
 	}
 
 	protected void customSetup(Setup setup) {
 
 		setup.putTypeLabel(DT.IDENT_IsType, "domain-type");
-		setup.putType(DT.IDENT_IsType, typeType -> {
-			typeType.instances().addAll(this.getTypeNodes( //
-				DT.IDENT_IsType, //
-				DL.IDENT_IsLink));
-		});
 
 		setup.putLinkLabel(DT.IDENT_IsTypeWithIdent, "type-idents");
-		setup.putLinkSources(DT.IDENT_IsTypeWithIdent, Handling.Association, Multiplicity.Multiplicity11, DT.IDENT_IsType);
-		setup.putLinkTargets(DT.IDENT_IsTypeWithIdent, Handling.Association, Multiplicity.Multiplicity1N, null);
+		setup.putLinkSources(DT.IDENT_IsTypeWithIdent, DT.IDENT_IsType, Handling.Association, Multiplicity.Multiplicity11);
+		setup.putLinkTargets(DT.IDENT_IsTypeWithIdent, null, Handling.Association, Multiplicity.Multiplicity1N);
 
 		setup.putLinkLabel(DT.IDENT_IsTypeWithLabel, "type-label");
-		setup.putLinkSources(DT.IDENT_IsTypeWithLabel, Handling.Association, Multiplicity.Multiplicity1N, DT.IDENT_IsType);
-		setup.putLinkTargets(DT.IDENT_IsTypeWithLabel, Handling.Aggregation, Multiplicity.Multiplicity01, null);
+		setup.putLinkSources(DT.IDENT_IsTypeWithLabel, DT.IDENT_IsType, Handling.Association, Multiplicity.Multiplicity1N);
+		setup.putLinkTargets(DT.IDENT_IsTypeWithLabel, null, Handling.Aggregation, Multiplicity.Multiplicity01);
 
 		setup.putLinkLabel(DT.IDENT_IsTypeWithInstance, "type-instances");
-		setup.putLinkSources(DT.IDENT_IsTypeWithInstance, Handling.Aggregation, Multiplicity.Multiplicity11, DT.IDENT_IsType);
-		setup.putLinkTargets(DT.IDENT_IsTypeWithInstance, Handling.Association, Multiplicity.Multiplicity0N, null);
+		setup.putLinkSources(DT.IDENT_IsTypeWithInstance, DT.IDENT_IsType, Handling.Aggregation, Multiplicity.Multiplicity11);
+		setup.putLinkTargets(DT.IDENT_IsTypeWithInstance, null, Handling.Association, Multiplicity.Multiplicity0N);
 
 		setup.putTypeLabel(DL.IDENT_IsLink, "domain-link");
-		setup.putType(DL.IDENT_IsLink, linkType -> {
-			linkType.instances().addAll(this.getLinkNodes(//
-				DT.IDENT_IsTypeWithIdent, //
-				DT.IDENT_IsTypeWithLabel, //
-				DT.IDENT_IsTypeWithInstance, //
-				DL.IDENT_IsLinkWithIdent, //
-				DL.IDENT_IsLinkWithSourceType, //
-				DL.IDENT_IsLinkWithSourceHandling, //
-				DL.IDENT_IsLinkWithSourceMultiplicity, //
-				DL.IDENT_IsLinkWithTargetType, //
-				DL.IDENT_IsLinkWithTargetHandling, //
-				DL.IDENT_IsLinkWithTargetMultiplicity));
-		});
 
 		setup.putLinkLabel(DL.IDENT_IsLinkWithIdent, "link-idents");
-		setup.putLinkSources(DL.IDENT_IsLinkWithIdent, Handling.Association, Multiplicity.Multiplicity11, DL.IDENT_IsLink);
-		setup.putLinkTargets(DL.IDENT_IsLinkWithIdent, Handling.Association, Multiplicity.Multiplicity1N, null);
+		setup.putLinkSources(DL.IDENT_IsLinkWithIdent, DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity11);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithIdent, null, Handling.Association, Multiplicity.Multiplicity1N);
 
 		setup.putLinkLabel(DL.IDENT_IsLinkWithLabel, "link-label");
-		setup.putLinkSources(DL.IDENT_IsLinkWithLabel, Handling.Association, Multiplicity.Multiplicity1N, DL.IDENT_IsLink);
-		setup.putLinkTargets(DL.IDENT_IsLinkWithLabel, Handling.Aggregation, Multiplicity.Multiplicity01, null);
+		setup.putLinkSources(DL.IDENT_IsLinkWithLabel, DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity1N);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithLabel, null, Handling.Aggregation, Multiplicity.Multiplicity01);
 
-		setup.putLinkLabel(DL.IDENT_IsLinkWithSourceType, "link-source-types");
-		setup.putLinkSources(DL.IDENT_IsLinkWithSourceType, Handling.Association, Multiplicity.Multiplicity0N, DL.IDENT_IsLink);
-		setup.putLinkTargets(DL.IDENT_IsLinkWithSourceType, Handling.Aggregation, Multiplicity.Multiplicity01, DT.IDENT_IsType);
+		setup.putLinkLabel(DL.IDENT_IsLinkWithSourceType, "link-source-type");
+		setup.putLinkSources(DL.IDENT_IsLinkWithSourceType, DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithSourceType, DT.IDENT_IsType, Handling.Aggregation, Multiplicity.Multiplicity01);
 
-		setup.putLinkLabel(DL.IDENT_IsLinkWithSourceHandling, "link-source-association");
-		setup.putLinkSources(DL.IDENT_IsLinkWithSourceHandling, Handling.Association, Multiplicity.Multiplicity0N, DL.IDENT_IsLink);
-		setup.putLinkTargets(DL.IDENT_IsLinkWithSourceHandling, Handling.Aggregation, Multiplicity.Multiplicity11, null);
+		setup.putLinkLabel(DL.IDENT_IsLinkWithSourceHandling, "link-source-handling");
+		setup.putLinkSources(DL.IDENT_IsLinkWithSourceHandling, DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithSourceHandling, null, Handling.Aggregation, Multiplicity.Multiplicity11);
 
 		setup.putLinkLabel(DL.IDENT_IsLinkWithSourceMultiplicity, "link-source-multiplicity");
-		setup.putLinkSources(DL.IDENT_IsLinkWithSourceMultiplicity, Handling.Association, Multiplicity.Multiplicity0N, DL.IDENT_IsLink);
-		setup.putLinkTargets(DL.IDENT_IsLinkWithSourceMultiplicity, Handling.Aggregation, Multiplicity.Multiplicity11, null);
-		
-		setup.putLinkLabel(DL.IDENT_IsLinkWithTargetType, "link-target-types");
-		setup.putLinkSources(DL.IDENT_IsLinkWithTargetType, Handling.Association, Multiplicity.Multiplicity0N, DL.IDENT_IsLink);
-		setup.putLinkTargets(DL.IDENT_IsLinkWithTargetType, Handling.Aggregation, Multiplicity.Multiplicity01, DT.IDENT_IsType);
-		
-		setup.putLinkLabel(DL.IDENT_IsLinkWithTargetHandling, "link-target-association");
-		setup.putLinkSources(DL.IDENT_IsLinkWithTargetHandling, Handling.Association, Multiplicity.Multiplicity0N, DL.IDENT_IsLink);
-		setup.putLinkTargets(DL.IDENT_IsLinkWithTargetHandling, Handling.Aggregation, Multiplicity.Multiplicity11, null);
-		
+		setup.putLinkSources(DL.IDENT_IsLinkWithSourceMultiplicity, DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithSourceMultiplicity, null, Handling.Aggregation, Multiplicity.Multiplicity11);
+
+		setup.putLinkLabel(DL.IDENT_IsLinkWithTargetType, "link-target-type");
+		setup.putLinkSources(DL.IDENT_IsLinkWithTargetType, DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithTargetType, DT.IDENT_IsType, Handling.Aggregation, Multiplicity.Multiplicity01);
+
+		setup.putLinkLabel(DL.IDENT_IsLinkWithTargetHandling, "link-target-handling");
+		setup.putLinkSources(DL.IDENT_IsLinkWithTargetHandling, DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithTargetHandling, null, Handling.Aggregation, Multiplicity.Multiplicity11);
+
 		setup.putLinkLabel(DL.IDENT_IsLinkWithTargetMultiplicity, "link-target-multiplicity");
-		setup.putLinkSources(DL.IDENT_IsLinkWithTargetMultiplicity, Handling.Association, Multiplicity.Multiplicity0N, DL.IDENT_IsLink);
-		setup.putLinkTargets(DL.IDENT_IsLinkWithTargetMultiplicity, Handling.Aggregation, Multiplicity.Multiplicity11, null);
-		
+		setup.putLinkSources(DL.IDENT_IsLinkWithTargetMultiplicity, DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N);
+		setup.putLinkTargets(DL.IDENT_IsLinkWithTargetMultiplicity, null, Handling.Aggregation, Multiplicity.Multiplicity11);
+
 	}
 
 	protected H2DL asLink(QN node) {
@@ -325,13 +313,15 @@ public class H2DM implements DM {
 
 	private void checkLinkByTextMap(HashMap2<String, H2DL> linkByTextMap) {
 		this.checkIdentMap(linkByTextMap, ident -> "DL with ident " + ident + " is missing", //
-			DT.IDENT_IsTypeWithIdent, DT.IDENT_IsTypeWithLabel, DT.IDENT_IsTypeWithInstance, DL.IDENT_IsLinkWithIdent, DL.IDENT_IsLinkWithLabel,
-			DL.IDENT_IsLinkWithSourceType, DL.IDENT_IsLinkWithSourceHandling, DL.IDENT_IsLinkWithSourceMultiplicity, DL.IDENT_IsLinkWithTargetType,
-			DL.IDENT_IsLinkWithTargetHandling, DL.IDENT_IsLinkWithTargetMultiplicity);
+			DT.IDENT_IsTypeWithIdent, DT.IDENT_IsTypeWithLabel, DT.IDENT_IsTypeWithInstance, //
+			DL.IDENT_IsLinkWithIdent, DL.IDENT_IsLinkWithLabel, //
+			DL.IDENT_IsLinkWithSourceType, DL.IDENT_IsLinkWithSourceHandling, DL.IDENT_IsLinkWithSourceMultiplicity, //
+			DL.IDENT_IsLinkWithTargetType, DL.IDENT_IsLinkWithTargetHandling, DL.IDENT_IsLinkWithTargetMultiplicity);
 	}
 
 	private void checkTypeByTextMap(HashMap2<String, H2DT> typeByTextMap) {
-		this.checkIdentMap(typeByTextMap, ident -> "DT with ident " + ident + " is missing", DT.IDENT_IsType, DL.IDENT_IsLink);
+		this.checkIdentMap(typeByTextMap, ident -> "DT with ident " + ident + " is missing", //
+			DT.IDENT_IsType, DL.IDENT_IsLink);
 	}
 
 	protected static class Setup {
@@ -341,18 +331,17 @@ public class H2DM implements DM {
 		}
 
 		public void putLinkLabel(String ident, String label) {
-			this.putLink(ident, link -> link.labelAsString().set(label));
+			this.linkLabelMap.put(ident, label);
 		}
 
-		public void putLinkSources(String ident, DL.Handling sourceAssociationAsEnum, DL.Multiplicity sourceMultiplicityAsEnum, String sourceTypeAsIdent) {
-			this.putLink(ident, link -> {
-				link.sourceHandlingAsEnum().set(sourceAssociationAsEnum);
-				link.sourceMultiplicityAsEnum().set(sourceMultiplicityAsEnum);
-				link.sourceTypeAsType().set(link.parent.getType(sourceTypeAsIdent));
-			});
+		public void putLinkSources(String ident, String sourceTypeIdent, Handling sourceHandling, Multiplicity sourceMultiplicity) {
+			this.linkSourceTypeMap.put(ident, sourceTypeIdent);
+			this.linkSourceHandlingMap.put(ident, Handling.trans.toSource(sourceHandling));
+			this.linkSourceMultiplicityMap.put(ident, Multiplicity.trans.toSource(sourceMultiplicity));
+		
 		}
 
-		public void putLinkTargets(String ident, DL.Handling association, DL.Multiplicity multiplicity, String  typeIdents) {
+		public void putLinkTargets(String ident, String typeIdents, DL.Handling association, DL.Multiplicity multiplicity) {
 			this.putLink(ident, link -> {
 				link.targetHandlingAsEnum().set(association);
 				link.targetMultiplicityAsEnum().set(multiplicity);
@@ -368,12 +357,26 @@ public class H2DM implements DM {
 			this.putType(ident, type -> type.labelAsString().set(label));
 		}
 
+		HashMap2<String, String> typeLabelMap = new HashMap2<>();
+
+		HashMap2<String, String> linkLabelMap = new HashMap2<>();
+
+		HashMap2<String, String> linkSourceTypeMap = new HashMap2<>();
+
+		HashMap2<String, String> linkSourceHandlingMap = new HashMap2<>();
+
+		HashMap2<String, String> linkSourceMultiplicityMap = new HashMap2<>();
+
+		HashMap2<String, String> linkTargetTypeMap = new HashMap2<>();
+		
+		HashMap2<String, String> linkTargetHandlingMap = new HashMap2<>();
+		
+		HashMap2<String, String> linkTargetMultiplicityMap = new HashMap2<>();
+		
 		final HashMap2<String, List<Consumer<H2DL>>> setupLinkMap = new HashMap2<>();
 
 		final HashMap2<String, List<Consumer<H2DT>>> setupTypeMap = new HashMap2<>();
 
-		 
-		
 	}
 
 }

@@ -386,7 +386,7 @@ public interface DL extends DE {
 		Composition;
 
 		/** Dieses Feld speichert den {@link OptionalizedTranslator optionalisierten} {@link Handling}-{@link EnumTranslator}. */
-		static final Translator2<String, Handling> trans = Translators.fromEnum(Handling.class).optionalize();
+		public static final Translator2<String, Handling> trans = Translators.fromEnum(Handling.class).optionalize();
 
 	}
 
@@ -406,7 +406,7 @@ public interface DL extends DE {
 		Multiplicity1N;
 
 		/** Dieses Feld speichert den {@link OptionalizedTranslator optionalisierten} {@link Multiplicity}-{@link EnumTranslator}. */
-		static final Translator2<String, Multiplicity> trans = Translators.fromEnum(Multiplicity.class).optionalize();
+		public static final Translator2<String, Multiplicity> trans = Translators.fromEnum(Multiplicity.class).optionalize();
 
 	}
 
