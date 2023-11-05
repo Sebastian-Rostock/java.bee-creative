@@ -30,18 +30,18 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
-	public void nodes(final Setter<? super String, ? super QN> nodes) {
-		try (final ResultSet rset = new H2QQ().push("SELECT V, N FROM QN WHERE V IN (").push(this).push(")").select(this.owner)) {
+	public void nodes(Setter<? super String, ? super QN> nodes) {
+		try (var rset = new H2QQ().push("SELECT V, N FROM QN WHERE V IN (").push(this).push(")").select(this.owner)) {
 			while (rset.next()) {
 				nodes.set(rset.getString(1), this.owner.newNode(rset.getLong(2)));
 			}
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
 
 	@Override
-	public H2QVSet havingState(final boolean state) {
+	public H2QVSet havingState(boolean state) {
 		return state ? this.intersect(this.owner.values()) : this.except(this.owner.values());
 	}
 
@@ -51,7 +51,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
-	public H2QVSet copy(final Filter<? super String> filter) throws NullPointerException {
+	public H2QVSet copy(Filter<? super String> filter) throws NullPointerException {
 		return this.owner.newValues(Iterables.filter(this, filter));
 	}
 
@@ -66,37 +66,37 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 	}
 
 	@Override
-	public H2QVSet union(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		final H2QVSet that = this.owner.asQVSet(set);
+	public H2QVSet union(QVSet set) throws NullPointerException, IllegalArgumentException {
+		var that = this.owner.asQVSet(set);
 		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") UNION (").push(that).push(")"));
 	}
 
 	@Override
-	public H2QVSet except(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		final H2QVSet that = this.owner.asQVSet(set);
+	public H2QVSet except(QVSet set) throws NullPointerException, IllegalArgumentException {
+		var that = this.owner.asQVSet(set);
 		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") EXCEPT (").push(that).push(")"));
 	}
 
 	@Override
-	public H2QVSet intersect(final QVSet set) throws NullPointerException, IllegalArgumentException {
-		final H2QVSet that = this.owner.asQVSet(set);
+	public H2QVSet intersect(QVSet set) throws NullPointerException, IllegalArgumentException {
+		var that = this.owner.asQVSet(set);
 		return new H2QVSet(this.owner, new H2QQ().push("(").push(this).push(") INTERSECT (").push(that).push(")"));
 	}
 
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (V VARCHAR(1G) NOT NULL)} besitzen. */
-	protected H2QVSet(final H2QS owner, final H2QQ table) {
+	protected H2QVSet(H2QS owner, H2QQ table) {
 		super(owner, table);
 	}
 
 	@Override
-	protected String customItem(final ResultSet item) throws SQLException {
+	protected String customItem(ResultSet item) throws SQLException {
 		return item.getString(1);
 	}
 
 	static class Main extends H2QVSet {
 
-		public Main(final H2QS owner) {
+		public Main(H2QS owner) {
 			super(owner, new H2QQ().push("SELECT V FROM QN"));
 		}
 
@@ -114,7 +114,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	static class Temp extends H2QVSet {
 
-		public Temp(final H2QS owner) {
+		public Temp(H2QS owner) {
 			super(owner, null);
 			new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (V VARCHAR(1G) NOT NULL)").update(this.owner);
 		}
@@ -134,7 +134,7 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	static class Order extends H2QVSet {
 
-		public Order(final H2QVSet that) {
+		public Order(H2QVSet that) {
 			super(that.owner, new H2QQ().push("SELECT * FROM (").push(that).push(") ORDER BY V"));
 		}
 

@@ -22,27 +22,27 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 
 	@Override
 	public long size() {
-		try (ResultSet rset = new H2QQ().push("SELECT COUNT(*) FROM (").push(this).push(")").select(this.owner)) {
+		try (var rset = new H2QQ().push("SELECT COUNT(*) FROM (").push(this).push(")").select(this.owner)) {
 			return rset.next() ? rset.getLong(1) : 0;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
 
 	@Override
 	public GI first() {
-		try (final ResultSet rset = new H2QQ().push("SELECT TOP 1 * FROM (").push(this).push(")").select(this.owner)) {
+		try (var rset = new H2QQ().push("SELECT TOP 1 * FROM (").push(this).push(")").select(this.owner)) {
 			return rset.next() ? this.customItem(rset) : null;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
 
 	@Override
 	public boolean isEmpty() {
-		try (final ResultSet rset = new H2QQ().push("SELECT TOP 1 * FROM (").push(this).push(")").select(this.owner)) {
+		try (var rset = new H2QQ().push("SELECT TOP 1 * FROM (").push(this).push(")").select(this.owner)) {
 			return !rset.next();
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
@@ -62,13 +62,13 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. */
-	protected H2QISet(final H2QS owner, final H2QQ table) {
+	protected H2QISet(H2QS owner, H2QQ table) {
 		this.owner = owner;
 		this.table = table != null ? table : new H2QQ(owner);
 	}
 
 	/** Diese Methode liefert den Eintrag zum gegebenen {@link ResultSet}. */
-	protected abstract GI customItem(final ResultSet next) throws SQLException;
+	protected abstract GI customItem(ResultSet next) throws SQLException;
 
 	private class Iter extends AbstractIterator<GI> {
 
@@ -76,7 +76,7 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 			try {
 				this.item = H2QISet.this.table.select(H2QISet.this.owner);
 				this.next = this.item.next();
-			} catch (final SQLException cause) {
+			} catch (SQLException cause) {
 				throw new IllegalStateException(cause);
 			}
 		}
@@ -86,17 +86,17 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 			if (this.next) return true;
 			try {
 				this.item.getStatement().close();
-			} catch (final SQLException ignore) {}
+			} catch (SQLException ignore) {}
 			return false;
 		}
 
 		@Override
 		public GI next() {
 			try {
-				final GI item = H2QISet.this.customItem(this.item);
+				var item = H2QISet.this.customItem(this.item);
 				this.next = this.item.next();
 				return item;
-			} catch (final SQLException cause) {
+			} catch (SQLException cause) {
 				throw new IllegalStateException(cause);
 			}
 		}

@@ -27,7 +27,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	/** Diese Methode liefert den Graphspeicher zu der Datenbankverbindung, die mit dem {@code jdbc:h2:}-Protokoll zum gegebenen Dateipfad erzeugt wurde. Dazu
 	 * wird das Laden der Klasse {@code org.h2.Driver} erzwungen. */
-	public static H2QS from(final String file) throws SQLException, NullPointerException, ClassNotFoundException {
+	public static H2QS from(String file) throws SQLException, NullPointerException, ClassNotFoundException {
 		Class.forName("org.h2.Driver");
 		return new H2QS(DriverManager.getConnection("jdbc:h2:" + file, "", ""));
 	}
@@ -38,7 +38,7 @@ public class H2QS implements QS, AutoCloseable {
 	/** Dieser Konstruktor initialisiert die Datenbankverbindung und erstellt bei Bedarf das Tabellenschema.
 	 *
 	 * @param conn Datenbankverbindung. */
-	public H2QS(final Connection conn) throws SQLException, NullPointerException {
+	public H2QS(Connection conn) throws SQLException, NullPointerException {
 		this.conn = conn;
 		new H2QQ().push("" + //
 			"CREATE SEQUENCE IF NOT EXISTS QT_SEQ;" + //
@@ -68,85 +68,85 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QE} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	public final H2QE asQE(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QE asQE(Object src) throws NullPointerException, IllegalArgumentException {
 		try {
-			final var res = (H2QE)src;
+			var res = (H2QE)src;
 			if (res.owner == this) return res;
-		} catch (final ClassCastException cause) {}
+		} catch (ClassCastException cause) {}
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QESet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	public final H2QESet asQESet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QESet asQESet(Object src) throws NullPointerException, IllegalArgumentException {
 		try {
-			final var res = (H2QESet)src;
+			var res = (H2QESet)src;
 			if (res.owner == this) return res;
-		} catch (final ClassCastException cause) {}
+		} catch (ClassCastException cause) {}
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QN} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	public final H2QN asQN(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QN asQN(Object src) throws NullPointerException, IllegalArgumentException {
 		try {
-			final var res = (H2QN)src;
+			var res = (H2QN)src;
 			if (res.owner == this) return res;
-		} catch (final ClassCastException cause) {}
+		} catch (ClassCastException cause) {}
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QNSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	public final H2QNSet asQNSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QNSet asQNSet(Object src) throws NullPointerException, IllegalArgumentException {
 		try {
-			final var res = (H2QNSet)src;
+			var res = (H2QNSet)src;
 			if (res.owner == this) return res;
-		} catch (final ClassCastException cause) {}
+		} catch (ClassCastException cause) {}
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode liefert die {@link Object#toString() Textdarstellung} des gegebenen Objekts oder löst eine Ausnahme aus. */
-	public final String asQV(final Object src) throws NullPointerException {
+	public final String asQV(Object src) throws NullPointerException {
 		return src.toString();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QVSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	public final H2QVSet asQVSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QVSet asQVSet(Object src) throws NullPointerException, IllegalArgumentException {
 		try {
-			final var res = (H2QVSet)src;
+			var res = (H2QVSet)src;
 			if (res.owner == this) return res;
-		} catch (final ClassCastException cause) {}
+		} catch (ClassCastException cause) {}
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QT} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	public final H2QT asQT(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QT asQT(Object src) throws NullPointerException, IllegalArgumentException {
 		try {
-			final var res = (H2QT)src;
+			var res = (H2QT)src;
 			if (res.owner == this) return res;
-		} catch (final ClassCastException cause) {}
+		} catch (ClassCastException cause) {}
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
-	public final H2QTSet asQTSet(final Object src) throws NullPointerException, IllegalArgumentException {
+	public final H2QTSet asQTSet(Object src) throws NullPointerException, IllegalArgumentException {
 		try {
-			final var res = (H2QTSet)src;
+			var res = (H2QTSet)src;
 			if (res.owner == this) return res;
-		} catch (final ClassCastException cause) {}
+		} catch (ClassCastException cause) {}
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} mit der gegebene Anzahl an {@link QTSet#names() Rollen}
 	 * oder löst eine Ausnahme aus. */
-	public final H2QTSet asQTSet(final Object src, final int roles) throws NullPointerException, IllegalArgumentException {
-		final var res = this.asQTSet(src);
+	public final H2QTSet asQTSet(Object src, int roles) throws NullPointerException, IllegalArgumentException {
+		var res = this.asQTSet(src);
 		if (res.names().size() == roles) return res;
 		throw new IllegalArgumentException();
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. Das {@link H2QTSet} muss die
 	 * gegebenen {@link QTSet#names() Rollennamen} besitzen. */
-	public final H2QTSet asQTSet(final Object src, final List<?> names) throws NullPointerException, IllegalArgumentException {
-		final var res = this.asQTSet(src, names.size());
+	public final H2QTSet asQTSet(Object src, List<?> names) throws NullPointerException, IllegalArgumentException {
+		var res = this.asQTSet(src, names.size());
 		if (res.names().equals(names)) return res;
 		throw new IllegalArgumentException();
 	}
@@ -160,7 +160,7 @@ public class H2QS implements QS, AutoCloseable {
 	@Override
 	public void close() throws SQLException {
 		synchronized (this.tables) {
-			for (final String name: new ArrayList<>(this.tables)) {
+			for (var name: new ArrayList<>(this.tables)) {
 				this.popTable(name);
 			}
 		}
@@ -169,7 +169,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	/** Diese Methode entfernt alle Hyperknoten mit Textwert, die nich in Hyperkanten verwendet werden. */
 	public void compact() {
-		final var edges = this.edges();
+		var edges = this.edges();
 		this.nodes().except(edges.contexts().union(edges.predicates()).union(edges.subjects()).union(edges.objects())).popAll();
 	}
 
@@ -189,37 +189,37 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public H2QN getNode(final Object value) {
+	public H2QN getNode(Object value) {
 		try {
-			final var string = this.asQV(value);
-			final var getStmt = this.getQV;
+			var string = this.asQV(value);
+			var getStmt = this.getQV;
 			getStmt.setString(1, string);
-			final var res = getStmt.executeQuery();
+			var res = getStmt.executeQuery();
 			return res.next() ? this.newNode(res.getLong(1)) : null;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
 
 	@Override
 	public H2QE newEdge() {
-		final var key = this.newKey(this.putQN);
+		var key = this.newKey(this.putQN);
 		return this.newEdge(key, key, key, key);
 	}
 
 	@Override
-	public H2QE newEdge(final QN node) throws NullPointerException, IllegalArgumentException {
-		final var key = this.asQN(node).key;
+	public H2QE newEdge(QN node) throws NullPointerException, IllegalArgumentException {
+		var key = this.asQN(node).key;
 		return this.newEdge(key, key, key, key);
 	}
 
 	@Override
-	public H2QE newEdge(final QN context, final QN predicate, final QN subject, final QN object) throws NullPointerException, IllegalArgumentException {
+	public H2QE newEdge(QN context, QN predicate, QN subject, QN object) throws NullPointerException, IllegalArgumentException {
 		return this.newEdge(this.asQN(context).key, this.asQN(predicate).key, this.asQN(subject).key, this.asQN(object).key);
 	}
 
 	/** Diese Methode liefert eine neue {@link H2QE Hyperkante} mit den gegebenen Knotenkennungen. */
-	public final H2QE newEdge(final long context, final long predicate, final long subject, final long object) {
+	public final H2QE newEdge(long context, long predicate, long subject, long object) {
 		return new H2QE(this, context, predicate, subject, object);
 	}
 
@@ -229,34 +229,34 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public H2QESet newEdges(final QN node) {
+	public H2QESet newEdges(QN node) {
 		return this.newEdges(this.newEdge(node));
 	}
 
 	@Override
-	public H2QESet newEdges(final QN context, final QN predicate, final QN subject, final QN object) {
+	public H2QESet newEdges(QN context, QN predicate, QN subject, QN object) {
 		return this.newEdges(this.newEdge(context, predicate, subject, object));
 	}
 
 	@Override
-	public H2QESet newEdges(final QE... edges) throws NullPointerException, IllegalArgumentException {
+	public H2QESet newEdges(QE... edges) throws NullPointerException, IllegalArgumentException {
 		return this.newEdges(Arrays.asList(edges));
 	}
 
 	@Override
-	public H2QESet newEdges(final Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
+	public H2QESet newEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (edges instanceof H2QESet) {
-				final var set = this.asQESet(edges);
+				var set = this.asQESet(edges);
 				if (set instanceof H2QESet.Temp) return set;
-				final var res = new H2QESet.Temp(this);
+				var res = new H2QESet.Temp(this);
 				new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT * FROM (").push(set).push(")").update(this);
 				return res;
 			}
-			final var buf = new H2QESet.Temp(this);
-			try (final var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (C, P, S, O) VALUES (?, ?, ?, ?)").prepare(this)) {
-				for (final Object item: edges) {
-					final var edge = this.asQE(item);
+			var buf = new H2QESet.Temp(this);
+			try (var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (C, P, S, O) VALUES (?, ?, ?, ?)").prepare(this)) {
+				for (Object item: edges) {
+					var edge = this.asQE(item);
 					stmt.setLong(1, edge.context);
 					stmt.setLong(2, edge.predicate);
 					stmt.setLong(3, edge.subject);
@@ -265,10 +265,10 @@ public class H2QS implements QS, AutoCloseable {
 				}
 				stmt.executeBatch();
 			}
-			final var res = new H2QESet.Temp(this);
+			var res = new H2QESet.Temp(this);
 			new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT DISTINCT * FROM ").push(buf.table).update(this);
 			return res;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
@@ -279,95 +279,95 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public H2QN newNode(final Object value) {
+	public H2QN newNode(Object value) {
 		try {
-			final var string = this.asQV(value);
-			final var putStmt = this.putQV;
+			var string = this.asQV(value);
+			var putStmt = this.putQV;
 			putStmt.setString(1, string);
 			this.markPutValue(putStmt.executeUpdate() != 0);
-			final var getStmt = this.getQN;
+			var getStmt = this.getQN;
 			getStmt.setString(1, string);
-			final var res = getStmt.executeQuery();
+			var res = getStmt.executeQuery();
 			if (res.next()) return this.newNode(res.getLong(1));
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 		throw new IllegalStateException();
 	}
 
 	/** Diese Methode liefert einen neuen {@link H2QN Hyperknoten} mit der gegebenen Kennung. */
-	public final H2QN newNode(final long key) {
+	public final H2QN newNode(long key) {
 		return new H2QN(this, key);
 	}
 
 	@Override
-	public H2QNSet newNodes(final QN... nodes) throws NullPointerException, IllegalArgumentException {
+	public H2QNSet newNodes(QN... nodes) throws NullPointerException, IllegalArgumentException {
 		return this.newNodes(Arrays.asList(nodes));
 	}
 
 	@Override
-	public H2QNSet newNodes(final Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
+	public H2QNSet newNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (nodes instanceof H2QNSet) {
-				final var set = this.asQNSet(nodes);
+				var set = this.asQNSet(nodes);
 				if (set instanceof H2QNSet.Temp) return set;
-				final H2QNSet res = new H2QNSet.Temp(this);
+				H2QNSet res = new H2QNSet.Temp(this);
 				new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT * FROM (").push(set).push(")").update(this);
 				return res;
 			}
-			final H2QNSet buf = new H2QNSet.Temp(this);
-			try (final var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (N) VALUES (?)").prepare(this)) {
-				for (final Object item: nodes) {
+			H2QNSet buf = new H2QNSet.Temp(this);
+			try (var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (N) VALUES (?)").prepare(this)) {
+				for (Object item: nodes) {
 					stmt.setLong(1, this.asQN(item).key);
 					stmt.addBatch();
 				}
 				stmt.executeBatch();
 			}
-			final H2QNSet res = new H2QNSet.Temp(this);
+			H2QNSet res = new H2QNSet.Temp(this);
 			new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT DISTINCT * FROM ").push(buf.table).update(this);
 			return res;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
 
 	@Override
-	public H2QVSet newValues(final Object... values) throws NullPointerException, IllegalArgumentException {
+	public H2QVSet newValues(Object... values) throws NullPointerException, IllegalArgumentException {
 		return this.newValues(Arrays.asList(values));
 	}
 
 	@Override
-	public H2QVSet newValues(final Iterable<?> values) throws NullPointerException, IllegalArgumentException {
+	public H2QVSet newValues(Iterable<?> values) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (values instanceof H2QVSet) {
-				final var set = (H2QVSet)values;
+				var set = (H2QVSet)values;
 				if (set.owner == this) {
 					if (set instanceof H2QVSet.Temp) return set;
-					final var res = new H2QVSet.Temp(this);
+					var res = new H2QVSet.Temp(this);
 					new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT V FROM (").push(set).push(")").update(this);
 					return res;
 				}
 			}
-			final var buf = new H2QVSet.Temp(this);
-			try (final var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (V) VALUES (?)").prepare(this)) {
-				for (final Object item: values) {
+			var buf = new H2QVSet.Temp(this);
+			try (var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (V) VALUES (?)").prepare(this)) {
+				for (Object item: values) {
 					stmt.setString(1, this.asQV(item));
 					stmt.addBatch();
 				}
 				stmt.executeBatch();
 			}
-			final var res = new H2QVSet.Temp(this);
+			var res = new H2QVSet.Temp(this);
 			new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT DISTINCT * FROM ").push(buf.table).update(this);
 			return res;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
 
 	@Override
-	public H2QT newTuple(final QN... nodes) throws NullPointerException, IllegalArgumentException {
-		final var size = nodes.length;
-		final var keys = new long[size];
+	public H2QT newTuple(QN... nodes) throws NullPointerException, IllegalArgumentException {
+		var size = nodes.length;
+		var keys = new long[size];
 		for (var i = 0; i < size; i++) {
 			keys[i] = this.asQN(nodes[i]).key;
 		}
@@ -375,9 +375,9 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	@Override
-	public H2QT newTuple(final List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-		final var size = nodes.size();
-		final var keys = new long[size];
+	public H2QT newTuple(List<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
+		var size = nodes.size();
+		var keys = new long[size];
 		for (var i = 0; i < size; i++) {
 			keys[i] = this.asQN(nodes.get(i)).key;
 		}
@@ -385,21 +385,21 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	/** Diese Methode liefert ein neues {@link H2QT Hypertupel} mit den gegebenen Knotenkennungen. */
-	public final H2QT newTuple(final long[] keys) {
+	public final H2QT newTuple(long[] keys) {
 		return new H2QT(this, keys);
 	}
 
 	@Override
-	public H2QTSet newTuples(final List<String> names, final QN... tuples) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet newTuples(List<String> names, QN... tuples) throws NullPointerException, IllegalArgumentException {
 		return this.newTuples(new Names(names), null, tuples);
 	}
 
 	@Override
-	public H2QTSet newTuples(final List<String> names, final Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet newTuples(List<String> names, Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException {
 		if (tuples instanceof H2QTSet) {
-			final var set = this.asQTSet(tuples, names.size());
+			var set = this.asQTSet(tuples, names.size());
 			if (set instanceof H2QTSet.Temp) return set.withNames(names);
-			final var res = new H2QTSet.Temp(this, new Names(names));
+			var res = new H2QTSet.Temp(this, new Names(names));
 			new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT * FROM (").push(set).push(")").update(this);
 			return res;
 		}
@@ -449,7 +449,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	Object putTable() {
 		synchronized (this.tables) {
-			final var name = "QT" + this.newKey(this.putQT);
+			var name = "QT" + this.newKey(this.putQT);
 			this.tables.add(name);
 			return new Object() {
 
@@ -468,7 +468,7 @@ public class H2QS implements QS, AutoCloseable {
 	}
 
 	/** Diese Methode entfernt die Tabelle mit dem gegebenen Namen, sofern dieser Name über {@link #putTable()} erzeugt wurde. */
-	void popTable(final String name) throws SQLException {
+	void popTable(String name) throws SQLException {
 		synchronized (this.tables) {
 			if (this.tables.remove(name)) {
 				try (var stmt = this.conn.createStatement()) {
@@ -478,13 +478,13 @@ public class H2QS implements QS, AutoCloseable {
 		}
 	}
 
-	boolean markPutValue(final boolean changed) {
+	boolean markPutValue(boolean changed) {
 		if (!changed) return false;
 		this.putValueMark = new Object();
 		return true;
 	}
 
-	boolean markPopValue(final boolean changed) {
+	boolean markPopValue(boolean changed) {
 		if (!changed) return false;
 		this.popValueMark = new Object();
 		return true;
@@ -492,21 +492,20 @@ public class H2QS implements QS, AutoCloseable {
 
 	/** Diese Methode führt die gegebene Anfrage {@link PreparedStatement#executeQuery() aus} und gibt den {@link ResultSet#getLong(int) Zahlenwert} des ersten
 	 * Ergebnisses zurück. */
-	private final long newKey(final PreparedStatement stmt) throws NullPointerException, IllegalStateException {
-		try (final var rset = stmt.executeQuery()) {
+	private long newKey(PreparedStatement stmt) throws NullPointerException, IllegalStateException {
+		try (var rset = stmt.executeQuery()) {
 			if (rset.next()) return rset.getLong(1);
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 		throw new IllegalStateException();
 	}
 
-	private final H2QTSet newTuples(final Names names, final Iterable<? extends QT> tuples1, final QN[] tuples2)
-		throws NullPointerException, IllegalArgumentException {
+	private H2QTSet newTuples(Names names, Iterable<? extends QT> tuples1, QN[] tuples2) throws NullPointerException, IllegalArgumentException {
 		try {
-			final var size = names.size();
-			final var buf = new H2QTSet.Temp(this, names);
-			final var qry = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (C0");
+			var size = names.size();
+			var buf = new H2QTSet.Temp(this, names);
+			var qry = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (C0");
 			for (var i = 1; i < size; i++) {
 				qry.push(", C").push(i);
 			}
@@ -515,9 +514,9 @@ public class H2QS implements QS, AutoCloseable {
 				qry.push(", ?");
 			}
 			qry.push(")");
-			try (final var stmt = qry.prepare(this)) {
+			try (var stmt = qry.prepare(this)) {
 				if (tuples2 != null) {
-					final var count = tuples2.length;
+					var count = tuples2.length;
 					if ((count % size) != 0) throw new IllegalArgumentException();
 					for (var r = 0; r < count; r += size) {
 						for (var i = 0; i < size; i++) {
@@ -526,8 +525,8 @@ public class H2QS implements QS, AutoCloseable {
 						stmt.addBatch();
 					}
 				} else {
-					for (final Object item: tuples1) {
-						final var keys = this.asQT(item).keys;
+					for (Object item: tuples1) {
+						var keys = this.asQT(item).keys;
 						if (keys.length != size) throw new IllegalArgumentException();
 						for (var i = 0; i < size; i++) {
 							stmt.setLong(i + 1, keys[i]);
@@ -537,10 +536,10 @@ public class H2QS implements QS, AutoCloseable {
 				}
 				stmt.executeBatch();
 			}
-			final var res = new H2QTSet.Temp(this, names);
+			var res = new H2QTSet.Temp(this, names);
 			new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT DISTINCT * FROM ").push(buf.table).update(this);
 			return res;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}

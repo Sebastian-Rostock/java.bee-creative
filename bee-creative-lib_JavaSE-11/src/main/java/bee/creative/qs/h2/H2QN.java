@@ -1,7 +1,5 @@
 package bee.creative.qs.h2;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import bee.creative.lang.Objects;
 import bee.creative.qs.QN;
@@ -20,11 +18,12 @@ public final class H2QN implements QN {
 	@Override
 	public boolean pop() {
 		try {
-			final PreparedStatement stmt1 = this.owner.popQN, stmt2 = this.owner.popQV;
+			var stmt1 = this.owner.popQN;
 			stmt1.setLong(1, this.key);
+			var stmt2 = this.owner.popQV;
 			stmt2.setLong(1, this.key);
 			return (stmt1.executeUpdate() != 0) | this.owner.markPopValue(stmt2.executeUpdate() != 0);
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
@@ -37,12 +36,12 @@ public final class H2QN implements QN {
 	@Override
 	public String value() {
 		try {
-			final PreparedStatement stmt = this.owner.getQV;
+			var stmt = this.owner.getQV;
 			stmt.setLong(1, this.key);
-			try (final ResultSet rset = stmt.executeQuery()) {
+			try (var rset = stmt.executeQuery()) {
 				return rset.next() ? rset.getString(1) : null;
 			}
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
@@ -58,20 +57,20 @@ public final class H2QN implements QN {
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof H2QN)) return false;
-		final H2QN that = (H2QN)object;
+		var that = (H2QN)object;
 		return (this.key == that.key) && (this.owner == that.owner);
 	}
 
 	@Override
 	public String toString() {
-		final String value = this.value();
+		var value = this.value();
 		return value == null ? Long.toString(this.key) : Objects.toString(value);
 	}
 
-	H2QN(final H2QS owner, final long key) {
+	H2QN(H2QS owner, long key) {
 		this.owner = owner;
 		this.key = key;
 	}

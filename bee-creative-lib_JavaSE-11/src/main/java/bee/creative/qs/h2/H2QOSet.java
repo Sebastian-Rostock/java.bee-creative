@@ -16,7 +16,7 @@ public abstract class H2QOSet<GI, GISet> extends H2QISet<GI> implements QOSet<GI
 
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. */
-	protected H2QOSet(final H2QS owner, final H2QQ table) {
+	protected H2QOSet(H2QS owner, H2QQ table) {
 		super(owner, table);
 	}
 

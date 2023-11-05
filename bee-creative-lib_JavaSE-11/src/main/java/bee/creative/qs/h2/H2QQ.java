@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import bee.creative.lang.Objects;
 import bee.creative.util.Consumer;
-import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert den Bauplan einer Datenbankanfrage als {@link ArrayList Auflistung} von Anfragetoken. Die {@link #toString() Textdarstellung} des
  * Bauplans entspricht der Verkettung der Textdarstellungen der Anfragetoken.
@@ -23,31 +22,31 @@ public final class H2QQ {
 
 	/** Dieser Konstruktor initialisiert den Namen der temporären Tabelle über {@link H2QS#putTable()} und bestückt die Anfrage anschließend mit
 	 * {@code this.push("select * from ").push(this)}. */
-	public H2QQ(final H2QS owner) {
+	public H2QQ(H2QS owner) {
 		this.name = owner.putTable();
 		this.push("SELECT * FROM ").push(this);
 	}
 
 	/** Diese Methode fügt den Namen der temporären Tabelle der gegebenen Anfrage an und gibt {@code this} zurück. */
-	public H2QQ push(final H2QQ table) throws NullPointerException {
+	public H2QQ push(H2QQ table) throws NullPointerException {
 		return this.push(table.name);
 	}
 
 	/** Diese Methode fügt die Anfragetoken der {@link H2QISet#table Anfrage} des gegebenen {@link H2QISet} an und gibt {@code this} zurück. */
-	public H2QQ push(final H2QISet<?> set) throws NullPointerException {
+	public H2QQ push(H2QISet<?> set) throws NullPointerException {
 		this.query.addAll(set.table.query);
 		return this;
 	}
 
 	/** Diese Methode ruft die gegebene Methode mit diesem Objekt auf und gibt {@code this} zurück. */
-	public H2QQ push(final Consumer<? super H2QQ> token) throws NullPointerException {
+	public H2QQ push(Consumer<? super H2QQ> token) throws NullPointerException {
 		token.set(this);
 		return this;
 	}
 
 	/** Diese Methode fügt den gegebenen Anfragetoken an und gibt {@code this} zurück. Der Anfragetoken darf nicht {@code null}, kein {@link H2QQ} und kein
 	 * {@link H2QISet} sein. */
-	public H2QQ push(final Object token) throws NullPointerException {
+	public H2QQ push(Object token) throws NullPointerException {
 		this.query.add(Objects.notNull(token));
 		return this;
 	}
@@ -55,7 +54,7 @@ public final class H2QQ {
 	/** Diese Methode überführt diese Anweisung in eine {@link Connection#prepareStatement(String) aufbereitete} und gibt sie zurück.
 	 *
 	 * @see Connection#prepareStatement(String) */
-	public PreparedStatement prepare(final H2QS owner) throws SQLException {
+	public PreparedStatement prepare(H2QS owner) throws SQLException {
 		return owner.conn.prepareStatement(this.toString());
 	}
 
@@ -63,10 +62,10 @@ public final class H2QQ {
 	 * Tabellenzeilen verändert wurden.
 	 *
 	 * @see Statement#executeUpdate(String) */
-	public boolean update(final H2QS owner) throws IllegalStateException {
-		try (Statement stmt = owner.conn.createStatement()) {
+	public boolean update(H2QS owner) throws IllegalStateException {
+		try (var stmt = owner.conn.createStatement()) {
 			return stmt.executeUpdate(this.toString()) != 0;
-		} catch (final SQLException cause) {
+		} catch (SQLException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}
@@ -75,13 +74,13 @@ public final class H2QQ {
 	 * zurück.
 	 *
 	 * @see Statement#executeQuery(String) */
-	public ResultSet select(final H2QS owner) throws SQLException {
+	public ResultSet select(H2QS owner) throws SQLException {
 		return owner.conn.createStatement().executeQuery(this.toString());
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder res = new StringBuilder(512);
+		var res = new StringBuilder(512);
 		this.query.trimToSize();
 		this.query.forEach(res::append);
 		return res.toString();
