@@ -39,8 +39,8 @@ public interface DE extends DO {
 		return this.label().translate(this.owner().valueTrans());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen
-	 * {@link QN#value() Textwert} besitzen.
+	/** Diese Methode erlaubt Zugriff auf die {@link QN Hyperknoten} zur Erkennung dieses Objekts. Diese Erkennungsknoten sollten dazu einen {@link QN#value()
+	 * Textwert} besitzen.
 	 *
 	 * @see DL#asTargetSet(QN)
 	 * @return Erkennungsknotenmenge. */

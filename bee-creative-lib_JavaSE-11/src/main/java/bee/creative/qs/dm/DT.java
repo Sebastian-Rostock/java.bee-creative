@@ -31,46 +31,53 @@ public interface DT extends DE {
 	 * @see #IDENT_IsTypeWithIdent */
 	@Override
 	default Set2<QN> idents() {
-		return this.parent().getLink(DT.IDENT_IsTypeWithIdent).getTargetSet(this.node());
+		return this.parent().getLink(DT.IDENT_IsTypeWithIdent).asTargetSet(this.node());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die Menge der {@link QN Hyperknoten} der Instanzen dieses Datentyps.
+	/** Diese Methode erlaubt Zugriff auf die {@link QN Hyperknoten} der Instanzen dieses Datentyps. Eine Instanz darf nur einen Datentyp besitzen. Hyperknoten
+	 * mit {@link QN#value() Textwert} sind als Instanz nicht zulässig.
 	 *
 	 * @see DT#IDENT_IsTypeWithInstance
-	 * @return Instanzknotenmenge. */
+	 * @see DL#asTargetSet(QN)
+	 * @return Instanzknoten. */
 	default Set2<QN> instances() {
-		return this.parent().getLink(DT.IDENT_IsTypeWithInstance).getTargetSet(this.node());
+		return this.parent().getLink(DT.IDENT_IsTypeWithInstance).asTargetSet(this.node());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetType() Ziel} erwünschenden {@link DL
-	 * Datenfelder}.
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#targetTypeAsType() Objektdatentyp} zulassenden
+	 * {@link DL Datenfelder}.
 	 *
 	 * @see DL#IDENT_IsLinkWithTargetType
-	 * @return Zielfeldknoten. */
+	 * @see DL#asSourceSet(QN)
+	 * @return Objektdatenfeldknoten. */
 	default Set2<QN> targetLinks() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetType).asSourceSet(this.node());
 	}
 
-	/** Diese Methode liefert die diesen Datentyp als {@link DL#targetType() Ziel} erwünschenden {@link DL Datenfelder}.
+	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#targetTypeAsType() Objektdatentyp} zulassenden {@link DL Datenfelder}.
 	 *
+	 * @see DT#targetLinks()
 	 * @see DM#linkTrans()
-	 * @return Zieldatenfelder. */
+	 * @return Objektdatenfelder. */
 	default Set2<DL> targetLinksAsLinks() {
 		return this.targetLinks().translate(this.parent().linkTrans());
 	}
 
-	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#sourceType() Quelle} erwünschenden {@link DL Datenfelder}.
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} der diesen Datentyp als {@link DL#sourceTypeAsType() Subjektdatentyp} zulassenden
+	 * {@link DL Datenfelder}.
 	 *
 	 * @see DL#IDENT_IsLinkWithSourceType
-	 * @return Quellfeldknoten. */
+	 * @see DL#asSourceSet(QN)
+	 * @return Subjektdatenfeldknoten. */
 	default Set2<QN> sourceLinks() {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceType).asSourceSet(this.node());
 	}
 
-	/** Diese Methode liefert die diesen Datentyp als {@link DL#sourceType() Quelle} erwünschenden {@link DL Datenfelder}.
+	/** Diese Methode erlaubt Zugriff auf die diesen Datentyp als {@link DL#sourceTypeAsType() Subjektdatentyp} zulassenden {@link DL Datenfelder}.
 	 *
+	 * @see DT#sourceLinks()
 	 * @see DM#linkTrans()
-	 * @return Quelldatenfelder. */
+	 * @return Subjektdatenfelder. */
 	default Set2<DL> sourceLinksAsLinks() {
 		return this.sourceLinks().translate(this.parent().linkTrans());
 	}
