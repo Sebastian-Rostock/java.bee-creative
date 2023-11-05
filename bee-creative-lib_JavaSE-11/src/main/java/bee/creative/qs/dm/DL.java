@@ -16,8 +16,8 @@ import bee.creative.util.Translators;
 import bee.creative.util.Translators.EnumTranslator;
 import bee.creative.util.Translators.OptionalizedTranslator;
 
-/** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) mit Bezug zu einem {@link #parent() Domänenmodell}, {@link #label() Beschriftung},
- * {@link #idents() Erkennungsmerkmalen} sowie Kriterien zulässiger {@link #edges() Hyperkanten}.
+/** Diese Schnittstelle definiert ein Datenfeld (Domain-Link) als {@link #label() beschriftete} und {@link #idents() erkennbarer} {@link #node() Prädikatknoten}
+ * mit Festlegungen zur Vielzahl, Handhabung und Typisierung der damit verbundenen Objekt- und Subjektknoten.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DL extends DE {
@@ -67,7 +67,7 @@ public interface DL extends DE {
 	 * @see #IDENT_IsLinkWithIdent */
 	@Override
 	default Set2<QN> idents() {
-		return this.parent().getLink(DL.IDENT_IsLinkWithIdent).getTargetSet(this.node());
+		return this.parent().getLink(DL.IDENT_IsLinkWithIdent).asTargetSet(this.node());
 	}
 
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link QE#context() Kontextknoten} des {@link #parent()

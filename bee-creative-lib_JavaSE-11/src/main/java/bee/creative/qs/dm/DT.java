@@ -4,6 +4,10 @@ import bee.creative.qs.QN;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
+/** Diese Schnittstelle definiert einen Datentyp (Domain-type) als {@link #label() beschriftete} und {@link #idents() erkennbare} {@link #instances()
+ * Instanzmenge}.
+ *
+ * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DT extends DE {
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DT}. */

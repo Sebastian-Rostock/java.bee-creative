@@ -5,7 +5,7 @@ import bee.creative.qs.QS;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert ein Domänenkonstante (domain-enum) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Domänenmodell}, einer
+/** Diese Schnittstelle definiert ein Domänenkonstante (Domain-Enum) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Domänenmodell}, einer
  * {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

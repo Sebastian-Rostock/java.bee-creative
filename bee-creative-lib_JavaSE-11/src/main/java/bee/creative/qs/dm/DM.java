@@ -9,11 +9,12 @@ import bee.creative.util.Set2;
 import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
 import bee.creative.util.Translators.OptionalizedTranslator;
+//TODO 
 
 /** Diese Schnittstelle definiert ein Domänenmodell (domain-model), dass auf einem {@link #owner() Graphspeicher} aufbaut
  * und Wissen in Form von {@link QE Hyperkanten} mit einem bestimmten {@link #context() Kontextknoten}
  * beschreibt.
- *   
+ *   <p>
  * Die Prädikatknoten stehen objektrelational gesehen für Datenfelder bzw. Spalten konkreter Tabellen.
  *  mit optionalem Dytentyp für source und target
  *
