@@ -1,15 +1,28 @@
-package bee.creative.qs.ds;
+package bee.creative.qs.dm;
 
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
+import bee.creative.qs.QS;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
 import bee.creative.util.Translators.OptionalizedTranslator;
 
-/** Diese Schnittstelle definiert ein Domänenmodell (domain-model).
+/** Diese Schnittstelle definiert ein Domänenmodell (domain-model), dass auf einem {@link #owner() Graphspeicher} aufbaut
+ * und Wissen in Form von {@link QE Hyperkanten} mit einem bestimmten {@link #context() Kontextknoten}
+ * beschreibt.
+ *   
+ * Die Prädikatknoten stehen objektrelational gesehen für Datenfelder bzw. Spalten konkreter Tabellen.
+ *  mit optionalem Dytentyp für source und target
+ *
+ *  * <p>
+ *
+ * TODO Datentyp pflicht für interne Knoten und verboten für externe knoten.
+ * <p>
+ * TODO 
+ *  
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DM extends QO {

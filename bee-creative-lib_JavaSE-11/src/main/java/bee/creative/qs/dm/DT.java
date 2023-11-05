@@ -1,4 +1,4 @@
-package bee.creative.qs.ds;
+package bee.creative.qs.dm;
 
 import bee.creative.qs.QN;
 import bee.creative.util.Property2;
@@ -23,7 +23,7 @@ public interface DT extends DE {
 	 * @see #IDENT_IsTypeWithLabel */
 	@Override
 	default Property2<QN> label() {
-		return this.parent().getLink(DT.IDENT_IsTypeWithLabel).asTargetProp(this.node());
+		return this.parent().getLink(DT.IDENT_IsTypeWithLabel).asTargetProperty(this.node());
 	}
 
 	/** {@inheritDoc}
@@ -42,7 +42,7 @@ public interface DT extends DE {
 		return this.parent().getLink(DT.IDENT_IsTypeWithInstance).getTargetSet(this.node());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#targetType() Ziel} erwünschenden {@link DL
 	 * Datenfelder}.
 	 *
 	 * @see DL#IDENT_IsLinkWithTargetType
@@ -51,7 +51,7 @@ public interface DT extends DE {
 		return this.parent().getLink(DL.IDENT_IsLinkWithTargetType).asSourceSet(this.node());
 	}
 
-	/** Diese Methode liefert die diesen Datentyp als {@link DL#targetTypes() Ziel} erwünschenden {@link DL Datenfelder}.
+	/** Diese Methode liefert die diesen Datentyp als {@link DL#targetType() Ziel} erwünschenden {@link DL Datenfelder}.
 	 *
 	 * @see DM#linkTrans()
 	 * @return Zieldatenfelder. */
@@ -59,7 +59,7 @@ public interface DT extends DE {
 		return this.targetLinks().translate(this.parent().linkTrans());
 	}
 
-	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
+	/** Diese Methode liefert die {@link DL#node() Feldknoten} der diesen Datentyp als {@link DL#sourceType() Quelle} erwünschenden {@link DL Datenfelder}.
 	 *
 	 * @see DL#IDENT_IsLinkWithSourceType
 	 * @return Quellfeldknoten. */
@@ -67,7 +67,7 @@ public interface DT extends DE {
 		return this.parent().getLink(DL.IDENT_IsLinkWithSourceType).asSourceSet(this.node());
 	}
 
-	/** Diese Methode liefert die diesen Datentyp als {@link DL#sourceTypes() Quelle} erwünschenden {@link DL Datenfelder}.
+	/** Diese Methode liefert die diesen Datentyp als {@link DL#sourceType() Quelle} erwünschenden {@link DL Datenfelder}.
 	 *
 	 * @see DM#linkTrans()
 	 * @return Quelldatenfelder. */

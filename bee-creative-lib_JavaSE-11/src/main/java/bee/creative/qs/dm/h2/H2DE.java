@@ -1,7 +1,7 @@
-package bee.creative.qs.ds.h2;
+package bee.creative.qs.dm.h2;
 
 import bee.creative.lang.Objects;
-import bee.creative.qs.ds.DE;
+import bee.creative.qs.dm.DE;
 import bee.creative.qs.h2.H2QN;
 import bee.creative.qs.h2.H2QS;
 

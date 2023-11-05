@@ -1,4 +1,4 @@
-package bee.creative.qs.ds;
+package bee.creative.qs.dm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,18 +6,24 @@ import java.util.Map;
 import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
-import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
 import bee.creative.util.Consumer;
 import bee.creative.util.Filters;
+import bee.creative.util.Getter;
 import bee.creative.util.HashMap2;
 import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
 
 public class DS {
 
-	public static QNSet getObjectSet(QN context, QN predicate, QN subject) throws NullPointerException, IllegalArgumentException {
-		return DS.getEdgesHavingContextAndPredicate(context, predicate).withSubject(subject).objects();
+	public static List<QN> getObjectSet(QN context, QN predicate, QN subject) throws NullPointerException, IllegalArgumentException {
+		return DS.getEdgesHavingContextAndPredicate(context, predicate).withSubject(subject).objects().toList();
+	}
+
+	public static HashMap2<QN, QN> getObjectMap(QN context, QN predicate) throws NullPointerException, IllegalArgumentException {
+		var subjectObjectMap = new HashMap2<QN, QN>(10);
+		DS.getEdgesHavingContextAndPredicate(context, predicate).forEach(edge -> subjectObjectMap.put(edge.subject(), edge.object()));
+		return subjectObjectMap;
 	}
 
 	/** Diese Methode liefert zu jedem der gegebenen {@link QE#subject() Subjektknoten} einen diesem über {@link QE Hyperkanten} mit dem gegebenen
@@ -36,6 +42,13 @@ public class DS {
 		return subjectObjectMap;
 	}
 
+	public static HashMap2<QN, List<QN>> getObjectSetMap(QN context, QN predicate) throws NullPointerException, IllegalArgumentException {
+		var objectSet = (Getter<QN, List<QN>>)object -> new ArrayList<>();
+		var subjectObjectSetMap = new HashMap2<QN, List<QN>>(10);
+		DS.getEdgesHavingContextAndPredicate(context, predicate).forEach(edge -> subjectObjectSetMap.install(edge.subject(), objectSet).add(edge.object()));
+		return subjectObjectSetMap;
+	}
+
 	/** Diese Methode liefert zu jedem der gegebenen {@link QE#subject() Subjektknoten} alle diesem über {@link QE Hyperkanten} mit dem gegebenen
 	 * {@link QE#context() Kontextknoten} und dem gegebenen {@link QE#predicate() Prädikatknoten} zugeordneten {@link QE#object() Objektknoten}. Zu jedem
 	 * Subjektknoten, dem kein Objektknoten zugeordnet ist, wird eine leere Liste geliefert.
@@ -52,8 +65,14 @@ public class DS {
 		return subjectObjectSetMap;
 	}
 
-	public static QNSet getSubjectSet(QN context, QN predicate, QN object) throws NullPointerException, IllegalArgumentException {
-		return DS.getEdgesHavingContextAndPredicate(context, predicate).withObject(object).objects();
+	public static List<QN> getSubjectSet(QN context, QN predicate, QN object) throws NullPointerException, IllegalArgumentException {
+		return DS.getEdgesHavingContextAndPredicate(context, predicate).withObject(object).objects().toList();
+	}
+
+	public static HashMap2<QN, QN> getSubjectMap(QN context, QN predicate) throws NullPointerException, IllegalArgumentException {
+		var objectSubjectMap = new HashMap2<QN, QN>(10);
+		DS.getEdgesHavingContextAndPredicate(context, predicate).forEach(edge -> objectSubjectMap.put(edge.object(), edge.subject()));
+		return objectSubjectMap;
 	}
 
 	public static HashMap2<QN, QN> getSubjectMap(QN context, QN predicate, Iterable<? extends QN> objectSet)
@@ -62,6 +81,13 @@ public class DS {
 		DS.getEdgesHavingContextAndPredicateAndObjects(context, predicate, objectSubjectMap.keySet())
 			.forEach(edge -> objectSubjectMap.put(edge.object(), edge.subject()));
 		return objectSubjectMap;
+	}
+
+	public static HashMap2<QN, List<QN>> getSubjectSetMap(QN context, QN predicate) throws NullPointerException, IllegalArgumentException {
+		var subjectSet = (Getter<QN, List<QN>>)object -> new ArrayList<>();
+		var objectSubjectSetMap = new HashMap2<QN, List<QN>>(10);
+		DS.getEdgesHavingContextAndPredicate(context, predicate).forEach(edge -> objectSubjectSetMap.install(edge.object(), subjectSet).add(edge.subject()));
+		return objectSubjectSetMap;
 	}
 
 	public static HashMap2<QN, List<QN>> getSubjectSetMap(QN context, QN predicate, Iterable<? extends QN> objectSet)
@@ -163,13 +189,13 @@ public class DS {
 	}
 
 	static HashMap2<QN, QN> newNodeNodeMap(Iterable<? extends QN> nodeSet) {
-		var nodeMap = new HashMap2<QN, QN>(100);
+		var nodeMap = new HashMap2<QN, QN>(10);
 		nodeSet.forEach(node -> nodeMap.put(node, null));
 		return nodeMap;
 	}
 
 	static HashMap2<QN, List<QN>> newNodeNodeSetMap(Iterable<? extends QN> nodeSet) {
-		var nodeSetMap = new HashMap2<QN, List<QN>>(100);
+		var nodeSetMap = new HashMap2<QN, List<QN>>(10);
 		nodeSet.forEach(node -> nodeSetMap.put(node, new ArrayList<>()));
 		return nodeSetMap;
 	}
@@ -342,18 +368,18 @@ public class DS {
 		var CLONE_WITH_EDGE = new Object();
 		var CLONE_WITH_NODE = new Object();
 
-		var cloneWithObject = new HashMap2<QN, Object>(100);
+		var cloneWithObject = new HashMap2<QN, Object>(10);
 		var cloneEdgeWithObject = (Consumer<QN>)predicate -> cloneWithObject.put(predicate, CLONE_WITH_EDGE);
 		var cloneNodeWithObject = (Consumer<QN>)predicate -> cloneWithObject.put(predicate, CLONE_WITH_NODE);
 
-		var cloneWithSubject = new HashMap2<QN, Object>(100);
+		var cloneWithSubject = new HashMap2<QN, Object>(10);
 		var cloneEdgeWithSubject = (Consumer<QN>)predicate -> cloneWithSubject.put(predicate, CLONE_WITH_EDGE);
 		var cloneNodeWithSubject = (Consumer<QN>)predicate -> cloneWithSubject.put(predicate, CLONE_WITH_NODE);
 
-		var nodesToClone = new ArrayList<QN>(100);
+		var nodesToClone = new ArrayList<QN>(10);
 
-		var nodesToCheckForClone = new HashSet2<QN>(100);
-		var nodesToCheckForValue = new HashSet2<QN>(100);
+		var nodesToCheckForClone = new HashSet2<QN>(10);
+		var nodesToCheckForValue = new HashSet2<QN>(10);
 
 		var qs = context.owner();
 		var edges = qs.edges().havingContext(context);

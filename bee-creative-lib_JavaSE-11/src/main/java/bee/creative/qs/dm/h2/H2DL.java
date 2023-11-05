@@ -1,7 +1,7 @@
-package bee.creative.qs.ds.h2;
+package bee.creative.qs.dm.h2;
 
 import bee.creative.qs.QN;
-import bee.creative.qs.ds.DL;
+import bee.creative.qs.dm.DL;
 import bee.creative.qs.h2.H2QESet;
 import bee.creative.qs.h2.H2QN;
 

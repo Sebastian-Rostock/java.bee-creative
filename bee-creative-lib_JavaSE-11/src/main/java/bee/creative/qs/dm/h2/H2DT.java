@@ -1,6 +1,6 @@
-package bee.creative.qs.ds.h2;
+package bee.creative.qs.dm.h2;
 
-import bee.creative.qs.ds.DT;
+import bee.creative.qs.dm.DT;
 import bee.creative.qs.h2.H2QN;
 
 public class H2DT extends H2DE implements DT {

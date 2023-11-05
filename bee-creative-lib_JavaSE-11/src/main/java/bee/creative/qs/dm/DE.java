@@ -1,12 +1,12 @@
-package bee.creative.qs.ds;
+package bee.creative.qs.dm;
 
 import bee.creative.qs.QN;
 import bee.creative.qs.QS;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert ein Domänenkonstante (domain-enum) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Domänenmodell} sowie
- * mit {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
+/** Diese Schnittstelle definiert ein Domänenkonstante (domain-enum) als {@link #node() Hyperknoten} mit Bezug zu einem {@link #parent() Domänenmodell}, einer
+ * {@link #label() Beschriftung} und {@link #idents() Erkennungsmerkmalen}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DE extends DO {
@@ -27,7 +27,7 @@ public interface DE extends DO {
 	/** Diese Methode erlaubt Zugriff auf den {@link QN Hyperknoten} zur Beschriftung dieses Objekts. Dieser Beschriftungsknoten sollte dazu einen
 	 * {@link QN#value() Textwert} besitzen oder beschreiben.
 	 *
-	 * @see DL#asTargetProp(QN)
+	 * @see DL#asTargetProperty(QN)
 	 * @return Beschriftungsknoten. */
 	Property2<QN> label();
 
