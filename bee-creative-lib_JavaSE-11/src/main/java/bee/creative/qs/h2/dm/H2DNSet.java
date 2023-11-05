@@ -1,4 +1,4 @@
-package bee.creative.qs.dm.h2;
+package bee.creative.qs.h2.dm;
 
 import bee.creative.qs.dm.DNSet;
 import bee.creative.qs.h2.H2QNSet;

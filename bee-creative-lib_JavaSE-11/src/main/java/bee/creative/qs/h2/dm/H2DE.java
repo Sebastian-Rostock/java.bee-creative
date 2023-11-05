@@ -1,4 +1,4 @@
-package bee.creative.qs.dm.h2;
+package bee.creative.qs.h2.dm;
 
 import bee.creative.lang.Objects;
 import bee.creative.qs.dm.DE;

@@ -1,4 +1,4 @@
-package bee.creative.qs.dm.h2;
+package bee.creative.qs.h2.dm;
 
 import java.util.ArrayList;
 import java.util.List;
