@@ -1,4 +1,4 @@
-package bee.creative.qs.dm;
+package bee.creative.qs.ds;
 
 import java.util.List;
 import bee.creative.qs.QN;

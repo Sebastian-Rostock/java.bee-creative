@@ -1,4 +1,4 @@
-package bee.creative.qs.dm;
+package bee.creative.qs.ds;
 
 import bee.creative.qs.QN;
 import bee.creative.util.Property2;

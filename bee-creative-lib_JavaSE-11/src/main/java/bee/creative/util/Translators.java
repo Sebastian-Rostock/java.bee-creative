@@ -1,6 +1,7 @@
 package bee.creative.util;
 
 import java.util.Arrays;
+import java.util.Map;
 import bee.creative.lang.Objects;
 
 /** Diese Klasse implementiert grundlegende {@link Translator}.
@@ -324,6 +325,10 @@ public class Translators {
 
 	public static <GEnum extends Enum<?>> Translator2<String, GEnum> fromEnum(Class<GEnum> enumClass) throws NullPointerException {
 		return Translators.fromEnum(Enum::name, enumClass.getEnumConstants());
+	}
+
+	public static <GSource, GTarget> Translator2<GSource, GTarget> fromEnum(Map<GTarget, GSource> sourceByTarget) throws NullPointerException {
+		return Translators.fromEnum(sourceByTarget::get, sourceByTarget.keySet());
 	}
 
 	@SafeVarargs
