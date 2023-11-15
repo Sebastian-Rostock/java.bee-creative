@@ -1,32 +1,35 @@
 package bee.creative.qs.h2.ds;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import bee.creative.qs.QN;
 import bee.creative.qs.ds.DH;
 import bee.creative.qs.ds.DL;
-import bee.creative.qs.ds.DM;
-import bee.creative.qs.ds.DT;
 import bee.creative.qs.ds.DL.Handling;
 import bee.creative.qs.ds.DL.Multiplicity;
+import bee.creative.qs.ds.DM;
+import bee.creative.qs.ds.DS;
+import bee.creative.qs.ds.DT;
 import bee.creative.qs.h2.H2QESet;
 import bee.creative.qs.h2.H2QN;
 import bee.creative.qs.h2.H2QS;
 import bee.creative.util.Getter;
 import bee.creative.util.HashMap2;
-import bee.creative.util.Iterable2;
 import bee.creative.util.Iterables;
 import bee.creative.util.Setter;
-import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
 import bee.creative.util.Translators;
 
 public class H2DM implements DM {
 
+	public final H2DS parent;
+
 	public final H2QN context;
 
-	public H2DM(H2QN context) {
-		this.context = context;
+	public H2DM(H2DS parent) {
+		this(parent, parent.owner().newNode());
+		parent.models().add(this.context);
 	}
 
 	@Override
@@ -40,130 +43,123 @@ public class H2DM implements DM {
 	}
 
 	@Override
+	public DS parent() {
+		return this.parent;
+	}
+
+	@Override
 	public H2QN context() {
 		return this.context;
 	}
 
 	@Override
 	public DH history() {
+		// TODO
 		return null;
 	}
 
 	@Override
 	public H2DL getLink(QN ident) {
+		this.checkMaps();
 		return this.linkByNodeMap.get(ident);
 	}
 
 	@Override
 	public H2DL getLink(String ident) {
+		this.checkMaps();
 		return this.linkByTextMap.get(ident);
 	}
 
 	@Override
 	public H2DT getType(QN ident) {
+		this.checkMaps();
 		return this.typeByNodeMap.get(ident);
 	}
 
 	@Override
 	public H2DT getType(String ident) {
+		this.checkMaps();
 		return this.typeByTextMap.get(ident);
 	}
 
 	@Override
 	public void updateIdents() {
+		var rollback = true;
+		var linkByTextMapBackup = this.linkByTextMap;
+		var linkByNodeMapBackup = this.linkByNodeMap;
+		var typeByTextMapBackup = this.typeByTextMap;
+		var typeByNodeMapBackup = this.typeByNodeMap;
+		try {
+			linkByTextMap = new HashMap2<>(100);
+			linkByNodeMap = new HashMap2<>(100);
+			typeByTextMap = new HashMap2<>(100);
+			typeByNodeMap = new HashMap2<>(100);
 
-		var linkByTextMap = new HashMap2<String, H2DL>(100);
-		var linkByNodeMap = new HashMap2<QN, H2DL>(100);
-		var typeByTextMap = new HashMap2<String, H2DT>(100);
-		var typeByNodeMap = new HashMap2<QN, H2DT>(100);
+			var isLinkWithIdent_IdentText = DL.IDENT_IsLinkWithIdent;
+			var isLinkWithIdent_IdentNode = this.owner().newNode(isLinkWithIdent_IdentText);
 
-		var isLinkWithIdent_IdentText = DL.IDENT_IsLinkWithIdent;
-		var isLinkWithIdent_IdentNode = this.owner().newNode(isLinkWithIdent_IdentText);
+			var isLinkWithIdent_EdgeList = this.edges().havingObject(isLinkWithIdent_IdentNode) //
+				.iterator().filter(edge -> edge.subject().equals(edge.predicate())).toList();
 
-		var isLinkWithIdent_EdgeList = this.edges().havingObject(isLinkWithIdent_IdentNode) //
-			.iterator().filter(edge -> edge.subject().equals(edge.predicate())).toList();
+			if (isLinkWithIdent_EdgeList.size() > 1) //
+				throw new IllegalArgumentException("DL with ident " + isLinkWithIdent_IdentText + " is not unique");
 
-		if (isLinkWithIdent_EdgeList.size() > 1) //
-			throw new IllegalArgumentException("DL with ident " + isLinkWithIdent_IdentText + " is not unique");
+			if (isLinkWithIdent_EdgeList.isEmpty()) {
 
-		if (isLinkWithIdent_EdgeList.isEmpty()) {
-
-			var isLinkWithIdent = this.asLink(this.owner().newNode());
-			isLinkWithIdent.setTarget(isLinkWithIdent.node, isLinkWithIdent_IdentNode);
-			linkByTextMap.put(isLinkWithIdent_IdentText, isLinkWithIdent);
-			linkByNodeMap.put(isLinkWithIdent_IdentNode, isLinkWithIdent);
-
-			var rollbackSetup = true;
-			var linkByTextMap2 = this.linkByTextMap;
-			var linkByNodeMap2 = this.linkByNodeMap;
-			var typeByTextMap2 = this.typeByTextMap;
-			var typeByNodeMap2 = this.typeByNodeMap;
-
-			try {
-
-				this.linkByTextMap = linkByTextMap;
-				this.linkByNodeMap = linkByNodeMap;
-				this.typeByTextMap = typeByTextMap;
-				this.typeByNodeMap = typeByNodeMap;
+				var isLinkWithIdent = this.asLink(this.owner().newNode());
+				isLinkWithIdent.setTarget(isLinkWithIdent.node(), isLinkWithIdent_IdentNode);
+				linkByTextMap.put(isLinkWithIdent_IdentText, isLinkWithIdent);
+				linkByNodeMap.put(isLinkWithIdent_IdentNode, isLinkWithIdent);
 
 				this.customSetup();
 				this.checkLinkByTextMap(this.linkByTextMap);
 				this.checkTypeByTextMap(this.typeByTextMap);
-				rollbackSetup = false;
 
-			} finally {
+			} else {
+				var isLinkWithIdent = this.asLink(isLinkWithIdent_EdgeList.get(0).predicate());
 
-				if (rollbackSetup) {
-					this.linkByTextMap = linkByTextMap2;
-					this.linkByNodeMap = linkByNodeMap2;
-					this.typeByTextMap = typeByTextMap2;
-					this.typeByNodeMap = typeByNodeMap2;
-				}
+				this.setupIdentMaps(isLinkWithIdent, linkByNodeMap::put, linkByTextMap::put, this::asLink, ident -> "DL with ident " + ident + " is not unique");
+				this.checkLinkByTextMap(linkByTextMap);
+
+				var isTypeWithIdent = linkByTextMap.get(DT.IDENT_IsTypeWithIdent);
+
+				this.setupIdentMaps(isTypeWithIdent, typeByNodeMap::put, typeByTextMap::put, this::asType, ident -> "DT with ident " + ident + " is not unique");
+				this.checkTypeByTextMap(typeByTextMap);
 
 			}
-		} else {
-			var isLinkWithIdent = this.asLink(isLinkWithIdent_EdgeList.get(0).predicate());
 
-			this.setupIdentMaps(isLinkWithIdent, linkByNodeMap::put, linkByTextMap::put, this::asLink, ident -> "DL with ident " + ident + " is not unique");
-			this.checkLinkByTextMap(linkByTextMap);
+			this.linkByTextMap.compact();
+			this.linkByNodeMap.compact();
+			this.typeByTextMap.compact();
+			this.typeByNodeMap.compact();
 
-			var isTypeWithIdent = linkByTextMap.get(DT.IDENT_IsTypeWithIdent);
-
-			this.setupIdentMaps(isTypeWithIdent, typeByNodeMap::put, typeByTextMap::put, this::asType, ident -> "DT with ident " + ident + " is not unique");
-			this.checkTypeByTextMap(typeByTextMap);
-
-			this.linkByTextMap = linkByTextMap;
-			this.linkByNodeMap = linkByNodeMap;
-			this.typeByTextMap = typeByTextMap;
-			this.typeByNodeMap = typeByNodeMap;
-
+			rollback = false;
+		} finally {
+			if (rollback) {
+				this.linkByTextMap = linkByTextMapBackup;
+				this.linkByNodeMap = linkByNodeMapBackup;
+				this.typeByTextMap = typeByTextMapBackup;
+				this.typeByNodeMap = typeByNodeMapBackup;
+			}
 		}
-
-		this.linkByTextMap.compact();
-		this.linkByNodeMap.compact();
-		this.typeByTextMap.compact();
-		this.typeByNodeMap.compact();
-
 	}
 
 	@Override
 	public Translator2<QN, DL> linkTrans() {
-		return this.linkTrans;
+		return this.linkTrans == null ? this.linkTrans = Translators.from(QN.class, DL.class, this::asLink, DL::node).optionalize() : this.linkTrans;
 	}
 
 	@Override
 	public Translator2<QN, DT> typeTrans() {
-		return this.typeTrans;
+		return this.typeTrans == null ? this.typeTrans = Translators.from(QN.class, DT.class, this::asType, DT::node).optionalize() : this.typeTrans;
 	}
 
-	/** Diese Methode liefet die {@link DL#node() Feldknoten} der {@link DL Datenfelder} mit den gegebenen {@link DL#identsAsStrings() Erkennungstextwerten}. */
-	protected Iterable2<QN> getLinkNodes(String... linkIdents) {
-		return Iterables.fromArray(linkIdents).translate(this::getLink).translate(H2DL::node);
+	protected H2DL asLink(QN node) {
+		return new H2DL(this, this.context.owner.asQN(node));
 	}
 
-	/** Diese Methode liefet die {@link DT#node() Typknoten} der {@link DT Datentypen} mit den gegebenen {@link DT#identsAsStrings() Erkennungstextwerten}. */
-	protected Iterable2<QN> getTypeNodes(String... typeIdents) {
-		return Iterables.fromArray(typeIdents).translate(this::getType).translate(H2DT::node);
+	protected H2DT asType(QN node) {
+		return new H2DT(this, this.context.owner.asQN(node));
 	}
 
 	/** Diese Methode TODO */
@@ -207,40 +203,12 @@ public class H2DM implements DM {
 
 		this.customSetup(setup);
 
-		var nodeByValueMap = new HashMap2<String, QN>(100);
-		var valueSet = this.owner().newValues(Iterables.concatAll(Iterables.translate(//
-			Arrays.asList(setup.typeLabelMap, setup.linkLabelMap, setup.linkSourceTypeMap, setup.linkSourceHandlingMap, setup.linkSourceMultiplicityMap),
-			map -> map.keySet().concat(map.values()))));
-		valueSet.putAll();
-		valueSet.nodes(nodeByValueMap::put);
-
-		var tr = Translators.fromEnum(nodeByValueMap).reverse();
-
-	var linkIdentTrans =	linkByTextMap.translate(Translators.neutral(), Translators.neutral());
-		
-		
-		setup.linkLabelMap.keySet()
-			.forEach(ident -> this.linkByNodeMap.put(nodeByValueMap.get(ident), this.linkByTextMap.install(ident, ignored -> this.asLink(owner.newNode()))));
-
-		setup.typeLabelMap.keySet()
-			.forEach(ident -> this.typeByNodeMap.put(nodeByValueMap.get(ident), this.typeByTextMap.install(ident, ignored -> this.asType(owner.newNode()))));
-
 		this.checkLinkByTextMap(this.linkByTextMap);
 		this.checkTypeByTextMap(this.typeByTextMap);
 
-		setup.typeLabelMap.translate(typeIdentTrans, tr);
+		// TODO
 		
-		getLink(DT.IDENT_IsTypeWithLabel).setTargetMap(null);
-		
-		setup.setupLinkMap.forEach((linkIdent, linkSetupList) -> {
-			var link = this.getLink(linkIdent);
-			linkSetupList.forEach(linkSetup -> linkSetup.set(link));
-		});
-
-		setup.setupTypeMap.forEach((typeIdent, typeSetupList) -> {
-			var type = this.getType(typeIdent);
-			typeSetupList.forEach(typeSetup -> typeSetup.set(type));
-		});
+		this.getLink(DT.IDENT_IsTypeWithLabel).setTargetMap(null);
 
 		this.typesAsTypes().addAll(this.typeByNodeMap.values());
 		this.linksAsLinks().addAll(this.linkByNodeMap.values());
@@ -286,27 +254,31 @@ public class H2DM implements DM {
 		setup.putLink(DL.IDENT_IsLinkWithTargetMultiplicity, "link-target-multiplicity", DL.IDENT_IsLink, Handling.Association, Multiplicity.Multiplicity0N, null,
 			Handling.Aggregation, Multiplicity.Multiplicity11);
 
+		setup.apply();
+
 	}
 
-	protected H2DL asLink(QN node) {
-		return new H2DL(this, this.context.owner.asQN(node));
+	H2DM(H2DS parent, H2QN context) {
+		this.parent = parent;
+		this.context = context;
 	}
 
-	protected H2DT asType(QN node) {
-		return new H2DT(this, this.context.owner.asQN(node));
+	private Translator2<QN, DL> linkTrans;
+
+	protected HashMap2<String, H2DL> linkByTextMap;
+
+	protected HashMap2<QN, H2DL> linkByNodeMap;
+
+	private Translator2<QN, DT> typeTrans;
+
+	protected HashMap2<String, H2DT> typeByTextMap;
+
+	protected HashMap2<QN, H2DT> typeByNodeMap;
+
+	private void checkMaps() {
+		if (this.linkByNodeMap != null) return;
+		this.updateIdents();
 	}
-
-	protected HashMap2<String, H2DL> linkByTextMap = new HashMap2<>();
-
-	protected HashMap2<QN, H2DL> linkByNodeMap = new HashMap2<>();
-
-	protected HashMap2<String, H2DT> typeByTextMap = new HashMap2<>();
-
-	protected HashMap2<QN, H2DT> typeByNodeMap = new HashMap2<>();
-
-	private final Translator2<QN, DL> linkTrans = Translators.from(QN.class, DL.class, this::asLink, DL::node).optionalize();
-
-	private final Translator2<QN, DT> typeTrans = Translators.from(QN.class, DT.class, this::asType, DT::node).optionalize();
 
 	private void checkLinkByTextMap(HashMap2<String, H2DL> linkByTextMap) {
 		this.checkIdentMap(linkByTextMap, ident -> "DL with ident " + ident + " is missing", //
@@ -321,41 +293,82 @@ public class H2DM implements DM {
 			DT.IDENT_IsType, DL.IDENT_IsLink);
 	}
 
-	protected class Setup {
-
+	protected final class Setup {
+	
 		public void putType(String ident, String label) {
-
-			var t = H2DM.this.typeByTextMap.install(ident, ignored -> asType(owner().newNode()));
-
-			this.typeLabelMap.put(ident, label);
+			this.typeSetupMap.put(ident, Arrays.asList(label));
 		}
-
+	
 		public void putLink(String ident, String label, String sourceTypeIdent, Handling sourceHandling, Multiplicity sourceMultiplicity, String targetTypeIdent,
-			DL.Handling targetHandling, DL.Multiplicity targetMultiplicity) {
-			this.linkLabelMap.put(ident, label);
-			this.linkSourceTypeMap.put(ident, sourceTypeIdent);
-			this.linkSourceHandlingMap.put(ident, Handling.trans.toSource(sourceHandling));
-			this.linkSourceMultiplicityMap.put(ident, Multiplicity.trans.toSource(sourceMultiplicity));
-			this.linkTargetTypeMap.put(ident, targetTypeIdent);
-			this.linkTargetHandlingMap.put(ident, Handling.trans.toSource(targetHandling));
-			this.linkTargetMultiplicityMap.put(ident, Multiplicity.trans.toSource(targetMultiplicity));
+			Handling targetHandling, Multiplicity targetMultiplicity) {
+			this.linkSetupMap.put(ident, Arrays.asList(label, //
+				sourceTypeIdent, Handling.trans.toSource(sourceHandling), Multiplicity.trans.toSource(sourceMultiplicity), //
+				targetTypeIdent, Handling.trans.toSource(targetHandling), Multiplicity.trans.toSource(targetMultiplicity)));
+		}
+	
+		HashMap2<String, QN> createNodeByValueMap(Iterable<?> values) {
+			var valueSet = H2DM.this.owner().newValues(values);
+			var nodeByValueMap = new HashMap2<String, QN>(100);
+			valueSet.putAll();
+			valueSet.nodes(nodeByValueMap::put);
+			return nodeByValueMap;
+		}
+	
+		public void apply() {
+			var that = H2DM.this;
+			var owner = that.owner();
+			var nodeByValueMap = this.createNodeByValueMap(Iterables.concatAll(Iterables.fromArray(this.typeSetupMap.keySet(), this.linkSetupMap.keySet(),
+				Iterables.concatAll(this.typeSetupMap.values()), Iterables.concatAll(this.linkSetupMap.values()))));
+	
+			this.linkSetupMap.keySet()
+				.forEach(ident -> that.linkByNodeMap.put(nodeByValueMap.get(ident), that.linkByTextMap.install(ident, ignored -> that.asLink(owner.newNode()))));
+	
+			this.typeSetupMap.keySet()
+				.forEach(ident -> that.typeByNodeMap.put(nodeByValueMap.get(ident), that.typeByTextMap.install(ident, ignored -> that.asType(owner.newNode()))));
+	
+		}
+	
+		HashMap2<String, List<String>> linkSetupMap = new HashMap2<>();
+	
+		HashMap2<String, List<String>> typeSetupMap = new HashMap2<>();
+	
+	}
+
+	protected class Setup2 {
+
+		public void putProps(String ident, String... props) {
+			this.propValueMap.put(ident, Arrays.asList(props));
+		}
+		
+		public HashMap2<QN, QN> getProp(int index){
+			
 		}
 
-		HashMap2<String, String> typeLabelMap = new HashMap2<>();
+		HashMap2<String, QN> createNodeByValueMap(Iterable<?> values) {
+			var valueSet = H2DM.this.owner().newValues(values);
+			var nodeByValueMap = new HashMap2<String, QN>(100);
+			valueSet.putAll();
+			valueSet.nodes(nodeByValueMap::put);
+			return nodeByValueMap;
+		}
 
-		HashMap2<String, String> linkLabelMap = new HashMap2<>();
+		public void apply() {
+			var that = H2DM.this;
+			var owner = that.owner();
+			var nodeByValueMap = this.createNodeByValueMap(Iterables.concatAll(Iterables.fromArray(this.propValueMap.keySet(), this.linkSetupMap.keySet(),
+				Iterables.concatAll(this.propValueMap.values()), Iterables.concatAll(this.linkSetupMap.values()))));
 
-		HashMap2<String, String> linkSourceTypeMap = new HashMap2<>();
+			this.linkSetupMap.keySet()
+				.forEach(ident -> that.linkByNodeMap.put(nodeByValueMap.get(ident), that.linkByTextMap.install(ident, ignored -> that.asLink(owner.newNode()))));
 
-		HashMap2<String, String> linkSourceHandlingMap = new HashMap2<>();
+			this.propValueMap.keySet()
+				.forEach(ident -> that.typeByNodeMap.put(nodeByValueMap.get(ident), that.typeByTextMap.install(ident, ignored -> that.asType(owner.newNode()))));
 
-		HashMap2<String, String> linkSourceMultiplicityMap = new HashMap2<>();
+		}
 
-		HashMap2<String, String> linkTargetTypeMap = new HashMap2<>();
+		HashMap2<String, List<String>> linkSetupMap = new HashMap2<>();
 
-		HashMap2<String, String> linkTargetHandlingMap = new HashMap2<>();
-
-		HashMap2<String, String> linkTargetMultiplicityMap = new HashMap2<>();
+		HashMap2<String, List<String>> propValueMap = new HashMap2<>();
 
 	}
 

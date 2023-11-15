@@ -4,38 +4,37 @@ import bee.creative.qs.QE;
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QO;
-import bee.creative.qs.QS;
 import bee.creative.util.Set2;
 import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
 import bee.creative.util.Translators.OptionalizedTranslator;
-//TODO 
 
-/** Diese Schnittstelle definiert ein Domänenmodell (domain-model), dass auf einem {@link #owner() Graphspeicher} aufbaut
- * und Wissen in Form von {@link QE Hyperkanten} mit einem bestimmten {@link #context() Kontextknoten}
- * beschreibt.
- *   <p>
- * Die Prädikatknoten stehen objektrelational gesehen für Datenfelder bzw. Spalten konkreter Tabellen.
- *  mit optionalem Dytentyp für source und target
- *
- *  * <p>
- *
- * TODO Datentyp pflicht für interne Knoten und verboten für externe knoten.
- * <p>
- * TODO 
- *  
+/** Diese Schnittstelle definiert ein Domänenmodell (domain-model), dass auf einem {@link #owner() Graphspeicher} aufbaut und Wissen in Form von {@link QE
+ * Hyperkanten} mit einem bestimmten {@link #context() Kontextknoten} beschreibt. Die Prädikatknoten stehen objektrelational gesehen für {@link DL Datenfelder}
+ * bzw. Spalten konkreter Tabellen.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DM extends QO {
 
+	/** Dieses Feld speichert den Textwert des {@link DS#installSet(String) Erkennungsknoten} für die {@link DS#models() Domänenmodelle} eines {@link DS
+	 * Domänenspeichers}. */
+	String IDENT_IsDomain = "DS:IsDomain";
+
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link #context() Kontextknoten} dieses Domänenmodells.
 	 *
 	 * @return Hyperkanten mit {@link #context()}. */
-	QESet edges();
+	default QESet edges() {
+		return this.owner().edges().havingContext(this.context());
+	}
 
-	QN context(); // kontext für alles
+	/** Diese Methode liefet das dieses Domänenmodelle verwaltenden Domänenspeicher.
+	 *
+	 * @return Domänenspeicher. */
+	DS parent();
 
 	DH history(); // log oder null
+
+	QN context(); // kontext für alles
 
 	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DL#node() Feldknoten}-{@link DL Datenfeld}-{@link Translator}. */
 	Translator2<QN, DL> linkTrans();
@@ -83,12 +82,12 @@ public interface DM extends QO {
 
 	default boolean putEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		var history = this.history();
-		return DS.putEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+		return DQ.putEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 	default boolean popEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		var history = this.history();
-		return DS.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
+		return DQ.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 	/** Diese Methode übernimmt Änderungen an {@link DE#idents()} auf die internen Puffer zur Beschleunigung von {@link #getLink(String)} und

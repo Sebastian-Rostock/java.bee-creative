@@ -1,42 +1,23 @@
 package bee.creative.qs.ds;
 
 import java.util.Collection;
-import bee.creative.qs.QE;
-import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QS;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterator2;
+import bee.creative.util.Properties;
 import bee.creative.util.Property2;
 import bee.creative.util.Set2;
 
-/** Diese Schnittstelle definiert eine {@link QNSet Menge} von {@link QN Hyperknoten}, die über ein {@link #link() Datenfeld} einem {@link #source()
- * Subjektknoten} bzw. einem {@link #target() Objektknoten} zugeordnet ist.
+/** Diese Schnittstelle definiert eine veränderbare {@link QNSet Menge} von {@link QN Hyperknoten}.
  *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public interface DNSet extends QNSet, DO {
+public interface DSNSet extends QNSet {
 
-	/** Diese Methode liefert das Datenfeld, dessen {@link DL#node() Hyperknoten} in den {@link #edges() Hyperkanten} verwendet wird.
-	 *
-	 * @return Datenfeld. */
-	DL link();
-
-	/** Diese Methode liefert die Mengensicht auf alle {@link DL#edges() Hyperkanten des Datenfeldes}, die als {@link QE#subject() Subjektknoten} bzw. als
-	 * {@link QE#object() Objektknoten} den dieses Objekts verwenden.
-	 *
-	 * @return Hyperkanten mit Subjekt- bzw. Objektbindung. */
-	QESet edges();
-
-	/** Diese Methode liefert den als {@link QE#object() Objektnoten} der {@link #edges() Hyperkanten} verwendeten {@link QN Hyperknoten} oder {@code null}.
-	 *
-	 * @return Objektnoten oder {@code null}. */
-	QN target();
-
-	/** Diese Methode liefert den als {@link QE#subject() Subjektnoten} der {@link #edges() Hyperkanten} verwendeten {@link QN Hyperknoten} oder {@code null}.
-	 *
-	 * @return Subjektnoten oder {@code null}. */
-	QN source();
+	default QN getNode() {
+		return this.first();
+	}
 
 	/** Diese Methode ersetzt alle Elemente dieser Menge mit dem gegebenen {@link QN Hyperknoten}. Wenn dieser {@code null} ist, wird die Menge geleert.
 	 *
@@ -85,10 +66,12 @@ public interface DNSet extends QNSet, DO {
 
 	/** Diese Methode erlaubt Zugriff auf den ersten bzw. einzigen {@link QN Hyperknoten} dieser Menge.
 	 *
-	 * @see #first()
+	 * @see #getNode()
 	 * @see #setNode(QN)
 	 * @return Elementsicht. */
-	Property2<QN> asNode();
+	default Property2<QN> asNode() {
+		return Properties.from(this::getNode, this::setNode);
+	}
 
 	/** Diese Methode erlaubt Zugriff auf den {@link QN Hyperknoten} dieser Menge.
 	 *
@@ -103,61 +86,61 @@ public interface DNSet extends QNSet, DO {
 
 			@Override
 			public int size() {
-				return (int)DNSet.this.size();
+				return (int)DSNSet.this.size();
 			}
 
 			@Override
 			public boolean isEmpty() {
-				return DNSet.this.isEmpty();
+				return DSNSet.this.isEmpty();
 			}
 
 			@Override
 			public void clear() {
-				DNSet.this.setNodes(Iterables.empty());
+				DSNSet.this.setNodes(Iterables.empty());
 			}
 
 			@Override
 			public boolean add(QN e) {
-				return DNSet.this.putNode(e);
+				return DSNSet.this.putNode(e);
 			}
 
 			@Override
 			public boolean addAll(Collection<? extends QN> c) {
-				return DNSet.this.putNodes(c);
+				return DSNSet.this.putNodes(c);
 			}
 
 			@Override
 			public boolean remove(Object o) {
-				return (o instanceof QN) && DNSet.this.popNode((QN)o);
+				return (o instanceof QN) && DSNSet.this.popNode((QN)o);
 			}
 
 			@Override
 			public boolean removeAll(Collection<?> c) {
 				@SuppressWarnings ("unchecked")
 				var nodes = (Iterable<QN>)Iterables.filter(c, e -> e instanceof QN);
-				return DNSet.this.popNodes(nodes);
+				return DSNSet.this.popNodes(nodes);
 			}
 
 			@Override
 			public boolean retainAll(Collection<?> c) {
-				var nodes = DNSet.this.toSet();
+				var nodes = DSNSet.this.toSet();
 				nodes.retainAll(c);
-				return DNSet.this.setNodes(nodes);
+				return DSNSet.this.setNodes(nodes);
 			}
 
 			@Override
 			public boolean contains(Object o) {
-				return DNSet.this.toSet().contains(o);
+				return DSNSet.this.toSet().contains(o);
 			}
 
 			@Override
 			public boolean containsAll(Collection<?> c) {
-				return DNSet.this.toSet().containsAll(c);
+				return DSNSet.this.toSet().containsAll(c);
 			}
 
 			@Override
 			public Iterator2<QN> iterator() {
-				var iter = DNSet.this.iterator();
+				var iter = DSNSet.this.iterator();
 				return new Iterator2<>() {
 
 					@Override
@@ -173,7 +156,7 @@ public interface DNSet extends QNSet, DO {
 					@Override
 					public void remove() {
 						if (this.next == null) throw new IllegalStateException();
-						DNSet.this.popNode(this.next);
+						DSNSet.this.popNode(this.next);
 						this.next = null;
 					}
 
@@ -184,27 +167,27 @@ public interface DNSet extends QNSet, DO {
 
 			@Override
 			public int hashCode() {
-				return DNSet.this.toSet().hashCode();
+				return DSNSet.this.toSet().hashCode();
 			}
 
 			@Override
 			public boolean equals(Object obj) {
-				return DNSet.this.toSet().equals(obj);
+				return DSNSet.this.toSet().equals(obj);
 			}
 
 			@Override
 			public Object[] toArray() {
-				return DNSet.this.toList().toArray();
+				return DSNSet.this.toList().toArray();
 			}
 
 			@Override
 			public <T> T[] toArray(T[] a) {
-				return DNSet.this.toList().toArray(a);
+				return DSNSet.this.toList().toArray(a);
 			}
 
 			@Override
 			public String toString() {
-				return DNSet.this.toList().toString();
+				return DSNSet.this.toList().toString();
 			}
 
 		};

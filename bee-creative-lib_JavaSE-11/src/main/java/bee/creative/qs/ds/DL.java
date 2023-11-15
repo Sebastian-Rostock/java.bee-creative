@@ -23,31 +23,31 @@ import bee.creative.util.Translators.OptionalizedTranslator;
 public interface DL extends DE {
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DL}. */
-	String IDENT_IsLink = "DM:IsLink";
+	String IDENT_IsLink = "DS:IsLink";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #label()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithLabel = "DM:IsLinkWithLabel";
+	String IDENT_IsLinkWithLabel = "DS:IsLinkWithLabel";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #idents()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithIdent = "DM:IsLinkWithIdent";
+	String IDENT_IsLinkWithIdent = "DS:IsLinkWithIdent";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #sourceType()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceType = "DM:IsLinkWithSourceType";
+	String IDENT_IsLinkWithSourceType = "DS:IsLinkWithSourceType";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #sourceHandling()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceHandling = "DM:IsLinkWithSourceHandling";
+	String IDENT_IsLinkWithSourceHandling = "DS:IsLinkWithSourceHandling";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #sourceMultiplicity()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithSourceMultiplicity = "DM:IsLinkWithSourceMultiplicity";
+	String IDENT_IsLinkWithSourceMultiplicity = "DS:IsLinkWithSourceMultiplicity";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #targetType()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetType = "DM:IsLinkWithTargetType";
+	String IDENT_IsLinkWithTargetType = "DS:IsLinkWithTargetType";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #targetHandling()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetHandling = "DM:IsLinkWithTargetHandling";
+	String IDENT_IsLinkWithTargetHandling = "DS:IsLinkWithTargetHandling";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link #targetMultiplicity()}-{@link DL Datenfeld}. */
-	String IDENT_IsLinkWithTargetMultiplicity = "DM:IsLinkWithTargetMultiplicity";
+	String IDENT_IsLinkWithTargetMultiplicity = "DS:IsLinkWithTargetMultiplicity";
 
 	/** {@inheritDoc} Dieser wird als {@link QE#predicate() Prädikatknoten} der {@link #edges() Hyperkanten} verwendet. Als {@link QE#context() Kontextknoten}
 	 * wird der des {@link #parent() Domänenmodells} verwendet. */
@@ -171,26 +171,26 @@ public interface DL extends DE {
 		return this.getSources(target).first();
 	}
 
-	DNSet getSources(QN target) throws NullPointerException, IllegalArgumentException;
+	DLNSet getSources(QN target) throws NullPointerException, IllegalArgumentException;
 
 	default List<QN> getSourceSet(QN target) throws NullPointerException, IllegalArgumentException {
 		return this.getSources(target).toList();
 	}
 
 	default Map<QN, QN> getSourceMap() throws NullPointerException, IllegalArgumentException {
-		return DS.getSubjectMap(this.parent().context(), this.node());
+		return DQ.getSubjectMap(this.parent().context(), this.node());
 	}
 
 	default Map<QN, QN> getSourceMap(Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		return DS.getSubjectMap(this.parent().context(), this.node(), targetSet);
+		return DQ.getSubjectMap(this.parent().context(), this.node(), targetSet);
 	}
 
 	default Map<QN, List<QN>> getSourceSetMap() throws NullPointerException, IllegalArgumentException {
-		return DS.getSubjectSetMap(this.parent().context(), this.node());
+		return DQ.getSubjectSetMap(this.parent().context(), this.node());
 	}
 
 	default Map<QN, List<QN>> getSourceSetMap(Iterable<? extends QN> targetSet) throws NullPointerException, IllegalArgumentException {
-		return DS.getSubjectSetMap(this.parent().context(), this.node(), targetSet);
+		return DQ.getSubjectSetMap(this.parent().context(), this.node(), targetSet);
 	}
 
 	default boolean setSource(QN target, QN source) throws NullPointerException, IllegalArgumentException {
@@ -204,14 +204,14 @@ public interface DL extends DE {
 	default boolean setSourceMap(Map<? extends QN, ? extends QN> targetSourceMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.setSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DQ.setSubjectMap(model.context(), this.node(), targetSourceMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 	default boolean setSourceSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.setSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DQ.setSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
@@ -226,14 +226,14 @@ public interface DL extends DE {
 	default boolean putSourceMap(Map<? extends QN, ? extends QN> targetSourceMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.putSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DQ.putSubjectMap(model.context(), this.node(), targetSourceMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 	default boolean putSourceSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.putSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DQ.putSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
@@ -248,14 +248,14 @@ public interface DL extends DE {
 	default boolean popSourceMap(Map<? extends QN, ? extends QN> targetSourceMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.popSubjectMap(model.context(), this.node(), targetSourceMap, //
+		return DQ.popSubjectMap(model.context(), this.node(), targetSourceMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 	default boolean popSourceSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> targetSourceSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.popSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
+		return DQ.popSubjectSetMap(model.context(), this.node(), targetSourceSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
@@ -263,26 +263,26 @@ public interface DL extends DE {
 		return this.getTargets(source).first();
 	}
 
-	DNSet getTargets(QN source) throws NullPointerException, IllegalArgumentException;
+	DLNSet getTargets(QN source) throws NullPointerException, IllegalArgumentException;
 
 	default List<QN> getTargetSet(QN source) throws NullPointerException, IllegalArgumentException {
 		return this.getTargets(source).toList();
 	}
 
 	default Map<QN, QN> getTargetMap() throws NullPointerException, IllegalArgumentException {
-		return DS.getObjectMap(this.parent().context(), this.node());
+		return DQ.getObjectMap(this.parent().context(), this.node());
 	}
 
 	default Map<QN, QN> getTargetMap(Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		return DS.getObjectMap(this.parent().context(), this.node(), sourceSet);
+		return DQ.getObjectMap(this.parent().context(), this.node(), sourceSet);
 	}
 
 	default Map<QN, List<QN>> getTargetSetMap() throws NullPointerException, IllegalArgumentException {
-		return DS.getObjectSetMap(this.parent().context(), this.node());
+		return DQ.getObjectSetMap(this.parent().context(), this.node());
 	}
 
 	default Map<QN, List<QN>> getTargetSetMap(Iterable<? extends QN> sourceSet) throws NullPointerException, IllegalArgumentException {
-		return DS.getObjectSetMap(this.parent().context(), this.node(), sourceSet);
+		return DQ.getObjectSetMap(this.parent().context(), this.node(), sourceSet);
 	}
 
 	default boolean setTarget(QN source, QN target) throws NullPointerException, IllegalArgumentException {
@@ -296,14 +296,14 @@ public interface DL extends DE {
 	default boolean setTargetMap(Map<? extends QN, ? extends QN> sourceTargetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.setObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DQ.setObjectMap(model.context(), this.node(), sourceTargetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 	default boolean setTargetSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.setObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DQ.setObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
@@ -318,14 +318,14 @@ public interface DL extends DE {
 	default boolean putTargetMap(Map<? extends QN, ? extends QN> sourceTargetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.putObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DQ.putObjectMap(model.context(), this.node(), sourceTargetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 	default boolean putTargetSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.putObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DQ.putObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
@@ -340,14 +340,14 @@ public interface DL extends DE {
 	default boolean popTargetMap(Map<? extends QN, ? extends QN> sourceTargetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.popObjectMap(model.context(), this.node(), sourceTargetMap, //
+		return DQ.popObjectMap(model.context(), this.node(), sourceTargetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
 	default boolean popTargetSetMap(Map<? extends QN, ? extends Iterable<? extends QN>> sourceTargetSetMap) {
 		var model = this.parent();
 		var history = model.history();
-		return DS.popObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
+		return DQ.popObjectSetMap(model.context(), this.node(), sourceTargetSetMap, //
 			history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 

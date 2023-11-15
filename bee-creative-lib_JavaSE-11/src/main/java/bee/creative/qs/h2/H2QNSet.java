@@ -111,7 +111,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 		return this.owner.newNode(item.getInt(1));
 	}
 
-	static final class Main extends H2QNSet {
+	static class Main extends H2QNSet {
 
 		public Main(H2QS owner) {
 			super(owner, new H2QQ().push("SELECT N FROM QN"));
@@ -129,7 +129,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	}
 
-	static final class Temp extends H2QNSet {
+	static class Temp extends H2QNSet {
 
 		public Temp(H2QS owner) {
 			super(owner, null);

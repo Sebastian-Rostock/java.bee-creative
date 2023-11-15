@@ -11,16 +11,16 @@ import bee.creative.util.Set2;
 public interface DT extends DE {
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für den {@link DT Datentyp} von {@link DT}. */
-	String IDENT_IsType = "DM:IsType";
+	String IDENT_IsType = "DS:IsType";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DE#label()}-{@link DL Datenfeld}. */
-	String IDENT_IsTypeWithLabel = "DM:IsTypeWithLabel";
+	String IDENT_IsTypeWithLabel = "DS:IsTypeWithLabel";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DE#idents()}-{@link DL Datenfeld}. */
-	String IDENT_IsTypeWithIdent = "DM:IsTypeWithIdent";
+	String IDENT_IsTypeWithIdent = "DS:IsTypeWithIdent";
 
 	/** Dieses Feld speichert den Textwert eines {@link DE#idents() Erkennungsknoten} für das {@link DT#instances()}-{@link DL Datenfeld}. */
-	String IDENT_IsTypeWithInstance = "DM:IsTypeWithInstance";
+	String IDENT_IsTypeWithInstance = "DS:IsTypeWithInstance";
 
 	/** {@inheritDoc}
 	 *
