@@ -23,12 +23,12 @@ public class CSVReader implements Closeable {
 	 * @param data Objekt.
 	 * @return {@link CSVReader}.
 	 * @throws IOException Wenn der {@link CSVReader} nicht erzeugt werden kann. */
-	public static CSVReader from(final Object data) throws IOException {
+	public static CSVReader from(Object data) throws IOException {
 		if (data instanceof CSVReader) return (CSVReader)data;
 		return new CSVReader(IO.inputReaderFrom(data));
 	}
 
-	static void check(final char symbol) throws IllegalArgumentException {
+	static void check(char symbol) throws IllegalArgumentException {
 		if ((symbol == '\r') || (symbol == '\n')) throw new IllegalArgumentException();
 	}
 
@@ -60,7 +60,7 @@ public class CSVReader implements Closeable {
 	 * @param reader Eingabe.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code reader} {@code null} ist. */
-	public CSVReader(final Reader reader) throws IOException, NullPointerException {
+	public CSVReader(Reader reader) throws IOException, NullPointerException {
 		this.reader = reader;
 		this.value = new StringBuilder();
 		this.entry = new ArrayList<>();
@@ -99,7 +99,7 @@ public class CSVReader implements Closeable {
 	 * @param quote Maskierungszeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Maskierungszeichen einem Zeilenumbruch gleicht. */
-	public CSVReader useQuote(final char quote) throws IllegalArgumentException {
+	public CSVReader useQuote(char quote) throws IllegalArgumentException {
 		CSVReader.check(quote);
 		synchronized (this.reader) {
 			this.quote = quote;
@@ -113,7 +113,7 @@ public class CSVReader implements Closeable {
 	 * @param comma Trennzeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Trennzeichen einem Zeilenumbruch gleicht. */
-	public CSVReader useComma(final char comma) throws IllegalArgumentException {
+	public CSVReader useComma(char comma) throws IllegalArgumentException {
 		CSVReader.check(comma);
 		synchronized (this.reader) {
 			this.comma = comma;
@@ -135,9 +135,9 @@ public class CSVReader implements Closeable {
 	}
 
 	String[][] readTableImpl() throws IOException, IllegalArgumentException {
-		final ArrayList<String[]> result = new ArrayList<>();
+		ArrayList<String[]> result = new ArrayList<>();
 		while (true) {
-			final String[] entry = this.readEntryImpl();
+			String[] entry = this.readEntryImpl();
 			if (entry == null) return result.toArray(new String[result.size()][]);
 			result.add(entry);
 		}
@@ -157,10 +157,10 @@ public class CSVReader implements Closeable {
 	}
 
 	String[] readEntryImpl() throws IOException, IllegalArgumentException {
-		final ArrayList<String> result = this.entry;
+		ArrayList<String> result = this.entry;
 		try {
 			while (true) {
-				final String value = this.readValueImpl();
+				String value = this.readValueImpl();
 				if (value == null) return result.isEmpty() ? null : result.toArray(new String[result.size()]);
 				result.add(value);
 			}
@@ -186,7 +186,6 @@ public class CSVReader implements Closeable {
 	}
 
 	String readValueImpl() throws IOException, IllegalArgumentException {
-		// TODO this.next bestimmen, dann res liefern
 		if (this.ignore) {
 			this.ignore = false;
 			return "";
@@ -195,15 +194,15 @@ public class CSVReader implements Closeable {
 		int symbol = this.symbol;
 		if (symbol < 0) return null;
 		// Zeilenende erkennen.
-		final Reader reader = this.reader;
-		final StringBuilder result = this.value;
+		Reader reader = this.reader;
+		StringBuilder result = this.value;
 		try {
 			while ((symbol == '\r') || (symbol == '\n')) {
 				symbol = reader.read();
 			}
 			if (symbol != this.symbol) return null;
 			// Maskierung erkennen.
-			final char quote = this.quote, comma = this.comma;
+			char quote = this.quote, comma = this.comma;
 			if (symbol == quote) {
 				symbol = reader.read();
 				while (true) {
@@ -214,12 +213,9 @@ public class CSVReader implements Closeable {
 							if (symbol == comma) {
 								symbol = reader.read();
 								this.ignore = (symbol < 0) || (symbol == '\r') || (symbol == '\n');
-							} else if ((symbol == '\r') || (symbol == '\n')) {
-								this.ignore = true;
-								while ((symbol == '\r') || (symbol == '\n')) {
-									symbol = reader.read();
-								}
-							} else if (symbol >= 0) throw new IllegalArgumentException();
+							} else {
+								if ((symbol >= 0) && (symbol != '\r') && (symbol != '\n')) throw new IllegalArgumentException();
+							}
 							return result.toString().intern();
 						}
 					}
