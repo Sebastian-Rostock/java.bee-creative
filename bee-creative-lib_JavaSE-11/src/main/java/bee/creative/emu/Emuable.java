@@ -9,6 +9,6 @@ public interface Emuable {
 	/** Diese Methode gibt den geschätzten Speicherverbrauch dieses Objekts zurück.
 	 *
 	 * @return Speicherverbrauch. */
-	public long emu();
+	long emu();
 
 }

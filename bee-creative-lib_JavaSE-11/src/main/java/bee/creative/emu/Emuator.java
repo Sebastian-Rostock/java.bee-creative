@@ -12,6 +12,6 @@ public interface Emuator<GInput> {
 	 * @param input Objekt.
 	 * @return Speicherverbrauch.
 	 * @throws NullPointerException Wenn {@code input} {@code null} ist. */
-	public long emu(GInput input) throws NullPointerException;
+	long emu(GInput input) throws NullPointerException;
 
 }
