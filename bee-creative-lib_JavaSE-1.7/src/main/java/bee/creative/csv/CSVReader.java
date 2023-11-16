@@ -47,8 +47,11 @@ public class CSVReader implements Closeable {
 	/** Dieses Feld speichert das Trennzeichen. */
 	char comma = ';';
 
-	/** Dieses Feld speichert das zuletzt gelesene Zeichen. */
+	/** Dieses Feld speichert das erste Zeichen des nächsten Werts, das Trennzeichen, das Maskierungszeichen oder -1. */
 	int symbol;
+
+	/** Dieses Feld speichert nur dann {@code true}, wenn beim {@link #readValueImpl() nächste gelesenen Wert} {@code ""} geliefert werden soll. */
+	boolean ignore;
 
 	/** Dieser Konstruktor initialisiert die Eingabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird
 	 * {@code '"'} genutzt. Die Methoden {@link #useQuote(char)}, {@link #useComma(char)}, {@link #readValue()}, {@link #readEntry()} und {@link #readTable()}
@@ -166,10 +169,10 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	/** Diese Methode ließt den nächsten Wert und gibt ihn zurück. Wenn es auf der aktuellen Zeile keinen weiteren Wert gibt, wird {@code null} geliefert. Der
-	 * nächste Wert nach {@code null} ist der erste Wert der nächsten Zeile. Wenn der Wert nicht in {@link #getQuote() Maskierungszeichen} eingeschlossen ist,
-	 * endet er spätentens am Ende der Eingabe, am Ende der Zeile oder an einem {@link #getComma() Trennzeichen}. Andernfalls endet er nach dem ersten
-	 * {@link #getQuote() Maskierungszeichen}, dem kein weiteres {@link #getQuote() Maskierungszeichen} folgt.
+	/** Diese Methode ließt den nächsten Wert und gibt ihn zurück. Wenn der letzte Wert der Zeile bereits gelesen wurde, wird {@code null} geliefert. Der nächste
+	 * Wert nach {@code null} ist der erste Wert der nächsten Zeile. Wenn der Wert nicht in {@link #getQuote() Maskierungszeichen} eingeschlossen ist, endet er
+	 * spätentens am Ende der Eingabe, am Ende der Zeile oder an einem {@link #getComma() Trennzeichen}. Andernfalls endet er nach dem ersten {@link #getQuote()
+	 * Maskierungszeichen}, dem kein weiteres {@link #getQuote() Maskierungszeichen} folgt.
 	 *
 	 * @see #getQuote()
 	 * @see #getComma()
@@ -183,34 +186,46 @@ public class CSVReader implements Closeable {
 	}
 
 	String readValueImpl() throws IOException, IllegalArgumentException {
-		final char quote = this.quote, comma = this.comma;
+		// TODO this.next bestimmen, dann res liefern
+		if (this.ignore) {
+			this.ignore = false;
+			return "";
+		}
+		// Eingabenende erkennen.
+		int symbol = this.symbol;
+		if (symbol < 0) return null;
+		// Zeilenende erkennen.
 		final Reader reader = this.reader;
 		final StringBuilder result = this.value;
-		int symbol = this.symbol;
 		try {
-			// Zeilenende erkennen.
-			if (symbol == -1) return null;
 			while ((symbol == '\r') || (symbol == '\n')) {
 				symbol = reader.read();
 			}
 			if (symbol != this.symbol) return null;
 			// Maskierung erkennen.
+			final char quote = this.quote, comma = this.comma;
 			if (symbol == quote) {
 				symbol = reader.read();
-				while (symbol >= 0) {
+				while (true) {
+					if (symbol < 0) throw new IllegalArgumentException();
 					if (symbol == quote) {
 						symbol = reader.read();
 						if (symbol != quote) {
 							if (symbol == comma) {
 								symbol = reader.read();
-							}
+								this.ignore = (symbol < 0) || (symbol == '\r') || (symbol == '\n');
+							} else if ((symbol == '\r') || (symbol == '\n')) {
+								this.ignore = true;
+								while ((symbol == '\r') || (symbol == '\n')) {
+									symbol = reader.read();
+								}
+							} else if (symbol >= 0) throw new IllegalArgumentException();
 							return result.toString().intern();
 						}
 					}
 					result.append((char)symbol);
 					symbol = reader.read();
 				}
-				throw new IllegalArgumentException();
 			}
 			// Wertende erkennen.
 			while ((symbol >= 0) && (symbol != comma) && (symbol != '\r') && (symbol != '\n')) {
@@ -219,6 +234,7 @@ public class CSVReader implements Closeable {
 			}
 			if (symbol == comma) {
 				symbol = reader.read();
+				this.ignore = (symbol < 0) || (symbol == '\r') || (symbol == '\n');
 			}
 			return result.toString().intern();
 		} finally {
