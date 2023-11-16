@@ -14,12 +14,6 @@ import bee.creative.util.Producer;
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends LOGEntry>, String[]> {
 
-	/** Dieses Feld speichert die erfassten Protokollzeilen. */
-	protected final List<String> result = new ArrayList<>();
-
-	/** Dieses Feld speichert die Anzahl der Protokollebenen. */
-	protected int indent;
-
 	/** Diese Methode gibt die Textdarstellungen der {@link #print(String) erfassten} Protokollzeilen zurück.
 	 *
 	 * @return Textdarstellungen. */
@@ -33,7 +27,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 * @param entries Protokollzeilen.
 	 * @return Textdarstellungen. */
 	@Override
-	public String[] get(final Iterable<? extends LOGEntry> entries) {
+	public String[] get(Iterable<? extends LOGEntry> entries) {
 		this.printAll(entries);
 		return this.get();
 	}
@@ -42,7 +36,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 * wird dazu über {@link #customIndent(int)} ermittelt.
 	 *
 	 * @param text Zeichenkette oder {@code null}. */
-	public void print(final String text) {
+	public void print(String text) {
 		if (text == null) return;
 		this.result.add(this.customIndent(this.indent).concat(text));
 	}
@@ -50,7 +44,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	/** Diese Methode {@link #customPrint(Object, Object[]) erfasst} die gegebene Protokollzeile.
 	 *
 	 * @param node Protokollzeile. */
-	public void print(final LOGEntry node) {
+	public void print(LOGEntry node) {
 		this.customPrint(node.text, node.args);
 		this.indent += node.indent();
 	}
@@ -58,11 +52,17 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	/** Diese Methode {@link #print(LOGEntry) erfasst} die gegebenen Protokollzeilen.
 	 *
 	 * @param entries Protokollzeilen. */
-	public void printAll(final Iterable<? extends LOGEntry> entries) {
-		for (final LOGEntry entry: entries) {
+	public void printAll(Iterable<? extends LOGEntry> entries) {
+		for (var entry: entries) {
 			this.print(entry);
 		}
 	}
+
+	/** Dieses Feld speichert die erfassten Protokollzeilen. */
+	protected final List<String> result = new ArrayList<>();
+
+	/** Dieses Feld speichert die Anzahl der Protokollebenen. */
+	protected int indent;
 
 	/** Diese Methode erfasst die gegebene Protokollzeile.
 	 * <ul>
@@ -81,7 +81,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 *
 	 * @param text {@link LOGBuilder}, Textbaustein, Formattext oder {@code null}.
 	 * @param args Textbausteine, Formatargumente oder {@code null}. */
-	protected void customPrint(final Object text, final Object[] args) {
+	protected void customPrint(Object text, Object[] args) {
 		if (text instanceof LOGBuilder) {
 			this.printAll((LOGBuilder)text);
 		} else if (args == null) {
@@ -100,7 +100,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 *
 	 * @param object Objekt oder {@code null}.
 	 * @return Zeichenkette oder {@code null}. */
-	protected String customText(final Object object) {
+	protected String customText(Object object) {
 		return object != null ? object.toString() : null;
 	}
 
@@ -108,7 +108,7 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 *
 	 * @param object Objekt.
 	 * @return Textbaustein bzw. Formatargument. */
-	protected Object customArg(final Object object) {
+	protected Object customArg(Object object) {
 		return object;
 	}
 
@@ -120,11 +120,11 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 * @param objects Objektliste.
 	 * @return Textbausteine bzw. Formatargumente.
 	 * @throws NullPointerException Wenn {@code args} {@code null} ist. */
-	protected Object[] customArgs(final Object[] objects) throws NullPointerException {
-		final int length = objects.length;
+	protected Object[] customArgs(Object[] objects) throws NullPointerException {
+		var length = objects.length;
 		if (length == 0) return objects;
-		final Object[] result = new Object[length];
-		for (int i = 0; i < length; i++) {
+		var result = new Object[length];
+		for (var i = 0; i < length; i++) {
 			result[i] = this.customArg(objects[i]);
 		}
 		return result;
@@ -134,9 +134,9 @@ public class LOGPrinter implements Producer<String[]>, Getter<Iterable<? extends
 	 *
 	 * @param count Anzahl der Protokollebenen.
 	 * @return Zeichenkette zur Einrückung. */
-	protected String customIndent(final int count) {
+	protected String customIndent(int count) {
 		if (count <= 0) return "";
-		final String space = "                                        "; // 40 x Space
+		var space = "                                        "; // 40 x Space
 		if (count <= 20) return space.substring(0, count * 2);
 		return "(" + count + ")" + space.substring(0, 40 - Integers.getSize(count));
 	}

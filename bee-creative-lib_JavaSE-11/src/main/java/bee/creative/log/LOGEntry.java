@@ -20,49 +20,6 @@ import bee.creative.lang.Objects;
  * @author [cc-by] 2019 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class LOGEntry {
 
-	/** Dieses Feld speichert den {@link LOGBuilder}, Zeilentext, Formattext oder {@code null}. */
-	final Object text;
-
-	/** Dieses Feld speichert die Zeilenteile, Formatargumente oder {@code null}. */
-	final Object[] args;
-
-	/** Dieses Feld speichert den vorherigen Knoten des Rings. */
-	LOGEntry prev = this;
-
-	/** Dieses Feld speichert den nächsten Knoten des Rings. */
-	LOGEntry next = this;
-
-	LOGEntry(final Object text, final Object[] args) {
-		this.text = text;
-		this.args = args;
-	}
-
-	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGEntry} ein. */
-	void pushEntry(final Object text, final Object[] args) {
-		this.insert(new LOGEntry(text, args));
-	}
-
-	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGEnter} ein. */
-	void pushEnter(final Object text, final Object[] args) {
-		this.insert(new LOGEnter(text, args));
-	}
-
-	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGLeave} ein. */
-	void pushLeave(final Object text, final Object[] args) {
-		this.insert(new LOGLeave(text, args));
-	}
-
-	/** Diese Methode fügt den gegebenen Knoten als neuen {@link #prev} ein. */
-	void insert(final LOGEntry node) {
-		this.prev = ((node.prev = (node.next = this).prev).next = node);
-	}
-
-	/** Diese Methode entfernt diesen Knoten aus seinem bisherigen Ring und überführt ihn in einen Ring mit sich selbst. */
-	void delete() {
-		(this.prev.next = this.next).prev = this.prev;
-		this.prev = (this.next = this);
-	}
-
 	/** Diese Methode gibt Zeilentext, Formattext oder {@code null} zurück.
 	 *
 	 * @return Objekt der Protokollzeile. */
@@ -87,6 +44,49 @@ public class LOGEntry {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this.text, this.args);
+	}
+
+	/** Dieses Feld speichert den {@link LOGBuilder}, Zeilentext, Formattext oder {@code null}. */
+	final Object text;
+
+	/** Dieses Feld speichert die Zeilenteile, Formatargumente oder {@code null}. */
+	final Object[] args;
+
+	/** Dieses Feld speichert den vorherigen Knoten des Rings. */
+	LOGEntry prev = this;
+
+	/** Dieses Feld speichert den nächsten Knoten des Rings. */
+	LOGEntry next = this;
+
+	LOGEntry(Object text, Object[] args) {
+		this.text = text;
+		this.args = args;
+	}
+
+	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGEntry} ein. */
+	void pushEntry(Object text, Object[] args) {
+		this.insert(new LOGEntry(text, args));
+	}
+
+	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGEnter} ein. */
+	void pushEnter(Object text, Object[] args) {
+		this.insert(new LOGEnter(text, args));
+	}
+
+	/** Diese Methode {@link #insert(LOGEntry) fügt} einen neuen {@link LOGLeave} ein. */
+	void pushLeave(Object text, Object[] args) {
+		this.insert(new LOGLeave(text, args));
+	}
+
+	/** Diese Methode fügt den gegebenen Knoten als neuen {@link #prev} ein. */
+	void insert(LOGEntry node) {
+		this.prev = ((node.prev = (node.next = this).prev).next = node);
+	}
+
+	/** Diese Methode entfernt diesen Knoten aus seinem bisherigen Ring und überführt ihn in einen Ring mit sich selbst. */
+	void delete() {
+		(this.prev.next = this.next).prev = this.prev;
+		this.prev = (this.next = this);
 	}
 
 }

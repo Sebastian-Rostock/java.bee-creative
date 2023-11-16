@@ -33,7 +33,7 @@ public final class INIToken {
 	 * @param section Name des Abschnitts.
 	 * @return Abschnitt.
 	 * @throws NullPointerException Wenn {@code section} {@code null} ist. */
-	public static INIToken fromSection(final String section) throws NullPointerException {
+	public static INIToken fromSection(String section) throws NullPointerException {
 		return new INIToken(section.toString(), null);
 	}
 
@@ -45,7 +45,7 @@ public final class INIToken {
 	 * @param value Wert der Eigenschaft.
 	 * @return Eigenschaft
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
-	public static INIToken fromProperty(final String key, final String value) throws NullPointerException {
+	public static INIToken fromProperty(String key, String value) throws NullPointerException {
 		return new INIToken(key.toString(), value.toString());
 	}
 
@@ -55,19 +55,8 @@ public final class INIToken {
 	 * @param comment Text des Kommentar.
 	 * @return Kommentar.
 	 * @throws NullPointerException Wenn {@code comment} {@code null} ist. */
-	public static INIToken fromComment(final String comment) throws NullPointerException {
+	public static INIToken fromComment(String comment) throws NullPointerException {
 		return new INIToken(null, comment.toString());
-	}
-
-	/** Dieses Feld speichert das {@link #key()}, die {@link #section()} oder {@code null}. */
-	final String string1;
-
-	/** Dieses Feld speichert den {@link #value()}. den {@link #comment()} oder {@code null}. */
-	final String string2;
-
-	INIToken(final String string1, final String string2) {
-		this.string1 = string1;
-		this.string2 = string2;
 	}
 
 	/** Diese Methode gibt die Typkennung des Elements zurück.
@@ -76,7 +65,7 @@ public final class INIToken {
 	 * @see #PROPERTY
 	 * @see #COMMENT
 	 * @return Typkennung. */
-	public final int type() {
+	public int type() {
 		if (this.string1 == null) return INIToken.COMMENT;
 		if (this.string2 == null) return INIToken.SECTION;
 		return INIToken.PROPERTY;
@@ -86,7 +75,7 @@ public final class INIToken {
 	 *
 	 * @see #fromProperty(String, String)
 	 * @return Schlüssel der Eigenschaft oder {@code null}. */
-	public final String key() {
+	public String key() {
 		return this.string2 != null ? this.string1 : null;
 	}
 
@@ -94,7 +83,7 @@ public final class INIToken {
 	 *
 	 * @see #fromProperty(String, String)
 	 * @return Wert der Eigenschaft oder {@code null}. */
-	public final String value() {
+	public String value() {
 		return this.string1 != null ? this.string2 : null;
 	}
 
@@ -102,7 +91,7 @@ public final class INIToken {
 	 *
 	 * @see #fromSection(String)
 	 * @return Namen des Abschnitts oder {@code null}. */
-	public final String section() {
+	public String section() {
 		return this.string2 == null ? this.string1 : null;
 	}
 
@@ -110,49 +99,60 @@ public final class INIToken {
 	 *
 	 * @see #fromComment(String)
 	 * @return Text des Kommentars oder {@code null}. */
-	public final String comment() {
+	public String comment() {
 		return this.string1 == null ? this.string2 : null;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element ein {@link #SECTION Anschnitt} {@link #type() ist}.
 	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #SECTION}. */
-	public final boolean isSection() {
+	public boolean isSection() {
 		return this.string2 == null;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element eine {@link #PROPERTY Eigenschaft} {@link #type() ist}.
 	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #PROPERTY}. */
-	public final boolean isProperty() {
+	public boolean isProperty() {
 		return (this.string1 != null) && (this.string2 != null);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element ein {@link #COMMENT Kommentar} {@link #type() ist}.
 	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #COMMENT}. */
-	public final boolean isComment() {
+	public boolean isComment() {
 		return this.string1 == null;
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return Objects.hash(this.string1, this.string2);
 	}
 
 	@Override
-	public final boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof INIToken)) return false;
-		final INIToken that = (INIToken)object;
+		var that = (INIToken)object;
 		return Objects.equals(this.string1, that.string1) && Objects.equals(this.string2, that.string2);
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		if (this.string1 == null) return ";" + Objects.toString(this.string2);
 		if (this.string2 == null) return "[" + Objects.toString(this.string1) + "]";
 		return Objects.toString(this.string1) + "=" + Objects.toString(this.string2);
+	}
+
+	/** Dieses Feld speichert {@link #key()}, {@link #section()} oder {@code null}. */
+	final String string1;
+
+	/** Dieses Feld speichert {@link #value()}, {@link #comment()} oder {@code null}. */
+	final String string2;
+
+	INIToken(final String string1, final String string2) {
+		this.string1 = string1;
+		this.string2 = string2;
 	}
 
 }
