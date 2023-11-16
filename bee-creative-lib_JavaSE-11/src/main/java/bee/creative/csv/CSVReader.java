@@ -23,12 +23,12 @@ public class CSVReader implements Closeable {
 	 * @param data Objekt.
 	 * @return {@link CSVReader}.
 	 * @throws IOException Wenn der {@link CSVReader} nicht erzeugt werden kann. */
-	public static CSVReader from(final Object data) throws IOException {
+	public static CSVReader from(Object data) throws IOException {
 		if (data instanceof CSVReader) return (CSVReader)data;
 		return new CSVReader(IO.inputReaderFrom(data));
 	}
 
-	static void check(final char symbol) throws IllegalArgumentException {
+	static void check(char symbol) throws IllegalArgumentException {
 		if ((symbol == '\r') || (symbol == '\n')) throw new IllegalArgumentException();
 	}
 
@@ -47,8 +47,11 @@ public class CSVReader implements Closeable {
 	/** Dieses Feld speichert das Trennzeichen. */
 	char comma = ';';
 
-	/** Dieses Feld speichert das zuletzt gelesene Zeichen. */
+	/** Dieses Feld speichert das erste Zeichen des nächsten Werts, das Trennzeichen, das Maskierungszeichen oder -1. */
 	int symbol;
+
+	/** Dieses Feld speichert nur dann {@code true}, wenn beim {@link #readValueImpl() nächste gelesenen Wert} {@code ""} geliefert werden soll. */
+	boolean ignore;
 
 	/** Dieser Konstruktor initialisiert die Eingabe. Als {@link #getComma() Trennzeichen} wird {@code ';'} und als {@link #getQuote() Maskierungszeichen} wird
 	 * {@code '"'} genutzt. Die Methoden {@link #useQuote(char)}, {@link #useComma(char)}, {@link #readValue()}, {@link #readEntry()} und {@link #readTable()}
@@ -57,12 +60,12 @@ public class CSVReader implements Closeable {
 	 * @param reader Eingabe.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code reader} {@code null} ist. */
-	public CSVReader(final Reader reader) throws IOException, NullPointerException {
+	public CSVReader(Reader reader) throws IOException, NullPointerException {
 		this.reader = reader;
 		this.value = new StringBuilder();
 		this.entry = new ArrayList<>();
 		// Leere Zeilen zu Beginn ignorieren.
-		int symbol = reader.read();
+		var symbol = reader.read();
 		while ((symbol == '\r') || (symbol == '\n')) {
 			symbol = reader.read();
 		}
@@ -96,7 +99,7 @@ public class CSVReader implements Closeable {
 	 * @param quote Maskierungszeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Maskierungszeichen einem Zeilenumbruch gleicht. */
-	public CSVReader useQuote(final char quote) throws IllegalArgumentException {
+	public CSVReader useQuote(char quote) throws IllegalArgumentException {
 		CSVReader.check(quote);
 		synchronized (this.reader) {
 			this.quote = quote;
@@ -110,7 +113,7 @@ public class CSVReader implements Closeable {
 	 * @param comma Trennzeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Trennzeichen einem Zeilenumbruch gleicht. */
-	public CSVReader useComma(final char comma) throws IllegalArgumentException {
+	public CSVReader useComma(char comma) throws IllegalArgumentException {
 		CSVReader.check(comma);
 		synchronized (this.reader) {
 			this.comma = comma;
@@ -132,9 +135,9 @@ public class CSVReader implements Closeable {
 	}
 
 	String[][] readTableImpl() throws IOException, IllegalArgumentException {
-		final ArrayList<String[]> result = new ArrayList<>();
+		var result = new ArrayList<>();
 		while (true) {
-			final String[] entry = this.readEntryImpl();
+			var entry = this.readEntryImpl();
 			if (entry == null) return result.toArray(new String[result.size()][]);
 			result.add(entry);
 		}
@@ -154,10 +157,10 @@ public class CSVReader implements Closeable {
 	}
 
 	String[] readEntryImpl() throws IOException, IllegalArgumentException {
-		final ArrayList<String> result = this.entry;
+		var result = this.entry;
 		try {
 			while (true) {
-				final String value = this.readValueImpl();
+				var value = this.readValueImpl();
 				if (value == null) return result.isEmpty() ? null : result.toArray(new String[result.size()]);
 				result.add(value);
 			}
@@ -166,10 +169,10 @@ public class CSVReader implements Closeable {
 		}
 	}
 
-	/** Diese Methode ließt den nächsten Wert und gibt ihn zurück. Wenn es auf der aktuellen Zeile keinen weiteren Wert gibt, wird {@code null} geliefert. Der
-	 * nächste Wert nach {@code null} ist der erste Wert der nächsten Zeile. Wenn der Wert nicht in {@link #getQuote() Maskierungszeichen} eingeschlossen ist,
-	 * endet er spätentens am Ende der Eingabe, am Ende der Zeile oder an einem {@link #getComma() Trennzeichen}. Andernfalls endet er nach dem ersten
-	 * {@link #getQuote() Maskierungszeichen}, dem kein weiteres {@link #getQuote() Maskierungszeichen} folgt.
+	/** Diese Methode ließt den nächsten Wert und gibt ihn zurück. Wenn der letzte Wert der Zeile bereits gelesen wurde, wird {@code null} geliefert. Der nächste
+	 * Wert nach {@code null} ist der erste Wert der nächsten Zeile. Wenn der Wert nicht in {@link #getQuote() Maskierungszeichen} eingeschlossen ist, endet er
+	 * spätentens am Ende der Eingabe, am Ende der Zeile oder an einem {@link #getComma() Trennzeichen}. Andernfalls endet er nach dem ersten {@link #getQuote()
+	 * Maskierungszeichen}, dem kein weiteres {@link #getQuote() Maskierungszeichen} folgt.
 	 *
 	 * @see #getQuote()
 	 * @see #getComma()
@@ -183,26 +186,36 @@ public class CSVReader implements Closeable {
 	}
 
 	String readValueImpl() throws IOException, IllegalArgumentException {
-		final char quote = this.quote, comma = this.comma;
-		final Reader reader = this.reader;
-		final StringBuilder result = this.value;
-		int symbol = this.symbol;
+		if (this.ignore) {
+			this.ignore = false;
+			return "";
+		}
+		// Eingabenende erkennen.
+		var symbol = this.symbol;
+		if (symbol < 0) return null;
+		// Zeilenende erkennen.
+		var reader = this.reader;
+		var result = this.value;
 		try {
-			// Zeilenende erkennen.
-			if (symbol == -1) return null;
 			while ((symbol == '\r') || (symbol == '\n')) {
 				symbol = reader.read();
 			}
 			if (symbol != this.symbol) return null;
 			// Maskierung erkennen.
+			var quote = this.quote;
+			var comma = this.comma;
 			if (symbol == quote) {
 				symbol = reader.read();
-				while (symbol >= 0) {
+				while (true) {
+					if (symbol < 0) throw new IllegalArgumentException();
 					if (symbol == quote) {
 						symbol = reader.read();
 						if (symbol != quote) {
 							if (symbol == comma) {
 								symbol = reader.read();
+								this.ignore = (symbol < 0) || (symbol == '\r') || (symbol == '\n');
+							} else {
+								if ((symbol >= 0) && (symbol != '\r') && (symbol != '\n')) throw new IllegalArgumentException();
 							}
 							return result.toString().intern();
 						}
@@ -210,7 +223,6 @@ public class CSVReader implements Closeable {
 					result.append((char)symbol);
 					symbol = reader.read();
 				}
-				throw new IllegalArgumentException();
 			}
 			// Wertende erkennen.
 			while ((symbol >= 0) && (symbol != comma) && (symbol != '\r') && (symbol != '\n')) {
@@ -219,6 +231,7 @@ public class CSVReader implements Closeable {
 			}
 			if (symbol == comma) {
 				symbol = reader.read();
+				this.ignore = (symbol < 0) || (symbol == '\r') || (symbol == '\n');
 			}
 			return result.toString().intern();
 		} finally {

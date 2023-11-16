@@ -22,7 +22,7 @@ public class CSVWriter implements Closeable, Flushable {
 	 * @param data Objekt.
 	 * @return {@link CSVWriter}.
 	 * @throws IOException Wenn der {@link CSVWriter} nicht erzeugt werden kann. */
-	public static CSVWriter from(final Object data) throws IOException {
+	public static CSVWriter from(Object data) throws IOException {
 		if (data instanceof CSVWriter) return (CSVWriter)data;
 		return new CSVWriter(IO.outputWriterFrom(data));
 	}
@@ -51,7 +51,7 @@ public class CSVWriter implements Closeable, Flushable {
 	 * @param writer Ausgabe.
 	 * @throws IOException Wenn {@link Writer#flush()} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code writer} {@code null} ist. */
-	public CSVWriter(final Writer writer) throws IOException, NullPointerException {
+	public CSVWriter(Writer writer) throws IOException, NullPointerException {
 		writer.flush();
 		this.writer = writer;
 	}
@@ -93,7 +93,7 @@ public class CSVWriter implements Closeable, Flushable {
 	 *
 	 * @param force Maskierungszwang.
 	 * @return {@code this}. */
-	public CSVWriter useForce(final boolean force) {
+	public CSVWriter useForce(boolean force) {
 		synchronized (this.writer) {
 			this.force = force;
 		}
@@ -105,7 +105,7 @@ public class CSVWriter implements Closeable, Flushable {
 	 * @param quote Maskierungszeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Maskierungszeichen einem Zeilenumbruch gleicht. */
-	public CSVWriter useQuote(final char quote) throws IllegalArgumentException {
+	public CSVWriter useQuote(char quote) throws IllegalArgumentException {
 		CSVReader.check(quote);
 		synchronized (this.writer) {
 			this.quote = quote;
@@ -118,7 +118,7 @@ public class CSVWriter implements Closeable, Flushable {
 	 * @param comma Trennzeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Trennzeichen einem Zeilenumbruch gleicht. */
-	public CSVWriter useComma(final char comma) throws IllegalArgumentException {
+	public CSVWriter useComma(char comma) throws IllegalArgumentException {
 		CSVReader.check(comma);
 		synchronized (this.writer) {
 			this.comma = comma;
@@ -134,15 +134,15 @@ public class CSVWriter implements Closeable, Flushable {
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link #writeEntry(String...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code entries} {@code null} ist oder enthält. */
-	public CSVWriter writeTable(final Object[][] entries) throws IOException {
+	public CSVWriter writeTable(Object[][] entries) throws IOException {
 		synchronized (this.writer) {
 			this.writeTableImpl(entries);
 		}
 		return this;
 	}
 
-	void writeTableImpl(final Object[][] values) throws IOException {
-		for (final Object[] value: values) {
+	void writeTableImpl(Object[][] values) throws IOException {
+		for (var value: values) {
 			this.writeEntryImpl(value);
 		}
 	}
@@ -171,14 +171,14 @@ public class CSVWriter implements Closeable, Flushable {
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link #writeValue(String...)} bzw. {@link #writeEntry()} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
-	public CSVWriter writeEntry(final Object... values) throws IOException, NullPointerException {
+	public CSVWriter writeEntry(Object... values) throws IOException, NullPointerException {
 		synchronized (this.writer) {
 			this.writeEntryImpl(values);
 		}
 		return this;
 	}
 
-	void writeEntryImpl(final Object[] values) throws IOException {
+	void writeEntryImpl(Object[] values) throws IOException {
 		this.writeValueImpl(values);
 		this.writeEntryImpl();
 	}
@@ -194,29 +194,29 @@ public class CSVWriter implements Closeable, Flushable {
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public CSVWriter writeValue(final Object value) throws IOException, NullPointerException {
+	public CSVWriter writeValue(Object value) throws IOException, NullPointerException {
 		synchronized (this.writer) {
 			this.writeValueImpl(value.toString());
 		}
 		return this;
 	}
 
-	void writeValueImpl(final String value) throws IOException {
-		final Writer target = this.writer;
-		final char quote = this.quote;
-		final char comma = this.comma;
+	void writeValueImpl(String value) throws IOException {
+		var quote = this.quote;
+		var comma = this.comma;
+		var target = this.writer;
 		if (this.ignore) {
 			this.ignore = false;
 		} else {
 			target.write(comma);
 		}
-		final int length = value.length();
-		boolean mask = false;
+		var length = value.length();
+		var mask = false;
 		if (quote == 0) {
 			mask = false;
 		} else if (!this.force) {
-			for (int i = 0; i < length; i++) {
-				final char symbol = value.charAt(i);
+			for (var i = 0; i < length; i++) {
+				var symbol = value.charAt(i);
 				if ((symbol == quote) || (symbol == comma) || (symbol == '\r') || (symbol == '\n')) {
 					mask = true;
 					break;
@@ -227,8 +227,8 @@ public class CSVWriter implements Closeable, Flushable {
 		}
 		if (mask) {
 			target.write(quote);
-			for (int i = 0; i < length; i++) {
-				final char symbol = value.charAt(i);
+			for (var i = 0; i < length; i++) {
+				var symbol = value.charAt(i);
 				if (symbol == quote) {
 					target.write(quote);
 				}
@@ -247,15 +247,15 @@ public class CSVWriter implements Closeable, Flushable {
 	 * @return {@code this}.
 	 * @throws IOException Wenn {@link Writer#write(int)} bzw. {@link Writer#write(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält. */
-	public CSVWriter writeValue(final Object... values) throws IOException, NullPointerException {
+	public CSVWriter writeValue(Object... values) throws IOException, NullPointerException {
 		synchronized (this.writer) {
 			this.writeValueImpl(values);
 		}
 		return this;
 	}
 
-	void writeValueImpl(final Object... values) throws IOException, NullPointerException {
-		for (final Object value: values) {
+	void writeValueImpl(Object... values) throws IOException, NullPointerException {
+		for (var value: values) {
 			this.writeValueImpl(value.toString());
 		}
 	}
