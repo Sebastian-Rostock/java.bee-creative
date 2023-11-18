@@ -58,26 +58,16 @@ public interface DM extends QO {
 		return this.types().translate(this.typeTrans());
 	}
 
-	/** Diese Methode liefert das {@link DL Datenfeld} mit dem gegebenen Erkennungsknoten oder {@code null}.
-	 *
-	 * @see #updateIdents()
-	 * @param ident {@link DL#idents() Erkennugnsknoten}.
-	 * @return {@link DL Datenfeld} oder {@code null}. */
-	default DL getLink(QN ident) {
-		return this.getLink(ident.value());
-	}
-
 	/** Diese Methode liefert das {@link DL Datenfeld} mit dem gegebenen Erkennungstextwert oder {@code null}.
 	 *
-	 * @see #updateIdents()
 	 * @param ident {@link QN#value() Textwert} eines {@link DL#idents() Erkennugnsknoten}.
 	 * @return {@link DL Datenfeld} oder {@code null}. */
 	DL getLink(String ident);
 
-	default DT getType(QN ident) {
-		return this.getType(ident.value());
-	}
-
+	/** Diese Methode liefert den {@link DT Datentyp} mit dem gegebenen Erkennungstextwert oder {@code null}.
+	 *
+	 * @param ident {@link QN#value() Textwert} eines {@link DT#idents() Erkennugnsknoten}.
+	 * @return {@link DT Datentyp} oder {@code null}. */
 	DT getType(String ident);
 
 	default boolean putEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
@@ -89,11 +79,5 @@ public interface DM extends QO {
 		var history = this.history();
 		return DQ.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
-
-	/** Diese Methode übernimmt Änderungen an {@link DE#idents()} auf die internen Puffer zur Beschleunigung von {@link #getLink(String)} und
-	 * {@link #getType(String)}. Wenn das {@link DL Datenfeld} zu {@link DL#IDENT_IsLinkWithIdent} nicht ermittelt werden kann, wird das Datenmodell
-	 * initialisiert. Wenn essentielle Datenfelder oder Datentypen nicht ermittelt werden können, wird eine Ausnahme ausgelöst. Dies verursachende Änderungen an
-	 * den {@link #edges()} sollten über die {@link #history()} rückgängig gemacht werden. */
-	void updateIdents() throws IllegalArgumentException;
 
 }

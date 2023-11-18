@@ -28,12 +28,23 @@ public class H2DS implements DS {
 
 	@Override
 	public H2QN install(String value) throws NullPointerException {
-		return this.installMap.install(Objects.notNull(value), this::installItem);
+		return this.installMap.install(Objects.notNull(value), item -> {
+			var node = this.node;
+			var owner = node.owner;
+			var result = owner.newNode();
+			owner.newEdge(node, owner.newNode(item), node, result).put();
+			return result;
+		});
 	}
 
 	@Override
 	public Set2<QN> installSet(String value) throws NullPointerException {
-		return this.installSetMap.install(Objects.notNull(value), this::installItems).asNodeSet();
+		return this.installSetMap.install(Objects.notNull(value), item -> new Items(this, this.install(item))).asNodeSet();
+	}
+
+	@Override
+	public Translator2<QN, DM> modelTrans() {
+		return this.modelTrans == null ? this.modelTrans = Translators.from(QN.class, DM.class, this::asModel, DM::context).optionalize() : this.modelTrans;
 	}
 
 	/** Diese Methode aktualisiert den Puffer der über {@link #install(String)} bereitgestellten {@link QN Hyperknoten}. */
@@ -52,36 +63,19 @@ public class H2DS implements DS {
 		});
 	}
 
-	@Override
-	public Translator2<QN, DM> modelTrans() {
-		return this.domainTrans == null ? this.domainTrans = Translators.from(QN.class, DM.class, this::asDomain, DM::context).optionalize() : this.domainTrans;
-	}
-
-	protected H2DM asDomain(QN node) {
+	protected H2DM asModel(QN node) {
 		return new H2DM(this, this.node.owner.asQN(node));
 	}
 
 	private final H2QN node;
 
+	private Translator2<QN, DM> modelTrans;
+
 	private HashMap2<String, H2QN> installMap;
 
 	private HashMap2<String, Items> installSetMap;
 
-	private Translator2<QN, DM> domainTrans;
-
-	private H2QN installItem(String value) {
-		var node = this.node;
-		var owner = node.owner;
-		var result = owner.newNode();
-		owner.newEdge(node, owner.newNode(value), node, result).put();
-		return result;
-	}
-
-	private Items installItems(String value) {
-		return new Items(this, this.install(value));
-	}
-
-	static class Items extends H2DSNSet {
+	private static class Items extends H2DSNSet {
 
 		public Items(H2DS parent, H2QN predicate) {
 			super(parent.node.owner, new H2QQ().push(parent.node.owner.edges() //
