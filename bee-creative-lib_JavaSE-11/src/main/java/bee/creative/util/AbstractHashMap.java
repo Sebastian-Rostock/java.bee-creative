@@ -104,13 +104,6 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	}
 
 	@Override
-	public void putAll(final Map<? extends GKey, ? extends GValue> map) {
-		for (final Entry<? extends GKey, ? extends GValue> entry: map.entrySet()) {
-			this.putImpl(entry.getKey(), entry.getValue());
-		}
-	}
-
-	@Override
 	public void clear() {
 		this.clearImpl();
 	}
