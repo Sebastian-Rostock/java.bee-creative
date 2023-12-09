@@ -30,6 +30,11 @@ public interface QS {
 	 * @return Textwerte. */
 	QVSet values();
 
+	/** Diese Methode liefet das diesen Graphspeicher verwaltende Objekt.
+	 * 
+	 * @return Besitzer dieses Graphspeichers oder {@code null}. */
+	Object owner();
+
 	/** Diese Methode liefert den {@link QN Hyperknoten}, der von diesem Graphspeicher {@link QN#owner() verwaltet} wird und dessen {@link QN#value() Textwert}
 	 * gleich der {@link Object#toString() Textdarstellung} des gegebenen Objekts ist. Wenn dieser nicht existiert, wird {@code null} geliefert.
 	 *

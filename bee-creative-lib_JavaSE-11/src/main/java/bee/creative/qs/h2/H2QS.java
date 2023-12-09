@@ -1,7 +1,6 @@
 package bee.creative.qs.h2;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,21 +24,24 @@ import bee.creative.util.Translators;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2QS implements QS, AutoCloseable {
 
-	/** Diese Methode liefert den Graphspeicher zu der Datenbankverbindung, die mit dem {@code jdbc:h2:}-Protokoll zum gegebenen Dateipfad erzeugt wurde. Dazu
-	 * wird das Laden der Klasse {@code org.h2.Driver} erzwungen. */
+	/** Diese Methode liefert den Graphspeicher zum gegebenen {@link H2C#from(String) Dateipfad} und ohne {@link #owner() Besitzer}. */
 	public static H2QS from(String file) throws SQLException, NullPointerException, ClassNotFoundException {
-		Class.forName("org.h2.Driver");
-		return new H2QS(DriverManager.getConnection("jdbc:h2:" + file, "", ""));
+		return new H2QS(H2C.from(file), null);
 	}
 
 	/** Dieses Feld speichert die über den Konstruktor bereitgestellte Datenbankverbindung. */
 	public final Connection conn;
 
+	/** Dieses Feld speichert den Besitzer oder {@code null}. */
+	public final Object owner;
+
 	/** Dieser Konstruktor initialisiert die Datenbankverbindung und erstellt bei Bedarf das Tabellenschema.
 	 *
-	 * @param conn Datenbankverbindung. */
-	public H2QS(Connection conn) throws SQLException, NullPointerException {
+	 * @param conn Datenbankverbindung.
+	 * @param owner Besitzer oder {@code null}. */
+	public H2QS(Connection conn, Object owner) throws SQLException, NullPointerException {
 		this.conn = conn;
+		this.owner = owner;
 		new H2QQ().push("" + //
 			"CREATE SEQUENCE IF NOT EXISTS QT_SEQ;" + //
 			"CREATE SEQUENCE IF NOT EXISTS QN_SEQ;" + //
@@ -72,8 +74,10 @@ public class H2QS implements QS, AutoCloseable {
 		try {
 			var res = (H2QE)src;
 			if (res.owner == this) return res;
-		} catch (ClassCastException cause) {}
-		throw new IllegalArgumentException();
+			throw new IllegalArgumentException();
+		} catch (ClassCastException cause) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QESet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
@@ -81,8 +85,10 @@ public class H2QS implements QS, AutoCloseable {
 		try {
 			var res = (H2QESet)src;
 			if (res.owner == this) return res;
-		} catch (ClassCastException cause) {}
-		throw new IllegalArgumentException();
+			throw new IllegalArgumentException();
+		} catch (ClassCastException cause) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QN} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
@@ -90,8 +96,10 @@ public class H2QS implements QS, AutoCloseable {
 		try {
 			var res = (H2QN)src;
 			if (res.owner == this) return res;
-		} catch (ClassCastException cause) {}
-		throw new IllegalArgumentException();
+			throw new IllegalArgumentException();
+		} catch (ClassCastException cause) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QNSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
@@ -99,8 +107,10 @@ public class H2QS implements QS, AutoCloseable {
 		try {
 			var res = (H2QNSet)src;
 			if (res.owner == this) return res;
-		} catch (ClassCastException cause) {}
-		throw new IllegalArgumentException();
+			throw new IllegalArgumentException();
+		} catch (ClassCastException cause) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/** Diese Methode liefert die {@link Object#toString() Textdarstellung} des gegebenen Objekts oder löst eine Ausnahme aus. */
@@ -113,8 +123,10 @@ public class H2QS implements QS, AutoCloseable {
 		try {
 			var res = (H2QVSet)src;
 			if (res.owner == this) return res;
-		} catch (ClassCastException cause) {}
-		throw new IllegalArgumentException();
+			throw new IllegalArgumentException();
+		} catch (ClassCastException cause) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QT} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
@@ -122,8 +134,10 @@ public class H2QS implements QS, AutoCloseable {
 		try {
 			var res = (H2QT)src;
 			if (res.owner == this) return res;
-		} catch (ClassCastException cause) {}
-		throw new IllegalArgumentException();
+			throw new IllegalArgumentException();
+		} catch (ClassCastException cause) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} oder löst eine Ausnahme aus. */
@@ -131,8 +145,10 @@ public class H2QS implements QS, AutoCloseable {
 		try {
 			var res = (H2QTSet)src;
 			if (res.owner == this) return res;
-		} catch (ClassCastException cause) {}
-		throw new IllegalArgumentException();
+			throw new IllegalArgumentException();
+		} catch (ClassCastException cause) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/** Diese Methode liefert das gegebene Objekt als {@link H2QTSet} dieses {@link QO Graphspeichers} mit der gegebene Anzahl an {@link QTSet#names() Rollen}
@@ -159,18 +175,20 @@ public class H2QS implements QS, AutoCloseable {
 
 	@Override
 	public void close() throws SQLException {
-		synchronized (this.tables) {
-			for (var name: new ArrayList<>(this.tables)) {
-				this.popTable(name);
+		try {
+			synchronized (this.tables) {
+				for (var name: new ArrayList<>(this.tables)) {
+					this.popTable(name);
+				}
 			}
+		} finally {
+			this.conn.close();
 		}
-		this.conn.close();
 	}
 
 	/** Diese Methode entfernt alle Hyperknoten mit Textwert, die nich in Hyperkanten verwendet werden. */
 	public void compact() {
-		var edges = this.edges();
-		this.nodes().except(edges.contexts().union(edges.predicates()).union(edges.subjects()).union(edges.objects())).popAll();
+		this.nodes().except(this.edges().nodes()).popAll();
 	}
 
 	@Override
@@ -186,6 +204,11 @@ public class H2QS implements QS, AutoCloseable {
 	@Override
 	public H2QVSet values() {
 		return this.values;
+	}
+
+	@Override
+	public Object owner() {
+		return this.owner;
 	}
 
 	@Override

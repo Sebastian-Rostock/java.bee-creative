@@ -28,6 +28,11 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	}
 
 	@Override
+	public H2QNSet nodes() {
+		return this.contexts().union(this.predicates()).union(this.subjects()).union(this.objects());
+	}
+
+	@Override
 	public H2QNSet contexts() {
 		return new H2QNSet(this.owner, new H2QQ().push("SELECT DISTINCT C AS N FROM (").push(this).push(")"));
 	}

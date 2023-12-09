@@ -18,7 +18,7 @@ public interface DM extends QO {
 
 	/** Dieses Feld speichert den Textwert des {@link DS#installSet(String) Erkennungsknoten} für die {@link DS#models() Domänenmodelle} eines {@link DS
 	 * Domänenspeichers}. */
-	String IDENT_IsDomain = "DS:IsDomain";
+	String IDENT_IsModel = "DS:IsModel";
 
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten {@link QE Hyperkanten} mit dem {@link #context() Kontextknoten} dieses Domänenmodells.
 	 *
@@ -36,9 +36,6 @@ public interface DM extends QO {
 
 	QN context(); // kontext für alles
 
-	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DL#node() Feldknoten}-{@link DL Datenfeld}-{@link Translator}. */
-	Translator2<QN, DL> linkTrans();
-
 	default Set2<QN> links() { // datenfelder, beziehungen
 		return this.getType(DL.IDENT_IsLink).instances();
 	}
@@ -46,9 +43,6 @@ public interface DM extends QO {
 	default Set2<DL> linksAsLinks() {
 		return this.links().translate(this.linkTrans());
 	}
-
-	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DT#node() Typknoten}-{@link DT Datentyp}-{@link Translator}. */
-	Translator2<QN, DT> typeTrans();
 
 	default Set2<QN> types() { // datentypen
 		return this.getType(DT.IDENT_IsType).instances();
@@ -79,5 +73,11 @@ public interface DM extends QO {
 		var history = this.history();
 		return DQ.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
+
+	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DL#node() Feldknoten}-{@link DL Datenfeld}-{@link Translator}. */
+	Translator2<QN, DL> linkTrans();
+
+	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link DT#node() Typknoten}-{@link DT Datentyp}-{@link Translator}. */
+	Translator2<QN, DT> typeTrans();
 
 }

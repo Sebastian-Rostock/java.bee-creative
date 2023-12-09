@@ -5,6 +5,11 @@ package bee.creative.qs;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QESet extends QXSet<QE, QESet> {
 
+	/** Diese Methode gibt eine Mengensicht auf alle {@link QN Haperknoten} zurück, die in den Hyperkanten dieser Menge aufgeführt sind.
+	 *
+	 * @return Hyperknoten der Hyperkanten dieser Menge. */
+	QNSet nodes();
+
 	/** Diese Methode gibt eine Mengensicht auf alle {@link QE#context() Kontextknoten} zurück, die in den Hyperkanten dieser Menge aufgeführt sind.
 	 *
 	 * @return Kontextknoten der Hyperkanten dieser Menge. */

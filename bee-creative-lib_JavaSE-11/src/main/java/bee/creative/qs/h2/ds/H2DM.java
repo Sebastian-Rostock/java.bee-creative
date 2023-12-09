@@ -26,7 +26,7 @@ public class H2DM implements DM {
 	public final H2QN context;
 
 	public H2DM(H2DS parent) {
-		this(parent, parent.owner().newNode());
+		this(parent, parent.store().newNode());
 		parent.models().add(this.context);
 	}
 
@@ -58,33 +58,25 @@ public class H2DM implements DM {
 
 	@Override
 	public H2DL getLink(String ident) {
-		if (this.linkMap != null) return this.linkMap.get(ident);
-		this.linkMap = new HashMap2<>(100);
-		var edgeList = this.edges().havingObject(this.owner().newNode(DL.IDENT_IsLinkWithIdent)).iterator() //
-			.filter(edge -> edge.subject().equals(edge.predicate())).toList();
-		if (edgeList.isEmpty()) return null;
-		var asError = (Getter<Object, String>)value -> "DL with ident " + value + " is not unique";
-		if (edgeList.size() > 1) throw new IllegalArgumentException(asError.get(DL.IDENT_IsLinkWithIdent));
-		this.setupItemMap(this.linkMap, this.asLink(edgeList.get(0).predicate()), this::asLink, asError);
+		if (this.linkMap == null) {
+			this.linkMap = new HashMap2<>(100);
+			var edgeList = this.edges().havingObject(this.owner().newNode(DL.IDENT_IsLinkWithIdent)).iterator() //
+				.filter(edge -> edge.subject().equals(edge.predicate())).toList();
+			if (edgeList.isEmpty()) return null;
+			var asError = (Getter<Object, String>)value -> "DL with ident " + value + " is not unique";
+			if (edgeList.size() > 1) throw new IllegalArgumentException(asError.get(DL.IDENT_IsLinkWithIdent));
+			this.setupItemMap(this.linkMap, this.asLink(edgeList.get(0).predicate()), this::asLink, asError);
+		}
 		return this.linkMap.get(ident);
 	}
 
 	@Override
 	public H2DT getType(String ident) {
-		if (this.typeMap != null) return this.typeMap.get(ident);
-		this.typeMap = new HashMap2<>(100);
-		this.setupItemMap(this.typeMap, this.getLink(DT.IDENT_IsTypeWithIdent), this::asType, value -> "DT with ident " + value + " is not unique");
+		if (this.typeMap == null) {
+			this.typeMap = new HashMap2<>(100);
+			this.setupItemMap(this.typeMap, this.getLink(DT.IDENT_IsTypeWithIdent), this::asType, value -> "DT with ident " + value + " is not unique");
+		}
 		return this.typeMap.get(ident);
-	}
-
-	@Override
-	public Translator2<QN, DL> linkTrans() {
-		return this.linkTrans == null ? this.linkTrans = Translators.from(QN.class, DL.class, this::asLink, DL::node).optionalize() : this.linkTrans;
-	}
-
-	@Override
-	public Translator2<QN, DT> typeTrans() {
-		return this.typeTrans == null ? this.typeTrans = Translators.from(QN.class, DT.class, this::asType, DT::node).optionalize() : this.typeTrans;
 	}
 
 	public void install() {
@@ -122,7 +114,18 @@ public class H2DM implements DM {
 	 * {@link #getType(String)}. Wenn das {@link DL Datenfeld} zu {@link DL#IDENT_IsLinkWithIdent} nicht verwendet wird, wird das Datenmodell initialisiert. Wenn
 	 * essentielle Datenfelder oder Datentypen nicht ermittelt werden können, wird eine Ausnahme ausgelöst. */
 	public void invalidateIdents() {
+		this.linkMap = null;
+		this.typeMap = null;
+	}
 
+	@Override
+	public Translator2<QN, DL> linkTrans() {
+		return this.linkTrans == null ? this.linkTrans = Translators.from(QN.class, DL.class, this::asLink, DL::node).optionalize() : this.linkTrans;
+	}
+
+	@Override
+	public Translator2<QN, DT> typeTrans() {
+		return this.typeTrans == null ? this.typeTrans = Translators.from(QN.class, DT.class, this::asType, DT::node).optionalize() : this.typeTrans;
 	}
 
 	protected H2DL asLink(QN node) {
