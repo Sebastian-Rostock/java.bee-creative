@@ -253,11 +253,11 @@ public class DQ {
 	 * werden.
 	 *
 	 * @param context Kontextknoten, mit dem die Prädikat-Subjekt-Objekt-Tripel entfernt werden sollen.
-	 * @param edges Hinzuzufügende Prädikat-Subjekt-Objekt-Tripel.
+	 * @param edges Zuentfernende Prädikat-Subjekt-Objekt-Tripel.
 	 * @param putContextOrNull Kontextknoten zur Erfassung der gegenüber des vorherigen Datenstandes gespeicherten Prädikat-Subjekt-Objekt-Tripel.
 	 * @param popContextOrNull Kontextknoten zur Erfassung der gegenüber des vorherigen Datenstandes entfernten Prädikat-Subjekt-Objekt-Tripel.
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst.
-	 * @see QESet#putAll() */
+	 * @see QESet#popAll() */
 	public static boolean popEdges(QN context, Iterable<? extends QE> edges, QN putContextOrNull, QN popContextOrNull)
 		throws NullPointerException, IllegalArgumentException {
 		return DQ.popEdgesImpl(context, putContextOrNull, popContextOrNull, context.owner().newEdges(edges).withContext(context));

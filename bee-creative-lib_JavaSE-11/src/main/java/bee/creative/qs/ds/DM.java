@@ -40,14 +40,30 @@ public interface DM extends QO {
 		return this.getType(DL.IDENT_IsLink).instances();
 	}
 
+	/** Diese Methode erlaubt Zugriff auf alle {@link DL Datenfelder}.
+	 *
+	 * @see #links()
+	 * @see #linksAsLinks()
+	 * @return Datenfelder. */
 	default Set2<DL> linksAsLinks() {
 		return this.links().translate(this.linkTrans());
 	}
 
-	default Set2<QN> types() { // datentypen
+	/** Diese Methode erlaubt Zugriff auf die {@link DT#node() Typknoten} aller {@link DT Datentypen}.
+	 *
+	 * @see DT#IDENT_IsType
+	 * @see DT#node()
+	 * @see DT#instances()
+	 * @return Datentypknoten. */
+	default Set2<QN> types() {
 		return this.getType(DT.IDENT_IsType).instances();
 	}
 
+	/** Diese Methode erlaubt Zugriff auf alle {@link DT Datentypen}.
+	 *
+	 * @see #types()
+	 * @see #typeTrans()
+	 * @return Datentypen. */
 	default Set2<DT> typesAsTypes() {
 		return this.types().translate(this.typeTrans());
 	}
@@ -64,11 +80,24 @@ public interface DM extends QO {
 	 * @return {@link DT Datentyp} oder {@code null}. */
 	DT getType(String ident);
 
+	/** Diese Methode speichert die als {@link QE Hyperkanten} gegebenen Prädikat-Subjekt-Objekt-Tripel mit dem {@link #context() Kontextknoten} dieses
+	 * Datenmodells im {@link #owner() Graphspeicher}. Wenn die {@link #history()} vorliegt, wird der Unterschied gegenüber des vorherigen Datenstandes erfasst.
+	 *
+	 * @see DQ#putEdges(QN, Iterable, QN, QN)
+	 * @param edges Hinzuzufügende Prädikat-Subjekt-Objekt-Tripel.
+	 * @return {@code true} bei Änderung des Graphspeicherinhalts; {@code false} sonst. */
 	default boolean putEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		var history = this.history();
 		return DQ.putEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);
 	}
 
+	/** Diese Methode entfernt die als {@link QE Hyperkanten} gegebenen Prädikat-Subjekt-Objekt-Tripel mit dem {@link #context() Kontextknoten} dieses
+	 * Datenmodells aus dem {@link #owner() Graphspeicher}. Wenn die {@link #history()} vorliegt, wird der Unterschied gegenüber des vorherigen Datenstandes
+	 * erfasst.
+	 *
+	 * @see DQ#popEdges(QN, Iterable, QN, QN)
+	 * @param edges Zuentfernende Prädikat-Subjekt-Objekt-Tripel.
+	 * @return {@code true} bei Änderung des Graphspeicherinhalts; {@code false} sonst. */
 	default boolean popEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
 		var history = this.history();
 		return DQ.popEdges(this.context(), edges, history != null ? history.putContext() : null, history != null ? history.popContext() : null);

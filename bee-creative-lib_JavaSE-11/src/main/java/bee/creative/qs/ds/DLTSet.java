@@ -2,7 +2,6 @@ package bee.creative.qs.ds;
 
 import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
-import bee.creative.util.Property2;
 
 /** Diese Schnittstelle definiert das {@link DLNSet} für {@link DL#getTargets(QN)}.
  *
