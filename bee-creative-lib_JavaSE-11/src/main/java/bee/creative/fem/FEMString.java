@@ -381,7 +381,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class ConcatString extends HashString implements Emuable {
 
 		static int size(FEMString string) {
@@ -458,7 +457,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class ConcatString1 extends ConcatString {
 
 		ConcatString1(final FEMString string1, final FEMString string2) throws IllegalArgumentException {
@@ -467,7 +465,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class ConcatString2 extends ConcatString {
 
 		ConcatString2(final FEMString string1, final FEMString string2) throws IllegalArgumentException {
@@ -476,7 +473,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class SectionString extends HashString implements Emuable {
 
 		public final FEMString string;
@@ -517,7 +513,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class ReverseString extends HashString implements Emuable {
 
 		public final FEMString string;
@@ -565,7 +560,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class UniformString extends HashString {
 
 		public final int value;
@@ -616,7 +610,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class CompactStringINT8 extends HashString implements Emuable {
 
 		/** Dieses Feld speichert das Array der Codepoints, das nicht verändert werden sollte. */
@@ -658,7 +651,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class CompactStringINT16 extends HashString implements Emuable {
 
 		final short[] items;
@@ -703,7 +695,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class CompactStringINT32 extends HashString implements Emuable {
 
 		final int[] items;
@@ -744,7 +735,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class CompactStringUTF8 extends HashString implements Emuable {
 
 		final byte[] items;
@@ -795,7 +785,6 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 
 	}
 
-	@SuppressWarnings ("javadoc")
 	public static class CompactStringUTF16 extends HashString implements Emuable {
 
 		final short[] items;
@@ -1675,7 +1664,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer>, C
 	@Override
 	public int compareTo(final FEMString that) throws NullPointerException {
 		final int length = Math.min(this.length, that.length);
-		for (int i = 0; i < length; i++) { // TODO schneller, ggf. über ectract int[32] und IAMArray.from(...).compare
+		for (int i = 0; i < length; i++) {
 			final int result = Comparators.compare(this.customGet(i), that.customGet(i));
 			if (result != 0) return result;
 		}
