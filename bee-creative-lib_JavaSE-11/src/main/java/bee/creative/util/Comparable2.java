@@ -7,7 +7,7 @@ package bee.creative.util;
 public interface Comparable2<GItem> extends Comparable<GItem> {
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparables#concat(Comparable, Comparable) Comparables.concat(this, that)}. */
-	default Comparable2<GItem> concat(final Comparable<? super GItem> that) throws NullPointerException {
+	default Comparable2<GItem> concat(Comparable<? super GItem> that) throws NullPointerException {
 		return Comparables.concat(this, that);
 	}
 
@@ -22,7 +22,7 @@ public interface Comparable2<GItem> extends Comparable<GItem> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Comparables#translate(Comparable, Getter) Comparables.translate(this, trans)}. */
-	default <GItem2> Comparable2<GItem2> translate(final Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
+	default <GItem2> Comparable2<GItem2> translate(Getter<? super GItem2, ? extends GItem> trans) throws NullPointerException {
 		return Comparables.translate(this, trans);
 	}
 

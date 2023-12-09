@@ -51,7 +51,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
 	 *
 	 * @param items neuer Inhalt. */
-	protected abstract void setData(final GData items);
+	protected abstract void setData(GData items);
 
 	@Override
 	public int size() {
@@ -64,50 +64,50 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	}
 
 	@Override
-	public boolean add(final GItem e) {
-		final GData data = this.getData(false);
+	public boolean add(GItem e) {
+		var data = this.getData(false);
 		if (!data.add(e)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public boolean addAll(final Collection<? extends GItem> c) {
-		final GData data = this.getData(false);
+	public boolean addAll(Collection<? extends GItem> c) {
+		var data = this.getData(false);
 		if (!data.addAll(c)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public boolean remove(final Object o) {
-		final GData data = this.getData(false);
+	public boolean remove(Object o) {
+		var data = this.getData(false);
 		if (!data.remove(o)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public boolean removeAll(final Collection<?> c) {
-		final GData data = this.getData(false);
+	public boolean removeAll(Collection<?> c) {
+		var data = this.getData(false);
 		if (!data.removeAll(c)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public boolean contains(final Object item) {
+	public boolean contains(Object item) {
 		return this.getData(true).contains(item);
 	}
 
 	@Override
-	public boolean containsAll(final Collection<?> c) {
+	public boolean containsAll(Collection<?> c) {
 		return this.getData(true).containsAll(c);
 	}
 
 	@Override
-	public boolean retainAll(final Collection<?> c) {
-		final GData data = this.getData(false);
+	public boolean retainAll(Collection<?> c) {
+		var data = this.getData(false);
 		if (!data.retainAll(c)) return false;
 		this.setData(data);
 		return true;
@@ -115,7 +115,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 
 	@Override
 	public void clear() {
-		final GData data = this.getData(false);
+		var data = this.getData(false);
 		data.clear();
 		this.setData(data);
 	}
@@ -126,7 +126,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		return this.getData(true).equals(object);
 	}
 
@@ -141,7 +141,7 @@ public abstract class AbstractProxyCollection<GItem, GData extends Collection<GI
 	}
 
 	@Override
-	public <T> T[] toArray(final T[] result) {
+	public <T> T[] toArray(T[] result) {
 		return this.getData(true).toArray(result);
 	}
 

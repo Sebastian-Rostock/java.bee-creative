@@ -7,12 +7,12 @@ import bee.creative.lang.Objects.BaseObject;
 public abstract class AbstractHasher extends BaseObject implements Hasher2 {
 
 	@Override
-	public int hash(final Object input) {
+	public int hash(Object input) {
 		return Objects.hash(input);
 	}
 
 	@Override
-	public boolean equals(final Object input1, final Object input2) {
+	public boolean equals(Object input1, Object input2) {
 		return Objects.equals(input1, input2);
 	}
 

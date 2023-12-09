@@ -10,7 +10,7 @@ import bee.creative.lang.Objects.BaseObject;
 public abstract class AbstractGetter<GItem, GValue> extends BaseObject implements Getter3<GItem, GValue> {
 
 	@Override
-	public GValue get(final GItem item) {
+	public GValue get(GItem item) {
 		return null;
 	}
 

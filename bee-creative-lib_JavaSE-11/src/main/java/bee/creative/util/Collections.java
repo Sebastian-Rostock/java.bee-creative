@@ -18,14 +18,13 @@ public class Collections {
 	/** Diese Klasse implementiert ein unveränderliches {@link Set} als Sicht auf die Menge aller Elemente von zwei gegebenen {@link Set}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class UnionSet<GItem> extends AbstractSet2<GItem> {
 
 		public final Set<? extends GItem> items1;
 
 		public final Set<? extends GItem> items2;
 
-		public UnionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+		public UnionSet(Set<? extends GItem> items1, Set<? extends GItem> items2) throws NullPointerException {
 			this.items1 = Objects.notNull(items1);
 			this.items2 = Objects.notNull(items2);
 		}
@@ -46,7 +45,7 @@ public class Collections {
 		}
 
 		@Override
-		public boolean contains(final Object item) {
+		public boolean contains(Object item) {
 			return this.items1.contains(item) || this.items2.contains(item);
 		}
 
@@ -56,14 +55,13 @@ public class Collections {
 	 * {@link #items2 zweiten} gegebenen {@link Set}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class ExceptSet<GItem> extends AbstractSet2<GItem> {
 
 		public final Set<? extends GItem> items1;
 
 		public final Set<? extends GItem> items2;
 
-		public ExceptSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+		public ExceptSet(Set<? extends GItem> items1, Set<? extends GItem> items2) throws NullPointerException {
 			this.items1 = Objects.notNull(items1);
 			this.items2 = Objects.notNull(items2);
 		}
@@ -84,7 +82,7 @@ public class Collections {
 		}
 
 		@Override
-		public boolean contains(final Object item) {
+		public boolean contains(Object item) {
 			return this.items1.contains(item) && !this.items2.contains(item);
 		}
 
@@ -94,14 +92,13 @@ public class Collections {
 	 * gegebenen {@link Set}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class IntersectSet<GItem> extends AbstractSet2<GItem> {
 
 		public final Set<? extends GItem> items1;
 
 		public final Set<? extends GItem> items2;
 
-		public IntersectSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+		public IntersectSet(Set<? extends GItem> items1, Set<? extends GItem> items2) throws NullPointerException {
 			this.items1 = Objects.notNull(items1);
 			this.items2 = Objects.notNull(items2);
 		}
@@ -122,7 +119,7 @@ public class Collections {
 		}
 
 		@Override
-		public boolean contains(final Object item) {
+		public boolean contains(Object item) {
 			return this.items1.contains(item) && this.items2.contains(item);
 		}
 
@@ -133,7 +130,6 @@ public class Collections {
 	 *
 	 * @param <GKey> Typ der Elemente der Schlüsselmenge.
 	 * @param <GValue> Typ der Elemente der Wertmenge. */
-	@SuppressWarnings ("javadoc")
 	public static class CartesianSet<GKey, GValue> extends AbstractSet2<Entry<GKey, GValue>> {
 
 		class Iter extends AbstractIterator<Entry<GKey, GValue>> {
@@ -155,7 +151,7 @@ public class Collections {
 
 			@Override
 			public Entry<GKey, GValue> next() {
-				final GValue nextValue = this.valueIter.next();
+				var nextValue = this.valueIter.next();
 				return Entries.from(this.nextKey, nextValue);
 			}
 
@@ -165,7 +161,7 @@ public class Collections {
 
 		public final Set<? extends GValue> values;
 
-		public CartesianSet(final Set<? extends GKey> keys, final Set<? extends GValue> values) throws NullPointerException {
+		public CartesianSet(Set<? extends GKey> keys, Set<? extends GValue> values) throws NullPointerException {
 			this.keys = Objects.notNull(keys);
 			this.values = Objects.notNull(values);
 		}
@@ -186,9 +182,9 @@ public class Collections {
 		}
 
 		@Override
-		public boolean contains(final Object item) {
+		public boolean contains(Object item) {
 			if (!(item instanceof Entry<?, ?>)) return false;
-			final Entry<?, ?> entry = (Entry<?, ?>)item;
+			var entry = (Entry<?, ?>)item;
 			return this.keys.contains(entry.getKey()) && this.values.contains(entry.getValue());
 		}
 
@@ -197,15 +193,14 @@ public class Collections {
 	/** Diese Klasse implementiert eine rückwärts geordnete Sicht auf die gegebene {@link List}.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class ReverseList<GItem> extends AbstractList2<GItem> {
 
 		class Iter implements ListIterator<GItem> {
 
 			final ListIterator<GItem> that;
 
-			Iter(final int index) {
-				final List<GItem> items = ReverseList.this.items;
+			Iter(int index) {
+				var items = ReverseList.this.items;
 				this.that = items.listIterator(items.size() - index);
 			}
 
@@ -220,12 +215,12 @@ public class Collections {
 			}
 
 			@Override
-			public void set(final GItem item2) {
+			public void set(GItem item2) {
 				this.that.set(item2);
 			}
 
 			@Override
-			public void add(final GItem item2) {
+			public void add(GItem item2) {
 				this.that.add(item2);
 				this.that.hasPrevious();
 				this.that.previous();
@@ -260,43 +255,43 @@ public class Collections {
 
 		public final List<GItem> items;
 
-		public ReverseList(final List<GItem> items) {
+		public ReverseList(List<GItem> items) {
 			this.items = Objects.notNull(items);
 		}
 
 		@Override
-		protected void removeRange(final int fromIndex, final int toIndex) {
-			final int size = this.items.size();
+		protected void removeRange(int fromIndex, int toIndex) {
+			var size = this.items.size();
 			this.items.subList(size - toIndex, size - fromIndex).clear();
 		}
 
 		@Override
-		public GItem get(final int index) {
+		public GItem get(int index) {
 			return this.items.get(this.items.size() - index - 1);
 		}
 
 		@Override
-		public GItem set(final int index, final GItem item2) {
+		public GItem set(int index, GItem item2) {
 			return this.items.set(this.items.size() - index - 1, item2);
 		}
 
 		@Override
-		public void add(final int index, final GItem item2) {
+		public void add(int index, GItem item2) {
 			this.items.add(this.items.size() - index, item2);
 		}
 
 		@Override
-		public boolean retainAll(final Collection<?> items2) {
+		public boolean retainAll(Collection<?> items2) {
 			return this.items.retainAll(items2);
 		}
 
 		@Override
-		public GItem remove(final int index) {
+		public GItem remove(int index) {
 			return this.items.remove(this.items.size() - index - 1);
 		}
 
 		@Override
-		public boolean removeAll(final Collection<?> items2) {
+		public boolean removeAll(Collection<?> items2) {
 			return this.items.removeAll(items2);
 		}
 
@@ -316,24 +311,24 @@ public class Collections {
 		}
 
 		@Override
-		public int indexOf(final Object item2) {
-			final int index = this.items.lastIndexOf(item2);
+		public int indexOf(Object item2) {
+			var index = this.items.lastIndexOf(item2);
 			return index < 0 ? -1 : this.items.size() - index - 1;
 		}
 
 		@Override
-		public int lastIndexOf(final Object item2) {
-			final int index = this.items.indexOf(item2);
+		public int lastIndexOf(Object item2) {
+			var index = this.items.indexOf(item2);
 			return index < 0 ? -1 : this.items.size() - index - 1;
 		}
 
 		@Override
-		public boolean contains(final Object item2) {
+		public boolean contains(Object item2) {
 			return this.items.contains(item2);
 		}
 
 		@Override
-		public boolean containsAll(final Collection<?> items2) {
+		public boolean containsAll(Collection<?> items2) {
 			return this.items.containsAll(items2);
 		}
 
@@ -343,7 +338,7 @@ public class Collections {
 		}
 
 		@Override
-		public ListIterator<GItem> listIterator(final int index) {
+		public ListIterator<GItem> listIterator(int index) {
 			return new Iter(index);
 		}
 
@@ -354,7 +349,6 @@ public class Collections {
 	 * wird in die {@link #items1 erste} und andernfalls in die {@link #items2 zweite} eingefügt.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class ConcatList<GItem> extends AbstractList2<GItem> {
 
 		public final List<GItem> items1;
@@ -363,27 +357,27 @@ public class Collections {
 
 		public final boolean extendMode;
 
-		public ConcatList(final List<GItem> items1, final List<GItem> items2, final boolean extendMode) {
+		public ConcatList(List<GItem> items1, List<GItem> items2, boolean extendMode) {
 			this.items1 = Objects.notNull(items1);
 			this.items2 = Objects.notNull(items2);
 			this.extendMode = extendMode;
 		}
 
 		@Override
-		public GItem get(final int index) {
-			final int size = this.items1.size();
+		public GItem get(int index) {
+			var size = this.items1.size();
 			return index < size ? this.items1.get(index) : this.items2.get(index - size);
 		}
 
 		@Override
-		public GItem set(final int index, final GItem item) {
-			final int size = this.items1.size();
+		public GItem set(int index, GItem item) {
+			var size = this.items1.size();
 			return index < size ? this.items1.set(index, item) : this.items2.set(index - size, item);
 		}
 
 		@Override
-		public void add(final int index, final GItem item) {
-			final int size = this.items1.size();
+		public void add(int index, GItem item) {
+			var size = this.items1.size();
 			if ((index < size) || ((index == size) && this.extendMode)) {
 				this.items1.add(index, item);
 			} else {
@@ -392,32 +386,32 @@ public class Collections {
 		}
 
 		@Override
-		public boolean addAll(final int index, final Collection<? extends GItem> items) {
-			final int size = this.items1.size();
+		public boolean addAll(int index, Collection<? extends GItem> items) {
+			var size = this.items1.size();
 			if ((index < size) || ((index == size) && this.extendMode)) return this.items1.addAll(index, items);
 			return this.items2.addAll(index - size, items);
 		}
 
 		@Override
-		public boolean retainAll(final Collection<?> items) {
+		public boolean retainAll(Collection<?> items) {
 			if (!this.items1.retainAll(items)) return this.items2.retainAll(items);
 			this.items2.retainAll(items);
 			return true;
 		}
 
 		@Override
-		public GItem remove(final int index) {
-			final int size = this.items1.size();
+		public GItem remove(int index) {
+			var size = this.items1.size();
 			return index < size ? this.items1.remove(index) : this.items2.remove(index - size);
 		}
 
 		@Override
-		public boolean remove(final Object item) {
+		public boolean remove(Object item) {
 			return this.items1.remove(item) || this.items2.remove(item);
 		}
 
 		@Override
-		public boolean removeAll(final Collection<?> item) {
+		public boolean removeAll(Collection<?> item) {
 			if (!this.items1.removeAll(item)) return this.items2.removeAll(item);
 			this.items2.removeAll(item);
 			return true;
@@ -440,22 +434,22 @@ public class Collections {
 		}
 
 		@Override
-		public int indexOf(final Object item) {
-			int index = this.items1.indexOf(item);
+		public int indexOf(Object item) {
+			var index = this.items1.indexOf(item);
 			if (index >= 0) return index;
 			index = this.items2.indexOf(item);
 			return index < 0 ? -1 : index + this.items1.size();
 		}
 
 		@Override
-		public int lastIndexOf(final Object item) {
-			final int index = this.items2.lastIndexOf(item);
+		public int lastIndexOf(Object item) {
+			var index = this.items2.lastIndexOf(item);
 			if (index >= 0) return index + this.items1.size();
 			return this.items1.lastIndexOf(item);
 		}
 
 		@Override
-		public boolean contains(final Object item) {
+		public boolean contains(Object item) {
 			return this.items1.contains(item) || this.items2.contains(item);
 		}
 
@@ -465,16 +459,10 @@ public class Collections {
 		}
 
 		@Override
-		public ListIterator<GItem> listIterator(final int index) {
-			final ListIterator<GItem> iterator1, iterator2;
-			int size = this.items1.size();
-			if (index < size) {
-				iterator1 = this.items1.listIterator(index);
-				iterator2 = this.items2.listIterator(0);
-			} else {
-				iterator1 = this.items1.listIterator(size);
-				iterator2 = this.items2.listIterator(index - size);
-			}
+		public ListIterator<GItem> listIterator(int index) {
+			var size = this.items1.size();
+			var iterator1 = index < size ? this.items1.listIterator(index) : this.items1.listIterator(size);
+			var iterator2 = index < size ? this.items2.listIterator(0) : this.items2.listIterator(index - size);
 			size = 0;
 			return new ListIterator<>() {
 
@@ -493,12 +481,12 @@ public class Collections {
 				}
 
 				@Override
-				public void set(final GItem item) {
+				public void set(GItem item) {
 					this.iterator.set(item);
 				}
 
 				@Override
-				public void add(final GItem item) {
+				public void add(GItem item) {
 					if ((iterator2.nextIndex() != 0) || (iterator1.nextIndex() != this.size)) {
 						this.iterator.add(item);
 					} else if (ConcatList.this.extendMode) {
@@ -545,7 +533,6 @@ public class Collections {
 	 * ist, wird an die {@link #items1 erste} und andernfalls an die {@link #items2 zweite} angefügt.
 	 *
 	 * @param <GItem> Typ der Elemente. */
-	@SuppressWarnings ("javadoc")
 	public static class ConcatCollection<GItem> extends AbstractCollection2<GItem> {
 
 		public final Collection<GItem> items1;
@@ -554,36 +541,36 @@ public class Collections {
 
 		public final boolean extendMode;
 
-		public ConcatCollection(final Collection<GItem> items1, final Collection<GItem> items2, final boolean extendMode) {
+		public ConcatCollection(Collection<GItem> items1, Collection<GItem> items2, boolean extendMode) {
 			this.items1 = Objects.notNull(items1);
 			this.items2 = Objects.notNull(items2);
 			this.extendMode = extendMode;
 		}
 
 		@Override
-		public boolean add(final GItem item) {
+		public boolean add(GItem item) {
 			return (this.extendMode ? this.items1 : this.items2).add(item);
 		}
 
 		@Override
-		public boolean addAll(final Collection<? extends GItem> items) {
+		public boolean addAll(Collection<? extends GItem> items) {
 			return (this.extendMode ? this.items1 : this.items2).addAll(items);
 		}
 
 		@Override
-		public boolean retainAll(final Collection<?> items) {
+		public boolean retainAll(Collection<?> items) {
 			if (!this.items1.retainAll(items)) return this.items2.retainAll(items);
 			this.items2.retainAll(items);
 			return true;
 		}
 
 		@Override
-		public boolean remove(final Object item) {
+		public boolean remove(Object item) {
 			return this.items1.remove(item) || this.items2.remove(item);
 		}
 
 		@Override
-		public boolean removeAll(final Collection<?> items) {
+		public boolean removeAll(Collection<?> items) {
 			if (!this.items1.removeAll(items)) return this.items2.removeAll(items);
 			this.items2.removeAll(items);
 			return true;
@@ -601,7 +588,7 @@ public class Collections {
 		}
 
 		@Override
-		public boolean contains(final Object item) {
+		public boolean contains(Object item) {
 			return this.items1.contains(item) || this.items2.contains(item);
 		}
 
@@ -618,14 +605,13 @@ public class Collections {
 	 * @param <GKey2> Typ der Schlüssel der gegebenen {@link Map}.
 	 * @param <GValue> Typ der Werte.
 	 * @param <GValue2> Typ der Werte der gegebenen {@link Map}. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedMap<GKey, GValue, GKey2, GValue2> extends AbstractMap<GKey, GValue> implements Map3<GKey, GValue> {
 
 		class SourceEntry extends AbstractEntry<GKey2, GValue2> {
 
 			public final Entry<GKey, GValue> that;
 
-			SourceEntry(final Entry<GKey, GValue> that) {
+			SourceEntry(Entry<GKey, GValue> that) {
 				this.that = that;
 			}
 
@@ -640,7 +626,7 @@ public class Collections {
 			}
 
 			@Override
-			public Entry2<GKey2, GValue2> useValue(final GValue2 value) throws UnsupportedOperationException {
+			public Entry2<GKey2, GValue2> useValue(GValue2 value) throws UnsupportedOperationException {
 				this.that.setValue(TranslatedMap.this.valueTrans.toTarget(value));
 				return this;
 			}
@@ -651,7 +637,7 @@ public class Collections {
 
 			final Entry<GKey2, GValue2> that;
 
-			TargetEntry(final Entry<GKey2, GValue2> that) {
+			TargetEntry(Entry<GKey2, GValue2> that) {
 				this.that = that;
 			}
 
@@ -666,7 +652,7 @@ public class Collections {
 			}
 
 			@Override
-			public Entry2<GKey, GValue> useValue(final GValue value) throws UnsupportedOperationException {
+			public Entry2<GKey, GValue> useValue(GValue value) throws UnsupportedOperationException {
 				this.that.setValue(TranslatedMap.this.valueTrans.toSource(value));
 				return this;
 			}
@@ -676,28 +662,28 @@ public class Collections {
 		class EntryTranslator implements Translator<Entry<GKey2, GValue2>, Entry<GKey, GValue>> {
 
 			@Override
-			public boolean isSource(final Object object) {
+			public boolean isSource(Object object) {
 				if (!(object instanceof Entry)) return false;
-				final Entry<?, ?> entry = (Entry<?, ?>)object;
+				var entry = (Entry<?, ?>)object;
 				return TranslatedMap.this.keyTrans.isSource(entry.getKey()) && TranslatedMap.this.valueTrans.isSource(entry.getValue());
 			}
 
 			@Override
-			public boolean isTarget(final Object object) {
+			public boolean isTarget(Object object) {
 				if (!(object instanceof Entry)) return false;
-				final Entry<?, ?> entry = (Entry<?, ?>)object;
+				var entry = (Entry<?, ?>)object;
 				return TranslatedMap.this.keyTrans.isTarget(entry.getKey()) && TranslatedMap.this.valueTrans.isTarget(entry.getValue());
 			}
 
 			@Override
 			@SuppressWarnings ("unchecked")
-			public Entry<GKey2, GValue2> toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+			public Entry<GKey2, GValue2> toSource(Object object) throws ClassCastException, IllegalArgumentException {
 				return new SourceEntry((Entry<GKey, GValue>)object);
 			}
 
 			@Override
 			@SuppressWarnings ("unchecked")
-			public Entry<GKey, GValue> toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+			public Entry<GKey, GValue> toTarget(Object object) throws ClassCastException, IllegalArgumentException {
 				return new TargetEntry((Entry<GKey2, GValue2>)object);
 			}
 
@@ -709,8 +695,7 @@ public class Collections {
 
 		public final Translator<GValue2, GValue> valueTrans;
 
-		public TranslatedMap(final Map<GKey2, GValue2> that, final Translator<GKey2, GKey> keyTrans, final Translator<GValue2, GValue> valueTrans)
-			throws NullPointerException {
+		public TranslatedMap(Map<GKey2, GValue2> that, Translator<GKey2, GKey> keyTrans, Translator<GValue2, GValue> valueTrans) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.keyTrans = Objects.notNull(keyTrans);
 			this.valueTrans = Objects.notNull(valueTrans);
@@ -722,19 +707,19 @@ public class Collections {
 		}
 
 		@Override
-		public boolean containsKey(final Object key2) {
+		public boolean containsKey(Object key2) {
 			if (!this.keyTrans.isTarget(key2)) return false;
 			return this.that.containsKey(this.keyTrans.toSource(key2));
 		}
 
 		@Override
-		public boolean containsValue(final Object value2) {
+		public boolean containsValue(Object value2) {
 			if (!this.valueTrans.isTarget(value2)) return false;
 			return this.that.containsValue(this.valueTrans.toSource(value2));
 		}
 
 		@Override
-		public GValue get(final Object key2) {
+		public GValue get(Object key2) {
 			if (!this.keyTrans.isTarget(key2)) return null;
 			return this.valueTrans.toTarget(this.that.get(this.keyTrans.toSource(key2)));
 		}
@@ -750,13 +735,13 @@ public class Collections {
 		}
 
 		@Override
-		public GValue put(final GKey key2, final GValue value2) {
+		public GValue put(GKey key2, GValue value2) {
 			return this.valueTrans.toTarget(this.that.put(this.keyTrans.toSource(key2), this.valueTrans.toSource(value2)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public void putAll(final Map<? extends GKey, ? extends GValue> entries2) {
+		public void putAll(Map<? extends GKey, ? extends GValue> entries2) {
 			this.that.putAll(Collections.translate((Map<GKey, GValue>)entries2, Translators.reverse(this.keyTrans), Translators.reverse(this.valueTrans)));
 		}
 
@@ -787,75 +772,74 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GItem2> Typ der Elemente der gegebenen {@link List}. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedList<GItem, GItem2> extends AbstractList2<GItem> {
 
 		public final List<GItem2> that;
 
 		public final Translator<GItem2, GItem> trans;
 
-		public TranslatedList(final List<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
+		public TranslatedList(List<GItem2> that, Translator<GItem2, GItem> trans) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
-		protected void removeRange(final int fromIndex, final int toIndex) {
+		protected void removeRange(int fromIndex, int toIndex) {
 			this.that.subList(fromIndex, toIndex).clear();
 		}
 
 		@Override
-		public GItem get(final int index) {
+		public GItem get(int index) {
 			return this.trans.toTarget(this.that.get(index));
 		}
 
 		@Override
-		public GItem set(final int index, final GItem item2) {
+		public GItem set(int index, GItem item2) {
 			return this.trans.toTarget(this.that.set(index, this.trans.toSource(item2)));
 		}
 
 		@Override
-		public boolean add(final GItem item2) {
+		public boolean add(GItem item2) {
 			return this.that.add(this.trans.toSource(item2));
 		}
 
 		@Override
-		public void add(final int index, final GItem item2) {
+		public void add(int index, GItem item2) {
 			this.that.add(index, this.trans.toSource(item2));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean addAll(final Collection<? extends GItem> items2) {
+		public boolean addAll(Collection<? extends GItem> items2) {
 			return this.that.addAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean addAll(final int index, final Collection<? extends GItem> items2) {
+		public boolean addAll(int index, Collection<? extends GItem> items2) {
 			return this.that.addAll(index, Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
 		@Override
-		public GItem remove(final int index) {
+		public GItem remove(int index) {
 			return this.trans.toTarget(this.that.remove(index));
 		}
 
 		@Override
-		public boolean remove(final Object item2) {
+		public boolean remove(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.remove(this.trans.toSource(item2));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean removeAll(final Collection<?> items2) {
+		public boolean removeAll(Collection<?> items2) {
 			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean retainAll(final Collection<?> items2) {
+		public boolean retainAll(Collection<?> items2) {
 			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
@@ -875,7 +859,7 @@ public class Collections {
 		}
 
 		@Override
-		public boolean contains(final Object item2) {
+		public boolean contains(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.contains(this.trans.toSource(item2));
 		}
@@ -886,13 +870,13 @@ public class Collections {
 		}
 
 		@Override
-		public int indexOf(final Object item2) {
+		public int indexOf(Object item2) {
 			if (!this.trans.isTarget(item2)) return -1;
 			return this.that.indexOf(this.trans.toSource(item2));
 		}
 
 		@Override
-		public int lastIndexOf(final Object item2) {
+		public int lastIndexOf(Object item2) {
 			if (!this.trans.isTarget(item2)) return -1;
 			return this.that.lastIndexOf(this.trans.toSource(item2));
 		}
@@ -902,44 +886,43 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GItem2> Typ der Elemente des gegebenen {@link Set}. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedSet<GItem, GItem2> extends AbstractSet2<GItem> {
 
 		public final Set<GItem2> that;
 
 		public final Translator<GItem2, GItem> trans;
 
-		public TranslatedSet(final Set<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
+		public TranslatedSet(Set<GItem2> that, Translator<GItem2, GItem> trans) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
-		public boolean add(final GItem item2) {
+		public boolean add(GItem item2) {
 			return this.that.add(this.trans.toSource(item2));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean addAll(final Collection<? extends GItem> items2) {
+		public boolean addAll(Collection<? extends GItem> items2) {
 			return this.that.addAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
 		@Override
-		public boolean remove(final Object item2) {
+		public boolean remove(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.remove(this.trans.toSource(item2));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean removeAll(final Collection<?> items2) {
+		public boolean removeAll(Collection<?> items2) {
 			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean retainAll(final Collection<?> items2) {
+		public boolean retainAll(Collection<?> items2) {
 			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
@@ -959,7 +942,7 @@ public class Collections {
 		}
 
 		@Override
-		public boolean contains(final Object item2) {
+		public boolean contains(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.contains(this.trans.toSource(item2));
 		}
@@ -975,44 +958,43 @@ public class Collections {
 	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GItem2> Typ der Elemente der gegebenen {@link Collection}. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedCollection<GItem, GItem2> extends AbstractCollection2<GItem> {
 
 		public final Collection<GItem2> that;
 
 		public final Translator<GItem2, GItem> trans;
 
-		public TranslatedCollection(final Collection<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
+		public TranslatedCollection(Collection<GItem2> that, Translator<GItem2, GItem> trans) throws NullPointerException {
 			this.that = Objects.notNull(that);
 			this.trans = Objects.notNull(trans);
 		}
 
 		@Override
-		public boolean add(final GItem item2) {
+		public boolean add(GItem item2) {
 			return this.that.add(this.trans.toSource(item2));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean addAll(final Collection<? extends GItem> items2) {
+		public boolean addAll(Collection<? extends GItem> items2) {
 			return this.that.addAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
 		@Override
-		public boolean remove(final Object item2) {
+		public boolean remove(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.remove(this.trans.toSource(item2));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean removeAll(final Collection<?> items2) {
+		public boolean removeAll(Collection<?> items2) {
 			return this.that.removeAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public boolean retainAll(final Collection<?> items2) {
+		public boolean retainAll(Collection<?> items2) {
 			return this.that.retainAll(Collections.translate((Collection<GItem>)items2, Translators.reverse(this.trans)));
 		}
 
@@ -1032,7 +1014,7 @@ public class Collections {
 		}
 
 		@Override
-		public boolean contains(final Object item2) {
+		public boolean contains(Object item2) {
 			if (!this.trans.isTarget(item2)) return false;
 			return this.that.contains(this.trans.toSource(item2));
 		}
@@ -1045,71 +1027,68 @@ public class Collections {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link UnionSet new UnionSet<>(items1, items2)}. */
-	public static <GItem> Set2<GItem> union(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+	public static <GItem> Set2<GItem> union(Set<? extends GItem> items1, Set<? extends GItem> items2) throws NullPointerException {
 		return new UnionSet<>(items1, items2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ExceptSet new ExceptSet<>(items1, items2)}. */
-	public static <GItem> Set2<GItem> except(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+	public static <GItem> Set2<GItem> except(Set<? extends GItem> items1, Set<? extends GItem> items2) throws NullPointerException {
 		return new ExceptSet<>(items1, items2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link IntersectSet new IntersectSet<>(items1, items2)}. */
-	public static <GItem> Set2<GItem> intersect(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
+	public static <GItem> Set2<GItem> intersect(Set<? extends GItem> items1, Set<? extends GItem> items2) throws NullPointerException {
 		return new IntersectSet<>(items1, items2);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatList new ConcatList<>(items1, items2, extendMode)}. */
-	public static <GKey, GValue> Set2<Entry<GKey, GValue>> cartesian(final Set<? extends GKey> keys, final Set<? extends GValue> values)
-		throws NullPointerException {
+	public static <GKey, GValue> Set2<Entry<GKey, GValue>> cartesian(Set<? extends GKey> keys, Set<? extends GValue> values) throws NullPointerException {
 		return new CartesianSet<>(keys, values);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ReverseList new ReverseList<>(items)}. */
-	public static <GItem> List2<GItem> reverse(final List<GItem> items) throws NullPointerException {
+	public static <GItem> List2<GItem> reverse(List<GItem> items) throws NullPointerException {
 		return new ReverseList<>(items);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Collections#concat(List, List, boolean) Collections.concat(items1, items2, true)}. */
-	public static <GTarget> List2<GTarget> concat(final List<GTarget> items1, final List<GTarget> items2) throws NullPointerException {
+	public static <GTarget> List2<GTarget> concat(List<GTarget> items1, List<GTarget> items2) throws NullPointerException {
 		return Collections.concat(items1, items2, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatList new ConcatList<>(items1, items2, extendMode)}. */
-	public static <GItem> List2<GItem> concat(final List<GItem> items1, final List<GItem> items2, final boolean extendMode) throws NullPointerException {
+	public static <GItem> List2<GItem> concat(List<GItem> items1, List<GItem> items2, boolean extendMode) throws NullPointerException {
 		return new ConcatList<>(items1, items2, extendMode);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link Collections#concat(Collection, Collection, boolean) Collections.concat(items1, items2, true)}. */
-	public static <GItem> Collection2<GItem> concat(final Collection<GItem> items1, final Collection<GItem> items2) throws NullPointerException {
+	public static <GItem> Collection2<GItem> concat(Collection<GItem> items1, Collection<GItem> items2) throws NullPointerException {
 		return Collections.concat(items1, items2, true);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link ConcatCollection new ConcatCollection<>(items1, items2, extendMode)}. */
-	public static <GItem> Collection2<GItem> concat(final Collection<GItem> items1, final Collection<GItem> items2, final boolean extendMode)
-		throws NullPointerException {
+	public static <GItem> Collection2<GItem> concat(Collection<GItem> items1, Collection<GItem> items2, boolean extendMode) throws NullPointerException {
 		return new ConcatCollection<>(items1, items2, extendMode);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedMap new TranslatedMap<>(that, keyTrans, valueTrans)}. */
-	public static <GKey2, GValue2, GKey, GValue> Map3<GKey, GValue> translate(final Map<GKey2, GValue2> that, final Translator<GKey2, GKey> keyTrans,
-		final Translator<GValue2, GValue> valueTrans) throws NullPointerException {
+	public static <GKey2, GValue2, GKey, GValue> Map3<GKey, GValue> translate(Map<GKey2, GValue2> that, Translator<GKey2, GKey> keyTrans,
+		Translator<GValue2, GValue> valueTrans) throws NullPointerException {
 		return new TranslatedMap<>(that, keyTrans, valueTrans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedList new TranslatedList<>(that, trans)}. */
-	public static <GItem2, GItem> List2<GItem> translate(final List<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
+	public static <GItem2, GItem> List2<GItem> translate(List<GItem2> that, Translator<GItem2, GItem> trans) throws NullPointerException {
 		return new TranslatedList<>(that, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedSet new TranslatedSet<>(that, trans)}. */
-	public static <GItem2, GItem> Set2<GItem> translate(final Set<GItem2> that, final Translator<GItem2, GItem> trans) throws NullPointerException {
+	public static <GItem2, GItem> Set2<GItem> translate(Set<GItem2> that, Translator<GItem2, GItem> trans) throws NullPointerException {
 		return new TranslatedSet<>(that, trans);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link TranslatedCollection new TranslatedCollection<>(that, trans)}. */
-	public static <GItem2, GItem> Collection2<GItem> translate(final Collection<GItem2> items, final Translator<GItem2, GItem> trans)
-		throws NullPointerException {
+	public static <GItem2, GItem> Collection2<GItem> translate(Collection<GItem2> items, Translator<GItem2, GItem> trans) throws NullPointerException {
 		return new TranslatedCollection<>(items, trans);
 	}
 

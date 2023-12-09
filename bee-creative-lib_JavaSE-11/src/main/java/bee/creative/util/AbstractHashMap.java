@@ -16,7 +16,7 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 *
 	 * @param capacity Anzahl der maximal verwaltbaren Einträge.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Einträgen ist. */
-	public void allocate(final int capacity) throws IllegalArgumentException {
+	public void allocate(int capacity) throws IllegalArgumentException {
 		this.allocateImpl(capacity);
 	}
 
@@ -41,7 +41,7 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 * @see #installImpl(Object)
 	 * @param key gesuchter Schlüssel.
 	 * @return enthaltener und ggf. erzeugter Wert. */
-	public GValue install(final GKey key) {
+	public GValue install(GKey key) {
 		return this.customGetValue(this.installImpl(key));
 	}
 
@@ -51,7 +51,7 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 * @param key Schlüssel des Eintrags.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return enthaltener und ggf. erzeugter Wert. */
-	public GValue install(final GKey key, final Getter<? super GKey, ? extends GValue> installValue) {
+	public GValue install(GKey key, Getter<? super GKey, ? extends GValue> installValue) {
 		return this.install(key, Getters.<GKey>neutral(), installValue);
 	}
 
@@ -64,7 +64,7 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	 * @param installKey Methode zur Überführung des gegebenen Schlüssels in den einzutragenden Schlüssel.
 	 * @param installValue Methode zur Überführung des einzutragenden Schlüssels in den einzutragenden Wert.
 	 * @return enthaltener und ggf. erzeugter Wert. */
-	public GValue install(final GKey key, final Getter<? super GKey, ? extends GKey> installKey, final Getter<? super GKey, ? extends GValue> installValue) {
+	public GValue install(GKey key, Getter<? super GKey, ? extends GKey> installKey, Getter<? super GKey, ? extends GValue> installValue) {
 		return this.customGetValue(this.installImpl(key, installKey, installValue));
 	}
 
@@ -79,27 +79,27 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	}
 
 	@Override
-	public boolean containsKey(final Object key) {
+	public boolean containsKey(Object key) {
 		return this.hasKeyImpl(key);
 	}
 
 	@Override
-	public boolean containsValue(final Object value) {
+	public boolean containsValue(Object value) {
 		return this.hasValueImpl(value);
 	}
 
 	@Override
-	public GValue get(final Object key) {
+	public GValue get(Object key) {
 		return this.getImpl(key);
 	}
 
 	@Override
-	public GValue put(final GKey key, final GValue value) {
+	public GValue put(GKey key, GValue value) {
 		return this.putImpl(key, value);
 	}
 
 	@Override
-	public GValue remove(final Object key) {
+	public GValue remove(Object key) {
 		return this.popImpl(key);
 	}
 
@@ -129,12 +129,12 @@ public abstract class AbstractHashMap<GKey, GValue> extends AbstractHashData<GKe
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof Map<?, ?>)) return false;
-		final Map<?, ?> that = (Map<?, ?>)object;
+		var that = (Map<?, ?>)object;
 		if (that.size() != this.size()) return false;
-		for (final Entry<?, ?> entry: that.entrySet()) {
+		for (var entry: that.entrySet()) {
 			if (!this.hasEntryImpl(entry.getKey(), entry.getValue())) return false;
 		}
 		return true;

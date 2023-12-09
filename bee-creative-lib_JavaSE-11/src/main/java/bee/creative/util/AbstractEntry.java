@@ -20,26 +20,26 @@ public abstract class AbstractEntry<GKey, GValue> implements Entry2<GKey, GValue
 	}
 
 	@Override
-	public final GKey setKey(final GKey key) {
-		final GKey result = this.getKey();
+	public GKey setKey(GKey key) {
+		var result = this.getKey();
 		this.useKey(key);
 		return result;
 	}
 
 	@Override
-	public final GValue setValue(final GValue value) {
-		final GValue result = this.getValue();
+	public GValue setValue(GValue value) {
+		var result = this.getValue();
 		this.useValue(value);
 		return result;
 	}
 
 	/** Diese Methode setzt den {@link #getKey() Schlüssel} und gibt {@code this} zurück. */
-	public Entry2<GKey, GValue> useKey(final GKey key) throws UnsupportedOperationException {
+	public Entry2<GKey, GValue> useKey(GKey key) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
 
 	/** Diese Methode setzt den {@link #getValue() Wert} und gibt {@code this} zurück. */
-	public Entry2<GKey, GValue> useValue(final GValue value) throws UnsupportedOperationException {
+	public Entry2<GKey, GValue> useValue(GValue value) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -49,10 +49,10 @@ public abstract class AbstractEntry<GKey, GValue> implements Entry2<GKey, GValue
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof Entry<?, ?>)) return false;
-		final Entry<?, ?> that = (Entry<?, ?>)object;
+		var that = (Entry<?, ?>)object;
 		return Objects.equals(this.getKey(), that.getKey()) && Objects.equals(this.getValue(), that.getValue());
 	}
 

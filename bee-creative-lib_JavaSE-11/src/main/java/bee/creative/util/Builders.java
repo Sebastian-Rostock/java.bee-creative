@@ -52,7 +52,7 @@ public class Builders {
 	public static abstract class BaseBuilder2<GValue, GOwner> extends BaseBuilder<GValue, GOwner> implements Property<GValue> {
 
 		/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner use(final BaseBuilder<? extends GValue, ?> source) throws NullPointerException {
+		public GOwner use(BaseBuilder<? extends GValue, ?> source) throws NullPointerException {
 			this.set(source.get());
 			return this.owner();
 		}
@@ -72,20 +72,20 @@ public class Builders {
 		 * @see #clear()
 		 * @see #putAll(Iterable) */
 		@Override
-		public void set(final GResult value) throws NullPointerException {
+		public void set(GResult value) throws NullPointerException {
 			this.clear();
 			this.putAll(value);
 		}
 
 		/** Diese Methode {@link Collection#add(Object) fügt} das gegebene Element hinzu und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner put(final GItem item) {
+		public GOwner put(GItem item) {
 			this.get().add(item);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Collection#add(Object) fügt} die gegebenen Elemente hinzu und gibt den {@link #owner() Besitzer} zurück. */
 		@SafeVarargs
-		public final GOwner putAll(final GItem... items) {
+		public final GOwner putAll(GItem... items) {
 			return this.putAll(Arrays.asList(items));
 		}
 
@@ -93,26 +93,26 @@ public class Builders {
 		 *
 		 * @param items Elemente.
 		 * @return den {@link #owner() Besitzer}. */
-		public GOwner putAll(final Iterator<? extends GItem> items) {
+		public GOwner putAll(Iterator<? extends GItem> items) {
 			Iterators.addAll(this.get(), items);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Collection#add(Object) fügt} die gegebenen Element hinzu und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAll(final Iterable<? extends GItem> items) {
+		public GOwner putAll(Iterable<? extends GItem> items) {
 			Iterables.addAll(this.get(), items);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Collection#remove(Object) entfern} das gegebene Element und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner pop(final Object key) {
+		public GOwner pop(Object key) {
 			this.get().remove(key);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Collection#remove(Object) entfern} die gegebenen Elemente und gibt den {@link #owner() Besitzer} zurück. */
 		@SafeVarargs
-		public final GOwner popAll(final Object... items) {
+		public final GOwner popAll(Object... items) {
 			return this.popAll(Arrays.asList(items));
 		}
 
@@ -120,13 +120,13 @@ public class Builders {
 		 *
 		 * @param items Elemente.
 		 * @return den {@link #owner() Besitzer}. */
-		public GOwner popAll(final Iterator<?> items) {
+		public GOwner popAll(Iterator<?> items) {
 			Iterators.removeAll(this.get(), items);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Map#remove(Object) entfern} die gegebenen Elemente und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner popAll(final Iterable<?> items) {
+		public GOwner popAll(Iterable<?> items) {
 			Iterables.removeAll(this.get(), items);
 			return this.owner();
 		}
@@ -170,7 +170,7 @@ public class Builders {
 			}
 
 			@Override
-			public void set(final GValue value) {
+			public void set(GValue value) {
 				BaseMapBuilder.this.put(this.getKey(), value);
 			}
 
@@ -186,62 +186,62 @@ public class Builders {
 
 		}
 
-		void putImpl(final Entry<? extends GKey, ? extends GValue> entry) {
+		void putImpl(Entry<? extends GKey, ? extends GValue> entry) {
 			this.get().put(entry.getKey(), entry.getValue());
 		}
 
-		<GKey2 extends GKey> void putKeyImpl(final Getter<? super GKey2, ? extends GValue> toValue, final GKey2 key) {
+		<GKey2 extends GKey> void putKeyImpl(Getter<? super GKey2, ? extends GValue> toValue, GKey2 key) {
 			this.get().put(key, toValue.get(key));
 		}
 
-		<GValue2 extends GValue> void putValueImpl(final Getter<? super GValue2, ? extends GKey> toKey, final GValue2 value) {
+		<GValue2 extends GValue> void putValueImpl(Getter<? super GValue2, ? extends GKey> toKey, GValue2 value) {
 			this.get().put(toKey.get(value), value);
 		}
 
-		void putInverseImpl(final Entry<? extends GValue, ? extends GKey> entry) {
+		void putInverseImpl(Entry<? extends GValue, ? extends GKey> entry) {
 			this.get().put(entry.getValue(), entry.getKey());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} den gegebenen Eintrag ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner put(final Entry<? extends GKey, ? extends GValue> entry) {
+		public GOwner put(Entry<? extends GKey, ? extends GValue> entry) {
 			this.putImpl(entry);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} den über Schlüssel und Wert gegebenen Eintrag ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner put(final GKey key, final GValue value) {
+		public GOwner put(GKey key, GValue value) {
 			this.get().put(key, value);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} den über Schlüssel und {@link Getter} gegebenen Eintrag ein und gibt den {@link #owner() Besitzer}
 		 * zurück. Der {@link Getter} dient der Ermittlung des Werts zum gegebenen Schlüssel. */
-		public <GKey2 extends GKey> GOwner putKey(final Getter<? super GKey2, ? extends GValue> toValue, final GKey2 key) {
+		public <GKey2 extends GKey> GOwner putKey(Getter<? super GKey2, ? extends GValue> toValue, GKey2 key) {
 			this.putKeyImpl(toValue, key);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} den über {@link Getter} und Wert gegebenen Eintrag ein und gibt den {@link #owner() Besitzer} zurück.
 		 * Der {@link Getter} dient der Ermittlung des Schlüssels zum gegebenen Wert. */
-		public <GValue2 extends GValue> GOwner putValue(final Getter<? super GValue2, ? extends GKey> toKey, final GValue2 value) {
+		public <GValue2 extends GValue> GOwner putValue(Getter<? super GValue2, ? extends GKey> toKey, GValue2 value) {
 			this.putValueImpl(toKey, value);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} den gegebenen Eintrag invertiert ein und gibt den {@link #owner() Besitzer} zurück. Schlüssel und
 		 * Wert des Eintrags werden dazu als Wert bzw. Schlüssel verwendet. */
-		public GOwner putInverse(final Entry<? extends GValue, ? extends GKey> entry) {
+		public GOwner putInverse(Entry<? extends GValue, ? extends GKey> entry) {
 			this.putInverseImpl(entry);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die gegebenen Einträge ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAll(final Map<? extends GKey, ? extends GValue> entries) {
+		public GOwner putAll(Map<? extends GKey, ? extends GValue> entries) {
 			return this.putAll(entries.entrySet());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die gegebenen Einträge ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAll(final Iterator<? extends Entry<? extends GKey, ? extends GValue>> entries) {
+		public GOwner putAll(Iterator<? extends Entry<? extends GKey, ? extends GValue>> entries) {
 			while (entries.hasNext()) {
 				this.putImpl(entries.next());
 			}
@@ -249,17 +249,17 @@ public class Builders {
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die gegebenen Einträge ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAll(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
+		public GOwner putAll(Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
 			return this.putAll(entries.iterator());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über Schlüssel und Werte gegebenen Einträge ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAll(final GKey[] keys, final GValue[] values) {
+		public GOwner putAll(GKey[] keys, GValue[] values) {
 			return this.putAll(Arrays.asList(keys), Arrays.asList(values));
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über Schlüssel und Werte gegebenen Einträge ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAll(final Iterator<? extends GKey> keys, final Iterator<? extends GValue> values) {
+		public GOwner putAll(Iterator<? extends GKey> keys, Iterator<? extends GValue> values) {
 			while (keys.hasNext() && values.hasNext()) {
 				this.put(keys.next(), values.next());
 			}
@@ -267,20 +267,20 @@ public class Builders {
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über Schlüssel und Werte gegebenen Einträge ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAll(final Iterable<? extends GKey> keys, final Iterable<? extends GValue> values) {
+		public GOwner putAll(Iterable<? extends GKey> keys, Iterable<? extends GValue> values) {
 			return this.putAll(keys.iterator(), values.iterator());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über Schlüssel und {@link Getter} gegebenen Einträge ein und gibt den {@link #owner() Besitzer}
 		 * zurück. Der {@link Getter} dient der Ermittlung der Werte zu den gegebenen Schlüsseln. */
 		@SafeVarargs
-		public final <GKey2 extends GKey> GOwner putAllKeys(final Getter<? super GKey2, ? extends GValue> toValue, final GKey2... keys) {
+		public final <GKey2 extends GKey> GOwner putAllKeys(Getter<? super GKey2, ? extends GValue> toValue, GKey2... keys) {
 			return this.putAllKeys(toValue, Arrays.asList(keys));
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über Schlüssel und {@link Getter} gegebenen Einträge ein und gibt den {@link #owner() Besitzer}
 		 * zurück. Der {@link Getter} dient der Ermittlung der Werte zu den gegebenen Schlüsseln. */
-		public <GKey2 extends GKey> GOwner putAllKeys(final Getter<? super GKey2, ? extends GValue> toValue, final Iterator<? extends GKey2> keys) {
+		public <GKey2 extends GKey> GOwner putAllKeys(Getter<? super GKey2, ? extends GValue> toValue, Iterator<? extends GKey2> keys) {
 			while (keys.hasNext()) {
 				this.putKeyImpl(toValue, keys.next());
 			}
@@ -289,20 +289,20 @@ public class Builders {
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über Schlüssel und {@link Getter} gegebenen Einträge ein und gibt den {@link #owner() Besitzer}
 		 * zurück. Der {@link Getter} dient der Ermittlung der Werte zu den gegebenen Schlüsseln. */
-		public <GKey2 extends GKey> GOwner putAllKeys(final Getter<? super GKey2, ? extends GValue> toValue, final Iterable<? extends GKey2> keys) {
+		public <GKey2 extends GKey> GOwner putAllKeys(Getter<? super GKey2, ? extends GValue> toValue, Iterable<? extends GKey2> keys) {
 			return this.putAllKeys(toValue, keys.iterator());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über {@link Getter} und Werte gegebenen Einträge ein und gibt den {@link #owner() Besitzer}
 		 * zurück. Der {@link Getter} dient der Ermittlung der Schlüssel zu den gegebenen Werten. */
 		@SafeVarargs
-		public final <GValue2 extends GValue> GOwner putAllValues(final Getter<? super GValue2, ? extends GKey> toKey, final GValue2... values) {
+		public final <GValue2 extends GValue> GOwner putAllValues(Getter<? super GValue2, ? extends GKey> toKey, GValue2... values) {
 			return this.putAllValues(toKey, Arrays.asList(values));
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über {@link Getter} und Werte gegebenen Einträge ein und gibt den {@link #owner() Besitzer}
 		 * zurück. Der {@link Getter} dient der Ermittlung der Schlüssel zu den gegebenen Werten. */
-		public <GValue2 extends GValue> GOwner putAllValues(final Getter<? super GValue2, ? extends GKey> toKey, final Iterator<? extends GValue2> values) {
+		public <GValue2 extends GValue> GOwner putAllValues(Getter<? super GValue2, ? extends GKey> toKey, Iterator<? extends GValue2> values) {
 			while (values.hasNext()) {
 				this.putValueImpl(toKey, values.next());
 			}
@@ -311,17 +311,17 @@ public class Builders {
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die über {@link Getter} und Werte gegebenen Einträge ein und gibt den {@link #owner() Besitzer}
 		 * zurück. Der {@link Getter} dient der Ermittlung der Schlüssel zu den gegebenen Werten. */
-		public <GValue2 extends GValue> GOwner putAllValues(final Getter<? super GValue2, ? extends GKey> toKey, final Iterable<? extends GValue2> values) {
+		public <GValue2 extends GValue> GOwner putAllValues(Getter<? super GValue2, ? extends GKey> toKey, Iterable<? extends GValue2> values) {
 			return this.putAllValues(toKey, values.iterator());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die gegebenen Einträge invertiert ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAllInverse(final Map<? extends GValue, ? extends GKey> entries) {
+		public GOwner putAllInverse(Map<? extends GValue, ? extends GKey> entries) {
 			return this.putAllInverse(entries.entrySet());
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die gegebenen Einträge invertiert ein und gibt den {@link #owner() Besitzer} zurück. **/
-		public GOwner putAllInverse(final Iterator<? extends Entry<? extends GValue, ? extends GKey>> entries) {
+		public GOwner putAllInverse(Iterator<? extends Entry<? extends GValue, ? extends GKey>> entries) {
 			while (entries.hasNext()) {
 				this.putInverseImpl(entries.next());
 			}
@@ -329,36 +329,36 @@ public class Builders {
 		}
 
 		/** Diese Methode {@link Map#put(Object, Object) fügt} die gegebenen Einträge invertiert ein und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner putAllInverse(final Iterable<? extends Entry<? extends GValue, ? extends GKey>> entries) {
+		public GOwner putAllInverse(Iterable<? extends Entry<? extends GValue, ? extends GKey>> entries) {
 			return this.putAllInverse(entries.iterator());
 		}
 
 		/** Diese Methode {@link Map#remove(Object) entfern} den Eintrag mit dem gegebenen Schlüssel und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner pop(final Object key) {
+		public GOwner pop(Object key) {
 			this.get().remove(key);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Map#remove(Object) entfern} den Eintrag mit dem gegebenen Schlüssel und gibt den {@link #owner() Besitzer} zurück. */
 		@SafeVarargs
-		public final GOwner popAll(final Object... keys) {
+		public final GOwner popAll(Object... keys) {
 			return this.popAll(Arrays.asList(keys));
 		}
 
 		/** Diese Methode {@link Map#remove(Object) entfern} den Eintrag mit dem gegebenen Schlüssel und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner popAll(final Iterator<?> keys) {
+		public GOwner popAll(Iterator<?> keys) {
 			Iterators.removeAll(this.get().keySet(), keys);
 			return this.owner();
 		}
 
 		/** Diese Methode {@link Map#remove(Object) entfern} den Eintrag mit dem gegebenen Schlüssel und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner popAll(final Iterable<?> keys) {
+		public GOwner popAll(Iterable<?> keys) {
 			Iterables.removeAll(this.get().keySet(), keys);
 			return this.owner();
 		}
 
 		@Override
-		public void set(final GResult value) {
+		public void set(GResult value) {
 			this.clear();
 			this.putAll(value);
 		}
@@ -375,7 +375,7 @@ public class Builders {
 		 *
 		 * @param key Schlüssel.
 		 * @return Konfigurator. */
-		public ValueProxy forKey(final GKey key) {
+		public ValueProxy forKey(GKey key) {
 			return new ValueProxy() {
 
 				@Override
@@ -405,7 +405,7 @@ public class Builders {
 		}
 
 		/** Diese Methode {@link #set(Object) setzt} den Wert und gibt den {@link #owner() Besitzer} zurück. */
-		public GOwner useValue(final GValue value) {
+		public GOwner useValue(GValue value) {
 			this.set(value);
 			return this.owner();
 		}
@@ -417,7 +417,7 @@ public class Builders {
 
 		@Override
 		public Iterator2<GValue> iterator() {
-			final GValue result = this.get();
+			var result = this.get();
 			if (result == null) return Iterators.empty();
 			return Iterators.fromItem(result);
 		}
@@ -436,7 +436,7 @@ public class Builders {
 		 * @param result {@link Set}.
 		 * @return {@link SetBuilder}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static <GItem> ItemSetBuilder<GItem> from(final Set<GItem> result) throws NullPointerException {
+		public static <GItem> ItemSetBuilder<GItem> from(Set<GItem> result) throws NullPointerException {
 			return new ItemSetBuilder<>(result);
 		}
 
@@ -450,7 +450,7 @@ public class Builders {
 		 * @param <GItem> Typ der Elemente.
 		 * @param comparator Ordnung der Elemente.
 		 * @return {@link SetBuilder} eines {@link TreeSet}. */
-		public static <GItem> TreeSetBuilder<GItem> forTreeSet(final Comparator<? super GItem> comparator) {
+		public static <GItem> TreeSetBuilder<GItem> forTreeSet(Comparator<? super GItem> comparator) {
 			return new TreeSetBuilder<>(new TreeSet<>(comparator));
 		}
 
@@ -467,7 +467,7 @@ public class Builders {
 		 * @param <GItem> Typ der Elemente.
 		 * @param withHashCache Aktivierung des Streuwertpuffers.
 		 * @return {@link SetBuilder} eines {@link HashSet}. */
-		public static <GItem> HashSetBuilder<GItem> forHashSet(final boolean withHashCache) {
+		public static <GItem> HashSetBuilder<GItem> forHashSet(boolean withHashCache) {
 			return new HashSetBuilder<>(withHashCache ? new HashSet2<GItem>() : new HashSet<GItem>());
 		}
 
@@ -475,14 +475,14 @@ public class Builders {
 		 *
 		 * @param <GItem> Typ der Elemente.
 		 * @return {@link SetBuilder} eines {@link ProxySet}. */
-		public static <GItem> ProxySetBuilder<GItem> forProxySet(final Property<Set<GItem>> property) throws NullPointerException {
+		public static <GItem> ProxySetBuilder<GItem> forProxySet(Property<Set<GItem>> property) throws NullPointerException {
 			return new ProxySetBuilder<>(ProxySet.from(property));
 		}
 
 		final GResult value;
 
 		/** Dieser Konstruktor initialisiert das {@link Set}. */
-		public SetBuilder(final GResult value) throws NullPointerException {
+		public SetBuilder(GResult value) throws NullPointerException {
 			this.value = Objects.notNull(value);
 		}
 
@@ -495,7 +495,7 @@ public class Builders {
 		 *
 		 * @param items zweite Menge.
 		 * @return neuer {@link SetBuilder} zum {@link UnionSet}. */
-		public ItemSetBuilder<GItem> toUnited(final Set<? extends GItem> items) {
+		public ItemSetBuilder<GItem> toUnited(Set<? extends GItem> items) {
 			return SetBuilder.from(bee.creative.util.Collections.<GItem>union(this.get(), items));
 		}
 
@@ -504,7 +504,7 @@ public class Builders {
 		 * @param <GItem2> Typ der Elemente in der zweiten Menge.
 		 * @param items zweite Menge.
 		 * @return neuer {@link SetBuilder} zum {@link CartesianSet}. */
-		public <GItem2> ItemSetBuilder<Entry<GItem, GItem2>> toCrossed(final Set<? extends GItem2> items) {
+		public <GItem2> ItemSetBuilder<Entry<GItem, GItem2>> toCrossed(Set<? extends GItem2> items) {
 			return SetBuilder.from(bee.creative.util.Collections.cartesian(this.get(), items));
 		}
 
@@ -512,7 +512,7 @@ public class Builders {
 		 *
 		 * @param items zweite Menge.
 		 * @return neuer {@link SetBuilder} zum {@link IntersectSet}. */
-		public ItemSetBuilder<GItem> toIntersected(final Set<? extends GItem> items) {
+		public ItemSetBuilder<GItem> toIntersected(Set<? extends GItem> items) {
 			return SetBuilder.from(bee.creative.util.Collections.intersect(this.get(), items));
 		}
 
@@ -521,7 +521,7 @@ public class Builders {
 		 * @see java.util.Collections#checkedSet(Set, Class)
 		 * @param itemClazz Klasse der Elemente.
 		 * @return neuer {@link SetBuilder} zum {@code checkedSet}. */
-		public ItemSetBuilder<GItem> toChecked(final Class<GItem> itemClazz) {
+		public ItemSetBuilder<GItem> toChecked(Class<GItem> itemClazz) {
 			return SetBuilder.from(Collections.checkedSet(this.get(), itemClazz));
 		}
 
@@ -530,7 +530,7 @@ public class Builders {
 		 * @param <GItem2> Typ der übersetzten Elemente.
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
 		 * @return neuer {@link SetBuilder} zum {@link TranslatedSet}. */
-		public <GItem2> ItemSetBuilder<GItem2> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
+		public <GItem2> ItemSetBuilder<GItem2> toTranslated(Translator<GItem, GItem2> itemTranslator) {
 			return SetBuilder.from(bee.creative.util.Collections.translate(this.get(), itemTranslator));
 		}
 
@@ -557,7 +557,7 @@ public class Builders {
 	 * @param <GItem> Typ der Elemente. */
 	public static class ItemSetBuilder<GItem> extends SetBuilder<GItem, Set<GItem>, ItemSetBuilder<GItem>> {
 
-		ItemSetBuilder(final Set<GItem> value) throws NullPointerException {
+		ItemSetBuilder(Set<GItem> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -573,7 +573,7 @@ public class Builders {
 	 * @param <GItem> Typ der Elemente. */
 	public static class TreeSetBuilder<GItem> extends SetBuilder<GItem, TreeSet<GItem>, TreeSetBuilder<GItem>> {
 
-		TreeSetBuilder(final TreeSet<GItem> value) throws NullPointerException {
+		TreeSetBuilder(TreeSet<GItem> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -589,7 +589,7 @@ public class Builders {
 	 * @param <GItem> Typ der Elemente. */
 	public static class HashSetBuilder<GItem> extends SetBuilder<GItem, HashSet<GItem>, HashSetBuilder<GItem>> {
 
-		HashSetBuilder(final HashSet<GItem> value) throws NullPointerException {
+		HashSetBuilder(HashSet<GItem> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -605,7 +605,7 @@ public class Builders {
 	 * @param <GItem> Typ der Elemente. */
 	public static class ProxySetBuilder<GItem> extends SetBuilder<GItem, ProxySet<GItem>, ProxySetBuilder<GItem>> {
 
-		ProxySetBuilder(final ProxySet<GItem> value) throws NullPointerException {
+		ProxySetBuilder(ProxySet<GItem> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -628,7 +628,7 @@ public class Builders {
 		 * @param result {@link List}.
 		 * @return {@link ListBuilder}.
 		 * @throws NullPointerException Wenn {@code result} {@code null} ist. */
-		public static <GItem> ItemListBuilder<GItem> from(final List<GItem> result) throws NullPointerException {
+		public static <GItem> ItemListBuilder<GItem> from(List<GItem> result) throws NullPointerException {
 			return new ItemListBuilder<>(result);
 		}
 
@@ -652,14 +652,14 @@ public class Builders {
 		 *
 		 * @param <GItem> Typ der Elemente.
 		 * @return {@link ListBuilder} einer {@link ProxyList}. */
-		public static <GItem> ProxyListBuilder<GItem> forProxyList(final Property<List<GItem>> property) throws NullPointerException {
+		public static <GItem> ProxyListBuilder<GItem> forProxyList(Property<List<GItem>> property) throws NullPointerException {
 			return new ProxyListBuilder<>(ProxyList.from(property));
 		}
 
 		final GResult value;
 
 		/** Dieser Konstruktor initialisiert die {@link List}. */
-		public ListBuilder(final GResult value) throws NullPointerException {
+		public ListBuilder(GResult value) throws NullPointerException {
 			this.value = Objects.notNull(value);
 		}
 
@@ -679,7 +679,7 @@ public class Builders {
 		 *
 		 * @param items zweite Liste.
 		 * @return neuer {@link ListBuilder} zur {@link ConcatList}. */
-		public ItemListBuilder<GItem> toChained(final List<GItem> items) {
+		public ItemListBuilder<GItem> toChained(List<GItem> items) {
 			return ListBuilder.from(bee.creative.util.Collections.concat(this.get(), items));
 		}
 
@@ -688,7 +688,7 @@ public class Builders {
 		 * @param items zweite Liste.
 		 * @param extendMode Erweiterungsmodus.
 		 * @return neuer {@link ListBuilder} zur {@link ConcatList}. */
-		public ItemListBuilder<GItem> toChained(final List<GItem> items, final boolean extendMode) {
+		public ItemListBuilder<GItem> toChained(List<GItem> items, boolean extendMode) {
 			return ListBuilder.from(bee.creative.util.Collections.concat(this.get(), items, extendMode));
 		}
 
@@ -697,7 +697,7 @@ public class Builders {
 		 * @see java.util.Collections#checkedList(List, Class)
 		 * @param itemClazz Klasse der Elemente.
 		 * @return neuer {@link ListBuilder} zur {@code checkedList}. */
-		public ItemListBuilder<GItem> toChecked(final Class<GItem> itemClazz) {
+		public ItemListBuilder<GItem> toChecked(Class<GItem> itemClazz) {
 			return ListBuilder.from(java.util.Collections.checkedList(this.get(), itemClazz));
 		}
 
@@ -706,7 +706,7 @@ public class Builders {
 		 * @param <GItem2> Typ der übersetzten Elemente.
 		 * @param itemTranslator {@link Translator} zur Übersetzung der Elemente.
 		 * @return neuer {@link ListBuilder} zur {@link TranslatedList}. */
-		public <GItem2> ItemListBuilder<GItem2> toTranslated(final Translator<GItem, GItem2> itemTranslator) {
+		public <GItem2> ItemListBuilder<GItem2> toTranslated(Translator<GItem, GItem2> itemTranslator) {
 			return ListBuilder.from(bee.creative.util.Collections.translate(this.get(), itemTranslator));
 		}
 
@@ -733,7 +733,7 @@ public class Builders {
 	 * @param <GItem> Typ der Elemente. */
 	public static class ItemListBuilder<GItem> extends ListBuilder<GItem, List<GItem>, ItemListBuilder<GItem>> {
 
-		ItemListBuilder(final List<GItem> value) throws NullPointerException {
+		ItemListBuilder(List<GItem> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -749,7 +749,7 @@ public class Builders {
 	 * @param <GItem> Typ der Elemente. */
 	public static class ArrayListBuilder<GItem> extends ListBuilder<GItem, ArrayList<GItem>, ArrayListBuilder<GItem>> {
 
-		ArrayListBuilder(final ArrayList<GItem> value) throws NullPointerException {
+		ArrayListBuilder(ArrayList<GItem> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -765,7 +765,7 @@ public class Builders {
 	 * @param <GItem> Typ der Elemente. */
 	public static class LinkedListBuilder<GItem> extends ListBuilder<GItem, LinkedList<GItem>, LinkedListBuilder<GItem>> {
 
-		LinkedListBuilder(final LinkedList<GItem> value) throws NullPointerException {
+		LinkedListBuilder(LinkedList<GItem> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -781,7 +781,7 @@ public class Builders {
 	 * @param <GItem> Typ der Elemente. */
 	public static class ProxyListBuilder<GItem> extends ListBuilder<GItem, ProxyList<GItem>, ProxyListBuilder<GItem>> {
 
-		ProxyListBuilder(final ProxyList<GItem> value) throws NullPointerException {
+		ProxyListBuilder(ProxyList<GItem> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -805,7 +805,7 @@ public class Builders {
 		 * @param <GValue> Typ der Werte.
 		 * @param result {@link Map}.
 		 * @return {@link MapBuilder}. */
-		public static <GKey, GValue> ItemMapBuilder<GKey, GValue> from(final Map<GKey, GValue> result) {
+		public static <GKey, GValue> ItemMapBuilder<GKey, GValue> from(Map<GKey, GValue> result) {
 			return new ItemMapBuilder<>(result);
 		}
 
@@ -824,7 +824,7 @@ public class Builders {
 		 * @param <GItem> Typ der Werte.
 		 * @param comparator Ordnung der Schlüssel.
 		 * @return {@link MapBuilder} einer {@link TreeMap}. */
-		public static <GKey, GItem> TreeMapBuilder<GKey, GItem> forTreeMap(final Comparator<? super GKey> comparator) {
+		public static <GKey, GItem> TreeMapBuilder<GKey, GItem> forTreeMap(Comparator<? super GKey> comparator) {
 			return new TreeMapBuilder<>(new TreeMap<GKey, GItem>(comparator));
 		}
 
@@ -843,14 +843,14 @@ public class Builders {
 		 * @param <GItem> Typ der Werte.
 		 * @param withHashCache Aktivierung des Streuwertpuffers.
 		 * @return {@link MapBuilder} einer {@link HashMap}. */
-		public static <GKey, GItem> HashMapBuilder<GKey, GItem> forHashMap(final boolean withHashCache) {
+		public static <GKey, GItem> HashMapBuilder<GKey, GItem> forHashMap(boolean withHashCache) {
 			return new HashMapBuilder<>(withHashCache ? new HashMap2<GKey, GItem>() : new HashMap<GKey, GItem>());
 		}
 
 		final GResult value;
 
 		/** Dieser Konstruktor initialisiert die {@link Map}. */
-		public MapBuilder(final GResult value) throws NullPointerException {
+		public MapBuilder(GResult value) throws NullPointerException {
 			this.value = Objects.notNull(value);
 		}
 
@@ -865,7 +865,7 @@ public class Builders {
 		 * @param keyClazz Klasse der Schlüssel.
 		 * @param valueClazz Klasse der Werte.
 		 * @return neuer {@link MapBuilder} zur {@code checkedMap}. */
-		public ItemMapBuilder<GKey, GValue> toChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
+		public ItemMapBuilder<GKey, GValue> toChecked(Class<GKey> keyClazz, Class<GValue> valueClazz) {
 			return MapBuilder.from(Collections.checkedMap(this.get(), keyClazz, valueClazz));
 		}
 
@@ -877,8 +877,7 @@ public class Builders {
 		 * @param keyTranslator {@link Translator} zur Übersetzung der Schlüssel.
 		 * @param valueTranslator {@link Translator} zur Übersetzung der Werte.
 		 * @return neuer {@link MapBuilder} zur {@code translatedMap}. */
-		public <GKey2, GValue2> ItemMapBuilder<GKey2, GValue2> toTranslated(final Translator<GKey, GKey2> keyTranslator,
-			final Translator<GValue, GValue2> valueTranslator) {
+		public <GKey2, GValue2> ItemMapBuilder<GKey2, GValue2> toTranslated(Translator<GKey, GKey2> keyTranslator, Translator<GValue, GValue2> valueTranslator) {
 			return MapBuilder.from(bee.creative.util.Collections.translate(this.get(), keyTranslator, valueTranslator));
 		}
 
@@ -906,7 +905,7 @@ public class Builders {
 	 * @param <GValue> Typ der Werte. */
 	public static class ItemMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, Map<GKey, GValue>, ItemMapBuilder<GKey, GValue>> {
 
-		ItemMapBuilder(final Map<GKey, GValue> value) throws NullPointerException {
+		ItemMapBuilder(Map<GKey, GValue> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -923,7 +922,7 @@ public class Builders {
 	 * @param <GValue> Typ der Werte. */
 	public static class TreeMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, TreeMap<GKey, GValue>, TreeMapBuilder<GKey, GValue>> {
 
-		TreeMapBuilder(final TreeMap<GKey, GValue> value) throws NullPointerException {
+		TreeMapBuilder(TreeMap<GKey, GValue> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -940,7 +939,7 @@ public class Builders {
 	 * @param <GValue> Typ der Werte. */
 	public static class HashMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, HashMap<GKey, GValue>, HashMapBuilder<GKey, GValue>> {
 
-		HashMapBuilder(final HashMap<GKey, GValue> value) throws NullPointerException {
+		HashMapBuilder(HashMap<GKey, GValue> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -957,7 +956,7 @@ public class Builders {
 	 * @param <GValue> Typ der Werte. */
 	public static class ProxyMapBuilder<GKey, GValue> extends MapBuilder<GKey, GValue, ProxyMap<GKey, GValue>, ProxyMapBuilder<GKey, GValue>> {
 
-		ProxyMapBuilder(final ProxyMap<GKey, GValue> value) throws NullPointerException {
+		ProxyMapBuilder(ProxyMap<GKey, GValue> value) throws NullPointerException {
 			super(value);
 		}
 
@@ -978,7 +977,7 @@ public class Builders {
 		 *
 		 * @param <GValue> Typ des Werts.
 		 * @return {@link ValueBuilder} eines {@link Property}. */
-		public static <GValue> ProxyValueBuilder<GValue> fromProxy(final Property<GValue> that) {
+		public static <GValue> ProxyValueBuilder<GValue> fromProxy(Property<GValue> that) {
 			return new ProxyValueBuilder<>(that);
 		}
 
@@ -991,7 +990,7 @@ public class Builders {
 
 		final Property<GValue> that;
 
-		ProxyValueBuilder(final Property<GValue> that) {
+		ProxyValueBuilder(Property<GValue> that) {
 			this.that = Objects.notNull(that);
 		}
 
@@ -1001,7 +1000,7 @@ public class Builders {
 		}
 
 		@Override
-		public void set(final GValue value) {
+		public void set(GValue value) {
 			this.that.set(value);
 		}
 

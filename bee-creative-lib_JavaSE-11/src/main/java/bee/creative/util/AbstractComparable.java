@@ -9,7 +9,7 @@ import bee.creative.lang.Objects.BaseObject;
 public abstract class AbstractComparable<GItem> extends BaseObject implements Comparable2<GItem> {
 
 	@Override
-	public int compareTo(final GItem item) {
+	public int compareTo(GItem item) {
 		return 0;
 	}
 

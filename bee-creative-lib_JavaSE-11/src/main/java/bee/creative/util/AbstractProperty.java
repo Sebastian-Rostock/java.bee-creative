@@ -11,7 +11,7 @@ public abstract class AbstractProperty<GValue> extends BaseObject implements Pro
 	}
 
 	@Override
-	public void set(final GValue value) {
+	public void set(GValue value) {
 	}
 
 }

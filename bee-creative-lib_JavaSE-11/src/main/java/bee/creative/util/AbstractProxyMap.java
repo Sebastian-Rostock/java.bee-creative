@@ -16,16 +16,16 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	static abstract class Data<GItem, GData extends Collection<GItem>> extends AbstractProxyCollection<GItem, GData> {
 
 		@Override
-		protected void setData(final GData items) {
+		protected void setData(GData items) {
 		}
 
 		@Override
-		public boolean add(final GItem e) {
+		public boolean add(GItem e) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean addAll(final Collection<? extends GItem> c) {
+		public boolean addAll(Collection<? extends GItem> c) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -34,12 +34,12 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	class Keys extends Data<GKey, KeysData> implements Set2<GKey> {
 
 		@Override
-		protected KeysData getData(final boolean readonly) {
+		protected KeysData getData(boolean readonly) {
 			return new KeysData(readonly);
 		}
 
 		@Override
-		protected void setData(final KeysData data) {
+		protected void setData(KeysData data) {
 			AbstractProxyMap.this.setData(data.data);
 		}
 
@@ -49,12 +49,12 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 		final GData data;
 
-		KeysData(final boolean readonly) {
+		KeysData(boolean readonly) {
 			this.data = AbstractProxyMap.this.getData(readonly);
 		}
 
 		@Override
-		protected Set<GKey> getData(final boolean readonly) {
+		protected Set<GKey> getData(boolean readonly) {
 			return this.data.keySet();
 		}
 
@@ -63,12 +63,12 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	class Values extends Data<GValue, ValuesData> {
 
 		@Override
-		protected ValuesData getData(final boolean readonly) {
+		protected ValuesData getData(boolean readonly) {
 			return new ValuesData(readonly);
 		}
 
 		@Override
-		protected void setData(final ValuesData data) {
+		protected void setData(ValuesData data) {
 			AbstractProxyMap.this.setData(data.data);
 		}
 
@@ -78,12 +78,12 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 		final GData data;
 
-		ValuesData(final boolean readonly) {
+		ValuesData(boolean readonly) {
 			this.data = AbstractProxyMap.this.getData(readonly);
 		}
 
 		@Override
-		protected Collection<GValue> getData(final boolean readonly) {
+		protected Collection<GValue> getData(boolean readonly) {
 			return this.data.values();
 		}
 
@@ -97,7 +97,7 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 				final Entry<GKey, GValue> entry;
 
-				public Next(final Entry<GKey, GValue> entry) {
+				public Next(Entry<GKey, GValue> entry) {
 					this.entry = entry;
 				}
 
@@ -112,7 +112,7 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 				}
 
 				@Override
-				public Entry2<GKey, GValue> useValue(final GValue value) {
+				public Entry2<GKey, GValue> useValue(GValue value) {
 					this.entry.setValue(value);
 					AbstractProxyMap.this.setData(Iter.this.data.data);
 					return this;
@@ -148,12 +148,12 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 		}
 
 		@Override
-		protected EntriesData getData(final boolean readonly) {
+		protected EntriesData getData(boolean readonly) {
 			return new EntriesData(readonly);
 		}
 
 		@Override
-		protected void setData(final EntriesData data) {
+		protected void setData(EntriesData data) {
 			AbstractProxyMap.this.setData(data.data);
 		}
 
@@ -163,12 +163,12 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 
 		final GData data;
 
-		EntriesData(final boolean readonly) {
+		EntriesData(boolean readonly) {
 			this.data = AbstractProxyMap.this.getData(readonly);
 		}
 
 		@Override
-		protected Set<Entry<GKey, GValue>> getData(final boolean readonly) {
+		protected Set<Entry<GKey, GValue>> getData(boolean readonly) {
 			return this.data.entrySet();
 		}
 
@@ -185,7 +185,7 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
 	 *
 	 * @param items neuer Inhalt. */
-	protected abstract void setData(final GData items);
+	protected abstract void setData(GData items);
 
 	@Override
 	public int size() {
@@ -198,46 +198,46 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	}
 
 	@Override
-	public GValue get(final Object key) {
+	public GValue get(Object key) {
 		return this.getData(true).get(key);
 	}
 
 	@Override
-	public GValue put(final GKey key, final GValue value) {
-		final GData data = this.getData(false);
-		final GValue result = data.put(key, value);
+	public GValue put(GKey key, GValue value) {
+		final var data = this.getData(false);
+		final var result = data.put(key, value);
 		this.setData(data);
 		return result;
 	}
 
 	@Override
-	public void putAll(final Map<? extends GKey, ? extends GValue> m) {
-		final GData data = this.getData(false);
+	public void putAll(Map<? extends GKey, ? extends GValue> m) {
+		var data = this.getData(false);
 		data.putAll(m);
 		this.setData(data);
 	}
 
 	@Override
-	public boolean containsKey(final Object key) {
+	public boolean containsKey(Object key) {
 		return this.getData(true).containsKey(key);
 	}
 
 	@Override
-	public boolean containsValue(final Object value) {
+	public boolean containsValue(Object value) {
 		return this.getData(true).containsValue(value);
 	}
 
 	@Override
-	public GValue remove(final Object key) {
-		final GData data = this.getData(false);
-		final GValue result = data.remove(key);
+	public GValue remove(Object key) {
+		var data = this.getData(false);
+		var result = data.remove(key);
 		this.setData(data);
 		return result;
 	}
 
 	@Override
 	public void clear() {
-		final GData data = this.getData(false);
+		var data = this.getData(false);
 		data.clear();
 		this.setData(data);
 	}
@@ -263,7 +263,7 @@ public abstract class AbstractProxyMap<GKey, GValue, GData extends Map<GKey, GVa
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		return this.getData(true).equals(object);
 	}
 

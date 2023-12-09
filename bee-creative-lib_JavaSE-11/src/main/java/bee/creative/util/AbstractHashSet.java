@@ -16,7 +16,7 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	 *
 	 * @param capacity Anzahl der maximal verwaltbaren Elemente.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als die aktuelle Anzahl an Elementen ist. */
-	public void allocate(final int capacity) throws IllegalArgumentException {
+	public void allocate(int capacity) throws IllegalArgumentException {
 		this.allocateImpl(capacity);
 	}
 
@@ -40,7 +40,7 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	 * @see #installImpl(Object)
 	 * @param item gesuchtes Element.
 	 * @return enthaltenes und ggf. eingefügtes Element. */
-	public GItem install(final GItem item) {
+	public GItem install(GItem item) {
 		return this.customGetKey(this.installImpl(item));
 	}
 
@@ -52,17 +52,17 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	 * @param item gesuchtes Element.
 	 * @param installItem Methode zur Überführung des gegebenen Elements in das einzutragende Element.
 	 * @return enthaltenes und ggf. eingefügtes Element. */
-	public GItem install(final GItem item, final Getter<? super GItem, ? extends GItem> installItem) {
+	public GItem install(GItem item, Getter<? super GItem, ? extends GItem> installItem) {
 		return this.customGetKey(this.installImpl(item, installItem, Getters.<GItem>neutral()));
 	}
 
 	@Override
-	protected GItem customGetValue(final int entryIndex) {
+	protected GItem customGetValue(int entryIndex) {
 		return null;
 	}
 
 	@Override
-	protected GItem customSetValue(final int entryIndex, final GItem value) {
+	protected GItem customSetValue(int entryIndex, GItem value) {
 		return null;
 	}
 
@@ -82,41 +82,41 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	}
 
 	@Override
-	public boolean add(final GItem item) {
+	public boolean add(GItem item) {
 		return this.putKeyImpl(item);
 	}
 
 	@Override
-	public boolean addAll(final Collection<? extends GItem> items) {
-		final int count = this.countImpl();
-		for (final GItem item: items) {
+	public boolean addAll(Collection<? extends GItem> items) {
+		var count = this.countImpl();
+		for (var item: items) {
 			this.putKeyImpl(item);
 		}
 		return count != this.countImpl();
 	}
 
 	@Override
-	public boolean contains(final Object item) {
+	public boolean contains(Object item) {
 		return this.hasKeyImpl(item);
 	}
 
 	@Override
-	public boolean containsAll(final Collection<?> items) {
+	public boolean containsAll(Collection<?> items) {
 		return this.newKeysImpl().containsAll(items);
 	}
 
 	@Override
-	public boolean remove(final Object item) {
+	public boolean remove(Object item) {
 		return this.popKeyImpl(item);
 	}
 
 	@Override
-	public boolean removeAll(final Collection<?> items) {
+	public boolean removeAll(Collection<?> items) {
 		return this.newKeysImpl().removeAll(items);
 	}
 
 	@Override
-	public boolean retainAll(final Collection<?> items) {
+	public boolean retainAll(Collection<?> items) {
 		return this.newKeysImpl().retainAll(items);
 	}
 
@@ -131,10 +131,10 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof Set<?>)) return false;
-		final Set<?> that = (Set<?>)object;
+		var that = (Set<?>)object;
 		if (that.size() != this.size()) return false;
 		return this.containsAll(that);
 	}
@@ -145,7 +145,7 @@ public abstract class AbstractHashSet<GItem> extends AbstractHashData<GItem, GIt
 	}
 
 	@Override
-	public <GItem> GItem[] toArray(final GItem[] result) {
+	public <GItem> GItem[] toArray(GItem[] result) {
 		return this.newKeysImpl().toArray(result);
 	}
 

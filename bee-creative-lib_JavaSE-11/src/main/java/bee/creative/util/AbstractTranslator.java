@@ -10,22 +10,22 @@ import bee.creative.lang.Objects.BaseObject;
 public abstract class AbstractTranslator<GSource, GTarget> extends BaseObject implements Translator2<GSource, GTarget> {
 
 	@Override
-	public boolean isTarget(final Object object) {
+	public boolean isTarget(Object object) {
 		return false;
 	}
 
 	@Override
-	public boolean isSource(final Object object) {
+	public boolean isSource(Object object) {
 		return false;
 	}
 
 	@Override
-	public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+	public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 
 	@Override
-	public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+	public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException {
 		throw new IllegalArgumentException();
 	}
 

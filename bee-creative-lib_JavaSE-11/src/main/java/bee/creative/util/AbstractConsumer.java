@@ -9,7 +9,7 @@ import bee.creative.lang.Objects.BaseObject;
 public abstract class AbstractConsumer<GValue> extends BaseObject implements Consumer3<GValue> {
 
 	@Override
-	public void set(final GValue value) {
+	public void set(GValue value) {
 	}
 
 }

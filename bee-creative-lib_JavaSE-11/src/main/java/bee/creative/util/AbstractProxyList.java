@@ -17,7 +17,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 
 		final ListIterator<GItem> iter;
 
-		Iter(final int index) {
+		Iter(int index) {
 			this.data = AbstractProxyList.this.getData(false);
 			this.iter = this.data.listIterator(index);
 		}
@@ -59,13 +59,13 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 		}
 
 		@Override
-		public void set(final GItem e) {
+		public void set(GItem e) {
 			this.iter.set(e);
 			AbstractProxyList.this.setData(this.data);
 		}
 
 		@Override
-		public void add(final GItem e) {
+		public void add(GItem e) {
 			this.iter.add(e);
 			AbstractProxyList.this.setData(this.data);
 		}
@@ -84,11 +84,11 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	/** Diese Methode setzt den Inhalt. Dieser wurde zuvor über {@link #getData(boolean)} zum Schreiben beschafft und anschließend verändert.
 	 *
 	 * @param items neuer Inhalt. */
-	protected abstract void setData(final GData items);
+	protected abstract void setData(GData items);
 
 	@Override
-	protected void removeRange(final int fromIndex, final int toIndex) {
-		final GData data = this.getData(false);
+	protected void removeRange(int fromIndex, int toIndex) {
+		var data = this.getData(false);
 		data.subList(fromIndex, toIndex).clear();
 		this.setData(data);
 	}
@@ -104,98 +104,98 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public GItem get(final int index) {
+	public GItem get(int index) {
 		return this.getData(true).get(index);
 	}
 
 	@Override
-	public GItem set(final int index, final GItem e) {
-		final GData data = this.getData(false);
-		final GItem result = data.set(index, e);
+	public GItem set(int index, GItem e) {
+		var data = this.getData(false);
+		var result = data.set(index, e);
 		this.setData(data);
 		return result;
 	}
 
 	@Override
-	public boolean add(final GItem e) {
-		final GData data = this.getData(false);
+	public boolean add(GItem e) {
+		var data = this.getData(false);
 		if (!data.add(e)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public void add(final int index, final GItem c) {
-		final GData data = this.getData(false);
+	public void add(int index, GItem c) {
+		var data = this.getData(false);
 		data.add(index, c);
 		this.setData(data);
 	}
 
 	@Override
-	public boolean addAll(final Collection<? extends GItem> c) {
-		final GData data = this.getData(false);
+	public boolean addAll(Collection<? extends GItem> c) {
+		var data = this.getData(false);
 		if (!data.addAll(c)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public boolean addAll(final int index, final Collection<? extends GItem> c) {
-		final GData data = this.getData(false);
+	public boolean addAll(int index, Collection<? extends GItem> c) {
+		var data = this.getData(false);
 		if (!data.addAll(index, c)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public GItem remove(final int index) {
-		final GData data = this.getData(false);
-		final GItem result = data.remove(index);
+	public GItem remove(int index) {
+		var data = this.getData(false);
+		var result = data.remove(index);
 		this.setData(data);
 		return result;
 	}
 
 	@Override
-	public boolean remove(final Object o) {
-		final GData data = this.getData(false);
+	public boolean remove(Object o) {
+		var data = this.getData(false);
 		if (!data.remove(o)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public boolean removeAll(final Collection<?> c) {
-		final GData data = this.getData(false);
+	public boolean removeAll(Collection<?> c) {
+		var data = this.getData(false);
 		if (!data.removeAll(c)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public boolean contains(final Object item) {
+	public boolean contains(Object item) {
 		return this.getData(true).contains(item);
 	}
 
 	@Override
-	public boolean containsAll(final Collection<?> c) {
+	public boolean containsAll(Collection<?> c) {
 		return this.getData(true).containsAll(c);
 	}
 
 	@Override
-	public boolean retainAll(final Collection<?> c) {
-		final GData data = this.getData(false);
+	public boolean retainAll(Collection<?> c) {
+		var data = this.getData(false);
 		if (!data.retainAll(c)) return false;
 		this.setData(data);
 		return true;
 	}
 
 	@Override
-	public int indexOf(final Object o) {
+	public int indexOf(Object o) {
 		return this.getData(true).indexOf(o);
 	}
 
 	@Override
-	public int lastIndexOf(final Object o) {
+	public int lastIndexOf(Object o) {
 		return this.getData(true).lastIndexOf(o);
 	}
 
@@ -205,13 +205,13 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public ListIterator<GItem> listIterator(final int index) {
+	public ListIterator<GItem> listIterator(int index) {
 		return new Iter(index);
 	}
 
 	@Override
 	public void clear() {
-		final GData data = this.getData(false);
+		var data = this.getData(false);
 		data.clear();
 		this.setData(data);
 	}
@@ -222,7 +222,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public boolean equals(final Object object) {
+	public boolean equals(Object object) {
 		return this.getData(true).equals(object);
 	}
 
@@ -237,7 +237,7 @@ public abstract class AbstractProxyList<GItem, GData extends List<GItem>> extend
 	}
 
 	@Override
-	public <T> T[] toArray(final T[] result) {
+	public <T> T[] toArray(T[] result) {
 		return this.getData(true).toArray(result);
 	}
 

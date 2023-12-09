@@ -9,7 +9,7 @@ import bee.creative.lang.Objects.BaseObject;
 public abstract class AbstractFilter<GItem> extends BaseObject implements Filter2<GItem> {
 
 	@Override
-	public boolean accept(final GItem item) {
+	public boolean accept(GItem item) {
 		return item != null;
 	}
 

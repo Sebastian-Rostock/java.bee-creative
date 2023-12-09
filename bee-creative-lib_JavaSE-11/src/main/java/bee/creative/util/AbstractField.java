@@ -10,12 +10,12 @@ import bee.creative.lang.Objects.BaseObject;
 public abstract class AbstractField<GItem, GValue> extends BaseObject implements Field2<GItem, GValue> {
 
 	@Override
-	public GValue get(final GItem item) {
+	public GValue get(GItem item) {
 		return null;
 	}
 
 	@Override
-	public void set(final GItem item, final GValue value) {
+	public void set(GItem item, GValue value) {
 	}
 
 }

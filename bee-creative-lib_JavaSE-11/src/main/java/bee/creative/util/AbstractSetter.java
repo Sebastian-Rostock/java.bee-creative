@@ -10,7 +10,7 @@ import bee.creative.lang.Objects.BaseObject;
 public abstract class AbstractSetter<GItem, GValue> extends BaseObject implements Setter3<GItem, GValue> {
 
 	@Override
-	public void set(final GItem item, final GValue value) {
+	public void set(GItem item, GValue value) {
 	}
 
 }
