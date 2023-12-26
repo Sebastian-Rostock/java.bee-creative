@@ -19,12 +19,18 @@ public interface QISet<ITEM> extends QO, Iterable<ITEM> {
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Menge leer ist.
 	 *
 	 * @return {@code true}, nur wenn der {@link #iterator()} kein Objekt liefert. */
-	boolean isEmpty();
+	default boolean isEmpty() {
+		return !this.iterator().hasNext();
+	}
 
 	/** Diese Methode gibt das erste Objekt in dieser Menge oder {@code null} zurück.
 	 *
 	 * @return erstes Objekt oder {@code null}. */
-	ITEM first();
+	default ITEM first() {
+		for (var item: this)
+			return item;
+		return null;
+	}
 
 	/** Diese Methode gibt den {@link Iterator2} über die Objekte dieser Menge zurück. Die Methode {@link Iterator#remove()} wird nicht unterstützt.
 	 *

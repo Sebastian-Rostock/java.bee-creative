@@ -1,5 +1,6 @@
 package bee.creative.qs;
 
+import java.util.Arrays;
 import java.util.List;
 import bee.creative.util.Translator;
 import bee.creative.util.Translator2;
@@ -20,10 +21,12 @@ public interface QS {
 	QESet edges();
 
 	/** Diese Methode liefert die Mengensicht auf alle Hyperknoten, die über einen {@link QN#value() Textwert} verfügen. Sie ist eine Abkürzung für
-	 * {@link #values() this.values().nodes())}.
+	 * {@link #values() this.values().nodes()}.
 	 *
 	 * @return Hyperknoten. */
-	QNSet nodes();
+	default QNSet nodes() {
+		return this.values().nodes();
+	}
 
 	/** Diese Methode liefert die Mengensicht auf alle gespeicherten Textwerte.
 	 *
@@ -46,13 +49,17 @@ public interface QS {
 	 *
 	 * @see #newNode()
 	 * @return Hyperkante. */
-	QE newEdge();
+	default QE newEdge() {
+		return this.newEdge(this.newNode());
+	}
 
 	/** /** Diese Methode ist eine Abkürzung für {@link #newEdge(QN, QN, QN, QN) this.newEdge(node, node, node, node)}.
 	 *
 	 * @param node Hyperknoten.
 	 * @return Hyperkante. */
-	QE newEdge(QN node) throws NullPointerException, IllegalArgumentException;
+	default QE newEdge(QN node) throws NullPointerException, IllegalArgumentException {
+		return this.newEdge(node, node, node, node);
+	}
 
 	/** Diese Methode liefert eine temporäre {@link QE Hyperkante}, die von diesem Graphspeicher {@link QE#owner() verwaltet} wird und die gegebenen {@link QN
 	 * Hyperknoten} mit den Rollen {@link QE#context() Kontext}, {@link QE#predicate() Prädikat}, {@link QE#subject() Subjekt} und {@link QE#object() Objekt}
@@ -70,32 +77,40 @@ public interface QS {
 	 *
 	 * @see #newEdge()
 	 * @return temporäre Hyperkantenmenge. */
-	QESet newEdges();
+	default QESet2 newEdges() {
+		return this.newEdges(this.newEdge());
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #newEdges(QE...) this.newEdges(this.newEdge(node))}.
 	 *
 	 * @see #newEdge(QN)
 	 * @return temporäre Hyperkantenmenge. */
-	QESet newEdges(QN node);
+	default QESet2 newEdges(QN node) {
+		return this.newEdges(this.newEdge(node));
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #newEdges(QE...) this.newEdges(this.newEdge(context, predicate, subject, object))}.
 	 *
 	 * @see #newEdge(QN, QN, QN, QN)
 	 * @return temporäre Hyperkantenmenge. */
-	QESet newEdges(QN context, QN predicate, QN subject, QN object);
+	default QESet2 newEdges(QN context, QN predicate, QN subject, QN object) {
+		return this.newEdges(this.newEdge(context, predicate, subject, object));
+	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #newEdges(Iterable) this.newEdges(Arrays.asList(edges))}.
 	 *
 	 * @param edges Hyperkanten.
 	 * @return temporäre Hyperkantenmenge. */
-	QESet newEdges(QE... edges) throws NullPointerException, IllegalArgumentException;
+	default QESet2 newEdges(QE... edges) throws NullPointerException, IllegalArgumentException {
+		return this.newEdges(Arrays.asList(edges));
+	}
 
 	/** Diese Methode überführt die gegebenen {@link QE Hyperkanten} in eine von diesem Graphspeicher {@link QESet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück.
 	 *
 	 * @param edges Hyperkanten.
 	 * @return temporäre Hyperkantenmenge. */
-	QESet newEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException;
+	QESet2 newEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode liefert einen neuen temporären {@link QN Hyperknoten}, der von diesem Graphspeicher {@link QN#owner() verwaltet} wird und dessen interne
 	 * Kennung in diesem Graphspeicher einzigartig ist. Der gelieferte Hyperknoten wird dabei nicht in den Graphspeicher eingefügt. Dies kann nur {@link QE#put()
@@ -116,7 +131,9 @@ public interface QS {
 	 *
 	 * @param nodes Hyperknoten.
 	 * @return temporäre Hyperknotenmenge. */
-	QNSet2 newNodes(QN... nodes) throws NullPointerException, IllegalArgumentException;
+	default QNSet2 newNodes(QN... nodes) throws NullPointerException, IllegalArgumentException {
+		return this.newNodes(Arrays.asList(nodes));
+	}
 
 	/** Diese Methode überführt die gegebenen {@link QE Hyperknoten} in eine von diesem Graphspeicher {@link QNSet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück.
@@ -129,7 +146,9 @@ public interface QS {
 	 *
 	 * @param values Textwerte.
 	 * @return temporäre Textwertmenge. */
-	QVSet2 newValues(Object... values) throws NullPointerException, IllegalArgumentException;
+	default QVSet2 newValues(Object... values) throws NullPointerException, IllegalArgumentException {
+		return this.newValues(Arrays.asList(values));
+	}
 
 	/** Diese Methode überführt die {@link Object#toString() Textdarstellungen} der gegebenen Objekte in eine von diesem Graphspeicher {@link QVSet#owner()
 	 * verwaltete} temporäre Menge und gibt diese zurück.
@@ -142,7 +161,9 @@ public interface QS {
 	 *
 	 * @param nodes Hyperknoten.
 	 * @return temporäres Hypertupel. */
-	QT newTuple(QN... nodes) throws NullPointerException, IllegalArgumentException;
+	default QT newTuple(QN... nodes) throws NullPointerException, IllegalArgumentException {
+		return this.newTuple(Arrays.asList(nodes));
+	}
 
 	/** Diese Methode liefert ein temporäres {@link QT Hypertupel}, das von diesem Graphspeicher {@link QT#owner() verwaltet} wird und die gegebenen {@link QN
 	 * Hyperknoten} in der gegebenen Reihenfolge miteinander verbindet. Die gegebene Liste darf nicht leer sein.
@@ -159,7 +180,7 @@ public interface QS {
 	 * @param names Rollennamen.
 	 * @param tuples Hyperknotentabelle.
 	 * @return temporäre Hypertupelmenge. */
-	QTSet newTuples(List<String> names, QN... tuples) throws NullPointerException, IllegalArgumentException;
+	QTSet2 newTuples(List<String> names, QN... tuples) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die gegebenen {@link QT Hypertupel} in eine von diesem Graphspeicher {@link QTSet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück. Die {@link QT#size() Anzahl} der Hyperknoten eines jeden Hypertupel muss gleich der {@link List#size() Anzahl} der gegebenen Rollennamen
@@ -168,7 +189,7 @@ public interface QS {
 	 * @param names Rollennamen.
 	 * @param tuples Hypertupel.
 	 * @return temporäre Hypertupelmenge. */
-	QTSet newTuples(List<String> names, Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException;
+	QTSet2 newTuples(List<String> names, Iterable<? extends QT> tuples) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode liefert den {@link OptionalizedTranslator optionalisierten} {@link QN#value() Textwert}-{@link #newNode(Object)
 	 * Hyperknoten}-{@link Translator}. */

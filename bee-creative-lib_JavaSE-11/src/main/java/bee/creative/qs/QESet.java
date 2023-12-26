@@ -1,6 +1,7 @@
 package bee.creative.qs;
 
 import bee.creative.util.Filter;
+import bee.creative.util.Iterables;
 
 /** Diese Schnittstelle definiert eine {@link QXSet Menge} von Hyperkanten.
  *
@@ -9,11 +10,15 @@ public interface QESet extends QXSet<QE, QESet> {
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newEdges(Iterable) this.owner().newEdges(this)}. */
 	@Override
-	QESet2 copy();
+	default QESet2 copy() {
+		return this.owner().newEdges(this);
+	}
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newEdges(Iterable) this.owner().newEdges(Iterables.filter(this, filter))}. */
 	@Override
-	QESet2 copy(Filter<? super QE> filter);
+	default QESet2 copy(Filter<? super QE> filter) {
+		return this.owner().newEdges(Iterables.filter(this, filter));
+	}
 
 	/** Diese Methode liefert eine Mengensicht auf alle {@link QN Haperknoten}, die in den Hyperkanten dieser Menge aufgeführt sind.
 	 *

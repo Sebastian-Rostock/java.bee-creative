@@ -43,24 +43,32 @@ public interface QE extends QX {
 	 *
 	 * @param context Kontextknoten.
 	 * @return Hyperkante mit dem gegebenen Kontextknoten. */
-	QE withContext(QN context) throws NullPointerException, IllegalArgumentException;
+	default QE withContext(QN context) throws NullPointerException, IllegalArgumentException {
+		return owner().newEdge(context, predicate(), subject(), object());
+	}
 
 	/** Diese Methode liefert eine Kopie dieser Hyperkante mit dem gegebenen {@link QE#predicate() Prädikatknoten}.
 	 *
 	 * @param predicate Prädikatknoten.
 	 * @return Hyperkante mit dem gegebenen Prädikatknoten. */
-	QE withPredicate(QN predicate) throws NullPointerException, IllegalArgumentException;
+	default QE withPredicate(QN predicate) throws NullPointerException, IllegalArgumentException {
+		return owner().newEdge(context(), predicate, subject(), object());
+	}
 
 	/** Diese Methode liefert eine Kopie dieser Hyperkante mit dem gegebenen {@link QE#subject() Subjektknoten}.
 	 *
 	 * @param subject Subjektknoten.
 	 * @return Hyperkante mit dem gegebenen Subjektknoten. */
-	QE withSubject(QN subject) throws NullPointerException, IllegalArgumentException;
+	default QE withSubject(QN subject) throws NullPointerException, IllegalArgumentException {
+		return owner().newEdge(context(), predicate(), subject, object());
+	}
 
 	/** Diese Methode liefert eine Kopie dieser Hyperkante mit dem gegebenen {@link QE#object() Objektknoten}.
 	 *
 	 * @param object Objektknoten.
 	 * @return Hyperkante mit dem gegebenen Objektknoten. */
-	QE withObject(QN object) throws NullPointerException, IllegalArgumentException;
+	default QE withObject(QN object) throws NullPointerException, IllegalArgumentException {
+		return owner().newEdge(context(), predicate(), subject(), object);
+	}
 
 }

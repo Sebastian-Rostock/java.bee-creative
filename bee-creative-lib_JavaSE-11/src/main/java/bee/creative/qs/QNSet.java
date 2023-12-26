@@ -1,12 +1,25 @@
 package bee.creative.qs;
 
 import bee.creative.util.Filter;
+import bee.creative.util.Iterables;
 import bee.creative.util.Setter;
 
 /** Diese Schnittstelle definiert eine {@link QXSet Menge} von {@link QN Hyperknoten}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QNSet extends QXSet<QN, QNSet> {
+
+	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(this)}. */
+	@Override
+	default QNSet2 copy() {
+		return this.owner().newNodes(this);
+	}
+
+	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(Iterables.filter(this, filter))}. */
+	@Override
+	default QNSet2 copy(Filter<? super QN> filter) throws NullPointerException {
+		return this.owner().newNodes(Iterables.filter(this, filter));
+	}
 
 	/** Diese Methode entfernt alle in dieser Menge enthaltenen Hyperknoten aus dem {@link #owner() Graphspeicher} und liefert nur dann {@code true}, wenn dadurch
 	 * der Inhalt des Graphspeichers verändert wurde. Damit werden auch die {@link QN#value() Textwerte} dieser Hyperknoten sowie alle diese Hyperknoten
@@ -45,13 +58,5 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	 * @param values Textwertfilter.
 	 * @return Hyperknoten mit den gegebenen Textwerten. */
 	QNSet havingValues(QVSet values) throws NullPointerException, IllegalArgumentException;
-
-	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(this)}. */
-	@Override
-	QNSet2 copy();
-
-	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(Iterables.filter(this, filter))}. */
-	@Override
-	QNSet2 copy(Filter<? super QN> filter) throws NullPointerException;
 
 }
