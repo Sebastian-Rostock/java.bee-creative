@@ -48,7 +48,7 @@ public class H2QTSet2 extends H2QTSet implements QTSet2 {
 
 	@Override
 	public boolean insertAll(Iterable<? extends QT> items) throws NullPointerException, IllegalArgumentException {
-		if(items instanceof H2QTSet) {
+		if (items instanceof H2QTSet) {
 			var that = owner.asQTSet(items, names());
 
 		}
@@ -65,7 +65,11 @@ public class H2QTSet2 extends H2QTSet implements QTSet2 {
 		for (var i = 1; i < size; i++) {
 			qry.push(", C").push(i).push(" BIGINT NOT NULL");
 		}
-		qry.push(")").update(owner);
+		qry.push(", PRIMARY KEY (C0");
+		for (var i = 1; i < size; i++) {
+			qry.push(", C").push(i);
+		}
+		qry.push("))").update(owner);
 	}
 
 	H2QTSet2(H2QS owner, H2QTSetNames names, H2QQ table) {

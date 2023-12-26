@@ -36,7 +36,7 @@ public class H2QNSet2 extends H2QNSet implements QNSet2 {
 
 	H2QNSet2(H2QS owner) {
 		super(owner, null);
-		new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (N BIGINT NOT NULL)").update(owner);
+		new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (N BIGINT NOT NULL, PRIMARY KEY (N))").update(owner);
 	}
 
 }

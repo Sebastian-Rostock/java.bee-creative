@@ -8,13 +8,13 @@ package bee.creative.qs;
  * @param <THIS> Typ dieser Menge. */
 public interface QXSet<ITEM, THIS> extends QOSet<ITEM, THIS> {
 
-	/** Diese Methode entfernt alle in dieser Menge enthaltenen Objekte aus dem {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn dadurch
-	 * der Inhalt des Graphspeichers verändert wurde.
+	/** Diese Methode entfernt alle in dieser Menge enthaltenen Elemente aus dem {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn
+	 * dadurch der Inhalt des Graphspeichers verändert wurde.
 	 *
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst. */
 	boolean popAll();
 
-	/** Diese Methode gibt eine Mengensicht auf die Objekte mit dem gegebenen Speicherzustand zurück.
+	/** Diese Methode gibt eine Mengensicht auf die Elemente mit dem gegebenen Speicherzustand zurück.
 	 *
 	 * @param state {@code true} für die im {@link QS Graphspeicher} gespeicherten Objekte bzw. {@code false} für die temporären Objekte.
 	 * @return Objekte mit dem gegebenen Speicherzustand. */

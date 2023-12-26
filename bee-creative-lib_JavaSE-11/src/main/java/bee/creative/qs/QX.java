@@ -13,7 +13,7 @@ public interface QX extends QO {
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst. */
 	boolean pop();
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Objekt im {@link #owner() Graphspeicher} gespeichert ist. Andernfalls ist dieses Objekt ein
+	/** Diese Methode liefert nur dann {@code true}, wenn dieses Objekt im {@link #owner() Graphspeicher} gespeichert ist. Andernfalls ist dieses Objekt ein
 	 * temporäres.
 	 *
 	 * @see QXSet#havingState(boolean)

@@ -40,7 +40,7 @@ public class H2QVSet2 extends H2QVSet implements QVSet2 {
 
 	H2QVSet2(H2QS owner) {
 		super(owner, null);
-		new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (V VARCHAR(1G) NOT NULL)").update(this.owner);
+		new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (V VARCHAR(1G) NOT NULL, PRIMARY KEY (V))").update(this.owner);
 	}
 
 	private boolean insertAllImpl(H2QVSet that) {

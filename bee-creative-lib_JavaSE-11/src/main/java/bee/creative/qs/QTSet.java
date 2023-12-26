@@ -12,13 +12,13 @@ public interface QTSet extends QOSet<QT, QTSet> {
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(List, Iterable) this.owner().newTuples(this.names(), this)}. */
 	@Override
-	default QTSet copy() {
+	default QTSet2 copy() {
 		return this.owner().newTuples(this.names(), this);
 	}
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(List, Iterable) this.owner().newTuples(this.names(), Iterables.filter(this, filter))}. */
 	@Override
-	default QTSet copy(Filter<? super QT> filter) throws NullPointerException {
+	default QTSet2 copy(Filter<? super QT> filter) throws NullPointerException {
 		return this.owner().newTuples(this.names(), Iterables.filter(this, filter));
 	}
 
