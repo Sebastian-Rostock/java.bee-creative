@@ -116,27 +116,27 @@ public interface QS {
 	 *
 	 * @param nodes Hyperknoten.
 	 * @return temporäre Hyperknotenmenge. */
-	QNSet newNodes(QN... nodes) throws NullPointerException, IllegalArgumentException;
+	QNSet2 newNodes(QN... nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die gegebenen {@link QE Hyperknoten} in eine von diesem Graphspeicher {@link QNSet#owner() verwaltete} temporäre Menge und gibt
 	 * diese zurück.
 	 *
 	 * @param nodes Hyperknoten.
 	 * @return temporäre Hyperknotenmenge. */
-	QNSet newNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
+	QNSet2 newNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #newValues(Iterable) this.newValues(Arrays.asList(values))}.
 	 *
 	 * @param values Textwerte.
 	 * @return temporäre Textwertmenge. */
-	QVSet newValues(Object... values) throws NullPointerException, IllegalArgumentException;
+	QVSet2 newValues(Object... values) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode überführt die {@link Object#toString() Textdarstellungen} der gegebenen Objekte in eine von diesem Graphspeicher {@link QVSet#owner()
 	 * verwaltete} temporäre Menge und gibt diese zurück.
 	 *
 	 * @param values Textwerte.
 	 * @return temporäre Textwertmenge. */
-	QVSet newValues(Iterable<?> values) throws NullPointerException, IllegalArgumentException;
+	QVSet2 newValues(Iterable<?> values) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode ist eine Abkürzung für {@link #newTuple(List) this.newTuple(Arrays.asList(nodes))}.
 	 *

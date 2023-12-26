@@ -1,5 +1,6 @@
 package bee.creative.qs;
 
+import bee.creative.util.Filter;
 import bee.creative.util.Setter;
 
 /** Diese Schnittstelle definiert eine {@link QXSet Menge} von {@link QN Hyperknoten}.
@@ -47,6 +48,10 @@ public interface QNSet extends QXSet<QN, QNSet> {
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(this)}. */
 	@Override
-	QNSet copy();
+	QNSet2 copy();
+
+	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(Iterables.filter(this, filter))}. */
+	@Override
+	QNSet2 copy(Filter<? super QN> filter) throws NullPointerException;
 
 }

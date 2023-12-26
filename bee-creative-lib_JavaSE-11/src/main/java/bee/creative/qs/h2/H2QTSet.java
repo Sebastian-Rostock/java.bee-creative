@@ -2,18 +2,14 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import bee.creative.lang.Array;
-import bee.creative.lang.Objects;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QT;
 import bee.creative.qs.QTSet;
 import bee.creative.util.Filter;
-import bee.creative.util.HashSet;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert ein {@link QTSet} als Sicht auf das ergebnis einer SQL-Anfrage.
@@ -22,41 +18,41 @@ import bee.creative.util.Iterables;
 public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
-	public H2QTSet copy() {
+	public H2QTSet2 copy() {
 		return this.owner.newTuples(this.names(), this);
 	}
 
 	@Override
-	public H2QTSet copy(Filter<? super QT> filter) throws NullPointerException {
+	public H2QTSet2 copy(Filter<? super QT> filter) throws NullPointerException {
 		return this.owner.newTuples(this.names(), Iterables.filter(this, filter));
 	}
 
 	@Override
 	public H2QTSet order() {
-		return new Order(this.owner, this.names);
+		return new H2QTSetOrder(this);
 	}
 
 	@Override
-	public H2QTSet index() {
+	public H2QTSet2 index() {
 		return this.index(this.names());
 	}
 
 	/** Diese Methode indiziert diese Menge bezüglich der gegebenen Rollen in der gegebenen Reihenfolge und gibt {@code this} zurück. */
-	public H2QTSet index(int... roles) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet2 index(int... roles) throws NullPointerException, IllegalArgumentException {
 		return this.copy().index(roles);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #index(int...) this.index(this.roles(names))}.
 	 *
 	 * @see #roles(String...) */
-	public H2QTSet index(String... names) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet2 index(String... names) throws NullPointerException, IllegalArgumentException {
 		return this.index(this.roles(names));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@link #index(int...) this.index(this.roles(names))}.
 	 *
 	 * @see #roles(List) */
-	public H2QTSet index(List<String> names) throws NullPointerException, IllegalArgumentException {
+	public H2QTSet2 index(List<String> names) throws NullPointerException, IllegalArgumentException {
 		return this.index(this.roles(names));
 	}
 
@@ -157,7 +153,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 				list.add(that.names.name(i2));
 			}
 		}
-		var names = new Names(list);
+		var names = new H2QTSetNames(list);
 		var qry = new H2QQ().push("(SELECT A.C0");
 		for (var i = 1; i < size1; i++) {
 			qry.push(", A.C").push(i); // add all from this
@@ -179,7 +175,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet select(int... roles) throws NullPointerException, IllegalArgumentException {
-		var names = new Names(this.names(roles));
+		var names = new H2QTSetNames(this.names(roles));
 		var size = names.size();
 		var qry = new H2QQ().push("SELECT DISTINCT C").push(roles[0]).push(" AS C0");
 		for (var i = 1; i < size; i++) {
@@ -257,7 +253,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QTSet withNames(List<String> names) throws NullPointerException, IllegalArgumentException {
 		if (this.names().equals(names)) return this;
-		var names2 = new Names(names);
+		var names2 = new H2QTSetNames(names);
 		if (this.names.size() != names2.size()) throw new IllegalArgumentException();
 		return new H2QTSet(this.owner, names2, this.table);
 	}
@@ -265,7 +261,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QTSet havingNode(int role, QN node) throws NullPointerException, IllegalArgumentException {
 		this.name(role);
-		Long key = this.owner.asQN(node).key;
+		var key = this.owner.asQN(node).key;
 		return new H2QTSet(this.owner, this.names, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE C").push(role).push("=").push(key));
 	}
 
@@ -288,7 +284,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (C0 BIGINT NOT NULL, C1 BIGINT NOT NULL, ...)} besitzen. */
-	protected H2QTSet(H2QS owner, Names names, H2QQ table) {
+	protected H2QTSet(H2QS owner, H2QTSetNames names, H2QQ table) {
 		super(owner, table);
 		this.names = names;
 	}
@@ -303,109 +299,6 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		return this.owner.newTuple(keys);
 	}
 
-	private final Names names;
-
-	static class Temp extends H2QTSet {
-
-		public Temp(H2QS owner, Names names) {
-			super(owner, names, null);
-			var size = names.size();
-			var qry = new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (C0 BIGINT NOT NULL");
-			for (var i = 1; i < size; i++) {
-				qry.push(", C").push(i).push(" BIGINT NOT NULL");
-			}
-			qry.push(")").update(owner);
-		}
-
-		@Override
-		public H2QTSet copy() {
-			return this;
-		}
-
-		@Override
-		public H2QTSet index(int... roles) throws NullPointerException, IllegalArgumentException {
-			if (roles.length == 0) return this;
-			var size = new Names(this.names(roles)).size();
-			var qry = new H2QQ().push("CREATE INDEX IF NOT EXISTS ").push(this.table).push("_INDEX_");
-			for (var i = 0; i < size; i++) {
-				qry.push("C").push(roles[i]);
-			}
-			qry.push(" ON ").push(this.table).push(" (C").push(roles[0]);
-			for (var i = 1; i < size; i++) {
-				qry.push(", C").push(roles[i]);
-			}
-			qry.push(")").update(this.owner);
-			return this;
-		}
-
-	}
-
-	static class Order extends H2QTSet {
-
-		public Order(H2QS owner, Names names) {
-			super(owner, names, new H2QQ());
-			var size = names.size();
-			var qry = this.table.push("SELECT * FROM (").push(this).push(") ORDER BY C0");
-			for (var i = 1; i < size; i++) {
-				qry.push(", C").push(i);
-			}
-		}
-
-		@Override
-		public H2QTSet order() {
-			return this;
-		}
-
-	}
-
-	static class Names extends HashSet<String> implements Array<String> {
-
-		public final List<String> list = new AbstractList<>() {
-
-			@Override
-			public String get(int index) {
-				return Names.this.get(index);
-			}
-
-			@Override
-			public int size() {
-				return Names.this.size();
-			}
-
-		};
-
-		public Names(String... names) throws NullPointerException, IllegalArgumentException {
-			this(Arrays.asList(names));
-		}
-
-		public Names(List<String> names) throws NullPointerException, IllegalArgumentException {
-			var size = names.size();
-			this.allocate(size);
-			for (var i = 0; i < size; i++) {
-				this.putIndexImpl(Objects.notNull(names.get(i)));
-			}
-			if ((size == 0) || (size != this.size())) throw new IllegalArgumentException();
-		}
-
-		@Override
-		public String get(int index) {
-			return this.customGetKey(index);
-		}
-
-		public int role(String name) throws NullPointerException {
-			return this.getIndexImpl(Objects.notNull(name));
-		}
-
-		public String name(int index) throws IllegalArgumentException {
-			try {
-				return this.get(index);
-			} catch (IndexOutOfBoundsException cause) {
-				throw new IllegalArgumentException(cause);
-			}
-		}
-
-		private static final long serialVersionUID = 2586580774778548666L;
-
-	}
+	final H2QTSetNames names;
 
 }

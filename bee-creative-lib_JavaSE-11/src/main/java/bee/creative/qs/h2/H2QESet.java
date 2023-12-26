@@ -7,7 +7,6 @@ import bee.creative.qs.QESet;
 import bee.creative.qs.QN;
 import bee.creative.qs.QNSet;
 import bee.creative.qs.QTSet;
-import bee.creative.qs.h2.H2QTSet.Names;
 import bee.creative.util.Filter;
 import bee.creative.util.Iterables;
 
@@ -23,7 +22,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public boolean popAll() {
-		return new H2QQ().push("DELETE FROM QE AS A WHERE EXISTS ((").push(this).push(") AS B WHERE A.C=B.C AND A.P=B.P AND A.S=B.S AND A.O=B.O)")
+		return new H2QQ().push("DELETE FROM QE AS A WHERE EXISTS ((").push(this.index()).push(") AS B WHERE A.C=B.C AND A.P=B.P AND A.S=B.S AND A.O=B.O)")
 			.update(this.owner);
 	}
 
@@ -54,7 +53,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public QTSet tuples(String context, String predicate, String subject, String object) throws NullPointerException, IllegalArgumentException {
-		return new H2QTSet(this.owner, new Names(context, predicate, subject, object),
+		return new H2QTSet(this.owner, new H2QTSetNames(context, predicate, subject, object),
 			new H2QQ().push("SELECT C AS C0, P AS C1, S AS C2, O AS C3 FROM (").push(this).push(")"));
 	}
 
@@ -174,18 +173,18 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	}
 
 	@Override
-	public H2QESet copy() {
+	public H2QESet2 copy() {
 		return this.owner.newEdges(this);
 	}
 
 	@Override
-	public H2QESet copy(Filter<? super QE> filter) throws NullPointerException {
+	public H2QESet2 copy(Filter<? super QE> filter) throws NullPointerException {
 		return this.owner.newEdges(Iterables.filter(this, filter));
 	}
 
 	@Override
 	public H2QESet order() {
-		return new Order(this);
+		return new H2QESetOrder(this);
 	}
 
 	/** {@inheritDoc} Sie ist eine Abkürzung für {@link #index(String) this.index("CPSO")}. */
@@ -229,55 +228,6 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	@Override
 	protected QE customItem(ResultSet item) throws SQLException {
 		return this.owner.newEdge(item.getInt(1), item.getInt(2), item.getInt(3), item.getInt(4));
-	}
-
-	static class Main extends H2QESet {
-
-		public Main(H2QS owner) {
-			super(owner, new H2QQ().push("SELECT * FROM QE"));
-		}
-
-		@Override
-		public H2QESet index() {
-			return this;
-		}
-
-	}
-
-	static class Temp extends H2QESet {
-
-		public Temp(H2QS owner) {
-			super(owner, null);
-			new H2QQ().push("CREATE TEMPORARY TABLE ").push(this.table).push(" (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL)")
-				.update(owner);
-		}
-
-		@Override
-		public H2QESet copy() {
-			return this;
-		}
-
-		@Override
-		public H2QESet index(String cols) throws NullPointerException, IllegalArgumentException {
-			if ((cols.length() != 4) || ((cols.indexOf('C') | cols.indexOf('P') | cols.indexOf('S') | cols.indexOf('O')) < 0)) throw new IllegalArgumentException();
-			new H2QQ().push("CREATE INDEX IF NOT EXISTS ").push(this.table).push("_INDEX_").push(cols).push(" ON ").push(this.table).push(" (").push(cols.charAt(0))
-				.push(", ").push(cols.charAt(1)).push(", ").push(cols.charAt(2)).push(", ").push(cols.charAt(3)).push(")").update(this.owner);
-			return this;
-		}
-
-	}
-
-	static class Order extends H2QESet {
-
-		public Order(H2QESet that) {
-			super(that.owner, new H2QQ().push("SELECT * FROM (").push(that).push(") ORDER BY C, P, S, O"));
-		}
-
-		@Override
-		public H2QESet order() {
-			return this;
-		}
-
 	}
 
 }

@@ -2,46 +2,47 @@ package bee.creative.qs;
 
 import bee.creative.util.Filter;
 
-/** Diese Schnittstelle definiert eine beliebig große Sicht auf eine filter- und kopier- und komponierbare Menge von Objekten mit Bezug zu einem {@link #owner()
- * Graphspeicher}.
+/** Diese Schnittstelle definiert eine beliebig große Sicht auf eine filter- und kopier- und komponierbare Menge von Elementen mit Bezug zu einem
+ * {@link #owner() Graphspeicher}.
  *
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GI> Typ der Einträge.
- * @param <GISet> Typ dieser Menge. */
-public interface QOSet<GI, GISet> extends QISet<GI> {
+ * @param <ITEM> Typ der Elemente.
+ * @param <THIS> Typ dieser Menge. */
+public interface QOSet<ITEM, THIS> extends QISet<ITEM> {
 
-	/** Diese Methode gibt eine temporäre Kopie dieser Menge zurück.
+	/** Diese Methode gibt eine temporäre Kopie dieser Menge zurück, sofern diese Menge keine ist. Andernfalls wird {@code this} geliefert.
 	 *
-	 * @return Kopie dieser Menge. */
-	GISet copy();
+	 * @see #copy(Filter)
+	 * @return Kopie dieser Menge oder {@code this}. */
+	THIS copy();
 
 	/** Diese Methode gibt eine temporäre Kopie der Menge der Objekte zurück, die vom gegebenen Filter {@link Filter#accept(Object) akzeptiert} werden.
 	 *
 	 * @param filter Filter.
 	 * @return Gefilterte Menge. */
-	GISet copy(Filter<? super GI> filter) throws NullPointerException;
+	THIS copy(Filter<? super ITEM> filter) throws NullPointerException;
 
-	/** Diese Methode gibt die geordnete Mengensicht auf die Objekte dieser Menge zurück.
+	/** Diese Methode gibt die geordnete Mengensicht auf die Objekte dieser Menge zurück. Andernfalls wird {@code this} geliefert.
 	 *
 	 * @return Geordnete Menge. */
-	GISet order();
+	THIS order();
 
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die in dieser oder der gegebenen Menge enthalten sind.
 	 *
 	 * @param set Menge.
 	 * @return Vereinigung dieser mit der gegebenen Menge. */
-	GISet union(GISet set) throws NullPointerException, IllegalArgumentException;
+	THIS union(THIS set) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die gleichzeitig in dieser und nicht in der gegebenen Menge enthalten sind.
 	 *
 	 * @param set Menge.
 	 * @return Diese Menge ohne die gegebenen Menge. */
-	GISet except(GISet set) throws NullPointerException, IllegalArgumentException;
+	THIS except(THIS set) throws NullPointerException, IllegalArgumentException;
 
 	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die gleichzeitig in dieser und in der gegebenen Menge enthalten sind.
 	 *
 	 * @param set Menge.
 	 * @return Schitt dieser mit der gegebenen Menge. */
-	GISet intersect(GISet set) throws NullPointerException, IllegalArgumentException;
+	THIS intersect(THIS set) throws NullPointerException, IllegalArgumentException;
 
 }

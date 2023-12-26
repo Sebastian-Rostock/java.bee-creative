@@ -34,9 +34,18 @@ public interface DM extends QO {
 
 	DH history(); // log oder null
 
-	QN context(); // kontext für alles
+	/** Diese Methode liefert den Als {@link QE#context() Kontextknoten} aller {@link QE Hyperkanten} dieses {@link #parent() Domänenmodells}.
+	 * 
+	 * @return Kontextknoten. */
+	QN context();
 
-	default Set2<QN> links() { // datenfelder, beziehungen
+	/** Diese Methode erlaubt Zugriff auf die {@link DL#node() Hyperknoten} aller {@link DL Datenfelder}.
+	 *
+	 * @see DL#IDENT_IsLink
+	 * @see DL#node()
+	 * @see DT#instances()
+	 * @return Datenfeldknoten. */
+	default Set2<QN> links() {
 		return this.getType(DL.IDENT_IsLink).instances();
 	}
 
@@ -49,7 +58,7 @@ public interface DM extends QO {
 		return this.links().translate(this.linkTrans());
 	}
 
-	/** Diese Methode erlaubt Zugriff auf die {@link DT#node() Typknoten} aller {@link DT Datentypen}.
+	/** Diese Methode erlaubt Zugriff auf die {@link DT#node() Hyperknoten} aller {@link DT Datentypen}.
 	 *
 	 * @see DT#IDENT_IsType
 	 * @see DT#node()
