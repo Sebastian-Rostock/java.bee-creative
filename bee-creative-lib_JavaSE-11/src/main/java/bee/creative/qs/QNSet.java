@@ -8,15 +8,15 @@ import bee.creative.util.Setter;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QNSet extends QXSet<QN, QNSet> {
 
-	/** Diese Methode entfernt alle in dieser Menge enthaltenen Hyperknoten aus dem {@link #owner() Graphspeicher} und gibt nur dann {@code true} zurück, wenn
-	 * dadurch der Inhalt des Graphspeichers verändert wurde. Damit werden auch die {@link QN#value() Textwerte} dieser Hyperknoten sowie alle diese Hyperknoten
+	/** Diese Methode entfernt alle in dieser Menge enthaltenen Hyperknoten aus dem {@link #owner() Graphspeicher} und liefert nur dann {@code true}, wenn dadurch
+	 * der Inhalt des Graphspeichers verändert wurde. Damit werden auch die {@link QN#value() Textwerte} dieser Hyperknoten sowie alle diese Hyperknoten
 	 * verwendenden {@link QE Hyperkanten} entfernt.
 	 *
 	 * @return {@code true} bei Änderung des Graphspeicherinhalts bzw. {@code false} sonst. */
 	@Override
 	boolean popAll();
 
-	/** Diese Methode gibt eine Mengensicht auf alle Textwerte zurück, die in den Hyperknoten dieser Menge {@link QN#value() aufgeführt} sind.
+	/** Diese Methode liefert eine Mengensicht auf alle Textwerte, die in den Hyperknoten dieser Menge {@link QN#value() aufgeführt} sind.
 	 *
 	 * @return Textwerte der Hyperknoten dieser Menge. */
 	QVSet values();
@@ -26,20 +26,20 @@ public interface QNSet extends QXSet<QN, QNSet> {
 	 * @param values Abbildung von {@link QN Hyperknoten} auf {@link QN#value() Textwerte}. */
 	void values(Setter<? super QN, ? super String> values) throws NullPointerException;
 
-	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten dieser Menge als Hypertupel der Länge {@code 1} zurück.
+	/** Diese Methode liefert eine Mengensicht auf die Hyperknoten dieser Menge als Hypertupel der Länge {@code 1}.
 	 *
 	 * @param name Name der {@link QTSet#names() Rolle} {@code 0}, über welche die Hypertupel ihren Hyperknoten referenzieren.
 	 * @return Hyperknoten dieser Menge als Hypertupel. */
 	QTSet tuples(String name) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten zurück, die einen {@link QN#value() Textwert} besitzen. Die Mengensicht entspricht
+	/** Diese Methode liefert eine Mengensicht auf die Hyperknoten, die einen {@link QN#value() Textwert} besitzen. Die Mengensicht entspricht
 	 * {@code this.intersect(this.owner().nodes())}.
 	 *
 	 * @see #havingValues(QVSet)
 	 * @return Hyperknoten mit Textwerten. */
 	QNSet havingValue();
 
-	/** Diese Methode gibt eine Mengensicht auf die Hyperknoten zurück, deren {@link QN#value() Textwerte} in der gegebenen Menge enthalten sind. Die Mengensicht
+	/** Diese Methode liefert eine Mengensicht auf die Hyperknoten, deren {@link QN#value() Textwerte} in der gegebenen Menge enthalten sind. Die Mengensicht
 	 * entspricht {@code this.intersect(values.nodes())}.
 	 *
 	 * @param values Textwertfilter.

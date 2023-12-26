@@ -10,36 +10,36 @@ import bee.creative.util.Filter;
  * @param <THIS> Typ dieser Menge. */
 public interface QOSet<ITEM, THIS> extends QISet<ITEM> {
 
-	/** Diese Methode gibt eine temporäre Kopie dieser Menge zurück, sofern diese Menge keine ist. Andernfalls wird {@code this} geliefert.
+	/** Diese Methode liefert eine temporäre Kopie dieser Menge, sofern diese Menge keine ist. Andernfalls wird {@code this} geliefert.
 	 *
 	 * @see #copy(Filter)
 	 * @return Kopie dieser Menge oder {@code this}. */
 	THIS copy();
 
-	/** Diese Methode gibt eine temporäre Kopie der Menge der Objekte zurück, die vom gegebenen Filter {@link Filter#accept(Object) akzeptiert} werden.
+	/** Diese Methode liefert eine temporäre Kopie der Menge der Elemente, die vom gegebenen Filter {@link Filter#accept(Object) akzeptiert} werden.
 	 *
 	 * @param filter Filter.
 	 * @return Gefilterte Menge. */
 	THIS copy(Filter<? super ITEM> filter) throws NullPointerException;
 
-	/** Diese Methode gibt die geordnete Mengensicht auf die Objekte dieser Menge zurück. Andernfalls wird {@code this} geliefert.
+	/** Diese Methode liefert die geordnete Mengensicht auf die Elemente dieser Menge, sofern diese Menge keine ist. Andernfalls wird {@code this} geliefert.
 	 *
 	 * @return Geordnete Menge. */
 	THIS order();
 
-	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die in dieser oder der gegebenen Menge enthalten sind.
+	/** Diese Methode liefert die Mengensicht auf die Elemente, die in dieser oder der gegebenen Menge enthalten sind.
 	 *
 	 * @param set Menge.
 	 * @return Vereinigung dieser mit der gegebenen Menge. */
 	THIS union(THIS set) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die gleichzeitig in dieser und nicht in der gegebenen Menge enthalten sind.
+	/** Diese Methode liefert die Mengensicht auf die Elemente, die gleichzeitig in dieser und nicht in der gegebenen Menge enthalten sind.
 	 *
 	 * @param set Menge.
-	 * @return Diese Menge ohne die gegebenen Menge. */
+	 * @return diese Menge ohne die gegebenen Menge. */
 	THIS except(THIS set) throws NullPointerException, IllegalArgumentException;
 
-	/** Diese Methode gibt die Mengensicht auf die Objekte zurück, die gleichzeitig in dieser und in der gegebenen Menge enthalten sind.
+	/** Diese Methode liefert die Mengensicht auf die Elemente, die gleichzeitig in dieser und in der gegebenen Menge enthalten sind.
 	 *
 	 * @param set Menge.
 	 * @return Schitt dieser mit der gegebenen Menge. */

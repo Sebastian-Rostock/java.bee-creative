@@ -1,5 +1,5 @@
 package bee.creative.qs;
 
-public interface QTSet2 extends QTSet, QOSet2<QT> {
+public interface QTSet2 extends QTSet, QISet2<QT> {
 
 }

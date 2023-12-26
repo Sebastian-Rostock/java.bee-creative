@@ -8,8 +8,8 @@ package bee.creative.qs;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QN extends QX {
 
-	/** Diese Methode gibt den Textwert des Hyperknoten zurück. Wenn der Hyperknoten keinen Textwert besitzt, wird {@code null} geliefert. Andernfalls kann dieser
-	 * zur {@link QS#newNode(Object) Identifikation} des Hyperknoten im {@link #owner() Graphspeicher} eingesetzt werden.
+	/** Diese Methode liefert den Textwert des Hyperknoten. Wenn der Hyperknoten keinen Textwert besitzt, wird {@code null} geliefert. Andernfalls kann dieser zur
+	 * {@link QS#newNode(Object) Identifikation} des Hyperknoten im {@link #owner() Graphspeicher} eingesetzt werden.
 	 *
 	 * @return Textwert oder {@code null}. */
 	String value();
