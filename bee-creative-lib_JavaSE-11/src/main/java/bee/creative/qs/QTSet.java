@@ -10,11 +10,9 @@ import bee.creative.util.Iterables;
  * @author [cc-by] 2021 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QTSet extends QOSet<QT, QTSet> {
 
-	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(List, Iterable) this.owner().newTuples(this.names(), this)}. */
+	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(List, Iterable) this.owner().newTuples(this.names(), this)} oder {@code this}. */
 	@Override
-	default QTSet2 copy() {
-		return this.owner().newTuples(this.names(), this);
-	}
+	QTSet2 copy();
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newTuples(List, Iterable) this.owner().newTuples(this.names(), Iterables.filter(this, filter))}. */
 	@Override

@@ -3,11 +3,6 @@ package bee.creative.qs.h2;
 class H2QNSetMain extends H2QNSet {
 
 	@Override
-	public H2QNSet index() {
-		return this;
-	}
-
-	@Override
 	public H2QVSet values() {
 		return this.owner.values();
 	}

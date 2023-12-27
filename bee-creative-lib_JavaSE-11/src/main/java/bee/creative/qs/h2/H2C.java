@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /** Diese Klasse erzeugt eine H2-Datenbankverbindung.
- * 
+ *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class H2C {
 

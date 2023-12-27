@@ -26,7 +26,6 @@ public abstract class H2DE implements DE {
 		return this.parent;
 	}
 
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.node);

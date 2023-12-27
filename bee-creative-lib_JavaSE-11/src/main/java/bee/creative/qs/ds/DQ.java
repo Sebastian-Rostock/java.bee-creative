@@ -14,7 +14,7 @@ import bee.creative.util.HashMap2;
 import bee.creative.util.HashSet2;
 import bee.creative.util.Iterables;
 
-//TODO 
+// TODO
 public class DQ {
 
 	public static List<QN> getObjectSet(QN context, QN predicate, QN subject) throws NullPointerException, IllegalArgumentException {

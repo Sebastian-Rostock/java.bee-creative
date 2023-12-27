@@ -32,11 +32,6 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		return new H2QTSetOrder(this);
 	}
 
-	@Override
-	public H2QTSet2 index() {
-		return this.index(this.names());
-	}
-
 	/** Diese Methode indiziert diese Menge bezüglich der gegebenen Rollen in der gegebenen Reihenfolge und gibt {@code this} zurück. */
 	public H2QTSet2 index(int... roles) throws NullPointerException, IllegalArgumentException {
 		return this.copy().index(roles);

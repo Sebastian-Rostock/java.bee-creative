@@ -17,13 +17,13 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 
 	@Override
 	public boolean putAll() {
-		return new H2QQ().push("MERGE INTO QE SELECT * FROM (").push(this.index()).push(")").update(this.owner);
+		return new H2QQ().push("MERGE INTO QE SELECT * FROM ").push(this.copy().table).update(this.owner);
 	}
 
 	@Override
 	public boolean popAll() {
-		return new H2QQ().push("DELETE FROM QE AS A WHERE EXISTS ((").push(this.index()).push(") AS B WHERE A.C=B.C AND A.P=B.P AND A.S=B.S AND A.O=B.O)")
-			.update(this.owner);
+		return new H2QQ().push("DELETE FROM QE AS A WHERE EXISTS (SELECT 1 FROM ").push(this.copy().table)
+			.push(" AS B WHERE A.C=B.C AND A.P=B.P AND A.S=B.S AND A.O=B.O)").update(this.owner);
 	}
 
 	@Override
@@ -187,11 +187,11 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 		return new H2QESetOrder(this);
 	}
 
-	/** {@inheritDoc} Sie ist eine Abkürzung für {@link #index(String) this.index("CPSO")}. */
-	@Override
-	public H2QESet index() {
-		return this.index("CPSO");
-	}
+	// /** {@inheritDoc} Sie ist eine Abkürzung für {@link #index(String) this.index("CPSO")}. */
+	// @Override
+	// public H2QESet index() {
+	// return this.index("CPSO");
+	// }
 
 	/** Diese Methode indiziert diese temporäre Menge zur schnelleren Suche über die gegebenen Spalten in der gegebenen Reihenfolge und gibt diese bzw. eine
 	 * derart indizierte temporäre Kopie zurück. Die Spaltenliste {@code cols} muss dazu aus den Zeichen {@code C}, {@code P}, {@code S} und {@code O} bestehen,
@@ -221,7 +221,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL)}
 	 * besitzen. */
-	protected H2QESet(H2QS owner, H2QQ table) {
+	protected H2QESet(H2QS owner, H2QQ table) throws NullPointerException {
 		super(owner, table);
 	}
 

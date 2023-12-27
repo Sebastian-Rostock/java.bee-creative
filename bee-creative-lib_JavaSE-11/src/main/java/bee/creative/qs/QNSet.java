@@ -9,11 +9,9 @@ import bee.creative.util.Setter;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QNSet extends QXSet<QN, QNSet> {
 
-	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(this)}. */
+	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(this)} oder {@code this}. */
 	@Override
-	default QNSet2 copy() {
-		return this.owner().newNodes(this);
-	}
+	QNSet2 copy();
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newNodes(Iterables.filter(this, filter))}. */
 	@Override

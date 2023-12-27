@@ -17,7 +17,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	@Override
 	public boolean popAll() {
-		var that = this.index();
+		var that = this.copy();
 		return this.owner.markPopValue(new H2QQ().push("DELETE FROM QN WHERE N IN (").push(that).push(")").update(this.owner)) //
 			| new H2QQ().push("DELETE FROM QE WHERE C IN (").push(that).push(")").update(this.owner) //
 			| new H2QQ().push("DELETE FROM QE WHERE P IN (").push(that).push(")").update(this.owner) //
@@ -77,11 +77,6 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 	}
 
 	@Override
-	public H2QNSet index() {
-		return this.copy().index();
-	}
-
-	@Override
 	public H2QNSet union(QNSet set) throws NullPointerException, IllegalArgumentException {
 		var that = this.owner.asQNSet(set);
 		return new H2QNSet(this.owner, new H2QQ().push("(").push(this).push(") UNION (").push(that).push(")"));
@@ -101,7 +96,7 @@ public class H2QNSet extends H2QOSet<QN, QNSet> implements QNSet {
 
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. Die Tabelle muss die Spalten {@code (N BIGINT NOT NULL)} besitzen. */
-	protected H2QNSet(H2QS owner, H2QQ table) {
+	public H2QNSet(H2QS owner, H2QQ table) {
 		super(owner, table);
 	}
 

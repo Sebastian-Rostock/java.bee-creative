@@ -17,14 +17,19 @@ public final class H2QQ {
 
 	/** Dieser Konstruktor initialisiert den Namen der temporären Tabelle mit {@code null}. */
 	public H2QQ() {
-		this.name = null;
+		this(null);
 	}
 
 	/** Dieser Konstruktor initialisiert den Namen der temporären Tabelle über {@link H2QS#putTable()} und bestückt die Anfrage anschließend mit
 	 * {@code this.push("select * from ").push(this)}. */
-	public H2QQ(H2QS owner) {
-		this.name = owner.putTable();
-		this.push("SELECT * FROM ").push(this);
+	public H2QQ(H2QS owner) throws NullPointerException {
+		this(owner.putTable());
+	}
+
+	public H2QQ(Object name) {
+		this.name = name;
+		if (name == null) return;
+		this.push("SELECT * FROM ").push(name);
 	}
 
 	/** Diese Methode fügt den Namen der temporären Tabelle der gegebenen Anfrage an und gibt {@code this} zurück. */

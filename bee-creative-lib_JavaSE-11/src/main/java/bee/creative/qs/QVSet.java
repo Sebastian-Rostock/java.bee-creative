@@ -9,11 +9,9 @@ import bee.creative.util.Setter;
  * @author [cc-by] 2020 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface QVSet extends QXSet<String, QVSet> {
 
-	/** {@inheritDoc} Sie liefert damit {@link QS#newValues(Iterable) this.owner().newValues(this)}. */
+	/** {@inheritDoc} Sie liefert damit {@link QS#newValues(Iterable) this.owner().newValues(this)} oder {@code this}. */
 	@Override
-	default QVSet2 copy() {
-		return this.owner().newValues(this);
-	}
+	QVSet2 copy();
 
 	/** {@inheritDoc} Sie liefert damit {@link QS#newNodes(Iterable) this.owner().newValues(Iterables.filter(this, filter))}. */
 	@Override

@@ -35,7 +35,7 @@ public interface DM extends QO {
 	DH history(); // log oder null
 
 	/** Diese Methode liefert den Als {@link QE#context() Kontextknoten} aller {@link QE Hyperkanten} dieses {@link #parent() Domänenmodells}.
-	 * 
+	 *
 	 * @return Kontextknoten. */
 	QN context();
 

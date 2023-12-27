@@ -9,13 +9,13 @@ import bee.creative.util.Translator2;
 import bee.creative.util.Translators.OptionalizedTranslator;
 
 /** Diese Schnittstelle definiert einen Domänenspeicher, der seinen Zustand in einem {@link #store() Graphspeicher} speichert.
- * 
+ *
  * @author [cc-by] 2023 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface DS {
 
 	/** Diese Methode liefert den Graphspeicher, in welchem alle Daten dieses Domänenspeichers gespeichert sind. Der {@link QS#owner() Besitzer} des
 	 * Graphspeichers ist dieser Domänenspeicher.
-	 * 
+	 *
 	 * @return Graphspeicher. */
 	QS store();
 

@@ -44,7 +44,7 @@ public interface QE extends QX {
 	 * @param context Kontextknoten.
 	 * @return Hyperkante mit dem gegebenen Kontextknoten. */
 	default QE withContext(QN context) throws NullPointerException, IllegalArgumentException {
-		return owner().newEdge(context, predicate(), subject(), object());
+		return this.owner().newEdge(context, this.predicate(), this.subject(), this.object());
 	}
 
 	/** Diese Methode liefert eine Kopie dieser Hyperkante mit dem gegebenen {@link QE#predicate() Prädikatknoten}.
@@ -52,7 +52,7 @@ public interface QE extends QX {
 	 * @param predicate Prädikatknoten.
 	 * @return Hyperkante mit dem gegebenen Prädikatknoten. */
 	default QE withPredicate(QN predicate) throws NullPointerException, IllegalArgumentException {
-		return owner().newEdge(context(), predicate, subject(), object());
+		return this.owner().newEdge(this.context(), predicate, this.subject(), this.object());
 	}
 
 	/** Diese Methode liefert eine Kopie dieser Hyperkante mit dem gegebenen {@link QE#subject() Subjektknoten}.
@@ -60,7 +60,7 @@ public interface QE extends QX {
 	 * @param subject Subjektknoten.
 	 * @return Hyperkante mit dem gegebenen Subjektknoten. */
 	default QE withSubject(QN subject) throws NullPointerException, IllegalArgumentException {
-		return owner().newEdge(context(), predicate(), subject, object());
+		return this.owner().newEdge(this.context(), this.predicate(), subject, this.object());
 	}
 
 	/** Diese Methode liefert eine Kopie dieser Hyperkante mit dem gegebenen {@link QE#object() Objektknoten}.
@@ -68,7 +68,7 @@ public interface QE extends QX {
 	 * @param object Objektknoten.
 	 * @return Hyperkante mit dem gegebenen Objektknoten. */
 	default QE withObject(QN object) throws NullPointerException, IllegalArgumentException {
-		return owner().newEdge(context(), predicate(), subject(), object);
+		return this.owner().newEdge(this.context(), this.predicate(), this.subject(), object);
 	}
 
 }

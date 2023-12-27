@@ -2,7 +2,7 @@ package bee.creative.qs.ds;
 
 import bee.creative.qs.QN;
 
-// TODO 
+// TODO
 // domain-history
 public interface DH {
 

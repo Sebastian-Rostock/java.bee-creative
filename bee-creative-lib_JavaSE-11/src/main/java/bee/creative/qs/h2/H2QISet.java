@@ -2,6 +2,7 @@ package bee.creative.qs.h2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import bee.creative.lang.Objects;
 import bee.creative.qs.QISet;
 import bee.creative.util.AbstractIterator;
 import bee.creative.util.Iterator2;
@@ -62,8 +63,8 @@ public abstract class H2QISet<GI> implements QISet<GI> {
 
 	/** Dieser Konstruktor initialisiert {@link #owner Graphspeicher} und {@link #table Tabelle}. Wenn letztre {@code null} ist, wird sie über
 	 * {@link H2QQ#H2QQ(H2QS)} erzeugt. */
-	protected H2QISet(H2QS owner, H2QQ table) {
-		this.owner = owner;
+	protected H2QISet(H2QS owner, H2QQ table) throws NullPointerException {
+		this.owner = Objects.notNull(owner);
 		this.table = table != null ? table : new H2QQ(owner);
 	}
 

@@ -34,7 +34,7 @@ public interface QS {
 	QVSet values();
 
 	/** Diese Methode liefet das diesen Graphspeicher verwaltende Objekt.
-	 * 
+	 *
 	 * @return Besitzer dieses Graphspeichers oder {@code null}. */
 	Object owner();
 
@@ -135,8 +135,8 @@ public interface QS {
 		return this.newNodes(Arrays.asList(nodes));
 	}
 
-	/** Diese Methode überführt die gegebenen {@link QE Hyperknoten} in eine von diesem Graphspeicher {@link QNSet#owner() verwaltete} temporäre Menge und gibt
-	 * diese zurück.
+	/** Diese Methode überführt die gegebenen {@link QE Hyperknoten} in eine von diesem Graphspeicher {@link QNSet#owner() verwaltete} temporäre änderbaren Menge
+	 * und gibt diese zurück.
 	 *
 	 * @param nodes Hyperknoten.
 	 * @return temporäre Hyperknotenmenge. */
@@ -151,7 +151,7 @@ public interface QS {
 	}
 
 	/** Diese Methode überführt die {@link Object#toString() Textdarstellungen} der gegebenen Objekte in eine von diesem Graphspeicher {@link QVSet#owner()
-	 * verwaltete} temporäre Menge und gibt diese zurück.
+	 * verwaltete} temporäre änderbaren Menge und gibt diese zurück.
 	 *
 	 * @param values Textwerte.
 	 * @return temporäre Textwertmenge. */

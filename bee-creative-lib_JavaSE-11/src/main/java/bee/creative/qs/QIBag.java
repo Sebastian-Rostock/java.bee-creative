@@ -17,7 +17,7 @@ public interface QIBag<ITEM, THIS> extends QISet<ITEM> {
 
 	/** Diese Methode liefert eine Mengensicht auf alle Hyperknoten, die einen Textwert {@link QN#value() besitzen}, der die {@link Object#toString()
 	 * Textdarstellung} eines Elements dieser Sammlung darstellt.
-	 * 
+	 *
 	 * @return Hyperknoten dieser Sammlung. */
 	QNSet nodes();
 

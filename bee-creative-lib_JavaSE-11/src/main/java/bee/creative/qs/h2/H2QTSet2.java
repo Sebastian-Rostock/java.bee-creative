@@ -49,7 +49,7 @@ public class H2QTSet2 extends H2QTSet implements QTSet2 {
 	@Override
 	public boolean insertAll(Iterable<? extends QT> items) throws NullPointerException, IllegalArgumentException {
 		if (items instanceof H2QTSet) {
-			var that = owner.asQTSet(items, names());
+			var that = this.owner.asQTSet(items, this.names());
 
 		}
 	}

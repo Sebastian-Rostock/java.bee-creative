@@ -166,6 +166,20 @@ public class H2QS implements QS, AutoCloseable {
 		throw new IllegalArgumentException();
 	}
 
+	/** Diese Methode liefert die gegebenen Hyperkoten als {@link H2QNSet} dieses {@link QO Graphspeichers}. */
+	public final H2QNSet toQNSet(Iterable<? extends QN> src) throws NullPointerException, IllegalArgumentException {
+		return src instanceof H2QNSet ? this.asQNSet(src) : this.newNodes(src);
+	}
+
+	/** Diese Methode liefert die gegebenen Textwerte als {@link H2QVSet} dieses {@link QO Graphspeichers}. */
+	public final H2QVSet toQVSet(Iterable<?> src) throws NullPointerException, IllegalArgumentException {
+		if (src instanceof H2QVSet) {
+			var res = (H2QVSet)src;
+			if (res.owner == this) return res;
+		}
+		return this.newValues(src);
+	}
+
 	/** Diese Methode leert den Graphspeicher. */
 	public void reset() throws IllegalStateException {
 		this.popValueMark = new Object();
@@ -267,32 +281,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	@Override
 	public H2QESet2 newEdges(Iterable<? extends QE> edges) throws NullPointerException, IllegalArgumentException {
-		try {
-			if (edges instanceof H2QESet) {
-				var set = this.asQESet(edges);
-				if (set instanceof H2QESet2) return (H2QESet2)set;
-				var res = new H2QESet2(this);
-				new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT * FROM (").push(set).push(")").update(this);
-				return res;
-			}
-			var buf = new H2QESet2(this);
-			try (var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (C, P, S, O) VALUES (?, ?, ?, ?)").prepare(this)) {
-				for (Object item: edges) {
-					var edge = this.asQE(item);
-					stmt.setLong(1, edge.context);
-					stmt.setLong(2, edge.predicate);
-					stmt.setLong(3, edge.subject);
-					stmt.setLong(4, edge.object);
-					stmt.addBatch();
-				}
-				stmt.executeBatch();
-			}
-			var res = new H2QESet2(this);
-			new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT DISTINCT * FROM ").push(buf.table).update(this);
-			return res;
-		} catch (SQLException cause) {
-			throw new IllegalStateException(cause);
-		}
+		return edges instanceof H2QESet2 ? (H2QESet2)this.asQESet(edges) : new H2QESet2(this, edges);
 	}
 
 	@Override
@@ -329,28 +318,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	@Override
 	public H2QNSet2 newNodes(Iterable<? extends QN> nodes) throws NullPointerException, IllegalArgumentException {
-		try {
-			if (nodes instanceof H2QNSet) {
-				var set = this.asQNSet(nodes);
-				if (set instanceof H2QNSet2) return (H2QNSet2)set;
-				var res = new H2QNSet2(this);
-				new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT * FROM (").push(set).push(")").update(this);
-				return res;
-			}
-			H2QNSet buf = new H2QNSet2(this);
-			try (var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (N) VALUES (?)").prepare(this)) {
-				for (Object item: nodes) {
-					stmt.setLong(1, this.asQN(item).key);
-					stmt.addBatch();
-				}
-				stmt.executeBatch();
-			}
-			var res = new H2QNSet2(this);
-			new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT DISTINCT * FROM ").push(buf.table).update(this);
-			return res;
-		} catch (SQLException cause) {
-			throw new IllegalStateException(cause);
-		}
+		return new H2QNSet2(this, nodes);
 	}
 
 	@Override
