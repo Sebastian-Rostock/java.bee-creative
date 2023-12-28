@@ -14,7 +14,6 @@ import bee.creative.lang.Objects;
 public class Producers {
 
 	/** Diese Klasse implementiert einen {@link Producer3}, der beim {@link #get() Lesen} stets {@code null} liefert. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyProducer extends AbstractProducer<Object> {
 
 		public static final Producer3<?> INSTANCE = new EmptyProducer();
@@ -24,7 +23,6 @@ public class Producers {
 	/** Diese Klasse implementiert einen {@link Producer3}, der beim {@link #get() Lesen} stets einen gegebenen Wert liefert.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class ValueProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final GValue that;
@@ -49,13 +47,15 @@ public class Producers {
 	 * Lesen erfolgt über {@code this.that.invoke(null)}.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class MethodProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Method that;
 
+		public final boolean forceAccessible;
+
 		/** Dieser Konstruktor initialisiert Methode und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
 		public MethodProducer(final Method that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
 			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 0)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
@@ -72,7 +72,7 @@ public class Producers {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}
@@ -81,13 +81,15 @@ public class Producers {
 	 * delegiert. Das Lesen erfolgt über {@code this.that.newInstance()}.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class ConstructorProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Constructor<?> that;
 
+		public final boolean forceAccessible;
+
 		/** Dieser Konstruktor initialisiert Konstruktor und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
 		public ConstructorProducer(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
 			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 0)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
@@ -104,7 +106,7 @@ public class Producers {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}
@@ -114,7 +116,6 @@ public class Producers {
 	 *
 	 * @param <GValue> Typ des Werts.
 	 * @param <GValue2> Typ des Werts des gegebenen {@link Producer}. */
-	@SuppressWarnings ("javadoc")
 	public static class TranslatedProducer<GValue, GValue2> extends AbstractProducer<GValue> {
 
 		public final Producer<? extends GValue2> that;
@@ -142,7 +143,6 @@ public class Producers {
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class SynchronizedProducer<GValue> extends AbstractProducer<GValue> {
 
 		public final Producer<? extends GValue> that;
@@ -223,10 +223,11 @@ public class Producers {
 	 * @see #fromNative(java.lang.reflect.Field, boolean)
 	 * @see #fromNative(Method, boolean)
 	 * @see #fromNative(Constructor, boolean) */
+	@SuppressWarnings ("unchecked")
 	public static <GValue> Producer3<GValue> fromNative(final String memberPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
 		final Object object = Natives.parse(memberPath);
-		if (object instanceof Class<?>) return Producers.fromNative((Class)object, forceAccessible);
+		if (object instanceof Class<?>) return Producers.fromNative((Class<GValue>)object, forceAccessible);
 		if (object instanceof java.lang.reflect.Field) return Producers.fromNative((java.lang.reflect.Field)object, forceAccessible);
 		if (object instanceof Method) return Producers.fromNative((Method)object, forceAccessible);
 		if (object instanceof Constructor<?>) return Producers.fromNative((Constructor<?>)object, forceAccessible);

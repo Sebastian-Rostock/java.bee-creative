@@ -19,7 +19,6 @@ import bee.creative.ref.References;
 public class Getters {
 
 	/** Diese Klasse implementiert den leeren {@link Getter3}, der beim {@link #get(Object) Lesen} stets {@code null} liefert. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyGetter extends AbstractGetter<Object, Object> {
 
 		public static final Getter3<?, ?> INSTANCE = new EmptyGetter();
@@ -27,7 +26,6 @@ public class Getters {
 	}
 
 	/** Diese Klasse implementiert den neutralen {@link Getter3}, der beim {@link #get(Object) Lesen} stets den gegebenen Datensatz als Wert liefert. */
-	@SuppressWarnings ("javadoc")
 	public static class NeutralGetter extends AbstractGetter<Object, Object> {
 
 		public static final Getter3<?, ?> INSTANCE = new NeutralGetter();
@@ -45,12 +43,14 @@ public class Getters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class MethodGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		public final Method that;
 
+		public final boolean forceAccessible;
+
 		public MethodGetter(final Method that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
 			if (that.getParameterTypes().length != (Modifier.isStatic(that.getModifiers()) ? 1 : 0)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
@@ -73,7 +73,7 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}
@@ -83,12 +83,14 @@ public class Getters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class ConstructorGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		public final Constructor<?> that;
 
+		public final boolean forceAccessible;
+
 		public ConstructorGetter(final Constructor<?> that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
 			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
@@ -106,7 +108,7 @@ public class Getters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}
@@ -117,7 +119,6 @@ public class Getters {
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param <GValue2> Typ des zu übersetzenden Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class ConcatGetter<GItem, GValue, GValue2> extends AbstractGetter<GItem, GValue> {
 
 		public final Getter<? super GItem, ? extends GValue2> that;
@@ -150,7 +151,6 @@ public class Getters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class BufferedGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		private static interface Ref extends Producer<Object> {
@@ -293,7 +293,6 @@ public class Getters {
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param <GItem2> Typ der Elemente des iterierbaren Datensatzes sowie des Datensatzes des {@link #that lesenden} {@link Getter}.
 	 * @param <GValue2> Typ des Werts des {@link #that lesenden} {@link Getter}. */
-	@SuppressWarnings ("javadoc")
 	public static class AggregatedGetter<GItem extends Iterable<? extends GItem2>, GValue, GItem2, GValue2> extends AbstractGetter<GItem, GValue> {
 
 		/** Dieses Feld speichert den {@link Getter} zum Lesen des Werts eines Elements des interierbaren Datensatzes. */
@@ -343,7 +342,6 @@ public class Getters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class OptionalizedGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		public final Getter<? super GItem, GValue> that;
@@ -373,7 +371,6 @@ public class Getters {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class SynchronizedGetter<GItem, GValue> extends AbstractGetter<GItem, GValue> {
 
 		public final Getter<? super GItem, ? extends GValue> that;

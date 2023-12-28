@@ -12,7 +12,6 @@ public final class Fields {
 
 	/** Diese Klasse implementiert ein {@link Field2}, das beim {@link #get(Object) Lesen} stets {@code null} liefert und das {@link #set(Object, Object)
 	 * Schreiben} ignoriert. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyField extends AbstractField<Object, Object> {
 
 		public static final Field2<?, ?> INSTANCE = new EmptyField();
@@ -26,12 +25,14 @@ public final class Fields {
 	 * @see java.lang.reflect.Field#set(Object, Object)
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class NativeField<GItem, GValue> extends AbstractField<GItem, GValue> {
 
 		public final java.lang.reflect.Field that;
 
+		public final boolean forceAccessible;
+
 		public NativeField(final java.lang.reflect.Field target, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
 			this.that = forceAccessible ? Natives.forceAccessible(target) : Objects.notNull(target);
 		}
 
@@ -56,7 +57,7 @@ public final class Fields {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}
@@ -214,7 +215,6 @@ public final class Fields {
 	 *
 	 * @param <GItem> Typ des Datensatzes.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
-	@SuppressWarnings ("javadoc")
 	public static class SynchronizedField<GItem, GValue> extends AbstractField<GItem, GValue> {
 
 		public final Field<? super GItem, GValue> that;

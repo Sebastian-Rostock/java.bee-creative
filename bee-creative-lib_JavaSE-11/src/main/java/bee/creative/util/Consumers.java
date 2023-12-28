@@ -56,8 +56,11 @@ public class Consumers {
 
 		public final Method that;
 
+		public final boolean forceAccessible;
+
 		/** Dieser Konstruktor initialisiert Methode und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
 		public MethodConsumer(final Method that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
 			if (!Modifier.isStatic(that.getModifiers()) || (that.getParameterTypes().length != 1)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
@@ -73,7 +76,7 @@ public class Consumers {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}

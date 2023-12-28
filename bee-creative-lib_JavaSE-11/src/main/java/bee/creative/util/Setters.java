@@ -30,7 +30,10 @@ public class Setters {
 
 		public final Method that;
 
+		public final boolean forceAccessible;
+
 		public MethodSetter(final Method method, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
 			if (method.getParameterTypes().length != (Modifier.isStatic(method.getModifiers()) ? 2 : 1)) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(method) : Objects.notNull(method);
 		}
@@ -50,7 +53,7 @@ public class Setters {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}
@@ -260,7 +263,7 @@ public class Setters {
 	 * @see Setters#fromNative(Method, boolean) */
 	public static <GItem, GValue> Setter3<GItem, GValue> fromNative(final String memberPath, final boolean forceAccessible)
 		throws NullPointerException, IllegalArgumentException {
-		final Object object = Natives.parse(memberPath);
+		final var object = Natives.parse(memberPath);
 		if (object instanceof java.lang.reflect.Field) return Setters.fromNative((java.lang.reflect.Field)object, forceAccessible);
 		if (object instanceof Method) return Setters.fromNative((Method)object, forceAccessible);
 		throw new IllegalArgumentException();

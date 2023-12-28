@@ -13,7 +13,6 @@ public class Properties {
 
 	/** Diese Klasse implementiert ein {@link Property2}, das das {@link #set(Object) Schreiben} ignoriert und beim {@link #get() Lesen} stets {@code null}
 	 * liefert. */
-	@SuppressWarnings ("javadoc")
 	public static class EmptyProperty extends AbstractProperty<Object> {
 
 		public static final Property2<?> INSTANCE = new EmptyProperty();
@@ -24,7 +23,6 @@ public class Properties {
 	 * werden kann.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class ValueProperty<GValue> extends AbstractProperty<GValue> {
 
 		public GValue value;
@@ -55,7 +53,6 @@ public class Properties {
 	 * über das gegebene {@link Property} geschrieben.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class SetupProperty<GValue> extends AbstractProperty<GValue> {
 
 		public final Property<GValue> that;
@@ -92,13 +89,15 @@ public class Properties {
 	 * {@link java.lang.reflect.Field natives statisches Datenfeld} delegiert. *
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class NativeProperty<GValue> extends AbstractProperty<GValue> {
 
 		public final java.lang.reflect.Field that;
 
+		public final boolean forceAccessible;
+
 		/** Dieser Konstruktor initialisiert das Datenfeld und {@link Natives#forceAccessible(AccessibleObject) Zugreifbarkeit}. */
 		public NativeProperty(final java.lang.reflect.Field that, final boolean forceAccessible) throws NullPointerException, IllegalArgumentException {
+			this.forceAccessible = forceAccessible;
 			if (!Modifier.isStatic(that.getModifiers())) throw new IllegalArgumentException();
 			this.that = forceAccessible ? Natives.forceAccessible(that) : Objects.notNull(that);
 		}
@@ -124,7 +123,7 @@ public class Properties {
 
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.that, this.that.isAccessible());
+			return Objects.toInvokeString(this, this.that, this.forceAccessible);
 		}
 
 	}
@@ -133,7 +132,6 @@ public class Properties {
 	 * {@link #set(Object) Schreiben} an einen gegebenen {@link Consumer} delegiert.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class CompositeProperty<GValue> extends AbstractProperty<GValue> {
 
 		public final Producer<? extends GValue> get;
@@ -241,7 +239,6 @@ public class Properties {
 	 * Synchronisationsobjekt {@code null} ist, wird {@code this} verwendet.
 	 *
 	 * @param <GValue> Typ des Werts. */
-	@SuppressWarnings ("javadoc")
 	public static class SynchronizedProperty<GValue> extends AbstractProperty<GValue> {
 
 		public final Property<GValue> that;

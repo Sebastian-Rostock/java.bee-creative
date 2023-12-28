@@ -225,12 +225,12 @@ public class Translators {
 
 		@Override
 		public GTarget toTarget(Object object) throws ClassCastException, IllegalArgumentException {
-			return object == null ? this.that.toTarget(object) : null;
+			return object != null ? this.that.toTarget(object) : null;
 		}
 
 		@Override
 		public GSource toSource(Object object) throws ClassCastException, IllegalArgumentException {
-			return object == null ? this.that.toSource(object) : null;
+			return object != null ? this.that.toSource(object) : null;
 		}
 
 		@Override
