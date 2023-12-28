@@ -18,7 +18,7 @@ public final class H2QQ {
 
 	/** Dieser Konstruktor initialisiert den Namen der temporären Tabelle mit {@code null}. */
 	public H2QQ() {
-		this(null);
+		this.name = null;
 	}
 
 	/** Dieser Konstruktor initialisiert den Namen der temporären Tabelle über {@link H2QS#putTable()} und bestückt die Anfrage anschließend mit
@@ -95,6 +95,7 @@ public final class H2QQ {
 		var res = new StringBuilder(512);
 		this.query.trimToSize();
 		this.query.forEach(res::append);
+		// System.err.println(res);
 		return res.toString();
 	}
 

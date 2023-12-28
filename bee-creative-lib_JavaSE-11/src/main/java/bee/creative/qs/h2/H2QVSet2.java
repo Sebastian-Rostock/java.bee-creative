@@ -42,7 +42,7 @@ public class H2QVSet2 extends H2QVSet implements QVSet2 {
 		} else {
 			try {
 				var that = new H2QVSet2(owner, false);
-				try (var stmt = new H2QQ().push("INSERT INTO ").push(that.table).push(" (N) VALUES (?)").prepare(owner)) {
+				try (var stmt = new H2QQ().push("INSERT INTO ").push(that.table).push(" (V) VALUES (?)").prepare(owner)) {
 					for (var item: items) {
 						var value = owner.asQV(item);
 						stmt.setString(1, value);

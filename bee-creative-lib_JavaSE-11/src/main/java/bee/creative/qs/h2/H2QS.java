@@ -337,30 +337,7 @@ public class H2QS implements QS, AutoCloseable {
 
 	@Override
 	public H2QVSet2 newValues(Iterable<?> values) throws NullPointerException, IllegalArgumentException {
-		try {
-			if (values instanceof H2QVSet) {
-				var set = (H2QVSet)values;
-				if (set.owner == this) {
-					if (set instanceof H2QVSet2) return (H2QVSet2)set;
-					var res = new H2QVSet2(this);
-					new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT V FROM (").push(set).push(")").update(this);
-					return res;
-				}
-			}
-			var buf = new H2QVSet2(this);
-			try (var stmt = new H2QQ().push("INSERT INTO ").push(buf.table).push(" (V) VALUES (?)").prepare(this)) {
-				for (Object item: values) {
-					stmt.setString(1, this.asQV(item));
-					stmt.addBatch();
-				}
-				stmt.executeBatch();
-			}
-			var res = new H2QVSet2(this);
-			new H2QQ().push("INSERT INTO ").push(res.table).push(" SELECT DISTINCT * FROM ").push(buf.table).update(this);
-			return res;
-		} catch (SQLException cause) {
-			throw new IllegalStateException(cause);
-		}
+		return new H2QVSet2(this, values);
 	}
 
 	@Override
