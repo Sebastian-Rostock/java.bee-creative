@@ -157,7 +157,7 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	@Override
 	public H2QESet havingSubjects(QNSet subjects) throws NullPointerException, IllegalArgumentException {
 		var that = this.owner.asQNSet(subjects);
-		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(" WHERE S IN (SELECT N FROM (").push(that).push("))"));
+		return new H2QESet(this.owner, new H2QQ().push("SELECT * FROM (").push(this).push(") WHERE S IN (SELECT N FROM (").push(that).push("))"));
 	}
 
 	@Override
@@ -186,12 +186,6 @@ public class H2QESet extends H2QOSet<QE, QESet> implements QESet {
 	public H2QESet order() {
 		return new H2QESetOrder(this);
 	}
-
-	// /** {@inheritDoc} Sie ist eine Abkürzung für {@link #index(String) this.index("CPSO")}. */
-	// @Override
-	// public H2QESet index() {
-	// return this.index("CPSO");
-	// }
 
 	/** Diese Methode indiziert diese temporäre Menge zur schnelleren Suche über die gegebenen Spalten in der gegebenen Reihenfolge und gibt diese bzw. eine
 	 * derart indizierte temporäre Kopie zurück. Die Spaltenliste {@code cols} muss dazu aus den Zeichen {@code C}, {@code P}, {@code S} und {@code O} bestehen,
