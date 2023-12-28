@@ -29,7 +29,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QTSet order() {
-		return new H2QTSetOrder(this);
+		return new H2QTSetOrder(this, this.names);
 	}
 
 	/** Diese Methode indiziert diese Menge bezüglich der gegebenen Rollen in der gegebenen Reihenfolge und gibt {@code this} zurück. */
@@ -294,6 +294,6 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 		return this.owner.newTuple(keys);
 	}
 
-	final H2QTSetNames names;
+	private final H2QTSetNames names;
 
 }

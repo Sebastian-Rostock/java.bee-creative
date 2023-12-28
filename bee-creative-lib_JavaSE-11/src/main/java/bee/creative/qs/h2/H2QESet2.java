@@ -33,7 +33,7 @@ public class H2QESet2 extends H2QESet implements QESet2 {
 	@Override
 	public boolean deleteAll(Iterable<? extends QE> items) throws NullPointerException, IllegalArgumentException {
 		var that = this.toQESet(items);
-		return new H2QQ().push("DELETE FROM ").push(this.table).push(" AS A WHERE EXISTS ((").push(that)
+		return new H2QQ().push("DELETE FROM ").push(this.table).push(" AS A WHERE EXISTS (SELECT 1 FROM (").push(that)
 			.push(") AS B WHERE A.C=B.C AND A.P=B.P AND A.S=B.S AND A.O=B.O)").update(this.owner);
 	}
 

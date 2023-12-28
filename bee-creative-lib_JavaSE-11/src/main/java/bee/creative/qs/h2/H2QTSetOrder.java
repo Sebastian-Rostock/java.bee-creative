@@ -7,13 +7,9 @@ class H2QTSetOrder extends H2QTSet {
 		return this;
 	}
 
-	H2QTSetOrder(H2QTSet that) {
-		super(that.owner, that.names, new H2QQ());
-		var size = this.names().size();
-		var qry = this.table.push("SELECT * FROM (").push(that).push(") ORDER BY C0");
-		for (var i = 1; i < size; i++) {
-			qry.push(", C").push(i);
-		}
+	H2QTSetOrder(H2QTSet that, H2QTSetNames names) {
+		super(that.owner, names, new H2QQ());
+		this.table.push("SELECT * FROM (").push(that).push(") ORDER BY C0").push(1, names.size(), (q, i) -> q.push(", C").push(i));
 	}
 
 }
