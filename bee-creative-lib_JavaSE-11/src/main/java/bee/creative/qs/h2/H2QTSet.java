@@ -111,10 +111,7 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 
 	@Override
 	public H2QESet edges(int context, int predicate, int subject, int object) throws NullPointerException, IllegalArgumentException {
-		this.name(context);
-		this.name(predicate);
-		this.name(subject);
-		this.name(object);
+		this.names(context, predicate, subject, object);
 		return new H2QESet(this.owner, new H2QQ().push("SELECT DISTINCT C").push(context).push(" AS C, C").push(predicate).push(" AS P, C").push(subject)
 			.push("AS S, C").push(object).push(" AS O FROM (").push(this).push(")"));
 	}
@@ -171,13 +168,8 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	@Override
 	public H2QTSet select(int... roles) throws NullPointerException, IllegalArgumentException {
 		var names = new H2QTSetNames(this.names(roles));
-		var size = names.size();
-		var qry = new H2QQ().push("SELECT DISTINCT C").push(roles[0]).push(" AS C0");
-		for (var i = 1; i < size; i++) {
-			qry.push(", C").push(roles[i]).push(" AS C").push(i);
-		}
-		qry.push(" FROM (").push(this).push(")");
-		return new H2QTSet(this.owner, names, qry);
+		return new H2QTSet(this.owner, names, new H2QQ().push("SELECT DISTINCT C").push(roles[0]).push(" AS C0")
+			.push(1, names.size(), (q, i) -> q.push(", C").push(roles[i]).push(" AS C").push(i)).push(" FROM (").push(this).push(")"));
 	}
 
 	@Override
@@ -220,19 +212,10 @@ public class H2QTSet extends H2QOSet<QT, QTSet> implements QTSet {
 	public H2QTSet withNodes(int role, QNSet nodes) throws NullPointerException, IllegalArgumentException {
 		this.name(role);
 		var that = this.owner.asQTSet(nodes);
-		var size = this.names.size();
-		var qry = new H2QQ().push(role != 0 ? "SELECT DISTINCT A.C0" : "SELECT DISTINCT B.N AS C0");
-		for (var i = 1; i < role; i++) {
-			qry.push(", A.C").push(i);
-		}
-		if (role != 0) {
-			qry.push(", B.N AS C").push(role);
-		}
-		for (var i = role + 1; i < size; i++) {
-			qry.push(", A.C").push(i);
-		}
-		qry.push(" FROM (").push(this).push(") AS A, (").push(that).push(") AS B");
-		return new H2QTSet(this.owner, this.names, qry);
+		return new H2QTSet(this.owner, this.names,
+			new H2QQ().push(role != 0 ? "SELECT DISTINCT A.C0" : "SELECT DISTINCT B.N AS C0").push(1, role, (q, i) -> q.push(", A.C").push(i))
+				.push(role != 0, q -> q.push(", B.N AS C").push(role)).push(role + 1, this.names.size(), (q, i) -> q.push(", A.C").push(i)).push(" FROM (").push(this)
+				.push(") AS A, (").push(that).push(") AS B"));
 	}
 
 	@Override

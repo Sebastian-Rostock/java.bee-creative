@@ -81,8 +81,8 @@ public class H2DS implements DS, AutoCloseable {
 
 	private HashMap2<String, H2QN> createInstallMap() throws IllegalStateException {
 		var itemNodeByIdentNodeMap = new HashMap2<QN, QN>(100);
-		this.store.edges().havingContext(this.domain).havingPredicate(this.domain).forEach(edge -> {
-			if (itemNodeByIdentNodeMap.put(edge.subject(), edge.object()) != null) throw new IllegalStateException();
+		this.store.edges().havingContext(this.domain).havingSubject(this.domain).forEach(edge -> {
+			if (itemNodeByIdentNodeMap.put(edge.predicate(), edge.object()) != null) throw new IllegalStateException();
 		});
 		if (itemNodeByIdentNodeMap.size() != itemNodeByIdentNodeMap.values().iterator().toSet().size()) throw new IllegalStateException();
 		var installMap = new HashMap2<String, H2QN>(itemNodeByIdentNodeMap.size());

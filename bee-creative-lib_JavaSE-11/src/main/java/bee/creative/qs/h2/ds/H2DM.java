@@ -74,12 +74,16 @@ public class H2DM implements DM {
 	public H2DT getType(String ident) {
 		if (this.typeMap == null) {
 			this.typeMap = new HashMap2<>(100);
-			this.setupItemMap(this.typeMap, this.getLink(DT.IDENT_IsTypeWithIdent), this::asType, value -> "DT with ident " + value + " is not unique");
+			var identLink = this.getLink(DT.IDENT_IsTypeWithIdent);
+			if (identLink == null) return null;
+			this.setupItemMap(this.typeMap, identLink, this::asType, value -> "DT with ident " + value + " is not unique");
 		}
 		return this.typeMap.get(ident);
 	}
 
 	public void install() {
+		getType(null);
+
 		this.installType(DT.IDENT_IsType, "domain-type");
 		this.installType(DL.IDENT_IsLink, "domain-link");
 

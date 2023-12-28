@@ -43,7 +43,7 @@ public class H2QS implements QS, AutoCloseable {
 		new H2QQ().push("" + //
 			"CREATE SEQUENCE IF NOT EXISTS QT_SEQ;" + //
 			"CREATE SEQUENCE IF NOT EXISTS QN_SEQ;" + //
-			"CREATE TABLE IF NOT EXISTS QN (N BIGINT NOT NULL, V VARCHAR(1G) NOT NULL, PRIMARY KEY (N));" + //
+			"CREATE TABLE IF NOT EXISTS QN (N BIGINT NOT NULL DEFAULT NEXT VALUE FOR QN_SEQ, V VARCHAR(1G) NOT NULL, PRIMARY KEY (N));" + //
 			"CREATE TABLE IF NOT EXISTS QE (C BIGINT NOT NULL, P BIGINT NOT NULL, S BIGINT NOT NULL, O BIGINT NOT NULL, PRIMARY KEY (C, P, S, O));" + //
 			"CREATE UNIQUE INDEX IF NOT EXISTS QN_INDEX_V ON QN (V);" + //
 			"CREATE INDEX IF NOT EXISTS QE_INDEX_CPO ON QE (C, P, O, S);" + //
@@ -59,7 +59,7 @@ public class H2QS implements QS, AutoCloseable {
 		this.getQV = this.conn.prepareStatement("SELECT V FROM QN WHERE N=?");
 		this.getQE = this.conn.prepareStatement("SELECT TOP 1 * FROM QE WHERE C=? AND P=? AND S=? AND O=?");
 		this.putQN = this.conn.prepareStatement("SELECT NEXT VALUE FOR QN_SEQ");
-		this.putQV = this.conn.prepareStatement("MERGE INTO QN (N, V) KEY (V) VALUES (NEXT VALUE FOR QN_SEQ, ?)");
+		this.putQV = this.conn.prepareStatement("MERGE INTO QN (V) KEY (V) VALUES (?)");
 		this.putQE = this.conn.prepareStatement("MERGE INTO QE (C, P, S, O) VALUES (?, ?, ?, ?)");
 		this.putQT = this.conn.prepareStatement("SELECT NEXT VALUE FOR QT_SEQ");
 		this.popQN = this.conn.prepareStatement("DELETE FROM QE WHERE C=?1 OR P=?1 OR S=?1 OR O=?1");

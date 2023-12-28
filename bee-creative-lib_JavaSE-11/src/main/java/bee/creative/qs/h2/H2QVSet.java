@@ -15,8 +15,8 @@ public class H2QVSet extends H2QOSet<String, QVSet> implements QVSet {
 
 	@Override
 	public boolean putAll() {
-		return this.owner
-			.markPutValue(new H2QQ().push("MERGE INTO QN (N, V) KEY (V) SELECT NEXT VALUE FOR QN_SEQ AS N, V FROM (").push(this).push(")").update(this.owner));
+		return this.owner.markPutValue(new H2QQ().push("MERGE INTO QN A USING (").push(this)
+			.push(") B ON A.V=B.V WHEN NOT MATCHED THEN INSERT (N, V) VALUES (SELECT NEXT VALUE FOR QN_SEQ AS N, V)").update(this.owner));
 	}
 
 	@Override
